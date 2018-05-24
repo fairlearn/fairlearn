@@ -372,6 +372,6 @@ def expgrad(dataX, dataA, dataY, learner, cons_class=moments.DP, eps=0.01,
         print("...last_t=%d, best_t=%d, best_gap=%.6f"
               ", n_oracle_calls=%d, n_hs=%d"
               % (res.last_t, res.best_t, res.best_gap,
-                 res.n_oracle_calls, res.n_classifiers))
+                 res.n_oracle_calls, len(res.classifiers)))
 
     return res
