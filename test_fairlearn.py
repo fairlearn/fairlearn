@@ -85,13 +85,19 @@ if __name__ == '__main__':
 
     for test in tests:
         res_tuple = red.expgrad(dataX, dataA, dataY, learner,
-                                cons_class=test["cons_class"], eps=test["eps"])
+                                cons=test["cons_class"](), eps=test["eps"])
         res = res_tuple._asdict()
         Q = res["best_classifier"]
         res["n_classifiers"] = len(res["classifiers"])
+
+        disp = test["cons_class"]()
+        disp.init(dataX, dataA, dataY)
+
+        error = moments.MisclassError()
+        error.init(dataX, dataA, dataY)
         
-        res["disp"] = test["cons_class"](dataX, dataA, dataY).gamma(Q).max()
-        res["error"] = moments.MisclassError(dataX, dataA, dataY).gamma(Q)[0]
+        res["disp"] = disp.gamma(Q).max()
+        res["error"] = error.gamma(Q)[0]
         report_header = "testing (%s, eps=%.3f)" \
                         % (test["cons_class"].short_name, test["eps"])
         report_list = []

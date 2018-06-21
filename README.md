@@ -2,9 +2,13 @@
 
 A python package that implements the black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453).
 
-## Usage
+## Installation
 
-Clone the repository locally `git clone git@github.com:Microsoft/fairlearn.git`. Verify that the package works by running `python test_fairlearn.py` in the root.
+The package can be installed via `pip install fairlearn`. To verify that it works, download `test_fairlearn.py` from the repository and run `python test_fairlearn.py`.
+
+Instead of installing the package, you can clone the repository locally via `git clone git@github.com:Microsoft/fairlearn.git`. To verify that the package works, run `python test_fairlearn.py` in the root of the repository.
+
+## Usage
 
 The function `expgrad` in the module `fairlearn.classred` implements the reduction of fair classification to weighted binary classification. Any learner that supports weighted binary classification can be provided as input for this reduction. Two common fairness definitions are provided in the module `fairlearn.moments`: demographic parity (class `DP`) and equalized odds (class `EO`). See the file `test_fairlearn.py` for example usage of `expgrad`.
 

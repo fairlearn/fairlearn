@@ -41,11 +41,13 @@ class _GapResult:
 
 class _Lagrangian:
     # Operations related to the Lagrangian
-    def __init__(self, dataX, dataA, dataY, learner, cons_class, eps, B,
+    def __init__(self, dataX, dataA, dataY, learner, cons, eps, B,
                  opt_lambda=True, debug=False):
         self.X = dataX
-        self.obj = moments.MisclassError(dataX, dataA, dataY)
-        self.cons = cons_class(dataX, dataA, dataY)
+        self.obj = moments.MisclassError()
+        self.obj.init(dataX, dataA, dataY)
+        self.cons = cons
+        self.cons.init(dataX, dataA, dataY)
         self.pickled_learner = pickle.dumps(learner)
         self.eps = eps
         self.B = B
@@ -216,7 +218,7 @@ _MIN_T = 5
 _RUN_LP_STEP = True
 
 
-def expgrad(dataX, dataA, dataY, learner, cons_class=moments.DP, eps=0.01,
+def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
             T=50, nu=None, eta_mul=2.0, debug=False):
     """
     Return a fair classifier under specified fairness constraints
@@ -233,7 +235,7 @@ def expgrad(dataX, dataA, dataY, learner, cons_class=moments.DP, eps=0.01,
                  predict(X) are in {0,1}
 
     Optional keyword arguments:
-      cons_class -- the fairness measure (default moments.DP)
+      cons -- the fairness measure (default moments.DP())
       eps -- allowed fairness constraint violation (default 0.01)
       T -- max number of iterations (default 50)
       nu -- convergence threshold for the duality gap (default None,
@@ -272,7 +274,7 @@ def expgrad(dataX, dataA, dataY, learner, cons_class=moments.DP, eps=0.01,
         print("...EG STARTING")
 
     B = 1/eps
-    lagr = _Lagrangian(dataX, dataA, dataY, learner, cons_class, eps, B,
+    lagr = _Lagrangian(dataX, dataA, dataY, learner, cons, eps, B,
                        debug=debug)
 
     theta  = pd.Series(0, lagr.cons.index)

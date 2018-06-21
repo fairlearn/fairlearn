@@ -7,11 +7,17 @@ __all__ = ["DP", "EO"]
 
 class Moment:
     """Generic moment"""
-    
-    def __init__(self, dataX, dataA, dataY):
+
+    def __init__(self):
+        self.initialized = False
+
+    def init(self, dataX, dataA, dataY):
+        assert self.initialized==False, \
+            "moments can be initialized only once"
         self.X = dataX
         self.tags = pd.DataFrame({"attr": dataA, "label": dataY})
         self.n = dataX.shape[0]
+        self.initialized = True
         self._gamma_descr = None
 
 
@@ -19,8 +25,8 @@ class MisclassError(Moment):
     """Misclassification error"""
     short_name = "Err"
 
-    def __init__(self, dataX, dataA, dataY):
-        super().__init__(dataX, dataA, dataY)
+    def init(self, dataX, dataA, dataY):
+        super().init(dataX, dataA, dataY)
         self.index = ["all"]
 
     def gamma(self, predictor):
@@ -40,8 +46,8 @@ class MisclassError(Moment):
 class _CondOpportunity(Moment):
     """Generic fairness metric including DP and EO"""
 
-    def __init__(self, dataX, dataA, dataY, dataGrp):
-        super().__init__(dataX, dataA, dataY)
+    def init(self, dataX, dataA, dataY, dataGrp):
+        super().init(dataX, dataA, dataY)
         self.tags["grp"] = dataGrp
         self.prob_grp = self.tags.groupby("grp").size()/self.n
         self.prob_attr_grp = self.tags.groupby(["grp", "attr"]).size()/self.n
@@ -77,14 +83,14 @@ class DP(_CondOpportunity):
     """Demographic parity"""
     short_name = "DP"
 
-    def __init__(self, dataX, dataA, dataY):
-        super().__init__(dataX, dataA, dataY,
-                         dataY.apply(lambda y : "all"))
+    def init(self, dataX, dataA, dataY):
+        super().init(dataX, dataA, dataY,
+                     dataY.apply(lambda y : "all"))
 
 class EO(_CondOpportunity):
     """Equalized odds"""
     short_name = "EO"
     
-    def __init__(self, dataX, dataA, dataY):
-        super().__init__(dataX, dataA, dataY,
-                         dataY.apply(lambda y : "label="+str(y)))
+    def init(self, dataX, dataA, dataY):
+        super().init(dataX, dataA, dataY,
+                     dataY.apply(lambda y : "label="+str(y)))
