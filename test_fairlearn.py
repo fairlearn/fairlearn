@@ -12,10 +12,10 @@ import fairlearn.classred as red
 print = functools.partial(print, flush=True)
 
 
-class LeastSquaresLearner:    
+class LeastSquaresLearner:
     def __init__(self):
         self.weights = None
-        
+
     def fit(self, X, Y, W):
         sqrtW = np.sqrt(W)
         matX = np.array(X) * sqrtW[:, np.newaxis]
@@ -25,50 +25,53 @@ class LeastSquaresLearner:
 
     def predict(self, X):
         pred = X.dot(self.weights)
-        return 1*(pred>0.5)
+        return 1*(pred > 0.5)
 
 
-tests = [ {"cons_class": moments.DP, "eps": 0.100, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.100000, "error": 0.250000,
-           "n_oracle_calls":  32, "n_classifiers": 3},
-          {"cons_class": moments.DP, "eps": 0.050, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.050000,
-           "error": 0.266522, "n_oracle_calls":  23, "n_classifiers": 6},
-          {"cons_class": moments.DP, "eps": 0.020, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.020000, "error": 0.332261,
-           "n_oracle_calls":  22, "n_classifiers": 5},
-          {"cons_class": moments.DP, "eps": 0.010, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.010000, "error": 0.354174,
-           "n_oracle_calls":  22, "n_classifiers": 5},
-          {"cons_class": moments.DP, "eps": 0.005, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.005000, "error": 0.365130,
-           "n_oracle_calls":  22, "n_classifiers": 5},
-          {"cons_class": moments.EO, "eps": 0.100, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.100000, "error": 0.309333,
-           "n_oracle_calls":  21, "n_classifiers": 4},
-          {"cons_class": moments.EO, "eps": 0.050, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.050000, "error": 0.378827,
-           "n_oracle_calls":  19, "n_classifiers": 6},
-          {"cons_class": moments.EO, "eps": 0.020, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.020000, "error": 0.421531,
-           "n_oracle_calls":  19, "n_classifiers": 6},
-          {"cons_class": moments.EO, "eps": 0.010, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.010000, "error": 0.435765,
-           "n_oracle_calls":  19, "n_classifiers": 6},
-          {"cons_class": moments.EO, "eps": 0.005, "best_gap": 0.000000,
-           "last_t": 5, "best_t": 5, "disp": 0.005000, "error": 0.442883,
-           "n_oracle_calls":  19, "n_classifiers": 6},
-        ]
+tests = [{"cons_class": moments.DP, "eps": 0.100, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.100000, "error": 0.250000,
+          "n_oracle_calls":  32, "n_classifiers": 3},
+         {"cons_class": moments.DP, "eps": 0.050, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.050000,
+          "error": 0.266522, "n_oracle_calls":  23, "n_classifiers": 6},
+         {"cons_class": moments.DP, "eps": 0.020, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.020000, "error": 0.332261,
+          "n_oracle_calls":  22, "n_classifiers": 5},
+         {"cons_class": moments.DP, "eps": 0.010, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.010000, "error": 0.354174,
+          "n_oracle_calls":  22, "n_classifiers": 5},
+         {"cons_class": moments.DP, "eps": 0.005, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.005000, "error": 0.365130,
+          "n_oracle_calls":  22, "n_classifiers": 5},
+         {"cons_class": moments.EO, "eps": 0.100, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.100000, "error": 0.309333,
+          "n_oracle_calls":  21, "n_classifiers": 4},
+         {"cons_class": moments.EO, "eps": 0.050, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.050000, "error": 0.378827,
+          "n_oracle_calls":  19, "n_classifiers": 6},
+         {"cons_class": moments.EO, "eps": 0.020, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.020000, "error": 0.421531,
+          "n_oracle_calls":  19, "n_classifiers": 6},
+         {"cons_class": moments.EO, "eps": 0.010, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.010000, "error": 0.435765,
+          "n_oracle_calls":  19, "n_classifiers": 6},
+         {"cons_class": moments.EO, "eps": 0.005, "best_gap": 0.000000,
+          "last_t": 5, "best_t": 5, "disp": 0.005000, "error": 0.442883,
+          "n_oracle_calls":  19, "n_classifiers": 6},
+         ]
 
 _PRECISION = 1e-6
+
 
 def test_res_float(key, res, test, report_list):
     if abs(res[key]-test[key]) > _PRECISION:
         report_list.append("%s_diff=%e" % (key, res[key]-test[key]))
 
+
 def test_res_int(key, res, test, report_list):
     if abs(res[key]-test[key]) > 0:
-        report_list.append("%s_diff=%d" % (key, res[key]-test[key]))        
+        report_list.append("%s_diff=%d" % (key, res[key]-test[key]))
+
 
 if __name__ == '__main__':
     attrs = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
@@ -95,7 +98,7 @@ if __name__ == '__main__':
 
         error = moments.MisclassError()
         error.init(dataX, dataA, dataY)
-        
+
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
         report_header = "testing (%s, eps=%.3f)" \
