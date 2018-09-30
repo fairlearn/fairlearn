@@ -115,7 +115,7 @@ class _Lagrangian:
                 print("%smul=%.0f" % (" "*9, mul))
             L_low_mul, tmp, tmp, tmp \
                 = self.eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
-            if (L_low_mul < res.L_low):
+            if L_low_mul < res.L_low:
                 res.L_low = L_low_mul
             if res.gap() > nu+_PRECISION:
                 break
