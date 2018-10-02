@@ -1,6 +1,6 @@
 # Reductions for Fair Machine Learning
 
-A python package that implements the black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453).
+A Python package that implements the black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453).
 
 ## Installation
 
