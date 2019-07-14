@@ -4,9 +4,9 @@ A Python package that implements the black-box approach to fair classification d
 
 ## Installation
 
-The package can be installed via `pip install fairlearn`. To verify that it works, download `test_fairlearn.py` from the repository and run `python test_fairlearn.py`.
+The package can be installed via `pip install fairlearn`. To verify that it works, download `test_fairlearn_smoke.py` from the repository and run `py.test test_fairlearn_smoke.py`.
 
-Instead of installing the package, you can clone the repository locally via `git clone git@github.com:Microsoft/fairlearn.git`. To verify that the package works, run `python test_fairlearn.py` in the root of the repository.
+Instead of installing the package, you can clone the repository locally via `git clone git@github.com:Microsoft/fairlearn.git`. To verify that the package works, run `py.test test_fairlearn_smoke.py` in the root of the repository.
 
 ## Usage
 
@@ -38,7 +38,7 @@ fairlearn is maintained by:
 If you are the current maintainer of this project:
 
 1. Create a branch for the release: `git checkout -b release-vxx.xx`
-1. Ensure that all tests return "ok": `python test_fairlearn.py`
+1. Ensure that all tests return "ok": `py.test test_fairlearn_smoke.py`
 1. Bump the module version in `fairlearn/__init__.py`
 1. Make a pull request to Microsoft/fairlearn
 1. Merge Microsoft/fairlearn pull request
