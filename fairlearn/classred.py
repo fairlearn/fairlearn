@@ -218,7 +218,7 @@ _MIN_T = 5
 _RUN_LP_STEP = True
 
 
-def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
+def expgrad(dataX, dataA, dataY, learner, cons=moments.DemographicParity(), eps=0.01,
             T=50, nu=None, eta_mul=2.0, debug=False):
     """
     Return a fair classifier under specified fairness constraints
@@ -235,7 +235,7 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
                  predict(X) are in {0,1}
 
     Optional keyword arguments:
-      cons -- the fairness measure (default moments.DP())
+      cons -- the fairness measure (default moments.DemographicParity())
       eps -- allowed fairness constraint violation (default 0.01)
       T -- max number of iterations (default 50)
       nu -- convergence threshold for the duality gap (default None,

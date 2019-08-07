@@ -3,7 +3,7 @@
 
 import pandas as pd
 
-__all__ = ["DP", "EO"]
+__all__ = ["DemographicParity", "EqualizedOdds"]
 
 
 class Moment:
@@ -45,7 +45,7 @@ class MisclassError(Moment):
 
 
 class _CondOpportunity(Moment):
-    """Generic fairness metric including DP and EO"""
+    """Generic fairness metric including DemographicParity and EqualizedOdds"""
 
     def init(self, dataX, dataA, dataY, dataGrp):
         super().init(dataX, dataA, dataY)
@@ -80,7 +80,7 @@ class _CondOpportunity(Moment):
         return signed_weights
 
 
-class DP(_CondOpportunity):
+class DemographicParity(_CondOpportunity):
     """Demographic parity"""
     short_name = "DP"
 
@@ -89,7 +89,7 @@ class DP(_CondOpportunity):
                      dataY.apply(lambda y: "all"))
 
 
-class EO(_CondOpportunity):
+class EqualizedOdds(_CondOpportunity):
     """Equalized odds"""
     short_name = "EO"
 
