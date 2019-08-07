@@ -258,7 +258,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
       n_oracle_calls -- how many times the learner was called
     """
 
-    exponentiated_gradient_reductionResult = namedtuple("ExgradResult",
+    exponentiated_gradient_reduction_result = namedtuple("ExgradResult",
                                "best_classifier best_gap classifiers weights"
                                " last_t best_t n_oracle_calls")
 
@@ -269,7 +269,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
         "the number of rows in all data fields must match"
 
     if debug:
-        print("...EG STARTING")
+        print("...Exponentiated Gradient STARTING")
 
     B = 1/eps
     lagrangian = _Lagrangian(dataX, dataA, dataY, learner, constraints, eps, B,
@@ -358,13 +358,14 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
     best_classifier = lambda X: _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
 
-    result = exponentiated_gradient_reductionResult(best_classifier=best_classifier,
-                        best_gap=best_gap,
-                        classifiers=lagrangian.classifiers,
-                        weights=weights,
-                        last_t=last_t,
-                        best_t=best_t,
-                        n_oracle_calls=lagrangian.n_oracle_calls)
+    result = exponentiated_gradient_reduction_result(
+        best_classifier=best_classifier,
+        best_gap=best_gap,
+        classifiers=lagrangian.classifiers,
+        weights=weights,
+        last_t=last_t,
+        best_t=best_t,
+        n_oracle_calls=lagrangian.n_oracle_calls)
 
     if debug:
         print("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
