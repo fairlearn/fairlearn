@@ -41,13 +41,13 @@ class _GapResult:
 
 class _Lagrangian:
     # Operations related to the Lagrangian
-    def __init__(self, dataX, dataA, dataY, learner, cons, eps, B,
+    def __init__(self, dataX, dataA, dataY, learner, constraints, eps, B,
                  opt_lambda=True, debug=False):
         self.X = dataX
         self.obj = moments.MisclassError()
         self.obj.init(dataX, dataA, dataY)
-        self.cons = cons
-        self.cons.init(dataX, dataA, dataY)
+        self.constraints = constraints
+        self.constraints.init(dataX, dataA, dataY)
         self.pickled_learner = pickle.dumps(learner)
         self.eps = eps
         self.B = B
@@ -96,7 +96,7 @@ class _Lagrangian:
 
         if callable(h):
             error = self.obj.gamma(h)[0]
-            gamma = self.cons.gamma(h)
+            gamma = self.constraints.gamma(h)
         else:
             error = self.errors[h.index].dot(h)
             gamma = self.gammas[h.index].dot(h)
@@ -123,13 +123,13 @@ class _Lagrangian:
 
     def solve_linprog(self, nu):
         n_hs = len(self.hs)
-        n_cons = len(self.cons.index)
+        n_constraints = len(self.constraints.index)
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_res
         c = np.concatenate((self.errors, [self.B]))
         A_ub = np.concatenate(
-            (self.gammas-self.eps, -np.ones((n_cons, 1))), axis=1)
-        b_ub = np.zeros(n_cons)
+            (self.gammas-self.eps, -np.ones((n_constraints, 1))), axis=1)
+        b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate(
             (np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
@@ -140,10 +140,10 @@ class _Lagrangian:
             (-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
         dual_bounds = [
-            (None, None) if i == n_cons else (0, None) for i in range(n_cons+1)]
+            (None, None) if i == n_constraints else (0, None) for i in range(n_constraints+1)]
         res_dual = opt.linprog(dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub,
                                bounds=dual_bounds)
-        lambda_vec = pd.Series(res_dual.x[:-1], self.cons.index)
+        lambda_vec = pd.Series(res_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
         self.last_linprog_res = (h, lambda_vec,
                                  self.eval_gap(h, lambda_vec, nu))
@@ -154,7 +154,7 @@ class _Lagrangian:
         # for the vector of Lagrange multipliers lambda_vec.
 
         signed_weights = self.obj.signed_weights() \
-                         + self.cons.signed_weights(lambda_vec)
+                         + self.constraints.signed_weights(lambda_vec)
         redY = 1*(signed_weights > 0)
         redW = signed_weights.abs()
         redW = self.n*redW/redW.sum()
@@ -165,7 +165,7 @@ class _Lagrangian:
 
         h = lambda X: classifier.predict(X)
         h_error = self.obj.gamma(h)[0]
-        h_gamma = self.cons.gamma(h)
+        h_gamma = self.constraints.gamma(h)
         h_val = h_error + h_gamma.dot(lambda_vec)
 
         if not self.hs.empty:
@@ -218,10 +218,10 @@ _MIN_T = 5
 _RUN_LP_STEP = True
 
 
-def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, cons=moments.DemographicParity(), eps=0.01,
+def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=moments.DemographicParity(), eps=0.01,
             T=50, nu=None, eta_mul=2.0, debug=False):
     """
-    Return a fair classifier under specified fairness constraints
+    Return a fair classifier under specified fairness constraintstraints
     via exponentiated-gradient reduction.
 
     Required input arguments:
@@ -235,7 +235,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, cons=moments.
                  predict(X) are in {0,1}
 
     Optional keyword arguments:
-      cons -- the fairness measure (default moments.DemographicParity())
+      constraints -- the fairness measure (default moments.DemographicParity())
       eps -- allowed fairness constraint violation (default 0.01)
       T -- max number of iterations (default 50)
       nu -- convergence threshold for the duality gap (default None,
@@ -274,10 +274,10 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, cons=moments.
         print("...EG STARTING")
 
     B = 1/eps
-    lagr = _Lagrangian(dataX, dataA, dataY, learner, cons, eps, B,
+    lagr = _Lagrangian(dataX, dataA, dataY, learner, constraints, eps, B,
                        debug=debug)
 
-    theta = pd.Series(0, lagr.cons.index)
+    theta = pd.Series(0, lagr.constraints.index)
     Qsum = pd.Series()
     lambdas = pd.DataFrame()
     gaps_EG = []
