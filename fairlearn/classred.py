@@ -360,7 +360,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, cons=moments.
     best_classifier = lambda X: _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
 
-    res = exponentiated_gradient_reductionResult(best_classifier=best_classifier,
+    result = exponentiated_gradient_reductionResult(best_classifier=best_classifier,
                         best_gap=best_gap,
                         classifiers=lagr.classifiers,
                         weights=weights,
@@ -373,7 +373,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, cons=moments.
               % (eps, B, nu, T, eta_min))
         print("...last_t=%d, best_t=%d, best_gap=%.6f"
               ", n_oracle_calls=%d, n_hs=%d"
-              % (res.last_t, res.best_t, res.best_gap,
-                 res.n_oracle_calls, len(res.classifiers)))
+              % (result.last_t, result.best_t, result.best_gap,
+                 result.n_oracle_calls, len(result.classifiers)))
 
-    return res
+    return result
