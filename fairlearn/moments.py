@@ -16,7 +16,7 @@ class Moment:
         assert self.initialized is False, \
             "moments can be initialized only once"
         self.X = dataX
-        self.tags = pd.DataFrame({"attr": dataA, "label": dataY})
+        self.tags = pd.DataFrame({"protected_attribute": dataA, "label": dataY})
         self.n = dataX.shape[0]
         self.initialized = True
         self._gamma_descr = None
@@ -51,22 +51,22 @@ class _CondOpportunity(Moment):
         super().init(dataX, dataA, dataY)
         self.tags["grp"] = dataGrp
         self.prob_grp = self.tags.groupby("grp").size()/self.n
-        self.prob_attr_grp = self.tags.groupby(["grp", "attr"]).size()/self.n
+        self.prob_attr_grp = self.tags.groupby(["grp", "protected_attribute"]).size()/self.n
         signed = pd.concat([self.prob_attr_grp, self.prob_attr_grp],
                            keys=["+", "-"],
-                           names=["sign", "grp", "attr"])
+                           names=["sign", "grp", "protected_attribute"])
         self.index = signed.index
 
     def gamma(self, predictor):
         pred = predictor(self.X)
         self.tags["pred"] = pred
         expect_grp = self.tags.groupby("grp").mean()
-        expect_attr_grp = self.tags.groupby(["grp", "attr"]).mean()
+        expect_attr_grp = self.tags.groupby(["grp", "protected_attribute"]).mean()
         expect_attr_grp["diff"] = expect_attr_grp["pred"] - expect_grp["pred"]
         g_unsigned = expect_attr_grp["diff"]
         g_signed = pd.concat([g_unsigned, -g_unsigned],
                              keys=["+", "-"],
-                             names=["sign", "grp", "attr"])
+                             names=["sign", "grp", "protected_attribute"])
         self._gamma_descr = str(expect_attr_grp[["pred", "diff"]])
         return g_signed
 
@@ -75,7 +75,7 @@ class _CondOpportunity(Moment):
         adjust = lambda_signed.sum(level="grp")/self.prob_grp \
                  - lambda_signed/self.prob_attr_grp
         signed_weights = self.tags.apply(
-            lambda row: adjust[row["grp"], row["attr"]], axis=1
+            lambda row: adjust[row["grp"], row["protected_attribute"]], axis=1
         )
         return signed_weights
 
