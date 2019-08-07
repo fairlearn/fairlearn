@@ -87,7 +87,7 @@ if __name__ == '__main__':
     learner = LeastSquaresLearner()
 
     for test in tests:
-        res_tuple = red.expgrad(dataX, dataA, dataY, learner,
+        res_tuple = red.exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
                                 cons=test["cons_class"](), eps=test["eps"])
         res = res_tuple._asdict()
         Q = res["best_classifier"]

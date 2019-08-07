@@ -10,7 +10,7 @@ Instead of installing the package, you can clone the repository locally via `git
 
 ## Usage
 
-The function `expgrad` in the module `fairlearn.classred` implements the reduction of fair classification to weighted binary classification. Any learner that supports weighted binary classification can be provided as input for this reduction. Two common fairness definitions are provided in the module `fairlearn.moments`: demographic parity (class `DemographicParity`) and equalized odds (class `EqualizedOdds`). See the file `test_fairlearn.py` for example usage of `expgrad`.
+The function `exponentiated_gradient_reduction` in the module `fairlearn.classred` implements the reduction of fair classification to weighted binary classification. Any learner that supports weighted binary classification can be provided as input for this reduction. Two common fairness definitions are provided in the module `fairlearn.moments`: demographic parity (class `DemographicParity`) and equalized odds (class `EqualizedOdds`). See the file `test_fairlearn.py` for example usage of `exponentiated_gradient_reduction`.
 
 ## Contributing
 

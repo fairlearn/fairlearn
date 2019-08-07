@@ -6,12 +6,12 @@ This module implements the Lagrangian reduction of fair binary
 classification to standard binary classification.
 
 FUNCTIONS
-expgrad -- optimize accuracy subject to fairness constraints
+exponentiated_gradient_reduction -- optimize accuracy subject to fairness constraints
 """
 
 from __future__ import print_function
 
-__all__ = ["expgrad"]
+__all__ = ["exponentiated_gradient_reduction"]
 
 import numpy as np
 import scipy.optimize as opt
@@ -198,7 +198,7 @@ def _mean_pred(dataX, hs, weights):
     return pred[weights.index].dot(weights)
 
 
-### Explicit optimization parameters of expgrad
+### Explicit optimization parameters of exponentiated_gradient_reduction
 
 # A multiplier controlling the automatic setting of nu.
 _ACCURACY_MUL = 0.5
@@ -209,7 +209,7 @@ _REGR_CHECK_INCREASE_T = 1.6
 _SHRINK_REGRET = 0.8
 _SHRINK_ETA = 0.8
 
-# The smallest number of iterations after which expgrad terminates.
+# The smallest number of iterations after which exponentiated_gradient_reduction terminates.
 _MIN_T = 5
 
 # If _RUN_LP_STEP is set to True, then each step of exponentiated gradient is
@@ -218,7 +218,7 @@ _MIN_T = 5
 _RUN_LP_STEP = True
 
 
-def expgrad(dataX, dataA, dataY, learner, cons=moments.DemographicParity(), eps=0.01,
+def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, cons=moments.DemographicParity(), eps=0.01,
             T=50, nu=None, eta_mul=2.0, debug=False):
     """
     Return a fair classifier under specified fairness constraints
@@ -260,7 +260,7 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DemographicParity(), eps=
       n_oracle_calls -- how many times the learner was called
     """
 
-    ExpgradResult = namedtuple("ExgradResult",
+    exponentiated_gradient_reductionResult = namedtuple("ExgradResult",
                                "best_classifier best_gap classifiers weights"
                                " last_t best_t n_oracle_calls")
 
@@ -360,7 +360,7 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DemographicParity(), eps=
     best_classifier = lambda X: _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
 
-    res = ExpgradResult(best_classifier=best_classifier,
+    res = exponentiated_gradient_reductionResult(best_classifier=best_classifier,
                         best_gap=best_gap,
                         classifiers=lagr.classifiers,
                         weights=weights,
