@@ -27,7 +27,7 @@ _PRECISION = 1e-12
 
 
 class _GapResult:
-    # The result of a duality gap computation
+    """ The result of a duality gap computation"""
     def __init__(self, L, L_low, L_high, gamma, error):
         self.L = L
         self.L_low = L_low
@@ -36,15 +36,15 @@ class _GapResult:
         self.error = error
 
     def gap(self):
-        return max(self.L-self.L_low, self.L_high-self.L)
+        return max(self.L - self.L_low, self.L_high - self.L)
 
 
 class _Lagrangian:
-    # Operations related to the Lagrangian
+    """ Operations related to the Lagrangian"""
     def __init__(self, dataX, dataA, dataY, learner, constraints, eps, B,
                  opt_lambda=True, debug=False):
         self.X = dataX
-        self.obj = moments.MisclassError()
+        self.obj = moments.MisclassificationError()
         self.obj.init(dataX, dataA, dataY)
         self.constraints = constraints
         self.constraints.init(dataX, dataA, dataY)
@@ -63,12 +63,11 @@ class _Lagrangian:
         self.last_linprog_result = None
 
     def eval_from_error_gamma(self, error, gamma, lambda_vec):
-        # Return the value of the Lagrangian.
-        #
-        # Returned values:
-        #   L -- value of the Lagrangian
-        #   L_high -- value of the Lagrangian under the best response of the
-        #             lambda player
+        """ Return the value of the Lagrangian.
+        Returned values:
+        L -- value of the Lagrangian
+        L_high -- value of the Lagrangian under the best response of the lambda player
+        """
 
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         if self.opt_lambda:
@@ -85,14 +84,13 @@ class _Lagrangian:
         return L, L_high
 
     def eval(self, h, lambda_vec):
-        # Return the value of the Lagrangian.
-        #
-        # Returned values:
-        #   L -- value of the Lagrangian
-        #   L_high -- value of the Lagrangian under the best response of the
-        #             lambda player
-        #   gamma -- vector of constraint violations
-        #   error -- the empirical error
+        """ Return the value of the Lagrangian.
+        Returned values:
+        L -- value of the Lagrangian
+        L_high -- value of the Lagrangian under the best response of the lambda player
+        gamma -- vector of constraint violations
+        error -- the empirical error
+        """
 
         if callable(h):
             error = self.obj.gamma(h)[0]
@@ -104,7 +102,7 @@ class _Lagrangian:
         return L, L_high, gamma, error
 
     def eval_gap(self, h, lambda_hat, nu):
-        # Return the duality gap object for the given h and lambda_hat
+        """Return the duality gap object for the given h and lambda_hat"""
 
         L, L_high, gamma, error \
             = self.eval(h, lambda_hat)
@@ -150,8 +148,8 @@ class _Lagrangian:
         return self.last_linprog_res
 
     def best_h(self, lambda_vec):
-        # Return the classifier that solves the best-response problem
-        # for the vector of Lagrange multipliers lambda_vec.
+        """Return the classifier that solves the best-response problem
+        for the vector of Lagrange multipliers lambda_vec."""
 
         signed_weights = self.obj.signed_weights() \
                          + self.constraints.signed_weights(lambda_vec)
@@ -190,7 +188,7 @@ class _Lagrangian:
 
 
 def _mean_pred(dataX, hs, weights):
-    # Return a weighted average of predictions produced by classifiers in hs
+    """Return a weighted average of predictions produced by classifiers in hs"""
 
     pred = pd.DataFrame()
     for t in range(len(hs)):

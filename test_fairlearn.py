@@ -96,7 +96,7 @@ if __name__ == '__main__':
         disp = test["constraints_class"]()
         disp.init(dataX, dataA, dataY)
 
-        error = moments.MisclassError()
+        error = moments.MisclassificationError()
         error.init(dataX, dataA, dataY)
 
         res["disp"] = disp.gamma(Q).max()

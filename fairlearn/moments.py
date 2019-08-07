@@ -22,7 +22,7 @@ class Moment:
         self._gamma_descr = None
 
 
-class MisclassError(Moment):
+class MisclassificationError(Moment):
     """Misclassification error"""
     short_name = "Err"
 
