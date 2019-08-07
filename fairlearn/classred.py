@@ -106,24 +106,24 @@ class _Lagrangian:
 
         L, L_high, gamma, error \
             = self.eval(h, lambda_hat)
-        res = _GapResult(L, L, L_high, gamma, error)
+        result = _GapResult(L, L, L_high, gamma, error)
         for mul in [1.0, 2.0, 5.0, 10.0]:
             h_hat, h_hat_idx = self.best_h(mul*lambda_hat)
             if self.debug:
                 print("%smul=%.0f" % (" "*9, mul))
             L_low_mul, tmp, tmp, tmp \
                 = self.eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
-            if L_low_mul < res.L_low:
-                res.L_low = L_low_mul
-            if res.gap() > nu+_PRECISION:
+            if L_low_mul < result.L_low:
+                result.L_low = L_low_mul
+            if result.gap() > nu+_PRECISION:
                 break
-        return res
+        return result
 
     def solve_linprog(self, nu):
         n_hs = len(self.hs)
         n_constraints = len(self.constraints.index)
         if self.last_linprog_n_hs == n_hs:
-            return self.last_linprog_res
+            return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
         A_ub = np.concatenate(
             (self.gammas-self.eps, -np.ones((n_constraints, 1))), axis=1)
@@ -131,8 +131,8 @@ class _Lagrangian:
         A_eq = np.concatenate(
             (np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        res = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq)
-        h = pd.Series(res.x[:-1], self.hs.index)
+        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq)
+        h = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate(
             (-A_ub.transpose(), A_eq.transpose()), axis=1)
@@ -143,9 +143,9 @@ class _Lagrangian:
                                bounds=dual_bounds)
         lambda_vec = pd.Series(res_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
-        self.last_linprog_res = (h, lambda_vec,
+        self.last_linprog_result = (h, lambda_vec,
                                  self.eval_gap(h, lambda_vec, nu))
-        return self.last_linprog_res
+        return self.last_linprog_result
 
     def best_h(self, lambda_vec):
         """Return the classifier that solves the best-response problem
@@ -272,10 +272,10 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
         print("...EG STARTING")
 
     B = 1/eps
-    lagr = _Lagrangian(dataX, dataA, dataY, learner, constraints, eps, B,
+    lagrangian = _Lagrangian(dataX, dataA, dataY, learner, constraints, eps, B,
                        debug=debug)
 
-    theta = pd.Series(0, lagr.constraints.index)
+    theta = pd.Series(0, lagrangian.constraints.index)
     Qsum = pd.Series()
     lambdas = pd.DataFrame()
     gaps_EG = []
@@ -292,7 +292,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
         lambdas[t] = lambda_vec
         lambda_EG = lambdas.mean(axis=1)
 
-        h, h_idx = lagr.best_h(lambda_vec)
+        h, h_idx = lagrangian.best_h(lambda_vec)
         pred_h = h(dataX)
 
         if t == 0:
@@ -307,17 +307,17 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
         if not Qsum.index.contains(h_idx):
             Qsum.at[h_idx] = 0.0
         Qsum[h_idx] += 1.0
-        gamma = lagr.gammas[h_idx]
+        gamma = lagrangian.gammas[h_idx]
 
         Q_EG = Qsum / Qsum.sum()
-        res_EG = lagr.eval_gap(Q_EG, lambda_EG, nu)
+        res_EG = lagrangian.eval_gap(Q_EG, lambda_EG, nu)
         gap_EG = res_EG.gap()
         gaps_EG.append(gap_EG)
 
         if (t == 0) or not _RUN_LP_STEP:
             gap_LP = np.PINF
         else:
-            Q_LP, lambda_LP, res_LP = lagr.solve_linprog(nu)
+            Q_LP, lambda_LP, res_LP = lagrangian.solve_linprog(nu)
             gap_LP = res_LP.gap()
 
         if gap_EG < gap_LP:
@@ -351,7 +351,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
     gaps_best = gaps_series[gaps_series <= gaps_series.min()+_PRECISION]
     best_t = gaps_best.index[-1]
     weights = Qs[best_t]
-    hs = lagr.hs
+    hs = lagrangian.hs
     for h_idx in hs.index:
         if not weights.index.contains(h_idx):
             weights.at[h_idx] = 0.0
@@ -360,11 +360,11 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
 
     result = exponentiated_gradient_reductionResult(best_classifier=best_classifier,
                         best_gap=best_gap,
-                        classifiers=lagr.classifiers,
+                        classifiers=lagrangian.classifiers,
                         weights=weights,
                         last_t=last_t,
                         best_t=best_t,
-                        n_oracle_calls=lagr.n_oracle_calls)
+                        n_oracle_calls=lagrangian.n_oracle_calls)
 
     if debug:
         print("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
