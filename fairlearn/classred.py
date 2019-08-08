@@ -205,6 +205,9 @@ _MIN_T = 5
 # followed by the saddle point optimization over the convex hull of classifiers returned so far.
 _RUN_LINEAR_PROGRAMMING_STEP = True
 
+exponentiated_gradient_reduction_result = namedtuple("ExgradResult",
+    "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls")
+
 
 def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
     constraints=moments.DemographicParity(), eps=0.01, T=50, nu=None, eta_mul=2.0, debug=False):
@@ -247,10 +250,6 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
       best_t -- the iteration in which best_classifier was obtained
       n_oracle_calls -- how many times the learner was called
     """
-
-    exponentiated_gradient_reduction_result = namedtuple("ExgradResult",
-        "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls")
-
     n = dataX.shape[0]
     assert len(dataX.shape) == 2 and len(dataA.shape) == 1 and len(dataY.shape) == 1, \
         "dataX must be a DataFrame and dataY and dataA must be Series"
@@ -343,14 +342,14 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
         # update theta based on learning rate
         theta += eta * (gamma - eps)
 
-    return _format_results(gaps, Qs, hs, lagrangian, eps, B, nu, T, eta_min)
+    return _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug)
 
-def _format_results(gaps, Qs, hs, lagrangian, eps, B, nu, T, eta_min):
+def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
     gaps_series = pd.Series(gaps)
     gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
     best_t = gaps_best.index[-1]
     weights = Qs[best_t]
-    for h_idx in hs.index:
+    for h_idx in lagrangian.hs.index:
         if not weights.index.contains(h_idx):
             weights.at[h_idx] = 0.0
     best_classifier = lambda X: _mean_pred(X, lagrangian.hs, weights)
