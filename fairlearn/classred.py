@@ -133,12 +133,10 @@ class _Lagrangian:
         dual_b_ub = c
         dual_bounds = [
             (None, None) if i == n_constraints else (0, None) for i in range(n_constraints+1)]
-        res_dual = opt.linprog(dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub,
-                               bounds=dual_bounds)
-        lambda_vec = pd.Series(res_dual.x[:-1], self.constraints.index)
+        result_dual = opt.linprog(dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds)
+        lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
-        self.last_linprog_result = (h, lambda_vec,
-                                 self.eval_gap(h, lambda_vec, nu))
+        self.last_linprog_result = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
         return self.last_linprog_result
 
     def best_h(self, lambda_vec):
@@ -183,7 +181,6 @@ class _Lagrangian:
 
 def _mean_pred(dataX, hs, weights):
     """Return a weighted average of predictions produced by classifiers in hs"""
-
     pred = pd.DataFrame()
     for t in range(len(hs)):
         pred[t] = hs[t](dataX)
@@ -196,22 +193,21 @@ def _mean_pred(dataX, hs, weights):
 _ACCURACY_MUL = 0.5
 
 # Parameters controlling adaptive shrinking of the learning rate.
-_REGR_CHECK_START_T = 5
-_REGR_CHECK_INCREASE_T = 1.6
+_REGRET_CHECK_START_T = 5
+_REGRET_CHECK_INCREASE_T = 1.6
 _SHRINK_REGRET = 0.8
 _SHRINK_ETA = 0.8
 
 # The smallest number of iterations after which exponentiated_gradient_reduction terminates.
 _MIN_T = 5
 
-# If _RUN_LP_STEP is set to True, then each step of exponentiated gradient is
-# followed by the saddle point optimization over the convex hull of
-# classifiers returned so far.
-_RUN_LP_STEP = True
+# If _RUN_LINEAR_PROGRAMMING_STEP is set to True, then each step of exponentiated gradient is
+# followed by the saddle point optimization over the convex hull of classifiers returned so far.
+_RUN_LINEAR_PROGRAMMING_STEP = True
 
 
-def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=moments.DemographicParity(), eps=0.01,
-            T=50, nu=None, eta_mul=2.0, debug=False):
+def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
+    constraints=moments.DemographicParity(), eps=0.01, T=50, nu=None, eta_mul=2.0, debug=False):
     """
     Return a fair classifier under specified fairness constraintstraints
     via exponentiated-gradient reduction.
@@ -270,11 +266,11 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
     theta = pd.Series(0, lagrangian.constraints.index)
     Qsum = pd.Series()
     lambdas = pd.DataFrame()
-    gaps_EG = []
+    gaps_exponentiated_gradient = []
     gaps = []
     Qs = []
 
-    last_regr_checked = _REGR_CHECK_START_T
+    last_regr_checked = _REGRET_CHECK_START_T
     last_gap = np.PINF
     for t in range(0, T):
         if debug:
@@ -283,7 +279,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
         # set lambdas for every constraint
         lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
         lambdas[t] = lambda_vec
-        lambda_EG = lambdas.mean(axis=1)
+        lambda_exponentiated_gradient = lambdas.mean(axis=1)
 
         # select classifier according to best_h method
         h, h_idx = lagrangian.best_h(lambda_vec)
@@ -303,36 +299,40 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
             Qsum.at[h_idx] = 0.0
         Qsum[h_idx] += 1.0
         gamma = lagrangian.gammas[h_idx]
-        Q_EG = Qsum / Qsum.sum()
-        result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, nu)
-        gap_EG = result_EG.gap()
-        gaps_EG.append(gap_EG)
+        Q_exponentiated_gradient = Qsum / Qsum.sum()
+        result_exponentiated_gradient = lagrangian.eval_gap(Q_exponentiated_gradient, lambda_exponentiated_gradient, nu)
+        gap_exponentiated_gradient = result_exponentiated_gradient.gap()
+        gaps_exponentiated_gradient.append(gap_exponentiated_gradient)
 
-        if t == 0 or not _RUN_LP_STEP:
-            gap_LP = np.PINF
+        if t == 0 or not _RUN_LINEAR_PROGRAMMING_STEP:
+            gap_linear_programming = np.PINF
         else:
-            Q_LP, lambda_LP, result_LP = lagrangian.solve_linprog(nu)
-            gap_LP = result_LP.gap()
+            # saddle point optimization over the convex hull of classifiers returned so far
+            Q_linear_programming, _, result_linear_programming = lagrangian.solve_linprog(nu)
+            gap_linear_programming = result_linear_programming.gap()
 
-        if gap_EG < gap_LP:
-            Qs.append(Q_EG)
-            gaps.append(gap_EG)
+        # keep values from exponentiated gradient or linear programming
+        if gap_exponentiated_gradient < gap_linear_programming:
+            Qs.append(Q_exponentiated_gradient)
+            gaps.append(gap_exponentiated_gradient)
         else:
-            Qs.append(Q_LP)
-            gaps.append(gap_LP)
+            Qs.append(Q_linear_programming)
+            gaps.append(gap_linear_programming)
 
         if debug:
             print("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
-                  ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f"
-                  % (_INDENTATION, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
-                     gap_EG, result_EG.gamma.max(), result_EG.error, gap_LP))
+                  ", gap=%.6f, disp=%.3f, err=%.3f, gap_linear_programming=%.6f"
+                  % (_INDENTATION, eta, result_exponentiated_gradient.L_low,
+                     result_exponentiated_gradient.L, result_exponentiated_gradient.L_high,
+                     gap_exponentiated_gradient, result_exponentiated_gradient.gamma.max(),
+                     result_exponentiated_gradient.error, gap_linear_programming))
 
         if (gaps[t] < nu) and (t >= _MIN_T):
             # solution found
             break
 
-        if t >= last_regr_checked * _REGR_CHECK_INCREASE_T:
-            best_gap = min(gaps_EG)
+        if t >= last_regr_checked * _REGRET_CHECK_INCREASE_T:
+            best_gap = min(gaps_exponentiated_gradient)
 
             if best_gap > last_gap*_SHRINK_REGRET:
                 eta *= _SHRINK_ETA
