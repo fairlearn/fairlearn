@@ -270,7 +270,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
     gaps = []
     Qs = []
 
-    last_regr_checked = _REGRET_CHECK_START_T
+    last_regret_checked = _REGRET_CHECK_START_T
     last_gap = np.PINF
     for t in range(0, T):
         if debug:
@@ -331,26 +331,29 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
             # solution found
             break
 
-        if t >= last_regr_checked * _REGRET_CHECK_INCREASE_T:
+        # update regret
+        if t >= last_regret_checked * _REGRET_CHECK_INCREASE_T:
             best_gap = min(gaps_exponentiated_gradient)
 
-            if best_gap > last_gap*_SHRINK_REGRET:
+            if best_gap > last_gap * _SHRINK_REGRET:
                 eta *= _SHRINK_ETA
-            last_regr_checked = t
+            last_regret_checked = t
             last_gap = best_gap
 
+        # update theta based on learning rate
         theta += eta * (gamma - eps)
 
-    last_t = len(Qs) - 1
+    return _format_results(gaps, Qs, hs, lagrangian, eps, B, nu, T, eta_min)
+
+def _format_results(gaps, Qs, hs, lagrangian, eps, B, nu, T, eta_min):
     gaps_series = pd.Series(gaps)
     gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
     best_t = gaps_best.index[-1]
     weights = Qs[best_t]
-    hs = lagrangian.hs
     for h_idx in hs.index:
         if not weights.index.contains(h_idx):
             weights.at[h_idx] = 0.0
-    best_classifier = lambda X: _mean_pred(X, hs, weights)
+    best_classifier = lambda X: _mean_pred(X, lagrangian.hs, weights)
     best_gap = gaps[best_t]
 
     result = exponentiated_gradient_reduction_result(
@@ -358,7 +361,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
         best_gap=best_gap,
         classifiers=lagrangian.classifiers,
         weights=weights,
-        last_t=last_t,
+        last_t=len(Qs) - 1,
         best_t=best_t,
         n_oracle_calls=lagrangian.n_oracle_calls)
 
@@ -369,5 +372,5 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
               ", n_oracle_calls=%d, n_hs=%d"
               % (result.last_t, result.best_t, result.best_gap,
                  result.n_oracle_calls, len(result.classifiers)))
-
+    
     return result
