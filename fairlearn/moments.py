@@ -84,7 +84,10 @@ class _CondOpportunity(Moment):
 
 
 class DemographicParity(_CondOpportunity):
-    """Demographic parity"""
+    """ Demographic parity
+    A classifier h satisfies DP if
+    Prob[h(X) = y' | A = a] = Prob[h(X) = y'] for all a, y'
+    """
     short_name = "DP"
 
     def init(self, dataX, dataA, dataY):
@@ -93,7 +96,10 @@ class DemographicParity(_CondOpportunity):
 
 
 class EqualizedOdds(_CondOpportunity):
-    """Equalized odds"""
+    """ Equalized odds
+    Adds conditioning on label compared to Demographic parity, i.e.
+    Prob[h(X) = y' | A = a, Y = y] = Prob[h(X) = y' | Y = y] for all a, y, y'
+    """
     short_name = "EO"
 
     def init(self, dataX, dataA, dataY):
