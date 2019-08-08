@@ -24,6 +24,8 @@ from collections import namedtuple
 print = functools.partial(print, flush=True)
 
 _PRECISION = 1e-12
+_LINE = "_"*9
+_INDENTATION = " "*9
 
 
 class _GapResult:
@@ -103,7 +105,7 @@ class _Lagrangian:
         for mul in [1.0, 2.0, 5.0, 10.0]:
             h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
             if self.debug:
-                print("%smul=%.0f" % (" "*9, mul))
+                print("%smul=%.0f" % (_INDENTATION, mul))
             L_low_mul, _, _, _ = self.eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
             if L_low_mul < result.L_low:
                 result.L_low = L_low_mul
@@ -145,9 +147,9 @@ class _Lagrangian:
 
         signed_weights = self.obj.signed_weights() \
                          + self.constraints.signed_weights(lambda_vec)
-        redY = 1*(signed_weights > 0)
+        redY = 1 * (signed_weights > 0)
         redW = signed_weights.abs()
-        redW = self.n*redW/redW.sum()
+        redW = self.n * redW / redW.sum()
 
         classifier = pickle.loads(self.pickled_learner)
         classifier.fit(self.X, redY, redW)
@@ -168,7 +170,7 @@ class _Lagrangian:
 
         if h_value < best_value - _PRECISION:
             if self.debug:
-                print("%sbest_h: val improvement %f" % ("_"*9, best_value - h_value))
+                print("%sbest_h: val improvement %f" % (_LINE, best_value - h_value))
             h_idx = len(self.hs)
             self.hs.at[h_idx] = h
             self.classifiers.at[h_idx] = classifier
@@ -322,7 +324,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner, constraints=m
         if debug:
             print("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
                   ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f"
-                  % (" "*9, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
+                  % (_INDENTATION, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
                      gap_EG, result_EG.gamma.max(), result_EG.error, gap_LP))
 
         if (gaps[t] < nu) and (t >= _MIN_T):
