@@ -6,12 +6,12 @@ This module implements the Lagrangian reduction of fair binary
 classification to standard binary classification.
 
 FUNCTIONS
-exponentiated_gradient_reduction -- optimize accuracy subject to fairness constraints
+expgrad -- optimize accuracy subject to fairness constraints
 """
 
 from __future__ import print_function
 
-__all__ = ["exponentiated_gradient_reduction"]
+__all__ = ["expgrad"]
 
 import numpy as np
 import scipy.optimize as opt
@@ -190,7 +190,7 @@ def _mean_pred(dataX, hs, weights):
     return pred[weights.index].dot(weights)
 
 
-### Explicit optimization parameters of exponentiated_gradient_reduction
+### Explicit optimization parameters of expgrad
 
 # A multiplier controlling the automatic setting of nu.
 _ACCURACY_MUL = 0.5
@@ -201,19 +201,19 @@ _REGRET_CHECK_INCREASE_T = 1.6
 _SHRINK_REGRET = 0.8
 _SHRINK_ETA = 0.8
 
-# The smallest number of iterations after which exponentiated_gradient_reduction terminates.
+# The smallest number of iterations after which expgrad terminates.
 _MIN_T = 5
 
-# If _RUN_LINEAR_PROGRAMMING_STEP is set to True, then each step of exponentiated gradient is
+# If _RUN_LP_STEP is set to True, then each step of exponentiated gradient is
 # followed by the saddle point optimization over the convex hull of classifiers returned so far.
-_RUN_LINEAR_PROGRAMMING_STEP = True
+_RUN_LP_STEP = True
 
-exponentiated_gradient_reduction_result = namedtuple("ExgradResult",
+expgrad_result = namedtuple("ExgradResult",
     "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls")
 
 
-def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
-    constraints=moments.DemographicParity(), eps=0.01, T=50, nu=None, eta_mul=2.0, debug=False):
+def expgrad(dataX, dataA, dataY, learner,
+    constraints=moments.DP(), eps=0.01, T=50, nu=None, eta_mul=2.0, debug=False):
     """
     Return a fair classifier under specified fairness constraintstraints
     via exponentiated-gradient reduction.
@@ -229,7 +229,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
                  predict(X) are in {0,1}
 
     Optional keyword arguments:
-      constraints -- the fairness measure (default moments.DemographicParity())
+      constraints -- the fairness measure (default moments.DP())
       eps -- allowed fairness constraint violation (default 0.01)
       T -- max number of iterations (default 50)
       nu -- convergence threshold for the duality gap (default None,
@@ -264,7 +264,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
     theta = pd.Series(0, lagrangian.constraints.index)
     Qsum = pd.Series()
     lambdas = pd.DataFrame()
-    gaps_exponentiated_gradient = []
+    gaps_EG = []
     gaps = []
     Qs = []
 
@@ -277,7 +277,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
         # set lambdas for every constraint
         lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
         lambdas[t] = lambda_vec
-        lambda_exponentiated_gradient = lambdas.mean(axis=1)
+        lambda_EG = lambdas.mean(axis=1)
 
         # select classifier according to best_h method
         h, h_idx = lagrangian.best_h(lambda_vec)
@@ -296,33 +296,33 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
             Qsum.at[h_idx] = 0.0
         Qsum[h_idx] += 1.0
         gamma = lagrangian.gammas[h_idx]
-        Q_exponentiated_gradient = Qsum / Qsum.sum()
-        result_exponentiated_gradient = lagrangian.eval_gap(Q_exponentiated_gradient, lambda_exponentiated_gradient, nu)
-        gap_exponentiated_gradient = result_exponentiated_gradient.gap()
-        gaps_exponentiated_gradient.append(gap_exponentiated_gradient)
+        Q_EG = Qsum / Qsum.sum()
+        result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, nu)
+        gap_EG = result_EG.gap()
+        gaps_EG.append(gap_EG)
 
-        if t == 0 or not _RUN_LINEAR_PROGRAMMING_STEP:
-            gap_linear_programming = np.PINF
+        if t == 0 or not _RUN_LP_STEP:
+            gap_LP = np.PINF
         else:
             # saddle point optimization over the convex hull of classifiers returned so far
-            Q_linear_programming, _, result_linear_programming = lagrangian.solve_linprog(nu)
-            gap_linear_programming = result_linear_programming.gap()
+            Q_LP, _, result_LP = lagrangian.solve_linprog(nu)
+            gap_LP = result_LP.gap()
 
         # keep values from exponentiated gradient or linear programming
-        if gap_exponentiated_gradient < gap_linear_programming:
-            Qs.append(Q_exponentiated_gradient)
-            gaps.append(gap_exponentiated_gradient)
+        if gap_EG < gap_LP:
+            Qs.append(Q_EG)
+            gaps.append(gap_EG)
         else:
-            Qs.append(Q_linear_programming)
-            gaps.append(gap_linear_programming)
+            Qs.append(Q_LP)
+            gaps.append(gap_LP)
 
         if debug:
             print("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
-                  ", gap=%.6f, disp=%.3f, err=%.3f, gap_linear_programming=%.6f"
-                  % (_INDENTATION, eta, result_exponentiated_gradient.L_low,
-                     result_exponentiated_gradient.L, result_exponentiated_gradient.L_high,
-                     gap_exponentiated_gradient, result_exponentiated_gradient.gamma.max(),
-                     result_exponentiated_gradient.error, gap_linear_programming))
+                  ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f"
+                  % (_INDENTATION, eta, result_EG.L_low,
+                     result_EG.L, result_EG.L_high,
+                     gap_EG, result_EG.gamma.max(),
+                     result_EG.error, gap_LP))
 
         if (gaps[t] < nu) and (t >= _MIN_T):
             # solution found
@@ -330,7 +330,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
 
         # update regret
         if t >= last_regret_checked * _REGRET_CHECK_INCREASE_T:
-            best_gap = min(gaps_exponentiated_gradient)
+            best_gap = min(gaps_EG)
 
             if best_gap > last_gap * _SHRINK_REGRET:
                 eta *= _SHRINK_ETA
@@ -353,7 +353,7 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
     best_classifier = lambda X: _mean_pred(X, lagrangian.hs, weights)
     best_gap = gaps[best_t]
 
-    result = exponentiated_gradient_reduction_result(
+    result = expgrad_result(
         best_classifier=best_classifier,
         best_gap=best_gap,
         classifiers=lagrangian.classifiers,
