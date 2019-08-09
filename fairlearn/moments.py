@@ -5,6 +5,7 @@ import pandas as pd
 
 __all__ = ["DP", "EO"]
 
+
 class Moment:
     """Generic moment"""
 
@@ -12,7 +13,7 @@ class Moment:
         self.initialized = False
 
     def init(self, dataX, dataA, dataY):
-        assert self.initialized==False, \
+        assert self.initialized is False, \
             "moments can be initialized only once"
         self.X = dataX
         self.tags = pd.DataFrame({"attr": dataA, "label": dataY})
@@ -58,7 +59,7 @@ class _CondOpportunity(Moment):
                            keys=["+", "-"],
                            names=["sign", "grp", "attr"])
         self.index = signed.index
-        
+
     def gamma(self, predictor):
         pred = predictor(self.X)
         self.tags["pred"] = pred
@@ -67,7 +68,7 @@ class _CondOpportunity(Moment):
         expect_attr_grp["diff"] = expect_attr_grp["pred"] - expect_grp["pred"]
         g_unsigned = expect_attr_grp["diff"]
         g_signed = pd.concat([g_unsigned, -g_unsigned],
-                             keys=["+","-"],
+                             keys=["+", "-"],
                              names=["sign", "grp", "attr"])
         self._gamma_descr = str(expect_attr_grp[["pred", "diff"]])
         return g_signed
@@ -83,20 +84,21 @@ class _CondOpportunity(Moment):
             lambda row: adjust[row["grp"], row["attr"]], axis=1
         )
         return signed_weights
-    
-    
+
+
 class DP(_CondOpportunity):
     """Demographic parity"""
     short_name = "DP"
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
-                     dataY.apply(lambda y : "all"))
+                     dataY.apply(lambda y: "all"))
+
 
 class EO(_CondOpportunity):
     """Equalized odds"""
     short_name = "EO"
-    
+
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
-                     dataY.apply(lambda y : "label="+str(y)))
+                     dataY.apply(lambda y: "label="+str(y)))

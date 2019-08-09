@@ -61,7 +61,7 @@ class _Lagrangian:
         self.n_oracle_calls = 0
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
-        
+
     def eval_from_error_gamma(self, error, gamma, lambda_vec):
         # Return the value of the Lagrangian.
         #
@@ -83,7 +83,7 @@ class _Lagrangian:
         else:
             L_high = error + self.B*(max_gamma-self.eps)
         return L, L_high
-    
+
     def eval(self, h, lambda_vec):
         # Return the value of the Lagrangian.
         #
@@ -93,7 +93,7 @@ class _Lagrangian:
         #             lambda player
         #   gamma -- vector of constraint violations
         #   error -- the empirical error
-        
+
         if callable(h):
             error = self.obj.gamma(h)[0]
             gamma = self.cons.gamma(h)
@@ -105,7 +105,7 @@ class _Lagrangian:
 
     def eval_gap(self, h, lambda_hat, nu):
         # Return the duality gap object for the given h and lambda_hat
-        
+
         L, L_high, gamma, error \
             = self.eval(h, lambda_hat)
         res = _GapResult(L, L, L_high, gamma, error)
@@ -115,12 +115,12 @@ class _Lagrangian:
                 print("%smul=%.0f" % (" "*9, mul))
             L_low_mul, tmp, tmp, tmp \
                 = self.eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
-            if (L_low_mul < res.L_low):
+            if L_low_mul < res.L_low:
                 res.L_low = L_low_mul
             if res.gap() > nu+_PRECISION:
                 break
         return res
-    
+
     def solve_linprog(self, nu):
         n_hs = len(self.hs)
         n_cons = len(self.cons.index)
@@ -140,7 +140,7 @@ class _Lagrangian:
             (-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
         dual_bounds = [
-            (None, None) if i==n_cons else (0, None) for i in range(n_cons+1)]
+            (None, None) if i == n_cons else (0, None) for i in range(n_cons+1)]
         res_dual = opt.linprog(dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub,
                                bounds=dual_bounds)
         lambda_vec = pd.Series(res_dual.x[:-1], self.cons.index)
@@ -152,7 +152,7 @@ class _Lagrangian:
     def best_h(self, lambda_vec):
         # Return the classifier that solves the best-response problem
         # for the vector of Lagrange multipliers lambda_vec.
-    
+
         signed_weights = self.obj.signed_weights() \
                          + self.cons.signed_weights(lambda_vec)
         redY = 1*(signed_weights > 0)
@@ -162,14 +162,14 @@ class _Lagrangian:
         classifier = pickle.loads(self.pickled_learner)
         classifier.fit(self.X, redY, redW)
         self.n_oracle_calls += 1
-        
+
         h = lambda X: classifier.predict(X)
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.cons.gamma(h)
         h_val = h_error + h_gamma.dot(lambda_vec)
 
         if not self.hs.empty:
-            vals =  self.errors + self.gammas.transpose().dot(lambda_vec)
+            vals = self.errors + self.gammas.transpose().dot(lambda_vec)
             best_idx = vals.idxmin()
             best_val = vals[best_idx]
         else:
@@ -191,7 +191,7 @@ class _Lagrangian:
 
 def _mean_pred(dataX, hs, weights):
     # Return a weighted average of predictions produced by classifiers in hs
-    
+
     pred = pd.DataFrame()
     for t in range(len(hs)):
         pred[t] = hs[t](dataX)
@@ -223,7 +223,7 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
     """
     Return a fair classifier under specified fairness constraints
     via exponentiated-gradient reduction.
-    
+
     Required input arguments:
       dataX -- a DataFrame containing covariates
       dataA -- a Series containing the protected attribute
@@ -273,9 +273,9 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
     lagr = _Lagrangian(dataX, dataA, dataY, learner, cons, eps, B,
                        debug=debug)
 
-    theta  = pd.Series(0, lagr.cons.index)
+    theta = pd.Series(0, lagr.cons.index)
     Qsum = pd.Series()
-    lambdas  = pd.DataFrame()
+    lambdas = pd.DataFrame()
     gaps_EG = []
     gaps = []
     Qs = []
@@ -311,13 +311,13 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
         res_EG = lagr.eval_gap(Q_EG, lambda_EG, nu)
         gap_EG = res_EG.gap()
         gaps_EG.append(gap_EG)
-        
+
         if (t == 0) or not _RUN_LP_STEP:
             gap_LP = np.PINF
         else:
             Q_LP, lambda_LP, res_LP = lagr.solve_linprog(nu)
             gap_LP = res_LP.gap()
-            
+
         if gap_EG < gap_LP:
             Qs.append(Q_EG)
             gaps.append(gap_EG)
@@ -341,19 +341,19 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
                 eta *= _SHRINK_ETA
             last_regr_checked = t
             last_gap = best_gap
-            
+
         theta += eta*(gamma-eps)
-        
+
     last_t = len(Qs)-1
     gaps_series = pd.Series(gaps)
-    gaps_best = gaps_series[gaps_series<=gaps_series.min()+_PRECISION]
+    gaps_best = gaps_series[gaps_series <= gaps_series.min()+_PRECISION]
     best_t = gaps_best.index[-1]
     weights = Qs[best_t]
     hs = lagr.hs
     for h_idx in hs.index:
         if not weights.index.contains(h_idx):
             weights.at[h_idx] = 0.0
-    best_classifier = lambda X : _mean_pred(X, hs, weights)
+    best_classifier = lambda X: _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
 
     res = ExpgradResult(best_classifier=best_classifier,
