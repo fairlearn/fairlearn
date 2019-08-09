@@ -302,7 +302,7 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
                 print("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
                       % (eps, B, nu, T, eta_min))
 
-        if not Qsum.index.contains(h_idx):
+        if not h_idx in Qsum.index:
             Qsum.at[h_idx] = 0.0
         Qsum[h_idx] += 1.0
         gamma = lagr.gammas[h_idx]
@@ -351,7 +351,7 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
     weights = Qs[best_t]
     hs = lagr.hs
     for h_idx in hs.index:
-        if not weights.index.contains(h_idx):
+        if not h_idx in weights.index:
             weights.at[h_idx] = 0.0
     best_classifier = lambda X: _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
