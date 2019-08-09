@@ -347,10 +347,11 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
     gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
     best_t = gaps_best.index[-1]
     weights = Qs[best_t]
-    for h_idx in lagrangian.hs.index:
+    hs = lagrangian.hs
+    for h_idx in hs.index:
         if h_idx not in weights.index:
             weights.at[h_idx] = 0.0
-    best_classifier = lambda X: _mean_pred(X, lagrangian.hs, weights)
+    best_classifier = lambda X: _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
 
     result = expgrad_result(
