@@ -208,14 +208,14 @@ _MIN_T = 5
 # followed by the saddle point optimization over the convex hull of classifiers returned so far.
 _RUN_LP_STEP = True
 
-expgrad_result = namedtuple("ExgradResult",
+expgrad_result = namedtuple("ExpgradResult",
     "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls")
 
 
 def expgrad(dataX, dataA, dataY, learner,
     constraints=moments.DP(), eps=0.01, T=50, nu=None, eta_mul=2.0, debug=False):
     """
-    Return a fair classifier under specified fairness constraintstraints
+    Return a fair classifier under specified fairness constraints
     via exponentiated-gradient reduction.
 
     Required input arguments:
