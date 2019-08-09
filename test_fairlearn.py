@@ -28,34 +28,34 @@ class LeastSquaresLearner:
         return 1*(pred > 0.5)
 
 
-tests = [{"cons_class": moments.DP, "eps": 0.100, "best_gap": 0.000000,
+tests = [{"constraints_class": moments.DP, "eps": 0.100, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.100000, "error": 0.250000,
           "n_oracle_calls":  32, "n_classifiers": 3},
-         {"cons_class": moments.DP, "eps": 0.050, "best_gap": 0.000000,
+         {"constraints_class": moments.DP, "eps": 0.050, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.050000,
           "error": 0.266522, "n_oracle_calls":  23, "n_classifiers": 6},
-         {"cons_class": moments.DP, "eps": 0.020, "best_gap": 0.000000,
+         {"constraints_class": moments.DP, "eps": 0.020, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.020000, "error": 0.332261,
           "n_oracle_calls":  22, "n_classifiers": 5},
-         {"cons_class": moments.DP, "eps": 0.010, "best_gap": 0.000000,
+         {"constraints_class": moments.DP, "eps": 0.010, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.010000, "error": 0.354174,
           "n_oracle_calls":  22, "n_classifiers": 5},
-         {"cons_class": moments.DP, "eps": 0.005, "best_gap": 0.000000,
+         {"constraints_class": moments.DP, "eps": 0.005, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.005000, "error": 0.365130,
           "n_oracle_calls":  22, "n_classifiers": 5},
-         {"cons_class": moments.EO, "eps": 0.100, "best_gap": 0.000000,
+         {"constraints_class": moments.EO, "eps": 0.100, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.100000, "error": 0.309333,
           "n_oracle_calls":  21, "n_classifiers": 4},
-         {"cons_class": moments.EO, "eps": 0.050, "best_gap": 0.000000,
+         {"constraints_class": moments.EO, "eps": 0.050, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.050000, "error": 0.378827,
           "n_oracle_calls":  19, "n_classifiers": 6},
-         {"cons_class": moments.EO, "eps": 0.020, "best_gap": 0.000000,
+         {"constraints_class": moments.EO, "eps": 0.020, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.020000, "error": 0.421531,
           "n_oracle_calls":  19, "n_classifiers": 6},
-         {"cons_class": moments.EO, "eps": 0.010, "best_gap": 0.000000,
+         {"constraints_class": moments.EO, "eps": 0.010, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.010000, "error": 0.435765,
           "n_oracle_calls":  19, "n_classifiers": 6},
-         {"cons_class": moments.EO, "eps": 0.005, "best_gap": 0.000000,
+         {"constraints_class": moments.EO, "eps": 0.005, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.005000, "error": 0.442883,
           "n_oracle_calls":  19, "n_classifiers": 6},
          ]
@@ -63,12 +63,12 @@ tests = [{"cons_class": moments.DP, "eps": 0.100, "best_gap": 0.000000,
 _PRECISION = 1e-6
 
 
-def test_res_float(key, res, test, report_list):
+def test_result_float(key, res, test, report_list):
     if abs(res[key]-test[key]) > _PRECISION:
         report_list.append("%s_diff=%e" % (key, res[key]-test[key]))
 
 
-def test_res_int(key, res, test, report_list):
+def test_result_int(key, res, test, report_list):
     if abs(res[key]-test[key]) > 0:
         report_list.append("%s_diff=%d" % (key, res[key]-test[key]))
 
@@ -87,30 +87,30 @@ if __name__ == '__main__':
     learner = LeastSquaresLearner()
 
     for test in tests:
-        res_tuple = red.expgrad(dataX, dataA, dataY, learner,
-                                cons=test["cons_class"](), eps=test["eps"])
-        res = res_tuple._asdict()
-        Q = res["best_classifier"]
-        res["n_classifiers"] = len(res["classifiers"])
+        results_tuple = red.expgrad(dataX, dataA, dataY, learner,
+                                constraints=test["constraints_class"](), eps=test["eps"])
+        results = results_tuple._asdict()
+        Q = results["best_classifier"]
+        results["n_classifiers"] = len(results["classifiers"])
 
-        disp = test["cons_class"]()
+        disp = test["constraints_class"]()
         disp.init(dataX, dataA, dataY)
 
-        error = moments.MisclassError()
+        error = moments.MisclassificationError()
         error.init(dataX, dataA, dataY)
 
-        res["disp"] = disp.gamma(Q).max()
-        res["error"] = error.gamma(Q)[0]
+        results["disp"] = disp.gamma(Q).max()
+        results["error"] = error.gamma(Q)[0]
         report_header = "testing (%s, eps=%.3f)" \
-                        % (test["cons_class"].short_name, test["eps"])
+                        % (test["constraints_class"].short_name, test["eps"])
         report_list = []
-        test_res_float("best_gap", res, test, report_list)
-        test_res_int("last_t", res, test, report_list)
-        test_res_int("best_t", res, test, report_list)
-        test_res_float("disp", res, test, report_list)
-        test_res_float("error", res, test, report_list)
-        test_res_int("n_oracle_calls", res, test, report_list)
-        test_res_int("n_classifiers", res, test, report_list)
+        test_result_float("best_gap", results, test, report_list)
+        test_result_int("last_t", results, test, report_list)
+        test_result_int("best_t", results, test, report_list)
+        test_result_float("disp", results, test, report_list)
+        test_result_float("error", results, test, report_list)
+        test_result_int("n_oracle_calls", results, test, report_list)
+        test_result_int("n_classifiers", results, test, report_list)
         if report_list:
             print("%s: %s" % (report_header, ", ".join(report_list)))
         else:
