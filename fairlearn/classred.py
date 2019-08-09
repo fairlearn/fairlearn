@@ -23,9 +23,13 @@ from collections import namedtuple
 
 print = functools.partial(print, flush=True)
 
-_PRECISION = 1e-12
+<<<<<<< HEAD
+_PRECISION = 1e-8
 _LINE = "_"*9
 _INDENTATION = " "*9
+=======
+_PRECISION = 1e-8
+>>>>>>> 925dec66e37f915d6096892fcc24ca9ae6219c46
 
 
 class _GapResult:
@@ -69,11 +73,14 @@ class _Lagrangian:
         Returned values:
         L -- value of the Lagrangian
         L_high -- value of the Lagrangian under the best response of the lambda player
-        """
-        lambda_signed = (lambda_vec["+"] - lambda_vec["-"]).abs()
-        L = error + np.sum(lambda_vec*gamma) \
-            - self.eps*np.sum(lambda_signed if self.opt_lambda else lambda_vec)
-
+        """        
+        lambda_signed = self.constraints.lambda_signed(lambda_vec)
+        if self.opt_lambda:
+            L = error + np.sum(lambda_vec * gamma) \
+                - self.eps * np.sum(lambda_signed.abs())
+        else:
+            L = error + np.sum(lambda_vec * gamma) \
+                - self.eps * np.sum(lambda_vec)
         max_gamma = gamma.max()
         if max_gamma < self.eps:
             L_high = error
@@ -125,7 +132,7 @@ class _Lagrangian:
         A_eq = np.concatenate(
             (np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq)
+        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
         h = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate(
@@ -251,10 +258,6 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
       n_oracle_calls -- how many times the learner was called
     """
     n = dataX.shape[0]
-    assert len(dataX.shape) == 2 and len(dataA.shape) == 1 and len(dataY.shape) == 1, \
-        "dataX must be a DataFrame and dataY and dataA must be Series"
-    assert dataA.shape[0] == n and dataY.shape[0] == n, \
-        "the number of rows in all data fields must match"
 
     if debug:
         print("...Exponentiated Gradient STARTING")
@@ -293,8 +296,7 @@ def exponentiated_gradient_reduction(dataX, dataA, dataY, learner,
                 print("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
                       % (eps, B, nu, T, eta_min))
 
-        # Determine new average Q
-        if not Qsum.index.contains(h_idx):
+        if h_idx not in Qsum.index:
             Qsum.at[h_idx] = 0.0
         Qsum[h_idx] += 1.0
         gamma = lagrangian.gammas[h_idx]
@@ -350,7 +352,7 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
     best_t = gaps_best.index[-1]
     weights = Qs[best_t]
     for h_idx in lagrangian.hs.index:
-        if not weights.index.contains(h_idx):
+        if h_idx not in weights.index:
             weights.at[h_idx] = 0.0
     best_classifier = lambda X: _mean_pred(X, lagrangian.hs, weights)
     best_gap = gaps[best_t]
