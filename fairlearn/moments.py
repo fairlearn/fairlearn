@@ -26,7 +26,7 @@ class MisclassError(Moment):
     short_name = "Err"
 
     def init(self, dataX, dataA, dataY):
-        super().init(dataX, dataA, dataY)
+        super().init(dataX, dataY, dataY)
         self.index = ["all"]
 
     def gamma(self, predictor):
@@ -36,6 +36,9 @@ class MisclassError(Moment):
         self._gamma_descr = str(error)
         return error
 
+    def lambda_signed(self, lambda_vec):
+        return lambda_vec
+    
     def signed_weights(self, lambda_vec=None):
         if lambda_vec is None:
             return 2*self.tags["label"]-1
@@ -68,6 +71,9 @@ class _CondOpportunity(Moment):
                              names=["sign", "grp", "attr"])
         self._gamma_descr = str(expect_attr_grp[["pred", "diff"]])
         return g_signed
+
+    def lambda_signed(self, lambda_vec):
+        return lambda_vec["+"] - lambda_vec["-"]
 
     def signed_weights(self, lambda_vec):
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]

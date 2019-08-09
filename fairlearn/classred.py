@@ -70,7 +70,7 @@ class _Lagrangian:
         #   L_high -- value of the Lagrangian under the best response of the
         #             lambda player
         
-        lambda_signed = lambda_vec["+"] - lambda_vec["-"]
+        lambda_signed = self.cons.lambda_signed(lambda_vec)
         if self.opt_lambda:
             L = error + np.sum(lambda_vec*gamma) \
                 - self.eps*np.sum(lambda_signed.abs())
