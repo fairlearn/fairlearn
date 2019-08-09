@@ -265,10 +265,6 @@ def expgrad(dataX, dataA, dataY, learner, cons=moments.DP(), eps=0.01,
                                " last_t best_t n_oracle_calls")
 
     n = dataX.shape[0]
-    assert len(dataX.shape)==2 and len(dataA.shape)==1 and len(dataY.shape)==1, \
-        "dataX must be a DataFrame and dataY and dataA must be Series"
-    assert dataA.shape[0]==n and dataY.shape[0]==n, \
-        "the number of rows in all data fields must match"
 
     if debug:
         print("...EG STARTING")
