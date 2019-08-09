@@ -23,13 +23,9 @@ from collections import namedtuple
 
 print = functools.partial(print, flush=True)
 
-<<<<<<< HEAD
 _PRECISION = 1e-8
 _LINE = "_"*9
 _INDENTATION = " "*9
-=======
-_PRECISION = 1e-8
->>>>>>> 925dec66e37f915d6096892fcc24ca9ae6219c46
 
 
 class _GapResult:
