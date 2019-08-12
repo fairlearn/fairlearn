@@ -24,6 +24,7 @@ class LeastSquaresLearner:
         pred = X.dot(self.weights)
         return 1*(pred > 0.5)
 
+
 class TestFairLearnSmoke:
     def setup_method(self, method):
         print("setup_method      method:%s" % method.__name__)
@@ -37,12 +38,6 @@ class TestFairLearnSmoke:
         self.dataA = pd.Series(attrs)
         self.learner = LeastSquaresLearner()
         self._PRECISION = 1e-6
-
-		
-
-
-
-
 
     smoke_test_data = [{"cons_class": moments.DP, "eps": 0.100, "best_gap": 0.000000,
           "last_t": 5, "best_t": 5, "disp": 0.100000, "error": 0.250000,
