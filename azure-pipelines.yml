@@ -14,5 +14,5 @@ steps:
 - script: pip install -r requirements.txt
   displayName: 'Install required packages'
 
-- script: python test_fairlearn_smoke.py
+- script: python -m pytest test_fairlearn_smoke.py
   displayName: 'Run smoke tests'
