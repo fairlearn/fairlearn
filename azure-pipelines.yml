@@ -6,5 +6,8 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- script: pip install -r requirements.txt
+  displayName: 'Install required packages'
+
 - script: python test_fairlearn.py
   displayName: 'Run tests'
