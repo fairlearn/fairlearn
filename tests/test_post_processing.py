@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
-from fairlearn.post_processing.roc_curve_based_post_processing import equalized_odds
+from fairlearn.post_processing.roc_curve_based_post_processing import roc_curve_based_post_processing
 
 ex_attrs1 = [x      for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
 ex_attrs2 = [x      for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
@@ -15,7 +15,7 @@ ex_scores = [int(x) for x in '0011233' '0001111' '011112']
 
 def run_roc_curve_based_post_processing_and_plot(ex_attrs, flip):
     print("STARTING TEST")
-    pred_EO, pred_DP = equalized_odds(ex_attrs, ex_labels, ex_scores, debug=True, flip=flip)
+    pred_EO, pred_DP = roc_curve_based_post_processing(ex_attrs, ex_labels, ex_scores, debug=True, flip=flip)
     ex_preds_EO = []
     ex_preds_DP = []
     for i in range(len(ex_attrs)):

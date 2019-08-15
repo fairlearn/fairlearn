@@ -167,10 +167,23 @@ def get_roc(data, x_grid, flip=True, debug=False, attr=None):
         
     return roc_interp, sel_interp
         
-def equalized_odds(attrs, labels, scores, flip=True, debug=False, gridsize=1000):
-    """ TODO: doc
-    flip means we consider negative weights as well
-    task: come up with threshold that turns scores into (good) labels
+def roc_curve_based_post_processing(attrs, labels, scores, flip=True, debug=False, gridsize=1000):
+    """ Post processing algorithm based on M. Hardt, E. Price, N. Srebro's paper "Equality of
+    Opportunity in Supervised Learning" (https://arxiv.org/pdf/1610.02413.pdf).
+    
+    :param attrs: the protected attributes
+    :type attrs: list
+    :param labels: the labels of the dataset
+    :type labels: list
+    :param scores: the scores produced by a model's prediction
+    :type scores: list
+    :param flip: allow flipping to negative weights if it improves accuracy.
+    :type flip: bool
+    :param debug: show debugging output if True
+    :type debug: bool
+    :param gridsize: The number of ticks on the grid over which we evaluate the curves.
+        A large gridsize means that we approximate the actual curve, so it increases the chance
+        of being very close to the actual best solution.
     """
     data = pd.DataFrame({'attr': attrs, 'score': scores, 'label': labels})
     n = len(labels)
