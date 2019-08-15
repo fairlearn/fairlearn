@@ -27,3 +27,15 @@ class TestGridSearch:
 
         with pytest.raises(RuntimeError, match=r"Supplied Y labels not 0 or 1"):
             _, _ = gs._generate_p0_p1(Y)
+
+    def test_generate_weights(self):
+        A = [int(x) for x in "0011"]
+        Y = [int(x) for x in "0101"]
+        L = 10
+        p_ratio = 2
+
+        W_expect = [ -21, -19, 9, 11]
+
+        W = gs._generate_weights(Y, A, L, p_ratio)
+
+        assert np.array_equal(W_expect, W), str(W)+str(W_expect)
