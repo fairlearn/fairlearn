@@ -88,7 +88,7 @@ def interpolate_curve(data, x_col, y_col, content_col, x_grid):
 def get_roc(data, x_grid, flip=True, debug=False, attr=None):
     """Get ROC curve based on data columns 'score' and 'label'"""
 
-    attr_str = "attribute " + str(attr)
+    attr_str = "attribute value" + str(attr)
     if debug:
         color = debug_color(attr_str)
             
@@ -99,12 +99,12 @@ def get_roc(data, x_grid, flip=True, debug=False, attr=None):
 
     n = len(labels)
     n_positive = sum(labels)
-    n_negative = n-n_positive
+    n_negative = n - n_positive
 
     assert (n_positive > 0) & (n_negative > 0), "Degenerate labels for " + attr_str
     
     scores.append(-np.inf)
-    labels.append( np.nan)
+    labels.append(np.nan)
     
     x_list, y_list, op_list = [0], [0], [('>', np.inf)]
     
