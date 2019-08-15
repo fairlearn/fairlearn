@@ -10,7 +10,7 @@ and produces a sequence of models, each of which corresponds to a
 different accuracy/fairness trade-off
 """
 
-import itertools
+import copy
 import numpy as np
 import pandas as pd
 from collections import namedtuple
@@ -98,10 +98,11 @@ def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls = 11):
         Yprime = np.vectorize(f)(Y)
 
         # Run the learner
-        model = learner.fit(abs(W), X, Yprime)
+        mylearner = copy.deepcopy(learner)
+        mylearner.fit(X, Yprime, np.absolute(W))
 
         # Append the new learner, along with its L value to the result
-        result.append({"model":model, "lambda":L})
+        result.append({"model": mylearner, "lambda":L})
 
     # Return the result array (tuples of (L,model))
     return result
