@@ -23,6 +23,12 @@ def _generate_p0_p1(Y):
     """
     unique, counts = np.unique(Y, return_counts=True)
 
+    if len(unique) != 2:
+        raise RuntimeError("Supplied Y not binary")
+
+    if not np.array_equal(unique, [0, 1]):
+        raise RuntimeError("Supplied Y labels not 0 or 1")
+
     p0 = counts[0] / len(Y)
     p1 = counts[1] / len(Y)
 
@@ -38,13 +44,12 @@ def grid_search_classification_binary_protected_1d(learner, X, Y, A):
 
     # Check that Y and A are both 1d vectors
 
-    # Check that Y only has values 0 and 1
-
     # Check that A only has values 0 and 1
-
-    # If needed, check Y only has values 0 and 1
     
     # Compute p0 and p1
+    # This will also check that Y is binary with values
+    # 0 and 1
+    p0, p1 = _generate_p0_p1(Y)
 
     # If not supplied, generate array of trial Lagrangian multipliers
 
