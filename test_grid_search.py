@@ -13,5 +13,5 @@ class TestGridSearch:
 
         p0, p1 = gs._generate_p0_p1(Y)
 
-        assert p0 == (7/21)
-        assert p1 == (14/21)
+        assert p0 == 8/20
+        assert p1 == 12/20
