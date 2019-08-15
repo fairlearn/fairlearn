@@ -186,12 +186,50 @@ def roc_curve_based_post_processing(attrs, labels, scores, flip=True, debug=Fals
         of being very close to the actual best solution.
     """
     data = pd.DataFrame({'attr': attrs, 'score': scores, 'label': labels})
+    assert len(labels) > 0, "Empty dataset"
+
+    grouped = data.groupby('attr')
+
+    pred_EO = _roc_curve_based_post_processing_equalized_odds(labels, grouped, gridsize, flip, debug)
+    pred_DP = _roc_curve_based_post_processing_demographic_parity(labels, grouped, gridsize, flip, debug)
+
+    return pred_EO, pred_DP
+
+def _roc_curve_based_post_processing_demographic_parity(labels, grouped, gridsize, flip, debug):
     n = len(labels)
     npos = sum(labels)
     nneg = n-npos
-    assert n>0, "Empty dataset"
+    roc = {}
+    sel = {}
+    x_grid= np.linspace(0, 1, gridsize+1)
+    err_given_sel = 0*x_grid
+    for attr, group in grouped:
+        p_attr = len(group)/n
+        roc[attr], sel[attr] = get_roc(group, x_grid, flip=flip, debug=debug, attr=attr)
+        err_given_sel += p_attr * sel[attr]['err']
 
-    grouped = data.groupby('attr')
+    i_best_DP = err_given_sel.idxmin()
+    sel_best = x_grid[i_best_DP]
+    
+    # create the solution as interpolation of multiple points with a separate predictor per protected attribute
+    pred_DP_by_attr = {}
+    for attr in roc.keys():
+        # for DP we already have the predictor directly without complex interpolation. no p_ignore
+        r = sel[attr].transpose()[i_best_DP]
+        pred_DP_by_attr[attr] = interpolated_pred(0, 0, r.p0, r.op0, r.p1, r.op1)
+    
+    if debug:
+        print("-"*65)
+        print("From ROC curves")
+        print("Best DP: error=%.3f, selection rate=%.3f" % (err_given_sel[i_best_DP], sel_best))
+        print("-"*65)
+
+    return lambda a,x : pred_DP_by_attr[a](x)   
+
+def _roc_curve_based_post_processing_equalized_odds(labels, grouped, gridsize, flip, debug):
+    n = len(labels)
+    npos = sum(labels)
+    nneg = n-npos
     roc = {}
     sel = {}
     x_grid= np.linspace(0, 1, gridsize+1)
@@ -201,50 +239,35 @@ def roc_curve_based_post_processing(attrs, labels, scores, flip=True, debug=Fals
         p_attr = len(group)/n
         roc[attr], sel[attr] = get_roc(group, x_grid, flip=flip, debug=debug, attr=attr)
         y_vals[attr] = roc[attr]['y']
-        err_given_sel += p_attr * sel[attr]['err']
 
     # EQUALIZED ODDS
-    y_min       = np.amin(y_vals, axis=1)
+    y_min = np.amin(y_vals, axis=1)
     # conditional probabilities represented as x -> P[Y_hat=1 | Y=0]
     # and                                      y -> P[Y_hat=1 | Y=1]
     err_given_x = (nneg/n) * x_grid + (npos/n) * (1-y_min)
-    i_best_EO   = err_given_x.idxmin()
+    i_best_EO = err_given_x.idxmin()
     x_best = x_grid[i_best_EO]
     y_best = y_min[i_best_EO]
-
-    # DEMOGRAPHIC PARITY
-    # TODO: separate this out of this method, or at least rename the method
-    i_best_DP = err_given_sel.idxmin()
-    sel_best  = x_grid[i_best_DP]
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
     pred_EO_by_attr = {}
-    pred_DP_by_attr = {}
     for attr in roc.keys():
         r = roc[attr].transpose()[i_best_EO]
         # p_ignore is the probability at which we're ignoring the score, i.e. on the diagonal of the ROC curve
-        if r.y==r.x:
+        if r.y == r.x:
             p_ignore = 0
         else:
-            p_ignore = (r.y-y_best)/(r.y-r.x)
+            p_ignore = (r.y - y_best) / (r.y - r.x)
         pred_EO_by_attr[attr] = interpolated_pred(p_ignore, x_best, r.p0, r.op0, r.p1, r.op1)
-
-        # for DP we already have the predictor directly without complex interpolation. no p_ignore
-        r = sel[attr].transpose()[i_best_DP]
-        pred_DP_by_attr[attr] = interpolated_pred(0, 0, r.p0, r.op0, r.p1, r.op1)
-
-    pred_EO = lambda a,x : pred_EO_by_attr[a](x)
-    pred_DP = lambda a,x : pred_DP_by_attr[a](x)    
 
     if debug:
         print("-"*65)
         print("From ROC curves")
-        print("Best EO: error=%.3f, FP rate=%.3f, TP rate=%.3f" % (err_given_x[i_best_EO], x_best, y_best) )
-        print("Best DP: error=%.3f, selection rate=%.3f" % (err_given_sel[i_best_DP], sel_best) )
+        print("Best EO: error=%.3f, FP rate=%.3f, TP rate=%.3f" % (err_given_x[i_best_EO], x_best, y_best))
         print("-"*65)
         line, = plt.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
         line.zorder -= 1
         plt.plot(x_best, y_best, 'm*', ms=10, label='EO solution') 
         plt.legend()
 
-    return pred_EO, pred_DP
+    return lambda a,x : pred_EO_by_attr[a](x)
