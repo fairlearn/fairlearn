@@ -6,7 +6,7 @@ A Python package that implements the black-box approach to fair classification d
 
 The package can be installed via `pip install fairlearn`. To verify that it works, download `test_fairlearn.py` from the repository and run `python test_fairlearn.py`.
 
-Instead of installing the package, you can clone the repository locally via `git clone git@github.com:Microsoft/fairlearn.git`. To verify that the package works, run `python test_fairlearn.py` in the root of the repository.
+Instead of installing the package, you can clone the repository locally via `git clone git@github.com:Microsoft/fairlearn.git`. To verify that the package works, run `python ./tests/test_fairlearn.py` in the root of the repository.
 
 ## Usage
 
