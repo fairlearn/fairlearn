@@ -1,6 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from fairlearn.post_processing.roc_curve_based_post_processing import equalized_odds
 
 ex_attrs1 = [x      for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
