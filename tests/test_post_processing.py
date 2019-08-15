@@ -4,6 +4,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pytest
 from fairlearn.post_processing.roc_curve_based_post_processing import equalized_odds
 
 ex_attrs1 = [x      for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
@@ -12,17 +13,8 @@ ex_labels = [int(x) for x in '0110100' '0010111' '000111']
 ex_scores = [int(x) for x in '0011233' '0001111' '011112']
 
 
-def test(test_id=1):
+def run_roc_curve_based_post_processing_and_plot(ex_attrs, flip):
     print("STARTING TEST")
-    if test_id==1:
-        ex_attrs, flip = ex_attrs1, True
-    elif test_id==2:
-        ex_attrs, flip = list(zip(ex_attrs1, ex_attrs2)), True
-    elif test_id==3:
-        ex_attrs, flip = ex_attrs1, False
-    elif test_id==4:
-        ex_attrs, flip = ex_attrs2, False
-    
     pred_EO, pred_DP = equalized_odds(ex_attrs, ex_labels, ex_scores, debug=True, flip=flip)
     ex_preds_EO = []
     ex_preds_DP = []
@@ -49,8 +41,14 @@ def test(test_id=1):
     print("error_DP=%.3f" % ex_data['error_DP'].mean() )
     plt.show()
 
-if __name__ == '__main__':
-    test(1)
-    test(2)
-    test(3)
-    test(4)
+def test_1():
+    run_roc_curve_based_post_processing_and_plot(ex_attrs1, True)
+
+def test_2():
+    run_roc_curve_based_post_processing_and_plot(list(zip(ex_attrs1, ex_attrs2)), True)
+
+def test_3():
+    run_roc_curve_based_post_processing_and_plot(ex_attrs1, False)
+
+def test_4():
+    run_roc_curve_based_post_processing_and_plot(ex_attrs2, False)
