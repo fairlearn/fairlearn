@@ -47,14 +47,14 @@ def _generate_weights(Y, A, L, p_ratio):
 
         W.append(w)
 
-    return W
+    return np.array(W)
 
 def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls = 11):
     """Function to generate a 1d set of models for a classification problem with
     a single binary protected attribute
     """
     # Must specify Ls or num_Ls
-    if not( Ls is None ^ num_Ls is None):
+    if not( (Ls is None) ^ (num_Ls is None)):
         raise RuntimeError("Must specify either Ls or num_Ls")
 
     # Check that X, Y and A have the same number of rows
@@ -95,7 +95,7 @@ def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls = 11):
 
         # Generate Y'
         f = lambda x: 1 if x>0 else 0
-        Yprime = map(f, Y)
+        Yprime = np.vectorize(f)(Y)
 
         # Run the learner
         model = learner.fit(abs(W), X, Yprime)
