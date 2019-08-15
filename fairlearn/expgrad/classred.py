@@ -18,7 +18,7 @@ import scipy.optimize as opt
 import pandas as pd
 import pickle
 import functools
-import fairlearn.moments as moments
+import fairlearn.expgrad.moments as moments
 from collections import namedtuple
 
 print = functools.partial(print, flush=True)
