@@ -10,6 +10,7 @@ and produces a sequence of models, each of which corresponds to a
 different accuracy/fairness trade-off
 """
 
+import itertools
 import numpy as np
 import pandas as pd
 from collections import namedtuple
@@ -33,6 +34,20 @@ def _generate_p0_p1(Y):
     p1 = counts[1] / len(Y)
 
     return p0, p1
+
+def _generate_weights(Y, A, L, p_ratio):
+    W = []
+
+    for y, a in zip(Y, A):
+        w = 1e128
+        if a==0:
+            w = 2*y - 1 - L * p_ratio
+        else:
+            w = 2*y - 1 + L
+
+        W.append(w)
+
+    return W
 
 def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls = 11):
     """Function to generate a 1d set of models for a classification problem with
@@ -73,15 +88,21 @@ def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls = 11):
             limit = p0/p1
         Ls = np.linspace(-2*limit, 2*limit, num_Ls)
 
+    result = []
     for L in Ls:
         # Generate W array
+        W = _generate_weights(Y, A, L, p1/p0)
 
         # Generate Y'
+        f = lambda x: 1 if x>0 else 0
+        Yprime = map(f, Y)
 
         # Run the learner
         model = learner.fit(abs(W), X, Yprime)
 
         # Append the new learner, along with its L value to the result
+        result.append({"model":model, "lambda":L})
 
     # Return the result array (tuples of (L,model))
+    return result
 
