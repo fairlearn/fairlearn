@@ -85,12 +85,12 @@ def interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
     return pd.DataFrame(dict_list)[[x_col, y_col, 'p0', content_col + '0', 'p1', content_col + '1']]
 
-def get_roc(data, x_grid, flip=True, debug=False, attr=None):
+def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
     """Get ROC curve based on data columns 'score' and 'label'"""
 
-    attr_str = "attribute value" + str(attr)
+    attribute_str = "attribute value" + str(attribute)
     if debug:
-        color = debug_color(attr_str)
+        color = debug_color(attribute_str)
             
     data_sorted = data.sort_values(by='score', ascending=False)
 
@@ -101,7 +101,7 @@ def get_roc(data, x_grid, flip=True, debug=False, attr=None):
     n_positive = sum(labels)
     n_negative = n - n_positive
 
-    assert (n_positive > 0) & (n_negative > 0), "Degenerate labels for " + attr_str
+    assert (n_positive > 0) and (n_negative > 0), "Degenerate labels for " + attribute_str
     
     scores.append(-np.inf)
     labels.append(np.nan)
@@ -110,7 +110,7 @@ def get_roc(data, x_grid, flip=True, debug=False, attr=None):
     
     i = 0
     count = [0, 0]
-    while i<n:
+    while i < n:
         threshold = scores[i]
         while scores[i] == threshold:
             count[labels[i]] += 1
@@ -154,7 +154,7 @@ def get_roc(data, x_grid, flip=True, debug=False, attr=None):
         print(OUTPUT_SEPARATOR)
         print("")
         print(OUTPUT_SEPARATOR)
-        print("Processing " + attr_str)
+        print("Processing " + attribute_str)
         print(OUTPUT_SEPARATOR)
         print("DATA")
         print(data)
@@ -166,16 +166,16 @@ def get_roc(data, x_grid, flip=True, debug=False, attr=None):
         print("\nROC curve: interpolated [just top]")
         print(roc_curve_interpolated.head())
         plt.plot(roc_sorted['x'], roc_sorted['y'], c=color, ls='--', lw=1.0, label='_')
-        plt.plot(roc_conv['x'], roc_conv['y'], c=color, ls='-', lw=2.0, label='attribute '+str(attr))
+        plt.plot(roc_conv['x'], roc_conv['y'], c=color, ls='-', lw=2.0, label='attribute ' + str(attribute))
         
     return roc_curve_interpolated, sel_interp
         
-def roc_curve_based_post_processing(attrs, labels, scores, flip=True, debug=False, gridsize=1000):
+def roc_curve_based_post_processing(attributes, labels, scores, flip=True, debug=False, gridsize=1000):
     """ Post processing algorithm based on M. Hardt, E. Price, N. Srebro's paper "Equality of
     Opportunity in Supervised Learning" (https://arxiv.org/pdf/1610.02413.pdf).
     
-    :param attrs: the protected attributes
-    :type attrs: list
+    :param attributes: the protected attributes
+    :type attributes: list
     :param labels: the labels of the dataset
     :type labels: list
     :param scores: the scores produced by a model's prediction
@@ -188,38 +188,38 @@ def roc_curve_based_post_processing(attrs, labels, scores, flip=True, debug=Fals
         A large gridsize means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
     """
-    data = pd.DataFrame({'attr': attrs, 'score': scores, 'label': labels})
+    data = pd.DataFrame({'attribute': attributes, 'score': scores, 'label': labels})
     assert len(labels) > 0, "Empty dataset"
 
-    data_grouped_by_attr = data.groupby('attr')
+    data_grouped_by_attribute = data.groupby('attribute')
 
-    pred_EO = _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr, gridsize, flip, debug)
-    pred_DP = _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attr, gridsize, flip, debug)
+    pred_EO = _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug)
+    pred_DP = _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug)
 
     return pred_EO, pred_DP
 
-def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attr, gridsize, flip, debug):
+def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug):
     n = len(labels)
     n_positive = sum(labels)
     n_negative = n - n_positive
     roc = {}
     sel = {}
-    x_grid= np.linspace(0, 1, gridsize + 1)
+    x_grid = np.linspace(0, 1, gridsize + 1)
     err_given_sel = 0 * x_grid
-    for attr, group in data_grouped_by_attr:
-        p_attr = len(group) / n
-        roc[attr], sel[attr] = get_roc(group, x_grid, flip=flip, debug=debug, attr=attr)
-        err_given_sel += p_attr * sel[attr]['err']
+    for attribute, group in data_grouped_by_attribute:
+        p_attribute = len(group) / n
+        roc[attribute], sel[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
+        err_given_sel += p_attribute * sel[attribute]['err']
 
     i_best_DP = err_given_sel.idxmin()
     sel_best = x_grid[i_best_DP]
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
-    pred_DP_by_attr = {}
-    for attr in roc.keys():
+    pred_DP_by_attribute = {}
+    for attribute in roc.keys():
         # for DP we already have the predictor directly without complex interpolation. no p_ignore
-        r = sel[attr].transpose()[i_best_DP]
-        pred_DP_by_attr[attr] = interpolated_pred(0, 0, r.p0, r.op0, r.p1, r.op1)
+        r = sel[attribute].transpose()[i_best_DP]
+        pred_DP_by_attribute[attribute] = interpolated_pred(0, 0, r.p0, r.op0, r.p1, r.op1)
     
     if debug:
         print(OUTPUT_SEPARATOR)
@@ -227,9 +227,9 @@ def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_
         print("Best DP: error=%.3f, selection rate=%.3f" % (err_given_sel[i_best_DP], sel_best))
         print(OUTPUT_SEPARATOR)
 
-    return lambda a,x : pred_DP_by_attr[a](x)   
+    return lambda a,x : pred_DP_by_attribute[a](x)   
 
-def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr, gridsize, flip, debug):
+def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug):
     n = len(labels)
     n_positive = sum(labels)
     n_negative = n - n_positive
@@ -238,10 +238,10 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
     x_grid= np.linspace(0, 1, gridsize + 1)
     y_vals = pd.DataFrame()
     err_given_sel = 0 * x_grid
-    for attr, group in data_grouped_by_attr:
-        p_attr = len(group) / n
-        roc[attr], sel[attr] = get_roc(group, x_grid, flip=flip, debug=debug, attr=attr)
-        y_vals[attr] = roc[attr]['y']
+    for attribute, group in data_grouped_by_attribute:
+        p_attribute = len(group) / n
+        roc[attribute], sel[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
+        y_vals[attribute] = roc[attribute]['y']
 
     y_min = np.amin(y_vals, axis=1)
     # conditional probabilities represented as x -> P[Y_hat=1 | Y=0]
@@ -252,15 +252,15 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
     y_best = y_min[i_best_EO]
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
-    pred_EO_by_attr = {}
-    for attr in roc.keys():
-        r = roc[attr].transpose()[i_best_EO]
+    pred_EO_by_attribute = {}
+    for attribute in roc.keys():
+        r = roc[attribute].transpose()[i_best_EO]
         # p_ignore is the probability at which we're ignoring the score, i.e. on the diagonal of the ROC curve
         if r.y == r.x:
             p_ignore = 0
         else:
             p_ignore = (r.y - y_best) / (r.y - r.x)
-        pred_EO_by_attr[attr] = interpolated_pred(p_ignore, x_best, r.p0, r.op0, r.p1, r.op1)
+        pred_EO_by_attribute[attribute] = interpolated_pred(p_ignore, x_best, r.p0, r.op0, r.p1, r.op1)
 
     if debug:
         print(OUTPUT_SEPARATOR)
@@ -272,4 +272,4 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
         plt.plot(x_best, y_best, 'm*', ms=10, label='EO solution') 
         plt.legend()
 
-    return lambda a,x : pred_EO_by_attr[a](x)
+    return lambda a,x : pred_EO_by_attribute[a](x)
