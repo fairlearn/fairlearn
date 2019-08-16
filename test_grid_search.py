@@ -66,3 +66,7 @@ class TestGridSearch:
 
         result = gs.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A, num_Ls=11)
         assert len(result) == 11
+        assert result[5]["lambda"] == 0
+        lambdas = [x["lambda"] for x in result]
+        assert len(np.unique(lambdas)) == len(result)
+        assert sorted(lambdas)
