@@ -40,19 +40,19 @@ def debug_color(key):
 def debug_has_color(key):
     return key in debug_colormap
 
-def pred_from_operator(op, threshold):
+def pred_from_operation(operation, threshold):
     """ Encodes the threshold rule P_hat > t or P_hat < t
     """
-    if op == '>':
+    if operation == '>':
         return lambda x: x > threshold
-    elif op == '<':
+    elif operation == '<':
         return lambda x: x < threshold
     else:
-        assert False, "Unrecognized operation:" + op
+        assert False, "Unrecognized operation:" + operation
 
-def interpolated_pred(p_ignore, pred_const, p0, op0, p1, op1):
-    pred0 = pred_from_operator(*op0)
-    pred1 = pred_from_operator(*op1)
+def interpolated_pred(p_ignore, pred_const, p0, operation0, p1, operation1):
+    pred0 = pred_from_operation(*operation0)
+    pred1 = pred_from_operation(*operation1)
     return (lambda x : p_ignore * pred_const + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
 
 def interpolate_curve(data, x_col, y_col, content_col, x_grid):
@@ -86,7 +86,10 @@ def interpolate_curve(data, x_col, y_col, content_col, x_grid):
     return pd.DataFrame(dict_list)[[x_col, y_col, 'p0', content_col + '0', 'p1', content_col + '1']]
 
 def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
-    """Get ROC curve based on data columns 'score' and 'label'"""
+    """Get ROC curve based on data columns 'score' and 'label'
+    Scores represent output values from the model.
+    Labels are the 
+    """
 
     attribute_str = "attribute value" + str(attribute)
     if debug:
@@ -106,7 +109,7 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
     scores.append(-np.inf)
     labels.append(np.nan)
     
-    x_list, y_list, op_list = [0], [0], [('>', np.inf)]
+    x_list, y_list, operation_list = [0], [0], [('>', np.inf)]
     
     i = 0
     count = [0, 0]
@@ -117,17 +120,17 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
             i += 1
         x, y = count[0] / n_negative, count[1] / n_positive
         threshold = (threshold + scores[i]) / 2
-        op = ('>', threshold)
+        operation = ('>', threshold)
 
         # if flipping labels gives better accuracy try flipping
         if flip & (x > y):
             x, y = 1 - x, 1 - y
-            op = ('<', threshold)
+            operation = ('<', threshold)
         x_list.append(x)
         y_list.append(y)
-        op_list.append(op)
+        operation_list.append(operation)
     
-    roc_raw = pd.DataFrame({'x': x_list, 'y': y_list, 'op': op_list})
+    roc_raw = pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list})
     
     roc_sorted = roc_raw.sort_values(by=['x', 'y'])
     selected = []
@@ -141,13 +144,13 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
                 break
         selected.append(r2)
 
-    roc_conv = pd.DataFrame(selected)[['x', 'y', 'op']]
+    roc_conv = pd.DataFrame(selected)[['x', 'y', 'operation']]
 
     roc_conv['sel'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * roc_conv['y']
     roc_conv['err'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * (1 - roc_conv['y'])
     
-    roc_curve_interpolated = interpolate_curve(roc_conv, 'x', 'y', 'op', x_grid)
-    sel_interp = interpolate_curve(roc_conv, 'sel', 'err', 'op', x_grid)
+    roc_curve_interpolated = interpolate_curve(roc_conv, 'x', 'y', 'operation', x_grid)
+    sel_interp = interpolate_curve(roc_conv, 'sel', 'err', 'operation', x_grid)
 
     if debug:
         print("")
@@ -207,6 +210,7 @@ def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_
     x_grid = np.linspace(0, 1, gridsize + 1)
     err_given_sel = 0 * x_grid
     for attribute, group in data_grouped_by_attribute:
+        # determine probability of current protected attribute group based on data
         p_attribute = len(group) / n
         roc[attribute], sel[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
         err_given_sel += p_attribute * sel[attribute]['err']
@@ -219,7 +223,7 @@ def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_
     for attribute in roc.keys():
         # for DP we already have the predictor directly without complex interpolation. no p_ignore
         r = sel[attribute].transpose()[i_best_DP]
-        pred_DP_by_attribute[attribute] = interpolated_pred(0, 0, r.p0, r.op0, r.p1, r.op1)
+        pred_DP_by_attribute[attribute] = interpolated_pred(0, 0, r.p0, r.operation0, r.p1, r.operation1)
     
     if debug:
         print(OUTPUT_SEPARATOR)
@@ -260,7 +264,7 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
             p_ignore = 0
         else:
             p_ignore = (r.y - y_best) / (r.y - r.x)
-        pred_EO_by_attribute[attribute] = interpolated_pred(p_ignore, x_best, r.p0, r.op0, r.p1, r.op1)
+        pred_EO_by_attribute[attribute] = interpolated_pred(p_ignore, x_best, r.p0, r.operation0, r.p1, r.operation1)
 
     if debug:
         print(OUTPUT_SEPARATOR)
