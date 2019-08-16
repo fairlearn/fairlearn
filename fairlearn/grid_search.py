@@ -7,7 +7,9 @@ binary protected attribute.
 
 This is a simplification of the full exponentiated gradient search
 and produces a sequence of models, each of which corresponds to a
-different accuracy/fairness trade-off
+different accuracy/fairness trade-off. The dimensionality of the search
+increases with the number of possible values for the protected attribute,
+so this technique does not scale beyond a binary protected attribute.
 """
 
 import copy
@@ -50,10 +52,33 @@ def _generate_weights(Y, A, L, p_ratio):
     return np.array(W)
 
 def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls = 11):
-    """Function to generate a 1d set of models for a classification problem with
-    a single binary protected attribute
+    """Function to generate a list of models for a classification problem with
+    a single binary protected attribute. The models sweep through different potential
+    Lagrangian multipliers for the constrained optimisation problem (the constraint
+    being demographic parity), each one corresponding to a particular tradeoff between
+    fairness and accuracy
+
+    :param learner: An object which can be used to fit a model to features, labels and weights. A deep copy of this
+    is made for each value of the Lagrangian multiplier used
+    :type learner: Must implement a fit(X, Y, W) method
+    :param X: The array of training data features (which may or may not contain the protected attribute). Must have as many rows as Y and A
+    :type X: Numpy array with two dimensions or pandas dataframe
+    :param Y: The list of binary classes, which must be 0 or 1. Must contain the same number of entries as rows in X
+    :type Y: Numpy array with one dimension
+    :param A: The protected attribute corresponding to each row of X. Must be either 0 or 1
+    :type A: Numpy array with one dimension
+    :param Ls: User specified set of Lagrangian multipliers to use for the optimisation problem. If this is set then
+    num_Ls must be None. The result array will be equal in length to this array
+    :type Ls: List of real numbers
+    :param num_Ls: Specifies the number of Lagrangian multipliers to use in the optimisation problem. If this is set then
+    Ls must be None. The result array will have as many entries as specified here
+
+    :return: The models corresponding to each value of the Lagrangian multiplier tested
+    :rtype: List of dictionaries. Each dictionary has fields "lambda" and "model." Each model will correspond to the input parameter
+    learner after calling 'fit' on it (a deep copy is made). The user is responsible for converting these objects to an actual model,
+    if further processing is required.
     """
-    # Must specify Ls or num_Ls
+    # Must specify either Ls or num_Ls
     if not( (Ls is None) ^ (num_Ls is None)):
         raise RuntimeError("Must specify either Ls or num_Ls")
 
@@ -90,12 +115,12 @@ def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls = 11):
 
     result = []
     for L in Ls:
-        # Generate W array
+        # Generate weights array
         W = _generate_weights(Y, A, L, p1/p0)
 
         # Generate Y'
         f = lambda x: 1 if x>0 else 0
-        Yprime = np.vectorize(f)(Y)
+        Yprime = np.vectorize(f)(W)
 
         # Run the learner
         mylearner = copy.deepcopy(learner)
