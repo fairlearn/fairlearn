@@ -14,5 +14,10 @@ steps:
 - script: pip install -r requirements.txt
   displayName: 'Install required packages'
 
-- script: python -m pytest test/
+- script: python -m pytest test/ --junitxml=./TEST-TEST.xml 
   displayName: 'Run tests'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/TEST-*.xml'
+  condition: succeededOrFailed()
+
