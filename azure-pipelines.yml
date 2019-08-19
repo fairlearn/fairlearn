@@ -14,5 +14,5 @@ steps:
 - script: pip install -r requirements.txt
   displayName: 'Install required packages'
 
-- script: python -m pytest test/test*.py
+- script: python -m pytest test/
   displayName: 'Run tests'
