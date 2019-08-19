@@ -106,11 +106,11 @@ class BinaryClassificationGridSearch:
             re_labels = np.vectorize(f)(sample_weights)
 
             # Run the learner
-            mylearner = copy.deepcopy(learner)
-            mylearner.fit(x, re_labels, sample_weight=np.absolute(sample_weights))
+            current_learner = copy.deepcopy(learner)
+            current_learner.fit(x, re_labels, sample_weight=np.absolute(sample_weights))
 
             # Append the new learner, along with its current_multiplier value to the result
-            result.append({"model": mylearner, "lagrange_multiplier":current_multiplier})
+            result.append({"model": current_learner, "lagrange_multiplier":current_multiplier})
 
         # Return the result array (tuples of (current_multiplier,model))
         return result
