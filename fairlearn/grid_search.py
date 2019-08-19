@@ -35,19 +35,15 @@ class BinaryClassificationGridSearch:
 
         return p0, p1
 
+    def _weight_function(self, y_val, a_val, L, p_ratio):
+        if a_val == 0:
+            return 2*y_val - 1 - L * p_ratio
+        else:
+            return 2*y_val - 1 + L
+
     def _generate_weights(self, y, protected_attribute, L, p_ratio):
-        weights = []
-
-        for current_y, current_a in zip(y, protected_attribute):
-            w = 1e128
-            if current_a == 0:
-                w = 2*current_y - 1 - L * p_ratio
-            else:
-                w = 2*current_y - 1 + L
-
-            weights.append(w)
-
-        return np.array(weights)
+        weight_func = np.vectorize(self._weight_function)
+        return weight_func(y, protected_attribute, L, p_ratio)
 
     def grid_search_binary_protected_attribute(self, learner, x, y, protected_attribute, lagrangian_multipliers=None, number_lagrangian_multipliers=11):
         """Function to generate a list of models for a binary classification problem with
