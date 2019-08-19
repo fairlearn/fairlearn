@@ -161,3 +161,22 @@ class TestGridSearch:
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
             _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)
+
+    def test_grid_already_fair(self):
+        num_samples_each = 4000
+        A = pd.Series(np.concatenate((np.zeros(num_samples_each), np.ones(num_samples_each)), axis=None))
+        scores = np.linspace(0, 1, num_samples_each)
+        feat1 = pd.Series(np.concatenate((scores, scores), axis=None))
+        Y = pd.Series([x>0.5 for x in feat1])
+        X = pd.DataFrame({"actual_feature": feat1, "protected_attribute_feature": A, "constant_ones_feature": np.ones(len(Y))})
+        unweighted_learner = LeastSquaresLearner()
+        unweighted_learner.fit(X, Y, np.ones(len(Y)))
+        target = gs.BinaryClassificationGridSearch()
+        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrangian_multipliers=5)
+        assert len(result)==5
+        f1weights = [x["model"].weights["actual_feature"] for x in result]
+        assert len(f1weights)==5
+        f2weights = [x["model"].weights["protected_attribute_feature"] for x in result]
+        assert len(f2weights)==5
+        f3weights = [x["model"].weights["constant_ones_feature"] for x in result]
+        assert len(f3weights)==5
