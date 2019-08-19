@@ -163,20 +163,37 @@ class TestGridSearch:
             _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)
 
     def test_grid_already_fair(self):
-        num_samples_each = 4000
+        # Number of samples of each attribute to generate
+        # Large numbers required to beat down the errors in the weights
+        num_samples_each = 400000
+
+        # Create a 'rigged' dataset which while it contains the protected attribute, actually doesn't depend on it
+
+        # Attribute array is evenly divided between zeros and ones
         A = pd.Series(np.concatenate((np.zeros(num_samples_each), np.ones(num_samples_each)), axis=None))
+
+        # Generate a set of scores which we threshold to get the label
         scores = np.linspace(0, 1, num_samples_each)
-        feat1 = pd.Series(np.concatenate((scores, scores), axis=None))
-        Y = pd.Series([x>0.5 for x in feat1])
-        X = pd.DataFrame({"actual_feature": feat1, "protected_attribute_feature": A, "constant_ones_feature": np.ones(len(Y))})
-        unweighted_learner = LeastSquaresLearner()
-        unweighted_learner.fit(X, Y, np.ones(len(Y)))
+
+        # Need two copies of the scores, one for each value of the protected features
+        actual_feature = pd.Series(np.concatenate((scores, scores), axis=None))
+
+        # Generate the labels by thresholding
+        Y = pd.Series([x>0.5 for x in actual_feature])
+
+        # Assemble the dataframe of samples
+        # Need a extra 'ones' column to allow our simple least squares learner to work properly
+        X = pd.DataFrame({"actual_feature": actual_feature, "protected_attribute_feature": A, "constant_ones_feature": np.ones(len(Y))})
+
         target = gs.BinaryClassificationGridSearch()
         result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrangian_multipliers=5)
         assert len(result)==5
-        f1weights = [x["model"].weights["actual_feature"] for x in result]
-        assert len(f1weights)==5
-        f2weights = [x["model"].weights["protected_attribute_feature"] for x in result]
-        assert len(f2weights)==5
-        f3weights = [x["model"].weights["constant_ones_feature"] for x in result]
-        assert len(f3weights)==5
+
+        # Check the weights for each of the models returned against the expected values
+        # Note that the 'middle' value in each array corresponds to the Lagrange multiplier being zero
+        expected_actual_feature_weights = [0, 0, 1.5, 0, 0]
+        expected_protected_attribute_feature_weights = [-1, -1, 0, 1, 1]
+        expected_constant_ones_feature_weights = [1, 1, -0.25, 0, 0]
+        assert np.allclose(expected_actual_feature_weights, [x["model"].weights["actual_feature"] for x in result])
+        assert np.allclose(expected_protected_attribute_feature_weights, [x["model"].weights["protected_attribute_feature"] for x in result])
+        assert np.allclose(expected_constant_ones_feature_weights, [x["model"].weights["constant_ones_feature"] for x in result])
