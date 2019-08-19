@@ -15,20 +15,20 @@ so this technique does not scale beyond a binary protected attribute.
 import copy
 import numpy as np
 
-def _generate_p0_p1(labels):
+def _generate_p0_p1(y):
     """ Function to compute p0 and p1 for the given
     set of labels
     """
-    unique, counts = np.unique(labels, return_counts=True)
+    unique, counts = np.unique(y, return_counts=True)
 
     if len(unique) != 2:
-        raise RuntimeError("Supplied Y not binary")
+        raise RuntimeError("Supplied y not binary")
 
     if not np.array_equal(unique, [0, 1]):
-        raise RuntimeError("Supplied Y labels not 0 or 1")
+        raise RuntimeError("Supplied y labels not 0 or 1")
 
-    p0 = counts[0] / len(labels)
-    p1 = counts[1] / len(labels)
+    p0 = counts[0] / len(y)
+    p1 = counts[1] / len(y)
 
     return p0, p1
 
