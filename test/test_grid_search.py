@@ -12,8 +12,8 @@ class LeastSquaresLearner:
     def __init__(self):
         self.weights = None
 
-    def fit(self, X, Y, W):
-        sqrtW = np.sqrt(W)
+    def fit(self, X, Y, sample_weight):
+        sqrtW = np.sqrt(sample_weight)
         matX = np.array(X) * sqrtW[:, np.newaxis]
         vecY = Y * sqrtW
         self.lsqinfo = np.linalg.lstsq(matX, vecY, rcond=-1)
@@ -86,7 +86,7 @@ class TestGridSearch:
             _ = gs.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A, [-1,0,1], 3)
 
     def test_grid_bad_Y_shape(self):
-        message = r"Supplied Y not 1d vector"
+        message = r"Supplied y not 1d vector"
 
         A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
         feat1 = [int(x) for x in '0110101' '0111101' '001011']
@@ -99,7 +99,7 @@ class TestGridSearch:
             _ = gs.classification_binary_protected_1d(LeastSquaresLearner(), X, badY, A)
 
     def test_grid_bad_A_shape(self):
-        message = r"Supplied A not 1d vector"
+        message = r"Supplied protected_attribute not 1d vector"
 
         Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
         feat1 = [int(x) for x in '0110101' '0111101' '001011']
@@ -112,7 +112,7 @@ class TestGridSearch:
             _ = gs.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, badA)
 
     def test_grid_A_Y_mismatch(self):
-        message = r"Supplied A and Y not same length"
+        message = r"Supplied protected_attribute and y not same length"
 
         A = pd.Series([int(x) for x in '0000000' '1111111' '010101' '1'])
         Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
@@ -125,7 +125,7 @@ class TestGridSearch:
             _ = gs.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A)
 
     def test_grid_X_Y_mismatch(self):
-        message = r"Supplied X and Y do not have same number of rows"
+        message = r"Supplied x and y do not have same number of rows"
 
         A = pd.Series([int(x) for x in '0000000' '1111111' '010101' '1'])
         Y = pd.Series([int(x) for x in '0110100' '0010111' '001111' '0'])
@@ -138,7 +138,7 @@ class TestGridSearch:
             _ = gs.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A)
 
     def test_grid_bad_A_labels(self):
-        message = r"Supplied A labels not 0 or 1"
+        message = r"Supplied protected_attribute labels not 0 or 1"
 
         A = pd.Series([int(x) for x in '0000000' '2222222' '020202'])
         Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])

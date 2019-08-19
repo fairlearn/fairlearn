@@ -15,14 +15,11 @@ so this technique does not scale beyond a binary protected attribute.
 import copy
 import numpy as np
 
-def _generate_p0_p1(Y):
+def _generate_p0_p1(labels):
     """ Function to compute p0 and p1 for the given
-    set of labels Y
-
-    Assume we have already checked that Y is binary with
-    values 0 and 1
+    set of labels
     """
-    unique, counts = np.unique(Y, return_counts=True)
+    unique, counts = np.unique(labels, return_counts=True)
 
     if len(unique) != 2:
         raise RuntimeError("Supplied Y not binary")
@@ -30,26 +27,26 @@ def _generate_p0_p1(Y):
     if not np.array_equal(unique, [0, 1]):
         raise RuntimeError("Supplied Y labels not 0 or 1")
 
-    p0 = counts[0] / len(Y)
-    p1 = counts[1] / len(Y)
+    p0 = counts[0] / len(labels)
+    p1 = counts[1] / len(labels)
 
     return p0, p1
 
-def _generate_weights(Y, A, L, p_ratio):
-    W = []
+def _generate_weights(labels, protected_attribute, L, p_ratio):
+    weights = []
 
-    for y, a in zip(Y, A):
+    for y, a in zip(labels, protected_attribute):
         w = 1e128
         if a == 0:
             w = 2*y - 1 - L * p_ratio
         else:
             w = 2*y - 1 + L
 
-        W.append(w)
+        weights.append(w)
 
-    return np.array(W)
+    return np.array(weights)
 
-def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls=11):
+def classification_binary_protected_1d(learner, x, y, protected_attribute, Ls=None, num_Ls=11):
     """Function to generate a list of models for a classification problem with
     a single binary protected attribute. The models sweep through different potential
     Lagrangian multipliers for the constrained optimisation problem (the constraint
@@ -58,15 +55,15 @@ def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls=11):
 
     :param learner: An object which can be used to fit a model to features, labels and
     weights. A deep copy of this is made for each value of the Lagrangian multiplier used
-    :type learner: Must implement a fit(X, Y, W) method
-    :param X: The array of training data features (which may or may not contain the
+    :type learner: Must implement a fit(x, y, sample_weight) method
+    :param x: The array of training data features (which may or may not contain the
     protected attribute). Must have as many rows as Y and A
-    :type X: Numpy array with two dimensions or pandas dataframe
-    :param Y: The list of binary classes, which must be 0 or 1. Must contain the same
+    :type x: Numpy array with two dimensions or pandas dataframe
+    :param y: The list of binary classes, which must be 0 or 1. Must contain the same
     number of entries as rows in X
-    :type Y: Numpy array with one dimension
-    :param A: The protected attribute corresponding to each row of X. Must be either 0 or 1
-    :type A: Numpy array with one dimension
+    :type y: Numpy array with one dimension
+    :param protected_attribute: The protected attribute corresponding to each row of X. Must be either 0 or 1
+    :type protected_attribute: Numpy array with one dimension
     :param Ls: User specified set of Lagrangian multipliers to use for the optimisation
     problem. If this is set then num_Ls must be None. The result array will be equal in
     length to this array
@@ -85,29 +82,29 @@ def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls=11):
     if not (Ls is None) ^ (num_Ls is None):
         raise RuntimeError("Must specify either Ls or num_Ls")
 
-    # Check that X, Y and A have the same number of rows
-    # Check that Y and A are both 1d vectors
-    if len(Y.shape) != 1:
-        raise RuntimeError("Supplied Y not 1d vector")
+    # Check that x, y and protected_attribute have the same number of rows
+    # Check that y and protected_attribute are both 1d vectors
+    if len(y.shape) != 1:
+        raise RuntimeError("Supplied y not 1d vector")
 
-    if len(A.shape) != 1:
-        raise RuntimeError("Supplied A not 1d vector")
+    if len(protected_attribute.shape) != 1:
+        raise RuntimeError("Supplied protected_attribute not 1d vector")
 
-    if A.shape[0] != Y.shape[0]:
-        raise RuntimeError("Supplied A and Y not same length")
+    if protected_attribute.shape[0] != y.shape[0]:
+        raise RuntimeError("Supplied protected_attribute and y not same length")
 
-    if X.shape[0] != Y.shape[0]:
-        raise RuntimeError("Supplied X and Y do not have same number of rows")
+    if x.shape[0] != y.shape[0]:
+        raise RuntimeError("Supplied x and y do not have same number of rows")
 
     # Check that A only has values 0 and 1
-    uniqueA = np.unique(A)
-    if not np.array_equal(uniqueA, [0, 1]):
-        raise RuntimeError("Supplied A labels not 0 or 1")
+    unique_protected_attribute_values = np.unique(protected_attribute)
+    if not np.array_equal(unique_protected_attribute_values, [0, 1]):
+        raise RuntimeError("Supplied protected_attribute labels not 0 or 1")
 
     # Compute p0 and p1
     # This will also check that Y is binary with values
     # 0 and 1
-    p0, p1 = _generate_p0_p1(Y)
+    p0, p1 = _generate_p0_p1(y)
 
     # If not supplied, generate array of trial Lagrangian multipliers
     if Ls is None:
@@ -119,15 +116,15 @@ def classification_binary_protected_1d(learner, X, Y, A, Ls=None, num_Ls=11):
     result = []
     for L in Ls:
         # Generate weights array
-        W = _generate_weights(Y, A, L, p1/p0)
+        sample_weights = _generate_weights(y, protected_attribute, L, p1/p0)
 
         # Generate Y'
         f = lambda x: 1 if x > 0 else 0
-        Yprime = np.vectorize(f)(W)
+        re_labels = np.vectorize(f)(sample_weights)
 
         # Run the learner
         mylearner = copy.deepcopy(learner)
-        mylearner.fit(X, Yprime, np.absolute(W))
+        mylearner.fit(x, re_labels, sample_weight=np.absolute(sample_weights))
 
         # Append the new learner, along with its L value to the result
         result.append({"model": mylearner, "lambda":L})
