@@ -34,20 +34,6 @@ class TestGridSearch:
         assert p0 == 8/20
         assert p1 == 12/20
 
-    def test_generate_p0_p1_nonbinary(self):
-        Y = [int(x) for x in "01200011111"]
-
-        target = gs.BinaryClassificationGridSearch()
-        with pytest.raises(RuntimeError, match=r"Supplied y not binary"):
-            _, _ = target._generate_p0_p1(Y)
-
-    def test_generate_p0_p1_not01(self):
-        Y = [int(x) for x in "020202220002"]
-
-        target = gs.BinaryClassificationGridSearch()
-        with pytest.raises(RuntimeError, match=r"Supplied y labels not 0 or 1"):
-            _, _ = target._generate_p0_p1(Y)
-
     def test_generate_weights(self):
         A = [int(x) for x in "0011"]
         Y = [int(x) for x in "0101"]
@@ -70,15 +56,15 @@ class TestGridSearch:
         X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
 
         target = gs.BinaryClassificationGridSearch()
-        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrangian_multipliers=11)
+        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrange_multipliers=11)
         assert len(result) == 11
-        assert result[5]["lagrangian_multiplier"] == 0
-        multipliers = [x["lagrangian_multiplier"] for x in result]
+        assert result[5]["lagrange_multiplier"] == 0
+        multipliers = [x["lagrange_multiplier"] for x in result]
         assert len(np.unique(multipliers)) == len(result)
         assert sorted(multipliers)
 
     def test_grid_bad_Ls(self):
-        message = r"Must specify either lagrangian_multipliers or number_lagrangian_multipliers"
+        message = r"Must specify either lagrange_multipliers or number_lagrange_multipliers"
         A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
         Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
         feat1 = [int(x) for x in '0110101' '0111101' '001011']
@@ -91,62 +77,6 @@ class TestGridSearch:
             _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, None, None)
         with pytest.raises(RuntimeError, match=message):
             _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, [-1,0,1], 3)
-
-    def test_grid_bad_Y_shape(self):
-        message = r"Supplied y not 1d vector"
-
-        A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
-
-        target = gs.BinaryClassificationGridSearch()
-        badY = np.ones((2,3))
-        with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, badY, A)
-
-    def test_grid_bad_A_shape(self):
-        message = r"Supplied protected_attribute not 1d vector"
-
-        Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
-
-        target = gs.BinaryClassificationGridSearch()
-        badA = np.ones((2,5))
-        with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, badA)
-
-    def test_grid_A_Y_mismatch(self):
-        message = r"Supplied protected_attribute and y not same length"
-
-        A = pd.Series([int(x) for x in '0000000' '1111111' '010101' '1'])
-        Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
-
-        target = gs.BinaryClassificationGridSearch()
-        with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)
-
-    def test_grid_X_Y_mismatch(self):
-        message = r"Supplied x and y do not have same number of rows"
-
-        A = pd.Series([int(x) for x in '0000000' '1111111' '010101' '1'])
-        Y = pd.Series([int(x) for x in '0110100' '0010111' '001111' '0'])
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
-
-        target = gs.BinaryClassificationGridSearch()
-        with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)
 
     def test_grid_bad_A_labels(self):
         message = r"Supplied protected_attribute labels not 0 or 1"
@@ -186,7 +116,7 @@ class TestGridSearch:
         X = pd.DataFrame({"actual_feature": actual_feature, "protected_attribute_feature": A, "constant_ones_feature": np.ones(len(Y))})
 
         target = gs.BinaryClassificationGridSearch()
-        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrangian_multipliers=5)
+        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrange_multipliers=5)
         assert len(result)==5
 
         # Check the weights for each of the models returned against the expected values
