@@ -77,18 +77,16 @@ class BinaryClassificationGridSearch:
         copy is made). The user is responsible for converting these objects to an actual model,
         if further processing is required.
         """
-        # Must specify either Ls or num_Ls
+        # Must specify either an array of Lagrange multipliers or how many of them to generate
         if not (lagrange_multipliers is None) ^ (number_lagrange_multipliers is None):
             raise RuntimeError("Must specify either lagrange_multipliers or number_lagrange_multipliers")
 
-        # Check that A only has values 0 and 1
+        # Check that the protected_attribute only has values 0 and 1
         unique_protected_attribute_values = np.unique(protected_attribute)
         if not np.array_equal(unique_protected_attribute_values, [0, 1]):
             raise RuntimeError("Supplied protected_attribute labels not 0 or 1")
 
         # Compute p0 and p1
-        # This will also check that Y is binary with values
-        # 0 and 1
         p0, p1 = self._generate_p0_p1(y)
 
         # If not supplied, generate array of trial lagrange multipliers
