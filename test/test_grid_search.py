@@ -72,10 +72,10 @@ class TestGridSearch:
         target = gs.BinaryClassificationGridSearch()
         result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrangian_multipliers=11)
         assert len(result) == 11
-        assert result[5]["lambda"] == 0
-        lambdas = [x["lambda"] for x in result]
-        assert len(np.unique(lambdas)) == len(result)
-        assert sorted(lambdas)
+        assert result[5]["lagrangian_multiplier"] == 0
+        multipliers = [x["lagrangian_multiplier"] for x in result]
+        assert len(np.unique(multipliers)) == len(result)
+        assert sorted(multipliers)
 
     def test_grid_bad_Ls(self):
         message = r"Must specify either lagrangian_multipliers or number_lagrangian_multipliers"

@@ -84,7 +84,7 @@ class BinaryClassificationGridSearch:
         The result array will have as many entries as specified here
 
         :return: The models corresponding to each value of the Lagrangian multiplier tested
-        :rtype: List of dictionaries. Each dictionary has fields "lambda" and "model." Each
+        :rtype: List of dictionaries. Each dictionary has fields "lagrangian_multiplier" and "model." Each
         model will correspond to the input parameter learner after calling 'fit' on it (a deep
         copy is made). The user is responsible for converting these objects to an actual model,
         if further processing is required.
@@ -138,7 +138,7 @@ class BinaryClassificationGridSearch:
             mylearner.fit(x, re_labels, sample_weight=np.absolute(sample_weights))
 
             # Append the new learner, along with its current_multiplier value to the result
-            result.append({"model": mylearner, "lambda":current_multiplier})
+            result.append({"model": mylearner, "lagrangian_multiplier":current_multiplier})
 
         # Return the result array (tuples of (current_multiplier,model))
         return result
