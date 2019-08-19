@@ -2,14 +2,12 @@
 # Licensed under the MIT License.
 
 """
-This module implements a 1d grid search for binary classification with a single
+This module implements a 1d grid search for cases with a single
+binary protected attribute. The grid search produces a sequence of models,
+each of which corresponds to a different accuracy/fairness trade-off. The
+dimensionality of the search increases with the number of possible values
+for the protected attribute, so this technique does not scale beyond a
 binary protected attribute.
-
-This is a simplification of the full exponentiated gradient search
-and produces a sequence of models, each of which corresponds to a
-different accuracy/fairness trade-off. The dimensionality of the search
-increases with the number of possible values for the protected attribute,
-so this technique does not scale beyond a binary protected attribute.
 """
 
 import copy
@@ -52,7 +50,7 @@ class BinaryClassificationGridSearch:
         return np.array(weights)
 
     def grid_search_binary_protected_attribute(self, learner, x, y, protected_attribute, lagrangian_multipliers=None, number_lagrangian_multipliers=11):
-        """Function to generate a list of models for a classification problem with
+        """Function to generate a list of models for a binary classification problem with
         a single binary protected attribute. The models sweep through different potential
         Lagrangian multipliers for the constrained optimisation problem (the constraint
         being demographic parity), each one corresponding to a particular tradeoff between
