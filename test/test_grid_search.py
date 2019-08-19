@@ -6,29 +6,16 @@ import fairlearn.grid_search as gs
 import numpy as np
 import pandas as pd
 
+import simple_learners
+
 import pytest
-
-class LeastSquaresLearner:
-    def __init__(self):
-        self.weights = None
-
-    def fit(self, X, Y, sample_weight):
-        sqrtW = np.sqrt(sample_weight)
-        matX = np.array(X) * sqrtW[:, np.newaxis]
-        vecY = Y * sqrtW
-        self.lsqinfo = np.linalg.lstsq(matX, vecY, rcond=-1)
-        self.weights = pd.Series(self.lsqinfo[0], index=list(X))
-
-    def predict(self, X):
-        pred = X.dot(self.weights)
-        return 1*(pred > 0.5)
 
 class TestGridSearch:
     def _quick_data(self):
         feature_1 = [int(x) for x in '0110101' '0111101' '001011']
         feature_2 = [int(x) for x in '0000100' '0000011' '111111']
         feature_3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feature_1, "feat2": feature_2, "feat3": feature_3})
+        X = pd.DataFrame({"feature_1": feature_1, "feature_2": feature_2, "feature_3": feature_3})
         Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
         A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
         return X, Y, A
@@ -61,7 +48,7 @@ class TestGridSearch:
     def test_grid_smoke(self):
         X, Y, A = self._quick_data()
         target = gs.BinaryClassificationGridSearch()
-        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrange_multipliers=11)
+        result = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=11)
         assert len(result) == 11
         assert result[5]["lagrange_multiplier"] == 0
         multipliers = [x["lagrange_multiplier"] for x in result]
@@ -74,9 +61,9 @@ class TestGridSearch:
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, None, None)
+            _ = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, None, None)
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, np.random.randint(10, size=3), 3)
+            _ = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, np.random.randint(10, size=3), 3)
 
     def test_grid_bad_A_labels(self):
         X, Y, _ = self._quick_data()
@@ -86,7 +73,7 @@ class TestGridSearch:
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, bad_protected_attribute)
+            _ = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, bad_protected_attribute)
 
     def test_grid_already_fair(self):
         # Number of samples of each attribute to generate
@@ -112,7 +99,7 @@ class TestGridSearch:
         X = pd.DataFrame({"actual_feature": actual_feature, "protected_attribute_feature": A, "constant_ones_feature": np.ones(len(Y))})
 
         target = gs.BinaryClassificationGridSearch()
-        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrange_multipliers=5)
+        result = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=5)
         assert len(result)==5
 
         # Check the weights for each of the models returned against the expected values
