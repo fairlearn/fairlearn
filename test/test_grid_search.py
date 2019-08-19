@@ -70,7 +70,7 @@ class TestGridSearch:
         X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
 
         target = gs.BinaryClassificationGridSearch()
-        result = target.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A, num_Ls=11)
+        result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrangian_multipliers=11)
         assert len(result) == 11
         assert result[5]["lambda"] == 0
         lambdas = [x["lambda"] for x in result]
@@ -78,7 +78,7 @@ class TestGridSearch:
         assert sorted(lambdas)
 
     def test_grid_bad_Ls(self):
-        message = r"Must specify either Ls or num_Ls"
+        message = r"Must specify either lagrangian_multipliers or number_lagrangian_multipliers"
         A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
         Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
         feat1 = [int(x) for x in '0110101' '0111101' '001011']
@@ -88,9 +88,9 @@ class TestGridSearch:
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A, None, None)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, None, None)
         with pytest.raises(RuntimeError, match=message):
-            _ = target.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A, [-1,0,1], 3)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, [-1,0,1], 3)
 
     def test_grid_bad_Y_shape(self):
         message = r"Supplied y not 1d vector"
@@ -104,7 +104,7 @@ class TestGridSearch:
         target = gs.BinaryClassificationGridSearch()
         badY = np.ones((2,3))
         with pytest.raises(RuntimeError, match=message):
-            _ = target.classification_binary_protected_1d(LeastSquaresLearner(), X, badY, A)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, badY, A)
 
     def test_grid_bad_A_shape(self):
         message = r"Supplied protected_attribute not 1d vector"
@@ -118,7 +118,7 @@ class TestGridSearch:
         target = gs.BinaryClassificationGridSearch()
         badA = np.ones((2,5))
         with pytest.raises(RuntimeError, match=message):
-            _ = target.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, badA)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, badA)
 
     def test_grid_A_Y_mismatch(self):
         message = r"Supplied protected_attribute and y not same length"
@@ -132,7 +132,7 @@ class TestGridSearch:
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)
 
     def test_grid_X_Y_mismatch(self):
         message = r"Supplied x and y do not have same number of rows"
@@ -146,7 +146,7 @@ class TestGridSearch:
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)
 
     def test_grid_bad_A_labels(self):
         message = r"Supplied protected_attribute labels not 0 or 1"
@@ -160,4 +160,4 @@ class TestGridSearch:
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.classification_binary_protected_1d(LeastSquaresLearner(), X, Y, A)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)

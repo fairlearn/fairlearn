@@ -51,7 +51,7 @@ class BinaryClassificationGridSearch:
 
         return np.array(weights)
 
-    def classification_binary_protected_1d(self, learner, x, y, protected_attribute, lagrangian_multipliers=None, num_Ls=11):
+    def grid_search_binary_protected_attribute(self, learner, x, y, protected_attribute, lagrangian_multipliers=None, number_lagrangian_multipliers=11):
         """Function to generate a list of models for a classification problem with
         a single binary protected attribute. The models sweep through different potential
         Lagrangian multipliers for the constrained optimisation problem (the constraint
@@ -79,9 +79,9 @@ class BinaryClassificationGridSearch:
         be equal in length to this array
         :type lagrangian_multipliers: List of real numbers
         
-        :param num_Ls: Specifies the number of Lagrangian multipliers to use in the
-        optimisation problem. If this is set then lagrangian_multipliers must be None. The result
-        array will have as many entries as specified here
+        :param number_lagrangian_multipliers: Specifies the number of Lagrangian multipliers to
+        use in the optimisation problem. If this is set then lagrangian_multipliers must be None.
+        The result array will have as many entries as specified here
 
         :return: The models corresponding to each value of the Lagrangian multiplier tested
         :rtype: List of dictionaries. Each dictionary has fields "lambda" and "model." Each
@@ -90,8 +90,8 @@ class BinaryClassificationGridSearch:
         if further processing is required.
         """
         # Must specify either Ls or num_Ls
-        if not (lagrangian_multipliers is None) ^ (num_Ls is None):
-            raise RuntimeError("Must specify either Ls or num_Ls")
+        if not (lagrangian_multipliers is None) ^ (number_lagrangian_multipliers is None):
+            raise RuntimeError("Must specify either lagrangian_multipliers or number_lagrangian_multipliers")
 
         # Check that x, y and protected_attribute have the same number of rows
         # Check that y and protected_attribute are both 1d vectors
@@ -122,7 +122,7 @@ class BinaryClassificationGridSearch:
             limit = 1
             if p0/p1 > 1:
                 limit = p0/p1
-            lagrangian_multipliers = np.linspace(-2*limit, 2*limit, num_Ls)
+            lagrangian_multipliers = np.linspace(-2*limit, 2*limit, number_lagrangian_multipliers)
 
         result = []
         for current_multiplier in lagrangian_multipliers:
