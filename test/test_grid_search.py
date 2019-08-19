@@ -24,6 +24,15 @@ class LeastSquaresLearner:
         return 1*(pred > 0.5)
 
 class TestGridSearch:
+    def _quick_data(self):
+        feature_1 = [int(x) for x in '0110101' '0111101' '001011']
+        feature_2 = [int(x) for x in '0000100' '0000011' '111111']
+        feature_3 = [int(x) for x in '1111111' '1111111' '111111']
+        X = pd.DataFrame({"feat1": feature_1, "feat2": feature_2, "feat3": feature_3})
+        Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
+        A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
+        return X, Y, A
+
     def test_generate_p0_p1_smoke(self):
         Y = [int(x) for x in '0110101' '0111101' '001011']
 
@@ -35,11 +44,13 @@ class TestGridSearch:
         assert p1 == 12/20
 
     def test_generate_weights(self):
-        A = [int(x) for x in "0011"]
-        Y = [int(x) for x in "0101"]
+        # Set up sample data
+        A = [0, 0, 1, 1]
+        Y = [0, 1, 0, 1]
         L = 10
         p_ratio = 2
 
+        # Expected results
         W_expect = [ -21, -19, 9, 11]
 
         target = gs.BinaryClassificationGridSearch()
@@ -48,13 +59,7 @@ class TestGridSearch:
         assert np.array_equal(W_expect, W), str(W)+str(W_expect)
 
     def test_grid_smoke(self):
-        A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
-        Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
-
+        X, Y, A = self._quick_data()
         target = gs.BinaryClassificationGridSearch()
         result = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, number_lagrange_multipliers=11)
         assert len(result) == 11
@@ -63,34 +68,25 @@ class TestGridSearch:
         assert len(np.unique(multipliers)) == len(result)
         assert sorted(multipliers)
 
-    def test_grid_bad_Ls(self):
+    def test_grid_bad_lagrange_multiplier_specification(self):
+        X, Y, A = self._quick_data()
         message = r"Must specify either lagrange_multipliers or number_lagrange_multipliers"
-        A = pd.Series([int(x) for x in '0000000' '1111111' '010101'])
-        Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
             _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, None, None)
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, [-1,0,1], 3)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A, np.random.randint(10, size=3), 3)
 
     def test_grid_bad_A_labels(self):
+        X, Y, _ = self._quick_data()
         message = r"Supplied protected_attribute labels not 0 or 1"
 
-        A = pd.Series([int(x) for x in '0000000' '2222222' '020202'])
-        Y = pd.Series([int(x) for x in '0110100' '0010111' '001111'])
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        X = pd.DataFrame({"feat1": feat1, "feat2": feat2, "feat3": feat3})
+        bad_protected_attribute = pd.Series([int(x) for x in '0000000' '2222222' '020202'])
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, A)
+            _ = target.grid_search_binary_protected_attribute(LeastSquaresLearner(), X, Y, bad_protected_attribute)
 
     def test_grid_already_fair(self):
         # Number of samples of each attribute to generate
