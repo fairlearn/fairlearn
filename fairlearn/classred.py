@@ -141,7 +141,8 @@ class _Lagrangian:
             (-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
         dual_bounds = [
-            (None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)]
+            (None, None) if i == n_constraints else (0, None)
+            for i in range(n_constraints + 1)]
         result_dual = opt.linprog(
             dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds)
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
