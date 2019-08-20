@@ -183,16 +183,26 @@ class TestBinaryProtectedAttribute:
 
         assert np.allclose(expected_multipliers, actual_multipliers)
 
-    def test_grid_already_fair(self):
+    @pytest.mark.parametrize("testdata", [[0, 1], [-1, 1], [-2, 4], [1, 2]])
+    def test_grid_already_fair(self, testdata):
         # Number of samples of each attribute to generate
         # Large numbers required to beat down the errors in the weights
         num_samples_each = 400000
 
+        # We need a numeric binary attribute, but it need not
+        # be taken from {0, 1}
+        a_offset = testdata[0]
+        a_scale = testdata[1]
+        assert a_scale != 0
+        assert a_offset == int(a_offset)
+        assert a_scale == int(a_scale)
+
         # Create a 'rigged' dataset which while it contains the protected attribute, actually doesn't depend on it
 
-        # Attribute array is evenly divided between zeros and ones
-        A = pd.Series(np.concatenate(
+        # Attribute array is evenly divided between two values
+        A_raw = pd.Series(np.concatenate(
             (np.zeros(num_samples_each), np.ones(num_samples_each)), axis=None))
+        A = a_scale * A_raw + a_offset
 
         # Generate a set of scores which we threshold to get the label
         scores = np.linspace(0, 1, num_samples_each)
@@ -216,11 +226,22 @@ class TestBinaryProtectedAttribute:
         # Check the weights for each of the models returned against the expected values
         # Note that the 'middle' value in each array corresponds to the Lagrange multiplier being zero
         expected_actual_feature_weights = [0, 0, 1.5, 0, 0]
-        expected_protected_attribute_feature_weights = [-1, -1, 0, 1, 1]
+        expected_protected_attribute_feature_weights = np.array([-1, -1, 0, 1, 1]) / a_scale
         expected_constant_ones_feature_weights = [1, 1, -0.25, 0, 0]
-        assert np.allclose(expected_actual_feature_weights, [
-                           x["model"].weights["actual_feature"] for x in result])
-        assert np.allclose(expected_protected_attribute_feature_weights, [
-                           x["model"].weights["protected_attribute_feature"] for x in result])
-        assert np.allclose(expected_constant_ones_feature_weights, [
-                           x["model"].weights["constant_ones_feature"] for x in result])
+        result_actual_feature_weights = [
+            x["model"].weights["actual_feature"] for x in result]
+        result_protected_attribute_feature_weights = [
+            x["model"].weights["protected_attribute_feature"] for x in result]
+        result_constant_ones_feature_weights = [
+            x["model"].weights["constant_ones_feature"] for x in result]
+
+        assert np.allclose(expected_actual_feature_weights,
+                           result_actual_feature_weights, rtol=1e-3)
+        assert np.allclose(expected_protected_attribute_feature_weights,
+                           result_protected_attribute_feature_weights, rtol=1e-3)
+
+        # Have not quite figured out functional form for constant_ones feature
+        assert expected_constant_ones_feature_weights[2] == pytest.approx(result_constant_ones_feature_weights[2], rel=1e-3)
+        if a_scale==1 and a_offset==0:
+            # Do know what the unrescaled constant_ones feature weight should be
+            assert np.allclose(expected_constant_ones_feature_weights, result_constant_ones_feature_weights)
