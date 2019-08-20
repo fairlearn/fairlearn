@@ -56,15 +56,14 @@ class BinaryProtectedAttributeDemographicParity:
 
         :param x: The array of training data features (which may or may not contain the
         protected attribute). Must have as many rows as y and protected_attribute
-        :type x: Numpy array with two dimensions or pandas dataframe
+        :type x: Nested list or numpy array with two dimensions or pandas dataframe
 
         :param y: The list of binary classes, which must be 0 or 1. Must contain the same
         number of entries as rows in x
-        :type y: Numpy array with one dimension
+        :type y: List or Numpy array with one dimension
 
-        :param protected_attribute: The protected attribute corresponding to each row of x.
-        Must be either 0 or 1
-        :type protected_attribute: Numpy array with one dimension
+        :param protected_attribute: The binary protected attribute corresponding to each row of x
+        :type protected_attribute: List of Numpy array with one dimension
         
         :param lagrange_multipliers: User specified set of lagrange multipliers to use for
         the optimisation problem. If this is set then num_Ls must be None. The result array will
