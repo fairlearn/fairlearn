@@ -21,7 +21,12 @@ class BinaryProtectedAttributeDemographicParity:
         """ Function to compute p0 and p1 for the given
         set of labels
         """
-        _, counts = np.unique(y, return_counts=True)
+        unique_labels, counts = np.unique(y, return_counts=True)
+        if len(unique_labels) > 2:
+            raise RuntimeError("Supplied Y labels are not binary")
+
+        if not set(unique_labels).issubset({0, 1}):
+            raise RuntimeError("Supplied Y labels are not 0 or 1")
 
         p0 = counts[0] / len(y)
         p1 = counts[1] / len(y)

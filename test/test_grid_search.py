@@ -105,7 +105,7 @@ class TestBinaryProtectedAttributeDemographicParity:
         with pytest.raises(RuntimeError, match=message):
             _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, np.random.randint(10, size=3), 3)
 
-    def test_grid_bad_A_labels(self):
+    def test_non_binary_protected_attribute(self):
         X, Y, _ = self._quick_data()
         message = r"Protected Attribute is not binary"
 
@@ -114,6 +114,24 @@ class TestBinaryProtectedAttributeDemographicParity:
         target = gs.BinaryProtectedAttributeDemographicParity()
         with pytest.raises(RuntimeError, match=message):
             _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, bad_protected_attribute)
+
+    def test_non_binary_labels(self):
+        X, _, A = self._quick_data(8)
+        bad_labels = [0, 1, 2, 0, 1, 2, 0, 1]
+        message = r"Supplied Y labels are not binary"
+
+        target = gs.BinaryProtectedAttributeDemographicParity()
+        with pytest.raises(RuntimeError, match=message):
+            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, bad_labels, A)
+
+    def test_labels_not_0_1(self):
+        X, _, A = self._quick_data(8)
+        bad_labels = [0, 2, 2, 0, 0, 2, 0, 0]
+        message = r"Supplied Y labels are not 0 or 1"
+        
+        target = gs.BinaryProtectedAttributeDemographicParity()
+        with pytest.raises(RuntimeError, match=message):
+            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, bad_labels, A)
 
     def test_grid_already_fair(self):
         # Number of samples of each attribute to generate
