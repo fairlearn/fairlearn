@@ -17,19 +17,22 @@ class BinaryProtectedAttributeDemographicParity:
         # Nothing to do
         return
 
-    def _generate_p0_p1(self, y):
+    def _generate_p0_p1(self, protected_attribute):
         """ Function to compute p0 and p1 for the given
-        set of labels
+        set of protected_attribute values
         """
-        unique_labels, counts = np.unique(y, return_counts=True)
+        unique_labels, counts = np.unique(protected_attribute, return_counts=True)
         if len(unique_labels) > 2:
-            raise RuntimeError("Supplied Y labels are not binary")
+            raise RuntimeError("Protected Attribute is not binary")
 
-        if not set(unique_labels).issubset({0, 1}):
-            raise RuntimeError("Supplied Y labels are not 0 or 1")
-
-        p0 = counts[0] / len(y)
-        p1 = counts[1] / len(y)
+        p0 = counts[0] / len(protected_attribute)
+        # It is possible that our data only contain one value for
+        # the protected attribute
+        # We do not consider this an error
+        if len(counts) > 1:
+            p1 = counts[1] / len(protected_attribute)
+        else:
+            p1 = 0
 
         return p0, p1
 
@@ -59,10 +62,12 @@ class BinaryProtectedAttributeDemographicParity:
         :type x: Nested list or numpy array with two dimensions or pandas dataframe
 
         :param y: The list of binary classes, which must be 0 or 1. Must contain the same
-        number of entries as rows in x
+        number of entries as rows in x. We do not consider it an error if only one
+        class is present
         :type y: List or Numpy array with one dimension
 
         :param protected_attribute: The binary protected attribute corresponding to each row of x
+        We do not consider it an error if only one attribute value is present
         :type protected_attribute: List of Numpy array with one dimension
         
         :param lagrange_multipliers: User specified set of lagrange multipliers to use for
@@ -84,13 +89,16 @@ class BinaryProtectedAttributeDemographicParity:
         if not (lagrange_multipliers is None) ^ (number_lagrange_multipliers is None):
             raise RuntimeError("Must specify either lagrange_multipliers or number_lagrange_multipliers")
 
-        # Check that the protected_attribute only has values 0 and 1
-        unique_protected_attribute_values = np.unique(protected_attribute)
-        if len(unique_protected_attribute_values) > 2:
-            raise RuntimeError("Protected Attribute is not binary")
+        # Verify we have a binary classification problem
+        unique_labels = np.unique(y)
+        if len(unique_labels) > 2:
+            raise RuntimeError("Supplied Y labels are not binary")
 
-        # Compute p0 and p1
-        p0, p1 = self._generate_p0_p1(y)
+        if not set(unique_labels).issubset({0, 1}):
+            raise RuntimeError("Supplied Y labels are not 0 or 1")
+
+        # Compute p0 and p1 from the protected_attribute
+        p0, p1 = self._generate_p0_p1(protected_attribute)
 
         # If not supplied, generate array of trial lagrange multipliers
         if lagrange_multipliers is None:

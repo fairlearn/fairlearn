@@ -70,15 +70,15 @@ class TestBinaryProtectedAttributeDemographicParity:
         self._smoke_core(X_pandas, Y, A)
 
     def test_generate_p0_p1_smoke(self):
-        number_labels = 32
-        Y = np.random.randint(2, size=number_labels)
+        number_attributes = 32
+        A = np.random.randint(2, size=number_attributes)
 
         target = gs.BinaryProtectedAttributeDemographicParity()
 
-        p0, p1 = target._generate_p0_p1(Y)
+        p0, p1 = target._generate_p0_p1(A)
 
-        assert p0 == 1 - sum(Y) / number_labels
-        assert p1 == sum(Y) / number_labels
+        assert p0 == 1 - sum(A) / number_attributes
+        assert p1 == sum(A) / number_attributes
 
     def test_generate_weights(self):
         # Set up sample data
