@@ -15,7 +15,8 @@ ex_scores = [int(x) for x in '0011233' '0001111' '011112']
 
 def run_roc_curve_based_post_processing_and_plot(ex_attrs, flip):
     print("STARTING TEST")
-    pred_EO, pred_DP = roc_curve_based_post_processing(ex_attrs, ex_labels, ex_scores, debug=True, flip=flip)
+    pred_EO = roc_curve_based_post_processing("EO", ex_attrs, ex_labels, ex_scores, debug=True, flip=flip)
+    pred_DP = roc_curve_based_post_processing("DP", ex_attrs, ex_labels, ex_scores, debug=True, flip=flip)
     ex_preds_EO = []
     ex_preds_DP = []
     for i in range(len(ex_attrs)):

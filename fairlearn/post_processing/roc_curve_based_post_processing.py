@@ -1,8 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-""" ROC Curve based post-processing algorithm for binary classification
-with one categorical protected attribute.
+""" ROC Curve based Post processing algorithm based on M. Hardt,
+E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
+Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
+classification with one categorical protected attribute. 
 """
 
 import sys
@@ -211,10 +213,11 @@ def _filter_points_to_get_convex_hull(roc_sorted):
         selected.append(r2)
     return selected
         
-def roc_curve_based_post_processing(attributes, labels, scores, flip=True, debug=False, gridsize=1000):
-    """ Post processing algorithm based on M. Hardt, E. Price, N. Srebro's paper "Equality of
-    Opportunity in Supervised Learning" (https://arxiv.org/pdf/1610.02413.pdf).
-    
+def roc_curve_based_post_processing(fairness_metric="DP", attributes, labels, scores, flip=True, debug=False, gridsize=1000):
+    """ 
+    :param fairness_metric: the fairness metric for which to optimize,
+        currently only Demographic Parity ("DP") and Equalized Odds ("EO") are supported.
+    :type fairness_metric: str
     :param attributes: the protected attributes
     :type attributes: list
     :param labels: the labels of the dataset
@@ -234,10 +237,12 @@ def roc_curve_based_post_processing(attributes, labels, scores, flip=True, debug
 
     data_grouped_by_attribute = data.groupby('attribute')
 
-    pred_EO = _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug)
-    pred_DP = _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug)
-
-    return pred_EO, pred_DP
+    if fairness_metric == "EO":
+        return _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug)
+    elif fairness_metric == "DP":
+        return _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug)
+    
+    raise ValueError("Only 'DP' and 'EO' are currently supported as fairness_metrics.")
 
 def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug):
     n = len(labels)
