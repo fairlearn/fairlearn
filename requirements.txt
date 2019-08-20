@@ -2,3 +2,4 @@ numpy
 pandas
 pytest
 scipy
+flake8
