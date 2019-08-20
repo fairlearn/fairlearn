@@ -220,8 +220,10 @@ _MIN_T = 5
 # hull of classifiers returned so far.
 _RUN_LP_STEP = True
 
+column_names = str("best_classifier best_gap classifiers "
+                   "weights last_t best_t n_oracle_calls")
 expgrad_result = namedtuple("ExpgradResult",
-                            "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls")
+                            column_names)
 
 
 def expgrad(dataX, dataA, dataY, learner,
