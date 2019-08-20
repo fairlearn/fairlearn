@@ -70,7 +70,8 @@ class _Lagrangian:
         """ Return the value of the Lagrangian.
         Returned values:
         L -- value of the Lagrangian
-        L_high -- value of the Lagrangian under the best response of the lambda player
+        L_high -- value of the Lagrangian under the best
+        response of the lambda player
         """
         lambda_signed = self.constraints.lambda_signed(lambda_vec)
         if self.opt_lambda:
@@ -90,7 +91,8 @@ class _Lagrangian:
         """ Return the value of the Lagrangian.
         Returned values:
         L -- value of the Lagrangian
-        L_high -- value of the Lagrangian under the best response of the lambda player
+        L_high -- value of the Lagrangian under the best
+        response of the lambda player
         gamma -- vector of constraint violations
         error -- the empirical error
         """
