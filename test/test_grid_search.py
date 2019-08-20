@@ -59,6 +59,11 @@ class TestBinaryProtectedAttribute:
         A_pandas = pd.Series(A)
         self._smoke_core(X, Y, A_pandas)
 
+    def test_grid_smoke_A_non_numeric(self):
+        X, Y, _ = self._quick_data(number_samples=8)
+        A = ["XY", "GF", "XY", "XY", "GF", "GF", "GF", "GF"]
+        self._smoke_core(X, Y, A)
+
     def test_grid_smoke_X_numpy(self):
         X, Y, A = self._quick_data()
         X_numpy = np.array(X)
@@ -69,29 +74,45 @@ class TestBinaryProtectedAttribute:
         X_pandas = pd.DataFrame(X, columns=["feature_1", "feature_2", "feature_3"])
         self._smoke_core(X_pandas, Y, A)
 
-    def test_generate_p0_p1_smoke(self):
+    def test_generate_protected_attribute_info_smoke(self):
         number_attributes = 32
         A = np.random.randint(2, size=number_attributes)
 
         target = gs.BinaryProtectedAttribute()
 
-        p0, p1 = target._generate_p0_p1(A)
+        p0, p1, a0_val = target._generate_protected_attribute_info(A)
 
         assert p0 == 1 - sum(A) / number_attributes
         assert p1 == sum(A) / number_attributes
+        # Need to handle case were array is all 1s
+        if p0 == 1:
+            assert a0_val == A[0]
+        else:
+            assert a0_val == 0
 
-    def test_generate_weights(self):
+    def test_generate_protected_attribute_info_non_numeric(self):
+        A = ["AB", "AB", "CD", "AB"]
+
+        target = gs.BinaryProtectedAttribute()
+
+        p0, p1, a0_val = target._generate_protected_attribute_info(A)
+        assert p0 == 0.75
+        assert p1 == 0.25
+        assert a0_val == "AB"
+
+    def test_generate_weights_smoke(self):
         # Set up sample data
         A = [0, 0, 1, 1]
         Y = [0, 1, 0, 1]
         L = 10
         p_ratio = 2
+        a0_val = 0 # Must match A
 
         # Expected results
         W_expect = [ -21, -19, 9, 11]
 
         target = gs.BinaryProtectedAttribute()
-        W = target._generate_weights(Y, A, L, p_ratio)
+        W = target._generate_weights(Y, A, L, p_ratio, a0_val)
 
         assert np.array_equal(W_expect, W), str(W)+str(W_expect)
 
