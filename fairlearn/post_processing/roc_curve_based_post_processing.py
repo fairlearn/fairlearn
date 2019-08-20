@@ -1,6 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+""" ROC Curve based post-processing algorithm for binary classification
+with one categorical protected attribute.
+"""
+
 import sys
 import numpy as np
 import pandas as pd
@@ -41,8 +45,7 @@ def debug_has_color(key):
     return key in debug_colormap
 
 def pred_from_operation(operation, threshold):
-    """ Encodes the threshold rule P_hat > t or P_hat < t
-    """
+    """ Encodes the threshold rule Y_hat > t or Y_hat < t"""
     if operation == '>':
         return lambda x: x > threshold
     elif operation == '<':
@@ -50,14 +53,27 @@ def pred_from_operation(operation, threshold):
     else:
         assert False, "Unrecognized operation:" + operation
 
-def interpolated_pred(p_ignore, pred_const, p0, operation0, p1, operation1):
+def interpolated_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
+    """Creates the interpolated prediction between two predictions. The predictions
+    are represented through the threshold rules operation0 and operation1.
+    
+    :param p_ignore: p_ignore changes the interpolated prediction P to the desired 
+        solution using the transformation p_ignore * prediction_constant + (1 - p_ignore) * P 
+    :param prediction_constant: 0 if not required, otherwise the x value of the best
+        solution should be passed
+    :param p0: interpolation multiplier for prediction from the first predictor
+    :param operation0: threshold rule for the first predictor
+    :param p1: interpolation multiplier for prediction from the second predictor
+    :param operation1: threshold rule for the second predictor
+    :return: an anonymous function that scales the original prediction to the desired one
+    """
     pred0 = pred_from_operation(*operation0)
     pred1 = pred_from_operation(*operation1)
-    return (lambda x : p_ignore * pred_const + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
+    return (lambda x : p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
 
 def interpolate_curve(data, x_col, y_col, content_col, x_grid):
     """Interpolates the data frame in "data" along the values in "x_grid".
-
+    TODO: does this really hold true?
     Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]
              (2) min and max in x_grid are below/above min and max in data[x_col]
              (3) data is indexed 0,...,len(data)"""
@@ -69,10 +85,17 @@ def interpolate_curve(data, x_col, y_col, content_col, x_grid):
     x0 = data_transpose[0][x_col]
     while data_transpose[i + 1][x_col] == x0:
         i += 1
+    
+    # calculate the curve points for each x tick in x_grid
     for x in x_grid:
+        # skip over data points that we've already passed
         while x > data_transpose[i + 1][x_col]:
             i += 1
-        p0 = (data_transpose[i + 1][x_col] - x)/(data_transpose[i + 1][x_col] - data_transpose[i][x_col])
+        
+        # Calculate the y value at x based on the slope between data points i and i+1
+        x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
+        x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
+        p0 = x_distance_from_next_data_point/x_distance_between_data_points
         p1 = 1 - p0
         y = p0 * data_transpose[i][y_col] + p1 * data_transpose[i + 1][y_col]
         dict_list.append({
@@ -88,7 +111,6 @@ def interpolate_curve(data, x_col, y_col, content_col, x_grid):
 def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
     """Get ROC curve based on data columns 'score' and 'label'
     Scores represent output values from the model.
-    Labels are the 
     """
 
     attribute_str = "attribute value" + str(attribute)
@@ -111,6 +133,11 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
     
     x_list, y_list, operation_list = [0], [0], [('>', np.inf)]
     
+    # Iterate through all samples which are sorted by increasing scores.
+    # Setting the threshold between two scores means that everything smaller
+    # than the threshold gets a label of 0 while everything larger than the
+    # threshold gets a label of 1. Flipping labels is an option if flipping
+    # labels provides better accuracy.
     i = 0
     count = [0, 0]
     while i < n:
@@ -118,12 +145,16 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
         while scores[i] == threshold:
             count[labels[i]] += 1
             i += 1
+        # For the ROC curve we plot points (x, y), where x represents
+        # the conditional probability P[Y_hat=1 | Y=0] and y represents
+        # the conditional probability P[Y_hat=1 | Y=1]. The conditional
+        # probability is achieved by dividing by only the number of
+        # negative/positive samples.
         x, y = count[0] / n_negative, count[1] / n_positive
         threshold = (threshold + scores[i]) / 2
         operation = ('>', threshold)
 
-        # if flipping labels gives better accuracy try flipping
-        if flip & (x > y):
+        if flip and x > y:
             x, y = 1 - x, 1 - y
             operation = ('<', threshold)
         x_list.append(x)
@@ -133,24 +164,15 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
     roc_raw = pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list})
     
     roc_sorted = roc_raw.sort_values(by=['x', 'y'])
-    selected = []
-    for r2 in roc_sorted.itertuples():
-        while len(selected) >= 2:
-            r1 = selected[-1]
-            r0 = selected[-2]
-            if (r1.y - r0.y) * (r2.x - r0.x) <= (r2.y - r0.y) * (r1.x - r0.x):
-                selected.pop()
-            else:
-                break
-        selected.append(r2)
+    selected = _filter_points_to_get_convex_hull(roc_sorted)
 
     roc_conv = pd.DataFrame(selected)[['x', 'y', 'operation']]
 
-    roc_conv['sel'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * roc_conv['y']
-    roc_conv['err'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * (1 - roc_conv['y'])
+    roc_conv['selection'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * roc_conv['y']
+    roc_conv['error'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * (1 - roc_conv['y'])
     
     roc_curve_interpolated = interpolate_curve(roc_conv, 'x', 'y', 'operation', x_grid)
-    sel_interp = interpolate_curve(roc_conv, 'sel', 'err', 'operation', x_grid)
+    selection_interpolated = interpolate_curve(roc_conv, 'selection', 'error', 'operation', x_grid)
 
     if debug:
         print("")
@@ -162,7 +184,6 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
         print("DATA")
         print(data)
         print("\nROC curve: initial")
-        #print(roc_raw)
         print(roc_sorted)
         print("\nROC curve: convex")
         print(roc_conv)
@@ -171,7 +192,24 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
         plt.plot(roc_sorted['x'], roc_sorted['y'], c=color, ls='--', lw=1.0, label='_')
         plt.plot(roc_conv['x'], roc_conv['y'], c=color, ls='-', lw=2.0, label='attribute ' + str(attribute))
         
-    return roc_curve_interpolated, sel_interp
+    return roc_curve_interpolated, selection_interpolated
+
+def _filter_points_to_get_convex_hull(roc_sorted):
+    selected = []
+    for r2 in roc_sorted.itertuples():
+        while len(selected) >= 2:
+            r1 = selected[-1]
+            r0 = selected[-2]
+            # Calculate the y value at r2's x if the slope between r0 and r1 is continued.
+            # If that y value is not larger than r2's actual y value we know that r1 lies
+            # below the line between r0 and r2 and can be dropped since we can reach all points
+            # between r0 and r2 through interpolation.
+            if (r1.y - r0.y) * (r2.x - r0.x) <= (r2.y - r0.y) * (r1.x - r0.x):
+                selected.pop()
+            else:
+                break
+        selected.append(r2)
+    return selected
         
 def roc_curve_based_post_processing(attributes, labels, scores, flip=True, debug=False, gridsize=1000):
     """ Post processing algorithm based on M. Hardt, E. Price, N. Srebro's paper "Equality of
@@ -203,77 +241,97 @@ def roc_curve_based_post_processing(attributes, labels, scores, flip=True, debug
 
 def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug):
     n = len(labels)
-    n_positive = sum(labels)
-    n_negative = n - n_positive
     roc = {}
-    sel = {}
+    selection = {}
     x_grid = np.linspace(0, 1, gridsize + 1)
-    err_given_sel = 0 * x_grid
+    error_given_selection = 0 * x_grid
     for attribute, group in data_grouped_by_attribute:
         # determine probability of current protected attribute group based on data
         p_attribute = len(group) / n
-        roc[attribute], sel[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
-        err_given_sel += p_attribute * sel[attribute]['err']
+        roc[attribute], selection[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
+        # add up errors for the current group multiplied by the probability of the current group
+        error_given_selection += p_attribute * selection[attribute]['error']
 
-    i_best_DP = err_given_sel.idxmin()
-    sel_best = x_grid[i_best_DP]
+    # find minimum error point
+    i_best_DP = error_given_selection.idxmin()
+    selection_best = x_grid[i_best_DP]
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
-    pred_DP_by_attribute = {}
+    predicted_DP_by_attribute = {}
     for attribute in roc.keys():
-        # for DP we already have the predictor directly without complex interpolation. no p_ignore
-        r = sel[attribute].transpose()[i_best_DP]
-        pred_DP_by_attribute[attribute] = interpolated_pred(0, 0, r.p0, r.operation0, r.p1, r.operation1)
+        # For DP we already have the predictor directly without complex interpolation.
+        roc_result = selection[attribute].transpose()[i_best_DP]
+        predicted_DP_by_attribute[attribute] = interpolated_prediction(0, 0,
+                                                                       roc_result.p0, roc_result.operation0,
+                                                                       roc_result.p1, roc_result.operation1)
     
     if debug:
         print(OUTPUT_SEPARATOR)
         print("From ROC curves")
-        print("Best DP: error=%.3f, selection rate=%.3f" % (err_given_sel[i_best_DP], sel_best))
+        print("Best DP: error=%.3f, selection rate=%.3f" % (error_given_selection[i_best_DP], selection_best))
         print(OUTPUT_SEPARATOR)
 
-    return lambda a,x : pred_DP_by_attribute[a](x)   
+    return lambda a, x : predicted_DP_by_attribute[a](x)   
 
 def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug):
+    """ Calculates the ROC curve of every attribute and take the overlapping region.
+    From the resulting ROC curve the algorithm finds the best solution by selecting the
+    point on the curve with minimal error.
+    """
     n = len(labels)
     n_positive = sum(labels)
     n_negative = n - n_positive
     roc = {}
-    sel = {}
-    x_grid= np.linspace(0, 1, gridsize + 1)
-    y_vals = pd.DataFrame()
-    err_given_sel = 0 * x_grid
+    selection = {}
+    x_grid = np.linspace(0, 1, gridsize + 1)
+    y_values = pd.DataFrame()
     for attribute, group in data_grouped_by_attribute:
-        p_attribute = len(group) / n
-        roc[attribute], sel[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
-        y_vals[attribute] = roc[attribute]['y']
+        roc[attribute], selection[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
+        y_values[attribute] = roc[attribute]['y']
 
-    y_min = np.amin(y_vals, axis=1)
-    # conditional probabilities represented as x -> P[Y_hat=1 | Y=0]
-    # and                                      y -> P[Y_hat=1 | Y=1]
-    err_given_x = (n_negative / n) * x_grid + (n_positive / n) * (1 - y_min)
-    i_best_EO = err_given_x.idxmin()
+    # Calculate the overlap of the ROC curves by taking the lowest y value
+    # at every given x.
+    y_min = np.amin(y_values, axis=1)
+    # Calculate the error at any given x as the sum of
+    # a) the proportion of negative labels multiplied by x which represents
+    #    the conditional probability P[Y_hat=1 | Y=0], i.e. the probability
+    #    of a positive prediction given a negative label.
+    # b) the propotion of positive labels multiplied by 1-y_min, where y_min
+    #    represents the conditional probability P[Y_hat=1 | Y=1], i.e. the
+    #    probability of a correct prediction of a positive label, so 1-y_min
+    #    represents a negative prediction given a positive label.
+    error_given_x = (n_negative / n) * x_grid + (n_positive / n) * (1 - y_min)
+    i_best_EO = error_given_x.idxmin()
     x_best = x_grid[i_best_EO]
     y_best = y_min[i_best_EO]
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
-    pred_EO_by_attribute = {}
+    predicted_EO_by_attribute = {}
     for attribute in roc.keys():
-        r = roc[attribute].transpose()[i_best_EO]
-        # p_ignore is the probability at which we're ignoring the score, i.e. on the diagonal of the ROC curve
-        if r.y == r.x:
+        roc_result = roc[attribute].transpose()[i_best_EO]
+        # p_ignore * x_best represent the diagonal of the ROC plot.
+        if roc_result.y == roc_result.x:
+            # result is on the diagonal of the ROC plot, i.e. p_ignore is not required
             p_ignore = 0
         else:
-            p_ignore = (r.y - y_best) / (r.y - r.x)
-        pred_EO_by_attribute[attribute] = interpolated_pred(p_ignore, x_best, r.p0, r.operation0, r.p1, r.operation1)
+            # Calculate p_ignore to change prediction P to y_best
+            # p_ignore * x_best + (1 - p_ignore) * P
+            difference_from_best_predictor_for_attribute = roc_result.y - y_best
+            vertical_distance_from_diagonal = roc_result.y - roc_result.x
+            p_ignore = difference_from_best_predictor_for_attribute / vertical_distance_from_diagonal
+
+        predicted_EO_by_attribute[attribute] = interpolated_prediction(p_ignore, x_best,
+                                                                       roc_result.p0, roc_result.operation0,
+                                                                       roc_result.p1, roc_result.operation1)
 
     if debug:
         print(OUTPUT_SEPARATOR)
         print("From ROC curves")
-        print("Best EO: error=%.3f, FP rate=%.3f, TP rate=%.3f" % (err_given_x[i_best_EO], x_best, y_best))
+        print("Best EO: error=%.3f, FP rate=%.3f, TP rate=%.3f" % (error_given_x[i_best_EO], x_best, y_best))
         print(OUTPUT_SEPARATOR)
         line, = plt.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
         line.zorder -= 1
         plt.plot(x_best, y_best, 'm*', ms=10, label='EO solution') 
         plt.legend()
 
-    return lambda a,x : pred_EO_by_attribute[a](x)
+    return lambda a, x : predicted_EO_by_attribute[a](x)
