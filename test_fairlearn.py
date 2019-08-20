@@ -25,7 +25,7 @@ class LeastSquaresLearner:
 
     def predict(self, X):
         pred = X.dot(self.weights)
-        return 1*(pred > 0.5)
+        return 1 * (pred > 0.5)
 
 
 tests = [{"constraints_class": moments.DP, "eps": 0.100, "best_gap": 0.000000,
@@ -64,13 +64,13 @@ _PRECISION = 1e-6
 
 
 def test_result_float(key, res, test, report_list):
-    if abs(res[key]-test[key]) > _PRECISION:
-        report_list.append("%s_diff=%e" % (key, res[key]-test[key]))
+    if abs(res[key] - test[key]) > _PRECISION:
+        report_list.append("%s_diff=%e" % (key, res[key] - test[key]))
 
 
 def test_result_int(key, res, test, report_list):
-    if abs(res[key]-test[key]) > 0:
-        report_list.append("%s_diff=%d" % (key, res[key]-test[key]))
+    if abs(res[key] - test[key]) > 0:
+        report_list.append("%s_diff=%d" % (key, res[key] - test[key]))
 
 
 if __name__ == '__main__':
@@ -88,7 +88,8 @@ if __name__ == '__main__':
 
     for test in tests:
         results_tuple = red.expgrad(dataX, dataA, dataY, learner,
-                                constraints=test["constraints_class"](), eps=test["eps"])
+                                    constraints=test["constraints_class"](),
+                                    eps=test["eps"])
         results = results_tuple._asdict()
         Q = results["best_classifier"]
         results["n_classifiers"] = len(results["classifiers"])
