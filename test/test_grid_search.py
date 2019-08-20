@@ -133,6 +133,26 @@ class TestBinaryProtectedAttributeDemographicParity:
         with pytest.raises(RuntimeError, match=message):
             _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, bad_labels, A)
 
+    def test_lagrange_multiplier_generation(self):
+        # Check that the Lagrange multiplier values are being generated for the correct
+        # range. We do not do full checks on np.linspace
+        X, Y, A = self._quick_data(32)
+
+        # Reimplement the multiplier computation
+        p0 = 1 - (sum(A) / len(A))
+        p1 = sum(A) / len(A)
+        limit = 1
+        if p0/p1 > 1:
+            limit = p0/p1
+
+        target = gs.BinaryProtectedAttributeDemographicParity()
+        results = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=3)
+
+        expected_multipliers = [ -2*limit, 0, 2*limit ]
+        actual_multipliers = [r["lagrange_multiplier"] for r in results]
+
+        assert np.allclose(expected_multipliers, actual_multipliers)
+
     def test_grid_already_fair(self):
         # Number of samples of each attribute to generate
         # Large numbers required to beat down the errors in the weights
