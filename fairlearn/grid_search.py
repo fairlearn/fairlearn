@@ -12,6 +12,7 @@ considered
 import copy
 import numpy as np
 
+
 class BinaryProtectedAttribute:
     def __init__(self):
         # Nothing to do
@@ -21,7 +22,8 @@ class BinaryProtectedAttribute:
         """ Function to compute p0 and p1 for the given
         set of protected_attribute values
         """
-        unique_labels, counts = np.unique(protected_attribute, return_counts=True)
+        unique_labels, counts = np.unique(
+            protected_attribute, return_counts=True)
         if len(unique_labels) > 2:
             raise RuntimeError("Protected Attribute is not binary")
 
@@ -38,9 +40,9 @@ class BinaryProtectedAttribute:
 
     def _weight_function(self, y_val, a_val, L, p_ratio, a0_val):
         if a_val == a0_val:
-            return 2*y_val - 1 - L * p_ratio
+            return 2 * y_val - 1 - L * p_ratio
         else:
-            return 2*y_val - 1 + L
+            return 2 * y_val - 1 + L
 
     def _generate_weights(self, y, protected_attribute, L, p_ratio, a0_val):
         weight_func = np.vectorize(self._weight_function)
@@ -69,12 +71,12 @@ class BinaryProtectedAttribute:
         :param protected_attribute: The binary protected attribute corresponding to each row of x
         We do not consider it an error if only one attribute value is present
         :type protected_attribute: List of Numpy array with one dimension
-        
+
         :param lagrange_multipliers: User specified set of Lagrange multipliers to use for
         the optimisation problem. If this is set then number_lagrange_multipliers must be None.
         The result array will be equal in length to this array
         :type lagrange_multipliers: List of real numbers
-        
+
         :param number_lagrange_multipliers: Specifies the number of Lagrange multipliers to
         use in the optimisation problem. If this is set then lagrange_multipliers must be None.
         The result array will have as many entries as specified here
@@ -87,7 +89,8 @@ class BinaryProtectedAttribute:
         """
         # Must specify either an array of Lagrange multipliers or how many of them to generate
         if not (lagrange_multipliers is None) ^ (number_lagrange_multipliers is None):
-            raise RuntimeError("Must specify either lagrange_multipliers or number_lagrange_multipliers")
+            raise RuntimeError(
+                "Must specify either lagrange_multipliers or number_lagrange_multipliers")
 
         # Verify we have a binary classification problem
         unique_labels = np.unique(y)
@@ -98,31 +101,36 @@ class BinaryProtectedAttribute:
             raise RuntimeError("Supplied Y labels are not 0 or 1")
 
         # Extract required statistics from protected_attribute
-        p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
+        p0, p1, a0_val = self._generate_protected_attribute_info(
+            protected_attribute)
 
         # If not supplied, generate array of trial lagrange multipliers
         if lagrange_multipliers is None:
             limit = 1
-            if p0/p1 > 1:
-                limit = p0/p1
-            lagrange_multipliers = np.linspace(-2*limit, 2*limit, number_lagrange_multipliers)
+            if p0 / p1 > 1:
+                limit = p0 / p1
+            lagrange_multipliers = np.linspace(-2 * limit,
+                                               2 * limit, number_lagrange_multipliers)
 
         result = []
         for current_multiplier in lagrange_multipliers:
             # Generate weights array
-            sample_weights = self._generate_weights(y, protected_attribute, current_multiplier, p1/p0, a0_val)
+            sample_weights = self._generate_weights(
+                y, protected_attribute, current_multiplier, p1 / p0, a0_val)
 
             # Generate Y'
-            f = lambda x: 1 if x > 0 else 0
+            def f(x): return 1 if x > 0 else 0
             re_labels = np.vectorize(f)(sample_weights)
 
             # Run the learner
             current_learner = copy.deepcopy(learner)
-            current_learner.fit(x, re_labels, sample_weight=np.absolute(sample_weights))
+            current_learner.fit(
+                x, re_labels, sample_weight=np.absolute(sample_weights))
 
             # Append the new model, along with its current_multiplier value to the result
             # Note that we call it a model because it is a learner which has had 'fit' called
-            result.append({"model": current_learner, "lagrange_multiplier":current_multiplier})
+            result.append({"model": current_learner,
+                           "lagrange_multiplier": current_multiplier})
 
         # Return the result array (tuples of (current_multiplier,model))
         return result
