@@ -192,7 +192,8 @@ class _Lagrangian:
 
 
 def _mean_pred(dataX, hs, weights):
-    """Return a weighted average of predictions produced by classifiers in hs"""
+    """Return a weighted average of predictions produced by
+    classifiers in hs"""
     pred = pd.DataFrame()
     for t in range(len(hs)):
         pred[t] = hs[t](dataX)
@@ -213,8 +214,9 @@ _SHRINK_ETA = 0.8
 # The smallest number of iterations after which expgrad terminates.
 _MIN_T = 5
 
-# If _RUN_LP_STEP is set to True, then each step of exponentiated gradient is
-# followed by the saddle point optimization over the convex hull of classifiers returned so far.
+# If _RUN_LP_STEP is set to True, then each step of exponentiated
+# gradient is followed by the saddle point optimization over the convex
+# hull of classifiers returned so far.
 _RUN_LP_STEP = True
 
 expgrad_result = namedtuple("ExpgradResult",
@@ -314,7 +316,8 @@ def expgrad(dataX, dataA, dataY, learner,
         if t == 0 or not _RUN_LP_STEP:
             gap_LP = np.PINF
         else:
-            # saddle point optimization over the convex hull of classifiers returned so far
+            # saddle point optimization over the convex hull of
+            # classifiers returned so far
             Q_LP, _, result_LP = lagrangian.solve_linprog(nu)
             gap_LP = result_LP.gap()
 
