@@ -16,7 +16,8 @@ class Moment:
         assert self.initialized is False, \
             "moments can be initialized only once"
         self.X = dataX
-        self.tags = pd.DataFrame({"protected_attribute": dataA, "label": dataY})
+        self.tags = pd.DataFrame(
+            {"protected_attribute": dataA, "label": dataY})
         self.n = dataX.shape[0]
         self.initialized = True
         self._gamma_descr = None
@@ -39,7 +40,7 @@ class MisclassificationError(Moment):
 
     def lambda_signed(self, lambda_vec):
         return lambda_vec
-    
+
     def signed_weights(self, lambda_vec=None):
         if lambda_vec is None:
             return 2 * self.tags["label"] - 1
@@ -54,7 +55,8 @@ class _CondOpportunity(Moment):
         super().init(dataX, dataA, dataY)
         self.tags["grp"] = dataGrp
         self.prob_grp = self.tags.groupby("grp").size() / self.n
-        self.prob_attr_grp = self.tags.groupby(["grp", "protected_attribute"]).size()/self.n
+        self.prob_attr_grp = self.tags.groupby(
+            ["grp", "protected_attribute"]).size() / self.n
         signed = pd.concat([self.prob_attr_grp, self.prob_attr_grp],
                            keys=["+", "-"],
                            names=["sign", "grp", "protected_attribute"])
@@ -67,7 +69,8 @@ class _CondOpportunity(Moment):
         pred = predictor(self.X)
         self.tags["pred"] = pred
         expect_grp = self.tags.groupby("grp").mean()
-        expect_attr_grp = self.tags.groupby(["grp", "protected_attribute"]).mean()
+        expect_attr_grp = self.tags.groupby(
+            ["grp", "protected_attribute"]).mean()
         expect_attr_grp["diff"] = expect_attr_grp["pred"] - expect_grp["pred"]
         g_unsigned = expect_attr_grp["diff"]
         g_signed = pd.concat([g_unsigned, -g_unsigned],
@@ -82,7 +85,7 @@ class _CondOpportunity(Moment):
     def signed_weights(self, lambda_vec):
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         adjust = lambda_signed.sum(level="grp") / self.prob_grp \
-                 - lambda_signed / self.prob_attr_grp
+            - lambda_signed / self.prob_attr_grp
         signed_weights = self.tags.apply(
             lambda row: adjust[row["grp"], row["protected_attribute"]], axis=1
         )
