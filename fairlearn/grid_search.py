@@ -48,49 +48,63 @@ class BinaryProtectedAttribute:
         weight_func = np.vectorize(self._weight_function)
         return weight_func(y, protected_attribute, L, p_ratio, a0_val)
 
-    def demographic_parity_binary_classification(self, learner, x, y, protected_attribute, lagrange_multipliers=None, number_lagrange_multipliers=11):
-        """Function to generate a list of models for a binary classification problem with
-        a single binary protected attribute. The models sweep through different potential
-        lagrange multipliers for the constrained optimisation problem (the constraint
-        being demographic parity), each one corresponding to a particular tradeoff between
-        fairness and accuracy
+    def demographic_parity_binary_classification(self,
+                                                 learner,
+                                                 x, y, protected_attribute,
+                                                 lagrange_multipliers=None,
+                                                 number_lagrange_multipliers=11):
+        """Function to generate a list of models for a binary classification
+        problem with a single binary protected attribute. The models sweep
+        through different potential Lagrange multipliers for the constrained
+        optimisation problem (the constraint being demographic parity), each
+        one corresponding to a particular tradeoff between fairness and
+        accuracy
 
-        :param learner: An object which can be used to fit a model to features, labels and
-        weights. A deep copy of this is made for each value of the lagrange multiplier used
+        :param learner: An object which can be used to fit a model to
+        features, labels and weights. A deep copy of this is made for each
+        value of the lagrange multiplier used
         :type learner: Must implement a fit(x, y, sample_weight) method
 
-        :param x: The array of training data features (which may or may not contain the
-        protected attribute). Must have as many rows as y and protected_attribute
-        :type x: Nested list or numpy array with two dimensions or pandas dataframe
+        :param x: The array of training data features (which may or may
+        not contain the protected attribute). Must have as many rows
+        as y and protected_attribute
+        :type x: Nested list or numpy array with two dimensions or
+        pandas dataframe
 
-        :param y: The list of binary classes, which must be 0 or 1. Must contain the same
-        number of entries as rows in x. We do not consider it an error if only one
-        class is present
+        :param y: The list of binary classes, which must be 0 or 1. Must
+        contain the same number of entries as rows in x. We do not
+        consider it an error if only one class is present
         :type y: List or Numpy array with one dimension
 
-        :param protected_attribute: The binary protected attribute corresponding to each row of x
-        We do not consider it an error if only one attribute value is present
+        :param protected_attribute: The binary protected attribute
+        corresponding to each row of x. We do not consider it an error
+        if only one attribute value is present
         :type protected_attribute: List of Numpy array with one dimension
 
-        :param lagrange_multipliers: User specified set of Lagrange multipliers to use for
-        the optimisation problem. If this is set then number_lagrange_multipliers must be None.
+        :param lagrange_multipliers: User specified set of Lagrange
+        multipliers to use for the optimisation problem. If this is set
+        then number_lagrange_multipliers must be None.
         The result array will be equal in length to this array
         :type lagrange_multipliers: List of real numbers
 
-        :param number_lagrange_multipliers: Specifies the number of Lagrange multipliers to
-        use in the optimisation problem. If this is set then lagrange_multipliers must be None.
+        :param number_lagrange_multipliers: Specifies the number of
+        Lagrange multipliers to use in the optimisation problem. If this
+        is set then lagrange_multipliers must be None.
         The result array will have as many entries as specified here
 
-        :return: The models corresponding to each value of the Lagrange multiplier tested
-        :rtype: List of dictionaries. Each dictionary has fields "lagrange_multiplier" and "model." Each
-        model will correspond to the input parameter learner after calling 'fit' on it (a deep
-        copy is made). The user is responsible for converting these objects to an actual model,
-        if further processing is required.
+        :return: The models corresponding to each value of the Lagrange
+        multiplier tested
+        :rtype: List of dictionaries. Each dictionary has fields
+        "lagrange_multiplier" and "model." Each model will correspond to
+        the input parameter learner after calling 'fit' on it (a deep
+        copy is made). The user is responsible for converting these
+        objects to an actual model, if further processing is required.
         """
-        # Must specify either an array of Lagrange multipliers or how many of them to generate
+        # Must specify either an array of Lagrange multipliers or how many
+        # of them to generate
         if not (lagrange_multipliers is None) ^ (number_lagrange_multipliers is None):
-            raise RuntimeError(
-                "Must specify either lagrange_multipliers or number_lagrange_multipliers")
+            raise RuntimeError("Must specify either lagrange_multipliers "
+                               "or number_lagrange_multipliers")
 
         # Verify we have a binary classification problem
         unique_labels = np.unique(y)
@@ -110,7 +124,8 @@ class BinaryProtectedAttribute:
             if p0 / p1 > 1:
                 limit = p0 / p1
             lagrange_multipliers = np.linspace(-2 * limit,
-                                               2 * limit, number_lagrange_multipliers)
+                                               2 * limit,
+                                               number_lagrange_multipliers)
 
         result = []
         for current_multiplier in lagrange_multipliers:
@@ -127,8 +142,10 @@ class BinaryProtectedAttribute:
             current_learner.fit(
                 x, re_labels, sample_weight=np.absolute(sample_weights))
 
-            # Append the new model, along with its current_multiplier value to the result
-            # Note that we call it a model because it is a learner which has had 'fit' called
+            # Append the new model, along with its current_multiplier value
+            # to the result
+            # Note that we call it a model because it is a learner which has
+            # had 'fit' called
             result.append({"model": current_learner,
                            "lagrange_multiplier": current_multiplier})
 
