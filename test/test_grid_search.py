@@ -10,7 +10,7 @@ import simple_learners
 
 import pytest
 
-class TestBinaryProtectedAttributeDemographicParity:
+class TestBinaryProtectedAttribute:
     def _quick_data(self, number_samples=8):
         feature_1 = np.random.randint(2, size=number_samples)
         feature_2 = np.random.randint(6, size=number_samples)
@@ -21,8 +21,8 @@ class TestBinaryProtectedAttributeDemographicParity:
         return X, Y, A
 
     def _smoke_core(self, X, Y, A):
-        target = gs.BinaryProtectedAttributeDemographicParity()
-        result = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=11)
+        target = gs.BinaryProtectedAttribute()
+        result = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=11)
         assert len(result) == 11
 
         # 'Central' multiplier of generated set should be 0
@@ -73,7 +73,7 @@ class TestBinaryProtectedAttributeDemographicParity:
         number_attributes = 32
         A = np.random.randint(2, size=number_attributes)
 
-        target = gs.BinaryProtectedAttributeDemographicParity()
+        target = gs.BinaryProtectedAttribute()
 
         p0, p1 = target._generate_p0_p1(A)
 
@@ -90,7 +90,7 @@ class TestBinaryProtectedAttributeDemographicParity:
         # Expected results
         W_expect = [ -21, -19, 9, 11]
 
-        target = gs.BinaryProtectedAttributeDemographicParity()
+        target = gs.BinaryProtectedAttribute()
         W = target._generate_weights(Y, A, L, p_ratio)
 
         assert np.array_equal(W_expect, W), str(W)+str(W_expect)
@@ -99,11 +99,11 @@ class TestBinaryProtectedAttributeDemographicParity:
         X, Y, A = self._quick_data()
         message = r"Must specify either lagrange_multipliers or number_lagrange_multipliers"
 
-        target = gs.BinaryProtectedAttributeDemographicParity()
+        target = gs.BinaryProtectedAttribute()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, None, None)
+            _ = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, None, None)
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, np.random.randint(10, size=3), 3)
+            _ = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, np.random.randint(10, size=3), 3)
 
     def test_non_binary_protected_attribute(self):
         X, Y, _ = self._quick_data()
@@ -111,27 +111,27 @@ class TestBinaryProtectedAttributeDemographicParity:
 
         bad_protected_attribute = [0, 1, 2]
 
-        target = gs.BinaryProtectedAttributeDemographicParity()
+        target = gs.BinaryProtectedAttribute()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, bad_protected_attribute)
+            _ = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, bad_protected_attribute)
 
     def test_non_binary_labels(self):
         X, _, A = self._quick_data(8)
         bad_labels = [0, 1, 2, 0, 1, 2, 0, 1]
         message = r"Supplied Y labels are not binary"
 
-        target = gs.BinaryProtectedAttributeDemographicParity()
+        target = gs.BinaryProtectedAttribute()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, bad_labels, A)
+            _ = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, bad_labels, A)
 
     def test_labels_not_0_1(self):
         X, _, A = self._quick_data(8)
         bad_labels = [0, 2, 2, 0, 0, 2, 0, 0]
         message = r"Supplied Y labels are not 0 or 1"
         
-        target = gs.BinaryProtectedAttributeDemographicParity()
+        target = gs.BinaryProtectedAttribute()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, bad_labels, A)
+            _ = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, bad_labels, A)
 
     def test_lagrange_multiplier_generation(self):
         # Check that the Lagrange multiplier values are being generated for the correct
@@ -145,8 +145,8 @@ class TestBinaryProtectedAttributeDemographicParity:
         if p0/p1 > 1:
             limit = p0/p1
 
-        target = gs.BinaryProtectedAttributeDemographicParity()
-        results = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=3)
+        target = gs.BinaryProtectedAttribute()
+        results = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=3)
 
         expected_multipliers = [ -2*limit, 0, 2*limit ]
         actual_multipliers = [r["lagrange_multiplier"] for r in results]
@@ -176,8 +176,8 @@ class TestBinaryProtectedAttributeDemographicParity:
         # Need a extra 'ones' column to allow our simple least squares learner to work properly
         X = pd.DataFrame({"actual_feature": actual_feature, "protected_attribute_feature": A, "constant_ones_feature": np.ones(len(Y))})
 
-        target = gs.BinaryProtectedAttributeDemographicParity()
-        result = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=5)
+        target = gs.BinaryProtectedAttribute()
+        result = target.demographic_parity_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=5)
         assert len(result)==5
 
         # Check the weights for each of the models returned against the expected values

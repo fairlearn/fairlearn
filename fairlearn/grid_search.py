@@ -12,7 +12,7 @@ considered
 import copy
 import numpy as np
 
-class BinaryProtectedAttributeDemographicParity:
+class BinaryProtectedAttribute:
     def __init__(self):
         # Nothing to do
         return
@@ -46,7 +46,7 @@ class BinaryProtectedAttributeDemographicParity:
         weight_func = np.vectorize(self._weight_function)
         return weight_func(y, protected_attribute, L, p_ratio)
 
-    def grid_search_binary_classification(self, learner, x, y, protected_attribute, lagrange_multipliers=None, number_lagrange_multipliers=11):
+    def demographic_parity_binary_classification(self, learner, x, y, protected_attribute, lagrange_multipliers=None, number_lagrange_multipliers=11):
         """Function to generate a list of models for a binary classification problem with
         a single binary protected attribute. The models sweep through different potential
         lagrange multipliers for the constrained optimisation problem (the constraint
