@@ -10,7 +10,7 @@ import simple_learners
 
 import pytest
 
-class TestGridSearch:
+class TestBinaryProtectedAttributeDemographicParity:
     def _quick_data(self, number_samples=8):
         feature_1 = np.random.randint(2, size=number_samples)
         feature_2 = np.random.randint(6, size=number_samples)
@@ -21,8 +21,8 @@ class TestGridSearch:
         return X, Y, A
 
     def _smoke_core(self, X, Y, A):
-        target = gs.BinaryClassificationGridSearch()
-        result = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=11)
+        target = gs.BinaryProtectedAttributeDemographicParity()
+        result = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=11)
         assert len(result) == 11
 
         # 'Central' multiplier of generated set should be 0
@@ -73,7 +73,7 @@ class TestGridSearch:
         number_labels = 32
         Y = np.random.randint(2, size=number_labels)
 
-        target = gs.BinaryClassificationGridSearch()
+        target = gs.BinaryProtectedAttributeDemographicParity()
 
         p0, p1 = target._generate_p0_p1(Y)
 
@@ -90,7 +90,7 @@ class TestGridSearch:
         # Expected results
         W_expect = [ -21, -19, 9, 11]
 
-        target = gs.BinaryClassificationGridSearch()
+        target = gs.BinaryProtectedAttributeDemographicParity()
         W = target._generate_weights(Y, A, L, p_ratio)
 
         assert np.array_equal(W_expect, W), str(W)+str(W_expect)
@@ -99,11 +99,11 @@ class TestGridSearch:
         X, Y, A = self._quick_data()
         message = r"Must specify either lagrange_multipliers or number_lagrange_multipliers"
 
-        target = gs.BinaryClassificationGridSearch()
+        target = gs.BinaryProtectedAttributeDemographicParity()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, None, None)
+            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, None, None)
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, np.random.randint(10, size=3), 3)
+            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, np.random.randint(10, size=3), 3)
 
     def test_grid_bad_A_labels(self):
         X, Y, _ = self._quick_data()
@@ -111,9 +111,9 @@ class TestGridSearch:
 
         bad_protected_attribute = [0, 1, 2]
 
-        target = gs.BinaryClassificationGridSearch()
+        target = gs.BinaryProtectedAttributeDemographicParity()
         with pytest.raises(RuntimeError, match=message):
-            _ = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, bad_protected_attribute)
+            _ = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, bad_protected_attribute)
 
     def test_grid_already_fair(self):
         # Number of samples of each attribute to generate
@@ -138,8 +138,8 @@ class TestGridSearch:
         # Need a extra 'ones' column to allow our simple least squares learner to work properly
         X = pd.DataFrame({"actual_feature": actual_feature, "protected_attribute_feature": A, "constant_ones_feature": np.ones(len(Y))})
 
-        target = gs.BinaryClassificationGridSearch()
-        result = target.grid_search_binary_protected_attribute(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=5)
+        target = gs.BinaryProtectedAttributeDemographicParity()
+        result = target.grid_search_binary_classification(simple_learners.LeastSquaresBinaryClassifierLearner(), X, Y, A, number_lagrange_multipliers=5)
         assert len(result)==5
 
         # Check the weights for each of the models returned against the expected values
