@@ -4,6 +4,7 @@
 import numpy as np
 import pandas as pd
 
+
 class LeastSquaresBinaryClassifierLearner:
     def __init__(self):
         self.weights = None
@@ -17,4 +18,4 @@ class LeastSquaresBinaryClassifierLearner:
 
     def predict(self, X):
         pred = X.dot(self.weights)
-        return 1*(pred > 0.5)
+        return 1 * (pred > 0.5)
