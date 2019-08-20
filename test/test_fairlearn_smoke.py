@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import numpy as np
 import pandas as pd
 import fairlearn.moments as moments
 import fairlearn.classred as red
@@ -9,6 +8,7 @@ import fairlearn.classred as red
 import simple_learners
 
 import pytest
+
 
 class TestFairLearnSmoke:
     def setup_method(self, method):
