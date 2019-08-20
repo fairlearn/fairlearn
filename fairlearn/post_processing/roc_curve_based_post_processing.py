@@ -147,9 +147,9 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
         while scores[i] == threshold:
             count[labels[i]] += 1
             i += 1
-        # For the ROC curve we plot points (x, y), where x represents
-        # the conditional probability P[Y_hat=1 | Y=0] and y represents
-        # the conditional probability P[Y_hat=1 | Y=1]. The conditional
+        # For the ROC curve we calculate points (x, y), where x represents
+        # the conditional probability P[Y_hat=0 | Y=0] and y represents
+        # the conditional probability P[Y_hat=0 | Y=1]. The conditional
         # probability is achieved by dividing by only the number of
         # negative/positive samples.
         x, y = count[0] / n_negative, count[1] / n_positive
