@@ -225,7 +225,12 @@ expgrad_result = namedtuple("ExpgradResult",
 
 
 def expgrad(dataX, dataA, dataY, learner,
-            constraints=moments.DP(), eps=0.01, T=50, nu=None, eta_mul=2.0, debug=False):
+            constraints=moments.DP(),
+            eps=0.01,
+            T=50,
+            nu=None,
+            eta_mul=2.0,
+            debug=False):
     """
     Return a fair classifier under specified fairness constraints
     via exponentiated-gradient reduction.
