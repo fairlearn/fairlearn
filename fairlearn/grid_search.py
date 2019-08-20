@@ -83,8 +83,8 @@ class BinaryClassificationGridSearch:
 
         # Check that the protected_attribute only has values 0 and 1
         unique_protected_attribute_values = np.unique(protected_attribute)
-        if not np.array_equal(unique_protected_attribute_values, [0, 1]):
-            raise RuntimeError("Supplied protected_attribute labels not 0 or 1")
+        if len(unique_protected_attribute_values) > 2:
+            raise RuntimeError("Protected Attribute is not binary")
 
         # Compute p0 and p1
         p0, p1 = self._generate_p0_p1(y)

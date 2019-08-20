@@ -107,9 +107,9 @@ class TestGridSearch:
 
     def test_grid_bad_A_labels(self):
         X, Y, _ = self._quick_data()
-        message = r"Supplied protected_attribute labels not 0 or 1"
+        message = r"Protected Attribute is not binary"
 
-        bad_protected_attribute = [0, 2, 2]
+        bad_protected_attribute = [0, 1, 2]
 
         target = gs.BinaryClassificationGridSearch()
         with pytest.raises(RuntimeError, match=message):
