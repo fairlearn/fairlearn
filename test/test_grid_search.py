@@ -6,7 +6,7 @@ import fairlearn.grid_search as gs
 import numpy as np
 import pandas as pd
 
-import simple_learners
+from test import simple_learners
 
 import pytest
 
