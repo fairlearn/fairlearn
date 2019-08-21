@@ -362,3 +362,86 @@ class TestBinaryProtectedAttribute:
         assert np.allclose(result_constant_ones_feature_weights,
                            expected_constant_ones_feature_weights,
                            rtol=1e-3)
+
+    def test_grid_unfair(self):
+        # Variant of test_grid_already_fair where the two populations
+        # have the same distribution but different thresholds
+
+        number_a0 = 5000
+        number_a1 = 200
+
+        a0_threshold = 0.2
+        a1_threshold = 0.8
+
+        a0_label = 3
+        a1_label = 7
+
+        a0s = np.full(number_a0, a0_label)
+        a1s = np.full(number_a1, a1_label)
+
+        a0_scores = np.linspace(0, 1, number_a0)
+        a1_scores = np.linspace(0, 1, number_a1)
+        score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
+
+        A = np.concatenate((a0s, a1s), axis=None)
+
+        Y_a0 = [x > a0_threshold for x in a0_scores]
+        Y_a1 = [x > a1_threshold for x in a1_scores]
+
+        Y = np.concatenate((Y_a0, Y_a1), axis=None)
+
+        X = pd.DataFrame({"actual_feature": score_feature,
+                          "protected_attribute_feature": A,
+                          "constant_ones_feature": np.ones(len(Y))})
+
+        target = gs.BinaryProtectedAttribute()
+        result = target.demographic_parity_binary_classification(
+            simple_learners.LeastSquaresBinaryClassifierLearner(),
+            X, Y, A, number_lagrange_multipliers=7)
+        assert len(result) == 7
+
+        result_actual_feature_weights = [
+            x["model"].weights["actual_feature"] for x in result]
+        result_protected_attribute_feature_weights = [
+            x["model"].weights["protected_attribute_feature"] for x in result]
+        result_constant_ones_feature_weights = [
+            x["model"].weights["constant_ones_feature"] for x in result]
+
+        # The following 'golden values' are empirically determined
+        expected_actual_feature_weights = [
+            0, 0, 0.22047, 0.95963, 0.68783, 0, 0
+        ]
+
+        # Since we have an unfair dataset, a Lagrange multiplier
+        # of zero is no longer expected to give a zero weight
+        # on the protected attribute
+        # However, in the following data, we can see that
+        # a non-zero multiplier value should exist to give
+        # that zero weight
+        expected_protected_attribute_feature_weights = [
+            -0.25000,
+            -0.25000,
+            -0.23338,
+            -0.15000,
+            0.10659,
+            0.25000,
+            0.25000]
+
+        expected_constant_ones_feature_weights = [
+            1.75,
+            1.75,
+            1.52549,
+            0.77018,
+            -0.09694,
+            -0.75,
+            -0.75]
+
+        assert np.allclose(result_actual_feature_weights,
+                           expected_actual_feature_weights,
+                           rtol=1e-3)
+        assert np.allclose(result_protected_attribute_feature_weights,
+                           expected_protected_attribute_feature_weights,
+                           rtol=1e-3)
+        assert np.allclose(result_constant_ones_feature_weights,
+                           expected_constant_ones_feature_weights,
+                           rtol=1e-3)
