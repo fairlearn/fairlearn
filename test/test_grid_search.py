@@ -428,3 +428,19 @@ class TestBinaryProtectedAttribute:
         assert np.allclose(result_constant_ones_feature_weights,
                            expected_constant_ones_feature_weights,
                            rtol=1e-3)
+
+    def test_grid_smoke_linear_regression(self):
+        number_samples = 20
+        feature_1 = np.random.randint(20, size=number_samples)
+        feature_2 = np.random.randint(60, size=number_samples)
+        feature_3 = np.random.randint(30, size=number_samples)
+        X = np.stack((feature_1, feature_2, feature_3), -1).tolist()
+        Y = np.random.randint(20, size=number_samples).tolist()
+        A = np.random.randint(2, size=number_samples).tolist()
+
+        target = gs.BinaryProtectedAttribute()
+        result = target.bounded_group_loss_regression(
+            simple_learners.LeastSquaresRegressor(),
+            X, Y, A
+        )
+        assert len(result) == 11
