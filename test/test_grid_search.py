@@ -21,6 +21,30 @@ class TestBinaryProtectedAttribute:
         A = np.random.randint(2, size=number_samples).tolist()
         return X, Y, A
 
+    def _simple_threshold_data(self,
+                               number_a0, number_a1,
+                               a0_threshold, a1_threshold,
+                               a0_label, a1_label):
+
+        a0s = np.full(number_a0, a0_label)
+        a1s = np.full(number_a1, a1_label)
+
+        a0_scores = np.linspace(0, 1, number_a0)
+        a1_scores = np.linspace(0, 1, number_a1)
+        score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
+
+        A = np.concatenate((a0s, a1s), axis=None)
+
+        Y_a0 = [x > a0_threshold for x in a0_scores]
+        Y_a1 = [x > a1_threshold for x in a1_scores]
+
+        Y = np.concatenate((Y_a0, Y_a1), axis=None)
+
+        X = pd.DataFrame({"actual_feature": score_feature,
+                          "protected_attribute_feature": A,
+                          "constant_ones_feature": np.ones(len(Y))})
+        return X, Y, A
+
     def _smoke_core(self, X, Y, A):
         target = gs.BinaryProtectedAttribute()
         result = target.demographic_parity_binary_classification(
@@ -201,6 +225,9 @@ class TestBinaryProtectedAttribute:
         # Large numbers required to beat down the errors in the weights
         num_samples_each = 400000
 
+        # Give half the dataset a label 0 and the other half 1
+        score_threshold = 0.5
+
         # We need a numeric binary attribute, but it need not
         # be taken from {0, 1}
         a_offset = testdata[0]
@@ -209,31 +236,15 @@ class TestBinaryProtectedAttribute:
         assert a_offset == int(a_offset)
         assert a_scale == int(a_scale)
 
-        # Create a 'rigged' dataset which while it contains the protected
-        # attribute, actually doesn't depend on it
+        a0_label = 0 * a_scale + a_offset
+        a1_label = 1 * a_scale + a_offset
 
-        # Attribute array is evenly divided between two values
-        A_raw = pd.Series(np.concatenate(
-            (np.zeros(num_samples_each), np.ones(num_samples_each)),
-            axis=None))
-        A = a_scale * A_raw + a_offset
-
-        # Generate a set of scores which we threshold to get the label
-        scores = np.linspace(0, 1, num_samples_each)
-
-        # Need two copies of the scores, one for each value of the protected
-        # features
-        actual_feature = pd.Series(np.concatenate((scores, scores), axis=None))
-
-        # Generate the labels by thresholding
-        Y = pd.Series([x > 0.5 for x in actual_feature])
-
-        # Assemble the dataframe of samples
-        # Need a extra 'ones' column to allow our simple least squares
-        # learner to work properly
-        X = pd.DataFrame({"actual_feature": actual_feature,
-                          "protected_attribute_feature": A,
-                          "constant_ones_feature": np.ones(len(Y))})
+        X, Y, A = self._simple_threshold_data(num_samples_each,
+                                              num_samples_each,
+                                              score_threshold,
+                                              score_threshold,
+                                              a0_label,
+                                              a1_label)
 
         target = gs.BinaryProtectedAttribute()
         result = target.demographic_parity_binary_classification(
@@ -286,23 +297,9 @@ class TestBinaryProtectedAttribute:
         a0_label = 17
         a1_label = 37
 
-        a0s = np.full(number_a0, a0_label)
-        a1s = np.full(number_a1, a1_label)
-
-        a0_scores = np.linspace(0, 1, number_a0)
-        a1_scores = np.linspace(0, 1, number_a1)
-        score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
-
-        A = np.concatenate((a0s, a1s), axis=None)
-
-        Y_a0 = [x > score_threshold for x in a0_scores]
-        Y_a1 = [x > score_threshold for x in a1_scores]
-
-        Y = np.concatenate((Y_a0, Y_a1), axis=None)
-
-        X = pd.DataFrame({"actual_feature": score_feature,
-                          "protected_attribute_feature": A,
-                          "constant_ones_feature": np.ones(len(Y))})
+        X, Y, A = self._simple_threshold_data(number_a0, number_a1,
+                                              score_threshold, score_threshold,
+                                              a0_label, a1_label)
 
         target = gs.BinaryProtectedAttribute()
         result = target.demographic_parity_binary_classification(
@@ -376,23 +373,9 @@ class TestBinaryProtectedAttribute:
         a0_label = 3
         a1_label = 7
 
-        a0s = np.full(number_a0, a0_label)
-        a1s = np.full(number_a1, a1_label)
-
-        a0_scores = np.linspace(0, 1, number_a0)
-        a1_scores = np.linspace(0, 1, number_a1)
-        score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
-
-        A = np.concatenate((a0s, a1s), axis=None)
-
-        Y_a0 = [x > a0_threshold for x in a0_scores]
-        Y_a1 = [x > a1_threshold for x in a1_scores]
-
-        Y = np.concatenate((Y_a0, Y_a1), axis=None)
-
-        X = pd.DataFrame({"actual_feature": score_feature,
-                          "protected_attribute_feature": A,
-                          "constant_ones_feature": np.ones(len(Y))})
+        X, Y, A = self._simple_threshold_data(number_a0, number_a1,
+                                              a0_threshold, a1_threshold,
+                                              a0_label, a1_label)
 
         target = gs.BinaryProtectedAttribute()
         result = target.demographic_parity_binary_classification(
