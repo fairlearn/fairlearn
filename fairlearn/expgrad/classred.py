@@ -24,12 +24,13 @@ from collections import namedtuple
 print = functools.partial(print, flush=True)
 
 _PRECISION = 1e-8
-_LINE = "_"*9
-_INDENTATION = " "*9
+_LINE = "_" * 9
+_INDENTATION = " " * 9
 
 
 class _GapResult:
     """ The result of a duality gap computation"""
+
     def __init__(self, L, L_low, L_high, gamma, error):
         self.L = L
         self.L_low = L_low
@@ -43,6 +44,7 @@ class _GapResult:
 
 class _Lagrangian:
     """ Operations related to the Lagrangian"""
+
     def __init__(self, dataX, dataA, dataY, learner, constraints, eps, B,
                  opt_lambda=True, debug=False):
         self.X = dataX
@@ -68,8 +70,9 @@ class _Lagrangian:
         """ Return the value of the Lagrangian.
         Returned values:
         L -- value of the Lagrangian
-        L_high -- value of the Lagrangian under the best response of the lambda player
-        """        
+        L_high -- value of the Lagrangian under the best
+        response of the lambda player
+        """
         lambda_signed = self.constraints.lambda_signed(lambda_vec)
         if self.opt_lambda:
             L = error + np.sum(lambda_vec * gamma) \
@@ -88,7 +91,8 @@ class _Lagrangian:
         """ Return the value of the Lagrangian.
         Returned values:
         L -- value of the Lagrangian
-        L_high -- value of the Lagrangian under the best response of the lambda player
+        L_high -- value of the Lagrangian under the best
+        response of the lambda player
         gamma -- vector of constraint violations
         error -- the empirical error
         """
@@ -109,7 +113,8 @@ class _Lagrangian:
             h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
             if self.debug:
                 print("%smul=%.0f" % (_INDENTATION, mul))
-            L_low_mul, _, _, _ = self.eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
+            L_low_mul, _, _, _ = self.eval(
+                pd.Series({h_hat_idx: 1.0}), lambda_hat)
             if L_low_mul < result.L_low:
                 result.L_low = L_low_mul
             if result.gap() > nu + _PRECISION:
@@ -123,23 +128,27 @@ class _Lagrangian:
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
         A_ub = np.concatenate(
-            (self.gammas-self.eps, -np.ones((n_constraints, 1))), axis=1)
+            (self.gammas - self.eps, -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate(
             (np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
+        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub,
+                             A_eq=A_eq, b_eq=b_eq, method='simplex')
         h = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate(
             (-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
         dual_bounds = [
-            (None, None) if i == n_constraints else (0, None) for i in range(n_constraints+1)]
-        result_dual = opt.linprog(dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds)
+            (None, None) if i == n_constraints else (0, None)
+            for i in range(n_constraints + 1)]
+        result_dual = opt.linprog(
+            dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds)
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
-        self.last_linprog_result = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
+        self.last_linprog_result = (
+            h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
         return self.last_linprog_result
 
     def best_h(self, lambda_vec):
@@ -147,7 +156,7 @@ class _Lagrangian:
         for the vector of Lagrange multipliers lambda_vec."""
 
         signed_weights = self.obj.signed_weights() \
-                         + self.constraints.signed_weights(lambda_vec)
+            + self.constraints.signed_weights(lambda_vec)
         redY = 1 * (signed_weights > 0)
         redW = signed_weights.abs()
         redW = self.n * redW / redW.sum()
@@ -156,7 +165,7 @@ class _Lagrangian:
         classifier.fit(self.X, redY, redW)
         self.n_oracle_calls += 1
 
-        h = lambda X: classifier.predict(X)
+        def h(X): return classifier.predict(X)
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
@@ -171,7 +180,8 @@ class _Lagrangian:
 
         if h_value < best_value - _PRECISION:
             if self.debug:
-                print("%sbest_h: val improvement %f" % (_LINE, best_value - h_value))
+                print("%sbest_h: val improvement %f" %
+                      (_LINE, best_value - h_value))
             h_idx = len(self.hs)
             self.hs.at[h_idx] = h
             self.classifiers.at[h_idx] = classifier
@@ -183,14 +193,15 @@ class _Lagrangian:
 
 
 def _mean_pred(dataX, hs, weights):
-    """Return a weighted average of predictions produced by classifiers in hs"""
+    """Return a weighted average of predictions produced by
+    classifiers in hs"""
     pred = pd.DataFrame()
     for t in range(len(hs)):
         pred[t] = hs[t](dataX)
     return pred[weights.index].dot(weights)
 
 
-### Explicit optimization parameters of expgrad
+# Explicit optimization parameters of expgrad
 
 # A multiplier controlling the automatic setting of nu.
 _ACCURACY_MUL = 0.5
@@ -204,16 +215,24 @@ _SHRINK_ETA = 0.8
 # The smallest number of iterations after which expgrad terminates.
 _MIN_T = 5
 
-# If _RUN_LP_STEP is set to True, then each step of exponentiated gradient is
-# followed by the saddle point optimization over the convex hull of classifiers returned so far.
+# If _RUN_LP_STEP is set to True, then each step of exponentiated
+# gradient is followed by the saddle point optimization over the convex
+# hull of classifiers returned so far.
 _RUN_LP_STEP = True
 
+column_names = str("best_classifier best_gap classifiers "
+                   "weights last_t best_t n_oracle_calls")
 expgrad_result = namedtuple("ExpgradResult",
-    "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls")
+                            column_names)
 
 
 def expgrad(dataX, dataA, dataY, learner,
-    constraints=moments.DP(), eps=0.01, T=50, nu=None, eta_mul=2.0, debug=False):
+            constraints=moments.DP(),
+            eps=0.01,
+            T=50,
+            nu=None,
+            eta_mul=2.0,
+            debug=False):
     """
     Return a fair classifier under specified fairness constraints
     via exponentiated-gradient reduction.
@@ -258,8 +277,9 @@ def expgrad(dataX, dataA, dataY, learner,
     if debug:
         print("...Exponentiated Gradient STARTING")
 
-    B = 1/eps
-    lagrangian = _Lagrangian(dataX, dataA, dataY, learner, constraints, eps, B, debug=debug)
+    B = 1 / eps
+    lagrangian = _Lagrangian(dataX, dataA, dataY, learner,
+                             constraints, eps, B, debug=debug)
 
     theta = pd.Series(0, lagrangian.constraints.index)
     Qsum = pd.Series()
@@ -304,7 +324,8 @@ def expgrad(dataX, dataA, dataY, learner,
         if t == 0 or not _RUN_LP_STEP:
             gap_LP = np.PINF
         else:
-            # saddle point optimization over the convex hull of classifiers returned so far
+            # saddle point optimization over the convex hull of
+            # classifiers returned so far
             Q_LP, _, result_LP = lagrangian.solve_linprog(nu)
             gap_LP = result_LP.gap()
 
@@ -342,6 +363,7 @@ def expgrad(dataX, dataA, dataY, learner,
 
     return _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug)
 
+
 def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
     gaps_series = pd.Series(gaps)
     gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
@@ -351,7 +373,8 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
     for h_idx in hs.index:
         if h_idx not in weights.index:
             weights.at[h_idx] = 0.0
-    best_classifier = lambda X: _mean_pred(X, hs, weights)
+
+    def best_classifier(X): return _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
 
     result = expgrad_result(
@@ -370,5 +393,5 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
               ", n_oracle_calls=%d, n_hs=%d"
               % (result.last_t, result.best_t, result.best_gap,
                  result.n_oracle_calls, len(result.classifiers)))
-    
+
     return result
