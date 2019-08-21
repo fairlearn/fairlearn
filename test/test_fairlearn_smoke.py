@@ -1,28 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import numpy as np
 import pandas as pd
 import fairlearn.moments as moments
 import fairlearn.classred as red
 
+import simple_learners
+
 import pytest
-
-
-class LeastSquaresLearner:
-    def __init__(self):
-        self.weights = None
-
-    def fit(self, X, Y, W):
-        sqrtW = np.sqrt(W)
-        matX = np.array(X) * sqrtW[:, np.newaxis]
-        vecY = Y * sqrtW
-        self.lsqinfo = np.linalg.lstsq(matX, vecY, rcond=-1)
-        self.weights = pd.Series(self.lsqinfo[0], index=list(X))
-
-    def predict(self, X):
-        pred = X.dot(self.weights)
-        return 1 * (pred > 0.5)
 
 
 class TestFairLearnSmoke:
@@ -37,7 +22,7 @@ class TestFairLearnSmoke:
             {"feat1": feat1, "feat2": feat2, "feat3": feat3})
         self.dataY = pd.Series(labls)
         self.dataA = pd.Series(attrs)
-        self.learner = LeastSquaresLearner()
+        self.learner = simple_learners.LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
     smoke_test_data = [{"cons_class": moments.DP, "eps": 0.100,
