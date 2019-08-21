@@ -11,6 +11,7 @@ from fairlearn.post_processing.roc_curve_based_post_processing import (roc_curve
                                                                        _get_roc,
                                                                        _calculate_roc_points,
                                                                        _get_scores_labels_and_counts,
+                                                                       _filter_points_to_get_convex_hull,
                                                                        SCORE_KEY,
                                                                        LABEL_KEY,
                                                                        ATTRIBUTE_KEY)
@@ -121,6 +122,25 @@ def test__interpolate_curve():
         # base points.
         assert np.isclose((y - current_base_point_y) / (x - current_base_point_x), (next_base_point_y - y) / (next_base_point_x - x)) 
 
+def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
+    if ignore_indices is None:
+        ignore_indices = []
+    assert len(expected_points) - len(ignore_indices) == len(actual_points)
+
+    # order by x to be able to iterate through
+    actual_points = actual_points.sort_values(by="x")
+    actual_points.index = range(len(actual_points))
+
+    index_offset = 0
+    for i in range(len(actual_points)):
+        while i in ignore_indices:
+            index_offset += 1
+
+        assert np.isclose(actual_points["x"][i], expected_points["x"][i + index_offset])
+        assert np.isclose(actual_points["y"][i], expected_points["y"][i + index_offset])
+        assert actual_points["operation"][i].operator == expected_points["operation"][i + index_offset].operator
+        assert np.isclose(actual_points["operation"][i].threshold, expected_points["operation"][i + index_offset].threshold)
+
 def test_calculate_roc_points():
     data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
     grouped_data = data.groupby(ATTRIBUTE_KEY).get_group("A").sort_values(by=SCORE_KEY, ascending=False)
@@ -136,14 +156,9 @@ def test_calculate_roc_points():
                       ThresholdOperation('>', -np.inf)]
     })
 
-    assert len(expected_roc_points) == len(roc_points)
+    _assert_equal_points(expected_roc_points, roc_points)
 
-    # order by x to be able to iterate through
-    roc_points = roc_points.sort_values(by="x")
-    roc_points.index = range(len(roc_points))
-
-    for i in range(len(roc_points)):
-        assert np.isclose(roc_points["x"][i], expected_roc_points["x"][i])
-        assert np.isclose(roc_points["y"][i], expected_roc_points["y"][i])
-        assert roc_points["operation"][i].operator == expected_roc_points["operation"][i].operator
-        assert np.isclose(roc_points["operation"][i].threshold, expected_roc_points["operation"][i].threshold)
+    # try filtering to get the convex hull
+    # this should drop the second and third point
+    selected_points = pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[['x', 'y', 'operation']]
+    _assert_equal_points(expected_roc_points, selected_points, ignore_indices=[1,2])
