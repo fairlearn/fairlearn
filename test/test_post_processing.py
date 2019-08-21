@@ -83,23 +83,29 @@ def test_predict_from_operation_invalid_operator():
     with pytest.raises(ValueError, match="Unrecognized operator: ="):
         ThresholdOperation('=', 0.5)
 
-def test__interpolate_curve():
+def test_interpolate_curve():
     # The operation is irrelevant in this case since its semantics are not
     # used within _interpolate_curve.
-    data = pd.DataFrame({
+    base_points = pd.DataFrame({
         "x":         [ 0,   1,   2,   3,   4,   5,   6,   7,   8,   9],
         "y":         [-5,  -2, -1.5, -1,   0,  0.5, 0.8, 1.0, 1.1, 1.15],
         "operation": ["i", "r", "r", "e", "l", "e", "v", "a", "n", "t"]
     })
     x_grid = np.linspace(0, 9, 100)
-    curve = _interpolate_curve(data, "x", "y", "operation", x_grid)
+    curve = _interpolate_curve(base_points, "x", "y", "operation", x_grid)
     
+    _assert_interpolated_points_are_between_base_points(base_points, curve)
+
+def _assert_interpolated_points_are_between_base_points(base_points, curve):
     def _get_base_point_coordinates(i, data):
         return data["x"][i], data["y"][i]
 
+    print(base_points)
+    print(curve)
+
     base_point_index = 1
-    current_base_point_x, current_base_point_y = _get_base_point_coordinates(0, data)
-    next_base_point_x, next_base_point_y = _get_base_point_coordinates(1, data)
+    current_base_point_x, current_base_point_y = _get_base_point_coordinates(0, base_points)
+    next_base_point_x, next_base_point_y = _get_base_point_coordinates(1, base_points)
     for x_grid_index in range(len(curve)):
         x = curve["x"][x_grid_index]
         y = curve["y"][x_grid_index]
@@ -108,9 +114,9 @@ def test__interpolate_curve():
             continue
 
         while x > next_base_point_x:
-            current_base_point_x, current_base_point_y = _get_base_point_coordinates(base_point_index, data)
+            current_base_point_x, current_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
             base_point_index += 1
-            next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, data)
+            next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
         
         if x == next_base_point_x:
             assert y == next_base_point_y
@@ -132,14 +138,19 @@ def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
     actual_points.index = range(len(actual_points))
 
     index_offset = 0
-    for i in range(len(actual_points)):
-        while i in ignore_indices:
+    for i in range(len(expected_points)):
+        if i in ignore_indices:
             index_offset += 1
 
-        assert np.isclose(actual_points["x"][i], expected_points["x"][i + index_offset])
-        assert np.isclose(actual_points["y"][i], expected_points["y"][i + index_offset])
-        assert actual_points["operation"][i].operator == expected_points["operation"][i + index_offset].operator
-        assert np.isclose(actual_points["operation"][i].threshold, expected_points["operation"][i + index_offset].threshold)
+            if i > len(expected_points):
+                break
+            
+            continue
+
+        assert np.isclose(actual_points["x"][i - index_offset], expected_points["x"][i])
+        assert np.isclose(actual_points["y"][i - index_offset], expected_points["y"][i])
+        assert actual_points["operation"][i - index_offset].operator == expected_points["operation"][i].operator
+        assert np.isclose(actual_points["operation"][i - index_offset].threshold, expected_points["operation"][i].threshold)
 
 def test_calculate_roc_points():
     data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
@@ -158,7 +169,24 @@ def test_calculate_roc_points():
 
     _assert_equal_points(expected_roc_points, roc_points)
 
-    # try filtering to get the convex hull
-    # this should drop the second and third point
+    # Try filtering to get the convex hull of the ROC points.
+    # This should drop the second and third point.
     selected_points = pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[['x', 'y', 'operation']]
     _assert_equal_points(expected_roc_points, selected_points, ignore_indices=[1,2])
+
+def test_get_roc():
+    data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
+    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group("A").sort_values(by=SCORE_KEY, ascending=False)
+    x_grid = np.linspace(0, 1, 100)
+    
+    roc, _ = _get_roc(grouped_data, x_grid, "A")
+
+    base_points = pd.DataFrame({
+        "x": [0, 0.5, 1],
+        "y": [0, 1,   1],
+        "operation": [ThresholdOperation('>', np.inf),
+                      ThresholdOperation('<', 2.5),
+                      ThresholdOperation('>', -np.inf)]
+    })
+
+    _assert_interpolated_points_are_between_base_points(base_points, roc)
