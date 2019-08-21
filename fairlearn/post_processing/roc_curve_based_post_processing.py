@@ -28,6 +28,10 @@ highlight_color = [0.95, 0.90, 0.40]
 
 OUTPUT_SEPARATOR = "-"*65
 
+SCORE_KEY = "score"
+LABEL_KEY = "label"
+ATTRIBUTE_KEY = "attribute"
+
 def debug_marker(key):
     if key not in debug_markermap:
         marker = debug_markers[len(debug_markermap) % debug_nmarkers]
@@ -46,16 +50,31 @@ def debug_color(key):
 def debug_has_color(key):
     return key in debug_colormap
 
-def pred_from_operation(operation, threshold):
-    """ Encodes the threshold rule Y_hat > t or Y_hat < t"""
-    if operation == '>':
-        return lambda x: x > threshold
-    elif operation == '<':
-        return lambda x: x < threshold
-    else:
-        assert False, "Unrecognized operation:" + operation
+class ThresholdOperation():
+    def __init__(self, operator, threshold):
+        if operator not in ['>', '<']:
+            raise ValueError("Unrecognized operator: " + operator)
+        self._operator = operator
+        self._threshold = threshold
 
-def interpolated_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
+    @property
+    def threshold(self):
+        return self._threshold
+
+    @property
+    def operator(self):
+        return self._operator
+
+    def get_predictor_from_operation(self):
+        """ Encodes the threshold rule Y_hat > t or Y_hat < t"""
+        if self._operator == '>':
+            return lambda x: x > self._threshold
+        elif self._operator == '<':
+            return lambda x: x < self._threshold
+        else:
+            raise ValueError("Unrecognized operator: " + self._operator)
+
+def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
     """Creates the interpolated prediction between two predictions. The predictions
     are represented through the threshold rules operation0 and operation1.
     
@@ -69,17 +88,15 @@ def interpolated_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
     :param operation1: threshold rule for the second predictor
     :return: an anonymous function that scales the original prediction to the desired one
     """
-    pred0 = pred_from_operation(*operation0)
-    pred1 = pred_from_operation(*operation1)
+    pred0 = operation0.get_predictor_from_operation()
+    pred1 = operation1.get_predictor_from_operation()
     return (lambda x : p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
 
-def interpolate_curve(data, x_col, y_col, content_col, x_grid):
+def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     """Interpolates the data frame in "data" along the values in "x_grid".
-    TODO: does this really hold true?
     Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]
              (2) min and max in x_grid are below/above min and max in data[x_col]
              (3) data is indexed 0,...,len(data)"""
-
     data_transpose = data.transpose()
 
     i = 0
@@ -110,30 +127,11 @@ def interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
     return pd.DataFrame(dict_list)[[x_col, y_col, 'p0', content_col + '0', 'p1', content_col + '1']]
 
-def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
-    """Get ROC curve based on data columns 'score' and 'label'
-    Scores represent output values from the model.
-    """
-
-    attribute_str = "attribute value" + str(attribute)
-    if debug:
-        color = debug_color(attribute_str)
-            
-    data_sorted = data.sort_values(by='score', ascending=False)
-
-    scores = list(data_sorted['score'])
-    labels = list(data_sorted['label'])
-
-    n = len(labels)
-    n_positive = sum(labels)
-    n_negative = n - n_positive
-
-    assert (n_positive > 0) and (n_negative > 0), "Degenerate labels for " + attribute_str
-    
+def _calculate_roc_points(scores, labels, n, n_positive, n_negative, flip=True):
     scores.append(-np.inf)
     labels.append(np.nan)
     
-    x_list, y_list, operation_list = [0], [0], [('>', np.inf)]
+    x_list, y_list, operation_list = [0], [0], [ThresholdOperation('>', np.inf)]
     
     # Iterate through all samples which are sorted by increasing scores.
     # Setting the threshold between two scores means that everything smaller
@@ -154,18 +152,43 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
         # negative/positive samples.
         x, y = count[0] / n_negative, count[1] / n_positive
         threshold = (threshold + scores[i]) / 2
-        operation = ('>', threshold)
+        operation = ThresholdOperation('>', threshold)
 
         if flip and x > y:
             x, y = 1 - x, 1 - y
-            operation = ('<', threshold)
+            operation = ThresholdOperation('<', threshold)
         x_list.append(x)
         y_list.append(y)
         operation_list.append(operation)
+        
+    return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}).sort_values(by=['x', 'y'])
+
+def _get_scores_labels_and_counts(data):
+    data_sorted = data.sort_values(by=SCORE_KEY, ascending=False)
+
+    scores = list(data_sorted[SCORE_KEY])
+    labels = list(data_sorted[LABEL_KEY])
+
+    n = len(labels)
+    n_positive = sum(labels)
+    n_negative = n - n_positive
+
+    return scores, labels, n, n_positive, n_negative
+
+def _get_roc(data, x_grid, attribute, flip=True, debug=False):
+    """Get ROC curve based on data columns 'score' and 'label'
+    Scores represent output values from the model.
+    """
+    attribute_str = "attribute value" + str(attribute)
+    if debug:
+        color = debug_color(attribute_str)
+            
+    scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
+
+    if n_positive == 0 or n_negative == 0:
+        raise ValueError("Degenerate labels for " + attribute_str)
     
-    roc_raw = pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list})
-    
-    roc_sorted = roc_raw.sort_values(by=['x', 'y'])
+    roc_sorted = _calculate_roc_points(scores, labels, n, n_positive, n_negative, flip)
     selected = _filter_points_to_get_convex_hull(roc_sorted)
 
     roc_conv = pd.DataFrame(selected)[['x', 'y', 'operation']]
@@ -173,8 +196,8 @@ def get_roc(data, x_grid, flip=True, debug=False, attribute=None):
     roc_conv['selection'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * roc_conv['y']
     roc_conv['error'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * (1 - roc_conv['y'])
     
-    roc_curve_interpolated = interpolate_curve(roc_conv, 'x', 'y', 'operation', x_grid)
-    selection_interpolated = interpolate_curve(roc_conv, 'selection', 'error', 'operation', x_grid)
+    roc_curve_interpolated = _interpolate_curve(roc_conv, 'x', 'y', 'operation', x_grid)
+    selection_interpolated = _interpolate_curve(roc_conv, 'selection', 'error', 'operation', x_grid)
 
     if debug:
         print("")
@@ -213,7 +236,7 @@ def _filter_points_to_get_convex_hull(roc_sorted):
         selected.append(r2)
     return selected
         
-def roc_curve_based_post_processing(fairness_metric="DP", attributes, labels, scores, flip=True, debug=False, gridsize=1000):
+def roc_curve_based_post_processing(attributes, labels, scores, fairness_metric="DP", flip=True, debug=False, gridsize=1000):
     """ 
     :param fairness_metric: the fairness metric for which to optimize,
         currently only Demographic Parity ("DP") and Equalized Odds ("EO") are supported.
@@ -232,10 +255,10 @@ def roc_curve_based_post_processing(fairness_metric="DP", attributes, labels, sc
         A large gridsize means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
     """
-    data = pd.DataFrame({'attribute': attributes, 'score': scores, 'label': labels})
+    data = pd.DataFrame({ATTRIBUTE_KEY: attributes, SCORE_KEY: scores, LABEL_KEY: labels})
     assert len(labels) > 0, "Empty dataset"
 
-    data_grouped_by_attribute = data.groupby('attribute')
+    data_grouped_by_attribute = data.groupby(ATTRIBUTE_KEY)
 
     if fairness_metric == "EO":
         return _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug)
@@ -253,7 +276,7 @@ def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_
     for attribute, group in data_grouped_by_attribute:
         # determine probability of current protected attribute group based on data
         p_attribute = len(group) / n
-        roc[attribute], selection[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
+        roc[attribute], selection[attribute] = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
         # add up errors for the current group multiplied by the probability of the current group
         error_given_selection += p_attribute * selection[attribute]['error']
 
@@ -266,7 +289,7 @@ def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_
     for attribute in roc.keys():
         # For DP we already have the predictor directly without complex interpolation.
         roc_result = selection[attribute].transpose()[i_best_DP]
-        predicted_DP_by_attribute[attribute] = interpolated_prediction(0, 0,
+        predicted_DP_by_attribute[attribute] = _interpolate_prediction(0, 0,
                                                                        roc_result.p0, roc_result.operation0,
                                                                        roc_result.p1, roc_result.operation1)
     
@@ -291,7 +314,7 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
     x_grid = np.linspace(0, 1, gridsize + 1)
     y_values = pd.DataFrame()
     for attribute, group in data_grouped_by_attribute:
-        roc[attribute], selection[attribute] = get_roc(group, x_grid, flip=flip, debug=debug, attribute=attribute)
+        roc[attribute], selection[attribute] = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
         y_values[attribute] = roc[attribute]['y']
 
     # Calculate the overlap of the ROC curves by taking the lowest y value
@@ -325,7 +348,7 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
             vertical_distance_from_diagonal = roc_result.y - roc_result.x
             p_ignore = difference_from_best_predictor_for_attribute / vertical_distance_from_diagonal
 
-        predicted_EO_by_attribute[attribute] = interpolated_prediction(p_ignore, x_best,
+        predicted_EO_by_attribute[attribute] = _interpolate_prediction(p_ignore, x_best,
                                                                        roc_result.p0, roc_result.operation0,
                                                                        roc_result.p1, roc_result.operation1)
 
