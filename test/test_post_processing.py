@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from collections import defaultdict, namedtuple
 from itertools import permutations
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,52 +21,13 @@ from fairlearn.post_processing.roc_curve_based_post_processing import (roc_curve
                                                                        DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE,
                                                                        EMPTY_INPUT_ERROR_MESSAGE)
 
+example_attribute_names1 = ["A", "B", "C"]
 example_attributes1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
 example_attributes2 = [x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
 example_labels = [int(x) for x in '0110100' '0010111' '000111']
 example_scores = [int(x) for x in '0011233' '0001111' '011112']
 
-'''
-def run_roc_curve_based_post_processing_and_plot(ex_attrs, flip):
-    print("STARTING TEST")
-    pred_EO = roc_curve_based_post_processing_equalized_odds(ex_attrs, example_labels, example_scores, debug=True, flip=flip)
-    pred_DP = roc_curve_based_post_processing_demographic_parity(ex_attrs, example_labels, example_scores, debug=True, flip=flip)
-    ex_preds_EO = []
-    ex_preds_DP = []
-    for i in range(len(ex_attrs)):
-        ex_preds_EO.append( pred_EO(ex_attrs[i], example_scores[i]) )
-        ex_preds_DP.append( pred_DP(ex_attrs[i], example_scores[i]) )
-    ex_data = pd.DataFrame({ATTRIBUTE_KEY: ex_attrs, SCORE_KEY: example_scores, LABEL_KEY: example_labels, 'pred_EO': ex_preds_EO, 'pred_DP': ex_preds_DP})
-    ex_data['error_EO'] = np.absolute(ex_data[LABEL_KEY]-ex_data['pred_EO'])
-    ex_data['error_DP'] = np.absolute(ex_data[LABEL_KEY]-ex_data['pred_DP'])
-
-    print("APPLYING EO PREDICTOR")
-    print("")
-    print(ex_data.groupby([ATTRIBUTE_KEY, LABEL_KEY]).mean()[['pred_EO']])
-    print("")
-    print("error_EO=%.3f" % ex_data['error_EO'].mean())
-
-    print("-"*65)
-
-    print("APPLYING DP PREDICTOR")
-    print("")
-    print(ex_data.groupby([ATTRIBUTE_KEY]).mean()[['pred_DP']])
-    print("")
-    print("error_DP=%.3f" % ex_data['error_DP'].mean())
-    plt.show()
-
-def test_1():
-    run_roc_curve_based_post_processing_and_plot(example_attributes1, True)
-
-def test_2():
-    run_roc_curve_based_post_processing_and_plot(list(zip(example_attributes1, example_attributes2)), True)
-
-def test_3():
-    run_roc_curve_based_post_processing_and_plot(example_attributes1, False)
-
-def test_4():
-    run_roc_curve_based_post_processing_and_plot(example_attributes2, False)
-'''
+LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 def test_predict_from_operation_less():
     classifier = ThresholdOperation('<', 0.5).get_predictor_from_operation()
@@ -243,30 +205,6 @@ def _get_grouped_data_and_base_points(attribute_value):
 
     return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
 
-def test_roc_curve_based_post_processing_demographic_parity_no_attributes():
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-        roc_curve_based_post_processing_demographic_parity([], example_labels, example_scores)
-
-def test_roc_curve_based_post_processing_equalized_odds_no_attributes():
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-        roc_curve_based_post_processing_equalized_odds([], example_labels, example_scores)
-
-def test_roc_curve_based_post_processing_demographic_parity_no_labels():
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-        roc_curve_based_post_processing_demographic_parity(example_attributes1, [], example_scores)
-
-def test_roc_curve_based_post_processing_equalized_odds_no_labels():
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-        roc_curve_based_post_processing_equalized_odds(example_attributes1, [], example_scores)
-
-def test_roc_curve_based_post_processing_demographic_parity_no_scores():
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-        roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, [])
-
-def test_roc_curve_based_post_processing_equalized_odds_no_scores():
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-        roc_curve_based_post_processing_equalized_odds(example_attributes1, example_labels, [])
-
 def _generate_list_reduction_permutations():
     list_reduction_permutations = []
     for permutation in permutations([0, 0, 1]):
@@ -286,7 +224,6 @@ def _generate_empty_list_permutations():
         empty_list_permutations.append(permutation)
 
     return empty_list_permutations
-
 
 def test_roc_curve_based_post_processing_demographic_parity_different_input_lengths():
     # try all combinations of input lists being shorter/longer than others
@@ -319,3 +256,105 @@ def test_roc_curve_based_post_processing_equalized_odds_different_input_lengths(
             roc_curve_based_post_processing_equalized_odds(example_attributes1[:permutation[0]],
                                                            example_labels[:permutation[1]],
                                                            example_scores[:permutation[2]])
+
+def _get_discretized_predictions(adjusted_model):
+    labels_and_predictions = defaultdict(list)
+    for i in range(len(example_attributes1)):
+        labels_and_predictions[example_attributes1[i]].append(LabelAndPrediction(example_labels[i], adjusted_model(example_attributes1[i], example_scores[i])))
+    
+    return {
+        attribute_value: [
+            LabelAndPrediction(lp.label, int(lp.prediction >= 0.5)) for lp in labels_and_predictions[attribute_value]
+        ] for attribute_value in labels_and_predictions
+    }
+
+def test_roc_curve_based_post_processing_demographic_parity():
+    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores)
+    
+    # For Demographic Parity we can ignore p_ignore since it's always 0.
+
+    # attribute value A
+    value_for_less_than_2_5 = 0.8008
+    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 0))
+    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 2.499))
+    assert 0 == adjusted_model(example_attribute_names1[0], 2.5)
+    assert 0 == adjusted_model(example_attribute_names1[0], 100)
+
+    # attribute value B
+    value_for_less_than_0_5 = 0.00133333333333
+    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0))
+    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0.5))
+    assert 1 == adjusted_model(example_attribute_names1[1], 0.51)
+    assert 1 == adjusted_model(example_attribute_names1[1], 1)
+    assert 1 == adjusted_model(example_attribute_names1[1], 100)
+
+    # attribute value C
+    value_between_0_5_and_1_5 = 0.608
+    assert 0 == adjusted_model(example_attribute_names1[2], 0)
+    assert 0 == adjusted_model(example_attribute_names1[2], 0.5)
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 0.51))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1.5))
+    assert 1 == adjusted_model(example_attribute_names1[2], 1.51)
+    assert 1 == adjusted_model(example_attribute_names1[2], 100)
+
+    # Assert Demographic Parity actually holds    
+    discretized_predictions = _get_discretized_predictions(adjusted_model)
+
+    # TODO check whether this is expected
+    assert [sum([lp.prediction for lp in discretized_predictions[attribute_value]])
+            / len(discretized_predictions[attribute_value])
+            for attribute_value in discretized_predictions] == [5/7, 4/7, 5/6]
+
+def test_roc_curve_based_post_processing_equalized_odds():
+    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1, example_labels, example_scores, debug=True)
+
+    # For Equalized Odds we need to factor in that the output is calculated by
+    # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
+    # with p_ignore != 0 and prediction_constant != 0 for at least some attributes values.
+    prediction_constant = 0.334
+
+    # attribute value A
+    p_ignore = 0.001996007984031716
+    base_value = prediction_constant * p_ignore
+    value_for_less_than_2_5 = base_value + (1 - p_ignore) * 0.668
+    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 0))
+    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 2.499))
+    assert base_value == adjusted_model(example_attribute_names1[0], 2.5)
+    assert base_value == adjusted_model(example_attribute_names1[0], 100)
+
+    # attribute value B
+    p_ignore = 0.1991991991991991
+    base_value = prediction_constant * p_ignore
+    value_for_less_than_0_5 = base_value + (1 - p_ignore) * 0.001
+    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0))
+    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0.5))
+    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[1], 0.51)
+    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[1], 1)
+    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[1], 100)
+
+    # attribute value C
+    # p_ignore is 0 
+    p_ignore = 0
+    base_value = prediction_constant * p_ignore
+    value_between_0_5_and_1_5 = base_value + (1 - p_ignore) * 0.501
+    assert base_value == adjusted_model(example_attribute_names1[2], 0)
+    assert base_value == adjusted_model(example_attribute_names1[2], 0.5)
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 0.51))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1.5))
+    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[2], 1.51)
+    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[2], 100)
+
+    # Assert Equalized Odds actually holds
+    discretized_predictions = _get_discretized_predictions(adjusted_model)
+
+    # TODO check whether this is expected
+    predictions_based_on_label = {}
+    for label in [0, 1]:
+        predictions_based_on_label[label] = [sum([lp.prediction for lp in discretized_predictions[attribute_value] if lp.label == label])/len([lp for lp in discretized_predictions[attribute_value] if lp.label == label]) for attribute_value in discretized_predictions]
+
+    # assert counts of positive predictions for negative labels
+    assert predictions_based_on_label[0] == [2/4, 1/3, 2/3]
+    # assert counts of positive predictions for positive labels
+    assert predictions_based_on_label[1] == [3/3, 3/4, 3/3]

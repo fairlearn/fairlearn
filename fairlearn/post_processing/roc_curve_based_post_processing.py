@@ -76,8 +76,11 @@ class ThresholdOperation():
             return lambda x: x < self._threshold
         else:
             raise ValueError("Unrecognized operator: " + self._operator)
+    
+    def __repr__(self):
+        return "[{}{}]".format(self._operator, self._threshold)
 
-def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
+def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1, debug=False):
     """Creates the interpolated prediction between two predictions. The predictions
     are represented through the threshold rules operation0 and operation1.
     
@@ -93,6 +96,15 @@ def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
     """
     pred0 = operation0.get_predictor_from_operation()
     pred1 = operation1.get_predictor_from_operation()
+    if debug:
+        print(OUTPUT_SEPARATOR)
+        print("p_ignore: {}".format(p_ignore))
+        print("prediction_constant: {}".format(prediction_constant))
+        print("p0: {}".format(p0))
+        print("operation0: {}".format(operation0))
+        print("p1: {}".format(p1))
+        print("operation1: {}".format(operation1))
+        print(OUTPUT_SEPARATOR)
     return (lambda x : p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
 
 def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
@@ -241,7 +253,7 @@ def _filter_points_to_get_convex_hull(roc_sorted):
         
 def _sanity_check_and_group_data(attributes, labels, scores):
     if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
-        raise ValueError()
+        raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
     if len(attributes) != len(labels) or len(attributes) != len(scores):
         raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE)
@@ -293,7 +305,8 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         roc_result = selection[attribute].transpose()[i_best_DP]
         predicted_DP_by_attribute[attribute] = _interpolate_prediction(0, 0,
                                                                        roc_result.p0, roc_result.operation0,
-                                                                       roc_result.p1, roc_result.operation1)
+                                                                       roc_result.p1, roc_result.operation1,
+                                                                       debug)
     
     if debug:
         print(OUTPUT_SEPARATOR)
@@ -301,7 +314,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         print("Best DP: error=%.3f, selection rate=%.3f" % (error_given_selection[i_best_DP], selection_best))
         print(OUTPUT_SEPARATOR)
 
-    return lambda a, x : predicted_DP_by_attribute[a](x)   
+    return lambda a, x: predicted_DP_by_attribute[a](x)   
 
 def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000, flip=True, debug=False):
     """ Calculates the ROC curve of every attribute and take the overlapping region.
@@ -370,9 +383,9 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
 
         predicted_EO_by_attribute[attribute] = _interpolate_prediction(p_ignore, x_best,
                                                                        roc_result.p0, roc_result.operation0,
-                                                                       roc_result.p1, roc_result.operation1)
+                                                                       roc_result.p1, roc_result.operation1,
+                                                                       debug)
 
-    # TODO make debug output better
     if debug:
         print(OUTPUT_SEPARATOR)
         print("From ROC curves")
@@ -382,5 +395,6 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
         line.zorder -= 1
         plt.plot(x_best, y_best, 'm*', ms=10, label='EO solution') 
         plt.legend()
+        plt.show()
 
-    return lambda a, x : predicted_EO_by_attribute[a](x)
+    return lambda a, x: predicted_EO_by_attribute[a](x)
