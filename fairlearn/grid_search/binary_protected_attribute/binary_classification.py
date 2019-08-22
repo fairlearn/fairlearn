@@ -49,7 +49,7 @@ def sweep_demographic_parity(learner,
     :param protected_attribute: The binary protected attribute
     corresponding to each row of x. We do not consider it an error
     if only one attribute value is present
-    :type protected_attribute: List of Numpy array with one dimension
+    :type protected_attribute: List or Numpy array with one dimension
 
     :param lagrange_multipliers: User specified set of Lagrange
     multipliers to use for the optimisation problem. If this is set
