@@ -77,11 +77,11 @@ class TestRegression:
 
         with pytest.raises(RuntimeError, match=message):
             _ = reg.bounded_group_loss(
-                simple_learners.LeastSquaresBinaryClassifierLearner(),
+                simple_learners.LeastSquaresRegressor(),
                 X, Y, A,
                 None, None)
         with pytest.raises(RuntimeError, match=message):
             _ = reg.bounded_group_loss(
-                simple_learners.LeastSquaresBinaryClassifierLearner(),
+                simple_learners.LeastSquaresRegressor(),
                 X, Y, A,
                 np.random.randint(10, size=3), 3)
