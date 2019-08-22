@@ -148,3 +148,78 @@ class TestRegression:
                            expected_protected_attribute_feature_weights)
         assert np.allclose(result_constant_ones_feature_weights,
                            expected_constant_ones_feature_weights)
+
+    def test_bgl_unfair(self):
+        a0_count = 5
+        a1_count = 7
+
+        a0_label = 2
+        a1_label = 3
+
+        a0_factor = 1
+        a1_factor = 16
+
+        X, Y, A = self._simple_regression_data(a0_count, a1_count,
+                                               a0_factor, a1_factor,
+                                               a0_label, a1_label)
+
+        lsr = simple_learners.LeastSquaresRegressor()
+
+        result = reg.bounded_group_loss(lsr,
+                                        X, Y, A,
+                                        number_of_tradeoffs=11)
+        assert len(result) == 11
+
+        result_actual_feature_weights = [
+            x["model"].weights["actual_feature"] for x in result]
+        result_protected_attribute_feature_weights = [
+            x["model"].weights["protected_attribute_feature"] for x in result]
+        result_constant_ones_feature_weights = [
+            x["model"].weights["constant_ones_feature"] for x in result]
+
+        expected_actual_feature_weights = [
+            16.0,
+            14.3333,
+            12.7073,
+            11.1205,
+            9.57143,
+            8.05882,
+            6.58140,
+            5.13793,
+            3.72727,
+            2.34831,
+            1.0]
+        expected_protected_attribute_feature_weights = [
+            0,
+            7.5,
+            7.5,
+            7.5,
+            7.5,
+            7.5,
+            7.5,
+            7.5,
+            7.5,
+            7.5,
+            0]
+        expected_constant_ones_feature_weights = [
+            0,
+            -21.66667,
+            -20.85366,
+            -20.06024,
+            -19.28571,
+            -18.52941,
+            -17.79070,
+            -17.06897,
+            -16.36364,
+            -15.67416,
+            0]
+
+        assert np.allclose(result_actual_feature_weights,
+                           expected_actual_feature_weights,
+                           rtol=1e-4)
+        assert np.allclose(result_protected_attribute_feature_weights,
+                           expected_protected_attribute_feature_weights,
+                           rtol=1e-4)
+        assert np.allclose(result_constant_ones_feature_weights,
+                           expected_constant_ones_feature_weights,
+                           rtol=1e-4)
