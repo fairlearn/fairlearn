@@ -72,7 +72,7 @@ def sweep_demographic_parity(learner,
     """
     # Must specify either an array of Lagrange multipliers or how many
     # of them to generate
-    if not (lagrange_multipliers is None) ^ (number_lagrange_multipliers is None):  # noqa: E501
+    if bool(lagrange_multipliers is None) == bool(number_lagrange_multipliers is None):  # noqa: E501
         raise RuntimeError("Must specify either lagrange_multipliers "
                            "or number_lagrange_multipliers")
 

@@ -20,7 +20,7 @@ def sweep_bounded_group_loss(learner,
                              number_of_tradeoffs=11):
     # Must specify either an array of tradeoffs or the number
     # of tradeoffs to generated
-    if not (tradeoffs is None) ^ (number_of_tradeoffs is None):
+    if bool(tradeoffs is None) == bool(number_of_tradeoffs is None):
         raise RuntimeError("Must specify either tradeoffs "
                            "or number_of_tradeoffs")
 
