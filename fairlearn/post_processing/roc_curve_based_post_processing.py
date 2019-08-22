@@ -340,14 +340,13 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
     n_positive = sum(labels)
     n_negative = n - n_positive
     roc = {}
-    selection = {}
     x_grid = np.linspace(0, 1, gridsize + 1)
     y_values = pd.DataFrame()
 
     data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
-        roc[attribute], selection[attribute] = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
+        roc[attribute], _ = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
         y_values[attribute] = roc[attribute]['y']
 
     # Calculate the overlap of the ROC curves by taking the lowest y value
