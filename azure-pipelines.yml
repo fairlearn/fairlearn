@@ -9,7 +9,7 @@ schedules:
     include:
       - master
       - dev
-    always: true
+  always: true
 
 pool:
   vmImage: 'ubuntu-latest'
