@@ -23,6 +23,30 @@ class TestRegression:
         A = np.random.randint(2, size=number_samples).tolist()
         return X, Y, A
 
+    def _simple_regression_data(self,
+                                number_a0, number_a1,
+                                a0_factor, a1_factor,
+                                a0_label, a1_label):
+
+        a0s = np.full(number_a0, a0_label)
+        a1s = np.full(number_a1, a1_label)
+
+        a0_scores = np.linspace(0, 1, number_a0)
+        a1_scores = np.linspace(0, 1, number_a1)
+        score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
+
+        A = np.concatenate((a0s, a1s), axis=None)
+
+        Y_a0 = a0_factor * a0_scores
+        Y_a1 = a1_factor * a1_scores
+
+        Y = np.concatenate((Y_a0, Y_a1), axis=None)
+
+        X = pd.DataFrame({"actual_feature": score_feature,
+                          "protected_attribute_feature": A,
+                          "constant_ones_feature": np.ones(len(Y))})
+        return X, Y, A
+
     def _smoke_bgl_core(self, X, Y, A):
         result = reg.bounded_group_loss(
             simple_learners.LeastSquaresRegressor(),
@@ -85,3 +109,42 @@ class TestRegression:
                 simple_learners.LeastSquaresRegressor(),
                 X, Y, A,
                 np.random.randint(10, size=3), 3)
+
+    def test_bgl_already_fair(self):
+        a0_count = 10
+        a1_count = 20
+
+        a0_label = 3
+        a1_label = 7
+
+        a0_factor = 1
+        a1_factor = 1
+
+        X, Y, A = self._simple_regression_data(a0_count, a1_count,
+                                               a0_factor, a1_factor,
+                                               a0_label, a1_label)
+
+        lsr = simple_learners.LeastSquaresRegressor()
+
+        result = reg.bounded_group_loss(lsr,
+                                        X, Y, A,
+                                        number_of_tradeoffs=5)
+        assert len(result) == 5
+
+        result_actual_feature_weights = [
+            x["model"].weights["actual_feature"] for x in result]
+        result_protected_attribute_feature_weights = [
+            x["model"].weights["protected_attribute_feature"] for x in result]
+        result_constant_ones_feature_weights = [
+            x["model"].weights["constant_ones_feature"] for x in result]
+
+        expected_actual_feature_weights = [1, 1, 1, 1, 1]
+        expected_protected_attribute_feature_weights = [0, 0, 0, 0, 0]
+        expected_constant_ones_feature_weights = [0, 0, 0, 0, 0]
+
+        assert np.allclose(result_actual_feature_weights,
+                           expected_actual_feature_weights)
+        assert np.allclose(result_protected_attribute_feature_weights,
+                           expected_protected_attribute_feature_weights)
+        assert np.allclose(result_constant_ones_feature_weights,
+                           expected_constant_ones_feature_weights)
