@@ -69,3 +69,19 @@ class TestRegression:
         X_pandas = pd.DataFrame(
             X, columns=["feature_1", "feature_2", "feature_3"])
         self._smoke_bgl_core(X_pandas, Y, A)
+
+    def test_bgl_bad_tradeoff_specification(self):
+        X, Y, A = self._quick_data()
+        message = str("Must specify either tradeoffs "
+                      "or number_of_tradeoffs")
+
+        with pytest.raises(RuntimeError, match=message):
+            _ = reg.bounded_group_loss(
+                simple_learners.LeastSquaresBinaryClassifierLearner(),
+                X, Y, A,
+                None, None)
+        with pytest.raises(RuntimeError, match=message):
+            _ = reg.bounded_group_loss(
+                simple_learners.LeastSquaresBinaryClassifierLearner(),
+                X, Y, A,
+                np.random.randint(10, size=3), 3)

@@ -18,6 +18,11 @@ def bounded_group_loss(learner,
                        x, y, protected_attribute,
                        tradeoffs=None,
                        number_of_tradeoffs=11):
+    # Must specify either an array of tradeoffs or the number
+    # of tradeoffs to generated
+    if not (tradeoffs is None) ^ (number_of_tradeoffs is None):
+        raise RuntimeError("Must specify either tradeoffs "
+                           "or number_of_tradeoffs")
 
     # Extract required statistics from protected_attribute
     p0, p1, a0_val = utilities.generate_protected_attribute_info(
