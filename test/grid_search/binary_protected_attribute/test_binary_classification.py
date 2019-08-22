@@ -61,41 +61,41 @@ class TestBinaryClassification:
         assert len(np.unique(multipliers)) == len(result)
         assert sorted(multipliers)
 
-    def test_grid_smoke(self):
+    def test_demographicparity_smoke(self):
         X, Y, A = self._quick_data()
         self._smoke_core(X, Y, A)
 
-    def test_grid_smoke_Y_numpy(self):
+    def test_demographicparity_smoke_Y_numpy(self):
         X, Y, A = self._quick_data()
         Y_numpy = np.array(Y)
         self._smoke_core(X, Y_numpy, A)
 
-    def test_grid_smoke_Y_pandas(self):
+    def test_demographicparity_smoke_Y_pandas(self):
         X, Y, A = self._quick_data()
         Y_pandas = pd.Series(Y)
         self._smoke_core(X, Y_pandas, A)
 
-    def test_grid_smoke_A_numpy(self):
+    def test_demographicparity_smoke_A_numpy(self):
         X, Y, A = self._quick_data()
         A_numpy = np.array(A)
         self._smoke_core(X, Y, A_numpy)
 
-    def test_grid_smoke_A_pandas(self):
+    def test_demographicparity_smoke_A_pandas(self):
         X, Y, A = self._quick_data()
         A_pandas = pd.Series(A)
         self._smoke_core(X, Y, A_pandas)
 
-    def test_grid_smoke_A_non_numeric(self):
+    def test_demographicparity_smoke_A_non_numeric(self):
         X, Y, _ = self._quick_data(number_samples=8)
         A = ["XY", "GF", "XY", "XY", "GF", "GF", "GF", "GF"]
         self._smoke_core(X, Y, A)
 
-    def test_grid_smoke_X_numpy(self):
+    def test_demographicparity_smoke_X_numpy(self):
         X, Y, A = self._quick_data()
         X_numpy = np.array(X)
         self._smoke_core(X_numpy, Y, A)
 
-    def test_grid_smoke_X_pandas(self):
+    def test_demographicparity_smoke_X_pandas(self):
         X, Y, A = self._quick_data()
         X_pandas = pd.DataFrame(
             X, columns=["feature_1", "feature_2", "feature_3"])
@@ -116,7 +116,7 @@ class TestBinaryClassification:
 
         assert np.array_equal(W_expect, W), str(W) + str(W_expect)
 
-    def test_grid_bad_lagrange_multiplier_specification(self):
+    def test_demographicparity_bad_lagrange_multiplier_specification(self):
         X, Y, A = self._quick_data()
         message = str("Must specify either lagrange_multipliers "
                       "or number_lagrange_multipliers")
@@ -187,7 +187,7 @@ class TestBinaryClassification:
         assert np.allclose(expected_multipliers, actual_multipliers)
 
     @pytest.mark.parametrize("testdata", [[0, 1], [-1, 1], [-2, 4], [1, 2]])
-    def test_grid_already_fair(self, testdata):
+    def test_demographicparity_already_fair(self, testdata):
         # Number of samples of each attribute to generate
         # Large numbers required to beat down the errors in the weights
         num_samples_each = 400000
@@ -250,9 +250,9 @@ class TestBinaryClassification:
                 expected_constant_ones_feature_weights,
                 result_constant_ones_feature_weights)
 
-    def test_grid_fair_uneven_populations(self):
-        # Variant of test_grid_already_fair, which has unequal populations
-        # in the two classes
+    def test_demographicparity_fair_uneven_populations(self):
+        # Variant of test_demographicparity_already_fair, which has unequal
+        # populations in the two classes
         # Also allow the threshold to be adjustable
 
         score_threshold = 0.625
@@ -325,9 +325,10 @@ class TestBinaryClassification:
                            expected_constant_ones_feature_weights,
                            rtol=1e-3)
 
-    def test_grid_unfair(self):
-        # Variant of test_grid_already_fair where the two populations
-        # have the same distribution but different thresholds
+    def test_demographicparity_unfair(self):
+        # Variant of test_demographicparity_already_fair where the
+        # two populations have the same distribution but different
+        # thresholds
 
         number_a0 = 5000
         number_a1 = 200
