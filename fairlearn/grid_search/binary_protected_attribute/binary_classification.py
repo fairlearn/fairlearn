@@ -4,16 +4,18 @@
 import copy
 import numpy as np
 
+from . import utilities
 
-def _weight_function(self, y_val, a_val, L, p_ratio, a0_val):
+
+def _weight_function(y_val, a_val, L, p_ratio, a0_val):
     if a_val == a0_val:
         return 2 * y_val - 1 - L * p_ratio
     else:
         return 2 * y_val - 1 + L
 
 
-def _generate_weights(self, y, protected_attribute, L, p_ratio, a0_val):
-    weight_func = np.vectorize(self._weight_function)
+def _generate_weights(y, protected_attribute, L, p_ratio, a0_val):
+    weight_func = np.vectorize(_weight_function)
     return weight_func(y, protected_attribute, L, p_ratio, a0_val)
 
 
