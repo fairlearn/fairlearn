@@ -32,6 +32,9 @@ SCORE_KEY = "score"
 LABEL_KEY = "label"
 ATTRIBUTE_KEY = "attribute"
 
+DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "Attributes, labels, and scores need to be of equal length."
+EMPTY_INPUT_ERROR_MESSAGE = "At least one of attributes, labels, or scores are empty."
+
 def debug_marker(key):
     if key not in debug_markermap:
         marker = debug_markers[len(debug_markermap) % debug_nmarkers]
@@ -236,43 +239,42 @@ def _filter_points_to_get_convex_hull(roc_sorted):
         selected.append(r2)
     return selected
         
-def roc_curve_based_post_processing(attributes, labels, scores, fairness_metric="DP", flip=True, debug=False, gridsize=1000):
-    """ 
-    :param fairness_metric: the fairness metric for which to optimize,
-        currently only Demographic Parity ("DP") and Equalized Odds ("EO") are supported.
-    :type fairness_metric: str
+def _sanity_check_and_group_data(attributes, labels, scores):
+    if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
+        raise ValueError()
+
+    if len(attributes) != len(labels) or len(attributes) != len(scores):
+        raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE)
+    data = pd.DataFrame({ATTRIBUTE_KEY: attributes, SCORE_KEY: scores, LABEL_KEY: labels})
+
+    return data.groupby(ATTRIBUTE_KEY)
+    
+
+def roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000, flip=True, debug=False):
+    """ TODO add description
     :param attributes: the protected attributes
     :type attributes: list
     :param labels: the labels of the dataset
     :type labels: list
     :param scores: the scores produced by a model's prediction
     :type scores: list
+    :param gridsize: The number of ticks on the grid over which we evaluate the curves.
+        A large gridsize means that we approximate the actual curve, so it increases the chance
+        of being very close to the actual best solution.
+    :type gridsize: int
     :param flip: allow flipping to negative weights if it improves accuracy.
     :type flip: bool
     :param debug: show debugging output if True
     :type debug: bool
-    :param gridsize: The number of ticks on the grid over which we evaluate the curves.
-        A large gridsize means that we approximate the actual curve, so it increases the chance
-        of being very close to the actual best solution.
     """
-    data = pd.DataFrame({ATTRIBUTE_KEY: attributes, SCORE_KEY: scores, LABEL_KEY: labels})
-    assert len(labels) > 0, "Empty dataset"
-
-    data_grouped_by_attribute = data.groupby(ATTRIBUTE_KEY)
-
-    if fairness_metric == "EO":
-        return _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug)
-    elif fairness_metric == "DP":
-        return _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug)
-    
-    raise ValueError("Only 'DP' and 'EO' are currently supported as fairness_metrics.")
-
-def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_attribute, gridsize, flip, debug):
     n = len(labels)
     roc = {}
     selection = {}
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
+
+    data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
+
     for attribute, group in data_grouped_by_attribute:
         # determine probability of current protected attribute group based on data
         p_attribute = len(group) / n
@@ -301,10 +303,25 @@ def _roc_curve_based_post_processing_demographic_parity(labels, data_grouped_by_
 
     return lambda a, x : predicted_DP_by_attribute[a](x)   
 
-def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attribute, gridsize, flip, debug):
+def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000, flip=True, debug=False):
     """ Calculates the ROC curve of every attribute and take the overlapping region.
     From the resulting ROC curve the algorithm finds the best solution by selecting the
     point on the curve with minimal error.
+
+    :param attributes: the protected attributes
+    :type attributes: list
+    :param labels: the labels of the dataset
+    :type labels: list
+    :param scores: the scores produced by a model's prediction
+    :type scores: list
+    :param gridsize: The number of ticks on the grid over which we evaluate the curves.
+        A large gridsize means that we approximate the actual curve, so it increases the chance
+        of being very close to the actual best solution.
+    :type gridsize: int
+    :param flip: allow flipping to negative weights if it improves accuracy.
+    :type flip: bool
+    :param debug: show debugging output if True
+    :type debug: bool
     """
     n = len(labels)
     n_positive = sum(labels)
@@ -313,6 +330,9 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
     selection = {}
     x_grid = np.linspace(0, 1, gridsize + 1)
     y_values = pd.DataFrame()
+
+    data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
+
     for attribute, group in data_grouped_by_attribute:
         roc[attribute], selection[attribute] = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
         y_values[attribute] = roc[attribute]['y']
@@ -352,6 +372,7 @@ def _roc_curve_based_post_processing_equalized_odds(labels, data_grouped_by_attr
                                                                        roc_result.p0, roc_result.operation0,
                                                                        roc_result.p1, roc_result.operation1)
 
+    # TODO make debug output better
     if debug:
         print(OUTPUT_SEPARATOR)
         print("From ROC curves")
