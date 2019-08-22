@@ -19,10 +19,10 @@ def _generate_weights(y, protected_attribute, L, p_ratio, a0_val):
     return weight_func(y, protected_attribute, L, p_ratio, a0_val)
 
 
-def demographic_parity(learner,
-                       x, y, protected_attribute,
-                       lagrange_multipliers=None,
-                       number_lagrange_multipliers=11):
+def sweep_demographic_parity(learner,
+                             x, y, protected_attribute,
+                             lagrange_multipliers=None,
+                             number_lagrange_multipliers=11):
     """Function to generate a list of models for a binary classification
     problem with a single binary protected attribute. The models sweep
     through different potential Lagrange multipliers for the constrained

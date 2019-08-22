@@ -14,10 +14,10 @@ def _regression_weight_function(a_val, trade_off, p0, p1, a0_val):
         return (1 - trade_off) / p1
 
 
-def bounded_group_loss(learner,
-                       x, y, protected_attribute,
-                       tradeoffs=None,
-                       number_of_tradeoffs=11):
+def sweep_bounded_group_loss(learner,
+                             x, y, protected_attribute,
+                             tradeoffs=None,
+                             number_of_tradeoffs=11):
     # Must specify either an array of tradeoffs or the number
     # of tradeoffs to generated
     if not (tradeoffs is None) ^ (number_of_tradeoffs is None):

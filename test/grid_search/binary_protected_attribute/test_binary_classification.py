@@ -46,7 +46,7 @@ class TestBinaryClassification:
         return X, Y, A
 
     def _smoke_core(self, X, Y, A):
-        result = bc.demographic_parity(
+        result = bc.sweep_demographic_parity(
             simple_learners.LeastSquaresBinaryClassifierLearner(),
             X, Y, A,
             number_lagrange_multipliers=11)
@@ -122,12 +122,12 @@ class TestBinaryClassification:
                       "or number_lagrange_multipliers")
 
         with pytest.raises(RuntimeError, match=message):
-            _ = bc.demographic_parity(
+            _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),
                 X, Y, A,
                 None, None)
         with pytest.raises(RuntimeError, match=message):
-            _ = bc.demographic_parity(
+            _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),
                 X, Y, A,
                 np.random.randint(10, size=3), 3)
@@ -139,7 +139,7 @@ class TestBinaryClassification:
         bad_protected_attribute = [0, 1, 2]
 
         with pytest.raises(RuntimeError, match=message):
-            _ = bc.demographic_parity(
+            _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),
                 X, Y, bad_protected_attribute)
 
@@ -149,7 +149,7 @@ class TestBinaryClassification:
         message = r"Supplied Y labels are not binary"
 
         with pytest.raises(RuntimeError, match=message):
-            _ = bc.demographic_parity(
+            _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),
                 X, bad_labels, A)
 
@@ -159,7 +159,7 @@ class TestBinaryClassification:
         message = r"Supplied Y labels are not 0 or 1"
 
         with pytest.raises(RuntimeError, match=message):
-            _ = bc.demographic_parity(
+            _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),
                 X, bad_labels, A)
 
@@ -176,7 +176,7 @@ class TestBinaryClassification:
         if p0 / p1 > 1:
             limit = p0 / p1
 
-        results = bc.demographic_parity(
+        results = bc.sweep_demographic_parity(
             simple_learners.LeastSquaresBinaryClassifierLearner(),
             X, Y, A,
             number_lagrange_multipliers=3)
@@ -213,7 +213,7 @@ class TestBinaryClassification:
                                               a0_label,
                                               a1_label)
 
-        result = bc.demographic_parity(
+        result = bc.sweep_demographic_parity(
             simple_learners.LeastSquaresBinaryClassifierLearner(),
             X, Y, A, number_lagrange_multipliers=5)
         assert len(result) == 5
@@ -267,7 +267,7 @@ class TestBinaryClassification:
                                               score_threshold, score_threshold,
                                               a0_label, a1_label)
 
-        result = bc.demographic_parity(
+        result = bc.sweep_demographic_parity(
             simple_learners.LeastSquaresBinaryClassifierLearner(),
             X, Y, A, number_lagrange_multipliers=11)
         assert len(result) == 11
@@ -343,7 +343,7 @@ class TestBinaryClassification:
                                               a0_threshold, a1_threshold,
                                               a0_label, a1_label)
 
-        result = bc.demographic_parity(
+        result = bc.sweep_demographic_parity(
             simple_learners.LeastSquaresBinaryClassifierLearner(),
             X, Y, A, number_lagrange_multipliers=7)
         assert len(result) == 7

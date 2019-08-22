@@ -48,7 +48,7 @@ class TestRegression:
         return X, Y, A
 
     def _smoke_bgl_core(self, X, Y, A):
-        result = reg.bounded_group_loss(
+        result = reg.sweep_bounded_group_loss(
             simple_learners.LeastSquaresRegressor(),
             X, Y, A
         )
@@ -100,12 +100,12 @@ class TestRegression:
                       "or number_of_tradeoffs")
 
         with pytest.raises(RuntimeError, match=message):
-            _ = reg.bounded_group_loss(
+            _ = reg.sweep_bounded_group_loss(
                 simple_learners.LeastSquaresRegressor(),
                 X, Y, A,
                 None, None)
         with pytest.raises(RuntimeError, match=message):
-            _ = reg.bounded_group_loss(
+            _ = reg.sweep_bounded_group_loss(
                 simple_learners.LeastSquaresRegressor(),
                 X, Y, A,
                 np.random.randint(10, size=3), 3)
@@ -126,9 +126,9 @@ class TestRegression:
 
         lsr = simple_learners.LeastSquaresRegressor()
 
-        result = reg.bounded_group_loss(lsr,
-                                        X, Y, A,
-                                        number_of_tradeoffs=5)
+        result = reg.sweep_bounded_group_loss(lsr,
+                                              X, Y, A,
+                                              number_of_tradeoffs=5)
         assert len(result) == 5
 
         result_actual_feature_weights = [
@@ -165,9 +165,9 @@ class TestRegression:
 
         lsr = simple_learners.LeastSquaresRegressor()
 
-        result = reg.bounded_group_loss(lsr,
-                                        X, Y, A,
-                                        number_of_tradeoffs=11)
+        result = reg.sweep_bounded_group_loss(lsr,
+                                              X, Y, A,
+                                              number_of_tradeoffs=11)
         assert len(result) == 11
 
         result_actual_feature_weights = [
