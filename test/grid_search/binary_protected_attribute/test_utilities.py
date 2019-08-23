@@ -9,7 +9,7 @@ import fairlearn.grid_search.binary_protected_attribute.utilities as utilities
 
 class TestUtilities:
     def test_generate_protected_attribute_info_smoke(self):
-        number_attributes = 4
+        number_attributes = 100
 
         # Fill A with 0s and 1s
         A = np.random.randint(2, size=number_attributes)
@@ -25,15 +25,6 @@ class TestUtilities:
             assert p1 == sum(A) / number_attributes
             assert a0_val == 0
 
-    def test_generate_protected_attribute_info_unary(self):
-        A = [12, 12, 12]
-
-        p0, p1, a0_val = utilities.generate_protected_attribute_info(A)
-
-        assert p0 == 1
-        assert p1 == 0
-        assert a0_val == 12
-
     def test_generate_protected_attribute_info_non_numeric(self):
         A = ["AB", "AB", "CD", "AB"]
 
@@ -43,8 +34,13 @@ class TestUtilities:
         assert a0_val == "AB"
 
     def test_generate_protected_attribute_info_notbinary(self):
-        A = np.random.randint(20, size=400)
+        message = str("Protected Attribute does not have "
+                      "exactly two unique values")
 
-        message = "Protected Attribute is not binary"
+        A = np.random.randint(20, size=400)
+        with pytest.raises(RuntimeError, match=message):
+            _, _, _ = utilities.generate_protected_attribute_info(A)
+
+        A = [1, 1, 1, 1, 1]
         with pytest.raises(RuntimeError, match=message):
             _, _, _ = utilities.generate_protected_attribute_info(A)
