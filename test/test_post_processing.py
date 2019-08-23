@@ -139,7 +139,7 @@ def test_calculate_roc_points():
     data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
     grouped_data = data.groupby(ATTRIBUTE_KEY).get_group("A").sort_values(by=SCORE_KEY, ascending=False)
 
-    roc_points = _calculate_roc_points(*_get_scores_labels_and_counts(grouped_data))
+    roc_points = _calculate_roc_points(grouped_data, "A")
     expected_roc_points = pd.DataFrame({
         "x": [0, 0.25, 0.5, 0.5, 1],
         "y": [0, 1/3,  2/3, 1,   1],
@@ -161,9 +161,10 @@ def test_get_roc():
     for attribute_value in ['A', 'B', 'C']:
         grouped_data, base_points, ignore_for_base_points, x_grid = _get_grouped_data_and_base_points(attribute_value)
         
-        roc, _ = _get_roc(grouped_data, x_grid, attribute_value)
+        roc_convex_hull = _get_roc(grouped_data, x_grid, attribute_value)
+        curve = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
 
-        _assert_interpolated_points_are_between_base_points(base_points, roc, ignore_for_base_points)
+        _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points)
 
 def _get_grouped_data_and_base_points(attribute_value):
     data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
@@ -269,7 +270,7 @@ def _get_discretized_predictions(adjusted_model):
     }
 
 def test_roc_curve_based_post_processing_demographic_parity():
-    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores, debug=True)
+    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores, debug=False)
     
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
@@ -315,6 +316,7 @@ def test_roc_curve_based_post_processing_equalized_odds():
     prediction_constant = 0.334
 
     # attribute value A
+    # p_ignore is almost 0 which means there's almost no adjustment
     p_ignore = 0.001996007984031716
     base_value = prediction_constant * p_ignore
     value_for_less_than_2_5 = base_value + (1 - p_ignore) * 0.668
@@ -324,6 +326,7 @@ def test_roc_curve_based_post_processing_equalized_odds():
     assert base_value == adjusted_model(example_attribute_names1[0], 100)
 
     # attribute value B
+    # p_ignore is the largest among the three classes indicating a large adjustment
     p_ignore = 0.1991991991991991
     base_value = prediction_constant * p_ignore
     value_for_less_than_0_5 = base_value + (1 - p_ignore) * 0.001
@@ -334,7 +337,7 @@ def test_roc_curve_based_post_processing_equalized_odds():
     assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[1], 100)
 
     # attribute value C
-    # p_ignore is 0 
+    # p_ignore is 0 which means there's no adjustment
     p_ignore = 0
     base_value = prediction_constant * p_ignore
     value_between_0_5_and_1_5 = base_value + (1 - p_ignore) * 0.501
@@ -352,7 +355,10 @@ def test_roc_curve_based_post_processing_equalized_odds():
     # TODO check whether this is expected
     predictions_based_on_label = {}
     for label in [0, 1]:
-        predictions_based_on_label[label] = [sum([lp.prediction for lp in discretized_predictions[attribute_value] if lp.label == label])/len([lp for lp in discretized_predictions[attribute_value] if lp.label == label]) for attribute_value in discretized_predictions]
+        predictions_based_on_label[label] = \
+            [sum([lp.prediction for lp in discretized_predictions[attribute_value] if lp.label == label])
+             / len([lp for lp in discretized_predictions[attribute_value] if lp.label == label])
+             for attribute_value in discretized_predictions]
 
     # assert counts of positive predictions for negative labels
     assert predictions_based_on_label[0] == [2/4, 1/3, 2/3]

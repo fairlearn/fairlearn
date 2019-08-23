@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 
-from roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot
+from .roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot
 
 OUTPUT_SEPARATOR = "-"*65
 
@@ -22,7 +22,6 @@ ATTRIBUTE_KEY = "attribute"
 
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "Attributes, labels, and scores need to be of equal length."
 EMPTY_INPUT_ERROR_MESSAGE = "At least one of attributes, labels, or scores are empty."
-
 
 class ThresholdOperation():
     def __init__(self, operator, threshold):
@@ -96,8 +95,8 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
         # skip over data points that we've already passed
         while x > data_transpose[i + 1][x_col]:
             i += 1
-        
-        # Calculate the y value at x based on the slope between data points i and i+1
+                
+        # Calculate the y value at x based on the slope between data points i and i + 1
         x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
         x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
         p0 = x_distance_from_next_data_point/x_distance_between_data_points
@@ -175,10 +174,8 @@ def _get_roc(data, x_grid, attribute, flip=True, debug=False):
     Scores represent output values from the model.
     """
     roc_sorted = _calculate_roc_points(data, attribute, flip)
-    selected = _filter_points_to_get_convex_hull(roc_sorted)
-
-    roc_convex_hull = pd.DataFrame(selected)[['x', 'y', 'operation']]
-
+    roc_selected = _filter_points_to_get_convex_hull(roc_sorted)
+    roc_convex_hull = pd.DataFrame(roc_selected)[['x', 'y', 'operation']]
     return roc_convex_hull
 
 def _filter_points_to_get_convex_hull(roc_sorted):
@@ -242,15 +239,16 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
 
         roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
         # Calculate selection to represent the proportion of positive predictions.
-        roc_convex_hull['selection'] = (n_negative / n) * roc_convex_hull['x'] + (n_positive / n) * roc_convex_hull['y']
+        roc_convex_hull['selection'] = (n_negative / n_group) * roc_convex_hull['x'] + (n_positive / n_group) * roc_convex_hull['y']
         # We find the error by adding the fraction of negative samples multiplied by the rate of
         # predicting negative samples as positive samples, plus the fraction of positive samples
         # multiplied by the rate of predicting positive samples as negative samples.
-        roc_convex_hull['error'] = (n_negative / n) * roc_convex_hull['x'] + (n_positive / n) * (1 - roc_convex_hull['y'])
+        roc_convex_hull['error'] = (n_negative / n_group) * roc_convex_hull['x'] + (n_positive / n_group) * (1 - roc_convex_hull['y'])
 
         selection[attribute] = _interpolate_curve(roc_convex_hull, 'selection', 'error', 'operation', x_grid)
         
-        # add up errors for the current group multiplied by the probability of the current group
+        # Add up errors for the current group multiplied by the probability of the current group.
+        # This will help us in identifying the minimum overall error.
         error_given_selection += p_attribute * selection[attribute]['error']
 
         if debug:
@@ -264,10 +262,10 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
             print(roc_convex_hull)
             plot(attribute, 'selection', 'error', selection[attribute])
 
-    # find minimum error point
+    # Find minimum error point given that at each point the selection rate for each attribute
+    # value is identical by design.
     i_best_DP = error_given_selection.idxmin()
     x_best = x_grid[i_best_DP]
-    y_best = selection[attribute]["error"][i_best_DP]
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
     predicted_DP_by_attribute = {}
@@ -284,7 +282,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         print("From ROC curves")
         print("Best DP: error=%.3f, selection rate=%.3f" % (error_given_selection[i_best_DP], x_best))
         print(OUTPUT_SEPARATOR)
-        plot_solution_and_show_plot(x_best, y_best, "DP solution")
+        plot_solution_and_show_plot(x_best, None, "DP solution")
 
     return lambda a, x: predicted_DP_by_attribute[a](x)   
 
@@ -331,7 +329,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
             print(group)
             print("\nROC curve: convex")
             print(roc_convex_hull)
-            plot(attribute, 'x', 'y', roc)
+            plot(attribute, 'x', 'y', roc[attribute])
 
     # Calculate the overlap of the ROC curves by taking the lowest y value
     # at every given x.

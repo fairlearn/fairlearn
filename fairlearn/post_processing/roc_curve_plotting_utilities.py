@@ -11,26 +11,20 @@ debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
 debug_ncolors = len(debug_colors)
 debug_colormap = {}
 
-debug_markers = "^vso<>"
-debug_nmarkers = len(debug_markers)
-debug_markermap = {}
-
 highlight_color = [0.95, 0.90, 0.40]
 
-def debug_marker(key):
-    if key not in debug_markermap:
-        marker = debug_markers[len(debug_markermap) % debug_nmarkers]
-        debug_markermap[key] = marker
-    return debug_markermap[key]
 
-def debug_color(key):
+def _get_debug_color(key):
     if key not in debug_colormap:
         color = debug_colors[len(debug_colormap) % debug_ncolors]
         debug_colormap[key] = color
     return debug_colormap[key]
 
 def plot_solution_and_show_plot(x_best, y_best, solution_label):
-    plt.plot(x_best, y_best, 'm*', ms=10, label=solution_label) 
+    if y_best is None:
+        plt.axvline(x=x_best, label=solution_label, ls='--')
+    else:
+        plt.plot(x_best, y_best, 'm*', ms=10, label=solution_label) 
     plt.legend()
     plt.show()
 
@@ -39,5 +33,5 @@ def plot_overlap(x_grid, y_min):
     line.zorder -= 1
 
 def plot(attribute, x_col, y_col, points):
-    color = debug_color(attribute)
+    color = _get_debug_color(attribute)
     plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0, label='attribute ' + str(attribute))
