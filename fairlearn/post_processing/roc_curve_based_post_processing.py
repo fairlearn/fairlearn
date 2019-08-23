@@ -10,21 +10,9 @@ classification with one categorical protected attribute.
 import sys
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.colors
 
-tab10_norm  = matplotlib.colors.Normalize(vmin=0, vmax=7)
-tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
-debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
-debug_ncolors = len(debug_colors)
-debug_colormap = {}
 
-debug_markers = "^vso<>"
-debug_nmarkers = len(debug_markers)
-debug_markermap = {}
-
-highlight_color = [0.95, 0.90, 0.40]
+from roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot
 
 OUTPUT_SEPARATOR = "-"*65
 
@@ -35,23 +23,6 @@ ATTRIBUTE_KEY = "attribute"
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "Attributes, labels, and scores need to be of equal length."
 EMPTY_INPUT_ERROR_MESSAGE = "At least one of attributes, labels, or scores are empty."
 
-def debug_marker(key):
-    if key not in debug_markermap:
-        marker = debug_markers[len(debug_markermap) % debug_nmarkers]
-        debug_markermap[key] = marker
-    return debug_markermap[key]
-
-def debug_has_marker(key):
-    return key in debug_markermap
-
-def debug_color(key):
-    if key not in debug_colormap:
-        color = debug_colors[len(debug_colormap) % debug_ncolors]
-        debug_colormap[key] = color
-    return debug_colormap[key]
-
-def debug_has_color(key):
-    return key in debug_colormap
 
 class ThresholdOperation():
     def __init__(self, operator, threshold):
@@ -142,7 +113,12 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
     return pd.DataFrame(dict_list)[[x_col, y_col, 'p0', content_col + '0', 'p1', content_col + '1']]
 
-def _calculate_roc_points(scores, labels, n, n_positive, n_negative, flip=True):
+def _calculate_roc_points(data, attribute, flip=True):
+    scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
+
+    if n_positive == 0 or n_negative == 0:
+        raise ValueError("Degenerate labels for attribute value {}".format(attribute))
+
     scores.append(-np.inf)
     labels.append(np.nan)
     
@@ -184,55 +160,26 @@ def _get_scores_labels_and_counts(data):
     scores = list(data_sorted[SCORE_KEY])
     labels = list(data_sorted[LABEL_KEY])
 
-    n = len(labels)
-    n_positive = sum(labels)
-    n_negative = n - n_positive
+    n, n_positive, n_negative = _get_counts(labels)
 
     return scores, labels, n, n_positive, n_negative
 
+def _get_counts(labels):
+    n = len(labels)
+    n_positive = sum(labels)
+    n_negative = n - n_positive
+    return n, n_positive, n_negative
+
 def _get_roc(data, x_grid, attribute, flip=True, debug=False):
-    """Get ROC curve based on data columns 'score' and 'label'
+    """Get ROC curve's convex hull based on data columns 'score' and 'label'
     Scores represent output values from the model.
     """
-    attribute_str = "attribute value" + str(attribute)
-    if debug:
-        color = debug_color(attribute_str)
-            
-    scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
-
-    if n_positive == 0 or n_negative == 0:
-        raise ValueError("Degenerate labels for " + attribute_str)
-    
-    roc_sorted = _calculate_roc_points(scores, labels, n, n_positive, n_negative, flip)
+    roc_sorted = _calculate_roc_points(data, attribute, flip)
     selected = _filter_points_to_get_convex_hull(roc_sorted)
 
-    roc_conv = pd.DataFrame(selected)[['x', 'y', 'operation']]
+    roc_convex_hull = pd.DataFrame(selected)[['x', 'y', 'operation']]
 
-    roc_conv['selection'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * roc_conv['y']
-    roc_conv['error'] = (n_negative / n) * roc_conv['x'] + (n_positive / n) * (1 - roc_conv['y'])
-    
-    roc_curve_interpolated = _interpolate_curve(roc_conv, 'x', 'y', 'operation', x_grid)
-    selection_interpolated = _interpolate_curve(roc_conv, 'selection', 'error', 'operation', x_grid)
-
-    if debug:
-        print("")
-        print(OUTPUT_SEPARATOR)
-        print("")
-        print(OUTPUT_SEPARATOR)
-        print("Processing " + attribute_str)
-        print(OUTPUT_SEPARATOR)
-        print("DATA")
-        print(data)
-        print("\nROC curve: initial")
-        print(roc_sorted)
-        print("\nROC curve: convex")
-        print(roc_conv)
-        print("\nROC curve: interpolated [just top]")
-        print(roc_curve_interpolated.head())
-        plt.plot(roc_sorted['x'], roc_sorted['y'], c=color, ls='--', lw=1.0, label='_')
-        plt.plot(roc_conv['x'], roc_conv['y'], c=color, ls='-', lw=2.0, label='attribute ' + str(attribute))
-        
-    return roc_curve_interpolated, selection_interpolated
+    return roc_convex_hull
 
 def _filter_points_to_get_convex_hull(roc_sorted):
     selected = []
@@ -280,7 +227,6 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     :type debug: bool
     """
     n = len(labels)
-    roc = {}
     selection = {}
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
@@ -289,18 +235,43 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
 
     for attribute, group in data_grouped_by_attribute:
         # determine probability of current protected attribute group based on data
-        p_attribute = len(group) / n
-        roc[attribute], selection[attribute] = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
+        n_group = len(group)
+        n_positive = sum(group[LABEL_KEY])
+        n_negative = n_group - n_positive
+        p_attribute = n_group / n
+
+        roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
+        # Calculate selection to represent the proportion of positive predictions.
+        roc_convex_hull['selection'] = (n_negative / n) * roc_convex_hull['x'] + (n_positive / n) * roc_convex_hull['y']
+        # We find the error by adding the fraction of negative samples multiplied by the rate of
+        # predicting negative samples as positive samples, plus the fraction of positive samples
+        # multiplied by the rate of predicting positive samples as negative samples.
+        roc_convex_hull['error'] = (n_negative / n) * roc_convex_hull['x'] + (n_positive / n) * (1 - roc_convex_hull['y'])
+
+        selection[attribute] = _interpolate_curve(roc_convex_hull, 'selection', 'error', 'operation', x_grid)
+        
         # add up errors for the current group multiplied by the probability of the current group
         error_given_selection += p_attribute * selection[attribute]['error']
 
+        if debug:
+            print("")
+            print(OUTPUT_SEPARATOR)
+            print("Processing " + attribute)
+            print(OUTPUT_SEPARATOR)
+            print("DATA")
+            print(group)
+            print("\nROC curve: convex")
+            print(roc_convex_hull)
+            plot(attribute, 'selection', 'error', selection[attribute])
+
     # find minimum error point
     i_best_DP = error_given_selection.idxmin()
-    selection_best = x_grid[i_best_DP]
+    x_best = x_grid[i_best_DP]
+    y_best = selection[attribute]["error"][i_best_DP]
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
     predicted_DP_by_attribute = {}
-    for attribute in roc.keys():
+    for attribute in selection.keys():
         # For DP we already have the predictor directly without complex interpolation.
         roc_result = selection[attribute].transpose()[i_best_DP]
         predicted_DP_by_attribute[attribute] = _interpolate_prediction(0, 0,
@@ -311,8 +282,9 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     if debug:
         print(OUTPUT_SEPARATOR)
         print("From ROC curves")
-        print("Best DP: error=%.3f, selection rate=%.3f" % (error_given_selection[i_best_DP], selection_best))
+        print("Best DP: error=%.3f, selection rate=%.3f" % (error_given_selection[i_best_DP], x_best))
         print(OUTPUT_SEPARATOR)
+        plot_solution_and_show_plot(x_best, y_best, "DP solution")
 
     return lambda a, x: predicted_DP_by_attribute[a](x)   
 
@@ -346,8 +318,20 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
     data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
-        roc[attribute], _ = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
+        roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
+        roc[attribute] = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
         y_values[attribute] = roc[attribute]['y']
+
+        if debug:
+            print("")
+            print(OUTPUT_SEPARATOR)
+            print("Processing " + attribute)
+            print(OUTPUT_SEPARATOR)
+            print("DATA")
+            print(group)
+            print("\nROC curve: convex")
+            print(roc_convex_hull)
+            plot(attribute, 'x', 'y', roc)
 
     # Calculate the overlap of the ROC curves by taking the lowest y value
     # at every given x.
@@ -390,10 +374,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
         print("From ROC curves")
         print("Best EO: error=%.3f, FP rate=%.3f, TP rate=%.3f" % (error_given_x[i_best_EO], x_best, y_best))
         print(OUTPUT_SEPARATOR)
-        line, = plt.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
-        line.zorder -= 1
-        plt.plot(x_best, y_best, 'm*', ms=10, label='EO solution') 
-        plt.legend()
-        plt.show()
-
+        plot_overlap(x_grid, y_min)
+        plot_solution_and_show_plot(x_best, y_best, 'EO solution')
+        
     return lambda a, x: predicted_EO_by_attribute[a](x)

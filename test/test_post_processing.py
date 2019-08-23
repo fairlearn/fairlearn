@@ -269,7 +269,7 @@ def _get_discretized_predictions(adjusted_model):
     }
 
 def test_roc_curve_based_post_processing_demographic_parity():
-    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores)
+    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores, debug=True)
     
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
@@ -307,7 +307,7 @@ def test_roc_curve_based_post_processing_demographic_parity():
             for attribute_value in discretized_predictions] == [5/7, 4/7, 5/6]
 
 def test_roc_curve_based_post_processing_equalized_odds():
-    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1, example_labels, example_scores, debug=True)
+    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1, example_labels, example_scores, debug=False)
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
