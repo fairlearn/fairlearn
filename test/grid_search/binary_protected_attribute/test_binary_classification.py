@@ -45,7 +45,7 @@ class TestBinaryClassification:
                           "constant_ones_feature": np.ones(len(Y))})
         return X, Y, A
 
-    def _smoke_core(self, X, Y, A):
+    def _smoke_demographicparity_core(self, X, Y, A):
         result = bc.sweep_demographic_parity(
             simple_learners.LeastSquaresBinaryClassifierLearner(),
             X, Y, A,
@@ -63,43 +63,43 @@ class TestBinaryClassification:
 
     def test_demographicparity_smoke(self):
         X, Y, A = self._quick_data()
-        self._smoke_core(X, Y, A)
+        self._smoke_demographicparity_core(X, Y, A)
 
     def test_demographicparity_smoke_Y_numpy(self):
         X, Y, A = self._quick_data()
         Y_numpy = np.array(Y)
-        self._smoke_core(X, Y_numpy, A)
+        self._smoke_demographicparity_core(X, Y_numpy, A)
 
     def test_demographicparity_smoke_Y_pandas(self):
         X, Y, A = self._quick_data()
         Y_pandas = pd.Series(Y)
-        self._smoke_core(X, Y_pandas, A)
+        self._smoke_demographicparity_core(X, Y_pandas, A)
 
     def test_demographicparity_smoke_A_numpy(self):
         X, Y, A = self._quick_data()
         A_numpy = np.array(A)
-        self._smoke_core(X, Y, A_numpy)
+        self._smoke_demographicparity_core(X, Y, A_numpy)
 
     def test_demographicparity_smoke_A_pandas(self):
         X, Y, A = self._quick_data()
         A_pandas = pd.Series(A)
-        self._smoke_core(X, Y, A_pandas)
+        self._smoke_demographicparity_core(X, Y, A_pandas)
 
     def test_demographicparity_smoke_A_non_numeric(self):
         X, Y, _ = self._quick_data(number_samples=8)
         A = ["XY", "GF", "XY", "XY", "GF", "GF", "GF", "GF"]
-        self._smoke_core(X, Y, A)
+        self._smoke_demographicparity_core(X, Y, A)
 
     def test_demographicparity_smoke_X_numpy(self):
         X, Y, A = self._quick_data()
         X_numpy = np.array(X)
-        self._smoke_core(X_numpy, Y, A)
+        self._smoke_demographicparity_core(X_numpy, Y, A)
 
     def test_demographicparity_smoke_X_pandas(self):
         X, Y, A = self._quick_data()
         X_pandas = pd.DataFrame(
             X, columns=["feature_1", "feature_2", "feature_3"])
-        self._smoke_core(X_pandas, Y, A)
+        self._smoke_demographicparity_core(X_pandas, Y, A)
 
     def test_generate_weights_smoke(self):
         # Set up sample data
