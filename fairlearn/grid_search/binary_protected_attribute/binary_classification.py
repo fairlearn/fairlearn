@@ -78,9 +78,6 @@ def sweep_demographic_parity(learner,
 
     # Verify we have a binary classification problem
     unique_labels = np.unique(y)
-    if len(unique_labels) > 2:
-        raise RuntimeError("Supplied Y labels are not binary")
-
     if not set(unique_labels).issubset({0, 1}):
         raise RuntimeError("Supplied Y labels are not 0 or 1")
 

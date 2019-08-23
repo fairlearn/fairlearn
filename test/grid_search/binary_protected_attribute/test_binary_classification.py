@@ -133,25 +133,23 @@ class TestBinaryClassification:
                 np.random.randint(10, size=3), 3)
 
     def test_non_binary_protected_attribute(self):
-        X, Y, _ = self._quick_data()
-        message = r"Protected Attribute is not binary"
+        X, Y, _ = self._quick_data(4)
+        message = str("Protected Attribute does not "
+                      "have exactly two unique values")
 
-        bad_protected_attribute = [0, 1, 2]
-
+        # With too many A labels
+        bad_protected_attribute = [0, 1, 2, 0]
         with pytest.raises(RuntimeError, match=message):
             _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),
                 X, Y, bad_protected_attribute)
 
-    def test_non_binary_labels(self):
-        X, _, A = self._quick_data(8)
-        bad_labels = [0, 1, 2, 0, 1, 2, 0, 1]
-        message = r"Supplied Y labels are not binary"
-
+        # And with too few A labels
+        bad_protected_attribute = [1, 1, 1, 1]
         with pytest.raises(RuntimeError, match=message):
             _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),
-                X, bad_labels, A)
+                X, Y, bad_protected_attribute)
 
     def test_labels_not_0_1(self):
         X, _, A = self._quick_data(8)
