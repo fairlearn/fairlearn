@@ -1,4 +1,4 @@
-# Reductions for Fair Machine Learning
+# Fairness in Machine Learning - Mitigation algorithms
 
 A Python package that implements a variety of fairness-related algorithms to mitigate bias including:
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
