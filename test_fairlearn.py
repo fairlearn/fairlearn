@@ -6,8 +6,8 @@ from __future__ import print_function
 import functools
 import numpy as np
 import pandas as pd
-import fairlearn.moments as moments
-import fairlearn.classred as red
+import fairlearn.expgrad.moments as moments
+import fairlearn.expgrad.classred as red
 
 print = functools.partial(print, flush=True)
 

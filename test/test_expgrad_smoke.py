@@ -2,15 +2,15 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-import fairlearn.moments as moments
-import fairlearn.classred as red
+import fairlearn.expgrad.moments as moments
+import fairlearn.expgrad.classred as red
 
 import simple_learners
 
 import pytest
 
 
-class TestFairLearnSmoke:
+class TestExpgradSmoke:
     def setup_method(self, method):
         print("setup_method      method:%s" % method.__name__)
         attrs = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
