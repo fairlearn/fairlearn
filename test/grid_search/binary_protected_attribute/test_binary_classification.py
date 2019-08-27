@@ -101,6 +101,12 @@ class TestBinaryClassification:
             X, columns=["feature_1", "feature_2", "feature_3"])
         self._smoke_demographicparity_core(X_pandas, Y, A)
 
+    def test_demographicparity_unary_protected_attribute(self):
+        X, Y, _ = self._quick_data(8)
+
+        unary_protected_attribute = np.ones(8)
+        self._smoke_demographicparity_core(X, Y, unary_protected_attribute)
+
     def test_generate_weights_smoke(self):
         # Set up sample data
         A = [0, 0, 1, 1]
@@ -134,18 +140,11 @@ class TestBinaryClassification:
 
     def test_non_binary_protected_attribute(self):
         X, Y, _ = self._quick_data(4)
-        message = str("Protected Attribute does not "
-                      "have exactly two unique values")
+        message = str("Protected Attribute contains "
+                      "more than two unique values")
 
         # With too many A labels
         bad_protected_attribute = [0, 1, 2, 0]
-        with pytest.raises(RuntimeError, match=message):
-            _ = bc.sweep_demographic_parity(
-                simple_learners.LeastSquaresBinaryClassifierLearner(),
-                X, Y, bad_protected_attribute)
-
-        # And with too few A labels
-        bad_protected_attribute = [1, 1, 1, 1]
         with pytest.raises(RuntimeError, match=message):
             _ = bc.sweep_demographic_parity(
                 simple_learners.LeastSquaresBinaryClassifierLearner(),

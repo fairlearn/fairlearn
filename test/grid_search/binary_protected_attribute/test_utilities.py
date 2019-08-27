@@ -28,14 +28,18 @@ class TestUtilities:
         assert p1 == 0.25
         assert a0_val == "AB"
 
+    def test_generate_protected_attribute_unary(self):
+        A = np.ones(16)
+
+        p0, p1, a0_val = utilities.generate_protected_attribute_info(A)
+        assert p0 == 1
+        assert p1 == 0
+        assert a0_val == 1
+
     def test_generate_protected_attribute_info_notbinary(self):
-        message = str("Protected Attribute does not have "
-                      "exactly two unique values")
+        message = str("Protected Attribute contains "
+                      "more than two unique values")
 
         A = np.random.randint(20, size=400)
-        with pytest.raises(RuntimeError, match=message):
-            _, _, _ = utilities.generate_protected_attribute_info(A)
-
-        A = [1, 1, 1, 1, 1]
         with pytest.raises(RuntimeError, match=message):
             _, _, _ = utilities.generate_protected_attribute_info(A)

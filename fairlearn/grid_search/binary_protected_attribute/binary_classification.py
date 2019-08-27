@@ -88,7 +88,7 @@ def sweep_demographic_parity(learner,
     # If not supplied, generate array of trial lagrange multipliers
     if lagrange_multipliers is None:
         limit = 1
-        if p0 / p1 > 1:
+        if p1 > 0 and p0 / p1 > 1:
             limit = p0 / p1
         lagrange_multipliers = np.linspace(-2 * limit,
                                            2 * limit,
