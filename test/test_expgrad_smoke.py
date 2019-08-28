@@ -10,7 +10,7 @@ from test import simple_learners
 import pytest
 
 
-class TestFairLearnSmoke:
+class TestExpgradSmoke:
     def setup_method(self, method):
         print("setup_method      method:%s" % method.__name__)
         attrs = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
