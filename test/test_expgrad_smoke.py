@@ -5,7 +5,7 @@ import pandas as pd
 import fairlearn.moments as moments
 import fairlearn.classred as red
 
-import simple_learners
+from test import simple_learners
 
 import pytest
 
