@@ -62,79 +62,6 @@ def test_interpolate_curve():
     
     _assert_interpolated_points_are_between_base_points(base_points, curve)
 
-def _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points=None):
-    def _get_base_point_coordinates(i, data):
-        return data.x[i], data.y[i]
-
-    if ignore_for_base_points is None:
-        ignore_for_base_points = []
-
-    # Determine base point indices from base points such that points which are
-    # not corners on the convex hull are ignored. These points are listed by
-    # index in ignore_for_base_points.
-    start_base_point_index = 0
-    while start_base_point_index in ignore_for_base_points:
-        start_base_point_index += 1
-    
-    base_point_index = start_base_point_index + 1
-    while base_point_index in ignore_for_base_points:
-        base_point_index += 1
-
-    current_base_point_x, current_base_point_y = _get_base_point_coordinates(start_base_point_index, base_points)
-    next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
-
-    for x_grid_index in range(len(curve)):
-        x = curve.x[x_grid_index]
-        y = curve.y[x_grid_index]
-        if np.isclose(x, current_base_point_x):
-            assert np.isclose(y, current_base_point_y)
-            continue
-
-        while x > next_base_point_x:
-            current_base_point_x, current_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
-            base_point_index += 1
-            while base_point_index in ignore_for_base_points:
-                base_point_index += 1
-            next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
-        
-        if np.isclose(x, current_base_point_x):
-            assert np.isclose(y, current_base_point_y)
-            continue
-
-        if np.isclose(x, next_base_point_x):
-            assert np.isclose(y, next_base_point_y)
-            continue
-
-        # We know that current_base_point_x < x < next_base_point_x.
-        # Ensure that the curve point lies exactly between the two base points
-        # by checking the slope of the lines connecting the curve point to the
-        # base points.
-        assert np.isclose((y - current_base_point_y) / (x - current_base_point_x), (next_base_point_y - y) / (next_base_point_x - x)) 
-
-def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
-    if ignore_indices is None:
-        ignore_indices = []
-    assert len(expected_points) - len(ignore_indices) == len(actual_points)
-
-    # order by x to be able to iterate through
-    actual_points = actual_points.sort_values(by="x")
-    actual_points.index = range(len(actual_points))
-
-    index_offset = 0
-    for i in range(len(expected_points)):
-        if i in ignore_indices:
-            index_offset += 1
-
-            if i > len(expected_points):
-                break
-            
-            continue
-
-        assert np.isclose(actual_points.x[i - index_offset], expected_points.x[i])
-        assert np.isclose(actual_points.y[i - index_offset], expected_points.y[i])
-        assert actual_points.operation[i - index_offset].operator == expected_points.operation[i].operator
-        assert np.isclose(actual_points.operation[i - index_offset].threshold, expected_points.operation[i].threshold)
-
 def test_calculate_roc_points():
     data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
     grouped_data = data.groupby(ATTRIBUTE_KEY).get_group("A").sort_values(by=SCORE_KEY, ascending=False)
@@ -165,66 +92,6 @@ def test_get_roc():
         curve = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
 
         _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points)
-
-def _get_grouped_data_and_base_points(attribute_value):
-    data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
-    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group(attribute_value).sort_values(by=SCORE_KEY, ascending=False)
-    x_grid = np.linspace(0, 1, 100)
-
-    if attribute_value == "A":
-        expected_roc_points = pd.DataFrame({
-            "x": [0, 0.25, 0.5, 0.5, 1],
-            "y": [0, 1/3,  2/3, 1,   1],
-            "operation": [ThresholdOperation('>', np.inf),
-                        ThresholdOperation('<', 0.5),
-                        ThresholdOperation('<', 1.5),
-                        ThresholdOperation('<', 2.5),
-                        ThresholdOperation('>', -np.inf)]
-        })
-        ignore_for_base_points = [1, 2]
-    
-    if attribute_value == "B":
-        expected_roc_points = pd.DataFrame({
-            "x": [0, 1/3, 1],
-            "y": [0, 3/4, 1],
-            "operation": [ThresholdOperation('>', np.inf),
-                        ThresholdOperation('<', 0.5),
-                        ThresholdOperation('>', -np.inf)]
-        })
-        ignore_for_base_points = []
-
-    if attribute_value == "C":
-        expected_roc_points = pd.DataFrame({
-            "x": [0, 0,   2/3, 1],
-            "y": [0, 1/3,  1,  1],
-            "operation": [ThresholdOperation('>', np.inf),
-                        ThresholdOperation('<', 0.5),
-                        ThresholdOperation('<', 1.5),
-                        ThresholdOperation('>', -np.inf)]
-        })
-        ignore_for_base_points = [0]
-
-    return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
-
-def _generate_list_reduction_permutations():
-    list_reduction_permutations = []
-    for permutation in permutations([0, 0, 1]):
-        list_reduction_permutations.append(permutation)
-    for permutation in permutations([0, 1, 1]):
-        list_reduction_permutations.append(permutation)
-    
-    return list_reduction_permutations
-
-def _generate_empty_list_permutations():
-    empty_list_permutations = []
-    
-    n = len(example_attributes1)
-    for permutation in permutations([0, 0, n]):
-        empty_list_permutations.append(permutation)
-    for permutation in permutations([0, n, n]):
-        empty_list_permutations.append(permutation)
-
-    return empty_list_permutations
 
 def test_roc_curve_based_post_processing_demographic_parity_different_input_lengths():
     # try all combinations of input lists being shorter/longer than others
@@ -257,17 +124,6 @@ def test_roc_curve_based_post_processing_equalized_odds_different_input_lengths(
             roc_curve_based_post_processing_equalized_odds(example_attributes1[:permutation[0]],
                                                            example_labels[:permutation[1]],
                                                            example_scores[:permutation[2]])
-
-def _get_discretized_predictions(adjusted_model):
-    labels_and_predictions = defaultdict(list)
-    for i in range(len(example_attributes1)):
-        labels_and_predictions[example_attributes1[i]].append(LabelAndPrediction(example_labels[i], adjusted_model(example_attributes1[i], example_scores[i])))
-    
-    return {
-        attribute_value: [
-            LabelAndPrediction(lp.label, int(lp.prediction >= 0.5)) for lp in labels_and_predictions[attribute_value]
-        ] for attribute_value in labels_and_predictions
-    }
 
 def test_roc_curve_based_post_processing_demographic_parity():
     adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores, debug=False)
@@ -364,3 +220,147 @@ def test_roc_curve_based_post_processing_equalized_odds():
     assert predictions_based_on_label[0] == [2/4, 1/3, 2/3]
     # assert counts of positive predictions for positive labels
     assert predictions_based_on_label[1] == [3/3, 3/4, 3/3]
+
+def _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points=None):
+    def _get_base_point_coordinates(i, data):
+        return data.x[i], data.y[i]
+
+    if ignore_for_base_points is None:
+        ignore_for_base_points = []
+
+    # Determine base point indices from base points such that points which are
+    # not corners on the convex hull are ignored. These points are listed by
+    # index in ignore_for_base_points.
+    start_base_point_index = 0
+    while start_base_point_index in ignore_for_base_points:
+        start_base_point_index += 1
+    
+    base_point_index = start_base_point_index + 1
+    while base_point_index in ignore_for_base_points:
+        base_point_index += 1
+
+    current_base_point_x, current_base_point_y = _get_base_point_coordinates(start_base_point_index, base_points)
+    next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
+
+    for x_grid_index in range(len(curve)):
+        x = curve.x[x_grid_index]
+        y = curve.y[x_grid_index]
+        if np.isclose(x, current_base_point_x):
+            assert np.isclose(y, current_base_point_y)
+            continue
+
+        while x > next_base_point_x:
+            current_base_point_x, current_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
+            base_point_index += 1
+            while base_point_index in ignore_for_base_points:
+                base_point_index += 1
+            next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
+        
+        if np.isclose(x, current_base_point_x):
+            assert np.isclose(y, current_base_point_y)
+            continue
+
+        if np.isclose(x, next_base_point_x):
+            assert np.isclose(y, next_base_point_y)
+            continue
+
+        # We know that current_base_point_x < x < next_base_point_x.
+        # Ensure that the curve point lies exactly between the two base points
+        # by checking the slope of the lines connecting the curve point to the
+        # base points.
+        assert np.isclose((y - current_base_point_y) / (x - current_base_point_x), (next_base_point_y - y) / (next_base_point_x - x)) 
+
+def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
+    if ignore_indices is None:
+        ignore_indices = []
+    assert len(expected_points) - len(ignore_indices) == len(actual_points)
+
+    # order by x to be able to iterate through
+    actual_points = actual_points.sort_values(by="x")
+    actual_points.index = range(len(actual_points))
+
+    index_offset = 0
+    for i in range(len(expected_points)):
+        if i in ignore_indices:
+            index_offset += 1
+
+            if i > len(expected_points):
+                break
+            
+            continue
+
+        assert np.isclose(actual_points.x[i - index_offset], expected_points.x[i])
+        assert np.isclose(actual_points.y[i - index_offset], expected_points.y[i])
+        assert actual_points.operation[i - index_offset].operator == expected_points.operation[i].operator
+        assert np.isclose(actual_points.operation[i - index_offset].threshold, expected_points.operation[i].threshold)
+
+def _get_grouped_data_and_base_points(attribute_value):
+    data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
+    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group(attribute_value).sort_values(by=SCORE_KEY, ascending=False)
+    x_grid = np.linspace(0, 1, 100)
+
+    if attribute_value == "A":
+        expected_roc_points = pd.DataFrame({
+            "x": [0, 0.25, 0.5, 0.5, 1],
+            "y": [0, 1/3,  2/3, 1,   1],
+            "operation": [ThresholdOperation('>', np.inf),
+                        ThresholdOperation('<', 0.5),
+                        ThresholdOperation('<', 1.5),
+                        ThresholdOperation('<', 2.5),
+                        ThresholdOperation('>', -np.inf)]
+        })
+        ignore_for_base_points = [1, 2]
+    
+    if attribute_value == "B":
+        expected_roc_points = pd.DataFrame({
+            "x": [0, 1/3, 1],
+            "y": [0, 3/4, 1],
+            "operation": [ThresholdOperation('>', np.inf),
+                        ThresholdOperation('<', 0.5),
+                        ThresholdOperation('>', -np.inf)]
+        })
+        ignore_for_base_points = []
+
+    if attribute_value == "C":
+        expected_roc_points = pd.DataFrame({
+            "x": [0, 0,   2/3, 1],
+            "y": [0, 1/3,  1,  1],
+            "operation": [ThresholdOperation('>', np.inf),
+                        ThresholdOperation('<', 0.5),
+                        ThresholdOperation('<', 1.5),
+                        ThresholdOperation('>', -np.inf)]
+        })
+        ignore_for_base_points = [0]
+
+    return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
+
+def _generate_list_reduction_permutations():
+    list_reduction_permutations = []
+    for permutation in permutations([0, 0, 1]):
+        list_reduction_permutations.append(permutation)
+    for permutation in permutations([0, 1, 1]):
+        list_reduction_permutations.append(permutation)
+    
+    return list_reduction_permutations
+
+def _generate_empty_list_permutations():
+    empty_list_permutations = []
+    
+    n = len(example_attributes1)
+    for permutation in permutations([0, 0, n]):
+        empty_list_permutations.append(permutation)
+    for permutation in permutations([0, n, n]):
+        empty_list_permutations.append(permutation)
+
+    return empty_list_permutations
+
+def _get_discretized_predictions(adjusted_model):
+    labels_and_predictions = defaultdict(list)
+    for i in range(len(example_attributes1)):
+        labels_and_predictions[example_attributes1[i]].append(LabelAndPrediction(example_labels[i], adjusted_model(example_attributes1[i], example_scores[i])))
+    
+    return {
+        attribute_value: [
+            LabelAndPrediction(lp.label, int(lp.prediction >= 0.5)) for lp in labels_and_predictions[attribute_value]
+        ] for attribute_value in labels_and_predictions
+    }
