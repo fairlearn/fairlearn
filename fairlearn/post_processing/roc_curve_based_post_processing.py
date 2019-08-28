@@ -224,7 +224,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     :type debug: bool
     """
     n = len(labels)
-    selection = {}
+    selection_error_curve = {}
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
 
@@ -238,18 +238,20 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         p_attribute = n_group / n
 
         roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip, debug=debug)
-        # Calculate selection to represent the proportion of positive predictions.
-        roc_convex_hull['selection'] = (n_negative / n_group) * roc_convex_hull['x'] + (n_positive / n_group) * roc_convex_hull['y']
-        # We find the error by adding the fraction of negative samples multiplied by the rate of
-        # predicting negative samples as positive samples, plus the fraction of positive samples
-        # multiplied by the rate of predicting positive samples as negative samples.
-        roc_convex_hull['error'] = (n_negative / n_group) * roc_convex_hull['x'] + (n_positive / n_group) * (1 - roc_convex_hull['y'])
 
-        selection[attribute] = _interpolate_curve(roc_convex_hull, 'selection', 'error', 'operation', x_grid)
+        fraction_negative_label_positive_sample = (n_negative / n_group) * roc_convex_hull['x']
+        fraction_positive_label_positive_sample = (n_positive / n_group) * roc_convex_hull['y']
+        # Calculate selection to represent the proportion of positive predictions.
+        roc_convex_hull['selection'] = fraction_negative_label_positive_sample + fraction_positive_label_positive_sample
+
+        fraction_positive_label_negative_sample = (n_positive / n_group) * (1 - roc_convex_hull['y'])
+        roc_convex_hull['error'] = fraction_negative_label_positive_sample + fraction_positive_label_negative_sample
+
+        selection_error_curve[attribute] = _interpolate_curve(roc_convex_hull, 'selection', 'error', 'operation', x_grid)
         
         # Add up errors for the current group multiplied by the probability of the current group.
         # This will help us in identifying the minimum overall error.
-        error_given_selection += p_attribute * selection[attribute]['error']
+        error_given_selection += p_attribute * selection_error_curve[attribute]['error']
 
         if debug:
             print("")
@@ -260,7 +262,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
             print(group)
             print("\nROC curve: convex")
             print(roc_convex_hull)
-            plot(attribute, 'selection', 'error', selection[attribute])
+            plot(attribute, 'selection', 'error', selection_error_curve[attribute])
 
     # Find minimum error point given that at each point the selection rate for each attribute
     # value is identical by design.
@@ -269,9 +271,9 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
     predicted_DP_by_attribute = {}
-    for attribute in selection.keys():
+    for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
-        roc_result = selection[attribute].transpose()[i_best_DP]
+        roc_result = selection_error_curve[attribute].transpose()[i_best_DP]
         predicted_DP_by_attribute[attribute] = _interpolate_prediction(0, 0,
                                                                        roc_result.p0, roc_result.operation0,
                                                                        roc_result.p1, roc_result.operation1,
