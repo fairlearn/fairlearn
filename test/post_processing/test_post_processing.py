@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from collections import defaultdict, namedtuple
+import copy
 from itertools import permutations
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,7 +20,8 @@ from fairlearn.post_processing.roc_curve_based_post_processing import (roc_curve
                                                                        LABEL_KEY,
                                                                        ATTRIBUTE_KEY,
                                                                        DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE,
-                                                                       EMPTY_INPUT_ERROR_MESSAGE)
+                                                                       EMPTY_INPUT_ERROR_MESSAGE,
+                                                                       NON_BINARY_LABELS_ERROR_MESSAGE)
 
 example_attribute_names1 = ["A", "B", "C"]
 example_attributes1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
@@ -93,40 +95,40 @@ def test_get_roc():
 
         _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points)
 
-def test_roc_curve_based_post_processing_demographic_parity_different_input_lengths():
-    # try all combinations of input lists being shorter/longer than others
-    n = len(example_attributes1)
-    for permutation in _generate_list_reduction_permutations():
-        with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-            roc_curve_based_post_processing_demographic_parity(example_attributes1[:n-permutation[0]],
-                                                               example_labels[:n-permutation[1]],
-                                                               example_scores[:n-permutation[2]])
-    
-    # try providing empty lists in all combinations
-    for permutation in _generate_empty_list_permutations():
-        with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
-            roc_curve_based_post_processing_demographic_parity(example_attributes1[:permutation[0]],
-                                                               example_labels[:permutation[1]],
-                                                               example_scores[:permutation[2]])
+@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric', 
+                        [roc_curve_based_post_processing_demographic_parity,
+                         roc_curve_based_post_processing_equalized_odds])
+def test_roc_curve_based_post_processing_non_binary_labels(
+        roc_curve_based_post_processing_by_metric):
+    non_binary_labels = copy.deepcopy(example_labels)
+    non_binary_labels[0] = 2
+    with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
+        roc_curve_based_post_processing_by_metric(example_attributes1,
+                                                  non_binary_labels,
+                                                  example_scores)
 
-def test_roc_curve_based_post_processing_equalized_odds_different_input_lengths():
+@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric', 
+                        [roc_curve_based_post_processing_demographic_parity,
+                         roc_curve_based_post_processing_equalized_odds])
+def test_roc_curve_based_post_processing_different_input_lengths(
+        roc_curve_based_post_processing_by_metric):
     # try all combinations of input lists being shorter/longer than others
     n = len(example_attributes1)
     for permutation in _generate_list_reduction_permutations():
         with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-            roc_curve_based_post_processing_equalized_odds(example_attributes1[:n-permutation[0]],
-                                                           example_labels[:n-permutation[1]],
-                                                           example_scores[:n-permutation[2]])
+            roc_curve_based_post_processing_by_metric(example_attributes1[:n-permutation[0]],
+                                                      example_labels[:n-permutation[1]],
+                                                      example_scores[:n-permutation[2]])
     
     # try providing empty lists in all combinations
     for permutation in _generate_empty_list_permutations():
         with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
-            roc_curve_based_post_processing_equalized_odds(example_attributes1[:permutation[0]],
-                                                           example_labels[:permutation[1]],
-                                                           example_scores[:permutation[2]])
+            roc_curve_based_post_processing_by_metric(example_attributes1[:permutation[0]],
+                                                      example_labels[:permutation[1]],
+                                                      example_scores[:permutation[2]])
 
 def test_roc_curve_based_post_processing_demographic_parity():
-    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores, debug=False)
+    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores)
     
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
@@ -164,7 +166,7 @@ def test_roc_curve_based_post_processing_demographic_parity():
             for attribute_value in discretized_predictions] == [5/7, 4/7, 5/6]
 
 def test_roc_curve_based_post_processing_equalized_odds():
-    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1, example_labels, example_scores, debug=False)
+    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1, example_labels, example_scores)
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
