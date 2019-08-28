@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-import fairlearn.expgrad.moments as moments
-import fairlearn.expgrad.classred as red
+import fairlearn.moments as moments
+import fairlearn.classred as red
 
 from test import simple_learners
 
