@@ -9,12 +9,12 @@ import numpy as np
 import pandas as pd
 import pytest
 from fairlearn.post_processing.threshold_operation import ThresholdOperation
+from fairlearn.post_processing._roc_curve_utilities import (_calculate_roc_points,
+                                                            _filter_points_to_get_convex_hull,
+                                                            _get_roc,
+                                                            _interpolate_curve)
 from fairlearn.post_processing.roc_curve_based_post_processing import (roc_curve_based_post_processing_demographic_parity,
                                                                        roc_curve_based_post_processing_equalized_odds,
-                                                                       _interpolate_curve,
-                                                                       _get_roc,
-                                                                       _calculate_roc_points,
-                                                                       _filter_points_to_get_convex_hull,
                                                                        SCORE_KEY,
                                                                        LABEL_KEY,
                                                                        ATTRIBUTE_KEY,
