@@ -19,14 +19,21 @@ def _get_roc(data, x_grid, attribute, flip=True):
 def _filter_points_to_get_convex_hull(roc_sorted):
     selected = []
     for r2 in roc_sorted.itertuples():
+        # For each set of three points, i.e. the last two points in selected
+        # and the next point from the sorted list of base points, check
+        # whether the middle point (r1) lies above the line between the
+        # first point (r0) and the next base point (r2). If it is above,
+        # it is indeed required for the convex hull. If it is below or
+        # on the line, then it is part of the convex hull as defined with
+        # just r0 and r2 and we can drop it from the list of selected points.
         while len(selected) >= 2:
             r1 = selected[-1]
             r0 = selected[-2]
-            # Calculate the y value at r2's x if the slope between r0 and r1 is continued.
-            # If that y value is not larger than r2's actual y value we know that r1 lies
-            # below the line between r0 and r2 and can be dropped since we can reach all points
-            # between r0 and r2 through interpolation.
+            # Compare slopes of lines between r0 and r1/r2 to determine
+            # whether or not to drop r1. Instead of delta_y/delta_x we
+            # multiplied both sides of the inequation by the delta_xs.
             if (r1.y - r0.y) * (r2.x - r0.x) <= (r2.y - r0.y) * (r1.x - r0.x):
+                # drop r1
                 selected.pop()
             else:
                 break
@@ -92,8 +99,8 @@ def _calculate_roc_points(data, attribute, flip=True):
             count[labels[i]] += 1
             i += 1
         # For the ROC curve we calculate points (x, y), where x represents
-        # the conditional probability P[Y_hat=0 | Y=0] and y represents
-        # the conditional probability P[Y_hat=0 | Y=1]. The conditional
+        # the conditional probability P[Y_hat=1 | Y=0] and y represents
+        # the conditional probability P[Y_hat=1 | Y=1]. The conditional
         # probability is achieved by dividing by only the number of
         # negative/positive samples.
         x, y = count[0] / n_negative, count[1] / n_positive

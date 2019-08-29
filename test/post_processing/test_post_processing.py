@@ -51,6 +51,18 @@ def test_predict_from_operation_invalid_operator():
     with pytest.raises(ValueError, match="Unrecognized operator: ="):
         ThresholdOperation('=', 0.5)
 
+def test_assert_interpolated_curve():
+    # An easily interpretable test to make sure the assertion method works as expected
+    base_points = pd.DataFrame({
+        "x":         [0, 5, 10],
+        "y":         [0, 2.5, 5],
+        "operation": ["a", "b", "c"]  # irrelevant
+    })
+    x_grid = np.linspace(0, 10, 333)
+    curve = _interpolate_curve(base_points, "x", "y", "operation", x_grid)
+
+    _assert_interpolated_points_are_between_base_points(base_points, curve)
+
 def test_interpolate_curve():
     # The operation is irrelevant in this case since its semantics are not
     # used within _interpolate_curve.
@@ -63,6 +75,21 @@ def test_interpolate_curve():
     curve = _interpolate_curve(base_points, "x", "y", "operation", x_grid)
     
     _assert_interpolated_points_are_between_base_points(base_points, curve)
+
+def test_convex_hull():
+    # Point (0.3, 0.35) lies below the line between the adjacent points
+    # and therefore should be dropped for convex hull.
+    base_points = pd.DataFrame({
+        "x":         [0, 0.2, 0.3,  0.5, 1],
+        "y":         [0, 0.3, 0.35, 0.7, 1],
+        "operation": ["i", "r", "r", "e", "l"]
+    })
+    convex_hull = _filter_points_to_get_convex_hull(base_points)
+    expected_remaining_indices = [0, 1, 3, 4]
+    print([point.x for point in convex_hull])
+    assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()
+    assert (base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]).all()
+    assert (base_points.operation[expected_remaining_indices] == [point.operation for point in convex_hull]).all()
 
 def test_calculate_roc_points():
     data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
@@ -306,10 +333,10 @@ def _get_grouped_data_and_base_points(attribute_value):
             "x": [0, 0.25, 0.5, 0.5, 1],
             "y": [0, 1/3,  2/3, 1,   1],
             "operation": [ThresholdOperation('>', np.inf),
-                        ThresholdOperation('<', 0.5),
-                        ThresholdOperation('<', 1.5),
-                        ThresholdOperation('<', 2.5),
-                        ThresholdOperation('>', -np.inf)]
+                          ThresholdOperation('<', 0.5),
+                          ThresholdOperation('<', 1.5),
+                          ThresholdOperation('<', 2.5),
+                          ThresholdOperation('>', -np.inf)]
         })
         ignore_for_base_points = [1, 2]
     
@@ -318,8 +345,8 @@ def _get_grouped_data_and_base_points(attribute_value):
             "x": [0, 1/3, 1],
             "y": [0, 3/4, 1],
             "operation": [ThresholdOperation('>', np.inf),
-                        ThresholdOperation('<', 0.5),
-                        ThresholdOperation('>', -np.inf)]
+                          ThresholdOperation('<', 0.5),
+                          ThresholdOperation('>', -np.inf)]
         })
         ignore_for_base_points = []
 
@@ -328,9 +355,9 @@ def _get_grouped_data_and_base_points(attribute_value):
             "x": [0, 0,   2/3, 1],
             "y": [0, 1/3,  1,  1],
             "operation": [ThresholdOperation('>', np.inf),
-                        ThresholdOperation('<', 0.5),
-                        ThresholdOperation('<', 1.5),
-                        ThresholdOperation('>', -np.inf)]
+                          ThresholdOperation('<', 0.5),
+                          ThresholdOperation('<', 1.5),
+                          ThresholdOperation('>', -np.inf)]
         })
         ignore_for_base_points = [0]
 
