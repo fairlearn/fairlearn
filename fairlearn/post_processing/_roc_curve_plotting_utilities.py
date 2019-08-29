@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors
 
-tab10_norm  = matplotlib.colors.Normalize(vmin=0, vmax=7)
+tab10_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
 tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
 debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
 debug_ncolors = len(debug_colors)
@@ -20,6 +20,7 @@ def _get_debug_color(key):
         debug_colormap[key] = color
     return debug_colormap[key]
 
+
 def plot_solution_and_show_plot(x_best, y_best, solution_label):
     if y_best is None:
         plt.axvline(x=x_best, label=solution_label, ls='--')
@@ -28,10 +29,12 @@ def plot_solution_and_show_plot(x_best, y_best, solution_label):
     plt.legend()
     plt.show()
 
+
 def plot_overlap(x_grid, y_min):
     line, = plt.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
     line.zorder -= 1
 
-def plot(attribute, x_col, y_col, points):
+
+def plot_curve(attribute, x_col, y_col, points):
     color = _get_debug_color(attribute)
     plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0, label='attribute ' + str(attribute))

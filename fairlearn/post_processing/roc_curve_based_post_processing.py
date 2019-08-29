@@ -10,14 +10,10 @@ classification with one categorical protected attribute.
 import logging
 import numpy as np
 import pandas as pd
-import sys
 
-from .threshold_operation import ThresholdOperation
 from ._constants import LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY
-from ._roc_curve_utilities import (_calculate_roc_points, _filter_points_to_get_convex_hull,
-                                   _interpolate_curve, _get_roc, _get_scores_labels_and_counts,
-                                   _get_counts)
-from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot
+from ._roc_curve_utilities import _interpolate_curve, _get_roc
+from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
 
 OUTPUT_SEPARATOR = "-"*65
 
@@ -70,7 +66,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         roc_convex_hull['error'] = fraction_negative_label_positive_sample + fraction_positive_label_negative_sample
 
         selection_error_curve[attribute] = _interpolate_curve(roc_convex_hull, 'selection', 'error', 'operation', x_grid)
-        
+
         # Add up errors for the current group multiplied by the probability of the current group.
         # This will help us in identifying the minimum overall error.
         error_given_selection += p_attribute * selection_error_curve[attribute]['error']
@@ -83,13 +79,13 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         logger.debug("ROC curve: convex")
         logger.debug(roc_convex_hull)
         if plot:
-            plot(attribute, 'selection', 'error', selection_error_curve[attribute])
+            plot_curve(attribute, 'selection', 'error', selection_error_curve[attribute])
 
     # Find minimum error point given that at each point the selection rate for each attribute
     # value is identical by design.
     i_best_DP = error_given_selection.idxmin()
     x_best = x_grid[i_best_DP]
-    
+
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
     predicted_DP_by_attribute = {}
     for attribute in selection_error_curve.keys():
@@ -98,7 +94,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         predicted_DP_by_attribute[attribute] = _interpolate_prediction(0, 0,
                                                                        roc_result.p0, roc_result.operation0,
                                                                        roc_result.p1, roc_result.operation1)
-    
+
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
     logger.debug("Best DP: error=%.3f, selection rate=%.3f" % (error_given_selection[i_best_DP], x_best))
@@ -107,6 +103,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         plot_solution_and_show_plot(x_best, None, "DP solution")
 
     return lambda a, x: predicted_DP_by_attribute[a](x)   
+
 
 def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000, flip=True, plot=False):
     """ Calculates the ROC curve of every attribute and take the overlapping region.
@@ -150,7 +147,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
         logger.debug("ROC curve: convex")
         logger.debug(roc_convex_hull)
         if plot:
-            plot(attribute, 'x', 'y', roc[attribute])
+            plot_curve(attribute, 'x', 'y', roc[attribute])
 
     # Calculate the overlap of the ROC curves by taking the lowest y value
     # at every given x.
@@ -167,7 +164,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
     i_best_EO = error_given_x.idxmin()
     x_best = x_grid[i_best_EO]
     y_best = y_min[i_best_EO]
-    
+
     # create the solution as interpolation of multiple points with a separate predictor per protected attribute
     predicted_EO_by_attribute = {}
     for attribute in roc.keys():
@@ -186,7 +183,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
         predicted_EO_by_attribute[attribute] = _interpolate_prediction(p_ignore, x_best,
                                                                        roc_result.p0, roc_result.operation0,
                                                                        roc_result.p1, roc_result.operation1)
-    
+
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
     logger.debug("Best EO: error=%.3f, FP rate=%.3f, TP rate=%.3f" % (error_given_x[i_best_EO], x_best, y_best))
@@ -194,7 +191,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
     if plot:
         plot_overlap(x_grid, y_min)
         plot_solution_and_show_plot(x_best, y_best, 'EO solution')
-        
+
     return lambda a, x: predicted_EO_by_attribute[a](x)
 
 def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
@@ -222,8 +219,9 @@ def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
     logger.debug("p1: {}".format(p1))
     logger.debug("operation1: {}".format(operation1))
     logger.debug(OUTPUT_SEPARATOR)
-    return (lambda x : p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
-        
+    return (lambda x: p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
+
+
 def _sanity_check_and_group_data(attributes, labels, scores):
     if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
         raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)

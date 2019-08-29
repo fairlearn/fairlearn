@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+
 class ThresholdOperation():
     def __init__(self, operator, threshold):
         if operator not in ['>', '<']:
@@ -24,6 +25,6 @@ class ThresholdOperation():
             return lambda x: x < self._threshold
         else:
             raise ValueError("Unrecognized operator: " + self._operator)
-    
+
     def __repr__(self):
         return "[{}{}]".format(self._operator, self._threshold)

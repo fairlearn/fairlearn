@@ -8,13 +8,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
+from fairlearn.post_processing.threshold_operation import ThresholdOperation
 from fairlearn.post_processing.roc_curve_based_post_processing import (roc_curve_based_post_processing_demographic_parity,
                                                                        roc_curve_based_post_processing_equalized_odds,
-                                                                       ThresholdOperation,
                                                                        _interpolate_curve,
                                                                        _get_roc,
                                                                        _calculate_roc_points,
-                                                                       _get_scores_labels_and_counts,
                                                                        _filter_points_to_get_convex_hull,
                                                                        SCORE_KEY,
                                                                        LABEL_KEY,
@@ -73,7 +72,7 @@ def test_interpolate_curve():
     })
     x_grid = np.linspace(0, 9, 100)
     curve = _interpolate_curve(base_points, "x", "y", "operation", x_grid)
-    
+
     _assert_interpolated_points_are_between_base_points(base_points, curve)
 
 def test_convex_hull():
@@ -111,18 +110,18 @@ def test_calculate_roc_points():
     # Try filtering to get the convex hull of the ROC points.
     # This should drop the second and third point.
     selected_points = pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[['x', 'y', 'operation']]
-    _assert_equal_points(expected_roc_points, selected_points, ignore_indices=[1,2])
+    _assert_equal_points(expected_roc_points, selected_points, ignore_indices=[1, 2])
 
 def test_get_roc():
     for attribute_value in ['A', 'B', 'C']:
         grouped_data, base_points, ignore_for_base_points, x_grid = _get_grouped_data_and_base_points(attribute_value)
-        
+
         roc_convex_hull = _get_roc(grouped_data, x_grid, attribute_value)
         curve = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
 
         _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points)
 
-@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric', 
+@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
                         [roc_curve_based_post_processing_demographic_parity,
                          roc_curve_based_post_processing_equalized_odds])
 def test_roc_curve_based_post_processing_non_binary_labels(
@@ -134,7 +133,7 @@ def test_roc_curve_based_post_processing_non_binary_labels(
                                                   non_binary_labels,
                                                   example_scores)
 
-@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric', 
+@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
                         [roc_curve_based_post_processing_demographic_parity,
                          roc_curve_based_post_processing_equalized_odds])
 def test_roc_curve_based_post_processing_different_input_lengths(
@@ -146,7 +145,7 @@ def test_roc_curve_based_post_processing_different_input_lengths(
             roc_curve_based_post_processing_by_metric(example_attributes1[:n-permutation[0]],
                                                       example_labels[:n-permutation[1]],
                                                       example_scores[:n-permutation[2]])
-    
+
     # try providing empty lists in all combinations
     for permutation in _generate_empty_list_permutations():
         with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
@@ -156,7 +155,7 @@ def test_roc_curve_based_post_processing_different_input_lengths(
 
 def test_roc_curve_based_post_processing_demographic_parity():
     adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores)
-    
+
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
     # attribute value A
@@ -184,7 +183,7 @@ def test_roc_curve_based_post_processing_demographic_parity():
     assert 1 == adjusted_model(example_attribute_names1[2], 1.51)
     assert 1 == adjusted_model(example_attribute_names1[2], 100)
 
-    # Assert Demographic Parity actually holds    
+    # Assert Demographic Parity actually holds
     discretized_predictions = _get_discretized_predictions(adjusted_model)
 
     # TODO check whether this is expected
@@ -263,7 +262,7 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve, igno
     start_base_point_index = 0
     while start_base_point_index in ignore_for_base_points:
         start_base_point_index += 1
-    
+
     base_point_index = start_base_point_index + 1
     while base_point_index in ignore_for_base_points:
         base_point_index += 1
@@ -284,7 +283,7 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve, igno
             while base_point_index in ignore_for_base_points:
                 base_point_index += 1
             next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
-        
+
         if np.isclose(x, current_base_point_x):
             assert np.isclose(y, current_base_point_y)
             continue
@@ -297,7 +296,7 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve, igno
         # Ensure that the curve point lies exactly between the two base points
         # by checking the slope of the lines connecting the curve point to the
         # base points.
-        assert np.isclose((y - current_base_point_y) / (x - current_base_point_x), (next_base_point_y - y) / (next_base_point_x - x)) 
+        assert np.isclose((y - current_base_point_y) / (x - current_base_point_x), (next_base_point_y - y) / (next_base_point_x - x))
 
 def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
     if ignore_indices is None:
@@ -315,7 +314,7 @@ def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
 
             if i > len(expected_points):
                 break
-            
+
             continue
 
         assert np.isclose(actual_points.x[i - index_offset], expected_points.x[i])
@@ -339,7 +338,7 @@ def _get_grouped_data_and_base_points(attribute_value):
                           ThresholdOperation('>', -np.inf)]
         })
         ignore_for_base_points = [1, 2]
-    
+
     if attribute_value == "B":
         expected_roc_points = pd.DataFrame({
             "x": [0, 1/3, 1],
@@ -369,12 +368,12 @@ def _generate_list_reduction_permutations():
         list_reduction_permutations.append(permutation)
     for permutation in permutations([0, 1, 1]):
         list_reduction_permutations.append(permutation)
-    
+
     return list_reduction_permutations
 
 def _generate_empty_list_permutations():
     empty_list_permutations = []
-    
+
     n = len(example_attributes1)
     for permutation in permutations([0, 0, n]):
         empty_list_permutations.append(permutation)
@@ -387,7 +386,7 @@ def _get_discretized_predictions(adjusted_model):
     labels_and_predictions = defaultdict(list)
     for i in range(len(example_attributes1)):
         labels_and_predictions[example_attributes1[i]].append(LabelAndPrediction(example_labels[i], adjusted_model(example_attributes1[i], example_scores[i])))
-    
+
     return {
         attribute_value: [
             LabelAndPrediction(lp.label, int(lp.prediction >= 0.5)) for lp in labels_and_predictions[attribute_value]
