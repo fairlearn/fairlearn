@@ -1,6 +1,7 @@
 # Fairness in Machine Learning - Mitigation algorithms
 
 A Python package that implements a variety of fairness-related algorithms to mitigate bias including:
+
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
 | `expgrad` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
