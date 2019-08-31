@@ -88,7 +88,6 @@ def test_convex_hull():
     })
     convex_hull = _filter_points_to_get_convex_hull(base_points)
     expected_remaining_indices = [0, 1, 3, 4]
-    print([point.x for point in convex_hull])
     assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()
     assert (base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]).all()
     assert (base_points.operation[expected_remaining_indices] ==
@@ -207,7 +206,7 @@ def test_roc_curve_based_post_processing_demographic_parity():
     # TODO check whether this is expected
     assert [sum([lp.prediction for lp in discretized_predictions[attribute_value]])
             / len(discretized_predictions[attribute_value])
-            for attribute_value in discretized_predictions] == [5/7, 4/7, 5/6]
+            for attribute_value in sorted(discretized_predictions)] == [5/7, 4/7, 5/6]
 
 
 def test_roc_curve_based_post_processing_equalized_odds():
@@ -264,7 +263,7 @@ def test_roc_curve_based_post_processing_equalized_odds():
             [sum([lp.prediction for lp in discretized_predictions[attribute_value]
              if lp.label == label])
              / len([lp for lp in discretized_predictions[attribute_value] if lp.label == label])
-             for attribute_value in discretized_predictions]
+             for attribute_value in sorted(discretized_predictions)]
 
     # assert counts of positive predictions for negative labels
     assert predictions_based_on_label[0] == [2/4, 1/3, 2/3]
