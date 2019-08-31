@@ -26,7 +26,13 @@ logger = logging.getLogger(__name__)
 
 def roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
                                                        flip=True, plot=False):
-    """ TODO add description
+    """ Calculates selection and error rates for every attribute value at different thresholds
+    over the scores. Subsequently weighs each attribute value's error by the frequency of the
+    attribute value in the data. The minimum error point is the selected solution, which is
+    recreated by interpolating between two points on the convex hull of all solutions. Each
+    attribute value has its own model in the resulting post-processed model, which requires
+    the attribute value as an input.
+
     :param attributes: the protected attributes
     :type attributes: list
     :param labels: the labels of the dataset
@@ -41,6 +47,8 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
+    :return: the post-processed model as a function taking the protected attribute value
+        and the usual input data (x) as arguments to produce predictions
     """
     n = len(labels)
     selection_error_curve = {}
@@ -116,9 +124,9 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
 
 def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
                                                    flip=True, plot=False):
-    """ Calculates the ROC curve of every attribute and take the overlapping region.
-    From the resulting ROC curve the algorithm finds the best solution by selecting the
-    point on the curve with minimal error.
+    """ Calculates the ROC curve of every attribute value at different thresholds over the scores.
+    Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
+    selecting the point on the curve with minimal error.
 
     :param attributes: the protected attributes
     :type attributes: list
@@ -134,6 +142,8 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
+    :return: the post-processed model as a function taking the protected attribute value
+        and the usual input data (x) as arguments to produce predictions
     """
     n = len(labels)
     n_positive = sum(labels)
