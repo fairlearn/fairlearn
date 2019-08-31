@@ -4,13 +4,14 @@
 from collections import defaultdict, namedtuple
 import copy
 from itertools import permutations
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
 from fairlearn.post_processing.threshold_operation import ThresholdOperation
 from fairlearn.post_processing._roc_curve_utilities import (_calculate_roc_points,
-    _filter_points_to_get_convex_hull, _get_roc, _interpolate_curve)
+                                                            _filter_points_to_get_convex_hull,
+                                                            _get_roc,
+                                                            _interpolate_curve)
 from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 from fairlearn.post_processing.roc_curve_based_post_processing import \
     (roc_curve_based_post_processing_demographic_parity,
@@ -67,7 +68,7 @@ def test_interpolate_curve():
     # The operation is irrelevant in this case since its semantics are not
     # used within _interpolate_curve.
     base_points = pd.DataFrame({
-        "x":         [ 0,   1,   2,   3,   4,   5,   6,   7,   8,   9],
+        "x":         [0,    1,   2,   3,   4,   5,   6,   7,   8,   9],
         "y":         [-5,  -2, -1.5, -1,   0,  0.5, 0.8, 1.0, 1.1, 1.15],
         "operation": ["i", "r", "r", "e", "l", "e", "v", "a", "n", "t"]
     })
@@ -90,8 +91,8 @@ def test_convex_hull():
     print([point.x for point in convex_hull])
     assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()
     assert (base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]).all()
-    assert (base_points.operation[expected_remaining_indices] == \
-        [point.operation for point in convex_hull]).all()
+    assert (base_points.operation[expected_remaining_indices] ==
+            [point.operation for point in convex_hull]).all()
 
 
 def test_calculate_roc_points():
@@ -135,8 +136,8 @@ def test_get_roc():
 
 
 @pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
-                        [roc_curve_based_post_processing_demographic_parity,
-                         roc_curve_based_post_processing_equalized_odds])
+                         [roc_curve_based_post_processing_demographic_parity,
+                          roc_curve_based_post_processing_equalized_odds])
 def test_roc_curve_based_post_processing_non_binary_labels(
         roc_curve_based_post_processing_by_metric):
     non_binary_labels = copy.deepcopy(example_labels)
@@ -148,8 +149,8 @@ def test_roc_curve_based_post_processing_non_binary_labels(
 
 
 @pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
-                        [roc_curve_based_post_processing_demographic_parity,
-                         roc_curve_based_post_processing_equalized_odds])
+                         [roc_curve_based_post_processing_demographic_parity,
+                          roc_curve_based_post_processing_equalized_odds])
 def test_roc_curve_based_post_processing_different_input_lengths(
         roc_curve_based_post_processing_by_metric):
     # try all combinations of input lists being shorter/longer than others
@@ -426,7 +427,7 @@ def _get_discretized_predictions(adjusted_model):
     for i in range(len(example_attributes1)):
         labels_and_predictions[example_attributes1[i]].append(
             LabelAndPrediction(example_labels[i],
-            adjusted_model(example_attributes1[i], example_scores[i])))
+                               adjusted_model(example_attributes1[i], example_scores[i])))
 
     return {
         attribute_value: [

@@ -62,11 +62,12 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         fraction_positive_label_positive_sample = (n_positive / n_group) * roc_convex_hull['y']
         # Calculate selection to represent the proportion of positive predictions.
         roc_convex_hull['selection'] = fraction_negative_label_positive_sample + \
-                                       fraction_positive_label_positive_sample
+            fraction_positive_label_positive_sample
 
-        fraction_positive_label_negative_sample = (n_positive / n_group) * (1 - roc_convex_hull['y'])
+        fraction_positive_label_negative_sample = \
+            (n_positive / n_group) * (1 - roc_convex_hull['y'])
         roc_convex_hull['error'] = fraction_negative_label_positive_sample + \
-                                   fraction_positive_label_negative_sample
+            fraction_positive_label_negative_sample
 
         selection_error_curve[attribute] = _interpolate_curve(roc_convex_hull, 'selection',
                                                               'error', 'operation', x_grid)
@@ -90,7 +91,8 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     i_best_DP = error_given_selection.idxmin()
     x_best = x_grid[i_best_DP]
 
-    # create the solution as interpolation of multiple points with a separate predictor per protected attribute
+    # create the solution as interpolation of multiple points with a separate predictor per
+    # protected attribute
     predicted_DP_by_attribute = {}
     for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
@@ -109,7 +111,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     if plot:
         plot_solution_and_show_plot(x_best, None, "DP solution")
 
-    return lambda a, x: predicted_DP_by_attribute[a](x)   
+    return lambda a, x: predicted_DP_by_attribute[a](x)
 
 
 def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
@@ -173,7 +175,8 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
     x_best = x_grid[i_best_EO]
     y_best = y_min[i_best_EO]
 
-    # create the solution as interpolation of multiple points with a separate predictor per protected attribute
+    # create the solution as interpolation of multiple points with a separate predictor
+    # per protected attribute
     predicted_EO_by_attribute = {}
     for attribute in roc.keys():
         roc_result = roc[attribute].transpose()[i_best_EO]
@@ -187,7 +190,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
             difference_from_best_predictor_for_attribute = roc_result.y - y_best
             vertical_distance_from_diagonal = roc_result.y - roc_result.x
             p_ignore = difference_from_best_predictor_for_attribute / \
-                       vertical_distance_from_diagonal
+                vertical_distance_from_diagonal
 
         predicted_EO_by_attribute[attribute] = _interpolate_prediction(p_ignore, x_best,
                                                                        roc_result.p0,
@@ -206,12 +209,13 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
 
     return lambda a, x: predicted_EO_by_attribute[a](x)
 
+
 def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
     """Creates the interpolated prediction between two predictions. The predictions
     are represented through the threshold rules operation0 and operation1.
-    
-    :param p_ignore: p_ignore changes the interpolated prediction P to the desired 
-        solution using the transformation p_ignore * prediction_constant + (1 - p_ignore) * P 
+
+    :param p_ignore: p_ignore changes the interpolated prediction P to the desired
+        solution using the transformation p_ignore * prediction_constant + (1 - p_ignore) * P
     :param prediction_constant: 0 if not required, otherwise the x value of the best
         solution should be passed
     :param p0: interpolation multiplier for prediction from the first predictor
@@ -232,7 +236,7 @@ def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
     logger.debug("operation1: {}".format(operation1))
     logger.debug(OUTPUT_SEPARATOR)
     return (lambda x: p_ignore * prediction_constant +
-                      (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
+            (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
 
 
 def _sanity_check_and_group_data(attributes, labels, scores):

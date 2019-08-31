@@ -57,13 +57,13 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     x0 = data_transpose[0][x_col]
     while data_transpose[i + 1][x_col] == x0:
         i += 1
-    
+
     # calculate the curve points for each x tick in x_grid
     for x in x_grid:
         # skip over data points that we've already passed
         while x > data_transpose[i + 1][x_col]:
             i += 1
-                
+
         # Calculate the y value at x based on the slope between data points i and i + 1
         x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
         x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
@@ -89,9 +89,9 @@ def _calculate_roc_points(data, attribute, flip=True):
 
     scores.append(-np.inf)
     labels.append(np.nan)
-    
+
     x_list, y_list, operation_list = [0], [0], [ThresholdOperation('>', np.inf)]
-    
+
     # Iterate through all samples which are sorted by increasing scores.
     # Setting the threshold between two scores means that everything smaller
     # than the threshold gets a label of 0 while everything larger than the
@@ -119,9 +119,9 @@ def _calculate_roc_points(data, attribute, flip=True):
         x_list.append(x)
         y_list.append(y)
         operation_list.append(operation)
-        
+
     return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}) \
-           .sort_values(by=['x', 'y'])
+        .sort_values(by=['x', 'y'])
 
 
 def _get_scores_labels_and_counts(data):
