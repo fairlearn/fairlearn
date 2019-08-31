@@ -4,7 +4,7 @@
 """ ROC Curve based Post processing algorithm based on M. Hardt,
 E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
 Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
-classification with one categorical protected attribute. 
+classification with one categorical protected attribute.
 """
 
 import logging
@@ -24,7 +24,8 @@ NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 logger = logging.getLogger(__name__)
 
 
-def roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000, flip=True, plot=False):
+def roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
+                                                       flip=True, plot=False):
     """ TODO add description
     :param attributes: the protected attributes
     :type attributes: list
@@ -60,12 +61,15 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         fraction_negative_label_positive_sample = (n_negative / n_group) * roc_convex_hull['x']
         fraction_positive_label_positive_sample = (n_positive / n_group) * roc_convex_hull['y']
         # Calculate selection to represent the proportion of positive predictions.
-        roc_convex_hull['selection'] = fraction_negative_label_positive_sample + fraction_positive_label_positive_sample
+        roc_convex_hull['selection'] = fraction_negative_label_positive_sample + \
+                                       fraction_positive_label_positive_sample
 
         fraction_positive_label_negative_sample = (n_positive / n_group) * (1 - roc_convex_hull['y'])
-        roc_convex_hull['error'] = fraction_negative_label_positive_sample + fraction_positive_label_negative_sample
+        roc_convex_hull['error'] = fraction_negative_label_positive_sample + \
+                                   fraction_positive_label_negative_sample
 
-        selection_error_curve[attribute] = _interpolate_curve(roc_convex_hull, 'selection', 'error', 'operation', x_grid)
+        selection_error_curve[attribute] = _interpolate_curve(roc_convex_hull, 'selection',
+                                                              'error', 'operation', x_grid)
 
         # Add up errors for the current group multiplied by the probability of the current group.
         # This will help us in identifying the minimum overall error.
@@ -92,12 +96,15 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         # For DP we already have the predictor directly without complex interpolation.
         roc_result = selection_error_curve[attribute].transpose()[i_best_DP]
         predicted_DP_by_attribute[attribute] = _interpolate_prediction(0, 0,
-                                                                       roc_result.p0, roc_result.operation0,
-                                                                       roc_result.p1, roc_result.operation1)
+                                                                       roc_result.p0,
+                                                                       roc_result.operation0,
+                                                                       roc_result.p1,
+                                                                       roc_result.operation1)
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
-    logger.debug("Best DP: error=%.3f, selection rate=%.3f" % (error_given_selection[i_best_DP], x_best))
+    logger.debug("Best DP: error={0:.3f}, selection rate={1:.3f}"
+                 .format(error_given_selection[i_best_DP], x_best))
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
         plot_solution_and_show_plot(x_best, None, "DP solution")
@@ -105,7 +112,8 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     return lambda a, x: predicted_DP_by_attribute[a](x)   
 
 
-def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000, flip=True, plot=False):
+def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
+                                                   flip=True, plot=False):
     """ Calculates the ROC curve of every attribute and take the overlapping region.
     From the resulting ROC curve the algorithm finds the best solution by selecting the
     point on the curve with minimal error.
@@ -178,15 +186,19 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
             # p_ignore * x_best + (1 - p_ignore) * P
             difference_from_best_predictor_for_attribute = roc_result.y - y_best
             vertical_distance_from_diagonal = roc_result.y - roc_result.x
-            p_ignore = difference_from_best_predictor_for_attribute / vertical_distance_from_diagonal
+            p_ignore = difference_from_best_predictor_for_attribute / \
+                       vertical_distance_from_diagonal
 
         predicted_EO_by_attribute[attribute] = _interpolate_prediction(p_ignore, x_best,
-                                                                       roc_result.p0, roc_result.operation0,
-                                                                       roc_result.p1, roc_result.operation1)
+                                                                       roc_result.p0,
+                                                                       roc_result.operation0,
+                                                                       roc_result.p1,
+                                                                       roc_result.operation1)
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
-    logger.debug("Best EO: error=%.3f, FP rate=%.3f, TP rate=%.3f" % (error_given_x[i_best_EO], x_best, y_best))
+    logger.debug("Best EO: error={0:.3f}, FP rate={1:.3f}, TP rate={2:.3f}"
+                 .format(error_given_x[i_best_EO], x_best, y_best))
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
         plot_overlap(x_grid, y_min)
@@ -219,7 +231,8 @@ def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
     logger.debug("p1: {}".format(p1))
     logger.debug("operation1: {}".format(operation1))
     logger.debug(OUTPUT_SEPARATOR)
-    return (lambda x: p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
+    return (lambda x: p_ignore * prediction_constant +
+                      (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
 
 
 def _sanity_check_and_group_data(attributes, labels, scores):

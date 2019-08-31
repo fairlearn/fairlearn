@@ -4,8 +4,9 @@
 import numpy as np
 import pandas as pd
 
-from ._constants import LABEL_KEY, SCORE_KEY
+from ._constants import LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY
 from .threshold_operation import ThresholdOperation
+
 
 def _get_roc(data, x_grid, attribute, flip=True):
     """Get ROC curve's convex hull based on data columns 'score' and 'label'
@@ -15,6 +16,7 @@ def _get_roc(data, x_grid, attribute, flip=True):
     roc_selected = _filter_points_to_get_convex_hull(roc_sorted)
     roc_convex_hull = pd.DataFrame(roc_selected)[['x', 'y', 'operation']]
     return roc_convex_hull
+
 
 def _filter_points_to_get_convex_hull(roc_sorted):
     selected = []
@@ -40,12 +42,15 @@ def _filter_points_to_get_convex_hull(roc_sorted):
         selected.append(r2)
     return selected
 
+
 def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     """Interpolates the data frame in "data" along the values in "x_grid".
     Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]
              (2) min and max in x_grid are below/above min and max in data[x_col]
              (3) data is indexed 0,...,len(data)"""
     data_transpose = data.transpose()
+    content_col_0 = content_col + '0'
+    content_col_1 = content_col + '1'
 
     i = 0
     dict_list = []
@@ -68,12 +73,13 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
         dict_list.append({
             x_col: x,
             y_col: y,
-            'p0': p0,
-            content_col + '0': data_transpose[i][content_col],
-            'p1': p1,
-            content_col + '1': data_transpose[i + 1][content_col]})
+            P0_KEY: p0,
+            content_col_0: data_transpose[i][content_col],
+            P1_KEY: p1,
+            content_col_1: data_transpose[i + 1][content_col]})
 
-    return pd.DataFrame(dict_list)[[x_col, y_col, 'p0', content_col + '0', 'p1', content_col + '1']]
+    return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
+
 
 def _calculate_roc_points(data, attribute, flip=True):
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
@@ -114,7 +120,9 @@ def _calculate_roc_points(data, attribute, flip=True):
         y_list.append(y)
         operation_list.append(operation)
         
-    return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}).sort_values(by=['x', 'y'])
+    return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}) \
+           .sort_values(by=['x', 'y'])
+
 
 def _get_scores_labels_and_counts(data):
     data_sorted = data.sort_values(by=SCORE_KEY, ascending=False)
@@ -125,6 +133,7 @@ def _get_scores_labels_and_counts(data):
     n, n_positive, n_negative = _get_counts(labels)
 
     return scores, labels, n, n_positive, n_negative
+
 
 def _get_counts(labels):
     n = len(labels)

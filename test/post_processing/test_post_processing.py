@@ -10,17 +10,13 @@ import pandas as pd
 import pytest
 from fairlearn.post_processing.threshold_operation import ThresholdOperation
 from fairlearn.post_processing._roc_curve_utilities import (_calculate_roc_points,
-                                                            _filter_points_to_get_convex_hull,
-                                                            _get_roc,
-                                                            _interpolate_curve)
-from fairlearn.post_processing.roc_curve_based_post_processing import (roc_curve_based_post_processing_demographic_parity,
-                                                                       roc_curve_based_post_processing_equalized_odds,
-                                                                       SCORE_KEY,
-                                                                       LABEL_KEY,
-                                                                       ATTRIBUTE_KEY,
-                                                                       DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE,
-                                                                       EMPTY_INPUT_ERROR_MESSAGE,
-                                                                       NON_BINARY_LABELS_ERROR_MESSAGE)
+    _filter_points_to_get_convex_hull, _get_roc, _interpolate_curve)
+from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
+from fairlearn.post_processing.roc_curve_based_post_processing import \
+    (roc_curve_based_post_processing_demographic_parity,
+     roc_curve_based_post_processing_equalized_odds,
+     DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE, EMPTY_INPUT_ERROR_MESSAGE,
+     NON_BINARY_LABELS_ERROR_MESSAGE)
 
 example_attribute_names1 = ["A", "B", "C"]
 example_attributes1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
@@ -30,6 +26,7 @@ example_scores = [int(x) for x in '0011233' '0001111' '011112']
 
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
+
 def test_predict_from_operation_less():
     classifier = ThresholdOperation('<', 0.5).get_predictor_from_operation()
     assert classifier(-10000) == 1
@@ -37,6 +34,7 @@ def test_predict_from_operation_less():
     assert classifier(0.5) == 0
     assert classifier(1) == 0
     assert classifier(10000) == 0
+
 
 def test_predict_from_operation_more():
     classifier = ThresholdOperation('>', 0.5).get_predictor_from_operation()
@@ -46,9 +44,11 @@ def test_predict_from_operation_more():
     assert classifier(1) == 1
     assert classifier(10000) == 1
 
+
 def test_predict_from_operation_invalid_operator():
     with pytest.raises(ValueError, match="Unrecognized operator: ="):
         ThresholdOperation('=', 0.5)
+
 
 def test_assert_interpolated_curve():
     # An easily interpretable test to make sure the assertion method works as expected
@@ -61,6 +61,7 @@ def test_assert_interpolated_curve():
     curve = _interpolate_curve(base_points, "x", "y", "operation", x_grid)
 
     _assert_interpolated_points_are_between_base_points(base_points, curve)
+
 
 def test_interpolate_curve():
     # The operation is irrelevant in this case since its semantics are not
@@ -75,6 +76,7 @@ def test_interpolate_curve():
 
     _assert_interpolated_points_are_between_base_points(base_points, curve)
 
+
 def test_convex_hull():
     # Point (0.3, 0.35) lies below the line between the adjacent points
     # and therefore should be dropped for convex hull.
@@ -88,11 +90,17 @@ def test_convex_hull():
     print([point.x for point in convex_hull])
     assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()
     assert (base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]).all()
-    assert (base_points.operation[expected_remaining_indices] == [point.operation for point in convex_hull]).all()
+    assert (base_points.operation[expected_remaining_indices] == \
+        [point.operation for point in convex_hull]).all()
+
 
 def test_calculate_roc_points():
-    data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
-    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group("A").sort_values(by=SCORE_KEY, ascending=False)
+    data = pd.DataFrame({
+        ATTRIBUTE_KEY: example_attributes1,
+        SCORE_KEY: example_scores,
+        LABEL_KEY: example_labels})
+    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group("A") \
+        .sort_values(by=SCORE_KEY, ascending=False)
 
     roc_points = _calculate_roc_points(grouped_data, "A")
     expected_roc_points = pd.DataFrame({
@@ -109,17 +117,22 @@ def test_calculate_roc_points():
 
     # Try filtering to get the convex hull of the ROC points.
     # This should drop the second and third point.
-    selected_points = pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[['x', 'y', 'operation']]
+    selected_points = \
+        pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[['x', 'y', 'operation']]
     _assert_equal_points(expected_roc_points, selected_points, ignore_indices=[1, 2])
+
 
 def test_get_roc():
     for attribute_value in ['A', 'B', 'C']:
-        grouped_data, base_points, ignore_for_base_points, x_grid = _get_grouped_data_and_base_points(attribute_value)
+        grouped_data, base_points, ignore_for_base_points, x_grid = \
+            _get_grouped_data_and_base_points(attribute_value)
 
         roc_convex_hull = _get_roc(grouped_data, x_grid, attribute_value)
         curve = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
 
-        _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points)
+        _assert_interpolated_points_are_between_base_points(base_points, curve,
+                                                            ignore_for_base_points)
+
 
 @pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
                         [roc_curve_based_post_processing_demographic_parity,
@@ -132,6 +145,7 @@ def test_roc_curve_based_post_processing_non_binary_labels(
         roc_curve_based_post_processing_by_metric(example_attributes1,
                                                   non_binary_labels,
                                                   example_scores)
+
 
 @pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
                         [roc_curve_based_post_processing_demographic_parity,
@@ -153,8 +167,11 @@ def test_roc_curve_based_post_processing_different_input_lengths(
                                                       example_labels[:permutation[1]],
                                                       example_scores[:permutation[2]])
 
+
 def test_roc_curve_based_post_processing_demographic_parity():
-    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1, example_labels, example_scores)
+    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1,
+                                                                        example_labels,
+                                                                        example_scores)
 
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
@@ -191,8 +208,11 @@ def test_roc_curve_based_post_processing_demographic_parity():
             / len(discretized_predictions[attribute_value])
             for attribute_value in discretized_predictions] == [5/7, 4/7, 5/6]
 
+
 def test_roc_curve_based_post_processing_equalized_odds():
-    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1, example_labels, example_scores)
+    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1,
+                                                                    example_labels,
+                                                                    example_scores)
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
@@ -240,7 +260,8 @@ def test_roc_curve_based_post_processing_equalized_odds():
     predictions_based_on_label = {}
     for label in [0, 1]:
         predictions_based_on_label[label] = \
-            [sum([lp.prediction for lp in discretized_predictions[attribute_value] if lp.label == label])
+            [sum([lp.prediction for lp in discretized_predictions[attribute_value]
+             if lp.label == label])
              / len([lp for lp in discretized_predictions[attribute_value] if lp.label == label])
              for attribute_value in discretized_predictions]
 
@@ -249,7 +270,9 @@ def test_roc_curve_based_post_processing_equalized_odds():
     # assert counts of positive predictions for positive labels
     assert predictions_based_on_label[1] == [3/3, 3/4, 3/3]
 
-def _assert_interpolated_points_are_between_base_points(base_points, curve, ignore_for_base_points=None):
+
+def _assert_interpolated_points_are_between_base_points(base_points, curve,
+                                                        ignore_for_base_points=None):
     def _get_base_point_coordinates(i, data):
         return data.x[i], data.y[i]
 
@@ -267,8 +290,10 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve, igno
     while base_point_index in ignore_for_base_points:
         base_point_index += 1
 
-    current_base_point_x, current_base_point_y = _get_base_point_coordinates(start_base_point_index, base_points)
-    next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
+    current_base_point_x, current_base_point_y = \
+        _get_base_point_coordinates(start_base_point_index, base_points)
+    next_base_point_x, next_base_point_y = \
+        _get_base_point_coordinates(base_point_index, base_points)
 
     for x_grid_index in range(len(curve)):
         x = curve.x[x_grid_index]
@@ -278,11 +303,13 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve, igno
             continue
 
         while x > next_base_point_x:
-            current_base_point_x, current_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
+            current_base_point_x, current_base_point_y = \
+                _get_base_point_coordinates(base_point_index, base_points)
             base_point_index += 1
             while base_point_index in ignore_for_base_points:
                 base_point_index += 1
-            next_base_point_x, next_base_point_y = _get_base_point_coordinates(base_point_index, base_points)
+            next_base_point_x, next_base_point_y = \
+                _get_base_point_coordinates(base_point_index, base_points)
 
         if np.isclose(x, current_base_point_x):
             assert np.isclose(y, current_base_point_y)
@@ -296,7 +323,9 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve, igno
         # Ensure that the curve point lies exactly between the two base points
         # by checking the slope of the lines connecting the curve point to the
         # base points.
-        assert np.isclose((y - current_base_point_y) / (x - current_base_point_x), (next_base_point_y - y) / (next_base_point_x - x))
+        assert np.isclose((y - current_base_point_y) / (x - current_base_point_x),
+                          (next_base_point_y - y) / (next_base_point_x - x))
+
 
 def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
     if ignore_indices is None:
@@ -319,12 +348,19 @@ def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
 
         assert np.isclose(actual_points.x[i - index_offset], expected_points.x[i])
         assert np.isclose(actual_points.y[i - index_offset], expected_points.y[i])
-        assert actual_points.operation[i - index_offset].operator == expected_points.operation[i].operator
-        assert np.isclose(actual_points.operation[i - index_offset].threshold, expected_points.operation[i].threshold)
+        assert actual_points.operation[i - index_offset].operator == \
+            expected_points.operation[i].operator
+        assert np.isclose(actual_points.operation[i - index_offset].threshold,
+                          expected_points.operation[i].threshold)
+
 
 def _get_grouped_data_and_base_points(attribute_value):
-    data = pd.DataFrame({ATTRIBUTE_KEY: example_attributes1, SCORE_KEY: example_scores, LABEL_KEY: example_labels})
-    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group(attribute_value).sort_values(by=SCORE_KEY, ascending=False)
+    data = pd.DataFrame({
+        ATTRIBUTE_KEY: example_attributes1,
+        SCORE_KEY: example_scores,
+        LABEL_KEY: example_labels})
+    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group(attribute_value) \
+        .sort_values(by=SCORE_KEY, ascending=False)
     x_grid = np.linspace(0, 1, 100)
 
     if attribute_value == "A":
@@ -362,6 +398,7 @@ def _get_grouped_data_and_base_points(attribute_value):
 
     return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
 
+
 def _generate_list_reduction_permutations():
     list_reduction_permutations = []
     for permutation in permutations([0, 0, 1]):
@@ -370,6 +407,7 @@ def _generate_list_reduction_permutations():
         list_reduction_permutations.append(permutation)
 
     return list_reduction_permutations
+
 
 def _generate_empty_list_permutations():
     empty_list_permutations = []
@@ -382,13 +420,17 @@ def _generate_empty_list_permutations():
 
     return empty_list_permutations
 
+
 def _get_discretized_predictions(adjusted_model):
     labels_and_predictions = defaultdict(list)
     for i in range(len(example_attributes1)):
-        labels_and_predictions[example_attributes1[i]].append(LabelAndPrediction(example_labels[i], adjusted_model(example_attributes1[i], example_scores[i])))
+        labels_and_predictions[example_attributes1[i]].append(
+            LabelAndPrediction(example_labels[i],
+            adjusted_model(example_attributes1[i], example_scores[i])))
 
     return {
         attribute_value: [
-            LabelAndPrediction(lp.label, int(lp.prediction >= 0.5)) for lp in labels_and_predictions[attribute_value]
+            LabelAndPrediction(lp.label, int(lp.prediction >= 0.5))
+            for lp in labels_and_predictions[attribute_value]
         ] for attribute_value in labels_and_predictions
     }

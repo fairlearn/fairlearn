@@ -25,7 +25,7 @@ def plot_solution_and_show_plot(x_best, y_best, solution_label):
     if y_best is None:
         plt.axvline(x=x_best, label=solution_label, ls='--')
     else:
-        plt.plot(x_best, y_best, 'm*', ms=10, label=solution_label) 
+        plt.plot(x_best, y_best, 'm*', ms=10, label=solution_label)
     plt.legend()
     plt.show()
 
@@ -37,4 +37,5 @@ def plot_overlap(x_grid, y_min):
 
 def plot_curve(attribute, x_col, y_col, points):
     color = _get_debug_color(attribute)
-    plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0, label='attribute ' + str(attribute))
+    plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0,
+             label='attribute ' + str(attribute))
