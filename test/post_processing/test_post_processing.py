@@ -78,16 +78,40 @@ def test_interpolate_curve():
     _assert_interpolated_points_are_between_base_points(base_points, curve)
 
 
-def test_convex_hull():
-    # Point (0.3, 0.35) lies below the line between the adjacent points
-    # and therefore should be dropped for convex hull.
-    base_points = pd.DataFrame({
-        "x":         [0, 0.2, 0.3,  0.5, 1],
-        "y":         [0, 0.3, 0.35, 0.7, 1],
-        "operation": ["i", "r", "r", "e", "l"]
-    })
+@pytest.mark.parametrize("base_points,expected_remaining_indices",
+                         [(pd.DataFrame({
+                               "x":         [0, 1],
+                               "y":         [0, 1],
+                               "operation": ["i", "r"]
+                           }), [0, 1]),
+                          (pd.DataFrame({
+                               "x":         [0, 0.5, 1],
+                               "y":         [0, 0.5, 1],
+                               "operation": ["i", "r", "e"]
+                           }), [0, 2]),
+                          (pd.DataFrame({
+                               "x":         [0, 0.5, 1],
+                               "y":         [0, 0.51, 1],
+                               "operation": ["i", "r", "e"]
+                           }), [0, 1, 2]),
+                          (pd.DataFrame({
+                               "x":         [0, 0.2, 0.3,  0.5, 1],
+                               "y":         [0, 0.3, 0.35, 0.7, 1],
+                               "operation": ["i", "r", "r", "e", "l"]
+                           }), [0, 1, 3, 4]),
+                          (pd.DataFrame({
+                               "x":         [0, 0.1, 0.2, 0.5, 1],
+                               "y":         [0, 0.3, 0.5, 0.9, 1],
+                               "operation": ["i", "r", "r", "e", "l"]
+                           }), [0, 1, 2, 3, 4]),
+                          (pd.DataFrame({
+                               "x":         [0, 0.2, 0.3,  0.5, 1],
+                               "y":         [0, 0.3, 0.8, 0.82, 1],
+                               "operation": ["i", "r", "r", "e", "l"]
+                           }), [0, 2, 4])
+                          ])
+def test_convex_hull(base_points, expected_remaining_indices):
     convex_hull = _filter_points_to_get_convex_hull(base_points)
-    expected_remaining_indices = [0, 1, 3, 4]
     assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()
     assert (base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]).all()
     assert (base_points.operation[expected_remaining_indices] ==
