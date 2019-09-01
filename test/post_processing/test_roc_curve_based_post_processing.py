@@ -83,7 +83,6 @@ def test_roc_curve_based_post_processing_demographic_parity():
     # Assert Demographic Parity actually holds
     discretized_predictions = _get_discretized_predictions(adjusted_model)
 
-    # TODO check whether this is expected
     assert [sum([lp.prediction for lp in discretized_predictions[attribute_value]])
             / len(discretized_predictions[attribute_value])
             for attribute_value in sorted(discretized_predictions)] == [5/7, 4/7, 5/6]
@@ -136,7 +135,6 @@ def test_roc_curve_based_post_processing_equalized_odds():
     # Assert Equalized Odds actually holds
     discretized_predictions = _get_discretized_predictions(adjusted_model)
 
-    # TODO check whether this is expected
     predictions_based_on_label = {}
     for label in [0, 1]:
         predictions_based_on_label[label] = \
