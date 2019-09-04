@@ -9,68 +9,67 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
 
-class TestGridSearchClassification:
-    def _simple_threshold_data(self,
-                               number_a0, number_a1,
-                               a0_threshold, a1_threshold,
-                               a0_label, a1_label):
+def _simple_threshold_data(number_a0, number_a1,
+                           a0_threshold, a1_threshold,
+                           a0_label, a1_label):
 
-        a0s = np.full(number_a0, a0_label)
-        a1s = np.full(number_a1, a1_label)
+    a0s = np.full(number_a0, a0_label)
+    a1s = np.full(number_a1, a1_label)
 
-        a0_scores = np.linspace(0, 1, number_a0)
-        a1_scores = np.linspace(0, 1, number_a1)
-        score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
+    a0_scores = np.linspace(0, 1, number_a0)
+    a1_scores = np.linspace(0, 1, number_a1)
+    score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
 
-        A = np.concatenate((a0s, a1s), axis=None)
+    A = np.concatenate((a0s, a1s), axis=None)
 
-        Y_a0 = [x > a0_threshold for x in a0_scores]
-        Y_a1 = [x > a1_threshold for x in a1_scores]
+    Y_a0 = [x > a0_threshold for x in a0_scores]
+    Y_a1 = [x > a1_threshold for x in a1_scores]
 
-        Y = np.concatenate((Y_a0, Y_a1), axis=None)
+    Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
-        X = pd.DataFrame({"actual_feature": score_feature,
-                          "protected_attribute_feature": A,
-                          "constant_ones_feature": np.ones(len(Y))})
-        return X, Y, A
+    X = pd.DataFrame({"actual_feature": score_feature,
+                      "protected_attribute_feature": A,
+                      "constant_ones_feature": np.ones(len(Y))})
+    return X, Y, A
 
-    def test_demographicparity_fair_uneven_populations(self):
-        # Variant of test_demographicparity_already_fair, which has unequal
-        # populations in the two classes
-        # Also allow the threshold to be adjustable
 
-        score_threshold = 0.625
+def test_demographicparity_fair_uneven_populations():
+    # Variant of test_demographicparity_already_fair, which has unequal
+    # populations in the two classes
+    # Also allow the threshold to be adjustable
 
-        number_a0 = 4
-        number_a1 = 4
+    score_threshold = 0.625
 
-        a0_label = 17
-        a1_label = 37
+    number_a0 = 4
+    number_a1 = 4
 
-        X, Y, A = self._simple_threshold_data(number_a0, number_a1,
-                                              score_threshold, score_threshold,
-                                              a0_label, a1_label)
+    a0_label = 17
+    a1_label = 37
 
-        target = GridSearchClassification(LogisticRegression(),
-                                          fairness_metric=DemographicParity(),
-                                          number_of_lagrange_multipliers=11)
+    X, Y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label)
 
-        target.fit(X, Y, A)
-        assert len(target.all_models) == 11
+    target = GridSearchClassification(LogisticRegression(),
+                                      fairness_metric=DemographicParity(),
+                                      number_of_lagrange_multipliers=11)
 
-        test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
-                               "protected_attribute_feature": [17, 37],
-                               "constant_ones_feature": [1, 1]})
+    target.fit(X, Y, A)
+    assert len(target.all_models) == 11
 
-        sample_results = target.predict(test_X)
-        sample_proba = target.predict_proba(test_X)
-        assert np.allclose(sample_proba, [[0.37705209, 0.62294791], [0.82924014, 0.17075986]])
+    test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
+                           "protected_attribute_feature": [17, 37],
+                           "constant_ones_feature": [1, 1]})
 
-        sample_results = target.all_models[5]["model"].predict(test_X)
-        assert np.array_equal(sample_results, [0, 1])
+    sample_results = target.predict(test_X)
+    sample_proba = target.predict_proba(test_X)
+    assert np.allclose(sample_proba, [[0.37705209, 0.62294791], [0.82924014, 0.17075986]])
 
-        all_results = target.posterior_predict(test_X)
-        assert len(all_results) == 11
+    sample_results = target.all_models[5]["model"].predict(test_X)
+    assert np.array_equal(sample_results, [0, 1])
 
-        all_proba = target.posterior_predict_proba(test_X)
-        assert len(all_proba) == 11
+    all_results = target.posterior_predict(test_X)
+    assert len(all_results) == 11
+
+    all_proba = target.posterior_predict_proba(test_X)
+    assert len(all_proba) == 11
