@@ -25,8 +25,7 @@ class GridSearchClassification:
             raise RuntimeError("Supplied Y labels are not 0 or 1")
 
         # Extract required statistics from protected_attribute
-        p0, p1, a0_val = self._generate_protected_attribute_info(
-            protected_attribute)
+        p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
 
         # If not supplied, generate array of trial lagrange multipliers
         if lagrange_multipliers is None:
@@ -40,8 +39,11 @@ class GridSearchClassification:
         self.all_models = []
         for current_multiplier in lagrange_multipliers:
             # Generate weights array
-            sample_weights = self._generate_weights(
-                Y, protected_attribute, current_multiplier, p1 / p0, a0_val)
+            sample_weights = self._generate_weights(Y,
+                                                    protected_attribute,
+                                                    current_multiplier,
+                                                    p1 / p0,
+                                                    a0_val)
 
             # Generate Y'
             def f(x): return 1 if x > 0 else 0
