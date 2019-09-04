@@ -13,17 +13,24 @@ DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group 
 
 ## Installation
 
-The package can be installed via 
+The package can be installed via
 
-```pip install fairlearn```
+```python
+pip install fairlearn
+```
 
 or you can clone the repository locally via
 
-```git clone git@github.com:Microsoft/fairlearn.git```
+```python
+git clone git@github.com:Microsoft/fairlearn.git
+```
 
-To verify that it works run 
+To verify that it works run
 
-```python -m pytest -s ./test```
+```python
+pip install -r requirements.txt
+python -m pytest -s ./test
+```
 
 ## Usage
 
