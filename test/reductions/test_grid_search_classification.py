@@ -6,6 +6,7 @@ from fairlearn.reductions.grid_search_classification import GridSearchClassifica
 
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
 
 from test import simple_learners
 
@@ -42,8 +43,8 @@ class TestGridSearchClassification:
 
         score_threshold = 0.625
 
-        number_a0 = 5000
-        number_a1 = 200
+        number_a0 = 4
+        number_a1 = 4
 
         a0_label = 17
         a1_label = 37
@@ -52,63 +53,26 @@ class TestGridSearchClassification:
                                               score_threshold, score_threshold,
                                               a0_label, a1_label)
 
-        target = GridSearchClassification(simple_learners.LeastSquaresBinaryClassifierLearner(),
+        target = GridSearchClassification(LogisticRegression(),
                                           fairness_metric=DemographicParity(),
                                           number_of_lagrange_multipliers=11)
 
         target.fit(X, Y, A)
-
         assert len(target.all_results) == 11
 
-        result_actual_feature_weights = [
-            x["model"].weights["actual_feature"] for x in target.all_results]
-        result_protected_attribute_feature_weights = [
-            x["model"].weights["protected_attribute_feature"] for x in target.all_results]
-        result_constant_ones_feature_weights = [
-            x["model"].weights["constant_ones_feature"] for x in target.all_results]
+        test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
+                               "protected_attribute_feature": [17, 37],
+                               "constant_ones_feature": [1, 1]})
 
-        # The following 'golden values' are empirically determined
+        sample_results = target.predict(test_X)
+        sample_proba = target.predict_proba(test_X)
+        assert np.allclose(sample_proba, [[0.37705209, 0.62294791], [0.82924014, 0.17075986]])
 
-        # See the actual feature become maximally important for
-        # a multiplier of zero (as expected for a fair dataset)
-        expected_actual_feature_weights = [
-            0, 0, 0, 0.4993, 1.0264, 1.4057, 0.8190, 0.2876, 0, 0, 0]
+        sample_results = target.all_results[5]["model"].predict(test_X)
+        assert np.array_equal(sample_results, [0, 1])
 
-        # The zero in the middle of this corresponds to a multiplier
-        # of zero, and is expected since the dataset was created to
-        # be fair
-        expected_protected_attribute_feature_weights = [
-            -0.05,
-            -0.05,
-            -0.05,
-            -0.03604,
-            -0.02264,
-            0,
-            0.0353,
-            0.0445,
-            0.0500,
-            0.0500,
-            0.0500]
+        all_results = target.posterior_predict(test_X)
+        assert len(all_results) == 11
 
-        expected_constant_ones_feature_weights = [
-            1.8500,
-            1.8500,
-            1.8500,
-            1.0898,
-            0.3481,
-            -0.3279,
-            -0.7351,
-            -0.7921,
-            -0.8500,
-            -0.8500,
-            -0.8500]
-
-        assert np.allclose(result_actual_feature_weights,
-                           expected_actual_feature_weights,
-                           rtol=1e-3)
-        assert np.allclose(result_protected_attribute_feature_weights,
-                           expected_protected_attribute_feature_weights,
-                           rtol=1e-3)
-        assert np.allclose(result_constant_ones_feature_weights,
-                           expected_constant_ones_feature_weights,
-                           rtol=1e-3)
+        all_proba = target.posterior_predict_proba(test_X)
+        assert len(all_proba) == 11

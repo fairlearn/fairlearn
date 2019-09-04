@@ -64,7 +64,16 @@ class GridSearchClassification:
         self.best_model = self.all_results[0]
 
     def predict(self, X):
-        return self.best_model.predict(X)
+        return self.best_model["model"].predict(X)
+
+    def predict_proba(self, X):
+        return self.best_model["model"].predict_proba(X)
+
+    def posterior_predict(self, X):
+        return [r["model"].predict(X) for r in self.all_results]
+
+    def posterior_predict_proba(self, X):
+        return [r["model"].predict_proba(X) for r in self.all_results]
 
     def _generate_protected_attribute_info(self, protected_attribute):
         unique_labels, counts = np.unique(
