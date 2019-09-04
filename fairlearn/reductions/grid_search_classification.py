@@ -37,7 +37,7 @@ class GridSearchClassification:
                                                2 * limit,
                                                self.number_of_lagrange_multipliers)
 
-        self.all_results = []
+        self.all_models = []
         for current_multiplier in lagrange_multipliers:
             # Generate weights array
             sample_weights = self._generate_weights(
@@ -56,12 +56,12 @@ class GridSearchClassification:
             # to the result
             # Note that we call it a model because it is a learner which has
             # had 'fit' called
-            self.all_results.append({"model": current_learner,
-                                     "lagrange_multiplier": current_multiplier})
+            self.all_models.append({"model": current_learner,
+                                    "lagrange_multiplier": current_multiplier})
 
         # Designate a 'best' model
         # Selection algorithm not yet fully implemented
-        self.best_model = self.all_results[0]
+        self.best_model = self.all_models[0]
 
     def predict(self, X):
         return self.best_model["model"].predict(X)
@@ -70,10 +70,10 @@ class GridSearchClassification:
         return self.best_model["model"].predict_proba(X)
 
     def posterior_predict(self, X):
-        return [r["model"].predict(X) for r in self.all_results]
+        return [r["model"].predict(X) for r in self.all_models]
 
     def posterior_predict_proba(self, X):
-        return [r["model"].predict_proba(X) for r in self.all_results]
+        return [r["model"].predict_proba(X) for r in self.all_models]
 
     def _generate_protected_attribute_info(self, protected_attribute):
         unique_labels, counts = np.unique(

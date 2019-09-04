@@ -8,8 +8,6 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-from test import simple_learners
-
 
 class TestGridSearchClassification:
     def _simple_threshold_data(self,
@@ -58,7 +56,7 @@ class TestGridSearchClassification:
                                           number_of_lagrange_multipliers=11)
 
         target.fit(X, Y, A)
-        assert len(target.all_results) == 11
+        assert len(target.all_models) == 11
 
         test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
                                "protected_attribute_feature": [17, 37],
@@ -68,7 +66,7 @@ class TestGridSearchClassification:
         sample_proba = target.predict_proba(test_X)
         assert np.allclose(sample_proba, [[0.37705209, 0.62294791], [0.82924014, 0.17075986]])
 
-        sample_results = target.all_results[5]["model"].predict(test_X)
+        sample_results = target.all_models[5]["model"].predict(test_X)
         assert np.array_equal(sample_results, [0, 1])
 
         all_results = target.posterior_predict(test_X)
