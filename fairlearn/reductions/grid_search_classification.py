@@ -15,7 +15,7 @@ class GridSearchClassification:
         self.learner = learner
         if not isinstance(fairness_metric, DemographicParity):
             raise RuntimeError("DemographicParity is only currently supported fairness metric")
-        self.fairness_metric = fairness_metric
+        self.fairness_metric = copy.deepcopy(fairness_metric)
         self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
 
     def fit(self, X, Y, protected_attribute, lagrange_multipliers=None):
@@ -24,34 +24,22 @@ class GridSearchClassification:
         if not set(unique_labels).issubset({0, 1}):
             raise RuntimeError("Supplied Y labels are not 0 or 1")
 
-        # Extract required statistics from protected_attribute
-        p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
+        self.fairness_metric.set_binary_protected_attribute(protected_attribute)
 
         # If not supplied, generate array of trial lagrange multipliers
         if lagrange_multipliers is None:
-            limit = 1
-            if p1 > 0 and p0 / p1 > 1:
-                limit = p0 / p1
-            lagrange_multipliers = np.linspace(-2 * limit,
-                                               2 * limit,
-                                               self.number_of_lagrange_multipliers)
+            lagrange_multipliers = self.fairness_metric.generate_binary_trade_offs(
+                self.number_of_lagrange_multipliers)
 
         self.all_models = []
         for current_multiplier in lagrange_multipliers:
-            # Generate weights array
-            sample_weights = self._generate_weights(Y,
-                                                    protected_attribute,
-                                                    current_multiplier,
-                                                    p1 / p0,
-                                                    a0_val)
-
-            # Generate Y'
-            def f(x): return 1 if x > 0 else 0
-            re_labels = np.vectorize(f)(sample_weights)
+            # Generate weights and relabels
+            weights, re_labels = self.fairness_metric.reweight_and_relabel_binary_attribute(
+                Y, current_multiplier)
 
             # Run the learner
             current_learner = copy.deepcopy(self.learner)
-            current_learner.fit(X, re_labels, sample_weight=np.absolute(sample_weights))
+            current_learner.fit(X, re_labels, sample_weight=np.absolute(weights))
 
             # Append the new model, along with its current_multiplier value
             # to the result
@@ -75,23 +63,3 @@ class GridSearchClassification:
 
     def posterior_predict_proba(self, X):
         return [r["model"].predict_proba(X) for r in self.all_models]
-
-    def _generate_protected_attribute_info(self, protected_attribute):
-        unique_labels, counts = np.unique(protected_attribute, return_counts=True)
-        if len(unique_labels) > 2:
-            raise RuntimeError("Protected Attribute contains more than two unique values")
-
-        p0 = counts[0] / len(protected_attribute)
-        p1 = 1 - p0
-
-        return p0, p1, unique_labels[0]
-
-    def _weight_function(self, y_val, a_val, L, p_ratio, a0_val):
-        if a_val == a0_val:
-            return 2 * y_val - 1 - L * p_ratio
-        else:
-            return 2 * y_val - 1 + L
-
-    def _generate_weights(self, y, protected_attribute, L, p_ratio, a0_val):
-        weight_func = np.vectorize(self._weight_function)
-        return weight_func(y, protected_attribute, L, p_ratio, a0_val)
