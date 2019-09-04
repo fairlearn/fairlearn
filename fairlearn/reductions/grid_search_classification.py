@@ -49,8 +49,7 @@ class GridSearchClassification:
 
             # Run the learner
             current_learner = copy.deepcopy(self.learner)
-            current_learner.fit(
-                X, re_labels, sample_weight=np.absolute(sample_weights))
+            current_learner.fit(X, re_labels, sample_weight=np.absolute(sample_weights))
 
             # Append the new model, along with its current_multiplier value
             # to the result
@@ -76,11 +75,9 @@ class GridSearchClassification:
         return [r["model"].predict_proba(X) for r in self.all_models]
 
     def _generate_protected_attribute_info(self, protected_attribute):
-        unique_labels, counts = np.unique(
-            protected_attribute, return_counts=True)
+        unique_labels, counts = np.unique(protected_attribute, return_counts=True)
         if len(unique_labels) > 2:
-            raise RuntimeError("Protected Attribute contains "
-                               "more than two unique values")
+            raise RuntimeError("Protected Attribute contains more than two unique values")
 
         p0 = counts[0] / len(protected_attribute)
         p1 = 1 - p0
