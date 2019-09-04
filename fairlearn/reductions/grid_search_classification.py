@@ -4,7 +4,7 @@
 import copy
 import numpy as np
 
-from fairlearn.metrics.demographic_parity import DemographicParity
+from fairlearn.metrics import DemographicParity
 
 
 class GridSearchClassification:

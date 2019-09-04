@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from fairlearn.metrics.demographic_parity import DemographicParity
-from fairlearn.reductions.grid_search_classification import GridSearchClassification
+from fairlearn.metrics import DemographicParity
+from fairlearn.reductions import GridSearchClassification
 
 import numpy as np
 import pandas as pd
