@@ -4,7 +4,7 @@
 import copy
 import numpy as np
 
-import metrics.demographic_parity.DemographicParity as DemographicParity
+from fairlearn.metrics.demographic_parity import DemographicParity
 
 
 class GridSearchClassification:
@@ -13,7 +13,7 @@ class GridSearchClassification:
                  fairness_metric=DemographicParity(),
                  number_of_lagrange_multipliers=7):
         self.learner = learner
-        if fairness_metric is not DemographicParity:
+        if not isinstance(fairness_metric, DemographicParity):
             raise RuntimeError("DemographicParity is only currently supported fairness metric")
         self.fairness_metric = fairness_metric
         self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
