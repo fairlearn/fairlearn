@@ -4,3 +4,4 @@ pandas
 pytest
 scipy
 flake8
+sklearn
