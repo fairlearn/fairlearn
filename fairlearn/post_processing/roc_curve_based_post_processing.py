@@ -85,7 +85,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
         error_given_selection += p_attribute * selection_error_curve[attribute]['error']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing " + attribute)
+        logger.debug("Processing " + str(attribute))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
@@ -119,7 +119,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     if plot:
         plot_solution_and_show_plot(x_best, None, "DP solution")
 
-    return lambda a, x: predicted_DP_by_attribute[a](x)
+    return lambda A, X: _vectorized_prediction(predicted_DP_by_attribute, A, X)
 
 
 def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
@@ -160,7 +160,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
         y_values[attribute] = roc[attribute]['y']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing " + attribute)
+        logger.debug("Processing " + str(attribute))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
@@ -217,11 +217,26 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
         plot_overlap(x_grid, y_min)
         plot_solution_and_show_plot(x_best, y_best, 'EO solution')
 
-    return lambda a, x: predicted_EO_by_attribute[a](x)
+    return lambda A, X: _vectorized_prediction(predicted_EO_by_attribute, A, X)
+
+
+def _vectorized_prediction(function_dict, A, X):
+    """ Make predictions for all samples in X with all provided functions,
+    but use only the results from the function that corresponds to the protected
+    attribute value of the sample.
+
+    :param function_dict: the functions that apply to various protected attribute values
+    :type function_dict: dictionary of functions
+    :param A: protected attributes for each sample
+    :type A: vector as Series or ndarray
+    :param X: matrix of samples
+    :type X: matrix as DataFrame or ndarray
+    """
+    return sum([(A == a) * function_dict[a](X) for a in function_dict])
 
 
 def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
-    """Creates the interpolated prediction between two predictions. The predictions
+    """ Creates the interpolated prediction between two predictions. The predictions
     are represented through the threshold rules operation0 and operation1.
 
     :param p_ignore: p_ignore changes the interpolated prediction P to the desired
@@ -245,11 +260,12 @@ def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
     logger.debug("p1: {}".format(p1))
     logger.debug("operation1: {}".format(operation1))
     logger.debug(OUTPUT_SEPARATOR)
-    return (lambda x: p_ignore * prediction_constant +
-            (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x)))
+    return (lambda X: p_ignore * prediction_constant +
+            (1 - p_ignore) * (p0 * pred0(X) + p1 * pred1(X)))
 
 
 def _sanity_check_and_group_data(attributes, labels, scores):
+    # TODO check types: dataframe? ndarray? list? add test cases as well.
     if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
         raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
