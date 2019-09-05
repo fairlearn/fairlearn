@@ -58,7 +58,7 @@ def test_demographicparity_fair_uneven_populations():
     assert len(target.all_models) == 11
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
-                           "protected_attribute_feature": [17, 37],
+                           "protected_attribute_feature": [a0_label, a1_label],
                            "constant_ones_feature": [1, 1]})
 
     sample_results = target.predict(test_X)

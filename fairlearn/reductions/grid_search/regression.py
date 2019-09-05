@@ -5,9 +5,9 @@ import copy
 
 import numpy as np
 
-import BoundedGroupLoss
-import simple_quality_metrics.SimpleRegressionQualityMetric as SimpleRegressionQualityMetric
-import utilities
+from fairlearn.metrics import BoundedGroupLoss
+from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleRegressionQualityMetric
+from . import utilities
 
 
 class GridSearchRegression:
@@ -46,6 +46,12 @@ class GridSearchRegression:
 
         # Designate a 'best' model
         self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
+
+    def predict(self, X):
+        return self.best_model["model"].predict(X)
+
+    def posterior_predict(self, X):
+        return [r["model"].predict(X) for r in self.all_models]
 
     def _regression_weight_function(self, a_val, trade_off, p0, p1, a0_val):
         if a_val == a0_val:
