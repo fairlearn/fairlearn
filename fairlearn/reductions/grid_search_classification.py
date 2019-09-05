@@ -12,6 +12,7 @@ class GridSearchClassification:
     def __init__(self,
                  learner,
                  fairness_metric=DemographicParity(),
+                 quality_metric=SimpleQualityMetric(),
                  number_of_lagrange_multipliers=7):
         self.learner = learner
         if not isinstance(fairness_metric, DemographicParity):
@@ -19,7 +20,7 @@ class GridSearchClassification:
         self.fairness_metric = fairness_metric
         self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
 
-        self.quality_metric = SimpleQualityMetric()
+        self.quality_metric = quality_metric
 
     def fit(self, X, Y, protected_attribute, lagrange_multipliers=None):
         # Verify we have a binary classification problem
