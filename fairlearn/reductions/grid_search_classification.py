@@ -5,7 +5,7 @@ import copy
 import numpy as np
 
 from fairlearn.metrics import DemographicParity
-from fairlearn.reductions.simple_quality_metric import SimpleQualityMetric
+from fairlearn.reductions.grid_search.simple_quality_metric import SimpleQualityMetric
 
 
 class GridSearchClassification:
