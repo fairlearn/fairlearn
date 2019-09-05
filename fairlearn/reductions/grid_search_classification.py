@@ -3,11 +3,9 @@
 
 import copy
 import numpy as np
-import pandas as pd
 
 from fairlearn.metrics import DemographicParity
-
-import fairlearn.moments as moments
+from fairlearn.reductions.simple_quality_metric import SimpleQualityMetric
 
 
 class GridSearchClassification:
@@ -21,8 +19,7 @@ class GridSearchClassification:
         self.fairness_metric = fairness_metric
         self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
 
-        self.error_metric = moments.MisclassificationError()
-        self.disparity_metric = moments.DP()
+        self.quality_metric = SimpleQualityMetric()
 
     def fit(self, X, Y, protected_attribute, lagrange_multipliers=None):
         # Verify we have a binary classification problem
@@ -102,18 +99,10 @@ class GridSearchClassification:
         return weight_func(y, protected_attribute, L, p_ratio, a0_val)
 
     def _select_best_model(self, X, Y, protected_attribute, model_list):
-        self.error_metric.init(X, protected_attribute, pd.Series(Y))
-        self.disparity_metric.init(X, protected_attribute, pd.Series(Y))
+        self.quality_metric.set_data(X, Y, protected_attribute)
 
         for m in model_list:
-            current_error_metric = copy.deepcopy(self.error_metric)
-            current_disparity_metric = copy.deepcopy(self.disparity_metric)
-
-            def classifier(X): return m["model"].predict(X)
-            current_error = current_error_metric.gamma(classifier)[0]
-            current_disparity = current_disparity_metric.gamma(classifier).max()
-
-            m["quality"] = - (current_error + current_disparity)
+            m["quality"] = self.quality_metric.get_quality(m["model"])
 
         best_model = max(model_list, key=lambda x: x["quality"])
         return best_model
