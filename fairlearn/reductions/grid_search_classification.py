@@ -3,8 +3,11 @@
 
 import copy
 import numpy as np
+import pandas as pd
 
 from fairlearn.metrics import DemographicParity
+
+import fairlearn.moments as moments
 
 
 class GridSearchClassification:
@@ -17,6 +20,9 @@ class GridSearchClassification:
             raise RuntimeError("DemographicParity is only currently supported fairness metric")
         self.fairness_metric = fairness_metric
         self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
+
+        self.error_metric = moments.MisclassificationError()
+        self.disparity_metric = moments.DP()
 
     def fit(self, X, Y, protected_attribute, lagrange_multipliers=None):
         # Verify we have a binary classification problem
@@ -61,8 +67,7 @@ class GridSearchClassification:
                                     "lagrange_multiplier": current_multiplier})
 
         # Designate a 'best' model
-        # Selection algorithm not yet fully implemented
-        self.best_model = self.all_models[0]
+        self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
 
     def predict(self, X):
         return self.best_model["model"].predict(X)
@@ -95,3 +100,20 @@ class GridSearchClassification:
     def _generate_weights(self, y, protected_attribute, L, p_ratio, a0_val):
         weight_func = np.vectorize(self._weight_function)
         return weight_func(y, protected_attribute, L, p_ratio, a0_val)
+
+    def _select_best_model(self, X, Y, protected_attribute, model_list):
+        self.error_metric.init(X, protected_attribute, pd.Series(Y))
+        self.disparity_metric.init(X, protected_attribute, pd.Series(Y))
+
+        for m in model_list:
+            current_error_metric = copy.deepcopy(self.error_metric)
+            current_disparity_metric = copy.deepcopy(self.disparity_metric)
+
+            def classifier(X): return m["model"].predict(X)
+            current_error = current_error_metric.gamma(classifier)[0]
+            current_disparity = current_disparity_metric.gamma(classifier).max()
+
+            m["quality"] = - (current_error + current_disparity)
+
+        best_model = max(model_list, key=lambda x: x["quality"])
+        return best_model
