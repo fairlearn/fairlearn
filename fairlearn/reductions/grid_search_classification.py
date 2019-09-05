@@ -5,6 +5,7 @@ import copy
 import numpy as np
 
 from fairlearn.metrics import DemographicParity
+from fairlearn.reductions.grid_search import utilities as utilities
 from fairlearn.reductions.grid_search.simple_quality_metric import SimpleQualityMetric
 
 
@@ -29,7 +30,7 @@ class GridSearchClassification:
             raise RuntimeError("Supplied Y labels are not 0 or 1")
 
         # Extract required statistics from protected_attribute
-        p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
+        p0, p1, a0_val = utilities.generate_protected_attribute_info(protected_attribute)
 
         # If not supplied, generate array of trial lagrange multipliers
         if lagrange_multipliers is None:
@@ -78,16 +79,6 @@ class GridSearchClassification:
 
     def posterior_predict_proba(self, X):
         return [r["model"].predict_proba(X) for r in self.all_models]
-
-    def _generate_protected_attribute_info(self, protected_attribute):
-        unique_labels, counts = np.unique(protected_attribute, return_counts=True)
-        if len(unique_labels) > 2:
-            raise RuntimeError("Protected Attribute contains more than two unique values")
-
-        p0 = counts[0] / len(protected_attribute)
-        p1 = 1 - p0
-
-        return p0, p1, unique_labels[0]
 
     def _weight_function(self, y_val, a_val, L, p_ratio, a0_val):
         if a_val == a0_val:
