@@ -6,14 +6,14 @@ import numpy as np
 
 from fairlearn.metrics import DemographicParity
 from fairlearn.reductions.grid_search import utilities as utilities
-from fairlearn.reductions.grid_search.simple_quality_metric import SimpleQualityMetric
+from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 
 
 class GridSearchClassification:
     def __init__(self,
                  learner,
                  fairness_metric=DemographicParity(),
-                 quality_metric=SimpleQualityMetric(),
+                 quality_metric=SimpleClassificationQualityMetric(),
                  number_of_lagrange_multipliers=7):
         self.learner = learner
         if not isinstance(fairness_metric, DemographicParity):

@@ -7,7 +7,7 @@ import pandas as pd
 import fairlearn.moments as moments
 
 
-class SimpleQualityMetric:
+class SimpleClassificationQualityMetric:
     def __init__(self):
         self.error_metric = moments.MisclassificationError()
         self.disparity_metric = moments.DP()
@@ -29,3 +29,24 @@ class SimpleQualityMetric:
         current_disparity = current_disparity_metric.gamma(classifier).max()
 
         return -(current_error+current_disparity)
+
+
+class SimpleRegressionQualityMetric:
+    def __init__(self):
+        pass
+
+    def set_data(self, X, Y, protected_attribute):
+        self.X = X
+        self.Y = Y
+        self.protected_attribute = protected_attribute
+
+    def get_quality(self, model):
+        labels = pd.Series(self.Y)
+        preds = pd.Series(model.predict(self.X))
+        attrs = pd.Series(self.protected_attribute)
+        attr_vals = attrs.unique()
+        errors = (preds-labels)**2
+        error = errors.mean()
+        error0 = errors[attrs == attr_vals[0]].mean()
+        error1 = errors[attrs == attr_vals[1]].mean()
+        return -(error+error0+error1)
