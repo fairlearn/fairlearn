@@ -52,7 +52,7 @@ def test_bgl_unfair():
                         fairness_metric=BoundedGroupLoss(),
                         quality_metric=SimpleRegressionQualityMetric())
 
-    target.fit(X, Y, A)
+    target.fit(X, Y, protected_attribute=A)
 
     assert len(target.all_models) == 7
 

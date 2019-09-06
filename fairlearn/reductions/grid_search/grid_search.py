@@ -22,7 +22,16 @@ class GridSearch:
 
         self.quality_metric = quality_metric
 
-    def fit(self, X, Y, protected_attribute, lagrange_multipliers=None):
+    def fit(self, X, Y, **kwargs):
+        if "protected_attribute" in kwargs:
+            protected_attribute = kwargs["protected_attribute"]
+        else:
+            raise RuntimeError("Must specify protected_attribute (for now)")
+
+        lagrange_multipliers = None
+        if "lagrange_multipliers" in kwargs:
+            lagrange_multipliers = kwargs["lagrange_multipliers"]
+
         if isinstance(self.fairness_metric, DemographicParity):
             return self._fit_classification(X, Y, protected_attribute, lagrange_multipliers)
         elif isinstance(self.fairness_metric, BoundedGroupLoss):
@@ -51,11 +60,11 @@ class GridSearch:
         self.all_models = []
         for current_multiplier in lagrange_multipliers:
             # Generate weights array
-            sample_weights = self._generate_weights(Y,
-                                                    protected_attribute,
-                                                    current_multiplier,
-                                                    p1 / p0,
-                                                    a0_val)
+            sample_weights = self._generate_classification_weights(Y,
+                                                                   protected_attribute,
+                                                                   current_multiplier,
+                                                                   p1 / p0,
+                                                                   a0_val)
 
             # Generate Y'
             def f(x): return 1 if x > 0 else 0
@@ -110,7 +119,7 @@ class GridSearch:
     def posterior_predict_proba(self, X):
         return [r["model"].predict_proba(X) for r in self.all_models]
 
-    def _weight_function(self, y_val, a_val, L, p_ratio, a0_val):
+    def _classification_weight_function(self, y_val, a_val, L, p_ratio, a0_val):
         if a_val == a0_val:
             return 2 * y_val - 1 - L * p_ratio
         else:
@@ -128,8 +137,8 @@ class GridSearch:
 
         return p0, p1, unique_labels[0]
 
-    def _generate_weights(self, y, protected_attribute, L, p_ratio, a0_val):
-        weight_func = np.vectorize(self._weight_function)
+    def _generate_classification_weights(self, y, protected_attribute, L, p_ratio, a0_val):
+        weight_func = np.vectorize(self._classification_weight_function)
         return weight_func(y, protected_attribute, L, p_ratio, a0_val)
 
     def _select_best_model(self, X, Y, protected_attribute, model_list):

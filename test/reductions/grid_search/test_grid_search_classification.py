@@ -56,7 +56,7 @@ def test_demographicparity_fair_uneven_populations():
                         quality_metric=SimpleClassificationQualityMetric(),
                         number_of_lagrange_multipliers=11)
 
-    target.fit(X, Y, A)
+    target.fit(X, Y, protected_attribute=A)
     assert len(target.all_models) == 11
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
