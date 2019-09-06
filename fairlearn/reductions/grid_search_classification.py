@@ -4,26 +4,31 @@
 import copy
 import numpy as np
 
-from fairlearn.metrics import DemographicParity
+from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions.grid_search import utilities as utilities
-from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 
 
 class GridSearchClassification:
     def __init__(self,
                  learner,
-                 fairness_metric=DemographicParity(),
-                 quality_metric=SimpleClassificationQualityMetric(),
+                 fairness_metric,
+                 quality_metric,
                  number_of_lagrange_multipliers=7):
         self.learner = learner
-        if not isinstance(fairness_metric, DemographicParity):
-            raise RuntimeError("DemographicParity is only currently supported fairness metric")
+        if not isinstance(fairness_metric, DemographicParity) and not isinstance(fairness_metric, BoundedGroupLoss):
+            raise RuntimeError("Unsupported fairness metric")
         self.fairness_metric = fairness_metric
         self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
 
         self.quality_metric = quality_metric
 
     def fit(self, X, Y, protected_attribute, lagrange_multipliers=None):
+        if isinstance(self.fairness_metric, DemographicParity):
+            return self.fit_classification(X, Y, protected_attribute, lagrange_multipliers)
+        else:
+            raise RuntimeError("Can't get here")
+
+    def fit_classification(self, X, Y, protected_attribute, lagrange_multipliers=None):
         # Verify we have a binary classification problem
         unique_labels = np.unique(Y)
         if not set(unique_labels).issubset({0, 1}):
