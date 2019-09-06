@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from fairlearn.metrics import DemographicParity
-from fairlearn.reductions import GridSearchClassification
+from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 
 import numpy as np
@@ -51,10 +51,10 @@ def test_demographicparity_fair_uneven_populations():
                                      score_threshold, score_threshold,
                                      a0_label, a1_label)
 
-    target = GridSearchClassification(LogisticRegression(),
-                                      fairness_metric=DemographicParity(),
-                                      quality_metric=SimpleClassificationQualityMetric(),
-                                      number_of_lagrange_multipliers=11)
+    target = GridSearch(LogisticRegression(),
+                        fairness_metric=DemographicParity(),
+                        quality_metric=SimpleClassificationQualityMetric(),
+                        number_of_lagrange_multipliers=11)
 
     target.fit(X, Y, A)
     assert len(target.all_models) == 11

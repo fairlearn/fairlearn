@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from fairlearn.metrics import BoundedGroupLoss
-from fairlearn.reductions import GridSearchRegression
+from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleRegressionQualityMetric
 
 import numpy as np
@@ -48,9 +48,9 @@ def test_bgl_unfair():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
-    target = GridSearchRegression(LinearRegression(),
-                                  fairness_metric=BoundedGroupLoss(),
-                                  quality_metric=SimpleRegressionQualityMetric())
+    target = GridSearch(LinearRegression(),
+                        fairness_metric=BoundedGroupLoss(),
+                        quality_metric=SimpleRegressionQualityMetric())
 
     target.fit(X, Y, A)
 
