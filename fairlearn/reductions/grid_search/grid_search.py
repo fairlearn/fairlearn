@@ -14,7 +14,8 @@ class GridSearch:
                  quality_metric,
                  number_of_lagrange_multipliers=7):
         self.learner = learner
-        if not isinstance(fairness_metric, DemographicParity) and not isinstance(fairness_metric, BoundedGroupLoss):
+        if (not isinstance(fairness_metric, DemographicParity) and
+                not isinstance(fairness_metric, BoundedGroupLoss)):
             raise RuntimeError("Unsupported fairness metric")
         self.fairness_metric = fairness_metric
         self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
