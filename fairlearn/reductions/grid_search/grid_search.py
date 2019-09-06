@@ -11,14 +11,12 @@ class GridSearch:
     def __init__(self,
                  learner,
                  fairness_metric,
-                 quality_metric,
-                 number_of_lagrange_multipliers=7):
+                 quality_metric):
         self.learner = learner
         if (not isinstance(fairness_metric, DemographicParity) and
                 not isinstance(fairness_metric, BoundedGroupLoss)):
             raise RuntimeError("Unsupported fairness metric")
         self.fairness_metric = fairness_metric
-        self.number_of_lagrange_multipliers = number_of_lagrange_multipliers
 
         self.quality_metric = quality_metric
 
@@ -32,14 +30,21 @@ class GridSearch:
         if "lagrange_multipliers" in kwargs:
             lagrange_multipliers = kwargs["lagrange_multipliers"]
 
+        number_of_lagrange_multipliers = None
+        if "number_of_lagrange_multipliers" in kwargs:
+            number_of_lagrange_multipliers = kwargs["number_of_lagrange_multipliers"]
+
         if isinstance(self.fairness_metric, DemographicParity):
-            return self._fit_classification(X, Y, protected_attribute, lagrange_multipliers)
+            return self._fit_classification(X, Y, protected_attribute,
+                                            lagrange_multipliers, number_of_lagrange_multipliers)
         elif isinstance(self.fairness_metric, BoundedGroupLoss):
-            return self._fit_regression(X, Y, protected_attribute, lagrange_multipliers)
+            return self._fit_regression(X, Y, protected_attribute,
+                                        lagrange_multipliers, number_of_lagrange_multipliers)
         else:
             raise RuntimeError("Can't get here")
 
-    def _fit_classification(self, X, Y, protected_attribute, lagrange_multipliers=None):
+    def _fit_classification(self, X, Y, protected_attribute,
+                            lagrange_multipliers, number_of_lagrange_multipliers):
         # Verify we have a binary classification problem
         unique_labels = np.unique(Y)
         if not set(unique_labels).issubset({0, 1}):
@@ -55,7 +60,7 @@ class GridSearch:
                 limit = p0 / p1
             lagrange_multipliers = np.linspace(-2 * limit,
                                                2 * limit,
-                                               self.number_of_lagrange_multipliers)
+                                               number_of_lagrange_multipliers)
 
         self.all_models = []
         for current_multiplier in lagrange_multipliers:
@@ -84,12 +89,12 @@ class GridSearch:
         # Designate a 'best' model
         self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
 
-    def _fit_regression(self, X, Y, protected_attribute, tradeoffs=None):
+    def _fit_regression(self, X, Y, protected_attribute, tradeoffs, number_of_tradeoffs):
         # Extract required statistics from protected_attribute
         p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
 
         if tradeoffs is None:
-            tradeoffs = np.linspace(0, 1, self.number_of_lagrange_multipliers)
+            tradeoffs = np.linspace(0, 1, number_of_tradeoffs)
 
         self.all_models = []
         for tradeoff in tradeoffs:

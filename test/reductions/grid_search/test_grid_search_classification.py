@@ -53,10 +53,10 @@ def test_demographicparity_fair_uneven_populations():
 
     target = GridSearch(LogisticRegression(),
                         fairness_metric=DemographicParity(),
-                        quality_metric=SimpleClassificationQualityMetric(),
-                        number_of_lagrange_multipliers=11)
+                        quality_metric=SimpleClassificationQualityMetric())
 
-    target.fit(X, Y, protected_attribute=A)
+    target.fit(X, Y, protected_attribute=A,
+               number_of_lagrange_multipliers=11)
     assert len(target.all_models) == 11
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
