@@ -35,11 +35,11 @@ class GridSearch:
             number_of_lagrange_multipliers = kwargs["number_of_lagrange_multipliers"]
 
         if isinstance(self.fairness_metric, DemographicParity):
-            return self._fit_classification(X, Y, protected_attribute,
-                                            lagrange_multipliers, number_of_lagrange_multipliers)
+            self._fit_classification(X, Y, protected_attribute,
+                                     lagrange_multipliers, number_of_lagrange_multipliers)
         elif isinstance(self.fairness_metric, BoundedGroupLoss):
-            return self._fit_regression(X, Y, protected_attribute,
-                                        lagrange_multipliers, number_of_lagrange_multipliers)
+            self._fit_regression(X, Y, protected_attribute,
+                                 lagrange_multipliers, number_of_lagrange_multipliers)
         else:
             raise RuntimeError("Can't get here")
 
