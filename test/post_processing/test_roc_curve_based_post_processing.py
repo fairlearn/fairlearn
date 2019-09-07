@@ -3,20 +3,27 @@
 
 import copy
 import numpy as np
+import pandas as pd
 import pytest
+from fairlearn.metrics import DemographicParity, EqualizedOdds
 from fairlearn.post_processing.roc_curve_based_post_processing import \
-    (roc_curve_based_post_processing_demographic_parity,
-     roc_curve_based_post_processing_equalized_odds,
+    (ROCCurveBasedPostProcessing,
+     _roc_curve_based_post_processing_demographic_parity,
+     _roc_curve_based_post_processing_equalized_odds,
      DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE, EMPTY_INPUT_ERROR_MESSAGE,
      NON_BINARY_LABELS_ERROR_MESSAGE)
 from .test_utilities import (example_attributes1, example_labels, example_scores,
                              example_attribute_names1, _generate_empty_list_permutations,
-                             _get_discretized_predictions, _generate_list_reduction_permutations)
+                             _get_discretized_predictions, _generate_list_reduction_permutations,
+                             ExampleModel, ExampleEstimator)
+
+
+example_attributes1_X = [[a] for a in example_attributes1]
 
 
 @pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
-                         [roc_curve_based_post_processing_demographic_parity,
-                          roc_curve_based_post_processing_equalized_odds])
+                         [_roc_curve_based_post_processing_demographic_parity,
+                          _roc_curve_based_post_processing_equalized_odds])
 def test_roc_curve_based_post_processing_non_binary_labels(
         roc_curve_based_post_processing_by_metric):
     non_binary_labels = copy.deepcopy(example_labels)
@@ -28,8 +35,8 @@ def test_roc_curve_based_post_processing_non_binary_labels(
 
 
 @pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
-                         [roc_curve_based_post_processing_demographic_parity,
-                          roc_curve_based_post_processing_equalized_odds])
+                         [_roc_curve_based_post_processing_demographic_parity,
+                          _roc_curve_based_post_processing_equalized_odds])
 def test_roc_curve_based_post_processing_different_input_lengths(
         roc_curve_based_post_processing_by_metric):
     # try all combinations of input lists being shorter/longer than others
@@ -49,36 +56,36 @@ def test_roc_curve_based_post_processing_different_input_lengths(
 
 
 def test_roc_curve_based_post_processing_demographic_parity():
-    adjusted_model = roc_curve_based_post_processing_demographic_parity(example_attributes1,
-                                                                        example_labels,
-                                                                        example_scores)
+    adjusted_model = _roc_curve_based_post_processing_demographic_parity(example_attributes1,
+                                                                         example_labels,
+                                                                         example_scores)
 
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
     # attribute value A
     value_for_less_than_2_5 = 0.8008
-    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 0))
-    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 2.499))
-    assert 0 == adjusted_model(example_attribute_names1[0], 2.5)
-    assert 0 == adjusted_model(example_attribute_names1[0], 100)
+    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [0]))
+    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [2.499]))
+    assert 0 == adjusted_model([example_attribute_names1[0]], [2.5])
+    assert 0 == adjusted_model([example_attribute_names1[0]], [100])
 
     # attribute value B
     value_for_less_than_0_5 = 0.00133333333333
-    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0))
-    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0.5))
-    assert 1 == adjusted_model(example_attribute_names1[1], 0.51)
-    assert 1 == adjusted_model(example_attribute_names1[1], 1)
-    assert 1 == adjusted_model(example_attribute_names1[1], 100)
+    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0]))
+    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0.5]))
+    assert 1 == adjusted_model([example_attribute_names1[1]], [0.51])
+    assert 1 == adjusted_model([example_attribute_names1[1]], [1])
+    assert 1 == adjusted_model([example_attribute_names1[1]], [100])
 
     # attribute value C
     value_between_0_5_and_1_5 = 0.608
-    assert 0 == adjusted_model(example_attribute_names1[2], 0)
-    assert 0 == adjusted_model(example_attribute_names1[2], 0.5)
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 0.51))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1.5))
-    assert 1 == adjusted_model(example_attribute_names1[2], 1.51)
-    assert 1 == adjusted_model(example_attribute_names1[2], 100)
+    assert 0 == adjusted_model([example_attribute_names1[2]], [0])
+    assert 0 == adjusted_model([example_attribute_names1[2]], [0.5])
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [0.51]))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1]))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1.5]))
+    assert 1 == adjusted_model([example_attribute_names1[2]], [1.51])
+    assert 1 == adjusted_model([example_attribute_names1[2]], [100])
 
     # Assert Demographic Parity actually holds
     discretized_predictions = _get_discretized_predictions(adjusted_model)
@@ -89,9 +96,9 @@ def test_roc_curve_based_post_processing_demographic_parity():
 
 
 def test_roc_curve_based_post_processing_equalized_odds():
-    adjusted_model = roc_curve_based_post_processing_equalized_odds(example_attributes1,
-                                                                    example_labels,
-                                                                    example_scores)
+    adjusted_model = _roc_curve_based_post_processing_equalized_odds(example_attributes1,
+                                                                     example_labels,
+                                                                     example_scores)
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
@@ -103,34 +110,34 @@ def test_roc_curve_based_post_processing_equalized_odds():
     p_ignore = 0.001996007984031716
     base_value = prediction_constant * p_ignore
     value_for_less_than_2_5 = base_value + (1 - p_ignore) * 0.668
-    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 0))
-    assert np.isclose(value_for_less_than_2_5, adjusted_model(example_attribute_names1[0], 2.499))
-    assert base_value == adjusted_model(example_attribute_names1[0], 2.5)
-    assert base_value == adjusted_model(example_attribute_names1[0], 100)
+    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [0]))
+    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [2.499]))
+    assert base_value == adjusted_model([example_attribute_names1[0]], [2.5])
+    assert base_value == adjusted_model([example_attribute_names1[0]], [100])
 
     # attribute value B
     # p_ignore is the largest among the three classes indicating a large adjustment
     p_ignore = 0.1991991991991991
     base_value = prediction_constant * p_ignore
     value_for_less_than_0_5 = base_value + (1 - p_ignore) * 0.001
-    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0))
-    assert np.isclose(value_for_less_than_0_5, adjusted_model(example_attribute_names1[1], 0.5))
-    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[1], 0.51)
-    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[1], 1)
-    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[1], 100)
+    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0]))
+    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0.5]))
+    assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[1]], [0.51])
+    assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[1]], [1])
+    assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[1]], [100])
 
     # attribute value C
     # p_ignore is 0 which means there's no adjustment
     p_ignore = 0
     base_value = prediction_constant * p_ignore
     value_between_0_5_and_1_5 = base_value + (1 - p_ignore) * 0.501
-    assert base_value == adjusted_model(example_attribute_names1[2], 0)
-    assert base_value == adjusted_model(example_attribute_names1[2], 0.5)
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 0.51))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model(example_attribute_names1[2], 1.5))
-    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[2], 1.51)
-    assert base_value + 1 - p_ignore == adjusted_model(example_attribute_names1[2], 100)
+    assert base_value == adjusted_model([example_attribute_names1[2]], [0])
+    assert base_value == adjusted_model([example_attribute_names1[2]], [0.5])
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [0.51]))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1]))
+    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1.5]))
+    assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[2]], [1.51])
+    assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[2]], [100])
 
     # Assert Equalized Odds actually holds
     discretized_predictions = _get_discretized_predictions(adjusted_model)
@@ -147,3 +154,41 @@ def test_roc_curve_based_post_processing_equalized_odds():
     assert predictions_based_on_label[0] == [2/4, 1/3, 2/3]
     # assert counts of positive predictions for positive labels
     assert predictions_based_on_label[1] == [3/3, 3/4, 3/3]
+
+
+@pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
+def test_roc_curve_based_post_processing_demographic_parity_e2e(formatting_function):
+    X, Y, A = _format_X_Y_A(formatting_function, example_attributes1_X, example_labels,
+                            example_attributes1)
+    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                 fairness_metric=DemographicParity())
+    adjusted_model.fit(X, Y, A)
+
+    predictions = adjusted_model.predict(X, A)
+
+    # assert demographic parity
+    for a in example_attribute_names1:
+        assert np.isclose(np.average(predictions[np.array(example_attributes1) == a]), 0.572)
+
+
+@pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
+def test_roc_curve_based_post_processing_equalized_odds_e2e(formatting_function):
+    X, Y, A = _format_X_Y_A(formatting_function, example_attributes1_X, example_labels,
+                            example_attributes1)
+    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                 fairness_metric=EqualizedOdds())
+    adjusted_model.fit(X, Y, A)
+
+    predictions = adjusted_model.predict(X, A)
+    
+    # assert equalized odds
+    for a in example_attribute_names1:
+        positive_indices = (np.array(example_attributes1) == a) * (np.array(example_labels) == 1)
+        negative_indices = (np.array(example_attributes1) == a) * (np.array(example_labels) == 0)
+        assert np.isclose(np.average(predictions[positive_indices]), 0.66733333)
+        assert np.isclose(np.average(predictions[negative_indices]), 0.334)
+
+
+def _format_X_Y_A(formatting_function, unformatted_X, unformatted_Y, unformatted_A):
+    return formatting_function(unformatted_X), formatting_function(unformatted_Y), \
+        formatting_function(unformatted_A)

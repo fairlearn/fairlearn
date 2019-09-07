@@ -18,6 +18,19 @@ example_scores = [int(x) for x in '0011233' '0001111' '011112']
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 
+class ExampleModel():
+    def predict(self, X):
+        return example_scores
+
+
+class ExampleEstimator():
+    def fit(self, X, Y):
+        pass
+    
+    def predict(self, X):
+        return example_scores
+
+
 def _get_grouped_data_and_base_points(attribute_value):
     data = pd.DataFrame({
         ATTRIBUTE_KEY: example_attributes1,
@@ -90,7 +103,7 @@ def _get_discretized_predictions(adjusted_model):
     for i in range(len(example_attributes1)):
         labels_and_predictions[example_attributes1[i]].append(
             LabelAndPrediction(example_labels[i],
-                               adjusted_model(example_attributes1[i], example_scores[i])))
+                               adjusted_model([example_attributes1[i]], [example_scores[i]])))
 
     return {
         attribute_value: [

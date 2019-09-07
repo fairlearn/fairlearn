@@ -11,6 +11,9 @@ import logging
 import numpy as np
 import pandas as pd
 
+from fairlearn.exceptions import NotFittedException
+from fairlearn.metrics import FairnessMetric, DemographicParity, EqualizedOdds
+from fairlearn.post_processing import PostProcessing
 from ._constants import LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
 from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
@@ -24,8 +27,121 @@ NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 logger = logging.getLogger(__name__)
 
 
-def roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
-                                                       flip=True, plot=False):
+class ROCCurveBasedPostProcessing(PostProcessing):
+    def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
+                 fairness_metric=DemographicParity(), gridsize=1000, flip=True, plot=False):
+        """
+        Creates the post processing object.
+        :param fairness_unaware_model: the trained model whose output will be post processed
+        :type fairness_unaware_model: a trained model
+        :param fairness_unaware_estimator: an untrained estimator that will be trained, and
+            subsequently its output will be post processed
+        :type fairness_unaware_estimator: an untrained estimator
+        :param gridsize: The number of ticks on the grid over which we evaluate the curves.
+        A large gridsize means that we approximate the actual curve, so it increases the chance
+        of being very close to the actual best solution.
+        :type gridsize: int
+        :param flip: allow flipping to negative weights if it improves accuracy.
+        :type flip: bool
+        :param plot: show ROC plot if True
+        :type plot: bool
+        """
+        if fairness_unaware_model and fairness_unaware_estimator:
+            raise ValueError("Only one of 'fairness_unaware_model' and "
+                             "'fairness_unaware_estimator' can be passed.")
+        elif fairness_unaware_model:
+            self._fairness_unaware_model = fairness_unaware_model
+            self._fairness_unaware_estimator = None
+            self._validate_model()
+        elif fairness_unaware_estimator:
+            self._fairness_unaware_model = None
+            self._fairness_unaware_estimator = fairness_unaware_estimator
+            self._validate_estimator()
+        else:
+            raise ValueError("One of fairness_unaware_model and fairness_unaware_estimator' need "
+                             "to be passed.")
+        
+        self._fairness_metric = fairness_metric
+        self._validate_fairness_metric()
+        
+        self._gridsize = gridsize
+        self._flip = flip
+        self._plot = plot
+        self._post_processed_model = None
+
+    def _validate_fairness_metric(self):
+        if not isinstance(self._fairness_metric, FairnessMetric):
+            raise TypeError("The fairness metric is expected to be of type FairnessMetric.")
+        if not type(self._fairness_metric) in [DemographicParity, EqualizedOdds]:
+            raise ValueError("Currently only DemographicParity and EqualizedOdds are supported "
+                             "fairness metrics.")
+
+    def _validate_model(self):
+        predict_function = getattr(self._fairness_unaware_model, "predict", None)
+        if not predict_function:
+            raise ValueError("The model is expected to have a 'predict' method.")
+        if not callable(predict_function):
+            raise ValueError("The provided model does not have a callable 'predict' method.")
+
+    def _validate_estimator(self):
+        fit_function = getattr(self._fairness_unaware_estimator, "fit", None)
+        predict_function = getattr(self._fairness_unaware_estimator, "predict", None)
+        if not predict_function or not fit_function:
+            raise ValueError("The model is expected to have 'fit' and 'predict' methods.")
+        if not callable(predict_function) or not callable(fit_function):
+            raise ValueError("The provided model does not have callable 'fit' or 'predict' methods.")
+
+    def fit(self, X, y, protected_attribute):
+        self._validate_fairness_metric()
+
+        # TODO validate shape of X, y, protected_attribute
+
+        if self._fairness_unaware_estimator:
+            # train estimator on data first
+            self._validate_estimator()
+            self._fairness_unaware_estimator.fit(X, y)
+            self._fairness_unaware_model = self._fairness_unaware_estimator
+
+        self._validate_model()
+
+        scores = self._fairness_unaware_model.predict(X)
+        roc_curve_based_post_processing_method = None
+        if isinstance(self._fairness_metric, DemographicParity):
+            roc_curve_based_post_processing_method = \
+                _roc_curve_based_post_processing_demographic_parity
+        else:
+            roc_curve_based_post_processing_method = \
+                _roc_curve_based_post_processing_equalized_odds
+
+        self._post_processed_model = roc_curve_based_post_processing_method(
+            protected_attribute, y, scores, self._gridsize, self._flip, self._plot)
+
+    def predict(self, X, protected_attribute):
+        self._validate_post_processed_model_is_fitted()
+        return self._post_processed_model(protected_attribute, self._fairness_unaware_model.predict(X))
+    
+    def predict_proba(self, X, protected_attribute):
+        self._validate_post_processed_model_is_fitted()
+        #TODO
+        raise NotImplementedError()
+    
+    def posterior_proba(self, X, protected_attribute):
+        self._validate_post_processed_model_is_fitted()
+        #TODO
+        raise NotImplementedError()
+    
+    def posterior_predict_proba(self, X, protected_attribute):
+        self._validate_post_processed_model_is_fitted()
+        #TODO
+        raise NotImplementedError()
+
+    def _validate_post_processed_model_is_fitted(self):
+        if not self._post_processed_model:
+            raise NotFittedException("It is required to call 'fit' before 'predict'.")
+
+
+def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
+                                                        flip=True, plot=False):
     """ Calculates selection and error rates for every attribute value at different thresholds
     over the scores. Subsequently weighs each attribute value's error by the frequency of the
     attribute value in the data. The minimum error point is the selected solution, which is
@@ -48,7 +164,7 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     :param plot: show ROC plot if True
     :type plot: bool
     :return: the post-processed model as a function taking the protected attribute value
-        and the usual input data (x) as arguments to produce predictions
+        and the fairness unaware model's score as arguments to produce predictions
     """
     n = len(labels)
     selection_error_curve = {}
@@ -119,11 +235,11 @@ def roc_curve_based_post_processing_demographic_parity(attributes, labels, score
     if plot:
         plot_solution_and_show_plot(x_best, None, "DP solution")
 
-    return lambda A, X: _vectorized_prediction(predicted_DP_by_attribute, A, X)
+    return lambda A, scores: _vectorized_prediction(predicted_DP_by_attribute, A, scores)
 
 
-def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
-                                                   flip=True, plot=False):
+def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
+                                                    flip=True, plot=False):
     """ Calculates the ROC curve of every attribute value at different thresholds over the scores.
     Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
     selecting the point on the curve with minimal error.
@@ -143,7 +259,7 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
     :param plot: show ROC plot if True
     :type plot: bool
     :return: the post-processed model as a function taking the protected attribute value
-        and the usual input data (x) as arguments to produce predictions
+        and the fairness unaware model's score as arguments to produce predictions
     """
     n = len(labels)
     n_positive = sum(labels)
@@ -217,11 +333,11 @@ def roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, g
         plot_overlap(x_grid, y_min)
         plot_solution_and_show_plot(x_best, y_best, 'EO solution')
 
-    return lambda A, X: _vectorized_prediction(predicted_EO_by_attribute, A, X)
+    return lambda A, scores: _vectorized_prediction(predicted_EO_by_attribute, A, scores)
 
 
-def _vectorized_prediction(function_dict, A, X):
-    """ Make predictions for all samples in X with all provided functions,
+def _vectorized_prediction(function_dict, A, scores):
+    """ Make predictions for all samples with all provided functions,
     but use only the results from the function that corresponds to the protected
     attribute value of the sample.
 
@@ -229,10 +345,23 @@ def _vectorized_prediction(function_dict, A, X):
     :type function_dict: dictionary of functions
     :param A: protected attributes for each sample
     :type A: vector as Series or ndarray
-    :param X: matrix of samples
-    :type X: matrix as DataFrame or ndarray
+    :param scores: vector of predicted values
+    :type scores: vector as Series or ndarray
     """
-    return sum([(A == a) * function_dict[a](X) for a in function_dict])
+    A_vector = A
+    scores_vector = scores
+
+    if type(A_vector) == list:
+        A_vector = np.array(A)
+
+    if type(scores_vector) == list:
+        scores_vector = np.array(scores)
+
+    if len(A_vector) != len(scores_vector):
+        raise ValueError("The protected attribute vector needs to be of the same length as the "
+                         "scores vector.")
+
+    return sum([(A_vector == a) * function_dict[a](scores_vector) for a in function_dict])
 
 
 def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
@@ -260,12 +389,12 @@ def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
     logger.debug("p1: {}".format(p1))
     logger.debug("operation1: {}".format(operation1))
     logger.debug(OUTPUT_SEPARATOR)
-    return (lambda X: p_ignore * prediction_constant +
-            (1 - p_ignore) * (p0 * pred0(X) + p1 * pred1(X)))
+    return (lambda scores: p_ignore * prediction_constant +
+            (1 - p_ignore) * (p0 * pred0(scores) + p1 * pred1(scores)))
 
 
 def _sanity_check_and_group_data(attributes, labels, scores):
-    # TODO check types: dataframe? ndarray? list? add test cases as well.
+    # TODO check types: ndarray? list? add test cases as well.
     if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
         raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
