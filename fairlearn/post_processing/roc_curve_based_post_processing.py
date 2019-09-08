@@ -108,12 +108,14 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
     def predict(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
+        self._validate_input_data(X, protected_attribute)
         positive_probs = self._post_processed_model(protected_attribute,
                                                     self._fairness_unaware_model.predict(X))
         return (positive_probs >= 0.5) * 1
     
     def predict_proba(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
+        self._validate_input_data(X, protected_attribute)
         positive_probs = self._post_processed_model(protected_attribute,
                                                     self._fairness_unaware_model.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
@@ -154,7 +156,8 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         if type(X) != type(protected_attribute) or (y is not None and type(X) != type(y)) or \
                 type(X) not in [list, np.ndarray]:
             raise ValueError(INPUT_DATA_CONSISTENCY_ERROR_MESSAGE
-                             .format(X, y, protected_attribute))
+                             .format(type(X).__name__, type(y).__name__,
+                                     type(protected_attribute).__name__))
 
         if len(X) == 0 or len(protected_attribute) == 0 or (y is not None and len(y) == 0):
             raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)

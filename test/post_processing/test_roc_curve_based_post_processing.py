@@ -78,6 +78,36 @@ def test_not_model():
                                         fairness_metric=ExampleMetric())
 
 
+@pytest.mark.parametrize("X_transform,Y_transform,A_transform",
+                         [(np.array, lambda Y: Y, lambda A: A),
+                          (lambda X: X, np.array, lambda A: A),
+                          (lambda X: X, lambda Y: Y, np.array),
+                          (np.array, np.array, lambda A: A),
+                          (lambda X: X, np.array, np.array),
+                          (np.array, lambda Y: Y, np.array),
+                          (pd.DataFrame, lambda Y: Y, lambda A: A),
+                          (lambda X: X, pd.DataFrame, lambda A: A),
+                          (lambda X: X, lambda Y: Y, pd.DataFrame),
+                          (pd.DataFrame, pd.DataFrame, lambda A: A),
+                          (lambda X: X, pd.DataFrame, pd.DataFrame),
+                          (pd.DataFrame, lambda Y: Y, pd.DataFrame),
+                          (pd.DataFrame, pd.DataFrame, pd.DataFrame)])
+def test_inconsistent_input_data_types(X_transform, Y_transform, A_transform):
+    X = X_transform(example_attributes1_X)
+    Y = Y_transform(example_labels)
+    A = A_transform(example_attributes1)
+    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                 fairness_metric=DemographicParity())
+    
+    error_message = INPUT_DATA_CONSISTENCY_ERROR_MESSAGE.format(type(X).__name__,
+                                                                type(Y).__name__,
+                                                                type(A).__name__)
+
+    with pytest.raises(ValueError) as exception:
+        adjusted_model.fit(X, Y, A)
+    assert str(exception.value) == error_message
+
+
 @pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
 @pytest.mark.parametrize('Metric', [DemographicParity, EqualizedOdds])
 def test_roc_curve_based_post_processing_non_binary_labels(formatting_function, Metric):
