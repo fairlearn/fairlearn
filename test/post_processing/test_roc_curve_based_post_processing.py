@@ -20,24 +20,49 @@ from .test_utilities import (example_attributes1, example_labels, example_scores
 
 example_attributes1_X = [[a] for a in example_attributes1]
 
-
-@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
-                         [_roc_curve_based_post_processing_demographic_parity,
-                          _roc_curve_based_post_processing_equalized_odds])
-def test_roc_curve_based_post_processing_non_binary_labels(
-        roc_curve_based_post_processing_by_metric):
+@pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
+@pytest.mark.parametrize('Metric', [DemographicParity, EqualizedOdds])
+def test_roc_curve_based_post_processing_non_binary_labels(formatting_function, Metric):
     non_binary_labels = copy.deepcopy(example_labels)
     non_binary_labels[0] = 2
+
+    X, Y, A = _format_X_Y_A(formatting_function, example_attributes1_X, non_binary_labels,
+                            example_attributes1)
+    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                 fairness_metric=Metric())
+    
     with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
-        roc_curve_based_post_processing_by_metric(example_attributes1,
-                                                  non_binary_labels,
-                                                  example_scores)
+        adjusted_model.fit(X, Y, A)
+
+
+@pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
+@pytest.mark.parametrize('Metric', [DemographicParity, EqualizedOdds])
+def test_roc_curve_based_post_processing_different_input_lengths(formatting_function, Metric):
+    n = len(example_attributes1)
+    for permutation in [(0, 1), (1, 0)]:
+        with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
+            X, Y, A = _format_X_Y_A(formatting_function, example_attributes1_X[:n-permutation[0]],
+                                    example_labels[:n-permutation[1]],
+                                    example_attributes1)
+            adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                         fairness_metric=Metric())
+            adjusted_model.fit(X, Y, A)
+
+    # try providing empty lists in all combinations
+    for permutation in [(0, n), (n, 0)]:
+        with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
+            X, Y, A = _format_X_Y_A(formatting_function, example_attributes1_X[:permutation[0]],
+                                    example_labels[:permutation[1]],
+                                    example_attributes1)
+            adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                         fairness_metric=Metric())
+            adjusted_model.fit(X, Y, A)
 
 
 @pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
                          [_roc_curve_based_post_processing_demographic_parity,
                           _roc_curve_based_post_processing_equalized_odds])
-def test_roc_curve_based_post_processing_different_input_lengths(
+def test_roc_curve_based_post_processing_different_input_lengths_internals(
         roc_curve_based_post_processing_by_metric):
     # try all combinations of input lists being shorter/longer than others
     n = len(example_attributes1)

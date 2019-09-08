@@ -118,7 +118,8 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
     def predict(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
-        return self._post_processed_model(protected_attribute, self._fairness_unaware_model.predict(X))
+        return self._post_processed_model(protected_attribute,
+                                          self._fairness_unaware_model.predict(X))
     
     def predict_proba(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
