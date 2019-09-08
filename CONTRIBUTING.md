@@ -17,3 +17,29 @@ Pull requests against `master` trigger automated tests that are run through Azur
 
 ### Investigating automated test failures
 For every pull request to `master` with automated tests you can check the logs of the tests to find the root cause of failures. Our tests currently run through Azure Pipelines with steps for setup, test suites, and teardown. The `Checks` view of a pull request contains a link to the [Azure Pipelines Page](dev.azure.com/responsibleai/fairlearn/_build/results). All the steps are represented in the Azure Pipelines page, and you can see logs by clicking on a specific step. If you encounter problems with this workflow please reach out through the `Issues`.
+
+## API
+
+Reduction-based fairness mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
+
+```python
+reduction.fit(X, Y, protected_attribute)
+reduction.predict(X)
+reduction.predict_proba(X)
+```
+
+Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `protected_attribute` as a required argument for `predict` and `predict_proba`
+
+```python
+post_processor.fit(X, Y, protected_attribute)
+post_processor.predict(X, protected_attribute)
+post_processor.predict_proba(X, protected_attribute)
+```
+
+Any algorithm-specific parameters are passed to the constructor. Reductions require a learner/estimator to be passed that implements the `fit` method. Post-processing algorithms require an already trained model/predictor. For consistency we also provide the option to pass a learner/estimator instead, and will call `fit` internally.
+
+```python
+reduction = Reduction(estimator, fairness_metric=fairness_metric, **kwargs)
+post_processor = PostProcessing(fairness_unaware_model=model, fairness_metric=fairness_metric, **kwargs)
+post_processor = PostProcessing(fairness_unaware_estimator=estimator, fairness_metric=fairness_metric, **kwargs)
+```
