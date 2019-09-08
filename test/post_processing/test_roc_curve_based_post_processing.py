@@ -24,10 +24,59 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
 from .test_utilities import (example_attributes1, example_labels, example_scores,
                              example_attribute_names1, _generate_empty_list_permutations,
                              _get_discretized_predictions, _generate_list_reduction_permutations,
-                             ExampleModel, ExampleEstimator)
+                             ExampleModel, ExampleEstimator, ExampleMetric, ExampleNotMetric,
+                             ExampleNotModel, ExampleNotEstimator1, ExampleNotEstimator2)
 
 
 example_attributes1_X = [[a] for a in example_attributes1]
+
+
+@pytest.mark.parametrize("predict_method_name", ['predict', 'predict_proba'])
+def test_predict_before_fit_error(predict_method_name):
+    X, Y, A = example_attributes1_X, example_labels, example_attributes1
+    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                 fairness_metric=DemographicParity())
+
+    with pytest.raises(ValueError, match=PREDICT_BEFORE_FIT_ERROR_MESSAGE):
+        _ = getattr(adjusted_model, predict_method_name)(X, A)
+
+
+def test_both_model_and_estimator_error():
+    with pytest.raises(ValueError, match=EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE):
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                        fairness_unaware_estimator=ExampleEstimator(),
+                                        fairness_metric=DemographicParity())
+
+
+def test_no_model_or_estimator_error():
+    with pytest.raises(ValueError, match=MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE):
+        _ = ROCCurveBasedPostProcessing(fairness_metric=DemographicParity())
+
+
+def test_metric_not_supported():
+    with pytest.raises(ValueError, match=NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE):
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                        fairness_metric=ExampleMetric())
+
+
+def test_not_a_fairness_metric():
+    with pytest.raises(TypeError, match=FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE):
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                        fairness_metric=ExampleNotMetric())
+
+
+@pytest.mark.parametrize("not_estimator", [ExampleNotEstimator1(), ExampleNotEstimator2()])
+def test_not_estimator(not_estimator):
+    with pytest.raises(ValueError, match=MISSING_FIT_PREDICT_ERROR_MESSAGE):
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_estimator=not_estimator,
+                                        fairness_metric=ExampleMetric())
+
+
+def test_not_model():
+    with pytest.raises(ValueError, match=MISSING_PREDICT_ERROR_MESSAGE):
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleNotModel(),
+                                        fairness_metric=ExampleMetric())
+
 
 @pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
 @pytest.mark.parametrize('Metric', [DemographicParity, EqualizedOdds])

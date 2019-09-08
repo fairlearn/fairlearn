@@ -32,7 +32,7 @@ FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE = "The fairness metric is expected to be 
                                          "FairnessMetric."
 NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE = "Currently only DemographicParity and EqualizedOdds " \
                                               "are supported fairness metrics."
-MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and "\
+MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and " \
                                             "'fairness_unaware_estimator' need to be passed."
 EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
                                           "'fairness_unaware_estimator' can be passed."
@@ -80,36 +80,6 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._flip = flip
         self._plot = plot
         self._post_processed_model = None
-
-    def _validate_fairness_metric(self):
-        if not isinstance(self._fairness_metric, FairnessMetric):
-            raise TypeError(FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE)
-        if not type(self._fairness_metric) in [DemographicParity, EqualizedOdds]:
-            raise ValueError(NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE)
-
-    def _validate_model(self):
-        predict_function = getattr(self._fairness_unaware_model, "predict", None)
-        if not predict_function or not callable(predict_function):
-            raise ValueError(MISSING_PREDICT_ERROR_MESSAGE)
-
-    def _validate_estimator(self):
-        fit_function = getattr(self._fairness_unaware_estimator, "fit", None)
-        predict_function = getattr(self._fairness_unaware_estimator, "predict", None)
-        if not predict_function or not fit_function or not callable(predict_function) or \
-                not callable(fit_function):
-            raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
-
-    def _validate_input_data(self, X, protected_attribute, y=None):
-        if type(X) != type(protected_attribute) or (y is not None and type(X) != type(y)) or \
-                type(X) not in [list, np.ndarray]:
-            raise ValueError(INPUT_DATA_CONSISTENCY_ERROR_MESSAGE
-                             .format(X, y, protected_attribute))
-
-        if len(X) == 0 or len(protected_attribute) == 0 or (y is not None and len(y) == 0):
-            raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
-
-        if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
-            raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE)
 
     def fit(self, X, y, protected_attribute):
         self._validate_fairness_metric()
@@ -161,6 +131,36 @@ class ROCCurveBasedPostProcessing(PostProcessing):
     def _validate_post_processed_model_is_fitted(self):
         if not self._post_processed_model:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
+
+    def _validate_fairness_metric(self):
+        if not isinstance(self._fairness_metric, FairnessMetric):
+            raise TypeError(FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE)
+        if not type(self._fairness_metric) in [DemographicParity, EqualizedOdds]:
+            raise ValueError(NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE)
+
+    def _validate_model(self):
+        predict_function = getattr(self._fairness_unaware_model, "predict", None)
+        if not predict_function or not callable(predict_function):
+            raise ValueError(MISSING_PREDICT_ERROR_MESSAGE)
+
+    def _validate_estimator(self):
+        fit_function = getattr(self._fairness_unaware_estimator, "fit", None)
+        predict_function = getattr(self._fairness_unaware_estimator, "predict", None)
+        if not predict_function or not fit_function or not callable(predict_function) or \
+                not callable(fit_function):
+            raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
+
+    def _validate_input_data(self, X, protected_attribute, y=None):
+        if type(X) != type(protected_attribute) or (y is not None and type(X) != type(y)) or \
+                type(X) not in [list, np.ndarray]:
+            raise ValueError(INPUT_DATA_CONSISTENCY_ERROR_MESSAGE
+                             .format(X, y, protected_attribute))
+
+        if len(X) == 0 or len(protected_attribute) == 0 or (y is not None and len(y) == 0):
+            raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
+
+        if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
+            raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE)
 
 
 def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,

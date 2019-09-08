@@ -5,6 +5,7 @@ from collections import defaultdict, namedtuple
 from itertools import permutations
 import numpy as np
 import pandas as pd
+from fairlearn.metrics import FairnessMetric
 from fairlearn.post_processing.threshold_operation import ThresholdOperation
 from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 
@@ -23,12 +24,34 @@ class ExampleModel():
         return example_scores
 
 
+class ExampleNotModel():
+    pass
+
+
 class ExampleEstimator():
     def fit(self, X, Y):
         pass
     
     def predict(self, X):
         return example_scores
+
+
+class ExampleNotEstimator1():
+    def fit(self, X, Y):
+        pass
+
+
+class ExampleNotEstimator2():
+    def predict(self, X):
+        pass
+
+
+class ExampleMetric(FairnessMetric):
+    pass
+
+
+class ExampleNotMetric():
+    pass
 
 
 def _get_grouped_data_and_base_points(attribute_value):
