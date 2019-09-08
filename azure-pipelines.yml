@@ -8,7 +8,6 @@ schedules:
   branches:
     include:
       - master
-      - dev
   always: true
 
 pool:
