@@ -23,6 +23,20 @@ OUTPUT_SEPARATOR = "-"*65
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "Attributes, labels, and scores need to be of equal length."
 EMPTY_INPUT_ERROR_MESSAGE = "At least one of attributes, labels, or scores are empty."
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
+INPUT_DATA_CONSISTENCY_ERROR_MESSAGE = "The only allowed input data formats are: " \
+                                       "(list, list, list), (ndarray, ndarray, ndarray). " \
+                                       "Your provided data was of types ({}, {}, {})"
+MISSING_FIT_PREDICT_ERROR_MESSAGE = "The model does not have callable 'fit' or 'predict' methods."
+MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' method."
+FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE = "The fairness metric is expected to be of type " \
+                                         "FairnessMetric."
+NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE = "Currently only DemographicParity and EqualizedOdds " \
+                                              "are supported fairness metrics."
+MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and "\
+                                            "'fairness_unaware_estimator' need to be passed."
+EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
+                                          "'fairness_unaware_estimator' can be passed."
+PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +61,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         :type plot: bool
         """
         if fairness_unaware_model and fairness_unaware_estimator:
-            raise ValueError("Only one of 'fairness_unaware_model' and "
-                             "'fairness_unaware_estimator' can be passed.")
+            raise ValueError(EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE)
         elif fairness_unaware_model:
             self._fairness_unaware_model = fairness_unaware_model
             self._fairness_unaware_estimator = None
@@ -58,8 +71,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
             self._fairness_unaware_estimator = fairness_unaware_estimator
             self._validate_estimator()
         else:
-            raise ValueError("One of fairness_unaware_model and fairness_unaware_estimator' need "
-                             "to be passed.")
+            raise ValueError(MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
         
         self._fairness_metric = fairness_metric
         self._validate_fairness_metric()
@@ -71,30 +83,38 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
     def _validate_fairness_metric(self):
         if not isinstance(self._fairness_metric, FairnessMetric):
-            raise TypeError("The fairness metric is expected to be of type FairnessMetric.")
+            raise TypeError(FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE)
         if not type(self._fairness_metric) in [DemographicParity, EqualizedOdds]:
-            raise ValueError("Currently only DemographicParity and EqualizedOdds are supported "
-                             "fairness metrics.")
+            raise ValueError(NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE)
 
     def _validate_model(self):
         predict_function = getattr(self._fairness_unaware_model, "predict", None)
-        if not predict_function:
-            raise ValueError("The model is expected to have a 'predict' method.")
-        if not callable(predict_function):
-            raise ValueError("The provided model does not have a callable 'predict' method.")
+        if not predict_function or not callable(predict_function):
+            raise ValueError(MISSING_PREDICT_ERROR_MESSAGE)
 
     def _validate_estimator(self):
         fit_function = getattr(self._fairness_unaware_estimator, "fit", None)
         predict_function = getattr(self._fairness_unaware_estimator, "predict", None)
-        if not predict_function or not fit_function:
-            raise ValueError("The model is expected to have 'fit' and 'predict' methods.")
-        if not callable(predict_function) or not callable(fit_function):
-            raise ValueError("The provided model does not have callable 'fit' or 'predict' methods.")
+        if not predict_function or not fit_function or not callable(predict_function) or \
+                not callable(fit_function):
+            raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
+
+    def _validate_input_data(self, X, protected_attribute, y=None):
+        if type(X) != type(protected_attribute) or (y is not None and type(X) != type(y)) or \
+                type(X) not in [list, np.ndarray]:
+            raise ValueError(INPUT_DATA_CONSISTENCY_ERROR_MESSAGE
+                             .format(X, y, protected_attribute))
+
+        if len(X) == 0 or len(protected_attribute) == 0 or (y is not None and len(y) == 0):
+            raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
+
+        if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
+            raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE)
 
     def fit(self, X, y, protected_attribute):
         self._validate_fairness_metric()
 
-        # TODO validate shape of X, y, protected_attribute
+        self._validate_input_data(X, protected_attribute, y)
 
         if self._fairness_unaware_estimator:
             # train estimator on data first
@@ -118,13 +138,15 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
     def predict(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
-        return self._post_processed_model(protected_attribute,
-                                          self._fairness_unaware_model.predict(X))
+        positive_probs = self._post_processed_model(protected_attribute,
+                                                    self._fairness_unaware_model.predict(X))
+        return (positive_probs >= 0.5) * 1
     
     def predict_proba(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
-        #TODO
-        raise NotImplementedError()
+        positive_probs = self._post_processed_model(protected_attribute,
+                                                    self._fairness_unaware_model.predict(X))
+        return np.array([[1.0 - p, p] for p in positive_probs])
     
     def posterior_proba(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
@@ -138,7 +160,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
     def _validate_post_processed_model_is_fitted(self):
         if not self._post_processed_model:
-            raise NotFittedException("It is required to call 'fit' before 'predict'.")
+            raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
 
 def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
@@ -395,7 +417,6 @@ def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, o
 
 
 def _sanity_check_and_group_data(attributes, labels, scores):
-    # TODO check types: ndarray? list? add test cases as well.
     if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
         raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 

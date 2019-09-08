@@ -10,8 +10,17 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
     (ROCCurveBasedPostProcessing,
      _roc_curve_based_post_processing_demographic_parity,
      _roc_curve_based_post_processing_equalized_odds,
-     DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE, EMPTY_INPUT_ERROR_MESSAGE,
-     NON_BINARY_LABELS_ERROR_MESSAGE)
+     DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE,
+     EMPTY_INPUT_ERROR_MESSAGE,
+     NON_BINARY_LABELS_ERROR_MESSAGE,
+     INPUT_DATA_CONSISTENCY_ERROR_MESSAGE,
+     MISSING_FIT_PREDICT_ERROR_MESSAGE,
+     MISSING_PREDICT_ERROR_MESSAGE,
+     FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE,
+     NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE,
+     MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,
+     EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE,
+     PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 from .test_utilities import (example_attributes1, example_labels, example_scores,
                              example_attribute_names1, _generate_empty_list_permutations,
                              _get_discretized_predictions, _generate_list_reduction_permutations,
@@ -50,12 +59,13 @@ def test_roc_curve_based_post_processing_different_input_lengths(formatting_func
 
     # try providing empty lists in all combinations
     for permutation in [(0, n), (n, 0)]:
+        X, Y, A = _format_X_Y_A(formatting_function, example_attributes1_X[:permutation[0]],
+                                example_labels[:permutation[1]],
+                                example_attributes1)
+
+        adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                     fairness_metric=Metric())
         with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
-            X, Y, A = _format_X_Y_A(formatting_function, example_attributes1_X[:permutation[0]],
-                                    example_labels[:permutation[1]],
-                                    example_attributes1)
-            adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                         fairness_metric=Metric())
             adjusted_model.fit(X, Y, A)
 
 
@@ -189,11 +199,13 @@ def test_roc_curve_based_post_processing_demographic_parity_e2e(formatting_funct
                                                  fairness_metric=DemographicParity())
     adjusted_model.fit(X, Y, A)
 
-    predictions = adjusted_model.predict(X, A)
+    predictions = adjusted_model.predict_proba(X, A)
 
     # assert demographic parity
     for a in example_attribute_names1:
-        assert np.isclose(np.average(predictions[np.array(example_attributes1) == a]), 0.572)
+        average_probs = np.average(predictions[np.array(example_attributes1) == a], axis=0)
+        assert np.isclose(average_probs[0], 0.428)
+        assert np.isclose(average_probs[1], 0.572)
 
 
 @pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
@@ -204,14 +216,18 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(formatting_function)
                                                  fairness_metric=EqualizedOdds())
     adjusted_model.fit(X, Y, A)
 
-    predictions = adjusted_model.predict(X, A)
+    predictions = adjusted_model.predict_proba(X, A)
     
     # assert equalized odds
     for a in example_attribute_names1:
         positive_indices = (np.array(example_attributes1) == a) * (np.array(example_labels) == 1)
         negative_indices = (np.array(example_attributes1) == a) * (np.array(example_labels) == 0)
-        assert np.isclose(np.average(predictions[positive_indices]), 0.66733333)
-        assert np.isclose(np.average(predictions[negative_indices]), 0.334)
+        average_probs_positive_indices = np.average(predictions[positive_indices], axis=0)
+        average_probs_negative_indices = np.average(predictions[negative_indices], axis=0)
+        assert np.isclose(average_probs_positive_indices[0], 0.33266666)
+        assert np.isclose(average_probs_positive_indices[1], 0.66733333)
+        assert np.isclose(average_probs_negative_indices[0], 0.666)
+        assert np.isclose(average_probs_negative_indices[1], 0.334)
 
 
 def _format_X_Y_A(formatting_function, unformatted_X, unformatted_Y, unformatted_A):
