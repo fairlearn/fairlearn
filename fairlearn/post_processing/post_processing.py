@@ -12,9 +12,3 @@ class PostProcessing:
     def predict_proba(self, X, protected_attribute):
         raise NotImplementedError()
     
-    def posterior_proba(self, X, protected_attribute):
-        raise NotImplementedError()
-    
-    def posterior_predict_proba(self, X, protected_attribute):
-        raise NotImplementedError()
-    

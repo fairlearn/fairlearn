@@ -10,6 +10,7 @@ classification with one categorical protected attribute.
 import logging
 import numpy as np
 import pandas as pd
+import random
 
 from fairlearn.exceptions import NotFittedException
 from fairlearn.metrics import FairnessMetric, DemographicParity, EqualizedOdds
@@ -43,7 +44,8 @@ logger = logging.getLogger(__name__)
 
 class ROCCurveBasedPostProcessing(PostProcessing):
     def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
-                 fairness_metric=DemographicParity(), gridsize=1000, flip=True, plot=False):
+                 fairness_metric=DemographicParity(), gridsize=1000, flip=True, plot=False,
+                 seed=None):
         """
         Creates the post processing object.
         :param fairness_unaware_model: the trained model whose output will be post processed
@@ -79,6 +81,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._gridsize = gridsize
         self._flip = flip
         self._plot = plot
+        random.seed(seed)
         self._post_processed_model = None
 
     def fit(self, X, y, protected_attribute):
@@ -109,9 +112,10 @@ class ROCCurveBasedPostProcessing(PostProcessing):
     def predict(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
         self._validate_input_data(X, protected_attribute)
+        fairness_unaware_predictions = self._fairness_unaware_model.predict(X)
         positive_probs = self._post_processed_model(protected_attribute,
-                                                    self._fairness_unaware_model.predict(X))
-        return (positive_probs >= 0.5) * 1
+                                                    fairness_unaware_predictions)
+        return (positive_probs >= np.random.rand(len(positive_probs))) * 1
     
     def predict_proba(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
@@ -119,16 +123,6 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         positive_probs = self._post_processed_model(protected_attribute,
                                                     self._fairness_unaware_model.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
-    
-    def posterior_proba(self, X, protected_attribute):
-        self._validate_post_processed_model_is_fitted()
-        #TODO
-        raise NotImplementedError()
-    
-    def posterior_predict_proba(self, X, protected_attribute):
-        self._validate_post_processed_model_is_fitted()
-        #TODO
-        raise NotImplementedError()
 
     def _validate_post_processed_model_is_fitted(self):
         if not self._post_processed_model:
