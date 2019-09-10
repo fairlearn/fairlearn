@@ -12,6 +12,7 @@ from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE
 
 example_attribute_names1 = ["A", "B", "C"]
 example_attributes1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
+example_attribute_names2 = ["x", "Y"]
 example_attributes2 = [x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
 example_labels = [int(x) for x in '0110100' '0010111' '000111']
 example_scores = [int(x) for x in '0011233' '0001111' '011112']
@@ -134,3 +135,7 @@ def _get_discretized_predictions(adjusted_model):
             for lp in labels_and_predictions[attribute_value]
         ] for attribute_value in labels_and_predictions
     }
+
+
+def _format_as_list_of_lists(lst):
+    return [[item] for item in lst]
