@@ -324,6 +324,23 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(
         assert np.isclose(average_probs_negative_indices[1], expected_negative_p1)
 
 
+@pytest.mark.parametrize("attributes,attribute_names",
+                         [(example_attributes1, example_attribute_names1),
+                          (example_attributes2, example_attribute_names2)])
+@pytest.mark.parametrize("formatting_function", [lambda x: x, np.array])
+@pytest.mark.parametrize("Metric", [DemographicParity, EqualizedOdds])
+def test_predict_output_0_or_1(attributes, attribute_names, formatting_function, Metric):
+    X, Y, A = _format_X_Y_A(formatting_function, _format_as_list_of_lists(attributes),
+                            example_labels, attributes)
+    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                                 fairness_metric=Metric())
+    adjusted_model.fit(X, Y, A)
+
+    predictions = adjusted_model.predict(X, A)
+    for prediction in predictions:
+        assert prediction in [0, 1]
+
+
 def _format_X_Y_A(formatting_function, unformatted_X, unformatted_Y, unformatted_A):
     return formatting_function(unformatted_X), formatting_function(unformatted_Y), \
         formatting_function(unformatted_A)
