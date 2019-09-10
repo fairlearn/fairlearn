@@ -15,11 +15,10 @@ import random
 from fairlearn.exceptions import NotFittedException
 from fairlearn.metrics import FairnessMetric, DemographicParity, EqualizedOdds
 from fairlearn.post_processing import PostProcessing
-from ._constants import LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY
+from ._constants import LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
 from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
-
-OUTPUT_SEPARATOR = "-"*65
+from ._interpolated_prediction import InterpolatedPredictor
 
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "Attributes, labels, and scores need to be of equal length."
 EMPTY_INPUT_ERROR_MESSAGE = "At least one of attributes, labels, or scores are empty."
@@ -241,11 +240,11 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
         roc_result = selection_error_curve[attribute].transpose()[i_best_DP]
-        predicted_DP_by_attribute[attribute] = _interpolate_prediction(0, 0,
-                                                                       roc_result.p0,
-                                                                       roc_result.operation0,
-                                                                       roc_result.p1,
-                                                                       roc_result.operation1)
+        predicted_DP_by_attribute[attribute] = InterpolatedPredictor(0, 0,
+                                                                     roc_result.p0,
+                                                                     roc_result.operation0,
+                                                                     roc_result.p1,
+                                                                     roc_result.operation1)
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
@@ -338,11 +337,11 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
             p_ignore = difference_from_best_predictor_for_attribute / \
                 vertical_distance_from_diagonal
 
-        predicted_EO_by_attribute[attribute] = _interpolate_prediction(p_ignore, x_best,
-                                                                       roc_result.p0,
-                                                                       roc_result.operation0,
-                                                                       roc_result.p1,
-                                                                       roc_result.operation1)
+        predicted_EO_by_attribute[attribute] = InterpolatedPredictor(p_ignore, x_best,
+                                                                     roc_result.p0,
+                                                                     roc_result.operation0,
+                                                                     roc_result.p1,
+                                                                     roc_result.operation1)
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
@@ -381,36 +380,7 @@ def _vectorized_prediction(function_dict, A, scores):
         raise ValueError("The protected attribute vector needs to be of the same length as the "
                          "scores vector.")
 
-    return sum([(A_vector == a) * function_dict[a](scores_vector) for a in function_dict])
-
-
-def _interpolate_prediction(p_ignore, prediction_constant, p0, operation0, p1, operation1):
-    """ Creates the interpolated prediction between two predictions. The predictions
-    are represented through the threshold rules operation0 and operation1.
-
-    :param p_ignore: p_ignore changes the interpolated prediction P to the desired
-        solution using the transformation p_ignore * prediction_constant + (1 - p_ignore) * P
-    :param prediction_constant: 0 if not required, otherwise the x value of the best
-        solution should be passed
-    :param p0: interpolation multiplier for prediction from the first predictor
-    :param operation0: threshold rule for the first predictor
-    :param p1: interpolation multiplier for prediction from the second predictor
-    :param operation1: threshold rule for the second predictor
-    :return: an anonymous function that scales the original prediction to the desired one
-    """
-    pred0 = operation0.get_predictor_from_operation()
-    pred1 = operation1.get_predictor_from_operation()
-
-    logger.debug(OUTPUT_SEPARATOR)
-    logger.debug("p_ignore: {}".format(p_ignore))
-    logger.debug("prediction_constant: {}".format(prediction_constant))
-    logger.debug("p0: {}".format(p0))
-    logger.debug("operation0: {}".format(operation0))
-    logger.debug("p1: {}".format(p1))
-    logger.debug("operation1: {}".format(operation1))
-    logger.debug(OUTPUT_SEPARATOR)
-    return (lambda scores: p_ignore * prediction_constant +
-            (1 - p_ignore) * (p0 * pred0(scores) + p1 * pred1(scores)))
+    return sum([(A_vector == a) * function_dict[a].predict(scores_vector) for a in function_dict])
 
 
 def _sanity_check_and_group_data(attributes, labels, scores):
