@@ -8,6 +8,7 @@ import pytest
 from fairlearn.metrics import DemographicParity, EqualizedOdds
 from fairlearn.post_processing.roc_curve_based_post_processing import \
     (ROCCurveBasedPostProcessing,
+     _vectorized_prediction,
      _roc_curve_based_post_processing_demographic_parity,
      _roc_curve_based_post_processing_equalized_odds,
      DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE,
@@ -23,7 +24,7 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
      PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 from .test_utilities import (example_attributes1, example_attributes2, example_labels,
                              example_scores, example_attribute_names1, example_attribute_names2,
-                             _generate_empty_list_permutations, _get_discretized_predictions,
+                             _generate_empty_list_permutations, _get_predictions_by_attribute,
                              _generate_list_reduction_permutations, _format_as_list_of_lists,
                              ExampleModel, ExampleEstimator, ExampleMetric, ExampleNotMetric,
                              ExampleNotModel, ExampleNotEstimator1, ExampleNotEstimator2)
@@ -168,9 +169,8 @@ def test_roc_curve_based_post_processing_different_input_lengths_internals(
 
 
 def test_roc_curve_based_post_processing_demographic_parity():
-    adjusted_model = _roc_curve_based_post_processing_demographic_parity(example_attributes1,
-                                                                         example_labels,
-                                                                         example_scores)
+    adjusted_model = create_adjusted_model(_roc_curve_based_post_processing_demographic_parity,
+                                           example_attributes1, example_labels, example_scores)
 
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
@@ -200,17 +200,19 @@ def test_roc_curve_based_post_processing_demographic_parity():
     assert 1 == adjusted_model([example_attribute_names1[2]], [100])
 
     # Assert Demographic Parity actually holds
-    discretized_predictions = _get_discretized_predictions(adjusted_model)
+    predictions_by_attribute = _get_predictions_by_attribute(adjusted_model, example_attributes1,
+                                                             example_scores, example_labels)
 
-    assert [sum([lp.prediction for lp in discretized_predictions[attribute_value]])
-            / len(discretized_predictions[attribute_value])
-            for attribute_value in sorted(discretized_predictions)] == [5/7, 4/7, 5/6]
+    average_probabilities_by_attribute = \
+        [np.sum([lp.prediction for lp in predictions_by_attribute[attribute_value]])
+         / len(predictions_by_attribute[attribute_value])
+         for attribute_value in sorted(predictions_by_attribute)]
+    assert np.isclose(average_probabilities_by_attribute, [0.572] * 3).all()
 
 
 def test_roc_curve_based_post_processing_equalized_odds():
-    adjusted_model = _roc_curve_based_post_processing_equalized_odds(example_attributes1,
-                                                                     example_labels,
-                                                                     example_scores)
+    adjusted_model = create_adjusted_model(_roc_curve_based_post_processing_equalized_odds,
+                                           example_attributes1, example_labels, example_scores)
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
@@ -252,20 +254,21 @@ def test_roc_curve_based_post_processing_equalized_odds():
     assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[2]], [100])
 
     # Assert Equalized Odds actually holds
-    discretized_predictions = _get_discretized_predictions(adjusted_model)
+    predictions_by_attribute = _get_predictions_by_attribute(adjusted_model, example_attributes1,
+                                                             example_scores, example_labels)
 
     predictions_based_on_label = {}
     for label in [0, 1]:
         predictions_based_on_label[label] = \
-            [sum([lp.prediction for lp in discretized_predictions[attribute_value]
+            [np.sum([lp.prediction for lp in predictions_by_attribute[attribute_value]
              if lp.label == label])
-             / len([lp for lp in discretized_predictions[attribute_value] if lp.label == label])
-             for attribute_value in sorted(discretized_predictions)]
+             / len([lp for lp in predictions_by_attribute[attribute_value] if lp.label == label])
+             for attribute_value in sorted(predictions_by_attribute)]
 
     # assert counts of positive predictions for negative labels
-    assert predictions_based_on_label[0] == [2/4, 1/3, 2/3]
+    assert np.isclose(predictions_based_on_label[0], [0.334] * 3).all()
     # assert counts of positive predictions for positive labels
-    assert predictions_based_on_label[1] == [3/3, 3/4, 3/3]
+    assert np.isclose(predictions_based_on_label[1], [0.66733333] * 3).all()
 
 
 @pytest.mark.parametrize("attributes,attribute_names,expected_p0,expected_p1",
@@ -308,7 +311,7 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(
     adjusted_model.fit(X, Y, A)
 
     predictions = adjusted_model.predict_proba(X, A)
-    
+
     # assert equalized odds
     for a in attribute_names:
         positive_indices = (np.array(attributes) == a) * (np.array(example_labels) == 1)
@@ -324,3 +327,11 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(
 def _format_X_Y_A(formatting_function, unformatted_X, unformatted_Y, unformatted_A):
     return formatting_function(unformatted_X), formatting_function(unformatted_Y), \
         formatting_function(unformatted_A)
+
+
+def create_adjusted_model(roc_curve_based_post_processing_method, example_attributes,
+                          example_labels, example_scores):
+    post_processed_model_by_attribute = roc_curve_based_post_processing_method(
+        example_attributes, example_labels, example_scores)
+
+    return lambda A, scores: _vectorized_prediction(post_processed_model_by_attribute, A, scores)

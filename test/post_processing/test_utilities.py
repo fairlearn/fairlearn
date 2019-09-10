@@ -122,19 +122,13 @@ def _generate_empty_list_permutations():
     return empty_list_permutations
 
 
-def _get_discretized_predictions(adjusted_model):
+def _get_predictions_by_attribute(adjusted_model, attributes, scores, labels):
     labels_and_predictions = defaultdict(list)
-    for i in range(len(example_attributes1)):
-        labels_and_predictions[example_attributes1[i]].append(
-            LabelAndPrediction(example_labels[i],
-                               adjusted_model([example_attributes1[i]], [example_scores[i]])))
-
-    return {
-        attribute_value: [
-            LabelAndPrediction(lp.label, int(lp.prediction >= 0.5))
-            for lp in labels_and_predictions[attribute_value]
-        ] for attribute_value in labels_and_predictions
-    }
+    for i in range(len(attributes)):
+        labels_and_predictions[attributes[i]].append(
+            LabelAndPrediction(labels[i],
+                               adjusted_model([attributes[i]], [scores[i]])))
+    return labels_and_predictions
 
 
 def _format_as_list_of_lists(lst):

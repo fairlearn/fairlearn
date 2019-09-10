@@ -81,7 +81,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._flip = flip
         self._plot = plot
         random.seed(seed)
-        self._post_processed_model = None
+        self._post_processed_model_by_attribute = None
 
     def fit(self, X, y, protected_attribute):
         self._validate_fairness_metric()
@@ -105,26 +105,28 @@ class ROCCurveBasedPostProcessing(PostProcessing):
             roc_curve_based_post_processing_method = \
                 _roc_curve_based_post_processing_equalized_odds
 
-        self._post_processed_model = roc_curve_based_post_processing_method(
+        self._post_processed_model_by_attribute = roc_curve_based_post_processing_method(
             protected_attribute, y, scores, self._gridsize, self._flip, self._plot)
 
     def predict(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
         self._validate_input_data(X, protected_attribute)
         fairness_unaware_predictions = self._fairness_unaware_model.predict(X)
-        positive_probs = self._post_processed_model(protected_attribute,
-                                                    fairness_unaware_predictions)
+        positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
+                                                protected_attribute,
+                                                fairness_unaware_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
     
     def predict_proba(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
         self._validate_input_data(X, protected_attribute)
-        positive_probs = self._post_processed_model(protected_attribute,
-                                                    self._fairness_unaware_model.predict(X))
+        positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
+                                                protected_attribute,
+                                                self._fairness_unaware_model.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
     def _validate_post_processed_model_is_fitted(self):
-        if not self._post_processed_model:
+        if not self._post_processed_model_by_attribute:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
     def _validate_fairness_metric(self):
@@ -254,7 +256,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     if plot:
         plot_solution_and_show_plot(x_best, None, "DP solution")
 
-    return lambda A, scores: _vectorized_prediction(predicted_DP_by_attribute, A, scores)
+    return predicted_DP_by_attribute
 
 
 def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
@@ -352,7 +354,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
         plot_overlap(x_grid, y_min)
         plot_solution_and_show_plot(x_best, y_best, 'EO solution')
 
-    return lambda A, scores: _vectorized_prediction(predicted_EO_by_attribute, A, scores)
+    return predicted_EO_by_attribute
 
 
 def _vectorized_prediction(function_dict, A, scores):

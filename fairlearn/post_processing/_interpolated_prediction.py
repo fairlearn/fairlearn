@@ -22,8 +22,8 @@ class InterpolatedPredictor:
         :param operation1: threshold rule for the second predictor
         :return: an anonymous function that scales the original prediction to the desired one
         """
-        self._predictor0 = operation0.get_predictor_from_operation()
-        self._predictor1 = operation1.get_predictor_from_operation()
+        self._operation0 = operation0
+        self._operation1 = operation1
         self._p_ignore = p_ignore
         self._prediction_constant = prediction_constant
         self._p0 = p0
@@ -37,7 +37,14 @@ class InterpolatedPredictor:
         logger.debug("p1: {}".format(p1))
         logger.debug("operation1: {}".format(operation1))
         logger.debug(OUTPUT_SEPARATOR)
-    
+
+    def __repr__(self):
+        return "[p_ignore: {}, prediction_constant: {}," \
+            "p0: {}, operation0: {}, p1: {}, operation1: {}]" \
+            .format(self._p_ignore, self._prediction_constant, self._p0, self._operation0,
+                    self._p1, self._operation1)
+
     def predict(self, scores):
         return self._p_ignore * self._prediction_constant + (1 - self._p_ignore) * \
-            (self._p0 * self._predictor0(scores) + self._p1 * self._predictor1(scores))
+            (self._p0 * self._operation0.get_predictor_from_operation()(scores) + \
+                self._p1 * self._operation1.get_predictor_from_operation()(scores))
