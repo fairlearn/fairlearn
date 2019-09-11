@@ -3,8 +3,8 @@ schedules:
   displayName: "Daily Code Scan"
   branches:
     include:
-      - master
       - dev
+      - riedgar-ms/credscan
   always: true
 
 # =================================================
