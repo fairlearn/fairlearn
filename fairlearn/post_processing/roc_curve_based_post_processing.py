@@ -254,7 +254,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
                  .format(error_given_selection[i_best_DP], x_best))
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
-        plot_solution_and_show_plot(x_best, None, "DP solution")
+        plot_solution_and_show_plot(x_best, None, "DP solution", "selection rate", "error")
 
     return predicted_DP_by_attribute
 
@@ -352,7 +352,8 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
         plot_overlap(x_grid, y_min)
-        plot_solution_and_show_plot(x_best, y_best, 'EO solution')
+        plot_solution_and_show_plot(x_best, y_best, 'EO solution', "$P[\\hat{Y}=1|Y=0]$",
+                                    "$P[\\hat{Y}=1|Y=1]$")
 
     return predicted_EO_by_attribute
 
