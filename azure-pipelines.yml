@@ -11,6 +11,8 @@ schedules:
       - dev
   always: true
 
+# =================================================
+
 jobs:
 - job: "Testing"
   pool:
@@ -35,6 +37,8 @@ jobs:
     displayName: 'Publish Test Results **/TEST-*.xml'
     condition: succeededOrFailed()
 
+# -----
+
 - job: "WindowsCodeScans"
   displayName: "Code Scans (Windows)"
   pool:
@@ -49,3 +53,12 @@ jobs:
       verboseOutput: true
     continueOnError: true
 
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+    displayName: 'Run CredScan'
+    inputs:
+      outputFormat: csv
+      debugMode: false
+    continueOnError: true
+    
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-publishsecurityanalysislogs.PublishSecurityAnalysisLogs@2
+    displayName: 'Publish Security Analysis Logs'
