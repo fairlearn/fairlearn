@@ -53,12 +53,15 @@ jobs:
       verboseOutput: true
     continueOnError: true
 
-  - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
-    displayName: 'Run CredScan'
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-policheck.PoliCheck@1
+    displayName: 'Run PoliCheck'
     inputs:
-      outputFormat: csv
-      debugMode: false
+      targetType: F
+      optionsFC: 0
+      optionsXS: 0
+      optionsHMENABLE: 0
     continueOnError: true
+    condition: succeededOrFailed()
     
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-publishsecurityanalysislogs.PublishSecurityAnalysisLogs@2
     displayName: 'Publish Security Analysis Logs'
