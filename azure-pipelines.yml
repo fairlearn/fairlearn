@@ -37,7 +37,7 @@ jobs:
 
 - Code Scans
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: ''windows-latest''
     
   steps:
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
