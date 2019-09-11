@@ -1,0 +1,38 @@
+schedules:
+- cron: "0,5,10,15,20,25,30,35,40,45,50,55 * * * *"
+  displayName: "Daily Code Scan"
+  branches:
+    include:
+      - master
+      - dev
+  always: true
+
+# =================================================
+
+jobs:
+- job: "WindowsCodeScans"
+  displayName: "Code Scans (Windows)"
+  pool:
+    vmImage: 'windows-latest'
+    
+  steps:
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+    displayName: 'Run CredScan'
+    inputs:
+      outputFormat: csv
+      debugMode: false
+      verboseOutput: true
+    continueOnError: true
+
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-policheck.PoliCheck@1
+    displayName: 'Run PoliCheck'
+    inputs:
+      targetType: F
+      optionsFC: 1
+      optionsXS: 1
+      optionsHMENABLE: 0
+    continueOnError: true
+    condition: succeededOrFailed()
+    
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-publishsecurityanalysislogs.PublishSecurityAnalysisLogs@2
+    displayName: 'Publish Security Analysis Logs'
