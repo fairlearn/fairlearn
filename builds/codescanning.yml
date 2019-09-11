@@ -4,7 +4,7 @@ schedules:
   branches:
     include:
       - dev
-      - riedgar-ms/credscan
+      - master
   always: true
 
 # =================================================
