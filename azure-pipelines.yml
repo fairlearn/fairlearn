@@ -15,6 +15,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+  displayName: 'Run CredScan'
+  inputs:
+    outputFormat: csv
+    debugMode: false
+  continueOnError: true
+
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.5' 
