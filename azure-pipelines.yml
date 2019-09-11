@@ -57,8 +57,8 @@ jobs:
     displayName: 'Run PoliCheck'
     inputs:
       targetType: F
-      optionsFC: 0
-      optionsXS: 0
+      optionsFC: 1
+      optionsXS: 1
       optionsHMENABLE: 0
     continueOnError: true
     condition: succeededOrFailed()
