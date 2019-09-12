@@ -8,6 +8,12 @@ import fairlearn.moments as moments
 
 
 class SimpleClassificationQualityMetric:
+    """Class to calculate a metric for comparing models produced
+    by GridSearch
+    The metric produced is simply the sum of error and disparity
+    for the given model
+    """
+
     def __init__(self):
         self.error_metric = moments.MisclassificationError()
         self.disparity_metric = moments.DP()
@@ -32,8 +38,10 @@ class SimpleClassificationQualityMetric:
 
 
 class SimpleRegressionQualityMetric:
-    def __init__(self):
-        pass
+    """Simple class to produce a quality metric for regression models
+    produced by GridSearch, to enable one to be selected for the
+    predict methods
+    """
 
     def set_data(self, X, Y, protected_attribute):
         self.X = X
