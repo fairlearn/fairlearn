@@ -8,6 +8,11 @@ from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 
 
 class GridSearch:
+    _MODEL_KEY = "model"
+    _LAGRANGE_MULTIPLIER_KEY = "lagrange_multiplier"
+    _TRADEOFF_KEY = "tradeoff"
+    _QUALITY_KEY = "quality"
+
     def __init__(self,
                  learner,
                  fairness_metric,
@@ -87,8 +92,8 @@ class GridSearch:
             # to the result
             # Note that we call it a model because it is a learner which has
             # had 'fit' called
-            self.all_models.append({"model": current_learner,
-                                    "lagrange_multiplier": current_multiplier})
+            self.all_models.append({self._MODEL_KEY: current_learner,
+                                    self._LAGRANGE_MULTIPLIER_KEY: current_multiplier})
 
         # Designate a 'best' model
         self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
@@ -110,25 +115,28 @@ class GridSearch:
             current_learner = copy.deepcopy(self.learner)
             current_learner.fit(X, Y, sample_weight=weights)
 
-            self.all_models.append({"model": current_learner,
-                                    "tradeoff": tradeoff})
+            self.all_models.append({self._MODEL_KEY: current_learner,
+                                    self._TRADEOFF_KEY: tradeoff})
 
         # Designate a 'best' model
         self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
 
     def predict(self, X):
-        return self.best_model["model"].predict(X)
+        return self.best_model[self._MODEL_KEY].predict(X)
 
     def predict_proba(self, X):
-        return self.best_model["model"].predict_proba(X)
+        return self.best_model[self._MODEL_KEY].predict_proba(X)
 
     def posterior_predict(self, X):
-        return [r["model"].predict(X) for r in self.all_models]
+        return [r[self._MODEL_KEY].predict(X) for r in self.all_models]
 
     def posterior_predict_proba(self, X):
-        return [r["model"].predict_proba(X) for r in self.all_models]
+        return [r[self._MODEL_KEY].predict_proba(X) for r in self.all_models]
 
     def _classification_weight_function(self, y_val, a_val, L, p_ratio, a0_val):
+        # Used by the classification side of GridSearch to generate a sample
+        # set of weights, following demographic parity
+        # Weights vary with the current value of the Lagrange multiplier
         if a_val == a0_val:
             return 2 * y_val - 1 - L * p_ratio
         else:
@@ -154,12 +162,14 @@ class GridSearch:
         self.quality_metric.set_data(X, Y, protected_attribute)
 
         for m in model_list:
-            m["quality"] = self.quality_metric.get_quality(m["model"])
+            m[self._QUALITY_KEY] = self.quality_metric.get_quality(m[self._MODEL_KEY])
 
-        best_model = max(model_list, key=lambda x: x["quality"])
+        best_model = max(model_list, key=lambda x: x[self._QUALITY_KEY])
         return best_model
 
     def _regression_weight_function(self, a_val, trade_off, p0, p1, a0_val):
+        # Reweighting function for Bounded Group Loss for regression
+        # Note that it uses a trade_off parameter which varies between 0 and 1
         if a_val == a0_val:
             return trade_off / p0
         else:
