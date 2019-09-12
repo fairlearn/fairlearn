@@ -6,6 +6,7 @@ import numpy as np
 
 from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions.reductions_learner import ReductionsLearner
+from fairlearn.reductions.grid_search import QualityMetric
 
 
 class GridSearch(ReductionsLearner):
@@ -38,6 +39,8 @@ class GridSearch(ReductionsLearner):
             raise RuntimeError("Unsupported disparity metric")
         self.disparity_metric = disparity_metric
 
+        if not isinstance(quality_metric, QualityMetric):
+            raise RuntimeError("quality_metric must derive from QualityMetric")
         self.quality_metric = quality_metric
 
     def fit(self, X, Y, **kwargs):

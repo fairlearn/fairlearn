@@ -4,10 +4,12 @@
 import copy
 import pandas as pd
 
+from fairlearn.reductions.grid_search import QualityMetric
+
 import fairlearn.moments as moments
 
 
-class SimpleClassificationQualityMetric:
+class SimpleClassificationQualityMetric(QualityMetric):
     """Class to calculate a metric for comparing models produced
     by GridSearch
     The metric produced is simply the sum of error and disparity
@@ -37,7 +39,7 @@ class SimpleClassificationQualityMetric:
         return -(current_error+current_disparity)
 
 
-class SimpleRegressionQualityMetric:
+class SimpleRegressionQualityMetric(QualityMetric):
     """Simple class to produce a quality metric for regression models
     produced by GridSearch, to enable one to be selected for the
     predict methods
