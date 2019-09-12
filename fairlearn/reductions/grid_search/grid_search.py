@@ -5,7 +5,7 @@ import copy
 import numpy as np
 
 from fairlearn.metrics import DemographicParity, BoundedGroupLoss
-from fairlearn.reductions import ReductionsLearner
+from fairlearn.reductions.reductions_learner import ReductionsLearner
 
 
 class GridSearch(ReductionsLearner):
