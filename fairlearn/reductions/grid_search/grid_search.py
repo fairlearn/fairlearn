@@ -8,10 +8,24 @@ from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 
 
 class GridSearch:
+    """Learner to perform a grid search given a blackbox algorithm.
+    The supplied algorithm must implement a method
+    fit(X, Y, sample_weight=[...])
+    At the present time, the only disparity metrics supported
+    are demographic parity (for classification) and bounded group
+    loss (for regression)
+    """
+
+    _KW_PROTECTED_ATTRIBUTE = "protected_attribute"
+    _KW_LAGRANGE_MULTIPLIERS = "lagrange_multipliers"
+    _KW_NUMBER_LAGRANGE_MULTIPLIERS = "number_of_lagrange_multipliers"
+
     _MODEL_KEY = "model"
     _LAGRANGE_MULTIPLIER_KEY = "lagrange_multiplier"
     _TRADEOFF_KEY = "tradeoff"
     _QUALITY_KEY = "quality"
+
+    _MESSAGE_Y_NOT_BINARY = "Supplied Y labels are not 0 or 1"
 
     def __init__(self,
                  learner,
@@ -26,18 +40,18 @@ class GridSearch:
         self.quality_metric = quality_metric
 
     def fit(self, X, Y, **kwargs):
-        if "protected_attribute" in kwargs:
-            protected_attribute = kwargs["protected_attribute"]
+        if self._KW_PROTECTED_ATTRIBUTE in kwargs:
+            protected_attribute = kwargs[self._KW_PROTECTED_ATTRIBUTE]
         else:
             raise RuntimeError("Must specify protected_attribute (for now)")
 
         lagrange_multipliers = None
-        if "lagrange_multipliers" in kwargs:
-            lagrange_multipliers = kwargs["lagrange_multipliers"]
+        if self._KW_LAGRANGE_MULTIPLIERS in kwargs:
+            lagrange_multipliers = kwargs[self._KW_LAGRANGE_MULTIPLIERS]
 
         number_of_lagrange_multipliers = None
-        if "number_of_lagrange_multipliers" in kwargs:
-            number_of_lagrange_multipliers = kwargs["number_of_lagrange_multipliers"]
+        if self._KW_NUMBER_LAGRANGE_MULTIPLIERS in kwargs:
+            number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
@@ -57,7 +71,7 @@ class GridSearch:
         # Verify we have a binary classification problem
         unique_labels = np.unique(Y)
         if not set(unique_labels).issubset({0, 1}):
-            raise RuntimeError("Supplied Y labels are not 0 or 1")
+            raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
         # Extract required statistics from protected_attribute
         p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
