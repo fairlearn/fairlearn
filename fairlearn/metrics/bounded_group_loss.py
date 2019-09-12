@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 
-class BoundedGroupLoss:
-    def __init__(self):
-        # Nothing to do (yet)
-        pass
+from .metric import DisparityMetric
+
+
+class BoundedGroupLoss(DisparityMetric):
+    pass
