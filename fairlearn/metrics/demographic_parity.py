@@ -6,5 +6,4 @@ from .metric import FairnessMetric
 
 
 class DemographicParity(FairnessMetric):
-
     pass

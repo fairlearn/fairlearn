@@ -6,5 +6,4 @@ from .metric import FairnessMetric
 
 
 class BoundedGroupLoss(FairnessMetric):
-
     pass
