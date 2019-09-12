@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 
-from .metric import FairnessMetric
+from .metric import DisparityMetric
 
 
-class DemographicParity(FairnessMetric):
+class DemographicParity(DisparityMetric):
     pass

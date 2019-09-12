@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 
-from .metric import FairnessMetric
+from .metric import DisparityMetric
 
 
-class BoundedGroupLoss(FairnessMetric):
+class BoundedGroupLoss(DisparityMetric):
     pass
