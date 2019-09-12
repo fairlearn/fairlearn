@@ -34,6 +34,10 @@ class GridSearch:
         if "number_of_lagrange_multipliers" in kwargs:
             number_of_lagrange_multipliers = kwargs["number_of_lagrange_multipliers"]
 
+        # We do not yet have fairness metrics fully implemented
+        # For now, we assume that if we are passed a DemographicParity
+        # object we have a binary classification problem whereas
+        # BoundedGroupLoss indicates a regression
         if isinstance(self.fairness_metric, DemographicParity):
             self._fit_classification(X, Y, protected_attribute,
                                      lagrange_multipliers, number_of_lagrange_multipliers)
