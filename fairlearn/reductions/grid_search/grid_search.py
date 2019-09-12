@@ -15,13 +15,13 @@ class GridSearch:
 
     def __init__(self,
                  learner,
-                 fairness_metric,
+                 disparity_metric,
                  quality_metric):
         self.learner = learner
-        if (not isinstance(fairness_metric, DemographicParity) and
-                not isinstance(fairness_metric, BoundedGroupLoss)):
-            raise RuntimeError("Unsupported fairness metric")
-        self.fairness_metric = fairness_metric
+        if (not isinstance(disparity_metric, DemographicParity) and
+                not isinstance(disparity_metric, BoundedGroupLoss)):
+            raise RuntimeError("Unsupported disparity metric")
+        self.disparity_metric = disparity_metric
 
         self.quality_metric = quality_metric
 
@@ -39,14 +39,14 @@ class GridSearch:
         if "number_of_lagrange_multipliers" in kwargs:
             number_of_lagrange_multipliers = kwargs["number_of_lagrange_multipliers"]
 
-        # We do not yet have fairness metrics fully implemented
+        # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
         # BoundedGroupLoss indicates a regression
-        if isinstance(self.fairness_metric, DemographicParity):
+        if isinstance(self.disparity_metric, DemographicParity):
             self._fit_classification(X, Y, protected_attribute,
                                      lagrange_multipliers, number_of_lagrange_multipliers)
-        elif isinstance(self.fairness_metric, BoundedGroupLoss):
+        elif isinstance(self.disparity_metric, BoundedGroupLoss):
             self._fit_regression(X, Y, protected_attribute,
                                  lagrange_multipliers, number_of_lagrange_multipliers)
         else:

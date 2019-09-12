@@ -52,7 +52,7 @@ def test_demographicparity_fair_uneven_populations():
                                      a0_label, a1_label)
 
     target = GridSearch(LogisticRegression(),
-                        fairness_metric=DemographicParity(),
+                        disparity_metric=DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric())
 
     target.fit(X, Y, protected_attribute=A,

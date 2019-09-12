@@ -49,7 +49,7 @@ def test_bgl_unfair():
                                       a0_label, a1_label)
 
     target = GridSearch(LinearRegression(),
-                        fairness_metric=BoundedGroupLoss(),
+                        disparity_metric=BoundedGroupLoss(),
                         quality_metric=SimpleRegressionQualityMetric())
 
     target.fit(X, Y, protected_attribute=A, number_of_lagrange_multipliers=7)
