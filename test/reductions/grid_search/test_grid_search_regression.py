@@ -55,7 +55,7 @@ def test_bgl_unfair():
 
     target.fit(X, Y, protected_attribute=A, number_of_lagrange_multipliers=7)
 
-    assert len(target.all_models) == 7
+    assert len(target.all_results) == 7
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
                            "protected_attribute_feature": [a0_label, a1_label],
@@ -95,7 +95,7 @@ def test_bgl_unfair_compare():
 
     target.fit(X, Y, protected_attribute=A, number_of_lagrange_multipliers=7)
 
-    new_models = [z.model for z in target.all_models]
+    new_models = [z.model for z in target.all_results]
 
     old_results = reg.sweep_bounded_group_loss(LinearRegression(),
                                                X, Y, A,

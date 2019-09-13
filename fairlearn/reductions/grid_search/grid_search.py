@@ -87,7 +87,7 @@ class GridSearch(ReductionsLearner):
                                                2 * limit,
                                                number_of_lagrange_multipliers)
 
-        self.all_models = []
+        self.all_results = []
         for current_multiplier in lagrange_multipliers:
             # Generate weights array
             sample_weights = self._generate_classification_weights(Y,
@@ -112,10 +112,10 @@ class GridSearch(ReductionsLearner):
             # Note that we call it a model because it is a learner which has
             # had 'fit' called
             nxt = GridSearchResult(current_learner, current_multiplier, quality)
-            self.all_models.append(nxt)
+            self.all_results.append(nxt)
 
         # Designate a 'best' model
-        self.best_model = max(self.all_models, key=lambda x: x.quality_metric_value)
+        self.best_model = max(self.all_results, key=lambda x: x.quality_metric_value)
 
     def _fit_regression(self, X, Y, protected_attribute, tradeoffs, number_of_tradeoffs):
         # Extract required statistics from protected_attribute
@@ -124,7 +124,7 @@ class GridSearch(ReductionsLearner):
         if tradeoffs is None:
             tradeoffs = np.linspace(0, 1, number_of_tradeoffs)
 
-        self.all_models = []
+        self.all_results = []
         for tradeoff in tradeoffs:
             weight_func = np.vectorize(self._regression_weight_function)
             weights = weight_func(protected_attribute,
@@ -138,10 +138,10 @@ class GridSearch(ReductionsLearner):
             quality = self.quality_metric.get_quality(current_learner)
 
             nxt = GridSearchResult(current_learner, tradeoff, quality)
-            self.all_models.append(nxt)
+            self.all_results.append(nxt)
 
         # Designate a 'best' model
-        self.best_model = max(self.all_models, key=lambda x: x.quality_metric_value)
+        self.best_model = max(self.all_results, key=lambda x: x.quality_metric_value)
 
     def predict(self, X):
         return self.best_model.model.predict(X)
@@ -150,10 +150,10 @@ class GridSearch(ReductionsLearner):
         return self.best_model.model.predict_proba(X)
 
     def posterior_predict(self, X):
-        return [r.model.predict(X) for r in self.all_models]
+        return [r.model.predict(X) for r in self.all_results]
 
     def posterior_predict_proba(self, X):
-        return [r.model.predict_proba(X) for r in self.all_models]
+        return [r.model.predict_proba(X) for r in self.all_results]
 
     def _classification_weight_function(self, y_val, a_val, L, p_ratio, a0_val):
         # Used by the classification side of GridSearch to generate a sample
