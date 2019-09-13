@@ -67,7 +67,7 @@ def test_demographicparity_fair_uneven_populations():
     sample_proba = target.predict_proba(test_X)
     assert np.allclose(sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]])
 
-    sample_results = target.all_models[0]["model"].predict(test_X)
+    sample_results = target.all_models[0].model.predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
 
     all_results = target.posterior_predict(test_X)

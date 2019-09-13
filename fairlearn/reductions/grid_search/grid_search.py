@@ -6,7 +6,7 @@ import numpy as np
 
 from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions.reductions_learner import ReductionsLearner
-from fairlearn.reductions.grid_search import QualityMetric
+from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 
 
 class GridSearch(ReductionsLearner):
@@ -57,6 +57,9 @@ class GridSearch(ReductionsLearner):
         if self._KW_NUMBER_LAGRANGE_MULTIPLIERS in kwargs:
             number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
+        # Prep the quality metric
+        self.quality_metric.set_data(X, Y, protected_attribute)
+
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
@@ -106,12 +109,15 @@ class GridSearch(ReductionsLearner):
             current_learner = copy.deepcopy(self.learner)
             current_learner.fit(X, re_labels, sample_weight=np.absolute(sample_weights))
 
+            # Evaluate the quality metric
+            quality = self.quality_metric.get_quality(current_learner)
+
             # Append the new model, along with its current_multiplier value
             # to the result
             # Note that we call it a model because it is a learner which has
             # had 'fit' called
-            self.all_models.append({self._MODEL_KEY: current_learner,
-                                    self._LAGRANGE_MULTIPLIER_KEY: current_multiplier})
+            nxt = GridSearchResult(current_learner, current_multiplier, quality)
+            self.all_models.append(nxt)
 
         # Designate a 'best' model
         self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
@@ -133,23 +139,26 @@ class GridSearch(ReductionsLearner):
             current_learner = copy.deepcopy(self.learner)
             current_learner.fit(X, Y, sample_weight=weights)
 
-            self.all_models.append({self._MODEL_KEY: current_learner,
-                                    self._TRADEOFF_KEY: tradeoff})
+            # Evaluate the quality metric
+            quality = self.quality_metric.get_quality(current_learner)
+
+            nxt = GridSearchResult(current_learner, tradeoff, quality)
+            self.all_models.append(nxt)
 
         # Designate a 'best' model
         self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
 
     def predict(self, X):
-        return self.best_model[self._MODEL_KEY].predict(X)
+        return self.best_model.model.predict(X)
 
     def predict_proba(self, X):
-        return self.best_model[self._MODEL_KEY].predict_proba(X)
+        return self.best_model.model.predict_proba(X)
 
     def posterior_predict(self, X):
-        return [r[self._MODEL_KEY].predict(X) for r in self.all_models]
+        return [r.model.predict(X) for r in self.all_models]
 
     def posterior_predict_proba(self, X):
-        return [r[self._MODEL_KEY].predict_proba(X) for r in self.all_models]
+        return [r.model.predict_proba(X) for r in self.all_models]
 
     def _classification_weight_function(self, y_val, a_val, L, p_ratio, a0_val):
         # Used by the classification side of GridSearch to generate a sample
@@ -177,12 +186,7 @@ class GridSearch(ReductionsLearner):
         return weight_func(y, protected_attribute, L, p_ratio, a0_val)
 
     def _select_best_model(self, X, Y, protected_attribute, model_list):
-        self.quality_metric.set_data(X, Y, protected_attribute)
-
-        for m in model_list:
-            m[self._QUALITY_KEY] = self.quality_metric.get_quality(m[self._MODEL_KEY])
-
-        best_model = max(model_list, key=lambda x: x[self._QUALITY_KEY])
+        best_model = max(model_list, key=lambda x: x.quality_metric_value)
         return best_model
 
     def _regression_weight_function(self, a_val, trade_off, p0, p1, a0_val):
