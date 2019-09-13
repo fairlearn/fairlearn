@@ -22,11 +22,6 @@ class GridSearch(ReductionsLearner):
     _KW_LAGRANGE_MULTIPLIERS = "lagrange_multipliers"
     _KW_NUMBER_LAGRANGE_MULTIPLIERS = "number_of_lagrange_multipliers"
 
-    _MODEL_KEY = "model"
-    _LAGRANGE_MULTIPLIER_KEY = "lagrange_multiplier"
-    _TRADEOFF_KEY = "tradeoff"
-    _QUALITY_KEY = "quality"
-
     _MESSAGE_Y_NOT_BINARY = "Supplied Y labels are not 0 or 1"
 
     def __init__(self,
