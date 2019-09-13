@@ -59,4 +59,4 @@ class SimpleRegressionQualityMetric(QualityMetric):
         error = errors.mean()
         error0 = errors[attrs == attr_vals[0]].mean()
         error1 = errors[attrs == attr_vals[1]].mean()
-        return -(error+error0+error1)
+        return -(error+max(error0, error1))
