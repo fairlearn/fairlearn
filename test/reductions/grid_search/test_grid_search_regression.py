@@ -95,7 +95,7 @@ def test_bgl_unfair_compare():
 
     target.fit(X, Y, protected_attribute=A, number_of_lagrange_multipliers=7)
 
-    new_models = [z["model"] for z in target.all_models]
+    new_models = [z.model for z in target.all_models]
 
     old_results = reg.sweep_bounded_group_loss(LinearRegression(),
                                                X, Y, A,
