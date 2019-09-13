@@ -5,5 +5,5 @@
 from .metric import DisparityMetric
 
 
-class DemographicParity(DisparityMetric):
+class BoundedGroupLoss(DisparityMetric):
     pass

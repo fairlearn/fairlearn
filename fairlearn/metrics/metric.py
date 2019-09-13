@@ -2,5 +2,5 @@
 # Licensed under the MIT License.
 
 
-class FairnessMetric:
+class DisparityMetric:
     pass

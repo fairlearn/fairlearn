@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 
-from .metric import FairnessMetric
+from .metric import DisparityMetric
 
-class EqualizedOdds(FairnessMetric):
+
+class EqualizedOdds(DisparityMetric):
     pass
