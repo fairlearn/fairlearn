@@ -32,7 +32,7 @@ class ExampleNotModel():
 class ExampleEstimator():
     def fit(self, X, Y):
         pass
-    
+
     def predict(self, X):
         return example_scores
 

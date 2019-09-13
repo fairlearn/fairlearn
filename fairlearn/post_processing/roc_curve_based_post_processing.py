@@ -30,8 +30,8 @@ MISSING_FIT_PREDICT_ERROR_MESSAGE = "The model does not have callable 'fit' or '
 MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' method."
 FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE = "The fairness metric is expected to be of type " \
                                          "FairnessMetric."
-NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE = "Currently only DemographicParity and EqualizedOdds " \
-                                              "are supported fairness metrics."
+NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE = "Currently only DemographicParity and " \
+                                              "EqualizedOdds are supported fairness metrics."
 MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and " \
                                             "'fairness_unaware_estimator' need to be passed."
 EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
@@ -73,10 +73,10 @@ class ROCCurveBasedPostProcessing(PostProcessing):
             self._validate_estimator()
         else:
             raise ValueError(MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
-        
+
         self._fairness_metric = fairness_metric
         self._validate_fairness_metric()
-        
+
         self._gridsize = gridsize
         self._flip = flip
         self._plot = plot
@@ -116,7 +116,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
                                                 protected_attribute,
                                                 fairness_unaware_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
-    
+
     def predict_proba(self, X, protected_attribute):
         self._validate_post_processed_model_is_fitted()
         self._validate_input_data(X, protected_attribute)

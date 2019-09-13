@@ -32,48 +32,49 @@ from .test_utilities import (example_attributes1, example_attributes2, example_l
 
 @pytest.mark.parametrize("predict_method_name", ['predict', 'predict_proba'])
 def test_predict_before_fit_error(predict_method_name):
-    X, Y, A = _format_as_list_of_lists(example_attributes1), example_labels, example_attributes1
+    X = _format_as_list_of_lists(example_attributes1)
+    A = example_attributes1
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  fairness_metric=DemographicParity())
 
     with pytest.raises(ValueError, match=PREDICT_BEFORE_FIT_ERROR_MESSAGE):
-        _ = getattr(adjusted_model, predict_method_name)(X, A)
+        _ = getattr(adjusted_model, predict_method_name)(X, A)  # noqa: F841
 
 
 def test_both_model_and_estimator_error():
     with pytest.raises(ValueError, match=EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE):
-        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),  # noqa: F841
                                         fairness_unaware_estimator=ExampleEstimator(),
                                         fairness_metric=DemographicParity())
 
 
 def test_no_model_or_estimator_error():
     with pytest.raises(ValueError, match=MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE):
-        _ = ROCCurveBasedPostProcessing(fairness_metric=DemographicParity())
+        _ = ROCCurveBasedPostProcessing(fairness_metric=DemographicParity())  # noqa: F841
 
 
 def test_metric_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE):
-        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),  # noqa: F841
                                         fairness_metric=ExampleMetric())
 
 
 def test_not_a_fairness_metric():
     with pytest.raises(TypeError, match=FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE):
-        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),  # noqa: F841
                                         fairness_metric=ExampleNotMetric())
 
 
 @pytest.mark.parametrize("not_estimator", [ExampleNotEstimator1(), ExampleNotEstimator2()])
 def test_not_estimator(not_estimator):
     with pytest.raises(ValueError, match=MISSING_FIT_PREDICT_ERROR_MESSAGE):
-        _ = ROCCurveBasedPostProcessing(fairness_unaware_estimator=not_estimator,
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_estimator=not_estimator,  # noqa: F841
                                         fairness_metric=ExampleMetric())
 
 
 def test_not_model():
     with pytest.raises(ValueError, match=MISSING_PREDICT_ERROR_MESSAGE):
-        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleNotModel(),
+        _ = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleNotModel(),  # noqa: F841
                                         fairness_metric=ExampleMetric())
 
 
@@ -97,7 +98,7 @@ def test_inconsistent_input_data_types(X_transform, Y_transform, A_transform):
     A = A_transform(example_attributes1)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  fairness_metric=DemographicParity())
-    
+
     error_message = INPUT_DATA_CONSISTENCY_ERROR_MESSAGE.format(type(X).__name__,
                                                                 type(Y).__name__,
                                                                 type(A).__name__)
@@ -113,11 +114,11 @@ def test_roc_curve_based_post_processing_non_binary_labels(formatting_function, 
     non_binary_labels = copy.deepcopy(example_labels)
     non_binary_labels[0] = 2
 
-    X, Y, A = _format_X_Y_A(formatting_function, _format_as_list_of_lists(example_attributes1), non_binary_labels,
-                            example_attributes1)
+    X, Y, A = _format_X_Y_A(formatting_function, _format_as_list_of_lists(example_attributes1),
+                            non_binary_labels, example_attributes1)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  fairness_metric=Metric())
-    
+
     with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
         adjusted_model.fit(X, Y, A)
 
@@ -128,7 +129,8 @@ def test_roc_curve_based_post_processing_different_input_lengths(formatting_func
     n = len(example_attributes1)
     for permutation in [(0, 1), (1, 0)]:
         with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
-            X, Y, A = _format_X_Y_A(formatting_function, _format_as_list_of_lists(example_attributes1)[:n-permutation[0]],
+            X, Y, A = _format_X_Y_A(formatting_function,
+                                    _format_as_list_of_lists(example_attributes1)[:n-permutation[0]],  # noqa: E501
                                     example_labels[:n-permutation[1]],
                                     example_attributes1)
             adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
@@ -137,7 +139,8 @@ def test_roc_curve_based_post_processing_different_input_lengths(formatting_func
 
     # try providing empty lists in all combinations
     for permutation in [(0, n), (n, 0)]:
-        X, Y, A = _format_X_Y_A(formatting_function, _format_as_list_of_lists(example_attributes1)[:permutation[0]],
+        X, Y, A = _format_X_Y_A(formatting_function,
+                                _format_as_list_of_lists(example_attributes1)[:permutation[0]],
                                 example_labels[:permutation[1]],
                                 example_attributes1)
 
@@ -176,15 +179,19 @@ def test_roc_curve_based_post_processing_demographic_parity():
 
     # attribute value A
     value_for_less_than_2_5 = 0.8008
-    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [0]))
-    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [2.499]))
+    assert np.isclose(value_for_less_than_2_5,
+                      adjusted_model([example_attribute_names1[0]], [0]))
+    assert np.isclose(value_for_less_than_2_5,
+                      adjusted_model([example_attribute_names1[0]], [2.499]))
     assert 0 == adjusted_model([example_attribute_names1[0]], [2.5])
     assert 0 == adjusted_model([example_attribute_names1[0]], [100])
 
     # attribute value B
     value_for_less_than_0_5 = 0.00133333333333
-    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0]))
-    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0.5]))
+    assert np.isclose(value_for_less_than_0_5,
+                      adjusted_model([example_attribute_names1[1]], [0]))
+    assert np.isclose(value_for_less_than_0_5,
+                      adjusted_model([example_attribute_names1[1]], [0.5]))
     assert 1 == adjusted_model([example_attribute_names1[1]], [0.51])
     assert 1 == adjusted_model([example_attribute_names1[1]], [1])
     assert 1 == adjusted_model([example_attribute_names1[1]], [100])
@@ -193,9 +200,12 @@ def test_roc_curve_based_post_processing_demographic_parity():
     value_between_0_5_and_1_5 = 0.608
     assert 0 == adjusted_model([example_attribute_names1[2]], [0])
     assert 0 == adjusted_model([example_attribute_names1[2]], [0.5])
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [0.51]))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1]))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1.5]))
+    assert np.isclose(value_between_0_5_and_1_5,
+                      adjusted_model([example_attribute_names1[2]], [0.51]))
+    assert np.isclose(value_between_0_5_and_1_5,
+                      adjusted_model([example_attribute_names1[2]], [1]))
+    assert np.isclose(value_between_0_5_and_1_5,
+                      adjusted_model([example_attribute_names1[2]], [1.5]))
     assert 1 == adjusted_model([example_attribute_names1[2]], [1.51])
     assert 1 == adjusted_model([example_attribute_names1[2]], [100])
 
@@ -224,8 +234,10 @@ def test_roc_curve_based_post_processing_equalized_odds():
     p_ignore = 0.001996007984031716
     base_value = prediction_constant * p_ignore
     value_for_less_than_2_5 = base_value + (1 - p_ignore) * 0.668
-    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [0]))
-    assert np.isclose(value_for_less_than_2_5, adjusted_model([example_attribute_names1[0]], [2.499]))
+    assert np.isclose(value_for_less_than_2_5,
+                      adjusted_model([example_attribute_names1[0]], [0]))
+    assert np.isclose(value_for_less_than_2_5,
+                      adjusted_model([example_attribute_names1[0]], [2.499]))
     assert base_value == adjusted_model([example_attribute_names1[0]], [2.5])
     assert base_value == adjusted_model([example_attribute_names1[0]], [100])
 
@@ -234,8 +246,10 @@ def test_roc_curve_based_post_processing_equalized_odds():
     p_ignore = 0.1991991991991991
     base_value = prediction_constant * p_ignore
     value_for_less_than_0_5 = base_value + (1 - p_ignore) * 0.001
-    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0]))
-    assert np.isclose(value_for_less_than_0_5, adjusted_model([example_attribute_names1[1]], [0.5]))
+    assert np.isclose(value_for_less_than_0_5,
+                      adjusted_model([example_attribute_names1[1]], [0]))
+    assert np.isclose(value_for_less_than_0_5,
+                      adjusted_model([example_attribute_names1[1]], [0.5]))
     assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[1]], [0.51])
     assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[1]], [1])
     assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[1]], [100])
@@ -247,9 +261,12 @@ def test_roc_curve_based_post_processing_equalized_odds():
     value_between_0_5_and_1_5 = base_value + (1 - p_ignore) * 0.501
     assert base_value == adjusted_model([example_attribute_names1[2]], [0])
     assert base_value == adjusted_model([example_attribute_names1[2]], [0.5])
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [0.51]))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1]))
-    assert np.isclose(value_between_0_5_and_1_5, adjusted_model([example_attribute_names1[2]], [1.5]))
+    assert np.isclose(value_between_0_5_and_1_5,
+                      adjusted_model([example_attribute_names1[2]], [0.51]))
+    assert np.isclose(value_between_0_5_and_1_5,
+                      adjusted_model([example_attribute_names1[2]], [1]))
+    assert np.isclose(value_between_0_5_and_1_5,
+                      adjusted_model([example_attribute_names1[2]], [1.5]))
     assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[2]], [1.51])
     assert base_value + 1 - p_ignore == adjusted_model([example_attribute_names1[2]], [100])
 
