@@ -120,7 +120,7 @@ class GridSearch(ReductionsLearner):
             self.all_models.append(nxt)
 
         # Designate a 'best' model
-        self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
+        self.best_model = max(self.all_models, key=lambda x: x.quality_metric_value)
 
     def _fit_regression(self, X, Y, protected_attribute, tradeoffs, number_of_tradeoffs):
         # Extract required statistics from protected_attribute
@@ -146,7 +146,7 @@ class GridSearch(ReductionsLearner):
             self.all_models.append(nxt)
 
         # Designate a 'best' model
-        self.best_model = self._select_best_model(X, Y, protected_attribute, self.all_models)
+        self.best_model = max(self.all_models, key=lambda x: x.quality_metric_value)
 
     def predict(self, X):
         return self.best_model.model.predict(X)
@@ -184,10 +184,6 @@ class GridSearch(ReductionsLearner):
     def _generate_classification_weights(self, y, protected_attribute, L, p_ratio, a0_val):
         weight_func = np.vectorize(self._classification_weight_function)
         return weight_func(y, protected_attribute, L, p_ratio, a0_val)
-
-    def _select_best_model(self, X, Y, protected_attribute, model_list):
-        best_model = max(model_list, key=lambda x: x.quality_metric_value)
-        return best_model
 
     def _regression_weight_function(self, a_val, trade_off, p0, p1, a0_val):
         # Reweighting function for Bounded Group Loss for regression
