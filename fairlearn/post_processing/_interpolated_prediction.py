@@ -45,6 +45,8 @@ class InterpolatedPredictor:
                     self._p1, self._operation1)
 
     def predict(self, scores):
-        return self._p_ignore * self._prediction_constant + (1 - self._p_ignore) * \
-            (self._p0 * self._operation0.get_predictor_from_operation()(scores) +
-                self._p1 * self._operation1.get_predictor_from_operation()(scores))
+        transformation_adjustment = self._p_ignore * self._prediction_constant
+        weighted_predictions0 = self._p0 * self._operation0.get_predictor_from_operation()(scores)
+        weighted_predictions1 = self._p1 * self._operation1.get_predictor_from_operation()(scores)
+        interpolated_predictions = (1 - self._p_ignore) * (weighted_predictions0 + weighted_predictions1)  # noqa: E501
+        return transformation_adjustment + interpolated_predictions

@@ -4,10 +4,10 @@
 
 class PostProcessing:
     def fit(self, X, y, protected_attribute):
-        raise NotImplementedError()
+        raise NotImplementedError(self.fit.__name__ + " is not implemented")
 
     def predict(self, X, protected_attribute):
-        raise NotImplementedError()
+        raise NotImplementedError(self.predict.__name__ + " is not implemented")
 
     def predict_proba(self, X, protected_attribute):
-        raise NotImplementedError()
+        raise NotImplementedError(self.predict_proba.__name__ + " is not implemented")
