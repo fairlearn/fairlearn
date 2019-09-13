@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from fairlearn.post_processing.threshold_operation import ThresholdOperation
+from fairlearn.post_processing._threshold_operation import ThresholdOperation
 from fairlearn.post_processing._roc_curve_utilities import (_calculate_roc_points,
                                                             _filter_points_to_get_convex_hull,
                                                             _get_roc,

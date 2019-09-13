@@ -46,5 +46,5 @@ class InterpolatedPredictor:
 
     def predict(self, scores):
         return self._p_ignore * self._prediction_constant + (1 - self._p_ignore) * \
-            (self._p0 * self._operation0.get_predictor_from_operation()(scores) + \
+            (self._p0 * self._operation0.get_predictor_from_operation()(scores) +
                 self._p1 * self._operation1.get_predictor_from_operation()(scores))
