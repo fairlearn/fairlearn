@@ -115,7 +115,7 @@ class GridSearch(ReductionsLearner):
             self.all_results.append(nxt)
 
         # Designate a 'best' model
-        self.best_model = max(self.all_results, key=lambda x: x.quality_metric_value)
+        self.best_result = max(self.all_results, key=lambda x: x.quality_metric_value)
 
     def _fit_regression(self, X, Y, protected_attribute, tradeoffs, number_of_tradeoffs):
         # Extract required statistics from protected_attribute
@@ -141,13 +141,13 @@ class GridSearch(ReductionsLearner):
             self.all_results.append(nxt)
 
         # Designate a 'best' model
-        self.best_model = max(self.all_results, key=lambda x: x.quality_metric_value)
+        self.best_result = max(self.all_results, key=lambda x: x.quality_metric_value)
 
     def predict(self, X):
-        return self.best_model.model.predict(X)
+        return self.best_result.model.predict(X)
 
     def predict_proba(self, X):
-        return self.best_model.model.predict_proba(X)
+        return self.best_result.model.predict_proba(X)
 
     def posterior_predict(self, X):
         return [r.model.predict(X) for r in self.all_results]
