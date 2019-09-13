@@ -13,7 +13,7 @@ import pandas as pd
 import random
 
 from fairlearn.exceptions import NotFittedException
-from fairlearn.metrics import FairnessMetric, DemographicParity, EqualizedOdds
+from fairlearn.metrics import DisparityMetric, DemographicParity, EqualizedOdds
 from fairlearn.post_processing import PostProcessing
 from ._constants import LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
@@ -29,7 +29,7 @@ INPUT_DATA_CONSISTENCY_ERROR_MESSAGE = "The only allowed input data formats are:
 MISSING_FIT_PREDICT_ERROR_MESSAGE = "The model does not have callable 'fit' or 'predict' methods."
 MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' method."
 FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE = "The fairness metric is expected to be of type " \
-                                         "FairnessMetric."
+                                         "DisparityMetric."
 NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE = "Currently only DemographicParity and " \
                                               "EqualizedOdds are supported fairness metrics."
 MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and " \
@@ -130,7 +130,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
     def _validate_fairness_metric(self):
-        if not isinstance(self._fairness_metric, FairnessMetric):
+        if not isinstance(self._fairness_metric, DisparityMetric):
             raise TypeError(FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE)
         if not type(self._fairness_metric) in [DemographicParity, EqualizedOdds]:
             raise ValueError(NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE)
