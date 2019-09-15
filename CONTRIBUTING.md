@@ -20,6 +20,14 @@ For every pull request to `master` with automated tests you can check the logs o
 
 ## API
 
+Any algorithm-specific parameters are passed to the constructor. Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. Post-processing algorithms require an already trained predictor. For consistency we also provide the option to pass an estimator instead, and will call `fit` internally.
+
+```python
+reduction = Reduction(estimator, fairness_metric=fairness_metric, **kwargs)
+post_processor = PostProcessing(fairness_unaware_model=model, fairness_metric=fairness_metric, **kwargs)
+post_processor = PostProcessing(fairness_unaware_estimator=estimator, fairness_metric=fairness_metric, **kwargs)
+```
+
 Reduction-based fairness mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
 
 ```python
@@ -34,12 +42,4 @@ Post-processing algorithms (such as the ones under `fairlearn.post_processing`) 
 post_processor.fit(X, Y, protected_attribute)
 post_processor.predict(X, protected_attribute)
 post_processor.predict_proba(X, protected_attribute)
-```
-
-Any algorithm-specific parameters are passed to the constructor. Reductions require a learner/estimator to be passed that implements the `fit` method. Post-processing algorithms require an already trained model/predictor. For consistency we also provide the option to pass a learner/estimator instead, and will call `fit` internally.
-
-```python
-reduction = Reduction(estimator, fairness_metric=fairness_metric, **kwargs)
-post_processor = PostProcessing(fairness_unaware_model=model, fairness_metric=fairness_metric, **kwargs)
-post_processor = PostProcessing(fairness_unaware_estimator=estimator, fairness_metric=fairness_metric, **kwargs)
 ```
