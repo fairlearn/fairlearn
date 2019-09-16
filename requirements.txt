@@ -1,11 +1,12 @@
 # Required for fairlearn
+matplotlib
 numpy
 pandas
 scipy
 
 # Required for environment
-flake8
 autopep8
+flake8
 
 # Required for test
 # Pin pytest due to VS Code issue
@@ -14,5 +15,4 @@ scikit-learn
 
 # Required for notebooks
 jupyter
-matplotlib
 shap
