@@ -21,12 +21,14 @@ def _get_debug_color(key):
     return debug_colormap[key]
 
 
-def plot_solution_and_show_plot(x_best, y_best, solution_label):
+def plot_solution_and_show_plot(x_best, y_best, solution_label, xlabel, ylabel):
     if y_best is None:
         plt.axvline(x=x_best, label=solution_label, ls='--')
     else:
         plt.plot(x_best, y_best, 'm*', ms=10, label=solution_label)
     plt.legend()
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.show()
 
 
@@ -38,4 +40,4 @@ def plot_overlap(x_grid, y_min):
 def plot_curve(attribute, x_col, y_col, points):
     color = _get_debug_color(attribute)
     plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0,
-             label='attribute ' + str(attribute))
+             label='attribute value ' + str(attribute))

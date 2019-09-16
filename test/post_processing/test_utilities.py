@@ -5,17 +5,54 @@ from collections import defaultdict, namedtuple
 from itertools import permutations
 import numpy as np
 import pandas as pd
-from fairlearn.post_processing.threshold_operation import ThresholdOperation
+from fairlearn.metrics import DisparityMetric
+from fairlearn.post_processing._threshold_operation import ThresholdOperation
 from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 
 
 example_attribute_names1 = ["A", "B", "C"]
 example_attributes1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
+example_attribute_names2 = ["x", "Y"]
 example_attributes2 = [x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
 example_labels = [int(x) for x in '0110100' '0010111' '000111']
 example_scores = [int(x) for x in '0011233' '0001111' '011112']
 
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
+
+
+class ExampleModel():
+    def predict(self, X):
+        return example_scores
+
+
+class ExampleNotModel():
+    pass
+
+
+class ExampleEstimator():
+    def fit(self, X, Y):
+        pass
+
+    def predict(self, X):
+        return example_scores
+
+
+class ExampleNotEstimator1():
+    def fit(self, X, Y):
+        pass
+
+
+class ExampleNotEstimator2():
+    def predict(self, X):
+        pass
+
+
+class ExampleMetric(DisparityMetric):
+    pass
+
+
+class ExampleNotMetric():
+    pass
 
 
 def _get_grouped_data_and_base_points(attribute_value):
@@ -85,16 +122,14 @@ def _generate_empty_list_permutations():
     return empty_list_permutations
 
 
-def _get_discretized_predictions(adjusted_model):
+def _get_predictions_by_attribute(adjusted_model, attributes, scores, labels):
     labels_and_predictions = defaultdict(list)
-    for i in range(len(example_attributes1)):
-        labels_and_predictions[example_attributes1[i]].append(
-            LabelAndPrediction(example_labels[i],
-                               adjusted_model(example_attributes1[i], example_scores[i])))
+    for i in range(len(attributes)):
+        labels_and_predictions[attributes[i]].append(
+            LabelAndPrediction(labels[i],
+                               adjusted_model([attributes[i]], [scores[i]])))
+    return labels_and_predictions
 
-    return {
-        attribute_value: [
-            LabelAndPrediction(lp.label, int(lp.prediction >= 0.5))
-            for lp in labels_and_predictions[attribute_value]
-        ] for attribute_value in labels_and_predictions
-    }
+
+def _format_as_list_of_lists(lst):
+    return [[item] for item in lst]
