@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from ._constants import LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY
-from .threshold_operation import ThresholdOperation
+from ._threshold_operation import ThresholdOperation
 
 
 def _get_roc(data, x_grid, attribute, flip=True):

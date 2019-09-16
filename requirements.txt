@@ -1,7 +1,18 @@
+# Required for fairlearn
 matplotlib
 numpy
 pandas
-pytest
 scipy
+
+# Required for environment
+autopep8
 flake8
-sklearn
+
+# Required for test
+# Pin pytest due to VS Code issue
+pytest==5.0.1
+scikit-learn
+
+# Required for notebooks
+jupyter
+shap

@@ -7,7 +7,7 @@ A Python package that implements a variety of fairness-related algorithms to mit
 | `expgrad` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
 | `grid_search.binary_protected_attribute.binary_classification` | As described in Section 3.4 in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP, EO |
 | `grid_search.binary_protected_attribute.regression` | Grid Search for regression | regression | binary | BGL |
-| `post_processing.roc_curve_based_post_processing` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
+| `post_processing.ROCCurveBasedPostProcessing` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
 
 DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. To request additional algorithms or fairness definitions, please open a new issue.
 
