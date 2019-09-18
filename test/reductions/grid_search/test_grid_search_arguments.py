@@ -11,6 +11,12 @@ from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric, SimpleRegressionQualityMetric  # noqa: E501
 
+# ==============================================================
+
+# The following are functions which convert ndarrays into other datatypes
+# They are used to generate different argument types for calls to
+# GridSearch
+
 
 def identity(X):
     return X
@@ -21,10 +27,14 @@ def pandasdf(X):
 
 
 def pandasseries(X):
+    # Will not work if ndarray has more than one dimension
     return pd.Series(X)
 
 
 def ndarray2d(X):
+    # Adds a second dimension of length 1 onto a 1D
+    # array. This is for checking that shapes n and
+    # n*1 behave the same
     if len(X.shape) != 1:
         raise RuntimeError("ndarray2d requires 1d ndarray")
 
@@ -32,11 +42,16 @@ def ndarray2d(X):
     return X
 
 
+# List the different datatypes which need to succeed for
+# all GridSearch calls
 Xtransform = [identity, pandasdf]
 Ytransform = [identity, pandasdf, pandasseries, ndarray2d]
 Atransform = [identity, pandasdf, pandasseries, ndarray2d]
 
 
+# Base class for tests
+# Tests which must be passed by all calls to the GridSearch
+# go here
 class ArgumentTests:
     def _quick_data(self, number_samples=48):
         feature_1 = np.random.randint(2, size=number_samples)
@@ -46,6 +61,8 @@ class ArgumentTests:
         Y = np.random.randint(2, size=number_samples)
         A = np.random.randint(2, size=number_samples)
         return X, Y, A
+
+    # ----------------------------
 
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
@@ -58,6 +75,8 @@ class ArgumentTests:
                aux_data=transformA(A),
                number_of_lagrange_multipliers=2)
         assert len(gs.all_results) == 2
+
+    # ----------------------------
 
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
@@ -88,6 +107,8 @@ class ArgumentTests:
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
+
+    # ----------------------------
 
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
@@ -125,6 +146,8 @@ class ArgumentTests:
 
         assert message == execInfo.value.args[0]
 
+    # ----------------------------
+
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
     @pytest.mark.parametrize("transformX", Xtransform)
@@ -143,6 +166,8 @@ class ArgumentTests:
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
+
+    # ----------------------------
 
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformX", Xtransform)
@@ -175,6 +200,8 @@ class ArgumentTests:
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
+
+    # ----------------------------
 
     @pytest.mark.parametrize("transformY", Ytransform)
     @pytest.mark.parametrize("transformX", Xtransform)
@@ -209,6 +236,7 @@ class ArgumentTests:
         assert message == execInfo.value.args[0]
 
 
+# Tests specific to DemographicParity
 class TestDemographicParity(ArgumentTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
@@ -249,6 +277,7 @@ class TestDemographicParity(ArgumentTests):
         assert message == execInfo.value.args[0]
 
 
+# Tests specific to BoundedGroupLoss
 class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
