@@ -135,7 +135,7 @@ class ArgumentTests:
         A[1] = 1
         A[2] = 2
 
-        message = str("Protected Attribute contains more than two unique values")
+        message = str("Target Attribute contains more than two unique values")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
