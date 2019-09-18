@@ -53,18 +53,33 @@ class GridSearch(ReductionsLearner):
         if self._KW_NUMBER_LAGRANGE_MULTIPLIERS in kwargs:
             number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
+        # Extract the protected attribute
+        A = None
+        if isinstance(aux_data, pd.DataFrame):
+            if len(aux_data.columns) == 1:
+                A = aux_data[0]
+            else:
+                raise RuntimeError("aux_data is DataFrame with more than one column")
+        else:
+            if len(aux_data.shape) == 1:
+                A = aux_data
+            elif len(aux_data.shape) == 2 and aux_data.shape[1] == 1:
+                A = aux_data[:, 0]
+            else:
+                raise RuntimeError("aux_data was ndarray with more than one column")
+
         # Prep the quality metric
-        self.quality_metric.set_data(X, Y, aux_data)
+        self.quality_metric.set_data(X, Y, A)
 
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
         # BoundedGroupLoss indicates a regression
         if isinstance(self.disparity_metric, DemographicParity):
-            self._fit_classification(X, Y, aux_data,
+            self._fit_classification(X, Y, A,
                                      lagrange_multipliers, number_of_lagrange_multipliers)
         elif isinstance(self.disparity_metric, BoundedGroupLoss):
-            self._fit_regression(X, Y, aux_data,
+            self._fit_regression(X, Y, A,
                                  lagrange_multipliers, number_of_lagrange_multipliers)
         else:
             raise RuntimeError("Can't get here")
