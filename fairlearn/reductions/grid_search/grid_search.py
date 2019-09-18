@@ -18,7 +18,7 @@ class GridSearch(ReductionsLearner):
     loss (for regression)
     """
 
-    _KW_PROTECTED_ATTRIBUTE = "protected_attribute"
+    _KW_AUX_DATA = "aux_data"
     _KW_LAGRANGE_MULTIPLIERS = "lagrange_multipliers"
     _KW_NUMBER_LAGRANGE_MULTIPLIERS = "number_of_lagrange_multipliers"
 
@@ -39,10 +39,10 @@ class GridSearch(ReductionsLearner):
         self.quality_metric = quality_metric
 
     def fit(self, X, Y, **kwargs):
-        if self._KW_PROTECTED_ATTRIBUTE in kwargs:
-            protected_attribute = kwargs[self._KW_PROTECTED_ATTRIBUTE]
+        if self._KW_AUX_DATA in kwargs:
+            aux_data = kwargs[self._KW_AUX_DATA]
         else:
-            raise RuntimeError("Must specify protected_attribute (for now)")
+            raise RuntimeError("Must specify aux_data (for now)")
 
         lagrange_multipliers = None
         if self._KW_LAGRANGE_MULTIPLIERS in kwargs:
@@ -53,17 +53,17 @@ class GridSearch(ReductionsLearner):
             number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
         # Prep the quality metric
-        self.quality_metric.set_data(X, Y, protected_attribute)
+        self.quality_metric.set_data(X, Y, aux_data)
 
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
         # BoundedGroupLoss indicates a regression
         if isinstance(self.disparity_metric, DemographicParity):
-            self._fit_classification(X, Y, protected_attribute,
+            self._fit_classification(X, Y, aux_data,
                                      lagrange_multipliers, number_of_lagrange_multipliers)
         elif isinstance(self.disparity_metric, BoundedGroupLoss):
-            self._fit_regression(X, Y, protected_attribute,
+            self._fit_regression(X, Y, aux_data,
                                  lagrange_multipliers, number_of_lagrange_multipliers)
         else:
             raise RuntimeError("Can't get here")
@@ -176,9 +176,9 @@ class GridSearch(ReductionsLearner):
 
         return p0, p1, unique_labels[0]
 
-    def _generate_classification_weights(self, y, protected_attribute, L, p_ratio, a0_val):
+    def _generate_classification_weights(self, y, rotected_attribute, L, p_ratio, a0_val):
         weight_func = np.vectorize(self._classification_weight_function)
-        return weight_func(y, protected_attribute, L, p_ratio, a0_val)
+        return weight_func(y, rotected_attribute, L, p_ratio, a0_val)
 
     def _regression_weight_function(self, a_val, trade_off, p0, p1, a0_val):
         # Reweighting function for Bounded Group Loss for regression
