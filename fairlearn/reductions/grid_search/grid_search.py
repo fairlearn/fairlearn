@@ -54,10 +54,10 @@ class GridSearch(ReductionsLearner):
             number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
         # Extract the protected attribute
-        A = self._make_vector(aux_data)
+        A = self._make_vector(aux_data, "aux_data")
 
         # Extract the Y values
-        Y_vector = self._make_vector(Y)
+        Y_vector = self._make_vector(Y, "Y")
 
         # Prep the quality metric
         self.quality_metric.set_data(X, Y_vector, A)
@@ -205,13 +205,13 @@ class GridSearch(ReductionsLearner):
         else:
             return (1 - trade_off) / p1
 
-    def _make_vector(self, formless):
+    def _make_vector(self, formless, formless_name):
         formed_vector = None
         if isinstance(formless, pd.DataFrame):
             if len(formless.columns) == 1:
                 formed_vector = formless[0].to_numpy()
             else:
-                raise RuntimeError("formless is DataFrame with more than one column")
+                raise RuntimeError("%s is a DataFrame with more than one column" % formless_name)
         elif isinstance(formless, pd.Series):
             formed_vector = formless.to_numpy()
         elif isinstance(formless, np.ndarray):
@@ -220,8 +220,8 @@ class GridSearch(ReductionsLearner):
             elif len(formless.shape) == 2 and formless.shape[1] == 1:
                 formed_vector = formless[:, 0]
             else:
-                raise RuntimeError("formless is ndarray with more than one column")
+                raise RuntimeError("%s is an ndarray with more than one column" % formless_name)
         else:
-            raise RuntimeError("formless not ndarray or DataFrame")
+            raise RuntimeError("formless not an ndarray or DataFrame")
 
         return formed_vector

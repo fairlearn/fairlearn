@@ -80,6 +80,70 @@ class ArgumentTests:
 
         assert message == execInfo.value.args[0]
 
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_Y_df_bad_columns(self, transformX, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, Y, A = self._quick_data()
+
+        Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
+        message = str("Y is a DataFrame with more than one column")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(transformX(X),
+                   Y_two_col_df,
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_Y_ndarray_bad_columns(self, transformX, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, Y, A = self._quick_data()
+
+        Y_two_col_ndarray = np.stack((Y, Y), -1)
+        message = str("Y is an ndarray with more than one column")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(transformX(X),
+                   Y_two_col_ndarray,
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_A_df_bad_columns(self, transformX, transformY):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, Y, A = self._quick_data()
+
+        A_two_col_df = pd.DataFrame({"a": A, "b": A})
+        message = str("aux_data is a DataFrame with more than one column")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(transformX(X),
+                   transformY(Y),
+                   aux_data=A_two_col_df,
+                   number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_A_ndarray_bad_columns(self, transformX, transformY):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, Y, A = self._quick_data()
+
+        A_two_col_ndarray = np.stack((A, A), -1)
+        message = str("aux_data is an ndarray with more than one column")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(transformX(X),
+                   transformY(Y),
+                   aux_data=A_two_col_ndarray,
+                   number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
 
 class TestDemographicParity(ArgumentTests):
     def setup_method(self, method):
