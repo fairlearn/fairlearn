@@ -32,8 +32,13 @@ def ndarray2d(X):
     return X
 
 
+Xtransform = [identity, pandasdf]
+Ytransform = [identity, pandasdf, pandasseries, ndarray2d]
+Atransform = [identity, pandasdf, pandasseries, ndarray2d]
+
+
 class ArgumentTests:
-    def _quick_data(self, number_samples=64):
+    def _quick_data(self, number_samples=48):
         feature_1 = np.random.randint(2, size=number_samples)
         feature_2 = np.random.randint(6, size=number_samples)
         feature_3 = np.random.randint(3, size=number_samples)
@@ -41,10 +46,6 @@ class ArgumentTests:
         Y = np.random.randint(2, size=number_samples)
         A = np.random.randint(2, size=number_samples)
         return X, Y, A
-
-    Xtransform = [identity, pandasdf]
-    Ytransform = [identity, pandasdf, pandasseries, ndarray2d]
-    Atransform = [identity, pandasdf, pandasseries, ndarray2d]
 
     def run_smoke(self, X, Y, A):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
@@ -72,7 +73,10 @@ class ArgumentTests:
 
         message = str("Protected Attribute contains more than two unique values")
         with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=3)
+            gs.fit(transformX(X),
+                   transformY(Y),
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
 
@@ -83,6 +87,38 @@ class TestDemographicParity(ArgumentTests):
         self.learner = LogisticRegression()
         self.disparity_criterion = DemographicParity()
         self.quality_metric = SimpleClassificationQualityMetric()
+
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_Y_ternary(self, transformX, transformY, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, Y, A = self._quick_data()
+        Y[0] = 0
+        Y[1] = 1
+        Y[2] = 2
+
+        message = str("Supplied Y labels are not 0 or 1")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(transformX(X), transformY(Y), aux_data=transformA(
+                A), number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_Y_not_0_1(self, transformX, transformY, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, Y, A = self._quick_data()
+        Y = Y + 1
+
+        message = str("Supplied Y labels are not 0 or 1")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(transformX(X), transformY(Y), aux_data=transformA(
+                A), number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
 
 
 class TestBoundedGroupLoss(ArgumentTests):
