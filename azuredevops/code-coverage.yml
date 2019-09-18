@@ -1,0 +1,38 @@
+schedules:
+- cron: "0 5 * * *" # Time is UTC
+  displayName: Daily midnight build
+  branches:
+    include:
+      - master
+      - dev
+  always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.5' 
+    addToPath: true
+
+- script: pip install -r requirements.txt
+  displayName: 'Install required packages'
+
+
+- script: python -m pytest test/ --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html
+  displayName: 'Run tests'
+
+# Publish code coverage results
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'cobertura'
+    summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
+    pathToSources: $(System.DefaultWorkingDirectory)
+    additionalCodeCoverageFiles: $(System.DefaultWorkingDirectory)/htmlcov/**
+    failIfCoverageEmpty: false
+    displayName: "Publish Code Coverage"
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/TEST-*.xml'
+  condition: succeededOrFailed()
