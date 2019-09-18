@@ -251,8 +251,7 @@ class GridSearch(ReductionsLearner):
                 num_rows = formless.shape[0]
                 num_cols = formless.shape[1]
             else:
-                raise RuntimeError(
-                    "%s is an ndarray which does not have exactly two dimensions" % formless_name)
+                raise RuntimeError("%s is an ndarray which is not 2D" % formless_name)
         else:
             raise RuntimeError("%s not an ndarray or DataFrame" % formless_name)
         return num_rows, num_cols
