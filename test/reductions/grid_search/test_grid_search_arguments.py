@@ -92,6 +92,24 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
     @pytest.mark.parametrize("transformX", Xtransform)
+    def test_X_Y_different_rows(self, transformX, transformY, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        num_rows = 8
+        X, _, A = self._quick_data(num_rows)
+        Y = np.random.randint(2, size=num_rows+1)
+
+        message = str("X and Y must have same number of rows")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(transformX(X),
+                   transformY(Y),
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
     def test_aux_data_non_binary(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data(8)

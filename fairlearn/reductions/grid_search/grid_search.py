@@ -26,6 +26,7 @@ class GridSearch(ReductionsLearner):
     _MESSAGE_Y_NOT_BINARY = "Supplied Y labels are not 0 or 1"
     _MESSAGE_X_NONE = "Must supply X"
     _MESSAGE_Y_NONE = "Must supply Y"
+    _MESSAGE_X_Y_ROWS = "X and Y must have same number of rows"
 
     def __init__(self,
                  learner,
@@ -66,6 +67,10 @@ class GridSearch(ReductionsLearner):
 
         # Extract the Y values
         Y_vector = self._make_vector(Y, "Y")
+
+        X_rows, _ = self._get_matrix_shape(X, "X")
+        if X_rows != Y_vector.shape[0]:
+            raise RuntimeError(self._MESSAGE_X_Y_ROWS)
 
         # Prep the quality metric
         self.quality_metric.set_data(X, Y_vector, A)
@@ -230,6 +235,24 @@ class GridSearch(ReductionsLearner):
             else:
                 raise RuntimeError("%s is an ndarray with more than one column" % formless_name)
         else:
-            raise RuntimeError("formless not an ndarray or DataFrame")
+            raise RuntimeError("%s not an ndarray or DataFrame" % formless_name)
 
         return formed_vector
+
+    def _get_matrix_shape(self, formless, formless_name):
+        num_rows = -1
+        num_cols = -1
+
+        if isinstance(formless, pd.DataFrame):
+            num_cols = len(formless.columns)
+            num_rows = len(formless.index)
+        elif isinstance(formless, np.ndarray):
+            if len(formless.shape) == 2:
+                num_rows = formless.shape[0]
+                num_cols = formless.shape[1]
+            else:
+                raise RuntimeError(
+                    "%s is an ndarray which does not have exactly two dimensions" % formless_name)
+        else:
+            raise RuntimeError("%s not an ndarray or DataFrame" % formless_name)
+        return num_rows, num_cols
