@@ -61,10 +61,40 @@ class ArgumentTests:
 
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
+    def test_X_is_None(self, transformY, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        _, Y, A = self._quick_data(8)
+
+        message = str("Must supply X")
+        with pytest.raises(ValueError) as execInfo:
+            gs.fit(None,
+                   transformY(Y),
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_Y_is_None(self, transformX, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, _, A = self._quick_data(8)
+
+        message = str("Must supply Y")
+        with pytest.raises(ValueError) as execInfo:
+            gs.fit(transformX(X),
+                   None,
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformY", Ytransform)
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_aux_data_non_binary(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+        X, Y, A = self._quick_data(8)
         A[0] = 0
         A[1] = 1
         A[2] = 2
@@ -82,7 +112,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_Y_df_bad_columns(self, transformX, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+        X, Y, A = self._quick_data(8)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
         message = str("Y is a DataFrame with more than one column")
@@ -98,7 +128,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_Y_ndarray_bad_columns(self, transformX, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+        X, Y, A = self._quick_data(8)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
         message = str("Y is an ndarray with more than one column")
@@ -114,7 +144,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_A_df_bad_columns(self, transformX, transformY):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+        X, Y, A = self._quick_data(8)
 
         A_two_col_df = pd.DataFrame({"a": A, "b": A})
         message = str("aux_data is a DataFrame with more than one column")
@@ -130,7 +160,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_A_ndarray_bad_columns(self, transformX, transformY):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+        X, Y, A = self._quick_data(8)
 
         A_two_col_ndarray = np.stack((A, A), -1)
         message = str("aux_data is an ndarray with more than one column")
@@ -155,7 +185,7 @@ class TestDemographicParity(ArgumentTests):
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_Y_ternary(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+        X, Y, A = self._quick_data(8)
         Y[0] = 0
         Y[1] = 1
         Y[2] = 2
@@ -172,7 +202,7 @@ class TestDemographicParity(ArgumentTests):
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_Y_not_0_1(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+        X, Y, A = self._quick_data(8)
         Y = Y + 1
 
         message = str("Supplied Y labels are not 0 or 1")

@@ -24,6 +24,8 @@ class GridSearch(ReductionsLearner):
     _KW_NUMBER_LAGRANGE_MULTIPLIERS = "number_of_lagrange_multipliers"
 
     _MESSAGE_Y_NOT_BINARY = "Supplied Y labels are not 0 or 1"
+    _MESSAGE_X_NONE = "Must supply X"
+    _MESSAGE_Y_NONE = "Must supply Y"
 
     def __init__(self,
                  learner,
@@ -40,6 +42,12 @@ class GridSearch(ReductionsLearner):
         self.quality_metric = quality_metric
 
     def fit(self, X, Y, **kwargs):
+        if X is None:
+            raise ValueError(self._MESSAGE_X_NONE)
+
+        if Y is None:
+            raise ValueError(self._MESSAGE_Y_NONE)
+
         if self._KW_AUX_DATA in kwargs:
             aux_data = kwargs[self._KW_AUX_DATA]
         else:
