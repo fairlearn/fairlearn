@@ -33,7 +33,7 @@ def ndarray2d(X):
 
 
 class ArgumentTypesTest:
-    def _quick_data(self, number_samples=32):
+    def _quick_data(self, number_samples=64):
         feature_1 = np.random.randint(2, size=number_samples)
         feature_2 = np.random.randint(6, size=number_samples)
         feature_3 = np.random.randint(3, size=number_samples)
