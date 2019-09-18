@@ -32,7 +32,7 @@ class ArgumentTypesTest:
 
     Xtransform = [identity, pandasdf]
     Ytransform = [identity, pandasdf]
-    Atransform = [identity, pandasdf]
+    Atransform = [identity]
 
     def run_smoke(self, X, Y, A):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)

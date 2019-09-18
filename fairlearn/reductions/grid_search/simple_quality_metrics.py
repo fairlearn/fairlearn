@@ -25,8 +25,14 @@ class SimpleClassificationQualityMetric(QualityMetric):
         self.Y = Y
         self.bin_id = bin_id
 
-        self.error_metric.init(X, bin_id, pd.Series(Y))
-        self.disparity_metric.init(X, bin_id, pd.Series(Y))
+        y_series = None
+        if( isinstance(self.Y, pd.DataFrame)):
+            y_series = self.Y[0]
+        else:
+            y_series = pd.Series(Y)
+
+        self.error_metric.init(X, bin_id, y_series)
+        self.disparity_metric.init(X, bin_id, y_series)
 
     def get_quality(self, model):
         current_error_metric = copy.deepcopy(self.error_metric)
