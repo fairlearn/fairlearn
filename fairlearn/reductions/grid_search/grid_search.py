@@ -201,17 +201,7 @@ class GridSearch(ReductionsLearner):
 
     def _generate_classification_weights(self, y, target_attribute, L, p_ratio, a0_val):
         weight_func = np.vectorize(self._classification_weight_function)
-        ys = None
-        if isinstance(y, pd.DataFrame):
-            ys = y[0].to_numpy()
-        elif len(y.shape) == 1:
-            ys = y
-        elif len(y.shape) == 2 and y.shape[1] == 1:
-            ys = y[:, 0]
-        else:
-            raise RuntimeError("Got bad Y for _generate_classification_weights")
-
-        return weight_func(ys, target_attribute, L, p_ratio, a0_val)
+        return weight_func(y, target_attribute, L, p_ratio, a0_val)
 
     def _regression_weight_function(self, a_val, trade_off, p0, p1, a0_val):
         # Reweighting function for Bounded Group Loss for regression
