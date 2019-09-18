@@ -47,19 +47,17 @@ class ArgumentTests:
         A = np.random.randint(2, size=number_samples)
         return X, Y, A
 
-    def run_smoke(self, X, Y, A):
-        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
-
-        gs.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=5)
-
-        assert len(gs.all_results) == 5
-
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
     @pytest.mark.parametrize("transformX", Xtransform)
     def test_valid_inputs(self, transformX, transformY, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
-        self.run_smoke(transformX(X), transformY(Y), transformA(A))
+        gs.fit(transformX(X),
+               transformY(Y),
+               aux_data=transformA(A),
+               number_of_lagrange_multipliers=2)
+        assert len(gs.all_results) == 2
 
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
