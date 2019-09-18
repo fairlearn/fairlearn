@@ -68,15 +68,15 @@ class GridSearch(ReductionsLearner):
         else:
             raise RuntimeError("Can't get here")
 
-    def _fit_classification(self, X, Y, aux_data,
+    def _fit_classification(self, X, Y, protected_attribute,
                             lagrange_multipliers, number_of_lagrange_multipliers):
         # Verify we have a binary classification problem
         unique_labels = np.unique(Y)
         if not set(unique_labels).issubset({0, 1}):
             raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
-        # Extract required statistics from aux_data
-        p0, p1, a0_val = self._generate_aux_data_info(aux_data)
+        # Extract required statistics from protected_attribute
+        p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
 
         # If not supplied, generate array of trial lagrange multipliers
         if lagrange_multipliers is None:
@@ -91,7 +91,7 @@ class GridSearch(ReductionsLearner):
         for current_multiplier in lagrange_multipliers:
             # Generate weights array
             sample_weights = self._generate_classification_weights(Y,
-                                                                   aux_data,
+                                                                   protected_attribute,
                                                                    current_multiplier,
                                                                    p1 / p0,
                                                                    a0_val)
@@ -117,9 +117,9 @@ class GridSearch(ReductionsLearner):
         # Designate a 'best' model
         self.best_result = max(self.all_results, key=lambda x: x.quality_metric_value)
 
-    def _fit_regression(self, X, Y, aux_data, tradeoffs, number_of_tradeoffs):
-        # Extract required statistics from aux_data
-        p0, p1, a0_val = self._generate_aux_data_info(aux_data)
+    def _fit_regression(self, X, Y, protected_attribute, tradeoffs, number_of_tradeoffs):
+        # Extract required statistics from protected_attribute
+        p0, p1, a0_val = self._generate_protected_attribute_info(protected_attribute)
 
         if tradeoffs is None:
             tradeoffs = np.linspace(0, 1, number_of_tradeoffs)
@@ -127,7 +127,7 @@ class GridSearch(ReductionsLearner):
         self.all_results = []
         for tradeoff in tradeoffs:
             weight_func = np.vectorize(self._regression_weight_function)
-            weights = weight_func(aux_data,
+            weights = weight_func(protected_attribute,
                                   tradeoff,
                                   p0, p1, a0_val)
 
@@ -164,21 +164,21 @@ class GridSearch(ReductionsLearner):
         else:
             return 2 * y_val - 1 + L
 
-    def _generate_aux_data_info(self, aux_data):
+    def _generate_protected_attribute_info(self, protected_attribute):
         unique_labels, counts = np.unique(
-            aux_data, return_counts=True)
+            protected_attribute, return_counts=True)
         if len(unique_labels) > 2:
             raise RuntimeError("Protected Attribute contains "
                                "more than two unique values")
 
-        p0 = counts[0] / len(aux_data)
+        p0 = counts[0] / len(protected_attribute)
         p1 = 1 - p0
 
         return p0, p1, unique_labels[0]
 
-    def _generate_classification_weights(self, y, aux_data, L, p_ratio, a0_val):
+    def _generate_classification_weights(self, y, rotected_attribute, L, p_ratio, a0_val):
         weight_func = np.vectorize(self._classification_weight_function)
-        return weight_func(y, aux_data, L, p_ratio, a0_val)
+        return weight_func(y, rotected_attribute, L, p_ratio, a0_val)
 
     def _regression_weight_function(self, a_val, trade_off, p0, p1, a0_val):
         # Reweighting function for Bounded Group Loss for regression
