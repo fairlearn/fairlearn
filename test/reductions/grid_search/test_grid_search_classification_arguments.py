@@ -20,6 +20,18 @@ def pandasdf(X):
     return pd.DataFrame(X)
 
 
+def pandasseries(X):
+    return pd.Series(X)
+
+
+def ndarray2d(X):
+    if len(X.shape) != 1:
+        raise RuntimeError("ndarray2d requires 1d ndarray")
+
+    X.shape = (X.shape[0], 1)
+    return X
+
+
 class ArgumentTypesTest:
     def _quick_data(self, number_samples=8):
         feature_1 = np.random.randint(2, size=number_samples)
@@ -31,7 +43,7 @@ class ArgumentTypesTest:
         return X, Y, A
 
     Xtransform = [identity, pandasdf]
-    Ytransform = [identity, pandasdf]
+    Ytransform = [identity, pandasdf, pandasseries, ndarray2d]
     Atransform = [identity]
 
     def run_smoke(self, X, Y, A):

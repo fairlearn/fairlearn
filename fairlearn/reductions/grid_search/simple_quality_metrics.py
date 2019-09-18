@@ -26,10 +26,15 @@ class SimpleClassificationQualityMetric(QualityMetric):
         self.bin_id = bin_id
 
         y_series = None
-        if( isinstance(self.Y, pd.DataFrame)):
+        if isinstance(self.Y, pd.DataFrame):
             y_series = self.Y[0]
         else:
-            y_series = pd.Series(Y)
+            if len(self.Y.shape) == 1:
+                y_series = pd.Series(self.Y)
+            elif len(self.Y.shape) == 2 and self.Y.shape[1] == 1:
+                y_series = pd.Series(self.Y[:, 0])
+            else:
+                raise RuntimeError("SimpleClassificationQualityMetric got bad Y")
 
         self.error_metric.init(X, bin_id, y_series)
         self.disparity_metric.init(X, bin_id, y_series)

@@ -182,8 +182,12 @@ class GridSearch(ReductionsLearner):
         ys = None
         if isinstance(y, pd.DataFrame):
             ys = y[0].to_numpy()
-        else:
+        elif len(y.shape) == 1:
             ys = y
+        elif len(y.shape) == 2 and y.shape[1] == 1:
+            ys = y[:, 0]
+        else:
+            raise RuntimeError("Got bad Y for _generate_classification_weights")
 
         return weight_func(ys, protected_attribute, L, p_ratio, a0_val)
 
