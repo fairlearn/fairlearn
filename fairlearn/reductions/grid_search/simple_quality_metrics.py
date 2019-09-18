@@ -24,6 +24,7 @@ class SimpleClassificationQualityMetric(QualityMetric):
         self.X = X
         self.Y = Y
         self.bin_id = bin_id
+
         self.error_metric.init(X, bin_id, pd.Series(Y))
         self.disparity_metric.init(X, bin_id, pd.Series(Y))
 
