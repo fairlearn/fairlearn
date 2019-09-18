@@ -41,9 +41,9 @@ class ArgumentTypesTest:
 
         assert len(gs.all_results) == 11
 
-    @pytest.mark.parametrize("transformX", Xtransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
     @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
     def test_inputs(self, transformX, transformY, transformA):
         X, Y, A = self._quick_data()
         self.run_smoke(transformX(X), transformY(Y), transformA(A))
