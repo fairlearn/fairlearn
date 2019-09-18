@@ -27,6 +27,7 @@ class GridSearch(ReductionsLearner):
     _MESSAGE_X_NONE = "Must supply X"
     _MESSAGE_Y_NONE = "Must supply Y"
     _MESSAGE_X_Y_ROWS = "X and Y must have same number of rows"
+    _MESSAGE_X_A_ROWS = "X and the target attribute must have same number of rows"
 
     def __init__(self,
                  learner,
@@ -62,7 +63,7 @@ class GridSearch(ReductionsLearner):
         if self._KW_NUMBER_LAGRANGE_MULTIPLIERS in kwargs:
             number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
-        # Extract the protected attribute
+        # Extract the target attribute
         A = self._make_vector(aux_data, "aux_data")
 
         # Extract the Y values
@@ -71,6 +72,9 @@ class GridSearch(ReductionsLearner):
         X_rows, _ = self._get_matrix_shape(X, "X")
         if X_rows != Y_vector.shape[0]:
             raise RuntimeError(self._MESSAGE_X_Y_ROWS)
+        if X_rows != A.shape[0]:
+            raise RuntimeError(self._MESSAGE_X_A_ROWS)
+
 
         # Prep the quality metric
         self.quality_metric.set_data(X, Y_vector, A)
