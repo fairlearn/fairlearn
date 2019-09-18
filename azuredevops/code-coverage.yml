@@ -1,9 +1,5 @@
-trigger:
-- master
-- dev
-
 schedules:
-- cron: "0 5 * * *"
+- cron: "0 5 * * *" # Time is UTC
   displayName: Daily midnight build
   branches:
     include:
@@ -33,7 +29,6 @@ steps:
     codeCoverageTool: 'cobertura'
     summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
     pathToSources: $(System.DefaultWorkingDirectory)
-    # reportDirectory: $(System.DefaultWorkingDirectory)/htmlcov
     additionalCodeCoverageFiles: $(System.DefaultWorkingDirectory)/htmlcov/**
     failIfCoverageEmpty: false
     displayName: "Publish Code Coverage"
