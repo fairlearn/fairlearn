@@ -24,7 +24,7 @@ steps:
   displayName: 'Install required packages'
 
 
-- script: python -m pytest test/ --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml
+- script: python -m pytest test/ --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html
   displayName: 'Run tests'
 
 # Publish code coverage results
