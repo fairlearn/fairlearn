@@ -5,11 +5,11 @@ import logging
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LinearRegression
 
-from fairlearn.metrics import DemographicParity
+from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions import GridSearch
-from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
+from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric, SimpleRegressionQualityMetric  # noqa: E501
 
 
 def identity(X):
@@ -67,3 +67,11 @@ class TestDemographicParity(ArgumentTypesTest):
         self.learner = LogisticRegression()
         self.disparity_criterion = DemographicParity()
         self.quality_metric = SimpleClassificationQualityMetric()
+
+
+class TestBoundedGroupLoss(ArgumentTypesTest):
+    def setup_method(self, method):
+        logging.info("setup_method      method:%s" % method.__name__)
+        self.learner = LinearRegression()
+        self.disparity_criterion = BoundedGroupLoss()
+        self.quality_metric = SimpleRegressionQualityMetric()

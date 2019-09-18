@@ -54,32 +54,23 @@ class GridSearch(ReductionsLearner):
             number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
         # Extract the protected attribute
-        A = None
-        if isinstance(aux_data, pd.DataFrame):
-            if len(aux_data.columns) == 1:
-                A = aux_data[0]
-            else:
-                raise RuntimeError("aux_data is DataFrame with more than one column")
-        else:
-            if len(aux_data.shape) == 1:
-                A = aux_data
-            elif len(aux_data.shape) == 2 and aux_data.shape[1] == 1:
-                A = aux_data[:, 0]
-            else:
-                raise RuntimeError("aux_data was ndarray with more than one column")
+        A = self._make_vector(aux_data)
+
+        # Extract the Y values
+        Y_vector = self._make_vector(Y)
 
         # Prep the quality metric
-        self.quality_metric.set_data(X, Y, A)
+        self.quality_metric.set_data(X, Y_vector, A)
 
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
         # BoundedGroupLoss indicates a regression
         if isinstance(self.disparity_metric, DemographicParity):
-            self._fit_classification(X, Y, A,
+            self._fit_classification(X, Y_vector, A,
                                      lagrange_multipliers, number_of_lagrange_multipliers)
         elif isinstance(self.disparity_metric, BoundedGroupLoss):
-            self._fit_regression(X, Y, A,
+            self._fit_regression(X, Y_vector, A,
                                  lagrange_multipliers, number_of_lagrange_multipliers)
         else:
             raise RuntimeError("Can't get here")
@@ -213,3 +204,24 @@ class GridSearch(ReductionsLearner):
             return trade_off / p0
         else:
             return (1 - trade_off) / p1
+
+    def _make_vector(self, formless):
+        formed_vector = None
+        if isinstance(formless, pd.DataFrame):
+            if len(formless.columns) == 1:
+                formed_vector = formless[0].to_numpy()
+            else:
+                raise RuntimeError("formless is DataFrame with more than one column")
+        elif isinstance(formless, pd.Series):
+            formed_vector = formless.to_numpy()
+        elif isinstance(formless, np.ndarray):
+            if len(formless.shape) == 1:
+                formed_vector = formless
+            elif len(formless.shape) == 2 and formless.shape[1] == 1:
+                formed_vector = formless[:, 0]
+            else:
+                raise RuntimeError("formless is ndarray with more than one column")
+        else:
+            raise RuntimeError("formless not ndarray or DataFrame")
+
+        return formed_vector
