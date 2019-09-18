@@ -32,7 +32,7 @@ def ndarray2d(X):
     return X
 
 
-class ArgumentTypesTest:
+class ArgumentTests:
     def _quick_data(self, number_samples=64):
         feature_1 = np.random.randint(2, size=number_samples)
         feature_2 = np.random.randint(6, size=number_samples)
@@ -49,19 +49,35 @@ class ArgumentTypesTest:
     def run_smoke(self, X, Y, A):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
 
-        gs.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=11)
+        gs.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=5)
 
-        assert len(gs.all_results) == 11
+        assert len(gs.all_results) == 5
 
     @pytest.mark.parametrize("transformA", Atransform)
     @pytest.mark.parametrize("transformY", Ytransform)
     @pytest.mark.parametrize("transformX", Xtransform)
-    def test_inputs(self, transformX, transformY, transformA):
+    def test_valid_inputs(self, transformX, transformY, transformA):
         X, Y, A = self._quick_data()
         self.run_smoke(transformX(X), transformY(Y), transformA(A))
 
+    @pytest.mark.parametrize("transformA", Atransform)
+    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformX", Xtransform)
+    def test_aux_data_non_binary(self, transformX, transformY, transformA):
+        gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
+        X, Y, A = self._quick_data()
+        A[0] = 0
+        A[1] = 1
+        A[2] = 2
 
-class TestDemographicParity(ArgumentTypesTest):
+        message = str("Protected Attribute contains more than two unique values")
+        with pytest.raises(RuntimeError) as execInfo:
+            gs.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=3)
+
+        assert message == execInfo.value.args[0]
+
+
+class TestDemographicParity(ArgumentTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
         self.learner = LogisticRegression()
@@ -69,7 +85,7 @@ class TestDemographicParity(ArgumentTypesTest):
         self.quality_metric = SimpleClassificationQualityMetric()
 
 
-class TestBoundedGroupLoss(ArgumentTypesTest):
+class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
         self.learner = LinearRegression()
