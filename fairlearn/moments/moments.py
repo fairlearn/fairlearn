@@ -3,7 +3,7 @@
 
 import pandas as pd
 
-__all__ = ["DemographicParity", "EO"]
+__all__ = ["DemographicParity", "EqualizedOdds"]
 
 
 class Moment:
@@ -49,7 +49,7 @@ class MisclassificationError(Moment):
 
 
 class _CondOpportunity(Moment):
-    """Generic fairness metric including DemographicParity and EO"""
+    """Generic fairness metric including DemographicParity and EqualizedOdds"""
 
     def init(self, dataX, dataA, dataY, dataGrp):
         super().init(dataX, dataA, dataY)
@@ -104,12 +104,12 @@ class DemographicParity(_CondOpportunity):
                      dataY.apply(lambda y: "all"))
 
 
-class EO(_CondOpportunity):
+class EqualizedOdds(_CondOpportunity):
     """ Equalized odds
     Adds conditioning on label compared to Demographic parity, i.e.
     Prob[h(X) = y' | A = a, Y = y] = Prob[h(X) = y' | Y = y] for all a, y, y'
     """
-    short_name = "EO"
+    short_name = "EqualizedOdds"
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
