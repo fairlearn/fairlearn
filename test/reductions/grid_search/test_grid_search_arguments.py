@@ -38,7 +38,8 @@ def ndarray2d(X):
     if len(X.shape) != 1:
         raise RuntimeError("ndarray2d requires 1d ndarray")
 
-    X.shape = (X.shape[0], 1)
+    X = np.expand_dims(X, 1)
+    assert len(X.shape) == 2
     return X
 
 
