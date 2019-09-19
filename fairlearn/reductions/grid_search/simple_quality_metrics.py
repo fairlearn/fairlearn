@@ -18,7 +18,7 @@ class SimpleClassificationQualityMetric(QualityMetric):
 
     def __init__(self):
         self.error_metric = moments.MisclassificationError()
-        self.disparity_metric = moments.DP()
+        self.disparity_metric = moments.DemographicParity()
 
     def set_data(self, X, Y, bin_id):
         self.X = X

@@ -3,7 +3,7 @@
 
 import pandas as pd
 
-__all__ = ["DP", "EO"]
+__all__ = ["DemographicParity", "EO"]
 
 
 class Moment:
@@ -49,7 +49,7 @@ class MisclassificationError(Moment):
 
 
 class _CondOpportunity(Moment):
-    """Generic fairness metric including DP and EO"""
+    """Generic fairness metric including DemographicParity and EO"""
 
     def init(self, dataX, dataA, dataY, dataGrp):
         super().init(dataX, dataA, dataY)
@@ -92,12 +92,12 @@ class _CondOpportunity(Moment):
         return signed_weights
 
 
-class DP(_CondOpportunity):
+class DemographicParity(_CondOpportunity):
     """ Demographic parity
-    A classifier h satisfies DP if
+    A classifier h satisfies DemographicParity if
     Prob[h(X) = y' | A = a] = Prob[h(X) = y'] for all a, y'
     """
-    short_name = "DP"
+    short_name = "DemographicParity"
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,

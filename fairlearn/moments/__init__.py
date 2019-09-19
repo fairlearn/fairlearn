@@ -2,4 +2,4 @@
 # Licensed under the MIT License.
 
 
-from .moments import Moment, DP, EO, MisclassificationError   # noqa: F401
+from .moments import Moment, DemographicParity, EO, MisclassificationError   # noqa: F401
