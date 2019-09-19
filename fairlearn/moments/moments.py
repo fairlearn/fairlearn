@@ -3,8 +3,6 @@
 
 import pandas as pd
 
-__all__ = ["DemographicParity", "EqualizedOdds"]
-
 
 class Moment:
     """Generic moment"""
