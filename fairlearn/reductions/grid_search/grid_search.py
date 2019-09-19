@@ -13,7 +13,7 @@ from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 class GridSearch(ReductionsLearner):
     """Learner to perform a grid search given a blackbox algorithm.
     The supplied algorithm must implement a method
-    fit(X, Y, sample_weight=[...])
+    fit(X, y, sample_weight=[...])
     At the present time, the only disparity metrics supported
     are demographic parity (for classification) and bounded group
     loss (for regression)
@@ -23,10 +23,10 @@ class GridSearch(ReductionsLearner):
     _KW_LAGRANGE_MULTIPLIERS = "lagrange_multipliers"
     _KW_NUMBER_LAGRANGE_MULTIPLIERS = "number_of_lagrange_multipliers"
 
-    _MESSAGE_Y_NOT_BINARY = "Supplied Y labels are not 0 or 1"
+    _MESSAGE_Y_NOT_BINARY = "Supplied y labels are not 0 or 1"
     _MESSAGE_X_NONE = "Must supply X"
-    _MESSAGE_Y_NONE = "Must supply Y"
-    _MESSAGE_X_Y_ROWS = "X and Y must have same number of rows"
+    _MESSAGE_Y_NONE = "Must supply y"
+    _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
     _MESSAGE_X_A_ROWS = "X and the target attribute must have same number of rows"
 
     def __init__(self,
@@ -43,11 +43,11 @@ class GridSearch(ReductionsLearner):
             raise RuntimeError("quality_metric must derive from QualityMetric")
         self.quality_metric = quality_metric
 
-    def fit(self, X, Y, **kwargs):
+    def fit(self, X, y, **kwargs):
         if X is None:
             raise ValueError(self._MESSAGE_X_NONE)
 
-        if Y is None:
+        if y is None:
             raise ValueError(self._MESSAGE_Y_NONE)
 
         if self._KW_AUX_DATA in kwargs:
@@ -67,34 +67,34 @@ class GridSearch(ReductionsLearner):
         A = self._make_vector(aux_data, "aux_data")
 
         # Extract the Y values
-        Y_vector = self._make_vector(Y, "Y")
+        y_vector = self._make_vector(y, "y")
 
         X_rows, _ = self._get_matrix_shape(X, "X")
-        if X_rows != Y_vector.shape[0]:
+        if X_rows != y_vector.shape[0]:
             raise RuntimeError(self._MESSAGE_X_Y_ROWS)
         if X_rows != A.shape[0]:
             raise RuntimeError(self._MESSAGE_X_A_ROWS)
 
         # Prep the quality metric
-        self.quality_metric.set_data(X, Y_vector, A)
+        self.quality_metric.set_data(X, y_vector, A)
 
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
         # BoundedGroupLoss indicates a regression
         if isinstance(self.disparity_metric, DemographicParity):
-            self._fit_classification(X, Y_vector, A,
+            self._fit_classification(X, y_vector, A,
                                      lagrange_multipliers, number_of_lagrange_multipliers)
         elif isinstance(self.disparity_metric, BoundedGroupLoss):
-            self._fit_regression(X, Y_vector, A,
+            self._fit_regression(X, y_vector, A,
                                  lagrange_multipliers, number_of_lagrange_multipliers)
         else:
             raise RuntimeError("Can't get here")
 
-    def _fit_classification(self, X, Y, target_attribute,
+    def _fit_classification(self, X, y, target_attribute,
                             lagrange_multipliers, number_of_lagrange_multipliers):
         # Verify we have a binary classification problem
-        unique_labels = np.unique(Y)
+        unique_labels = np.unique(y)
         if not set(unique_labels).issubset({0, 1}):
             raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
@@ -113,13 +113,13 @@ class GridSearch(ReductionsLearner):
         self.all_results = []
         for current_multiplier in lagrange_multipliers:
             # Generate weights array
-            sample_weights = self._generate_classification_weights(Y,
+            sample_weights = self._generate_classification_weights(y,
                                                                    target_attribute,
                                                                    current_multiplier,
                                                                    p1 / p0,
                                                                    a0_val)
 
-            # Generate Y'
+            # Generate y'
             def f(x): return 1 if x > 0 else 0
             re_labels = np.vectorize(f)(sample_weights)
 
@@ -140,7 +140,7 @@ class GridSearch(ReductionsLearner):
         # Designate a 'best' model
         self.best_result = max(self.all_results, key=lambda x: x.quality_metric_value)
 
-    def _fit_regression(self, X, Y, target_attribute, tradeoffs, number_of_tradeoffs):
+    def _fit_regression(self, X, y, target_attribute, tradeoffs, number_of_tradeoffs):
         # Extract required statistics from target_attribute
         p0, p1, a0_val = self._generate_target_attribute_info(target_attribute)
 
@@ -155,7 +155,7 @@ class GridSearch(ReductionsLearner):
                                   p0, p1, a0_val)
 
             current_learner = copy.deepcopy(self.learner)
-            current_learner.fit(X, Y, sample_weight=weights)
+            current_learner.fit(X, y, sample_weight=weights)
 
             # Evaluate the quality metric
             quality = self.quality_metric.get_quality(current_learner)

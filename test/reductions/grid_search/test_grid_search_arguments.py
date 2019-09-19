@@ -99,7 +99,7 @@ class ArgumentTests:
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, _, A = self._quick_data(8)
 
-        message = str("Must supply Y")
+        message = str("Must supply y")
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    None,
@@ -119,7 +119,7 @@ class ArgumentTests:
         X, _, A = self._quick_data(num_rows)
         Y = np.random.randint(2, size=num_rows+1)
 
-        message = str("X and Y must have same number of rows")
+        message = str("X and y must have same number of rows")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
@@ -176,7 +176,7 @@ class ArgumentTests:
         X, Y, A = self._quick_data(8)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
-        message = str("Y is a DataFrame with more than one column")
+        message = str("y is a DataFrame with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_df,
@@ -192,7 +192,7 @@ class ArgumentTests:
         X, Y, A = self._quick_data(8)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
-        message = str("Y is an ndarray with more than one column")
+        message = str("y is an ndarray with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
@@ -254,10 +254,12 @@ class TestDemographicParity(ArgumentTests):
         Y[1] = 1
         Y[2] = 2
 
-        message = str("Supplied Y labels are not 0 or 1")
+        message = str("Supplied y labels are not 0 or 1")
         with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(transformX(X), transformY(Y), aux_data=transformA(
-                A), number_of_lagrange_multipliers=3)
+            gs.fit(transformX(X),
+                   transformY(Y),
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
 
@@ -269,10 +271,12 @@ class TestDemographicParity(ArgumentTests):
         X, Y, A = self._quick_data(8)
         Y = Y + 1
 
-        message = str("Supplied Y labels are not 0 or 1")
+        message = str("Supplied y labels are not 0 or 1")
         with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(transformX(X), transformY(Y), aux_data=transformA(
-                A), number_of_lagrange_multipliers=3)
+            gs.fit(transformX(X),
+                   transformY(Y),
+                   aux_data=transformA(A),
+                   number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
 
