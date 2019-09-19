@@ -19,7 +19,6 @@ class GridSearch(ReductionsLearner):
     loss (for regression)
     """
 
-    _KW_AUX_DATA = "aux_data"
     _KW_LAGRANGE_MULTIPLIERS = "lagrange_multipliers"
     _KW_NUMBER_LAGRANGE_MULTIPLIERS = "number_of_lagrange_multipliers"
 
@@ -43,16 +42,14 @@ class GridSearch(ReductionsLearner):
             raise RuntimeError("quality_metric must derive from QualityMetric")
         self.quality_metric = quality_metric
 
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y, aux_data=None, **kwargs):
         if X is None:
             raise ValueError(self._MESSAGE_X_NONE)
 
         if y is None:
             raise ValueError(self._MESSAGE_Y_NONE)
 
-        if self._KW_AUX_DATA in kwargs:
-            aux_data = kwargs[self._KW_AUX_DATA]
-        else:
+        if aux_data is None:
             raise RuntimeError("Must specify aux_data (for now)")
 
         lagrange_multipliers = None
