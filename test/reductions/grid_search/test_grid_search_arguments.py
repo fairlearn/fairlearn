@@ -45,9 +45,9 @@ def ndarray2d(X):
 
 # List the different datatypes which need to succeed for
 # all GridSearch calls
-Xtransform = [identity, pandasdf]
-Ytransform = [identity, pandasdf, pandasseries, ndarray2d]
-Atransform = [identity, pandasdf, pandasseries, ndarray2d]
+candidate_X_transforms = [identity, pandasdf]
+candidate_Y_transforms = [identity, pandasdf, pandasseries, ndarray2d]
+candidate_A_transforms = [identity, pandasdf, pandasseries, ndarray2d]
 
 
 # Base class for tests
@@ -66,9 +66,9 @@ class ArgumentTests:
 
     # ----------------------------
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_valid_inputs(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
@@ -80,8 +80,8 @@ class ArgumentTests:
 
     # ----------------------------
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     def test_X_is_None(self, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         _, Y, A = self._quick_data()
@@ -95,8 +95,8 @@ class ArgumentTests:
 
         assert message == execInfo.value.args[0]
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_Y_is_None(self, transformX, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, _, A = self._quick_data()
@@ -112,9 +112,9 @@ class ArgumentTests:
 
     # ----------------------------
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_X_Y_different_rows(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, _, A = self._quick_data()
@@ -129,9 +129,9 @@ class ArgumentTests:
 
         assert message == execInfo.value.args[0]
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_X_A_different_rows(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, _ = self._quick_data()
@@ -148,9 +148,9 @@ class ArgumentTests:
 
     # ----------------------------
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_aux_data_non_binary(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
@@ -169,8 +169,8 @@ class ArgumentTests:
 
     # ----------------------------
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_Y_df_bad_columns(self, transformX, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
@@ -185,8 +185,8 @@ class ArgumentTests:
 
         assert message == execInfo.value.args[0]
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_Y_ndarray_bad_columns(self, transformX, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
@@ -203,8 +203,8 @@ class ArgumentTests:
 
     # ----------------------------
 
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_A_df_bad_columns(self, transformX, transformY):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
@@ -219,8 +219,8 @@ class ArgumentTests:
 
         assert message == execInfo.value.args[0]
 
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_A_ndarray_bad_columns(self, transformX, transformY):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
@@ -244,9 +244,9 @@ class TestDemographicParity(ArgumentTests):
         self.disparity_criterion = DemographicParity()
         self.quality_metric = SimpleClassificationQualityMetric()
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_Y_ternary(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
@@ -263,9 +263,9 @@ class TestDemographicParity(ArgumentTests):
 
         assert message == execInfo.value.args[0]
 
-    @pytest.mark.parametrize("transformA", Atransform)
-    @pytest.mark.parametrize("transformY", Ytransform)
-    @pytest.mark.parametrize("transformX", Xtransform)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_Y_not_0_1(self, transformX, transformY, transformA):
         gs = GridSearch(self.learner, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
