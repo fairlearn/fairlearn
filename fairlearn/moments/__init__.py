@@ -2,4 +2,6 @@
 # Licensed under the MIT License.
 
 from .moment import Moment  # noqa: F401
-from .moments import DemographicParity, EqualizedOdds, MisclassificationError   # noqa: F401
+
+from .conditional_opportunity import DemographicParity, EqualizedOdds  # noqa: F401
+from .moments import MisclassificationError   # noqa: F401
