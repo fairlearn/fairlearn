@@ -2,23 +2,7 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-
-
-class Moment:
-    """Generic moment"""
-
-    def __init__(self):
-        self.initialized = False
-
-    def init(self, dataX, dataA, dataY):
-        assert self.initialized is False, \
-            "moments can be initialized only once"
-        self.X = dataX
-        self.tags = pd.DataFrame(
-            {"protected_attribute": dataA, "label": dataY})
-        self.n = dataX.shape[0]
-        self.initialized = True
-        self._gamma_descr = None
+from .moment import Moment
 
 
 class MisclassificationError(Moment):

@@ -1,5 +1,5 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-
-from .moments import Moment, DemographicParity, EqualizedOdds, MisclassificationError   # noqa: F401
+from .moment import Moment  # noqa: F401
+from .moments import DemographicParity, EqualizedOdds, MisclassificationError   # noqa: F401
