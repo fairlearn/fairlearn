@@ -4,4 +4,4 @@
 from .moment import Moment  # noqa: F401
 
 from .conditional_opportunity import DemographicParity, EqualizedOdds  # noqa: F401
-from .moments import MisclassificationError   # noqa: F401
+from .misclassification_error import MisclassificationError   # noqa: F401
