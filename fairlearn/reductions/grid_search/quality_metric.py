@@ -3,7 +3,7 @@
 
 
 class QualityMetric:
-    def set_data(self, X, Y, protected_attribute):
+    def set_data(self, X, Y, bin_id):
         raise NotImplementedError()
 
     def get_quality(self, model):
