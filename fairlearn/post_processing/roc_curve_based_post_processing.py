@@ -20,12 +20,12 @@ from ._roc_curve_utilities import _interpolate_curve, _get_roc
 from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
 from ._interpolated_prediction import InterpolatedPredictor
 
-DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "Attributes, labels, and scores need to be of equal length."
+DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
 EMPTY_INPUT_ERROR_MESSAGE = "At least one of attributes, labels, or scores are empty."
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
-INPUT_DATA_CONSISTENCY_ERROR_MESSAGE = "The only allowed input data formats are: " \
-                                       "(list, list, list), (ndarray, ndarray, ndarray). " \
-                                       "Your provided data was of types ({}, {}, {})"
+INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
+                                  "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
+                                  "Your provided data was of types ({}, {}, {})"
 MISSING_FIT_PREDICT_ERROR_MESSAGE = "The model does not have callable 'fit' or 'predict' methods."
 MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' method."
 FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE = "The fairness metric is expected to be of type " \
@@ -37,6 +37,12 @@ MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and
 EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
                                           "'fairness_unaware_estimator' can be passed."
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
+MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE = "Post processing currently only supports a single " \
+                                              "protected attribute."
+ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "An attribute named {} or {} was detected. " \
+                                                 "Please rename your column and try again." \
+                                                 .format(SCORE_KEY, LABEL_KEY)
+SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +118,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._validate_post_processed_model_is_fitted()
         self._validate_input_data(X, protected_attribute)
         fairness_unaware_predictions = self._fairness_unaware_model.predict(X)
+
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
                                                 protected_attribute,
                                                 fairness_unaware_predictions)
@@ -148,17 +155,26 @@ class ROCCurveBasedPostProcessing(PostProcessing):
             raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
 
     def _validate_input_data(self, X, protected_attribute, y=None):
-        if type(X) != type(protected_attribute) or (y is not None and type(X) != type(y)) or \
-                type(X) not in [list, np.ndarray]:
-            raise ValueError(INPUT_DATA_CONSISTENCY_ERROR_MESSAGE
-                             .format(type(X).__name__, type(y).__name__,
+        allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
+        if type(X) not in allowed_input_types or \
+                type(protected_attribute) not in allowed_input_types or \
+                (y is not None and type(y) not in allowed_input_types):
+            raise ValueError(INPUT_DATA_FORMAT_ERROR_MESSAGE
+                             .format(type(X).__name__,
+                                     type(y).__name__,
                                      type(protected_attribute).__name__))
 
         if len(X) == 0 or len(protected_attribute) == 0 or (y is not None and len(y) == 0):
             raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
-        if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
-            raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE)
+        if y is None:
+            if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
+                raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
+                                 .format("X and protected_attribute"))
+        else:
+            if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
+                raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
+                                 .format("X, protected_attribute, and y"))
 
 
 def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
@@ -282,14 +298,18 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     :return: the post-processed model as a function taking the protected attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
+    data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
+
     n = len(labels)
-    n_positive = sum(labels)
+
+    if type(labels) == pd.DataFrame:
+        n_positive = labels.sum().loc[0]
+    else:
+        n_positive = sum(labels)
     n_negative = n - n_positive
     roc = {}
     x_grid = np.linspace(0, 1, gridsize + 1)
     y_values = pd.DataFrame()
-
-    data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
         roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip)
@@ -370,32 +390,79 @@ def _vectorized_prediction(function_dict, A, scores):
     :param scores: vector of predicted values
     :type scores: vector as Series or ndarray
     """
-    A_vector = A
-    scores_vector = scores
-
-    if type(A_vector) == list:
-        A_vector = np.array(A)
-
-    if type(scores_vector) == list:
-        scores_vector = np.array(scores)
+    # handle type conversion to ndarray for other types
+    A_vector = _convert_to_ndarray(A, MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE)
+    scores_vector = _convert_to_ndarray(scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
 
     if len(A_vector) != len(scores_vector):
-        raise ValueError("The protected attribute vector needs to be of the same length as the "
-                         "scores vector.")
+        raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE.format("A and scores"))
 
     return sum([(A_vector == a) * function_dict[a].predict(scores_vector) for a in function_dict])
 
 
-def _sanity_check_and_group_data(attributes, labels, scores):
+def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
+    if type(data) == list:
+        data = np.array(data)
+    elif type(data) == pd.DataFrame:
+        if len(data.columns) > 1:
+            # TODO: extend to multiple columns for additional data
+            raise ValueError(dataframe_multiple_columns_error_message)
+        data = data[data.columns[0]].values
+    elif type(data) == pd.Series:
+        data = data.values
+    return data
+
+
+def _sanity_check_and_group_data(attributes, labels, scores, attribute_names=None):
     if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
         raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
     if len(attributes) != len(labels) or len(attributes) != len(scores):
-        raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE)
+        raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
+                         .format("attributes, labels, and scores"))
 
     if set(np.unique(labels)) > set([0, 1]):
         raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
 
-    data = pd.DataFrame({ATTRIBUTE_KEY: attributes, SCORE_KEY: scores, LABEL_KEY: labels})
+    data_dict = {}
 
-    return data.groupby(ATTRIBUTE_KEY)
+    # TODO: extend to multiple columns for additional data
+    # and name columns after original column names if possible
+    # or store the original column names
+    attribute_name = ATTRIBUTE_KEY
+    if attribute_names is not None:
+        if attribute_name in [SCORE_KEY, LABEL_KEY]:
+            raise ValueError(ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
+        attribute_name = attribute_names[0]
+
+    _reformat_data_into_dict(attribute_name, data_dict, attributes)
+    _reformat_data_into_dict(SCORE_KEY, data_dict, scores)
+    _reformat_data_into_dict(LABEL_KEY, data_dict, labels)
+
+    return pd.DataFrame(data_dict).groupby(attribute_name)
+
+
+def _reformat_data_into_dict(key, data_dict, additional_data):
+    if type(additional_data) == np.ndarray:
+        if len(additional_data.shape) > 2 or (len(additional_data.shape) == 2 and
+                                              additional_data.shape[1] > 1):
+            # TODO: extend to multiple columns for additional_data
+            raise ValueError(MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE)
+        else:
+            data_dict[key] = additional_data.reshape(-1)
+    elif type(additional_data) == pd.DataFrame:
+        # TODO: extend to multiple columns for additional_data by using attribute_column
+        for attribute_column in additional_data.columns:
+            data_dict[key] = additional_data[attribute_column].values
+    elif type(additional_data) == pd.Series:
+        data_dict[key] = additional_data.values
+    elif type(additional_data) == list:
+        if type(additional_data[0]) == list:
+            if len(additional_data[0]) > 1:
+                # TODO: extend to multiple columns for additional_data
+                raise ValueError(MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE)
+            data_dict[key] = map(lambda a: a[0], additional_data)
+        else:
+            data_dict[key] = additional_data
+    else:
+        raise ValueError("Unexpected data type {} encountered.".format(type(additional_data)))

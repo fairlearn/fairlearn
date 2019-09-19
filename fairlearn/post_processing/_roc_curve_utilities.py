@@ -49,6 +49,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
              (2) min and max in x_grid are below/above min and max in data[x_col]
              (3) data is indexed 0,...,len(data)"""
     data_transpose = data.transpose()
+
     content_col_0 = content_col + '0'
     content_col_1 = content_col + '1'
 
