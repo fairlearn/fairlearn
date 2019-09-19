@@ -217,7 +217,8 @@ class GridSearch(ReductionsLearner):
             if len(formless.columns) == 1:
                 formed_vector = formless[0].to_numpy()
             else:
-                raise RuntimeError("%s is a DataFrame with more than one column" % formless_name)
+                msgfmt = "{0} is a DataFrame with more than one column"
+                raise RuntimeError(msgfmt.format(formless_name))
         elif isinstance(formless, pd.Series):
             formed_vector = formless.to_numpy()
         elif isinstance(formless, np.ndarray):
@@ -226,9 +227,11 @@ class GridSearch(ReductionsLearner):
             elif len(formless.shape) == 2 and formless.shape[1] == 1:
                 formed_vector = formless[:, 0]
             else:
-                raise RuntimeError("%s is an ndarray with more than one column" % formless_name)
+                msgfmt = "{0} is an ndarray with more than one column"
+                raise RuntimeError(msgfmt.format(formless_name))
         else:
-            raise RuntimeError("%s not an ndarray or DataFrame" % formless_name)
+            msgfmt = "{0} not an ndarray or DataFrame"
+            raise RuntimeError(msgfmt.format(formless_name))
 
         return formed_vector
 
@@ -244,7 +247,9 @@ class GridSearch(ReductionsLearner):
                 num_rows = formless.shape[0]
                 num_cols = formless.shape[1]
             else:
-                raise RuntimeError("%s is an ndarray which is not 2D" % formless_name)
+                msgfmt = "{0} is an ndarray which is not 2D"
+                raise RuntimeError(msgfmt.format(formless_name))
         else:
-            raise RuntimeError("%s not an ndarray or DataFrame" % formless_name)
+            msgfmt = "{0} not an ndarray or DataFrame"
+            raise RuntimeError(msgfmt.format(formless_name))
         return num_rows, num_cols
