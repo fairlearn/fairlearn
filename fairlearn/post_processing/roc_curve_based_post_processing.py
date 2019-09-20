@@ -138,7 +138,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
     def _validate_post_processed_model_is_fitted(self):
         if not self._post_processed_model_by_attribute:
-            raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)        
+            raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
     def _validate_model(self):
         predict_function = getattr(self._fairness_unaware_model, "predict", None)

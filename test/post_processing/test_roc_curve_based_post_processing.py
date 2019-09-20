@@ -24,8 +24,7 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
      MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
 from .test_utilities import (example_attributes1, example_attributes2, example_labels,
                              example_scores, example_attribute_names1, example_attribute_names2,
-                             _generate_empty_list_permutations, _get_predictions_by_attribute,
-                             _generate_list_reduction_permutations, _format_as_list_of_lists,
+                             _get_predictions_by_attribute, _format_as_list_of_lists,
                              ExampleModel, ExampleEstimator, ExampleNotModel,
                              ExampleNotEstimator1, ExampleNotEstimator2)
 
