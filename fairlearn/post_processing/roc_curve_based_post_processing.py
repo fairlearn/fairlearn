@@ -4,7 +4,7 @@
 """ ROC Curve based Post processing algorithm based on M. Hardt,
 E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
 Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
-classification with one categorical protected attribute.
+classification with one categorical sensitive attribute.
 """
 
 import logging
@@ -37,8 +37,8 @@ MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and
 EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
                                           "'fairness_unaware_estimator' can be passed."
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
-MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE = "Post processing currently only supports a single " \
-                                              "protected attribute."
+MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
+                                          "column in aux_data."
 ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "An attribute named {} or {} was detected. " \
                                                  "Please rename your column and try again." \
                                                  .format(SCORE_KEY, LABEL_KEY)
@@ -89,15 +89,15 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         random.seed(seed)
         self._post_processed_model_by_attribute = None
 
-    def fit(self, X, y, protected_attribute):
+    def fit(self, X, y, aux_data, **kwargs):
         self._validate_fairness_metric()
 
-        self._validate_input_data(X, protected_attribute, y)
+        self._validate_input_data(X, aux_data, y)
 
         if self._fairness_unaware_estimator:
             # train estimator on data first
             self._validate_estimator()
-            self._fairness_unaware_estimator.fit(X, y)
+            self._fairness_unaware_estimator.fit(X, y, **kwargs)
             self._fairness_unaware_model = self._fairness_unaware_estimator
 
         self._validate_model()
@@ -112,23 +112,23 @@ class ROCCurveBasedPostProcessing(PostProcessing):
                 _roc_curve_based_post_processing_equalized_odds
 
         self._post_processed_model_by_attribute = roc_curve_based_post_processing_method(
-            protected_attribute, y, scores, self._gridsize, self._flip, self._plot)
+            aux_data, y, scores, self._gridsize, self._flip, self._plot)
 
-    def predict(self, X, protected_attribute):
+    def predict(self, X, aux_data):
         self._validate_post_processed_model_is_fitted()
-        self._validate_input_data(X, protected_attribute)
+        self._validate_input_data(X, aux_data)
         fairness_unaware_predictions = self._fairness_unaware_model.predict(X)
 
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
-                                                protected_attribute,
+                                                aux_data,
                                                 fairness_unaware_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
-    def predict_proba(self, X, protected_attribute):
+    def predict_proba(self, X, aux_data):
         self._validate_post_processed_model_is_fitted()
-        self._validate_input_data(X, protected_attribute)
+        self._validate_input_data(X, aux_data)
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
-                                                protected_attribute,
+                                                aux_data,
                                                 self._fairness_unaware_model.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
@@ -154,27 +154,27 @@ class ROCCurveBasedPostProcessing(PostProcessing):
                 not callable(fit_function):
             raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
 
-    def _validate_input_data(self, X, protected_attribute, y=None):
+    def _validate_input_data(self, X, aux_data, y=None):
         allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
         if type(X) not in allowed_input_types or \
-                type(protected_attribute) not in allowed_input_types or \
+                type(aux_data) not in allowed_input_types or \
                 (y is not None and type(y) not in allowed_input_types):
             raise ValueError(INPUT_DATA_FORMAT_ERROR_MESSAGE
                              .format(type(X).__name__,
                                      type(y).__name__,
-                                     type(protected_attribute).__name__))
+                                     type(aux_data).__name__))
 
-        if len(X) == 0 or len(protected_attribute) == 0 or (y is not None and len(y) == 0):
+        if len(X) == 0 or len(aux_data) == 0 or (y is not None and len(y) == 0):
             raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
         if y is None:
-            if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
+            if len(X) != len(aux_data) or (y is not None and len(X) != len(y)):
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X and protected_attribute"))
+                                 .format("X and aux_data"))
         else:
-            if len(X) != len(protected_attribute) or (y is not None and len(X) != len(y)):
+            if len(X) != len(aux_data) or (y is not None and len(X) != len(y)):
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X, protected_attribute, and y"))
+                                 .format("X, aux_data, and y"))
 
 
 def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
@@ -186,12 +186,12 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     attribute value has its own model in the resulting post-processed model, which requires
     the attribute value as an input.
 
-    :param attributes: the protected attributes
-    :type attributes: list
+    :param attributes: the sensitive attribute data
+    :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
-    :type labels: list
+    :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param scores: the scores produced by a model's prediction
-    :type scores: list
+    :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param gridsize: The number of ticks on the grid over which we evaluate the curves.
         A large gridsize means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
@@ -200,7 +200,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the protected attribute value
+    :return: the post-processed model as a function taking the sensitive attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
     n = len(labels)
@@ -211,7 +211,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
-        # determine probability of current protected attribute group based on data
+        # determine probability of current sensitive attribute group based on data
         n_group = len(group)
         n_positive = sum(group[LABEL_KEY])
         n_negative = n_group - n_positive
@@ -253,7 +253,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     x_best = x_grid[i_best_DP]
 
     # create the solution as interpolation of multiple points with a separate predictor per
-    # protected attribute
+    # sensitive attribute
     predicted_DP_by_attribute = {}
     for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
@@ -281,7 +281,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
     selecting the point on the curve with minimal error.
 
-    :param attributes: the protected attributes
+    :param attributes: the sensitive attributes
     :type attributes: list
     :param labels: the labels of the dataset
     :type labels: list
@@ -295,7 +295,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the protected attribute value
+    :return: the post-processed model as a function taking the sensitive attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
     data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
@@ -343,7 +343,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     y_best = y_min[i_best_EO]
 
     # create the solution as interpolation of multiple points with a separate predictor
-    # per protected attribute
+    # per sensitive attribute
     predicted_EO_by_attribute = {}
     for attribute in roc.keys():
         roc_result = roc[attribute].transpose()[i_best_EO]
@@ -380,18 +380,18 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
 
 def _vectorized_prediction(function_dict, A, scores):
     """ Make predictions for all samples with all provided functions,
-    but use only the results from the function that corresponds to the protected
+    but use only the results from the function that corresponds to the sensitive
     attribute value of the sample.
 
-    :param function_dict: the functions that apply to various protected attribute values
+    :param function_dict: the functions that apply to various sensitive attribute values
     :type function_dict: dictionary of functions
-    :param A: protected attributes for each sample
+    :param A: sensitive attributes for each sample
     :type A: vector as Series or ndarray
     :param scores: vector of predicted values
     :type scores: vector as Series or ndarray
     """
     # handle type conversion to ndarray for other types
-    A_vector = _convert_to_ndarray(A, MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE)
+    A_vector = _convert_to_ndarray(A, MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
     scores_vector = _convert_to_ndarray(scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
 
     if len(A_vector) != len(scores_vector):
@@ -447,7 +447,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if len(additional_data.shape) > 2 or (len(additional_data.shape) == 2 and
                                               additional_data.shape[1] > 1):
             # TODO: extend to multiple columns for additional_data
-            raise ValueError(MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE)
+            raise ValueError(MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
         else:
             data_dict[key] = additional_data.reshape(-1)
     elif type(additional_data) == pd.DataFrame:
@@ -460,7 +460,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if type(additional_data[0]) == list:
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
-                raise ValueError(MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE)
+                raise ValueError(MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data

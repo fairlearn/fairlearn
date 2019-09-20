@@ -22,7 +22,7 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
      MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,
      EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE,
      PREDICT_BEFORE_FIT_ERROR_MESSAGE,
-     MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE)
+     MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
 from .test_utilities import (example_attributes1, example_attributes2, example_labels,
                              example_scores, example_attribute_names1, example_attribute_names2,
                              _generate_empty_list_permutations, _get_predictions_by_attribute,
@@ -130,7 +130,7 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, Y_
     n = len(example_attributes1)
     for permutation in [(0, 1), (1, 0)]:
         with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                           .format("X, protected_attribute, and y")):
+                           .format("X, aux_data, and y")):
             X = X_transform(_format_as_list_of_lists(example_attributes1)[:n-permutation[0]])
             Y = Y_transform(example_labels[:n-permutation[1]])
             A = A_transform(example_attributes1)
@@ -396,7 +396,6 @@ def test_predict_output_0_or_1(attributes, attribute_names, X_transform, Y_trans
                           (example_attributes2, example_attribute_names2)])
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("Y_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("Metric", [DemographicParity, EqualizedOdds])
 def test_predict_multiple_attributes_columns_error(attributes, attribute_names, X_transform,
                                                    Y_transform, Metric):
@@ -407,7 +406,7 @@ def test_predict_multiple_attributes_columns_error(attributes, attribute_names, 
                                                  fairness_metric=Metric())
     adjusted_model.fit(X, Y, attributes)
 
-    with pytest.raises(ValueError, match=MULTIPLE_PROTECTED_ATTRIBUTES_ERROR_MESSAGE):
+    with pytest.raises(ValueError, match=MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE):
         adjusted_model.predict(X, A)
 
 
@@ -428,11 +427,11 @@ def test_predict_different_argument_lengths(attributes, attribute_names, X_trans
     adjusted_model.fit(X, Y, A)
 
     with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                       .format("X and protected_attribute")):
+                       .format("X and aux_data")):
         adjusted_model.predict(X, A_transform(attributes[:-1]))
 
     with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                       .format("X and protected_attribute")):
+                       .format("X and aux_data")):
         adjusted_model.predict(X_transform(_format_as_list_of_lists(attributes))[:-1], A)
 
 
