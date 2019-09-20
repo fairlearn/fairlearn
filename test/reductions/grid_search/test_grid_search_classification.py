@@ -106,6 +106,7 @@ def test_can_specify_lagrange_multipliers():
     # Note that using integers for my_lagrange causes the test to fail
     my_lagrange = [-2.0, 0, 2.0]
 
+    # Try both ways of specifying the Lagrange multipliers
     target2.fit(X, y, aux_data=A, lagrange_multipliers=my_lagrange)
     target1.fit(X, y, aux_data=A, number_of_lagrange_multipliers=len(my_lagrange))
 
