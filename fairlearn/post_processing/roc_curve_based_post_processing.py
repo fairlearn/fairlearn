@@ -132,9 +132,9 @@ class ROCCurveBasedPostProcessing(PostProcessing):
                 type(aux_data) not in allowed_input_types or \
                 (y is not None and type(y) not in allowed_input_types):
             raise TypeError(INPUT_DATA_FORMAT_ERROR_MESSAGE
-                             .format(type(X).__name__,
-                                     type(y).__name__,
-                                     type(aux_data).__name__))
+                            .format(type(X).__name__,
+                                    type(y).__name__,
+                                    type(aux_data).__name__))
 
         if len(X) == 0 or len(aux_data) == 0 or (y is not None and len(y) == 0):
             raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
