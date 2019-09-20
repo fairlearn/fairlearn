@@ -210,7 +210,9 @@ class GridSearch(ReductionsLearner):
 
     def _make_vector(self, formless, formless_name):
         formed_vector = None
-        if isinstance(formless, pd.DataFrame):
+        if isinstance(formless, list):
+            formed_vector = np.array(formless)
+        elif isinstance(formless, pd.DataFrame):
             if len(formless.columns) == 1:
                 formed_vector = formless[0].to_numpy()
             else:

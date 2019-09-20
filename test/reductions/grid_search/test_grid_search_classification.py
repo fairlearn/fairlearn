@@ -5,6 +5,7 @@ from fairlearn.metrics import DemographicParity
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 
+import copy
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -51,7 +52,7 @@ def test_demographicparity_fair_uneven_populations():
                                      score_threshold, score_threshold,
                                      a0_label, a1_label)
 
-    target = GridSearch(LogisticRegression(),
+    target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
                         disparity_metric=DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric())
 
@@ -75,3 +76,84 @@ def test_demographicparity_fair_uneven_populations():
 
     all_proba = target.posterior_predict_proba(test_X)
     assert len(all_proba) == 11
+
+
+def test_lagrange_multiplier_zero_unchanged_model():
+    score_threshold = 0.6
+
+    number_a0 = 64
+    number_a1 = 24
+
+    a0_label = 7
+    a1_label = 22
+
+    X, y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label)
+
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
+
+    # Train an unmitigated estimator
+    unmitigated_estimator = copy.deepcopy(estimator)
+    unmitigated_estimator.fit(X, y)
+
+    # Do the grid search with a zero Lagrange multiplier
+    target = GridSearch(estimator,
+                        disparity_metric=DemographicParity(),
+                        quality_metric=SimpleClassificationQualityMetric())
+    target.fit(X, y, aux_data=A, lagrange_multipliers=[0])
+
+    # Check coefficients
+    gs_coeff = target.best_result.model.coef_
+    um_coeff = unmitigated_estimator.coef_
+    assert np.array_equal(gs_coeff, um_coeff)
+
+
+def test_can_specify_and_generate_lagrange_multipliers():
+    score_threshold = 0.4
+
+    number_a0 = 32
+    number_a1 = 24
+
+    a0_label = 11
+    a1_label = 3
+
+    X, y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label)
+
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
+
+    target1 = GridSearch(copy.deepcopy(estimator),
+                         disparity_metric=DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric())
+
+    target2 = GridSearch(copy.deepcopy(estimator),
+                         disparity_metric=DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric())
+
+    # Note that using integers for my_lagrange causes the test to fail
+    my_lagrange = [-2.0, 0, 2.0]
+
+    # Try both ways of specifying the Lagrange multipliers
+    target2.fit(X, y, aux_data=A, lagrange_multipliers=my_lagrange)
+    target1.fit(X, y, aux_data=A, number_of_lagrange_multipliers=len(my_lagrange))
+
+    assert len(target1.all_results) == len(my_lagrange)
+    assert len(target2.all_results) == len(my_lagrange)
+
+    # Check we generated the same multipliers
+    for i in range(len(my_lagrange)):
+        lm1 = target1.all_results[i].lagrange_multiplier
+        lm2 = target2.all_results[i].lagrange_multiplier
+        assert lm1 == lm2
+
+    # Check the models are the same
+    for i in range(len(my_lagrange)):
+        coef1 = target1.all_results[i].model.coef_
+        coef2 = target2.all_results[i].model.coef_
+        assert np.array_equal(coef1, coef2)
