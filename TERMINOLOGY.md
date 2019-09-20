@@ -1,0 +1,47 @@
+# Terminology
+
+## Estimators and Predictors
+Fairlearn largely follows the [terminology established by scikit-learn](https://scikit-learn.org/stable/developers/contributing.html#different-objects), specifically:
+- Estimator: implements a `fit` method
+- Predictor: implements a `predict` method
+
+## Fairness-related terms
+
+### Protected or sensitive attribute, group, or data
+
+In the scientific literature concerning fairness one usually selects a single feature or multiple features of a dataset as a protected or sensitive set of attributes. The objective is to optimize a chosen disparity metric (for a definition see one of the later sections) based on these attributes. In some scenarios these attributes may also be held out from the actual training data (note that holding out data is not sufficient for fairness due to the myriad of correlations in real datasets). Overall, every combination of the attributes defines what we refer to as a group.
+There is no definitive standard yet, but for this repository, we shall use the variable name `A` for a matrix of these attributes. This choice provides a few advantages:
+
+- The term ‘protected attribute’ has a specific meaning in legal contexts which does not always match the data science usage of the term
+- Brevity
+- It follows the convention set by `X` and `y` to provide single letter variables.
+- It may signify the presence of multiple sensitive attributes (as a matrix of values), as opposed to other choices such as `sensitive_attribute`.
+- It does not falsely imply ordering between `X`, `y`, and `A`, as opposed to, for example, `Z`.
+- It does not falsely imply that it is always part of the training features, as opposed to variable names that subscript `X`.
+
+### (Dis-)Parity vs. (Un-)Fairness vs. Bias
+
+There are a number of terms in the literature used to describe concepts related to disparity and fairness. As noted above, some can be particularly fraught since in legal circles they have precise meanings. We shall use the following definitions:
+
+- *Disparity* is something that we can _measure_ and potentially _mitigate_. For example, if we see that a credit scoring model is favoring one group over another.
+- *Fairness* includes the societal context in ways which may not be mathematically expressible. For example, if a finite amount of money is to be loaned, is it better for society to make a few large loans with minimal disparity, or to accept larger disparity and make many smaller loans?
+- *Bias* is anything which can affect the model. Examples include statistical biases in the input data and subconscious cognitive biases in the data scientist.
+
+### Disparity metrics
+
+There are various ways to assess fairness, e.g. by measuring through a metric that we’ll call disparity metric. Below are various definitions of disparity metrics that we use in the repository:
+- Classification:
+    - Demographic Parity (DP): A classifier h satisfies demographic parity under a distribution over (X, A, Y) if its prediction h(X) is statistically independent of the group attribute A — that is, if P[h(X) = y’ | A = a] = P[h(X) = y’] for all a, y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+    - Equalized Odds (EO): A classifier h satisfies equalized odds under a distribution over (X, A, Y) if its prediction h(X) is conditionally independent of the group attribute A given the label Y —that is, if P[h(X) = y’ | A = a, Y = y] = P[h(X) = y’ | Y = y] for all a, y, and y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+    - Equal Opportunity is a relaxed version of Equalized Odds that only considers positive labels, i.e. Y=1, see [[Hardt et al.]]( https://ttic.uchicago.edu/~nati/Publications/HardtPriceSrebro2016.pdf)
+- Regression:
+    - Statistical Parity: A predictor f satisfies statistical parity under a distribution over (X, A, Y) if f(X) is independent of the group attribute A. Since 0 ≤ f(X) ≤ 1, this is equivalent to P[f(X) ≥ z | A = a] = P[f(X) ≥ z] for all a in A and z in [0,1]. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+    - Bounded Group Loss: A predictor f satisfies bounded group loss at level ζ under a distribution over (X, A, Y ) if E[loss(Y, f(X)) | A = a] ≤ ζ for all a. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+
+### Fairness assessment
+
+Fairness assessment is the process of determining and evaluating the fairness of a model through a variety of metrics in multiple configurations:
+
+- Comparison of generated models with a visualization of the fairness/accuracy tradeoff
+- Fairness and accuracy regarding training labels
+- Fairness with respect to predicted outcome
