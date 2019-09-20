@@ -100,7 +100,7 @@ def test_lagrange_multiplier_zero_unchanged_model():
     unmitigated_learner.fit(X, y)
 
     # Do the grid search with a zero Lagrange multiplier
-    target = GridSearch(LogisticRegression(),
+    target = GridSearch(learner,
                         disparity_metric=DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric())
     target.fit(X, y, aux_data=A, lagrange_multipliers=[0])

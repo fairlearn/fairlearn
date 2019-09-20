@@ -240,7 +240,7 @@ class ArgumentTests:
 class TestDemographicParity(ArgumentTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
-        self.learner = LogisticRegression()
+        self.learner = LogisticRegression(solver='liblinear')
         self.disparity_criterion = DemographicParity()
         self.quality_metric = SimpleClassificationQualityMetric()
 
