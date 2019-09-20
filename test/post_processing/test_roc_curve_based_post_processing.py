@@ -15,13 +15,12 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
      EMPTY_INPUT_ERROR_MESSAGE,
      NON_BINARY_LABELS_ERROR_MESSAGE,
      INPUT_DATA_FORMAT_ERROR_MESSAGE,
-     MISSING_FIT_PREDICT_ERROR_MESSAGE,
-     MISSING_PREDICT_ERROR_MESSAGE,
      NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE,
-     MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,
-     EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE,
      PREDICT_BEFORE_FIT_ERROR_MESSAGE,
      MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
+from fairlearn.post_processing.post_processing import \
+    MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE, EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE, \
+    MISSING_FIT_PREDICT_ERROR_MESSAGE, MISSING_PREDICT_ERROR_MESSAGE
 from .test_utilities import (example_attributes1, example_attributes2, example_labels,
                              example_scores, example_attribute_names1, example_attribute_names2,
                              _get_predictions_by_attribute, _format_as_list_of_lists,
@@ -94,7 +93,7 @@ def test_inconsistent_input_data_types(X, Y, A, metric):
                                                            type(A).__name__)
 
     if X is None or Y is None and A is None:
-        with pytest.raises(ValueError) as exception:
+        with pytest.raises(TypeError) as exception:
             adjusted_model.fit(X, Y, A)
         assert str(exception.value) == error_message
 

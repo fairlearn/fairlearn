@@ -4,7 +4,7 @@
 """ ROC Curve based Post processing algorithm based on M. Hardt,
 E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
 Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
-classification with one categorical sensitive attribute.
+classification with one categorical grouping attribute.
 """
 
 import logging
@@ -26,15 +26,9 @@ NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
                                   "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
                                   "Your provided data was of types ({}, {}, {})"
-MISSING_FIT_PREDICT_ERROR_MESSAGE = "The model does not have callable 'fit' or 'predict' methods."
-MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' method."
 NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE = "Currently only {} and {} are supported " \
                                               "disparity metrics.".format(DEMOGRAPHIC_PARITY,
                                                                           EQUALIZED_ODDS)
-MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and " \
-                                            "'fairness_unaware_estimator' need to be passed."
-EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
-                                          "'fairness_unaware_estimator' can be passed."
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
                                           "column in aux_data."
@@ -54,8 +48,8 @@ class ROCCurveBasedPostProcessing(PostProcessing):
     def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
                  disparity_metric=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
                  seed=None):
-        """
-        Creates the post processing object.
+        """ Creates the post processing object.
+
         :param fairness_unaware_model: the trained model whose output will be post processed
         :type fairness_unaware_model: a trained model
         :param fairness_unaware_estimator: an untrained estimator that will be trained, and
@@ -70,18 +64,10 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         :param plot: show ROC plot if True
         :type plot: bool
         """
-        if fairness_unaware_model and fairness_unaware_estimator:
-            raise ValueError(EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE)
-        elif fairness_unaware_model:
-            self._fairness_unaware_model = fairness_unaware_model
-            self._fairness_unaware_estimator = None
-            self._validate_model()
-        elif fairness_unaware_estimator:
-            self._fairness_unaware_model = None
-            self._fairness_unaware_estimator = fairness_unaware_estimator
-            self._validate_estimator()
-        else:
-            raise ValueError(MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
+        super(ROCCurveBasedPostProcessing, self).__init__(
+            fairness_unaware_model=fairness_unaware_model,
+            fairness_unaware_estimator=fairness_unaware_estimator,
+            disparity_metric=disparity_metric)
 
         self._disparity_metric = disparity_metric
         if self._disparity_metric not in _SUPPORTED_DISPARITY_METRICS:
@@ -118,21 +104,21 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._post_processed_model_by_attribute = roc_curve_based_post_processing_method(
             aux_data, y, scores, self._gridsize, self._flip, self._plot)
 
-    def predict(self, X, aux_data):
+    def predict(self, X, group_data):
         self._validate_post_processed_model_is_fitted()
-        self._validate_input_data(X, aux_data)
+        self._validate_input_data(X, group_data)
         fairness_unaware_predictions = self._fairness_unaware_model.predict(X)
 
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
-                                                aux_data,
+                                                group_data,
                                                 fairness_unaware_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
-    def predict_proba(self, X, aux_data):
+    def predict_proba(self, X, group_data):
         self._validate_post_processed_model_is_fitted()
-        self._validate_input_data(X, aux_data)
+        self._validate_input_data(X, group_data)
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
-                                                aux_data,
+                                                group_data,
                                                 self._fairness_unaware_model.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
@@ -140,24 +126,12 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         if not self._post_processed_model_by_attribute:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
-    def _validate_model(self):
-        predict_function = getattr(self._fairness_unaware_model, "predict", None)
-        if not predict_function or not callable(predict_function):
-            raise ValueError(MISSING_PREDICT_ERROR_MESSAGE)
-
-    def _validate_estimator(self):
-        fit_function = getattr(self._fairness_unaware_estimator, "fit", None)
-        predict_function = getattr(self._fairness_unaware_estimator, "predict", None)
-        if not predict_function or not fit_function or not callable(predict_function) or \
-                not callable(fit_function):
-            raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
-
     def _validate_input_data(self, X, aux_data, y=None):
         allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
         if type(X) not in allowed_input_types or \
                 type(aux_data) not in allowed_input_types or \
                 (y is not None and type(y) not in allowed_input_types):
-            raise ValueError(INPUT_DATA_FORMAT_ERROR_MESSAGE
+            raise TypeError(INPUT_DATA_FORMAT_ERROR_MESSAGE
                              .format(type(X).__name__,
                                      type(y).__name__,
                                      type(aux_data).__name__))
@@ -190,7 +164,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     This method assumes that attributes, labels, and scores are non-empty data structures of
     equal length, and labels contains only binary labels 0 and 1.
 
-    :param attributes: the sensitive attribute data
+    :param attributes: the grouping attribute data
     :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
     :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
@@ -204,7 +178,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the sensitive attribute value
+    :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
     n = len(labels)
@@ -215,7 +189,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
-        # determine probability of current sensitive attribute group based on data
+        # determine probability of current grouping attribute group based on data
         n_group = len(group)
         n_positive = sum(group[LABEL_KEY])
         n_negative = n_group - n_positive
@@ -257,7 +231,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     x_best = x_grid[i_best_DP]
 
     # create the solution as interpolation of multiple points with a separate predictor per
-    # sensitive attribute
+    # grouping attribute
     predicted_DP_by_attribute = {}
     for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
@@ -288,7 +262,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     This method assumes that attributes, labels, and scores are non-empty data structures of
     equal length, and labels contains only binary labels 0 and 1.
 
-    :param attributes: the sensitive attribute data
+    :param attributes: the grouping attribute data
     :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
     :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
@@ -302,7 +276,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the sensitive attribute value
+    :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
     data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
@@ -350,7 +324,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     y_best = y_min[i_best_EO]
 
     # create the solution as interpolation of multiple points with a separate predictor
-    # per sensitive attribute
+    # per grouping attribute
     predicted_EO_by_attribute = {}
     for attribute in roc.keys():
         roc_result = roc[attribute].transpose()[i_best_EO]
@@ -387,14 +361,14 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
 
 def _vectorized_prediction(function_dict, A, scores):
     """ Make predictions for all samples with all provided functions,
-    but use only the results from the function that corresponds to the sensitive
+    but use only the results from the function that corresponds to the grouping
     attribute value of the sample.
 
     This method assumes that A and scores are of equal length.
 
-    :param function_dict: the functions that apply to various sensitive attribute values
+    :param function_dict: the functions that apply to various grouping attribute values
     :type function_dict: dictionary of functions
-    :param A: sensitive attributes for each sample
+    :param A: grouping attributes for each sample
     :type A: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param scores: vector of predicted values
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
@@ -461,4 +435,4 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         else:
             data_dict[key] = additional_data
     else:
-        raise ValueError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))
+        raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))
