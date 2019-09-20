@@ -22,6 +22,10 @@ def identity(X):
     return X
 
 
+def pylist(X):
+    return X.tolist()
+
+
 def pandasdf(X):
     return pd.DataFrame(X)
 
@@ -46,8 +50,8 @@ def ndarray2d(X):
 # List the different datatypes which need to succeed for
 # all GridSearch calls
 candidate_X_transforms = [identity, pandasdf]
-candidate_Y_transforms = [identity, pandasdf, pandasseries, ndarray2d]
-candidate_A_transforms = [identity, pandasdf, pandasseries, ndarray2d]
+candidate_Y_transforms = [identity, pylist, pandasdf, pandasseries, ndarray2d]
+candidate_A_transforms = [identity, pylist, pandasdf, pandasseries, ndarray2d]
 
 
 # Base class for tests
