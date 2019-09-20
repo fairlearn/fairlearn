@@ -432,7 +432,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if type(additional_data[0]) == list:
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
-                raise ValueError(MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
+                raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data
