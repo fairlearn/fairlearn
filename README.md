@@ -1,3 +1,8 @@
+
+![GatedCheckin:Dev](https://img.shields.io/badge/GatedCheckin%3ADev-succeeded-brightgreen)
+ [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) ![pypi badge](https://img.shields.io/badge/pypi-0.2.0-blue)
+
+
 # Fairness in Machine Learning - Mitigation algorithms
 
 A Python package that implements a variety of fairness-related algorithms to mitigate bias including:
