@@ -30,8 +30,8 @@ NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE = "Currently only {} and {} are sup
                                               "disparity metrics.".format(DEMOGRAPHIC_PARITY,
                                                                           EQUALIZED_ODDS)
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
-MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
-                                          "column in aux_data."
+MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
+                                          "column in {}."
 ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "An attribute named {} or {} was detected. " \
                                                  "Please rename your column and try again." \
                                                  .format(SCORE_KEY, LABEL_KEY)
@@ -359,7 +359,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     return predicted_EO_by_attribute
 
 
-def _vectorized_prediction(function_dict, A, scores):
+def _vectorized_prediction(function_dict, group_data, scores):
     """ Make predictions for all samples with all provided functions,
     but use only the results from the function that corresponds to the grouping
     attribute value of the sample.
@@ -368,16 +368,18 @@ def _vectorized_prediction(function_dict, A, scores):
 
     :param function_dict: the functions that apply to various grouping attribute values
     :type function_dict: dictionary of functions
-    :param A: grouping attributes for each sample
-    :type A: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+    :param group_data: grouping attributes for each sample
+    :type group_data: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param scores: vector of predicted values
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     """
     # handle type conversion to ndarray for other types
-    A_vector = _convert_to_ndarray(A, MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
+    group_data_vector = _convert_to_ndarray(group_data, MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE
+                                            .format("group_data"))
     scores_vector = _convert_to_ndarray(scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
 
-    return sum([(A_vector == a) * function_dict[a].predict(scores_vector) for a in function_dict])
+    return sum([(group_data_vector == a) * function_dict[a].predict(scores_vector)
+                for a in function_dict])
 
 
 def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
@@ -385,7 +387,7 @@ def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
         data = np.array(data)
     elif type(data) == pd.DataFrame:
         if len(data.columns) > 1:
-            # TODO: extend to multiple columns for additional data
+            # TODO: extend to multiple columns for additional group data
             raise ValueError(dataframe_multiple_columns_error_message)
         data = data[data.columns[0]].values
     elif type(data) == pd.Series:
@@ -396,7 +398,7 @@ def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
 def _reformat_and_group_data(attributes, labels, scores, attribute_names=None):
     data_dict = {}
 
-    # TODO: extend to multiple columns for additional data
+    # TODO: extend to multiple columns for additional group data
     # and name columns after original column names if possible
     # or store the original column names
     attribute_name = ATTRIBUTE_KEY
@@ -416,8 +418,8 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
     if type(additional_data) == np.ndarray:
         if len(additional_data.shape) > 2 or (len(additional_data.shape) == 2 and
                                               additional_data.shape[1] > 1):
-            # TODO: extend to multiple columns for additional_data
-            raise ValueError(MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
+            # TODO: extend to multiple columns for additional_group data
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
         else:
             data_dict[key] = additional_data.reshape(-1)
     elif type(additional_data) == pd.DataFrame:
@@ -430,7 +432,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if type(additional_data[0]) == list:
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
-                raise ValueError(MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
+                raise ValueError(MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data

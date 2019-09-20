@@ -17,7 +17,7 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
      INPUT_DATA_FORMAT_ERROR_MESSAGE,
      NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE,
      PREDICT_BEFORE_FIT_ERROR_MESSAGE,
-     MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
+     MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE)
 from fairlearn.post_processing.post_processing import \
     MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE, EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE, \
     MISSING_FIT_PREDICT_ERROR_MESSAGE, MISSING_PREDICT_ERROR_MESSAGE
@@ -89,12 +89,12 @@ def test_inconsistent_input_data_types(X, y, A, metric):
                                                  disparity_metric=metric)
 
     error_message = INPUT_DATA_FORMAT_ERROR_MESSAGE.format(type(X).__name__,
-                                                           type(Y).__name__,
+                                                           type(y).__name__,
                                                            type(A).__name__)
 
-    if X is None or Y is None and A is None:
+    if X is None or y is None and A is None:
         with pytest.raises(TypeError) as exception:
-            adjusted_model.fit(X, Y, A)
+            adjusted_model.fit(X, y, A)
         assert str(exception.value) == error_message
 
 
@@ -108,14 +108,14 @@ def test_roc_curve_based_post_processing_non_binary_labels(X_transform, y_transf
     non_binary_labels[0] = 2
 
     X = X_transform(_format_as_list_of_lists(example_attributes1))
-    Y = y_transform(non_binary_labels)
+    y = y_transform(non_binary_labels)
     A = A_transform(example_attributes1)
 
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
 
     with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
-        adjusted_model.fit(X, Y, A)
+        adjusted_model.fit(X, y, A)
 
 
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
@@ -129,23 +129,23 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, y_
         with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
                            .format("X, aux_data, and y")):
             X = X_transform(_format_as_list_of_lists(example_attributes1)[:n-permutation[0]])
-            Y = y_transform(example_labels[:n-permutation[1]])
+            y = y_transform(example_labels[:n-permutation[1]])
             A = A_transform(example_attributes1)
 
             adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                          disparity_metric=metric)
-            adjusted_model.fit(X, Y, A)
+            adjusted_model.fit(X, y, A)
 
     # try providing empty lists in all combinations
     for permutation in [(0, n), (n, 0)]:
         X = X_transform(_format_as_list_of_lists(example_attributes1)[:n-permutation[0]])
-        Y = y_transform(example_labels[:n-permutation[1]])
+        y = y_transform(example_labels[:n-permutation[1]])
         A = A_transform(example_attributes1)
 
         adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                      disparity_metric=metric)
         with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
-            adjusted_model.fit(X, Y, A)
+            adjusted_model.fit(X, y, A)
 
 
 @pytest.mark.parametrize("score_transform", ALLOWED_INPUT_DATA_TYPES)
@@ -153,11 +153,11 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, y_
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
 def test_roc_curve_based_post_processing_demographic_parity(score_transform, y_transform,
                                                             A_transform):
-    Y = y_transform(example_labels)
+    y = y_transform(example_labels)
     A = A_transform(example_attributes1)
     scores = score_transform(example_scores)
     adjusted_model = create_adjusted_model(_roc_curve_based_post_processing_demographic_parity,
-                                           A, Y, scores)
+                                           A, y, scores)
 
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
@@ -209,11 +209,11 @@ def test_roc_curve_based_post_processing_demographic_parity(score_transform, y_t
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
 def test_roc_curve_based_post_processing_equalized_odds(score_transform, y_transform,
                                                         A_transform):
-    Y = y_transform(example_labels)
+    y = y_transform(example_labels)
     A = A_transform(example_attributes1)
     scores = score_transform(example_scores)
     adjusted_model = create_adjusted_model(_roc_curve_based_post_processing_equalized_odds,
-                                           A, Y, scores)
+                                           A, y, scores)
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
@@ -291,11 +291,11 @@ def test_roc_curve_based_post_processing_demographic_parity_e2e(attributes, attr
                                                                 X_transform, y_transform,
                                                                 A_transform):
     X = X_transform(_format_as_list_of_lists(attributes))
-    Y = y_transform(example_labels)
+    y = y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=DEMOGRAPHIC_PARITY)
-    adjusted_model.fit(X, Y, A)
+    adjusted_model.fit(X, y, A)
 
     predictions = adjusted_model.predict_proba(X, A)
 
@@ -320,11 +320,11 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(
         attributes, attribute_names, expected_positive_p0, expected_positive_p1,
         expected_negative_p0, expected_negative_p1, X_transform, y_transform, A_transform):
     X = X_transform(_format_as_list_of_lists(attributes))
-    Y = y_transform(example_labels)
+    y = y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=EQUALIZED_ODDS)
-    adjusted_model.fit(X, Y, A)
+    adjusted_model.fit(X, y, A)
 
     predictions = adjusted_model.predict_proba(X, A)
 
@@ -350,11 +350,11 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(
 def test_predict_output_0_or_1(attributes, attribute_names, X_transform, y_transform, A_transform,
                                metric):
     X = X_transform(_format_as_list_of_lists(attributes))
-    Y = y_transform(example_labels)
+    y = y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
-    adjusted_model.fit(X, Y, A)
+    adjusted_model.fit(X, y, A)
 
     predictions = adjusted_model.predict(X, A)
     for prediction in predictions:
@@ -370,13 +370,14 @@ def test_predict_output_0_or_1(attributes, attribute_names, X_transform, y_trans
 def test_predict_multiple_attributes_columns_error(attributes, attribute_names, X_transform,
                                                    y_transform, metric):
     X = X_transform(_format_as_list_of_lists(attributes))
-    Y = y_transform(example_labels)
+    y = y_transform(example_labels)
     A = pd.DataFrame({"A1": attributes, "A2": attributes})
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
-    adjusted_model.fit(X, Y, attributes)
+    adjusted_model.fit(X, y, attributes)
 
-    with pytest.raises(ValueError, match=MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE):
+    with pytest.raises(ValueError,
+                       match=MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("group_data")):
         adjusted_model.predict(X, A)
 
 
@@ -390,11 +391,11 @@ def test_predict_multiple_attributes_columns_error(attributes, attribute_names, 
 def test_predict_different_argument_lengths(attributes, attribute_names, X_transform, y_transform,
                                             A_transform, metric):
     X = X_transform(_format_as_list_of_lists(attributes))
-    Y = y_transform(example_labels)
+    y = y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
-    adjusted_model.fit(X, Y, A)
+    adjusted_model.fit(X, y, A)
 
     with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
                        .format("X and aux_data")):
