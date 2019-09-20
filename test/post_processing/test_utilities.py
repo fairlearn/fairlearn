@@ -5,7 +5,6 @@ from collections import defaultdict, namedtuple
 from itertools import permutations
 import numpy as np
 import pandas as pd
-from fairlearn.metrics import DisparityMetric
 from fairlearn.post_processing._threshold_operation import ThresholdOperation
 from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 
@@ -45,14 +44,6 @@ class ExampleNotEstimator1():
 class ExampleNotEstimator2():
     def predict(self, X):
         pass
-
-
-class ExampleMetric(DisparityMetric):
-    pass
-
-
-class ExampleNotMetric():
-    pass
 
 
 def _get_grouped_data_and_base_points(attribute_value):

@@ -13,9 +13,9 @@ import pandas as pd
 import random
 
 from fairlearn.exceptions import NotFittedException
-from fairlearn.metrics import DisparityMetric, DemographicParity, EqualizedOdds
 from fairlearn.post_processing import PostProcessing
-from ._constants import LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR
+from ._constants import (LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR,
+                         DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
 from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
 from ._interpolated_prediction import InterpolatedPredictor
@@ -28,10 +28,9 @@ INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
                                   "Your provided data was of types ({}, {}, {})"
 MISSING_FIT_PREDICT_ERROR_MESSAGE = "The model does not have callable 'fit' or 'predict' methods."
 MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' method."
-FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE = "The fairness metric is expected to be of type " \
-                                         "DisparityMetric."
-NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE = "Currently only DemographicParity and " \
-                                              "EqualizedOdds are supported fairness metrics."
+NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE = "Currently only {} and {} are supported " \
+                                              "disparity metrics.".format(DEMOGRAPHIC_PARITY,
+                                                                          EQUALIZED_ODDS)
 MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and " \
                                             "'fairness_unaware_estimator' need to be passed."
 EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
@@ -43,13 +42,17 @@ ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "An attribute named {} or {} wa
                                                  "Please rename your column and try again." \
                                                  .format(SCORE_KEY, LABEL_KEY)
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
+UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
+
+
+_SUPPORTED_DISPARITY_METRICS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 
 logger = logging.getLogger(__name__)
 
 
 class ROCCurveBasedPostProcessing(PostProcessing):
     def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
-                 fairness_metric=DemographicParity(), gridsize=1000, flip=True, plot=False,
+                 disparity_metric=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
                  seed=None):
         """
         Creates the post processing object.
@@ -80,8 +83,9 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         else:
             raise ValueError(MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
 
-        self._fairness_metric = fairness_metric
-        self._validate_fairness_metric()
+        self._disparity_metric = disparity_metric
+        if self._disparity_metric not in _SUPPORTED_DISPARITY_METRICS:
+            raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
 
         self._gridsize = gridsize
         self._flip = flip
@@ -90,8 +94,6 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._post_processed_model_by_attribute = None
 
     def fit(self, X, y, aux_data, **kwargs):
-        self._validate_fairness_metric()
-
         self._validate_input_data(X, aux_data, y)
 
         if self._fairness_unaware_estimator:
@@ -104,12 +106,14 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
         scores = self._fairness_unaware_model.predict(X)
         roc_curve_based_post_processing_method = None
-        if isinstance(self._fairness_metric, DemographicParity):
+        if self._disparity_metric == DEMOGRAPHIC_PARITY:
             roc_curve_based_post_processing_method = \
                 _roc_curve_based_post_processing_demographic_parity
-        else:
+        elif self._disparity_metric == EQUALIZED_ODDS:
             roc_curve_based_post_processing_method = \
                 _roc_curve_based_post_processing_equalized_odds
+        else:
+            raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
 
         self._post_processed_model_by_attribute = roc_curve_based_post_processing_method(
             aux_data, y, scores, self._gridsize, self._flip, self._plot)
@@ -134,13 +138,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
 
     def _validate_post_processed_model_is_fitted(self):
         if not self._post_processed_model_by_attribute:
-            raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
-
-    def _validate_fairness_metric(self):
-        if not isinstance(self._fairness_metric, DisparityMetric):
-            raise TypeError(FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE)
-        if not type(self._fairness_metric) in [DemographicParity, EqualizedOdds]:
-            raise ValueError(NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE)
+            raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)        
 
     def _validate_model(self):
         predict_function = getattr(self._fairness_unaware_model, "predict", None)
@@ -176,6 +174,9 @@ class ROCCurveBasedPostProcessing(PostProcessing):
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
                                  .format("X, aux_data, and y"))
 
+        if set(np.unique(y)) > set([0, 1]):
+            raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
+
 
 def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
                                                         flip=True, plot=False):
@@ -185,6 +186,9 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     recreated by interpolating between two points on the convex hull of all solutions. Each
     attribute value has its own model in the resulting post-processed model, which requires
     the attribute value as an input.
+
+    This method assumes that attributes, labels, and scores are non-empty data structures of
+    equal length, and labels contains only binary labels 0 and 1.
 
     :param attributes: the sensitive attribute data
     :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
@@ -208,7 +212,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
 
-    data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
+    data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
         # determine probability of current sensitive attribute group based on data
@@ -281,12 +285,15 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
     selecting the point on the curve with minimal error.
 
-    :param attributes: the sensitive attributes
-    :type attributes: list
+    This method assumes that attributes, labels, and scores are non-empty data structures of
+    equal length, and labels contains only binary labels 0 and 1.
+
+    :param attributes: the sensitive attribute data
+    :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
-    :type labels: list
+    :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param scores: the scores produced by a model's prediction
-    :type scores: list
+    :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param gridsize: The number of ticks on the grid over which we evaluate the curves.
         A large gridsize means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
@@ -298,7 +305,7 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     :return: the post-processed model as a function taking the sensitive attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
-    data_grouped_by_attribute = _sanity_check_and_group_data(attributes, labels, scores)
+    data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
 
     n = len(labels)
 
@@ -383,19 +390,18 @@ def _vectorized_prediction(function_dict, A, scores):
     but use only the results from the function that corresponds to the sensitive
     attribute value of the sample.
 
+    This method assumes that A and scores are of equal length.
+
     :param function_dict: the functions that apply to various sensitive attribute values
     :type function_dict: dictionary of functions
     :param A: sensitive attributes for each sample
-    :type A: vector as Series or ndarray
+    :type A: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param scores: vector of predicted values
-    :type scores: vector as Series or ndarray
+    :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     """
     # handle type conversion to ndarray for other types
     A_vector = _convert_to_ndarray(A, MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE)
     scores_vector = _convert_to_ndarray(scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
-
-    if len(A_vector) != len(scores_vector):
-        raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE.format("A and scores"))
 
     return sum([(A_vector == a) * function_dict[a].predict(scores_vector) for a in function_dict])
 
@@ -413,17 +419,7 @@ def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
     return data
 
 
-def _sanity_check_and_group_data(attributes, labels, scores, attribute_names=None):
-    if len(attributes) == 0 or len(labels) == 0 or len(scores) == 0:
-        raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
-
-    if len(attributes) != len(labels) or len(attributes) != len(scores):
-        raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                         .format("attributes, labels, and scores"))
-
-    if set(np.unique(labels)) > set([0, 1]):
-        raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
-
+def _reformat_and_group_data(attributes, labels, scores, attribute_names=None):
     data_dict = {}
 
     # TODO: extend to multiple columns for additional data
@@ -465,4 +461,4 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         else:
             data_dict[key] = additional_data
     else:
-        raise ValueError("Unexpected data type {} encountered.".format(type(additional_data)))
+        raise ValueError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))

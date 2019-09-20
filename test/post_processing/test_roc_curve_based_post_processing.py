@@ -5,7 +5,7 @@ import copy
 import numpy as np
 import pandas as pd
 import pytest
-from fairlearn.metrics import DemographicParity, EqualizedOdds
+from fairlearn.post_processing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 from fairlearn.post_processing.roc_curve_based_post_processing import \
     (ROCCurveBasedPostProcessing,
      _vectorized_prediction,
@@ -17,8 +17,7 @@ from fairlearn.post_processing.roc_curve_based_post_processing import \
      INPUT_DATA_FORMAT_ERROR_MESSAGE,
      MISSING_FIT_PREDICT_ERROR_MESSAGE,
      MISSING_PREDICT_ERROR_MESSAGE,
-     FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE,
-     NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE,
+     NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE,
      MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,
      EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE,
      PREDICT_BEFORE_FIT_ERROR_MESSAGE,
@@ -27,8 +26,8 @@ from .test_utilities import (example_attributes1, example_attributes2, example_l
                              example_scores, example_attribute_names1, example_attribute_names2,
                              _generate_empty_list_permutations, _get_predictions_by_attribute,
                              _generate_list_reduction_permutations, _format_as_list_of_lists,
-                             ExampleModel, ExampleEstimator, ExampleMetric, ExampleNotMetric,
-                             ExampleNotModel, ExampleNotEstimator1, ExampleNotEstimator2)
+                             ExampleModel, ExampleEstimator, ExampleNotModel,
+                             ExampleNotEstimator1, ExampleNotEstimator2)
 
 
 ALLOWED_INPUT_DATA_TYPES = [lambda x: x, np.array, pd.DataFrame, pd.Series]
@@ -37,59 +36,59 @@ ALLOWED_INPUT_DATA_TYPES = [lambda x: x, np.array, pd.DataFrame, pd.Series]
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("predict_method_name", ['predict', 'predict_proba'])
-def test_predict_before_fit_error(X_transform, A_transform, predict_method_name):
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+def test_predict_before_fit_error(X_transform, A_transform, predict_method_name, metric):
     X = X_transform(_format_as_list_of_lists(example_attributes1))
     A = A_transform(example_attributes1)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=DemographicParity())
+                                                 disparity_metric=metric)
 
     with pytest.raises(ValueError, match=PREDICT_BEFORE_FIT_ERROR_MESSAGE):
-        getattr(adjusted_model, predict_method_name)(X, A)  # noqa: F841
+        getattr(adjusted_model, predict_method_name)(X, A)
 
 
-def test_both_model_and_estimator_error():
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+def test_both_model_and_estimator_error(metric):
     with pytest.raises(ValueError, match=EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),  # noqa: F841
-                                        fairness_unaware_estimator=ExampleEstimator(),
-                                        fairness_metric=DemographicParity())
+        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                    fairness_unaware_estimator=ExampleEstimator(),
+                                    disparity_metric=metric)
 
 
-def test_no_model_or_estimator_error():
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+def test_no_model_or_estimator_error(metric):
     with pytest.raises(ValueError, match=MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_metric=DemographicParity())  # noqa: F841
+        ROCCurveBasedPostProcessing(disparity_metric=metric)
 
 
 def test_metric_not_supported():
-    with pytest.raises(ValueError, match=NOT_SUPPORTED_FAIRNESS_METRIC_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),  # noqa: F841
-                                        fairness_metric=ExampleMetric())
-
-
-def test_not_a_fairness_metric():
-    with pytest.raises(TypeError, match=FAIRNESS_METRIC_EXPECTED_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),  # noqa: F841
-                                        fairness_metric=ExampleNotMetric())
+    with pytest.raises(ValueError, match=NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE):
+        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+                                    disparity_metric="UnsupportedMetric")
 
 
 @pytest.mark.parametrize("not_estimator", [ExampleNotEstimator1(), ExampleNotEstimator2()])
-def test_not_estimator(not_estimator):
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+def test_not_estimator(not_estimator, metric):
     with pytest.raises(ValueError, match=MISSING_FIT_PREDICT_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_estimator=not_estimator,  # noqa: F841
-                                        fairness_metric=ExampleMetric())
+        ROCCurveBasedPostProcessing(fairness_unaware_estimator=not_estimator,
+                                    disparity_metric=metric)
 
 
-def test_not_model():
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+def test_not_model(metric):
     with pytest.raises(ValueError, match=MISSING_PREDICT_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleNotModel(),  # noqa: F841
-                                        fairness_metric=ExampleMetric())
+        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleNotModel(),
+                                    disparity_metric=metric)
 
 
 @pytest.mark.parametrize("X", [None, _format_as_list_of_lists(example_attributes1)])
 @pytest.mark.parametrize("Y", [None, example_labels])
 @pytest.mark.parametrize("A", [None, example_attributes1])
-def test_inconsistent_input_data_types(X, Y, A):
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+def test_inconsistent_input_data_types(X, Y, A, metric):
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=DemographicParity())
+                                                 disparity_metric=metric)
 
     error_message = INPUT_DATA_FORMAT_ERROR_MESSAGE.format(type(X).__name__,
                                                            type(Y).__name__,
@@ -104,9 +103,9 @@ def test_inconsistent_input_data_types(X, Y, A):
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("Y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize('Metric', [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_roc_curve_based_post_processing_non_binary_labels(X_transform, Y_transform, A_transform,
-                                                           Metric):
+                                                           metric):
     non_binary_labels = copy.deepcopy(example_labels)
     non_binary_labels[0] = 2
 
@@ -115,7 +114,7 @@ def test_roc_curve_based_post_processing_non_binary_labels(X_transform, Y_transf
     A = A_transform(example_attributes1)
 
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=Metric())
+                                                 disparity_metric=metric)
 
     with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
         adjusted_model.fit(X, Y, A)
@@ -124,9 +123,9 @@ def test_roc_curve_based_post_processing_non_binary_labels(X_transform, Y_transf
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("Y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize('Metric', [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_roc_curve_based_post_processing_different_input_lengths(X_transform, Y_transform,
-                                                                 A_transform, Metric):
+                                                                 A_transform, metric):
     n = len(example_attributes1)
     for permutation in [(0, 1), (1, 0)]:
         with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
@@ -136,7 +135,7 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, Y_
             A = A_transform(example_attributes1)
 
             adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                         fairness_metric=Metric())
+                                                         disparity_metric=metric)
             adjusted_model.fit(X, Y, A)
 
     # try providing empty lists in all combinations
@@ -146,36 +145,9 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, Y_
         A = A_transform(example_attributes1)
 
         adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                     fairness_metric=Metric())
+                                                     disparity_metric=metric)
         with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
             adjusted_model.fit(X, Y, A)
-
-
-@pytest.mark.parametrize("score_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("Y_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize('roc_curve_based_post_processing_by_metric',
-                         [_roc_curve_based_post_processing_demographic_parity,
-                          _roc_curve_based_post_processing_equalized_odds])
-def test_roc_curve_based_post_processing_different_input_lengths_internals(
-        score_transform, Y_transform, A_transform, roc_curve_based_post_processing_by_metric):
-    # try all combinations of input lists being shorter/longer than others
-    n = len(example_attributes1)
-    for permutation in _generate_list_reduction_permutations():
-        with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                           .format("attributes, labels, and scores")):
-            attributes = A_transform(example_attributes1[:n-permutation[0]])
-            labels = Y_transform(example_labels[:n-permutation[1]])
-            scores = score_transform(example_scores[:n-permutation[2]])
-            roc_curve_based_post_processing_by_metric(attributes, labels, scores)
-
-    # try providing empty lists in all combinations
-    for permutation in _generate_empty_list_permutations():
-        with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
-            attributes = A_transform(example_attributes1[:n-permutation[0]])
-            labels = Y_transform(example_labels[:n-permutation[1]])
-            scores = score_transform(example_scores[:n-permutation[2]])
-            roc_curve_based_post_processing_by_metric(attributes, labels, scores)
 
 
 @pytest.mark.parametrize("score_transform", ALLOWED_INPUT_DATA_TYPES)
@@ -324,7 +296,7 @@ def test_roc_curve_based_post_processing_demographic_parity_e2e(attributes, attr
     Y = Y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=DemographicParity())
+                                                 disparity_metric=DEMOGRAPHIC_PARITY)
     adjusted_model.fit(X, Y, A)
 
     predictions = adjusted_model.predict_proba(X, A)
@@ -353,7 +325,7 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(
     Y = Y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=EqualizedOdds())
+                                                 disparity_metric=EQUALIZED_ODDS)
     adjusted_model.fit(X, Y, A)
 
     predictions = adjusted_model.predict_proba(X, A)
@@ -376,14 +348,14 @@ def test_roc_curve_based_post_processing_equalized_odds_e2e(
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("Y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("Metric", [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_predict_output_0_or_1(attributes, attribute_names, X_transform, Y_transform, A_transform,
-                               Metric):
+                               metric):
     X = X_transform(_format_as_list_of_lists(attributes))
     Y = Y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=Metric())
+                                                 disparity_metric=metric)
     adjusted_model.fit(X, Y, A)
 
     predictions = adjusted_model.predict(X, A)
@@ -396,14 +368,14 @@ def test_predict_output_0_or_1(attributes, attribute_names, X_transform, Y_trans
                           (example_attributes2, example_attribute_names2)])
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("Y_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("Metric", [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_predict_multiple_attributes_columns_error(attributes, attribute_names, X_transform,
-                                                   Y_transform, Metric):
+                                                   Y_transform, metric):
     X = X_transform(_format_as_list_of_lists(attributes))
     Y = Y_transform(example_labels)
     A = pd.DataFrame({"A1": attributes, "A2": attributes})
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=Metric())
+                                                 disparity_metric=metric)
     adjusted_model.fit(X, Y, attributes)
 
     with pytest.raises(ValueError, match=MULTIPLE_AUX_DATA_COLUMNS_ERROR_MESSAGE):
@@ -416,14 +388,14 @@ def test_predict_multiple_attributes_columns_error(attributes, attribute_names, 
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("Y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("Metric", [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_predict_different_argument_lengths(attributes, attribute_names, X_transform, Y_transform,
-                                            A_transform, Metric):
+                                            A_transform, metric):
     X = X_transform(_format_as_list_of_lists(attributes))
     Y = Y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
-                                                 fairness_metric=Metric())
+                                                 disparity_metric=metric)
     adjusted_model.fit(X, Y, A)
 
     with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
