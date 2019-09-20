@@ -78,7 +78,40 @@ def test_demographicparity_fair_uneven_populations():
     assert len(all_proba) == 11
 
 
-def test_can_specify_lagrange_multipliers():
+def test_lagrange_multiplier_zero_unchanged_model():
+    score_threshold = 0.6
+
+    number_a0 = 64
+    number_a1 = 24
+
+    a0_label = 7
+    a1_label = 22
+
+    X, y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label)
+
+    learner = LogisticRegression(solver='liblinear',
+                                 fit_intercept=True,
+                                 random_state=97)
+
+    # Train an unmitigated learner
+    unmitigated_learner = copy.deepcopy(learner)
+    unmitigated_learner.fit(X, y)
+
+    # Do the grid search with a zero Lagrange multiplier
+    target = GridSearch(LogisticRegression(),
+                        disparity_metric=DemographicParity(),
+                        quality_metric=SimpleClassificationQualityMetric())
+    target.fit(X, y, aux_data=A, lagrange_multipliers=[0])
+
+    # Check coefficients
+    gs_coeff = target.best_result.model.coef_
+    um_coeff = unmitigated_learner.coef_
+    assert np.array_equal(gs_coeff, um_coeff)
+
+
+def test_can_specify_and_generate_lagrange_multipliers():
     score_threshold = 0.4
 
     number_a0 = 32
@@ -123,4 +156,4 @@ def test_can_specify_lagrange_multipliers():
     for i in range(len(my_lagrange)):
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
-        np.equal(coef1, coef2)
+        assert np.array_equal(coef1, coef2)
