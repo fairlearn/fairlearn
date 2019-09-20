@@ -75,3 +75,45 @@ def test_demographicparity_fair_uneven_populations():
 
     all_proba = target.posterior_predict_proba(test_X)
     assert len(all_proba) == 11
+
+
+def test_can_specify_lagrange_multipliers():
+    score_threshold = 0.4
+
+    number_a0 = 32
+    number_a1 = 24
+
+    a0_label = 11
+    a1_label = 3
+
+    X, Y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label)
+
+    target1 = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
+                         disparity_metric=DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric())
+
+    target2 = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
+                         disparity_metric=DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric())
+
+    my_lagrange = [-2, 0, 2]
+
+    target1.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=len(my_lagrange))
+    target2.fit(X, Y, aux_data=A, lagrange_multipliers=my_lagrange)
+
+    assert len(target1.all_results) == len(my_lagrange)
+    assert len(target2.all_results) == len(my_lagrange)
+
+    # Check we generated the same multipliers
+    for i in range(len(my_lagrange)):
+        lm1 = target1.all_results[i].lagrange_multiplier
+        lm2 = target2.all_results[i].lagrange_multiplier
+        assert lm1 == lm2
+
+    # Check the models are the same
+    for i in range(len(my_lagrange)):
+        coef1 = target1.all_results[i].model.coef_
+        coef2 = target2.all_results[i].model.coef_
+        assert np.allclose(coef1, coef2)
