@@ -89,18 +89,18 @@ def test_bgl_unmitigated_same():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
-    learner = LinearRegression()
+    estimator = LinearRegression()
 
-    unmitigated_learner = copy.deepcopy(learner)
-    unmitigated_learner.fit(X, y)
+    unmitigated_estimator = copy.deepcopy(estimator)
+    unmitigated_estimator.fit(X, y)
 
-    target = GridSearch(learner,
+    target = GridSearch(estimator,
                         disparity_metric=BoundedGroupLoss(),
                         quality_metric=SimpleRegressionQualityMetric())
     # The value 0.5 comes from the counts of a0 and a1
     target.fit(X, y, aux_data=A, lagrange_multipliers=[0.5])
 
-    assert np.array_equal(unmitigated_learner.coef_, target.best_result.model.coef_)
+    assert np.array_equal(unmitigated_estimator.coef_, target.best_result.model.coef_)
 
 
 def test_bgl_lagrange_specifications():
@@ -117,12 +117,12 @@ def test_bgl_lagrange_specifications():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
-    learner = LinearRegression()
-    target1 = GridSearch(copy.deepcopy(learner),
+    estimator = LinearRegression()
+    target1 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=BoundedGroupLoss(),
                          quality_metric=SimpleRegressionQualityMetric())
 
-    target2 = GridSearch(copy.deepcopy(learner),
+    target2 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=BoundedGroupLoss(),
                          quality_metric=SimpleRegressionQualityMetric())
 

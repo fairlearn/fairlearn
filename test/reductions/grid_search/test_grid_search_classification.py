@@ -91,23 +91,23 @@ def test_lagrange_multiplier_zero_unchanged_model():
                                      score_threshold, score_threshold,
                                      a0_label, a1_label)
 
-    learner = LogisticRegression(solver='liblinear',
-                                 fit_intercept=True,
-                                 random_state=97)
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
 
-    # Train an unmitigated learner
-    unmitigated_learner = copy.deepcopy(learner)
-    unmitigated_learner.fit(X, y)
+    # Train an unmitigated estimator
+    unmitigated_estimator = copy.deepcopy(estimator)
+    unmitigated_estimator.fit(X, y)
 
     # Do the grid search with a zero Lagrange multiplier
-    target = GridSearch(learner,
+    target = GridSearch(estimator,
                         disparity_metric=DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric())
     target.fit(X, y, aux_data=A, lagrange_multipliers=[0])
 
     # Check coefficients
     gs_coeff = target.best_result.model.coef_
-    um_coeff = unmitigated_learner.coef_
+    um_coeff = unmitigated_estimator.coef_
     assert np.array_equal(gs_coeff, um_coeff)
 
 
@@ -124,15 +124,15 @@ def test_can_specify_and_generate_lagrange_multipliers():
                                      score_threshold, score_threshold,
                                      a0_label, a1_label)
 
-    learner = LogisticRegression(solver='liblinear',
-                                 fit_intercept=True,
-                                 random_state=97)
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
 
-    target1 = GridSearch(copy.deepcopy(learner),
+    target1 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=DemographicParity(),
                          quality_metric=SimpleClassificationQualityMetric())
 
-    target2 = GridSearch(copy.deepcopy(learner),
+    target2 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=DemographicParity(),
                          quality_metric=SimpleClassificationQualityMetric())
 
