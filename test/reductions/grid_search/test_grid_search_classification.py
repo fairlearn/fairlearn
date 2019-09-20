@@ -5,6 +5,7 @@ from fairlearn.metrics import DemographicParity
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 
+import copy
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -86,22 +87,27 @@ def test_can_specify_lagrange_multipliers():
     a0_label = 11
     a1_label = 3
 
-    X, Y, A = _simple_threshold_data(number_a0, number_a1,
+    X, y, A = _simple_threshold_data(number_a0, number_a1,
                                      score_threshold, score_threshold,
                                      a0_label, a1_label)
 
-    target1 = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
+    learner = LogisticRegression(solver='liblinear',
+                                 fit_intercept=True,
+                                 random_state=97)
+
+    target1 = GridSearch(copy.deepcopy(learner),
                          disparity_metric=DemographicParity(),
                          quality_metric=SimpleClassificationQualityMetric())
 
-    target2 = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
+    target2 = GridSearch(copy.deepcopy(learner),
                          disparity_metric=DemographicParity(),
                          quality_metric=SimpleClassificationQualityMetric())
 
-    my_lagrange = [-2, 0, 2]
+    # Note that using integers for my_lagrange causes the test to fail
+    my_lagrange = [-2.0, 0, 2.0]
 
-    target1.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=len(my_lagrange))
-    target2.fit(X, Y, aux_data=A, lagrange_multipliers=my_lagrange)
+    target2.fit(X, y, aux_data=A, lagrange_multipliers=my_lagrange)
+    target1.fit(X, y, aux_data=A, number_of_lagrange_multipliers=len(my_lagrange))
 
     assert len(target1.all_results) == len(my_lagrange)
     assert len(target2.all_results) == len(my_lagrange)
@@ -116,4 +122,4 @@ def test_can_specify_lagrange_multipliers():
     for i in range(len(my_lagrange)):
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
-        assert np.allclose(coef1, coef2)
+        np.equal(coef1, coef2)
