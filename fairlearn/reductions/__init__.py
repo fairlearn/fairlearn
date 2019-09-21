@@ -3,3 +3,4 @@
 
 from .grid_search.grid_search import GridSearch  # noqa: F401
 from .reductions_estimator import ReductionsEstimator  # noqa: F401
+from .exponentiated_gradient.exponentiated_gradient import exponentiated_gradient  # noqa: F401

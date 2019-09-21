@@ -3,7 +3,7 @@
 
 import pandas as pd
 import fairlearn.moments as moments
-import fairlearn.classred as red
+from fairlearn.reductions import exponentiated_gradient
 
 from test import simple_learners
 
@@ -77,10 +77,9 @@ class TestExpgradSmoke:
                         "n_classifiers": 6}, ]
 
     def run_smoke_test(self, data):
-        res_tuple = red.expgrad(self.dataX, self.dataA, self.dataY,
-                                self.learner,
-                                constraints=data["cons_class"](),
-                                eps=data["eps"])
+        res_tuple = exponentiated_gradient(self.dataX, self.dataA, self.dataY,
+                                           self.learner, constraints=data["cons_class"](),
+                                           eps=data["eps"])
 
         res = res_tuple._asdict()
         Q = res["best_classifier"]
