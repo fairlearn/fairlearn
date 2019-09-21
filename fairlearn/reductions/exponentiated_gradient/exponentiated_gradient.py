@@ -41,13 +41,19 @@ class ExponentiatedGradient(ReductionsEstimator):
         self._estimator = estimator
         self._disparity_metric = disparity_metric
         self._quality_metric = quality_metric
+        self._best_classifier = None
+        self._classifiers = None
 
     def fit(self, X, y, aux_data=None, **kwargs):
-        exponentiated_gradient(X, aux_data, y, self._estimator,
-                               constraints=self._disparity_metric)
+        # TODO: validate input data; unify between grid search an expgrad?
+        expgrad_result = exponentiated_gradient(X, aux_data, y, self._estimator,
+                                                constraints=self._disparity_metric)
+        self._best_classifier = expgrad_result.best_classifier
+        self._classifiers = expgrad_result.classifiers
+        # TODO: figure out whether we should keep the remaining data of the result object
 
     def predict(self, X):
-        raise NotImplementedError()
+        return self._best_classifier(X)
 
     def predict_proba(self, X):
         raise NotImplementedError()

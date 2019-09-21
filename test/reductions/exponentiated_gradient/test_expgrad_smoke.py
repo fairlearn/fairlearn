@@ -13,15 +13,14 @@ import pytest
 class TestExpgradSmoke:
     def setup_method(self, method):
         print("setup_method      method:%s" % method.__name__)
-        attrs = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
-        labls = [int(x) for x in '0110100' '0010111' '001111']
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        self.dataX = pd.DataFrame(
-            {"feat1": feat1, "feat2": feat2, "feat3": feat3})
-        self.dataY = pd.Series(labls)
-        self.dataA = pd.Series(attrs)
+        aux_data = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
+        labels =   [int(x) for x in '0110100' '0010111' '001111']  # noqa: E222
+        X1 =       [int(x) for x in '0110101' '0111101' '001011']  # noqa: E222
+        X2 =       [int(x) for x in '0000100' '0000011' '111111']  # noqa: E222
+        X3 =       [int(x) for x in '1111111' '1111111' '111111']  # noqa: E222
+        self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
+        self.y = pd.Series(labels)
+        self.A = pd.Series(aux_data)
         self.learner = simple_learners.LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
@@ -74,10 +73,10 @@ class TestExpgradSmoke:
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6}, ]
+                        "n_classifiers": 6}]
 
     def run_smoke_test(self, data):
-        res_tuple = exponentiated_gradient(self.dataX, self.dataA, self.dataY,
+        res_tuple = exponentiated_gradient(self.X, self.A, self.y,
                                            self.learner, constraints=data["cons_class"](),
                                            eps=data["eps"])
 
@@ -86,9 +85,9 @@ class TestExpgradSmoke:
         res["n_classifiers"] = len(res["classifiers"])
 
         disp = data["cons_class"]()
-        disp.init(self.dataX, self.dataA, self.dataY)
+        disp.init(self.X, self.A, self.y)
         error = moments.MisclassificationError()
-        error.init(self.dataX, self.dataA, self.dataY)
+        error.init(self.X, self.A, self.y)
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
 
