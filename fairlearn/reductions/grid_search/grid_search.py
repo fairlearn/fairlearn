@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 
 from fairlearn.metrics import DemographicParity, BoundedGroupLoss
-from fairlearn.reductions.reductions_learner import ReductionsLearner
+from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 
 
-class GridSearch(ReductionsLearner):
+class GridSearch(ReductionsEstimator):
     """Learner to perform a grid search given a blackbox algorithm.
     The supplied algorithm must implement a method
     fit(X, y, sample_weight=[...])
