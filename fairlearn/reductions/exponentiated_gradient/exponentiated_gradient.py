@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import functools
 from fairlearn import moments
+from fairlearn.reductions import ReductionsEstimator
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
@@ -37,6 +38,26 @@ column_names = str("best_classifier best_gap classifiers "
                    "weights last_t best_t n_oracle_calls")
 expgrad_result = namedtuple("ExpgradResult", column_names)
 
+
+class ExponentiatedGradient(ReductionsEstimator):
+    def __init__(self,
+                 learner,
+                 disparity_metric,
+                 quality_metric):
+    def fit(self, X, y, aux_data=None, **kwargs):
+        raise NotImplementedError()
+
+    def predict(self, X):
+        raise NotImplementedError()
+
+    def predict_proba(self, X):
+        raise NotImplementedError()
+
+    def posterior_predict(self, X):
+        raise NotImplementedError()
+
+    def posterior_predict_proba(self, X):
+        raise NotImplementedError()
 
 def exponentiated_gradient(dataX, dataA, dataY, learner,
                            constraints=moments.DP(),
