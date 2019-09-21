@@ -26,11 +26,11 @@ from collections import namedtuple
 print = functools.partial(print, flush=True)
 
 
-def _mean_pred(dataX, hs, weights):
+def _mean_pred(X, hs, weights):
     """Return a weighted average of predictions produced by classifiers in hs"""
     pred = pd.DataFrame()
     for t in range(len(hs)):
-        pred[t] = hs[t](dataX)
+        pred[t] = hs[t](X)
     return pred[weights.index].dot(weights)
 
 
@@ -41,9 +41,10 @@ expgrad_result = namedtuple("ExpgradResult", column_names)
 
 class ExponentiatedGradient(ReductionsEstimator):
     def __init__(self,
-                 learner,
+                 estimator,
                  disparity_metric,
                  quality_metric):
+
     def fit(self, X, y, aux_data=None, **kwargs):
         raise NotImplementedError()
 
@@ -59,7 +60,8 @@ class ExponentiatedGradient(ReductionsEstimator):
     def posterior_predict_proba(self, X):
         raise NotImplementedError()
 
-def exponentiated_gradient(dataX, dataA, dataY, learner,
+
+def exponentiated_gradient(X, A, y, estimator,
                            constraints=moments.DP(),
                            eps=0.01,
                            T=50,
@@ -71,10 +73,10 @@ def exponentiated_gradient(dataX, dataA, dataY, learner,
     via exponentiated-gradient reduction.
 
     Required input arguments:
-      dataX -- a DataFrame containing covariates
-      dataA -- a Series containing the protected attribute
-      dataY -- a Series containing labels in {0,1}
-      learner -- a learner implementing methods fit(X,Y,W) and predict(X),
+      X -- a DataFrame containing covariates
+      A -- a Series containing the protected attribute
+      y -- a Series containing labels in {0,1}
+      estimator -- a estimator implementing methods fit(X,Y,W) and predict(X),
                  where X is the DataFrame of covariates, and Y and W
                  are the Series containing the labels and weights,
                  respectively; labels Y and predictions returned by
@@ -99,19 +101,19 @@ def exponentiated_gradient(dataX, dataA, dataY, learner,
                   is guaranteed to have the classification error within
                   2*best_gap of the best error under constraint eps; the
                   constraint violation is at most 2*(eps+best_gap)
-      classifiers -- the base classifiers generated (instances of learner)
+      classifiers -- the base classifiers generated (instances of estimator)
       weights -- the weights of those classifiers within best_classifier
       last_t -- the last executed iteration; always last_t < T
       best_t -- the iteration in which best_classifier was obtained
-      n_oracle_calls -- how many times the learner was called
+      n_oracle_calls -- how many times the estimator was called
     """
-    n = dataX.shape[0]
+    n = X.shape[0]
 
     if debug:
         print("...Exponentiated Gradient STARTING")
 
     B = 1 / eps
-    lagrangian = _Lagrangian(dataX, dataA, dataY, learner,
+    lagrangian = _Lagrangian(X, A, y, estimator,
                              constraints, eps, B, debug=debug)
 
     theta = pd.Series(0, lagrangian.constraints.index)
@@ -134,11 +136,11 @@ def exponentiated_gradient(dataX, dataA, dataY, learner,
 
         # select classifier according to best_h method
         h, h_idx = lagrangian.best_h(lambda_vec)
-        pred_h = h(dataX)
+        pred_h = h(X)
 
         if t == 0:
             if nu is None:
-                nu = _ACCURACY_MUL * (pred_h - dataY).abs().std() / np.sqrt(n)
+                nu = _ACCURACY_MUL * (pred_h - y).abs().std() / np.sqrt(n)
             eta_min = nu / (2 * B)
             eta = eta_mul / B
             if debug:
