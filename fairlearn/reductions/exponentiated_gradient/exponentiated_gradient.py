@@ -11,8 +11,6 @@ exponentiated_gradient -- optimize accuracy subject to fairness constraints
 
 from __future__ import print_function
 
-__all__ = ["exponentiated_gradient"]
-
 import numpy as np
 import pandas as pd
 import functools
@@ -34,19 +32,19 @@ def _mean_pred(X, hs, weights):
     return pred[weights.index].dot(weights)
 
 
-column_names = str("best_classifier best_gap classifiers "
-                   "weights last_t best_t n_oracle_calls")
+column_names = "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls"
 expgrad_result = namedtuple("ExpgradResult", column_names)
 
 
 class ExponentiatedGradient(ReductionsEstimator):
-    def __init__(self,
-                 estimator,
-                 disparity_metric,
-                 quality_metric):
+    def __init__(self, estimator, disparity_metric, quality_metric):
+        self._estimator = estimator
+        self._disparity_metric = disparity_metric
+        self._quality_metric = quality_metric
 
     def fit(self, X, y, aux_data=None, **kwargs):
-        raise NotImplementedError()
+        exponentiated_gradient(X, aux_data, y, self._estimator,
+                               constraints=self._disparity_metric)
 
     def predict(self, X):
         raise NotImplementedError()
@@ -69,30 +67,25 @@ def exponentiated_gradient(X, A, y, estimator,
                            eta_mul=2.0,
                            debug=False):
     """
-    Return a fair classifier under specified fairness constraints
-    via exponentiated-gradient reduction.
+    Return a fair classifier under specified fairness constraints via exponentiated-gradient
+    reduction.
 
-    Required input arguments:
-      X -- a DataFrame containing covariates
-      A -- a Series containing the protected attribute
-      y -- a Series containing labels in {0,1}
-      estimator -- a estimator implementing methods fit(X,Y,W) and predict(X),
-                 where X is the DataFrame of covariates, and Y and W
-                 are the Series containing the labels and weights,
-                 respectively; labels Y and predictions returned by
-                 predict(X) are in {0,1}
+    :param X: a DataFrame containing covariates
+    :param A: a Series containing the protected attribute
+    :param y: a Series containing labels in {0,1}
+    :param estimator: an estimator implementing methods fit(X,Y,W) and predict(X), where X is the
+        DataFrame of covariates, and Y and W are the Series containing the labels and weights,
+        respectively; labels Y and predictions returned by predict(X) are in {0,1}
+    :param constraints: the disparity measure (default moments.DP())
+    :param eps: allowed fairness constraint violation (default 0.01)
+    :param T: max number of iterations (default 50)
+    :param nu: convergence threshold for the duality gap (default None), corresponding to a
+        conservative automatic setting based on the statistical uncertainty in measuring
+        classification error)
+    :param eta_mul: initial setting of the learning rate (default 2.0)
+    :param debug: if True, then debugging output is produced (default False)
 
-    Optional keyword arguments:
-      constraints -- the fairness measure (default moments.DP())
-      eps -- allowed fairness constraint violation (default 0.01)
-      T -- max number of iterations (default 50)
-      nu -- convergence threshold for the duality gap (default None,
-            corresponding to a conservative automatic setting based on the
-            statistical uncertainty in measuring classification error)
-      eta_mul -- initial setting of the learning rate (default 2.0)
-      debug -- if True, then debugging output is produced (default False)
-
-    Returned named tuple with fields:
+    :return: Returns named tuple with fields:
       best_classifier -- a function that maps a DataFrame X containing
                          covariates to a Series containing the corresponding
                          probabilistic decisions in [0,1]
