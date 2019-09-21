@@ -2,10 +2,8 @@
 # Licensed under the MIT License.
 
 from collections import defaultdict, namedtuple
-from itertools import permutations
 import numpy as np
 import pandas as pd
-from fairlearn.metrics import DisparityMetric
 from fairlearn.post_processing._threshold_operation import ThresholdOperation
 from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 
@@ -45,14 +43,6 @@ class ExampleNotEstimator1():
 class ExampleNotEstimator2():
     def predict(self, X):
         pass
-
-
-class ExampleMetric(DisparityMetric):
-    pass
-
-
-class ExampleNotMetric():
-    pass
 
 
 def _get_grouped_data_and_base_points(attribute_value):
@@ -98,28 +88,6 @@ def _get_grouped_data_and_base_points(attribute_value):
         ignore_for_base_points = [0]
 
     return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
-
-
-def _generate_list_reduction_permutations():
-    list_reduction_permutations = []
-    for permutation in permutations([0, 0, 1]):
-        list_reduction_permutations.append(permutation)
-    for permutation in permutations([0, 1, 1]):
-        list_reduction_permutations.append(permutation)
-
-    return list_reduction_permutations
-
-
-def _generate_empty_list_permutations():
-    empty_list_permutations = []
-
-    n = len(example_attributes1)
-    for permutation in permutations([0, 0, n]):
-        empty_list_permutations.append(permutation)
-    for permutation in permutations([0, n, n]):
-        empty_list_permutations.append(permutation)
-
-    return empty_list_permutations
 
 
 def _get_predictions_by_attribute(adjusted_model, attributes, scores, labels):
