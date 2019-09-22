@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-import fairlearn.moments as moments
+import fairlearn.reductions.moments as moments
 import fairlearn.classred as red
 
 from test import simple_learners
