@@ -14,7 +14,7 @@ from __future__ import print_function
 import numpy as np
 import pandas as pd
 import functools
-from fairlearn import moments
+from fairlearn.reductions import moments
 from fairlearn.reductions import ReductionsEstimator
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
@@ -100,7 +100,7 @@ class ExponentiatedGradient(ReductionsEstimator):
 
 
 def exponentiated_gradient(X, A, y, estimator,
-                           constraints=moments.DP(),
+                           constraints=moments.DemographicParity(),
                            eps=0.01,
                            T=50,
                            nu=None,
@@ -116,7 +116,7 @@ def exponentiated_gradient(X, A, y, estimator,
     :param estimator: an estimator implementing methods fit(X,Y,W) and predict(X), where X is the
         DataFrame of covariates, and Y and W are the Series containing the labels and weights,
         respectively; labels Y and predictions returned by predict(X) are in {0,1}
-    :param constraints: the disparity measure (default moments.DP())
+    :param constraints: the disparity measure (default moments.DemographicParity())
     :param eps: allowed fairness constraint violation (default 0.01)
     :param T: max number of iterations (default 50)
     :param nu: convergence threshold for the duality gap (default None), corresponding to a

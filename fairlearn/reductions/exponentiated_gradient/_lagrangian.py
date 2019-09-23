@@ -6,7 +6,7 @@ import pandas as pd
 import pickle
 import scipy.optimize as opt
 
-from fairlearn import moments
+from fairlearn.reductions import moments
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
 
