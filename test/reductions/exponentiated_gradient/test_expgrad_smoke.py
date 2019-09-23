@@ -73,7 +73,7 @@ class TestExpgradSmoke:
 
     def run_smoke_test(self, data):
         expgrad = ExponentiatedGradient(self.learner, disparity_metric=data["cons_class"](),
-                                        eps=data["eps"], quality_metric=None)
+                                        eps=data["eps"])
         expgrad.fit(self.X, self.y, self.A)
 
         res = expgrad._expgrad_result._asdict()

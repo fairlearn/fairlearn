@@ -64,11 +64,9 @@ class ExponentiatedGradientResult:
 
 
 class ExponentiatedGradient(ReductionsEstimator):
-    def __init__(self, estimator, disparity_metric, quality_metric, eps=0.01):
+    def __init__(self, estimator, disparity_metric, eps=0.01):
         self._estimator = estimator
         self._disparity_metric = disparity_metric
-        # TODO use quality metric
-        self._quality_metric = quality_metric
         self._eps = eps
         self._best_classifier = None
         self._classifiers = None

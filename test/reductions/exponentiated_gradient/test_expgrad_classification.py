@@ -13,6 +13,6 @@ def test_simple_fit_predict():
     estimator = LeastSquaresBinaryClassifierLearner()
     disparity_metric = DemographicParity()
     # TODO what about the quality metric?
-    expgrad = ExponentiatedGradient(estimator, disparity_metric, None)
+    expgrad = ExponentiatedGradient(estimator, disparity_metric)
     expgrad.fit(pd.DataFrame(X1), pd.Series(labels), aux_data=pd.Series(aux_data))
     expgrad.predict(pd.DataFrame(X1))
