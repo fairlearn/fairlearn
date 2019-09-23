@@ -21,7 +21,7 @@ def test_true_positive_rate_smoke():
 def test_true_positive_rate_smoke_chars():
     y_actual = [0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0]
     y_predict = [0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1]
-    group_ids = [0,0,0,0,1,1,1,1,2,2,2,2]
+    group_ids = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
 
     result = metrics.true_positive_rate(y_actual, y_predict, group_ids)
 
