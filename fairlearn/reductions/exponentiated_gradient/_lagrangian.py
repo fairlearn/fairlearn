@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import logging
 import numpy as np
 import pandas as pd
 import pickle
@@ -8,6 +9,8 @@ import scipy.optimize as opt
 
 from fairlearn.reductions import moments
 from ._constants import _PRECISION, _INDENTATION, _LINE
+
+logger = logging.getLogger(__name__)
 
 
 class _Lagrangian:
@@ -79,8 +82,7 @@ class _Lagrangian:
         result = _GapResult(L, L, L_high, gamma, error)
         for mul in [1.0, 2.0, 5.0, 10.0]:
             h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
-            if self.debug:
-                print("%smul=%.0f" % (_INDENTATION, mul))
+            logger.debug("%smul=%.0f" % (_INDENTATION, mul))
             L_low_mul, _, _, _ = self.eval(
                 pd.Series({h_hat_idx: 1.0}), lambda_hat)
             if L_low_mul < result.L_low:
@@ -147,9 +149,7 @@ class _Lagrangian:
             best_value = np.PINF
 
         if h_value < best_value - _PRECISION:
-            if self.debug:
-                print("%sbest_h: val improvement %f" %
-                      (_LINE, best_value - h_value))
+            logger.debug("%sbest_h: val improvement %f" % (_LINE, best_value - h_value))
             h_idx = len(self.hs)
             self.hs.at[h_idx] = h
             self.classifiers.at[h_idx] = classifier

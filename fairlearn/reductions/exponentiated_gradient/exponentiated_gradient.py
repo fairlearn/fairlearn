@@ -9,8 +9,7 @@ FUNCTIONS
 exponentiated_gradient -- optimize accuracy subject to fairness constraints
 """
 
-from __future__ import print_function
-
+import logging
 import numpy as np
 import pandas as pd
 import functools
@@ -21,7 +20,7 @@ from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCR
 from ._lagrangian import _Lagrangian
 from collections import namedtuple
 
-print = functools.partial(print, flush=True)
+logger = logging.getLogger(__name__)
 
 
 def _mean_pred(X, hs, weights):
@@ -64,10 +63,13 @@ class ExponentiatedGradientResult:
 
 
 class ExponentiatedGradient(ReductionsEstimator):
-    def __init__(self, estimator, disparity_metric, eps=0.01):
+    def __init__(self, estimator, disparity_metric, eps=0.01, T=50, nu=None, eta_mul=2.0):
         self._estimator = estimator
         self._disparity_metric = disparity_metric
         self._eps = eps
+        self._T = T
+        self._nu = nu
+        self._eta_mul = eta_mul
         self._best_classifier = None
         self._classifiers = None
 
@@ -75,7 +77,8 @@ class ExponentiatedGradient(ReductionsEstimator):
         # TODO: validate input data; unify between grid search an expgrad?
         self._expgrad_result = exponentiated_gradient(X, aux_data, y, self._estimator,
                                                       constraints=self._disparity_metric,
-                                                      eps=self._eps)
+                                                      eps=self._eps, T=self._T, nu=self._nu,
+                                                      eta_mul=self._eta_mul)
         self._best_classifier = expgrad_result.best_classifier
         self._classifiers = expgrad_result.classifiers
         # TODO: figure out whether we should keep the remaining data of the result object
@@ -140,8 +143,7 @@ def exponentiated_gradient(X, A, y, estimator,
     """
     n = X.shape[0]
 
-    if debug:
-        print("...Exponentiated Gradient STARTING")
+    logger.debug("...Exponentiated Gradient STARTING")
 
     B = 1 / eps
     lagrangian = _Lagrangian(X, A, y, estimator,
@@ -157,8 +159,7 @@ def exponentiated_gradient(X, A, y, estimator,
     last_regret_checked = _REGRET_CHECK_START_T
     last_gap = np.PINF
     for t in range(0, T):
-        if debug:
-            print("...iter=%03d" % t)
+        logger.debug("...iter=%03d" % t)
 
         # set lambdas for every constraint
         lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
@@ -174,9 +175,8 @@ def exponentiated_gradient(X, A, y, estimator,
                 nu = _ACCURACY_MUL * (pred_h - y).abs().std() / np.sqrt(n)
             eta_min = nu / (2 * B)
             eta = eta_mul / B
-            if debug:
-                print("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
-                      % (eps, B, nu, T, eta_min))
+            logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
+                         % (eps, B, nu, T, eta_min))
 
         if h_idx not in Qsum.index:
             Qsum.at[h_idx] = 0.0
@@ -203,13 +203,12 @@ def exponentiated_gradient(X, A, y, estimator,
             Qs.append(Q_LP)
             gaps.append(gap_LP)
 
-        if debug:
-            print("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
-                  ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f"
-                  % (_INDENTATION, eta, result_EG.L_low,
-                     result_EG.L, result_EG.L_high,
-                     gap_EG, result_EG.gamma.max(),
-                     result_EG.error, gap_LP))
+        logger.debug("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
+                     ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f"
+                     % (_INDENTATION, eta, result_EG.L_low,
+                        result_EG.L, result_EG.L_high,
+                        gap_EG, result_EG.gamma.max(),
+                        result_EG.error, gap_LP))
 
         if (gaps[t] < nu) and (t >= _MIN_T):
             # solution found
@@ -255,11 +254,11 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
         lagrangian.n_oracle_calls)
 
     if debug:
-        print("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
-              % (eps, B, nu, T, eta_min))
-        print("...last_t=%d, best_t=%d, best_gap=%.6f"
-              ", n_oracle_calls=%d, n_hs=%d"
-              % (last_t, best_t, best_gap,
-                 lagrangian.n_oracle_calls, len(lagrangian.classifiers)))
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
+                     % (eps, B, nu, T, eta_min))
+        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f"
+                     ", n_oracle_calls=%d, n_hs=%d"
+                     % (last_t, best_t, best_gap,
+                        lagrangian.n_oracle_calls, len(lagrangian.classifiers)))
 
     return result
