@@ -3,9 +3,10 @@
 
 import pandas as pd
 import fairlearn.moments as moments
-from fairlearn.reductions import exponentiated_gradient
+from fairlearn.reductions import ExponentiatedGradient
 
 from test import simple_learners
+from .test_utilities import aux_data, X1, X2, X3, labels
 
 import pytest
 
@@ -13,11 +14,6 @@ import pytest
 class TestExpgradSmoke:
     def setup_method(self, method):
         print("setup_method      method:%s" % method.__name__)
-        aux_data = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
-        labels =   [int(x) for x in '0110100' '0010111' '001111']  # noqa: E222
-        X1 =       [int(x) for x in '0110101' '0111101' '001011']  # noqa: E222
-        X2 =       [int(x) for x in '0000100' '0000011' '111111']  # noqa: E222
-        X3 =       [int(x) for x in '1111111' '1111111' '111111']  # noqa: E222
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
         self.A = pd.Series(aux_data)
@@ -76,11 +72,11 @@ class TestExpgradSmoke:
                         "n_classifiers": 6}]
 
     def run_smoke_test(self, data):
-        res_tuple = exponentiated_gradient(self.X, self.A, self.y,
-                                           self.learner, constraints=data["cons_class"](),
-                                           eps=data["eps"])
+        expgrad = ExponentiatedGradient(self.learner, disparity_metric=data["cons_class"](),
+                                        eps=data["eps"], quality_metric=None)
+        expgrad.fit(self.X, self.y, self.A)
 
-        res = res_tuple._asdict()
+        res = expgrad._expgrad_result._asdict()
         Q = res["best_classifier"]
         res["n_classifiers"] = len(res["classifiers"])
 

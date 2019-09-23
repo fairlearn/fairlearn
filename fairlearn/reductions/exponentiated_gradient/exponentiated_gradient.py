@@ -36,24 +36,53 @@ column_names = "best_classifier best_gap classifiers weights last_t best_t n_ora
 expgrad_result = namedtuple("ExpgradResult", column_names)
 
 
+class ExponentiatedGradientResult:
+    def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
+                 n_oracle_calls):
+        self._best_classifier = best_classifier
+        self._best_gap = best_gap
+        self._classifiers = classifiers
+        self._weights = weights
+        self._last_t = last_t
+        self._best_t = best_t
+        self._n_oracle_calls = n_oracle_calls
+
+    def _predict_with_best_classifier(self, X):
+        return self._best_classifier(X)
+
+    def _asdict(self):
+        return {
+            "best_classifier": self._best_classifier,
+            "best_gap": self._best_gap,
+            "classifiers": self._classifiers,
+            "weights": self._weights,
+            "last_t": self._last_t,
+            "best_t": self._best_t,
+            "n_oracle_calls": self._n_oracle_calls
+        }
+
+
 class ExponentiatedGradient(ReductionsEstimator):
-    def __init__(self, estimator, disparity_metric, quality_metric):
+    def __init__(self, estimator, disparity_metric, quality_metric, eps=0.01):
         self._estimator = estimator
         self._disparity_metric = disparity_metric
+        # TODO use quality metric
         self._quality_metric = quality_metric
+        self._eps = eps
         self._best_classifier = None
         self._classifiers = None
 
     def fit(self, X, y, aux_data=None, **kwargs):
         # TODO: validate input data; unify between grid search an expgrad?
-        expgrad_result = exponentiated_gradient(X, aux_data, y, self._estimator,
-                                                constraints=self._disparity_metric)
+        self._expgrad_result = exponentiated_gradient(X, aux_data, y, self._estimator,
+                                                      constraints=self._disparity_metric,
+                                                      eps=self._eps)
         self._best_classifier = expgrad_result.best_classifier
         self._classifiers = expgrad_result.classifiers
         # TODO: figure out whether we should keep the remaining data of the result object
 
     def predict(self, X):
-        return self._best_classifier(X)
+        return self._expgrad_result._predict_with_best_classifier(X)
 
     def predict_proba(self, X):
         raise NotImplementedError()
@@ -63,6 +92,10 @@ class ExponentiatedGradient(ReductionsEstimator):
 
     def posterior_predict_proba(self, X):
         raise NotImplementedError()
+
+    def _expgrad_result(self):
+        # Just making this available since it's needed for some of the tests
+        return self._expgrad_result
 
 
 def exponentiated_gradient(X, A, y, estimator,
@@ -211,21 +244,23 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
     def best_classifier(X): return _mean_pred(X, hs, weights)
     best_gap = gaps[best_t]
 
-    result = expgrad_result(
-        best_classifier=best_classifier,
-        best_gap=best_gap,
-        classifiers=lagrangian.classifiers,
-        weights=weights,
-        last_t=len(Qs) - 1,
-        best_t=best_t,
-        n_oracle_calls=lagrangian.n_oracle_calls)
+    last_t = len(Qs) - 1
+
+    result = ExponentiatedGradientResult(
+        best_classifier,
+        best_gap,
+        lagrangian.classifiers,
+        weights,
+        last_t,
+        best_t,
+        lagrangian.n_oracle_calls)
 
     if debug:
         print("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
               % (eps, B, nu, T, eta_min))
         print("...last_t=%d, best_t=%d, best_gap=%.6f"
               ", n_oracle_calls=%d, n_hs=%d"
-              % (result.last_t, result.best_t, result.best_gap,
-                 result.n_oracle_calls, len(result.classifiers)))
+              % (last_t, best_t, best_gap,
+                 lagrangian.n_oracle_calls, len(lagrangian.classifiers)))
 
     return result
