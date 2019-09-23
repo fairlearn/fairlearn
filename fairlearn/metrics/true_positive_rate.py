@@ -20,10 +20,10 @@ def true_positive_rate(y_actual, y_predict, group_id):
         true_positives[group] = 0
 
     for y, yhat, a in zip(y_actual, y_predict, group_id):
-        if yhat == 1:
+        if y == 1:
             positives['all'] += 1
             positives[a] += 1
-            if y == 1:
+            if yhat == 1:
                 true_positives['all'] += 1
                 true_positives[a] += 1
 
