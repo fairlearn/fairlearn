@@ -5,4 +5,4 @@
 class MetricsResult:
     def __init__(self):
         self.metric = None
-        self.group_metric = list()
+        self.group_metric = {}

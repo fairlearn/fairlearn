@@ -1,19 +1,34 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pandas as pd
+import numpy as np
 
 from . import MetricsResult
 
 
 def true_positive_rate(y_actual, y_predict, group_id):
-    data = pd.DataFrame({"y_actual": y_actual, "y_predict": y_predict, "group_id": group_id})
-
-    data['true_positives'] = data.apply(lambda row: row.y_predict and row.y_actual, axis=1)
-
-    counts = data.count()
 
     result = MetricsResult()
-    result.metric = counts['true_postiives'] / counts['y_predict']
+
+    groups = np.unique(group_id)
+
+    positives = {'all': 0}
+    true_positives = {'all': 0}
+
+    for group in groups:
+        positives[group] = 0
+        true_positives[group] = 0
+
+    for y, yhat, a in zip(y_actual, y_predict, group_id):
+        if yhat == 1:
+            positives['all'] += 1
+            positives[a] += 1
+            if y == 1:
+                true_positives['all'] += 1
+                true_positives[a] += 1
+
+    result.metric = true_positives['all'] / positives['all']
+    for group in groups:
+        result.group_metric[group] = true_positives[group] / positives[group]
 
     return result
