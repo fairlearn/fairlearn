@@ -7,7 +7,7 @@ import fairlearn.metrics as metrics
 
 
 def test_true_positive_rate_smoke():
-    y_actual =  [0, 0, 1, 1, 0, 1, 1, 1]  # noqa:E222
+    y_actual = [0, 0, 1, 1, 0, 1, 1, 1]
     y_predict = [0, 1, 1, 1, 1, 0, 0, 1]
     group_ids = [0, 0, 0, 0, 1, 1, 1, 1]
 
