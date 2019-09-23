@@ -6,7 +6,7 @@ import pandas as pd
 
 from fairlearn.reductions.grid_search import QualityMetric
 
-import fairlearn.moments as moments
+from fairlearn.reductions.moments import DemographicParity, MisclassificationError
 
 
 class SimpleClassificationQualityMetric(QualityMetric):
@@ -17,8 +17,8 @@ class SimpleClassificationQualityMetric(QualityMetric):
     """
 
     def __init__(self):
-        self.error_metric = moments.MisclassificationError()
-        self.disparity_metric = moments.DP()
+        self.error_metric = MisclassificationError()
+        self.disparity_metric = DemographicParity()
 
     def set_data(self, X, Y, bin_id):
         self.X = X
