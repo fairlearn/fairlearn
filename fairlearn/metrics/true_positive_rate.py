@@ -7,13 +7,14 @@ from . import MetricsResult
 
 
 def true_positive_rate(y_actual, y_predict, group_id):
+    all_dict_key = 'all-9d52d0d8'
 
     result = MetricsResult()
 
     groups = np.unique(group_id)
 
-    positives = {'all': 0}
-    true_positives = {'all': 0}
+    positives = {all_dict_key: 0}
+    true_positives = {all_dict_key: 0}
 
     for group in groups:
         positives[group] = 0
@@ -21,13 +22,13 @@ def true_positive_rate(y_actual, y_predict, group_id):
 
     for y, yhat, a in zip(y_actual, y_predict, group_id):
         if y == 1:
-            positives['all'] += 1
+            positives[all_dict_key] += 1
             positives[a] += 1
             if yhat == 1:
-                true_positives['all'] += 1
+                true_positives[all_dict_key] += 1
                 true_positives[a] += 1
 
-    result.metric = true_positives['all'] / positives['all']
+    result.metric = true_positives[all_dict_key] / positives[all_dict_key]
     for group in groups:
         result.group_metric[group] = true_positives[group] / positives[group]
 
