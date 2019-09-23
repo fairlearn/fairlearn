@@ -18,7 +18,7 @@ import scipy.optimize as opt
 import pandas as pd
 import pickle
 import functools
-import fairlearn.moments as moments
+import fairlearn.reductions.moments as moments
 from collections import namedtuple
 
 print = functools.partial(print, flush=True)
@@ -227,7 +227,7 @@ expgrad_result = namedtuple("ExpgradResult",
 
 
 def expgrad(dataX, dataA, dataY, learner,
-            constraints=moments.DP(),
+            constraints=moments.DemographicParity(),
             eps=0.01,
             T=50,
             nu=None,
@@ -248,7 +248,7 @@ def expgrad(dataX, dataA, dataY, learner,
                  predict(X) are in {0,1}
 
     Optional keyword arguments:
-      constraints -- the fairness measure (default moments.DP())
+      constraints -- the fairness measure (default moments.DemographicParity())
       eps -- allowed fairness constraint violation (default 0.01)
       T -- max number of iterations (default 50)
       nu -- convergence threshold for the duality gap (default None,
