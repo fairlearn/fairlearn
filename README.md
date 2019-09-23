@@ -1,6 +1,7 @@
 
-![GatedCheckin:Dev](https://img.shields.io/badge/GatedCheckin%3ADev-succeeded-brightgreen)
- [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) ![pypi badge](https://img.shields.io/badge/pypi-0.2.0-blue)
+
+[![Build Status](https://img.shields.io/azure-devops/build/responsibleai/fairlearn/6/dev?failed_label=bad&passed_label=good&label=GatedCheckin%3ADev)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=1&branchName=dev) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) ![pypi badge](https://img.shields.io/badge/pypi-0.2.0-blue)
+
 
 
 # Fairness in Machine Learning - Mitigation algorithms
