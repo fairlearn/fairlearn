@@ -32,6 +32,7 @@ def _mean_pred(X, hs, weights):
     return pred[weights.index].dot(weights)
 
 
+# TODO: decide whether we want a structured object instead of the namedtuple
 column_names = "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls"
 expgrad_result = namedtuple("ExpgradResult", column_names)
 
