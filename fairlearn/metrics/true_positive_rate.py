@@ -7,6 +7,8 @@ from . import MetricsResult
 
 
 def true_positive_rate(y_actual, y_predict, group_id):
+    # TODO: Validate y_actual and y_predict are from {0, 1}
+    # TODO: Validate that group_id are from {0 ... n}
     result = MetricsResult()
 
     groups = np.unique(group_id)
@@ -14,11 +16,9 @@ def true_positive_rate(y_actual, y_predict, group_id):
     positives_all = 0
     true_positives_all = 0
 
-    positives = {}
-    true_positives = {}
-    for group in groups:
-        positives[group] = 0
-        true_positives[group] = 0
+    positives = np.zeros(len(groups))
+    true_positives = np.zeros(len(groups))
+    result.group_metric = np.zeros(len(groups))
 
     for y, yhat, a in zip(y_actual, y_predict, group_id):
         if y == 1:

@@ -21,11 +21,11 @@ def test_true_positive_rate_smoke():
 def test_true_positive_rate_smoke_chars():
     y_actual = [0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0]
     y_predict = [0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1]
-    group_ids = ['a', 'a', 'a', 'a', 'b', 'b', 'b', 'b', 'c', 'c', 'c', 'c']
+    group_ids = [0,0,0,0,1,1,1,1,2,2,2,2]
 
     result = metrics.true_positive_rate(y_actual, y_predict, group_ids)
 
     assert result.metric == 0.5
-    assert result.group_metric['a'] == 1.0
-    assert result.group_metric['b'] == pytest.approx(0.333333333333)
-    assert result.group_metric['c'] == 0
+    assert result.group_metric[0] == 1.0
+    assert result.group_metric[1] == pytest.approx(0.333333333333)
+    assert result.group_metric[2] == 0
