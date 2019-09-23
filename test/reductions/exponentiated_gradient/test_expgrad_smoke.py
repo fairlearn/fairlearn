@@ -76,7 +76,7 @@ class TestExpgradSmoke:
                                         eps=data["eps"])
         expgrad.fit(self.X, self.y, self.A)
 
-        res = expgrad._expgrad_result._asdict()
+        res = expgrad._expgrad_result._as_dict()
         Q = res["best_classifier"]
         res["n_classifiers"] = len(res["classifiers"])
 

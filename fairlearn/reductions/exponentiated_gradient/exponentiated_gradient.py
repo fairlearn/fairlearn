@@ -50,7 +50,7 @@ class ExponentiatedGradientResult:
     def _predict_with_best_classifier(self, X):
         return self._best_classifier(X)
 
-    def _asdict(self):
+    def _as_dict(self):
         return {
             "best_classifier": self._best_classifier,
             "best_gap": self._best_gap,
