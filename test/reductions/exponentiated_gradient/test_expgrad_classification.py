@@ -3,7 +3,7 @@
 
 import pandas as pd
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.moments import DP
+from fairlearn.reductions.moments import DemographicParity
 
 from test.simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import aux_data, X1, X2, X3, labels
@@ -11,7 +11,7 @@ from .test_utilities import aux_data, X1, X2, X3, labels
 
 def test_simple_fit_predict():
     estimator = LeastSquaresBinaryClassifierLearner()
-    disparity_metric = DP()
+    disparity_metric = DemographicParity()
     # TODO what about the quality metric?
     expgrad = ExponentiatedGradient(estimator, disparity_metric, None)
     expgrad.fit(pd.DataFrame(X1), pd.Series(labels), aux_data=pd.Series(aux_data))
