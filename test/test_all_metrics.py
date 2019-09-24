@@ -43,13 +43,25 @@ def test_selection_rate_smoke():
     assert result.group_metric[1] == 0.25
 
 
-def test_demographic_parity():
+def test_demographic_disparity():
     y_a = [0, 0, 1, 1, 0, 1, 1, 1]
     y_p = [0, 0, 1, 1, 0, 0, 0, 1]
     grp = [0, 0, 0, 0, 1, 1, 1, 1]
 
-    dd = metrics.make_disparity_metric(metrics.selection_rate, 'ratio')
+    demographic_disparity = metrics.make_disparity_metric(metrics.selection_rate, 'ratio')
 
-    result = dd(y_a, y_p, grp)
+    result = demographic_disparity(y_a, y_p, grp)
 
     assert result.disparity == 0.5
+
+
+def test_unequalised_opportunity():
+    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
+    grp = [0, 0, 0, 0, 1, 1, 1, 1]
+
+    unequal_opportunity = metrics.make_disparity_metric(metrics.true_positive_rate, 'ratio')
+
+    result = unequal_opportunity(y_a, y_p, grp)
+
+    assert result.disparity == pytest.approx(0.3333333333333)
