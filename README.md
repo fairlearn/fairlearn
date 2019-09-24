@@ -1,3 +1,5 @@
+[![Build Status](https://img.shields.io/azure-devops/build/responsibleai/fairlearn/6/dev?failed_label=bad&passed_label=good&label=GatedCheckin%3ADev)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=1&branchName=dev) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![pypi badge](https://img.shields.io/badge/pypi-0.2.0-blue)
+
 # Fairness in Machine Learning - Mitigation algorithms
 
 A Python package that implements a variety of fairness-related algorithms to mitigate bias including:
