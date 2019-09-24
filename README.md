@@ -2,6 +2,8 @@
 
 # Fairness in Machine Learning - Mitigation algorithms
 
+[![Azure Notebooks](https://notebooks.azure.com/launch.png)](https://notebooks.azure.com/import/gh/microsoft/fairlearn)
+
 A Python package that implements a variety of fairness-related algorithms to mitigate bias including:
 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
@@ -12,6 +14,7 @@ A Python package that implements a variety of fairness-related algorithms to mit
 | `post_processing.ROCCurveBasedPostProcessing` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
 
 DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. To request additional algorithms or fairness definitions, please open a new issue.
+
 
 ## Installation
 
