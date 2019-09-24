@@ -15,18 +15,18 @@ def true_positive_rate(y_actual, y_predict, group_id):
     groups = np.unique(group_id)
     number_of_groups = np.max(groups) + 1
 
-    positives = np.zeros(number_of_groups)
-    true_positives = np.zeros(number_of_groups)
-    result.group_metric = np.zeros(number_of_groups)
-
-    for y, yhat, a in zip(y_actual, y_predict, group_id):
-        if y == 1:
-            positives[a] += 1
-            if yhat == 1:
-                true_positives[a] += 1
-
     result.metric = recall_score(y_actual, y_predict)
+
+    # Initialise the group results array
+    result.group_metric = np.full(number_of_groups, fill_value=float('nan'))
+
+    # The slicing we use requires Numpy arrays
+    y_a = np.array(y_actual)
+    y_p = np.array(y_predict)
     for group in groups:
-        result.group_metric[group] = true_positives[group] / positives[group]
+        group_indices = [i for i, elem in enumerate(group_id) if elem == group]
+        group_actual = y_a[group_indices]
+        group_predict = y_p[group_indices]
+        result.group_metric[group] = recall_score(group_actual, group_predict)
 
     return result
