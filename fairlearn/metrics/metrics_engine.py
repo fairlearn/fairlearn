@@ -2,25 +2,10 @@
 # Licensed under the MIT License.
 
 import numpy as np
-from sklearn.metrics import recall_score
 
 from . import DisparityResult, MetricResult
 
 _MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
-
-
-def true_positive_rate(y_true, y_pred, group_data, sample_weight=None):
-    return metric_by_groups(recall_score, y_true, y_pred, group_data, sample_weight)
-
-
-def selection_rate(y_true, y_pred, group_data, sample_weight=None):
-    if sample_weight is not None:
-        raise NotImplementedError("selection_rate and sample_weight")
-
-    def selection_metric(y_a, y_p, sample_weight):
-        return np.mean(y_p)
-
-    return metric_by_groups(selection_metric, y_true, y_pred, group_data, sample_weight)
 
 
 def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=None):
