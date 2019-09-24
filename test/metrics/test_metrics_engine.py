@@ -109,86 +109,61 @@ class TestMakeGroupMetric:
         assert result.group_metric[c] == 21
 
 
-'''
-def test_true_positive_rate_smoke():
-    y_actual = [0, 0, 1, 1, 0, 1, 1, 1]
-    y_predict = [0, 1, 1, 1, 1, 0, 0, 1]
-    group_ids = [0, 0, 0, 0, 1, 1, 1, 1]
+class TestComputeDisparity:
+    def test_smoke_diff(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
 
-    result = metrics.true_positive_rate(y_actual, y_predict, group_ids)
+        gmf = metrics.make_group_metric(mock_func)
 
-    assert result.metric == 0.6
-    assert result.group_metric[0] == 1.0
-    assert result.group_metric[1] == pytest.approx(0.33333333333)
+        result = metrics.compute_disparity(gmf, y_a, y_p, gid, 'diff')
 
+        assert result.disparity == 1
+        assert len(result.group_metric) == 2
+        assert result.group_metric[0] == 2
+        assert result.group_metric[1] == 3
 
-def test_true_positive_rate_smoke_chars():
-    y_actual = [0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0]
-    y_predict = [0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1]
-    group_ids = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
+    def test_smoke_ratio(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
 
-    result = metrics.true_positive_rate(y_actual, y_predict, group_ids)
+        gmf = metrics.make_group_metric(mock_func)
 
-    assert result.metric == 0.5
-    assert result.group_metric[0] == 1.0
-    assert result.group_metric[1] == pytest.approx(0.333333333333)
-    assert result.group_metric[2] == 0
+        result = metrics.compute_disparity(gmf, y_a, y_p, gid, 'ratio')
 
-
-def test_selection_rate_smoke():
-    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
-    grp = [0, 0, 0, 0, 1, 1, 1, 1]
-
-    result = metrics.selection_rate(y_a, y_p, grp)
-
-    assert result.metric == 0.375
-    assert result.group_metric[0] == 0.5
-    assert result.group_metric[1] == 0.25
+        assert result.disparity == pytest.approx(0.33333333)
+        assert len(result.group_metric) == 2
+        assert result.group_metric[0] == 2
+        assert result.group_metric[1] == 3
 
 
-def test_demographic_disparity():
-    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
-    grp = [0, 0, 0, 0, 1, 1, 1, 1]
+class TestMakeDisparityMetric:
+    def test_smoke_diff(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
 
-    demographic_disparity = metrics.make_disparity_metric(metrics.selection_rate, 'ratio')
+        gmf = metrics.make_group_metric(mock_func)
+        dmf = metrics.make_disparity_metric(gmf, 'diff')
 
-    result = demographic_disparity(y_a, y_p, grp)
+        result = dmf(y_a, y_p, gid)
+        assert result.disparity == 1
+        assert len(result.group_metric) == 2
+        assert result.group_metric[0] == 2
+        assert result.group_metric[1] == 3
 
-    assert result.disparity == 0.5
+    def test_smoke_ratio(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
 
+        gmf = metrics.make_group_metric(mock_func)
+        dmf = metrics.make_disparity_metric(gmf, 'ratio')
 
-def test_unequalised_opportunity():
-    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
-    grp = [0, 0, 0, 0, 1, 1, 1, 1]
-
-    unequal_opportunity = metrics.make_disparity_metric(metrics.true_positive_rate, 'ratio')
-
-    result = unequal_opportunity(y_a, y_p, grp)
-
-    assert result.disparity == pytest.approx(0.66666667)
-
-
-def test_non_binary_y_actual():
-    y_a = [0, 0, 1, 1, 0, 1, 1, 2]
-    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
-    grp = [0, 0, 0, 0, 1, 1, 1, 1]
-
-    with pytest.raises(ValueError) as exCtxt:
-        _ = metrics.selection_rate(y_a, y_p, grp)
-
-    assert exCtxt.value.args[0] == "Array y_actual contains values other than 0 and 1"
-
-
-def test_non_binary_y_predict():
-    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-    y_p = [0, 0, 1, 1, 0, 0, 0, 2]
-    grp = [0, 0, 0, 0, 1, 1, 1, 1]
-
-    with pytest.raises(ValueError) as exCtxt:
-        _ = metrics.selection_rate(y_a, y_p, grp)
-
-    assert exCtxt.value.args[0] == "Array y_predict contains values other than 0 and 1"
-'''
+        result = dmf(y_a, y_p, gid)
+        assert result.disparity == pytest.approx(0.33333333)
+        assert len(result.group_metric) == 2
+        assert result.group_metric[0] == 2
+        assert result.group_metric[1] == 3

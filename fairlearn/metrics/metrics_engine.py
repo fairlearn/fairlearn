@@ -63,11 +63,11 @@ def make_group_metric(metric_function):
     return wrapper
 
 
-def compute_disparity(metric_function,
+def compute_disparity(group_metric_function,
                       y_actual, y_predict, group_id,
                       comparison,
                       sample_weight=None):
-    metrics = metric_function(y_actual, y_predict, group_id, sample_weight)
+    metrics = group_metric_function(y_actual, y_predict, group_id, sample_weight)
 
     result = DisparityResult()
     result.group_metric = metrics.group_metric

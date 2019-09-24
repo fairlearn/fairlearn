@@ -10,3 +10,4 @@ from .bounded_group_loss import BoundedGroupLoss  # noqa: F401
 from .disparity_result import DisparityResult  # noqa: F401
 from .metric_result import MetricResult  # noqa: F401
 from .metrics_engine import metric_by_groups, make_group_metric  # noqa: F401
+from .metrics_engine import compute_disparity, make_disparity_metric  # noqa: F401
