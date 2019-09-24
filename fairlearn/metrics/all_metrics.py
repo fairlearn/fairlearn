@@ -4,7 +4,7 @@
 import numpy as np
 from sklearn.metrics import recall_score
 
-from . import MetricsResult
+from . import DisparityResult, MetricResult
 
 
 def true_positive_rate(y_actual, y_predict, group_id, sample_weight=None):
@@ -24,7 +24,7 @@ def selection_rate(y_actual, y_predict, group_id, sample_weight=None):
 def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weight=None):
     # TODO: Validate y_actual and y_predict are from {0, 1}
     # TODO: Validate that group_id are from {0 ... n}
-    result = MetricsResult()
+    result = MetricResult()
 
     groups = np.unique(group_id)
     number_of_groups = np.max(groups) + 1
@@ -47,3 +47,35 @@ def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weig
             sample_weight=sample_weight)
 
     return result
+
+
+def compute_disparity(metric_function,
+                      y_actual, y_predict, group_id,
+                      comparison,
+                      sample_weight=None):
+    metrics = metric_function(y_actual, y_predict, group_id, sample_weight)
+
+    result = DisparityResult()
+    result.group_metric = metrics.group_metric
+
+    if comparison == 'ratio':
+        result.disparity = np.min(metrics.group_metric) / np.max(metrics.group_metric)
+    elif comparison == 'diff':
+        result.disparity = np.max(metrics.group_metric) - np.min(metrics.group_metric)
+    else:
+        raise ValueError("comparison")
+
+    return result
+
+
+def make_disparity_metric(metric_function, comparison):
+
+    def wrapper(y_actual, y_predict, group_id, sample_weight=None):
+        return compute_disparity(metric_function,
+                                 y_actual,
+                                 y_predict,
+                                 group_id,
+                                 comparison,
+                                 sample_weight=None)
+
+    return wrapper

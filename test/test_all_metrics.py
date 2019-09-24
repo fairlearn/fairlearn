@@ -41,3 +41,15 @@ def test_selection_rate_smoke():
     assert result.metric == 0.375
     assert result.group_metric[0] == 0.5
     assert result.group_metric[1] == 0.25
+
+
+def test_demographic_parity():
+    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
+    grp = [0, 0, 0, 0, 1, 1, 1, 1]
+
+    dd = metrics.make_disparity_metric(metrics.selection_rate, 'ratio')
+
+    result = dd(y_a, y_p, grp)
+
+    assert result.disparity == 0.5
