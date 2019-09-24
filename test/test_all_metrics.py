@@ -29,3 +29,15 @@ def test_true_positive_rate_smoke_chars():
     assert result.group_metric[0] == 1.0
     assert result.group_metric[1] == pytest.approx(0.333333333333)
     assert result.group_metric[2] == 0
+
+
+def test_selection_rate_smoke():
+    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
+    grp = [0, 0, 0, 0, 1, 1, 1, 1]
+
+    result = metrics.selection_rate(y_a, y_p, grp)
+
+    assert result.metric == 0.375
+    assert result.group_metric[0] == 0.5
+    assert result.group_metric[1] == 0.25

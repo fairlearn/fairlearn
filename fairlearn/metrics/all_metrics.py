@@ -11,6 +11,16 @@ def true_positive_rate(y_actual, y_predict, group_id, sample_weight=None):
     return metric_by_groups(recall_score, y_actual, y_predict, group_id, sample_weight)
 
 
+def selection_rate(y_actual, y_predict, group_id, sample_weight=None):
+    if sample_weight is not None:
+        raise NotImplementedError("selection_rate and sample_weight")
+
+    def selection_metric(y_a, y_p, sample_weight):
+        return np.mean(y_p)
+
+    return metric_by_groups(selection_metric, y_actual, y_predict, group_id, sample_weight)
+
+
 def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weight=None):
     # TODO: Validate y_actual and y_predict are from {0, 1}
     # TODO: Validate that group_id are from {0 ... n}
