@@ -35,14 +35,20 @@ def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weig
     # The slicing we use requires Numpy arrays
     y_a = np.array(y_actual)
     y_p = np.array(y_predict)
+    s_w = None
+    if sample_weight is not None:
+        s_w = np.array(sample_weight)
     for group in groups:
         group_indices = [i for i, elem in enumerate(group_id) if elem == group]
         group_actual = y_a[group_indices]
         group_predict = y_p[group_indices]
+        group_weight = None
+        if s_w is not None:
+            group_weight = s_w[group_indices]
         result.group_metric[group] = metric_function(
             group_actual,
             group_predict,
-            sample_weight=sample_weight)
+            sample_weight=group_weight)
 
     return result
 

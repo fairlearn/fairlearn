@@ -1,11 +1,51 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import pytest
+import numpy as np
 
 import fairlearn.metrics as metrics
 
 
+class MetricMock:
+    def mock_func(self, y_actual, y_predict, sample_weight=None):
+        self.y_a = y_actual
+        self.y_p = y_predict
+        self.s_w = sample_weight
+
+        return np.sum(y_actual)
+
+
+class TestMetricByGroups:
+    def test_smoke(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
+        mm = MetricMock()
+
+        result = metrics.metric_by_groups(mm.mock_func, y_a, y_p, gid)
+
+        assert result.metric == 5
+        assert result.group_metric[0] == 2
+        assert result.group_metric[1] == 3
+
+    def test_string_groups(self):
+        a = "ABC"
+        b = "DEF"
+        c = "GHI"
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [a, a, a, b, b, c, c, c]
+        mm = MetricMock()
+
+        result = metrics.metric_by_groups(mm.mock_func, y_a, y_p, gid)
+
+        assert result.metric == 5
+        assert result.group_metric[a] == 1
+        assert result.group_metric[b] == 1
+        assert result.group_metric[c] == 3
+
+
+'''
 def test_true_positive_rate_smoke():
     y_actual = [0, 0, 1, 1, 0, 1, 1, 1]
     y_predict = [0, 1, 1, 1, 1, 0, 0, 1]
@@ -87,3 +127,4 @@ def test_non_binary_y_predict():
         _ = metrics.selection_rate(y_a, y_p, grp)
 
     assert exCtxt.value.args[0] == "Array y_predict contains values other than 0 and 1"
+'''
