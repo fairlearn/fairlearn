@@ -19,6 +19,12 @@ def _get_roc(data, x_grid, attribute, flip=True):
 
 
 def _filter_points_to_get_convex_hull(roc_sorted):
+    """ Uses a simplified version of Andrew's monotone chain convex hull algorithm
+    https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
+    to get the convex hull. Since we can assume the points (0,0) and (1,1) to be part
+    of the convex hull the problem is simpler and we only need to make a single pass
+    through the data.
+    """
     selected = []
     for r2 in roc_sorted.itertuples():
         # For each set of three points, i.e. the last two points in selected
