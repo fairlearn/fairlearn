@@ -24,9 +24,6 @@ steps:
 
 - script: pip install -r requirements.txt
   displayName: 'Install required packages'
-  
-- script: pip install -e fairlearn
-  displayName: 'Install fairlearn as editable package'
 
 - script: python -m pytest notebooks/ --nbval --junitxml=./TEST-TEST.xml
   displayName: 'Run notebooks as tests'
