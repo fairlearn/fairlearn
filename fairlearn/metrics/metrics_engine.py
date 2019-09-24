@@ -9,30 +9,30 @@ from . import DisparityResult, MetricResult
 _MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
 
 
-def true_positive_rate(y_actual, y_predict, group_data, sample_weight=None):
-    return metric_by_groups(recall_score, y_actual, y_predict, group_data, sample_weight)
+def true_positive_rate(y_true, y_pred, group_data, sample_weight=None):
+    return metric_by_groups(recall_score, y_true, y_pred, group_data, sample_weight)
 
 
-def selection_rate(y_actual, y_predict, group_data, sample_weight=None):
+def selection_rate(y_true, y_pred, group_data, sample_weight=None):
     if sample_weight is not None:
         raise NotImplementedError("selection_rate and sample_weight")
 
     def selection_metric(y_a, y_p, sample_weight):
         return np.mean(y_p)
 
-    return metric_by_groups(selection_metric, y_actual, y_predict, group_data, sample_weight)
+    return metric_by_groups(selection_metric, y_true, y_pred, group_data, sample_weight)
 
 
-def metric_by_groups(metric_function, y_actual, y_predict, group_data, sample_weight=None):
+def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=None):
     """ Applies a metric to each subgroup of a set of data
 
     :param metric_function
-    :type Function with signature (y_actual, y_predict, sample_weight=None) which returns a scalar
+    :type Function with signature (y_true, y_pred, sample_weight=None) which returns a scalar
 
-    :param y_actual
+    :param y_true
     :type Array of actual results (must be 0 or 1)
 
-    :param y_predict
+    :param y_pred
     :type Array of predicted results (must be 0 or 1)
 
     :param group_data
@@ -41,17 +41,17 @@ def metric_by_groups(metric_function, y_actual, y_predict, group_data, sample_we
     :param sample_weight
     :type Array of weights to apply to each result
     """
-    _check_binary(y_actual, "y_actual")
-    _check_binary(y_predict, "y_predict")
+    _check_binary(y_true, "y_true")
+    _check_binary(y_pred, "y_pred")
     result = MetricResult()
 
     groups = np.unique(group_data)
 
-    result.metric = metric_function(y_actual, y_predict, sample_weight=sample_weight)
+    result.metric = metric_function(y_true, y_pred, sample_weight=sample_weight)
 
     # The slicing we use requires Numpy arrays
-    y_a = np.array(y_actual)
-    y_p = np.array(y_predict)
+    y_a = np.array(y_true)
+    y_p = np.array(y_pred)
     s_w = None
     if sample_weight is not None:
         s_w = np.array(sample_weight)
@@ -70,10 +70,10 @@ def metric_by_groups(metric_function, y_actual, y_predict, group_data, sample_we
 
 
 def make_group_metric(metric_function):
-    def wrapper(y_actual, y_predict, group_data, sample_weight=None):
+    def wrapper(y_true, y_pred, group_data, sample_weight=None):
         return metric_by_groups(metric_function,
-                                y_actual,
-                                y_predict,
+                                y_true,
+                                y_pred,
                                 group_data,
                                 sample_weight)
 
@@ -81,10 +81,10 @@ def make_group_metric(metric_function):
 
 
 def compute_disparity(group_metric_function,
-                      y_actual, y_predict, group_data,
+                      y_true, y_pred, group_data,
                       comparison,
                       sample_weight=None):
-    metrics = group_metric_function(y_actual, y_predict, group_data, sample_weight)
+    metrics = group_metric_function(y_true, y_pred, group_data, sample_weight)
 
     result = DisparityResult()
     result.group_metric = metrics.group_metric
@@ -103,10 +103,10 @@ def compute_disparity(group_metric_function,
 
 def make_disparity_metric(metric_function, comparison):
 
-    def wrapper(y_actual, y_predict, group_data, sample_weight=None):
+    def wrapper(y_true, y_pred, group_data, sample_weight=None):
         return compute_disparity(metric_function,
-                                 y_actual,
-                                 y_predict,
+                                 y_true,
+                                 y_pred,
                                  group_data,
                                  comparison,
                                  sample_weight)

@@ -7,11 +7,11 @@ import pytest
 import fairlearn.metrics as metrics
 
 
-def mock_func(y_actual, y_predict, sample_weight=None):
+def mock_func(y_true, y_pred, sample_weight=None):
     if sample_weight is None:
-        return np.sum(y_actual)
+        return np.sum(y_true)
     else:
-        return np.sum(np.multiply(y_actual, sample_weight))
+        return np.sum(np.multiply(y_true, sample_weight))
 
 
 class TestMetricByGroups:
@@ -65,7 +65,7 @@ class TestMetricByGroups:
         with pytest.raises(ValueError) as exCtxt:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
-        assert exCtxt.value.args[0] == "Array y_actual contains values other than 0 and 1"
+        assert exCtxt.value.args[0] == "Array y_true contains values other than 0 and 1"
 
     def test_predict_not_0_1(self):
         y_a = [0, 1, 1, 1, 1, 0, 0, 1]
@@ -75,7 +75,7 @@ class TestMetricByGroups:
         with pytest.raises(ValueError) as exCtxt:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
-        assert exCtxt.value.args[0] == "Array y_predict contains values other than 0 and 1"
+        assert exCtxt.value.args[0] == "Array y_pred contains values other than 0 and 1"
 
 
 class TestMakeGroupMetric:
