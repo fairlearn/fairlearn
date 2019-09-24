@@ -26,16 +26,11 @@ def selection_rate(y_actual, y_predict, group_id, sample_weight=None):
 def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weight=None):
     _check_binary(y_actual, "y_actual")
     _check_binary(y_predict, "y_predict")
-    # TODO: Validate that group_id are from {0 ... n}
     result = MetricResult()
 
     groups = np.unique(group_id)
-    number_of_groups = np.max(groups) + 1
 
     result.metric = metric_function(y_actual, y_predict, sample_weight=sample_weight)
-
-    # Initialise the group results array
-    result.group_metric = np.full(number_of_groups, fill_value=float('nan'))
 
     # The slicing we use requires Numpy arrays
     y_a = np.array(y_actual)
@@ -61,10 +56,12 @@ def compute_disparity(metric_function,
     result = DisparityResult()
     result.group_metric = metrics.group_metric
 
+    metric_values = np.array(list(result.group_metric.values()))
+
     if comparison == 'ratio':
-        result.disparity = 1 - np.min(metrics.group_metric) / np.max(metrics.group_metric)
+        result.disparity = 1 - np.min(metric_values) / np.max(metric_values)
     elif comparison == 'diff':
-        result.disparity = np.max(metrics.group_metric) - np.min(metrics.group_metric)
+        result.disparity = np.max(metric_values) - np.min(metric_values)
     else:
         raise ValueError("comparison")
 
