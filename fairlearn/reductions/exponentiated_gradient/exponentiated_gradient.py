@@ -11,14 +11,12 @@ expgrad -- optimize accuracy subject to fairness constraints
 
 from __future__ import print_function
 
-__all__ = ["expgrad"]
-
 import numpy as np
 import scipy.optimize as opt
 import pandas as pd
 import pickle
 import functools
-import fairlearn.moments as moments
+from fairlearn.reductions import moments as moments
 from collections import namedtuple
 
 print = functools.partial(print, flush=True)
@@ -226,13 +224,13 @@ expgrad_result = namedtuple("ExpgradResult",
                             column_names)
 
 
-def expgrad(dataX, dataA, dataY, learner,
-            constraints=moments.DP(),
-            eps=0.01,
-            T=50,
-            nu=None,
-            eta_mul=2.0,
-            debug=False):
+def exponentiated_gradient(dataX, dataA, dataY, learner,
+                           constraints=moments.DemographicParity(),
+                           eps=0.01,
+                           T=50,
+                           nu=None,
+                           eta_mul=2.0,
+                           debug=False):
     """
     Return a fair classifier under specified fairness constraints
     via exponentiated-gradient reduction.
@@ -248,7 +246,7 @@ def expgrad(dataX, dataA, dataY, learner,
                  predict(X) are in {0,1}
 
     Optional keyword arguments:
-      constraints -- the fairness measure (default moments.DP())
+      constraints -- the fairness measure (default moments.DemographicParity())
       eps -- allowed fairness constraint violation (default 0.01)
       T -- max number of iterations (default 50)
       nu -- convergence threshold for the duality gap (default None,

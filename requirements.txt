@@ -16,4 +16,5 @@ scikit-learn
 
 # Required for notebooks
 jupyter
+nbval
 shap
