@@ -105,8 +105,7 @@ def exponentiated_gradient(X, A, y, estimator,
                            eps=0.01,
                            T=50,
                            nu=None,
-                           eta_mul=2.0,
-                           debug=False):
+                           eta_mul=2.0):
     """
     Return a fair classifier under specified fairness constraints via exponentiated-gradient
     reduction.
@@ -146,8 +145,7 @@ def exponentiated_gradient(X, A, y, estimator,
     logger.debug("...Exponentiated Gradient STARTING")
 
     B = 1 / eps
-    lagrangian = _Lagrangian(X, A, y, estimator,
-                             constraints, eps, B, debug=debug)
+    lagrangian = _Lagrangian(X, A, y, estimator, constraints, eps, B)
 
     theta = pd.Series(0, lagrangian.constraints.index)
     Qsum = pd.Series()
@@ -226,10 +224,10 @@ def exponentiated_gradient(X, A, y, estimator,
         # update theta based on learning rate
         theta += eta * (gamma - eps)
 
-    return _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug)
+    return _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min)
 
 
-def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
+def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min):
     gaps_series = pd.Series(gaps)
     gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
     best_t = gaps_best.index[-1]
@@ -253,12 +251,10 @@ def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min, debug):
         best_t,
         lagrangian.n_oracle_calls)
 
-    if debug:
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
-                     % (eps, B, nu, T, eta_min))
-        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f"
-                     ", n_oracle_calls=%d, n_hs=%d"
-                     % (last_t, best_t, best_gap,
-                        lagrangian.n_oracle_calls, len(lagrangian.classifiers)))
+    logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
+                 % (eps, B, nu, T, eta_min))
+    logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d"
+                 % (last_t, best_t, best_gap, lagrangian.n_oracle_calls,
+                    len(lagrangian.classifiers)))
 
     return result

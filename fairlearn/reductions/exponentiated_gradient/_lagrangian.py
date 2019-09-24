@@ -16,8 +16,7 @@ logger = logging.getLogger(__name__)
 class _Lagrangian:
     """ Operations related to the Lagrangian"""
 
-    def __init__(self, dataX, dataA, dataY, learner, constraints, eps, B,
-                 opt_lambda=True, debug=False):
+    def __init__(self, dataX, dataA, dataY, learner, constraints, eps, B, opt_lambda=True):
         self.X = dataX
         self.obj = moments.MisclassificationError()
         self.obj.init(dataX, dataA, dataY)
@@ -27,7 +26,6 @@ class _Lagrangian:
         self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
-        self.debug = debug
         self.hs = pd.Series()
         self.classifiers = pd.Series()
         self.errors = pd.Series()
