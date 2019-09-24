@@ -7,7 +7,11 @@ from sklearn.metrics import recall_score
 from . import MetricsResult
 
 
-def true_positive_rate(y_actual, y_predict, group_id):
+def true_positive_rate(y_actual, y_predict, group_id, sample_weight=None):
+    return metric_by_groups(recall_score, y_actual, y_predict, group_id, sample_weight)
+
+
+def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weight=None):
     # TODO: Validate y_actual and y_predict are from {0, 1}
     # TODO: Validate that group_id are from {0 ... n}
     result = MetricsResult()
@@ -15,7 +19,7 @@ def true_positive_rate(y_actual, y_predict, group_id):
     groups = np.unique(group_id)
     number_of_groups = np.max(groups) + 1
 
-    result.metric = recall_score(y_actual, y_predict)
+    result.metric = metric_function(y_actual, y_predict, sample_weight=sample_weight)
 
     # Initialise the group results array
     result.group_metric = np.full(number_of_groups, fill_value=float('nan'))
@@ -27,6 +31,9 @@ def true_positive_rate(y_actual, y_predict, group_id):
         group_indices = [i for i, elem in enumerate(group_id) if elem == group]
         group_actual = y_a[group_indices]
         group_predict = y_p[group_indices]
-        result.group_metric[group] = recall_score(group_actual, group_predict)
+        result.group_metric[group] = metric_function(
+            group_actual,
+            group_predict,
+            sample_weight=sample_weight)
 
     return result
