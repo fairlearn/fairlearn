@@ -52,6 +52,17 @@ def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weig
     return result
 
 
+def make_group_metric(metric_function):
+    def wrapper(y_actual, y_predict, group_id, sample_weight=None):
+        return metric_by_groups(metric_function,
+                                y_actual,
+                                y_predict,
+                                group_id,
+                                sample_weight)
+
+    return wrapper
+
+
 def compute_disparity(metric_function,
                       y_actual, y_predict, group_id,
                       comparison,
@@ -81,7 +92,7 @@ def make_disparity_metric(metric_function, comparison):
                                  y_predict,
                                  group_id,
                                  comparison,
-                                 sample_weight=None)
+                                 sample_weight)
 
     return wrapper
 

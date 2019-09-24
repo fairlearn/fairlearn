@@ -88,6 +88,39 @@ class TestMetricByGroups:
         assert exCtxt.value.args[0] == "Array y_predict contains values other than 0 and 1"
 
 
+class TestMakeGroupMetric:
+    def test_smoke(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
+        mm = MetricMock()
+
+        grouped_metric_func = metrics.make_group_metric(mm.mock_func)
+        result = grouped_metric_func(y_a, y_p, gid)
+        assert result.metric == 5
+        assert len(result.group_metric) == 2
+        assert result.group_metric[0] == 2
+        assert result.group_metric[1] == 3
+
+    def test_keys_and_weights(self):
+        a = "ABC"
+        b = "DEF"
+        c = "GHI"
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [a, a, a, b, b, c, c, c]
+        s_w = [1, 1, 1, 5, 5, 7, 7, 7]
+        mm = MetricMock()
+
+        grouped_metric_func = metrics.make_group_metric(mm.mock_func)
+        result = grouped_metric_func(y_a, y_p, gid, s_w)
+        assert result.metric == 27
+        assert len(result.group_metric) == 3
+        assert result.group_metric[a] == 1
+        assert result.group_metric[b] == 5
+        assert result.group_metric[c] == 21
+
+
 '''
 def test_true_positive_rate_smoke():
     y_actual = [0, 0, 1, 1, 0, 1, 1, 1]
