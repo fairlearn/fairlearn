@@ -6,6 +6,8 @@ from sklearn.metrics import recall_score
 
 from . import DisparityResult, MetricResult
 
+_MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
+
 
 def true_positive_rate(y_actual, y_predict, group_id, sample_weight=None):
     return metric_by_groups(recall_score, y_actual, y_predict, group_id, sample_weight)
@@ -22,7 +24,8 @@ def selection_rate(y_actual, y_predict, group_id, sample_weight=None):
 
 
 def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weight=None):
-    # TODO: Validate y_actual and y_predict are from {0, 1}
+    _check_binary(y_actual, "y_actual")
+    _check_binary(y_predict, "y_predict")
     # TODO: Validate that group_id are from {0 ... n}
     result = MetricResult()
 
@@ -79,3 +82,9 @@ def make_disparity_metric(metric_function, comparison):
                                  sample_weight=None)
 
     return wrapper
+
+
+def _check_binary(arr, arr_name):
+    unique_values = np.unique(arr)
+    if not set(unique_values).issubset({0, 1}):
+        raise ValueError(_MESSAGE_NON_BINARY.format(arr_name))

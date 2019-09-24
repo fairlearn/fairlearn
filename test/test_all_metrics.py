@@ -65,3 +65,25 @@ def test_unequalised_opportunity():
     result = unequal_opportunity(y_a, y_p, grp)
 
     assert result.disparity == pytest.approx(0.66666667)
+
+
+def test_non_binary_y_actual():
+    y_a = [0, 0, 1, 1, 0, 1, 1, 2]
+    y_p = [0, 0, 1, 1, 0, 0, 0, 1]
+    grp = [0, 0, 0, 0, 1, 1, 1, 1]
+
+    with pytest.raises(ValueError) as exCtxt:
+        _ = metrics.selection_rate(y_a, y_p, grp)
+
+    assert exCtxt.value.args[0] == "Array y_actual contains values other than 0 and 1"
+
+
+def test_non_binary_y_predict():
+    y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+    y_p = [0, 0, 1, 1, 0, 0, 0, 2]
+    grp = [0, 0, 0, 0, 1, 1, 1, 1]
+
+    with pytest.raises(ValueError) as exCtxt:
+        _ = metrics.selection_rate(y_a, y_p, grp)
+
+    assert exCtxt.value.args[0] == "Array y_predict contains values other than 0 and 1"
