@@ -17,7 +17,7 @@ def _get_roc(data, x_grid, attribute, flip=True):
     roc_convex_hull = pd.DataFrame(roc_selected)[['x', 'y', 'operation']]
     return roc_convex_hull
 
-s
+
 def _filter_points_to_get_convex_hull(roc_sorted):
     """ Uses a simplified version of Andrew's monotone chain convex hull algorithm
     https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
