@@ -12,13 +12,11 @@ exponentiated_gradient -- optimize accuracy subject to fairness constraints
 import logging
 import numpy as np
 import pandas as pd
-import functools
 from fairlearn.reductions import moments
 from fairlearn.reductions import ReductionsEstimator
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
-from collections import namedtuple
 
 logger = logging.getLogger(__name__)
 
@@ -31,11 +29,6 @@ def _mean_pred(X, hs, weights):
     return pred[weights.index].dot(weights)
 
 
-# TODO: decide whether we want a structured object instead of the namedtuple
-column_names = "best_classifier best_gap classifiers weights last_t best_t n_oracle_calls"
-expgrad_result = namedtuple("ExpgradResult", column_names)
-
-
 class ExponentiatedGradientResult:
     def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
                  n_oracle_calls):
@@ -46,9 +39,6 @@ class ExponentiatedGradientResult:
         self._last_t = last_t
         self._best_t = best_t
         self._n_oracle_calls = n_oracle_calls
-
-    def _predict_with_best_classifier(self, X):
-        return self._best_classifier(X)
 
     def _as_dict(self):
         return {
@@ -74,17 +64,17 @@ class ExponentiatedGradient(ReductionsEstimator):
         self._classifiers = None
 
     def fit(self, X, y, aux_data=None, **kwargs):
-        # TODO: validate input data; unify between grid search an expgrad?
+        # TODO: validate input data; unify between grid search and expgrad?
         self._expgrad_result = exponentiated_gradient(X, aux_data, y, self._estimator,
                                                       constraints=self._disparity_metric,
                                                       eps=self._eps, T=self._T, nu=self._nu,
                                                       eta_mul=self._eta_mul)
-        self._best_classifier = expgrad_result.best_classifier
-        self._classifiers = expgrad_result.classifiers
+        self._best_classifier = self._expgrad_result._best_classifier
+        self._classifiers = self._expgrad_result._classifiers
         # TODO: figure out whether we should keep the remaining data of the result object
 
     def predict(self, X):
-        return self._expgrad_result._predict_with_best_classifier(X)
+        return self._best_classifier(X)
 
     def predict_proba(self, X):
         raise NotImplementedError()
