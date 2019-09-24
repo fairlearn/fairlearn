@@ -64,4 +64,4 @@ def test_unequalised_opportunity():
 
     result = unequal_opportunity(y_a, y_p, grp)
 
-    assert result.disparity == pytest.approx(0.3333333333333)
+    assert result.disparity == pytest.approx(0.66666667)

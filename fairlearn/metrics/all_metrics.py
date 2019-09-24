@@ -59,7 +59,7 @@ def compute_disparity(metric_function,
     result.group_metric = metrics.group_metric
 
     if comparison == 'ratio':
-        result.disparity = np.min(metrics.group_metric) / np.max(metrics.group_metric)
+        result.disparity = 1 - np.min(metrics.group_metric) / np.max(metrics.group_metric)
     elif comparison == 'diff':
         result.disparity = np.max(metrics.group_metric) - np.min(metrics.group_metric)
     else:
