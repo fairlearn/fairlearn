@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-from fairlearn.reductions import moments
 from fairlearn.reductions import ExponentiatedGradient
+import fairlearn.reductions.moments as moments
 
 from test import simple_learners
 from .test_utilities import aux_data, X1, X2, X3, labels
