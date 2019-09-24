@@ -7,16 +7,11 @@ import pytest
 import fairlearn.metrics as metrics
 
 
-class MetricMock:
-    def mock_func(self, y_actual, y_predict, sample_weight=None):
-        self.y_a = y_actual
-        self.y_p = y_predict
-        self.s_w = sample_weight
-
-        if sample_weight is None:
-            return np.sum(y_actual)
-        else:
-            return np.sum(np.multiply(y_actual, sample_weight))
+def mock_func(y_actual, y_predict, sample_weight=None):
+    if sample_weight is None:
+        return np.sum(y_actual)
+    else:
+        return np.sum(np.multiply(y_actual, sample_weight))
 
 
 class TestMetricByGroups:
@@ -24,9 +19,8 @@ class TestMetricByGroups:
         y_a = [0, 0, 1, 1, 0, 1, 1, 1]
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 1, 1]
-        mm = MetricMock()
 
-        result = metrics.metric_by_groups(mm.mock_func, y_a, y_p, gid)
+        result = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
         assert result.metric == 5
         assert len(result.group_metric) == 2
@@ -40,9 +34,8 @@ class TestMetricByGroups:
         y_a = [0, 0, 1, 1, 0, 1, 1, 1]
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [a, a, a, b, b, c, c, c]
-        mm = MetricMock()
 
-        result = metrics.metric_by_groups(mm.mock_func, y_a, y_p, gid)
+        result = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
         assert result.metric == 5
         assert len(result.group_metric) == 3
@@ -55,9 +48,8 @@ class TestMetricByGroups:
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
-        mm = MetricMock()
 
-        result = metrics.metric_by_groups(mm.mock_func, y_a, y_p, gid, sample_weight=s_w)
+        result = metrics.metric_by_groups(mock_func, y_a, y_p, gid, sample_weight=s_w)
 
         assert result.metric == 10
         assert len(result.group_metric) == 3
@@ -69,10 +61,9 @@ class TestMetricByGroups:
         y_a = [0, 2, 0, 2, 0, 2, 2, 2]
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
-        mm = MetricMock()
 
         with pytest.raises(ValueError) as exCtxt:
-            _ = metrics.metric_by_groups(mm.mock_func, y_a, y_p, gid)
+            _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
         assert exCtxt.value.args[0] == "Array y_actual contains values other than 0 and 1"
 
@@ -80,10 +71,9 @@ class TestMetricByGroups:
         y_a = [0, 1, 1, 1, 1, 0, 0, 1]
         y_p = [0, 2, 0, 2, 0, 2, 2, 2]
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
-        mm = MetricMock()
 
         with pytest.raises(ValueError) as exCtxt:
-            _ = metrics.metric_by_groups(mm.mock_func, y_a, y_p, gid)
+            _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
         assert exCtxt.value.args[0] == "Array y_predict contains values other than 0 and 1"
 
@@ -93,9 +83,8 @@ class TestMakeGroupMetric:
         y_a = [0, 0, 1, 1, 0, 1, 1, 1]
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 1, 1]
-        mm = MetricMock()
 
-        grouped_metric_func = metrics.make_group_metric(mm.mock_func)
+        grouped_metric_func = metrics.make_group_metric(mock_func)
         result = grouped_metric_func(y_a, y_p, gid)
         assert result.metric == 5
         assert len(result.group_metric) == 2
@@ -110,9 +99,8 @@ class TestMakeGroupMetric:
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [a, a, a, b, b, c, c, c]
         s_w = [1, 1, 1, 5, 5, 7, 7, 7]
-        mm = MetricMock()
 
-        grouped_metric_func = metrics.make_group_metric(mm.mock_func)
+        grouped_metric_func = metrics.make_group_metric(mock_func)
         result = grouped_metric_func(y_a, y_p, gid, s_w)
         assert result.metric == 27
         assert len(result.group_metric) == 3
