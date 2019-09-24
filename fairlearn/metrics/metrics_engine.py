@@ -45,10 +45,9 @@ def metric_by_groups(metric_function, y_actual, y_predict, group_id, sample_weig
         group_weight = None
         if s_w is not None:
             group_weight = s_w[group_indices]
-        result.group_metric[group] = metric_function(
-            group_actual,
-            group_predict,
-            sample_weight=group_weight)
+        result.group_metric[group] = metric_function(group_actual,
+                                                     group_predict,
+                                                     sample_weight=group_weight)
 
     return result
 
