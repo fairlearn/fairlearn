@@ -41,11 +41,12 @@ supported_conversions = [identity, tondarray, tondarray2d, topandasseries, topan
 # ===========================================================
 
 
-def mock_func(y_true, y_pred, sample_weight=None):
-    if sample_weight is None:
-        return np.sum(y_true)
-    else:
-        return np.sum(np.multiply(y_true, sample_weight))
+def mock_func(y_true, y_pred):
+    return np.sum(y_true)
+
+
+def mock_func_weight(y_true, y_pred, sample_weight):
+    return np.sum(np.multiply(y_true, sample_weight))
 
 
 class TestMetricByGroup:
@@ -105,7 +106,7 @@ class TestMetricByGroup:
         gid = transform_gid([0, 0, 0, 0, 1, 1, 2, 2])
         s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3, 3])
 
-        result = metrics.metric_by_group(mock_func, y_a, y_p, gid, sample_weight=s_w)
+        result = metrics.metric_by_group(mock_func_weight, y_a, y_p, gid, sample_weight=s_w)
 
         assert result.overall == 10
         assert len(result.by_group) == 3
@@ -128,7 +129,7 @@ class TestMetricByGroup:
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.metric_by_group(mock_func, y_a, y_p, gid, s_w)
+            _ = metrics.metric_by_group(mock_func_weight, y_a, y_p, gid, s_w)
 
         expected = "Array y_pred is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -142,7 +143,7 @@ class TestMetricByGroup:
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.metric_by_group(mock_func, y_a, y_p, gid, s_w)
+            _ = metrics.metric_by_group(mock_func_weight, y_a, y_p, gid, s_w)
 
         expected = "Array group_data is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -156,7 +157,7 @@ class TestMetricByGroup:
         s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3])
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.metric_by_group(mock_func, y_a, y_p, gid, s_w)
+            _ = metrics.metric_by_group(mock_func_weight, y_a, y_p, gid, s_w)
 
         expected = "Array sample_weight is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -195,7 +196,7 @@ class TestMakeGroupMetric:
         gid = transform_gid([a, z, a, b, b, c, c, c])
         s_w = transform_s_w([1, 1, 1, 5, 5, 7, 7, 7])
 
-        grouped_metric_func = metrics.make_group_metric(mock_func)
+        grouped_metric_func = metrics.make_group_metric(mock_func_weight)
         result = grouped_metric_func(y_a, y_p, gid, s_w)
         assert result.overall == 28
         assert len(result.by_group) == 4

@@ -45,7 +45,10 @@ def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=N
 
     # Evaluate the overall metric with the numpy arrays
     # This ensures consistency in how metric_function is called
-    result.overall = metric_function(y_a, y_p, sample_weight=s_w)
+    if s_w is not None:
+        result.overall = metric_function(y_a, y_p, sample_weight=s_w)
+    else:
+        result.overall = metric_function(y_a, y_p)
 
     groups = np.unique(group_data)
     for group in groups:
@@ -55,9 +58,11 @@ def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=N
         group_weight = None
         if s_w is not None:
             group_weight = s_w[group_indices]
-        result.by_group[group] = metric_function(group_actual,
-                                                 group_predict,
-                                                 sample_weight=group_weight)
+            result.by_group[group] = metric_function(group_actual,
+                                                     group_predict,
+                                                     sample_weight=group_weight)
+        else:
+            result.by_group[group] = metric_function(group_actual, group_predict)
 
     result.min_over_groups = min(result.by_group.values())
     result.max_over_groups = max(result.by_group.values())
