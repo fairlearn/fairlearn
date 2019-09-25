@@ -23,23 +23,23 @@ For every pull request to `master` with automated tests you can check the logs o
 Any algorithm-specific parameters are passed to the constructor. Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. Post-processing algorithms require an already trained predictor. For consistency we also provide the option to pass an estimator instead, and will call `fit` internally.
 
 ```python
-reduction = Reduction(estimator, fairness_metric=fairness_metric, **kwargs)
-post_processor = PostProcessing(fairness_unaware_model=model, fairness_metric=fairness_metric, **kwargs)
-post_processor = PostProcessing(fairness_unaware_estimator=estimator, fairness_metric=fairness_metric, **kwargs)
+reduction = Reduction(estimator, constraints=constraints, **kwargs)
+post_processor = PostProcessing(fairness_unaware_model=model, disparity_criterion=disparity_criterion, **kwargs)
+post_processor = PostProcessing(fairness_unaware_estimator=estimator, disparity_criterion=disparity_criterion, **kwargs)
 ```
 
 Reduction-based fairness mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
 
 ```python
-reduction.fit(X, Y, protected_attribute)
+reduction.fit(X, Y, aux_data)
 reduction.predict(X)
 reduction.predict_proba(X)
 ```
 
-Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `protected_attribute` as a required argument for `predict` and `predict_proba`
+Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `aux_data` as a required argument for `predict` and `predict_proba`
 
 ```python
-post_processor.fit(X, Y, protected_attribute)
-post_processor.predict(X, protected_attribute)
-post_processor.predict_proba(X, protected_attribute)
+post_processor.fit(X, Y, aux_data)
+post_processor.predict(X, aux_data)
+post_processor.predict_proba(X, aux_data)
 ```
