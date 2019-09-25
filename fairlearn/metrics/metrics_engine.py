@@ -5,7 +5,6 @@ import numpy as np
 
 from . import GroupMetricResult
 
-_MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
 
