@@ -4,8 +4,9 @@
 Fairlearn largely follows the [terminology established by scikit-learn](https://scikit-learn.org/stable/developers/contributing.html#different-objects), specifically:
 - Estimator: implements a `fit` method
 - Predictor: implements a `predict` method
+However, contrary to [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator) we do not require determinism. Lots of unfairness mitigation techniques require randomized output to meet their objective in expectation. We do provide unrandomized versions of every method as well, but they may not be able to uphold the same theoretical guarantees.
 
-## Fairness-related terms
+## Group Fairness
 
 ### Protected or sensitive attribute, group, or data
 
@@ -27,9 +28,10 @@ There are a number of terms in the literature used to describe concepts related 
 - *Fairness* includes the societal context in ways which may not be mathematically expressible. For example, if a finite amount of money is to be loaned, is it better for society to make a few large loans with minimal disparity, or to accept larger disparity and make many smaller loans?
 - *Bias* is anything which can affect the model. Examples include statistical biases in the input data and subconscious cognitive biases in the data scientist.
 
-### Disparity metrics
+### Parity Criteria and Disparity Metrics
 
-There are various ways to assess fairness, e.g. by measuring through a metric that we’ll call disparity metric. Below are various definitions of disparity metrics that we use in the repository:
+When trying to mitigate unfairness we usually have a parity criterion in mind. Below are some examples of parity criteria we use in this repository:
+
 - Classification:
     - Demographic Parity (DP): A classifier h satisfies demographic parity under a distribution over (X, A, Y) if its prediction h(X) is statistically independent of the group attribute A — that is, if P[h(X) = y’ | A = a] = P[h(X) = y’] for all a, y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
     - Equalized Odds (EO): A classifier h satisfies equalized odds under a distribution over (X, A, Y) if its prediction h(X) is conditionally independent of the group attribute A given the label Y —that is, if P[h(X) = y’ | A = a, Y = y] = P[h(X) = y’ | Y = y] for all a, y, and y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
@@ -37,6 +39,8 @@ There are various ways to assess fairness, e.g. by measuring through a metric th
 - Regression:
     - Statistical Parity: A predictor f satisfies statistical parity under a distribution over (X, A, Y) if f(X) is independent of the group attribute A. Since 0 ≤ f(X) ≤ 1, this is equivalent to P[f(X) ≥ z | A = a] = P[f(X) ≥ z] for all a in A and z in [0,1]. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
     - Bounded Group Loss: A predictor f satisfies bounded group loss at level ζ under a distribution over (X, A, Y ) if E[loss(Y, f(X)) | A = a] ≤ ζ for all a. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+
+When assessing fairness of models we can measure disparity between groups in a variety of ways. While the criteria above are either fulfilled or not, a disparity metric provides a numerical value with which we can interpret fairness and compare models. We provide the functionality to convert common metrics from scikit-learn to group metrics, i.e. metrics that are evaluated on the entire data set, but also on each group individually. Additionally, group metrics tell us the minimum and maximum metric value and for which groups these values were observed. In certain cases we might be interested in the spread between minimum and maximum metric value, or the ratio between them. All of these are provided by group metric objects. For more information refer to `fairlearn.metrics.metrics_engine.py`.
 
 ### Fairness assessment
 
