@@ -9,7 +9,7 @@ _MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
 
-def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=None):
+def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=None):
     """ Applies a metric to each subgroup of a set of data
 
     :param metric_function
@@ -47,7 +47,7 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
 
     # Evaluate the overall metric with the numpy arrays
     # This ensures consistency in how metric_function is called
-    result.metric = metric_function(y_a, y_p, sample_weight=s_w)
+    result.overall = metric_function(y_a, y_p, sample_weight=s_w)
 
     groups = np.unique(group_data)
     for group in groups:
@@ -57,29 +57,29 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
         group_weight = None
         if s_w is not None:
             group_weight = s_w[group_indices]
-        result.group_metrics[group] = metric_function(group_actual,
-                                                      group_predict,
-                                                      sample_weight=group_weight)
+        result.by_group[group] = metric_function(group_actual,
+                                                 group_predict,
+                                                 sample_weight=group_weight)
 
-    result.min_metric = min(result.group_metrics.values())
-    result.max_metric = max(result.group_metrics.values())
+    result.min_over_groups = min(result.by_group.values())
+    result.max_over_groups = max(result.by_group.values())
 
-    result.min_metric_groups = set([k for k, v in result.group_metrics.items() if v == result.min_metric])  # noqa:E501
-    result.max_metric_groups = set([k for k, v in result.group_metrics.items() if v == result.max_metric])  # noqa:E501
+    result.argmin_groups = set([k for k, v in result.by_group.items() if v == result.min_over_groups])  # noqa:E501
+    result.argmax_groups = set([k for k, v in result.by_group.items() if v == result.max_over_groups])  # noqa:E501
 
-    result.metric_range = result.max_metric - result.min_metric
-    result.metric_range_ratio = result.max_metric / result.min_metric
+    result.range_over_groups = result.max_over_groups - result.min_over_groups
+    result.range_ratio_over_groups = result.max_over_groups / result.min_over_groups
 
     return result
 
 
 def make_group_metric(metric_function):
     def wrapper(y_true, y_pred, group_data, sample_weight=None):
-        return metric_by_groups(metric_function,
-                                y_true,
-                                y_pred,
-                                group_data,
-                                sample_weight)
+        return metric_by_group(metric_function,
+                               y_true,
+                               y_pred,
+                               group_data,
+                               sample_weight)
 
     return wrapper
 

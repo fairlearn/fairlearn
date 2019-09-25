@@ -5,13 +5,13 @@
 class GroupMetricResult:
     def __init__(self):
         # The 'metric' property is the given metric evaluated without regard to group
-        self.metric = None
+        self.overall = None
         # The 'group_metric' dictionary contains the metric for each group found in the
         # input
-        self.group_metrics = {}
-        self.min_metric = None
-        self.min_metric_groups = None
-        self.max_metric = None
-        self.max_metric_groups = None
-        self.metric_range = None
-        self.metric_range_ratio = None
+        self.by_group = {}
+        self.min_over_groups = None
+        self.argmin_groups = None
+        self.max_over_groups = None
+        self.argmax_groups = None
+        self.range_over_groups = None
+        self.range_ratio_over_groups = None
