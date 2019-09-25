@@ -37,19 +37,13 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
     # The slicing we use requires Numpy arrays
     y_a = np.array(y_true)
     y_p = np.array(y_pred)
+    g_d = np.asarray(group_data)
     s_w = None
     if sample_weight is not None:
         s_w = np.array(sample_weight)
 
-    group_data_is_numeric = False
-    if np.asarray(group_data).dtype.kind in set('buifc'):
-        group_data_is_numeric = True
-
     for group in groups:
-        if group_data_is_numeric:
-            group_indices = (group == group_data)
-        else:
-            group_indices = [i for i, elem in enumerate(group_data) if elem == group]
+        group_indices = (group == g_d)
         group_actual = y_a[group_indices]
         group_predict = y_p[group_indices]
         group_weight = None
