@@ -40,8 +40,16 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
     s_w = None
     if sample_weight is not None:
         s_w = np.array(sample_weight)
+
+    group_data_is_numeric = False
+    if np.asarray(group_data).dtype.kind in set('buifc'):
+        group_data_is_numeric = True
+
     for group in groups:
-        group_indices = [i for i, elem in enumerate(group_data) if elem == group]
+        if group_data_is_numeric:
+            group_indices = (group == group_data)
+        else:
+            group_indices = [i for i, elem in enumerate(group_data) if elem == group]
         group_actual = y_a[group_indices]
         group_predict = y_p[group_indices]
         group_weight = None
