@@ -36,18 +36,20 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
 
     result = GroupMetricResult()
 
-    groups = np.unique(group_data)
-
-    result.metric = metric_function(y_true, y_pred, sample_weight=sample_weight)
-
-    # The slicing we use requires Numpy arrays
-    y_a = np.asarray(y_true)
-    y_p = np.asarray(y_pred)
-    g_d = np.asarray(group_data)
+    # Make everything a numpy array
+    # This allows for fast slicing of the groups
+    y_a = np.squeeze(np.asarray(y_true))
+    y_p = np.squeeze(np.asarray(y_pred))
+    g_d = np.squeeze(np.asarray(group_data))
     s_w = None
     if sample_weight is not None:
-        s_w = np.asarray(sample_weight)
+        s_w = np.squeeze(np.asarray(sample_weight))
 
+    # Evaluate the overall metric with the numpy arrays
+    # This ensures consistency in how metric_function is called
+    result.metric = metric_function(y_a, y_p, sample_weight=s_w)
+
+    groups = np.unique(group_data)
     for group in groups:
         group_indices = (group == g_d)
         group_actual = y_a[group_indices]

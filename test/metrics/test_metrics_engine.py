@@ -2,9 +2,43 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 import pytest
 
 import fairlearn.metrics as metrics
+
+# ===========================================================
+
+# Conversions from Python lists to our supported datatypes
+
+
+def identity(X):
+    return X
+
+
+def tondarray(X):
+    return np.asarray(X)
+
+
+def tondarray2d(X):
+    # ndarray where second dimension is of length 1
+    arr = np.asarray(X)
+    arr = np.expand_dims(arr, 1)
+    assert len(arr.shape) == 2
+    return arr
+
+
+def topandasseries(X):
+    return pd.Series(X)
+
+
+def topandasdf(X):
+    return pd.DataFrame(X)
+
+
+supported_conversions = [identity, tondarray, tondarray2d, topandasseries, topandasdf]
+
+# ===========================================================
 
 
 def mock_func(y_true, y_pred, sample_weight=None):
@@ -15,10 +49,13 @@ def mock_func(y_true, y_pred, sample_weight=None):
 
 
 class TestMetricByGroups:
-    def test_smoke(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 1, 1]
+    @pytest.mark.parametrize("transform_gid", supported_conversions)
+    @pytest.mark.parametrize("transform_y_p", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_smoke(self, transform_y_a, transform_y_p, transform_gid):
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
+        gid = transform_gid([0, 0, 0, 0, 1, 1, 1, 1])
 
         result = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
