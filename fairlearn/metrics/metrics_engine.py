@@ -71,7 +71,7 @@ def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=N
     result.argmax_groups = set([k for k, v in result.by_group.items() if v == result.max_over_groups])  # noqa:E501
 
     result.range_over_groups = result.max_over_groups - result.min_over_groups
-    result.range_ratio_over_groups = result.max_over_groups / result.min_over_groups
+    result.range_ratio_over_groups = result.min_over_groups / result.max_over_groups
 
     return result
 

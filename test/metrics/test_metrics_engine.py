@@ -69,7 +69,7 @@ class TestMetricByGroup:
         assert result.max_over_groups == 3
         assert result.argmax_groups == {1}
         assert result.range_over_groups == 1
-        assert result.range_ratio_over_groups == 1.5
+        assert result.range_ratio_over_groups == pytest.approx(0.6666666667)
 
     @pytest.mark.parametrize("transform_gid", supported_conversions)
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
@@ -94,7 +94,7 @@ class TestMetricByGroup:
         assert result.max_over_groups == 3
         assert result.argmax_groups == {c}
         assert result.range_over_groups == 2
-        assert result.range_ratio_over_groups == 3
+        assert result.range_ratio_over_groups == pytest.approx(0.33333333333333)
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
     @pytest.mark.parametrize("transform_gid", supported_conversions)
@@ -118,7 +118,7 @@ class TestMetricByGroup:
         assert result.max_over_groups == 6
         assert result.argmax_groups == {2}
         assert result.range_over_groups == 4
-        assert result.range_ratio_over_groups == 3
+        assert result.range_ratio_over_groups == pytest.approx(0.33333333333333)
 
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
@@ -180,7 +180,7 @@ class TestMakeGroupMetric:
         assert result.argmin_groups == {0}
         assert result.argmax_groups == {1}
         assert result.range_over_groups == 1
-        assert result.range_ratio_over_groups == 1.5
+        assert result.range_ratio_over_groups == pytest.approx(0.66666666667)
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
     @pytest.mark.parametrize("transform_gid", supported_conversions)
@@ -209,4 +209,4 @@ class TestMakeGroupMetric:
         assert result.argmin_groups == {a, z}
         assert result.argmax_groups == {c}
         assert result.range_over_groups == 20
-        assert result.range_ratio_over_groups == 21
+        assert result.range_ratio_over_groups == pytest.approx(1.0/21.0)
