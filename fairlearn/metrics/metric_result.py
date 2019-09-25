@@ -8,7 +8,7 @@ class MetricResult:
         self.metric = None
         # The 'group_metric' dictionary contains the metric for each group found in the
         # input
-        self.group_metric = {}
+        self.group_metrics = {}
         self.min_metric = None
         self.min_metric_groups = None
         self.max_metric = None

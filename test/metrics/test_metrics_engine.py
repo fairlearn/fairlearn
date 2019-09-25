@@ -23,9 +23,9 @@ class TestMetricByGroups:
         result = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
         assert result.metric == 5
-        assert len(result.group_metric) == 2
-        assert result.group_metric[0] == 2
-        assert result.group_metric[1] == 3
+        assert len(result.group_metrics) == 2
+        assert result.group_metrics[0] == 2
+        assert result.group_metrics[1] == 3
         assert result.min_metric == 2
         assert result.min_metric_groups == {0}
         assert result.max_metric == 3
@@ -44,10 +44,10 @@ class TestMetricByGroups:
         result = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
         assert result.metric == 5
-        assert len(result.group_metric) == 3
-        assert result.group_metric[a] == 1
-        assert result.group_metric[b] == 1
-        assert result.group_metric[c] == 3
+        assert len(result.group_metrics) == 3
+        assert result.group_metrics[a] == 1
+        assert result.group_metrics[b] == 1
+        assert result.group_metrics[c] == 3
         assert result.min_metric == 1
         assert result.min_metric_groups == {a, b}
         assert result.max_metric == 3
@@ -64,10 +64,10 @@ class TestMetricByGroups:
         result = metrics.metric_by_groups(mock_func, y_a, y_p, gid, sample_weight=s_w)
 
         assert result.metric == 10
-        assert len(result.group_metric) == 3
-        assert result.group_metric[0] == 2
-        assert result.group_metric[1] == 2
-        assert result.group_metric[2] == 6
+        assert len(result.group_metrics) == 3
+        assert result.group_metrics[0] == 2
+        assert result.group_metrics[1] == 2
+        assert result.group_metrics[2] == 6
         assert result.min_metric == 2
         assert result.min_metric_groups == {0, 1}
         assert result.max_metric == 6
@@ -105,9 +105,9 @@ class TestMakeGroupMetric:
         grouped_metric_func = metrics.make_group_metric(mock_func)
         result = grouped_metric_func(y_a, y_p, gid)
         assert result.metric == 5
-        assert len(result.group_metric) == 2
-        assert result.group_metric[0] == 2
-        assert result.group_metric[1] == 3
+        assert len(result.group_metrics) == 2
+        assert result.group_metrics[0] == 2
+        assert result.group_metrics[1] == 3
         assert result.min_metric == 2
         assert result.max_metric == 3
         assert result.min_metric_groups == {0}
@@ -127,10 +127,10 @@ class TestMakeGroupMetric:
         grouped_metric_func = metrics.make_group_metric(mock_func)
         result = grouped_metric_func(y_a, y_p, gid, s_w)
         assert result.metric == 27
-        assert len(result.group_metric) == 3
-        assert result.group_metric[a] == 1
-        assert result.group_metric[b] == 5
-        assert result.group_metric[c] == 21
+        assert len(result.group_metrics) == 3
+        assert result.group_metrics[a] == 1
+        assert result.group_metrics[b] == 5
+        assert result.group_metrics[c] == 21
         assert result.min_metric == 1
         assert result.max_metric == 21
         assert result.min_metric_groups == {a}
