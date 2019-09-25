@@ -26,6 +26,10 @@ class TestMetricByGroups:
         assert len(result.group_metric) == 2
         assert result.group_metric[0] == 2
         assert result.group_metric[1] == 3
+        assert result.min_metric == 2
+        assert result.max_metric == 3
+        assert result.metric_range == 1
+        assert result.metric_range_ratio == 1.5
 
     def test_string_groups(self):
         a = "ABC"
@@ -42,6 +46,10 @@ class TestMetricByGroups:
         assert result.group_metric[a] == 1
         assert result.group_metric[b] == 1
         assert result.group_metric[c] == 3
+        assert result.min_metric == 1
+        assert result.max_metric == 3
+        assert result.metric_range == 2
+        assert result.metric_range_ratio == 3
 
     def test_with_weights(self):
         y_a = [0, 0, 1, 1, 0, 1, 1, 1]
@@ -56,6 +64,10 @@ class TestMetricByGroups:
         assert result.group_metric[0] == 2
         assert result.group_metric[1] == 2
         assert result.group_metric[2] == 6
+        assert result.min_metric == 2
+        assert result.max_metric == 6
+        assert result.metric_range == 4
+        assert result.metric_range_ratio == 3
 
     def test_actual_not_0_1(self):
         y_a = [0, 2, 0, 2, 0, 2, 2, 2]
