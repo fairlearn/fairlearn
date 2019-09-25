@@ -27,8 +27,6 @@ def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=N
     :param sample_weight
     :type Array of weights to apply to each result
     """
-    _check_binary(y_true, "y_true")
-    _check_binary(y_pred, "y_pred")
     _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
     _check_array_sizes(y_true, group_data, 'y_true', 'group_data')
     if sample_weight is not None:
@@ -82,12 +80,6 @@ def make_group_metric(metric_function):
                                sample_weight)
 
     return wrapper
-
-
-def _check_binary(arr, arr_name):
-    unique_values = np.unique(arr)
-    if not set(unique_values).issubset({0, 1}):
-        raise ValueError(_MESSAGE_NON_BINARY.format(arr_name))
 
 
 def _check_array_sizes(a, b, a_name, b_name):

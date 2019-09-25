@@ -119,30 +119,6 @@ class TestMetricByGroup:
         assert result.range_over_groups == 4
         assert result.range_ratio_over_groups == 3
 
-    @pytest.mark.parametrize("transform_y_a", supported_conversions)
-    def test_true_not_0_1(self, transform_y_a):
-        y_a = transform_y_a([0, 2, 0, 2, 0, 2, 2, 2])
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 2, 2]
-
-        with pytest.raises(ValueError) as exception_context:
-            _ = metrics.metric_by_group(mock_func, y_a, y_p, gid)
-
-        expected = "Array y_true contains values other than 0 and 1"
-        assert exception_context.value.args[0] == expected
-
-    @pytest.mark.parametrize("transform_y_p", supported_conversions)
-    def test_pred_not_0_1(self, transform_y_p):
-        y_a = [0, 1, 1, 1, 1, 0, 0, 1]
-        y_p = transform_y_p([0, 2, 0, 2, 0, 2, 2, 2])
-        gid = [0, 0, 0, 0, 1, 1, 2, 2]
-
-        with pytest.raises(ValueError) as exception_context:
-            _ = metrics.metric_by_group(mock_func, y_a, y_p, gid)
-
-        expected = "Array y_pred contains values other than 0 and 1"
-        assert exception_context.value.args[0] == expected
-
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
     def test_true_predict_length_mismatch(self, transform_y_a, transform_y_p):
