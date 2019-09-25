@@ -70,13 +70,16 @@ class TestMetricByGroups:
         assert result.metric_range == 1
         assert result.metric_range_ratio == 1.5
 
-    def test_string_groups(self):
+    @pytest.mark.parametrize("transform_gid", supported_conversions)
+    @pytest.mark.parametrize("transform_y_p", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_string_groups(self, transform_y_a, transform_y_p, transform_gid):
         a = "ABC"
         b = "DEF"
         c = "GHI"
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [a, a, a, b, b, c, c, c]
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
+        gid = transform_gid([a, a, a, b, b, c, c, c])
 
         result = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
@@ -92,11 +95,15 @@ class TestMetricByGroups:
         assert result.metric_range == 2
         assert result.metric_range_ratio == 3
 
-    def test_with_weights(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 2, 2]
-        s_w = [1, 1, 1, 1, 2, 2, 3, 3]
+    @pytest.mark.parametrize("transform_s_w", supported_conversions)
+    @pytest.mark.parametrize("transform_gid", supported_conversions)
+    @pytest.mark.parametrize("transform_y_p", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_with_weights(self, transform_y_a, transform_y_p, transform_gid, transform_s_w):
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
+        gid = transform_gid([0, 0, 0, 0, 1, 1, 2, 2])
+        s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3, 3])
 
         result = metrics.metric_by_groups(mock_func, y_a, y_p, gid, sample_weight=s_w)
 
@@ -112,8 +119,9 @@ class TestMetricByGroups:
         assert result.metric_range == 4
         assert result.metric_range_ratio == 3
 
-    def test_true_not_0_1(self):
-        y_a = [0, 2, 0, 2, 0, 2, 2, 2]
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_true_not_0_1(self, transform_y_a):
+        y_a = transform_y_a([0, 2, 0, 2, 0, 2, 2, 2])
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
 
@@ -122,9 +130,10 @@ class TestMetricByGroups:
 
         assert exCtxt.value.args[0] == "Array y_true contains values other than 0 and 1"
 
-    def test_predict_not_0_1(self):
+    @pytest.mark.parametrize("transform_y_p", supported_conversions)
+    def test_pred_not_0_1(self, transform_y_p):
         y_a = [0, 1, 1, 1, 1, 0, 0, 1]
-        y_p = [0, 2, 0, 2, 0, 2, 2, 2]
+        y_p = transform_y_p([0, 2, 0, 2, 0, 2, 2, 2])
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
 
         with pytest.raises(ValueError) as exCtxt:
@@ -132,9 +141,11 @@ class TestMetricByGroups:
 
         assert exCtxt.value.args[0] == "Array y_pred contains values other than 0 and 1"
 
-    def test_true_predict_length_mismatch(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0]
+    @pytest.mark.parametrize("transform_y_p", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_true_predict_length_mismatch(self, transform_y_a, transform_y_p):
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0])
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
@@ -143,10 +154,14 @@ class TestMetricByGroups:
 
         assert exCtxt.value.args[0] == "Array y_pred is not the same size as y_true"
 
-    def test_true_group_length_mismatch(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+
+
+    @pytest.mark.parametrize("transform_gid", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_true_group_length_mismatch(self, transform_y_a, transform_gid):
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
         y_p = [0, 1, 1, 1, 1, 0, 0, 0]
-        gid = [0, 0, 0, 0, 1, 1, 2]
+        gid = transform_gid([0, 0, 0, 0, 1, 1, 2])
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
         with pytest.raises(ValueError) as exCtxt:
@@ -154,11 +169,15 @@ class TestMetricByGroups:
 
         assert exCtxt.value.args[0] == "Array group_data is not the same size as y_true"
 
-    def test_true_weight_length_mismatch(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+
+
+    @pytest.mark.parametrize("transform_s_w", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_true_weight_length_mismatch(self, transform_y_a, transform_s_w):
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
         y_p = [0, 1, 1, 1, 1, 0, 0, 0]
         gid = [0, 0, 0, 0, 1, 1, 2, 3]
-        s_w = [1, 1, 1, 1, 2, 2, 3]
+        s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3])
 
         with pytest.raises(ValueError) as exCtxt:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
@@ -185,25 +204,31 @@ class TestMakeGroupMetric:
         assert result.metric_range == 1
         assert result.metric_range_ratio == 1.5
 
-    def test_keys_and_weights(self):
+    @pytest.mark.parametrize("transform_s_w", supported_conversions)
+    @pytest.mark.parametrize("transform_gid", supported_conversions)
+    @pytest.mark.parametrize("transform_y_p", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_keys_and_weights(self, transform_y_a, transform_y_p, transform_gid, transform_s_w):
         a = "ABC"
         b = "DEF"
         c = "GHI"
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [a, a, a, b, b, c, c, c]
-        s_w = [1, 1, 1, 5, 5, 7, 7, 7]
+        z = "something_longer"
+        y_a = transform_y_a([0, 1, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
+        gid = transform_gid([a, z, a, b, b, c, c, c])
+        s_w = transform_s_w([1, 1, 1, 5, 5, 7, 7, 7])
 
         grouped_metric_func = metrics.make_group_metric(mock_func)
         result = grouped_metric_func(y_a, y_p, gid, s_w)
-        assert result.metric == 27
-        assert len(result.group_metrics) == 3
+        assert result.metric == 28
+        assert len(result.group_metrics) == 4
         assert result.group_metrics[a] == 1
         assert result.group_metrics[b] == 5
         assert result.group_metrics[c] == 21
+        assert result.group_metrics[z] == 1
         assert result.min_metric == 1
         assert result.max_metric == 21
-        assert result.min_metric_groups == {a}
+        assert result.min_metric_groups == {a, z}
         assert result.max_metric_groups == {c}
         assert result.metric_range == 20
         assert result.metric_range_ratio == 21
