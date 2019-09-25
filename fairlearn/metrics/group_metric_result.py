@@ -10,8 +10,8 @@ class GroupMetricResult:
         # input
         self.by_group = {}
         self.min_over_groups = None
-        self.argmin_groups = None
         self.max_over_groups = None
+        self.argmin_groups = None
         self.argmax_groups = None
         self.range_over_groups = None
         self.range_ratio_over_groups = None
