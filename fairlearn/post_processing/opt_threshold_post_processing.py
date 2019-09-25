@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-""" ROC Curve based Post processing algorithm based on M. Hardt,
+""" Optimal Threshold Post Processing algorithm based on M. Hardt,
 E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
 Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
 classification with one categorical grouping attribute.
@@ -17,7 +17,7 @@ from fairlearn.post_processing import PostProcessing
 from ._constants import (LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
-from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
+from ._curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
 from ._interpolated_prediction import InterpolatedPredictor
 
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
@@ -44,7 +44,7 @@ _SUPPORTED_DISPARITY_METRICS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 logger = logging.getLogger(__name__)
 
 
-class ROCCurveBasedPostProcessing(PostProcessing):
+class OptThresholdPostProcessing(PostProcessing):
     def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
                  disparity_metric=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
                  seed=None):
@@ -61,10 +61,10 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         :type gridsize: int
         :param flip: allow flipping to negative weights if it improves accuracy.
         :type flip: bool
-        :param plot: show ROC plot if True
+        :param plot: show ROC/selection-error plot if True
         :type plot: bool
         """
-        super(ROCCurveBasedPostProcessing, self).__init__(
+        super(OptThresholdPostProcessing, self).__init__(
             fairness_unaware_model=fairness_unaware_model,
             fairness_unaware_estimator=fairness_unaware_estimator,
             disparity_metric=disparity_metric)
@@ -91,17 +91,17 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._validate_model()
 
         scores = self._fairness_unaware_model.predict(X)
-        roc_curve_based_post_processing_method = None
+        opt_threshold_post_processing_method = None
         if self._disparity_metric == DEMOGRAPHIC_PARITY:
-            roc_curve_based_post_processing_method = \
-                _roc_curve_based_post_processing_demographic_parity
+            opt_threshold_post_processing_method = \
+                _opt_threshold_post_processing_demographic_parity
         elif self._disparity_metric == EQUALIZED_ODDS:
-            roc_curve_based_post_processing_method = \
-                _roc_curve_based_post_processing_equalized_odds
+            opt_threshold_post_processing_method = \
+                _opt_threshold_post_processing_equalized_odds
         else:
             raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
 
-        self._post_processed_model_by_attribute = roc_curve_based_post_processing_method(
+        self._post_processed_model_by_attribute = opt_threshold_post_processing_method(
             aux_data, y, scores, self._gridsize, self._flip, self._plot)
 
     def predict(self, X, group_data):
@@ -152,8 +152,8 @@ class ROCCurveBasedPostProcessing(PostProcessing):
             raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
 
 
-def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
-                                                        flip=True, plot=False):
+def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
+                                                      flip=True, plot=False):
     """ Calculates selection and error rates for every attribute value at different thresholds
     over the scores. Subsequently weighs each attribute value's error by the frequency of the
     attribute value in the data. The minimum error point is the selected solution, which is
@@ -176,7 +176,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     :type gridsize: int
     :param flip: allow flipping to negative weights if it improves accuracy.
     :type flip: bool
-    :param plot: show ROC plot if True
+    :param plot: show selection-error plot if True
     :type plot: bool
     :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
@@ -235,12 +235,13 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     predicted_DP_by_attribute = {}
     for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
-        roc_result = selection_error_curve[attribute].transpose()[i_best_DP]
-        predicted_DP_by_attribute[attribute] = InterpolatedPredictor(0, 0,
-                                                                     roc_result.p0,
-                                                                     roc_result.operation0,
-                                                                     roc_result.p1,
-                                                                     roc_result.operation1)
+        selection_error_curve_result = selection_error_curve[attribute].transpose()[i_best_DP]
+        predicted_DP_by_attribute[attribute] = \
+            InterpolatedPredictor(0, 0,
+                                  selection_error_curve_result.p0,
+                                  selection_error_curve_result.operation0,
+                                  selection_error_curve_result.p1,
+                                  selection_error_curve_result.operation1)
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
@@ -253,8 +254,8 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     return predicted_DP_by_attribute
 
 
-def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
-                                                    flip=True, plot=False):
+def _opt_threshold_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
+                                                  flip=True, plot=False):
     """ Calculates the ROC curve of every attribute value at different thresholds over the scores.
     Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
     selecting the point on the curve with minimal error.

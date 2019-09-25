@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 import pytest
 from fairlearn.post_processing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
-from fairlearn.post_processing.roc_curve_based_post_processing import \
-    (ROCCurveBasedPostProcessing,
+from fairlearn.post_processing.opt_threshold_post_processing import \
+    (OptThresholdPostProcessing,
      _vectorized_prediction,
-     _roc_curve_based_post_processing_demographic_parity,
-     _roc_curve_based_post_processing_equalized_odds,
+     _opt_threshold_post_processing_demographic_parity,
+     _opt_threshold_post_processing_equalized_odds,
      DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE,
      EMPTY_INPUT_ERROR_MESSAGE,
      NON_BINARY_LABELS_ERROR_MESSAGE,
@@ -38,7 +38,7 @@ ALLOWED_INPUT_DATA_TYPES = [lambda x: x, np.array, pd.DataFrame, pd.Series]
 def test_predict_before_fit_error(X_transform, A_transform, predict_method_name, metric):
     X = X_transform(_format_as_list_of_lists(example_attributes1))
     A = A_transform(example_attributes1)
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
 
     with pytest.raises(ValueError, match=PREDICT_BEFORE_FIT_ERROR_MESSAGE):
@@ -48,7 +48,7 @@ def test_predict_before_fit_error(X_transform, A_transform, predict_method_name,
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_both_model_and_estimator_error(metric):
     with pytest.raises(ValueError, match=EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+        OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                     fairness_unaware_estimator=ExampleEstimator(),
                                     disparity_metric=metric)
 
@@ -56,12 +56,12 @@ def test_both_model_and_estimator_error(metric):
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_no_model_or_estimator_error(metric):
     with pytest.raises(ValueError, match=MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(disparity_metric=metric)
+        OptThresholdPostProcessing(disparity_metric=metric)
 
 
 def test_metric_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+        OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                     disparity_metric="UnsupportedMetric")
 
 
@@ -69,14 +69,14 @@ def test_metric_not_supported():
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_not_estimator(not_estimator, metric):
     with pytest.raises(ValueError, match=MISSING_FIT_PREDICT_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_estimator=not_estimator,
+        OptThresholdPostProcessing(fairness_unaware_estimator=not_estimator,
                                     disparity_metric=metric)
 
 
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_not_model(metric):
     with pytest.raises(ValueError, match=MISSING_PREDICT_ERROR_MESSAGE):
-        ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleNotModel(),
+        OptThresholdPostProcessing(fairness_unaware_model=ExampleNotModel(),
                                     disparity_metric=metric)
 
 
@@ -85,7 +85,7 @@ def test_not_model(metric):
 @pytest.mark.parametrize("A", [None, example_attributes1])
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_inconsistent_input_data_types(X, y, A, metric):
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
 
     error_message = INPUT_DATA_FORMAT_ERROR_MESSAGE.format(type(X).__name__,
@@ -102,7 +102,7 @@ def test_inconsistent_input_data_types(X, y, A, metric):
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_roc_curve_based_post_processing_non_binary_labels(X_transform, y_transform, A_transform,
+def test_opt_threshold_post_processing_non_binary_labels(X_transform, y_transform, A_transform,
                                                            metric):
     non_binary_labels = copy.deepcopy(example_labels)
     non_binary_labels[0] = 2
@@ -111,7 +111,7 @@ def test_roc_curve_based_post_processing_non_binary_labels(X_transform, y_transf
     y = y_transform(non_binary_labels)
     A = A_transform(example_attributes1)
 
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
 
     with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
@@ -122,7 +122,7 @@ def test_roc_curve_based_post_processing_non_binary_labels(X_transform, y_transf
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_roc_curve_based_post_processing_different_input_lengths(X_transform, y_transform,
+def test_opt_threshold_post_processing_different_input_lengths(X_transform, y_transform,
                                                                  A_transform, metric):
     n = len(example_attributes1)
     for permutation in [(0, 1), (1, 0)]:
@@ -132,7 +132,7 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, y_
             y = y_transform(example_labels[:n-permutation[1]])
             A = A_transform(example_attributes1)
 
-            adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+            adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                          disparity_metric=metric)
             adjusted_model.fit(X, y, A)
 
@@ -142,7 +142,7 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, y_
         y = y_transform(example_labels[:n-permutation[1]])
         A = A_transform(example_attributes1)
 
-        adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+        adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                      disparity_metric=metric)
         with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
             adjusted_model.fit(X, y, A)
@@ -151,12 +151,12 @@ def test_roc_curve_based_post_processing_different_input_lengths(X_transform, y_
 @pytest.mark.parametrize("score_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-def test_roc_curve_based_post_processing_demographic_parity(score_transform, y_transform,
+def test_opt_threshold_post_processing_demographic_parity(score_transform, y_transform,
                                                             A_transform):
     y = y_transform(example_labels)
     A = A_transform(example_attributes1)
     scores = score_transform(example_scores)
-    adjusted_model = create_adjusted_model(_roc_curve_based_post_processing_demographic_parity,
+    adjusted_model = create_adjusted_model(_opt_threshold_post_processing_demographic_parity,
                                            A, y, scores)
 
     # For Demographic Parity we can ignore p_ignore since it's always 0.
@@ -207,12 +207,12 @@ def test_roc_curve_based_post_processing_demographic_parity(score_transform, y_t
 @pytest.mark.parametrize("score_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-def test_roc_curve_based_post_processing_equalized_odds(score_transform, y_transform,
+def test_opt_threshold_post_processing_equalized_odds(score_transform, y_transform,
                                                         A_transform):
     y = y_transform(example_labels)
     A = A_transform(example_attributes1)
     scores = score_transform(example_scores)
-    adjusted_model = create_adjusted_model(_roc_curve_based_post_processing_equalized_odds,
+    adjusted_model = create_adjusted_model(_opt_threshold_post_processing_equalized_odds,
                                            A, y, scores)
 
     # For Equalized Odds we need to factor in that the output is calculated by
@@ -286,14 +286,14 @@ def test_roc_curve_based_post_processing_equalized_odds(score_transform, y_trans
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-def test_roc_curve_based_post_processing_demographic_parity_e2e(attributes, attribute_names,
+def test_opt_threshold_post_processing_demographic_parity_e2e(attributes, attribute_names,
                                                                 expected_p0, expected_p1,
                                                                 X_transform, y_transform,
                                                                 A_transform):
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=DEMOGRAPHIC_PARITY)
     adjusted_model.fit(X, y, A)
 
@@ -316,13 +316,13 @@ def test_roc_curve_based_post_processing_demographic_parity_e2e(attributes, attr
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("A_transform", ALLOWED_INPUT_DATA_TYPES)
-def test_roc_curve_based_post_processing_equalized_odds_e2e(
+def test_opt_threshold_post_processing_equalized_odds_e2e(
         attributes, attribute_names, expected_positive_p0, expected_positive_p1,
         expected_negative_p0, expected_negative_p1, X_transform, y_transform, A_transform):
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=EQUALIZED_ODDS)
     adjusted_model.fit(X, y, A)
 
@@ -352,7 +352,7 @@ def test_predict_output_0_or_1(attributes, attribute_names, X_transform, y_trans
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
     adjusted_model.fit(X, y, A)
 
@@ -372,7 +372,7 @@ def test_predict_multiple_attributes_columns_error(attributes, attribute_names, 
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = pd.DataFrame({"A1": attributes, "A2": attributes})
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
     adjusted_model.fit(X, y, attributes)
 
@@ -393,7 +393,7 @@ def test_predict_different_argument_lengths(attributes, attribute_names, X_trans
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ROCCurveBasedPostProcessing(fairness_unaware_model=ExampleModel(),
+    adjusted_model = OptThresholdPostProcessing(fairness_unaware_model=ExampleModel(),
                                                  disparity_metric=metric)
     adjusted_model.fit(X, y, A)
 
@@ -406,9 +406,9 @@ def test_predict_different_argument_lengths(attributes, attribute_names, X_trans
         adjusted_model.predict(X_transform(_format_as_list_of_lists(attributes))[:-1], A)
 
 
-def create_adjusted_model(roc_curve_based_post_processing_method, example_attributes,
+def create_adjusted_model(opt_threshold_post_processing_method, example_attributes,
                           example_labels, example_scores):
-    post_processed_model_by_attribute = roc_curve_based_post_processing_method(
+    post_processed_model_by_attribute = opt_threshold_post_processing_method(
         example_attributes, example_labels, example_scores)
 
     return lambda A, scores: _vectorized_prediction(post_processed_model_by_attribute, A, scores)
