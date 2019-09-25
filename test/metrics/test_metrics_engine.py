@@ -27,7 +27,9 @@ class TestMetricByGroups:
         assert result.group_metric[0] == 2
         assert result.group_metric[1] == 3
         assert result.min_metric == 2
+        assert result.min_metric_groups == {0}
         assert result.max_metric == 3
+        assert result.max_metric_groups == {1}
         assert result.metric_range == 1
         assert result.metric_range_ratio == 1.5
 
@@ -47,7 +49,9 @@ class TestMetricByGroups:
         assert result.group_metric[b] == 1
         assert result.group_metric[c] == 3
         assert result.min_metric == 1
+        assert result.min_metric_groups == {a, b}
         assert result.max_metric == 3
+        assert result.max_metric_groups == {c}
         assert result.metric_range == 2
         assert result.metric_range_ratio == 3
 
@@ -65,7 +69,9 @@ class TestMetricByGroups:
         assert result.group_metric[1] == 2
         assert result.group_metric[2] == 6
         assert result.min_metric == 2
+        assert result.min_metric_groups == {0, 1}
         assert result.max_metric == 6
+        assert result.max_metric_groups == {2}
         assert result.metric_range == 4
         assert result.metric_range_ratio == 3
 
@@ -104,6 +110,8 @@ class TestMakeGroupMetric:
         assert result.group_metric[1] == 3
         assert result.min_metric == 2
         assert result.max_metric == 3
+        assert result.min_metric_groups == {0}
+        assert result.max_metric_groups == {1}
         assert result.metric_range == 1
         assert result.metric_range_ratio == 1.5
 
@@ -125,5 +133,7 @@ class TestMakeGroupMetric:
         assert result.group_metric[c] == 21
         assert result.min_metric == 1
         assert result.max_metric == 21
+        assert result.min_metric_groups == {a}
+        assert result.max_metric_groups == {c}
         assert result.metric_range == 20
         assert result.metric_range_ratio == 21

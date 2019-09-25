@@ -10,6 +10,8 @@ class MetricResult:
         # input
         self.group_metric = {}
         self.min_metric = None
+        self.min_metric_groups = None
         self.max_metric = None
+        self.max_metric_groups = None
         self.metric_range = None
         self.metric_range_ratio = None

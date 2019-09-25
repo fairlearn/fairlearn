@@ -55,6 +55,10 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
 
     result.min_metric = min(result.group_metric.values())
     result.max_metric = max(result.group_metric.values())
+
+    result.min_metric_groups = set([k for k, v in result.group_metric.items() if v == result.min_metric])  # noqa:E501
+    result.max_metric_groups = set([k for k, v in result.group_metric.items() if v == result.max_metric])  # noqa:E501
+
     result.metric_range = result.max_metric - result.min_metric
     result.metric_range_ratio = result.max_metric / result.min_metric
 
