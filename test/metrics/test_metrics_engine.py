@@ -125,10 +125,10 @@ class TestMetricByGroups:
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
 
-        with pytest.raises(ValueError) as exCtxt:
+        with pytest.raises(ValueError) as exception_context:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
-        assert exCtxt.value.args[0] == "Array y_true contains values other than 0 and 1"
+        assert exception_context.value.args[0] == "Array y_true contains values other than 0 and 1"
 
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
     def test_pred_not_0_1(self, transform_y_p):
@@ -136,10 +136,10 @@ class TestMetricByGroups:
         y_p = transform_y_p([0, 2, 0, 2, 0, 2, 2, 2])
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
 
-        with pytest.raises(ValueError) as exCtxt:
+        with pytest.raises(ValueError) as exception_context:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
-        assert exCtxt.value.args[0] == "Array y_pred contains values other than 0 and 1"
+        assert exception_context.value.args[0] == "Array y_pred contains values other than 0 and 1"
 
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
@@ -149,10 +149,10 @@ class TestMetricByGroups:
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
-        with pytest.raises(ValueError) as exCtxt:
+        with pytest.raises(ValueError) as exception_context:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
 
-        assert exCtxt.value.args[0] == "Array y_pred is not the same size as y_true"
+        assert exception_context.value.args[0] == "Array y_pred is not the same size as y_true"
 
     @pytest.mark.parametrize("transform_gid", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
@@ -162,10 +162,10 @@ class TestMetricByGroups:
         gid = transform_gid([0, 0, 0, 0, 1, 1, 2])
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
-        with pytest.raises(ValueError) as exCtxt:
+        with pytest.raises(ValueError) as exception_context:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
 
-        assert exCtxt.value.args[0] == "Array group_data is not the same size as y_true"
+        assert exception_context.value.args[0] == "Array group_data is not the same size as y_true"
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
@@ -175,10 +175,10 @@ class TestMetricByGroups:
         gid = [0, 0, 0, 0, 1, 1, 2, 3]
         s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3])
 
-        with pytest.raises(ValueError) as exCtxt:
+        with pytest.raises(ValueError) as exception_context:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
 
-        assert exCtxt.value.args[0] == "Array sample_weight is not the same size as y_true"
+        assert exception_context.value.args[0] == "Array sample_weight is not the same size as y_true"
 
 
 class TestMakeGroupMetric:
