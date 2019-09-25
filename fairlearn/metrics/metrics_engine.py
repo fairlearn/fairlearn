@@ -6,6 +6,7 @@ import numpy as np
 from . import GroupMetricResult
 
 _MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
+_MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
 
 def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=None):
@@ -28,6 +29,11 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
     """
     _check_binary(y_true, "y_true")
     _check_binary(y_pred, "y_pred")
+    _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
+    _check_array_sizes(y_true, group_data, 'y_true', 'group_data')
+    if sample_weight is not None:
+        _check_array_sizes(y_true, sample_weight, 'y_true', 'sample_weight')
+
     result = GroupMetricResult()
 
     groups = np.unique(group_data)
@@ -80,3 +86,8 @@ def _check_binary(arr, arr_name):
     unique_values = np.unique(arr)
     if not set(unique_values).issubset({0, 1}):
         raise ValueError(_MESSAGE_NON_BINARY.format(arr_name))
+
+
+def _check_array_sizes(a, b, a_name, b_name):
+    if len(a) != len(b):
+        raise ValueError(_MESSAGE_SIZE_MISMATCH.format(b_name, a_name))

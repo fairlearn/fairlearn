@@ -75,7 +75,7 @@ class TestMetricByGroups:
         assert result.metric_range == 4
         assert result.metric_range_ratio == 3
 
-    def test_actual_not_0_1(self):
+    def test_true_not_0_1(self):
         y_a = [0, 2, 0, 2, 0, 2, 2, 2]
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 2, 2]
@@ -94,6 +94,39 @@ class TestMetricByGroups:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid)
 
         assert exCtxt.value.args[0] == "Array y_pred contains values other than 0 and 1"
+
+    def test_true_predict_length_mismatch(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0]
+        gid = [0, 0, 0, 0, 1, 1, 2, 2]
+        s_w = [1, 1, 1, 1, 2, 2, 3, 3]
+
+        with pytest.raises(ValueError) as exCtxt:
+            _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
+
+        assert exCtxt.value.args[0] == "Array y_pred is not the same size as y_true"
+
+    def test_true_group_length_mismatch(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 0]
+        gid = [0, 0, 0, 0, 1, 1, 2]
+        s_w = [1, 1, 1, 1, 2, 2, 3, 3]
+
+        with pytest.raises(ValueError) as exCtxt:
+            _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
+
+        assert exCtxt.value.args[0] == "Array group_data is not the same size as y_true"
+
+    def test_true_weight_length_mismatch(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 0]
+        gid = [0, 0, 0, 0, 1, 1, 2, 3]
+        s_w = [1, 1, 1, 1, 2, 2, 3]
+
+        with pytest.raises(ValueError) as exCtxt:
+            _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
+
+        assert exCtxt.value.args[0] == "Array sample_weight is not the same size as y_true"
 
 
 class TestMakeGroupMetric:
