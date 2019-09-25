@@ -28,9 +28,9 @@ There are a number of terms in the literature used to describe concepts related 
 - *Fairness* includes the societal context in ways which may not be mathematically expressible. For example, if a finite amount of money is to be loaned, is it better for society to make a few large loans with minimal disparity, or to accept larger disparity and make many smaller loans?
 - *Bias* is anything which can affect the model. Examples include statistical biases in the input data and subconscious cognitive biases in the data scientist.
 
-### Parity Criteria and Disparity Metrics
+### Parity Criteria/Constraints and Disparity Metrics
 
-When trying to mitigate unfairness we usually have a parity criterion in mind. Below are some examples of parity criteria we use in this repository:
+When trying to mitigate unfairness we usually have a parity criterion in mind. For certain methods (that we refer to as reductions) these are expressed as constraints, and we optimize the objective subject to these constraints. Below are some examples of parity criteria we use in this repository:
 
 - Classification:
     - Demographic Parity (DP): A classifier h satisfies demographic parity under a distribution over (X, A, Y) if its prediction h(X) is statistically independent of the group attribute A — that is, if P[h(X) = y’ | A = a] = P[h(X) = y’] for all a, y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
