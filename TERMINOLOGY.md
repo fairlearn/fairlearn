@@ -20,7 +20,7 @@ There is no definitive standard yet, but for this repository, we shall use the v
 - It does not falsely imply ordering between `X`, `y`, and `A`, as opposed to, for example, `Z`.
 - It does not falsely imply that it is always part of the training features, as opposed to variable names that subscript `X`.
 
-### (Dis-)Parity vs. (Un-)Fairness vs. Bias
+### Parity/Disparity vs. Fairness/Unfairness vs. Bias
 
 There are a number of terms in the literature used to describe concepts related to disparity and fairness. As noted above, some can be particularly fraught since in legal circles they have precise meanings. We shall use the following definitions:
 
