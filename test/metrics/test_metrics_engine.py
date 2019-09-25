@@ -102,6 +102,10 @@ class TestMakeGroupMetric:
         assert len(result.group_metric) == 2
         assert result.group_metric[0] == 2
         assert result.group_metric[1] == 3
+        assert result.min_metric == 2
+        assert result.max_metric == 3
+        assert result.metric_range == 1
+        assert result.metric_range_ratio == 1.5
 
     def test_keys_and_weights(self):
         a = "ABC"
@@ -119,63 +123,7 @@ class TestMakeGroupMetric:
         assert result.group_metric[a] == 1
         assert result.group_metric[b] == 5
         assert result.group_metric[c] == 21
-
-
-class TestComputeDisparity:
-    def test_smoke_diff(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 1, 1]
-
-        gmf = metrics.make_group_metric(mock_func)
-
-        result = metrics.compute_disparity(gmf, y_a, y_p, gid, 'diff')
-
-        assert result.disparity == 1
-        assert len(result.group_metric) == 2
-        assert result.group_metric[0] == 2
-        assert result.group_metric[1] == 3
-
-    def test_smoke_ratio(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 1, 1]
-
-        gmf = metrics.make_group_metric(mock_func)
-
-        result = metrics.compute_disparity(gmf, y_a, y_p, gid, 'ratio')
-
-        assert result.disparity == pytest.approx(0.33333333)
-        assert len(result.group_metric) == 2
-        assert result.group_metric[0] == 2
-        assert result.group_metric[1] == 3
-
-
-class TestMakeDisparityMetric:
-    def test_smoke_diff(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 1, 1]
-
-        gmf = metrics.make_group_metric(mock_func)
-        dmf = metrics.make_disparity_metric(gmf, 'diff')
-
-        result = dmf(y_a, y_p, gid)
-        assert result.disparity == 1
-        assert len(result.group_metric) == 2
-        assert result.group_metric[0] == 2
-        assert result.group_metric[1] == 3
-
-    def test_smoke_ratio(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 1, 1]
-
-        gmf = metrics.make_group_metric(mock_func)
-        dmf = metrics.make_disparity_metric(gmf, 'ratio')
-
-        result = dmf(y_a, y_p, gid)
-        assert result.disparity == pytest.approx(0.33333333)
-        assert len(result.group_metric) == 2
-        assert result.group_metric[0] == 2
-        assert result.group_metric[1] == 3
+        assert result.min_metric == 1
+        assert result.max_metric == 21
+        assert result.metric_range == 20
+        assert result.metric_range_ratio == 21

@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from . import DisparityResult, MetricResult
+from . import MetricResult
 
 _MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
 
@@ -68,40 +68,6 @@ def make_group_metric(metric_function):
                                 y_pred,
                                 group_data,
                                 sample_weight)
-
-    return wrapper
-
-
-def compute_disparity(group_metric_function,
-                      y_true, y_pred, group_data,
-                      comparison,
-                      sample_weight=None):
-    metrics = group_metric_function(y_true, y_pred, group_data, sample_weight)
-
-    result = DisparityResult()
-    result.group_metric = metrics.group_metric
-
-    metric_values = np.array(list(result.group_metric.values()))
-
-    if comparison == 'ratio':
-        result.disparity = 1 - np.min(metric_values) / np.max(metric_values)
-    elif comparison == 'diff':
-        result.disparity = np.max(metric_values) - np.min(metric_values)
-    else:
-        raise ValueError("comparison")
-
-    return result
-
-
-def make_disparity_metric(metric_function, comparison):
-
-    def wrapper(y_true, y_pred, group_data, sample_weight=None):
-        return compute_disparity(metric_function,
-                                 y_true,
-                                 y_pred,
-                                 group_data,
-                                 comparison,
-                                 sample_weight)
 
     return wrapper
 
