@@ -154,8 +154,6 @@ class TestMetricByGroups:
 
         assert exCtxt.value.args[0] == "Array y_pred is not the same size as y_true"
 
-
-
     @pytest.mark.parametrize("transform_gid", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
     def test_true_group_length_mismatch(self, transform_y_a, transform_gid):
@@ -168,8 +166,6 @@ class TestMetricByGroups:
             _ = metrics.metric_by_groups(mock_func, y_a, y_p, gid, s_w)
 
         assert exCtxt.value.args[0] == "Array group_data is not the same size as y_true"
-
-
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
