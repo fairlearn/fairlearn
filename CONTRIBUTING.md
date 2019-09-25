@@ -36,7 +36,9 @@ reduction.predict(X)
 reduction.predict_proba(X)
 ```
 
-Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `aux_data` as a required argument for `predict` and `predict_proba`
+where `aux_data` contains auxiliary data. As of now, grouping data can only be provided through `aux_data`. In the future we plan to allow specifying specific columns of `X` as grouping data, in which case `aux_data` would be optional.
+
+Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `aux_data` as a required argument for `predict` and `predict_proba`. In the future we will make `aux_data` optional if the grouping data is already provided through `X`.
 
 ```python
 post_processor.fit(X, Y, aux_data)
