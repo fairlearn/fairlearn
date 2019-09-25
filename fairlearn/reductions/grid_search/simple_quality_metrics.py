@@ -6,7 +6,7 @@ import pandas as pd
 
 from fairlearn.reductions.grid_search import QualityMetric
 
-import fairlearn.moments as moments
+from fairlearn.reductions.moments import DemographicParity, MisclassificationError
 
 
 class SimpleClassificationQualityMetric(QualityMetric):
@@ -17,16 +17,16 @@ class SimpleClassificationQualityMetric(QualityMetric):
     """
 
     def __init__(self):
-        self.error_metric = moments.MisclassificationError()
-        self.disparity_metric = moments.DP()
+        self.error_metric = MisclassificationError()
+        self.disparity_metric = DemographicParity()
 
-    def set_data(self, X, Y, protected_attribute):
+    def set_data(self, X, Y, bin_id):
         self.X = X
         self.Y = Y
-        self.protected_attribute = protected_attribute
+        self.bin_id = bin_id
 
-        self.error_metric.init(X, protected_attribute, pd.Series(Y))
-        self.disparity_metric.init(X, protected_attribute, pd.Series(Y))
+        self.error_metric.init(X, bin_id, pd.Series(Y))
+        self.disparity_metric.init(X, bin_id, pd.Series(Y))
 
     def get_quality(self, model):
         current_error_metric = copy.deepcopy(self.error_metric)
@@ -45,15 +45,15 @@ class SimpleRegressionQualityMetric(QualityMetric):
     predict methods
     """
 
-    def set_data(self, X, Y, protected_attribute):
+    def set_data(self, X, Y, bin_id):
         self.X = X
         self.Y = Y
-        self.protected_attribute = protected_attribute
+        self.bin_id = bin_id
 
     def get_quality(self, model):
         labels = pd.Series(self.Y)
         preds = pd.Series(model.predict(self.X))
-        attrs = pd.Series(self.protected_attribute)
+        attrs = pd.Series(self.bin_id)
         attr_vals = attrs.unique()
         errors = (preds-labels)**2
         error = errors.mean()

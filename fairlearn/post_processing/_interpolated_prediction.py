@@ -39,7 +39,7 @@ class InterpolatedPredictor:
         logger.debug(OUTPUT_SEPARATOR)
 
     def __repr__(self):
-        return "[p_ignore: {}, prediction_constant: {}," \
+        return "[p_ignore: {}, prediction_constant: {}, " \
             "p0: {}, operation0: {}, p1: {}, operation1: {}]" \
             .format(self._p_ignore, self._prediction_constant, self._p0, self._operation0,
                     self._p1, self._operation1)

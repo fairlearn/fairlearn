@@ -2,54 +2,11 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-
-__all__ = ["DP", "EO"]
-
-
-class Moment:
-    """Generic moment"""
-
-    def __init__(self):
-        self.initialized = False
-
-    def init(self, dataX, dataA, dataY):
-        assert self.initialized is False, \
-            "moments can be initialized only once"
-        self.X = dataX
-        self.tags = pd.DataFrame(
-            {"protected_attribute": dataA, "label": dataY})
-        self.n = dataX.shape[0]
-        self.initialized = True
-        self._gamma_descr = None
+from .moment import Moment
 
 
-class MisclassificationError(Moment):
-    """Misclassification error"""
-    short_name = "Err"
-
-    def init(self, dataX, dataA, dataY):
-        super().init(dataX, dataY, dataY)
-        self.index = ["all"]
-
-    def gamma(self, predictor):
-        pred = predictor(self.X)
-        error = pd.Series(data=(self.tags["label"] - pred).abs().mean(),
-                          index=self.index)
-        self._gamma_descr = str(error)
-        return error
-
-    def lambda_signed(self, lambda_vec):
-        return lambda_vec
-
-    def signed_weights(self, lambda_vec=None):
-        if lambda_vec is None:
-            return 2 * self.tags["label"] - 1
-        else:
-            return lambda_vec["all"] * (2 * self.tags["label"] - 1)
-
-
-class _CondOpportunity(Moment):
-    """Generic fairness metric including DP and EO"""
+class ConditionalOpportunity(Moment):
+    """Generic fairness metric including DemographicParity and EqualizedOdds"""
 
     def init(self, dataX, dataA, dataY, dataGrp):
         super().init(dataX, dataA, dataY)
@@ -92,24 +49,24 @@ class _CondOpportunity(Moment):
         return signed_weights
 
 
-class DP(_CondOpportunity):
+class DemographicParity(ConditionalOpportunity):
     """ Demographic parity
-    A classifier h satisfies DP if
+    A classifier h satisfies DemographicParity if
     Prob[h(X) = y' | A = a] = Prob[h(X) = y'] for all a, y'
     """
-    short_name = "DP"
+    short_name = "DemographicParity"
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
                      dataY.apply(lambda y: "all"))
 
 
-class EO(_CondOpportunity):
+class EqualizedOdds(ConditionalOpportunity):
     """ Equalized odds
     Adds conditioning on label compared to Demographic parity, i.e.
     Prob[h(X) = y' | A = a, Y = y] = Prob[h(X) = y' | Y = y] for all a, y, y'
     """
-    short_name = "EO"
+    short_name = "EqualizedOdds"
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,

@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 
-class ReductionsLearner:
+class ReductionsEstimator:
     def fit(self, X, y, **kwargs):
         raise NotImplementedError()
 

@@ -11,8 +11,10 @@ flake8
 # Required for test
 # Pin pytest due to VS Code issue
 pytest==5.0.1
+pytest-cov
 scikit-learn
 
 # Required for notebooks
 jupyter
+nbval
 shap
