@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 
-class MetricResult:
+class GroupMetricResult:
     def __init__(self):
         # The 'metric' property is the given metric evaluated without regard to group
         self.metric = None

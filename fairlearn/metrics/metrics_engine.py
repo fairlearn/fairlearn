@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from . import MetricResult
+from . import GroupMetricResult
 
 _MESSAGE_NON_BINARY = "Array {0} contains values other than 0 and 1"
 
@@ -28,7 +28,7 @@ def metric_by_groups(metric_function, y_true, y_pred, group_data, sample_weight=
     """
     _check_binary(y_true, "y_true")
     _check_binary(y_pred, "y_pred")
-    result = MetricResult()
+    result = GroupMetricResult()
 
     groups = np.unique(group_data)
 
