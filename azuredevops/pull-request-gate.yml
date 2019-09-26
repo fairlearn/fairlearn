@@ -14,8 +14,10 @@ pool:
 
 steps:
 - task: UsePythonVersion@0
+  variables:
+  - group: Python-versions
   inputs:
-    versionSpec: '3.5' 
+    versionSpec: '$(PyVer)' 
     addToPath: true
 
 - script: pip install -r requirements.txt
