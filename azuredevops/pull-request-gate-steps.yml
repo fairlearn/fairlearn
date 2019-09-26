@@ -1,5 +1,6 @@
 steps:
 - task: UsePythonVersion@0
+  displayName: 'Use Python $(PyVer)'
   inputs:
     versionSpec: '$(PyVer)' 
     addToPath: true
