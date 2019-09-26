@@ -1,5 +1,5 @@
 variables:
-  pythonVersions: "[3.5, 3.6]"
+  pythonVersions: "3.5,3.6"
 
 trigger: none # No CI build
 
@@ -22,7 +22,7 @@ jobs:
   strategy:
     maxParallel: 2
     matrix: # Would like to grab this from the Library variables
-       ${{ each pyVer in variables.pythonVersions }}:
+       ${{ each pyVer in variables.pythonVersions.split(',') }}:
          ${{ pyVer }}:
             PyVer: ${{ pyVer }}
 
