@@ -10,7 +10,7 @@ steps:
 - script: flake8 .
   displayName: "Run flake8"
 
-- script: python -m pytest test/ --junitxml=./TEST-TEST.xml 
+- script: python -m pytest test/ --junitxml=./TEST--TEST.xml -o junit_suite_name=$(Agent.JobName)-$(PyVer)
   displayName: 'Run tests'
 
 - task: PublishTestResults@2
