@@ -16,11 +16,11 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- job: PR-Gate
+- job: PR_Gate
   strategy:
     maxParallel: 2
     matrix: $[ dependencies.generator.outputs['PyVer'] ]
-    
+
   steps:
   - task: UsePythonVersion@0
     inputs:
