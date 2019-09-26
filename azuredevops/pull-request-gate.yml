@@ -1,4 +1,4 @@
-variables:
+parameters:
   pythonVersions: [3.5, 3.6]
 
 trigger: none # No CI build
