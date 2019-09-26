@@ -1,6 +1,4 @@
-trigger:
-- master
-- dev
+trigger: none # No CI build
 
 schedules:
 - cron: "0 4 * * *" # Time is UTC
