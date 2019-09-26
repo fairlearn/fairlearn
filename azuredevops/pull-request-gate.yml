@@ -1,3 +1,6 @@
+variables:
+- group: Python-versions
+
 trigger: none # No CI build
 
 schedules:
@@ -14,8 +17,6 @@ pool:
 
 steps:
 - task: UsePythonVersion@0
-  variables:
-  - group: Python-versions
   inputs:
     versionSpec: '$(PyVer)' 
     addToPath: true
