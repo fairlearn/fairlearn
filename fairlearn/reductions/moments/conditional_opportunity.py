@@ -71,3 +71,8 @@ class EqualizedOdds(ConditionalOpportunity):
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
                      dataY.apply(lambda y: "label=" + str(y)))
+
+
+class BoundedGroupLoss(ConditionalOpportunity):
+    def init(self, dataX, dataA, dataY):
+        raise NotImplementedError("Placeholder for now")
