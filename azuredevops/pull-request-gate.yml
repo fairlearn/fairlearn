@@ -16,7 +16,7 @@ jobs:
 - job: PR_Gate
   strategy:
     maxParallel: 2
-    matrix:
+    matrix: # Would like to grab this from the Library variables
       Py35:
         PyVer: 3.5
       Py36:
@@ -24,20 +24,4 @@ jobs:
 
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(PyVer)' 
-      addToPath: true
-
-  - script: pip install -r requirements.txt
-    displayName: 'Install required packages'
-
-  - script: flake8 .
-    displayName: "Run flake8"
-
-  - script: python -m pytest test/ --junitxml=./TEST-TEST.xml 
-    displayName: 'Run tests'
-
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results **/TEST-*.xml'
-    condition: succeededOrFailed()
+  - template: pull-request-gate-steps.yml
