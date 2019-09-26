@@ -61,7 +61,7 @@ class GridSearch(ReductionsEstimator):
             number_of_lagrange_multipliers = kwargs[self._KW_NUMBER_LAGRANGE_MULTIPLIERS]
 
         # Extract the target attribute
-        A = self._make_vector(aux_data, "aux_data")
+        A = self._make_vector(self.constraint.extract_A(X, aux_data), "A")
 
         # Extract the Y values
         y_vector = self._make_vector(y, "y")

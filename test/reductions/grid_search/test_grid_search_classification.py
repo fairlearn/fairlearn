@@ -22,7 +22,7 @@ def _simple_threshold_data(number_a0, number_a1,
     a1_scores = np.linspace(0, 1, number_a1)
     score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
 
-    A = np.concatenate((a0s, a1s), axis=None)
+    A = pd.DataFrame({"a_col": np.concatenate((a0s, a1s), axis=None)})
 
     Y_a0 = [x > a0_threshold for x in a0_scores]
     Y_a1 = [x > a1_threshold for x in a1_scores]
@@ -30,7 +30,7 @@ def _simple_threshold_data(number_a0, number_a1,
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
     X = pd.DataFrame({"actual_feature": score_feature,
-                      "aux_data_feature": A,
+                      "aux_data_feature": A['a_col'],
                       "constant_ones_feature": np.ones(len(Y))})
     return X, Y, A
 
@@ -52,8 +52,9 @@ def test_demographicparity_fair_uneven_populations():
                                      score_threshold, score_threshold,
                                      a0_label, a1_label)
 
+    dp = DemographicParity(from_X=False, column_name="a_col")
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                        constraint=DemographicParity(),
+                        constraint=dp,
                         quality_metric=SimpleClassificationQualityMetric())
 
     target.fit(X, Y, aux_data=A,
@@ -100,8 +101,9 @@ def test_lagrange_multiplier_zero_unchanged_model():
     unmitigated_estimator.fit(X, y)
 
     # Do the grid search with a zero Lagrange multiplier
+    dp = DemographicParity(from_X=False, column_name="a_col")
     target = GridSearch(estimator,
-                        constraint=DemographicParity(),
+                        constraint=dp,
                         quality_metric=SimpleClassificationQualityMetric())
     target.fit(X, y, aux_data=A, lagrange_multipliers=[0])
 
@@ -128,12 +130,13 @@ def test_can_specify_and_generate_lagrange_multipliers():
                                    fit_intercept=True,
                                    random_state=97)
 
+    dp = DemographicParity(from_X=False, column_name="a_col")
     target1 = GridSearch(copy.deepcopy(estimator),
-                         constraint=DemographicParity(),
+                         constraint=copy.deepcopy(dp),
                          quality_metric=SimpleClassificationQualityMetric())
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         constraint=DemographicParity(),
+                         constraint=copy.deepcopy(dp),
                          quality_metric=SimpleClassificationQualityMetric())
 
     # Note that using integers for my_lagrange causes the test to fail

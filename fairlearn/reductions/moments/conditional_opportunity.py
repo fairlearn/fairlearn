@@ -48,6 +48,15 @@ class ConditionalOpportunity(Moment):
         )
         return signed_weights
 
+    def extract_A(self, X, aux_data):
+        if self.from_X:
+            raise NotImplementedError("Must take A from aux_data for now")
+        else:
+            if self.column_name is not None:
+                return aux_data[self.column_name]
+            else:
+                raise NotImplementedError("This one is hard given range in input types")
+
 
 class DemographicParity(ConditionalOpportunity):
     """ Demographic parity
@@ -55,6 +64,18 @@ class DemographicParity(ConditionalOpportunity):
     Prob[h(X) = y' | A = a] = Prob[h(X) = y'] for all a, y'
     """
     short_name = "DemographicParity"
+
+    def __init__(self, from_X=True, column_name=None, column_index=None):
+        super().__init__()
+        self.from_X = from_X
+        if column_name is None and column_index is None:
+            # raise ValueError("Did not specify column_name or column_index")
+            pass
+        if column_name is not None and column_index is not None:
+            # raise ValueError("Specified both column_name and column_index")
+            pass
+        self.column_name = column_name
+        self.column_index = column_index
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
@@ -74,5 +95,18 @@ class EqualizedOdds(ConditionalOpportunity):
 
 
 class BoundedGroupLoss(ConditionalOpportunity):
+
+    def __init__(self, from_X=True, column_name=None, column_index=None):
+        super().__init__()
+        self.from_X = from_X
+        if column_name is None and column_index is None:
+            # raise ValueError("Did not specify column_name or column_index")
+            pass
+        if column_name is not None and column_index is not None:
+            # raise ValueError("Specified both column_name and column_index")
+            pass
+        self.column_name = column_name
+        self.column_index = column_index
+
     def init(self, dataX, dataA, dataY):
         raise NotImplementedError("Placeholder for now")

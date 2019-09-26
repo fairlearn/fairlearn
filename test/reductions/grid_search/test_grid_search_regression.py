@@ -22,7 +22,7 @@ def _simple_regression_data(number_a0, number_a1,
     a1_scores = np.linspace(0, 1, number_a1)
     score_feature = np.concatenate((a0_scores, a1_scores), axis=None)
 
-    A = np.concatenate((a0s, a1s), axis=None)
+    A = pd.DataFrame({"protected_column": np.concatenate((a0s, a1s), axis=None)})
 
     Y_a0 = a0_factor * a0_scores
     Y_a1 = a1_factor * a1_scores
@@ -30,7 +30,7 @@ def _simple_regression_data(number_a0, number_a1,
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
     X = pd.DataFrame({"actual_feature": score_feature,
-                      "aux_data_feature": A,
+                      "aux_data_feature": A["protected_column"],
                       "constant_ones_feature": np.ones(len(Y))})
     return X, Y, A
 
@@ -49,8 +49,9 @@ def test_bgl_unfair():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
+    bgl = BoundedGroupLoss(from_X=False, column_name="protected_column")
     target = GridSearch(LinearRegression(),
-                        constraint=BoundedGroupLoss(),
+                        constraint=bgl,
                         quality_metric=SimpleRegressionQualityMetric())
 
     target.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=7)
@@ -94,8 +95,9 @@ def test_bgl_unmitigated_same():
     unmitigated_estimator = copy.deepcopy(estimator)
     unmitigated_estimator.fit(X, y)
 
+    bgl = BoundedGroupLoss(from_X=False, column_name="protected_column")
     target = GridSearch(estimator,
-                        constraint=BoundedGroupLoss(),
+                        constraint=bgl,
                         quality_metric=SimpleRegressionQualityMetric())
     # The value 0.5 comes from the counts of a0 and a1
     target.fit(X, y, aux_data=A, lagrange_multipliers=[0.5])
@@ -118,12 +120,13 @@ def test_bgl_lagrange_specifications():
                                       a0_label, a1_label)
 
     estimator = LinearRegression()
+    bgl = BoundedGroupLoss(from_X=False, column_name="protected_column")
     target1 = GridSearch(copy.deepcopy(estimator),
-                         constraint=BoundedGroupLoss(),
+                         constraint=copy.deepcopy(bgl),
                          quality_metric=SimpleRegressionQualityMetric())
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         constraint=BoundedGroupLoss(),
+                         constraint=copy.deepcopy(bgl),
                          quality_metric=SimpleRegressionQualityMetric())
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
