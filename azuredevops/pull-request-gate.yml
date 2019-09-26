@@ -1,6 +1,3 @@
-variables:
-- group: Python-versions
-
 trigger: none # No CI build
 
 schedules:
@@ -19,7 +16,12 @@ jobs:
 - job: PR_Gate
   strategy:
     maxParallel: 2
-    matrix: $[ dependencies.generator.outputs['PyVer'] ]
+    matrix:
+      Py35:
+        PyVer: 3.5
+      Py36:
+        PyVer: 3.6
+
 
   steps:
   - task: UsePythonVersion@0
