@@ -160,3 +160,39 @@ def test_can_specify_and_generate_lagrange_multipliers():
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
         assert np.array_equal(coef1, coef2)
+
+
+def test_can_take_A_from_X_or_aux_data():
+    score_threshold = 0.5
+
+    number_a0 = 320
+    number_a1 = 290
+
+    a0_label = 1
+    a1_label = 3
+    X, y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label)
+
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
+
+    dp_X = DemographicParity(from_X=True, column_name="aux_data_feature")
+    dp_A = DemographicParity(from_X=False, column_name="a_col")
+
+    target_X = GridSearch(copy.deepcopy(estimator),
+                          constraint=dp_X,
+                          quality_metric=SimpleClassificationQualityMetric())
+
+    target_A = GridSearch(copy.deepcopy(estimator),
+                          constraint=dp_A,
+                          quality_metric=SimpleClassificationQualityMetric())
+
+    target_X.fit(X, y, number_of_lagrange_multipliers=5)
+    target_A.fit(X, y, aux_data=A, number_of_lagrange_multipliers=5)
+
+    for X_result, A_result in zip(target_X.all_results, target_A.all_results):
+        coefX = X_result.model.coef_
+        coefA = A_result.model.coef_
+        assert np.array_equal(coefX, coefA)

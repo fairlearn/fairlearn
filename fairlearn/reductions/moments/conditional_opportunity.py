@@ -50,7 +50,10 @@ class ConditionalOpportunity(Moment):
 
     def extract_A(self, X, aux_data):
         if self.from_X:
-            raise NotImplementedError("Must take A from aux_data for now")
+            if self.column_name is not None:
+                return X[self.column_name]
+            else:
+                raise NotImplementedError("This one is hard given range in input types")
         else:
             if self.column_name is not None:
                 return aux_data[self.column_name]

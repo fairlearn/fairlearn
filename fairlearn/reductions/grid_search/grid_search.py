@@ -49,9 +49,6 @@ class GridSearch(ReductionsEstimator):
         if y is None:
             raise ValueError(self._MESSAGE_Y_NONE)
 
-        if aux_data is None:
-            raise RuntimeError("Must specify aux_data (for now)")
-
         lagrange_multipliers = None
         if self._KW_LAGRANGE_MULTIPLIERS in kwargs:
             lagrange_multipliers = kwargs[self._KW_LAGRANGE_MULTIPLIERS]
