@@ -1,5 +1,5 @@
-parameters:
-  pythonVersions: [3.5, 3.6]
+variables:
+  pythonVersions: "[3.5, 3.6]"
 
 trigger: none # No CI build
 
@@ -22,10 +22,9 @@ jobs:
   strategy:
     maxParallel: 2
     matrix: # Would like to grab this from the Library variables
-      Py35:
-        PyVer: 3.5
-      Py36:
-        PyVer: 3.6
+       ${{ each pyVer in variables.pythonVersions }}:
+         ${{ pyVer }}:
+            PyVer: ${{ pyVer }}
 
   steps:
   - template: pull-request-gate-steps.yml
