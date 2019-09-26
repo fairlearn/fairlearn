@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from fairlearn.metrics import BoundedGroupLoss
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleRegressionQualityMetric
+from fairlearn.reductions.moments import BoundedGroupLoss
 
 import copy
 import numpy as np
@@ -50,7 +50,7 @@ def test_bgl_unfair():
                                       a0_label, a1_label)
 
     target = GridSearch(LinearRegression(),
-                        disparity_metric=BoundedGroupLoss(),
+                        constraint=BoundedGroupLoss(),
                         quality_metric=SimpleRegressionQualityMetric())
 
     target.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=7)
@@ -95,7 +95,7 @@ def test_bgl_unmitigated_same():
     unmitigated_estimator.fit(X, y)
 
     target = GridSearch(estimator,
-                        disparity_metric=BoundedGroupLoss(),
+                        constraint=BoundedGroupLoss(),
                         quality_metric=SimpleRegressionQualityMetric())
     # The value 0.5 comes from the counts of a0 and a1
     target.fit(X, y, aux_data=A, lagrange_multipliers=[0.5])
@@ -119,11 +119,11 @@ def test_bgl_lagrange_specifications():
 
     estimator = LinearRegression()
     target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=BoundedGroupLoss(),
+                         constraint=BoundedGroupLoss(),
                          quality_metric=SimpleRegressionQualityMetric())
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=BoundedGroupLoss(),
+                         constraint=BoundedGroupLoss(),
                          quality_metric=SimpleRegressionQualityMetric())
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]

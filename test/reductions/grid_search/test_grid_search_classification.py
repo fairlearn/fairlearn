@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from fairlearn.metrics import DemographicParity
 from fairlearn.reductions import GridSearch
+from fairlearn.reductions.moments import DemographicParity
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 
 import copy
@@ -53,7 +53,7 @@ def test_demographicparity_fair_uneven_populations():
                                      a0_label, a1_label)
 
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                        disparity_metric=DemographicParity(),
+                        constraint=DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric())
 
     target.fit(X, Y, aux_data=A,
@@ -101,7 +101,7 @@ def test_lagrange_multiplier_zero_unchanged_model():
 
     # Do the grid search with a zero Lagrange multiplier
     target = GridSearch(estimator,
-                        disparity_metric=DemographicParity(),
+                        constraint=DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric())
     target.fit(X, y, aux_data=A, lagrange_multipliers=[0])
 
@@ -129,11 +129,11 @@ def test_can_specify_and_generate_lagrange_multipliers():
                                    random_state=97)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=DemographicParity(),
+                         constraint=DemographicParity(),
                          quality_metric=SimpleClassificationQualityMetric())
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=DemographicParity(),
+                         constraint=DemographicParity(),
                          quality_metric=SimpleClassificationQualityMetric())
 
     # Note that using integers for my_lagrange causes the test to fail

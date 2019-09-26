@@ -5,7 +5,7 @@ import copy
 import numpy as np
 import pandas as pd
 
-from fairlearn.metrics import DemographicParity, BoundedGroupLoss
+from fairlearn.reductions.moments import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 
@@ -30,13 +30,13 @@ class GridSearch(ReductionsEstimator):
 
     def __init__(self,
                  learner,
-                 disparity_metric,
+                 constraint,
                  quality_metric):
         self.learner = learner
-        if (not isinstance(disparity_metric, DemographicParity) and
-                not isinstance(disparity_metric, BoundedGroupLoss)):
-            raise RuntimeError("Unsupported disparity metric")
-        self.disparity_metric = disparity_metric
+        if (not isinstance(constraint, DemographicParity) and
+                not isinstance(constraint, BoundedGroupLoss)):
+            raise RuntimeError("Unsupported constraint")
+        self.constraint = constraint
 
         if not isinstance(quality_metric, QualityMetric):
             raise RuntimeError("quality_metric must derive from QualityMetric")
@@ -79,10 +79,10 @@ class GridSearch(ReductionsEstimator):
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
         # BoundedGroupLoss indicates a regression
-        if isinstance(self.disparity_metric, DemographicParity):
+        if isinstance(self.constraint, DemographicParity):
             self._fit_classification(X, y_vector, A,
                                      lagrange_multipliers, number_of_lagrange_multipliers)
-        elif isinstance(self.disparity_metric, BoundedGroupLoss):
+        elif isinstance(self.constraint, BoundedGroupLoss):
             self._fit_regression(X, y_vector, A,
                                  lagrange_multipliers, number_of_lagrange_multipliers)
         else:

@@ -7,9 +7,9 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
-from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric, SimpleRegressionQualityMetric  # noqa: E501
+from fairlearn.reductions.moments import DemographicParity, BoundedGroupLoss
 
 # ==============================================================
 
