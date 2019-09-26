@@ -15,21 +15,27 @@ schedules:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(PyVer)' 
-    addToPath: true
+jobs:
+- job: PR-Gate
+  strategy:
+    maxParallel: 2
+    matrix: $[ dependencies.generator.outputs['PyVer'] ]
+    
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(PyVer)' 
+      addToPath: true
 
-- script: pip install -r requirements.txt
-  displayName: 'Install required packages'
+  - script: pip install -r requirements.txt
+    displayName: 'Install required packages'
 
-- script: flake8 .
-  displayName: "Run flake8"
+  - script: flake8 .
+    displayName: "Run flake8"
 
-- script: python -m pytest test/ --junitxml=./TEST-TEST.xml 
-  displayName: 'Run tests'
+  - script: python -m pytest test/ --junitxml=./TEST-TEST.xml 
+    displayName: 'Run tests'
 
-- task: PublishTestResults@2
-  displayName: 'Publish Test Results **/TEST-*.xml'
-  condition: succeededOrFailed()
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()
