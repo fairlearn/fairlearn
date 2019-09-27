@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-""" Optimal Threshold Post Processing algorithm based on M. Hardt,
+""" Threshold Optimization Post Processing algorithm based on M. Hardt,
 E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
 Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
 classification with one categorical grouping attribute.
