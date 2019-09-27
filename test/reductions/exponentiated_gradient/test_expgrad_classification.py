@@ -12,7 +12,6 @@ from .test_utilities import group_data, X1, X2, X3, labels  # noqa: F401
 def test_simple_fit_predict():
     estimator = LeastSquaresBinaryClassifierLearner()
     constraints = DemographicParity()
-    # TODO what about the quality metric?
     expgrad = ExponentiatedGradient(estimator, constraints)
     expgrad.fit(pd.DataFrame(X1), pd.Series(labels), group_data=pd.Series(group_data))
     expgrad.predict(pd.DataFrame(X1))
