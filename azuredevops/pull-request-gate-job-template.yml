@@ -1,7 +1,7 @@
 parameters:
   name: ''
   vmImage: ''
-  pyVersions: [Py35, Py36]
+  pyVersions: [3.5, 3.6]
 
 jobs:
 - job: ${{ parameters.name }}
