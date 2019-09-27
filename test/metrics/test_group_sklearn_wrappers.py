@@ -14,18 +14,20 @@ weight = [1, 2, 3, 1, 2, 3, 4, 2]
 
 # =======================================================
 
-supported_metrics = [metrics.group_precision_score]
+supported_metrics = {"group_accuracy_score": metrics.group_accuracy_score,
+                     "group_precision_score": metrics.group_precision_score,
+                     "group_recall_score": metrics.group_recall_score}
 
 # =======================================================
 
 
-@pytest.mark.parametrize("group_metric_func", supported_metrics)
-def test_metric_unweighted(group_metric_func):
+@pytest.mark.parametrize("name, group_metric_func", supported_metrics.items())
+def test_metric_unweighted(name, group_metric_func):
     result = group_metric_func(Y_true, Y_pred, groups)
     assert len(result.by_group) == 5
 
 
-@pytest.mark.parametrize("group_metric_func", supported_metrics)
-def test_metric_weighted(group_metric_func):
+@pytest.mark.parametrize("name, group_metric_func", supported_metrics.items())
+def test_metric_weighted(name, group_metric_func):
     result = group_metric_func(Y_true, Y_pred, groups, weight)
     assert len(result.by_group) == 5
