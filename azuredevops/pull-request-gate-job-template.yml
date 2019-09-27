@@ -11,8 +11,8 @@ jobs:
     maxParallel: 2
     matrix:
       ${{ each pyVer in parameters.pyVersions }}
-      ${{ pyVer }}:
-        PyVer: ${{ pyVer }}
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
 
   steps:
   - task: UsePythonVersion@0
