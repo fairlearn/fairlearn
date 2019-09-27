@@ -1,17 +1,24 @@
 parameters:
   name: ''
   vmImage: ''
-  pyVer: 3.5
+  pyVersions: [3.5, 3.6]
 
 jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+  strategy:
+    maxParallel: 2
+    matrix:
+      ${{ each pyVer in pyVersions }}
+      ${{ pyVer }}:
+        PyVer: ${{ pyVer }}
+
   steps:
   - task: UsePythonVersion@0
-    displayName: 'Use Python $(pyVer)'
+    displayName: 'Use Python $(PyVer)'
     inputs:
-      versionSpec: '$(pyVer)' 
+      versionSpec: '$(PyVer)' 
       addToPath: true
 
   - script: pip install -r requirements.txt
