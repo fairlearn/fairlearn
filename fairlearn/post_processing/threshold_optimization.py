@@ -27,14 +27,12 @@ INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
                                   "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
                                   "Your provided data was of types ({}, {}, {})"
 NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE = "Currently only {} and {} are supported " \
-                                              "disparity metrics.".format(DEMOGRAPHIC_PARITY,
-                                                                          EQUALIZED_ODDS)
+    "disparity metrics.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
-                                          "column in {}."
+    "column in {}."
 ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "An attribute named {} or {} was detected. " \
-                                                 "Please rename your column and try again." \
-                                                 .format(SCORE_KEY, LABEL_KEY)
+    "Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
@@ -44,7 +42,7 @@ _SUPPORTED_DISPARITY_METRICS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 logger = logging.getLogger(__name__)
 
 
-class OptThresholdPostProcessing(PostProcessing):
+class ThresholdOptimizer(PostProcessing):
     def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
                  disparity_metric=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
                  seed=None):
@@ -64,7 +62,7 @@ class OptThresholdPostProcessing(PostProcessing):
         :param plot: show ROC/selection-error plot if True
         :type plot: bool
         """
-        super(OptThresholdPostProcessing, self).__init__(
+        super(ThresholdOptimizer, self).__init__(
             fairness_unaware_model=fairness_unaware_model,
             fairness_unaware_estimator=fairness_unaware_estimator,
             disparity_metric=disparity_metric)
@@ -91,17 +89,17 @@ class OptThresholdPostProcessing(PostProcessing):
         self._validate_model()
 
         scores = self._fairness_unaware_model.predict(X)
-        opt_threshold_post_processing_method = None
+        threshold_optimization_method = None
         if self._disparity_metric == DEMOGRAPHIC_PARITY:
-            opt_threshold_post_processing_method = \
-                _opt_threshold_post_processing_demographic_parity
+            threshold_optimization_method = \
+                _threshold_optimization_demographic_parity
         elif self._disparity_metric == EQUALIZED_ODDS:
-            opt_threshold_post_processing_method = \
-                _opt_threshold_post_processing_equalized_odds
+            threshold_optimization_method = \
+                _threshold_optimization_equalized_odds
         else:
             raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
 
-        self._post_processed_model_by_attribute = opt_threshold_post_processing_method(
+        self._post_processed_model_by_attribute = threshold_optimization_method(
             aux_data, y, scores, self._gridsize, self._flip, self._plot)
 
     def predict(self, X, group_data):
@@ -152,8 +150,8 @@ class OptThresholdPostProcessing(PostProcessing):
             raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
 
 
-def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
-                                                      flip=True, plot=False):
+def _threshold_optimization_demographic_parity(attributes, labels, scores, gridsize=1000,
+                                               flip=True, plot=False):
     """ Calculates selection and error rates for every attribute value at different thresholds
     over the scores. Subsequently weighs each attribute value's error by the frequency of the
     attribute value in the data. The minimum error point is the selected solution, which is
@@ -186,7 +184,8 @@ def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
 
-    data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
+    data_grouped_by_attribute = _reformat_and_group_data(
+        attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
         # determine probability of current grouping attribute group based on data
@@ -197,8 +196,10 @@ def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores
 
         roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip)
 
-        fraction_negative_label_positive_sample = (n_negative / n_group) * roc_convex_hull['x']
-        fraction_positive_label_positive_sample = (n_positive / n_group) * roc_convex_hull['y']
+        fraction_negative_label_positive_sample = (
+            n_negative / n_group) * roc_convex_hull['x']
+        fraction_positive_label_positive_sample = (
+            n_positive / n_group) * roc_convex_hull['y']
         # Calculate selection to represent the proportion of positive predictions.
         roc_convex_hull['selection'] = fraction_negative_label_positive_sample + \
             fraction_positive_label_positive_sample
@@ -213,7 +214,8 @@ def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores
 
         # Add up errors for the current group multiplied by the probability of the current group.
         # This will help us in identifying the minimum overall error.
-        error_given_selection += p_attribute * selection_error_curve[attribute]['error']
+        error_given_selection += p_attribute * \
+            selection_error_curve[attribute]['error']
 
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("Processing " + str(attribute))
@@ -223,7 +225,8 @@ def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores
         logger.debug("ROC curve: convex")
         logger.debug(roc_convex_hull)
         if plot:
-            plot_curve(attribute, 'selection', 'error', selection_error_curve[attribute])
+            plot_curve(attribute, 'selection', 'error',
+                       selection_error_curve[attribute])
 
     # Find minimum error point given that at each point the selection rate for each attribute
     # value is identical by design.
@@ -235,7 +238,8 @@ def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores
     predicted_DP_by_attribute = {}
     for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
-        selection_error_curve_result = selection_error_curve[attribute].transpose()[i_best_DP]
+        selection_error_curve_result = selection_error_curve[attribute].transpose()[
+            i_best_DP]
         predicted_DP_by_attribute[attribute] = \
             InterpolatedPredictor(0, 0,
                                   selection_error_curve_result.p0,
@@ -249,13 +253,14 @@ def _opt_threshold_post_processing_demographic_parity(attributes, labels, scores
                  .format(error_given_selection[i_best_DP], x_best))
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
-        plot_solution_and_show_plot(x_best, None, "DP solution", "selection rate", "error")
+        plot_solution_and_show_plot(
+            x_best, None, "DP solution", "selection rate", "error")
 
     return predicted_DP_by_attribute
 
 
-def _opt_threshold_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
-                                                  flip=True, plot=False):
+def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=1000,
+                                           flip=True, plot=False):
     """ Calculates the ROC curve of every attribute value at different thresholds over the scores.
     Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
     selecting the point on the curve with minimal error.
@@ -280,7 +285,8 @@ def _opt_threshold_post_processing_equalized_odds(attributes, labels, scores, gr
     :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
-    data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
+    data_grouped_by_attribute = _reformat_and_group_data(
+        attributes, labels, scores)
 
     n = len(labels)
 
@@ -295,7 +301,8 @@ def _opt_threshold_post_processing_equalized_odds(attributes, labels, scores, gr
 
     for attribute, group in data_grouped_by_attribute:
         roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip)
-        roc[attribute] = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
+        roc[attribute] = _interpolate_curve(
+            roc_convex_hull, 'x', 'y', 'operation', x_grid)
         y_values[attribute] = roc[attribute]['y']
 
         logger.debug(OUTPUT_SEPARATOR)
@@ -377,7 +384,8 @@ def _vectorized_prediction(function_dict, group_data, scores):
     # handle type conversion to ndarray for other types
     group_data_vector = _convert_to_ndarray(group_data, MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE
                                             .format("group_data"))
-    scores_vector = _convert_to_ndarray(scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
+    scores_vector = _convert_to_ndarray(
+        scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
 
     return sum([(group_data_vector == a) * function_dict[a].predict(scores_vector)
                 for a in function_dict])
@@ -420,7 +428,8 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if len(additional_data.shape) > 2 or (len(additional_data.shape) == 2 and
                                               additional_data.shape[1] > 1):
             # TODO: extend to multiple columns for additional_group data
-            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
+            raise ValueError(
+                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
         else:
             data_dict[key] = additional_data.reshape(-1)
     elif type(additional_data) == pd.DataFrame:
@@ -433,9 +442,11 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if type(additional_data[0]) == list:
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
-                raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
+                raise ValueError(
+                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data
     else:
-        raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))
+        raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(
+            type(additional_data)))
