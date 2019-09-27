@@ -16,12 +16,12 @@ logger = logging.getLogger(__name__)
 class _Lagrangian:
     """ Operations related to the Lagrangian"""
 
-    def __init__(self, dataX, dataA, dataY, learner, constraints, eps, B, opt_lambda=True):
-        self.X = dataX
+    def __init__(self, X, A, y, learner, constraints, eps, B, opt_lambda=True):
+        self.X = X
         self.obj = moments.MisclassificationError()
-        self.obj.init(dataX, dataA, dataY)
+        self.obj.init(X, A, y)
         self.constraints = constraints
-        self.constraints.init(dataX, dataA, dataY)
+        self.constraints.init(X, A, y)
         self.pickled_learner = pickle.dumps(learner)
         self.eps = eps
         self.B = B

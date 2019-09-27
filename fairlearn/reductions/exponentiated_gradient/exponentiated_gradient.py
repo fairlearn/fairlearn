@@ -63,9 +63,9 @@ class ExponentiatedGradient(ReductionsEstimator):
         self._best_classifier = None
         self._classifiers = None
 
-    def fit(self, X, y, aux_data=None, **kwargs):
+    def fit(self, X, y, group_data=None, **kwargs):
         # TODO: validate input data; unify between grid search and expgrad?
-        self._expgrad_result = exponentiated_gradient(X, aux_data, y, self._estimator,
+        self._expgrad_result = exponentiated_gradient(X, group_data, y, self._estimator,
                                                       constraints=self._constraints,
                                                       eps=self._eps, T=self._T, nu=self._nu,
                                                       eta_mul=self._eta_mul)

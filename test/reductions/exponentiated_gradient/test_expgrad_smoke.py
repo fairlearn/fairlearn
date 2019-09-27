@@ -6,7 +6,7 @@ from fairlearn.reductions import ExponentiatedGradient
 import fairlearn.reductions.moments as moments
 
 from test import simple_learners
-from .test_utilities import aux_data, X1, X2, X3, labels
+from .test_utilities import group_data, X1, X2, X3, labels
 
 import pytest
 
@@ -16,7 +16,7 @@ class TestExpgradSmoke:
         print("setup_method      method:%s" % method.__name__)
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
-        self.A = pd.Series(aux_data)
+        self.A = pd.Series(group_data)
         self.learner = simple_learners.LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
