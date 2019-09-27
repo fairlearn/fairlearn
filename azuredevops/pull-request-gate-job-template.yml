@@ -1,7 +1,7 @@
 parameters:
   name: ''
   vmImage: ''
-  pyVersions: [Py-35, Py-36]
+  pyVersions: [Py35, Py36]
 
 jobs:
 - job: ${{ parameters.name }}
@@ -10,7 +10,7 @@ jobs:
   strategy:
     maxParallel: 2
     matrix:
-      ${{ each pyVer in parameters.pyVersions }}
+      ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
 
