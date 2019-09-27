@@ -13,30 +13,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- job: Linux
-  pool:
+- template: pull-request-gate-job-template.yml
+  parameters:
+    name: Linux
     vmImage: 'ubuntu-16.04'
-  strategy:
-    maxParallel: 2
-    matrix: # Would like to grab this from the Library variables
-      Py35:
-        PyVer: 3.5
-      Py36:
-        PyVer: 3.6
+    #pyVer: [ 3.5, 3.6 ]
 
-  steps:
-  - template: pull-request-gate-steps.yml
-
-- job: Windows
-  pool:
-    vmImage: 'vs2017-win2016'
-  strategy:
-    maxParallel: 2
-    matrix: # Would like to grab this from the Library variables
-      Py35:
-        PyVer: 3.5
-      Py36:
-        PyVer: 3.6
-
-  steps:
-  - template: pull-request-gate-steps.yml
+- template: pull-request-gate-job-template.yml
+  parameters:
+    name: Windows
+    vmImage:  'vs2017-win2016'
+    #pyVer: [ 3.5, 3.6 ]

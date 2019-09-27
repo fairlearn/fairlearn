@@ -1,0 +1,27 @@
+parameters:
+  name: ''
+  vmImage: ''
+  pyVer: 3.5
+
+jobs:
+  job: ${{ parameters.name }}
+  pool: ${{ parameters.vmImage }}
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(pyVer)'
+    inputs:
+      versionSpec: '$(pyVer)' 
+      addToPath: true
+
+  - script: pip install -r requirements.txt
+    displayName: 'Install required packages'
+
+  - script: flake8 .
+    displayName: "Run flake8"
+
+  - script: python -m pytest test/ --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+    displayName: 'Run tests'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()
