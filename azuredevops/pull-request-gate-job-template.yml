@@ -5,7 +5,8 @@ parameters:
 
 jobs:
 - job: ${{ parameters.name }}
-  pool: ${{ parameters.vmImage }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python $(pyVer)'
