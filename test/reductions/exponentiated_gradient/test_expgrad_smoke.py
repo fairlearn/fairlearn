@@ -72,7 +72,7 @@ class TestExpgradSmoke:
                         "n_classifiers": 6}]
 
     def run_smoke_test(self, data):
-        expgrad = ExponentiatedGradient(self.learner, disparity_metric=data["cons_class"](),
+        expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
                                         eps=data["eps"])
         expgrad.fit(self.X, self.y, self.A)
 

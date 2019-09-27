@@ -11,8 +11,8 @@ from .test_utilities import aux_data, X1, X2, X3, labels  # noqa: F401
 
 def test_simple_fit_predict():
     estimator = LeastSquaresBinaryClassifierLearner()
-    disparity_metric = DemographicParity()
+    constraints = DemographicParity()
     # TODO what about the quality metric?
-    expgrad = ExponentiatedGradient(estimator, disparity_metric)
+    expgrad = ExponentiatedGradient(estimator, constraints)
     expgrad.fit(pd.DataFrame(X1), pd.Series(labels), aux_data=pd.Series(aux_data))
     expgrad.predict(pd.DataFrame(X1))

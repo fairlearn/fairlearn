@@ -53,9 +53,9 @@ class ExponentiatedGradientResult:
 
 
 class ExponentiatedGradient(ReductionsEstimator):
-    def __init__(self, estimator, disparity_metric, eps=0.01, T=50, nu=None, eta_mul=2.0):
+    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
         self._estimator = estimator
-        self._disparity_metric = disparity_metric
+        self._constraints = constraints
         self._eps = eps
         self._T = T
         self._nu = nu
@@ -66,7 +66,7 @@ class ExponentiatedGradient(ReductionsEstimator):
     def fit(self, X, y, aux_data=None, **kwargs):
         # TODO: validate input data; unify between grid search and expgrad?
         self._expgrad_result = exponentiated_gradient(X, aux_data, y, self._estimator,
-                                                      constraints=self._disparity_metric,
+                                                      constraints=self._constraints,
                                                       eps=self._eps, T=self._T, nu=self._nu,
                                                       eta_mul=self._eta_mul)
         self._best_classifier = self._expgrad_result._best_classifier
@@ -85,13 +85,9 @@ class ExponentiatedGradient(ReductionsEstimator):
     def posterior_predict_proba(self, X):
         raise NotImplementedError()
 
-    def _expgrad_result(self):
-        # Just making this available since it's needed for some of the tests
-        return self._expgrad_result
-
 
 def exponentiated_gradient(X, A, y, estimator,
-                           constraints=moments.DemographicParity(),
+                           constraints,
                            eps=0.01,
                            T=50,
                            nu=None,
@@ -106,7 +102,7 @@ def exponentiated_gradient(X, A, y, estimator,
     :param estimator: an estimator implementing methods fit(X,Y,W) and predict(X), where X is the
         DataFrame of covariates, and Y and W are the Series containing the labels and weights,
         respectively; labels Y and predictions returned by predict(X) are in {0,1}
-    :param constraints: the disparity measure (default moments.DemographicParity())
+    :param constraints: the disparity constraints expressed as moments
     :param eps: allowed fairness constraint violation (default 0.01)
     :param T: max number of iterations (default 50)
     :param nu: convergence threshold for the duality gap (default None), corresponding to a
