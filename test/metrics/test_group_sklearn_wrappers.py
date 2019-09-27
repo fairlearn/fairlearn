@@ -14,6 +14,8 @@ weight = [1, 2, 3, 1, 2, 3, 4, 2]
 
 # =======================================================
 
+# Define as a dictionary so that the actual name can be seen
+# when pytest builds the tests
 supported_metrics = {"group_accuracy_score": metrics.group_accuracy_score,
                      "group_precision_score": metrics.group_precision_score,
                      "group_recall_score": metrics.group_recall_score}
