@@ -8,3 +8,6 @@ P0_KEY = "p0"
 P1_KEY = "p1"
 
 OUTPUT_SEPARATOR = "-"*65
+
+DEMOGRAPHIC_PARITY = "DemographicParity"
+EQUALIZED_ODDS = "EqualizedOdds"

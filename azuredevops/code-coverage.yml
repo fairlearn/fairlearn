@@ -1,8 +1,6 @@
-trigger:
-  branches:
-    include:
-    - master
-    - dev
+trigger: none
+
+pr: none
 
 schedules:
 - cron: "0 5 * * *" # Time is UTC

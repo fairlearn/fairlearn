@@ -1,13 +1,15 @@
+[![Build Status](https://img.shields.io/azure-devops/build/responsibleai/fairlearn/6/dev?failed_label=bad&passed_label=good&label=GatedCheckin%3ADev)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=1&branchName=dev) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![pypi badge](https://img.shields.io/badge/pypi-0.2.0-blue)
+
 # Fairness in Machine Learning - Mitigation algorithms
 
 A Python package that implements a variety of fairness-related algorithms to mitigate bias including:
 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
-| `expgrad` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
-| `grid_search.binary_protected_attribute.binary_classification` | As described in Section 3.4 in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP, EO |
-| `grid_search.binary_protected_attribute.regression` | Grid Search for regression | regression | binary | BGL |
-| `post_processing.ROCCurveBasedPostProcessing` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
+| `fairlearn.` `expgrad` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
+| `fairlearn.` `reductions.` `GridSearch` | As described in Section 3.4 in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP |
+| `fairlearn.` `reductions.` `GridSearch` | Grid Search for regression | regression | binary | BGL |
+| `fairlearn.` `post_processing.` `ROCCurveBasedPostProcessing` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
 
 DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to [the Terminology page](Terminology.md).
 

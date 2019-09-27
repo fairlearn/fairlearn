@@ -1,0 +1,30 @@
+trigger: none # No CI build
+
+schedules:
+- cron: "0 4 * * *" # Time is UTC
+  displayName: Daily build
+  branches:
+    include:
+      - master
+      - dev
+  always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- template: pull-request-gate-job-template.yml
+  parameters:
+    name: Linux
+    vmImage: 'ubuntu-16.04'
+
+- template: pull-request-gate-job-template.yml
+  parameters:
+    name: Windows
+    vmImage:  'vs2017-win2016'
+    
+- template: pull-request-gate-job-template.yml
+  parameters:
+    name: MacOS
+    vmImage:  'macOS-10.13'
+    pyVersions: [ 3.6, 3.7] 
