@@ -10,7 +10,7 @@ jobs:
   strategy:
     maxParallel: 2
     matrix:
-      ${{ each pyVer in pyVersions }}
+      ${{ each pyVer in parameters.pyVersions }}
       ${{ pyVer }}:
         PyVer: ${{ pyVer }}
 
