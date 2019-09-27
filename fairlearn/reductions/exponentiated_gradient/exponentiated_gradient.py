@@ -12,7 +12,6 @@ exponentiated_gradient -- optimize accuracy subject to fairness constraints
 import logging
 import numpy as np
 import pandas as pd
-from fairlearn.reductions import moments
 from fairlearn.reductions import ReductionsEstimator
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
