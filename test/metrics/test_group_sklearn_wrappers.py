@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import copy
 import pytest
 
 import fairlearn.metrics as metrics
@@ -24,7 +23,9 @@ supported_metrics_weighted = {"group_accuracy_score": metrics.group_accuracy_sco
                               "group_mean_squared_error": metrics.group_mean_squared_error}
 
 metrics_no_sample_weights = {"group_max_error": metrics.group_max_error,
-                             "group_mean_absolute_error": metrics.group_mean_absolute_error}
+                             "group_mean_absolute_error": metrics.group_mean_absolute_error,
+                             "group_mean_squared_log_error": metrics.group_mean_squared_log_error,
+                             "group_median_absolute_error": metrics.group_median_absolute_error}
 
 supported_metrics_unweighted = {**supported_metrics_weighted, **metrics_no_sample_weights}
 
