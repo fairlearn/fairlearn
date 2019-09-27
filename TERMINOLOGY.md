@@ -11,13 +11,11 @@ However, contrary to [scikit-learn estimators](https://scikit-learn.org/stable/g
 ### Protected or sensitive attribute, group, or data
 
 In the scientific literature concerning fairness one usually selects a single feature or multiple features of a dataset as a protected or sensitive set of attributes. The objective is to optimize a chosen disparity metric (for a definition see one of the later sections) based on these attributes. In some scenarios these attributes may also be held out from the actual training data (note that holding out data is not sufficient for fairness due to the myriad of correlations in real datasets). Overall, every combination of the attributes defines what we refer to as a group.
-There is no definitive standard yet, but for this repository, we shall use the variable name `A` for a matrix of these attributes. This choice provides a few advantages:
+There is no definitive standard yet, but for this repository, we shall use the variable name `group_data` for a matrix of these attributes. This choice provides a few advantages:
 
 - The term ‘protected attribute’ has a specific meaning in legal contexts which does not always match the data science usage of the term
-- Brevity
-- It follows the convention set by `X` and `y` to provide single letter variables.
 - It may signify the presence of multiple sensitive attributes (as a matrix of values), as opposed to other choices such as `sensitive_attribute`.
-- It does not falsely imply ordering between `X`, `y`, and `A`, as opposed to, for example, `Z`.
+- It does not falsely imply ordering between `X`, `y`, and `group_data`, as opposed to, for example, `Z`.
 - It does not falsely imply that it is always part of the training features, as opposed to variable names that subscript `X`.
 
 ### Parity/Disparity vs. Fairness/Unfairness vs. Bias
