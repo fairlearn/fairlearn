@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-from fairlearn.reductions import ExponentiatedGradient
-import fairlearn.reductions.moments as moments
-
+from fairlearn.reductions import ExponentiatedGradient, moments
+from fairlearn.reductions.moments import DemographicParity
+from test.simple_learners import LeastSquaresBinaryClassifierLearner
 from test import simple_learners
 from .test_utilities import group_data, X1, X2, X3, labels
 
@@ -100,3 +100,10 @@ class TestExpgradSmoke:
     @pytest.mark.parametrize("testdata", smoke_test_data)
     def test_smoke(self, testdata):
         self.run_smoke_test(testdata)
+    
+    def test_simple_fit_predict(self):
+        estimator = LeastSquaresBinaryClassifierLearner()
+        constraints = DemographicParity()
+        expgrad = ExponentiatedGradient(estimator, constraints)
+        expgrad.fit(pd.DataFrame(X1), pd.Series(labels), group_data=pd.Series(group_data))
+        expgrad.predict(pd.DataFrame(X1))
