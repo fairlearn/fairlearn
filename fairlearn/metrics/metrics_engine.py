@@ -83,6 +83,9 @@ def make_group_metric(metric_function):
                                group_data,
                                sample_weight)
 
+    # Improve the name of the returned function
+    wrapper.__name__ = "group_{0}".format(metric_function.__name__)
+    
     return wrapper
 
 
