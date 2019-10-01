@@ -3,4 +3,4 @@
 
 
 from .post_processing import PostProcessing  # noqa: F401
-from .threshold_optimization import ThresholdOptimizer  # noqa: F401
+from .threshold_optimizer import ThresholdOptimizer  # noqa: F401

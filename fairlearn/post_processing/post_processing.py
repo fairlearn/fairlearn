@@ -1,26 +1,26 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'fairness_unaware_model' and " \
-                                            "'fairness_unaware_estimator' need to be passed."
-EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'fairness_unaware_model' and " \
-                                          "'fairness_unaware_estimator' can be passed."
+MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'unconstrained_model' and " \
+                                            "'unconstrained_estimator' need to be passed."
+EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'unconstrained_model' and " \
+                                          "'unconstrained_estimator' can be passed."
 MISSING_FIT_PREDICT_ERROR_MESSAGE = "The model does not have callable 'fit' or 'predict' methods."
 MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' method."
 
 
 class PostProcessing:
-    def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
+    def __init__(self, *, unconstrained_model=None, unconstrained_estimator=None,
                  disparity_metric=None):
-        if fairness_unaware_model and fairness_unaware_estimator:
+        if unconstrained_model and unconstrained_estimator:
             raise ValueError(EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE)
-        elif fairness_unaware_model:
-            self._fairness_unaware_model = fairness_unaware_model
-            self._fairness_unaware_estimator = None
+        elif unconstrained_model:
+            self._unconstrained_model = unconstrained_model
+            self._unconstrained_estimator = None
             self._validate_model()
-        elif fairness_unaware_estimator:
-            self._fairness_unaware_model = None
-            self._fairness_unaware_estimator = fairness_unaware_estimator
+        elif unconstrained_estimator:
+            self._unconstrained_model = None
+            self._unconstrained_estimator = unconstrained_estimator
             self._validate_estimator()
         else:
             raise ValueError(MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
@@ -39,13 +39,13 @@ class PostProcessing:
         raise NotImplementedError(self.predict_proba.__name__ + " is not implemented")
 
     def _validate_model(self):
-        predict_function = getattr(self._fairness_unaware_model, "predict", None)
+        predict_function = getattr(self._unconstrained_model, "predict", None)
         if not predict_function or not callable(predict_function):
             raise ValueError(MISSING_PREDICT_ERROR_MESSAGE)
 
     def _validate_estimator(self):
-        fit_function = getattr(self._fairness_unaware_estimator, "fit", None)
-        predict_function = getattr(self._fairness_unaware_estimator, "predict", None)
+        fit_function = getattr(self._unconstrained_estimator, "fit", None)
+        predict_function = getattr(self._unconstrained_estimator, "predict", None)
         if not predict_function or not fit_function or not callable(predict_function) or \
                 not callable(fit_function):
             raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)

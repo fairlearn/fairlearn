@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from fairlearn.post_processing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
-from fairlearn.post_processing.threshold_optimization import \
+from fairlearn.post_processing.threshold_optimizer import \
     (ThresholdOptimizer,
      _vectorized_prediction,
      _threshold_optimization_demographic_parity,
@@ -38,7 +38,7 @@ ALLOWED_INPUT_DATA_TYPES = [lambda x: x, np.array, pd.DataFrame, pd.Series]
 def test_predict_before_fit_error(X_transform, A_transform, predict_method_name, metric):
     X = X_transform(_format_as_list_of_lists(example_attributes1))
     A = A_transform(example_attributes1)
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=metric)
 
     with pytest.raises(ValueError, match=PREDICT_BEFORE_FIT_ERROR_MESSAGE):
@@ -48,8 +48,8 @@ def test_predict_before_fit_error(X_transform, A_transform, predict_method_name,
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_both_model_and_estimator_error(metric):
     with pytest.raises(ValueError, match=EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE):
-        ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
-                           fairness_unaware_estimator=ExampleEstimator(),
+        ThresholdOptimizer(unconstrained_model=ExampleModel(),
+                           unconstrained_estimator=ExampleEstimator(),
                            disparity_metric=metric)
 
 
@@ -61,7 +61,7 @@ def test_no_model_or_estimator_error(metric):
 
 def test_metric_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE):
-        ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+        ThresholdOptimizer(unconstrained_model=ExampleModel(),
                            disparity_metric="UnsupportedMetric")
 
 
@@ -69,14 +69,14 @@ def test_metric_not_supported():
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_not_estimator(not_estimator, metric):
     with pytest.raises(ValueError, match=MISSING_FIT_PREDICT_ERROR_MESSAGE):
-        ThresholdOptimizer(fairness_unaware_estimator=not_estimator,
+        ThresholdOptimizer(unconstrained_estimator=not_estimator,
                            disparity_metric=metric)
 
 
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_not_model(metric):
     with pytest.raises(ValueError, match=MISSING_PREDICT_ERROR_MESSAGE):
-        ThresholdOptimizer(fairness_unaware_model=ExampleNotModel(),
+        ThresholdOptimizer(unconstrained_model=ExampleNotModel(),
                            disparity_metric=metric)
 
 
@@ -85,7 +85,7 @@ def test_not_model(metric):
 @pytest.mark.parametrize("A", [None, example_attributes1])
 @pytest.mark.parametrize("metric", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_inconsistent_input_data_types(X, y, A, metric):
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=metric)
 
     error_message = INPUT_DATA_FORMAT_ERROR_MESSAGE.format(type(X).__name__,
@@ -111,7 +111,7 @@ def test_threshold_optimization_non_binary_labels(X_transform, y_transform, A_tr
     y = y_transform(non_binary_labels)
     A = A_transform(example_attributes1)
 
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=metric)
 
     with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
@@ -133,7 +133,7 @@ def test_threshold_optimization_different_input_lengths(X_transform, y_transform
             y = y_transform(example_labels[:n - permutation[1]])
             A = A_transform(example_attributes1)
 
-            adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+            adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                                 disparity_metric=metric)
             adjusted_model.fit(X, y, A)
 
@@ -144,7 +144,7 @@ def test_threshold_optimization_different_input_lengths(X_transform, y_transform
         y = y_transform(example_labels[:n - permutation[1]])
         A = A_transform(example_attributes1)
 
-        adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+        adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                             disparity_metric=metric)
         with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
             adjusted_model.fit(X, y, A)
@@ -300,7 +300,7 @@ def test_threshold_optimization_demographic_parity_e2e(attributes, attribute_nam
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=DEMOGRAPHIC_PARITY)
     adjusted_model.fit(X, y, A)
 
@@ -330,7 +330,7 @@ def test_threshold_optimization_equalized_odds_e2e(
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=EQUALIZED_ODDS)
     adjusted_model.fit(X, y, A)
 
@@ -368,7 +368,7 @@ def test_predict_output_0_or_1(attributes, attribute_names, X_transform, y_trans
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=metric)
     adjusted_model.fit(X, y, A)
 
@@ -388,7 +388,7 @@ def test_predict_multiple_attributes_columns_error(attributes, attribute_names, 
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = pd.DataFrame({"A1": attributes, "A2": attributes})
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=metric)
     adjusted_model.fit(X, y, attributes)
 
@@ -409,7 +409,7 @@ def test_predict_different_argument_lengths(attributes, attribute_names, X_trans
     X = X_transform(_format_as_list_of_lists(attributes))
     y = y_transform(example_labels)
     A = A_transform(attributes)
-    adjusted_model = ThresholdOptimizer(fairness_unaware_model=ExampleModel(),
+    adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
                                         disparity_metric=metric)
     adjusted_model.fit(X, y, A)
 
