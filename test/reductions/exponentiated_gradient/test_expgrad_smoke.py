@@ -100,7 +100,7 @@ class TestExpgradSmoke:
     @pytest.mark.parametrize("testdata", smoke_test_data)
     def test_smoke(self, testdata):
         self.run_smoke_test(testdata)
-    
+
     def test_simple_fit_predict(self):
         estimator = LeastSquaresBinaryClassifierLearner()
         constraints = DemographicParity()
