@@ -73,15 +73,19 @@ class ExponentiatedGradient(ReductionsEstimator):
         # TODO: figure out whether we should keep the remaining data of the result object
 
     def predict(self, X):
-        return self._best_classifier(X)
+        positive_probs = self._best_classifier(X)
+        return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def predict_proba(self, X):
-        raise NotImplementedError()
+        positive_probs = self._best_classifier(X)
+        return np.concatenate((1-positive_probs, positive_probs), axis=1)
 
     def posterior_predict(self, X):
+        # TODO provide implementation
         raise NotImplementedError()
 
     def posterior_predict_proba(self, X):
+        # TODO provide implementation
         raise NotImplementedError()
 
 
