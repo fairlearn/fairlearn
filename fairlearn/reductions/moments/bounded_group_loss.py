@@ -26,7 +26,7 @@ class LossMoment(Moment):
         self.prob_attr = self.tags.groupby("protected_attribute").size() / self.n
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr
-        
+
         # fill in the information about the basis
         attr_vals = self.tags["protected_attribute"].unique()
         self.pos_basis = pd.DataFrame()

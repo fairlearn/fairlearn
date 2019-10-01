@@ -6,6 +6,7 @@ import pandas as pd
 _REDUCTION_TYPE_CLASSIFICATION = "classification"
 _REDUCTION_TYPE_LOSS_MINIMIZATION = "loss_minimization"
 
+
 class Moment:
     """Generic moment"""
 
