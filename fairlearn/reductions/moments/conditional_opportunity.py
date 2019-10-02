@@ -3,10 +3,19 @@
 
 import pandas as pd
 from .moment import Moment
+from .moment import _REDUCTION_TYPE_CLASSIFICATION
+from .misclassification_error import MisclassificationError
 
 
 class ConditionalOpportunity(Moment):
     """Generic fairness metric including DemographicParity and EqualizedOdds"""
+
+    def __init__(self):
+        super().__init__()
+        self.reduction_type = _REDUCTION_TYPE_CLASSIFICATION
+
+    def default_objective(self):
+        return MisclassificationError()
 
     def init(self, dataX, dataA, dataY, dataGrp):
         super().init(dataX, dataA, dataY)
@@ -18,6 +27,24 @@ class ConditionalOpportunity(Moment):
                            keys=["+", "-"],
                            names=["sign", "grp", "protected_attribute"])
         self.index = signed.index
+        self.default_objective_lambda_vec = None
+
+        # fill in the information about the basis
+        grp_vals = self.tags["grp"].unique()
+        attr_vals = self.tags["protected_attribute"].unique()
+        self.pos_basis = pd.DataFrame()
+        self.neg_basis = pd.DataFrame()
+        self.neg_basis_present = pd.Series()
+        zero_vec = pd.Series(0.0, self.index)
+        i = 0
+        for grp in grp_vals:
+            for attr in attr_vals[:-1]:
+                self.pos_basis[i] = 0 + zero_vec
+                self.neg_basis[i] = 0 + zero_vec
+                self.pos_basis[i]["+", grp, attr] = 1
+                self.neg_basis[i]["-", grp, attr] = 1
+                self.neg_basis_present.at[i] = True
+                i += 1
 
     def gamma(self, predictor):
         """ Calculates the degree to which constraints are currently violated by
@@ -36,6 +63,7 @@ class ConditionalOpportunity(Moment):
         self._gamma_descr = str(expect_attr_grp[["pred", "diff"]])
         return g_signed
 
+    # TODO: this needs to be removed after merging expgrad changes
     def lambda_signed(self, lambda_vec):
         return lambda_vec["+"] - lambda_vec["-"]
 
