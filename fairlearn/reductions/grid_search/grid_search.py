@@ -11,6 +11,8 @@ from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, _REDUCTION_TYPE_CLASSIFICATION
 
 class _GridGenerator:
+    """A generator of a grid of points with a bounded L1 norm.
+    """
 
     def __init__(self, limit, n_units, dim, neg_allowed, force_L1_norm):
         # static variables for integer grid accumulation

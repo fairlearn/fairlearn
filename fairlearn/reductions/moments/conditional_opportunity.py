@@ -3,7 +3,7 @@
 
 import pandas as pd
 from .moment import Moment
-from .moment import _REDUCTION_TYPE_CLASSIFICATION
+from .moment import _REDUCTION_TYPE_CLASSIFICATION, _GROUP_ID, _LABEL
 from .misclassification_error import MisclassificationError
 
 
@@ -22,16 +22,16 @@ class ConditionalOpportunity(Moment):
         self.tags["grp"] = dataGrp
         self.prob_grp = self.tags.groupby("grp").size() / self.n
         self.prob_attr_grp = self.tags.groupby(
-            ["grp", "protected_attribute"]).size() / self.n
+            ["grp", _GROUP_ID]).size() / self.n
         signed = pd.concat([self.prob_attr_grp, self.prob_attr_grp],
                            keys=["+", "-"],
-                           names=["sign", "grp", "protected_attribute"])
+                           names=["sign", "grp", _GROUP_ID])
         self.index = signed.index
         self.default_objective_lambda_vec = None
 
         # fill in the information about the basis
         grp_vals = self.tags["grp"].unique()
-        attr_vals = self.tags["protected_attribute"].unique()
+        attr_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series()
@@ -54,12 +54,12 @@ class ConditionalOpportunity(Moment):
         self.tags["pred"] = pred
         expect_grp = self.tags.groupby("grp").mean()
         expect_attr_grp = self.tags.groupby(
-            ["grp", "protected_attribute"]).mean()
+            ["grp", _GROUP_ID]).mean()
         expect_attr_grp["diff"] = expect_attr_grp["pred"] - expect_grp["pred"]
         g_unsigned = expect_attr_grp["diff"]
         g_signed = pd.concat([g_unsigned, -g_unsigned],
                              keys=["+", "-"],
-                             names=["sign", "grp", "protected_attribute"])
+                             names=["sign", "grp", _GROUP_ID])
         self._gamma_descr = str(expect_attr_grp[["pred", "diff"]])
         return g_signed
 
@@ -72,7 +72,7 @@ class ConditionalOpportunity(Moment):
         adjust = lambda_signed.sum(level="grp") / self.prob_grp \
             - lambda_signed / self.prob_attr_grp
         signed_weights = self.tags.apply(
-            lambda row: adjust[row["grp"], row["protected_attribute"]], axis=1
+            lambda row: adjust[row["grp"], row[_GROUP_ID]], axis=1
         )
         return signed_weights
 
@@ -98,4 +98,4 @@ class EqualizedOdds(ConditionalOpportunity):
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
-                     pd.Series(dataY).apply(lambda y: "label=" + str(y)))
+                     pd.Series(dataY).apply(lambda y: _LABEL + "=" + str(y)))
