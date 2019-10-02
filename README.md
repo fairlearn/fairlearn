@@ -11,7 +11,7 @@ A Python package that implements a variety of fairness-related algorithms to mit
 | `fairlearn.` `reductions.` `GridSearch` | Grid Search for regression | regression | binary | BGL |
 | `fairlearn.` `post_processing.` `ROCCurveBasedPostProcessing` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
 
-DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to [the Terminology page](Terminology.md).
+DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to [the Terminology page](TERMINOLOGY.md).
 
 To request additional algorithms or fairness definitions, please open a new issue.
 
