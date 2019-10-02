@@ -24,24 +24,24 @@ Any algorithm-specific parameters are passed to the constructor. Reductions requ
 
 ```python
 reduction = Reduction(estimator, constraints=constraints, **kwargs)
-post_processor = PostProcessing(fairness_unaware_model=model, disparity_criterion=disparity_criterion, **kwargs)
-post_processor = PostProcessing(fairness_unaware_estimator=estimator, disparity_criterion=disparity_criterion, **kwargs)
+post_processor = PostProcessing(unconstrained_model=model, disparity_criterion=disparity_criterion, **kwargs)
+post_processor = PostProcessing(unconstrained_estimator=estimator, disparity_criterion=disparity_criterion, **kwargs)
 ```
 
 Reduction-based fairness mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
 
 ```python
-reduction.fit(X, Y, aux_data)
+reduction.fit(X, Y, group_data)
 reduction.predict(X)
 reduction.predict_proba(X)
 ```
 
-where `aux_data` contains auxiliary data. As of now, grouping data can only be provided through `aux_data`. In the future we plan to allow specifying specific columns of `X` as grouping data, in which case `aux_data` would be optional.
+where `group_data` contains data on which group a sample belongs to. As of now, grouping data can only be provided through `group_data`. In the future we plan to allow specifying specific columns of `X` as grouping data, in which case `group_data` would be optional.
 
-Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `aux_data` as a required argument for `predict` and `predict_proba`. In the future we will make `aux_data` optional if the grouping data is already provided through `X`.
+Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `group_data` as a required argument for `predict` and `predict_proba`. In the future we will make `group_data` optional if the grouping data is already provided through `X`.
 
 ```python
-post_processor.fit(X, Y, aux_data)
-post_processor.predict(X, aux_data)
-post_processor.predict_proba(X, aux_data)
+post_processor.fit(X, Y, group_data)
+post_processor.predict(X, group_data)
+post_processor.predict_proba(X, group_data)
 ```
