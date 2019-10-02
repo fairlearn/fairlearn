@@ -331,7 +331,7 @@ def test_threshold_optimization_equalized_odds_e2e(
     y = y_transform(example_labels)
     A = A_transform(attributes)
     adjusted_model = ThresholdOptimizer(unconstrained_model=ExampleModel(),
-                                        parity_criteriaEQUALIZED_ODDS)
+                                        parity_criteria=EQUALIZED_ODDS)
     adjusted_model.fit(X, y, A)
 
     predictions = adjusted_model.predict_proba(X, A)
