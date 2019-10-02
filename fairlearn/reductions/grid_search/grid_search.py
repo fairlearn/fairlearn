@@ -10,6 +10,7 @@ from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, _REDUCTION_TYPE_CLASSIFICATION
 
+
 class _GridGenerator:
     """A generator of a grid of points with a bounded L1 norm.
     """
@@ -33,7 +34,10 @@ class _GridGenerator:
             self.accumulator.append(self.entry.copy())
         else:
             if (index == self.dim-1) and (self.force_L1_norm):
-                values = [-max_val, max_val] if (self.neg_allowed[index] and max_val>0) else [max_val]
+                if self.neg_allowed[index] and max_val > 0:
+                    values = [-max_val, max_val]
+                else:
+                    values = [max_val]
             else:
                 min_val = -max_val if self.neg_allowed[index] else 0
                 values = range(min_val, max_val+1)
@@ -113,29 +117,33 @@ class GridSearch(ReductionsEstimator):
             self.disparity_metric.init(X, A, y_vector)
             objective = self.disparity_metric.default_objective()
             objective.init(X, A, y_vector)
-            is_classification_reduction = (self.disparity_metric.reduction_type == _REDUCTION_TYPE_CLASSIFICATION)
+            is_classification_reduction = (self.disparity_metric.reduction_type == _REDUCTION_TYPE_CLASSIFICATION)  # noqa: E501
 
             # Basis information
             pos_basis = self.disparity_metric.pos_basis
             neg_basis = self.disparity_metric.neg_basis
             neg_allowed = self.disparity_metric.neg_basis_present
-            objective_in_the_span = (self.disparity_metric.default_objective_lambda_vec is not None)
+            objective_in_the_span = (self.disparity_metric.default_objective_lambda_vec is not None)   # noqa: E501
             dim = len(pos_basis.columns)
 
-            # Grid parameters: these should be provided as arguments, but explicitly here for the time being
+            # Grid parameters: these should be provided as arguments, but
+            # explicitly here for the time being
             grid_limit = 2.0
             grid_size = number_of_lagrange_multipliers-1
 
             # Generate the grid
-            grid = _GridGenerator(grid_limit, grid_size, dim, neg_allowed, objective_in_the_span).grid
+            grid = _GridGenerator(grid_limit,
+                                  grid_size, dim,
+                                  neg_allowed,
+                                  objective_in_the_span).grid
 
             # Fit the estimates
             self.all_results = []
             for i in grid:
                 beta_pos = grid[i].copy()
                 beta_neg = -grid[i].copy()
-                beta_pos[beta_pos<0] = 0.0
-                beta_neg[beta_neg<0] = 0.0
+                beta_pos[beta_pos < 0] = 0.0
+                beta_neg[beta_neg < 0] = 0.0
                 lambda_vec = pos_basis.dot(beta_pos) + neg_basis.dot(beta_neg)
                 weights = self.disparity_metric.signed_weights(lambda_vec)
                 if not objective_in_the_span:
@@ -158,7 +166,7 @@ class GridSearch(ReductionsEstimator):
             # Designate a 'best' model
             self.best_result = max(self.all_results, key=lambda x: x.quality_metric_value)
             return
-            
+
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
         # object we have a binary classification problem whereas
