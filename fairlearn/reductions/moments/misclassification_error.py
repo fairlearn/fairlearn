@@ -3,6 +3,7 @@
 
 import pandas as pd
 from .moment import Moment
+from .moment import _ALL, _LABEL
 
 
 class MisclassificationError(Moment):
@@ -11,11 +12,11 @@ class MisclassificationError(Moment):
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataY, dataY)
-        self.index = ["all"]
+        self.index = [_ALL]
 
     def gamma(self, predictor):
         pred = predictor(self.X)
-        error = pd.Series(data=(self.tags["label"] - pred).abs().mean(),
+        error = pd.Series(data=(self.tags[_LABEL] - pred).abs().mean(),
                           index=self.index)
         self._gamma_descr = str(error)
         return error
@@ -25,6 +26,6 @@ class MisclassificationError(Moment):
 
     def signed_weights(self, lambda_vec=None):
         if lambda_vec is None:
-            return 2 * self.tags["label"] - 1
+            return 2 * self.tags[_LABEL] - 1
         else:
-            return lambda_vec["all"] * (2 * self.tags["label"] - 1)
+            return lambda_vec[_ALL] * (2 * self.tags[_LABEL] - 1)

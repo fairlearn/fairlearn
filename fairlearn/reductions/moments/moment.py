@@ -8,6 +8,9 @@ _REDUCTION_TYPE_LOSS_MINIMIZATION = "loss_minimization"
 
 _GROUP_ID = "group_id"
 _LABEL = "label"
+_LOSS = "loss"
+_PREDICTION = "pred"
+_ALL = "all"
 
 
 class Moment:

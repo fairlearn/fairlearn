@@ -4,7 +4,7 @@
 import pandas as pd
 import numpy as np
 from .moment import Moment
-from .moment import _REDUCTION_TYPE_LOSS_MINIMIZATION, _GROUP_ID
+from .moment import _REDUCTION_TYPE_LOSS_MINIMIZATION, _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
 
 
 class LossMoment(Moment):
@@ -21,7 +21,7 @@ class LossMoment(Moment):
 
     def init(self, dataX, dataA, dataY):
         if self.no_groups:
-            dataA = pd.Series(dataY).apply(lambda y: "all")
+            dataA = pd.Series(dataY).apply(lambda y: _ALL)
         super().init(dataX, dataA, dataY)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.n
         self.index = self.prob_attr.index
@@ -45,11 +45,11 @@ class LossMoment(Moment):
         """ Calculates the degree to which constraints are currently violated by
         the predictor.
         """
-        self.tags["pred"] = predictor(self.X)
-        self.tags["loss"] = self.reduction_loss.eval(self.tags["label"], self.tags["pred"])
+        self.tags[_PREDICTION] = predictor(self.X)
+        self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
-        self._gamma_descr = str(expect_attr[["loss"]])
-        return expect_attr["loss"]
+        self._gamma_descr = str(expect_attr[[_LOSS]])
+        return expect_attr[_LOSS]
 
     def project_lambda(self, lambda_vec):
         return lambda_vec

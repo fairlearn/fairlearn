@@ -3,7 +3,7 @@
 
 import pandas as pd
 from .moment import Moment
-from .moment import _REDUCTION_TYPE_CLASSIFICATION, _GROUP_ID, _LABEL
+from .moment import _REDUCTION_TYPE_CLASSIFICATION, _GROUP_ID, _LABEL, _PREDICTION, _ALL
 from .misclassification_error import MisclassificationError
 
 
@@ -51,16 +51,16 @@ class ConditionalOpportunity(Moment):
         the predictor.
         """
         pred = predictor(self.X)
-        self.tags["pred"] = pred
+        self.tags[_PREDICTION] = pred
         expect_grp = self.tags.groupby("grp").mean()
         expect_attr_grp = self.tags.groupby(
             ["grp", _GROUP_ID]).mean()
-        expect_attr_grp["diff"] = expect_attr_grp["pred"] - expect_grp["pred"]
+        expect_attr_grp["diff"] = expect_attr_grp[_PREDICTION] - expect_grp[_PREDICTION]
         g_unsigned = expect_attr_grp["diff"]
         g_signed = pd.concat([g_unsigned, -g_unsigned],
                              keys=["+", "-"],
                              names=["sign", "grp", _GROUP_ID])
-        self._gamma_descr = str(expect_attr_grp[["pred", "diff"]])
+        self._gamma_descr = str(expect_attr_grp[[_PREDICTION, "diff"]])
         return g_signed
 
     # TODO: this needs to be removed after merging expgrad changes
@@ -86,7 +86,7 @@ class DemographicParity(ConditionalOpportunity):
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
-                     pd.Series(dataY).apply(lambda y: "all"))
+                     pd.Series(dataY).apply(lambda y: _ALL))
 
 
 class EqualizedOdds(ConditionalOpportunity):
