@@ -21,7 +21,7 @@ class LossMoment(Moment):
 
     def init(self, dataX, dataA, dataY):
         if self.no_groups:
-            dataA = dataY.apply(lambda y: "all")
+            dataA = pd.Series(dataY).apply(lambda y: "all")
         super().init(dataX, dataA, dataY)
         self.prob_attr = self.tags.groupby("protected_attribute").size() / self.n
         self.index = self.prob_attr.index

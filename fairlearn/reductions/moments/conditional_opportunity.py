@@ -86,7 +86,7 @@ class DemographicParity(ConditionalOpportunity):
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
-                     dataY.apply(lambda y: "all"))
+                     pd.Series(dataY).apply(lambda y: "all"))
 
 
 class EqualizedOdds(ConditionalOpportunity):
@@ -98,4 +98,4 @@ class EqualizedOdds(ConditionalOpportunity):
 
     def init(self, dataX, dataA, dataY):
         super().init(dataX, dataA, dataY,
-                     dataY.apply(lambda y: "label=" + str(y)))
+                     pd.Series(dataY).apply(lambda y: "label=" + str(y)))
