@@ -133,7 +133,8 @@ class GridSearch(ReductionsEstimator):
 
             # Generate the grid
             grid = _GridGenerator(grid_limit,
-                                  grid_size, dim,
+                                  grid_size,
+                                  dim,
                                   neg_allowed,
                                   objective_in_the_span).grid
 
