@@ -4,11 +4,11 @@
 Fairlearn largely follows the [terminology established by scikit-learn](https://scikit-learn.org/stable/developers/contributing.html#different-objects), specifically:
 - Estimator: implements a `fit` method
 - Predictor: implements a `predict` method
-However, contrary to [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator) we do not require determinism. Lots of unfairness mitigation techniques require randomized output to meet their objective in expectation. We do provide unrandomized versions of every method as well, but they may not be able to uphold the same theoretical guarantees.
+Unlike [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator) our estimators in fairlearn may not be deterministic. Lots of disparity mitigation techniques require randomized output to meet their objective in expectation. We do provide unrandomized versions of every method as well, but they may not be able to uphold the same theoretical guarantees.
 
 ## Randomized Predictors
 
-Rather than providing deterministic output many predictors produced by unfairness mitigation techniques in the fairness literature are randomized. As a consequence, it is possible to get different output from the predictor's `predict` method when providing samples with identical features. `predict_proba` provides insights on the probabilities themselves. If randomized predictions are not allowed or undesirable, it is possible to always use the most likely prediction from `predict_proba`. Please be aware that this can affect the fairness of the resulting predictions.
+Rather than providing deterministic output many predictors produced by disparity mitigation techniques in the fairness literature are randomized. As a consequence, it is possible to get different output from the predictor's `predict` method when providing samples with identical features. `predict_proba` provides insights on the probabilities themselves. If randomized predictions are not allowed or undesirable, it is possible to always use the most likely prediction from `predict_proba`. Please be aware that this can affect the fairness of the resulting predictions.
 
 ## Group Fairness
 
@@ -32,7 +32,7 @@ There are a number of terms in the literature used to describe concepts related 
 
 ### Parity Criteria/Constraints and Disparity Metrics
 
-When trying to mitigate unfairness we usually have a parity criterion in mind. For certain methods (that we refer to as reductions) these are expressed as constraints, and we optimize the objective subject to these constraints. Below are some examples of parity criteria we use in this repository:
+When trying to mitigate disparity we usually have a parity criterion in mind. For certain methods (that we refer to as reductions) these are expressed as constraints, and we optimize the objective subject to these constraints. Below are some examples of parity criteria we use in this repository:
 
 - Classification:
     - Demographic Parity (DP): A classifier h satisfies demographic parity under a distribution over (X, A, Y) if its prediction h(X) is statistically independent of the group attribute A — that is, if P[h(X) = y’ | A = a] = P[h(X) = y’] for all a, y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
