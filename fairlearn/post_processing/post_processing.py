@@ -11,7 +11,7 @@ MISSING_PREDICT_ERROR_MESSAGE = "The model does not have a callable 'predict' me
 
 class PostProcessing:
     def __init__(self, *, unconstrained_model=None, unconstrained_estimator=None,
-                 disparity_metric=None):
+                 parity_criteria=None):
         if unconstrained_model and unconstrained_estimator:
             raise ValueError(EITHER_MODEL_OR_ESTIMATOR_ERROR_MESSAGE)
         elif unconstrained_model:

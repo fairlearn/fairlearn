@@ -26,8 +26,8 @@ NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
                                   "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
                                   "Your provided data was of types ({}, {}, {})"
-NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE = "Currently only {} and {} are supported " \
-    "disparity metrics.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
+NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE = "Currently only {} and {} are supported " \
+    "parity criteria.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
     "column in {}."
@@ -37,14 +37,14 @@ SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains 
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
 
-_SUPPORTED_DISPARITY_METRICS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
+_SUPPORTED_PARITY_CRITERIA = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 
 logger = logging.getLogger(__name__)
 
 
 class ThresholdOptimizer(PostProcessing):
     def __init__(self, *, unconstrained_model=None, unconstrained_estimator=None,
-                 disparity_metric=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
+                 parity_criteria=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
                  seed=None):
         """ Creates the post processing object.
 
@@ -65,11 +65,11 @@ class ThresholdOptimizer(PostProcessing):
         super(ThresholdOptimizer, self).__init__(
             unconstrained_model=unconstrained_model,
             unconstrained_estimator=unconstrained_estimator,
-            disparity_metric=disparity_metric)
+            parity_criteria=parity_criteria)
 
-        self._disparity_metric = disparity_metric
-        if self._disparity_metric not in _SUPPORTED_DISPARITY_METRICS:
-            raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
+        self._parity_criteria = parity_criteria
+        if self._parity_criteria not in _SUPPORTED_PARITY_CRITERIA:
+            raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
 
         self._gridsize = gridsize
         self._flip = flip
@@ -90,14 +90,14 @@ class ThresholdOptimizer(PostProcessing):
 
         scores = self._unconstrained_model.predict(X)
         threshold_optimization_method = None
-        if self._disparity_metric == DEMOGRAPHIC_PARITY:
+        if self._parity_criteria == DEMOGRAPHIC_PARITY:
             threshold_optimization_method = \
                 _threshold_optimization_demographic_parity
-        elif self._disparity_metric == EQUALIZED_ODDS:
+        elif self._parity_criteria == EQUALIZED_ODDS:
             threshold_optimization_method = \
                 _threshold_optimization_equalized_odds
         else:
-            raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
+            raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
 
         self._post_processed_model_by_attribute = threshold_optimization_method(
             aux_data, y, scores, self._gridsize, self._flip, self._plot)
