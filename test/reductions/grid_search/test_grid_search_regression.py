@@ -4,6 +4,7 @@
 from fairlearn.metrics import BoundedGroupLoss
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleRegressionQualityMetric
+import fairlearn.reductions.moments as moments
 
 import copy
 import numpy as np
@@ -142,6 +143,42 @@ def test_bgl_lagrange_specifications():
 
     # Check the models are the same
     for i in range(len(tradeoffs)):
+        coef1 = target1.all_results[i].model.coef_
+        coef2 = target2.all_results[i].model.coef_
+        assert np.array_equal(coef1, coef2)
+
+
+def test_compare_custom_vs_moments():
+    a0_count = 13
+    a1_count = 37
+
+    a0_label = 2
+    a1_label = 3
+
+    a0_factor = 1
+    a1_factor = 16
+
+    X, y, A = _simple_regression_data(a0_count, a1_count,
+                                      a0_factor, a1_factor,
+                                      a0_label, a1_label)
+
+    estimator = LinearRegression()
+
+    target1 = GridSearch(copy.deepcopy(estimator),
+                         disparity_metric=BoundedGroupLoss(),
+                         quality_metric=SimpleRegressionQualityMetric())
+    target2 = GridSearch(copy.deepcopy(estimator),
+                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         quality_metric=SimpleRegressionQualityMetric())
+
+    target2.fit(X, y, aux_data=A, number_of_lagrange_multipliers=11)
+    lm = [r.lagrange_multiplier.iat[0] for r in target2.all_results]
+    target1.fit(X, y, aux_data=A, lagrange_multipliers=lm)
+
+    assert len(target1.all_results) == len(target2.all_results)
+
+    # Check the models are the same
+    for i in range(len(target1.all_results)):
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
         assert np.array_equal(coef1, coef2)

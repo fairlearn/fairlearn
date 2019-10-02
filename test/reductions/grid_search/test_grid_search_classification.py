@@ -196,4 +196,4 @@ def test_compare_custom_vs_moments():
     for i in range(len(lm)):
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
-        assert np.all_close(coef1, coef2)
+        assert np.aaray_equal(coef1, coef2)
