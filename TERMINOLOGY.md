@@ -8,7 +8,7 @@ Unlike [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#t
 
 ## Randomized Predictors
 
-Rather than providing deterministic output many predictors produced by disparity mitigation techniques in the fairness literature are randomized. As a consequence, it is possible to get different output from the predictor's `predict` method when providing samples with identical features. `predict_proba` provides insights on the probabilities themselves. If randomized predictions are not allowed or undesirable, it is possible to always use the most likely prediction from `predict_proba`. Please be aware that this can affect the fairness of the resulting predictions.
+Rather than providing deterministic output many predictors produced by disparity mitigation techniques in the fairness literature are randomized. As a consequence, it is possible to get different output from the predictor's `predict` method when providing samples with identical features.
 
 ## Group Fairness
 
