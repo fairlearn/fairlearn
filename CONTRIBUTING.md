@@ -23,7 +23,7 @@ For every pull request to `master` with automated tests you can check the logs o
 
 This section heavily relies on the definitions from our [terminology guide](TERMINOLOGY.md). Specifically, we use the terms "reduction", "group data", "moment", and "parity" in the following.
 
-For all unfairness mitigation methods algorithm-specific parameters are passed to the constructor. The methods to fit a mitigator and predict values with the resulting model shall resemble the APIs used by scikit-learn as much as possible for the sake of ease of use. Any deviations are noted below.
+For all disparity mitigation methods algorithm-specific parameters are passed to the constructor. The methods to fit a mitigator and predict values with the resulting model shall resemble the APIs used by scikit-learn as much as possible for the sake of ease of use. Any deviations are noted below.
 
 ### Reductions
 
@@ -34,7 +34,7 @@ constraints = Moment()
 reduction = Reduction(estimator, objective=objective, constraints=constraints, use_predict_proba=False, **kwargs)
 ```
 
-Reduction-based fairness mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
+Reduction-based disparity mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
 
 ```python
 reduction.fit(X, Y, group_data)
