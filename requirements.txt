@@ -4,6 +4,7 @@ numpy
 pandas
 scikit-learn
 scipy
+
 # Required for environment
 autopep8
 flake8
