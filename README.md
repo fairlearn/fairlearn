@@ -26,7 +26,7 @@ Onboarding guide
 </strong>
 </summary>
 
-As of version 0.2 fairlearn contained only the exponentiated gradient method. The same method is now located under `fairlearn.reductions.ExponentiatedGradient`. While in the past one could have run
+As of version 0.2 fairlearn contained only the exponentiated gradient method. The fairlearn repository now has a much more comprehensive approach to fairness and aims to incorporate other methods as specified above. The same exponentiated gradient technique is now located under `fairlearn.reductions.ExponentiatedGradient` as a class. While in the past one could have run
 
 ```python
 import numpy as np
@@ -51,6 +51,8 @@ exponentiated_gradient = ExponentiatedGradient(estimator, constraints=constraint
 exponentiated_gradient.fit(X, y, group_data)
 randomized_predictions = exponentiated_gradient.predict(X)
 ```
+
+Please reach out through the "Issues" if you encounter any problems.
 
 </details>
 
