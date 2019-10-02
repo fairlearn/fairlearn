@@ -33,7 +33,7 @@ To verify that it works run
 pip install -r requirements.txt
 python -m pytest -s ./test
 ```
-
+## Test
 ## Usage
 
 The function `expgrad` in the module `fairlearn.classred` implements the reduction of fair classification to weighted binary classification. Any learner that supports weighted binary classification can be provided as input for this reduction. Two common fairness definitions are provided in the module `fairlearn.moments`: demographic parity (class `DP`) and equalized odds (class `EO`). See the file `test_fairlearn.py` for example usage of `expgrad`.
