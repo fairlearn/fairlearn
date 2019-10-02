@@ -77,8 +77,8 @@ class ThresholdOptimizer(PostProcessing):
         random.seed(seed)
         self._post_processed_model_by_attribute = None
 
-    def fit(self, X, y, aux_data, **kwargs):
-        self._validate_input_data(X, aux_data, y)
+    def fit(self, X, y, group_data, **kwargs):
+        self._validate_input_data(X, group_data, y)
 
         if self._unconstrained_estimator:
             # train estimator on data first
@@ -100,7 +100,7 @@ class ThresholdOptimizer(PostProcessing):
             raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
 
         self._post_processed_model_by_attribute = threshold_optimization_method(
-            aux_data, y, scores, self._gridsize, self._flip, self._plot)
+            group_data, y, scores, self._gridsize, self._flip, self._plot)
 
     def predict(self, X, group_data):
         self._validate_post_processed_model_is_fitted()
@@ -124,27 +124,27 @@ class ThresholdOptimizer(PostProcessing):
         if not self._post_processed_model_by_attribute:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
-    def _validate_input_data(self, X, aux_data, y=None):
+    def _validate_input_data(self, X, group_data, y=None):
         allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
         if type(X) not in allowed_input_types or \
-                type(aux_data) not in allowed_input_types or \
+                type(group_data) not in allowed_input_types or \
                 (y is not None and type(y) not in allowed_input_types):
             raise TypeError(INPUT_DATA_FORMAT_ERROR_MESSAGE
                             .format(type(X).__name__,
                                     type(y).__name__,
-                                    type(aux_data).__name__))
+                                    type(group_data).__name__))
 
-        if len(X) == 0 or len(aux_data) == 0 or (y is not None and len(y) == 0):
+        if len(X) == 0 or len(group_data) == 0 or (y is not None and len(y) == 0):
             raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
         if y is None:
-            if len(X) != len(aux_data) or (y is not None and len(X) != len(y)):
+            if len(X) != len(group_data) or (y is not None and len(X) != len(y)):
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X and aux_data"))
+                                 .format("X and group_data"))
         else:
-            if len(X) != len(aux_data) or (y is not None and len(X) != len(y)):
+            if len(X) != len(group_data) or (y is not None and len(X) != len(y)):
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X, aux_data, and y"))
+                                 .format("X, group_data, and y"))
 
         if set(np.unique(y)) > set([0, 1]):
             raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
@@ -429,7 +429,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
                                               additional_data.shape[1] > 1):
             # TODO: extend to multiple columns for additional_group data
             raise ValueError(
-                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
+                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("group_data"))
         else:
             data_dict[key] = additional_data.reshape(-1)
     elif type(additional_data) == pd.DataFrame:
@@ -443,7 +443,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
                 raise ValueError(
-                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
+                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("group_data"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data

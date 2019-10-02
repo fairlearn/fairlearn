@@ -127,7 +127,7 @@ def test_threshold_optimization_different_input_lengths(X_transform, y_transform
     n = len(example_attributes1)
     for permutation in [(0, 1), (1, 0)]:
         with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                           .format("X, aux_data, and y")):
+                           .format("X, group_data, and y")):
             X = X_transform(_format_as_list_of_lists(
                 example_attributes1)[:n - permutation[0]])
             y = y_transform(example_labels[:n - permutation[1]])
@@ -414,11 +414,11 @@ def test_predict_different_argument_lengths(attributes, attribute_names, X_trans
     adjusted_model.fit(X, y, A)
 
     with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                       .format("X and aux_data")):
+                       .format("X and group_data")):
         adjusted_model.predict(X, A_transform(attributes[:-1]))
 
     with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                       .format("X and aux_data")):
+                       .format("X and group_data")):
         adjusted_model.predict(X_transform(
             _format_as_list_of_lists(attributes))[:-1], A)
 
