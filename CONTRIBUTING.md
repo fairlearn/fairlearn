@@ -27,9 +27,10 @@ For all unfairness mitigation methods algorithm-specific parameters are passed t
 
 ### Reductions
 
-Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. The constraints for reductions are all moments (see `fairlearn.reductions.moments`) passed as instances of classes inheriting from `Moment`. Moments are simply vector functions 
+Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. The constraints for reductions are all moments (see `fairlearn.reductions.moments`) passed as instances of classes inheriting from `Moment`. Moments are vector functions that we use to formalize our constraints. The moment objects need to be passed as constraints to the constructor of a reduction technique, which internally uses the constraints to solve the optimization problem.
 
 ```python
+constraints = Moment()
 reduction = Reduction(estimator, objective=objective, constraints=constraints, use_predict_proba=False, **kwargs)
 ```
 
