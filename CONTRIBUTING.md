@@ -20,12 +20,16 @@ For every pull request to `master` with automated tests you can check the logs o
 
 ## API
 
-Any algorithm-specific parameters are passed to the constructor. Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. Post-processing algorithms require an already trained predictor. For consistency we also provide the option to pass an estimator instead, and will call `fit` internally.
+This section heavily relies on the definitions from our [terminology guide](TERMINOLOGY.md). Specifically, we use the terms "reduction", "group data", "moment", and "parity" in the following.
+
+For all unfairness mitigation methods algorithm-specific parameters are passed to the constructor. The methods to fit a mitigator and predict values with the resulting model shall resemble the APIs used by scikit-learn as much as possible for the sake of ease of use. Any deviations are noted below.
+
+### Reductions
+
+Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. The constraints for reductions are all moments (see `fairlearn.reductions.moments`) passed as instances of classes inheriting from `Moment`. Moments are simply vector functions 
 
 ```python
-reduction = Reduction(estimator, constraints=constraints, **kwargs)
-post_processor = PostProcessing(unconstrained_model=model, disparity_criterion=disparity_criterion, **kwargs)
-post_processor = PostProcessing(unconstrained_estimator=estimator, disparity_criterion=disparity_criterion, **kwargs)
+reduction = Reduction(estimator, objective=objective, constraints=constraints, use_predict_proba=False, **kwargs)
 ```
 
 Reduction-based fairness mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
@@ -38,7 +42,16 @@ reduction.predict_proba(X)
 
 where `group_data` contains data on which group a sample belongs to. As of now, grouping data can only be provided through `group_data`. In the future we plan to allow specifying specific columns of `X` as grouping data, in which case `group_data` would be optional.
 
-Post-processing algorithms (such as the ones under `fairlearn.post_processing`) also provide the same functions albeit with `group_data` as a required argument for `predict` and `predict_proba`. In the future we will make `group_data` optional if the grouping data is already provided through `X`.
+### Post-processing methods
+
+Post-processing methods require an already trained predictor. For consistency we also provide the option to pass an estimator instead, and will call `fit` internally. For post-processing methods we provide the `parity_constraints` argument in the form of a string.
+
+```python
+post_processor = PostProcessing(unconstrained_model=model, parity_constraints=parity_constraints, **kwargs)
+post_processor = PostProcessing(unconstrained_estimator=estimator, parity_constraints=parity_constraints, **kwargs)
+```
+
+Post-processing methods (such as the ones under `fairlearn.post_processing`) also provide the same functions as the reductions above albeit with `group_data` as a required argument for `predict` and `predict_proba`. In the future we will make `group_data` optional if the grouping data is already provided through `X`.
 
 ```python
 post_processor.fit(X, Y, group_data)
