@@ -15,7 +15,46 @@ DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group 
 
 To request additional algorithms or fairness definitions, please open a new issue.
 
-## Installation
+# Existing users: How to onboard to fairlearn v0.3+
+
+<details>
+<summary>
+<strong>
+<em>
+Onboarding guide
+</em>
+</strong>
+</summary>
+
+As of version 0.2 fairlearn contained only the exponentiated gradient method. The same method is now located under `fairlearn.reductions.ExponentiatedGradient`. While in the past one could have run
+
+```python
+import numpy as np
+from fairlearn.classred import expgrad
+from fairlearn.moments import DP
+
+estimator = LogisticRegression()  # or any other estimator
+exponentiated_gradient_result = expgrad(X, group_data, y, estimator, constraints=DP())
+positive_probabilities = exponentiated_gradient_result.best_classifier(X)
+randomized_predictions = (positive_probabilities >= np.random.rand(len(positive_probabilities))) * 1
+```
+
+the equivalent operation is now
+
+```python
+from fairlearn.reductions import ExponentiatedGradient
+from fairlearn.reductions.moments import DemographicParity
+
+estimator = LogisticRegression()  # or any other estimator
+constraints = DemographicParity()
+exponentiated_gradient = ExponentiatedGradient(estimator, constraints=constraints)
+exponentiated_gradient.fit(X, y, group_data)
+randomized_predictions = exponentiated_gradient.predict(X)
+```
+
+</details>
+
+# Installation
 
 The package can be installed via
 
@@ -36,15 +75,15 @@ pip install -r requirements.txt
 python -m pytest -s ./test
 ```
 
-## Usage
+# Usage
 
-The function `expgrad` in the module `fairlearn.classred` implements the reduction of fair classification to weighted binary classification. Any learner that supports weighted binary classification can be provided as input for this reduction. Two common fairness definitions are provided in the module `fairlearn.moments`: demographic parity (class `DP`) and equalized odds (class `EO`). See the file `test_fairlearn.py` for example usage of `expgrad`.
+For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](CONTRIBUTING.md#api)
 
-## Contributing
+# Contributing
 
 To contribute please check our [Contributing Guide](CONTRIBUTING.md).
 
-## Maintainers
+# Maintainers
 
 fairlearn is maintained by:
 
@@ -52,7 +91,7 @@ fairlearn is maintained by:
 - **@romanlutz**
 - **@riedgar-ms**
 
-### Releasing
+## Releasing
 
 If you are the current maintainer of this project:
 
@@ -63,9 +102,9 @@ If you are the current maintainer of this project:
 1. Merge Microsoft/fairlearn pull request
 1. Tag and push: `git tag vxx.xx; git push --tags`
 
-## Issues
+# Issues
 
-### Regular (non-Security) Issues
+## Regular (non-Security) Issues
 Please submit a report through [Github issues](https://github.com/microsoft/fairlearn/issues). A maintainer will respond within 24 hours to handle the issue as follows:
 - bug: triage as `bug` and provide estimated timeline based on severity
 - feature request: triage as `feature request` and provide estimated timeline
@@ -74,6 +113,6 @@ Please submit a report through [Github issues](https://github.com/microsoft/fair
 Maintainers are supposed to link duplicate issues when possible.
 
 
-### Reporting Security Issues
+## Reporting Security Issues
 
 Please take a look at our guidelines for reporting [security issues](SECURITY.md).

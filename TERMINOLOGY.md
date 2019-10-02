@@ -6,6 +6,10 @@ Fairlearn largely follows the [terminology established by scikit-learn](https://
 - Predictor: implements a `predict` method
 However, contrary to [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator) we do not require determinism. Lots of unfairness mitigation techniques require randomized output to meet their objective in expectation. We do provide unrandomized versions of every method as well, but they may not be able to uphold the same theoretical guarantees.
 
+## Randomized Predictors
+
+Rather than providing deterministic output many predictors produced by unfairness mitigation techniques in the fairness literature are randomized. As a consequence, it is possible to get different output from the predictor's `predict` method when providing samples with identical features. `predict_proba` provides insights on the probabilities themselves. If randomized predictions are not allowed or undesirable, it is possible to always use the most likely prediction from `predict_proba`. Please be aware that this can affect the fairness of the resulting predictions.
+
 ## Group Fairness
 
 ### Protected or sensitive attribute, group, or data

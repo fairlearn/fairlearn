@@ -19,6 +19,7 @@ Pull requests against `master` trigger automated tests that are run through Azur
 For every pull request to `master` with automated tests you can check the logs of the tests to find the root cause of failures. Our tests currently run through Azure Pipelines with steps for setup, test suites, and teardown. The `Checks` view of a pull request contains a link to the [Azure Pipelines Page](dev.azure.com/responsibleai/fairlearn/_build/results). All the steps are represented in the Azure Pipelines page, and you can see logs by clicking on a specific step. If you encounter problems with this workflow please reach out through the `Issues`.
 
 ## API
+<div id="api">
 
 This section heavily relies on the definitions from our [terminology guide](TERMINOLOGY.md). Specifically, we use the terms "reduction", "group data", "moment", and "parity" in the following.
 
@@ -58,3 +59,4 @@ post_processor.fit(X, Y, group_data)
 post_processor.predict(X, group_data)
 post_processor.predict_proba(X, group_data)
 ```
+</div>
