@@ -13,6 +13,7 @@ from .metrics_engine import metric_by_group, make_group_metric  # noqa: F401
 
 # Classification metrics
 group_accuracy_score = make_group_metric(skm.accuracy_score)
+group_confusion_matrix = make_group_metric(skm.confusion_matrix)
 group_precision_score = make_group_metric(skm.precision_score)
 group_recall_score = make_group_metric(skm.recall_score)
 group_zero_one_loss = make_group_metric(skm.zero_one_loss)

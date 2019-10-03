@@ -49,6 +49,10 @@ def mock_func_weight(y_true, y_pred, sample_weight):
     return np.sum(np.multiply(y_true, sample_weight))
 
 
+def mock_func_matrix_return(y_true, y_pred):
+    return np.ones([len(y_true), sum(y_pred)])
+
+
 class TestMetricByGroup:
     @pytest.mark.parametrize("transform_gid", supported_conversions)
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
@@ -95,6 +99,30 @@ class TestMetricByGroup:
         assert result.argmax_groups == {c}
         assert result.range_over_groups == 2
         assert result.range_ratio_over_groups == pytest.approx(0.33333333333333)
+
+    @pytest.mark.parametrize("transform_gid", supported_conversions)
+    @pytest.mark.parametrize("transform_y_p", supported_conversions)
+    @pytest.mark.parametrize("transform_y_a", supported_conversions)
+    def test_matrix_metric(self, transform_y_a, transform_y_p, transform_gid):
+        a = "ABC"
+        b = "DEF"
+        c = "GHI"
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
+        gid = transform_gid([a, a, a, b, b, c, c, c])
+
+        result = metrics.metric_by_group(mock_func_matrix_return, y_a, y_p, gid)
+
+        assert np.array_equal(result.overall, np.ones([8, 5]))
+        assert np.array_equal(result.by_group[a], np.ones([3, 2]))
+        assert np.array_equal(result.by_group[b], np.ones([2, 2]))
+        assert np.array_equal(result.by_group[c], np.ones([3, 1]))
+        assert result.min_over_groups is None
+        assert result.argmin_groups is None
+        assert result.max_over_groups is None
+        assert result.argmax_groups is None
+        assert result.range_over_groups is None
+        assert result.range_ratio_over_groups is None
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
     @pytest.mark.parametrize("transform_gid", supported_conversions)

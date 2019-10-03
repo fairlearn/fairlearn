@@ -63,14 +63,20 @@ def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=N
         else:
             result.by_group[group] = metric_function(group_actual, group_predict)
 
-    result.min_over_groups = min(result.by_group.values())
-    result.max_over_groups = max(result.by_group.values())
+    try:
+        result.min_over_groups = min(result.by_group.values())
+        result.max_over_groups = max(result.by_group.values())
 
-    result.argmin_groups = set([k for k, v in result.by_group.items() if v == result.min_over_groups])  # noqa:E501
-    result.argmax_groups = set([k for k, v in result.by_group.items() if v == result.max_over_groups])  # noqa:E501
+        result.argmin_groups = set([k for k, v in result.by_group.items() if v == result.min_over_groups])  # noqa:E501
+        result.argmax_groups = set([k for k, v in result.by_group.items() if v == result.max_over_groups])  # noqa:E501
 
-    result.range_over_groups = result.max_over_groups - result.min_over_groups
-    result.range_ratio_over_groups = result.min_over_groups / result.max_over_groups
+        result.range_over_groups = result.max_over_groups - result.min_over_groups
+        result.range_ratio_over_groups = result.min_over_groups / result.max_over_groups
+    except ValueError:
+        # Nothing to do
+        # Failed to compute an extra result, most likely because operation (such as min)
+        # was not defined for the resturn type
+        pass
 
     return result
 
