@@ -71,11 +71,17 @@ def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=N
         result.argmax_groups = set([k for k, v in result.by_group.items() if v == result.max_over_groups])  # noqa:E501
 
         result.range_over_groups = result.max_over_groups - result.min_over_groups
-        result.range_ratio_over_groups = result.min_over_groups / result.max_over_groups
+        if result.min_over_groups < 0:
+            result.range_ratio_over_groups = np.nan
+        elif result.max_over_groups == 0:
+            # We have min=max=0
+            result.range_ratio_over_groups = 1
+        else:
+            result.range_ratio_over_groups = result.min_over_groups / result.max_over_groups
     except ValueError:
         # Nothing to do
         # Failed to compute an extra result, most likely because operation (such as min)
-        # was not defined for the resturn type
+        # was not defined for the return type (e.g. doing confusion matrices)
         pass
 
     return result

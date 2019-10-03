@@ -190,6 +190,44 @@ class TestMetricByGroup:
         expected = "Array sample_weight is not the same size as y_true"
         assert exception_context.value.args[0] == expected
 
+    def test_negative_results(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 0, 1, 1, 1]
+
+        def negative_results(y_true, y_pred):
+            return -(len(y_true) + len(y_pred))
+
+        result = metrics.metric_by_group(negative_results, y_a, y_p, gid)
+
+        assert result.overall == -16
+        assert result.by_group[0] == -10
+        assert result.by_group[1] == -6
+        assert result.min_over_groups == -10
+        assert result.max_over_groups == -6
+        assert result.range_over_groups == 4
+        assert np.isnan(result.range_ratio_over_groups)
+
+    def test_metric_results_zero(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 0, 1, 1, 1]
+
+        def zero_results(y_true, y_pred):
+            # Arrays will always be same length
+            return len(y_true)-len(y_pred)
+
+        result = metrics.metric_by_group(zero_results, y_a, y_p, gid)
+
+        assert result.overall == 0
+        assert result.by_group[0] == 0
+        assert result.by_group[1] == 0
+        assert result.min_over_groups == 0
+        assert result.max_over_groups == 0
+        assert result.range_over_groups == 0
+        # Following is special case
+        assert result.range_ratio_over_groups == 1
+
 
 class TestMakeGroupMetric:
     def test_smoke(self):
