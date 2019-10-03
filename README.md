@@ -1,17 +1,17 @@
 [![Build Status](https://img.shields.io/azure-devops/build/responsibleai/fairlearn/6/dev?failed_label=bad&passed_label=good&label=GatedCheckin%3ADev)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=1&branchName=dev) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![pypi badge](https://img.shields.io/badge/pypi-0.2.0-blue)
 
-# Fairness in Machine Learning - Mitigation algorithms
+# Fairness in machine learning - Mitigation algorithms
 
-A Python package that implements a variety of fairness-related algorithms to mitigate bias including:
+A Python package that implements a variety of algorithms that mitigate unfairness in supervised machine learning including:
 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
-| `fairlearn.` `expgrad` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
-| `fairlearn.` `reductions.` `GridSearch` | As described in Section 3.4 in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP |
-| `fairlearn.` `reductions.` `GridSearch` | Grid Search for regression | regression | binary | BGL |
+| `fairlearn.` `reductions.` `ExponentiatedGradient` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
+| `fairlearn.` `reductions.` `GridSearch` | Black-box approach described in Section 3.4 of the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP |
+| `fairlearn.` `reductions.` `GridSearch` | Grid search for regression | regression | binary | BGL |
 | `fairlearn.` `post_processing.` `ThresholdOptimizer` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
 
-DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to [the Terminology page](TERMINOLOGY.md).
+DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md).
 
 To request additional algorithms or fairness definitions, please open a new issue.
 
@@ -26,7 +26,7 @@ Onboarding guide
 </strong>
 </summary>
 
-As of version 0.2 fairlearn contained only the exponentiated gradient method. The fairlearn repository now has a much more comprehensive approach to fairness and aims to incorporate other methods as specified above. The same exponentiated gradient technique is now located under `fairlearn.reductions.ExponentiatedGradient` as a class. While in the past one could have run
+As of version 0.2 fairlearn contained only the exponentiated gradient method. The fairlearn repository now has a more comprehensive scope and aims to incorporate other methods as specified above. The same exponentiated gradient technique is now located under `fairlearn.reductions.ExponentiatedGradient` as a class. While in the past one could have run
 
 ```python
 import numpy as np
@@ -46,13 +46,12 @@ from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions.moments import DemographicParity
 
 estimator = LogisticRegression()  # or any other estimator
-constraints = DemographicParity()
-exponentiated_gradient = ExponentiatedGradient(estimator, constraints=constraints)
+exponentiated_gradient = ExponentiatedGradient(estimator, constraints=DemographicParity())
 exponentiated_gradient.fit(X, y, group_data)
 randomized_predictions = exponentiated_gradient.predict(X)
 ```
 
-Please reach out through the "Issues" if you encounter any problems.
+Please open a new issue if you encounter any problems.
 
 </details>
 
@@ -83,7 +82,7 @@ For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guid
 
 # Contributing
 
-To contribute please check our [Contributing Guide](CONTRIBUTING.md).
+To contribute please check our [Contributing guide](CONTRIBUTING.md).
 
 # Maintainers
 
@@ -106,8 +105,8 @@ If you are the current maintainer of this project:
 
 # Issues
 
-## Regular (non-Security) Issues
-Please submit a report through [Github issues](https://github.com/microsoft/fairlearn/issues). A maintainer will respond within 24 hours to handle the issue as follows:
+## Regular (non-security) issues
+Please submit a report through [GitHub issues](https://github.com/microsoft/fairlearn/issues). A maintainer will respond promptly as follows:
 - bug: triage as `bug` and provide estimated timeline based on severity
 - feature request: triage as `feature request` and provide estimated timeline
 - question or discussion: triage as `question` and respond or notify/identify a suitable expert to respond
@@ -115,6 +114,6 @@ Please submit a report through [Github issues](https://github.com/microsoft/fair
 Maintainers are supposed to link duplicate issues when possible.
 
 
-## Reporting Security Issues
+## Reporting security issues
 
 Please take a look at our guidelines for reporting [security issues](SECURITY.md).

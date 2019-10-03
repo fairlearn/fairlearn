@@ -1,12 +1,12 @@
 # Terminology
 
-## Estimators and Predictors
+## Estimators and predictors
 Fairlearn largely follows the [terminology established by scikit-learn](https://scikit-learn.org/stable/developers/contributing.html#different-objects), specifically:
 - Estimator: implements a `fit` method
-- Predictor: implements a `predict` method
+- Predictor: implements a `predict` method.
 Unlike [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator) our estimators in fairlearn may not be deterministic. Lots of disparity mitigation techniques require randomized output to meet their objective in expectation. We do provide unrandomized versions of every method as well, but they may not be able to uphold the same theoretical guarantees.
 
-## Randomized Predictors
+## Randomized predictors
 
 Rather than providing deterministic output many predictors produced by disparity mitigation techniques in the fairness literature are randomized. As a consequence, it is possible to get different output from the predictor's `predict` method when providing samples with identical features.
 
