@@ -68,12 +68,12 @@ class TestMetricByGroup:
         assert len(result.by_group) == 2
         assert result.by_group[0] == 2
         assert result.by_group[1] == 3
-        assert result.min_over_groups == 2
-        assert result.argmin_groups == {0}
-        assert result.max_over_groups == 3
-        assert result.argmax_groups == {1}
-        assert result.range_over_groups == 1
-        assert result.range_ratio_over_groups == pytest.approx(0.6666666667)
+        assert result.minimum == 2
+        assert result.argmin_set == {0}
+        assert result.maximum == 3
+        assert result.argmax_set == {1}
+        assert result.range == 1
+        assert result.range_ratio == pytest.approx(0.6666666667)
 
     @pytest.mark.parametrize("transform_gid", supported_conversions)
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
@@ -93,12 +93,12 @@ class TestMetricByGroup:
         assert result.by_group[a] == 1
         assert result.by_group[b] == 1
         assert result.by_group[c] == 3
-        assert result.min_over_groups == 1
-        assert result.argmin_groups == {a, b}
-        assert result.max_over_groups == 3
-        assert result.argmax_groups == {c}
-        assert result.range_over_groups == 2
-        assert result.range_ratio_over_groups == pytest.approx(0.33333333333333)
+        assert result.minimum == 1
+        assert result.argmin_set == {a, b}
+        assert result.maximum == 3
+        assert result.argmax_set == {c}
+        assert result.range == 2
+        assert result.range_ratio == pytest.approx(0.33333333333333)
 
     @pytest.mark.parametrize("transform_gid", supported_conversions)
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
@@ -117,12 +117,12 @@ class TestMetricByGroup:
         assert np.array_equal(result.by_group[a], np.ones([3, 2]))
         assert np.array_equal(result.by_group[b], np.ones([2, 2]))
         assert np.array_equal(result.by_group[c], np.ones([3, 1]))
-        assert result.min_over_groups is None
-        assert result.argmin_groups is None
-        assert result.max_over_groups is None
-        assert result.argmax_groups is None
-        assert result.range_over_groups is None
-        assert result.range_ratio_over_groups is None
+        assert result.minimum is None
+        assert result.argmin_set is None
+        assert result.maximum is None
+        assert result.argmax_set is None
+        assert result.range is None
+        assert result.range_ratio is None
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
     @pytest.mark.parametrize("transform_gid", supported_conversions)
@@ -141,12 +141,12 @@ class TestMetricByGroup:
         assert result.by_group[0] == 2
         assert result.by_group[1] == 2
         assert result.by_group[2] == 6
-        assert result.min_over_groups == 2
-        assert result.argmin_groups == {0, 1}
-        assert result.max_over_groups == 6
-        assert result.argmax_groups == {2}
-        assert result.range_over_groups == 4
-        assert result.range_ratio_over_groups == pytest.approx(0.33333333333333)
+        assert result.minimum == 2
+        assert result.argmin_set == {0, 1}
+        assert result.maximum == 6
+        assert result.argmax_set == {2}
+        assert result.range == 4
+        assert result.range_ratio == pytest.approx(0.33333333333333)
 
     @pytest.mark.parametrize("transform_y_p", supported_conversions)
     @pytest.mark.parametrize("transform_y_a", supported_conversions)
@@ -203,10 +203,10 @@ class TestMetricByGroup:
         assert result.overall == -16
         assert result.by_group[0] == -10
         assert result.by_group[1] == -6
-        assert result.min_over_groups == -10
-        assert result.max_over_groups == -6
-        assert result.range_over_groups == 4
-        assert np.isnan(result.range_ratio_over_groups)
+        assert result.minimum == -10
+        assert result.maximum == -6
+        assert result.range == 4
+        assert np.isnan(result.range_ratio)
 
     def test_metric_results_zero(self):
         y_a = [0, 0, 1, 1, 0, 1, 1, 1]
@@ -222,11 +222,11 @@ class TestMetricByGroup:
         assert result.overall == 0
         assert result.by_group[0] == 0
         assert result.by_group[1] == 0
-        assert result.min_over_groups == 0
-        assert result.max_over_groups == 0
-        assert result.range_over_groups == 0
+        assert result.minimum == 0
+        assert result.maximum == 0
+        assert result.range == 0
         # Following is special case
-        assert result.range_ratio_over_groups == 1
+        assert result.range_ratio == 1
 
 
 class TestMakeGroupMetric:
@@ -241,12 +241,12 @@ class TestMakeGroupMetric:
         assert len(result.by_group) == 2
         assert result.by_group[0] == 2
         assert result.by_group[1] == 3
-        assert result.min_over_groups == 2
-        assert result.max_over_groups == 3
-        assert result.argmin_groups == {0}
-        assert result.argmax_groups == {1}
-        assert result.range_over_groups == 1
-        assert result.range_ratio_over_groups == pytest.approx(0.66666666667)
+        assert result.minimum == 2
+        assert result.maximum == 3
+        assert result.argmin_set == {0}
+        assert result.argmax_set == {1}
+        assert result.range == 1
+        assert result.range_ratio == pytest.approx(0.66666666667)
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
     @pytest.mark.parametrize("transform_gid", supported_conversions)
@@ -270,9 +270,9 @@ class TestMakeGroupMetric:
         assert result.by_group[b] == 5
         assert result.by_group[c] == 21
         assert result.by_group[z] == 1
-        assert result.min_over_groups == 1
-        assert result.max_over_groups == 21
-        assert result.argmin_groups == {a, z}
-        assert result.argmax_groups == {c}
-        assert result.range_over_groups == 20
-        assert result.range_ratio_over_groups == pytest.approx(1.0/21.0)
+        assert result.minimum == 1
+        assert result.maximum == 21
+        assert result.argmin_set == {a, z}
+        assert result.argmax_set == {c}
+        assert result.range == 20
+        assert result.range_ratio == pytest.approx(1.0/21.0)
