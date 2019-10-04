@@ -172,7 +172,7 @@ def test_compare_custom_vs_moments():
                          quality_metric=SimpleRegressionQualityMetric())
 
     target2.fit(X, y, aux_data=A, number_of_lagrange_multipliers=11)
-    lm = [r.lagrange_multiplier.iat[0] for r in target2.all_results]
+    lm = [r.lagrange_multiplier.iat[0] / 2 for r in target2.all_results]
     target1.fit(X, y, aux_data=A, lagrange_multipliers=lm)
 
     assert len(target1.all_results) == len(target2.all_results)
@@ -181,4 +181,4 @@ def test_compare_custom_vs_moments():
     for i in range(len(target1.all_results)):
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
-        assert np.array_equal(coef1, coef2)
+        assert np.allclose(coef1, coef2, rtol=1e-2, atol=1e-3)
