@@ -31,4 +31,4 @@ jobs:
     vmImage:  'macOS-10.13'
     pyVersions: [3.7] 
 
-- template: code-coverage-job-template.yml
+- template: notebook-job-template.yml
