@@ -63,14 +63,26 @@ def metric_by_group(metric_function, y_true, y_pred, group_data, sample_weight=N
         else:
             result.by_group[group] = metric_function(group_actual, group_predict)
 
-    result.min_over_groups = min(result.by_group.values())
-    result.max_over_groups = max(result.by_group.values())
+    try:
+        result.minimum = min(result.by_group.values())
+        result.maximum = max(result.by_group.values())
 
-    result.argmin_groups = set([k for k, v in result.by_group.items() if v == result.min_over_groups])  # noqa:E501
-    result.argmax_groups = set([k for k, v in result.by_group.items() if v == result.max_over_groups])  # noqa:E501
+        result.argmin_set = set([k for k, v in result.by_group.items() if v == result.minimum])  # noqa:E501
+        result.argmax_set = set([k for k, v in result.by_group.items() if v == result.maximum])  # noqa:E501
 
-    result.range_over_groups = result.max_over_groups - result.min_over_groups
-    result.range_ratio_over_groups = result.min_over_groups / result.max_over_groups
+        result.range = result.maximum - result.minimum
+        if result.minimum < 0:
+            result.range_ratio = np.nan
+        elif result.maximum == 0:
+            # We have min=max=0
+            result.range_ratio = 1
+        else:
+            result.range_ratio = result.minimum / result.maximum
+    except ValueError:
+        # Nothing to do
+        # Failed to compute an extra result, most likely because operation (such as min)
+        # was not defined for the return type (e.g. doing confusion matrices)
+        pass
 
     return result
 
@@ -82,6 +94,9 @@ def make_group_metric(metric_function):
                                y_pred,
                                group_data,
                                sample_weight)
+
+    # Improve the name of the returned function
+    wrapper.__name__ = "group_{0}".format(metric_function.__name__)
 
     return wrapper
 

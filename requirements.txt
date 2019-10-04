@@ -2,6 +2,7 @@
 matplotlib
 numpy
 pandas
+scikit-learn
 scipy
 
 # Required for environment
@@ -12,7 +13,6 @@ flake8
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
-scikit-learn
 
 # Required for notebooks
 jupyter
