@@ -1,5 +1,5 @@
 parameters:
-  name: 'Code Coverage'
+  name: 'CodeCoverage'
   vmImage: 'ubuntu-latest'
   pyVersion: 3.6
 
