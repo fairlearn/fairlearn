@@ -1,7 +1,5 @@
 trigger: none # No CI build
 
-schedules: none # No scheduled build
-
 pool:
   vmImage: 'ubuntu-latest'
 
