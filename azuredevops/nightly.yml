@@ -1,6 +1,15 @@
 trigger: none # No CI build
 
-schedules: none # No scheduled build
+pr: none # Not for pull requests
+
+schedules:
+- cron: "0 6 * * *" # Time is UTC
+  displayName: Nightly Build
+  branches:
+    include:
+      - master
+      - dev
+  always: true
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -10,18 +19,17 @@ jobs:
   parameters:
     name: Linux
     vmImage: 'ubuntu-16.04'
-    pyVersions: [3.5]
 
 - template: all-tests-job-template.yml
   parameters:
     name: Windows
     vmImage:  'vs2017-win2016'
-    pyVersions: [3.6]
     
 - template: all-tests-job-template.yml
   parameters:
     name: MacOS
     vmImage:  'macOS-10.13'
-    pyVersions: [3.7] 
+    pyVersions: [3.6, 3.7] 
 
 - template: notebook-job-template.yml
+    vmImage: 'ubuntu-16.04'
