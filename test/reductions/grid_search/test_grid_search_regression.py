@@ -9,7 +9,7 @@ import fairlearn.reductions.moments as moments
 import copy
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge
 
 
 def _simple_regression_data(number_a0, number_a1,
@@ -162,12 +162,10 @@ def test_compare_custom_vs_moments():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
-    estimator = LinearRegression()
-
-    target1 = GridSearch(copy.deepcopy(estimator),
+    target1 = GridSearch(Ridge(alpha=1.0),
                          disparity_metric=BoundedGroupLoss(),
                          quality_metric=SimpleRegressionQualityMetric())
-    target2 = GridSearch(copy.deepcopy(estimator),
+    target2 = GridSearch(Ridge(alpha=2.0),
                          disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
                          quality_metric=SimpleRegressionQualityMetric())
 
