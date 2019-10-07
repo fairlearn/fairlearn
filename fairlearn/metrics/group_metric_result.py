@@ -11,13 +11,13 @@ class GroupMetricResult:
         self.by_group = {}
         # The following two properties list the minimum and maximum metric values in
         # the by_group dictionary
-        self.min_over_groups = None
-        self.max_over_groups = None
+        self.minimum = None
+        self.maximum = None
         # The following two properties are the set of groups which have the minimum
         # and maximum values for the metric
-        self.argmin_groups = None
-        self.argmax_groups = None
-        # The value of max_over_groups - min_over_groups
-        self.range_over_groups = None
-        # The value of min_over_groups / max_over_groups
-        self.range_ratio_over_groups = None
+        self.argmin_set = None
+        self.argmax_set = None
+        # The value of maximum - minimum
+        self.range = None
+        # The value of minimum / maximum
+        self.range_ratio = None

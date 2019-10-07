@@ -2,10 +2,11 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-import fairlearn.reductions.moments as moments
-from fairlearn.reductions import exponentiated_gradient
-
+from fairlearn.reductions import ExponentiatedGradient, moments
+from fairlearn.reductions.moments import DemographicParity
+from test.simple_learners import LeastSquaresBinaryClassifierLearner
 import simple_learners
+from .test_utilities import group_data, X1, X2, X3, labels
 
 import pytest
 
@@ -13,15 +14,9 @@ import pytest
 class TestExpgradSmoke:
     def setup_method(self, method):
         print("setup_method      method:%s" % method.__name__)
-        attrs = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
-        labls = [int(x) for x in '0110100' '0010111' '001111']
-        feat1 = [int(x) for x in '0110101' '0111101' '001011']
-        feat2 = [int(x) for x in '0000100' '0000011' '111111']
-        feat3 = [int(x) for x in '1111111' '1111111' '111111']
-        self.dataX = pd.DataFrame(
-            {"feat1": feat1, "feat2": feat2, "feat3": feat3})
-        self.dataY = pd.Series(labls)
-        self.dataA = pd.Series(attrs)
+        self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
+        self.y = pd.Series(labels)
+        self.A = pd.Series(group_data)
         self.learner = simple_learners.LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
@@ -74,21 +69,21 @@ class TestExpgradSmoke:
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6}, ]
+                        "n_classifiers": 6}]
 
     def run_smoke_test(self, data):
-        res_tuple = exponentiated_gradient(self.dataX, self.dataA, self.dataY,
-                                           self.learner, constraints=data["cons_class"](),
-                                           eps=data["eps"])
+        expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
+                                        eps=data["eps"])
+        expgrad.fit(self.X, self.y, self.A)
 
-        res = res_tuple._asdict()
+        res = expgrad._expgrad_result._as_dict()
         Q = res["best_classifier"]
         res["n_classifiers"] = len(res["classifiers"])
 
         disp = data["cons_class"]()
-        disp.init(self.dataX, self.dataA, self.dataY)
+        disp.init(self.X, self.A, self.y)
         error = moments.MisclassificationError()
-        error.init(self.dataX, self.dataA, self.dataY)
+        error.init(self.X, self.A, self.y)
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
 
@@ -105,3 +100,10 @@ class TestExpgradSmoke:
     @pytest.mark.parametrize("testdata", smoke_test_data)
     def test_smoke(self, testdata):
         self.run_smoke_test(testdata)
+
+    def test_simple_fit_predict(self):
+        estimator = LeastSquaresBinaryClassifierLearner()
+        constraints = DemographicParity()
+        expgrad = ExponentiatedGradient(estimator, constraints)
+        expgrad.fit(pd.DataFrame(X1), pd.Series(labels), group_data=pd.Series(group_data))
+        expgrad.predict(pd.DataFrame(X1))

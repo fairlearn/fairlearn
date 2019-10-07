@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-""" ROC Curve based Post processing algorithm based on M. Hardt,
+""" Threshold Optimization Post Processing algorithm based on M. Hardt,
 E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
 Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
 classification with one categorical grouping attribute.
@@ -17,7 +17,7 @@ from fairlearn.post_processing import PostProcessing
 from ._constants import (LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
-from ._roc_curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
+from ._curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
 from ._interpolated_prediction import InterpolatedPredictor
 
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
@@ -26,52 +26,50 @@ NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
                                   "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
                                   "Your provided data was of types ({}, {}, {})"
-NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE = "Currently only {} and {} are supported " \
-                                              "disparity metrics.".format(DEMOGRAPHIC_PARITY,
-                                                                          EQUALIZED_ODDS)
+NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE = "Currently only {} and {} are supported " \
+    "parity criteria.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
-                                          "column in {}."
+    "column in {}."
 ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "An attribute named {} or {} was detected. " \
-                                                 "Please rename your column and try again." \
-                                                 .format(SCORE_KEY, LABEL_KEY)
+    "Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
 
-_SUPPORTED_DISPARITY_METRICS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
+_SUPPORTED_PARITY_CRITERIA = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 
 logger = logging.getLogger(__name__)
 
 
-class ROCCurveBasedPostProcessing(PostProcessing):
-    def __init__(self, *, fairness_unaware_model=None, fairness_unaware_estimator=None,
-                 disparity_metric=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
+class ThresholdOptimizer(PostProcessing):
+    def __init__(self, *, unconstrained_model=None, unconstrained_estimator=None,
+                 parity_criteria=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
                  seed=None):
         """ Creates the post processing object.
 
-        :param fairness_unaware_model: the trained model whose output will be post processed
-        :type fairness_unaware_model: a trained model
-        :param fairness_unaware_estimator: an untrained estimator that will be trained, and
+        :param unconstrained_model: the trained model whose output will be post processed
+        :type unconstrained_model: a trained model
+        :param unconstrained_estimator: an untrained estimator that will be trained, and
             subsequently its output will be post processed
-        :type fairness_unaware_estimator: an untrained estimator
+        :type unconstrained_estimator: an untrained estimator
         :param gridsize: The number of ticks on the grid over which we evaluate the curves.
         A large gridsize means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
         :type gridsize: int
         :param flip: allow flipping to negative weights if it improves accuracy.
         :type flip: bool
-        :param plot: show ROC plot if True
+        :param plot: show ROC/selection-error plot if True
         :type plot: bool
         """
-        super(ROCCurveBasedPostProcessing, self).__init__(
-            fairness_unaware_model=fairness_unaware_model,
-            fairness_unaware_estimator=fairness_unaware_estimator,
-            disparity_metric=disparity_metric)
+        super(ThresholdOptimizer, self).__init__(
+            unconstrained_model=unconstrained_model,
+            unconstrained_estimator=unconstrained_estimator,
+            parity_criteria=parity_criteria)
 
-        self._disparity_metric = disparity_metric
-        if self._disparity_metric not in _SUPPORTED_DISPARITY_METRICS:
-            raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
+        self._parity_criteria = parity_criteria
+        if self._parity_criteria not in _SUPPORTED_PARITY_CRITERIA:
+            raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
 
         self._gridsize = gridsize
         self._flip = flip
@@ -82,36 +80,36 @@ class ROCCurveBasedPostProcessing(PostProcessing):
     def fit(self, X, y, aux_data, **kwargs):
         self._validate_input_data(X, aux_data, y)
 
-        if self._fairness_unaware_estimator:
+        if self._unconstrained_estimator:
             # train estimator on data first
             self._validate_estimator()
-            self._fairness_unaware_estimator.fit(X, y, **kwargs)
-            self._fairness_unaware_model = self._fairness_unaware_estimator
+            self._unconstrained_estimator.fit(X, y, **kwargs)
+            self._unconstrained_model = self._unconstrained_estimator
 
         self._validate_model()
 
-        scores = self._fairness_unaware_model.predict(X)
-        roc_curve_based_post_processing_method = None
-        if self._disparity_metric == DEMOGRAPHIC_PARITY:
-            roc_curve_based_post_processing_method = \
-                _roc_curve_based_post_processing_demographic_parity
-        elif self._disparity_metric == EQUALIZED_ODDS:
-            roc_curve_based_post_processing_method = \
-                _roc_curve_based_post_processing_equalized_odds
+        scores = self._unconstrained_model.predict(X)
+        threshold_optimization_method = None
+        if self._parity_criteria == DEMOGRAPHIC_PARITY:
+            threshold_optimization_method = \
+                _threshold_optimization_demographic_parity
+        elif self._parity_criteria == EQUALIZED_ODDS:
+            threshold_optimization_method = \
+                _threshold_optimization_equalized_odds
         else:
-            raise ValueError(NOT_SUPPORTED_DISPARITY_METRIC_ERROR_MESSAGE)
+            raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
 
-        self._post_processed_model_by_attribute = roc_curve_based_post_processing_method(
+        self._post_processed_model_by_attribute = threshold_optimization_method(
             aux_data, y, scores, self._gridsize, self._flip, self._plot)
 
     def predict(self, X, group_data):
         self._validate_post_processed_model_is_fitted()
         self._validate_input_data(X, group_data)
-        fairness_unaware_predictions = self._fairness_unaware_model.predict(X)
+        unconstrained_predictions = self._unconstrained_model.predict(X)
 
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
                                                 group_data,
-                                                fairness_unaware_predictions)
+                                                unconstrained_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def predict_proba(self, X, group_data):
@@ -119,7 +117,7 @@ class ROCCurveBasedPostProcessing(PostProcessing):
         self._validate_input_data(X, group_data)
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
                                                 group_data,
-                                                self._fairness_unaware_model.predict(X))
+                                                self._unconstrained_model.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
     def _validate_post_processed_model_is_fitted(self):
@@ -152,8 +150,8 @@ class ROCCurveBasedPostProcessing(PostProcessing):
             raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
 
 
-def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scores, gridsize=1000,
-                                                        flip=True, plot=False):
+def _threshold_optimization_demographic_parity(attributes, labels, scores, gridsize=1000,
+                                               flip=True, plot=False):
     """ Calculates selection and error rates for every attribute value at different thresholds
     over the scores. Subsequently weighs each attribute value's error by the frequency of the
     attribute value in the data. The minimum error point is the selected solution, which is
@@ -176,7 +174,7 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     :type gridsize: int
     :param flip: allow flipping to negative weights if it improves accuracy.
     :type flip: bool
-    :param plot: show ROC plot if True
+    :param plot: show selection-error plot if True
     :type plot: bool
     :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
@@ -186,7 +184,8 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
 
-    data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
+    data_grouped_by_attribute = _reformat_and_group_data(
+        attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
         # determine probability of current grouping attribute group based on data
@@ -197,8 +196,10 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
 
         roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip)
 
-        fraction_negative_label_positive_sample = (n_negative / n_group) * roc_convex_hull['x']
-        fraction_positive_label_positive_sample = (n_positive / n_group) * roc_convex_hull['y']
+        fraction_negative_label_positive_sample = (
+            n_negative / n_group) * roc_convex_hull['x']
+        fraction_positive_label_positive_sample = (
+            n_positive / n_group) * roc_convex_hull['y']
         # Calculate selection to represent the proportion of positive predictions.
         roc_convex_hull['selection'] = fraction_negative_label_positive_sample + \
             fraction_positive_label_positive_sample
@@ -213,7 +214,8 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
 
         # Add up errors for the current group multiplied by the probability of the current group.
         # This will help us in identifying the minimum overall error.
-        error_given_selection += p_attribute * selection_error_curve[attribute]['error']
+        error_given_selection += p_attribute * \
+            selection_error_curve[attribute]['error']
 
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("Processing " + str(attribute))
@@ -223,7 +225,8 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
         logger.debug("ROC curve: convex")
         logger.debug(roc_convex_hull)
         if plot:
-            plot_curve(attribute, 'selection', 'error', selection_error_curve[attribute])
+            plot_curve(attribute, 'selection', 'error',
+                       selection_error_curve[attribute])
 
     # Find minimum error point given that at each point the selection rate for each attribute
     # value is identical by design.
@@ -235,12 +238,14 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
     predicted_DP_by_attribute = {}
     for attribute in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
-        roc_result = selection_error_curve[attribute].transpose()[i_best_DP]
-        predicted_DP_by_attribute[attribute] = InterpolatedPredictor(0, 0,
-                                                                     roc_result.p0,
-                                                                     roc_result.operation0,
-                                                                     roc_result.p1,
-                                                                     roc_result.operation1)
+        selection_error_curve_result = selection_error_curve[attribute].transpose()[
+            i_best_DP]
+        predicted_DP_by_attribute[attribute] = \
+            InterpolatedPredictor(0, 0,
+                                  selection_error_curve_result.p0,
+                                  selection_error_curve_result.operation0,
+                                  selection_error_curve_result.p1,
+                                  selection_error_curve_result.operation1)
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
@@ -248,13 +253,14 @@ def _roc_curve_based_post_processing_demographic_parity(attributes, labels, scor
                  .format(error_given_selection[i_best_DP], x_best))
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
-        plot_solution_and_show_plot(x_best, None, "DP solution", "selection rate", "error")
+        plot_solution_and_show_plot(
+            x_best, None, "DP solution", "selection rate", "error")
 
     return predicted_DP_by_attribute
 
 
-def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, gridsize=1000,
-                                                    flip=True, plot=False):
+def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=1000,
+                                           flip=True, plot=False):
     """ Calculates the ROC curve of every attribute value at different thresholds over the scores.
     Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
     selecting the point on the curve with minimal error.
@@ -279,7 +285,8 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
     :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
-    data_grouped_by_attribute = _reformat_and_group_data(attributes, labels, scores)
+    data_grouped_by_attribute = _reformat_and_group_data(
+        attributes, labels, scores)
 
     n = len(labels)
 
@@ -294,7 +301,8 @@ def _roc_curve_based_post_processing_equalized_odds(attributes, labels, scores, 
 
     for attribute, group in data_grouped_by_attribute:
         roc_convex_hull = _get_roc(group, x_grid, attribute, flip=flip)
-        roc[attribute] = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
+        roc[attribute] = _interpolate_curve(
+            roc_convex_hull, 'x', 'y', 'operation', x_grid)
         y_values[attribute] = roc[attribute]['y']
 
         logger.debug(OUTPUT_SEPARATOR)
@@ -376,7 +384,8 @@ def _vectorized_prediction(function_dict, group_data, scores):
     # handle type conversion to ndarray for other types
     group_data_vector = _convert_to_ndarray(group_data, MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE
                                             .format("group_data"))
-    scores_vector = _convert_to_ndarray(scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
+    scores_vector = _convert_to_ndarray(
+        scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
 
     return sum([(group_data_vector == a) * function_dict[a].predict(scores_vector)
                 for a in function_dict])
@@ -419,7 +428,8 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if len(additional_data.shape) > 2 or (len(additional_data.shape) == 2 and
                                               additional_data.shape[1] > 1):
             # TODO: extend to multiple columns for additional_group data
-            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
+            raise ValueError(
+                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
         else:
             data_dict[key] = additional_data.reshape(-1)
     elif type(additional_data) == pd.DataFrame:
@@ -432,9 +442,11 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if type(additional_data[0]) == list:
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
-                raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
+                raise ValueError(
+                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("aux_data"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data
     else:
-        raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))
+        raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(
+            type(additional_data)))

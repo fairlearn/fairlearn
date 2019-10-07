@@ -3,4 +3,4 @@
 
 
 from .post_processing import PostProcessing  # noqa: F401
-from .roc_curve_based_post_processing import ROCCurveBasedPostProcessing  # noqa: F401
+from .threshold_optimizer import ThresholdOptimizer  # noqa: F401

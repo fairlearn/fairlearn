@@ -4,6 +4,7 @@
 from fairlearn.metrics import DemographicParity
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
+import fairlearn.reductions.moments as moments
 
 import copy
 import numpy as np
@@ -157,3 +158,46 @@ def test_can_specify_and_generate_lagrange_multipliers():
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
         assert np.array_equal(coef1, coef2)
+
+
+def test_compare_custom_vs_moments():
+    score_threshold = 0.5
+
+    number_a0 = 37
+    number_a1 = 93
+
+    a0_label = 11
+    a1_label = 4
+
+    X, y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label)
+
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
+
+    target1 = GridSearch(copy.deepcopy(estimator),
+                         disparity_metric=DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric())
+
+    target2 = GridSearch(copy.deepcopy(estimator),
+                         disparity_metric=moments.DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric())
+
+    target2.fit(X, y, aux_data=A, number_of_lagrange_multipliers=3)
+
+    lm = [r.lagrange_multiplier.iat[1] - r.lagrange_multiplier.iat[3] for r in target2.all_results]
+    target1._FLIP_ATTRIBUTE_VALS = True
+    target1.fit(X, y, aux_data=A, lagrange_multipliers=lm)
+
+    assert len(target1.all_results) == len(target2.all_results)
+
+    # q1 = [r.quality_metric_value for r in target1.all_results]
+    # q2 = [r.quality_metric_value for r in target2.all_results]
+
+    # Check the models are the same
+    for i in range(len(lm)):
+        coef1 = target1.all_results[i].model.coef_
+        coef2 = target2.all_results[i].model.coef_
+        assert np.allclose(coef1, coef2)
