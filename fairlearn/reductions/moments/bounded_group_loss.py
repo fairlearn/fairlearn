@@ -4,7 +4,7 @@
 import pandas as pd
 import numpy as np
 from .moment import Moment
-from .moment import _REDUCTION_TYPE_LOSS_MINIMIZATION
+from .moment import _REDUCTION_TYPE_LOSS_MINIMIZATION, _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
 
 
 class LossMoment(Moment):
@@ -21,14 +21,14 @@ class LossMoment(Moment):
 
     def init(self, dataX, dataA, dataY):
         if self.no_groups:
-            dataA = dataY.apply(lambda y: "all")
+            dataA = pd.Series(dataY).apply(lambda y: _ALL)
         super().init(dataX, dataA, dataY)
-        self.prob_attr = self.tags.groupby("protected_attribute").size() / self.n
+        self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.n
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr
 
         # fill in the information about the basis
-        attr_vals = self.tags["protected_attribute"].unique()
+        attr_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series()
@@ -45,11 +45,11 @@ class LossMoment(Moment):
         """ Calculates the degree to which constraints are currently violated by
         the predictor.
         """
-        self.tags["pred"] = predictor(self.X)
-        self.tags["loss"] = self.reduction_loss.eval(self.tags["label"], self.tags["pred"])
-        expect_attr = self.tags.groupby("protected_attribute").mean()
-        self._gamma_descr = str(expect_attr[["loss"]])
-        return expect_attr["loss"]
+        self.tags[_PREDICTION] = predictor(self.X)
+        self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
+        expect_attr = self.tags.groupby(_GROUP_ID).mean()
+        self._gamma_descr = str(expect_attr[[_LOSS]])
+        return expect_attr[_LOSS]
 
     def project_lambda(self, lambda_vec):
         return lambda_vec
@@ -57,7 +57,7 @@ class LossMoment(Moment):
     def signed_weights(self, lambda_vec):
         adjust = lambda_vec / self.prob_attr
         signed_weights = self.tags.apply(
-            lambda row: adjust[row["protected_attribute"]], axis=1
+            lambda row: adjust[row[_GROUP_ID]], axis=1
         )
         return signed_weights
 
@@ -87,7 +87,7 @@ class SquareLoss:
                 - np.clip(y_pred, self.min_val, self.max_val)) ** 2
 
 
-class AbsLoss:
+class AbsoluteLoss:
 
     def __init__(self, min_val, max_val):
         self.min_val = min_val
@@ -100,7 +100,7 @@ class AbsLoss:
                       - np.clip(y_pred, self.min_val, self.max_val))
 
 
-class ZeroOneLoss(AbsLoss):
+class ZeroOneLoss(AbsoluteLoss):
 
     def __init__(self):
         super().__init__(0, 1)
