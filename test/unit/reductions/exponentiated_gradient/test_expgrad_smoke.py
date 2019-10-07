@@ -4,9 +4,8 @@
 import pandas as pd
 from fairlearn.reductions import ExponentiatedGradient, moments
 from fairlearn.reductions.moments import DemographicParity
-from test.simple_learners import LeastSquaresBinaryClassifierLearner
-import simple_learners
-from .test_utilities import group_data, X1, X2, X3, labels
+from simple_learners import LeastSquaresBinaryClassifierLearner
+from test_utilities import group_data, X1, X2, X3, labels
 
 import pytest
 
