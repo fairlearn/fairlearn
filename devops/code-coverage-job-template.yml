@@ -18,9 +18,6 @@ jobs:
   - script: pip install -r requirements.txt
     displayName: 'Install required packages'
 
-  - script: pip install -e .
-    displayName: 'Install fairlearn in edit mode'
-
   - script: python -m pytest test/ --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="${{ parameters.name }}"
     displayName: 'Run tests'
 
