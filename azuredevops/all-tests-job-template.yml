@@ -23,6 +23,9 @@ jobs:
 
   - script: pip install -r requirements.txt
     displayName: 'Install required packages'
+    
+  - script: pip install -e .
+    displayName: 'Install fairlearn in edit mode'
 
   - script: flake8 .
     displayName: "Run flake8"
