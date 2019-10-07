@@ -5,7 +5,7 @@ import pandas as pd
 import fairlearn.reductions.moments as moments
 from fairlearn.reductions import exponentiated_gradient
 
-from test import simple_learners
+import simple_learners
 
 import pytest
 
