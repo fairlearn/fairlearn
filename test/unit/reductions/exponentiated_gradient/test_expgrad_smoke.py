@@ -16,7 +16,7 @@ class TestExpgradSmoke:
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
         self.A = pd.Series(group_data)
-        self.learner = simple_learners.LeastSquaresBinaryClassifierLearner()
+        self.learner = LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
     smoke_test_data = [{"cons_class": moments.DemographicParity, "eps": 0.100,
