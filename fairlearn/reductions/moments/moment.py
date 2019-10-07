@@ -6,6 +6,12 @@ import pandas as pd
 _REDUCTION_TYPE_CLASSIFICATION = "classification"
 _REDUCTION_TYPE_LOSS_MINIMIZATION = "loss_minimization"
 
+_GROUP_ID = "group_id"
+_LABEL = "label"
+_LOSS = "loss"
+_PREDICTION = "pred"
+_ALL = "all"
+
 
 class Moment:
     """Generic moment"""
@@ -18,7 +24,16 @@ class Moment:
             "moments can be initialized only once"
         self.X = dataX
         self.tags = pd.DataFrame(
-            {"protected_attribute": dataA, "label": dataY})
+            {_GROUP_ID: dataA, _LABEL: dataY})
         self.n = dataX.shape[0]
         self.initialized = True
         self._gamma_descr = None
+
+    def gamma(self, predictor):
+        raise NotImplementedError()
+
+    def project_lambda(self, lambda_vec):
+        raise NotImplementedError()
+
+    def signed_weights(self, lambda_vec):
+        raise NotImplementedError()

@@ -8,6 +8,42 @@ import pandas as pd
 from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
+from fairlearn.reductions.moments.moment import Moment, _REDUCTION_TYPE_CLASSIFICATION
+
+
+class _GridGenerator:
+    """A generator of a grid of points with a bounded L1 norm.
+    """
+
+    def __init__(self, limit, n_units, dim, neg_allowed, force_L1_norm):
+        # static variables for integer grid accumulation
+        self.dim = dim
+        self.neg_allowed = neg_allowed
+        self.force_L1_norm = force_L1_norm
+
+        # working variables for integer grid accumulation
+        self.entry = np.zeros(self.dim)
+        self.accumulator = []
+        self.accumulate_integer_grid(0, n_units)
+
+        # re-scale the integer grid to obtain the final grid
+        self.grid = pd.DataFrame(self.accumulator).T * (float(limit) / n_units)
+
+    def accumulate_integer_grid(self, index, max_val):
+        if index == self.dim:
+            self.accumulator.append(self.entry.copy())
+        else:
+            if (index == self.dim-1) and (self.force_L1_norm):
+                if self.neg_allowed[index] and max_val > 0:
+                    values = [-max_val, max_val]
+                else:
+                    values = [max_val]
+            else:
+                min_val = -max_val if self.neg_allowed[index] else 0
+                values = range(min_val, max_val+1)
+            for current_value in values:
+                self.entry[index] = current_value
+                self.accumulate_integer_grid(index+1, max_val-abs(current_value))
 
 
 class GridSearch(ReductionsEstimator):
@@ -28,13 +64,16 @@ class GridSearch(ReductionsEstimator):
     _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
     _MESSAGE_X_A_ROWS = "X and the target attribute must have same number of rows"
 
+    _FLIP_ATTRIBUTE_VALS = False
+
     def __init__(self,
                  learner,
                  disparity_metric,
                  quality_metric):
         self.learner = learner
         if (not isinstance(disparity_metric, DemographicParity) and
-                not isinstance(disparity_metric, BoundedGroupLoss)):
+                not isinstance(disparity_metric, BoundedGroupLoss) and
+                not isinstance(disparity_metric, Moment)):
             raise RuntimeError("Unsupported disparity metric")
         self.disparity_metric = disparity_metric
 
@@ -74,6 +113,62 @@ class GridSearch(ReductionsEstimator):
 
         # Prep the quality metric
         self.quality_metric.set_data(X, y_vector, A)
+
+        if isinstance(self.disparity_metric, Moment):
+            # Prep the disparity metric and objective
+            self.disparity_metric.init(X, A, y_vector)
+            objective = self.disparity_metric.default_objective()
+            objective.init(X, A, y_vector)
+            is_classification_reduction = (self.disparity_metric.reduction_type == _REDUCTION_TYPE_CLASSIFICATION)  # noqa: E501
+
+            # Basis information
+            pos_basis = self.disparity_metric.pos_basis
+            neg_basis = self.disparity_metric.neg_basis
+            neg_allowed = self.disparity_metric.neg_basis_present
+            objective_in_the_span = (self.disparity_metric.default_objective_lambda_vec is not None)   # noqa: E501
+            dim = len(pos_basis.columns)
+
+            # Grid parameters: these should be provided as arguments, but
+            # explicitly here for the time being
+            grid_limit = 2.0
+            grid_size = number_of_lagrange_multipliers-1
+
+            # Generate the grid
+            grid = _GridGenerator(grid_limit,
+                                  grid_size,
+                                  dim,
+                                  neg_allowed,
+                                  objective_in_the_span).grid
+
+            # Fit the estimates
+            self.all_results = []
+            for i in grid:
+                beta_pos = grid[i].copy()
+                beta_neg = -grid[i].copy()
+                beta_pos[beta_pos < 0] = 0.0
+                beta_neg[beta_neg < 0] = 0.0
+                lambda_vec = pos_basis.dot(beta_pos) + neg_basis.dot(beta_neg)
+                weights = self.disparity_metric.signed_weights(lambda_vec)
+                if not objective_in_the_span:
+                    weights = weights + objective.signed_weights()
+                if is_classification_reduction:
+                    y_reduction = 1 * (weights > 0)
+                    weights = weights.abs()
+                else:
+                    y_reduction = y
+
+                current_learner = copy.deepcopy(self.learner)
+                current_learner.fit(X, y_reduction, sample_weight=weights)
+
+                # Evaluate the quality metric
+                quality = self.quality_metric.get_quality(current_learner)
+
+                nxt = GridSearchResult(current_learner, lambda_vec, quality)
+                self.all_results.append(nxt)
+
+            # Designate a 'best' model
+            self.best_result = max(self.all_results, key=lambda x: x.quality_metric_value)
+            return
 
         # We do not yet have disparity metrics fully implemented
         # For now, we assume that if we are passed a DemographicParity
@@ -194,7 +289,10 @@ class GridSearch(ReductionsEstimator):
         p0 = counts[0] / len(target_attribute)
         p1 = 1 - p0
 
-        return p0, p1, unique_labels[0]
+        if self._FLIP_ATTRIBUTE_VALS:
+            return p1, p0, unique_labels[1]
+        else:
+            return p0, p1, unique_labels[0]
 
     def _generate_classification_weights(self, y, target_attribute, L, p_ratio, a0_val):
         weight_func = np.vectorize(self._classification_weight_function)
