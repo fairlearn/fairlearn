@@ -1,0 +1,35 @@
+trigger: none
+
+schedules:
+- cron: "0 6 * * *" # Time is UTC
+  displayName: Daily midnight build
+  branches:
+    include:
+      - master
+      - dev
+  always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6' 
+    addToPath: true
+
+- script: pip install -r requirements.txt
+  displayName: 'Install required packages'
+
+- script: pip install -e .
+  displayName: 'Install fairlearn in edit mode'
+
+- script: pip install 'azureml-contrib-explain-model<=0.1.50' --extra-index-url 'https://azuremlsdktestpypi.azureedge.net/azureml-core-run-submit-tests/5132569'
+  displayName: 'Install fairness dashboard (preview)'
+
+- script: python -m pytest notebooks/ --nbval --junitxml=./TEST-TEST.xml
+  displayName: 'Run notebooks as tests'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/TEST-*.xml'
+  condition: succeededOrFailed()
