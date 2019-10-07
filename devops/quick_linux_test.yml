@@ -1,0 +1,12 @@
+# This is a manual test to simplify running a quick check on new dev work on a branch
+trigger: none # No CI build
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- template: pull-request-gate-job-template.yml
+  parameters:
+    name: Linux
+    vmImage: 'ubuntu-16.04'
