@@ -2,7 +2,17 @@
 
 # Fairness in machine learning - Mitigation algorithms
 
-A Python package that implements a variety of algorithms that mitigate unfairness in supervised machine learning including:
+A Python package that implements a variety of algorithms that mitigate unfairness in supervised machine learning.
+
+## Current Release
+
+* The current stable release is available at [FairLearn v0.2.0](https://github.com/microsoft/fairlearn/tree/v0.2.0).
+
+* Our latest work differs substantively from version 0.2.0, please visit the repo for further information. In particular, look at [Existing users: How to onboard to fairlearn v0.3+](#existing).
+
+#  Algorithms
+
+A variety of fairness-related algorithms to mitigate bias are included:
 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
@@ -14,6 +24,8 @@ A Python package that implements a variety of algorithms that mitigate unfairnes
 DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md).
 
 To request additional algorithms or fairness definitions, please open a new issue.
+
+# <a name="existing"></a>
 
 # Existing users: How to onboard to fairlearn v0.3+
 
@@ -91,6 +103,7 @@ fairlearn is maintained by:
 - **@MiroDudik**
 - **@romanlutz**
 - **@riedgar-ms**
+- **@bethz**
 
 ## Releasing
 
