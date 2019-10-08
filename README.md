@@ -104,6 +104,7 @@ fairlearn is maintained by:
 - **@MiroDudik**
 - **@romanlutz**
 - **@riedgar-ms**
+- **@bethz**
 
 ## Releasing
 
