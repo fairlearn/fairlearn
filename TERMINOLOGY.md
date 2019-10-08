@@ -1,53 +1,70 @@
-# Terminology
+# Concepts and terminology
 
 ## Estimators and predictors
+
 Fairlearn largely follows the [terminology established by scikit-learn](https://scikit-learn.org/stable/developers/contributing.html#different-objects), specifically:
-- Estimator: implements a `fit` method
-- Predictor: implements a `predict` method.
-Unlike [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator) our estimators in fairlearn may not be deterministic. Lots of disparity mitigation techniques require randomized output to meet their objective in expectation. We do provide unrandomized versions of every method as well, but they may not be able to uphold the same theoretical guarantees.
+- _Estimators_ implement a `fit` method.
+- _Predictors_ implement a `predict` method.
 
-## Randomized predictors
 
-Rather than providing deterministic output many predictors produced by disparity mitigation techniques in the fairness literature are randomized. As a consequence, it is possible to get different output from the predictor's `predict` method when providing samples with identical features.
+**Randomization.** Unlike [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator), estimators in fairlearn can produce randomized predictors. Randomization of predictions is required to satisfy many definitions of fairness. Because of randomization, it is possible to get different outputs from the predictor's `predict` method on identical data. For each of our methods, we provide explicit access to the probability distribution used for randomization.
 
-## Group Fairness
+## Fairness of AI systems
 
-### Protected or sensitive attribute, group, or data
+AI systems can behave unfairly for a variety of reasons. Sometimes it is because of societal biases reflected in the training data and in the decisions made during the development and deployment of these systems. In other cases, AI systems behave unfairly not because of societal biases, but because of characteristics of the data (e.g., too few data points about some group of people) or characteristics of the systems themselves. Because it can be hard to distinguish between these reasons (and these reasons are not mutually exclusive and often exacerbate one another), we define whether an AI system is behaving unfairly in terms of its impact on people – i.e., in terms of harms – and not in terms of specific causes, such as societal biases, or in terms of intent, such as prejudice.
 
-In the scientific literature concerning fairness one usually selects a single feature or multiple features of a dataset as a protected or sensitive set of attributes. The objective is to optimize a chosen disparity metric (for a definition see one of the later sections) based on these attributes. In some scenarios these attributes may also be held out from the actual training data (note that holding out data is not sufficient for fairness due to the myriad of correlations in real datasets). Overall, every combination of the attributes defines what we refer to as a group.
-There is no definitive standard yet, but for this repository, we shall use the variable name `group_data` for a matrix of these attributes. This choice provides a few advantages:
+**Usage of the word _bias_.** Since we define fairness in terms of harms rather than specific causes (such as societal biases), we avoid the usage of the words _bias_ or _debiasing_ in describing the functionality of fairlearn.
 
-- The term ‘protected attribute’ has a specific meaning in legal contexts which does not always match the data science usage of the term
-- It may signify the presence of multiple sensitive attributes (as a matrix of values), as opposed to other choices such as `sensitive_attribute`.
-- It does not falsely imply ordering between `X`, `y`, and `group_data`, as opposed to, for example, `Z`.
-- It does not falsely imply that it is always part of the training features, as opposed to variable names that subscript `X`.
+### Types of harms
 
-### Parity/Disparity vs. Fairness/Unfairness vs. Bias
+There are many types of harms (see, e.g., the [keynote by K. Crawford at NIPS 2017](https://www.youtube.com/watch?v=fMym_BKWQzk)). Fairlearn is most applicable to two kinds of harms:
 
-There are a number of terms in the literature used to describe concepts related to disparity and fairness. As noted above, some can be particularly fraught since in legal circles they have precise meanings. We shall use the following definitions:
+- _Allocation harms_. These harms can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
-- *Disparity* is something that we can _measure_ and potentially _mitigate_. For example, if we see that a credit scoring model is favoring one group over another.
-- *Fairness* includes the societal context in ways which may not be mathematically expressible. For example, if a finite amount of money is to be loaned, is it better for society to make a few large loans with minimal disparity, or to accept larger disparity and make many smaller loans?
-- *Bias* is anything which can affect the model. Examples include statistical biases in the input data and subconscious cognitive biases in the data scientist.
+- _Quality-of-service harms_. Quality of service refers to whether a system works as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld.
 
-### Parity Criteria/Constraints and Disparity Metrics
+### Fairness assessment and unfairness mitigation
 
-When trying to mitigate disparity we usually have a parity criterion in mind. For certain methods (that we refer to as reductions) these are expressed as constraints, and we optimize the objective subject to these constraints. Below are some examples of parity criteria we use in this repository:
+In fairlearn, we provide tools to assess fairness of predictors for classification and regression. We also provide tools that mitigate unfairness in classification and regression. In both assessment and mitigation scenarios, fairness is quantified using disparity metrics as we describe below.
 
-- Classification:
-    - Demographic Parity (DP): A classifier h satisfies demographic parity under a distribution over (X, A, Y) if its prediction h(X) is statistically independent of the group attribute A — that is, if P[h(X) = y’ | A = a] = P[h(X) = y’] for all a, y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
-    - Equalized Odds (EO): A classifier h satisfies equalized odds under a distribution over (X, A, Y) if its prediction h(X) is conditionally independent of the group attribute A given the label Y —that is, if P[h(X) = y’ | A = a, Y = y] = P[h(X) = y’ | Y = y] for all a, y, and y’. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
-    - Equal Opportunity is a relaxed version of Equalized Odds that only considers positive labels, i.e. Y=1, see [[Hardt et al.]]( https://ttic.uchicago.edu/~nati/Publications/HardtPriceSrebro2016.pdf)
-- Regression:
-    - Statistical Parity: A predictor f satisfies statistical parity under a distribution over (X, A, Y) if f(X) is independent of the group attribute A. Since 0 ≤ f(X) ≤ 1, this is equivalent to P[f(X) ≥ z | A = a] = P[f(X) ≥ z] for all a in A and z in [0,1]. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
-    - Bounded Group Loss: A predictor f satisfies bounded group loss at level ζ under a distribution over (X, A, Y ) if E[loss(Y, f(X)) | A = a] ≤ ζ for all a. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+#### Group fairness, group-membership features
 
-When assessing fairness of models we can measure disparity between groups in a variety of ways. While the criteria above are either fulfilled or not, a disparity metric provides a numerical value with which we can interpret fairness and compare models. We provide the functionality to convert common metrics from scikit-learn to group metrics, i.e. metrics that are evaluated on the entire data set, but also on each group individually. Additionally, group metrics tell us the minimum and maximum metric value and for which groups these values were observed. In certain cases we might be interested in the spread between minimum and maximum metric value, or the ratio between them. All of these are provided by group metric objects. For more information refer to `fairlearn.metrics.metrics_engine.py`.
+There are many approaches to conceptualizing fairness. In fairlearn, we follow the approach known as group fairness, which asks: _Which groups of individuals are at risk for experiencing harms?_
 
-### Fairness assessment
+The relevant groups (also called subpopulations) are defined using **group-membership features**, which represented as a data frame, an array or a vector called `group_membership`. Alternative terminology for group-membership features:
 
-Fairness assessment is the process of determining and evaluating the fairness of a model through a variety of metrics in multiple configurations:
+- _Sensitive features_ or _sensitive attributes_. These terms suggest that the system designer should be sensitive to these features when assessing group fairness. However, this terminology has been also used to require that the predictors should be "blind" to these features. Since we want to cover a wider range of use cases, we prefer the term _group-membership features_.
 
-- Comparison of generated models with a visualization of the fairness/accuracy tradeoff
-- Fairness and accuracy regarding training labels
-- Fairness with respect to predicted outcome
+- _Protected attribute_. The term is based on anti-discrimination laws that define specific _protected classes_. Since we seek to apply group fairness in a wider range of settings, we avoid this terminology.
+
+#### Parity constraints
+
+Group fairness is typically formalized by a set of constraints on the behavior of the predictor called **parity constraints** (also called criteria). Parity constraints require that some aspect (or aspects) of the predictor behavior be comparable across the groups defined by group-membership features.
+
+Let _X_ denote a feature vector used for predictions, _A_ be a single group-membership feature (such as age or race), and _Y_ be the true label. Parity constraints are phrased in terms of expectations with respect to the distribution over (_X,A,Y_).
+For example, in fairlearn, we consider the following types of parity constraints.
+
+_Binary classification_:
+
+- _Statistical parity_ (also known as _demographic parity_): A classifier _h_ satisfies statistical parity under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is statistically independent of the group membership _A_. This is equivalent to E[_h_(_X_) | _A_=_a_] = E[_h_(_X_)] for all _a_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+
+- _Equalized odds_: A classifier _h_ satisfies equalized odds under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is conditionally independent of the group membership _A_ given the label _Y_. This is equivalent to E[_h_(_X_) | _A_=_a_, _Y_=_y_] = E[_h_(_X_) | _Y_=_y_] for all _a, y_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+
+- _Equal opportunity_: a relaxed version of equalized odds that only considers conditional expectations with respect positive labels, i.e., _Y_=1. [[Hardt et al.]]( https://ttic.uchicago.edu/~nati/Publications/HardtPriceSrebro2016.pdf)
+
+_Regression_:
+
+- _Statistical parity_: A predictor _f_ satisfies statistical parity under a distribution over (_X, A, Y_) if _f_(_X_) is independent of the group membership _A_. This is equivalent to P[_f_(_X_) ≥ _z_ | _A_=_a_] = P[_f_(_X_) ≥ _z_] for all _a_ and _z_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+
+- _Bounded group loss_: A predictor _f_ satisfies bounded group loss at level _ζ_ under a distribution over (_X, A, Y_) if E[loss(_Y_, _f_(_X_)) | _A_=_a_] ≤ _ζ_ for all _a_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+
+Above, statistical parity seeks to mitigate allocation harms, whereas bounded group loss primarily seek to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
+
+#### Disparity metrics, group metrics
+
+Disparity metrics evaluate how far a given predictor departs from satisfying a parity constraint. They can either compare the behavior across different groups in terms of ratios or in terms of differences. For example, for binary classification:
+
+- _Statistical parity difference_ = (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) - (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
+- _Statistical parity ratio_ = (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) / (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
+
+Fairlearn provides the functionality to convert common accuracy and error metrics from `scikit-learn` to _group metrics_, i.e., metrics that are evaluated on the entire data set and also on each group individually. Additionally, group metrics yield the minimum and maximum metric value and for which groups these values were observed, as well as the difference and ratio between the maximum and the minimum values. For more information refer to `fairlearn.metrics` subpackage.
