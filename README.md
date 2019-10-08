@@ -8,9 +8,7 @@ A Python package that implements a variety of algorithms that mitigate unfairnes
 
 * The current stable release is available at [FairLearn v0.2.0](https://github.com/microsoft/fairlearn/tree/v0.2.0).
 
-* Our latest work differs substantively from version 0.2.0, please investigate this repo for further information. 
-
-* Current users can reference [Existing users: How to onboard to fairlearn v0.3+](#existing).
+* Our latest work differs substantively from version 0.2.0, please investigate this repo for further information. In particular, look at [Existing users: How to onboard to fairlearn v0.3+](#existing).
 
 #  Algorithms
 
