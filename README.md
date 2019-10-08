@@ -6,9 +6,9 @@ A Python package that implements a variety of algorithms that mitigate unfairnes
 
 ## Current Release
 
-*  The current stable release is available at [FairLearn v0.2.0](https://github.com/microsoft/fairlearn/tree/v0.2.0 ).
+* The current stable release is available at [FairLearn v0.2.0](https://github.com/microsoft/fairlearn/tree/v0.2.0).
 
-* This repo contains our latest development work and is frequently updated.
+* Our latest work differs substantively from version 0.2.0, please investigate this repo for further information. 
 
 * Current users can reference [Existing users: How to onboard to fairlearn v0.3+](#existing).
 
@@ -28,6 +28,7 @@ DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group 
 To request additional algorithms or fairness definitions, please open a new issue.
 
 # <a name="existing"></a>
+
 # Existing users: How to onboard to fairlearn v0.3+
 
 <details>
