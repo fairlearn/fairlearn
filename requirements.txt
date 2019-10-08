@@ -1,0 +1,20 @@
+# Required for fairlearn
+matplotlib
+numpy
+pandas
+scikit-learn
+scipy
+
+# Required for environment
+autopep8
+flake8
+
+# Required for test
+# Pin pytest due to VS Code issue
+pytest==5.0.1
+pytest-cov
+
+# Required for notebooks
+jupyter
+nbval
+shap
