@@ -135,6 +135,11 @@ class GridSearch(ReductionsEstimator):
         # Extract the target attribute
         A = self._make_vector(aux_data, "aux_data")
 
+        unique_labels = np.unique(A)
+        if len(unique_labels) > 2:
+            raise RuntimeError("Target Attribute contains "
+                               "more than two unique values")
+
         # Extract the Y values
         y_vector = self._make_vector(y, "y")
 
