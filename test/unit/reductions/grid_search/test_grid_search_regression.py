@@ -167,9 +167,10 @@ def test_compare_custom_vs_moments():
                          quality_metric=SimpleRegressionQualityMetric())
     target2 = GridSearch(Ridge(alpha=2.0),
                          disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
-                         quality_metric=SimpleRegressionQualityMetric())
+                         quality_metric=SimpleRegressionQualityMetric(),
+                         grid_size=11)
 
-    target2.fit(X, y, aux_data=A, number_of_lagrange_multipliers=11)
+    target2.fit(X, y, aux_data=A)
     lm = [r.lagrange_multiplier.iat[0] / 2 for r in target2.all_results]
     target1.fit(X, y, aux_data=A, lagrange_multipliers=lm)
 
