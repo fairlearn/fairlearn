@@ -183,9 +183,10 @@ def test_compare_custom_vs_moments():
 
     target2 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=moments.DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric())
+                         quality_metric=SimpleClassificationQualityMetric(),
+                         grid_size=3)
 
-    target2.fit(X, y, aux_data=A, number_of_lagrange_multipliers=3)
+    target2.fit(X, y, aux_data=A)
 
     lm = [r.lagrange_multiplier.iat[1] - r.lagrange_multiplier.iat[3] for r in target2.all_results]
     target1._FLIP_ATTRIBUTE_VALS = True

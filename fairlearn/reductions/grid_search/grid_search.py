@@ -15,19 +15,45 @@ class _GridGenerator:
     """A generator of a grid of points with a bounded L1 norm.
     """
 
-    def __init__(self, limit, n_units, dim, neg_allowed, force_L1_norm):
-        # static variables for integer grid accumulation
-        self.dim = dim
+    def __init__(self, grid_size, grid_limit, pos_basis, neg_basis, neg_allowed, force_L1_norm):
+        # grid parameters
+        self.dim = len(pos_basis.columns)
         self.neg_allowed = neg_allowed
         self.force_L1_norm = force_L1_norm
 
-        # working variables for integer grid accumulation
+        # true dimensionality of the grid
+        if self.force_L1_norm:
+            true_dim = self.dim - 1
+        else:
+            true_dim = self.dim
+
+        # a conservative lower bound on the scaling parameter of the grid
+        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0/true_dim) - 1
+        n_units = int(np.floor(n_units))
+        if n_units < 0:
+            n_units = 0
+
+        # find the grid of size at least "size" and save the first "size" entries
+        while True:
+            int_grid = self.build_integer_grid(n_units)
+            if len(int_grid) >= grid_size:
+                # re-scale the integer grid, separate into positive and negative parts
+                coef_grid_pos = pd.DataFrame(self.accumulator[:grid_size]).T * (float(grid_limit) / n_units)
+                coef_grid_neg = -coef_grid_pos.copy()
+                coef_grid_pos[coef_grid_pos < 0] = 0.0
+                coef_grid_neg[coef_grid_neg < 0] = 0.0
+                # convert the grid of basis coefficients into a grid of lambda vectors
+                self.grid = pos_basis.dot(coef_grid_pos) + neg_basis.dot(coef_grid_neg)
+                break
+            n_units = n_units + 1
+
+    def build_integer_grid(self, n_units):
+        # initialize working variables for the grid accumulation
         self.entry = np.zeros(self.dim)
         self.accumulator = []
+        # recursively create the integer grid
         self.accumulate_integer_grid(0, n_units)
-
-        # re-scale the integer grid to obtain the final grid
-        self.grid = pd.DataFrame(self.accumulator).T * (float(limit) / n_units)
+        return self.accumulator
 
     def accumulate_integer_grid(self, index, max_val):
         if index == self.dim:
@@ -69,7 +95,10 @@ class GridSearch(ReductionsEstimator):
     def __init__(self,
                  learner,
                  disparity_metric,
-                 quality_metric):
+                 quality_metric,
+                 grid_size = 10,
+                 grid_limit = 2.0,
+                 grid = None):
         self.learner = learner
         if (not isinstance(disparity_metric, DemographicParity) and
                 not isinstance(disparity_metric, BoundedGroupLoss) and
@@ -80,6 +109,10 @@ class GridSearch(ReductionsEstimator):
         if not isinstance(quality_metric, QualityMetric):
             raise RuntimeError("quality_metric must derive from QualityMetric")
         self.quality_metric = quality_metric
+
+        self.grid_size = grid_size
+        self.grid_limit = float(grid_limit)
+        self.grid = grid
 
     def fit(self, X, y, aux_data=None, **kwargs):
         if X is None:
@@ -126,28 +159,21 @@ class GridSearch(ReductionsEstimator):
             neg_basis = self.disparity_metric.neg_basis
             neg_allowed = self.disparity_metric.neg_basis_present
             objective_in_the_span = (self.disparity_metric.default_objective_lambda_vec is not None)   # noqa: E501
-            dim = len(pos_basis.columns)
-
-            # Grid parameters: these should be provided as arguments, but
-            # explicitly here for the time being
-            grid_limit = 2.0
-            grid_size = number_of_lagrange_multipliers-1
-
-            # Generate the grid
-            grid = _GridGenerator(grid_limit,
-                                  grid_size,
-                                  dim,
-                                  neg_allowed,
-                                  objective_in_the_span).grid
+            
+            if self.grid is None:
+                grid = _GridGenerator(self.grid_size,
+                                      self.grid_limit,
+                                      pos_basis,
+                                      neg_basis,
+                                      neg_allowed,
+                                      objective_in_the_span).grid
+            else:
+                grid = self.grid
 
             # Fit the estimates
             self.all_results = []
-            for i in grid:
-                beta_pos = grid[i].copy()
-                beta_neg = -grid[i].copy()
-                beta_pos[beta_pos < 0] = 0.0
-                beta_neg[beta_neg < 0] = 0.0
-                lambda_vec = pos_basis.dot(beta_pos) + neg_basis.dot(beta_neg)
+            for i in grid.columns:
+                lambda_vec = grid[i]
                 weights = self.disparity_metric.signed_weights(lambda_vec)
                 if not objective_in_the_span:
                     weights = weights + objective.signed_weights()
