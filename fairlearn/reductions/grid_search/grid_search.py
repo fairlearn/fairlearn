@@ -9,6 +9,7 @@ from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, _REDUCTION_TYPE_CLASSIFICATION
+from fairlearn.reductions.moments import ConditionalOpportunity
 
 
 class _GridGenerator:
@@ -135,6 +136,11 @@ class GridSearch(ReductionsEstimator):
         # Extract the target attribute
         A = self._make_vector(aux_data, "aux_data")
 
+        unique_labels = np.unique(A)
+        if len(unique_labels) > 2:
+            raise RuntimeError("Target Attribute contains "
+                               "more than two unique values")
+
         # Extract the Y values
         y_vector = self._make_vector(y, "y")
 
@@ -148,6 +154,13 @@ class GridSearch(ReductionsEstimator):
         self.quality_metric.set_data(X, y_vector, A)
 
         if isinstance(self.disparity_metric, Moment):
+            if isinstance(self.disparity_metric, ConditionalOpportunity):
+                # We have a classification problem
+                # Need to make sure that y is binary (for now)
+                unique_labels = np.unique(y_vector)
+                if not set(unique_labels).issubset({0, 1}):
+                    raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
+
             # Prep the disparity metric and objective
             self.disparity_metric.init(X, A, y_vector)
             objective = self.disparity_metric.default_objective()
@@ -181,7 +194,7 @@ class GridSearch(ReductionsEstimator):
                     y_reduction = 1 * (weights > 0)
                     weights = weights.abs()
                 else:
-                    y_reduction = y
+                    y_reduction = y_vector
 
                 current_learner = copy.deepcopy(self.learner)
                 current_learner.fit(X, y_reduction, sample_weight=weights)

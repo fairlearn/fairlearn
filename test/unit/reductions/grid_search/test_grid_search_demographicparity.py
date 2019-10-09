@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from fairlearn.metrics import DemographicParity
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 import fairlearn.reductions.moments as moments
@@ -54,11 +53,11 @@ def test_demographicparity_fair_uneven_populations():
                                      a0_label, a1_label)
 
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                        disparity_metric=DemographicParity(),
-                        quality_metric=SimpleClassificationQualityMetric())
+                        disparity_metric=moments.DemographicParity(),
+                        quality_metric=SimpleClassificationQualityMetric(),
+                        grid_size=11)
 
-    target.fit(X, Y, aux_data=A,
-               number_of_lagrange_multipliers=11)
+    target.fit(X, Y, aux_data=A)
     assert len(target.all_results) == 11
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
@@ -101,10 +100,17 @@ def test_lagrange_multiplier_zero_unchanged_model():
     unmitigated_estimator.fit(X, y)
 
     # Do the grid search with a zero Lagrange multiplier
+    iterables = [['+', '-'], ['all'], [a0_label, a1_label]]
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'grp', 'group_id'])
+    lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
+    grid_df = pd.DataFrame(lagrange_zero_series)
+
     target = GridSearch(estimator,
-                        disparity_metric=DemographicParity(),
-                        quality_metric=SimpleClassificationQualityMetric())
-    target.fit(X, y, aux_data=A, lagrange_multipliers=[0])
+                        disparity_metric=moments.DemographicParity(),
+                        quality_metric=SimpleClassificationQualityMetric(),
+                        grid=grid_df)
+    target.fit(X, y, aux_data=A)
+    assert len(target.all_results) == 1
 
     # Check coefficients
     gs_coeff = target.best_result.model.coef_
@@ -129,76 +135,41 @@ def test_can_specify_and_generate_lagrange_multipliers():
                                    fit_intercept=True,
                                    random_state=97)
 
-    target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric())
-
-    target2 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric())
-
-    # Note that using integers for my_lagrange causes the test to fail
-    my_lagrange = [-2.0, 0, 2.0]
-
-    # Try both ways of specifying the Lagrange multipliers
-    target2.fit(X, y, aux_data=A, lagrange_multipliers=my_lagrange)
-    target1.fit(X, y, aux_data=A, number_of_lagrange_multipliers=len(my_lagrange))
-
-    assert len(target1.all_results) == len(my_lagrange)
-    assert len(target2.all_results) == len(my_lagrange)
-
-    # Check we generated the same multipliers
-    for i in range(len(my_lagrange)):
-        lm1 = target1.all_results[i].lagrange_multiplier
-        lm2 = target2.all_results[i].lagrange_multiplier
-        assert lm1 == lm2
-
-    # Check the models are the same
-    for i in range(len(my_lagrange)):
-        coef1 = target1.all_results[i].model.coef_
-        coef2 = target2.all_results[i].model.coef_
-        assert np.array_equal(coef1, coef2)
-
-
-def test_compare_custom_vs_moments():
-    score_threshold = 0.5
-
-    number_a0 = 37
-    number_a1 = 93
-
-    a0_label = 11
-    a1_label = 4
-
-    X, y, A = _simple_threshold_data(number_a0, number_a1,
-                                     score_threshold, score_threshold,
-                                     a0_label, a1_label)
-
-    estimator = LogisticRegression(solver='liblinear',
-                                   fit_intercept=True,
-                                   random_state=97)
+    iterables = [['+', '-'], ['all'], sorted([a0_label, a1_label])]
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'grp', 'group_id'])
+    lagrange_negative_series = pd.Series([0.0, 0.0, 0.0, 2.0], index=midx)
+    lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
+    lagrange_positive_series = pd.Series([0.0, 2.0, 0.0, 0.0], index=midx)
+    grid_df = pd.concat([lagrange_negative_series,
+                         lagrange_zero_series,
+                         lagrange_positive_series],
+                        axis=1)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric())
-
-    target2 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=moments.DemographicParity(),
                          quality_metric=SimpleClassificationQualityMetric(),
                          grid_size=3)
 
+    target2 = GridSearch(copy.deepcopy(estimator),
+                         disparity_metric=moments.DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric(),
+                         grid=grid_df)
+
+    # Try both ways of specifying the Lagrange multipliers
     target2.fit(X, y, aux_data=A)
+    target1.fit(X, y, aux_data=A)
 
-    lm = [r.lagrange_multiplier.iat[1] - r.lagrange_multiplier.iat[3] for r in target2.all_results]
-    target1._FLIP_ATTRIBUTE_VALS = True
-    target1.fit(X, y, aux_data=A, lagrange_multipliers=lm)
+    assert len(target1.all_results) == 3
+    assert len(target2.all_results) == 3
 
-    assert len(target1.all_results) == len(target2.all_results)
-
-    # q1 = [r.quality_metric_value for r in target1.all_results]
-    # q2 = [r.quality_metric_value for r in target2.all_results]
+    # Check we generated the same multipliers
+    for i in range(3):
+        lm1 = target1.all_results[i].lagrange_multiplier
+        lm2 = target2.all_results[i].lagrange_multiplier
+        assert lm1.equals(lm2)
 
     # Check the models are the same
-    for i in range(len(lm)):
+    for i in range(3):
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
-        assert np.allclose(coef1, coef2)
+        assert np.array_equal(coef1, coef2)
