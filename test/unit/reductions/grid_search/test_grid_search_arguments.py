@@ -233,14 +233,8 @@ class ArgumentTests:
         assert message == execInfo.value.args[0]
 
 
-# Tests specific to DemographicParity
-class TestDemographicParity(ArgumentTests):
-    def setup_method(self, method):
-        logging.info("setup_method      method:%s" % method.__name__)
-        self.estimator = LogisticRegression(solver='liblinear')
-        self.disparity_criterion = moments.DemographicParity()
-        self.quality_metric = SimpleClassificationQualityMetric()
-
+# Tests specific to Classification
+class ConditionalOpportunityTests(ArgumentTests):
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -276,6 +270,24 @@ class TestDemographicParity(ArgumentTests):
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
+
+
+# Set up DemographicParity
+class TestDemographicParity(ConditionalOpportunityTests):
+    def setup_method(self, method):
+        logging.info("setup_method      method:%s" % method.__name__)
+        self.estimator = LogisticRegression(solver='liblinear')
+        self.disparity_criterion = moments.DemographicParity()
+        self.quality_metric = SimpleClassificationQualityMetric()
+
+
+# Test EqualizedOdds
+class TestEqualizedOdds(ConditionalOpportunityTests):
+    def setup_method(self, method):
+        logging.info("setup_method      method:%s" % method.__name__)
+        self.estimator = LogisticRegression(solver='liblinear')
+        self.disparity_criterion = moments.EqualizedOdds()
+        self.quality_metric = SimpleClassificationQualityMetric()
 
 
 # Tests specific to BoundedGroupLoss
