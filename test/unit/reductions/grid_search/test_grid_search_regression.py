@@ -51,8 +51,9 @@ def test_bgl_unfair():
                                       a0_label, a1_label)
 
     target = GridSearch(LinearRegression(),
-                        disparity_metric=BoundedGroupLoss(),
-                        quality_metric=SimpleRegressionQualityMetric())
+                        disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                        quality_metric=SimpleRegressionQualityMetric(),
+                        grid_size=7)
 
     target.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=7)
 
@@ -95,13 +96,21 @@ def test_bgl_unmitigated_same():
     unmitigated_estimator = copy.deepcopy(estimator)
     unmitigated_estimator.fit(X, y)
 
-    target = GridSearch(estimator,
-                        disparity_metric=BoundedGroupLoss(),
-                        quality_metric=SimpleRegressionQualityMetric())
-    # The value 0.5 comes from the counts of a0 and a1
-    target.fit(X, y, aux_data=A, lagrange_multipliers=[0.5])
+    # Do the grid search with a zero Lagrange multiplier
+    idx = pd.Int64Index(sorted([a0_label, a1_label]))
+    lagrange_balanced_series = pd.Series([1.0, 1.0], index=idx)
+    grid_df = pd.DataFrame(lagrange_balanced_series)
 
-    assert np.array_equal(unmitigated_estimator.coef_, target.best_result.model.coef_)
+    target = GridSearch(estimator,
+                        disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                        quality_metric=SimpleRegressionQualityMetric(),
+                        grid=grid_df)
+    target.fit(X, y, aux_data=A)
+
+    raw_coef = unmitigated_estimator.coef_
+    gs_coef = target.best_result.model.coef_
+    # Can't quite get exact match, but this should be very close
+    assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
 
 def test_bgl_lagrange_specifications():
@@ -119,13 +128,30 @@ def test_bgl_lagrange_specifications():
                                       a0_label, a1_label)
 
     estimator = LinearRegression()
+
+    # Do the grid search with a zero Lagrange multiplier
+    idx = pd.Int64Index(sorted([a0_label, a1_label]))
+    l0_series = pd.Series([2.0, 0.0], index=idx)
+    l1_series = pd.Series([1.5, 0.5], index=idx)
+    l2_series = pd.Series([1.0, 1.0], index=idx)
+    l3_series = pd.Series([0.5, 1.5], index=idx)
+    l4_series = pd.Series([0.0, 2.0], index=idx)
+    grid_df = pd.concat([l0_series,
+                         l1_series,
+                         l2_series,
+                         l3_series,
+                         l4_series],
+                        axis=1)
+
     target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=BoundedGroupLoss(),
-                         quality_metric=SimpleRegressionQualityMetric())
+                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         quality_metric=SimpleRegressionQualityMetric(),
+                         grid_size=5)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=BoundedGroupLoss(),
-                         quality_metric=SimpleRegressionQualityMetric())
+                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         quality_metric=SimpleRegressionQualityMetric(),
+                         grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
 
@@ -139,7 +165,7 @@ def test_bgl_lagrange_specifications():
     for i in range(len(tradeoffs)):
         lm1 = target1.all_results[i].lagrange_multiplier
         lm2 = target2.all_results[i].lagrange_multiplier
-        assert lm1 == lm2
+        assert lm1.equals(lm2)
 
     # Check the models are the same
     for i in range(len(tradeoffs)):
