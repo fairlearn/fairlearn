@@ -186,7 +186,7 @@ class GridSearch(ReductionsEstimator):
                     y_reduction = 1 * (weights > 0)
                     weights = weights.abs()
                 else:
-                    y_reduction = y
+                    y_reduction = y_vector
 
                 current_learner = copy.deepcopy(self.learner)
                 current_learner.fit(X, y_reduction, sample_weight=weights)
