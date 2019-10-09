@@ -38,12 +38,12 @@ class _GridGenerator:
             int_grid = self.build_integer_grid(n_units)
             if len(int_grid) >= grid_size:
                 # re-scale the integer grid, separate into positive and negative parts
-                coef_grid_pos = pd.DataFrame(self.accumulator[:grid_size]).T * (float(grid_limit) / n_units)
-                coef_grid_neg = -coef_grid_pos.copy()
-                coef_grid_pos[coef_grid_pos < 0] = 0.0
-                coef_grid_neg[coef_grid_neg < 0] = 0.0
+                pos_coefs = pd.DataFrame(self.accumulator[:grid_size]).T * (float(grid_limit) / n_units)   # noqa: E501
+                neg_coefs = -pos_coefs.copy()
+                pos_coefs[pos_coefs < 0] = 0.0
+                neg_coefs[neg_coefs < 0] = 0.0
                 # convert the grid of basis coefficients into a grid of lambda vectors
-                self.grid = pos_basis.dot(coef_grid_pos) + neg_basis.dot(coef_grid_neg)
+                self.grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
                 break
             n_units = n_units + 1
 
@@ -96,9 +96,9 @@ class GridSearch(ReductionsEstimator):
                  learner,
                  disparity_metric,
                  quality_metric,
-                 grid_size = 10,
-                 grid_limit = 2.0,
-                 grid = None):
+                 grid_size=10,
+                 grid_limit=2.0,
+                 grid=None):
         self.learner = learner
         if (not isinstance(disparity_metric, DemographicParity) and
                 not isinstance(disparity_metric, BoundedGroupLoss) and
@@ -159,7 +159,7 @@ class GridSearch(ReductionsEstimator):
             neg_basis = self.disparity_metric.neg_basis
             neg_allowed = self.disparity_metric.neg_basis_present
             objective_in_the_span = (self.disparity_metric.default_objective_lambda_vec is not None)   # noqa: E501
-            
+
             if self.grid is None:
                 grid = _GridGenerator(self.grid_size,
                                       self.grid_limit,
