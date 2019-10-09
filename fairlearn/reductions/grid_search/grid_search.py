@@ -9,6 +9,7 @@ from fairlearn.metrics import DemographicParity, BoundedGroupLoss
 from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, _REDUCTION_TYPE_CLASSIFICATION
+from fairlearn.reductions.moments import ConditionalOpportunity
 
 
 class _GridGenerator:
@@ -153,6 +154,13 @@ class GridSearch(ReductionsEstimator):
         self.quality_metric.set_data(X, y_vector, A)
 
         if isinstance(self.disparity_metric, Moment):
+            if isinstance(self.disparity_metric, ConditionalOpportunity):
+                # We have a classification problem
+                # Need to make sure that y is binary (for now)
+                unique_labels = np.unique(y_vector)
+                if not set(unique_labels).issubset({0, 1}):
+                    raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
+
             # Prep the disparity metric and objective
             self.disparity_metric.init(X, A, y_vector)
             objective = self.disparity_metric.default_objective()
