@@ -54,11 +54,11 @@ def test_demographicparity_fair_uneven_populations():
                                      a0_label, a1_label)
 
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                        disparity_metric=DemographicParity(),
-                        quality_metric=SimpleClassificationQualityMetric())
+                        disparity_metric=moments.DemographicParity(),
+                        quality_metric=SimpleClassificationQualityMetric(),
+                        grid_size=11)
 
-    target.fit(X, Y, aux_data=A,
-               number_of_lagrange_multipliers=11)
+    target.fit(X, Y, aux_data=A)
     assert len(target.all_results) == 11
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
@@ -101,10 +101,17 @@ def test_lagrange_multiplier_zero_unchanged_model():
     unmitigated_estimator.fit(X, y)
 
     # Do the grid search with a zero Lagrange multiplier
+    iterables = [['+', '-'], ['all'], [a0_label, a1_label]]
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'grp', 'group_id'])
+    lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
+    grid_df = pd.DataFrame(lagrange_zero_series)
+
     target = GridSearch(estimator,
-                        disparity_metric=DemographicParity(),
-                        quality_metric=SimpleClassificationQualityMetric())
-    target.fit(X, y, aux_data=A, lagrange_multipliers=[0])
+                        disparity_metric=moments.DemographicParity(),
+                        quality_metric=SimpleClassificationQualityMetric(),
+                        grid=grid_df)
+    target.fit(X, y, aux_data=A)
+    assert len(target.all_results) == 1
 
     # Check coefficients
     gs_coeff = target.best_result.model.coef_
