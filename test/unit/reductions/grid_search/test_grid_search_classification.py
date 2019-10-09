@@ -136,32 +136,41 @@ def test_can_specify_and_generate_lagrange_multipliers():
                                    fit_intercept=True,
                                    random_state=97)
 
+    iterables = [['+', '-'], ['all'], sorted([a0_label, a1_label])]
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'grp', 'group_id'])
+    lagrange_negative_series = pd.Series([0.0, 0.0, 0.0, 2.0], index=midx)
+    lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
+    lagrange_positive_series = pd.Series([0.0, 2.0, 0.0, 0.0], index=midx)
+    grid_df = pd.concat([lagrange_negative_series,
+                         lagrange_zero_series,
+                         lagrange_positive_series],
+                        axis=1)
+
     target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric())
+                         disparity_metric=moments.DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric(),
+                         grid_size=3)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric())
-
-    # Note that using integers for my_lagrange causes the test to fail
-    my_lagrange = [-2.0, 0, 2.0]
+                         disparity_metric=moments.DemographicParity(),
+                         quality_metric=SimpleClassificationQualityMetric(),
+                         grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
-    target2.fit(X, y, aux_data=A, lagrange_multipliers=my_lagrange)
-    target1.fit(X, y, aux_data=A, number_of_lagrange_multipliers=len(my_lagrange))
+    target2.fit(X, y, aux_data=A)
+    target1.fit(X, y, aux_data=A)
 
-    assert len(target1.all_results) == len(my_lagrange)
-    assert len(target2.all_results) == len(my_lagrange)
+    assert len(target1.all_results) == 3
+    assert len(target2.all_results) == 3
 
     # Check we generated the same multipliers
-    for i in range(len(my_lagrange)):
+    for i in range(3):
         lm1 = target1.all_results[i].lagrange_multiplier
         lm2 = target2.all_results[i].lagrange_multiplier
-        assert lm1 == lm2
+        assert lm1.equals(lm2)
 
     # Check the models are the same
-    for i in range(len(my_lagrange)):
+    for i in range(3):
         coef1 = target1.all_results[i].model.coef_
         coef2 = target2.all_results[i].model.coef_
         assert np.array_equal(coef1, coef2)
