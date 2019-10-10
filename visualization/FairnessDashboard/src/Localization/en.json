@@ -1,0 +1,38 @@
+{
+    "defaultClassNames": "Class {0}",
+    "defaultFeatureNames": "Feature {0}",
+    "accuracyTab": "Fairness in Accuracy",
+    "opportunityTab": "Fairness in Opportunity",
+    "modelComparisonTab": "Model Comparison",
+    "tableTab": "Detail View",
+    "dataSpecifications": "Data Specifications",
+    "attributes": "Attributes",
+    "attributesCount": "{0} attributes",
+    "instanceCount": "{0} instances",
+    "close": "Close",
+    "calculating": "Calculating...",
+    "Accuracy": {
+        "header": "How do you want to measure accuracy",
+        "body": "We have determined that your model generates {0} predictions. Based on the information, we recommend the following accuracy metrics:"
+    },
+    "Parity": {
+        "header": "Fairness measured in terms of disparity",
+        "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are two kinds of disparity metrics: more to come...."
+    },
+    "Footer": {
+        "back": "Back",
+        "next": "Next"
+    },
+    "Report": {
+        "title": "Accuracy and fairness assessment",
+        "globalAccuracyText": "Is your overall accuracy score",
+        "accuracyDisparityText": "Is the overall difference",
+        "editConfiguration": "Edit Configuration"
+    },
+    "Feature": {
+        "header": "Along which features would you like to evaluate your model's fairness?",
+        "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's accuracy and outputs differ across these splits.",
+        "learnMore": "Learn more",
+        "summaryCategoricalCount": "Your data contains {0} categorical values"
+    }
+}
