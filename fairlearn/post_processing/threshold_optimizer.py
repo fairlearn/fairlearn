@@ -382,8 +382,8 @@ def _vectorized_prediction(function_dict, sensitive_features, scores):
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     """
     # handle type conversion to ndarray for other types
-    sensitive_features_vector = _convert_to_ndarray(sensitive_features, MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE
-                                            .format("sensitive_features"))
+    sensitive_features_vector = _convert_to_ndarray(
+        sensitive_features, MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
     scores_vector = _convert_to_ndarray(
         scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
 
