@@ -17,7 +17,7 @@ AI systems can behave unfairly for a variety of reasons. Sometimes it is because
 
 ### Types of harms
 
-There are many types of harms (see, e.g., the [keynote by K. Crawford at NIPS 2017](https://www.youtube.com/watch?v=fMym_BKWQzk)). Fairlearn is most applicable to two kinds of harms:
+There are many types of harms (see, e.g., the [keynote by K. Crawford at NeurIPS 2017](https://www.youtube.com/watch?v=fMym_BKWQzk)). Fairlearn is most applicable to two kinds of harms:
 
 - _Allocation harms_. These harms can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
@@ -46,7 +46,7 @@ For example, in fairlearn, we consider the following types of parity constraints
 
 _Binary classification_:
 
-- _Statistical parity_ (also known as _demographic parity_): A classifier _h_ satisfies statistical parity under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is statistically independent of the group membership _A_. This is equivalent to E[_h_(_X_) | _A_=_a_] = E[_h_(_X_)] for all _a_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+- _Demographic parity_ (also known as _statistical parity_): A classifier _h_ satisfies demographic parity under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is statistically independent of the group membership _A_. This is equivalent to E[_h_(_X_) | _A_=_a_] = E[_h_(_X_)] for all _a_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
 
 - _Equalized odds_: A classifier _h_ satisfies equalized odds under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is conditionally independent of the group membership _A_ given the label _Y_. This is equivalent to E[_h_(_X_) | _A_=_a_, _Y_=_y_] = E[_h_(_X_) | _Y_=_y_] for all _a, y_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
 
@@ -54,17 +54,17 @@ _Binary classification_:
 
 _Regression_:
 
-- _Statistical parity_: A predictor _f_ satisfies statistical parity under a distribution over (_X, A, Y_) if _f_(_X_) is independent of the group membership _A_. This is equivalent to P[_f_(_X_) ≥ _z_ | _A_=_a_] = P[_f_(_X_) ≥ _z_] for all _a_ and _z_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+- _Demographic parity_: A predictor _f_ satisfies demographic parity under a distribution over (_X, A, Y_) if _f_(_X_) is independent of the group membership _A_. This is equivalent to P[_f_(_X_) ≥ _z_ | _A_=_a_] = P[_f_(_X_) ≥ _z_] for all _a_ and _z_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
 
 - _Bounded group loss_: A predictor _f_ satisfies bounded group loss at level _ζ_ under a distribution over (_X, A, Y_) if E[loss(_Y_, _f_(_X_)) | _A_=_a_] ≤ _ζ_ for all _a_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
 
-Above, statistical parity seeks to mitigate allocation harms, whereas bounded group loss primarily seek to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
+Above, demographic parity seeks to mitigate allocation harms, whereas bounded group loss primarily seek to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
 
 #### Disparity metrics, group metrics
 
 Disparity metrics evaluate how far a given predictor departs from satisfying a parity constraint. They can either compare the behavior across different groups in terms of ratios or in terms of differences. For example, for binary classification:
 
-- _Statistical parity difference_ = (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) - (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
-- _Statistical parity ratio_ = (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) / (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
+- _Demographic parity difference_ = (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) - (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
+- _Demographic parity ratio_ = (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) / (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
 
 Fairlearn provides the functionality to convert common accuracy and error metrics from `scikit-learn` to _group metrics_, i.e., metrics that are evaluated on the entire data set and also on each group individually. Additionally, group metrics yield the minimum and maximum metric value and for which groups these values were observed, as well as the difference and ratio between the maximum and the minimum values. For more information refer to `fairlearn.metrics` subpackage.
