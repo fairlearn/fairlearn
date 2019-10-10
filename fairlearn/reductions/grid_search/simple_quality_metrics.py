@@ -25,8 +25,8 @@ class SimpleClassificationQualityMetric(QualityMetric):
         self.Y = Y
         self.bin_id = bin_id
 
-        self.error_metric.load_data(X, pd.Series(Y), group_membership=bin_id)
-        self.disparity_metric.load_data(X, pd.Series(Y), group_membership=bin_id)
+        self.error_metric.load_data(X, pd.Series(Y), sensitive_feature=bin_id)
+        self.disparity_metric.load_data(X, pd.Series(Y), sensitive_feature=bin_id)
 
     def get_quality(self, model):
         current_error_metric = copy.deepcopy(self.error_metric)

@@ -18,9 +18,9 @@ class _Lagrangian:
     def __init__(self, X, A, y, learner, constraints, eps, B, opt_lambda=True):
         self.X = X
         self.constraints = constraints
-        self.constraints.load_data(X, y, group_membership=A)
+        self.constraints.load_data(X, y, sensitive_feature=A)
         self.obj = self.constraints.default_objective()
-        self.obj.load_data(X, y, group_membership=A)
+        self.obj.load_data(X, y, sensitive_feature=A)
         self.pickled_learner = pickle.dumps(learner)
         self.eps = eps
         self.B = B

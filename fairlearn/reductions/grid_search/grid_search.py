@@ -144,9 +144,9 @@ class GridSearch(ReductionsEstimator):
                 raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
         # Prep the disparity metric and objective
-        self.disparity_metric.load_data(X, y_vector, **kwargs)    # group_membership=A)
+        self.disparity_metric.load_data(X, y_vector, **kwargs)    # sensitive_feature=A)
         objective = self.disparity_metric.default_objective()
-        objective.load_data(X, y_vector, **kwargs)    # group_membership=A)
+        objective.load_data(X, y_vector, **kwargs)    # sensitive_feature=A)
         is_classification_reduction = isinstance(self.disparity_metric, ClassificationMoment)
 
         # Basis information

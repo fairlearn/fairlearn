@@ -10,7 +10,7 @@ _LOSS = "loss"
 _PREDICTION = "pred"
 _ALL = "all"
 _SIGN = "sign"
-_KW_GROUP_MEMBERSHIP = "group_membership"
+_KW_GROUP_MEMBERSHIP = "sensitive_feature"
 
 
 class Moment:

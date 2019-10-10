@@ -78,7 +78,7 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
         gs.fit(transformX(X),
                transformY(Y),
-               group_membership=transformA(A))
+               sensitive_feature=transformA(A))
         assert len(gs.all_results) == 2
 
     # ----------------------------
@@ -93,7 +93,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(None,
                    transformY(Y),
-                   group_membership=transformA(A))
+                   sensitive_feature=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -107,7 +107,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    None,
-                   group_membership=transformA(A))
+                   sensitive_feature=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -125,7 +125,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   group_membership=transformA(A))
+                   sensitive_feature=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -141,7 +141,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   group_membership=transformA(A))
+                   sensitive_feature=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -150,7 +150,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_group_membership_non_binary(self, transformX, transformY, transformA):
+    def test_sensitive_feature_non_binary(self, transformX, transformY, transformA):
         gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
         A[0] = 0
@@ -161,7 +161,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   group_membership=transformA(A))
+                   sensitive_feature=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -178,7 +178,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_df,
-                   group_membership=transformA(A))
+                   sensitive_feature=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -193,7 +193,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
-                   group_membership=transformA(A))
+                   sensitive_feature=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -206,11 +206,11 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         A_two_col_df = pd.DataFrame({"a": A, "b": A})
-        message = str("group_membership is a DataFrame with more than one column")
+        message = str("sensitive_feature is a DataFrame with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   group_membership=A_two_col_df,
+                   sensitive_feature=A_two_col_df,
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -222,11 +222,11 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         A_two_col_ndarray = np.stack((A, A), -1)
-        message = str("group_membership is an ndarray with more than one column")
+        message = str("sensitive_feature is an ndarray with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   group_membership=A_two_col_ndarray,
+                   sensitive_feature=A_two_col_ndarray,
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -248,7 +248,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   group_membership=transformA(A),
+                   sensitive_feature=transformA(A),
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -265,7 +265,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   group_membership=transformA(A),
+                   sensitive_feature=transformA(A),
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
