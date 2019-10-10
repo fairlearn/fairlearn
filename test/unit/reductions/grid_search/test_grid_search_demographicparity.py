@@ -31,7 +31,7 @@ def _simple_threshold_data(number_a0, number_a1,
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
     X = pd.DataFrame({"actual_feature": score_feature,
-                      "sensitive_feature": A,
+                      "sensitive_features": A,
                       "constant_ones_feature": np.ones(len(Y))})
     return X, Y, A
 
@@ -58,11 +58,11 @@ def test_demographicparity_fair_uneven_populations():
                         quality_metric=SimpleClassificationQualityMetric(),
                         grid_size=11)
 
-    target.fit(X, Y, sensitive_feature=A)
+    target.fit(X, Y, sensitive_features=A)
     assert len(target.all_results) == 11
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
-                           "sensitive_feature": [a0_label, a1_label],
+                           "sensitive_features": [a0_label, a1_label],
                            "constant_ones_feature": [1, 1]})
 
     sample_results = target.predict(test_X)
@@ -110,7 +110,7 @@ def test_lagrange_multiplier_zero_unchanged_model():
                         disparity_metric=moments.DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric(),
                         grid=grid_df)
-    target.fit(X, y, sensitive_feature=A)
+    target.fit(X, y, sensitive_features=A)
     assert len(target.all_results) == 1
 
     # Check coefficients
@@ -157,8 +157,8 @@ def test_can_specify_and_generate_lagrange_multipliers():
                          grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
-    target2.fit(X, y, sensitive_feature=A)
-    target1.fit(X, y, sensitive_feature=A)
+    target2.fit(X, y, sensitive_features=A)
+    target1.fit(X, y, sensitive_features=A)
 
     assert len(target1.all_results) == 3
     assert len(target2.all_results) == 3

@@ -73,16 +73,16 @@ class TestExpgradSmoke:
     def run_smoke_test(self, data):
         expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
                                         eps=data["eps"])
-        expgrad.fit(self.X, self.y, sensitive_feature=self.A)
+        expgrad.fit(self.X, self.y, sensitive_features=self.A)
 
         res = expgrad._expgrad_result._as_dict()
         Q = res["best_classifier"]
         res["n_classifiers"] = len(res["classifiers"])
 
         disp = data["cons_class"]()
-        disp.load_data(self.X, self.y, sensitive_feature=self.A)
+        disp.load_data(self.X, self.y, sensitive_features=self.A)
         error = moments.MisclassificationError()
-        error.load_data(self.X, self.y, sensitive_feature=self.A)
+        error.load_data(self.X, self.y, sensitive_features=self.A)
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
 
@@ -104,5 +104,5 @@ class TestExpgradSmoke:
         estimator = LeastSquaresBinaryClassifierLearner()
         constraints = DemographicParity()
         expgrad = ExponentiatedGradient(estimator, constraints)
-        expgrad.fit(pd.DataFrame(X1), pd.Series(labels), sensitive_feature=pd.Series(sensitive_features))
+        expgrad.fit(pd.DataFrame(X1), pd.Series(labels), sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))

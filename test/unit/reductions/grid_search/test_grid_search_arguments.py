@@ -78,7 +78,7 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
         gs.fit(transformX(X),
                transformY(Y),
-               sensitive_feature=transformA(A))
+               sensitive_features=transformA(A))
         assert len(gs.all_results) == 2
 
     # ----------------------------
@@ -93,7 +93,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(None,
                    transformY(Y),
-                   sensitive_feature=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -107,7 +107,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    None,
-                   sensitive_feature=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -125,7 +125,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_feature=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -141,7 +141,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_feature=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -161,7 +161,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_feature=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -178,7 +178,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_df,
-                   sensitive_feature=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -193,7 +193,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
-                   sensitive_feature=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -206,11 +206,11 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         A_two_col_df = pd.DataFrame({"a": A, "b": A})
-        message = str("sensitive_feature is a DataFrame with more than one column")
+        message = str("sensitive_features is a DataFrame with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_feature=A_two_col_df,
+                   sensitive_features=A_two_col_df,
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -222,11 +222,11 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         A_two_col_ndarray = np.stack((A, A), -1)
-        message = str("sensitive_feature is an ndarray with more than one column")
+        message = str("sensitive_features is an ndarray with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_feature=A_two_col_ndarray,
+                   sensitive_features=A_two_col_ndarray,
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -248,7 +248,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_feature=transformA(A),
+                   sensitive_features=transformA(A),
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -265,7 +265,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_feature=transformA(A),
+                   sensitive_features=transformA(A),
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
