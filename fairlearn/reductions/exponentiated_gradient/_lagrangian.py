@@ -7,7 +7,6 @@ import pandas as pd
 import pickle
 import scipy.optimize as opt
 
-from fairlearn.reductions import moments
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
 logger = logging.getLogger(__name__)
