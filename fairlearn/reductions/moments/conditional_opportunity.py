@@ -3,34 +3,30 @@
 
 import pandas as pd
 from .moment import Moment
-from .moment import _REDUCTION_TYPE_CLASSIFICATION, _GROUP_ID, _LABEL, _PREDICTION, _ALL
+from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL
 from .misclassification_error import MisclassificationError
 
 
-class ConditionalOpportunity(Moment):
+class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness metric including DemographicParity and EqualizedOdds"""
-
-    def __init__(self):
-        super().__init__()
-        self.reduction_type = _REDUCTION_TYPE_CLASSIFICATION
 
     def default_objective(self):
         return MisclassificationError()
 
-    def init(self, dataX, dataA, dataY, dataGrp):
-        super().init(dataX, dataA, dataY)
-        self.tags["grp"] = dataGrp
-        self.prob_grp = self.tags.groupby("grp").size() / self.n
-        self.prob_attr_grp = self.tags.groupby(
-            ["grp", _GROUP_ID]).size() / self.n
-        signed = pd.concat([self.prob_attr_grp, self.prob_attr_grp],
+    def load_data(self, X, y, event=None, **kwargs):
+        super().load_data(X, y, **kwargs)
+        self.tags[_EVENT] = event
+        self.prob_event = self.tags.groupby(_EVENT).size() / self.n
+        self.prob_attr_event = self.tags.groupby(
+            [_EVENT, _GROUP_ID]).size() / self.n
+        signed = pd.concat([self.prob_attr_event, self.prob_attr_event],
                            keys=["+", "-"],
-                           names=["sign", "grp", _GROUP_ID])
+                           names=["sign", _EVENT, _GROUP_ID])
         self.index = signed.index
         self.default_objective_lambda_vec = None
 
         # fill in the information about the basis
-        grp_vals = self.tags["grp"].unique()
+        grp_vals = self.tags[_EVENT].unique()
         attr_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
@@ -52,41 +48,41 @@ class ConditionalOpportunity(Moment):
         """
         pred = predictor(self.X)
         self.tags[_PREDICTION] = pred
-        expect_grp = self.tags.groupby("grp").mean()
-        expect_attr_grp = self.tags.groupby(
-            ["grp", _GROUP_ID]).mean()
-        expect_attr_grp["diff"] = expect_attr_grp[_PREDICTION] - expect_grp[_PREDICTION]
-        g_unsigned = expect_attr_grp["diff"]
+        expect_event = self.tags.groupby(_EVENT).mean()
+        expect_attr_event = self.tags.groupby(
+            [_EVENT, _GROUP_ID]).mean()
+        expect_attr_event["diff"] = expect_attr_event[_PREDICTION] - expect_event[_PREDICTION]
+        g_unsigned = expect_attr_event["diff"]
         g_signed = pd.concat([g_unsigned, -g_unsigned],
                              keys=["+", "-"],
-                             names=["sign", "grp", _GROUP_ID])
-        self._gamma_descr = str(expect_attr_grp[[_PREDICTION, "diff"]])
+                             names=["sign", _EVENT, _GROUP_ID])
+        self._gamma_descr = str(expect_attr_event[[_PREDICTION, "diff"]])
         return g_signed
 
-    # TODO: this needs to be removed after merging expgrad changes
-    def lambda_signed(self, lambda_vec):
+    # TODO: this can be further improved using the overcompleteness in group membership
+    def project_lambda(self, lambda_vec):
         return lambda_vec["+"] - lambda_vec["-"]
 
     def signed_weights(self, lambda_vec):
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
-        adjust = lambda_signed.sum(level="grp") / self.prob_grp \
-            - lambda_signed / self.prob_attr_grp
+        adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
+            - lambda_signed / self.prob_attr_event
         signed_weights = self.tags.apply(
-            lambda row: adjust[row["grp"], row[_GROUP_ID]], axis=1
+            lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
         return signed_weights
 
 
-class DemographicParity(ConditionalOpportunity):
+class DemographicParity(ConditionalSelectionRate):
     """ Demographic parity
     A classifier h satisfies DemographicParity if
     Prob[h(X) = y' | A = a] = Prob[h(X) = y'] for all a, y'
     """
     short_name = "DemographicParity"
 
-    def init(self, dataX, dataA, dataY):
-        super().init(dataX, dataA, dataY,
-                     pd.Series(dataY).apply(lambda y: _ALL))
+    def load_data(self, X, y, **kwargs):
+        super().load_data(X, y, event=_ALL, **kwargs)
+        # event=pd.Series(dataY).apply(lambda y: _ALL),
 
 
 class EqualizedOdds(ConditionalOpportunity):
@@ -96,6 +92,7 @@ class EqualizedOdds(ConditionalOpportunity):
     """
     short_name = "EqualizedOdds"
 
-    def init(self, dataX, dataA, dataY):
-        super().init(dataX, dataA, dataY,
-                     pd.Series(dataY).apply(lambda y: _LABEL + "=" + str(y)))
+    def load_data(self, X, y, **kwargs):
+        super().load_data(X, y,
+                     event=pd.Series(dataY).apply(lambda y: _LABEL + "=" + str(y)),
+                     **kwargs)

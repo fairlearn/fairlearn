@@ -7,7 +7,7 @@ from .moment import Moment
 from .moment import _REDUCTION_TYPE_LOSS_MINIMIZATION, _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
 
 
-class LossMoment(Moment):
+class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group"""
 
     def __init__(self, loss, no_groups=False):
@@ -62,13 +62,13 @@ class LossMoment(Moment):
         return signed_weights
 
 
-class AverageLossMoment(LossMoment):
+class AverageLossMoment(ConditionalLossMoment):
 
     def __init__(self, loss):
         super().__init__(loss, no_groups=True)
 
 
-class GroupLossMoment(LossMoment):
+class GroupLossMoment(ConditionalLossMoment):
 
     def __init__(self, loss):
         super().__init__(loss, no_groups=False)
