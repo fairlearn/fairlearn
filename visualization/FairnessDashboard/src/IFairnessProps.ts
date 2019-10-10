@@ -11,18 +11,23 @@ export interface IMetricResponse {
     bins?: number[];
 }
 
+export interface IMetricRequest {
+    metricKey: string;
+    binVector: number[];
+    modelIndex: number;
+}
+
 export interface IFairnessProps {
     dataSummary: IDatasetSummary;
-    testData?: any[][];
+    testData: any[][];
     predictionType?: PredictionTypes;
     // One array per each model;
     predictedY: number[][];
-    trueY?: number[];
+    trueY: number[];
     theme?: any;
     stringParams?: any;
-    augmentedCount?: number;
-    supportedAccuracyKeys: string[];
-    supportedParityKeys: string[];
+    supportedClassificationAccuracyKeys: string[];
+    supportedRegressionAccuracyKeys: string[];
     // The request hook
-    requestMetrics: (metricKey: string, binVector: number[], modelIndex: number) =>  Promise<IMetricResponse>;
+    requestMetrics: ( request: IMetricRequest, abortSignal?: AbortSignal) =>  Promise<IMetricResponse>;
 }
