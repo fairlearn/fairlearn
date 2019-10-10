@@ -3,6 +3,7 @@
 
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
+from fairlearn.reductions.moments.moment import _EVENT
 import fairlearn.reductions.moments as moments
 
 import copy
@@ -30,7 +31,7 @@ def _simple_threshold_data(number_a0, number_a1,
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
     X = pd.DataFrame({"actual_feature": score_feature,
-                      "aux_data_feature": A,
+                      "group_membership_feature": A,
                       "constant_ones_feature": np.ones(len(Y))})
     return X, Y, A
 
@@ -57,11 +58,11 @@ def test_demographicparity_fair_uneven_populations():
                         quality_metric=SimpleClassificationQualityMetric(),
                         grid_size=11)
 
-    target.fit(X, Y, aux_data=A)
+    target.fit(X, Y, group_membership=A)
     assert len(target.all_results) == 11
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
-                           "aux_data_feature": [a0_label, a1_label],
+                           "group_membership_feature": [a0_label, a1_label],
                            "constant_ones_feature": [1, 1]})
 
     sample_results = target.predict(test_X)
@@ -101,7 +102,7 @@ def test_lagrange_multiplier_zero_unchanged_model():
 
     # Do the grid search with a zero Lagrange multiplier
     iterables = [['+', '-'], ['all'], [a0_label, a1_label]]
-    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'grp', 'group_id'])
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', _EVENT, 'group_id'])
     lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
     grid_df = pd.DataFrame(lagrange_zero_series)
 
@@ -109,7 +110,7 @@ def test_lagrange_multiplier_zero_unchanged_model():
                         disparity_metric=moments.DemographicParity(),
                         quality_metric=SimpleClassificationQualityMetric(),
                         grid=grid_df)
-    target.fit(X, y, aux_data=A)
+    target.fit(X, y, group_membership=A)
     assert len(target.all_results) == 1
 
     # Check coefficients
@@ -136,7 +137,7 @@ def test_can_specify_and_generate_lagrange_multipliers():
                                    random_state=97)
 
     iterables = [['+', '-'], ['all'], sorted([a0_label, a1_label])]
-    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'grp', 'group_id'])
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', _EVENT, 'group_id'])
     lagrange_negative_series = pd.Series([0.0, 0.0, 0.0, 2.0], index=midx)
     lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
     lagrange_positive_series = pd.Series([0.0, 2.0, 0.0, 0.0], index=midx)
@@ -156,8 +157,8 @@ def test_can_specify_and_generate_lagrange_multipliers():
                          grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
-    target2.fit(X, y, aux_data=A)
-    target1.fit(X, y, aux_data=A)
+    target2.fit(X, y, group_membership=A)
+    target1.fit(X, y, group_membership=A)
 
     assert len(target1.all_results) == 3
     assert len(target2.all_results) == 3

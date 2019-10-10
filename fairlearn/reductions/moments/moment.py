@@ -10,6 +10,8 @@ _LOSS = "loss"
 _PREDICTION = "pred"
 _EVENT = "event"
 _ALL = "all"
+_SIGN = "sign"
+_KW_GROUP_MEMBERSHIP = "group_membership"
 
 
 class Moment:
@@ -22,8 +24,10 @@ class Moment:
         assert self.data_loaded is False, \
             "data can be loaded only once"
         self.X = X
-        self.tags = pd.DataFrame({_LABEL: y})
         self.n = self.X.shape[0]
+        self.tags = pd.DataFrame({_LABEL: y})
+        if _KW_GROUP_MEMBERSHIP in kwargs:
+            self.tags[_GROUP_ID] = kwargs[_KW_GROUP_MEMBERSHIP]
         self.data_loaded = True
         self._gamma_descr = None
 

@@ -3,26 +3,25 @@
 
 import pandas as pd
 import numpy as np
-from .moment import Moment
-from .moment import _REDUCTION_TYPE_LOSS_MINIMIZATION, _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
+from .moment import LossMoment
+from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL, _KW_GROUP_MEMBERSHIP
 
 
 class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group"""
 
     def __init__(self, loss, no_groups=False):
-        super().__init__()
-        self.reduction_type = _REDUCTION_TYPE_LOSS_MINIMIZATION
-        self.reduction_loss = loss
+        super().__init__(loss)
         self.no_groups = no_groups
 
     def default_objective(self):
         return AverageLossMoment(self.reduction_loss)
 
-    def init(self, dataX, dataA, dataY):
+    def load_data(self, X, y, **kwargs):
+        kwargs_mod = kwargs.copy()
         if self.no_groups:
-            dataA = pd.Series(dataY).apply(lambda y: _ALL)
-        super().init(dataX, dataA, dataY)
+            kwargs_mod[_KW_GROUP_MEMBERSHIP] = pd.Series(y).apply(lambda y: _ALL)
+        super().load_data(X, y, **kwargs_mod)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.n
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr

@@ -7,8 +7,7 @@ import pandas as pd
 
 from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
-from fairlearn.reductions.moments.moment import Moment, _REDUCTION_TYPE_CLASSIFICATION
-from fairlearn.reductions.moments import ConditionalOpportunity
+from fairlearn.reductions.moments.moment import Moment, ClassificationMoment, _KW_GROUP_MEMBERSHIP
 
 
 class _GridGenerator:
@@ -107,18 +106,18 @@ class GridSearch(ReductionsEstimator):
         self.grid_limit = float(grid_limit)
         self.grid = grid
 
-    def fit(self, X, y, aux_data=None, **kwargs):
+    def fit(self, X, y, **kwargs):
         if X is None:
             raise ValueError(self._MESSAGE_X_NONE)
 
         if y is None:
             raise ValueError(self._MESSAGE_Y_NONE)
 
-        if aux_data is None:
-            raise RuntimeError("Must specify aux_data (for now)")
+        if _KW_GROUP_MEMBERSHIP not in kwargs:
+            raise RuntimeError("Must specify {0} (for now)".format(_KW_GROUP_MEMBERSHIP))
 
         # Extract the target attribute
-        A = self._make_vector(aux_data, "aux_data")
+        A = self._make_vector(kwargs[_KW_GROUP_MEMBERSHIP], _KW_GROUP_MEMBERSHIP)
 
         unique_labels = np.unique(A)
         if len(unique_labels) > 2:
@@ -137,7 +136,7 @@ class GridSearch(ReductionsEstimator):
         # Prep the quality metric
         self.quality_metric.set_data(X, y_vector, A)
 
-        if isinstance(self.disparity_metric, ConditionalOpportunity):
+        if isinstance(self.disparity_metric, ClassificationMoment):
             # We have a classification problem
             # Need to make sure that y is binary (for now)
             unique_labels = np.unique(y_vector)
@@ -145,16 +144,16 @@ class GridSearch(ReductionsEstimator):
                 raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
         # Prep the disparity metric and objective
-        self.disparity_metric.init(X, A, y_vector)
+        self.disparity_metric.load_data(X, y_vector, **kwargs)    # group_membership=A)
         objective = self.disparity_metric.default_objective()
-        objective.init(X, A, y_vector)
-        is_classification_reduction = (self.disparity_metric.reduction_type == _REDUCTION_TYPE_CLASSIFICATION)  # noqa: E501
+        objective.load_data(X, y_vector, **kwargs)    # group_membership=A)
+        is_classification_reduction = isinstance(self.disparity_metric, ClassificationMoment)
 
         # Basis information
         pos_basis = self.disparity_metric.pos_basis
         neg_basis = self.disparity_metric.neg_basis
         neg_allowed = self.disparity_metric.neg_basis_present
-        objective_in_the_span = (self.disparity_metric.default_objective_lambda_vec is not None)   # noqa: E501
+        objective_in_the_span = (self.disparity_metric.default_objective_lambda_vec is not None)
 
         if self.grid is None:
             grid = _GridGenerator(self.grid_size,

@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-from .moment import Moment
-from .moment import _ALL, _LABEL, _REDUCTION_TYPE_CLASSIFICATION
+from .moment import ClassificationMoment
+from .moment import _ALL, _LABEL
 
 
 class MisclassificationError(ClassificationMoment):
@@ -11,7 +11,7 @@ class MisclassificationError(ClassificationMoment):
     short_name = "Err"
 
     def load_data(self, X, y, **kwargs):
-        super().init(X, y, **kwargs)
+        super().load_data(X, y, **kwargs)
         self.index = [_ALL]
 
     def gamma(self, predictor):
