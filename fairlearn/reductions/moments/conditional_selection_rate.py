@@ -100,5 +100,5 @@ class EqualizedOdds(ConditionalSelectionRate):
 
     def load_data(self, X, y, **kwargs):
         super().load_data(X, y,
-                     event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
-                     **kwargs)
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          **kwargs)
