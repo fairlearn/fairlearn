@@ -54,7 +54,7 @@ def test_bgl_unfair():
                         quality_metric=SimpleRegressionQualityMetric(),
                         grid_size=7)
 
-    target.fit(X, Y, group_membership=A, number_of_lagrange_multipliers=7)
+    target.fit(X, Y, group_membership=A)
 
     assert len(target.all_results) == 7
 
@@ -154,8 +154,8 @@ def test_bgl_lagrange_specifications():
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
 
-    target1.fit(X, y, group_membership=A, number_of_lagrange_multipliers=len(tradeoffs))
-    target2.fit(X, y, group_membership=A, lagrange_multipliers=tradeoffs)
+    target1.fit(X, y, group_membership=A)
+    target2.fit(X, y, group_membership=A)
 
     assert len(target1.all_results) == len(tradeoffs)
     assert len(target2.all_results) == len(tradeoffs)
