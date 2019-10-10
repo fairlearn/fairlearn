@@ -77,8 +77,8 @@ class ThresholdOptimizer(PostProcessing):
         random.seed(seed)
         self._post_processed_model_by_attribute = None
 
-    def fit(self, X, y, group_data, **kwargs):
-        self._validate_input_data(X, group_data, y)
+    def fit(self, X, y, sensitive_features, **kwargs):
+        self._validate_input_data(X, sensitive_features, y)
 
         if self._unconstrained_estimator:
             # train estimator on data first
@@ -100,23 +100,23 @@ class ThresholdOptimizer(PostProcessing):
             raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
 
         self._post_processed_model_by_attribute = threshold_optimization_method(
-            group_data, y, scores, self._gridsize, self._flip, self._plot)
+            sensitive_features, y, scores, self._gridsize, self._flip, self._plot)
 
-    def predict(self, X, group_data):
+    def predict(self, X, sensitive_features):
         self._validate_post_processed_model_is_fitted()
-        self._validate_input_data(X, group_data)
+        self._validate_input_data(X, sensitive_features)
         unconstrained_predictions = self._unconstrained_model.predict(X)
 
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
-                                                group_data,
+                                                sensitive_features,
                                                 unconstrained_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
-    def predict_proba(self, X, group_data):
+    def predict_proba(self, X, sensitive_features):
         self._validate_post_processed_model_is_fitted()
-        self._validate_input_data(X, group_data)
+        self._validate_input_data(X, sensitive_features)
         positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
-                                                group_data,
+                                                sensitive_features,
                                                 self._unconstrained_model.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
@@ -124,27 +124,27 @@ class ThresholdOptimizer(PostProcessing):
         if not self._post_processed_model_by_attribute:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
-    def _validate_input_data(self, X, group_data, y=None):
+    def _validate_input_data(self, X, sensitive_features, y=None):
         allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
         if type(X) not in allowed_input_types or \
-                type(group_data) not in allowed_input_types or \
+                type(sensitive_features) not in allowed_input_types or \
                 (y is not None and type(y) not in allowed_input_types):
             raise TypeError(INPUT_DATA_FORMAT_ERROR_MESSAGE
                             .format(type(X).__name__,
                                     type(y).__name__,
-                                    type(group_data).__name__))
+                                    type(sensitive_features).__name__))
 
-        if len(X) == 0 or len(group_data) == 0 or (y is not None and len(y) == 0):
+        if len(X) == 0 or len(sensitive_features) == 0 or (y is not None and len(y) == 0):
             raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
 
         if y is None:
-            if len(X) != len(group_data) or (y is not None and len(X) != len(y)):
+            if len(X) != len(sensitive_features) or (y is not None and len(X) != len(y)):
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X and group_data"))
+                                 .format("X and sensitive_features"))
         else:
-            if len(X) != len(group_data) or (y is not None and len(X) != len(y)):
+            if len(X) != len(sensitive_features) or (y is not None and len(X) != len(y)):
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X, group_data, and y"))
+                                 .format("X, sensitive_features, and y"))
 
         if set(np.unique(y)) > set([0, 1]):
             raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
@@ -184,7 +184,7 @@ def _threshold_optimization_demographic_parity(attributes, labels, scores, grids
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
 
-    data_grouped_by_attribute = _reformat_and_group_data(
+    data_grouped_by_attribute = _reformat_and_sensitive_features(
         attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
@@ -285,7 +285,7 @@ def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=
     :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
-    data_grouped_by_attribute = _reformat_and_group_data(
+    data_grouped_by_attribute = _reformat_and_sensitive_features(
         attributes, labels, scores)
 
     n = len(labels)
@@ -367,7 +367,7 @@ def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=
     return predicted_EO_by_attribute
 
 
-def _vectorized_prediction(function_dict, group_data, scores):
+def _vectorized_prediction(function_dict, sensitive_features, scores):
     """ Make predictions for all samples with all provided functions,
     but use only the results from the function that corresponds to the grouping
     attribute value of the sample.
@@ -376,18 +376,18 @@ def _vectorized_prediction(function_dict, group_data, scores):
 
     :param function_dict: the functions that apply to various grouping attribute values
     :type function_dict: dictionary of functions
-    :param group_data: grouping attributes for each sample
-    :type group_data: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+    :param sensitive_features: grouping attributes for each sample
+    :type sensitive_features: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param scores: vector of predicted values
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     """
     # handle type conversion to ndarray for other types
-    group_data_vector = _convert_to_ndarray(group_data, MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE
-                                            .format("group_data"))
+    sensitive_features_vector = _convert_to_ndarray(sensitive_features, MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE
+                                            .format("sensitive_features"))
     scores_vector = _convert_to_ndarray(
         scores, SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE)
 
-    return sum([(group_data_vector == a) * function_dict[a].predict(scores_vector)
+    return sum([(sensitive_features_vector == a) * function_dict[a].predict(scores_vector)
                 for a in function_dict])
 
 
@@ -404,7 +404,7 @@ def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
     return data
 
 
-def _reformat_and_group_data(attributes, labels, scores, attribute_names=None):
+def _reformat_and_sensitive_features(attributes, labels, scores, attribute_names=None):
     data_dict = {}
 
     # TODO: extend to multiple columns for additional group data
@@ -429,7 +429,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
                                               additional_data.shape[1] > 1):
             # TODO: extend to multiple columns for additional_group data
             raise ValueError(
-                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("group_data"))
+                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
         else:
             data_dict[key] = additional_data.reshape(-1)
     elif type(additional_data) == pd.DataFrame:
@@ -443,7 +443,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
                 raise ValueError(
-                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("group_data"))
+                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data
