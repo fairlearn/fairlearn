@@ -25,7 +25,7 @@ class PostProcessing:
         else:
             raise ValueError(MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
 
-    def fit(self, X, y, aux_data, **kwargs):
+    def fit(self, X, y, group_data, **kwargs):
         """ Fit the model based on training features and labels, auxiliary data,
         as well as the fairness-unaware model or estimator. If an estimator was passed
         in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
