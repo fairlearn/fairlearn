@@ -95,8 +95,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             classNames,
             featureIsCategorical,
             featureRanges,
-            predictionType: props.predictionType ||  "classes",
-            augmentedCount: props.augmentedCount || 0
+            predictionType: props.predictionType ||  "classes"
         };
     }
 
@@ -183,14 +182,14 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     onNext={this.setTab.bind(this, flights.skipDisparity ? "3" : "2")}
                                 />
                             </PivotItem>
-                            <PivotItem headerText={"Parity"} itemKey={"2"}>
+                            {flights.skipDisparity && (<PivotItem headerText={"Parity"} itemKey={"2"}>
                                 <ParityTab
                                     dashboardContext={this.state.dashboardContext}
                                     parityPickerProps={parityPickerProps}
                                     onNext={this.setTab.bind(this, "3")}
                                     onPrevious={this.setTab.bind(this, "1")}
                                 />
-                            </PivotItem>
+                            </PivotItem>)}
                         </Pivot>
                     </Stack.Item>
                 </Stack>}

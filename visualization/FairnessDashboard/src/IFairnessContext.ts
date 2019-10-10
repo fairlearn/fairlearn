@@ -13,5 +13,4 @@ export interface IFairnessContext {
 
 export interface IFairnessModelMetadata extends IModelMetadata {
     predictionType: "classes" | "regression" | "probability" | "logOdds";
-    augmentedCount: number;
 }
