@@ -7,7 +7,7 @@ The fairlearn package largely follows the [terminology established by scikit-lea
 - _Predictors_ implement a `predict` method.
 
 
-**Randomization.** Unlike [scikit-learn estimators](https://scikit-learn.org/stable/glossary.html#term-estimator), estimators in fairlearn can produce randomized predictors. Randomization of predictions is required to satisfy many definitions of fairness. Because of randomization, it is possible to get different outputs from the predictor's `predict` method on identical data. For each of our methods, we provide explicit access to the probability distribution used for randomization.
+**Randomization.** In contrast with [scikit-learn](https://scikit-learn.org/stable/glossary.html#term-estimator), estimators in fairlearn can produce randomized predictors. Randomization of predictions is required to satisfy many definitions of fairness. Because of randomization, it is possible to get different outputs from the predictor's `predict` method on identical data. For each of our methods, we provide explicit access to the probability distribution used for randomization.
 
 ## Fairness of AI systems
 
@@ -31,7 +31,7 @@ In fairlearn, we provide tools to assess fairness of predictors for classificati
 
 There are many approaches to conceptualizing fairness. In fairlearn, we follow the approach known as group fairness, which asks: _Which groups of individuals are at risk for experiencing harms?_
 
-The relevant groups (also called subpopulations) are defined using **sensitive features** (or sensitive attributes). This term suggests that the system designer should be sensitive to these features when assessing group fairness. Although these features may sometimes have privacy implications (e.g., gender or age) in other cases they may not (e.g., whether or not someone is a native speaker of language). Moreover, the word sensitive does not imply that these features should not be used to make predictions – indeed, in some cases it may be better to include them.
+The relevant groups (also called subpopulations) are defined using **sensitive features** (or sensitive attributes), which are passed to a fairlearn estimator as a vector or a matrix called `sensitive_features` (even if it is only one feature). The term suggests that the system designer should be sensitive to these features when assessing group fairness. Although these features may sometimes have privacy implications (e.g., gender or age) in other cases they may not (e.g., whether or not someone is a native speaker of a particular language). Moreover, the word sensitive does not imply that these features should not be used to make predictions – indeed, in some cases it may be better to include them.
 
 Fairness literature also uses the term _protected attribute_ in a similar sense as sensitive feature. The term is based on anti-discrimination laws that define specific _protected classes_. Since we seek to apply group fairness in a wider range of settings, we avoid this term.
 
