@@ -1,4 +1,4 @@
-Machine Learning explanation widget for Jupyter widget
+Machine Learning fairness widget for Jupyter widget
 
 Package Install
 ---------------

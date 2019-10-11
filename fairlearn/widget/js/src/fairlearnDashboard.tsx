@@ -1,5 +1,5 @@
 import { DOMWidgetModel, DOMWidgetView } from '@jupyter-widgets/base';
-import { FairnessDashboard } from 'fairlearn-dashboard';
+import { FairnessWizard } from 'fairlearn-dashboard';
 import * as _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -53,7 +53,7 @@ export class FairlearnView extends DOMWidgetView {
         root_element.style.cssText = "width: 100%;";
         this.model.on('change:response', this.resolvePromise, this);
         const data = this.model.get('value');
-        ReactDOM.render(<FairnessDashboard
+        ReactDOM.render(<FairnessWizard
             dataSummary={{featureNames: data.features, classNames: data.classes}}
             testData={data.dataset}
             predictedY={data.predicted_ys}
@@ -66,7 +66,7 @@ export class FairlearnView extends DOMWidgetView {
         this.el.appendChild(root_element)
     }
 
-    private makeRequest(data: any, abortSignal: AbortSignal): Promise<any> {
+    private makeRequest(data: any, abortSignal?: AbortSignal): Promise<any> {
         const promise = new Promise<any>((resolve, reject) => {
             const requestIndex = this.requestIndex;
             this.requestIndex++;
@@ -82,11 +82,13 @@ export class FairlearnView extends DOMWidgetView {
             this.touch();
 
             // handle abort
-            abortSignal.addEventListener('abort', () => {
-                clearTimeout(timeout);
-                reject(new DOMException('Aborted', 'AbortError'));
-                delete this.promiseDict[requestIndex];
-            });
+            if (abortSignal) {
+                abortSignal.addEventListener('abort', () => {
+                    clearTimeout(timeout);
+                    reject(new DOMException('Aborted', 'AbortError'));
+                    delete this.promiseDict[requestIndex];
+                });
+            }
         })
         return promise;
     }

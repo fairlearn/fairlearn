@@ -79,7 +79,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
 
     private static buildModelMetadata(props: IFairnessProps): IFairnessModelMetadata {
         let featureNames = props.dataSummary.featureNames;
-        if (featureNames === undefined) {
+        if (!featureNames) {
             let featureLength = 0;
             if (props.testData && props.testData[0] !== undefined) {
                 featureLength = props.testData[0].length;

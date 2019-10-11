@@ -5,16 +5,17 @@
 """Defines the Fairlearn dashboard class."""
 
 from .FairlearnWidget import FairlearnWidget
-from ._internal.constants import FairlearnDashboardInterface, WidgetRequestResponseConstants
-from ../
 from IPython.display import display
+from scipy.sparse import issparse
+import numpy as np
+import pandas as pd
 
 
 
 class FairlearnDashboard(object):
     """The dashboard class, wraps the dashboard component."""
 
-    def __init__(self, *, augmented_dataset, true_Y, predicted_Ys, class_names=None, feature_names=None, is_classifier=None):
+    def __init__(self, *, augmented_dataset, true_y, predicted_ys, class_names=None, feature_names=None, is_classifier=None):
         """Initialize the Explanation Dashboard.
 
         :param explanationObject: An object that represents an explanation.
@@ -35,18 +36,18 @@ class FairlearnDashboard(object):
         :type features: numpy.array or list[]
         """
         self._widget_instance = FairlearnWidget()
-        if augmented_dataset is None or true_Y is None or predicted_Ys is None:
+        if augmented_dataset is None or true_y is None or predicted_ys is None:
             raise ValueError("Required parameters not provided")
-        self._true_Y = true_Y
-        self._predicted_Ys = predicted_Ys
+        self._true_y = true_y
+        self._predicted_ys = predicted_ys
 
         self._metric_methods = {
             "accuracy_score": {
                 "model_type": ["classification"]
             },
-            "confusion_matrix": {
-                "model_type": ["classification"]
-            },
+            # "confusion_matrix": {
+            #     "model_type": ["classification"]
+            # },
             "precision_score": {
                 "model_type": ["classification"]
             },
@@ -73,18 +74,18 @@ class FairlearnDashboard(object):
             }
         }
 
-        classification_methods = [method[0] for method in _metric_methods.items() if "classification" in method[1]["model_type"]]
-        regression_methods = [method[0] for method in _metric_methods.items() if "regression" in method[1]["model_type"]]
+        classification_methods = [method[0] for method in self._metric_methods.items() if "classification" in method[1]["model_type"]]
+        regression_methods = [method[0] for method in self._metric_methods.items() if "regression" in method[1]["model_type"]]
 
         dataArg = {
-            "true_y": self._convertToList(true_Y),
-            "predicted_ys": self._convertToList(predicted_Ys),
+            "true_y": self._convertToList(true_y),
+            "predicted_ys": self._convertToList(predicted_ys),
             "dataset": self._convertToList(augmented_dataset),
-            "features": self._convertToList(feature_names),
-            "classes": self._convertToList(class_names),
             "classification_methods": classification_methods,
             "regression_methods": regression_methods
         }
+
+        if feature_names is not None
 
         if is_classifier is not None:
             dataArg["is_classifier"] = is_classifier

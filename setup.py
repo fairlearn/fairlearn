@@ -28,15 +28,15 @@ setuptools.setup(
         ('share/jupyter/nbextensions/fairlearn-widget', [
             'fairlearn/widget/static/extension.js',
             'fairlearn/widget/static/extension.js.map',
-            'fairlearny/widget/static/index.js',
+            'fairlearn/widget/static/index.js',
             'fairlearn/widget/static/index.js.map'
         ]),
         ("etc/jupyter/nbconfig/notebook.d", [
             "jupyter-config/nbconfig/notebook.d/fairlearn-widget.json"
         ]),
         ('share/jupyter/lab/extensions', [
-            'interpret_community/widget/js/'
-            'interpret_ml_widget/labextension/fairlearn-0.1.0.tgz'
+            'fairlearn/widget/js/'
+            'fairlearn_widget/labextension/fairlearn-widget-0.1.0.tgz'
         ])],
     zip_safe=False,
 )
