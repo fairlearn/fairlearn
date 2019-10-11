@@ -8,6 +8,7 @@ from .misclassification_error import MisclassificationError
 
 _DIFF = "diff"
 
+
 class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness metric including DemographicParity and EqualizedOdds"""
 

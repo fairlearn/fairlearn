@@ -10,6 +10,7 @@ from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
 from fairlearn import _KW_SENSITIVE_FEATURES
 
+
 class _GridGenerator:
     """A generator of a grid of points with a bounded L1 norm.
     """
