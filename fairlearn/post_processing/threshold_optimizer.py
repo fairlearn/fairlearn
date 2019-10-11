@@ -184,7 +184,7 @@ def _threshold_optimization_demographic_parity(attributes, labels, scores, grids
     x_grid = np.linspace(0, 1, gridsize + 1)
     error_given_selection = 0 * x_grid
 
-    data_grouped_by_attribute = _reformat_and_sensitive_features(
+    data_grouped_by_attribute = _reformat_and_group_data(
         attributes, labels, scores)
 
     for attribute, group in data_grouped_by_attribute:
@@ -285,7 +285,7 @@ def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=
     :return: the post-processed model as a function taking the grouping attribute value
         and the fairness unaware model's score as arguments to produce predictions
     """
-    data_grouped_by_attribute = _reformat_and_sensitive_features(
+    data_grouped_by_attribute = _reformat_and_group_data(
         attributes, labels, scores)
 
     n = len(labels)
@@ -404,7 +404,7 @@ def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
     return data
 
 
-def _reformat_and_sensitive_features(attributes, labels, scores, attribute_names=None):
+def _reformat_and_group_data(attributes, labels, scores, attribute_names=None):
     data_dict = {}
 
     # TODO: extend to multiple columns for additional group data

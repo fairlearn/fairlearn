@@ -3,7 +3,6 @@
 
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
-from fairlearn.reductions.moments.moment import _EVENT
 import fairlearn.reductions.moments as moments
 
 import copy
@@ -102,7 +101,7 @@ def test_lagrange_multiplier_zero_unchanged_model():
 
     # Do the grid search with a zero Lagrange multiplier
     iterables = [['+', '-'], ['all'], [a0_label, a1_label]]
-    midx = pd.MultiIndex.from_product(iterables, names=['sign', _EVENT, 'group_id'])
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'event', 'group_id'])
     lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
     grid_df = pd.DataFrame(lagrange_zero_series)
 
@@ -137,7 +136,7 @@ def test_can_specify_and_generate_lagrange_multipliers():
                                    random_state=97)
 
     iterables = [['+', '-'], ['all'], sorted([a0_label, a1_label])]
-    midx = pd.MultiIndex.from_product(iterables, names=['sign', _EVENT, 'group_id'])
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'event', 'group_id'])
     lagrange_negative_series = pd.Series([0.0, 0.0, 0.0, 2.0], index=midx)
     lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
     lagrange_positive_series = pd.Series([0.0, 2.0, 0.0, 0.0], index=midx)
