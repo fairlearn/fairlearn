@@ -78,7 +78,7 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
         gs.fit(transformX(X),
                transformY(Y),
-               aux_data=transformA(A))
+               sensitive_features=transformA(A))
         assert len(gs.all_results) == 2
 
     # ----------------------------
@@ -93,7 +93,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(None,
                    transformY(Y),
-                   aux_data=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -107,7 +107,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    None,
-                   aux_data=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -125,7 +125,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   aux_data=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -137,11 +137,11 @@ class ArgumentTests:
         X, Y, _ = self._quick_data()
         A = np.random.randint(2, size=len(Y)+1)
 
-        message = str("X and the target attribute must have same number of rows")
+        message = str("X and the sensitive features must have same number of rows")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   aux_data=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -150,18 +150,18 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_aux_data_non_binary(self, transformX, transformY, transformA):
+    def test_sensitive_feature_non_binary(self, transformX, transformY, transformA):
         gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
         X, Y, A = self._quick_data()
         A[0] = 0
         A[1] = 1
         A[2] = 2
 
-        message = str("Target Attribute contains more than two unique values")
+        message = str("Sensitive features contain more than two unique values")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   aux_data=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -178,7 +178,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_df,
-                   aux_data=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -193,7 +193,7 @@ class ArgumentTests:
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
-                   aux_data=transformA(A))
+                   sensitive_features=transformA(A))
 
         assert message == execInfo.value.args[0]
 
@@ -206,11 +206,11 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         A_two_col_df = pd.DataFrame({"a": A, "b": A})
-        message = str("aux_data is a DataFrame with more than one column")
+        message = str("sensitive_features is a DataFrame with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   aux_data=A_two_col_df,
+                   sensitive_features=A_two_col_df,
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -222,11 +222,11 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         A_two_col_ndarray = np.stack((A, A), -1)
-        message = str("aux_data is an ndarray with more than one column")
+        message = str("sensitive_features is an ndarray with more than one column")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   aux_data=A_two_col_ndarray,
+                   sensitive_features=A_two_col_ndarray,
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -248,7 +248,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   aux_data=transformA(A),
+                   sensitive_features=transformA(A),
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]
@@ -265,7 +265,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   aux_data=transformA(A),
+                   sensitive_features=transformA(A),
                    number_of_lagrange_multipliers=3)
 
         assert message == execInfo.value.args[0]

@@ -30,7 +30,7 @@ def _simple_regression_data(number_a0, number_a1,
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
     X = pd.DataFrame({"actual_feature": score_feature,
-                      "aux_data_feature": A,
+                      "sensitive_features": A,
                       "constant_ones_feature": np.ones(len(Y))})
     return X, Y, A
 
@@ -54,12 +54,12 @@ def test_bgl_unfair():
                         quality_metric=SimpleRegressionQualityMetric(),
                         grid_size=7)
 
-    target.fit(X, Y, aux_data=A, number_of_lagrange_multipliers=7)
+    target.fit(X, Y, sensitive_features=A)
 
     assert len(target.all_results) == 7
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
-                           "aux_data_feature": [a0_label, a1_label],
+                           "sensitive_features": [a0_label, a1_label],
                            "constant_ones_feature": [1, 1]})
 
     best_predict = target.predict(test_X)
@@ -104,7 +104,7 @@ def test_bgl_unmitigated_same():
                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
                         quality_metric=SimpleRegressionQualityMetric(),
                         grid=grid_df)
-    target.fit(X, y, aux_data=A)
+    target.fit(X, y, sensitive_features=A)
 
     raw_coef = unmitigated_estimator.coef_
     gs_coef = target.best_result.model.coef_
@@ -154,8 +154,8 @@ def test_bgl_lagrange_specifications():
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
 
-    target1.fit(X, y, aux_data=A, number_of_lagrange_multipliers=len(tradeoffs))
-    target2.fit(X, y, aux_data=A, lagrange_multipliers=tradeoffs)
+    target1.fit(X, y, sensitive_features=A)
+    target2.fit(X, y, sensitive_features=A)
 
     assert len(target1.all_results) == len(tradeoffs)
     assert len(target2.all_results) == len(tradeoffs)

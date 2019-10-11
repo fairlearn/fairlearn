@@ -2,31 +2,32 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-
-_REDUCTION_TYPE_CLASSIFICATION = "classification"
-_REDUCTION_TYPE_LOSS_MINIMIZATION = "loss_minimization"
+from fairlearn import _KW_SENSITIVE_FEATURES
 
 _GROUP_ID = "group_id"
+_EVENT = "event"
 _LABEL = "label"
 _LOSS = "loss"
 _PREDICTION = "pred"
 _ALL = "all"
+_SIGN = "sign"
 
 
 class Moment:
     """Generic moment"""
 
     def __init__(self):
-        self.initialized = False
+        self.data_loaded = False
 
-    def init(self, dataX, dataA, dataY):
-        assert self.initialized is False, \
-            "moments can be initialized only once"
-        self.X = dataX
-        self.tags = pd.DataFrame(
-            {_GROUP_ID: dataA, _LABEL: dataY})
-        self.n = dataX.shape[0]
-        self.initialized = True
+    def load_data(self, X, y, **kwargs):
+        assert self.data_loaded is False, \
+            "data can be loaded only once"
+        self.X = X
+        self.n = self.X.shape[0]
+        self.tags = pd.DataFrame({_LABEL: y})
+        if _KW_SENSITIVE_FEATURES in kwargs:
+            self.tags[_GROUP_ID] = kwargs[_KW_SENSITIVE_FEATURES]
+        self.data_loaded = True
         self._gamma_descr = None
 
     def gamma(self, predictor):
@@ -37,3 +38,15 @@ class Moment:
 
     def signed_weights(self, lambda_vec):
         raise NotImplementedError()
+
+
+class ClassificationMoment(Moment):
+    """Moment that can be expressed as weighted classification error"""
+
+
+class LossMoment(Moment):
+    """Moment that can be expressed as weighted loss"""
+
+    def __init__(self, loss):
+        super().__init__()
+        self.reduction_loss = loss

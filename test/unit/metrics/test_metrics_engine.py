@@ -173,7 +173,7 @@ class TestMetricByGroup:
         with pytest.raises(ValueError) as exception_context:
             _ = metrics.metric_by_group(mock_func_weight, y_a, y_p, gid, s_w)
 
-        expected = "Array group_data is not the same size as y_true"
+        expected = "Array group_membership is not the same size as y_true"
         assert exception_context.value.args[0] == expected
 
     @pytest.mark.parametrize("transform_s_w", supported_conversions)
