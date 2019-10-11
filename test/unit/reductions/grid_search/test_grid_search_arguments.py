@@ -137,7 +137,7 @@ class ArgumentTests:
         X, Y, _ = self._quick_data()
         A = np.random.randint(2, size=len(Y)+1)
 
-        message = str("X and the target attribute must have same number of rows")
+        message = str("X and the sensitive features must have same number of rows")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
@@ -157,7 +157,7 @@ class ArgumentTests:
         A[1] = 1
         A[2] = 2
 
-        message = str("Target Attribute contains more than two unique values")
+        message = str("Sensitive features contain more than two unique values")
         with pytest.raises(RuntimeError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),

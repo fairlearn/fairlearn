@@ -16,7 +16,7 @@ from fairlearn.reductions import ReductionsEstimator
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
-from fairlearn.reductions.moments.moment import _KW_GROUP_MEMBERSHIP
+from fairlearn import _KW_SENSITIVE_FEATURES
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class ExponentiatedGradient(ReductionsEstimator):
 
     def fit(self, X, y, **kwargs):
         # TODO: validate input data; unify between grid search and expgrad?
-        self._expgrad_result = exponentiated_gradient(X, kwargs[_KW_GROUP_MEMBERSHIP], y,
+        self._expgrad_result = exponentiated_gradient(X, kwargs[_KW_SENSITIVE_FEATURES], y,
                                                       self._estimator,
                                                       constraints=self._constraints,
                                                       eps=self._eps, T=self._T, nu=self._nu,

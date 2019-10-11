@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import pandas as pd
+from fairlearn import _KW_SENSITIVE_FEATURES
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
@@ -10,7 +11,6 @@ _LOSS = "loss"
 _PREDICTION = "pred"
 _ALL = "all"
 _SIGN = "sign"
-_KW_GROUP_MEMBERSHIP = "sensitive_features"
 
 
 class Moment:
@@ -25,8 +25,8 @@ class Moment:
         self.X = X
         self.n = self.X.shape[0]
         self.tags = pd.DataFrame({_LABEL: y})
-        if _KW_GROUP_MEMBERSHIP in kwargs:
-            self.tags[_GROUP_ID] = kwargs[_KW_GROUP_MEMBERSHIP]
+        if _KW_SENSITIVE_FEATURES in kwargs:
+            self.tags[_GROUP_ID] = kwargs[_KW_SENSITIVE_FEATURES]
         self.data_loaded = True
         self._gamma_descr = None
 
