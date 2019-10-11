@@ -8,7 +8,7 @@ from . import GroupMetricResult
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
 
-def metric_by_group(metric_function, y_true, y_pred, sensitive_features, sample_weight=None):
+def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_weight=None):
     """ Applies a metric to each subgroup of a set of data
 
     :param metric_function
@@ -20,14 +20,14 @@ def metric_by_group(metric_function, y_true, y_pred, sensitive_features, sample_
     :param y_pred
     :type Array of predicted results (must be 0 or 1)
 
-    :param sensitive_features
+    :param group_membership
     :type Array indicating the group to which each result belongs
 
     :param sample_weight
     :type Array of weights to apply to each result
     """
     _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
-    _check_array_sizes(y_true, sensitive_features, 'y_true', 'sensitive_features')
+    _check_array_sizes(y_true, group_membership, 'y_true', 'group_membership')
     if sample_weight is not None:
         _check_array_sizes(y_true, sample_weight, 'y_true', 'sample_weight')
 
@@ -37,7 +37,7 @@ def metric_by_group(metric_function, y_true, y_pred, sensitive_features, sample_
     # This allows for fast slicing of the groups
     y_a = np.squeeze(np.asarray(y_true))
     y_p = np.squeeze(np.asarray(y_pred))
-    g_d = np.squeeze(np.asarray(sensitive_features))
+    g_d = np.squeeze(np.asarray(group_membership))
     s_w = None
     if sample_weight is not None:
         s_w = np.squeeze(np.asarray(sample_weight))
@@ -49,7 +49,7 @@ def metric_by_group(metric_function, y_true, y_pred, sensitive_features, sample_
     else:
         result.overall = metric_function(y_a, y_p)
 
-    groups = np.unique(sensitive_features)
+    groups = np.unique(group_membership)
     for group in groups:
         group_indices = (group == g_d)
         group_actual = y_a[group_indices]
@@ -88,11 +88,11 @@ def metric_by_group(metric_function, y_true, y_pred, sensitive_features, sample_
 
 
 def make_group_metric(metric_function):
-    def wrapper(y_true, y_pred, sensitive_features, sample_weight=None):
+    def wrapper(y_true, y_pred, group_membership, sample_weight=None):
         return metric_by_group(metric_function,
                                y_true,
                                y_pred,
-                               sensitive_features,
+                               group_membership,
                                sample_weight)
 
     # Improve the name of the returned function
