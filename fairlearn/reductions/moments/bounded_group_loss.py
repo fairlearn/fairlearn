@@ -4,7 +4,8 @@
 import pandas as pd
 import numpy as np
 from .moment import LossMoment
-from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL, _KW_GROUP_MEMBERSHIP
+from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
+from fairlearn import _KW_SENSITIVE_FEATURES
 
 
 class ConditionalLossMoment(LossMoment):
@@ -20,7 +21,7 @@ class ConditionalLossMoment(LossMoment):
     def load_data(self, X, y, **kwargs):
         kwargs_mod = kwargs.copy()
         if self.no_groups:
-            kwargs_mod[_KW_GROUP_MEMBERSHIP] = pd.Series(y).apply(lambda y: _ALL)
+            kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
         super().load_data(X, y, **kwargs_mod)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.n
         self.index = self.prob_attr.index

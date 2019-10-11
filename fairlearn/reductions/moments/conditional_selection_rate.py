@@ -6,6 +6,8 @@ from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
 from .misclassification_error import MisclassificationError
 
+_DIFF = "diff"
+
 
 class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness metric including DemographicParity and EqualizedOdds"""
@@ -51,12 +53,12 @@ class ConditionalSelectionRate(ClassificationMoment):
         expect_event = self.tags.groupby(_EVENT).mean()
         expect_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).mean()
-        expect_group_event["diff"] = expect_group_event[_PREDICTION] - expect_event[_PREDICTION]
-        g_unsigned = expect_group_event["diff"]
+        expect_group_event[_DIFF] = expect_group_event[_PREDICTION] - expect_event[_PREDICTION]
+        g_unsigned = expect_group_event[_DIFF]
         g_signed = pd.concat([g_unsigned, -g_unsigned],
                              keys=["+", "-"],
                              names=[_SIGN, _EVENT, _GROUP_ID])
-        self._gamma_descr = str(expect_group_event[[_PREDICTION, "diff"]])
+        self._gamma_descr = str(expect_group_event[[_PREDICTION, _DIFF]])
         return g_signed
 
     # TODO: this can be further improved using the overcompleteness in group membership

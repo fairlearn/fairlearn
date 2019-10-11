@@ -7,7 +7,8 @@ import pandas as pd
 
 from fairlearn.reductions.reductions_estimator import ReductionsEstimator
 from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
-from fairlearn.reductions.moments.moment import Moment, ClassificationMoment, _KW_GROUP_MEMBERSHIP
+from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
+from fairlearn import _KW_SENSITIVE_FEATURES
 
 
 class _GridGenerator:
@@ -84,7 +85,7 @@ class GridSearch(ReductionsEstimator):
     _MESSAGE_X_NONE = "Must supply X"
     _MESSAGE_Y_NONE = "Must supply y"
     _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
-    _MESSAGE_X_A_ROWS = "X and the target attribute must have same number of rows"
+    _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
 
     def __init__(self,
                  learner,
@@ -113,15 +114,15 @@ class GridSearch(ReductionsEstimator):
         if y is None:
             raise ValueError(self._MESSAGE_Y_NONE)
 
-        if _KW_GROUP_MEMBERSHIP not in kwargs:
-            raise RuntimeError("Must specify {0} (for now)".format(_KW_GROUP_MEMBERSHIP))
+        if _KW_SENSITIVE_FEATURES not in kwargs:
+            raise RuntimeError("Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES))
 
         # Extract the target attribute
-        A = self._make_vector(kwargs[_KW_GROUP_MEMBERSHIP], _KW_GROUP_MEMBERSHIP)
+        sensitive = self._make_vector(kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
 
-        unique_labels = np.unique(A)
+        unique_labels = np.unique(sensitive)
         if len(unique_labels) > 2:
-            raise RuntimeError("Target Attribute contains "
+            raise RuntimeError("Sensitive features contain "
                                "more than two unique values")
 
         # Extract the Y values
@@ -130,11 +131,11 @@ class GridSearch(ReductionsEstimator):
         X_rows, _ = self._get_matrix_shape(X, "X")
         if X_rows != y_vector.shape[0]:
             raise RuntimeError(self._MESSAGE_X_Y_ROWS)
-        if X_rows != A.shape[0]:
-            raise RuntimeError(self._MESSAGE_X_A_ROWS)
+        if X_rows != sensitive.shape[0]:
+            raise RuntimeError(self._MESSAGE_X_SENSITIVE_ROWS)
 
         # Prep the quality metric
-        self.quality_metric.set_data(X, y_vector, A)
+        self.quality_metric.set_data(X, y_vector, sensitive)
 
         if isinstance(self.disparity_metric, ClassificationMoment):
             # We have a classification problem
@@ -144,9 +145,9 @@ class GridSearch(ReductionsEstimator):
                 raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
         # Prep the disparity metric and objective
-        self.disparity_metric.load_data(X, y_vector, **kwargs)    # sensitive_features=A)
+        self.disparity_metric.load_data(X, y_vector, **kwargs)
         objective = self.disparity_metric.default_objective()
-        objective.load_data(X, y_vector, **kwargs)    # sensitive_features=A)
+        objective.load_data(X, y_vector, **kwargs)
         is_classification_reduction = isinstance(self.disparity_metric, ClassificationMoment)
 
         # Basis information
