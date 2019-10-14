@@ -115,7 +115,7 @@ If you are the current maintainer of this project:
 1. Ensure that all tests return "ok": `python -m pytest -s ./test`
 1. Bump the module version in `fairlearn/__init__.py`
 1. Make a pull request to fairlearn/fairlearn
-1. Merge Microsoft/fairlearn pull request
+1. Merge fairlearn/fairlearn pull request
 1. Tag and push: `git tag vxx.xx; git push --tags`
 
 # Issues
