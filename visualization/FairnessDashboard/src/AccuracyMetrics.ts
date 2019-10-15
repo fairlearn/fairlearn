@@ -5,35 +5,35 @@ export interface IAccuracyOption {
     tags?: string[];
 }
 
-export const AccuracyOptions: IAccuracyOption[] = [
-    {
-        key: "m1",
+export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
+    "accuracy_score": {
+        key: "accuracy_score",
         title: "Method 1",
         description: "uses science to get the answer"
     },
-    {
-        key: "m2",
+    "precision_score": {
+        key: "precision_score",
         title: "Method 2",
         description: "guesses at truth"
     },
-    {
-        key: "m3",
+    "recall_score": {
+        key: "recall_score",
         title: "Method 3",
         description: "guesses at truth"
     },
-    {
-        key: "m4",
+    "zero_one_loss": {
+        key: "zero_one_loss",
         title: "Method 4",
         description: "guesses at truth"
     },
-    {
-        key: "m5",
+    "max_error": {
+        key: "max_error",
         title: "Method 5",
         description: "guesses at truth"
     },
-    {
-        key: "m6",
+    "mean_absolute_error": {
+        key: "mean_absolute_error",
         title: "Method 6",
         description: "guesses at truth"
     }
-];
+};

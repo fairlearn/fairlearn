@@ -5,6 +5,8 @@
 """Defines the Fairlearn dashboard class."""
 
 from .FairlearnWidget import FairlearnWidget
+from fairlearn.metrics import group_accuracy_score, group_precision_score, group_recall_score, group_zero_one_loss
+from fairlearn.metrics import group_max_error, group_mean_absolute_error, group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error
 from IPython.display import display
 from scipy.sparse import issparse
 import numpy as np
@@ -43,34 +45,40 @@ class FairlearnDashboard(object):
 
         self._metric_methods = {
             "accuracy_score": {
-                "model_type": ["classification"]
+                "model_type": ["classification"],
+                "function": group_accuracy_score
             },
-            # "confusion_matrix": {
-            #     "model_type": ["classification"]
-            # },
             "precision_score": {
-                "model_type": ["classification"]
+                "model_type": ["classification"],
+                "function": group_precision_score
             },
             "recall_score": {
-                "model_type": ["classification"]
+                "model_type": ["classification"],
+                "function": group_recall_score
             },
             "zero_one_loss": {
-                "model_type": ["classification"]
+                "model_type": ["classification"],
+                "function": group_zero_one_loss
             },
             "max_error": {
-                "model_type": ["regression"]
+                "model_type": ["regression"],
+                "function": group_max_error
             },
             "mean_absolute_error": {
-                "model_type": ["regression"]
+                "model_type": ["regression"],
+                "function": group_mean_absolute_error
             },
             "mean_squared_error": {
-                "model_type": ["regression"]
+                "model_type": ["regression"],
+                "function": group_mean_squared_error
             },
             "mean_squared_log_error": {
-                "model_type": ["regression"]
+                "model_type": ["regression"],
+                "function": group_mean_squared_log_error
             },
             "median_absolute_error": {
-                "model_type": ["regression"]
+                "model_type": ["regression"],
+                "function": group_median_absolute_error
             }
         }
 
@@ -85,7 +93,11 @@ class FairlearnDashboard(object):
             "regression_methods": regression_methods
         }
 
-        if feature_names is not None
+        if feature_names is not None:
+            dataArg["features"] = feature_names
+        
+        if class_names is not None:
+            dataArg["classes"] = class_names
 
         if is_classifier is not None:
             dataArg["is_classifier"] = is_classifier
@@ -97,9 +109,13 @@ class FairlearnDashboard(object):
     def _on_request(self, change):
         try:
             data = change.new["data"]
-            self._metric_methods.get(data[0])
+            method = self._metric_methods.get(data[0])
+            prediction = method(self._true_y, self._predicted_ys[data[2], data[1])
             self._widget_instance.response = {
-                "data": prediction,
+                "data": {
+                    "global": prediction.overall,
+                    "bins": prediction.by_group
+                    },
                 "id": change.new["id"]}
         except Exception:
             self._widget_instance.response = {

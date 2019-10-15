@@ -23,7 +23,7 @@ export interface IAccuracyPickerProps {
 }
 
 export interface IParityPickerProps {
-    parityOptions: IParityOption[];
+    parityOptions: IAccuracyOption[];
     selectedParityKey: string;
     onParityChange: (newKey: string) => void;
 }
@@ -39,7 +39,7 @@ export interface IWizardState {
     selectedModelId?: number;
     dashboardContext: IFairnessContext;
     accuracyMetrics: IAccuracyOption[];
-    parityMetrics: IParityOption[];
+    parityMetrics: IAccuracyOption[];
     selectedAccuracyKey: string;
     selectedParityKey: string;
     featureBins: IBinnedResponse[];
@@ -113,11 +113,16 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
 
         const featureBins = this.buildFeatureBins(fairnessContext.modelMetadata)
 
+        let accuracyMetrics = fairnessContext.modelMetadata.predictionType === "classes" ?
+            this.props.supportedClassificationAccuracyKeys.map(key => AccuracyOptions[key]) :
+            this.props.supportedRegressionAccuracyKeys.map(key => AccuracyOptions[key])
+        accuracyMetrics.filter(metric => !!metric);
+
         this.state = {
-            accuracyMetrics: AccuracyOptions,
-            selectedAccuracyKey: AccuracyOptions[0].key,
-            parityMetrics: ParityOptions,
-            selectedParityKey: ParityOptions[0].key,
+            accuracyMetrics,
+            selectedAccuracyKey: accuracyMetrics[0].key,
+            parityMetrics: accuracyMetrics,
+            selectedParityKey: accuracyMetrics[0].key,
             dashboardContext: fairnessContext,
             activeTabKey: "0",
             featureBins,
