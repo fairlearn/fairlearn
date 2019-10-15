@@ -110,7 +110,7 @@ class FairlearnDashboard(object):
         try:
             data = change.new["data"]
             method = self._metric_methods.get(data[0])
-            prediction = method(self._true_y, self._predicted_ys[data[2], data[1])
+            prediction = method(self._true_y, self._predicted_ys[data[2]], data[1])
             self._widget_instance.response = {
                 "data": {
                     "global": prediction.overall,
