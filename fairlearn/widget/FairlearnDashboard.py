@@ -109,17 +109,17 @@ class FairlearnDashboard(object):
     def _on_request(self, change):
         try:
             data = change.new["data"]
-            method = self._metric_methods.get(data[0])
-            prediction = method(self._true_y, self._predicted_ys[data[2]], data[1])
+            method = self._metric_methods.get(data["metricKey"])
+            prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], data["binVector"])
             self._widget_instance.response = {
                 "data": {
                     "global": prediction.overall,
                     "bins": prediction.by_group
                     },
                 "id": change.new["id"]}
-        except Exception:
+        except Exception as ed:
             self._widget_instance.response = {
-                "error": "Model threw exeption while predicting",
+                "error": ed,
                 "data": {},
                 "id": change.new["id"]}
 

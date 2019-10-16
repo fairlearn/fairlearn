@@ -109,6 +109,10 @@ export class FairlearnView extends DOMWidgetView {
             promise.reject(new DOMException(response.error, 'PythonError'));
         }
         else {
+            const keys = Object.keys(response.data.bins);
+            const resultArray = new Array(Math.max(...(keys as any[])));
+            keys.forEach(i => resultArray[i] = response.data.bins[i]);
+            response.data.bins = resultArray;
             promise.resolve(response.data);
         }
         clearTimeout(promise.timeout);
