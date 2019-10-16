@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 class ThresholdOptimizer(PostProcessing):
     def __init__(self, *, unconstrained_model=None, unconstrained_estimator=None,
                  parity_criteria=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
-                 seed=None):
+                 random_state=None):
         """ Creates the post processing object.
 
         :param unconstrained_model: the trained model whose output will be post processed
@@ -61,6 +61,8 @@ class ThresholdOptimizer(PostProcessing):
         :type flip: bool
         :param plot: show ROC/selection-error plot if True
         :type plot: bool
+        :param random_state: set to a constant for reproducibility
+        :type random_state: int
         """
         super(ThresholdOptimizer, self).__init__(
             unconstrained_model=unconstrained_model,
@@ -74,7 +76,7 @@ class ThresholdOptimizer(PostProcessing):
         self._gridsize = gridsize
         self._flip = flip
         self._plot = plot
-        random.seed(seed)
+        random.seed(random_state)
         self._post_processed_model_by_attribute = None
 
     def fit(self, X, y, sensitive_features, **kwargs):
