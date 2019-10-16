@@ -15,6 +15,12 @@ import pandas as pd
     
 def _fnr(true_y, predicted_y, bin_vector):
     matrixGroups = group_confusion_matrix(true_y, predicted_y, bin_vector)
+
+def _fpr(true_y, predicted_y, bin_vector):
+    matrixGroups = group_confusion_matrix(true_y, predicted_y, bin_vector)
+
+def _outcomes(true_y, predicted_y, bin_vector):
+    matrixGroups = group_confusion_matrix(true_y, predicted_y, bin_vector)
     
 
 class FairlearnDashboard(object):
@@ -84,15 +90,15 @@ class FairlearnDashboard(object):
                 "function": group_median_absolute_error
             },
             "fnr": {
-                "model_type":[]
+                "model_type":[],
                 "function": _fnr
             },
             "fpr": {
-                "model_type":[]
+                "model_type":[],
                 "function": _fpr
             },
             "outcomes": {
-                "model_type":[]
+                "model_type":[],
                 "function": _outcomes
             }
         }
@@ -126,7 +132,6 @@ class FairlearnDashboard(object):
             data = change.new["data"]
             method = self._metric_methods.get(data["metricKey"]).get("function")
             binVector = data["binVector"]
-            print(binVector)
             prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
             self._widget_instance.response = {
                 "data": {

@@ -111,7 +111,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             this.setSelectedModel(numbers[0]);
         }});
 
-        const featureBins = this.buildFeatureBins(fairnessContext.modelMetadata)
+        const featureBins = this.buildFeatureBins(fairnessContext.modelMetadata);
+        fairnessContext.binVector = this.generateBinVectorForBin(featureBins[0]);
+        fairnessContext.groupNames = this.generateStringLabelsForBins(featureBins[0]);
 
         let accuracyMetrics = fairnessContext.modelMetadata.predictionType === "classes" ?
             this.props.supportedClassificationAccuracyKeys.map(key => AccuracyOptions[key]) :
@@ -260,7 +262,14 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         }
         const newContext = _.cloneDeep(this.state.dashboardContext);
  
-        newContext.binVector = this.state.dashboardContext.dataset.map((row, rowIndex) => {
+        newContext.binVector = this.generateBinVectorForBin(value);
+        newContext.groupNames = this.generateStringLabelsForBins(value);
+
+        this.setState({dashboardContext: newContext, selectedBinIndex: value.featureIndex});
+    }
+
+    private generateBinVectorForBin(value: IBinnedResponse): number[] {
+        return this.state.dashboardContext.dataset.map((row, rowIndex) => {
             const featureValue = row[value.featureIndex];
             if (value.rangeType === RangeTypes.categorical) {
                 return value.array.indexOf(featureValue);
@@ -268,9 +277,6 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 return value.array.findIndex((group, groupIndex) => { return groupIndex > value.array.length || value.array[groupIndex + 1] > featureValue});
             }
         });
-        newContext.groupNames = this.generateStringLabelsForBins(value);
-
-        this.setState({dashboardContext: newContext, selectedBinIndex: value.featureIndex});
     }
 
     private generateStringLabelsForBins(bin: IBinnedResponse): string[] {
