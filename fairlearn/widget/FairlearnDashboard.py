@@ -5,14 +5,17 @@
 """Defines the Fairlearn dashboard class."""
 
 from .FairlearnWidget import FairlearnWidget
-from fairlearn.metrics import group_accuracy_score, group_precision_score, group_recall_score, group_zero_one_loss
+from fairlearn.metrics import group_confusion_matrix ,group_accuracy_score, group_precision_score, group_recall_score, group_zero_one_loss
 from fairlearn.metrics import group_max_error, group_mean_absolute_error, group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error
 from IPython.display import display
 from scipy.sparse import issparse
 import numpy as np
 import pandas as pd
 
-
+    
+def _fnr(true_y, predicted_y, bin_vector):
+    matrixGroups = group_confusion_matrix(true_y, predicted_y, bin_vector)
+    
 
 class FairlearnDashboard(object):
     """The dashboard class, wraps the dashboard component."""
@@ -79,6 +82,18 @@ class FairlearnDashboard(object):
             "median_absolute_error": {
                 "model_type": ["regression"],
                 "function": group_median_absolute_error
+            },
+            "fnr": {
+                "model_type":[]
+                "function": _fnr
+            },
+            "fpr": {
+                "model_type":[]
+                "function": _fpr
+            },
+            "outcomes": {
+                "model_type":[]
+                "function": _outcomes
             }
         }
 
@@ -109,8 +124,10 @@ class FairlearnDashboard(object):
     def _on_request(self, change):
         try:
             data = change.new["data"]
-            method = self._metric_methods.get(data["metricKey"])
-            prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], data["binVector"])
+            method = self._metric_methods.get(data["metricKey"]).get("function")
+            binVector = data["binVector"]
+            print(binVector)
+            prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
             self._widget_instance.response = {
                 "data": {
                     "global": prediction.overall,

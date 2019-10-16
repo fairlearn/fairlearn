@@ -132,6 +132,8 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 this.props.predictedY.length,
                 this.props.requestMetrics)
         };
+
+        this.setBinIndex(0);
     }
 
     public render(): React.ReactNode {
