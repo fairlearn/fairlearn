@@ -112,8 +112,8 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         }});
 
         const featureBins = this.buildFeatureBins(fairnessContext.modelMetadata);
-        fairnessContext.binVector = this.generateBinVectorForBin(featureBins[0]);
-        fairnessContext.groupNames = this.generateStringLabelsForBins(featureBins[0]);
+        fairnessContext.binVector = this.generateBinVectorForBin(featureBins[0], fairnessContext.dataset);
+        fairnessContext.groupNames = this.generateStringLabelsForBins(featureBins[0], fairnessContext.modelMetadata);
 
         let accuracyMetrics = fairnessContext.modelMetadata.predictionType === "classes" ?
             this.props.supportedClassificationAccuracyKeys.map(key => AccuracyOptions[key]) :
@@ -134,8 +134,6 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 this.props.predictedY.length,
                 this.props.requestMetrics)
         };
-
-        this.setBinIndex(0);
     }
 
     public render(): React.ReactNode {
@@ -191,7 +189,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     onNext={this.setTab.bind(this, flights.skipDisparity ? "3" : "2")}
                                 />
                             </PivotItem>
-                            {flights.skipDisparity && (<PivotItem headerText={"Parity"} itemKey={"2"}>
+                            {(flights.skipDisparity === false) && (<PivotItem headerText={"Parity"} itemKey={"2"}>
                                 <ParityTab
                                     dashboardContext={this.state.dashboardContext}
                                     parityPickerProps={parityPickerProps}
@@ -262,14 +260,14 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         }
         const newContext = _.cloneDeep(this.state.dashboardContext);
  
-        newContext.binVector = this.generateBinVectorForBin(value);
-        newContext.groupNames = this.generateStringLabelsForBins(value);
+        newContext.binVector = this.generateBinVectorForBin(value, this.state.dashboardContext.dataset);
+        newContext.groupNames = this.generateStringLabelsForBins(value, this.state.dashboardContext.modelMetadata);
 
         this.setState({dashboardContext: newContext, selectedBinIndex: value.featureIndex});
     }
 
-    private generateBinVectorForBin(value: IBinnedResponse): number[] {
-        return this.state.dashboardContext.dataset.map((row, rowIndex) => {
+    private generateBinVectorForBin(value: IBinnedResponse, dataset: any[][]): number[] {
+        return dataset.map((row, rowIndex) => {
             const featureValue = row[value.featureIndex];
             if (value.rangeType === RangeTypes.categorical) {
                 return value.array.indexOf(featureValue);
@@ -279,9 +277,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         });
     }
 
-    private generateStringLabelsForBins(bin: IBinnedResponse): string[] {
+    private generateStringLabelsForBins(bin: IBinnedResponse, modelMetadata: IFairnessModelMetadata): string[] {
         if (bin.rangeType === RangeTypes.categorical) {
-            if (bin.array.length === (this.state.dashboardContext.modelMetadata.featureRanges[bin.featureIndex] as ICategoricalRange).uniqueValues.length) {
+            if (bin.array.length === (modelMetadata.featureRanges[bin.featureIndex] as ICategoricalRange).uniqueValues.length) {
                 return (bin.array as string[]);
             } else {
                 return [].concat(...bin.array, "Other");

@@ -36,10 +36,12 @@
     "localized-strings": "^0.2.2",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.2",
-    "mlchartlib": "0.1.25",
+    "mlchartlib": "0.1.28",
     "moment": "^2.24.0",
-    "office-ui-fabric-react": "^7.11.0",
+    "office-ui-fabric-react": "7.21.0",
     "plotly.js": "^1.45.3",
+    "react": ">=16.3.2-0 <17.0.0",
+    "react-dom": ">=16.3.2-0 <17.0.0",
     "uuid": "^3.3.2"
   }
 }
