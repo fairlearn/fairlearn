@@ -179,7 +179,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     selectedFeatureChange={this.setBinIndex}
                                     selectedFeatureIndex={this.state.selectedBinIndex}
                                     featureBins={this.state.featureBins.filter(x => !!x)}
-                                    onNext={this.setTab.bind(this, "2")}
+                                    onNext={this.setTab.bind(this, "1")}
                                 />
                             </PivotItem>
                             <PivotItem headerText={"Accuracy"} itemKey={"1"}>
