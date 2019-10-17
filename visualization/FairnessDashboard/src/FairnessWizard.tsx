@@ -210,6 +210,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
                         selectedModelIndex={this.state.selectedModelId}
+                        onEditConfigs={this.setTab.bind(this, "0")}
                     />}
                 {(this.state.activeTabKey === "3" && this.state.selectedModelId === undefined) &&
                     <ModelComparisonChart
@@ -220,6 +221,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         accuracyPickerProps={accuracyPickerProps}
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
+                        onEditConfigs={this.setTab.bind(this, "0")}
                     />}
              </div>
          );

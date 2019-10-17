@@ -10,6 +10,7 @@ import { Text } from "office-ui-fabric-react/lib/Text";
 import { localization } from "../Localization/localization";
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { mergeStyleSets } from "@uifabric/styling";
+import { ActionButton } from "office-ui-fabric-react/lib/Button";
 
 export interface IModelComparisonProps {
     dashboardContext: IFairnessContext;
@@ -19,6 +20,7 @@ export interface IModelComparisonProps {
     accuracyPickerProps: IAccuracyPickerProps;
     parityPickerProps: IParityPickerProps;
     featureBinPickerProps: IFeatureBinPickerProps;
+    onEditConfigs: () => void;
 }
 
 export interface IState {
@@ -104,7 +106,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 <StackItem styles={{root: {backgroundColor: "#EBEBEB", padding: "10px 30px", height: "150px"}}}>
                     <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={{root: {height: "100%"}}}>
                         <Text variant={"xxLarge"}>{localization.Report.title}</Text>
-                        <Text variant={"medium"}>{localization.Report.editConfiguration}</Text>
+                        <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                     </Stack>
                 </StackItem>
                 <StackItem grow={2}>

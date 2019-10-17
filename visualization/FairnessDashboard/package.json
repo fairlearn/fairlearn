@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build-css": "node-sass-chokidar src/ -o rel/ && node-sass-chokidar src/ -o rel/FairnessDashboard"
+    "build-css": "node-sass-chokidar src/ -o rel/ && node-sass-chokidar src/ -o rel/FairnessDashboard",
+    "build-dev": "npm run build && npm run copy",
+    "copy": "xcopy \"rel\" \"..\\test\\test-page\\node_modules\\fairlearn-dashboard\\rel\" /e /y"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",

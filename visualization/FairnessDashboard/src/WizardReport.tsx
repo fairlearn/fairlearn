@@ -9,6 +9,7 @@ import { mergeStyleSets } from "@uifabric/styling";
 import _ from "lodash";
 import { ParityModes } from "./ParityMetrics";
 import { IPlotlyProperty, AccessibleChart } from "mlchartlib";
+import { ActionButton } from "office-ui-fabric-react/lib/Button";
 
 interface IMetrics {
     globalAccuracy: number;
@@ -124,6 +125,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         
         return (<Stack styles={{root: {height: "100%"}}}>
             <StackItem styles={{root: {backgroundColor: "#EBEBEB", padding: "10px 30px"}}}>
+                {this.props.modelCount > 0 && <StackItem>
+                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.clearModelSelection}>{localization.Report.backToComparisons}</ActionButton>
+                </StackItem>}
                 <StackItem>
                     <Text variant={"xxLarge"}>{localization.Report.title}</Text>
                 </StackItem>
@@ -138,7 +142,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                                 <Text variant={"medium"}>{localization.Report.accuracyDisparityText}</Text>
                             </Stack>
                         </StackItem>
-                        <StackItem>{localization.Report.editConfiguration}</StackItem>
+                        <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                     </Stack>
                 </Stack.Item>
             </StackItem>
@@ -164,6 +168,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 </Stack>
             </Stack.Item>
         </Stack>);
+    }
+
+    private readonly clearModelSelection = (): void => {
+        this.props.selections.onSelect([]);
     }
 
     private async loadData(): Promise<void> {

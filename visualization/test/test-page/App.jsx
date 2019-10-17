@@ -37,12 +37,13 @@ import { binaryClassifier } from '../__mock-data/binaryClassifier';
             global: Math.random(),
             bins
           })}, 300);
-          signal.addEventListener('abort', () => {
-            clearTimeout(timeout);
-            reject(new DOMException('Aborted', 'AbortError'));
-          });
+          if (signal) {
+            signal.addEventListener('abort', () => {
+              clearTimeout(timeout);
+              reject(new DOMException('Aborted', 'AbortError'));
+            });
+          }
         });
-
         return promise;
       }
 
