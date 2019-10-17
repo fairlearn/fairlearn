@@ -10,6 +10,7 @@ import _ from "lodash";
 import { ParityModes } from "./ParityMetrics";
 import { IPlotlyProperty, AccessibleChart } from "mlchartlib";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { SummaryTable } from "./Controls/SummaryTable";
 
 interface IMetrics {
     globalAccuracy: number;
@@ -148,15 +149,15 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             </StackItem>
             <Stack.Item grow={2} styles={{root: {padding: "10px 30px"}}}>
                 <Stack horizontal styles={{root: {height: "100%"}}}>
+                    <SummaryTable 
+                        binLabels={this.props.dashboardContext.groupNames}
+                        binValues={this.state.metrics.binnedFPR}/>
                     <Stack.Item styles={{root: {width: "55%"}}}>
                         <AccessibleChart
                             plotlyProps={accuracyPlot}
                             sharedSelectionContext={undefined}
                             theme={undefined}
                         />
-                    </Stack.Item>
-                    <Stack.Item>
-                        table
                     </Stack.Item>
                     <Stack.Item grow={2}>
                         <AccessibleChart
