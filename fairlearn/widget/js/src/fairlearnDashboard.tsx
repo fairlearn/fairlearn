@@ -22,12 +22,12 @@ import ReactDOM from 'react-dom';
 export class  FairlearnModel extends DOMWidgetModel {
     defaults() {
         return {
-            _model_name : 'fairlearnModel',
-            _view_name : 'fairlearnView',
+            _model_name : 'FairlearnModel',
+            _view_name : 'FairlearnView',
             _model_module : 'fairlearn-widget',
             _view_module : 'fairlearn-widget',
-            _model_module_version : '0.1.0',
-            _view_module_version : '0.1.0',
+            _model_module_version : '0.1.1',
+            _view_module_version : '0.1.1',
             value: {},
             request: {},
             response: {}
@@ -110,7 +110,7 @@ export class FairlearnView extends DOMWidgetView {
         }
         else {
             const keys = Object.keys(response.data.bins);
-            const resultArray = new Array(Math.max(...(keys as any[])));
+            const resultArray = new Array(Math.max(...(keys as any[])) + 1);
             keys.forEach(i => resultArray[i] = response.data.bins[i]);
             response.data.bins = resultArray;
             promise.resolve(response.data);
