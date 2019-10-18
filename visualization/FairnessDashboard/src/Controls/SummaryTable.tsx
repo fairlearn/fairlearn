@@ -1,8 +1,9 @@
 import React from "react";
 import { List } from "office-ui-fabric-react/lib/List";
-import { Stack } from "office-ui-fabric-react/lib/Stack";
+import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { Text } from "office-ui-fabric-react/lib/Text";
 import { mergeStyleSets } from "@uifabric/styling";
+import { Separator } from "office-ui-fabric-react/lib/Separator";
 
 export interface ISummaryTableProps {
     binValues: number[];
@@ -17,6 +18,17 @@ interface IBinItem {
 }
 
 export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
+
+    private static separatorStyle = {
+        root: [{
+          selectors: {
+            '::after': {
+              backgroundColor: 'darkgrey',
+            },
+          }
+        }]
+    };
+
     private static readonly classNames = mergeStyleSets({
         itemCell: [
           {
@@ -47,6 +59,9 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                     flex: 1
                 }
             }
+        },
+        minMaxLabel: {
+            backgroundColor: "#CCC"
         }
     });
     
@@ -93,8 +108,21 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             key={index}
             className={SummaryTable.classNames.itemCell}
             >
-            <h2>{item.title}</h2>
-            <Text variant={"medium"}>{item.score}</Text>
+            <Stack verticalAlign="space-evenly" styles={{root: {width: "200px"}}}>
+                <div>
+                    <div>
+                        <Text variant={"medium"}>{item.title}</Text>
+                    </div>
+                    <Stack horizontal>
+                        {item.isMin && <div className={SummaryTable.classNames.minMaxLabel}>Min</div>}
+                        {item.isMax && <div className={SummaryTable.classNames.minMaxLabel}>Max</div>}
+                    </Stack>
+                </div>
+            </Stack>
+            <Separator vertical styles={SummaryTable.separatorStyle} />
+            <Stack verticalAlign="space-evenly" styles={{root: {width: "100px"}}}>
+                <Text variant={"xxLarge"}>{item.score.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
+            </Stack>
           </Stack>
         );
     }

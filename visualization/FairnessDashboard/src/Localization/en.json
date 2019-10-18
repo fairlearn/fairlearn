@@ -28,7 +28,9 @@
         "globalAccuracyText": "Is your overall accuracy score",
         "accuracyDisparityText": "Is the overall difference",
         "editConfiguration": "Edit Configuration",
-        "backToComparisons": "Back to comparison view"
+        "backToComparisons": "Multimodel view",
+        "globalOutcomeText": "Is your average prediction",
+        "outcomeDisparityText": "Is your disparity in predictions"
     },
     "Feature": {
         "header": "Along which features would you like to evaluate your model's fairness?",

@@ -46,6 +46,13 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             margin: "auto",
             fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
             padding: "40px"
+        },
+        percentageText: {
+            alignSelf: "center",
+            fontSize: "55px"
+        },
+        percentageLabel: {
+            alignSelf: "center"
         }
     });
 
@@ -124,10 +131,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             this.props.featureBinPickerProps.selectedBinIndex];
         opportunityPlot.layout.yaxis.showticklabels = true;
         
-        return (<Stack styles={{root: {height: "100%"}}}>
-            <StackItem styles={{root: {backgroundColor: "#EBEBEB", padding: "10px 30px"}}}>
+        return (<div style={{height: "100%", overflowY:"auto"}}>
+            <div style={{backgroundColor: "#EBEBEB", padding: "10px 30px"}}>
                 {this.props.modelCount > 0 && <StackItem>
-                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.clearModelSelection}>{localization.Report.backToComparisons}</ActionButton>
+                    <ActionButton iconProps={{iconName: "ChromeBack"}} onClick={this.clearModelSelection}>{localization.Report.backToComparisons}</ActionButton>
                 </StackItem>}
                 <StackItem>
                     <Text variant={"xxLarge"}>{localization.Report.title}</Text>
@@ -136,18 +143,18 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     <Stack horizontal horizontalAlign="space-between" styles={{root: {height: "100%"}}}>
                         <StackItem>
                             <Stack horizontal styles={{root: {height: "100%"}}}>
-                                <Text variant={"xxLarge"}>{this.state.metrics.globalAccuracy.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-                                <Text variant={"medium"}>{localization.Report.globalAccuracyText}</Text>
+                                <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.globalAccuracy.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
+                                <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.globalAccuracyText}</Text>
                                 <Separator vertical styles={WizardReport.separatorStyle} />
-                                <Text variant={"xxLarge"}>{this.state.metrics.accuracyDisparity.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-                                <Text variant={"medium"}>{localization.Report.accuracyDisparityText}</Text>
+                                <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.accuracyDisparity.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
+                                <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.accuracyDisparityText}</Text>
                             </Stack>
                         </StackItem>
                         <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                     </Stack>
                 </Stack.Item>
-            </StackItem>
-            <Stack.Item grow={2} styles={{root: {padding: "10px 30px"}}}>
+            </div>
+            <div style={{padding: "10px 30px", height:"400px"}}>
                 <Stack horizontal styles={{root: {height: "100%"}}}>
                     <SummaryTable 
                         binLabels={this.props.dashboardContext.groupNames}
@@ -159,7 +166,25 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             theme={undefined}
                         />
                     </Stack.Item>
-                    <Stack.Item grow={2}>
+                </Stack>
+            </div>
+            <div style={{backgroundColor: "#EBEBEB", padding: "10px 30px"}}>
+                <Stack.Item styles={{root: {height: "100px"}}}>
+                    <Stack horizontal styles={{root: {height: "100%"}}}>
+                        <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.globalOutcome.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
+                        <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.globalOutcomeText}</Text>
+                        <Separator vertical styles={WizardReport.separatorStyle} />
+                        <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.outcomeDisparity.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
+                        <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.outcomeDisparityText}</Text>
+                    </Stack>
+                </Stack.Item>
+            </div>
+            <div style={{padding: "10px 30px", height:"400px"}}>
+                <Stack horizontal styles={{root: {height: "100%"}}}>
+                    <SummaryTable 
+                        binLabels={this.props.dashboardContext.groupNames}
+                        binValues={this.state.metrics.binnedFPR}/>
+                    <Stack.Item styles={{root: {width: "55%"}}}>
                         <AccessibleChart
                             plotlyProps={opportunityPlot}
                             sharedSelectionContext={undefined}
@@ -167,8 +192,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         />
                     </Stack.Item>
                 </Stack>
-            </Stack.Item>
-        </Stack>);
+            </div>
+        </div>);
     }
 
     private readonly clearModelSelection = (): void => {
