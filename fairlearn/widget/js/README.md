@@ -7,5 +7,5 @@ Package Install
 - [node](http://nodejs.org/)
 
 ```bash
-npm install --save fairnlearn-widget
+npm install --save fairlearn-widget
 ```

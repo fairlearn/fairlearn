@@ -22,8 +22,8 @@ import ReactDOM from 'react-dom';
 export class  FairlearnModel extends DOMWidgetModel {
     defaults() {
         return {
-            _model_name : 'FairlearnModel',
-            _view_name : 'FairlearnView',
+            _model_name : 'fairlearnModel',
+            _view_name : 'fairlearnView',
             _model_module : 'fairlearn-widget',
             _view_module : 'fairlearn-widget',
             _model_module_version : '0.1.0',

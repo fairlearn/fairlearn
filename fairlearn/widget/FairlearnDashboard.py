@@ -2,52 +2,46 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # ---------------------------------------------------------
 
-"""Defines the Fairlearn dashboard class."""
+"""Defines the fairlearn dashboard class."""
 
-from .FairlearnWidget import FairlearnWidget
-from fairlearn.metrics import group_confusion_matrix ,group_accuracy_score, group_precision_score, group_recall_score, group_zero_one_loss
-from fairlearn.metrics import group_max_error, group_mean_absolute_error, group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error
+from .fairlearnWidget import FairlearnWidget
+from fairlearn.metrics import group_confusion_matrix, group_accuracy_score, group_precision_score,\
+    group_recall_score, group_zero_one_loss, group_max_error, group_mean_absolute_error,\
+    group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error
 from IPython.display import display
 from scipy.sparse import issparse
 import numpy as np
 import pandas as pd
 
-    
-def _fnr(true_y, predicted_y, bin_vector):
-    matrixGroups = group_confusion_matrix(true_y, predicted_y, bin_vector)
-
-def _fpr(true_y, predicted_y, bin_vector):
-    matrixGroups = group_confusion_matrix(true_y, predicted_y, bin_vector)
-
-def _outcomes(true_y, predicted_y, bin_vector):
-    matrixGroups = group_confusion_matrix(true_y, predicted_y, bin_vector)
-    
 
 class FairlearnDashboard(object):
     """The dashboard class, wraps the dashboard component."""
 
-    def __init__(self, *, augmented_dataset, true_y, predicted_ys, class_names=None, feature_names=None, is_classifier=None):
-        """Initialize the Explanation Dashboard.
+    def __init__(
+        self, *,
+        sensitive_features,
+        true_y, predicted_ys,
+        class_names=None,
+        feature_names=None,
+        is_classifier=None):
+        """Initialize the fairlearn Dashboard.
 
-        :param explanationObject: An object that represents an explanation.
-        :type explanationObject: ExplanationMixin
-        :param model: An object that represents a model. It is assumed that for the classification case
-            it has a method of predict_proba() returning the prediction probabilities for each
-            class and for the regression case a method of predict() returning the prediction value.
-        :type model: object
-        :param datasetX:  A matrix of feature vector examples (# examples x # features), the same samples
-            used to build the explanationObject. Will overwrite any set on explanation object already
-        :type datasetX: numpy.array or list[][]
+        :param sensitive_features:  A matrix of feature vector examples (# examples x # features),
+            these can be from the initial dataset, or reserved from training. Currently only
+            categorical features are supported
+        :type sensitive_features: numpy.array or list[][] or Pandas Dataframe
         :param trueY: The true labels for the provided dataset. Will overwrite any set on
             explanation object already
         :type trueY: numpy.array or list[]
-        :param classes: The class names
-        :type classes: numpy.array or list[]
-        :param features: Feature names
-        :type features: numpy.array or list[]
+        :param predicted_ys: Array of output predictions from models to be evaluated
+        :type predicted_ys: numpy.array or list[][]
+        :param class_names: The class names
+        :type class_names: numpy.array or list[]
+        :param feature_names: Feature names
+        :type feature_names: numpy.array or list[]
         """
         self._widget_instance = FairlearnWidget()
-        if augmented_dataset is None or true_y is None or predicted_ys is None:
+        if sensitive_features is None or true_y is None or predicted_ys is None:
             raise ValueError("Required parameters not provided")
         self._true_y = true_y
         self._predicted_ys = predicted_ys
@@ -90,33 +84,35 @@ class FairlearnDashboard(object):
                 "function": group_median_absolute_error
             },
             "fnr": {
-                "model_type":[],
-                "function": _fnr
+                "model_type": [],
+                "function": group_accuracy_score
             },
             "fpr": {
-                "model_type":[],
-                "function": _fpr
+                "model_type": [],
+                "function": group_accuracy_score
             },
             "outcomes": {
-                "model_type":[],
-                "function": _outcomes
+                "model_type": [],
+                "function": group_accuracy_score
             }
         }
 
-        classification_methods = [method[0] for method in self._metric_methods.items() if "classification" in method[1]["model_type"]]
-        regression_methods = [method[0] for method in self._metric_methods.items() if "regression" in method[1]["model_type"]]
+        classification_methods = [method[0] for method in self._metric_methods.items()
+                                  if "classification" in method[1]["model_type"]]
+        regression_methods = [method[0] for method in self._metric_methods.items()
+                              if "regression" in method[1]["model_type"]]
 
         dataArg = {
             "true_y": self._convertToList(true_y),
             "predicted_ys": self._convertToList(predicted_ys),
-            "dataset": self._convertToList(augmented_dataset),
+            "dataset": self._convertToList(sensitive_features),
             "classification_methods": classification_methods,
             "regression_methods": regression_methods
         }
 
         if feature_names is not None:
             dataArg["features"] = feature_names
-        
+
         if class_names is not None:
             dataArg["classes"] = class_names
 
