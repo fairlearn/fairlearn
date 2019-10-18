@@ -357,7 +357,7 @@
   dependencies:
     tslib "^1.7.1"
 
-"@uifabric/foundation@^7.4.4":
+"@uifabric/foundation@^7.0.3", "@uifabric/foundation@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@uifabric/foundation/-/foundation-7.4.4.tgz#f9e01b37710ee95b3f2e82418f480b8b3fd879a2"
   integrity sha512-I4zrJXq2B00+LIzxcCDyi3+lx/sm0DzDdSFvQQp3DS9eiL8TzcjZTneRr32TQuVlA0Q7nFQClIXjglEo8+quFA==
@@ -368,7 +368,7 @@
     "@uifabric/utilities" "^7.4.0"
     tslib "^1.7.1"
 
-"@uifabric/icons@^7.3.0":
+"@uifabric/icons@^7.1.1", "@uifabric/icons@^7.3.0":
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/@uifabric/icons/-/icons-7.3.0.tgz#db5b418d1db1e3f05e92d71f2dc829aa6e239bdb"
   integrity sha512-wbcR8fJce20sPjsK2bbTC/cAZfAOFuE4dd4LHw194+8H+/dqotsowrQVp5Lu8aaHGQk+fXoiZmUy30WA9cAG4Q==
@@ -377,7 +377,7 @@
     "@uifabric/styling" "^7.7.1"
     tslib "^1.7.1"
 
-"@uifabric/merge-styles@^7.7.0":
+"@uifabric/merge-styles@^7.3.0", "@uifabric/merge-styles@^7.7.0":
   version "7.7.0"
   resolved "https://registry.yarnpkg.com/@uifabric/merge-styles/-/merge-styles-7.7.0.tgz#10caa72dd5fb9c63e22214f3a53856aa049bdb10"
   integrity sha512-VMLSHKNp4dFDOZTdXeXhNvkrdmxjTwP4MaUf6yLeMkD1qf36/uFAN4nQ7jVAr6RC5cVMklmxN6FtNj+6+bHGfA==
@@ -394,14 +394,14 @@
     "@uifabric/utilities" "^7.0.10"
     tslib "^1.7.1"
 
-"@uifabric/set-version@^7.0.2":
+"@uifabric/set-version@^7.0.1", "@uifabric/set-version@^7.0.2":
   version "7.0.2"
   resolved "https://registry.yarnpkg.com/@uifabric/set-version/-/set-version-7.0.2.tgz#9e2aede95e5cad58151e6ab0f94cc6efaef68c13"
   integrity sha512-3mQp7gqPOqphwX74j+N/lJEFeivKPv8ryY9QFXUxVPnrXNwpIkDW9Wk6CPqArzgGvQngRRKYD/PcyP5iuHN52A==
   dependencies:
     tslib "^1.7.1"
 
-"@uifabric/styling@^7.7.1", "@uifabric/styling@^7.7.2":
+"@uifabric/styling@^7.4.0", "@uifabric/styling@^7.7.1", "@uifabric/styling@^7.7.2":
   version "7.7.2"
   resolved "https://registry.yarnpkg.com/@uifabric/styling/-/styling-7.7.2.tgz#0dc3741b9f2f45efa270ba91780d5f49964409ed"
   integrity sha512-5xQbz5r4+XeWjb1omHara/1Hdk+dsNSUkZAw6sp/tnv/cGFea4+hMuSmSaTG6T78Osiy59UG+qw7Ax/spfr2EQ==
@@ -412,7 +412,7 @@
     "@uifabric/utilities" "^7.2.0"
     tslib "^1.7.1"
 
-"@uifabric/utilities@^7.0.10", "@uifabric/utilities@^7.2.0", "@uifabric/utilities@^7.4.0", "@uifabric/utilities@^7.5.0":
+"@uifabric/utilities@^7.0.10", "@uifabric/utilities@^7.0.7", "@uifabric/utilities@^7.2.0", "@uifabric/utilities@^7.4.0", "@uifabric/utilities@^7.5.0":
   version "7.5.0"
   resolved "https://registry.yarnpkg.com/@uifabric/utilities/-/utilities-7.5.0.tgz#9e7eb2c73595bd105620eea507aeb1bafaba8f14"
   integrity sha512-h9XwZVaKyLN3Ss4G+bXFWsmCzExID/SKbO64XPjsCIhuxVYsTg6/hDrvyU4TCEx06/ehXfdHRmyjCYL1PNdDMg==
@@ -2229,6 +2229,23 @@ extract-frustum-planes@^1.0.0:
   resolved "https://registry.yarnpkg.com/extract-frustum-planes/-/extract-frustum-planes-1.0.0.tgz#97d5703ff0564c8c3c6838cac45f9e7bc52c9ef5"
   integrity sha1-l9VwP/BWTIw8aDjKxF+ee8UsnvU=
 
+fairlearn-dashboard@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/fairlearn-dashboard/-/fairlearn-dashboard-0.0.1.tgz#d46382303abaf74454f431a945ece0b9ff8116c6"
+  integrity sha512-iy/p2WgK7WVlyE8eVZMsEE3nNDjCsz/FZXsFccFjHH0PTDEhN1bAW9SV2aPcTwd6Duzuvczh7dFUXyw1nPxQ/Q==
+  dependencies:
+    jmespath "^0.15.0"
+    localized-strings "^0.2.2"
+    lodash "^4.17.11"
+    memoize-one "^5.0.2"
+    mlchartlib "0.1.28"
+    moment "^2.24.0"
+    office-ui-fabric-react "7.21.0"
+    plotly.js "^1.45.3"
+    react ">=16.3.2-0 <17.0.0"
+    react-dom ">=16.3.2-0 <17.0.0"
+    uuid "^3.3.2"
+
 falafel@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/falafel/-/falafel-2.1.0.tgz#96bb17761daba94f46d001738b3cedf3a67fe06c"
@@ -4002,10 +4019,10 @@ mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0:
   dependencies:
     minimist "0.0.8"
 
-mlchartlib@0.1.26:
-  version "0.1.26"
-  resolved "https://registry.yarnpkg.com/mlchartlib/-/mlchartlib-0.1.26.tgz#8470aeb249743c3d8f9c8ec9020d2dda1db446e4"
-  integrity sha512-6H8+d1VJ3Hgz3jhFUafazuGi+ieWi4d+1CZjijmD+RW76rq9ORFTUWCh9ztKQ1eCvkLMS5j+e0T+t41rbjwD8Q==
+mlchartlib@0.1.28:
+  version "0.1.28"
+  resolved "https://registry.yarnpkg.com/mlchartlib/-/mlchartlib-0.1.28.tgz#53ad758fd2632575956e4755a31cbc66d2a16294"
+  integrity sha512-fQwSF7WcgsQDLn+DFAVwBLyCDLGAK+d1lKcMrlv2134R6KsgpyU/TBHpoqGX2wsP1us6RM553tSe5C7+2nl2xw==
   dependencies:
     jmespath "^0.15.0"
     localized-strings "^0.2.2"
@@ -4404,6 +4421,21 @@ object.pick@^1.3.0:
   integrity sha1-h6EKxMFpS9Lhy/U1kaZhQftd10c=
   dependencies:
     isobject "^3.0.1"
+
+office-ui-fabric-react@7.21.0:
+  version "7.21.0"
+  resolved "https://registry.yarnpkg.com/office-ui-fabric-react/-/office-ui-fabric-react-7.21.0.tgz#a463422f9cc1d5284cff6a151071f031fefc8259"
+  integrity sha512-EgP96DUCC6MtzlaMTIhobefLkvVoKYvGJtUVSNrSnUpUww2t1ZGfusqKba9S+Q7jYPtvkyYtrrtDwAbWQFmTzg==
+  dependencies:
+    "@microsoft/load-themed-styles" "^1.7.13"
+    "@uifabric/foundation" "^7.0.3"
+    "@uifabric/icons" "^7.1.1"
+    "@uifabric/merge-styles" "^7.3.0"
+    "@uifabric/set-version" "^7.0.1"
+    "@uifabric/styling" "^7.4.0"
+    "@uifabric/utilities" "^7.0.7"
+    prop-types "^15.5.10"
+    tslib "^1.7.1"
 
 office-ui-fabric-react@^7.11.0:
   version "7.48.1"
@@ -5058,7 +5090,7 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-dom@^16.8.6:
+"react-dom@>=16.3.2-0 <17.0.0", react-dom@^16.8.6:
   version "16.10.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.10.2.tgz#4840bce5409176bc3a1f2bd8cb10b92db452fda6"
   integrity sha512-kWGDcH3ItJK4+6Pl9DZB16BXYAZyrYQItU4OMy0jAkv5aNqc+mAKb4TpFtAteI6TJZu+9ZlNhaeNQSVQDHJzkw==
@@ -5073,7 +5105,7 @@ react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.10.2.tgz#984120fd4d16800e9a738208ab1fba422d23b5ab"
   integrity sha512-INBT1QEgtcCCgvccr5/86CfD71fw9EPmDxgiJX4I2Ddr6ZsV6iFXsuby+qWJPtmNuMY0zByTsG4468P7nHuNWA==
 
-react@^16.8.6:
+"react@>=16.3.2-0 <17.0.0", react@^16.8.6:
   version "16.10.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.10.2.tgz#a5ede5cdd5c536f745173c8da47bda64797a4cf0"
   integrity sha512-MFVIq0DpIhrHFyqLU0S3+4dIcBhhOvBE8bJ/5kHPVOVaGdo0KuiQzpcjCPsf585WvhypqtrMILyoE2th6dT+Lw==

@@ -5,7 +5,7 @@
 """Defines the fairlearn dashboard class."""
 
 from .fairlearnWidget import FairlearnWidget
-from fairlearn.metrics import group_confusion_matrix, group_accuracy_score, group_precision_score,\
+from fairlearn.metrics import group_accuracy_score, group_precision_score,\
     group_recall_score, group_zero_one_loss, group_max_error, group_mean_absolute_error,\
     group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error
 from IPython.display import display
@@ -18,12 +18,13 @@ class FairlearnDashboard(object):
     """The dashboard class, wraps the dashboard component."""
 
     def __init__(
-        self, *,
-        sensitive_features,
-        true_y, predicted_ys,
-        class_names=None,
-        feature_names=None,
-        is_classifier=None):
+            self, *,
+            sensitive_features,
+            true_y, predicted_ys,
+            class_names=None,
+            feature_names=None,
+            is_classifier=None):
+
         """Initialize the fairlearn Dashboard.
 
         :param sensitive_features:  A matrix of feature vector examples (# examples x # features),
