@@ -1,0 +1,4 @@
+include fairlearn/widget/static/extension.js
+include fairlearn/widget/static/index.js
+recursive-include jupyter-config *.json
+recursive-include fairlearn/widget/static *.js.map
