@@ -4,7 +4,7 @@ import { IFairnessContext, IFairnessModelMetadata } from "./IFairnessContext";
 import { localization } from "./Localization/localization";
 import _ from "lodash";
 import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
-import { Stack } from "office-ui-fabric-react/lib/Stack";
+import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { SelectionContext, ICategoricalRange, IModelMetadata, ModelMetadata, RangeTypes } from "mlchartlib";
 import { AccuracyOptions, IAccuracyOption } from "./AccuracyMetrics";
 import { WizardReport } from "./WizardReport";
@@ -15,6 +15,8 @@ import { MetricsCache } from "./MetricsCache";
 import { ModelComparisonChart } from "./Controls/ModelComparisonChart";
 import { FeatureTab } from "./Controls/FeatureTab";
 import { IBinnedResponse } from "./IBinnedResponse";
+import { Text } from "office-ui-fabric-react/lib/Text";
+import { IntroTab } from "./Controls/IntroTab";
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -49,6 +51,12 @@ export interface IWizardState {
 
 const trueYPath = "trueY";
 const indexPath = "index";
+
+const introTabKey = "introTab";
+const featureBinTabKey = "featureBinTab";
+const accuracyTabKey = "accuracyTab";
+const disparityTabKey = "disparityTab";
+const reportTabKey = "reportTab"
 
 const flights = {
     skipDisparity: true
@@ -126,7 +134,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             parityMetrics: accuracyMetrics,
             selectedParityKey: accuracyMetrics[0].key,
             dashboardContext: fairnessContext,
-            activeTabKey: "0",
+            activeTabKey: introTabKey,
             featureBins,
             selectedBinIndex: 0,
             metricCache: new MetricsCache(
@@ -153,12 +161,23 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             onBinChange: this.setBinIndex
         };
          return (
-             <div style={{height: '800px'}}>
-                 {(this.state.activeTabKey === "0" ||
-                   this.state.activeTabKey === "1" ||
-                   this.state.activeTabKey === "2"
+             <Stack style={{height: '800px'}}>
+                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" style={{
+                     height: "35px",
+                     backgroundColor: "#333",
+                     color: "#CCC"
+                     }}>
+                    <Text variant={"mediumPlus"} style={{padding: "20px"}}>{localization.Header.title}</Text>
+                    <Text variant={"medium"} style={{padding: "15px"}}>{localization.Header.documentation}</Text>
+                </Stack>
+                {(this.state.activeTabKey === introTabKey) &&
+                    <StackItem grow={2}>
+                        <IntroTab onNext={this.setTab.bind(this, featureBinTabKey)}/>
+                    </StackItem>}
+                 {(this.state.activeTabKey === featureBinTabKey ||
+                   this.state.activeTabKey === accuracyTabKey ||
+                   this.state.activeTabKey === disparityTabKey
                  ) &&
-                 <Stack horizontal style={{height: "100%"}} >
                     <Stack.Item grow={2}>
                         <Pivot
                             style={{
@@ -173,34 +192,33 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                             }}
                             selectedKey={this.state.activeTabKey}
                             onLinkClick={this.handleTabClick}>
-                            <PivotItem headerText={"Protected Attributes"} itemKey={"0"} style={{height: "100%"}}>
+                            <PivotItem headerText={"Protected Attributes"} itemKey={featureBinTabKey} style={{height: "100%"}}>
                                 <FeatureTab
                                     dashboardContext={this.state.dashboardContext}
                                     selectedFeatureChange={this.setBinIndex}
                                     selectedFeatureIndex={this.state.selectedBinIndex}
                                     featureBins={this.state.featureBins.filter(x => !!x)}
-                                    onNext={this.setTab.bind(this, "1")}
+                                    onNext={this.setTab.bind(this, accuracyTabKey)}
                                 />
                             </PivotItem>
-                            <PivotItem headerText={"Accuracy"} itemKey={"1"}>
+                            <PivotItem headerText={"Accuracy"} itemKey={accuracyTabKey}>
                                 <AccuracyTab
                                     dashboardContext={this.state.dashboardContext}
                                     accuracyPickerProps={accuracyPickerProps}
-                                    onNext={this.setTab.bind(this, flights.skipDisparity ? "3" : "2")}
+                                    onNext={this.setTab.bind(this, flights.skipDisparity ? reportTabKey : disparityTabKey)}
                                 />
                             </PivotItem>
-                            {(flights.skipDisparity === false) && (<PivotItem headerText={"Parity"} itemKey={"2"}>
+                            {(flights.skipDisparity === false) && (<PivotItem headerText={"Parity"} itemKey={disparityTabKey}>
                                 <ParityTab
                                     dashboardContext={this.state.dashboardContext}
                                     parityPickerProps={parityPickerProps}
-                                    onNext={this.setTab.bind(this, "3")}
-                                    onPrevious={this.setTab.bind(this, "1")}
+                                    onNext={this.setTab.bind(this, reportTabKey)}
+                                    onPrevious={this.setTab.bind(this, accuracyTabKey)}
                                 />
                             </PivotItem>)}
                         </Pivot>
-                    </Stack.Item>
-                </Stack>}
-                {(this.state.activeTabKey === "3" && this.state.selectedModelId !== undefined) &&
+                    </Stack.Item>}
+                {(this.state.activeTabKey === reportTabKey && this.state.selectedModelId !== undefined) &&
                     <WizardReport 
                         dashboardContext={this.state.dashboardContext}
                         metricsCache={this.state.metricCache}
@@ -210,9 +228,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
                         selectedModelIndex={this.state.selectedModelId}
-                        onEditConfigs={this.setTab.bind(this, "0")}
+                        onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
                     />}
-                {(this.state.activeTabKey === "3" && this.state.selectedModelId === undefined) &&
+                {(this.state.activeTabKey === reportTabKey && this.state.selectedModelId === undefined) &&
                     <ModelComparisonChart
                         dashboardContext={this.state.dashboardContext}
                         metricsCache={this.state.metricCache}
@@ -221,9 +239,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         accuracyPickerProps={accuracyPickerProps}
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
-                        onEditConfigs={this.setTab.bind(this, "0")}
+                        onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
                     />}
-             </div>
+             </Stack>
          );
     }
 
@@ -320,6 +338,6 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
     }
 
     private readonly onMetricError = (error: any): void => {
-        this.setState({activeTabKey: "1"});
+        this.setState({activeTabKey: accuracyTabKey});
     }
 }

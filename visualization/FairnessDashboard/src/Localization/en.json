@@ -1,4 +1,5 @@
 {
+    "loremIpsum": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     "defaultClassNames": "Class {0}",
     "defaultFeatureNames": "Feature {0}",
     "accuracyTab": "Fairness in Accuracy",
@@ -19,9 +20,18 @@
         "header": "Fairness measured in terms of disparity",
         "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are two kinds of disparity metrics: more to come...."
     },
+    "Header": {
+        "title": "FairLearn Toolkit",
+        "documentation": "Documentation"
+    },
     "Footer": {
         "back": "Back",
         "next": "Next"
+    },
+    "Intro": {
+        "welcome": "Welcome to the",
+        "explanatoryStep": "Setting up your fairness assessment is easy",
+        "getStarted": "Get started"
     },
     "Report": {
         "title": "Accuracy and fairness assessment",
