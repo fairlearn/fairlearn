@@ -71,7 +71,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 size: 10
             },
             margin: {
-                t: 10
+                t: 10,
+                l: 10
             },
             showlegend: false,
             hovermode: 'closest',
@@ -111,9 +112,6 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 textposition: 'auto'
             }
         ];
-        accuracyPlot.layout.yaxis.title = this.props.dashboardContext.modelMetadata.featureNames[
-            this.props.featureBinPickerProps.selectedBinIndex];
-        accuracyPlot.layout.yaxis.showticklabels = true;
 
         const opportunityPlot = _.cloneDeep(WizardReport.barPlotlyProps);
         opportunityPlot.data = [
@@ -126,10 +124,6 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 textposition: 'auto'
             } as any
         ];
-
-        opportunityPlot.layout.yaxis.title = this.props.dashboardContext.modelMetadata.featureNames[
-            this.props.featureBinPickerProps.selectedBinIndex];
-        opportunityPlot.layout.yaxis.showticklabels = true;
         
         return (<div style={{height: "100%", overflowY:"auto"}}>
             <div style={{backgroundColor: "#EBEBEB", padding: "10px 30px"}}>

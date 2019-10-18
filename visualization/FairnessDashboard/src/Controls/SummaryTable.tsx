@@ -32,7 +32,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
     private static readonly classNames = mergeStyleSets({
         itemCell: [
           {
-            padding: 10,
+            display: "inline-flex",
             width: "100%",
             position: "relative",
             float: "left",
@@ -46,6 +46,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             paddingBottom: "57px",
             boxSizing: "border-box",
             height: "100%",
+            width: "300px",
             selectors: {
                 ".ms-List-surface": {
                     height: "100%"
@@ -61,6 +62,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             }
         },
         minMaxLabel: {
+            padding: "2px, 5px",
             backgroundColor: "#CCC"
         }
     });
@@ -104,26 +106,30 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
 
     private readonly _onRenderCell = (item: IBinItem, index: number | undefined): JSX.Element => {
         return (
-          <Stack horizontal
+          <div
             key={index}
             className={SummaryTable.classNames.itemCell}
             >
-            <Stack verticalAlign="space-evenly" styles={{root: {width: "200px"}}}>
-                <div>
+            <div style={{width: "48%", alignSelf: "center"}}>
+                <Stack verticalAlign="space-evenly">
                     <div>
-                        <Text variant={"medium"}>{item.title}</Text>
+                        <div>
+                            <Text style={{fontSize: "25px"}}>{item.title}</Text>
+                        </div>
+                        <Stack horizontal>
+                            {item.isMin && <div className={SummaryTable.classNames.minMaxLabel}>Min</div>}
+                            {item.isMax && <div className={SummaryTable.classNames.minMaxLabel}>Max</div>}
+                        </Stack>
                     </div>
-                    <Stack horizontal>
-                        {item.isMin && <div className={SummaryTable.classNames.minMaxLabel}>Min</div>}
-                        {item.isMax && <div className={SummaryTable.classNames.minMaxLabel}>Max</div>}
-                    </Stack>
-                </div>
-            </Stack>
+                </Stack>
+            </div>
             <Separator vertical styles={SummaryTable.separatorStyle} />
-            <Stack verticalAlign="space-evenly" styles={{root: {width: "100px"}}}>
-                <Text variant={"xxLarge"}>{item.score.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-            </Stack>
-          </Stack>
+            <div style={{flex: "1", alignSelf: "center"}}> 
+                <Stack verticalAlign="space-evenly">
+                    <Text style={{fontSize:"55px", paddingLeft:"10px"}}>{item.score.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
+                </Stack>
+            </div>
+          </div>
         );
     }
 }
