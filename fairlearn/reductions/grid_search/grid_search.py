@@ -6,9 +6,11 @@ import numpy as np
 import pandas as pd
 
 from fairlearn.reductions.reductions_estimator import ReductionsEstimator
-from fairlearn.reductions.grid_search import QualityMetric, GridSearchResult
+from fairlearn.reductions.grid_search import GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
 from fairlearn import _KW_SENSITIVE_FEATURES
+
+_TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
 
 class _GridGenerator:
@@ -88,20 +90,23 @@ class GridSearch(ReductionsEstimator):
     _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
 
     def __init__(self,
-                 learner,
+                 estimator,
                  disparity_metric,
-                 quality_metric,
+                 selection_rule=_TRADEOFF_OPTIMIZATION,
+                 constraint_weight=0.5,
                  grid_size=10,
                  grid_limit=2.0,
                  grid=None):
-        self.learner = learner
+        self.estimator = estimator
         if not isinstance(disparity_metric, Moment):
             raise RuntimeError("Unsupported disparity metric")
         self.disparity_metric = disparity_metric
 
-        if not isinstance(quality_metric, QualityMetric):
-            raise RuntimeError("quality_metric must derive from QualityMetric")
-        self.quality_metric = quality_metric
+        if not (selection_rule == _TRADEOFF_OPTIMIZATION):
+            raise RuntimeError("Unsupported selection rule")
+        self.selection_rule = selection_rule
+        self.constraint_weight = float(constraint_weight)
+        self.objective_weight = 1.0 - constraint_weight
 
         self.grid_size = grid_size
         self.grid_limit = float(grid_limit)
@@ -133,9 +138,6 @@ class GridSearch(ReductionsEstimator):
             raise RuntimeError(self._MESSAGE_X_Y_ROWS)
         if X_rows != sensitive.shape[0]:
             raise RuntimeError(self._MESSAGE_X_SENSITIVE_ROWS)
-
-        # Prep the quality metric
-        self.quality_metric.set_data(X, y_vector, sensitive)
 
         if isinstance(self.disparity_metric, ClassificationMoment):
             # We have a classification problem
@@ -179,30 +181,36 @@ class GridSearch(ReductionsEstimator):
             else:
                 y_reduction = y_vector
 
-            current_learner = copy.deepcopy(self.learner)
-            current_learner.fit(X, y_reduction, sample_weight=weights)
+            current_estimator = copy.deepcopy(self.estimator)
+            current_estimator.fit(X, y_reduction, sample_weight=weights)
+            predict_fct = lambda X: current_estimator.predict(X)
 
-            # Evaluate the quality metric
-            quality = self.quality_metric.get_quality(current_learner)
-
-            nxt = GridSearchResult(current_learner, lambda_vec, quality)
+            nxt = GridSearchResult(current_estimator,
+                                   lambda_vec,
+                                   objective.gamma(predict_fct)[0],
+                                   self.disparity_metric.gamma(predict_fct)
+                                   )
             self.all_results.append(nxt)
 
-        # Designate a 'best' model
-        self.best_result = max(self.all_results, key=lambda x: x.quality_metric_value)
+        if self.selection_rule == _TRADEOFF_OPTIMIZATION:
+            loss_fct = lambda x: self.objective_weight*x.objective + self.constraint_weight*x.gamma.max()
+            self.best_result = min(self.all_results, key=loss_fct)
+        else:
+            raise RuntimeError("Unsupported selection rule")
+
         return
 
     def predict(self, X):
-        return self.best_result.model.predict(X)
+        return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
-        return self.best_result.model.predict_proba(X)
+        return self.best_result.predictor.predict_proba(X)
 
     def posterior_predict(self, X):
-        return [r.model.predict(X) for r in self.all_results]
+        return [r.predictor.predict(X) for r in self.all_results]
 
     def posterior_predict_proba(self, X):
-        return [r.model.predict_proba(X) for r in self.all_results]
+        return [r.predictor.predict_proba(X) for r in self.all_results]
 
     def _make_vector(self, formless, formless_name):
         formed_vector = None
