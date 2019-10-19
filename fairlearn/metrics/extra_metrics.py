@@ -24,4 +24,5 @@ def miss_score(y_true, y_pred, sample_weight=None):
 
 def fallout_score(y_true, y_pred, sample_weight=None):
     # aka False Positive Rate
+    # Since we use specificity, also restricted to binary classification
     return 1 - specificity_score(y_true, y_pred, sample_weight)

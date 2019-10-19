@@ -92,6 +92,7 @@ def test_fallout_none_correct():
     result = metrics.fallout_score(y_true, y_pred)
     assert result == 1
 
+
 def test_fallout_some_correct():
     y_true = [0, 0, 0, 0, 1, 1, 1]
     y_pred = [0, 1, 1, 0, 0, 1, 0]
