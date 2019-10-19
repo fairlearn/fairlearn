@@ -10,7 +10,7 @@ from fairlearn.reductions.grid_search import GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
 from fairlearn import _KW_SENSITIVE_FEATURES
 
-_TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
+TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
 
 class _GridGenerator:
@@ -92,7 +92,7 @@ class GridSearch(ReductionsEstimator):
     def __init__(self,
                  estimator,
                  disparity_metric,
-                 selection_rule=_TRADEOFF_OPTIMIZATION,
+                 selection_rule=TRADEOFF_OPTIMIZATION,
                  constraint_weight=0.5,
                  grid_size=10,
                  grid_limit=2.0,
@@ -102,7 +102,10 @@ class GridSearch(ReductionsEstimator):
             raise RuntimeError("Unsupported disparity metric")
         self.disparity_metric = disparity_metric
 
-        if not (selection_rule == _TRADEOFF_OPTIMIZATION):
+        if (selection_rule == TRADEOFF_OPTIMIZATION):
+            if not (0.0 <= constraint_weight <= 1.0):
+                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
+        else:
             raise RuntimeError("Unsupported selection rule")
         self.selection_rule = selection_rule
         self.constraint_weight = float(constraint_weight)
@@ -188,11 +191,10 @@ class GridSearch(ReductionsEstimator):
             nxt = GridSearchResult(current_estimator,
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
-                                   self.disparity_metric.gamma(predict_fct)
-                                   )
+                                   self.disparity_metric.gamma(predict_fct))
             self.all_results.append(nxt)
 
-        if self.selection_rule == _TRADEOFF_OPTIMIZATION:
+        if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(x):
                 return self.objective_weight*x.objective + self.constraint_weight*x.gamma.max()
             self.best_result = min(self.all_results, key=loss_fct)
