@@ -28,7 +28,7 @@ def test_specificity_some_correct():
     y_pred = [0, 0, 0, 1, 1]
 
     result = metrics.specificity_score(y_true, y_pred)
-    assert result == 0.25
+    assert result == 0.75
 
 
 def test_specificity_some_correct_with_false_negative():
@@ -36,4 +36,4 @@ def test_specificity_some_correct_with_false_negative():
     y_pred = [0, 0, 1, 0, 0]
 
     result = metrics.specificity_score(y_true, y_pred)
-    assert result == 0.25
+    assert result == 0.75

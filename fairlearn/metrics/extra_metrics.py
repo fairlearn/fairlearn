@@ -4,6 +4,10 @@
 import sklearn.metrics as skm
 
 
-def specificity_score(y_pred, y_true, sample_weight=None):
+def specificity_score(y_true, y_pred, sample_weight=None):
     # aka True Negative Rate
-    return 0
+    cm = skm.confusion_matrix(y_true, y_pred, sample_weight)
+    # Taken from
+    # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
+    tn, fp, fn, tp = cm.ravel()
+    return tn / (tn+fp)
