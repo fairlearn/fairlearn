@@ -48,8 +48,9 @@ def test_bgl_unfair():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
+    bgl_square_loss = moments.GroupLossMoment(moments.SquareLoss(-np.inf, np.inf))
     target = GridSearch(LinearRegression(),
-                        disparity_metric=moments.GroupLossMoment(moments.SquareLoss(-np.inf, np.inf)),
+                        disparity_metric=bgl_square_loss,
                         grid_size=7)
 
     target.fit(X, Y, sensitive_features=A)

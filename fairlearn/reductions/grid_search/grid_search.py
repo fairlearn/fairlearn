@@ -183,7 +183,7 @@ class GridSearch(ReductionsEstimator):
 
             current_estimator = copy.deepcopy(self.estimator)
             current_estimator.fit(X, y_reduction, sample_weight=weights)
-            predict_fct = lambda X: current_estimator.predict(X)
+            def predict_fct(X): return current_estimator.predict(X)
 
             nxt = GridSearchResult(current_estimator,
                                    lambda_vec,
@@ -193,7 +193,8 @@ class GridSearch(ReductionsEstimator):
             self.all_results.append(nxt)
 
         if self.selection_rule == _TRADEOFF_OPTIMIZATION:
-            loss_fct = lambda x: self.objective_weight*x.objective + self.constraint_weight*x.gamma.max()
+            def loss_fct(x):
+                return self.objective_weight*x.objective + self.constraint_weight*x.gamma.max()
             self.best_result = min(self.all_results, key=loss_fct)
         else:
             raise RuntimeError("Unsupported selection rule")
