@@ -138,3 +138,13 @@ def test_group_recall_score_pos_label():
     expected_overall = skm.recall_score(Y_true, Y_pred, pos_label=0)
 
     assert np.array_equal(result.overall, expected_overall)
+
+# ======================================================================================
+
+
+def test_group_zero_one_loss_unnormalized():
+    result = metrics.group_zero_one_loss(Y_true, Y_pred, groups, False)
+
+    expected_overall = skm.zero_one_loss(Y_true, Y_pred, False)
+
+    assert result.overall == expected_overall

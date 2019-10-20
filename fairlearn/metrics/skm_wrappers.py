@@ -53,3 +53,15 @@ def group_recall_score(y_true, y_pred, group_membership,
 
     return metric_by_group(internal_recall_wrapper,
                            y_true, y_pred, group_membership, sample_weight)
+
+
+def group_zero_one_loss(y_true, y_pred, group_membership,
+                        normalize=True,
+                        sample_weight=None):
+
+    def internal_zol_wrapper(y_true, y_pred, sample_weight=None):
+        return skm.zero_one_loss(y_true, y_pred,
+                                 normalize=normalize,
+                                 sample_weight=sample_weight)
+
+    return metric_by_group(internal_zol_wrapper, y_true, y_pred, group_membership, sample_weight)
