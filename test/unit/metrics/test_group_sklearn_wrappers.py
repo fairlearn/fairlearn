@@ -16,11 +16,12 @@ c = "c"
 Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 Y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 
-Y_t3 = [a, b, c, c, c, b, b, b, c, c, a, a, a, a, c, b, c, c]
-Y_p3 = [b, c, c, c, b, b, b, b, b, c, a, a, c, b, a, a, b, a]
+Y_t3 = [a, b, c, c, c, b, b, b, c, c, a, a, a, a, a, b, c, c]
+Y_p3 = [b, c, c, c, b, b, b, b, b, c, a, a, c, a, a, b, c, c]
 
 groups = [3, 4, 1, 0, 0, 0, 3, 2, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
 weight = [1, 2, 3, 1, 2, 3, 4, 2, 3, 3, 2, 1, 2, 3, 1, 2, 3, 4]
+group2 = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 
 # =======================================================
 
@@ -100,5 +101,21 @@ def test_group_confusion_matrix_labels():
 
     result = metrics.group_confusion_matrix(Y_true, Y_pred, groups, labels=labels)
     expected_overall = skm.confusion_matrix(Y_true, Y_pred, labels=labels)
+
+    assert np.array_equal(result.overall, expected_overall)
+
+
+# ======================================================================================
+
+def test_group_precision_score_ternary():
+    result = metrics.group_precision_score(Y_t3, Y_p3, group2, average=None)
+    expected_overall = skm.precision_score(Y_t3, Y_p3, average=None)
+
+    assert np.array_equal(result.overall, expected_overall)
+
+
+def test_group_precision_score_pos_label():
+    result = metrics.group_precision_score(Y_true, Y_pred, groups, pos_label=0)
+    expected_overall = skm.precision_score(Y_true, Y_pred, pos_label=0)
 
     assert np.array_equal(result.overall, expected_overall)
