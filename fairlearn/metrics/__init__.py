@@ -8,7 +8,7 @@ from .metrics_engine import metric_by_group, make_group_metric  # noqa: F401
 
 from .skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
 from .skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
-from .skm_wrappers import group_zero_one_loss  # noqa: F401
+from .skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
 
 from .extra_metrics import specificity_score, miss_score, fallout_score
 

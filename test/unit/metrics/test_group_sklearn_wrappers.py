@@ -34,7 +34,8 @@ supported_metrics_weighted = [(skm.accuracy_score, metrics.group_accuracy_score)
 
 # The following only work with binary data when called with their default arguments
 supported_metrics_weighted_binary = [(skm.precision_score, metrics.group_precision_score),
-                                     (skm.recall_score, metrics.group_recall_score)]
+                                     (skm.recall_score, metrics.group_recall_score),
+                                     (skm.roc_auc_score, metrics.group_roc_auc_score)]
 supported_metrics_weighted_binary = supported_metrics_weighted_binary + supported_metrics_weighted
 
 
@@ -138,6 +139,22 @@ def test_group_recall_score_pos_label():
     expected_overall = skm.recall_score(Y_true, Y_pred, pos_label=0)
 
     assert np.array_equal(result.overall, expected_overall)
+
+# ======================================================================================
+
+
+def test_group_roc_auc_score_average():
+    result = metrics.group_roc_auc_score(Y_true, Y_pred, groups, average='samples')
+    expected_overall = skm.roc_auc_score(Y_true, Y_pred, average='samples')
+
+    assert expected_overall == result.overall
+
+
+def test_group_roc_auc_score_max_fpr():
+    result = metrics.group_roc_auc_score(Y_true, Y_pred, groups, max_fpr=0.5)
+    expected_overall = skm.roc_auc_score(Y_true, Y_pred, max_fpr=0.5)
+
+    assert expected_overall == result.overall
 
 # ======================================================================================
 

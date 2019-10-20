@@ -55,6 +55,19 @@ def group_recall_score(y_true, y_pred, group_membership,
                            y_true, y_pred, group_membership, sample_weight)
 
 
+def group_roc_auc_score(y_true, y_pred, group_membership,
+                        average='macro', max_fpr=None,
+                        sample_weight=None):
+
+    def internal_ras_wrapper(y_true, y_pred, sample_weight=None):
+        return skm.roc_auc_score(y_true, y_pred,
+                                 average=average, max_fpr=max_fpr,
+                                 sample_weight=sample_weight)
+
+    return metric_by_group(internal_ras_wrapper,
+                           y_true, y_pred, group_membership, sample_weight)
+
+
 def group_zero_one_loss(y_true, y_pred, group_membership,
                         normalize=True,
                         sample_weight=None):
