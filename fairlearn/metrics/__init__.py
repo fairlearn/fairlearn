@@ -6,12 +6,11 @@ import sklearn.metrics as skm
 from .group_metric_result import GroupMetricResult  # noqa: F401
 from .metrics_engine import metric_by_group, make_group_metric  # noqa: F401
 
-from .skm_wrappers import group_accuracy_score  # noqa: F401
+from .skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
 
 from .extra_metrics import specificity_score, miss_score, fallout_score
 
 # Classification metrics
-group_confusion_matrix = make_group_metric(skm.confusion_matrix)
 group_precision_score = make_group_metric(skm.precision_score)
 group_recall_score = make_group_metric(skm.recall_score)
 group_zero_one_loss = make_group_metric(skm.zero_one_loss)

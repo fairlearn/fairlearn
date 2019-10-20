@@ -86,3 +86,14 @@ def test_group_accuracy_score_unnormalized():
     expected_overall = skm.accuracy_score(Y_true, Y_pred, False)
 
     assert result.overall == expected_overall
+
+
+# ======================================================================================
+
+def test_group_confusion_matrix_labels():
+    labels = [0, 4]
+
+    result = metrics.group_confusion_matrix(Y_true, Y_pred, groups, labels=labels)
+    expected_overall = skm.confusion_matrix(Y_true, Y_pred, labels=labels)
+
+    assert np.array_equal(result.overall, expected_overall)
