@@ -26,8 +26,13 @@ weight = [1, 2, 3, 1, 2, 3, 4, 2, 3, 3, 2, 1, 2, 3, 1, 2, 3, 4]
 
 # Define as a dictionary so that the actual name can be seen
 # when pytest builds the tests
+
 supported_metrics_weighted = [(skm.accuracy_score, metrics.group_accuracy_score),
                               (skm.confusion_matrix, metrics.group_confusion_matrix)]
+
+supported_metrics_weighted_binary = [(skm.precision_score, metrics.group_precision_score)]
+supported_metrics_weighted_binary = supported_metrics_weighted_binary + supported_metrics_weighted
+
 
 metrics_no_sample_weights = [metrics.group_max_error,
                              metrics.group_mean_absolute_error,
@@ -48,7 +53,7 @@ def test_metric_unweighted(group_metric_func):
     assert len(result.by_group) == 5
 
 
-@pytest.mark.parametrize("func_tuple", supported_metrics_weighted)
+@pytest.mark.parametrize("func_tuple", supported_metrics_weighted_binary)
 def test_metric_weighted(func_tuple):
     metric_func = func_tuple[0]
     group_metric_func = func_tuple[1]
