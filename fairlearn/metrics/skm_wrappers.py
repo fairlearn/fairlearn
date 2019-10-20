@@ -40,3 +40,16 @@ def group_precision_score(y_true, y_pred, group_membership,
                                    sample_weight=sample_weight)
 
     return metric_by_group(internal_prec_wrapper, y_true, y_pred, group_membership, sample_weight)
+
+
+def group_recall_score(y_true, y_pred, group_membership,
+                       labels=None, pos_label=1, average='binary',
+                       sample_weight=None):
+
+    def internal_recall_wrapper(y_true, y_pred, sample_weight=None):
+        return skm.recall_score(y_true, y_pred,
+                                labels=labels, pos_label=pos_label, average=average,
+                                sample_weight=sample_weight)
+
+    return metric_by_group(internal_recall_wrapper,
+                           y_true, y_pred, group_membership, sample_weight)

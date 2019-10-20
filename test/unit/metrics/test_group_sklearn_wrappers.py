@@ -31,7 +31,9 @@ group2 = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 supported_metrics_weighted = [(skm.accuracy_score, metrics.group_accuracy_score),
                               (skm.confusion_matrix, metrics.group_confusion_matrix)]
 
-supported_metrics_weighted_binary = [(skm.precision_score, metrics.group_precision_score)]
+# The following only work with binary data when called with their default arguments
+supported_metrics_weighted_binary = [(skm.precision_score, metrics.group_precision_score),
+                                     (skm.recall_score, metrics.group_recall_score)]
 supported_metrics_weighted_binary = supported_metrics_weighted_binary + supported_metrics_weighted
 
 
@@ -117,5 +119,21 @@ def test_group_precision_score_ternary():
 def test_group_precision_score_pos_label():
     result = metrics.group_precision_score(Y_true, Y_pred, groups, pos_label=0)
     expected_overall = skm.precision_score(Y_true, Y_pred, pos_label=0)
+
+    assert np.array_equal(result.overall, expected_overall)
+
+# ======================================================================================
+
+
+def test_group_recaull_score_ternary():
+    result = metrics.group_recall_score(Y_t3, Y_p3, group2, average=None)
+    expected_overall = skm.recall_score(Y_t3, Y_p3, average=None)
+
+    assert np.array_equal(result.overall, expected_overall)
+
+
+def test_group_recall_score_pos_label():
+    result = metrics.group_recall_score(Y_true, Y_pred, groups, pos_label=0)
+    expected_overall = skm.recall_score(Y_true, Y_pred, pos_label=0)
 
     assert np.array_equal(result.overall, expected_overall)
