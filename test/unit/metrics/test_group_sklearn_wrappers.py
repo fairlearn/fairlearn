@@ -29,7 +29,8 @@ group2 = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 # when pytest builds the tests
 
 supported_metrics_weighted = [(skm.accuracy_score, metrics.group_accuracy_score),
-                              (skm.confusion_matrix, metrics.group_confusion_matrix)]
+                              (skm.confusion_matrix, metrics.group_confusion_matrix),
+                              (skm.zero_one_loss, metrics.group_zero_one_loss)]
 
 # The following only work with binary data when called with their default arguments
 supported_metrics_weighted_binary = [(skm.precision_score, metrics.group_precision_score),
