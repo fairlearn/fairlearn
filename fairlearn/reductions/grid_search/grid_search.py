@@ -105,7 +105,7 @@ class GridSearch(Reduction):
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")
-        self.constraints = constraints
+        self.constraints_ = constraints
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
@@ -147,7 +147,7 @@ class GridSearch(Reduction):
         if X_rows != sensitive.shape[0]:
             raise RuntimeError(self._MESSAGE_X_SENSITIVE_ROWS)
 
-        if isinstance(self.constraints, ClassificationMoment):
+        if isinstance(self.constraints_, ClassificationMoment):
             # We have a classification problem
             # Need to make sure that y is binary (for now)
             unique_labels = np.unique(y_vector)
@@ -155,16 +155,16 @@ class GridSearch(Reduction):
                 raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
         # Prep the disparity metric and objective
-        self.constraints.load_data(X, y_vector, **kwargs)
-        objective = self.constraints.default_objective()
+        self.constraints_.load_data(X, y_vector, **kwargs)
+        objective = self.constraints_.default_objective()
         objective.load_data(X, y_vector, **kwargs)
-        is_classification_reduction = isinstance(self.constraints, ClassificationMoment)
+        is_classification_reduction = isinstance(self.constraints_, ClassificationMoment)
 
         # Basis information
-        pos_basis = self.constraints.pos_basis
-        neg_basis = self.constraints.neg_basis
-        neg_allowed = self.constraints.neg_basis_present
-        objective_in_the_span = (self.constraints.default_objective_lambda_vec is not None)
+        pos_basis = self.constraints_.pos_basis
+        neg_basis = self.constraints_.neg_basis
+        neg_allowed = self.constraints_.neg_basis_present
+        objective_in_the_span = (self.constraints_.default_objective_lambda_vec is not None)
 
         if self.grid is None:
             grid = _GridGenerator(self.grid_size,
@@ -180,7 +180,7 @@ class GridSearch(Reduction):
         self.all_results = []
         for i in grid.columns:
             lambda_vec = grid[i]
-            weights = self.constraints.signed_weights(lambda_vec)
+            weights = self.constraints_.signed_weights(lambda_vec)
             if not objective_in_the_span:
                 weights = weights + objective.signed_weights()
             if is_classification_reduction:
@@ -196,7 +196,7 @@ class GridSearch(Reduction):
             nxt = GridSearchResult(current_estimator,
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
-                                   self.constraints.gamma(predict_fct))
+                                   self.constraints_.gamma(predict_fct))
             self.all_results.append(nxt)
 
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
