@@ -209,12 +209,6 @@ class GridSearch(Reduction):
     def predict_proba(self, X):
         return self.best_result.predictor.predict_proba(X)
 
-    def posterior_predict(self, X):
-        return [r.predictor.predict(X) for r in self.all_results]
-
-    def posterior_predict_proba(self, X):
-        return [r.predictor.predict_proba(X) for r in self.all_results]
-
     def _make_vector(self, formless, formless_name):
         formed_vector = None
         if isinstance(formless, list):

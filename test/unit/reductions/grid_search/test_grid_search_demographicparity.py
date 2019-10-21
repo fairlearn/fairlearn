@@ -69,12 +69,6 @@ def test_demographicparity_fair_uneven_populations():
     sample_results = target.all_results[0].predictor.predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
 
-    all_results = target.posterior_predict(test_X)
-    assert len(all_results) == 11
-
-    all_proba = target.posterior_predict_proba(test_X)
-    assert len(all_proba) == 11
-
 
 def test_lambda_vec_zero_unchanged_model():
     score_threshold = 0.6
