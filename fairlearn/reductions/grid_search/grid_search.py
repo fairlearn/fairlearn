@@ -5,7 +5,7 @@ import copy
 import numpy as np
 import pandas as pd
 
-from fairlearn.reductions.reductions_estimator import ReductionsEstimator
+from fairlearn.reductions import Reduction
 from fairlearn.reductions.grid_search import GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
 from fairlearn import _KW_SENSITIVE_FEATURES
@@ -74,7 +74,7 @@ class _GridGenerator:
                 self.accumulate_integer_grid(index+1, max_val-abs(current_value))
 
 
-class GridSearch(ReductionsEstimator):
+class GridSearch(Reduction):
     """Learner to perform a grid search given a blackbox algorithm.
     The supplied algorithm must implement a method
     fit(X, y, sample_weight=[...])
