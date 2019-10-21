@@ -14,7 +14,7 @@ def specificity_score(y_true, y_pred, sample_weight=None):
     return tn / (tn+fp)
 
 
-def miss_score(y_true, y_pred, sample_weight=None):
+def miss_rate(y_true, y_pred, sample_weight=None):
     # aka False Negative Rate
     tpr = skm.recall_score(y_true, y_pred, sample_weight=sample_weight)
 
@@ -22,7 +22,7 @@ def miss_score(y_true, y_pred, sample_weight=None):
     return 1 - tpr
 
 
-def fallout_score(y_true, y_pred, sample_weight=None):
+def fallout_rate(y_true, y_pred, sample_weight=None):
     # aka False Positive Rate
     # Since we use specificity, also restricted to binary classification
     return 1 - specificity_score(y_true, y_pred, sample_weight)

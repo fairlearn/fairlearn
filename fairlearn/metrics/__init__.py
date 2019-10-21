@@ -10,12 +10,12 @@ from .skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: 
 from .skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
 from .skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
 
-from .extra_metrics import specificity_score, miss_score, fallout_score
+from .extra_metrics import specificity_score, miss_rate, fallout_rate
 
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
-group_miss_score = make_group_metric(miss_score)
-group_fallout_score = make_group_metric(fallout_score)
+group_miss_rate = make_group_metric(miss_rate)
+group_fallout_rate = make_group_metric(fallout_rate)
 
 # Regression metrics
 group_max_error = make_group_metric(skm.max_error)
