@@ -7,7 +7,10 @@ import fairlearn.reductions.moments as moments
 import copy
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.linear_model import LogisticRegression
+
+constraint_list = ["demographic_parity", moments.DemographicParity()]
 
 
 def _simple_threshold_data(number_a0, number_a1,
@@ -34,7 +37,8 @@ def _simple_threshold_data(number_a0, number_a1,
     return X, Y, A
 
 
-def test_demographicparity_fair_uneven_populations():
+@pytest.mark.parametrize("constraint", constraint_list)
+def test_demographicparity_fair_uneven_populations(constraint):
     # Variant of test_demographicparity_already_fair, which has unequal
     # populations in the two classes
     # Also allow the threshold to be adjustable
@@ -52,7 +56,7 @@ def test_demographicparity_fair_uneven_populations():
                                      a0_label, a1_label)
 
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                        constraints=moments.DemographicParity(),
+                        constraints=copy.deepcopy(constraint),
                         grid_size=11)
 
     target.fit(X, Y, sensitive_features=A)
@@ -70,7 +74,8 @@ def test_demographicparity_fair_uneven_populations():
     assert np.array_equal(sample_results, [1, 0])
 
 
-def test_lambda_vec_zero_unchanged_model():
+@pytest.mark.parametrize("constraint", constraint_list)
+def test_lambda_vec_zero_unchanged_model(constraint):
     score_threshold = 0.6
 
     number_a0 = 64
@@ -98,7 +103,7 @@ def test_lambda_vec_zero_unchanged_model():
     grid_df = pd.DataFrame(lagrange_zero_series)
 
     target = GridSearch(estimator,
-                        constraints=moments.DemographicParity(),
+                        constraints=copy.deepcopy(constraint),
                         grid=grid_df)
     target.fit(X, y, sensitive_features=A)
     assert len(target.all_results) == 1
@@ -109,7 +114,8 @@ def test_lambda_vec_zero_unchanged_model():
     assert np.array_equal(gs_coeff, um_coeff)
 
 
-def test_can_specify_and_generate_lambda_vecs():
+@pytest.mark.parametrize("constraint", constraint_list)
+def test_can_specify_and_generate_lambda_vecs(constraint):
     score_threshold = 0.4
 
     number_a0 = 32
@@ -137,11 +143,11 @@ def test_can_specify_and_generate_lambda_vecs():
                         axis=1)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.DemographicParity(),
+                         constraints=copy.deepcopy(constraint),
                          grid_size=3)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.DemographicParity(),
+                         constraints=copy.deepcopy(constraint),
                          grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
