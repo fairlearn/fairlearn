@@ -6,7 +6,7 @@ import numpy as np
 from .metrics_engine import metric_by_group
 
 
-def selection_rate(y_true, y_pred, pos_label=1, sample_weight=None):
+def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
     """
     The selection rate is the fraction of predicted labels which
     match the 'good' outcome (as specified by pos_label)
@@ -20,10 +20,10 @@ def selection_rate(y_true, y_pred, pos_label=1, sample_weight=None):
 
 
 def group_selection_rate(y_true, y_pred, group_membership,
-                         pos_label=1, sample_weight=None):
+                         *, pos_label=1, sample_weight=None):
 
     def internal_sel_wrapper(y_true, y_pred, sample_weight=None):
-        return selection_rate(y_true, y_pred, pos_label, sample_weight=sample_weight)
+        return selection_rate(y_true, y_pred, pos_label=pos_label, sample_weight=sample_weight)
 
     return metric_by_group(internal_sel_wrapper,
                            y_true, y_pred, group_membership,
