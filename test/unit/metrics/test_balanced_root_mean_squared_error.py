@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import math
+import pytest
 
 import fairlearn.metrics as metrics
 
@@ -47,3 +48,13 @@ def test_probability_predict():
     expected_1 = 0.25
 
     assert (expected_0+expected_1)/2 == result
+
+
+@pytest.mark.parametrize("y_true", [[0, 0, 0], [1, 1, 1], [0, 0, 2], [1, 1, 2], [0, 1, 2]])
+def test_y_true_not_0_1(y_true):
+    y_pred = [0.5, 0.5, 0.5]
+
+    message = "Only 0 and 1 are allowed in y_true and both must be present"
+    with pytest.raises(ValueError) as execInfo:
+        _ = metrics.balanced_root_mean_squared_error(y_true, y_pred)
+    assert message == execInfo.value.args[0]
