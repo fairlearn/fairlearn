@@ -16,8 +16,8 @@ c = "c"
 Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 Y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 
-Y_t3 = [a, b, c, c, c, b, b, b, c, c, a, a, a, a, a, b, c, c]
-Y_p3 = [b, c, c, c, b, b, b, b, b, c, a, a, c, a, a, b, c, c]
+Y_true_ternary = [a, b, c, c, c, b, b, b, c, c, a, a, a, a, a, b, c, c]
+Y_pred_ternary = [b, c, c, c, b, b, b, b, b, c, a, a, c, a, a, b, c, c]
 
 groups = [3, 4, 1, 0, 0, 0, 3, 2, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
 weight = [1, 2, 3, 1, 2, 3, 4, 2, 3, 3, 2, 1, 2, 3, 1, 2, 3, 4]
@@ -87,9 +87,9 @@ def test_metric_weighted_ternary(func_tuple):
     metric_func = func_tuple[0]
     group_metric_func = func_tuple[1]
 
-    result = group_metric_func(Y_t3, Y_p3, groups, sample_weight=weight)
+    result = group_metric_func(Y_true_ternary, Y_pred_ternary, groups, sample_weight=weight)
     assert len(result.by_group) == 5
-    expected_overall = metric_func(Y_t3, Y_p3, sample_weight=weight)
+    expected_overall = metric_func(Y_true_ternary, Y_pred_ternary, sample_weight=weight)
 
     if isinstance(expected_overall, np.ndarray):
         assert np.array_equal(expected_overall, result.overall)
@@ -121,8 +121,8 @@ def test_group_confusion_matrix_labels():
 # ======================================================================================
 
 def test_group_precision_score_ternary():
-    result = metrics.group_precision_score(Y_t3, Y_p3, group2, average=None)
-    expected_overall = skm.precision_score(Y_t3, Y_p3, average=None)
+    result = metrics.group_precision_score(Y_true_ternary, Y_pred_ternary, group2, average=None)
+    expected_overall = skm.precision_score(Y_true_ternary, Y_pred_ternary, average=None)
 
     assert np.array_equal(result.overall, expected_overall)
 
@@ -137,8 +137,8 @@ def test_group_precision_score_pos_label():
 
 
 def test_group_recaull_score_ternary():
-    result = metrics.group_recall_score(Y_t3, Y_p3, group2, average=None)
-    expected_overall = skm.recall_score(Y_t3, Y_p3, average=None)
+    result = metrics.group_recall_score(Y_true_ternary, Y_pred_ternary, group2, average=None)
+    expected_overall = skm.recall_score(Y_true_ternary, Y_pred_ternary, average=None)
 
     assert np.array_equal(result.overall, expected_overall)
 
