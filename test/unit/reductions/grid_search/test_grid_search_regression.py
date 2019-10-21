@@ -7,7 +7,11 @@ import fairlearn.reductions.moments as moments
 import copy
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.linear_model import LinearRegression
+
+
+constraint_list = ["demographic_parity", moments.GroupLossMoment(moments.ZeroOneLoss())]
 
 
 def _simple_regression_data(number_a0, number_a1,
@@ -75,7 +79,8 @@ def test_bgl_unfair():
                        all_predict)
 
 
-def test_bgl_unmitigated_same():
+@pytest.mark.parametrize("constraint", constraint_list)
+def test_bgl_unmitigated_same(constraint):
     a0_count = 4
     a1_count = 4
 
@@ -100,7 +105,7 @@ def test_bgl_unmitigated_same():
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
     target = GridSearch(estimator,
-                        constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                        constraints=copy.deepcopy(constraint),
                         grid=grid_df)
     target.fit(X, y, sensitive_features=A)
 
@@ -110,7 +115,8 @@ def test_bgl_unmitigated_same():
     assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
 
-def test_bgl_lagrange_specifications():
+@pytest.mark.parametrize("constraint", constraint_list)
+def test_bgl_lagrange_specifications(constraint):
     a0_count = 13
     a1_count = 4
 
@@ -141,11 +147,11 @@ def test_bgl_lagrange_specifications():
                         axis=1)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         constraints=copy.deepcopy(constraint),
                          grid_size=5)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         constraints=copy.deepcopy(constraint),
                          grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
