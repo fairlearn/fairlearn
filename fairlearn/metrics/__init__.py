@@ -12,7 +12,7 @@ from .skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
 from .skm_wrappers import group_mean_squared_error  # noqa: F401
 
 from .extra_metrics import specificity_score, miss_rate, fallout_rate
-from .extra_metrics import selection_rate, group_selection_rate  # noqa: F401
+from .selection_rate import selection_rate, group_selection_rate  # noqa: F401
 
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
