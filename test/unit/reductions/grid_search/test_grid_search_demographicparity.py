@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch
-from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric  # noqa: E501
 import fairlearn.reductions.moments as moments
 
 import copy
@@ -54,7 +53,6 @@ def test_demographicparity_fair_uneven_populations():
 
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
                         disparity_metric=moments.DemographicParity(),
-                        quality_metric=SimpleClassificationQualityMetric(),
                         grid_size=11)
 
     target.fit(X, Y, sensitive_features=A)
@@ -68,7 +66,7 @@ def test_demographicparity_fair_uneven_populations():
     sample_proba = target.predict_proba(test_X)
     assert np.allclose(sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]])
 
-    sample_results = target.all_results[0].model.predict(test_X)
+    sample_results = target.all_results[0].predictor.predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
 
     all_results = target.posterior_predict(test_X)
@@ -78,7 +76,7 @@ def test_demographicparity_fair_uneven_populations():
     assert len(all_proba) == 11
 
 
-def test_lagrange_multiplier_zero_unchanged_model():
+def test_lambda_vec_zero_unchanged_model():
     score_threshold = 0.6
 
     number_a0 = 64
@@ -107,18 +105,17 @@ def test_lagrange_multiplier_zero_unchanged_model():
 
     target = GridSearch(estimator,
                         disparity_metric=moments.DemographicParity(),
-                        quality_metric=SimpleClassificationQualityMetric(),
                         grid=grid_df)
     target.fit(X, y, sensitive_features=A)
     assert len(target.all_results) == 1
 
     # Check coefficients
-    gs_coeff = target.best_result.model.coef_
+    gs_coeff = target.best_result.predictor.coef_
     um_coeff = unmitigated_estimator.coef_
     assert np.array_equal(gs_coeff, um_coeff)
 
 
-def test_can_specify_and_generate_lagrange_multipliers():
+def test_can_specify_and_generate_lambda_vecs():
     score_threshold = 0.4
 
     number_a0 = 32
@@ -147,12 +144,10 @@ def test_can_specify_and_generate_lagrange_multipliers():
 
     target1 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=moments.DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric(),
                          grid_size=3)
 
     target2 = GridSearch(copy.deepcopy(estimator),
                          disparity_metric=moments.DemographicParity(),
-                         quality_metric=SimpleClassificationQualityMetric(),
                          grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
@@ -164,12 +159,12 @@ def test_can_specify_and_generate_lagrange_multipliers():
 
     # Check we generated the same multipliers
     for i in range(3):
-        lm1 = target1.all_results[i].lagrange_multiplier
-        lm2 = target2.all_results[i].lagrange_multiplier
+        lm1 = target1.all_results[i].lambda_vec
+        lm2 = target2.all_results[i].lambda_vec
         assert lm1.equals(lm2)
 
     # Check the models are the same
     for i in range(3):
-        coef1 = target1.all_results[i].model.coef_
-        coef2 = target2.all_results[i].model.coef_
+        coef1 = target1.all_results[i].predictor.coef_
+        coef2 = target2.all_results[i].predictor.coef_
         assert np.array_equal(coef1, coef2)

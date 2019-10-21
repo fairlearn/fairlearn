@@ -3,7 +3,8 @@
 
 
 class GridSearchResult:
-    def __init__(self, model, lagrange_multiplier, quality_metric_value):
-        self.model = model
-        self.lagrange_multiplier = lagrange_multiplier
-        self.quality_metric_value = quality_metric_value
+    def __init__(self, predictor, lambda_vec, objective, gamma):
+        self.predictor = predictor
+        self.lambda_vec = lambda_vec
+        self.objective = objective
+        self.gamma = gamma
