@@ -100,7 +100,7 @@ def test_metric_weighted_ternary(func_tuple):
 # ======================================================================================
 
 def test_group_accuracy_score_unnormalized():
-    result = metrics.group_accuracy_score(Y_true, Y_pred, groups, False)
+    result = metrics.group_accuracy_score(Y_true, Y_pred, groups, normalize=False)
 
     expected_overall = skm.accuracy_score(Y_true, Y_pred, False)
 
@@ -136,7 +136,7 @@ def test_group_precision_score_pos_label():
 # ======================================================================================
 
 
-def test_group_recaull_score_ternary():
+def test_group_recall_score_ternary():
     result = metrics.group_recall_score(Y_true_ternary, Y_pred_ternary, group2, average=None)
     expected_overall = skm.recall_score(Y_true_ternary, Y_pred_ternary, average=None)
 
@@ -169,7 +169,7 @@ def test_group_roc_auc_score_max_fpr():
 
 
 def test_group_zero_one_loss_unnormalized():
-    result = metrics.group_zero_one_loss(Y_true, Y_pred, groups, False)
+    result = metrics.group_zero_one_loss(Y_true, Y_pred, groups, normalize=False)
 
     expected_overall = skm.zero_one_loss(Y_true, Y_pred, False)
 

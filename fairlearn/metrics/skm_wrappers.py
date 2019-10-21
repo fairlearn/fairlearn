@@ -6,7 +6,7 @@ import sklearn.metrics as skm
 from .metrics_engine import metric_by_group
 
 
-def group_accuracy_score(y_true, y_pred, group_membership,
+def group_accuracy_score(y_true, y_pred, group_membership, *,
                          normalize=True,
                          sample_weight=None):
 
@@ -18,7 +18,7 @@ def group_accuracy_score(y_true, y_pred, group_membership,
     return metric_by_group(internal_acc_wrapper, y_true, y_pred, group_membership, sample_weight)
 
 
-def group_confusion_matrix(y_true, y_pred, group_membership,
+def group_confusion_matrix(y_true, y_pred, group_membership, *,
                            labels=None,
                            sample_weight=None):
 
@@ -30,7 +30,7 @@ def group_confusion_matrix(y_true, y_pred, group_membership,
     return metric_by_group(internal_cm_wrapper, y_true, y_pred, group_membership, sample_weight)
 
 
-def group_precision_score(y_true, y_pred, group_membership,
+def group_precision_score(y_true, y_pred, group_membership, *,
                           labels=None, pos_label=1, average='binary',
                           sample_weight=None):
 
@@ -42,7 +42,7 @@ def group_precision_score(y_true, y_pred, group_membership,
     return metric_by_group(internal_prec_wrapper, y_true, y_pred, group_membership, sample_weight)
 
 
-def group_recall_score(y_true, y_pred, group_membership,
+def group_recall_score(y_true, y_pred, group_membership, *,
                        labels=None, pos_label=1, average='binary',
                        sample_weight=None):
 
@@ -55,7 +55,7 @@ def group_recall_score(y_true, y_pred, group_membership,
                            y_true, y_pred, group_membership, sample_weight)
 
 
-def group_roc_auc_score(y_true, y_pred, group_membership,
+def group_roc_auc_score(y_true, y_pred, group_membership, *,
                         average='macro', max_fpr=None,
                         sample_weight=None):
 
@@ -68,7 +68,7 @@ def group_roc_auc_score(y_true, y_pred, group_membership,
                            y_true, y_pred, group_membership, sample_weight)
 
 
-def group_zero_one_loss(y_true, y_pred, group_membership,
+def group_zero_one_loss(y_true, y_pred, group_membership, *,
                         normalize=True,
                         sample_weight=None):
 
@@ -82,7 +82,7 @@ def group_zero_one_loss(y_true, y_pred, group_membership,
 # --------------------------------------------------------------------------------------
 
 
-def group_mean_squared_error(y_true, y_pred, group_membership,
+def group_mean_squared_error(y_true, y_pred, group_membership, *,
                              multioutput='uniform_average',
                              sample_weight=None):
 
