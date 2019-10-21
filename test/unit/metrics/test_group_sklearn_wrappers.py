@@ -174,3 +174,15 @@ def test_group_zero_one_loss_unnormalized():
     expected_overall = skm.zero_one_loss(Y_true, Y_pred, False)
 
     assert result.overall == expected_overall
+
+
+# =============================================================================================
+
+def test_group_mean_squared_error_multioutput():
+    y_t = np.random.rand(len(groups), 2)
+    y_p = np.random.rand(len(groups), 2)
+    result = metrics.group_mean_squared_error(y_t, y_p, groups, multioutput='raw_values')
+
+    expected_overall = skm.mean_squared_error(y_t, y_p, multioutput='raw_values')
+
+    assert np.array_equal(result.overall, expected_overall)
