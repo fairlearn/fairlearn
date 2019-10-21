@@ -8,7 +8,11 @@ from .metrics_engine import metric_by_group
 
 
 def specificity_score(y_true, y_pred, sample_weight=None):
-    # aka True Negative Rate
+    """
+    The specificity score is also known as the True Negative Rate.
+    At the present time, this routine only supports binary
+    classifiers with labels taken from {0, 1}
+    """
     cm = skm.confusion_matrix(y_true, y_pred, sample_weight=sample_weight)
     # Taken from
     # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
@@ -18,6 +22,11 @@ def specificity_score(y_true, y_pred, sample_weight=None):
 
 
 def miss_rate(y_true, y_pred, sample_weight=None):
+    """
+    The miss rate is also known as the False Negative Rate.
+    At the present time, this routine only supports binary
+    classifiers with labels taken from {0, 1}
+    """
     # aka False Negative Rate
     tpr = skm.recall_score(y_true, y_pred, sample_weight=sample_weight)
 
@@ -26,6 +35,11 @@ def miss_rate(y_true, y_pred, sample_weight=None):
 
 
 def fallout_rate(y_true, y_pred, sample_weight=None):
+    """
+    The fallout rate is also known as the False Positive Rate.
+    At the present time, this routine only supports binary
+    classifiers with labels taken from {0, 1}
+    """
     # aka False Positive Rate
     # Since we use specificity, also restricted to binary classification
     return 1 - specificity_score(y_true, y_pred, sample_weight)
@@ -34,6 +48,10 @@ def fallout_rate(y_true, y_pred, sample_weight=None):
 
 
 def selection_rate(y_true, y_pred, pos_label=1, sample_weight=None):
+    """
+    The selection rate is the fraction of predicted labels which
+    match the 'good' outcome (as specified by pos_label)
+    """
     selected = (np.squeeze(np.asarray(y_pred)) == pos_label)
     s_w = np.ones(len(selected))
     if sample_weight is not None:
