@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 
-class ReductionsEstimator:
+class Reduction:
     def fit(self, X, y, **kwargs):
         raise NotImplementedError()
 
@@ -10,10 +10,4 @@ class ReductionsEstimator:
         raise NotImplementedError()
 
     def predict_proba(self, X):
-        raise NotImplementedError()
-
-    def posterior_predict(self, X):
-        raise NotImplementedError()
-
-    def posterior_predict_proba(self, X):
         raise NotImplementedError()

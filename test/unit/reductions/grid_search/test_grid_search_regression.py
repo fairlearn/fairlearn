@@ -50,7 +50,7 @@ def test_bgl_unfair():
 
     bgl_square_loss = moments.GroupLossMoment(moments.SquareLoss(-np.inf, np.inf))
     target = GridSearch(LinearRegression(),
-                        disparity_metric=bgl_square_loss,
+                        constraints=bgl_square_loss,
                         grid_size=7)
 
     target.fit(X, Y, sensitive_features=A)
@@ -64,7 +64,7 @@ def test_bgl_unfair():
     best_predict = target.predict(test_X)
     assert np.allclose([-1.91764706,  9.61176471], best_predict)
 
-    all_predict = target.posterior_predict(test_X)
+    all_predict = [r.predictor.predict(test_X) for r in target.all_results]
     assert np.allclose([[3.2, 11.2],
                         [-3.47346939, 10.64897959],
                         [-2.68, 10.12],
@@ -100,7 +100,7 @@ def test_bgl_unmitigated_same():
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
     target = GridSearch(estimator,
-                        disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                        constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
                         grid=grid_df)
     target.fit(X, y, sensitive_features=A)
 
@@ -141,11 +141,11 @@ def test_bgl_lagrange_specifications():
                         axis=1)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
                          grid_size=5)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
                          grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
