@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import fairlearn.constants as constants
 from fairlearn.reductions import GridSearch
 import fairlearn.reductions.moments as moments
 
@@ -10,7 +11,7 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
-constraint_list = ["demographic_parity", moments.DemographicParity()]
+constraint_list = [constants.demographic_parity, moments.DemographicParity()]
 
 
 def _simple_threshold_data(number_a0, number_a1,

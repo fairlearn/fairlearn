@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import fairlearn.constants as constants
 from fairlearn.reductions import GridSearch
 import fairlearn.reductions.moments as moments
 
@@ -11,7 +12,7 @@ import pytest
 from sklearn.linear_model import LinearRegression
 
 
-constraint_list = ["bounded_group_loss", moments.GroupLossMoment(moments.ZeroOneLoss())]
+constraint_list = [constants.bounded_group_loss, moments.GroupLossMoment(moments.ZeroOneLoss())]
 
 
 def _simple_regression_data(number_a0, number_a1,

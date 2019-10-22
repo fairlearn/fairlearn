@@ -110,15 +110,15 @@ class GridSearch(Reduction):
         elif isinstance(constraints, str) and constraints in _constraint_strings:
             self.constraints_ = copy.deepcopy(_constraint_strings[constraints])
         else:
-            msg = ("Unsupposed constraint. Please supply a Moment object or "
+            msg = ("Unsupported constraint. Please supply a Moment object or "
                    "string from {0}").format(list(_constraint_strings.keys()))
-            raise RuntimeError(msg)
+            raise ValueError(msg)
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
-                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
+                raise ValueError("Must specify constraint_weight between 0.0 and 1.0")
         else:
-            raise RuntimeError("Unsupported selection rule")
+            raise ValueError("Unsupported selection rule")
         self.selection_rule = selection_rule
         self.constraint_weight = float(constraint_weight)
         self.objective_weight = 1.0 - constraint_weight
