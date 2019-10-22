@@ -21,20 +21,41 @@ from .selection_rate import selection_rate, group_selection_rate  # noqa: F401
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
 """
-A grouped metric for the specificity_score
+A grouped metric for the specificity score
 """
 
 group_miss_rate = make_group_metric(miss_rate)
 """
-A grouped metric for the miss_rate
+A grouped metric for the miss rate
 """
 
 group_fallout_rate = make_group_metric(fallout_rate)
+"""
+A grouped metric for the fallout rate
+"""
 
 # Regression metrics
 group_max_error = make_group_metric(skm.max_error)
+"""
+A grouped wrapper around the sklearn.metrics.max_error routine
+"""
+
 group_mean_absolute_error = make_group_metric(skm.mean_absolute_error)
+"""
+A grouped wrapper around the sklearn.metrics.mean_absolute_error
+"""
+
 group_mean_squared_log_error = make_group_metric(skm.mean_squared_log_error)
+"""
+A grouped wrapper around the sklearn.metrics.mean_squared_log_error routine
+"""
+
 group_median_absolute_error = make_group_metric(skm.median_absolute_error)
+"""
+A grouped wrapper around the sklearn.metrics.median_absolute_error
+"""
 
 group_balanced_root_mean_squared_error = make_group_metric(balanced_root_mean_squared_error)
+"""
+A grouped wrapper around the balanced_root_mean_squared_error routine
+"""
