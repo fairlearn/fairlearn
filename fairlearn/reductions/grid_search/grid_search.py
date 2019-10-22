@@ -11,6 +11,7 @@ from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
 from fairlearn.reductions.moments import DemographicParity, GroupLossMoment
 from fairlearn.reductions.moments import ZeroOneLoss
 from fairlearn import _KW_SENSITIVE_FEATURES
+import fairlearn.constants as flc
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
@@ -76,8 +77,8 @@ class _GridGenerator:
                 self.accumulate_integer_grid(index+1, max_val-abs(current_value))
 
 
-_constraint_strings = {"demographic_parity": DemographicParity(),
-                       "bounded_group_loss": GroupLossMoment(ZeroOneLoss())}
+_constraint_strings = {flc.demographic_parity: DemographicParity(),
+                       flc.bounded_group_loss: GroupLossMoment(ZeroOneLoss())}
 
 
 class GridSearch(Reduction):
