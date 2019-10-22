@@ -11,7 +11,7 @@ import pytest
 from sklearn.linear_model import LinearRegression
 
 
-constraint_list = ["demographic_parity", moments.GroupLossMoment(moments.ZeroOneLoss())]
+constraint_list = ["bounded_group_loss", moments.GroupLossMoment(moments.ZeroOneLoss())]
 
 
 def _simple_regression_data(number_a0, number_a1,

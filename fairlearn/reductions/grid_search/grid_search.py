@@ -103,9 +103,14 @@ class GridSearch(Reduction):
                  grid_limit=2.0,
                  grid=None):
         self.estimator = estimator
-        if not isinstance(constraints, Moment):
-            raise RuntimeError("Unsupported disparity metric")
-        self.constraints_ = constraints
+        if isinstance(constraints, Moment):
+            self.constraints_ = constraints
+        elif isinstance(constraints, str) and constraints in _constraint_strings:
+            self.constraints_ = copy.deepcopy(_constraint_strings[constraints])
+        else:
+            msg = ("Unsupposed constraint. Please supply a Moment object or "
+                   " string from {0}").format(_constraint_strings)
+            raise RuntimeError(msg)
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
