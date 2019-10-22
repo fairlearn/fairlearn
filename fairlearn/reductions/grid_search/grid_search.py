@@ -131,7 +131,7 @@ class GridSearch(Reduction):
         ----------
         X : array_like
             The feature data for the machine learning problem
-        
+
         y : array_like
             The ground truth labels for the machine learning problem
 

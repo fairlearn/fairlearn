@@ -55,7 +55,8 @@ group_median_absolute_error = make_group_metric(skm.median_absolute_error)
 A grouped wrapper around the sklearn.metrics.median_absolute_error
 """
 
-group_balanced_root_mean_squared_error = make_group_metric(balanced_root_mean_squared_error)
+group_balanced_root_mean_squared_error = make_group_metric(
+    balanced_root_mean_squared_error)
 """
 A grouped wrapper around the balanced_root_mean_squared_error routine
 """
