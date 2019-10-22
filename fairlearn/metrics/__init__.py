@@ -1,6 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+""" This module contains the functionality for computing metrics
+"""
+
 import sklearn.metrics as skm
 
 from .group_metric_result import GroupMetricResult  # noqa: F401
@@ -17,7 +20,15 @@ from .selection_rate import selection_rate, group_selection_rate  # noqa: F401
 
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
+"""
+A grouped metric for the specificity_score
+"""
+
 group_miss_rate = make_group_metric(miss_rate)
+"""
+A grouped metric for the miss_rate
+"""
+
 group_fallout_rate = make_group_metric(fallout_rate)
 
 # Regression metrics
