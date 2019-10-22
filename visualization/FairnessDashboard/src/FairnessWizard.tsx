@@ -1,4 +1,4 @@
-import { IFairnessProps } from "./IFairnessProps";
+import { IFairnessProps, PredictionType, PredictionTypes } from "./IFairnessProps";
 import React from "react";
 import { IFairnessContext, IFairnessModelMetadata } from "./IFairnessContext";
 import { localization } from "./Localization/localization";
@@ -17,6 +17,7 @@ import { FeatureTab } from "./Controls/FeatureTab";
 import { IBinnedResponse } from "./IBinnedResponse";
 import { Text } from "office-ui-fabric-react/lib/Text";
 import { IntroTab } from "./Controls/IntroTab";
+import { number } from "prop-types";
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -97,14 +98,34 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         const classNames = props.dataSummary.classNames || ModelMetadata.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
         const featureIsCategorical = ModelMetadata.buildIsCategorical(featureNames.length, props.testData, props.dataSummary.categoricalMap);
         const featureRanges = ModelMetadata.buildFeatureRanges(props.testData, featureIsCategorical, props.dataSummary.categoricalMap);
+        const predictionType = FairnessWizard.determinePredictionType(props.trueY, props.predictedY, props.predictionType);
         return {
             featureNames,
             featureNamesAbridged: featureNames,
             classNames,
             featureIsCategorical,
             featureRanges,
-            predictionType: props.predictionType ||  "classes"
+            predictionType
         };
+    }
+    private static determinePredictionType(trueY: number[], predictedYs: number[][], specifiedType?: PredictionType): PredictionType {
+        if (specifiedType === PredictionTypes.binaryClassification
+            || specifiedType === PredictionTypes.probability
+            || specifiedType === PredictionTypes.regression) {
+            return specifiedType;
+        }
+        const trueIsInteger = trueY.every(x => Number.isInteger(x));
+        const predictedIsInteger = predictedYs.every(predictionVector => predictionVector.every(x => Number.isInteger(x)));
+        if (!trueIsInteger) {
+            return PredictionTypes.regression;
+        }
+        if (!predictedIsInteger) {
+            return PredictionTypes.probability;
+        }
+        if (_.uniq(trueY).length < 3 && _.uniq(_.flatten(predictedYs)).length < 3) {
+            return PredictionTypes.binaryClassification
+        }
+        return PredictionTypes.regression
     }
 
     private selections: SelectionContext;
@@ -123,8 +144,8 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         fairnessContext.binVector = this.generateBinVectorForBin(featureBins[0], fairnessContext.dataset);
         fairnessContext.groupNames = this.generateStringLabelsForBins(featureBins[0], fairnessContext.modelMetadata);
 
-        let accuracyMetrics = fairnessContext.modelMetadata.predictionType === "classes" ?
-            this.props.supportedClassificationAccuracyKeys.map(key => AccuracyOptions[key]) :
+        let accuracyMetrics = fairnessContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
+            this.props.supportedBinaryClassificationAccuracyKeys.map(key => AccuracyOptions[key]) :
             this.props.supportedRegressionAccuracyKeys.map(key => AccuracyOptions[key])
         accuracyMetrics.filter(metric => !!metric);
 

@@ -211,27 +211,22 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 this.props.dashboardContext.binVector,
                 this.props.featureBinPickerProps.selectedBinIndex, 
                 this.props.selectedModelIndex,
-                // TODO: use fnr et al when available
-                // "fnr")).bins;
-                this.props.accuracyPickerProps.selectedAccuracyKey)).bins;
+                "miss_rate")).bins;
             const binnedFPR = (await this.props.metricsCache.getMetric(
                 this.props.dashboardContext.binVector,
                 this.props.featureBinPickerProps.selectedBinIndex, 
                 this.props.selectedModelIndex,
-                // "fpr")).bins;
-                this.props.accuracyPickerProps.selectedAccuracyKey)).bins;
+                "fallout_rate")).bins;
             const outcomes = await this.props.metricsCache.getMetric(
                 this.props.dashboardContext.binVector,
                 this.props.featureBinPickerProps.selectedBinIndex, 
                 this.props.selectedModelIndex,
-                // "outcomes");
-                this.props.accuracyPickerProps.selectedAccuracyKey);
+                "selection_rate");
             const outcomeDisparity = await this.props.metricsCache.getDisparityMetric(
                 this.props.dashboardContext.binVector,
                 this.props.featureBinPickerProps.selectedBinIndex, 
                 this.props.selectedModelIndex,
-                // "outcomes",
-                this.props.accuracyPickerProps.selectedAccuracyKey,
+                "selection_rate",
                 ParityModes.difference);
             this.setState({
                 metrics: {

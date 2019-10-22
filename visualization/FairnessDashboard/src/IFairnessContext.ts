@@ -1,4 +1,5 @@
 import { IModelMetadata } from "mlchartlib";
+import { PredictionType } from "./IFairnessProps";
 
 export interface IFairnessContext {
     // rows by [aug columns + feature columns + trueY + groupIndex]
@@ -12,5 +13,5 @@ export interface IFairnessContext {
 }
 
 export interface IFairnessModelMetadata extends IModelMetadata {
-    predictionType: "classes" | "regression" | "probability" | "logOdds";
+    predictionType: PredictionType;
 }

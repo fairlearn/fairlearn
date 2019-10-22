@@ -7,7 +7,9 @@
 from .fairlearnWidget import FairlearnWidget
 from fairlearn.metrics import group_accuracy_score, group_precision_score,\
     group_recall_score, group_zero_one_loss, group_max_error, group_mean_absolute_error,\
-    group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error
+    group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error,\
+    group_specificity_score, group_miss_rate, group_fallout_rate, group_selection_rate,\
+    group_balanced_root_mean_squared_error
 from IPython.display import display
 from scipy.sparse import issparse
 import numpy as np
@@ -64,6 +66,22 @@ class FairlearnDashboard(object):
                 "model_type": ["classification"],
                 "function": group_zero_one_loss
             },
+            "specificity_score": {
+                "model_type": ["classification"],
+                "function": group_specificity_score
+            },
+            "miss_rate": {
+                "model_type": ["classification"],
+                "function": group_miss_rate
+            },
+            "fallout_rate": {
+                "model_type": ["classification"],
+                "function": group_fallout_rate
+            },
+            "selection_rate": {
+                "model_type": [],
+                "function": group_selection_rate
+            },
             "max_error": {
                 "model_type": ["regression"],
                 "function": group_max_error
@@ -83,18 +101,6 @@ class FairlearnDashboard(object):
             "median_absolute_error": {
                 "model_type": ["regression"],
                 "function": group_median_absolute_error
-            },
-            "fnr": {
-                "model_type": [],
-                "function": group_accuracy_score
-            },
-            "fpr": {
-                "model_type": [],
-                "function": group_accuracy_score
-            },
-            "outcomes": {
-                "model_type": [],
-                "function": group_accuracy_score
             }
         }
 

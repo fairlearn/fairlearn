@@ -56,7 +56,13 @@
         "precisionScore": "Precision score",
         "recallScore": "Recall score",
         "zeroOneLoss": "Zero-one loss",
+        "specificityScore": "Specificity score",
+        "missRate": "Miss rate",
+        "falloutRate": "Fallout rate",
         "maxError": "Max error",
-        "meanAbsoluteError": "Mean absolute error"
+        "meanAbsoluteError": "Mean absolute error",
+        "meanSquaredError": "Mean squared error",
+        "meanSquaredLogError": "Mean squared log error",
+        "medianAbsoluteError": "Median absolute error"
     }
 }
