@@ -1,3 +1,5 @@
+# Nightly build pipeline
+
 trigger: none # No CI build
 
 pr: none # Not for pull requests
