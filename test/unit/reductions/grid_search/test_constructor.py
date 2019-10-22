@@ -11,7 +11,7 @@ import fairlearn.reductions.moments as moments
 @pytest.mark.parametrize("bad_constraint", [1, "random_string", LinearRegression()])
 def test_bad_constraints(bad_constraint):
     message = ("Unsupported constraint. Please supply a Moment object "
-               "or string from ['demographic_parity', 'bounded_group_loss']")
+               "or string from ['bounded_group_loss', 'demographic_parity']")
     with pytest.raises(ValueError) as execInfo:
         GridSearch(LinearRegression(), bad_constraint)
     assert message == execInfo.value.args[0]
