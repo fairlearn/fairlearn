@@ -2,9 +2,12 @@
 # Licensed under the MIT License.
 
 
-class QualityMetric:
-    def set_data(self, X, Y, bin_id):
+class Reduction:
+    def fit(self, X, y, **kwargs):
         raise NotImplementedError()
 
-    def get_quality(self, model):
+    def predict(self, X):
+        raise NotImplementedError()
+
+    def predict_proba(self, X):
         raise NotImplementedError()

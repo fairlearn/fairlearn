@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=13&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)
+[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)
 
 
 
@@ -8,7 +8,7 @@ A Python package that implements a variety of algorithms that mitigate unfairnes
 
 ## Current Release
 
-* The current stable release is available at [FairLearn v0.2.0](https://github.com/microsoft/fairlearn/tree/v0.2.0).
+* The current stable release is available at [FairLearn v0.2.0](https://github.com/fairlearn/fairlearn/tree/v0.2.0).
 
 * Our latest work differs substantively from version 0.2.0, please visit the repo for further information. In particular, look at [Existing users: How to onboard to fairlearn v0.3+](#existing).
 
@@ -80,7 +80,7 @@ pip install fairlearn
 or you can clone the repository locally via
 
 ```python
-git clone git@github.com:Microsoft/fairlearn.git
+git clone git@github.com:fairlearn/fairlearn.git
 ```
 
 To verify that it works run
@@ -114,14 +114,14 @@ If you are the current maintainer of this project:
 1. Create a branch for the release: `git checkout -b release-vxx.xx`
 1. Ensure that all tests return "ok": `python -m pytest -s ./test`
 1. Bump the module version in `fairlearn/__init__.py`
-1. Make a pull request to Microsoft/fairlearn
-1. Merge Microsoft/fairlearn pull request
+1. Make a pull request to fairlearn/fairlearn
+1. Merge fairlearn/fairlearn pull request
 1. Tag and push: `git tag vxx.xx; git push --tags`
 
 # Issues
 
 ## Regular (non-security) issues
-Please submit a report through [GitHub issues](https://github.com/microsoft/fairlearn/issues). A maintainer will respond promptly as follows:
+Please submit a report through [GitHub issues](https://github.com/fairlearn/fairlearn/issues). A maintainer will respond promptly as follows:
 - bug: triage as `bug` and provide estimated timeline based on severity
 - feature request: triage as `feature request` and provide estimated timeline
 - question or discussion: triage as `question` and respond or notify/identify a suitable expert to respond

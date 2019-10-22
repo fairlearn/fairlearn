@@ -2,16 +2,16 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-from .moment import Moment
+from .moment import ClassificationMoment
 from .moment import _ALL, _LABEL
 
 
-class MisclassificationError(Moment):
+class MisclassificationError(ClassificationMoment):
     """Misclassification error"""
     short_name = "Err"
 
-    def init(self, dataX, dataA, dataY):
-        super().init(dataX, dataY, dataY)
+    def load_data(self, X, y, **kwargs):
+        super().load_data(X, y, **kwargs)
         self.index = [_ALL]
 
     def gamma(self, predictor):
@@ -21,7 +21,7 @@ class MisclassificationError(Moment):
         self._gamma_descr = str(error)
         return error
 
-    def lambda_signed(self, lambda_vec):
+    def project_lambda(self, lambda_vec):
         return lambda_vec
 
     def signed_weights(self, lambda_vec=None):

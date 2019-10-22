@@ -7,7 +7,6 @@ import pandas as pd
 import pickle
 import scipy.optimize as opt
 
-from fairlearn.reductions import moments
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
 logger = logging.getLogger(__name__)
@@ -18,10 +17,10 @@ class _Lagrangian:
 
     def __init__(self, X, A, y, learner, constraints, eps, B, opt_lambda=True):
         self.X = X
-        self.obj = moments.MisclassificationError()
-        self.obj.init(X, A, y)
         self.constraints = constraints
-        self.constraints.init(X, A, y)
+        self.constraints.load_data(X, y, sensitive_features=A)
+        self.obj = self.constraints.default_objective()
+        self.obj.load_data(X, y, sensitive_features=A)
         self.pickled_learner = pickle.dumps(learner)
         self.eps = eps
         self.B = B
@@ -30,6 +29,7 @@ class _Lagrangian:
         self.classifiers = pd.Series()
         self.errors = pd.Series()
         self.gammas = pd.DataFrame()
+        self.lambdas = pd.DataFrame()
         self.n = self.X.shape[0]
         self.n_oracle_calls = 0
         self.last_linprog_n_hs = 0
@@ -42,10 +42,10 @@ class _Lagrangian:
         L_high -- value of the Lagrangian under the best
         response of the lambda player
         """
-        lambda_signed = self.constraints.lambda_signed(lambda_vec)
+        lambda_projected = self.constraints.project_lambda(lambda_vec)
         if self.opt_lambda:
-            L = error + np.sum(lambda_vec * gamma) \
-                - self.eps * np.sum(lambda_signed.abs())
+            L = error + np.sum(lambda_projected * gamma) \
+                - self.eps * np.sum(lambda_projected)
         else:
             L = error + np.sum(lambda_vec * gamma) \
                 - self.eps * np.sum(lambda_vec)
@@ -153,6 +153,7 @@ class _Lagrangian:
             self.classifiers.at[h_idx] = classifier
             self.errors.at[h_idx] = h_error
             self.gammas[h_idx] = h_gamma
+            self.lambdas[h_idx] = lambda_vec.copy()
             best_idx = h_idx
 
         return self.hs[best_idx], best_idx

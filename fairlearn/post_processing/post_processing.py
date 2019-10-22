@@ -25,17 +25,17 @@ class PostProcessing:
         else:
             raise ValueError(MODEL_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
 
-    def fit(self, X, y, aux_data, **kwargs):
+    def fit(self, X, y, sensitive_features, **kwargs):
         """ Fit the model based on training features and labels, auxiliary data,
         as well as the fairness-unaware model or estimator. If an estimator was passed
         in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
         """
         raise NotImplementedError(self.fit.__name__ + " is not implemented")
 
-    def predict(self, X, group_data):
+    def predict(self, X, sensitive_features):
         raise NotImplementedError(self.predict.__name__ + " is not implemented")
 
-    def predict_proba(self, X, group_data):
+    def predict_proba(self, X, sensitive_features):
         raise NotImplementedError(self.predict_proba.__name__ + " is not implemented")
 
     def _validate_model(self):

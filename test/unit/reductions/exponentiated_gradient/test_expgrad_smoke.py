@@ -5,7 +5,7 @@ import pandas as pd
 from fairlearn.reductions import ExponentiatedGradient, moments
 from fairlearn.reductions.moments import DemographicParity
 from simple_learners import LeastSquaresBinaryClassifierLearner
-from test_utilities import group_data, X1, X2, X3, labels
+from test_utilities import sensitive_features, X1, X2, X3, labels
 
 import pytest
 
@@ -15,7 +15,7 @@ class TestExpgradSmoke:
         print("setup_method      method:%s" % method.__name__)
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
-        self.A = pd.Series(group_data)
+        self.A = pd.Series(sensitive_features)
         self.learner = LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
@@ -73,16 +73,16 @@ class TestExpgradSmoke:
     def run_smoke_test(self, data):
         expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
                                         eps=data["eps"])
-        expgrad.fit(self.X, self.y, self.A)
+        expgrad.fit(self.X, self.y, sensitive_features=self.A)
 
         res = expgrad._expgrad_result._as_dict()
         Q = res["best_classifier"]
         res["n_classifiers"] = len(res["classifiers"])
 
         disp = data["cons_class"]()
-        disp.init(self.X, self.A, self.y)
+        disp.load_data(self.X, self.y, sensitive_features=self.A)
         error = moments.MisclassificationError()
-        error.init(self.X, self.A, self.y)
+        error.load_data(self.X, self.y, sensitive_features=self.A)
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
 
@@ -104,5 +104,6 @@ class TestExpgradSmoke:
         estimator = LeastSquaresBinaryClassifierLearner()
         constraints = DemographicParity()
         expgrad = ExponentiatedGradient(estimator, constraints)
-        expgrad.fit(pd.DataFrame(X1), pd.Series(labels), group_data=pd.Series(group_data))
+        expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
+                    sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))

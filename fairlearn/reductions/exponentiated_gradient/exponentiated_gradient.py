@@ -12,10 +12,11 @@ exponentiated_gradient -- optimize accuracy subject to fairness constraints
 import logging
 import numpy as np
 import pandas as pd
-from fairlearn.reductions import ReductionsEstimator
+from fairlearn.reductions import Reduction
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
+from fairlearn import _KW_SENSITIVE_FEATURES
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class ExponentiatedGradientResult:
         }
 
 
-class ExponentiatedGradient(ReductionsEstimator):
+class ExponentiatedGradient(Reduction):
     def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
         self._estimator = estimator
         self._constraints = constraints
@@ -62,9 +63,10 @@ class ExponentiatedGradient(ReductionsEstimator):
         self._best_classifier = None
         self._classifiers = None
 
-    def fit(self, X, y, group_data=None, **kwargs):
+    def fit(self, X, y, **kwargs):
         # TODO: validate input data; unify between grid search and expgrad?
-        self._expgrad_result = exponentiated_gradient(X, group_data, y, self._estimator,
+        self._expgrad_result = exponentiated_gradient(X, kwargs[_KW_SENSITIVE_FEATURES], y,
+                                                      self._estimator,
                                                       constraints=self._constraints,
                                                       eps=self._eps, T=self._T, nu=self._nu,
                                                       eta_mul=self._eta_mul)
