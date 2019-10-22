@@ -232,7 +232,7 @@ class GridSearch(Reduction):
 
     def predict(self, X):
         """Provides a prediction for the given input data based
-        on the best model found 
+        on the best model found by the grid search.
 
         Parameters
         ----------
