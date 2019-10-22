@@ -30,7 +30,8 @@ class _GridGenerator:
             true_dim = self.dim
 
         # a conservative lower bound on the scaling parameter of the grid
-        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0/true_dim) - 1
+        n_units = (float(grid_size) / (2.0**neg_allowed.sum())
+                   ) ** (1.0 / true_dim) - 1
         n_units = int(np.floor(n_units))
         if n_units < 0:
             n_units = 0
@@ -61,26 +62,32 @@ class _GridGenerator:
         if index == self.dim:
             self.accumulator.append(self.entry.copy())
         else:
-            if (index == self.dim-1) and (self.force_L1_norm):
+            if (index == self.dim - 1) and (self.force_L1_norm):
                 if self.neg_allowed[index] and max_val > 0:
                     values = [-max_val, max_val]
                 else:
                     values = [max_val]
             else:
                 min_val = -max_val if self.neg_allowed[index] else 0
-                values = range(min_val, max_val+1)
+                values = range(min_val, max_val + 1)
             for current_value in values:
                 self.entry[index] = current_value
-                self.accumulate_integer_grid(index+1, max_val-abs(current_value))
+                self.accumulate_integer_grid(
+                    index + 1, max_val - abs(current_value))
 
 
 class GridSearch(Reduction):
-    """Learner to perform a grid search given a blackbox algorithm.
-    The supplied algorithm must implement a method
-    fit(X, y, sample_weight=[...])
-    At the present time, the only disparity metrics supported
-    are demographic parity (for classification) and bounded group
-    loss (for regression)
+    """Learner to perform a grid search given a blackbox estimator algorithm.
+
+    Parameters
+    ----------
+    estimator : Object
+        An object corresponding to the scikit-learn Estimator concept with sample
+        weights. That is it implements predict(X, y, sample_weight)
+
+    constraints : Moment
+        An object of type Moment which describes the constraint (demographic parity etc.)
+        to be applied
     """
 
     _MESSAGE_Y_NOT_BINARY = "Supplied y labels are not 0 or 1"
@@ -104,7 +111,8 @@ class GridSearch(Reduction):
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
-                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
+                raise RuntimeError(
+                    "Must specify constraint_weight between 0.0 and 1.0")
         else:
             raise RuntimeError("Unsupported selection rule")
         self.selection_rule = selection_rule
@@ -116,6 +124,21 @@ class GridSearch(Reduction):
         self.grid = grid
 
     def fit(self, X, y, **kwargs):
+        """Runs the grid search. This will result in multiple copies of the
+        estimator being made, and the `fit` method of each one called.
+
+        Parameters
+        ----------
+        X : array_like
+            The feature data for the machine learning problem
+        
+        y : array_like
+            The ground truth labels for the machine learning problem
+
+        sensitive_features : array_like
+            A (currently) required keyword argument listing the
+            feature used by the constraints object
+        """
         if X is None:
             raise ValueError(self._MESSAGE_X_NONE)
 
@@ -123,10 +146,12 @@ class GridSearch(Reduction):
             raise ValueError(self._MESSAGE_Y_NONE)
 
         if _KW_SENSITIVE_FEATURES not in kwargs:
-            raise RuntimeError("Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES))
+            raise RuntimeError(
+                "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES))
 
         # Extract the target attribute
-        sensitive = self._make_vector(kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
+        sensitive = self._make_vector(
+            kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
 
         unique_labels = np.unique(sensitive)
         if len(unique_labels) > 2:
@@ -153,13 +178,15 @@ class GridSearch(Reduction):
         self.constraints.load_data(X, y_vector, **kwargs)
         objective = self.constraints.default_objective()
         objective.load_data(X, y_vector, **kwargs)
-        is_classification_reduction = isinstance(self.constraints, ClassificationMoment)
+        is_classification_reduction = isinstance(
+            self.constraints, ClassificationMoment)
 
         # Basis information
         pos_basis = self.constraints.pos_basis
         neg_basis = self.constraints.neg_basis
         neg_allowed = self.constraints.neg_basis_present
-        objective_in_the_span = (self.constraints.default_objective_lambda_vec is not None)
+        objective_in_the_span = (
+            self.constraints.default_objective_lambda_vec is not None)
 
         if self.grid is None:
             grid = _GridGenerator(self.grid_size,
@@ -196,7 +223,7 @@ class GridSearch(Reduction):
 
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(x):
-                return self.objective_weight*x.objective + self.constraint_weight*x.gamma.max()
+                return self.objective_weight * x.objective + self.constraint_weight * x.gamma.max()
             self.best_result = min(self.all_results, key=loss_fct)
         else:
             raise RuntimeError("Unsupported selection rule")
@@ -204,6 +231,21 @@ class GridSearch(Reduction):
         return
 
     def predict(self, X):
+        """Provides a prediction for the given input data based
+        on the best model found 
+
+        Parameters
+        ----------
+        X : array_like
+            The data for which predictions are required
+
+        Returns
+        -------
+        out : scalar or array_like
+            The prediction. If X represents the data for a single example
+            the result will be a scalar. Otherwise the result will be an
+            array
+        """
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
