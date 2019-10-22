@@ -324,6 +324,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/d3@^3":
+  version "3.5.43"
+  resolved "https://registry.yarnpkg.com/@types/d3/-/d3-3.5.43.tgz#e9b4992817e0b6c5efaa7d6e5bb2cee4d73eab58"
+  integrity sha512-t9ZmXOcpVxywRw86YtIC54g7M9puRh8hFedRvVfHKf5YyOP6pSxA0TvpXpfseXSCInoW4P7bggTrSDiUOs4g5w==
+
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.1.tgz#42995b446db9a48a11a07ec083499a860e9138ff"
@@ -370,6 +375,13 @@
   version "12.11.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.11.2.tgz#75ba3beda30d690b89a5089ca1c6e8e386150b76"
   integrity sha512-dsfE4BHJkLQW+reOS6b17xhZ/6FB1rB8eRRvO08nn5o+voxf3i74tuyFWNH6djdfgX7Sm5s6LD8t6mJug4dpDw==
+
+"@types/plotly.js-dist@npm:@types/plotly.js":
+  version "1.44.12"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.44.12.tgz#2181cda646ebb5c62065025f10020c9d3823b0f2"
+  integrity sha512-APexJluj038qj7H3OWS+x6oDLFrqnnl3jNfIRFBjb4ps8/kpbzwZwLDXdCEBLVF/77VjRsLNDA5LXH0rpeBN2w==
+  dependencies:
+    "@types/d3" "^3"
 
 "@types/prop-types@*":
   version "15.7.3"

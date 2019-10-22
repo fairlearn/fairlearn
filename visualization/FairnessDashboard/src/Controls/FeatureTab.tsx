@@ -10,6 +10,7 @@ import { mergeStyleSets } from "@uifabric/styling";
 import { Icon } from "office-ui-fabric-react/lib/Icon";
 import { IBinnedResponse } from "../IBinnedResponse";
 import { Text } from "office-ui-fabric-react/lib/Text";
+import { ActionButton } from "office-ui-fabric-react/lib/Button";
 
 interface IFeatureItem {
     title: string;
@@ -25,13 +26,16 @@ export interface IFeatureTabProps extends IWizardTabProps {
     selectedFeatureChange: (value: number) => void;
 }
 
-export class FeatureTab extends React.PureComponent<IFeatureTabProps> {
+interface IState {
+    expandedBins: number[];
+}
+
+export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
     private static readonly classNames = mergeStyleSets({
         itemCell: [
           {
             padding: 10,
             width: "100%",
-            height: "150px",
             position: "relative",
             float: "left",
             cursor: "pointer",
@@ -52,6 +56,11 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps> {
             overflowY: "auto"
         }
     });
+
+    constructor(props: IFeatureTabProps) {
+        super(props);
+        this.state = { expandedBins: []};
+    }
     
     render(): React.ReactNode {
         return(
@@ -68,9 +77,10 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps> {
                                 items={this.props.featureBins.map((bin, index) => {
                                     return {
                                         title: this.props.dashboardContext.modelMetadata.featureNames[bin.featureIndex],
-                                        description: localization.formatString(localization.Feature.summaryCategoricalCount, bin.array.length),
+                                        description: localization.formatString(localization.Feature.summaryCategoricalCount, bin.array.length) as string,
                                         onSelect: this.props.selectedFeatureChange.bind(this, bin.featureIndex),
-                                        selected: this.props.selectedFeatureIndex === bin.featureIndex
+                                        selected: this.props.selectedFeatureIndex === bin.featureIndex,
+                                        categories: bin.array as string[]
                                     };
                                 })}
                                 onRenderCell={this._onRenderCell}
@@ -98,8 +108,22 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps> {
             {item.selected && (<Icon iconName="CompletedSolid" className={FeatureTab.classNames.iconClass}/>)}
             <h2>{item.title}</h2>
             <p>{item.description}</p>
-            <Text variant={"medium"}>"See categories"</Text>
+            {!this.state.expandedBins.includes(index) && (                    
+                <ActionButton 
+                    iconProps={{iconName: "Forward"}}
+                    onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>)}
+            {this.state.expandedBins.includes(index) && (
+                <div>
+                    <ActionButton 
+                    iconProps={{iconName: "Back"}}
+                    onClick={this.updateExpandedList.bind(this)}>{localization.Feature.hideCategories}</ActionButton>
+                    {!!item.categories && item.categories.map(category => <div>{category}</div>)}
+                </div>)}
           </div>
         );
+    }
+
+    private readonly updateExpandedList = (value?: number): void => {
+        this.setState(() => {return {expandedBins: [value]}})
     }
 }

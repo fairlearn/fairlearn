@@ -6,9 +6,9 @@ export const binaryClassifier = {
         [0,0,0,0]
     ],
     augmentedData: [
-        ["a"],
-        ["b"],
-        ["b"],
-        ["b"]
+        ["a", "1"],
+        ["b", "2"],
+        ["b", "2"],
+        ["b", "3"]
     ]
 }
