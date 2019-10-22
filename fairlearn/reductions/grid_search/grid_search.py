@@ -110,7 +110,7 @@ class GridSearch(Reduction):
             self.constraints_ = copy.deepcopy(_constraint_strings[constraints])
         else:
             msg = ("Unsupposed constraint. Please supply a Moment object or "
-                   " string from {0}").format(_constraint_strings)
+                   "string from {0}").format(list(_constraint_strings.keys()))
             raise RuntimeError(msg)
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
