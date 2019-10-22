@@ -21,3 +21,4 @@ shap
 
 # Required for documentation
 sphinx
+sphinx-rtd-theme
