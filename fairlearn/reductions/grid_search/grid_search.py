@@ -8,7 +8,8 @@ import pandas as pd
 from fairlearn.reductions import Reduction
 from fairlearn.reductions.grid_search import GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
-from fairlearn.reductions.moments import DemographicParity, SquareLoss
+from fairlearn.reductions.moments import DemographicParity, GroupLossMoment
+from fairlearn.reductions.moments import ZeroOneLoss
 from fairlearn import _KW_SENSITIVE_FEATURES
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
@@ -76,7 +77,7 @@ class _GridGenerator:
 
 
 _constraint_strings = {"demographic_parity": DemographicParity(),
-                       "bounded_group_loss": SquareLoss(-np.inf, np.inf)}
+                       "bounded_group_loss": GroupLossMoment(ZeroOneLoss())}
 
 
 class GridSearch(Reduction):
