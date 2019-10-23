@@ -4,7 +4,7 @@
 import pandas as pd
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from .misclassification_error import MisclassificationError
+from .error_rate import ErrorRate
 
 _DIFF = "diff"
 
@@ -13,7 +13,7 @@ class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness metric including DemographicParity and EqualizedOdds"""
 
     def default_objective(self):
-        return MisclassificationError()
+        return ErrorRate()
 
     def load_data(self, X, y, event=None, **kwargs):
         super().load_data(X, y, **kwargs)
