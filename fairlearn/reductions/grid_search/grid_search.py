@@ -239,7 +239,7 @@ class GridSearch(Reduction):
         best model found by the grid search. The underlying
         estimator must support predict_proba for this
         to work.
-        
+
         :param X: The data for which predictions are required
         :type X: Array
         """
