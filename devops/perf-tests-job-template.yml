@@ -1,7 +1,7 @@
 parameters:
-  name: ''
-  vmImage: ''
-  pyVersions: [3.5, 3.7]
+  name: 'Performance'
+  vmImage: 'ubuntu-latest'
+  pyVersions: [3.7]
 
 jobs:
 - job: ${{ parameters.name }}
