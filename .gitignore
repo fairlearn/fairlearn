@@ -108,3 +108,6 @@ venv.bak/
 
 # VS Code
 /.vscode
+
+# Documentation
+docs/source/

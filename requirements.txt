@@ -18,3 +18,7 @@ pytest-cov
 jupyter
 nbval
 shap
+
+# Required for documentation
+sphinx
+sphinx-docfx-yaml
