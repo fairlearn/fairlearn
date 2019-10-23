@@ -18,6 +18,7 @@ import { IBinnedResponse } from "./IBinnedResponse";
 import { Text } from "office-ui-fabric-react/lib/Text";
 import { IntroTab } from "./Controls/IntroTab";
 import { number } from "prop-types";
+import { mergeStyleSets } from "@uifabric/styling";
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -50,9 +51,6 @@ export interface IWizardState {
     metricCache: MetricsCache;
 }
 
-const trueYPath = "trueY";
-const indexPath = "index";
-
 const introTabKey = "introTab";
 const featureBinTabKey = "featureBinTab";
 const accuracyTabKey = "accuracyTab";
@@ -66,14 +64,9 @@ const flights = {
 
 export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardState> {
     private static buildInitialFairnessContext(props: IFairnessProps): IFairnessContext {
-        const dataset = props.testData.map((row, rowIndex) => {
-            const result = {...row};
-            result[trueYPath] = props.trueY[rowIndex];
-            result[indexPath] = rowIndex;
-            return result;
-        });
         return {
-            dataset,
+            dataset: props.testData,
+            trueY: props.trueY,
             predictions: props.predictedY,
             binVector: [],
             groupNames: [],
@@ -108,6 +101,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             predictionType
         };
     }
+    
     private static determinePredictionType(trueY: number[], predictedYs: number[][], specifiedType?: PredictionType): PredictionType {
         if (specifiedType === PredictionTypes.binaryClassification
             || specifiedType === PredictionTypes.probability
@@ -116,17 +110,40 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         }
         const trueIsInteger = trueY.every(x => Number.isInteger(x));
         const predictedIsInteger = predictedYs.every(predictionVector => predictionVector.every(x => Number.isInteger(x)));
+        const trueIsBinary = _.uniq(trueY).length < 3;
         if (!trueIsInteger) {
             return PredictionTypes.regression;
         }
         if (!predictedIsInteger) {
             return PredictionTypes.probability;
         }
-        if (_.uniq(trueY).length < 3 && _.uniq(_.flatten(predictedYs)).length < 3) {
+        if (trueIsBinary && _.uniq(_.flatten(predictedYs)).length < 3) {
             return PredictionTypes.binaryClassification
         }
         return PredictionTypes.regression
     }
+
+    private static readonly classNames = mergeStyleSets({
+        frame: {
+            height: "800px",
+            fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`
+        },
+        thinHeader: {
+            height: "36px",
+            backgroundColor: "#333333",
+            color: "#FFFFFF"
+        },
+        headerLeft: {
+            fontSize: "15px",
+            lineHeight: "24px",
+            fontWeight: "500",
+            padding: "20px"
+        },
+        headerRight: {
+            fontSize: "12px",
+            padding: "20px"
+        }
+    });
 
     private selections: SelectionContext;
 
@@ -182,14 +199,10 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             onBinChange: this.setBinIndex
         };
          return (
-             <Stack style={{height: '800px'}}>
-                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" style={{
-                     height: "35px",
-                     backgroundColor: "#333",
-                     color: "#CCC"
-                     }}>
-                    <Text variant={"mediumPlus"} style={{padding: "20px"}}>{localization.Header.title}</Text>
-                    <Text variant={"medium"} style={{padding: "15px"}}>{localization.Header.documentation}</Text>
+             <Stack className={FairnessWizard.classNames.frame}>
+                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
+                    <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
+                    <div className={FairnessWizard.classNames.headerRight}>{localization.Header.documentation}</div>
                 </Stack>
                 {(this.state.activeTabKey === introTabKey) &&
                     <StackItem grow={2}>

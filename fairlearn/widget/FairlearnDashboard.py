@@ -101,7 +101,20 @@ class FairlearnDashboard(object):
             "median_absolute_error": {
                 "model_type": ["regression"],
                 "function": group_median_absolute_error
-            }
+            },
+            # TODO: implement with correct metric
+            "overprediction": {
+                "model_type": [],
+                "function": group_mean_absolute_error
+            },
+            "underprediction": {
+                "model_type": [],
+                "function": group_mean_absolute_error
+            },
+            "average": {
+                "model_type": [],
+                "function": group_mean_absolute_error
+            },
         }
 
         classification_methods = [method[0] for method in self._metric_methods.items()

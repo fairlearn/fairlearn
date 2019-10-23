@@ -1,7 +1,7 @@
 {
   "name": "fairlearn-dashboard",
   "version": "0.0.1",
-  "license": "See license file 'LICENSE'",
+  "license": "MIT",
   "description": "Dashboard for evaluating the fairness of models.",
   "main": "rel/index.js",
   "module": "rel/index.js",

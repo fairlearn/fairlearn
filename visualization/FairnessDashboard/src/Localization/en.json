@@ -33,12 +33,16 @@
         "explanatoryStep": "Setting up your fairness assessment is easy",
         "getStarted": "Get started"
     },
+    "ModelComparison": {
+        "title": "Model Comparison"
+    },
     "Report": {
-        "title": "Accuracy and fairness assessment",
+        "title": "Disparity in Accuracy",
         "globalAccuracyText": "Is your overall accuracy score",
         "accuracyDisparityText": "Is the overall difference",
         "editConfiguration": "Edit Configuration",
         "backToComparisons": "Multimodel view",
+        "outcomesTitle": "Disparity in Predictions",
         "globalOutcomeText": "Is your average prediction",
         "outcomeDisparityText": "Is your disparity in predictions"
     },

@@ -11,6 +11,7 @@ import { localization } from "../Localization/localization";
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { mergeStyleSets } from "@uifabric/styling";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { AccuracyOptions } from "../AccuracyMetrics";
 
 export interface IModelComparisonProps {
     dashboardContext: IFairnessContext;
@@ -77,7 +78,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             margin: "auto",
             fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
             padding: "40px"
-        }
+        },
+        
     });
 
     public render(): React.ReactNode {
@@ -101,11 +103,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             series.name = this.props.dashboardContext.modelNames[series.name];
             return series;
         });
+        props.layout.xaxis.title = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title;
         return (
             <Stack styles={{root: {height: "100%"}}}>
                 <StackItem styles={{root: {backgroundColor: "#EBEBEB", padding: "10px 30px", height: "150px"}}}>
                     <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={{root: {height: "100%"}}}>
-                        <Text variant={"xxLarge"}>{localization.Report.title}</Text>
+                        <Text variant={"xxLarge"}>{localization.ModelComparison.title}</Text>
                         <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                     </Stack>
                 </StackItem>

@@ -11,15 +11,22 @@ import { ParityModes } from "./ParityMetrics";
 import { IPlotlyProperty, AccessibleChart } from "mlchartlib";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
 import { SummaryTable } from "./Controls/SummaryTable";
+import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
 
 interface IMetrics {
     globalAccuracy: number;
     accuracyDisparity: number;
-    binnedFNR: number[];
-    binnedFPR: number[];
     globalOutcome: number;
     outcomeDisparity: number;
-    binnedOutcome: number[];
+    // Optional, based on model type
+    binnedFNR?: number[];
+    binnedFPR?: number[];
+    binnedOutcome?: number[];
+    binnedOverprediction?: number[];
+    binnedUnderprediction?: number[];
+    // different length, raw unbinned errors and predictions
+    errors?: number[];
+    predictions?: number[];
 }
 
 export interface IState {
@@ -95,25 +102,56 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         }
 
         const accuracyPlot = _.cloneDeep(WizardReport.barPlotlyProps);
-        accuracyPlot.data = [
-            {
-                x: this.state.metrics.binnedFPR,
-                y: this.props.dashboardContext.groupNames,
-                text: this.state.metrics.binnedFPR.map(num => (num as number).toFixed(3)),
-                orientation: 'h',
-                type: 'bar',
-                textposition: 'auto'
-            } as any, {
-                x: this.state.metrics.binnedFNR.map(x => -1 * x),
-                y: this.props.dashboardContext.groupNames,
-                text: this.state.metrics.binnedFNR.map(num => (num as number).toFixed(3)),
-                orientation: 'h',
-                type: 'bar',
-                textposition: 'auto'
-            }
-        ];
-
         const opportunityPlot = _.cloneDeep(WizardReport.barPlotlyProps);
+        // TODO: reverse everything
+        const reversedNames = this.props.dashboardContext.groupNames;
+        if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification) {
+            accuracyPlot.data = [
+                {
+                    x: this.state.metrics.binnedFPR,
+                    y: reversedNames,
+                    text: this.state.metrics.binnedFPR.map(num => (num as number).toFixed(3)),
+                    orientation: 'h',
+                    type: 'bar',
+                    textposition: 'auto'
+                } as any, {
+                    x: this.state.metrics.binnedFNR.map(x => -1 * x),
+                    y: reversedNames,
+                    text: this.state.metrics.binnedFNR.map(num => (num as number).toFixed(3)),
+                    orientation: 'h',
+                    type: 'bar',
+                    textposition: 'auto'
+                }
+            ];
+        } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
+            accuracyPlot.data = [
+                {
+                    x: this.state.metrics.binnedOverprediction,
+                    y: reversedNames,
+                    text: this.state.metrics.binnedOverprediction.map(num => (num as number).toFixed(3)),
+                    orientation: 'h',
+                    type: 'bar',
+                    textposition: 'auto'
+                } as any, {
+                    x: this.state.metrics.binnedUnderprediction.map(x => -1 * x),
+                    y: reversedNames,
+                    text: this.state.metrics.binnedUnderprediction.map(num => (num as number).toFixed(3)),
+                    orientation: 'h',
+                    type: 'bar',
+                    textposition: 'auto'
+                }
+            ];
+        } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
+            accuracyPlot.data = [
+                {
+                    x: this.state.metrics.errors,
+                    y: this.props.dashboardContext.binVector,
+                    type: 'box'
+                } as any
+            ];
+        }
+
+        
         opportunityPlot.data = [
             {
                 x: this.state.metrics.binnedOutcome,
@@ -163,7 +201,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 </Stack>
             </div>
             <div style={{backgroundColor: "#EBEBEB", padding: "10px 30px"}}>
-                <Stack.Item styles={{root: {height: "100px"}}}>
+                <Stack.Item styles={{root: {height: "120px"}}}>
+                    <StackItem>
+                        <Text variant={"xxLarge"}>{localization.Report.outcomesTitle}</Text>
+                    </StackItem>
                     <Stack horizontal styles={{root: {height: "100%"}}}>
                         <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.globalOutcome.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
                         <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.globalOutcomeText}</Text>
@@ -196,6 +237,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
 
     private async loadData(): Promise<void> {
         try {
+            let binnedFNR: number[];
+            let binnedFPR: number[];
+            let binnedOverprediction: number[];
+            let binnedUnderprediction: number[];
+            let predictions: number[];
+            let errors: number[];
+            let outcomes: IMetricResponse;
+            let outcomeDisparity: number;
             const globalAccuracy = (await this.props.metricsCache.getMetric(
                 this.props.dashboardContext.binVector,
                 this.props.featureBinPickerProps.selectedBinIndex, 
@@ -207,27 +256,68 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 this.props.selectedModelIndex,
                 this.props.accuracyPickerProps.selectedAccuracyKey,
                 ParityModes.difference);
-            const binnedFNR = (await this.props.metricsCache.getMetric(
-                this.props.dashboardContext.binVector,
-                this.props.featureBinPickerProps.selectedBinIndex, 
-                this.props.selectedModelIndex,
-                "miss_rate")).bins;
-            const binnedFPR = (await this.props.metricsCache.getMetric(
-                this.props.dashboardContext.binVector,
-                this.props.featureBinPickerProps.selectedBinIndex, 
-                this.props.selectedModelIndex,
-                "fallout_rate")).bins;
-            const outcomes = await this.props.metricsCache.getMetric(
-                this.props.dashboardContext.binVector,
-                this.props.featureBinPickerProps.selectedBinIndex, 
-                this.props.selectedModelIndex,
-                "selection_rate");
-            const outcomeDisparity = await this.props.metricsCache.getDisparityMetric(
-                this.props.dashboardContext.binVector,
-                this.props.featureBinPickerProps.selectedBinIndex, 
-                this.props.selectedModelIndex,
-                "selection_rate",
-                ParityModes.difference);
+            if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification) {
+                binnedFNR = (await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "miss_rate")).bins;
+                binnedFPR = (await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "fallout_rate")).bins;
+                outcomes = await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "selection_rate");
+                outcomeDisparity = await this.props.metricsCache.getDisparityMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "selection_rate",
+                    ParityModes.difference);
+            } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
+                predictions = this.props.dashboardContext.predictions[this.props.selectedModelIndex];
+                binnedOverprediction = (await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "overprediction")).bins;
+                binnedUnderprediction = (await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "underprediction")).bins;
+                outcomes = await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "average");
+                outcomeDisparity = await this.props.metricsCache.getDisparityMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "average",
+                    ParityModes.difference);
+            } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
+                predictions = this.props.dashboardContext.predictions[this.props.selectedModelIndex];
+                errors = predictions.map((predicted, index) => {
+                    return this.props.dashboardContext.trueY[index] - predicted;
+                });
+                outcomes = await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "average");
+                outcomeDisparity = await this.props.metricsCache.getDisparityMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "average",
+                    ParityModes.difference);
+            }
             this.setState({
                 metrics: {
                     globalAccuracy,
@@ -236,7 +326,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     binnedFPR,
                     globalOutcome: outcomes.global,
                     binnedOutcome: outcomes.bins,
-                    outcomeDisparity
+                    outcomeDisparity,
+                    predictions,
+                    errors,
+                    binnedOverprediction,
+                    binnedUnderprediction
                 }
             });
         } catch {

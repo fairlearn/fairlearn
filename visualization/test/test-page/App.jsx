@@ -80,6 +80,7 @@ import { binaryClassifier } from '../__mock-data/binaryClassifier';
                         trueY={data.trueY}
                         supportedBinaryClassificationAccuracyKeys={["accuracy_score", "precision_score", "recall_score", "zero_one_loss"]}
                         supportedRegressionAccuracyKeys={["mean_absolute_error", "recall_score"]}
+                        supportedPredictionAccuracyKeys={["mean_absolute_error", "recall_score"]}
                         stringParams={{contextualHelp: this.messages}}
                         requestMetrics={this.generateRandomMetrics.bind(this)}
                         key={new Date()}
