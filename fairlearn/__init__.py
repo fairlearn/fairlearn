@@ -7,7 +7,7 @@ __version__ = "0.3.0-alpha"
 _KW_SENSITIVE_FEATURES = "sensitive_features"
 
 
-# Setup logging infrustructure
+# Setup logging infrastructure
 import logging  # noqa: E402
 import os  # noqa: E402
 # Only log to disk if environment variable specified
