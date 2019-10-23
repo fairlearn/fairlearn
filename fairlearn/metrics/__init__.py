@@ -14,6 +14,7 @@ from .skm_wrappers import group_mean_squared_error  # noqa: F401
 from .balanced_root_mean_squared_error import balanced_root_mean_squared_error
 from .extra_metrics import specificity_score, miss_rate, fallout_rate
 from .selection_rate import selection_rate, group_selection_rate  # noqa: F401
+from .mean_prediction import mean_prediction
 
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
@@ -27,3 +28,5 @@ group_mean_squared_log_error = make_group_metric(skm.mean_squared_log_error)
 group_median_absolute_error = make_group_metric(skm.median_absolute_error)
 
 group_balanced_root_mean_squared_error = make_group_metric(balanced_root_mean_squared_error)
+
+group_mean_prediction = make_group_metric(mean_prediction)
