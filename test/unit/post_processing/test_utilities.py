@@ -8,22 +8,22 @@ from fairlearn.post_processing._threshold_operation import ThresholdOperation
 from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 
 
-example_attribute_names1 = ["A", "B", "C"]
-example_attributes1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
-example_attribute_names2 = ["x", "Y"]
-example_attributes2 = [x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
-example_labels = [int(x) for x in '0110100' '0010111' '000111']
-example_scores = [int(x) for x in '0011233' '0001111' '011112']
+sensitive_feature_names_ex1 = ["A", "B", "C"]
+sensitive_features_ex1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
+sensitive_feature_names_ex2 = ["x", "Y"]
+sensitive_features_ex2 = [x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
+labels_ex = [int(x) for x in '0110100' '0010111' '000111']
+scores_ex = [int(x) for x in '0011233' '0001111' '011112']
 
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 
-class ExampleModel():
+class ExamplePredictor():
     def predict(self, X):
-        return example_scores
+        return scores_ex
 
 
-class ExampleNotModel():
+class ExampleNotPredictor():
     pass
 
 
@@ -32,7 +32,7 @@ class ExampleEstimator():
         pass
 
     def predict(self, X):
-        return example_scores
+        return scores_ex
 
 
 class ExampleNotEstimator1():
@@ -47,9 +47,9 @@ class ExampleNotEstimator2():
 
 def _get_grouped_data_and_base_points(attribute_value):
     data = pd.DataFrame({
-        ATTRIBUTE_KEY: example_attributes1,
-        SCORE_KEY: example_scores,
-        LABEL_KEY: example_labels})
+        ATTRIBUTE_KEY: sensitive_features_ex1,
+        SCORE_KEY: scores_ex,
+        LABEL_KEY: labels_ex})
     grouped_data = data.groupby(ATTRIBUTE_KEY).get_group(attribute_value) \
         .sort_values(by=SCORE_KEY, ascending=False)
     x_grid = np.linspace(0, 1, 100)

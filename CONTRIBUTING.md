@@ -46,18 +46,18 @@ where `group_data` contains data on which group a sample belongs to. As of now, 
 
 ### Post-processing methods
 
-Post-processing methods require an already trained predictor. For consistency we also provide the option to pass an estimator instead, and will call `fit` internally. For post-processing methods we provide the `parity_constraints` argument in the form of a string.
+Post-processing methods require an already trained predictor. For consistency we also provide the option to pass an estimator instead, and will call `fit` internally. For post-processing methods we provide the `constraints` argument in the form of a string.
 
 ```python
-post_processor = PostProcessing(unconstrained_model=model, parity_constraints=parity_constraints, **kwargs)
-post_processor = PostProcessing(unconstrained_estimator=estimator, parity_constraints=parity_constraints, **kwargs)
+post_processor = PostProcessing(unconstrained_predictor=predictor, constraints=constraints, **kwargs)
+post_processor = PostProcessing(estimator=estimator, constraints=constraints, **kwargs)
 ```
 
-Post-processing methods (such as the ones under `fairlearn.post_processing`) also provide the same functions as the reductions above albeit with `group_data` as a required argument for `predict` and `predict_proba`. In the future we will make `group_data` optional if the grouping data is already provided through `X`.
+Post-processing methods (such as the ones under `fairlearn.post_processing`) also provide the same functions as the reductions above albeit with `group_data` as a required argument for `predict` and `_pmf_predict`. In the future we will make `sensitive_features` optional if the grouping data is already provided through `X`.
 
 ```python
-post_processor.fit(X, Y, group_data)
-post_processor.predict(X, group_data)
-post_processor.predict_proba(X, group_data)
+post_processor.fit(X, Y, sensitive_features=sensitive_features)
+post_processor.predict(X, sensitive_features=sensitive_features)
+post_processor._pmf_predict(X, sensitive_features=sensitive_features)
 ```
 </div>
