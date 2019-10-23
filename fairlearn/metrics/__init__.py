@@ -54,5 +54,13 @@ group_balanced_root_mean_squared_error = make_group_metric(balanced_root_mean_sq
 """
 
 group_mean_prediction = make_group_metric(mean_prediction)
+"""A grouped wrapper around the mean_prediction routine
+"""
+
 group_mean_overprediction = make_group_metric(mean_overprediction)
+"""A grouped wrapper around the mean_overprediction routine
+"""
+
 group_mean_underprediction = make_group_metric(mean_underprediction)
+"""A grouped wapper around the mean_underprediction routine
+"""
