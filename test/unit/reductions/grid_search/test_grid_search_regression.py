@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch
-from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleRegressionQualityMetric
 import fairlearn.reductions.moments as moments
 
 import copy
@@ -49,9 +48,9 @@ def test_bgl_unfair():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
+    bgl_square_loss = moments.GroupLossMoment(moments.SquareLoss(-np.inf, np.inf))
     target = GridSearch(LinearRegression(),
-                        disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
-                        quality_metric=SimpleRegressionQualityMetric(),
+                        constraints=bgl_square_loss,
                         grid_size=7)
 
     target.fit(X, Y, sensitive_features=A)
@@ -65,7 +64,7 @@ def test_bgl_unfair():
     best_predict = target.predict(test_X)
     assert np.allclose([-1.91764706,  9.61176471], best_predict)
 
-    all_predict = target.posterior_predict(test_X)
+    all_predict = [r.predictor.predict(test_X) for r in target.all_results]
     assert np.allclose([[3.2, 11.2],
                         [-3.47346939, 10.64897959],
                         [-2.68, 10.12],
@@ -101,13 +100,12 @@ def test_bgl_unmitigated_same():
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
     target = GridSearch(estimator,
-                        disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
-                        quality_metric=SimpleRegressionQualityMetric(),
+                        constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
                         grid=grid_df)
     target.fit(X, y, sensitive_features=A)
 
     raw_coef = unmitigated_estimator.coef_
-    gs_coef = target.best_result.model.coef_
+    gs_coef = target.best_result.predictor.coef_
     # Can't quite get exact match, but this should be very close
     assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
@@ -143,13 +141,11 @@ def test_bgl_lagrange_specifications():
                         axis=1)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
-                         quality_metric=SimpleRegressionQualityMetric(),
+                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
                          grid_size=5)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         disparity_metric=moments.GroupLossMoment(moments.ZeroOneLoss()),
-                         quality_metric=SimpleRegressionQualityMetric(),
+                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
                          grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
@@ -162,12 +158,12 @@ def test_bgl_lagrange_specifications():
 
     # Check we generated the same multipliers
     for i in range(len(tradeoffs)):
-        lm1 = target1.all_results[i].lagrange_multiplier
-        lm2 = target2.all_results[i].lagrange_multiplier
+        lm1 = target1.all_results[i].lambda_vec
+        lm2 = target2.all_results[i].lambda_vec
         assert lm1.equals(lm2)
 
     # Check the models are the same
     for i in range(len(tradeoffs)):
-        coef1 = target1.all_results[i].model.coef_
-        coef2 = target2.all_results[i].model.coef_
+        coef1 = target1.all_results[i].predictor.coef_
+        coef2 = target2.all_results[i].predictor.coef_
         assert np.array_equal(coef1, coef2)
