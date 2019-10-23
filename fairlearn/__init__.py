@@ -8,8 +8,8 @@ _KW_SENSITIVE_FEATURES = "sensitive_features"
 
 
 # Setup logging infrustructure
-import logging
-import os
+import logging  # noqa: E402
+import os  # noqa: E402
 # Only log to disk if environment variable specified
 fairlearn_logs = os.environ.get('FAIRLEARN_LOGS')
 if fairlearn_logs is not None:
