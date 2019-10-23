@@ -37,7 +37,7 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
             lineHeight: "24px",
         },
         lowerSection: {
-            padding: "50px 94px 90px 94px",
+            padding: "50px 90px 90px 90px",
             backgroundColor: "#F2F2F2",
             color: "#333333",
             flexGrow: 1

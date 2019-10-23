@@ -54,6 +54,21 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
         },
         itemsList: {
             overflowY: "auto"
+        },
+        frame: {
+            height: "100%",
+        },
+        header: {
+            color: "#333333",
+            fontSize: "32px",
+            lineHeight: "39px",
+            fontWeight: "100"
+        },
+        textBody: {
+            paddingTop: "12px",
+            fontSize: "18px",
+            lineHeight: "24px",
+            fontWeight: "300"
         }
     });
 
@@ -64,14 +79,13 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
     
     render(): React.ReactNode {
         return(
-            <Stack horizontal style={{height: "100%"}}>
+            <Stack horizontal className={FeatureTab.classNames.frame}>
                 <StackItem grow={2}>
                     <Stack style={{height: "100%"}}>
-                        <h2 style={{fontWeight: "bold"}}>
+                        <h2 className={FeatureTab.classNames.header}>
                             {localization.Feature.header}
                         </h2>
-                        <p>{localization.Feature.body}</p>
-                        <a>{localization.Feature.learnMore}</a>
+                        <p className={FeatureTab.classNames.textBody}>{localization.Feature.body}</p>
                         <StackItem grow={2} className={FeatureTab.classNames.itemsList}>
                             <List
                                 items={this.props.featureBins.map((bin, index) => {

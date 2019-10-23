@@ -142,6 +142,13 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         headerRight: {
             fontSize: "12px",
             padding: "20px"
+        },
+        pivot: {
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: "#F2F2F2",
+            padding: "30px 90px 0 90px"
         }
     });
 
@@ -214,11 +221,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                  ) &&
                     <Stack.Item grow={2}>
                         <Pivot
-                            style={{
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column"
-                            }}
+                            className={FairnessWizard.classNames.pivot}
                             styles={{
                                 itemContainer: {
                                     height: "100%"
