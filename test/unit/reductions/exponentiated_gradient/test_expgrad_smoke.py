@@ -81,7 +81,7 @@ class TestExpgradSmoke:
 
         disp = data["cons_class"]()
         disp.load_data(self.X, self.y, sensitive_features=self.A)
-        error = moments.MisclassificationError()
+        error = moments.ErrorRate()
         error.load_data(self.X, self.y, sensitive_features=self.A)
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
