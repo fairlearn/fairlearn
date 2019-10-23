@@ -77,15 +77,12 @@ class _GridGenerator:
 class GridSearch(Reduction):
     """Learner to perform a grid search given a blackbox estimator algorithm.
 
-    Parameters
-    ----------
-    estimator : Object
-        An object corresponding to the scikit-learn Estimator concept with sample
-        weights. That is it implements predict(X, y, sample_weight)
+    :param estimator: The underlying estimator to be used. Must provide a
+        fit(X, y, sample_weights) method
 
-    constraints : Moment
-        An object of type Moment which describes the constraint (demographic parity etc.)
-        to be applied
+    :param constraints: Object describing the parity constraints. This provides the reweighting
+        and relabelling
+    :type constraints: fairlearn.moments.Moment
     """
 
     _MESSAGE_Y_NOT_BINARY = "Supplied y labels are not 0 or 1"
@@ -102,6 +99,8 @@ class GridSearch(Reduction):
                  grid_size=10,
                  grid_limit=2.0,
                  grid=None):
+        """Constructor for a GridSearch object
+        """
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")
@@ -124,17 +123,15 @@ class GridSearch(Reduction):
         """Runs the grid search. This will result in multiple copies of the
         estimator being made, and the `fit` method of each one called.
 
-        Parameters
-        ----------
-        X : array_like
-            The feature data for the machine learning problem
+        :param X: The feature data for the machine learning problem
+        :type X: Array
 
-        y : array_like
-            The ground truth labels for the machine learning problem
+        :param y: The ground truth labels for the machine learning problem
+        :type y: 1-D array
 
-        sensitive_features : array_like
-            A (currently) required keyword argument listing the
+        :param sensitive_features: A (currently) required keyword argument listing the
             feature used by the constraints object
+        :type sensitive_features: 1-D array (for now)
         """
         if X is None:
             raise ValueError(self._MESSAGE_X_NONE)
@@ -228,17 +225,12 @@ class GridSearch(Reduction):
         """Provides a prediction for the given input data based
         on the best model found by the grid search.
 
-        Parameters
-        ----------
-        X : array_like
-            The data for which predictions are required
+        :param X: The data for which predictions are required
+        :type X: Array
 
-        Returns
-        -------
-        out : scalar or array_like
-            The prediction. If X represents the data for a single example
+        :return: The prediction. If X represents the data for a single example
             the result will be a scalar. Otherwise the result will be an
-            array
+        :rtype: Scalar or array
         """
         return self.best_result.predictor.predict(X)
 
