@@ -21,4 +21,4 @@ shap
 
 # Required for documentation
 sphinx
-sphinx-rtd-theme
+sphinx-docfx-yaml

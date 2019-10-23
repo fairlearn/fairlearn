@@ -11,29 +11,21 @@ _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_weight=None):
     """ Applies a metric to each subgroup of a set of data
 
-    Parameters
-    ----------
-    metric_function : function
-        Function with signature (y_true, y_pred, sample_weight=None) which returns a scalar
+    :param metric_function: Function with signature (y_true, y_pred, sample_weight=None)
+     which returns a scalar
 
-    y_true : array_like
-        The ground-truth values
+    :param y_true: Array of ground-truth values
 
-    y_pred : array_like
-        The predicted values
+    :param y_pred: Array of predicted values
 
-    group_membership : array_like
-        Indicates the group to which each input value belongs
+    :param group_membership: Array Indicating the group to which each input value belongs
 
-    sample_weight : array_like, optional
-        The weights to apply to each input value
+    :param sample_weight: Optional weights to apply to each input value
 
-    Returns
-    -------
-    out : GroupMetricResult
-        Object containing the result of applying metric_function to the entire dataset
+    :return: Object containing the result of applying metric_function to the entire dataset
         and to each group identified in group_membership.
         If the metric_function returns a scalar, then additional fields are populated
+    :rtype: fairlearn.metrics.GroupMetricResult
     """
     _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
     _check_array_sizes(y_true, group_membership, 'y_true', 'group_membership')
