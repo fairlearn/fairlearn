@@ -12,6 +12,8 @@ import { IPlotlyProperty, AccessibleChart } from "mlchartlib";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
 import { SummaryTable } from "./Controls/SummaryTable";
 import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
+import { AccuracyOptions } from "./AccuracyMetrics";
+import { NONAME } from "dns";
 
 interface IMetrics {
     globalAccuracy: number;
@@ -51,20 +53,74 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
     private static readonly classNames = mergeStyleSets({
         spinner: {
             margin: "auto",
-            fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
             padding: "40px"
         },
-        percentageText: {
-            alignSelf: "center",
-            fontSize: "55px"
+        header: {
+            padding: "0 90px",
+            backgroundColor: "#F2F2F2"
         },
-        percentageLabel: {
-            alignSelf: "center"
+        multimodelButton: {
+            marginTop: "20px",
+            padding: 0,
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "400"
+        },
+        headerTitle: {
+            paddingTop: "10px",
+            color: "#333333",
+            fontSize: "32px",
+            lineHeight: "39px",
+            fontWeight: "100"
+        },
+        headerBanner: {
+            display: "flex"
+        },
+        bannerWrapper: {
+            width: "100%",
+            paddingTop: "18px",
+            paddingBottom: "15px",
+            display: "inline-flex",
+            flexDirection: "row",
+            justifyContent: "space-between"
+        },
+        editButton: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "20px",
+            fontWeight: "400"
+        },
+        metricText: {
+            color: "#333333",
+            fontSize: "36px",
+            lineHeight: "44px",
+            fontWeight: "100",
+            paddingRight: "12px"
+        },
+        firstMetricLabel: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "400",
+            padding: "0 17px 0 12px",
+            alignSelf: "center",
+            maxWidth: "90px",
+            borderRight: "1px solid #CCCCCC",
+            marginRight: "20px"
+        },
+        metricLabel: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "400",
+            alignSelf: "center",
+            maxWidth: "130px"
         }
     });
 
     private static barPlotlyProps: IPlotlyProperty = {
-        config: { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian', 'lasso2d', 'select2d'] },
+        config: { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian', 'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'] },
         data: [
             {
                 orientation: 'h',
@@ -162,29 +218,33 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 textposition: 'auto'
             } as any
         ];
-        
+        const globalAccuracyString = this.formatNumbers(this.state.metrics.globalAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
+        const disparityAccuracyString = this.formatNumbers(this.state.metrics.accuracyDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
+        const outcomeKey = this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ? "selection_rate" : "average";
+        const globalOutcomeString = this.formatNumbers(this.state.metrics.globalOutcome, outcomeKey);
+        const disparityOutcomeString = this.formatNumbers(this.state.metrics.outcomeDisparity, outcomeKey);
         return (<div style={{height: "100%", overflowY:"auto"}}>
-            <div style={{backgroundColor: "#EBEBEB", padding: "10px 30px"}}>
-                {this.props.modelCount > 0 && <StackItem>
-                    <ActionButton iconProps={{iconName: "ChromeBack"}} onClick={this.clearModelSelection}>{localization.Report.backToComparisons}</ActionButton>
-                </StackItem>}
-                <StackItem>
-                    <Text variant={"xxLarge"}>{localization.Report.title}</Text>
-                </StackItem>
-                <Stack.Item styles={{root: {height: "100px"}}}>
-                    <Stack horizontal horizontalAlign="space-between" styles={{root: {height: "100%"}}}>
-                        <StackItem>
-                            <Stack horizontal styles={{root: {height: "100%"}}}>
-                                <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.globalAccuracy.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-                                <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.globalAccuracyText}</Text>
-                                <Separator vertical styles={WizardReport.separatorStyle} />
-                                <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.accuracyDisparity.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-                                <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.accuracyDisparityText}</Text>
-                            </Stack>
-                        </StackItem>
-                        <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
-                    </Stack>
-                </Stack.Item>
+            <div className={WizardReport.classNames.header}>
+                {this.props.modelCount > 0 &&
+                    <ActionButton
+                        className={WizardReport.classNames.multimodelButton}
+                        iconProps={{iconName: "ChevronLeft"}}
+                        onClick={this.clearModelSelection}>
+                        {localization.Report.backToComparisons}
+                    </ActionButton>}
+                <div className={WizardReport.classNames.headerTitle}>{localization.Report.title}</div>
+                <div className={WizardReport.classNames.bannerWrapper}>
+                    <div className={WizardReport.classNames.headerBanner}>
+                        <div className={WizardReport.classNames.metricText}>{globalAccuracyString}</div>
+                        <div className={WizardReport.classNames.firstMetricLabel}>{localization.Report.globalAccuracyText}</div>
+                        <div className={WizardReport.classNames.metricText}>{disparityAccuracyString}</div>
+                        <div className={WizardReport.classNames.metricLabel}>{localization.Report.accuracyDisparityText}</div>
+                    </div>
+                    <ActionButton
+                        className={WizardReport.classNames.editButton}
+                        iconProps={{iconName: "Edit"}}
+                        onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
+                </div>
             </div>
             <div style={{padding: "10px 30px", height:"400px"}}>
                 <Stack horizontal styles={{root: {height: "100%"}}}>
@@ -200,19 +260,16 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     </Stack.Item>
                 </Stack>
             </div>
-            <div style={{backgroundColor: "#EBEBEB", padding: "10px 30px"}}>
-                <Stack.Item styles={{root: {height: "120px"}}}>
-                    <StackItem>
-                        <Text variant={"xxLarge"}>{localization.Report.outcomesTitle}</Text>
-                    </StackItem>
-                    <Stack horizontal styles={{root: {height: "100%"}}}>
-                        <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.globalOutcome.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-                        <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.globalOutcomeText}</Text>
-                        <Separator vertical styles={WizardReport.separatorStyle} />
-                        <Text className={WizardReport.classNames.percentageText}>{this.state.metrics.outcomeDisparity.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-                        <Text variant={"medium"} className={WizardReport.classNames.percentageLabel}>{localization.Report.outcomeDisparityText}</Text>
-                    </Stack>
-                </Stack.Item>
+            <div className={WizardReport.classNames.header}>
+                <div className={WizardReport.classNames.headerTitle}>{localization.Report.outcomesTitle}</div>
+                <div className={WizardReport.classNames.bannerWrapper}>
+                    <div className={WizardReport.classNames.headerBanner}>
+                        <div className={WizardReport.classNames.metricText}>{globalOutcomeString}</div>
+                        <div className={WizardReport.classNames.firstMetricLabel}>{localization.Report.globalOutcomeText}</div>
+                        <div className={WizardReport.classNames.metricText}>{disparityOutcomeString}</div>
+                        <div className={WizardReport.classNames.metricLabel}>{localization.Report.outcomeDisparityText}</div>
+                    </div>
+                </div>
             </div>
             <div style={{padding: "10px 30px", height:"400px"}}>
                 <Stack horizontal styles={{root: {height: "100%"}}}>
@@ -229,6 +286,17 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 </Stack>
             </div>
         </div>);
+    }
+
+    private readonly formatNumbers = (value: number, key: string, isRatio: boolean = false): string => {
+        if (value === null || value === undefined) {
+            return NaN.toString();
+        }
+        const styleObject = {maximumSignificantDigits: 3};
+        if (AccuracyOptions[key].isPercentage && !isRatio) {
+            (styleObject as any).style = "percent";
+        }
+        return value.toLocaleString(undefined, styleObject);
     }
 
     private readonly clearModelSelection = (): void => {

@@ -69,6 +69,10 @@
         "meanAbsoluteError": "Mean absolute error",
         "meanSquaredError": "Mean squared error",
         "meanSquaredLogError": "Mean squared log error",
-        "medianAbsoluteError": "Median absolute error"
+        "medianAbsoluteError": "Median absolute error",
+        "average": "Average",
+        "selectionRate": "Selection rate",
+        "overprediction": "Overprediction",
+        "underprediction": "Underprediction"
     }
 }

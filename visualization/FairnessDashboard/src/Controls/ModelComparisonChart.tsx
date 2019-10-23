@@ -31,7 +31,7 @@ export interface IState {
 
 export class ModelComparisonChart extends React.PureComponent<IModelComparisonProps, IState> {
     private readonly plotlyProps: IPlotlyProperty = {
-        config: { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian', 'lasso2d', 'select2d'] },
+        config: { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian', 'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'] },
         data: [
             {
                 datapointLevelAccessors: {
