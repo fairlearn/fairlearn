@@ -78,17 +78,9 @@ class ExponentiatedGradient(Reduction):
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
-    def predict_proba(self, X):
+    def _pmf_predict(self, X):
         positive_probs = self._best_classifier(X)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
-
-    def posterior_predict(self, X):
-        # TODO provide implementation
-        raise NotImplementedError()
-
-    def posterior_predict_proba(self, X):
-        # TODO provide implementation
-        raise NotImplementedError()
 
 
 def exponentiated_gradient(X, A, y, estimator,
