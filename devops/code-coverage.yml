@@ -10,7 +10,6 @@ schedules:
   branches:
     include:
       - master
-      - dev
   always: true
 
 jobs:
