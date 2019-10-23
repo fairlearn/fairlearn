@@ -91,16 +91,11 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
 def make_group_metric(metric_function):
     """Function to turn a regular metric into a grouped metric
 
-    Parameters
-    ----------
-    metric_function : function
-        The function to be wrapped. Metric functions are assumed
-        to have signature (y_true, y_pred, sample_weight)
+    :param metric_function: The function to be wrapped
+    :type metric_function: A function with signature (y_true, y_pred, sample_weight)
 
-    Returns
-    -------
-    out : function
-        A function with signature (y_true, y_pred, group_membership, sample_weight)
+    :return: A wrapped version of the supplied metric_function
+    :rtype: A function with signature (y_true, y_pred, group_membership, sample_weight)
     """
     def wrapper(y_true, y_pred, group_membership, sample_weight=None):
         return metric_by_group(metric_function,
