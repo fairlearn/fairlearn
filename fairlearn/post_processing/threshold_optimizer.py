@@ -37,7 +37,7 @@ SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains 
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
 
-_SUPPORTED_constraints = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
+_SUPPORTED_CONSTRAINTS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class ThresholdOptimizer(PostProcessing):
             constraints=constraints)
 
         self._constraints = constraints
-        if self._constraints not in _SUPPORTED_constraints:
+        if self._constraints not in _SUPPORTED_CONSTRAINTS:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
         self._grid_size = grid_size
