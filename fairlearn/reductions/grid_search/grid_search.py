@@ -30,8 +30,7 @@ class _GridGenerator:
             true_dim = self.dim
 
         # a conservative lower bound on the scaling parameter of the grid
-        n_units = (float(grid_size) / (2.0**neg_allowed.sum())
-                   ) ** (1.0 / true_dim) - 1
+        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0 / true_dim) - 1   # noqa: E501
         n_units = int(np.floor(n_units))
         if n_units < 0:
             n_units = 0
@@ -72,8 +71,7 @@ class _GridGenerator:
                 values = range(min_val, max_val + 1)
             for current_value in values:
                 self.entry[index] = current_value
-                self.accumulate_integer_grid(
-                    index + 1, max_val - abs(current_value))
+                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))   # noqa: E501
 
 
 class GridSearch(Reduction):
@@ -111,8 +109,7 @@ class GridSearch(Reduction):
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
-                raise RuntimeError(
-                    "Must specify constraint_weight between 0.0 and 1.0")
+                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")   # noqa: E501
         else:
             raise RuntimeError("Unsupported selection rule")
         self.selection_rule = selection_rule
@@ -146,12 +143,11 @@ class GridSearch(Reduction):
             raise ValueError(self._MESSAGE_Y_NONE)
 
         if _KW_SENSITIVE_FEATURES not in kwargs:
-            raise RuntimeError(
-                "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES))
+            msg = "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES)
+            raise RuntimeError(msg)
 
         # Extract the target attribute
-        sensitive = self._make_vector(
-            kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
+        sensitive = self._make_vector(kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
 
         unique_labels = np.unique(sensitive)
         if len(unique_labels) > 2:
@@ -178,15 +174,13 @@ class GridSearch(Reduction):
         self.constraints.load_data(X, y_vector, **kwargs)
         objective = self.constraints.default_objective()
         objective.load_data(X, y_vector, **kwargs)
-        is_classification_reduction = isinstance(
-            self.constraints, ClassificationMoment)
+        is_classification_reduction = isinstance(self.constraints, ClassificationMoment)
 
         # Basis information
         pos_basis = self.constraints.pos_basis
         neg_basis = self.constraints.neg_basis
         neg_allowed = self.constraints.neg_basis_present
-        objective_in_the_span = (
-            self.constraints.default_objective_lambda_vec is not None)
+        objective_in_the_span = (self.constraints.default_objective_lambda_vec is not None)
 
         if self.grid is None:
             grid = _GridGenerator(self.grid_size,
