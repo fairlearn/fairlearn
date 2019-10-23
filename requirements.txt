@@ -13,6 +13,7 @@ flake8
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
+tempeh>=0.1.2
 
 # Required for notebooks
 jupyter
