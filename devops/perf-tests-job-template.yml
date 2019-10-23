@@ -13,6 +13,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+  timeoutInMinutes: 120
 
   steps:
   - task: UsePythonVersion@0
