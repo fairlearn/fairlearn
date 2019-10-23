@@ -34,13 +34,13 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
     private static readonly classNames = mergeStyleSets({
         itemCell: [
           {
-            padding: 10,
+            padding: "30px 36px 20px 0",
             width: "100%",
             position: "relative",
             float: "left",
             cursor: "pointer",
             boxSizing: "border-box",
-            border: `1px solid grey`,
+            borderBottom: "1px solid #CCCCCC",
             selectors: {
               '&:hover': { background: "lightgray" }
             }
@@ -58,6 +58,11 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
         frame: {
             height: "100%",
         },
+        main: {
+            height: "100%",
+            maxWidth: "700px",
+            flex: 1
+        },
         header: {
             color: "#333333",
             fontSize: "32px",
@@ -69,6 +74,23 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             fontSize: "18px",
             lineHeight: "24px",
             fontWeight: "300"
+        },
+        tableHeader: {
+            borderBottom: "1px solid #CCCCCC"
+        },
+        itemTitle: {
+            margin: 0,
+            color: "#333333",
+            fontSize: "22px",
+            lineHeight: "26px",
+            fontWeight: "300"
+        },
+        valueCount: {
+            paddingTop: "15px",
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "18px",
+            fontWeight: "500"
         }
     });
 
@@ -79,31 +101,29 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
     
     render(): React.ReactNode {
         return(
-            <Stack horizontal className={FeatureTab.classNames.frame}>
-                <StackItem grow={2}>
-                    <Stack style={{height: "100%"}}>
-                        <h2 className={FeatureTab.classNames.header}>
-                            {localization.Feature.header}
-                        </h2>
-                        <p className={FeatureTab.classNames.textBody}>{localization.Feature.body}</p>
-                        <StackItem grow={2} className={FeatureTab.classNames.itemsList}>
-                            <List
-                                items={this.props.featureBins.map((bin, index) => {
-                                    return {
-                                        title: this.props.dashboardContext.modelMetadata.featureNames[bin.featureIndex],
-                                        description: localization.formatString(localization.Feature.summaryCategoricalCount, bin.array.length) as string,
-                                        onSelect: this.props.selectedFeatureChange.bind(this, bin.featureIndex),
-                                        selected: this.props.selectedFeatureIndex === bin.featureIndex,
-                                        categories: bin.array as string[]
-                                    };
-                                })}
-                                onRenderCell={this._onRenderCell}
-                            />
-                        </StackItem>
-                        <Separator />
-                        <WizardFooter onNext={this.props.onNext}/>
-                    </Stack>
-                </StackItem>
+            <Stack horizontal horizontalAlign="space-between" className={FeatureTab.classNames.frame}>
+                <Stack className={FeatureTab.classNames.main}>
+                    <h2 className={FeatureTab.classNames.header}>
+                        {localization.Feature.header}
+                    </h2>
+                    <p className={FeatureTab.classNames.textBody}>{localization.Feature.body}</p>
+                    <div className={FeatureTab.classNames.tableHeader}></div>
+                    <StackItem grow={2} className={FeatureTab.classNames.itemsList}>
+                        <List
+                            items={this.props.featureBins.map((bin, index) => {
+                                return {
+                                    title: this.props.dashboardContext.modelMetadata.featureNames[bin.featureIndex],
+                                    description: localization.formatString(localization.Feature.summaryCategoricalCount, bin.array.length) as string,
+                                    onSelect: this.props.selectedFeatureChange.bind(this, bin.featureIndex),
+                                    selected: this.props.selectedFeatureIndex === bin.featureIndex,
+                                    categories: bin.array as string[]
+                                };
+                            })}
+                            onRenderCell={this._onRenderCell}
+                        />
+                    </StackItem>
+                    <WizardFooter onNext={this.props.onNext}/>
+                </Stack>
                 <DataSpecificationBlade
                         numberRows={this.props.dashboardContext.dataset.length}
                         featureNames={this.props.dashboardContext.modelMetadata.featureNames}/>
@@ -120,9 +140,9 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             data-is-focusable={true}
           >
             {item.selected && (<Icon iconName="CompletedSolid" className={FeatureTab.classNames.iconClass}/>)}
-            <h2>{item.title}</h2>
-            <p>{item.description}</p>
-            {!this.state.expandedBins.includes(index) && (                    
+            <h2 className={FeatureTab.classNames.itemTitle}>{item.title}</h2>
+            <p className={FeatureTab.classNames.valueCount}>{item.description}</p>
+            {!this.state.expandedBins.includes(index) && (
                 <ActionButton 
                     iconProps={{iconName: "Forward"}}
                     onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>)}

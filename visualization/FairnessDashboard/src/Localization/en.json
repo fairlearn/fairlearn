@@ -34,7 +34,9 @@
         "getStarted": "Get started"
     },
     "ModelComparison": {
-        "title": "Model Comparison"
+        "title": "Model Comparison",
+        "howToRead": "How to read this chart",
+        "insights": "Insights"
     },
     "Report": {
         "title": "Disparity in Accuracy",

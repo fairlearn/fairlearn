@@ -74,12 +74,81 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     };
 
     private static readonly classNames = mergeStyleSets({
+        frame: {
+            height: "100%"
+        },
         spinner: {
             margin: "auto",
-            fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
             padding: "40px"
         },
-        
+        header: {
+            backgroundColor: "#EBEBEB",
+            padding: "0 90px",
+            height: "90px",
+            display: "inline-flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center"
+        },
+        headerTitle: {
+            color: "#333333",
+            fontSize: "32px",
+            lineHeight: "39px",
+            fontWeight: "100"
+        },
+        editButton: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "20px",
+            fontWeight: "400"
+        },
+        main: {
+            height: "100%",
+            flex: 1,
+            display: "inline-flex",
+            flexDirection: "row"
+        },
+        mainRight: {
+            padding: "30px 90px 0 35px",
+            width: "300px"
+        },
+        rightTitle: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "500",
+            paddingBottom: "18px",
+            borderBottom: "1px solid #CCCCCC"
+        },
+        rightText: {
+            paddingTop: "16px",
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "18px",
+            fontWeight: "400",
+            paddingBottom: "30px",
+            borderBottom: "0.5px dashed #CCCCCC"
+        },
+        insights: {
+            textTransform: "uppercase",
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "500",
+            padding: "18px 0",
+        },
+        insightsText: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "400",
+            paddingBottom: "18px",
+            borderBottom: "1px solid #CCCCCC"
+        },
+        chart: {
+            padding: "60px 0 100px 35px",
+            flex: 1
+        }
     });
 
     public render(): React.ReactNode {
@@ -105,25 +174,26 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         });
         props.layout.xaxis.title = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title;
         return (
-            <Stack styles={{root: {height: "100%"}}}>
-                <StackItem styles={{root: {backgroundColor: "#EBEBEB", padding: "10px 30px", height: "150px"}}}>
-                    <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={{root: {height: "100%"}}}>
-                        <Text variant={"xxLarge"}>{localization.ModelComparison.title}</Text>
-                        <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
-                    </Stack>
-                </StackItem>
-                <StackItem grow={2}>
-                    <Stack horizontal horizontalAlign="space-between" styles={{root: {height: "100%"}}}>
-                        <StackItem grow={2}>
-                            <AccessibleChart
-                                plotlyProps={props}
-                                sharedSelectionContext={this.props.selections}
-                                theme={undefined}
-                            />
-                        </StackItem>
-                        <p style={{width: "300px"}}>"Lorem Ipsum goes here......."</p>
-                    </Stack>
-                </StackItem>
+            <Stack className={ModelComparisonChart.classNames.frame}>
+                <div className={ModelComparisonChart.classNames.header}>
+                    <h2 className={ModelComparisonChart.classNames.headerTitle}>{localization.ModelComparison.title}</h2>
+                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={ModelComparisonChart.classNames.editButton}>{localization.Report.editConfiguration}</ActionButton>
+                </div>
+                <div className={ModelComparisonChart.classNames.main}>
+                    <div className={ModelComparisonChart.classNames.chart}>
+                        <AccessibleChart
+                            plotlyProps={props}
+                            sharedSelectionContext={this.props.selections}
+                            theme={undefined}
+                        />
+                    </div>
+                    <div className={ModelComparisonChart.classNames.mainRight}>
+                        <div className={ModelComparisonChart.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
+                        <div className={ModelComparisonChart.classNames.rightText}>{localization.loremIpsum}</div>
+                        <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={ModelComparisonChart.classNames.insightsText}>{localization.loremIpsum}</div>
+                    </div>
+                </div>
             </Stack>);
     }
 

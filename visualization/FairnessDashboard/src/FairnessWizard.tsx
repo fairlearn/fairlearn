@@ -243,6 +243,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     dashboardContext={this.state.dashboardContext}
                                     accuracyPickerProps={accuracyPickerProps}
                                     onNext={this.setTab.bind(this, flights.skipDisparity ? reportTabKey : disparityTabKey)}
+                                    onPrevious={this.setTab.bind(this, featureBinTabKey)}
                                 />
                             </PivotItem>
                             {(flights.skipDisparity === false) && (<PivotItem headerText={"Parity"} itemKey={disparityTabKey}>
