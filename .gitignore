@@ -110,4 +110,4 @@ venv.bak/
 /.vscode
 
 # Documentation
-docs/source/
+docbuild/

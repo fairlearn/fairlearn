@@ -21,4 +21,3 @@ shap
 
 # Required for documentation
 sphinx
-sphinx-docfx-yaml
