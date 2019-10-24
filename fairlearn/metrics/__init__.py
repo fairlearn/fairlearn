@@ -6,7 +6,7 @@
 
 import sklearn.metrics as skm
 
-from .group_metric_result import GroupMetricResult  # noqa: F401
+from ._group_metric_result import GroupMetricResult  # noqa: F401
 from .metrics_engine import metric_by_group, make_group_metric  # noqa: F401
 
 from .skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
