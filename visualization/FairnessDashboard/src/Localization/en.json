@@ -36,7 +36,10 @@
     "ModelComparison": {
         "title": "Model Comparison",
         "howToRead": "How to read this chart",
-        "insights": "Insights"
+        "insights": "Insights",
+        "howToReadText": "The chart shows {0} and disparity of {1}.",
+        "insightsText1": "The most accurate predictor achieves {0} of {1} and a disparity of {2}.",
+        "insightsText2": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}."
     },
     "Report": {
         "title": "Disparity in Accuracy",

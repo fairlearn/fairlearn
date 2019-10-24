@@ -22,37 +22,6 @@ interface IBinItem {
 
 export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
     private static readonly classNames = mergeStyleSets({
-        itemCell: [
-          {
-            display: "inline-flex",
-            width: "100%",
-            position: "relative",
-            float: "left",
-            boxSizing: "border-box",
-            border: `1px solid grey`,
-            height: "100%"
-          }
-        ],
-        itemsList: {
-            paddingTop: "20px",
-            paddingBottom: "57px",
-            boxSizing: "border-box",
-            height: "100%",
-            width: "300px",
-            selectors: {
-                ".ms-List-surface": {
-                    height: "100%"
-                },
-                ".ms-List-page": {
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column"
-                },
-                ".ms-List-cell": {
-                    flex: 1
-                }
-            }
-        },
         minMaxLabel: {
             padding: "1px 9px",
             marginTop: "4px",
@@ -73,7 +42,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "500",
-            paddingBottom: "12px"
+            height: "26px"
         },
         flexCol: {
             display: "flex",
@@ -108,10 +77,10 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         metricLabel: {
             color: "#333333",
             fontSize: "12px",
-            lineHeight: "16px",
+            lineHeight: "12px",
             fontWeight: "500",
-            paddingLeft: "18px",
-            paddingBottom: "12px",
+            alignSelf: "center",
+            height: "26px"
         },
         metricBox: {
             flex: 1,
@@ -128,7 +97,8 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
 
         },
         frame: {
-            paddingBottom: "24px"
+            paddingBottom: "19px",
+            display: "flex"
         }
     });
     

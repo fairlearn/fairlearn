@@ -125,7 +125,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         },
         chartWrapper: {
             flex: 1,
-            paddingTop: "30px"
+            paddingTop: "23px"
         },
         mainRight: {
             paddingLeft: "35px",
@@ -218,7 +218,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             );
         }
 
-        const alternateHeight = this.props.featureBinPickerProps.featureBins.length * 60 + 102;
+        const alternateHeight = this.props.featureBinPickerProps.featureBins.length * 60 + 106;
         const areaHeights = Math.max(460, alternateHeight);
 
         const accuracyKey = this.props.accuracyPickerProps.selectedAccuracyKey;

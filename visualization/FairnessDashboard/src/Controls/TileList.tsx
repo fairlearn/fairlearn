@@ -35,6 +35,7 @@ export class TileList extends React.PureComponent<ITileListProps> {
             boxSizing: "border-box",
             backgroundColor: "#FFFFFF",
             marginBottom: "10px",
+            marginRight: "10px",
             selectors: {
               '&:hover': { background: "lightgray" }
             }

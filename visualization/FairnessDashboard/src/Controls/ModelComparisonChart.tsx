@@ -12,6 +12,7 @@ import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { mergeStyleSets } from "@uifabric/styling";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
 import { AccuracyOptions } from "../AccuracyMetrics";
+import { FormatMetrics } from "../FormatMetrics";
 
 export interface IModelComparisonProps {
     dashboardContext: IFairnessContext;
@@ -166,6 +167,49 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 index: index
             };
         });
+
+        let minAccuracy: number = Number.MAX_SAFE_INTEGER;
+        let maxAccuracy: number = Number.MIN_SAFE_INTEGER;
+        let maxDisparity: number = Number.MIN_SAFE_INTEGER;
+        let minDisparity: number = Number.MAX_SAFE_INTEGER;
+        let minAccuracyIndex: number;
+        let maxAccuracyIndex: number;
+        let minDisparityIndex: number;
+        let maxDisparityIndex: number;
+        this.state.accuracyArray.forEach((value, index) => {
+            if (value >= maxAccuracy) {
+                maxAccuracyIndex = index;
+                maxAccuracy = value;
+            }
+            if (value <= minAccuracy) {
+                minAccuracyIndex = index;
+                minAccuracy = value;
+            }
+        });
+        this.state.disparityArray.forEach((value, index) => {
+            if (value >= maxDisparity) {
+                maxDisparityIndex = index;
+                maxDisparity = value;
+            }
+            if (value <= minDisparity) {
+                minDisparityIndex = index;
+                minDisparity = value;
+            }
+        });
+
+        const insights1 = localization.formatString(
+            localization.ModelComparison.insightsText1,
+            AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title,
+            FormatMetrics.formatNumbers(maxAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey),
+            FormatMetrics.formatNumbers(this.state.disparityArray[maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
+        );
+
+        const insights2 = localization.formatString(
+            localization.ModelComparison.insightsText2,
+            AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title,
+            FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
+            FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey)
+        );
         
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
@@ -191,7 +235,10 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         <div className={ModelComparisonChart.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
                         <div className={ModelComparisonChart.classNames.rightText}>{localization.loremIpsum}</div>
                         <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={ModelComparisonChart.classNames.insightsText}>{localization.loremIpsum}</div>
+                        <div className={ModelComparisonChart.classNames.insightsText}>
+                            <div>{insights1}</div>
+                            <div>{insights2}</div>
+                        </div>
                     </div>
                 </div>
             </Stack>);
