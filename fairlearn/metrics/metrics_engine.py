@@ -11,20 +11,21 @@ _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_weight=None):
     """ Applies a metric to each subgroup of a set of data
 
-    :param metric_function
-    :type Function with signature (y_true, y_pred, sample_weight=None) which returns a scalar
+    :param metric_function: Function with signature ``(y_true, y_pred, sample_weight=None)``
+     which returns a scalar
 
-    :param y_true
-    :type Array of actual results (must be 0 or 1)
+    :param y_true: Array of ground-truth values
 
-    :param y_pred
-    :type Array of predicted results (must be 0 or 1)
+    :param y_pred: Array of predicted values
 
-    :param group_membership
-    :type Array indicating the group to which each result belongs
+    :param group_membership: Array Indicating the group to which each input value belongs
 
-    :param sample_weight
-    :type Array of weights to apply to each result
+    :param sample_weight: Optional weights to apply to each input value
+
+    :return: Object containing the result of applying metric_function to the entire dataset
+        and to each group identified in group_membership.
+        If the metric_function returns a scalar, then additional fields are populated
+    :rtype: fairlearn.metrics.GroupMetricResult
     """
     _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
     _check_array_sizes(y_true, group_membership, 'y_true', 'group_membership')
@@ -88,6 +89,16 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
 
 
 def make_group_metric(metric_function):
+    """Function to turn a regular metric into a grouped metric
+
+    :param metric_function: The function to be wrapped. This must have signature
+        ``(y_true, y_pred, sample_weight)``
+    :type metric_function: func
+
+    :return: A wrapped version of the supplied metric_function. It will have
+        signature ``(y_true, y_pred, group_membership, sample_weight)``
+    :rtype: func
+    """
     def wrapper(y_true, y_pred, group_membership, sample_weight=None):
         return metric_by_group(metric_function,
                                y_true,

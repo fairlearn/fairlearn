@@ -130,7 +130,7 @@ class _Lagrangian:
         redW = self.n * redW / redW.sum()
 
         classifier = pickle.loads(self.pickled_learner)
-        classifier.fit(self.X, redY, redW)
+        classifier.fit(self.X, redY, sample_weight=redW)
         self.n_oracle_calls += 1
 
         def h(X): return classifier.predict(X)

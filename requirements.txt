@@ -13,8 +13,12 @@ flake8
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
+tempeh>=0.1.4
 
 # Required for notebooks
 jupyter
 nbval
 shap
+
+# Required for documentation
+sphinx

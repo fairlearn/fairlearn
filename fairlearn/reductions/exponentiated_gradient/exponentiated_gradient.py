@@ -4,9 +4,6 @@
 """
 This module implements the Lagrangian reduction of fair binary
 classification to standard binary classification.
-
-FUNCTIONS
-exponentiated_gradient -- optimize accuracy subject to fairness constraints
 """
 
 import logging
@@ -53,6 +50,27 @@ class ExponentiatedGradientResult:
 
 
 class ExponentiatedGradient(Reduction):
+    """An Estimator which implements the exponentiated gradient approach to
+    reductions described by `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    :param estimator: The underlying estimator to be used. Must provide a
+        fit(X, y, sample_weights) method
+
+    :param constraints: Object describing the parity constraints
+    :type constraints: fairlearn.moments.Moment
+
+    :param eps: ?
+    :type eps: float
+
+    :param T: Maximum number of iterations
+    :type T: int
+
+    :param nu: ?
+    :type nu: ?
+
+    :param eta_mul: ?
+    :type eta_mul: float
+    """
     def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
         self._estimator = estimator
         self._constraints = constraints
@@ -65,7 +83,20 @@ class ExponentiatedGradient(Reduction):
 
     def fit(self, X, y, **kwargs):
         # TODO: validate input data; unify between grid search and expgrad?
-        self._expgrad_result = exponentiated_gradient(X, kwargs[_KW_SENSITIVE_FEATURES], y,
+
+        if type(X) in [np.ndarray, list]:
+            X_train = pd.DataFrame(X)
+        else:
+            X_train = X
+
+        if type(y) in [np.ndarray, list]:
+            y_train = pd.Series(y)
+        else:
+            y_train = y
+
+        self._expgrad_result = exponentiated_gradient(X_train,
+                                                      kwargs[_KW_SENSITIVE_FEATURES],
+                                                      y_train,
                                                       self._estimator,
                                                       constraints=self._constraints,
                                                       eps=self._eps, T=self._T, nu=self._nu,
@@ -78,17 +109,9 @@ class ExponentiatedGradient(Reduction):
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
-    def predict_proba(self, X):
+    def _pmf_predict(self, X):
         positive_probs = self._best_classifier(X)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
-
-    def posterior_predict(self, X):
-        # TODO provide implementation
-        raise NotImplementedError()
-
-    def posterior_predict_proba(self, X):
-        # TODO provide implementation
-        raise NotImplementedError()
 
 
 def exponentiated_gradient(X, A, y, estimator,
