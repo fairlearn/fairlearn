@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from . import GroupMetricResult
+from ._group_metric_result import GroupMetricResult
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 

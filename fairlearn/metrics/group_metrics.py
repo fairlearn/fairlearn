@@ -20,25 +20,6 @@ from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F4
 from ._skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
 from ._skm_wrappers import group_mean_squared_error  # noqa: F401
 
-
-__all__ = [
-    "group_accuracy_score",
-    "group_balanced_root_mean_squared_error",
-    "group_confusion_matrix",
-    "group_fallout_rate",
-    "group_mean_prediction",
-    "group_mean_overprediction",
-    "group_mean_squared_error",
-    "group_mean_underprediction",
-    "group_miss_rate",
-    "group_precision_score",
-    "group_recall_score",
-    "group_roc_auc_score",
-    "group_selection_rate",
-    "group_specificity_score",
-    "group_zero_one_loss"
-]
-
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
 """A grouped metric for the specificity score
@@ -69,7 +50,8 @@ group_median_absolute_error = make_group_metric(skm.median_absolute_error)
 """A grouped wrapper around the sklearn.metrics.median_absolute_error
 """
 
-group_balanced_root_mean_squared_error = make_group_metric(balanced_root_mean_squared_error)
+group_balanced_root_mean_squared_error = make_group_metric(
+    balanced_root_mean_squared_error)
 """A grouped wrapper around the balanced_root_mean_squared_error routine
 """
 

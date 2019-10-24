@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 
 import fairlearn.metrics as metrics
-import fairlearn.metrics._metrics_engine as m_me
 
 # ===========================================================
 
@@ -236,7 +235,7 @@ class TestMakeGroupMetric:
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 1, 1]
 
-        grouped_metric_func = m_me.make_group_metric(mock_func)
+        grouped_metric_func = metrics.make_group_metric(mock_func)
         result = grouped_metric_func(y_a, y_p, gid)
         assert result.overall == 5
         assert len(result.by_group) == 2
@@ -263,7 +262,7 @@ class TestMakeGroupMetric:
         gid = transform_gid([a, z, a, b, b, c, c, c])
         s_w = transform_s_w([1, 1, 1, 5, 5, 7, 7, 7])
 
-        grouped_metric_func = m_me.make_group_metric(mock_func_weight)
+        grouped_metric_func = metrics.make_group_metric(mock_func_weight)
         result = grouped_metric_func(y_a, y_p, gid, s_w)
         assert result.overall == 28
         assert len(result.by_group) == 4
