@@ -9,7 +9,7 @@ to each of the subgroups identified in the input data.
 import sklearn.metrics as skm
 
 from ._balanced_root_mean_squared_error import balanced_root_mean_squared_error
-from .extra_metrics import specificity_score, miss_rate, fallout_rate
+from ._extra_metrics import specificity_score, miss_rate, fallout_rate
 from ._selection_rate import group_selection_rate  # noqa: F401
 from ._mean_predictions import mean_prediction, mean_overprediction, mean_underprediction
 
