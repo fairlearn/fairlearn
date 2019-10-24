@@ -5,7 +5,7 @@ import pytest
 import numpy as np
 import sklearn.metrics as skm
 
-import fairlearn.metrics.group_metrics as group_metrics
+import fairlearn.metrics.group_metrics as gm
 
 # ======================================================
 
@@ -28,22 +28,22 @@ group2 = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 # Define as a dictionary so that the actual name can be seen
 # when pytest builds the tests
 
-supported_metrics_weighted = [(skm.accuracy_score, group_metrics.group_accuracy_score),
-                              (skm.confusion_matrix, group_metrics.group_confusion_matrix),
-                              (skm.zero_one_loss, group_metrics.group_zero_one_loss)]
+supported_metrics_weighted = [(skm.accuracy_score, gm.group_accuracy_score),
+                              (skm.confusion_matrix, gm.group_confusion_matrix),
+                              (skm.zero_one_loss, gm.group_zero_one_loss)]
 
 # The following only work with binary data when called with their default arguments
-supported_metrics_weighted_binary = [(skm.precision_score, group_metrics.group_precision_score),
-                                     (skm.recall_score, group_metrics.group_recall_score),
-                                     (skm.roc_auc_score, group_metrics.group_roc_auc_score),
-                                     (skm.mean_squared_error, group_metrics.group_mean_squared_error)]
+supported_metrics_weighted_binary = [(skm.precision_score, gm.group_precision_score),
+                                     (skm.recall_score, gm.group_recall_score),
+                                     (skm.roc_auc_score, gm.group_roc_auc_score),
+                                     (skm.mean_squared_error, gm.group_mean_squared_error)]
 supported_metrics_weighted_binary = supported_metrics_weighted_binary + supported_metrics_weighted
 
 
-metrics_no_sample_weights = [(skm.max_error, group_metrics.group_max_error),
-                             (skm.mean_absolute_error, group_metrics.group_mean_absolute_error),
-                             (skm.mean_squared_log_error, group_metrics.group_mean_squared_log_error),
-                             (skm.median_absolute_error, group_metrics.group_median_absolute_error)]
+metrics_no_sample_weights = [(skm.max_error, gm.group_max_error),
+                             (skm.mean_absolute_error, gm.group_mean_absolute_error),
+                             (skm.mean_squared_log_error, gm.group_mean_squared_log_error),
+                             (skm.median_absolute_error, gm.group_median_absolute_error)]
 
 supported_metrics_unweighted = metrics_no_sample_weights + supported_metrics_weighted_binary
 
@@ -100,7 +100,7 @@ def test_metric_weighted_ternary(func_tuple):
 # ======================================================================================
 
 def test_group_accuracy_score_unnormalized():
-    result = metrics.group_accuracy_score(Y_true, Y_pred, groups, normalize=False)
+    result = gm.group_accuracy_score(Y_true, Y_pred, groups, normalize=False)
 
     expected_overall = skm.accuracy_score(Y_true, Y_pred, False)
 
@@ -112,7 +112,7 @@ def test_group_accuracy_score_unnormalized():
 def test_group_confusion_matrix_labels():
     labels = [0, 4]
 
-    result = metrics.group_confusion_matrix(Y_true, Y_pred, groups, labels=labels)
+    result = gm.group_confusion_matrix(Y_true, Y_pred, groups, labels=labels)
     expected_overall = skm.confusion_matrix(Y_true, Y_pred, labels=labels)
 
     assert np.array_equal(result.overall, expected_overall)
@@ -121,14 +121,17 @@ def test_group_confusion_matrix_labels():
 # ======================================================================================
 
 def test_group_precision_score_ternary():
-    result = metrics.group_precision_score(Y_true_ternary, Y_pred_ternary, group2, average=None)
+    result = gm.group_precision_score(Y_true_ternary,
+                                      Y_pred_ternary,
+                                      group2,
+                                      average=None)
     expected_overall = skm.precision_score(Y_true_ternary, Y_pred_ternary, average=None)
 
     assert np.array_equal(result.overall, expected_overall)
 
 
 def test_group_precision_score_pos_label():
-    result = metrics.group_precision_score(Y_true, Y_pred, groups, pos_label=0)
+    result = gm.group_precision_score(Y_true, Y_pred, groups, pos_label=0)
     expected_overall = skm.precision_score(Y_true, Y_pred, pos_label=0)
 
     assert np.array_equal(result.overall, expected_overall)
@@ -137,14 +140,14 @@ def test_group_precision_score_pos_label():
 
 
 def test_group_recall_score_ternary():
-    result = metrics.group_recall_score(Y_true_ternary, Y_pred_ternary, group2, average=None)
+    result = gm.group_recall_score(Y_true_ternary, Y_pred_ternary, group2, average=None)
     expected_overall = skm.recall_score(Y_true_ternary, Y_pred_ternary, average=None)
 
     assert np.array_equal(result.overall, expected_overall)
 
 
 def test_group_recall_score_pos_label():
-    result = metrics.group_recall_score(Y_true, Y_pred, groups, pos_label=0)
+    result = gm.group_recall_score(Y_true, Y_pred, groups, pos_label=0)
     expected_overall = skm.recall_score(Y_true, Y_pred, pos_label=0)
 
     assert np.array_equal(result.overall, expected_overall)
@@ -153,14 +156,14 @@ def test_group_recall_score_pos_label():
 
 
 def test_group_roc_auc_score_average():
-    result = metrics.group_roc_auc_score(Y_true, Y_pred, groups, average='samples')
+    result = gm.group_roc_auc_score(Y_true, Y_pred, groups, average='samples')
     expected_overall = skm.roc_auc_score(Y_true, Y_pred, average='samples')
 
     assert expected_overall == result.overall
 
 
 def test_group_roc_auc_score_max_fpr():
-    result = metrics.group_roc_auc_score(Y_true, Y_pred, groups, max_fpr=0.5)
+    result = gm.group_roc_auc_score(Y_true, Y_pred, groups, max_fpr=0.5)
     expected_overall = skm.roc_auc_score(Y_true, Y_pred, max_fpr=0.5)
 
     assert expected_overall == result.overall
@@ -169,7 +172,7 @@ def test_group_roc_auc_score_max_fpr():
 
 
 def test_group_zero_one_loss_unnormalized():
-    result = metrics.group_zero_one_loss(Y_true, Y_pred, groups, normalize=False)
+    result = gm.group_zero_one_loss(Y_true, Y_pred, groups, normalize=False)
 
     expected_overall = skm.zero_one_loss(Y_true, Y_pred, False)
 
@@ -181,7 +184,7 @@ def test_group_zero_one_loss_unnormalized():
 def test_group_mean_squared_error_multioutput():
     y_t = np.random.rand(len(groups), 2)
     y_p = np.random.rand(len(groups), 2)
-    result = metrics.group_mean_squared_error(y_t, y_p, groups, multioutput='raw_values')
+    result = gm.group_mean_squared_error(y_t, y_p, groups, multioutput='raw_values')
 
     expected_overall = skm.mean_squared_error(y_t, y_p, multioutput='raw_values')
 
