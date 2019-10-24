@@ -117,6 +117,55 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             fontWeight: "400",
             alignSelf: "center",
             maxWidth: "130px"
+        },
+        presentationArea: {
+            display: "flex",
+            flexDirection: "row",
+            padding: "20px 40px 30px 90px"
+        },
+        chartWrapper: {
+            flex: 1,
+            paddingTop: "30px"
+        },
+        mainRight: {
+            paddingLeft: "35px",
+            width: "300px"
+        },
+        rightTitle: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "500",
+            paddingBottom: "18px",
+            borderBottom: "1px solid #CCCCCC"
+        },
+        rightText: {
+            paddingTop: "16px",
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "18px",
+            fontWeight: "400",
+            paddingBottom: "30px",
+            borderBottom: "0.5px dashed #CCCCCC"
+        },
+        insights: {
+            textTransform: "uppercase",
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "500",
+            padding: "18px 0",
+        },
+        insightsText: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "400",
+            paddingBottom: "18px",
+            borderBottom: "1px solid #CCCCCC"
+        },
+        tableWrapper: {
+            paddingBottom: "20px"
         }
     });
 
@@ -135,25 +184,29 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 size: 10
             },
             margin: {
-                t: 10,
-                l: 10
+                t: 4,
+                l: 0,
+                r: 0,
+                b: 20
             },
             showlegend: false,
             hovermode: 'closest',
+            plot_bgcolor: "#FAFAFA",
             xaxis: {
-                automargin: true
+                autorange: true,
+                mirror: true,
+                linecolor: '#CCCCCC',
+                linewidth: 1,
             },
             yaxis: {
-                automargin: true,
                 showticklabels: false,
                 showgrid: true,
                 dtick: 1,
                 tick0: 0.5,
-                gridcolor: 'rgb(0,0,0)',
+                gridcolor: '#CCCCCC',
                 gridwidth: 1,
-                linecolor: 'rgb(0,0,0)',
-                linewidth: 1
-            },
+                autorange: "reversed"
+            }
         } as any
     };
 
@@ -165,44 +218,95 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             );
         }
 
+        const alternateHeight = this.props.featureBinPickerProps.featureBins.length * 60 + 102;
+        const areaHeights = Math.max(460, alternateHeight);
+
+        const accuracyKey = this.props.accuracyPickerProps.selectedAccuracyKey;
+        const outcomeKey = this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ? "selection_rate" : "average";
+
         const accuracyPlot = _.cloneDeep(WizardReport.barPlotlyProps);
         const opportunityPlot = _.cloneDeep(WizardReport.barPlotlyProps);
         // TODO: reverse everything
+        const nameIndex = this.props.dashboardContext.groupNames.map((unuxed, i) => i);
         const reversedNames = this.props.dashboardContext.groupNames;
         if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification) {
             accuracyPlot.data = [
                 {
                     x: this.state.metrics.binnedFPR,
-                    y: reversedNames,
+                    y: nameIndex,
                     text: this.state.metrics.binnedFPR.map(num => (num as number).toFixed(3)),
+                    name: localization.Metrics.overprediction,
+                    width: 0.5,
                     orientation: 'h',
                     type: 'bar',
                     textposition: 'auto'
                 } as any, {
                     x: this.state.metrics.binnedFNR.map(x => -1 * x),
-                    y: reversedNames,
+                    y: nameIndex,
                     text: this.state.metrics.binnedFNR.map(num => (num as number).toFixed(3)),
+                    name: localization.Metrics.underprediction,
+                    width: 0.5,
                     orientation: 'h',
                     type: 'bar',
                     textposition: 'auto'
+                }
+            ];
+            accuracyPlot.layout.annotations = [
+                {
+                    text: localization.Report.underestimationError,
+                    x: 0.02,
+                    y: 1,
+                    yref: 'paper', xref: 'paper',
+                    showarrow: false,
+                    font: {color:'#666666', size: 10}
+                },
+                    {
+                    text: localization.Report.overestimationError,
+                    x: 0.98,
+                    y: 1,
+                    yref: 'paper', xref: 'paper',
+                    showarrow: false,
+                    font: {color:'#666666', size: 10}
                 }
             ];
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
             accuracyPlot.data = [
                 {
                     x: this.state.metrics.binnedOverprediction,
-                    y: reversedNames,
+                    y: nameIndex,
                     text: this.state.metrics.binnedOverprediction.map(num => (num as number).toFixed(3)),
+                    name: localization.Metrics.overprediction,
+                    width: 0.5,
                     orientation: 'h',
                     type: 'bar',
                     textposition: 'auto'
                 } as any, {
                     x: this.state.metrics.binnedUnderprediction.map(x => -1 * x),
-                    y: reversedNames,
+                    y: nameIndex,
                     text: this.state.metrics.binnedUnderprediction.map(num => (num as number).toFixed(3)),
+                    name: localization.Metrics.underprediction,
+                    width: 0.5,
                     orientation: 'h',
                     type: 'bar',
                     textposition: 'auto'
+                }
+            ];
+            accuracyPlot.layout.annotations = [
+                {
+                    text: localization.Report.underestimationError,
+                    x: 0.1,
+                    y: 1,
+                    yref: 'paper', xref: 'paper',
+                    showarrow: false,
+                    font: {color:'#666666', size: 10}
+                },
+                {
+                    text: localization.Report.overestimationError,
+                    x: 0.9,
+                    y: 1,
+                    yref: 'paper', xref: 'paper',
+                    showarrow: false,
+                    font: {color:'#666666', size: 10}
                 }
             ];
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
@@ -224,18 +328,24 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         opportunityPlot.data = [
             {
                 x: this.state.metrics.binnedOutcome,
-                y: this.props.dashboardContext.groupNames,
+                y: nameIndex,
                 text: this.state.metrics.binnedOutcome.map(num => (num as number).toFixed(3)),
+                name: AccuracyOptions[outcomeKey].title,
                 orientation: 'h',
                 type: 'bar',
                 textposition: 'auto'
             } as any
         ];
-        const globalAccuracyString = this.formatNumbers(this.state.metrics.globalAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
-        const disparityAccuracyString = this.formatNumbers(this.state.metrics.accuracyDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
-        const outcomeKey = this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ? "selection_rate" : "average";
+        
+        const globalAccuracyString = this.formatNumbers(this.state.metrics.globalAccuracy, accuracyKey);
+        const disparityAccuracyString = this.formatNumbers(this.state.metrics.accuracyDisparity, accuracyKey);
+        
         const globalOutcomeString = this.formatNumbers(this.state.metrics.globalOutcome, outcomeKey);
         const disparityOutcomeString = this.formatNumbers(this.state.metrics.outcomeDisparity, outcomeKey);
+        const formattedBinAccuracyValues = this.state.metrics.binnedAccuracy.map(value => 
+            this.formatNumbers(value, accuracyKey));
+        const formattedBinOutcomeValues = this.state.metrics.binnedOutcome.map(value => 
+            this.formatNumbers(value, outcomeKey));
         return (<div style={{height: "100%", overflowY:"auto"}}>
             <div className={WizardReport.classNames.header}>
                 {this.props.modelCount > 0 &&
@@ -259,19 +369,25 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
             </div>
-            <div style={{padding: "10px 30px", height:"400px"}}>
-                <Stack horizontal styles={{root: {height: "100%"}}}>
+            <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
                         binLabels={this.props.dashboardContext.groupNames}
+                        formattedBinValues={formattedBinAccuracyValues}
+                        metricLabel={AccuracyOptions[accuracyKey].title}
                         binValues={this.state.metrics.binnedAccuracy}/>
-                    <Stack.Item styles={{root: {width: "55%"}}}>
+                    <div className={WizardReport.classNames.chartWrapper}>
                         <AccessibleChart
                             plotlyProps={accuracyPlot}
                             sharedSelectionContext={undefined}
                             theme={undefined}
                         />
-                    </Stack.Item>
-                </Stack>
+                    </div>
+                    <div className={WizardReport.classNames.mainRight}>
+                        <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
+                        <div className={WizardReport.classNames.rightText}>{localization.loremIpsum}</div>
+                        <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
+                    </div>
             </div>
             <div className={WizardReport.classNames.header}>
                 <div className={WizardReport.classNames.headerTitle}>{localization.Report.outcomesTitle}</div>
@@ -284,19 +400,25 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     </div>
                 </div>
             </div>
-            <div style={{padding: "10px 30px", height:"400px"}}>
-                <Stack horizontal styles={{root: {height: "100%"}}}>
+            <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
                         binLabels={this.props.dashboardContext.groupNames}
+                        formattedBinValues={formattedBinOutcomeValues}
+                        metricLabel={AccuracyOptions[outcomeKey].title}
                         binValues={this.state.metrics.binnedOutcome}/>
-                    <Stack.Item styles={{root: {width: "55%"}}}>
+                    <div className={WizardReport.classNames.chartWrapper}>
                         <AccessibleChart
                             plotlyProps={opportunityPlot}
                             sharedSelectionContext={undefined}
                             theme={undefined}
                         />
-                    </Stack.Item>
-                </Stack>
+                    </div>
+                    <div className={WizardReport.classNames.mainRight}>
+                        <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
+                        <div className={WizardReport.classNames.rightText}>{localization.loremIpsum}</div>
+                        <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
+                    </div>
             </div>
         </div>);
     }

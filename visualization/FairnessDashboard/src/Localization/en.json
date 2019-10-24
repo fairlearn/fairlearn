@@ -46,7 +46,12 @@
         "backToComparisons": "Multimodel view",
         "outcomesTitle": "Disparity in Predictions",
         "globalOutcomeText": "Is your average prediction",
-        "outcomeDisparityText": "Is your disparity in predictions"
+        "outcomeDisparityText": "Is your disparity in predictions",
+        "minTag": "Min",
+        "maxTag": "Max",
+        "groupLabel": "Subgroup",
+        "underestimationError": "Underestimation error",
+        "overestimationError": "Overestimation error"
     },
     "Feature": {
         "header": "Along which features would you like to evaluate your model's fairness?",

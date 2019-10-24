@@ -4,31 +4,23 @@ import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { Text } from "office-ui-fabric-react/lib/Text";
 import { mergeStyleSets } from "@uifabric/styling";
 import { Separator } from "office-ui-fabric-react/lib/Separator";
+import { localization } from "../Localization/localization";
 
 export interface ISummaryTableProps {
     binValues: number[];
+    formattedBinValues: string[];
     binLabels: string[];
+    metricLabel: string;
 }
 
 interface IBinItem {
     title: string;
-    score: number;
+    score: string;
     isMin: boolean;
     isMax: boolean;
 }
 
 export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
-
-    private static separatorStyle = {
-        root: [{
-          selectors: {
-            '::after': {
-              backgroundColor: 'darkgrey',
-            },
-          }
-        }]
-    };
-
     private static readonly classNames = mergeStyleSets({
         itemCell: [
           {
@@ -62,8 +54,81 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             }
         },
         minMaxLabel: {
-            padding: "2px, 5px",
-            backgroundColor: "#CCC"
+            padding: "1px 9px",
+            marginTop: "4px",
+            color: "#FFFFFF",
+            fontSize: "10px",
+            lineHeight: "20px",
+            fontWeight: "400",
+            backgroundColor: "#999999"
+        },
+        groupCol: {
+            display: "inline-flex",
+            flexDirection:"column",
+            height: "100%",
+            width: "max-content"
+        },
+        groupLabel: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "500",
+            paddingBottom: "12px"
+        },
+        flexCol: {
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+            borderTop: "1px solid #CCCCCC",
+            borderBottom: "1px solid #CCCCCC"
+        },
+        binBox: {
+            flex: 1,
+            // minWidth: "100px",
+            // maxWidth: "200px",
+            // width: "max-content",
+            width: "130px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            borderBottom: "0.5px dashed #CCCCCC"
+        },
+        binTitle: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "18px",
+            fontWeight: "400"
+        },
+        metricCol: {
+            display: "inline-flex",
+            flexDirection:"column",
+            height: "100%",
+            width: "120px"
+        },
+        metricLabel: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "500",
+            paddingLeft: "18px",
+            paddingBottom: "12px",
+        },
+        metricBox: {
+            flex: 1,
+            paddingLeft: "10px",
+            color: "#333333",
+            fontSize: "32px",
+            lineHeight: "39px",
+            fontWeight: "100",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            borderLeft: "0.5px dashed #CCCCCC",
+            borderBottom: "0.5px dashed #CCCCCC"
+
+        },
+        frame: {
+            paddingBottom: "24px"
         }
     });
     
@@ -91,45 +156,33 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             }
         });
         return (
-            <List className={SummaryTable.classNames.itemsList}
-                    items={this.props.binValues.map((binValue, index) => {
-                                    return {
-                                        title: this.props.binLabels[index],
-                                        score: binValue,
-                                        isMin: minIndexes.includes(index),
-                                        isMax: maxIndexes.includes(index)
-                                    };
-                                })}
-                    onRenderCell={this._onRenderCell}
-            />);
-    }
-
-    private readonly _onRenderCell = (item: IBinItem, index: number | undefined): JSX.Element => {
-        return (
-          <div
-            key={index}
-            className={SummaryTable.classNames.itemCell}
-            >
-            <div style={{width: "48%", alignSelf: "center"}}>
-                <Stack verticalAlign="space-evenly">
-                    <div>
-                        <div>
-                            <Text style={{fontSize: "25px"}}>{item.title}</Text>
-                        </div>
-                        <Stack horizontal>
-                            {item.isMin && <div className={SummaryTable.classNames.minMaxLabel}>Min</div>}
-                            {item.isMax && <div className={SummaryTable.classNames.minMaxLabel}>Max</div>}
-                        </Stack>
+            <div className={SummaryTable.classNames.frame}>
+                <div className={SummaryTable.classNames.groupCol}>
+                    <div className={SummaryTable.classNames.groupLabel}>{localization.Report.groupLabel}</div>
+                    <div className={SummaryTable.classNames.flexCol}>
+                        {this.props.binLabels.map((label, index) => {
+                            return (<div className={SummaryTable.classNames.binBox}>
+                                <div className={SummaryTable.classNames.binTitle}>{label}</div>
+                                <Stack horizontal>
+                                    {minIndexes.includes(index) && <div className={SummaryTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
+                                    {maxIndexes.includes(index) && <div className={SummaryTable.classNames.minMaxLabel}>{localization.Report.maxTag}</div>}
+                                </Stack>
+                            </div>)
+                        })}
                     </div>
-                </Stack>
+                </div>
+                <div className={SummaryTable.classNames.metricCol}>
+                    <div className={SummaryTable.classNames.metricLabel}>{this.props.metricLabel}</div>
+                    <div className={SummaryTable.classNames.flexCol}>
+                        {this.props.formattedBinValues.map((value) => {
+                            return (
+                            <div className={SummaryTable.classNames.metricBox}>
+                                {value}
+                            </div>);
+                        })}
+                    </div>
+                </div>
             </div>
-            <Separator vertical styles={SummaryTable.separatorStyle} />
-            <div style={{flex: "1", alignSelf: "center"}}> 
-                <Stack verticalAlign="space-evenly">
-                    <Text style={{fontSize:"55px", paddingLeft:"10px"}}>{item.score.toLocaleString(undefined, {style: "percent", maximumFractionDigits: 1})}</Text>
-                </Stack>
-            </div>
-          </div>
         );
     }
 }
