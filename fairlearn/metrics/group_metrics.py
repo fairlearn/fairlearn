@@ -10,10 +10,10 @@ from ._mean_predictions import mean_prediction, mean_overprediction, mean_underp
 
 from .metrics_engine import make_group_metric
 
-from .skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
-from .skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
-from .skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
-from .skm_wrappers import group_mean_squared_error  # noqa: F401
+from ._skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
+from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
+from ._skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
+from ._skm_wrappers import group_mean_squared_error  # noqa: F401
 
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
