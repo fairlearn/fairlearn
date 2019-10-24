@@ -17,11 +17,9 @@ try
     $scriptpath = Resolve-FullPath (Split-Path -parent $PSCommandPath)
     $rootpath = Resolve-FullPath ([System.IO.Path]::Combine($scriptpath, ".."))
 
-    $codedirectoryname = "fairlearn"
-    $codepath = [System.IO.Path]::Combine($rootpath, $codedirectoryname)
+    $codepath = [System.IO.Path]::Combine($rootpath, "fairlearn")
     $docbuildpath = [System.IO.Path]::Combine($rootpath, "docbuild")
     $docconfigpath = [System.IO.Path]::Combine($rootpath, "docs")
-    $doccodepath = [System.IO.Path]::Combine($docbuildpath, $codedirectoryname)
 
     # Make sure we have a clean slate
     Remove-Item -Path $docbuildpath -Recurse -Force -ErrorAction SilentlyContinue
@@ -31,9 +29,6 @@ try
 
     # Copy the doc configurations to the build path
     Copy-Item $docconfigpath -Destination "$docbuildpath" -Recurse -Force
-
-    # Copy the source code into the build path
-    Copy-Item $codepath -Destination $doccodepath -Recurse -Force
 
     # Move into the docbuild directory
     Set-Location -Path $docbuildpath
