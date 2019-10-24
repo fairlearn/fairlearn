@@ -8,6 +8,18 @@ from ._selection_rate import selection_rate  # noqa: F401,E501
 import sklearn.metrics as skm
 
 
+__all__ = [
+    "balanced_root_mean_squared_error",
+    "fallout_rate",
+    "mean_prediction",
+    "mean_overprediction",
+    "mean_underprediction",
+    "miss_rate",
+    "selection_rate",
+    "specificity_score"
+]
+
+
 def specificity_score(y_true, y_pred, sample_weight=None):
     """
     The specificity score is also known as the True Negative Rate.
