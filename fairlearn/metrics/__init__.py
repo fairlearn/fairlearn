@@ -5,9 +5,10 @@
 """
 
 from ._group_metric_result import GroupMetricResult  # noqa: F401
-from ._metrics_engine import metric_by_group  # noqa: F401
+from ._metrics_engine import make_group_metric, metric_by_group  # noqa: F401
 
 __all__ = [
     "GroupMetricResult",
+    "make_group_metric",
     "metric_by_group"
 ]
