@@ -27,7 +27,7 @@ INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
                                   "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
                                   "Your provided data was of types ({}, {}, {})"
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supported " \
-    "parity criteria.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
+    "constraints.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
     "column in {}."
@@ -48,8 +48,8 @@ class ThresholdOptimizer(PostProcessing):
                  random_state=None):
         """ Creates the post processing object.
 
-        :param unconstrained_predictor: the trained model whose output will be post processed
-        :type unconstrained_predictor: a trained model
+        :param unconstrained_predictor: the trained predictor whose output will be post processed
+        :type unconstrained_predictor: a trained predictor
         :param estimator: an untrained estimator that will be trained, and
             subsequently its output will be post processed
         :type estimator: an untrained estimator
@@ -77,7 +77,7 @@ class ThresholdOptimizer(PostProcessing):
         self._flip = flip
         self._plot = plot
         random.seed(random_state)
-        self._post_processed_model_by_attribute = None
+        self._post_processed_predictor_by_attribute = None
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         self._validate_input_data(X, sensitive_features, y)
@@ -88,7 +88,7 @@ class ThresholdOptimizer(PostProcessing):
             self._estimator.fit(X, y, **kwargs)
             self._unconstrained_predictor = self._estimator
 
-        self._validate_model()
+        self._validate_predictor()
 
         scores = self._unconstrained_predictor.predict(X)
         threshold_optimization_method = None
@@ -101,29 +101,29 @@ class ThresholdOptimizer(PostProcessing):
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        self._post_processed_model_by_attribute = threshold_optimization_method(
+        self._post_processed_predictor_by_attribute = threshold_optimization_method(
             sensitive_features, y, scores, self._grid_size, self._flip, self._plot)
 
     def predict(self, X, *, sensitive_features):
-        self._validate_post_processed_model_is_fitted()
+        self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
         unconstrained_predictions = self._unconstrained_predictor.predict(X)
 
-        positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
+        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_attribute,
                                                 sensitive_features,
                                                 unconstrained_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X, *, sensitive_features):
-        self._validate_post_processed_model_is_fitted()
+        self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
-        positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
+        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_attribute,
                                                 sensitive_features,
                                                 self._unconstrained_predictor.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
-    def _validate_post_processed_model_is_fitted(self):
-        if not self._post_processed_model_by_attribute:
+    def _validate_post_processed_predictor_is_fitted(self):
+        if not self._post_processed_predictor_by_attribute:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
     def _validate_input_data(self, X, sensitive_features, y=None):
@@ -158,7 +158,7 @@ def _threshold_optimization_demographic_parity(attributes, labels, scores, grid_
     over the scores. Subsequently weighs each attribute value's error by the frequency of the
     attribute value in the data. The minimum error point is the selected solution, which is
     recreated by interpolating between two points on the convex hull of all solutions. Each
-    attribute value has its own model in the resulting post-processed model, which requires
+    attribute value has its own predictor in the resulting post-processed predictor, which requires
     the attribute value as an input.
 
     This method assumes that attributes, labels, and scores are non-empty data structures of
@@ -168,7 +168,7 @@ def _threshold_optimization_demographic_parity(attributes, labels, scores, grid_
     :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
     :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    :param scores: the scores produced by a model's prediction
+    :param scores: the scores produced by a predictor's prediction
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param grid_size: The number of ticks on the grid over which we evaluate the curves.
         A large grid_size means that we approximate the actual curve, so it increases the chance
@@ -178,8 +178,8 @@ def _threshold_optimization_demographic_parity(attributes, labels, scores, grid_
     :type flip: bool
     :param plot: show selection-error plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the grouping attribute value
-        and the fairness unaware model's score as arguments to produce predictions
+    :return: the post-processed predictor as a function taking the grouping attribute value
+        and the fairness unaware predictor's score as arguments to produce predictions
     """
     n = len(labels)
     selection_error_curve = {}
@@ -274,7 +274,7 @@ def _threshold_optimization_equalized_odds(attributes, labels, scores, grid_size
     :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
     :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    :param scores: the scores produced by a model's prediction
+    :param scores: the scores produced by a predictor's prediction
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param grid_size: The number of ticks on the grid over which we evaluate the curves.
         A large grid_size means that we approximate the actual curve, so it increases the chance
@@ -284,8 +284,8 @@ def _threshold_optimization_equalized_odds(attributes, labels, scores, grid_size
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the grouping attribute value
-        and the fairness unaware model's score as arguments to produce predictions
+    :return: the post-processed predictor as a function taking the grouping attribute value
+        and the fairness unaware predictor's score as arguments to produce predictions
     """
     data_grouped_by_attribute = _reformat_and_group_data(
         attributes, labels, scores)

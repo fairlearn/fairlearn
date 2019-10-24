@@ -90,12 +90,12 @@ def _get_grouped_data_and_base_points(attribute_value):
     return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
 
 
-def _get_predictions_by_attribute(adjusted_model, attributes, scores, labels):
+def _get_predictions_by_attribute(adjusted_predictor, attributes, scores, labels):
     labels_and_predictions = defaultdict(list)
     for i in range(len(attributes)):
         labels_and_predictions[attributes[i]].append(
             LabelAndPrediction(labels[i],
-                               adjusted_model([attributes[i]], [scores[i]])))
+                               adjusted_predictor([attributes[i]], [scores[i]])))
     return labels_and_predictions
 
 
