@@ -3,7 +3,7 @@
 
 import sklearn.metrics as skm
 
-from .metrics_engine import metric_by_group
+from ._metrics_engine import metric_by_group
 
 
 def group_accuracy_score(y_true, y_pred, group_membership, *,

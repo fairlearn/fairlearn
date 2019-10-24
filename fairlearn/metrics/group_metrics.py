@@ -8,7 +8,7 @@ from .extra_metrics import specificity_score, miss_rate, fallout_rate
 from ._selection_rate import group_selection_rate  # noqa: F401
 from ._mean_predictions import mean_prediction, mean_overprediction, mean_underprediction
 
-from .metrics_engine import make_group_metric
+from ._metrics_engine import make_group_metric
 
 from ._skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
 from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
