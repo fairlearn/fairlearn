@@ -1,6 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+"""This module contains the grouped versions of metrics. These use the
+metrics_engine routine to apply the corresponding metric
+to each of the subgroups identified in the input data.
+"""
+
 import sklearn.metrics as skm
 
 from ._balanced_root_mean_squared_error import balanced_root_mean_squared_error
@@ -14,6 +19,25 @@ from ._skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa:
 from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
 from ._skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
 from ._skm_wrappers import group_mean_squared_error  # noqa: F401
+
+
+__all__ = [
+    "group_accuracy_score",
+    "group_balanced_root_mean_squared_error",
+    "group_confusion_matrix",
+    "group_fallout_rate",
+    "group_mean_prediction",
+    "group_mean_overprediction",
+    "group_mean_squared_error",
+    "group_mean_underprediction",
+    "group_miss_rate",
+    "group_precision_score",
+    "group_recall_score",
+    "group_roc_auc_score",
+    "group_selection_rate",
+    "group_specificity_score",
+    "group_zero_one_loss"
+]
 
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
