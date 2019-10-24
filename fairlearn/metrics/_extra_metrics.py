@@ -22,7 +22,7 @@ def specificity_score(y_true, y_pred, sample_weight=None):
     # Taken from
     # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
     # This restricts us to binary classification
-    tn, fp, fn, tp = cm.ravel()
+    tn, fp, _, _ = cm.ravel()
     return tn / (tn + fp)
 
 
