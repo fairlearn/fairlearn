@@ -28,7 +28,7 @@ class PostProcessing:
     def fit(self, X, y, sensitive_features, **kwargs):
         """ Fit the model based on training features and labels, auxiliary data,
         as well as the fairness-unaware model or estimator. If an estimator was passed
-        in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
+        in the constructor this fit method will call ``fit(X, y, **kwargs)`` on said estimator.
         """
         raise NotImplementedError(self.fit.__name__ + " is not implemented")
 

@@ -8,6 +8,25 @@ def mean_prediction(y_true, y_pred, sample_weight=None):
     """Returns the (weighted) mean prediction. The true
     values are ignored, but required as an argument in order
     to maintain a consistent interface
+
+    :Example:
+
+    Without weights
+
+    .. literalinclude:: /../test/unit/metrics/test_mean_predictions.py
+        :linenos:
+        :language: python
+        :lines: 8-13
+        :dedent: 4
+
+    With weights
+
+    .. literalinclude:: /../test/unit/metrics/test_mean_predictions.py
+        :linenos:
+        :language: python
+        :lines: 17-23
+        :dedent: 4
+
     """
 
     y_p = np.squeeze(np.asarray(y_pred))

@@ -4,9 +4,6 @@
 """
 This module implements the Lagrangian reduction of fair binary
 classification to standard binary classification.
-
-FUNCTIONS
-exponentiated_gradient -- optimize accuracy subject to fairness constraints
 """
 
 import logging
@@ -53,6 +50,27 @@ class ExponentiatedGradientResult:
 
 
 class ExponentiatedGradient(Reduction):
+    """An Estimator which implements the exponentiated gradient approach to
+    reductions described by `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    :param estimator: The underlying estimator to be used. Must provide a
+        fit(X, y, sample_weights) method
+
+    :param constraints: Object describing the parity constraints
+    :type constraints: fairlearn.moments.Moment
+
+    :param eps: ?
+    :type eps: float
+
+    :param T: Maximum number of iterations
+    :type T: int
+
+    :param nu: ?
+    :type nu: ?
+
+    :param eta_mul: ?
+    :type eta_mul: float
+    """
     def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
         self._estimator = estimator
         self._constraints = constraints

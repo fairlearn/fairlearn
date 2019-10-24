@@ -75,7 +75,8 @@ class _GridGenerator:
 
 
 class GridSearch(Reduction):
-    """Learner to perform a grid search given a blackbox estimator algorithm.
+    """Learner to perform a grid search given a blackbox estimator algorithm. The approach used
+    is taken from section 3.4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     :param estimator: The underlying estimator to be used. Must provide a
         fit(X, y, sample_weights) method

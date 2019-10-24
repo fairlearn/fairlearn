@@ -11,7 +11,7 @@ _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_weight=None):
     """ Applies a metric to each subgroup of a set of data
 
-    :param metric_function: Function with signature (y_true, y_pred, sample_weight=None)
+    :param metric_function: Function with signature ``(y_true, y_pred, sample_weight=None)``
      which returns a scalar
 
     :param y_true: Array of ground-truth values
@@ -91,11 +91,13 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
 def make_group_metric(metric_function):
     """Function to turn a regular metric into a grouped metric
 
-    :param metric_function: The function to be wrapped
-    :type metric_function: A function with signature (y_true, y_pred, sample_weight)
+    :param metric_function: The function to be wrapped. This must have signature
+        ``(y_true, y_pred, sample_weight)``
+    :type metric_function: func
 
-    :return: A wrapped version of the supplied metric_function
-    :rtype: A function with signature (y_true, y_pred, group_membership, sample_weight)
+    :return: A wrapped version of the supplied metric_function. It will have
+        signature ``(y_true, y_pred, group_membership, sample_weight)``
+    :rtype: func
     """
     def wrapper(y_true, y_pred, group_membership, sample_weight=None):
         return metric_by_group(metric_function,
