@@ -83,7 +83,20 @@ class ExponentiatedGradient(Reduction):
 
     def fit(self, X, y, **kwargs):
         # TODO: validate input data; unify between grid search and expgrad?
-        self._expgrad_result = exponentiated_gradient(X, kwargs[_KW_SENSITIVE_FEATURES], y,
+
+        if type(X) in [np.ndarray, list]:
+            X_train = pd.DataFrame(X)
+        else:
+            X_train = X
+
+        if type(y) in [np.ndarray, list]:
+            y_train = pd.Series(y)
+        else:
+            y_train = y
+
+        self._expgrad_result = exponentiated_gradient(X_train,
+                                                      kwargs[_KW_SENSITIVE_FEATURES],
+                                                      y_train,
                                                       self._estimator,
                                                       constraints=self._constraints,
                                                       eps=self._eps, T=self._T, nu=self._nu,

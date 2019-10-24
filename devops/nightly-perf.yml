@@ -1,0 +1,21 @@
+# Nightly performance test pipeline
+
+trigger: none # No CI build
+
+pr: none # Not for pull requests
+
+schedules:
+- cron: "0 6 * * *" # Time is UTC
+  displayName: Nightly Perf Test
+  branches:
+    include:
+      - master
+  always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- template: perf-tests-job-template.yml
+  parameters:
+    vmImage: 'ubuntu-16.04'
