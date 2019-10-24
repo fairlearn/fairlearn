@@ -17,13 +17,14 @@ import { NONAME } from "dns";
 
 interface IMetrics {
     globalAccuracy: number;
+    binnedAccuracy: number[];
     accuracyDisparity: number;
     globalOutcome: number;
     outcomeDisparity: number;
+    binnedOutcome: number[];
     // Optional, based on model type
     binnedFNR?: number[];
     binnedFPR?: number[];
-    binnedOutcome?: number[];
     binnedOverprediction?: number[];
     binnedUnderprediction?: number[];
     // different length, raw unbinned errors and predictions
@@ -144,7 +145,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             },
             yaxis: {
                 automargin: true,
-                showticklabels: false
+                showticklabels: false,
+                showgrid: true,
+                dtick: 1,
+                tick0: 0.5,
+                gridcolor: 'rgb(0,0,0)',
+                gridwidth: 1,
+                linecolor: 'rgb(0,0,0)',
+                linewidth: 1
             },
         } as any
     };
@@ -202,9 +210,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 {
                     x: this.state.metrics.errors,
                     y: this.props.dashboardContext.binVector,
-                    type: 'box'
+                    type: 'box',
+                    orientation: 'h',
+                    boxpoints: 'all',
+                    jitter: 0.4,
+                    pointpos: 0,
                 } as any
             ];
+            accuracyPlot.layout
         }
 
         
@@ -250,7 +263,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 <Stack horizontal styles={{root: {height: "100%"}}}>
                     <SummaryTable 
                         binLabels={this.props.dashboardContext.groupNames}
-                        binValues={this.state.metrics.binnedFPR}/>
+                        binValues={this.state.metrics.binnedAccuracy}/>
                     <Stack.Item styles={{root: {width: "55%"}}}>
                         <AccessibleChart
                             plotlyProps={accuracyPlot}
@@ -275,7 +288,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 <Stack horizontal styles={{root: {height: "100%"}}}>
                     <SummaryTable 
                         binLabels={this.props.dashboardContext.groupNames}
-                        binValues={this.state.metrics.binnedFPR}/>
+                        binValues={this.state.metrics.binnedOutcome}/>
                     <Stack.Item styles={{root: {width: "55%"}}}>
                         <AccessibleChart
                             plotlyProps={opportunityPlot}
@@ -313,11 +326,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             let errors: number[];
             let outcomes: IMetricResponse;
             let outcomeDisparity: number;
-            const globalAccuracy = (await this.props.metricsCache.getMetric(
+            const accuracy = (await this.props.metricsCache.getMetric(
                 this.props.dashboardContext.binVector,
                 this.props.featureBinPickerProps.selectedBinIndex, 
                 this.props.selectedModelIndex,
-                this.props.accuracyPickerProps.selectedAccuracyKey)).global;
+                this.props.accuracyPickerProps.selectedAccuracyKey));
             const accuracyDisparity = await this.props.metricsCache.getDisparityMetric(
                 this.props.dashboardContext.binVector,
                 this.props.featureBinPickerProps.selectedBinIndex, 
@@ -388,7 +401,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             }
             this.setState({
                 metrics: {
-                    globalAccuracy,
+                    globalAccuracy: accuracy.global,
+                    binnedAccuracy: accuracy.bins,
                     accuracyDisparity,
                     binnedFNR,
                     binnedFPR,

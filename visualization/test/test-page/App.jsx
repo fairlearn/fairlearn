@@ -1,6 +1,7 @@
 import React from 'react';
 import { FairnessWizard } from 'fairlearn-dashboard';
 import { binaryClassifier } from '../__mock-data/binaryClassifier';
+import {regression} from "../__mock-data/regression";
 
     class App extends React.Component {
       constructor(props) {
@@ -11,7 +12,8 @@ import { binaryClassifier } from '../__mock-data/binaryClassifier';
       }
 
       static choices = [
-        {label: 'binaryClassifier', data: binaryClassifier}
+        {label: 'binaryClassifier', data: binaryClassifier},
+        {label: 'regression', data: regression}
       ]
 
       messages = {
