@@ -5,8 +5,8 @@ import sklearn.metrics as skm
 
 from ._balanced_root_mean_squared_error import balanced_root_mean_squared_error
 from .extra_metrics import specificity_score, miss_rate, fallout_rate
-from .selection_rate import group_selection_rate  # noqa: F401
-from .mean_predictions import mean_prediction, mean_overprediction, mean_underprediction
+from ._selection_rate import group_selection_rate  # noqa: F401
+from ._mean_predictions import mean_prediction, mean_overprediction, mean_underprediction
 
 from .metrics_engine import make_group_metric
 
