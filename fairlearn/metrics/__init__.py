@@ -11,8 +11,10 @@ from .extra_metrics import selection_rate, specificity_score  # noqa: F401
 
 from .group_metrics import group_accuracy_score, group_balanced_root_mean_squared_error  # noqa: F401, E501
 from .group_metrics import group_confusion_matrix, group_fallout_rate  # noqa: F401
+from .group_metrics import group_max_error, group_mean_absolute_error  # noqa: F401
 from .group_metrics import group_mean_prediction, group_mean_overprediction  # noqa: F401
 from .group_metrics import group_mean_squared_error, group_mean_underprediction  # noqa: F401
+from .group_metrics import group_mean_squared_log_error, group_median_absolute_error  # noqa: F401
 from .group_metrics import group_miss_rate, group_precision_score  # noqa: F401
 from .group_metrics import group_recall_score, group_roc_auc_score  # noqa: F401
 from .group_metrics import group_selection_rate,  group_specificity_score  # noqa: F401
@@ -37,10 +39,14 @@ _group_metrics = [
     "group_balanced_root_mean_squared_error",
     "group_confusion_matrix",
     "group_fallout_rate",
+    "group_max_error",
+    "group_mean_absolute_error",
     "group_mean_prediction",
     "group_mean_overprediction",
     "group_mean_squared_error",
+    "group_mean_squared_log_error",
     "group_mean_underprediction",
+    "group_median_absolute_error",
     "group_miss_rate",
     "group_precision_score",
     "group_recall_score",
