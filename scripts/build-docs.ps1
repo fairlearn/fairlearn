@@ -47,7 +47,7 @@ try
     & sphinx-apidoc "$codepath" -o "$docbuildpath"
 
     Write-Host "Building Docs" 
-    sphinx-build . _build
+    & sphinx-build . _build
 }
 finally
 {
