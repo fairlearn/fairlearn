@@ -5,7 +5,7 @@ import pytest
 import numpy as np
 import sklearn.metrics as skm
 
-import fairlearn.metrics as metrics
+import fairlearn.metrics.group_metrics as group_metrics
 
 # ======================================================
 
@@ -28,22 +28,22 @@ group2 = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 # Define as a dictionary so that the actual name can be seen
 # when pytest builds the tests
 
-supported_metrics_weighted = [(skm.accuracy_score, metrics.group_accuracy_score),
-                              (skm.confusion_matrix, metrics.group_confusion_matrix),
-                              (skm.zero_one_loss, metrics.group_zero_one_loss)]
+supported_metrics_weighted = [(skm.accuracy_score, group_metrics.group_accuracy_score),
+                              (skm.confusion_matrix, group_metrics.group_confusion_matrix),
+                              (skm.zero_one_loss, group_metrics.group_zero_one_loss)]
 
 # The following only work with binary data when called with their default arguments
-supported_metrics_weighted_binary = [(skm.precision_score, metrics.group_precision_score),
-                                     (skm.recall_score, metrics.group_recall_score),
-                                     (skm.roc_auc_score, metrics.group_roc_auc_score),
-                                     (skm.mean_squared_error, metrics.group_mean_squared_error)]
+supported_metrics_weighted_binary = [(skm.precision_score, group_metrics.group_precision_score),
+                                     (skm.recall_score, group_metrics.group_recall_score),
+                                     (skm.roc_auc_score, group_metrics.group_roc_auc_score),
+                                     (skm.mean_squared_error, group_metrics.group_mean_squared_error)]
 supported_metrics_weighted_binary = supported_metrics_weighted_binary + supported_metrics_weighted
 
 
-metrics_no_sample_weights = [(skm.max_error, metrics.group_max_error),
-                             (skm.mean_absolute_error, metrics.group_mean_absolute_error),
-                             (skm.mean_squared_log_error, metrics.group_mean_squared_log_error),
-                             (skm.median_absolute_error, metrics.group_median_absolute_error)]
+metrics_no_sample_weights = [(skm.max_error, group_metrics.group_max_error),
+                             (skm.mean_absolute_error, group_metrics.group_mean_absolute_error),
+                             (skm.mean_squared_log_error, group_metrics.group_mean_squared_log_error),
+                             (skm.median_absolute_error, group_metrics.group_median_absolute_error)]
 
 supported_metrics_unweighted = metrics_no_sample_weights + supported_metrics_weighted_binary
 
