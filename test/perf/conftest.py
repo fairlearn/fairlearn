@@ -18,15 +18,15 @@ COMBINATIONS = {
     "adult_uci": {
         "rbm_svm": {
             THRESHOLD_OPTIMIZER: {
-                TIME: 100,
+                TIME: 13,
                 MEMORY: 100000
             },
             EXPONENTIATED_GRADIENT: {
-                TIME: 100,
+                TIME: 2600,
                 MEMORY: 100000
             },
             GRID_SEARCH: {
-                TIME: 100,
+                TIME: 1500,
                 MEMORY: 100000
             }
         },
@@ -36,11 +36,11 @@ COMBINATIONS = {
                 MEMORY: 100000
             },
             EXPONENTIATED_GRADIENT: {
-                TIME: 25,
+                TIME: 50,
                 MEMORY: 100000
             },
             GRID_SEARCH: {
-                TIME: 15,
+                TIME: 30,
                 MEMORY: 100000
             }
         }
@@ -63,7 +63,7 @@ COMBINATIONS = {
                 MEMORY: 100000
             },
             EXPONENTIATED_GRADIENT: {
-                TIME: 9,
+                TIME: 12,
                 MEMORY: 100000
             },
             # no grid search since there are more than two sensitive feature values

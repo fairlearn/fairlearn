@@ -23,7 +23,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 @pytest.mark.parametrize("perf_test_configuration", all_perf_test_configurations,
                          ids=all_perf_test_configurations_descriptions)
-def test_perf(perf_test_configuration):
+def test_perf(perf_test_configuration, request):
+    print("Starting with test case {}".format(request.node.name))
     print("Downloading dataset")
     dataset = datasets[perf_test_configuration.dataset]()
     print("Done downloading dataset")
@@ -81,6 +82,7 @@ def test_perf(perf_test_configuration):
     # TODO evaluate accuracy/fairness tradeoff
 
     total_time = time() - start_time
-    assert total_time <= perf_test_configuration.max_time_consumption
     print("Total time taken: {}s".format(total_time))
     print("Maximum allowed time: {}s".format(perf_test_configuration.max_time_consumption))
+    assert total_time <= perf_test_configuration.max_time_consumption
+    print("\n\n===============================================================\n\n")
