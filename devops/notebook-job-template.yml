@@ -2,6 +2,7 @@ parameters:
   name: 'Notebooks'
   vmImage: 'ubuntu-latest'
   pyVersion: 3.6
+  requirementsFile: 'requirements.txt'
 
 jobs:
 - job:  ${{ parameters.name }}
@@ -15,8 +16,8 @@ jobs:
       versionSpec: ${{ parameters.pyVersion }} 
       addToPath: true
 
-  - script: pip install -r requirements.txt
-    displayName: 'Install required packages'
+  - script: pip install -r ${{ parameters.requirementsFile }}
+    displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
 
   - script: pip install -e .
     displayName: 'Install fairlearn in edit mode'
