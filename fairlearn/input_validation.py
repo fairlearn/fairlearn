@@ -13,7 +13,8 @@ _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number 
 _KW_SENSITIVE_FEATURES = "sensitive_features"
 
 
-def _validate_and_reformat_reductions_input(X, y, **kwargs):
+def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_feature=False,
+                                            **kwargs):
     if X is None:
         raise ValueError(_MESSAGE_X_NONE)
 
@@ -27,9 +28,10 @@ def _validate_and_reformat_reductions_input(X, y, **kwargs):
     # Extract the target attribute
     sensitive = _make_vector(kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
 
-    unique_labels = np.unique(sensitive)
-    if len(unique_labels) > 2:
-        raise RuntimeError("Sensitive features contain more than two unique values")
+    if enforce_binary_sensitive_feature:
+        unique_labels = np.unique(sensitive)
+        if len(unique_labels) > 2:
+            raise RuntimeError("Sensitive features contain more than two unique values")
 
     # Extract the Y values
     y_vector = _make_vector(y, "y")

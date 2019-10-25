@@ -116,7 +116,8 @@ class ExponentiatedGradient(Reduction):
         """ Return a fair classifier under specified fairness constraints via
             exponentiated-gradient reduction.
         """
-        # TODO: validate input data; unify between grid search and expgrad?
+        _, _, _ = _validate_and_reformat_reductions_input(X, y, **kwargs)
+
         if type(X) in [np.ndarray, list]:
             X_train = pd.DataFrame(X)
         else:

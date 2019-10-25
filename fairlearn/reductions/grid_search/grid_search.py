@@ -151,7 +151,8 @@ class GridSearch(Reduction):
             feature used by the constraints object
         :type sensitive_features: 1-D array (for now)
         """
-        _, y_vector, _ = _validate_and_reformat_reductions_input(X, y, **kwargs)
+        _, y_vector, _ = _validate_and_reformat_reductions_input(
+            X, y, enforce_binary_sensitive_feature=True, **kwargs)
 
         if isinstance(self.constraints, ClassificationMoment):
             # We have a classification problem
