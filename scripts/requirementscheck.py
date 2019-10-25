@@ -25,6 +25,7 @@ print("Found requirements files: {0}".format(files))
 
 dependencies = {}
 for f in files:
+    print("Parsing file: {0}".format(f))
     target_file = os.path.join(target_dir, f)
     dep_dict = {}
     with open(f, 'r') as fd:
@@ -35,10 +36,12 @@ for f in files:
                 dep_dict[req_name] = req.specs[0][1]
 
     dependencies[f] = dep_dict
+print("All requirements files parsed")
 
 truth_file = list(dependencies.keys())[0]
 print("Taking {0} as ground truth".format(truth_file))
 truth_deps = dependencies[truth_file]
+print()
 
 found_mismatch = False
 for f, d in dependencies.items():
@@ -53,6 +56,8 @@ for f, d in dependencies.items():
             if ver != d[dep]:
                 print("  Mismatched versions for {0}".format(dep), file=sys.stderr)
                 found_mismatch = True
+    print("Examination completed")
+    print()
 
 # spec = importlib.util.spec_from_file_location("setup", os.path.join(target_dir, "setup.py"))
 # module = importlib.util.module_from_spec(spec)
@@ -60,6 +65,7 @@ for f, d in dependencies.items():
 # print(module)
 
 if found_mismatch:
+    print("FOUND MISMATCHES", file=sys.stderr)
     sys.exit(1)
 else:
     sys.exit(0)
