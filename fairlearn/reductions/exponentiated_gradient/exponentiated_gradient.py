@@ -43,7 +43,7 @@ class ExponentiatedGradientResult:
         2*(eps+best_gap)
         """
         self._best_gap = best_gap
-        
+
         """ The base classifiers generated (instances of estimator).
         """
         self._classifiers = classifiers
@@ -100,7 +100,7 @@ class ExponentiatedGradient(Reduction):
             classification error)
         :type nu: float
         :param eta_mul: initial setting of the learning rate (default 2.0)
-        :type eta_mul: float        
+        :type eta_mul: float
         """
         self._estimator = estimator
         self._constraints = constraints
@@ -126,15 +126,15 @@ class ExponentiatedGradient(Reduction):
         else:
             y_train = y
 
-
         A = kwargs[_KW_SENSITIVE_FEATURES]
 
-        n = X.shape[0]
+        n = X_train.shape[0]
 
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self._eps
-        lagrangian = _Lagrangian(X, A, y, self._estimator, self._constraints, self._eps, B)
+        lagrangian = _Lagrangian(X_train, A, y_train, self._estimator, self._constraints,
+                                 self._eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series()
@@ -155,11 +155,11 @@ class ExponentiatedGradient(Reduction):
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
-            pred_h = h(X)
+            pred_h = h(X_train)
 
             if t == 0:
                 if self._nu is None:
-                    self._nu = _ACCURACY_MUL * (pred_h - y).abs().std() / np.sqrt(n)
+                    self._nu = _ACCURACY_MUL * (pred_h - y_train).abs().std() / np.sqrt(n)
                 eta_min = self._nu / (2 * B)
                 eta = self._eta_mul / B
                 logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
@@ -260,9 +260,9 @@ class ExponentiatedGradient(Reduction):
             lagrangian.n_oracle_calls)
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
-                    % (self._eps, B, self._nu, self._T, eta_min))
+                     % (self._eps, B, self._nu, self._T, eta_min))
         logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d"
-                    % (last_t, best_t, best_gap, lagrangian.n_oracle_calls,
+                     % (last_t, best_t, best_gap, lagrangian.n_oracle_calls,
                         len(lagrangian.classifiers)))
 
         return result
