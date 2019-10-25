@@ -9,7 +9,8 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import GridSearch
-import fairlearn.reductions.moments as moments
+from fairlearn.reductions import DemographicParity, EqualizedOdds
+from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
 
 # ==============================================================
 
@@ -292,7 +293,7 @@ class TestDemographicParity(ConditionalOpportunityTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LogisticRegression(solver='liblinear')
-        self.disparity_criterion = moments.DemographicParity()
+        self.disparity_criterion = DemographicParity()
 
 
 # Test EqualizedOdds
@@ -300,7 +301,7 @@ class TestEqualizedOdds(ConditionalOpportunityTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LogisticRegression(solver='liblinear')
-        self.disparity_criterion = moments.EqualizedOdds()
+        self.disparity_criterion = EqualizedOdds()
 
 
 # Tests specific to BoundedGroupLoss
@@ -308,4 +309,4 @@ class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LinearRegression()
-        self.disparity_criterion = moments.GroupLossMoment(moments.ZeroOneLoss())
+        self.disparity_criterion = GroupLossMoment(ZeroOneLoss())

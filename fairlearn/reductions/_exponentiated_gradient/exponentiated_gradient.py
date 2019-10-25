@@ -1,8 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""
-This module implements the Lagrangian reduction of fair binary
+"""This module implements the Lagrangian reduction of fair binary
 classification to standard binary classification.
 """
 
@@ -27,6 +26,9 @@ def _mean_pred(X, hs, weights):
 
 
 class ExponentiatedGradientResult:
+    """Class to hold the result of an ExponentiatedGradient
+    estimator
+    """
     def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
                  n_oracle_calls):
         """ Result object for the exponentiated gradient reduction operation.
