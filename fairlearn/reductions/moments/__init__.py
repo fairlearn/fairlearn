@@ -8,3 +8,15 @@ from .conditional_selection_rate import DemographicParity, EqualizedOdds  # noqa
 from .error_rate import ErrorRate   # noqa: F401
 from .bounded_group_loss import GroupLossMoment   # noqa: F401
 from .bounded_group_loss import SquareLoss, AbsoluteLoss, ZeroOneLoss  # noqa: F401
+
+__all__ = [
+    "AbsoluteLoss",
+    "Moment",
+    "ConditionalSelectionRate",
+    "DemographicParity",
+    "EqualizedOdds",
+    "ErrorRate",
+    "GroupLossMoment",
+    "SquareLoss",
+    "ZeroOneLoss"
+]
