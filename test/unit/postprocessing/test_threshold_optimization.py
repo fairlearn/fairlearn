@@ -5,9 +5,9 @@ import copy
 import numpy as np
 import pandas as pd
 import pytest
-from fairlearn.post_processing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
-from fairlearn.post_processing import ThresholdOptimizer
-from fairlearn.post_processing._threshold_optimizer import \
+from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
+from fairlearn.postprocessing import ThresholdOptimizer
+from fairlearn.postprocessing._threshold_optimizer import \
     (_vectorized_prediction,
      _threshold_optimization_demographic_parity,
      _threshold_optimization_equalized_odds,
@@ -18,7 +18,7 @@ from fairlearn.post_processing._threshold_optimizer import \
      NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
      PREDICT_BEFORE_FIT_ERROR_MESSAGE,
      MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE)
-from fairlearn.post_processing._post_processing import \
+from fairlearn.postprocessing._post_processing import \
     PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE, EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE, \
     MISSING_FIT_PREDICT_ERROR_MESSAGE, MISSING_PREDICT_ERROR_MESSAGE
 from .test_utilities import (sensitive_features_ex1, sensitive_features_ex2, labels_ex,

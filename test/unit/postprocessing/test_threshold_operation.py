@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import pytest
-from fairlearn.post_processing._threshold_operation import ThresholdOperation
+from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 
 
 def test_predict_from_operation_less():

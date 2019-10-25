@@ -4,8 +4,8 @@
 from collections import defaultdict, namedtuple
 import numpy as np
 import pandas as pd
-from fairlearn.post_processing._threshold_operation import ThresholdOperation
-from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
+from fairlearn.postprocessing._threshold_operation import ThresholdOperation
+from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 
 
 sensitive_feature_names_ex1 = ["A", "B", "C"]
