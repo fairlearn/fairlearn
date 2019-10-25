@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
+from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import GridSearch
 import fairlearn.reductions.moments as moments
 
@@ -225,6 +226,26 @@ class ArgumentTests:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=A_two_col_ndarray)
+
+        assert message == execInfo.value.args[0]
+
+    def test_no_predict_before_fit(self):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, _, _ = self._quick_data()
+
+        message = str("Must call fit before attempting to make predictions")
+        with pytest.raises(NotFittedException) as execInfo:
+            gs.predict(X)
+
+        assert message == execInfo.value.args[0]
+
+    def test_no_predict_proba_before_fit(self):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, _, _ = self._quick_data()
+
+        message = str("Must call fit before attempting to make predictions")
+        with pytest.raises(NotFittedException) as execInfo:
+            gs.predict_proba(X)
 
         assert message == execInfo.value.args[0]
 

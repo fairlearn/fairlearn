@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from . import GroupMetricResult
+from ._group_metric_result import GroupMetricResult
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
@@ -22,10 +22,10 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
 
     :param sample_weight: Optional weights to apply to each input value
 
-    :return: Object containing the result of applying metric_function to the entire dataset
-        and to each group identified in group_membership.
-        If the metric_function returns a scalar, then additional fields are populated
-    :rtype: fairlearn.metrics.GroupMetricResult
+    :return: Object containing the result of applying ``metric_function`` to the entire dataset
+        and to each group identified in ``group_membership``.
+        If the ``metric_function`` returns a scalar, then additional fields are populated
+    :rtype: :class:`GroupMetricResult`
     """
     _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
     _check_array_sizes(y_true, group_membership, 'y_true', 'group_membership')

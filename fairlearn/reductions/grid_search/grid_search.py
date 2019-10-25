@@ -5,11 +5,13 @@ import copy
 import numpy as np
 import pandas as pd
 
+from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
 from fairlearn.reductions.grid_search import GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
 from fairlearn.input_validation import _KW_SENSITIVE_FEATURES, \
     _validate_and_reformat_reductions_input
+from fairlearn import _NO_PREDICT_BEFORE_FIT
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
@@ -116,6 +118,25 @@ class GridSearch(Reduction):
         self.grid_limit = float(grid_limit)
         self.grid = grid
 
+        self._all_results = []
+        self._best_result = None
+
+    @property
+    def all_results(self):
+        """A list of :class:`GridSearchResult` from each
+        point in the grid
+        """
+        return self._all_results
+
+    @property
+    def best_result(self):
+        """The best result found from the grid search.
+        The predictor contained in this instance of
+        :class:`GridSearchResult` is used in calls to
+        ``predict`` and ``predict_proba``.
+        """
+        return self._best_result
+
     def fit(self, X, y, **kwargs):
         """Runs the grid search. This will result in multiple copies of the
         estimator being made, and the `fit` method of each one called.
@@ -162,7 +183,7 @@ class GridSearch(Reduction):
             grid = self.grid
 
         # Fit the estimates
-        self.all_results = []
+        self._all_results = []
         for i in grid.columns:
             lambda_vec = grid[i]
             weights = self.constraints.signed_weights(lambda_vec)
@@ -182,12 +203,12 @@ class GridSearch(Reduction):
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
                                    self.constraints.gamma(predict_fct))
-            self.all_results.append(nxt)
+            self._all_results.append(nxt)
 
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(x):
                 return self.objective_weight * x.objective + self.constraint_weight * x.gamma.max()
-            self.best_result = min(self.all_results, key=loss_fct)
+            self._best_result = min(self._all_results, key=loss_fct)
         else:
             raise RuntimeError("Unsupported selection rule")
 
@@ -204,15 +225,19 @@ class GridSearch(Reduction):
             the result will be a scalar. Otherwise the result will be an
         :rtype: Scalar or array
         """
+        if self.best_result is None:
+            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
-        """Provides the result of predict_proba from the
+        """Provides the result of ``predict_proba`` from the
         best model found by the grid search. The underlying
-        estimator must support predict_proba for this
+        estimator must support ``predict_proba`` for this
         to work.
 
         :param X: The data for which predictions are required
         :type X: Array
         """
+        if self.best_result is None:
+            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict_proba(X)
