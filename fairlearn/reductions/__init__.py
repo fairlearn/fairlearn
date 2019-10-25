@@ -5,7 +5,7 @@
 approach to disparity mitigation
 """
 
-from .reduction import Reduction  # noqa: F401
+from ._reduction import Reduction  # noqa: F401
 
 from .exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from .exponentiated_gradient import ExponentiatedGradientResult  # noqa: F401
