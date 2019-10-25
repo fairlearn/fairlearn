@@ -26,10 +26,11 @@ def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_featu
         raise RuntimeError(msg)
 
     # Extract the target attribute
-    sensitive = _make_vector(kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
+    sensitive_features_vector = _make_vector(kwargs[_KW_SENSITIVE_FEATURES],
+                                             _KW_SENSITIVE_FEATURES)
 
     if enforce_binary_sensitive_feature:
-        unique_labels = np.unique(sensitive)
+        unique_labels = np.unique(sensitive_features_vector)
         if len(unique_labels) > 2:
             raise RuntimeError("Sensitive features contain more than two unique values")
 
@@ -39,34 +40,34 @@ def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_featu
     X_rows, _ = _get_matrix_shape(X, "X")
     if X_rows != y_vector.shape[0]:
         raise RuntimeError(_MESSAGE_X_Y_ROWS)
-    if X_rows != sensitive.shape[0]:
+    if X_rows != sensitive_features_vector.shape[0]:
         raise RuntimeError(_MESSAGE_X_SENSITIVE_ROWS)
 
-    return X, y_vector, sensitive
+    return pd.DataFrame(X), y_vector, sensitive_features_vector
 
 
 def _make_vector(formless, formless_name):
     formed_vector = None
     if isinstance(formless, list):
-        formed_vector = np.array(formless)
+        formed_vector = pd.Series(formless)
     elif isinstance(formless, pd.DataFrame):
         if len(formless.columns) == 1:
-            formed_vector = formless[0].to_numpy()
+            formed_vector = formless.iloc[:, 0]
         else:
             msgfmt = "{0} is a DataFrame with more than one column"
             raise RuntimeError(msgfmt.format(formless_name))
     elif isinstance(formless, pd.Series):
-        formed_vector = formless.to_numpy()
+        formed_vector = formless
     elif isinstance(formless, np.ndarray):
         if len(formless.shape) == 1:
-            formed_vector = formless
+            formed_vector = pd.Series(formless)
         elif len(formless.shape) == 2 and formless.shape[1] == 1:
-            formed_vector = formless[:, 0]
+            formed_vector = pd.Series(formless[:, 0])
         else:
             msgfmt = "{0} is an ndarray with more than one column"
             raise RuntimeError(msgfmt.format(formless_name))
     else:
-        msgfmt = "{0} not an ndarray or DataFrame"
+        msgfmt = "{0} not an ndarray, Series or DataFrame"
         raise RuntimeError(msgfmt.format(formless_name))
 
     return formed_vector

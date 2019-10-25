@@ -151,20 +151,20 @@ class GridSearch(Reduction):
             feature used by the constraints object
         :type sensitive_features: 1-D array (for now)
         """
-        _, y_vector, _ = _validate_and_reformat_reductions_input(
+        X_train, y_train, _ = _validate_and_reformat_reductions_input(
             X, y, enforce_binary_sensitive_feature=True, **kwargs)
 
         if isinstance(self.constraints, ClassificationMoment):
             # We have a classification problem
             # Need to make sure that y is binary (for now)
-            unique_labels = np.unique(y_vector)
+            unique_labels = np.unique(y_train)
             if not set(unique_labels).issubset({0, 1}):
                 raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
         # Prep the parity constraints and objective
-        self.constraints.load_data(X, y_vector, **kwargs)
+        self.constraints.load_data(X_train, y_train, **kwargs)
         objective = self.constraints.default_objective()
-        objective.load_data(X, y_vector, **kwargs)
+        objective.load_data(X_train, y_train, **kwargs)
         is_classification_reduction = isinstance(self.constraints, ClassificationMoment)
 
         # Basis information
@@ -194,7 +194,7 @@ class GridSearch(Reduction):
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
-                y_reduction = y_vector
+                y_reduction = y_train
 
             current_estimator = copy.deepcopy(self.estimator)
             current_estimator.fit(X, y_reduction, sample_weight=weights)

@@ -116,19 +116,7 @@ class ExponentiatedGradient(Reduction):
         """ Return a fair classifier under specified fairness constraints via
             exponentiated-gradient reduction.
         """
-        _, _, _ = _validate_and_reformat_reductions_input(X, y, **kwargs)
-
-        if type(X) in [np.ndarray, list]:
-            X_train = pd.DataFrame(X)
-        else:
-            X_train = X
-
-        if type(y) in [np.ndarray, list]:
-            y_train = pd.Series(y)
-        else:
-            y_train = y
-
-        A = kwargs[_KW_SENSITIVE_FEATURES]
+        X_train, y_train, A = _validate_and_reformat_reductions_input(X, y, **kwargs)
 
         n = X_train.shape[0]
 
