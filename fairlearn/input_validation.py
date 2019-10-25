@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 
 
 _MESSAGE_X_NONE = "Must supply X"

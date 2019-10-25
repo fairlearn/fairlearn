@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-from fairlearn import _KW_SENSITIVE_FEATURES
+from fairlearn.input_validation import _KW_SENSITIVE_FEATURES
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
