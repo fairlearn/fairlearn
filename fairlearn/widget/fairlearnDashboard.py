@@ -9,7 +9,8 @@ from fairlearn.metrics import group_accuracy_score, group_precision_score,\
     group_recall_score, group_zero_one_loss, group_max_error, group_mean_absolute_error,\
     group_mean_squared_error, group_mean_squared_log_error, group_median_absolute_error,\
     group_specificity_score, group_miss_rate, group_fallout_rate, group_selection_rate,\
-    group_balanced_root_mean_squared_error
+    group_balanced_root_mean_squared_error, group_mean_overprediction,\
+    group_mean_underprediction, group_mean_prediction
 from IPython.display import display
 from scipy.sparse import issparse
 import numpy as np
@@ -102,18 +103,17 @@ class FairlearnDashboard(object):
                 "model_type": ["regression"],
                 "function": group_median_absolute_error
             },
-            # TODO: implement with correct metric
             "overprediction": {
                 "model_type": [],
-                "function": group_mean_absolute_error
+                "function": group_mean_overprediction
             },
             "underprediction": {
                 "model_type": [],
-                "function": group_mean_absolute_error
+                "function": group_mean_underprediction
             },
             "average": {
                 "model_type": [],
-                "function": group_mean_absolute_error
+                "function": group_mean_prediction
             },
         }
 
@@ -131,12 +131,12 @@ class FairlearnDashboard(object):
         }
 
         if feature_names is not None:
-            dataArg["features"] = feature_names
+            dataArg["features"] = self._convertToList(feature_names)
 
         if class_names is not None:
-            dataArg["classes"] = class_names
+            dataArg["classes"] = self._convertToList(class_names)
 
-        if is_classifier is not None:
+        if is_classifier is not None and isinstance(is_classifier, bool):
             dataArg["is_classifier"] = is_classifier
 
         self._widget_instance.value = dataArg
