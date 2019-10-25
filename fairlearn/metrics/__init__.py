@@ -1,7 +1,22 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""This module contains the functionality for computing metrics
+"""This module contains the functionality for computing metrics, with a
+particular focus on group metrics.
+
+For our purpose, a metric is a function with signature
+``f(y_true, y_pred, ....)``
+where ``y_true`` are the set of true values and ``y_pred`` are
+values predicted by a machine learning algorithm. Other
+arguments may be present (most often sample weights), which will
+affect how the metric is calculated.
+
+The group metrics in this module have signatures
+``g(y_true, y_pred, group_membership, ...)``
+where ``group_membership`` is an array of values indicating
+a group to which each pair of true and predicted values belong.
+The metric is evaluated for the entire set of data, and also
+for each subgroup identified in ``group_membership``.
 """
 
 from ._extra_metrics import balanced_root_mean_squared_error, fallout_rate  # noqa: F401
