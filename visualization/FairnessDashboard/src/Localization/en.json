@@ -36,12 +36,17 @@
     "ModelComparison": {
         "title": "Model Comparison",
         "howToRead": "How to read this chart",
+        "lower": "lower",
+        "higher": "higher",
+        "howToReadText": "This chart represents each of the {0} models as a selectable point. The x-axis represents {1}, with {2} being better. The y-axis represents disparity, with lower being better.",
         "insights": "Insights",
-        "howToReadText": "The chart shows {0} and disparity of {1}.",
-        "insightsText1": "The most accurate predictor achieves {0} of {1} and a disparity of {2}.",
-        "insightsText2": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}."
+        "insightsText1": "The chart shows {0} and disparity of {1} predictors.",
+        "insightsText2": "{0} of the predictors ranges from {1} to {2}. The disparity of the predictors ranges from {3} to {4}.",
+        "insightsText3": "The most accurate predictor achieves {0} of {1} and a disparity of {2}.",
+        "insightsText4": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}."
     },
     "Report": {
+        "modelName": "Model {0}",
         "title": "Disparity in Accuracy",
         "globalAccuracyText": "Is your overall accuracy score",
         "accuracyDisparityText": "Is the overall difference",
@@ -54,7 +59,12 @@
         "maxTag": "Max",
         "groupLabel": "Subgroup",
         "underestimationError": "Underestimation error",
-        "overestimationError": "Overestimation error"
+        "overestimationError": "Overestimation error",
+        "classificationOutcomesHowToRead": "This chart shows the selection rate, the number of points in each group that were classified as 1 divided by the size of the group",
+        "regressionOutcomesHowToRead": "This chart shows the distribution of predictions for each group. The individual points are overlaid on the box plot.",
+        "classificationAccuracyHowToRead": "Underestimation error rate is the number of points where the model predicted 0 when the true value was 1, divided by the group size. Overestimation error rate is the number of points where the model predicted 1 when the true value was 0, divided by the group size.",
+        "probabilityAccuracyHowToRead": "Underestimation error rate is the sum of all negative errors within a group divided by the group size. Overestimation error rate is the sum of all positive errors in a group divided by the group size.",
+        "regressionAccuracyHowToRead": "This chart shows the error distribution for each group. The error is the predicted value minus the true value."
     },
     "Feature": {
         "header": "Along which features would you like to evaluate your model's fairness?",

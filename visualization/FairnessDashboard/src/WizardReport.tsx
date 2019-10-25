@@ -14,6 +14,7 @@ import { SummaryTable } from "./Controls/SummaryTable";
 import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
 import { AccuracyOptions } from "./AccuracyMetrics";
 import { NONAME } from "dns";
+import { ChartColors } from "./ChartColors";
 
 interface IMetrics {
     globalAccuracy: number;
@@ -136,7 +137,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             fontSize: "15px",
             lineHeight: "16px",
             fontWeight: "500",
-            paddingBottom: "18px",
+            paddingBottom: "11px",
             borderBottom: "1px solid #CCCCCC"
         },
         rightText: {
@@ -166,6 +167,30 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         },
         tableWrapper: {
             paddingBottom: "20px"
+        },
+        textRow: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            paddingBottom: "7px"
+        },
+        colorBlock: {
+            width: "15px",
+            height: "15px",
+            marginRight: "9px"
+        },
+        multimodelSection: {
+            display: "flex",
+            flexDirection:"row"
+        },
+        modelLabel: {
+            alignSelf: "center",
+            paddingLeft: "35px",
+            paddingTop: "16px",
+            color: "#333333",
+            fontSize: "26px",
+            lineHeight: "16px",
+            fontWeight: "400"
         }
     });
 
@@ -193,12 +218,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             hovermode: 'closest',
             plot_bgcolor: "#FAFAFA",
             xaxis: {
+                fixedrange: true,
                 autorange: true,
                 mirror: true,
                 linecolor: '#CCCCCC',
                 linewidth: 1,
             },
             yaxis: {
+                fixedrange: true,
                 showticklabels: false,
                 showgrid: true,
                 dtick: 1,
@@ -226,9 +253,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
 
         const accuracyPlot = _.cloneDeep(WizardReport.barPlotlyProps);
         const opportunityPlot = _.cloneDeep(WizardReport.barPlotlyProps);
-        // TODO: reverse everything
         const nameIndex = this.props.dashboardContext.groupNames.map((unuxed, i) => i);
-        const reversedNames = this.props.dashboardContext.groupNames;
+        let howToReadAccuracySection: React.ReactNode;
+        let insightsAccuracySection: React.ReactNode;
+        let howToReadOutcomesSection: React.ReactNode;
+        let insightsOutcomesSection: React.ReactNode;
+
         if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification) {
             accuracyPlot.data = [
                 {
@@ -237,18 +267,22 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     text: this.state.metrics.binnedFPR.map(num => (num as number).toFixed(3)),
                     name: localization.Metrics.overprediction,
                     width: 0.5,
+                    color: ChartColors[0],
                     orientation: 'h',
                     type: 'bar',
-                    textposition: 'auto'
+                    textposition: 'auto',
+                    hoverinfo: "skip"
                 } as any, {
                     x: this.state.metrics.binnedFNR.map(x => -1 * x),
                     y: nameIndex,
                     text: this.state.metrics.binnedFNR.map(num => (num as number).toFixed(3)),
                     name: localization.Metrics.underprediction,
                     width: 0.5,
+                    color: ChartColors[1],
                     orientation: 'h',
                     type: 'bar',
-                    textposition: 'auto'
+                    textposition: 'auto',
+                    hoverinfo: "skip"
                 }
             ];
             accuracyPlot.layout.annotations = [
@@ -269,6 +303,33 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     font: {color:'#666666', size: 10}
                 }
             ];
+            opportunityPlot.data = [
+                {
+                    x: this.state.metrics.binnedOutcome,
+                    y: nameIndex,
+                    text: this.state.metrics.binnedOutcome.map(num => (num as number).toFixed(3)),
+                    name: AccuracyOptions[outcomeKey].title,
+                    color: ChartColors[0],
+                    orientation: 'h',
+                    type: 'bar',
+                    textposition: 'auto',
+                    hoverinfo: "skip"
+                } as any
+            ];
+            howToReadAccuracySection = (<div>
+                <div className={WizardReport.classNames.textRow}>
+                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                    <div>{localization.Report.overestimationError}</div>
+                </div>
+                <div className={WizardReport.classNames.textRow}>
+                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                    <div>{localization.Report.underestimationError}</div>
+                </div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead}</div>
+            </div>);
+            howToReadOutcomesSection = (<div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationOutcomesHowToRead}</div>
+            </div>);
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
             accuracyPlot.data = [
                 {
@@ -277,18 +338,22 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     text: this.state.metrics.binnedOverprediction.map(num => (num as number).toFixed(3)),
                     name: localization.Metrics.overprediction,
                     width: 0.5,
+                    color: ChartColors[0],
                     orientation: 'h',
                     type: 'bar',
-                    textposition: 'auto'
+                    textposition: 'auto',
+                    hoverinfo: "skip"
                 } as any, {
                     x: this.state.metrics.binnedUnderprediction.map(x => -1 * x),
                     y: nameIndex,
                     text: this.state.metrics.binnedUnderprediction.map(num => (num as number).toFixed(3)),
                     name: localization.Metrics.underprediction,
                     width: 0.5,
+                    color: ChartColors[1],
                     orientation: 'h',
                     type: 'bar',
-                    textposition: 'auto'
+                    textposition: 'auto',
+                    hoverinfo: "skip"
                 }
             ];
             accuracyPlot.layout.annotations = [
@@ -309,33 +374,67 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     font: {color:'#666666', size: 10}
                 }
             ];
-        } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
-            accuracyPlot.data = [
+            opportunityPlot.data = [
                 {
-                    x: this.state.metrics.errors,
+                    x: this.state.metrics.predictions,
                     y: this.props.dashboardContext.binVector,
                     type: 'box',
+                    color: ChartColors[0],
+                    boxmean: true,
                     orientation: 'h',
                     boxpoints: 'all',
                     jitter: 0.4,
                     pointpos: 0,
                 } as any
             ];
-            accuracyPlot.layout
+            howToReadAccuracySection = (<div>
+                <div className={WizardReport.classNames.textRow}>
+                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                    <div>{localization.Report.overestimationError}</div>
+                </div>
+                <div className={WizardReport.classNames.textRow}>
+                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                    <div>{localization.Report.underestimationError}</div>
+                </div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead}</div>
+            </div>);
+            howToReadOutcomesSection = (<div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.regressionOutcomesHowToRead}</div>
+            </div>);
+        } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
+            accuracyPlot.data = [
+                {
+                    x: this.state.metrics.errors,
+                    y: this.props.dashboardContext.binVector,
+                    type: 'box',
+                    color: ChartColors[0],
+                    orientation: 'h',
+                    boxmean: true,
+                    boxpoints: 'all',
+                    jitter: 0.4,
+                    pointpos: 0,
+                } as any
+            ];
+            opportunityPlot.data = [
+                {
+                    x: this.state.metrics.predictions,
+                    y: this.props.dashboardContext.binVector,
+                    type: 'box',
+                    color: ChartColors[0],
+                    boxmean: true,
+                    orientation: 'h',
+                    boxpoints: 'all',
+                    jitter: 0.4,
+                    pointpos: 0,
+                } as any
+            ];
+            howToReadAccuracySection = (<div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.regressionAccuracyHowToRead}</div>
+            </div>);
+            howToReadOutcomesSection = (<div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.regressionOutcomesHowToRead}</div>
+            </div>);
         }
-
-        
-        opportunityPlot.data = [
-            {
-                x: this.state.metrics.binnedOutcome,
-                y: nameIndex,
-                text: this.state.metrics.binnedOutcome.map(num => (num as number).toFixed(3)),
-                name: AccuracyOptions[outcomeKey].title,
-                orientation: 'h',
-                type: 'bar',
-                textposition: 'auto'
-            } as any
-        ];
         
         const globalAccuracyString = this.formatNumbers(this.state.metrics.globalAccuracy, accuracyKey);
         const disparityAccuracyString = this.formatNumbers(this.state.metrics.accuracyDisparity, accuracyKey);
@@ -349,12 +448,17 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         return (<div style={{height: "100%", overflowY:"auto"}}>
             <div className={WizardReport.classNames.header}>
                 {this.props.modelCount > 0 &&
-                    <ActionButton
-                        className={WizardReport.classNames.multimodelButton}
-                        iconProps={{iconName: "ChevronLeft"}}
-                        onClick={this.clearModelSelection}>
-                        {localization.Report.backToComparisons}
-                    </ActionButton>}
+                    <div className={WizardReport.classNames.multimodelSection}>
+                        <ActionButton
+                            className={WizardReport.classNames.multimodelButton}
+                            iconProps={{iconName: "ChevronLeft"}}
+                            onClick={this.clearModelSelection}>
+                            {localization.Report.backToComparisons}
+                        </ActionButton>
+                        <div className={WizardReport.classNames.modelLabel}>
+                            {localization.formatString(localization.Report.modelName, this.props.selectedModelIndex)}
+                        </div>
+                    </div>}
                 <div className={WizardReport.classNames.headerTitle}>{localization.Report.title}</div>
                 <div className={WizardReport.classNames.bannerWrapper}>
                     <div className={WizardReport.classNames.headerBanner}>
@@ -384,9 +488,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     </div>
                     <div className={WizardReport.classNames.mainRight}>
                         <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={WizardReport.classNames.rightText}>{localization.loremIpsum}</div>
-                        <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
+                        <div className={WizardReport.classNames.rightText}>{howToReadAccuracySection}</div>
+                        {/* <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
                     </div>
             </div>
             <div className={WizardReport.classNames.header}>
@@ -415,9 +519,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     </div>
                     <div className={WizardReport.classNames.mainRight}>
                         <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={WizardReport.classNames.rightText}>{localization.loremIpsum}</div>
-                        <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
+                        <div className={WizardReport.classNames.rightText}>{howToReadOutcomesSection}</div>
+                        {/* <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
                     </div>
             </div>
         </div>);
@@ -507,7 +611,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
                 predictions = this.props.dashboardContext.predictions[this.props.selectedModelIndex];
                 errors = predictions.map((predicted, index) => {
-                    return this.props.dashboardContext.trueY[index] - predicted;
+                    return predicted - this.props.dashboardContext.trueY[index];
                 });
                 outcomes = await this.props.metricsCache.getMetric(
                     this.props.dashboardContext.binVector,

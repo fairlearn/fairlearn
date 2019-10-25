@@ -125,7 +125,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
 
     private static readonly classNames = mergeStyleSets({
         frame: {
-            height: "800px",
+            minHeight: "800px",
             fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`
         },
         thinHeader: {
@@ -144,11 +144,16 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             padding: "20px"
         },
         pivot: {
-            height: "100%",
+            flex: 1,
             display: "flex",
             flexDirection: "column",
             backgroundColor: "#F2F2F2",
             padding: "30px 90px 0 90px"
+        },
+        body: {
+            flex: 1,
+            display: "flex",
+            flexDirection: "column"
         }
     });
 
@@ -212,14 +217,14 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                     <div className={FairnessWizard.classNames.headerRight}>{localization.Header.documentation}</div>
                 </Stack>
                 {(this.state.activeTabKey === introTabKey) &&
-                    <StackItem grow={2}>
+                    <StackItem grow={2} className={FairnessWizard.classNames.body}>
                         <IntroTab onNext={this.setTab.bind(this, featureBinTabKey)}/>
                     </StackItem>}
                  {(this.state.activeTabKey === featureBinTabKey ||
                    this.state.activeTabKey === accuracyTabKey ||
                    this.state.activeTabKey === disparityTabKey
                  ) &&
-                    <Stack.Item grow={2}>
+                    <Stack.Item grow={2} className={FairnessWizard.classNames.body}>
                         <Pivot
                             className={FairnessWizard.classNames.pivot}
                             styles={{

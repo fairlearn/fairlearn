@@ -47,7 +47,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 },
                 type: 'scatter',
                 xAccessor: 'Accuracy',
-                yAccessor: 'Parity'
+                yAccessor: 'Parity',
+                hoverinfo: 'none'
             }
         ],
         layout: {
@@ -56,17 +57,23 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 size: 10
             },
             margin: {
-                t: 10
+                t: 4,
+                r:0
             },
             hovermode: 'closest',
             xaxis: {
                 automargin: true,
+                fixedrange: true,
+                mirror: true,
+                linecolor: '#CCCCCC',
+                linewidth: 1,
                 title:{
                     text: 'Error'
                 }
             },
             yaxis: {
                 automargin: true,
+                fixedrange: true,
                 title:{
                     text: 'Disparity'
                 }
@@ -76,7 +83,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
 
     private static readonly classNames = mergeStyleSets({
         frame: {
-            height: "100%"
+            flex: 1,
+            display: "flex",
+            flexDirection: "column"
         },
         spinner: {
             margin: "auto",
@@ -149,6 +158,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         chart: {
             padding: "60px 0 100px 35px",
             flex: 1
+        },
+        textSection: {
+            paddingBottom: "5px"
         }
     });
 
@@ -196,19 +208,38 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 minDisparity = value;
             }
         });
-
-        const insights1 = localization.formatString(
-            localization.ModelComparison.insightsText1,
-            AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title,
-            FormatMetrics.formatNumbers(maxAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey),
-            FormatMetrics.formatNumbers(this.state.disparityArray[maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
-        );
-
+        const formattedMinAccuracy = FormatMetrics.formatNumbers(minAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
+        const formattedMaxAccuracy = FormatMetrics.formatNumbers(maxAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
+        const formattedMinDisparity = FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
+        const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
+        const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
         const insights2 = localization.formatString(
             localization.ModelComparison.insightsText2,
+            selectedMetric.title,
+            formattedMinAccuracy,
+            formattedMaxAccuracy,
+            formattedMinDisparity,
+            formattedMaxDisparity
+        );
+        const insights3 = localization.formatString(
+            localization.ModelComparison.insightsText3,
+            AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title,
+            selectedMetric.isMinimization ? formattedMinAccuracy : formattedMaxAccuracy, 
+            FormatMetrics.formatNumbers(this.state.disparityArray[selectedMetric.isMinimization ? minAccuracyIndex : maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
+        );
+
+        const insights4 = localization.formatString(
+            localization.ModelComparison.insightsText4,
             AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title,
             FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
-            FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey)
+            formattedMinDisparity
+        );
+
+        const howToReadText = localization.formatString(
+            localization.ModelComparison.howToReadText,
+            this.props.modelCount.toString(),
+            selectedMetric.title,
+            selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
         
         const props = _.cloneDeep(this.plotlyProps);
@@ -233,11 +264,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     </div>
                     <div className={ModelComparisonChart.classNames.mainRight}>
                         <div className={ModelComparisonChart.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={ModelComparisonChart.classNames.rightText}>{localization.loremIpsum}</div>
+                        <div className={ModelComparisonChart.classNames.rightText}>{howToReadText}</div>
                         <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
                         <div className={ModelComparisonChart.classNames.insightsText}>
-                            <div>{insights1}</div>
-                            <div>{insights2}</div>
+                            <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
+                            <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
+                            <div>{insights4}</div>
                         </div>
                     </div>
                 </div>
