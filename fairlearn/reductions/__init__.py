@@ -1,6 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+"""This module contains algorithms implementing the reductions
+approach to disparity mitigation
+"""
+
 from .reduction import Reduction  # noqa: F401
 
 from .exponentiated_gradient import ExponentiatedGradient  # noqa: F401
