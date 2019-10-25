@@ -1,8 +1,9 @@
 import argparse
-import importlib.util
+# import importlib.util
 import os
 import re
 import requirements
+import sys
 
 
 desc = "Checks setup.py and pip requirements files for consistency"
@@ -35,9 +36,30 @@ for f in files:
 
     dependencies[f] = dep_dict
 
+truth_file = list(dependencies.keys())[0]
+print("Taking {0} as ground truth".format(truth_file))
+truth_deps = dependencies[truth_file]
 
-spec = importlib.util.spec_from_file_location("setup", os.path.join(target_dir, "setup.py"))
-module = importlib.util.module_from_spec(spec)
-#spec.loader.exec_module(module)
+found_mismatch = False
+for f, d in dependencies.items():
+    if f == truth_file:
+        continue
+    print("Examining {0}".format(f))
+    if sorted(d.keys()) != sorted(truth_deps.keys()):
+        print(" Dependency list does not match!", file=sys.stderr)
+        found_mismatch = True
+    else:
+        for dep, ver in truth_deps.items():
+            if ver != d[dep]:
+                print("  Mismatched versions for {0}".format(dep), file=sys.stderr)
+                found_mismatch = True
 
-print(module)
+# spec = importlib.util.spec_from_file_location("setup", os.path.join(target_dir, "setup.py"))
+# module = importlib.util.module_from_spec(spec)
+# spec.loader.exec_module(module)
+# print(module)
+
+if found_mismatch:
+    sys.exit(1)
+else:
+    sys.exit(0)
