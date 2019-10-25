@@ -39,4 +39,3 @@ class GridSearchResult:
         """Description goes here
         """
         return self._gamma
-
