@@ -10,9 +10,9 @@ from .reduction import Reduction  # noqa: F401
 from .exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from .exponentiated_gradient import ExponentiatedGradientResult  # noqa: F401
 from .grid_search import GridSearch, GridSearchResult  # noqa: F401
-from .moments import AbsoluteLoss, Moment, ConditionalSelectionRate  # noqa: F401
-from .moments import DemographicParity, EqualizedOdds, ErrorRate   # noqa: F401
-from .moments import GroupLossMoment, SquareLoss, ZeroOneLoss  # noqa: F401
+from ._moments import AbsoluteLoss, Moment, ConditionalSelectionRate  # noqa: F401
+from ._moments import DemographicParity, EqualizedOdds, ErrorRate   # noqa: F401
+from ._moments import GroupLossMoment, SquareLoss, ZeroOneLoss  # noqa: F401
 
 _exponentiated_gradient = [
     "ExponentiatedGradient",
@@ -27,11 +27,13 @@ _grid_search = [
 _moments = [
     "AbsoluteLoss",
     "Moment",
+    "ClassificationMoment",
     "ConditionalSelectionRate",
     "DemographicParity",
     "EqualizedOdds",
     "ErrorRate",
     "GroupLossMoment",
+    "LossMoment",
     "SquareLoss",
     "ZeroOneLoss"
 ]

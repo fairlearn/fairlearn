@@ -1,8 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from fairlearn.reductions import GridSearch
-import fairlearn.reductions.moments as moments
+from fairlearn.reductions import GridSearch, DemographicParity
 
 import copy
 import numpy as np
@@ -52,7 +51,7 @@ def test_demographicparity_fair_uneven_populations():
                                      a0_label, a1_label)
 
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                        constraints=moments.DemographicParity(),
+                        constraints=DemographicParity(),
                         grid_size=11)
 
     target.fit(X, Y, sensitive_features=A)
@@ -98,7 +97,7 @@ def test_lambda_vec_zero_unchanged_model():
     grid_df = pd.DataFrame(lagrange_zero_series)
 
     target = GridSearch(estimator,
-                        constraints=moments.DemographicParity(),
+                        constraints=DemographicParity(),
                         grid=grid_df)
     target.fit(X, y, sensitive_features=A)
     assert len(target.all_results) == 1
@@ -137,11 +136,11 @@ def test_can_specify_and_generate_lambda_vecs():
                         axis=1)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.DemographicParity(),
+                         constraints=DemographicParity(),
                          grid_size=3)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.DemographicParity(),
+                         constraints=DemographicParity(),
                          grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
