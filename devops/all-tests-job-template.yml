@@ -22,6 +22,9 @@ jobs:
       versionSpec: '$(PyVer)' 
       addToPath: true
 
+  - script: python $(Build.SourcesDirectory)/scripts/requirementscheck.py $(Build.SourcesDirectory)
+    displayName: "Run check on requirements files"
+
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
 
