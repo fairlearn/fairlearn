@@ -1,3 +1,6 @@
+# Simple script which finds all files matching requirements*.txt in a given directory
+# and makes sure that they match up to '>=' vs '=='
+
 import argparse
 # import importlib.util
 import os
