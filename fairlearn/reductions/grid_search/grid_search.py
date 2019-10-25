@@ -9,8 +9,7 @@ from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
 from fairlearn.reductions.grid_search import GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
-from fairlearn.input_validation import _KW_SENSITIVE_FEATURES, \
-    _validate_and_reformat_reductions_input
+from fairlearn.input_validation import _validate_and_reformat_reductions_input
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
