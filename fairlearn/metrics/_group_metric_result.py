@@ -4,7 +4,7 @@
 
 class GroupMetricResult:
     """Class to hold the result of a grouped metric, produced by calling
-    fairlearn.metrics.metric_by_group.
+    the metric_by_group function.
     """
 
     def __init__(self):
@@ -19,12 +19,12 @@ class GroupMetricResult:
         self._maximum = None
         # The following two properties are the set of groups which have the minimum
         # and maximum values for the metric
-        self.argmin_set = None
-        self.argmax_set = None
+        self._argmin_set = None
+        self._argmax_set = None
         # The value of maximum - minimum
-        self.range = None
+        self._range = None
         # The value of minimum / maximum
-        self.range_ratio = None
+        self._range_ratio = None
 
     @property
     def overall(self):
@@ -75,3 +75,51 @@ class GroupMetricResult:
     @maximum.setter
     def maximum(self, value):
         self._maximum = value
+
+    @property
+    def argmin_set(self):
+        """If ``minimum`` is set, this is the set of
+        groups (that is, keys in the ``by_group``
+        dictionary) corresponding to the minimum value
+        of the metric.
+        """
+        return self._argmin_set
+
+    @argmin_set.setter
+    def argmin_set(self, value):
+        self._argmin_set = value
+
+    @property
+    def argmax_set(self):
+        """If ``maximum`` is set, this is the set of
+        groups (that is, keys in the ``by_group``
+        dictionary) corresponding to the maximum value
+        of the metric.
+        """
+        return self._argmax_set
+
+    @argmax_set.setter
+    def argmax_set(self, value):
+        self._argmax_set = value
+
+    @property
+    def range(self):
+        """If ``maximum`` and ``minimum`` are set, this
+        will be set to the difference between them
+        """
+        return self._range
+
+    @range.setter
+    def range(self, value):
+        self._range = value
+
+    @property
+    def range_ratio(self):
+        """If ``maximum`` and ``minimum`` are set, this
+        will be set to the ratio ``minimum/maximum``
+        """
+        return self._range_ratio
+
+    @range_ratio.setter
+    def range_ratio(self, value):
+        self._range_ratio = value
