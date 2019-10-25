@@ -2,5 +2,10 @@
 # Licensed under the MIT License.
 
 
-from .post_processing import PostProcessing  # noqa: F401
-from .threshold_optimizer import ThresholdOptimizer  # noqa: F401
+from ._post_processing import PostProcessing  # noqa: F401
+from ._threshold_optimizer import ThresholdOptimizer  # noqa: F401
+
+__all__ = [
+    "PostProcessing",
+    "ThresholdOptimizer"
+]
