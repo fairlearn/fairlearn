@@ -258,14 +258,16 @@ class GridSearch(Reduction):
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
-        """Provides the result of predict_proba from the
+        """Provides the result of ``predict_proba`` from the
         best model found by the grid search. The underlying
-        estimator must support predict_proba for this
+        estimator must support ``predict_proba`` for this
         to work.
 
         :param X: The data for which predictions are required
         :type X: Array
         """
+        if self.best_result is None:
+            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict_proba(X)
 
     def _make_vector(self, formless, formless_name):

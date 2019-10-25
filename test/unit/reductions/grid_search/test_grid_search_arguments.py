@@ -239,6 +239,16 @@ class ArgumentTests:
 
         assert message == execInfo.value.args[0]
 
+    def test_no_predict_proba_before_fit(self):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, _, _ = self._quick_data()
+
+        message = str("Must call fit before attempting to make predictions")
+        with pytest.raises(NotFittedException) as execInfo:
+            gs.predict_proba(X)
+
+        assert message == execInfo.value.args[0]
+
 
 # Tests specific to Classification
 class ConditionalOpportunityTests(ArgumentTests):
