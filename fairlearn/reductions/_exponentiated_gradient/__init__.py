@@ -5,6 +5,6 @@ from .exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from .exponentiated_gradient import ExponentiatedGradientResult  # noqa: F401
 
 __all__ = [
-    "ExponentiatedGradieht",
+    "ExponentiatedGradient",
     "ExponentiatedGradientResult"
 ]
