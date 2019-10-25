@@ -63,18 +63,16 @@ def compare_specs(spec1, spec2):
     have2 = len(spec2.specs) > 0
 
     if have1 != have2:
-        print("{0}Only one spec on {1}",
-              error_prefix,
-              spec1.name)
+        msg = "Only one spec on {0}".format(spec1.name)
+        print_ado_error(msg)
         specs_match = False
     elif not have1:
         # We have two empty lists
         pass
     else:
         if spec1.specs[0][1] != spec2.specs[0][1]:
-            print("{0}Version mismatch on {1}",
-                  error_prefix,
-                  spec1.name)
+            msg = "Version mismatch on {0}".format(spec1.name)
+            print_ado_error(msg)
             specs_match = False
 
     return specs_match
@@ -96,11 +94,13 @@ def compare_requirements(req1, req2):
         return False
     else:
         all_match = True
+        matches = []
         for i in range(len(names1)):
             # No need to check the spec again
             spec1 = req1[i]
             spec2 = req2[i]
-            all_match = all_match and compare_specs(spec1, spec2)
+            matches.append(compare_specs(spec1, spec2))
+        all_match = all_match and any(matches)
 
     return all_match
 
