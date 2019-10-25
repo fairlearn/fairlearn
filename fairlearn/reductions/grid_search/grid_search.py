@@ -120,6 +120,25 @@ class GridSearch(Reduction):
         self.grid_limit = float(grid_limit)
         self.grid = grid
 
+        self._all_results = []
+        self._best_result = None
+
+    @property
+    def all_results(self):
+        """A list of :class:`GridSearchResult` from each
+        point in the grid
+        """
+        return self._all_results
+
+    @property
+    def best_result(self):
+        """The best result found from the grid search.
+        The predictor contained in this instance of
+        :class:`GridSearchResult` is used in calls to
+        ``predict`` and ``predict_proba``.
+        """
+        return self._best_result
+
     def fit(self, X, y, **kwargs):
         """Runs the grid search. This will result in multiple copies of the
         estimator being made, and the `fit` method of each one called.
@@ -191,7 +210,7 @@ class GridSearch(Reduction):
             grid = self.grid
 
         # Fit the estimates
-        self.all_results = []
+        self._all_results = []
         for i in grid.columns:
             lambda_vec = grid[i]
             weights = self.constraints.signed_weights(lambda_vec)
@@ -211,12 +230,12 @@ class GridSearch(Reduction):
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
                                    self.constraints.gamma(predict_fct))
-            self.all_results.append(nxt)
+            self._all_results.append(nxt)
 
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(x):
                 return self.objective_weight * x.objective + self.constraint_weight * x.gamma.max()
-            self.best_result = min(self.all_results, key=loss_fct)
+            self._best_result = min(self._all_results, key=loss_fct)
         else:
             raise RuntimeError("Unsupported selection rule")
 
