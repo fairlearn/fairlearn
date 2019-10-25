@@ -103,6 +103,10 @@ class FairlearnDashboard(object):
                 "model_type": ["regression"],
                 "function": group_median_absolute_error
             },
+            "balanced_root_mean_squared_error": {
+                "model_type": ["regression"],
+                "function": group_balanced_root_mean_squared_error
+            },
             "overprediction": {
                 "model_type": [],
                 "function": group_mean_overprediction
