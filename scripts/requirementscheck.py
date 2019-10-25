@@ -54,14 +54,14 @@ for f, d in dependencies.items():
         continue
     print("Examining {0}".format(f))
     if sorted(d.keys()) != sorted(truth_deps.keys()):
-        print(" Dependency list does not match!", file=sys.stderr)
+        print(" Dependency list does not match!")
         found_mismatch = True
     else:
         for dep, ver in truth_deps.items():
             if ver != d[dep]:
-                print("  Mismatched versions for {0}".format(dep), file=sys.stderr)
+                print("  Mismatched versions for {0}".format(dep))
                 found_mismatch = True
-    print("Examination completed")
+    print("Examination of {0} completed".format(f))
     print()
 
 # spec = importlib.util.spec_from_file_location("setup", os.path.join(target_dir, "setup.py"))
@@ -70,7 +70,7 @@ for f, d in dependencies.items():
 # print(module)
 
 if found_mismatch:
-    print("FOUND MISMATCHES", file=sys.stderr)
+    print("##[error]Found mismatches", file=sys.stderr)
     sys.exit(1)
 else:
     sys.exit(0)
