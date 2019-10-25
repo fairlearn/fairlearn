@@ -229,14 +229,6 @@ class ExponentiatedGradient(Reduction):
         positive_probs = self._best_classifier(X)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
 
-    def posterior_predict(self, X):
-        # TODO provide implementation
-        raise NotImplementedError()
-
-    def posterior_predict_proba(self, X):
-        # TODO provide implementation
-        raise NotImplementedError()
-
     def _format_results(self, gaps, Qs, lagrangian, B, eta_min):
         gaps_series = pd.Series(gaps)
         gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
