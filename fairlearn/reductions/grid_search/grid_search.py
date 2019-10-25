@@ -5,10 +5,11 @@ import copy
 import numpy as np
 import pandas as pd
 
+from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
 from fairlearn.reductions.grid_search import GridSearchResult
 from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
-from fairlearn import _KW_SENSITIVE_FEATURES
+from fairlearn import _KW_SENSITIVE_FEATURES, _NO_PREDICT_BEFORE_FIT
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
@@ -252,6 +253,8 @@ class GridSearch(Reduction):
             the result will be a scalar. Otherwise the result will be an
         :rtype: Scalar or array
         """
+        if self.best_result is None:
+            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
