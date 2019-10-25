@@ -4,7 +4,7 @@
 
 class GroupMetricResult:
     """Class to hold the result of a grouped metric, produced by calling
-    the metric_by_group function.
+    the :func:`metric_by_group` function.
     """
 
     def __init__(self):
