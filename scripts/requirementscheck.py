@@ -31,9 +31,14 @@ for f in files:
     with open(f, 'r') as fd:
         for req in requirements.parse(fd):
             req_name = req.name
-            assert len(req.specs) <= 1
+            if len(req.specs) > 1:
+                print("Spec too complicated", file=sys.stderr)
+                sys.exit(2)
             if len(req.specs) == 1:
                 dep_dict[req_name] = req.specs[0][1]
+            else:
+                # Nothing specified so add a fake version
+                dep_dict[req_name] = -1
 
     dependencies[f] = dep_dict
 print("All requirements files parsed")
