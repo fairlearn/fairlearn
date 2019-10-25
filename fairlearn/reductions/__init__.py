@@ -9,7 +9,7 @@ from .reduction import Reduction  # noqa: F401
 
 from .exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from .exponentiated_gradient import ExponentiatedGradientResult  # noqa: F401
-from .grid_search import GridSearch, GridSearchResult  # noqa: F401
+from ._grid_search import GridSearch, GridSearchResult  # noqa: F401
 from ._moments import AbsoluteLoss, Moment, ConditionalSelectionRate  # noqa: F401
 from ._moments import DemographicParity, EqualizedOdds, ErrorRate   # noqa: F401
 from ._moments import GroupLossMoment, SquareLoss, ZeroOneLoss  # noqa: F401
