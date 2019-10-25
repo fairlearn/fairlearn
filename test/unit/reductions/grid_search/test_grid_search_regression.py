@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch
-import fairlearn.reductions.moments as moments
+from fairlearn.reductions import GroupLossMoment
+from fairlearn.reductions import SquareLoss, ZeroOneLoss
 
 import copy
 import numpy as np
@@ -48,7 +49,7 @@ def test_bgl_unfair():
                                       a0_factor, a1_factor,
                                       a0_label, a1_label)
 
-    bgl_square_loss = moments.GroupLossMoment(moments.SquareLoss(-np.inf, np.inf))
+    bgl_square_loss = GroupLossMoment(SquareLoss(-np.inf, np.inf))
     target = GridSearch(LinearRegression(),
                         constraints=bgl_square_loss,
                         grid_size=7)
@@ -100,7 +101,7 @@ def test_bgl_unmitigated_same():
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
     target = GridSearch(estimator,
-                        constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                        constraints=GroupLossMoment(ZeroOneLoss()),
                         grid=grid_df)
     target.fit(X, y, sensitive_features=A)
 
@@ -141,11 +142,11 @@ def test_bgl_lagrange_specifications():
                         axis=1)
 
     target1 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         constraints=GroupLossMoment(ZeroOneLoss()),
                          grid_size=5)
 
     target2 = GridSearch(copy.deepcopy(estimator),
-                         constraints=moments.GroupLossMoment(moments.ZeroOneLoss()),
+                         constraints=GroupLossMoment(ZeroOneLoss()),
                          grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]

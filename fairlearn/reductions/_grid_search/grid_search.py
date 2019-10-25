@@ -7,8 +7,8 @@ import pandas as pd
 
 from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
-from fairlearn.reductions.grid_search import GridSearchResult
-from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
+from fairlearn.reductions._moments import Moment, ClassificationMoment
+from .grid_search_result import GridSearchResult
 from fairlearn import _KW_SENSITIVE_FEATURES, _NO_PREDICT_BEFORE_FIT
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
