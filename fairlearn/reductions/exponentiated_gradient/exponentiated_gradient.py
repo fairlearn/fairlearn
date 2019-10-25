@@ -213,7 +213,7 @@ class ExponentiatedGradient(Reduction):
             # update theta based on learning rate
             theta += eta * (gamma - self._eps)
 
-        self._expgrad_result = _format_results(gaps, Qs, lagrangian, self._eps, B, self._nu, self._T, eta_min)
+        self._expgrad_result = self._format_results(gaps, Qs, lagrangian, B, eta_min)
 
         self._best_classifier = self._expgrad_result._best_classifier
         self._classifiers = self._expgrad_result._classifiers
@@ -235,7 +235,7 @@ class ExponentiatedGradient(Reduction):
         # TODO provide implementation
         raise NotImplementedError()
 
-    def _format_results(gaps, Qs, lagrangian, eps, B, nu, T, eta_min):
+    def _format_results(self, gaps, Qs, lagrangian, B, eta_min):
         gaps_series = pd.Series(gaps)
         gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
         best_t = gaps_best.index[-1]
@@ -260,7 +260,7 @@ class ExponentiatedGradient(Reduction):
             lagrangian.n_oracle_calls)
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f"
-                    % (eps, B, nu, T, eta_min))
+                    % (self._eps, B, self._nu, self._T, eta_min))
         logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d"
                     % (last_t, best_t, best_gap, lagrangian.n_oracle_calls,
                         len(lagrangian.classifiers)))
