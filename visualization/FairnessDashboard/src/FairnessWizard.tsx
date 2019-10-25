@@ -187,6 +187,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             activeTabKey: introTabKey,
             featureBins,
             selectedBinIndex: 0,
+            selectedModelId: this.props.predictedY.length === 1 ? 0 : undefined,
             metricCache: new MetricsCache(
                 featureBins.length,
                 this.props.predictedY.length,

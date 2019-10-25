@@ -447,7 +447,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             this.formatNumbers(value, outcomeKey));
         return (<div style={{height: "100%", overflowY:"auto"}}>
             <div className={WizardReport.classNames.header}>
-                {this.props.modelCount > 0 &&
+                {this.props.modelCount > 1 &&
                     <div className={WizardReport.classNames.multimodelSection}>
                         <ActionButton
                             className={WizardReport.classNames.multimodelButton}
