@@ -470,7 +470,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     <ActionButton
                         className={WizardReport.classNames.editButton}
                         iconProps={{iconName: "Edit"}}
-                        onClick={this.props.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
+                        onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
             </div>
             <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
@@ -540,6 +540,13 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
 
     private readonly clearModelSelection = (): void => {
         this.props.selections.onSelect([]);
+    }
+
+    private readonly onEditConfigs = (): void => {
+        if (this.props.modelCount > 1) {
+            this.props.selections.onSelect([]);
+        }
+        this.props.onEditConfigs();
     }
 
     private async loadData(): Promise<void> {
