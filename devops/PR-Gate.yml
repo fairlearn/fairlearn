@@ -1,6 +1,5 @@
 pr:
 - master
-- dev
 
 trigger: none # No CI build
 

@@ -9,5 +9,5 @@ P1_KEY = "p1"
 
 OUTPUT_SEPARATOR = "-"*65
 
-DEMOGRAPHIC_PARITY = "DemographicParity"
-EQUALIZED_ODDS = "EqualizedOdds"
+DEMOGRAPHIC_PARITY = "demographic_parity"
+EQUALIZED_ODDS = "equalized_odds"

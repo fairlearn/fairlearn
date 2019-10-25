@@ -5,10 +5,12 @@ import copy
 import numpy as np
 import pandas as pd
 
+from fairlearn._input_validation import _validate_and_reformat_reductions_input
+from fairlearn import _NO_PREDICT_BEFORE_FIT
+from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
-from fairlearn.reductions.grid_search import GridSearchResult
-from fairlearn.reductions.moments.moment import Moment, ClassificationMoment
-from fairlearn import _KW_SENSITIVE_FEATURES
+from fairlearn.reductions._moments import Moment, ClassificationMoment
+from .grid_search_result import GridSearchResult
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
@@ -30,7 +32,7 @@ class _GridGenerator:
             true_dim = self.dim
 
         # a conservative lower bound on the scaling parameter of the grid
-        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0/true_dim) - 1
+        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0 / true_dim) - 1   # noqa: E501
         n_units = int(np.floor(n_units))
         if n_units < 0:
             n_units = 0
@@ -61,33 +63,31 @@ class _GridGenerator:
         if index == self.dim:
             self.accumulator.append(self.entry.copy())
         else:
-            if (index == self.dim-1) and (self.force_L1_norm):
+            if (index == self.dim - 1) and (self.force_L1_norm):
                 if self.neg_allowed[index] and max_val > 0:
                     values = [-max_val, max_val]
                 else:
                     values = [max_val]
             else:
                 min_val = -max_val if self.neg_allowed[index] else 0
-                values = range(min_val, max_val+1)
+                values = range(min_val, max_val + 1)
             for current_value in values:
                 self.entry[index] = current_value
-                self.accumulate_integer_grid(index+1, max_val-abs(current_value))
+                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))   # noqa: E501
 
 
 class GridSearch(Reduction):
-    """Learner to perform a grid search given a blackbox algorithm.
-    The supplied algorithm must implement a method
-    fit(X, y, sample_weight=[...])
-    At the present time, the only disparity metrics supported
-    are demographic parity (for classification) and bounded group
-    loss (for regression)
-    """
+    """Learner to perform a grid search given a blackbox estimator algorithm. The approach used
+    is taken from section 3.4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
+    :param estimator: The underlying estimator to be used. Must provide a
+        fit(X, y, sample_weights) method
+
+    :param constraints: Object describing the parity constraints. This provides the reweighting
+        and relabelling
+    :type constraints: fairlearn.moments.Moment
+    """
     _MESSAGE_Y_NOT_BINARY = "Supplied y labels are not 0 or 1"
-    _MESSAGE_X_NONE = "Must supply X"
-    _MESSAGE_Y_NONE = "Must supply y"
-    _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
-    _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
 
     def __init__(self,
                  estimator,
@@ -97,6 +97,8 @@ class GridSearch(Reduction):
                  grid_size=10,
                  grid_limit=2.0,
                  grid=None):
+        """Constructor for a GridSearch object
+        """
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")
@@ -104,7 +106,7 @@ class GridSearch(Reduction):
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
-                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
+                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")   # noqa: E501
         else:
             raise RuntimeError("Unsupported selection rule")
         self.selection_rule = selection_rule
@@ -115,44 +117,53 @@ class GridSearch(Reduction):
         self.grid_limit = float(grid_limit)
         self.grid = grid
 
+        self._all_results = []
+        self._best_result = None
+
+    @property
+    def all_results(self):
+        """A list of :class:`GridSearchResult` from each
+        point in the grid
+        """
+        return self._all_results
+
+    @property
+    def best_result(self):
+        """The best result found from the grid search.
+        The predictor contained in this instance of
+        :class:`GridSearchResult` is used in calls to
+        ``predict`` and ``predict_proba``.
+        """
+        return self._best_result
+
     def fit(self, X, y, **kwargs):
-        if X is None:
-            raise ValueError(self._MESSAGE_X_NONE)
+        """Runs the grid search. This will result in multiple copies of the
+        estimator being made, and the `fit` method of each one called.
 
-        if y is None:
-            raise ValueError(self._MESSAGE_Y_NONE)
+        :param X: The feature data for the machine learning problem
+        :type X: Array
 
-        if _KW_SENSITIVE_FEATURES not in kwargs:
-            raise RuntimeError("Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES))
+        :param y: The ground truth labels for the machine learning problem
+        :type y: 1-D array
 
-        # Extract the target attribute
-        sensitive = self._make_vector(kwargs[_KW_SENSITIVE_FEATURES], _KW_SENSITIVE_FEATURES)
-
-        unique_labels = np.unique(sensitive)
-        if len(unique_labels) > 2:
-            raise RuntimeError("Sensitive features contain "
-                               "more than two unique values")
-
-        # Extract the Y values
-        y_vector = self._make_vector(y, "y")
-
-        X_rows, _ = self._get_matrix_shape(X, "X")
-        if X_rows != y_vector.shape[0]:
-            raise RuntimeError(self._MESSAGE_X_Y_ROWS)
-        if X_rows != sensitive.shape[0]:
-            raise RuntimeError(self._MESSAGE_X_SENSITIVE_ROWS)
+        :param sensitive_features: A (currently) required keyword argument listing the
+            feature used by the constraints object
+        :type sensitive_features: 1-D array (for now)
+        """
+        X_train, y_train, _ = _validate_and_reformat_reductions_input(
+            X, y, enforce_binary_sensitive_feature=True, **kwargs)
 
         if isinstance(self.constraints, ClassificationMoment):
             # We have a classification problem
             # Need to make sure that y is binary (for now)
-            unique_labels = np.unique(y_vector)
+            unique_labels = np.unique(y_train)
             if not set(unique_labels).issubset({0, 1}):
                 raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
 
-        # Prep the disparity metric and objective
-        self.constraints.load_data(X, y_vector, **kwargs)
+        # Prep the parity constraints and objective
+        self.constraints.load_data(X_train, y_train, **kwargs)
         objective = self.constraints.default_objective()
-        objective.load_data(X, y_vector, **kwargs)
+        objective.load_data(X_train, y_train, **kwargs)
         is_classification_reduction = isinstance(self.constraints, ClassificationMoment)
 
         # Basis information
@@ -172,7 +183,7 @@ class GridSearch(Reduction):
             grid = self.grid
 
         # Fit the estimates
-        self.all_results = []
+        self._all_results = []
         for i in grid.columns:
             lambda_vec = grid[i]
             weights = self.constraints.signed_weights(lambda_vec)
@@ -182,7 +193,7 @@ class GridSearch(Reduction):
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
-                y_reduction = y_vector
+                y_reduction = y_train
 
             current_estimator = copy.deepcopy(self.estimator)
             current_estimator.fit(X, y_reduction, sample_weight=weights)
@@ -192,64 +203,41 @@ class GridSearch(Reduction):
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
                                    self.constraints.gamma(predict_fct))
-            self.all_results.append(nxt)
+            self._all_results.append(nxt)
 
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(x):
-                return self.objective_weight*x.objective + self.constraint_weight*x.gamma.max()
-            self.best_result = min(self.all_results, key=loss_fct)
+                return self.objective_weight * x.objective + self.constraint_weight * x.gamma.max()
+            self._best_result = min(self._all_results, key=loss_fct)
         else:
             raise RuntimeError("Unsupported selection rule")
 
         return
 
     def predict(self, X):
+        """Provides a prediction for the given input data based
+        on the best model found by the grid search.
+
+        :param X: The data for which predictions are required
+        :type X: Array
+
+        :return: The prediction. If X represents the data for a single example
+            the result will be a scalar. Otherwise the result will be an
+        :rtype: Scalar or array
+        """
+        if self.best_result is None:
+            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
+        """Provides the result of ``predict_proba`` from the
+        best model found by the grid search. The underlying
+        estimator must support ``predict_proba`` for this
+        to work.
+
+        :param X: The data for which predictions are required
+        :type X: Array
+        """
+        if self.best_result is None:
+            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict_proba(X)
-
-    def _make_vector(self, formless, formless_name):
-        formed_vector = None
-        if isinstance(formless, list):
-            formed_vector = np.array(formless)
-        elif isinstance(formless, pd.DataFrame):
-            if len(formless.columns) == 1:
-                formed_vector = formless[0].to_numpy()
-            else:
-                msgfmt = "{0} is a DataFrame with more than one column"
-                raise RuntimeError(msgfmt.format(formless_name))
-        elif isinstance(formless, pd.Series):
-            formed_vector = formless.to_numpy()
-        elif isinstance(formless, np.ndarray):
-            if len(formless.shape) == 1:
-                formed_vector = formless
-            elif len(formless.shape) == 2 and formless.shape[1] == 1:
-                formed_vector = formless[:, 0]
-            else:
-                msgfmt = "{0} is an ndarray with more than one column"
-                raise RuntimeError(msgfmt.format(formless_name))
-        else:
-            msgfmt = "{0} not an ndarray or DataFrame"
-            raise RuntimeError(msgfmt.format(formless_name))
-
-        return formed_vector
-
-    def _get_matrix_shape(self, formless, formless_name):
-        num_rows = -1
-        num_cols = -1
-
-        if isinstance(formless, pd.DataFrame):
-            num_cols = len(formless.columns)
-            num_rows = len(formless.index)
-        elif isinstance(formless, np.ndarray):
-            if len(formless.shape) == 2:
-                num_rows = formless.shape[0]
-                num_cols = formless.shape[1]
-            else:
-                msgfmt = "{0} is an ndarray which is not 2D"
-                raise RuntimeError(msgfmt.format(formless_name))
-        else:
-            msgfmt = "{0} not an ndarray or DataFrame"
-            raise RuntimeError(msgfmt.format(formless_name))
-        return num_rows, num_cols

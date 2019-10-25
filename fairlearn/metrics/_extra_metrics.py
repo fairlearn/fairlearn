@@ -1,7 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+"""This module contains a variety of extra metrics which are useful for assessing fairness
+which are not available as part of scikit-learn.
+"""
+
 import sklearn.metrics as skm
+
+from ._balanced_root_mean_squared_error import balanced_root_mean_squared_error  # noqa: F401
+from ._mean_predictions import mean_prediction, mean_overprediction, mean_underprediction  # noqa: F401,E501
+from ._selection_rate import selection_rate  # noqa: F401,E501
 
 
 def specificity_score(y_true, y_pred, sample_weight=None):
@@ -14,8 +22,8 @@ def specificity_score(y_true, y_pred, sample_weight=None):
     # Taken from
     # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
     # This restricts us to binary classification
-    tn, fp, fn, tp = cm.ravel()
-    return tn / (tn+fp)
+    tn, fp, _, _ = cm.ravel()
+    return tn / (tn + fp)
 
 
 def miss_rate(y_true, y_pred, sample_weight=None):

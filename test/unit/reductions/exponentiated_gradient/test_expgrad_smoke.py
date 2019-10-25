@@ -2,12 +2,14 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-from fairlearn.reductions import ExponentiatedGradient, moments
-from fairlearn.reductions.moments import DemographicParity
+import pytest
+
+
+from fairlearn.reductions import ExponentiatedGradient
+from fairlearn.reductions import DemographicParity, EqualizedOdds
+from fairlearn.reductions import ErrorRate
 from simple_learners import LeastSquaresBinaryClassifierLearner
 from test_utilities import sensitive_features, X1, X2, X3, labels
-
-import pytest
 
 
 class TestExpgradSmoke:
@@ -19,52 +21,52 @@ class TestExpgradSmoke:
         self.learner = LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
-    smoke_test_data = [{"cons_class": moments.DemographicParity, "eps": 0.100,
+    smoke_test_data = [{"cons_class": DemographicParity, "eps": 0.100,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.100000,
                         "error": 0.250000, "n_oracle_calls": 32,
                         "n_classifiers": 3},
-                       {"cons_class": moments.DemographicParity, "eps": 0.050,
+                       {"cons_class": DemographicParity, "eps": 0.050,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.050000,
                         "error": 0.266522, "n_oracle_calls": 23,
                         "n_classifiers": 6},
-                       {"cons_class": moments.DemographicParity, "eps": 0.020,
+                       {"cons_class": DemographicParity, "eps": 0.020,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.020000,
                         "error": 0.332261, "n_oracle_calls": 22,
                         "n_classifiers": 5},
-                       {"cons_class": moments.DemographicParity, "eps": 0.010,
+                       {"cons_class": DemographicParity, "eps": 0.010,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.010000,
                         "error": 0.354174, "n_oracle_calls": 22,
                         "n_classifiers": 5},
-                       {"cons_class": moments.DemographicParity, "eps": 0.005,
+                       {"cons_class": DemographicParity, "eps": 0.005,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.365130, "n_oracle_calls": 22,
                         "n_classifiers": 5},
-                       {"cons_class": moments.EqualizedOdds, "eps": 0.100,
+                       {"cons_class": EqualizedOdds, "eps": 0.100,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.100000,
                         "error": 0.309333, "n_oracle_calls": 21,
                         "n_classifiers": 4},
-                       {"cons_class": moments.EqualizedOdds, "eps": 0.050,
+                       {"cons_class": EqualizedOdds, "eps": 0.050,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.050000,
                         "error": 0.378827, "n_oracle_calls": 19,
                            "n_classifiers": 6},
-                       {"cons_class": moments.EqualizedOdds, "eps": 0.020,
+                       {"cons_class": EqualizedOdds, "eps": 0.020,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.020000,
                         "error": 0.421531, "n_oracle_calls": 19,
                            "n_classifiers": 6},
-                       {"cons_class": moments.EqualizedOdds, "eps": 0.010,
+                       {"cons_class": EqualizedOdds, "eps": 0.010,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.010000,
                         "error": 0.435765, "n_oracle_calls": 19,
                            "n_classifiers": 6},
-                       {"cons_class": moments.EqualizedOdds, "eps": 0.005,
+                       {"cons_class": EqualizedOdds, "eps": 0.005,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
@@ -81,7 +83,7 @@ class TestExpgradSmoke:
 
         disp = data["cons_class"]()
         disp.load_data(self.X, self.y, sensitive_features=self.A)
-        error = moments.MisclassificationError()
+        error = ErrorRate()
         error.load_data(self.X, self.y, sensitive_features=self.A)
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
