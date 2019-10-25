@@ -10,7 +10,7 @@ from ._threshold_operation import ThresholdOperation
 
 def _get_roc(data, x_grid, attribute, flip=True):
     """Get ROC curve's convex hull based on data columns 'score' and 'label'
-    Scores represent output values from the model.
+    Scores represent output values from the predictor.
     """
     roc_sorted = _calculate_roc_points(data, attribute, flip)
     roc_selected = _filter_points_to_get_convex_hull(roc_sorted)

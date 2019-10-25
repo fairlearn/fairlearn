@@ -4,9 +4,6 @@
 """
 This module implements the Lagrangian reduction of fair binary
 classification to standard binary classification.
-
-FUNCTIONS
-exponentiated_gradient -- optimize accuracy subject to fairness constraints
 """
 
 import logging
@@ -80,6 +77,9 @@ class ExponentiatedGradientResult:
 
 
 class ExponentiatedGradient(Reduction):
+    """An Estimator which implements the exponentiated gradient approach to
+    reductions described by `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    """
     def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
         """ The constructor for a mitigator object that applies the exponentiated gradient
         reduction to a provided estimator to achieve the given constraints.
@@ -116,6 +116,16 @@ class ExponentiatedGradient(Reduction):
             exponentiated-gradient reduction.
         """
         # TODO: validate input data; unify between grid search and expgrad?
+        if type(X) in [np.ndarray, list]:
+            X_train = pd.DataFrame(X)
+        else:
+            X_train = X
+
+        if type(y) in [np.ndarray, list]:
+            y_train = pd.Series(y)
+        else:
+            y_train = y
+
 
         A = kwargs[_KW_SENSITIVE_FEATURES]
 
@@ -213,7 +223,7 @@ class ExponentiatedGradient(Reduction):
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
-    def predict_proba(self, X):
+    def _pmf_predict(self, X):
         positive_probs = self._best_classifier(X)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
 

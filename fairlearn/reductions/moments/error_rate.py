@@ -6,7 +6,7 @@ from .moment import ClassificationMoment
 from .moment import _ALL, _LABEL
 
 
-class MisclassificationError(ClassificationMoment):
+class ErrorRate(ClassificationMoment):
     """Misclassification error"""
     short_name = "Err"
 

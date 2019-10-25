@@ -2,8 +2,8 @@
 # Licensed under the MIT License.
 
 """ Threshold Optimization Post Processing algorithm based on M. Hardt,
-E. Price, N. Srebro's paper "Equality of Opportunity in Supervised
-Learning" (https://arxiv.org/pdf/1610.02413.pdf) for binary
+E. Price, N. Srebro's paper "`Equality of Opportunity in Supervised
+Learning <https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
 classification with one categorical grouping attribute.
 """
 
@@ -26,8 +26,8 @@ NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
                                   "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
                                   "Your provided data was of types ({}, {}, {})"
-NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE = "Currently only {} and {} are supported " \
-    "parity criteria.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
+NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supported " \
+    "constraints.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
     "column in {}."
@@ -37,26 +37,26 @@ SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains 
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
 
-_SUPPORTED_PARITY_CRITERIA = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
+_SUPPORTED_CONSTRAINTS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 
 logger = logging.getLogger(__name__)
 
 
 class ThresholdOptimizer(PostProcessing):
-    def __init__(self, *, unconstrained_model=None, unconstrained_estimator=None,
-                 parity_criteria=DEMOGRAPHIC_PARITY, gridsize=1000, flip=True, plot=False,
+    def __init__(self, *, unconstrained_predictor=None, estimator=None,
+                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True, plot=False,
                  random_state=None):
         """ Creates the post processing object.
 
-        :param unconstrained_model: the trained model whose output will be post processed
-        :type unconstrained_model: a trained model
-        :param unconstrained_estimator: an untrained estimator that will be trained, and
+        :param unconstrained_predictor: the trained predictor whose output will be post processed
+        :type unconstrained_predictor: a trained predictor
+        :param estimator: an untrained estimator that will be trained, and
             subsequently its output will be post processed
-        :type unconstrained_estimator: an untrained estimator
-        :param gridsize: The number of ticks on the grid over which we evaluate the curves.
-        A large gridsize means that we approximate the actual curve, so it increases the chance
+        :type estimator: an untrained estimator
+        :param grid_size: The number of ticks on the grid over which we evaluate the curves.
+        A large grid_size means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
-        :type gridsize: int
+        :type grid_size: int
         :param flip: allow flipping to negative weights if it improves accuracy.
         :type flip: bool
         :param plot: show ROC/selection-error plot if True
@@ -65,65 +65,65 @@ class ThresholdOptimizer(PostProcessing):
         :type random_state: int
         """
         super(ThresholdOptimizer, self).__init__(
-            unconstrained_model=unconstrained_model,
-            unconstrained_estimator=unconstrained_estimator,
-            parity_criteria=parity_criteria)
+            unconstrained_predictor=unconstrained_predictor,
+            estimator=estimator,
+            constraints=constraints)
 
-        self._parity_criteria = parity_criteria
-        if self._parity_criteria not in _SUPPORTED_PARITY_CRITERIA:
-            raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
+        self._constraints = constraints
+        if self._constraints not in _SUPPORTED_CONSTRAINTS:
+            raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        self._gridsize = gridsize
+        self._grid_size = grid_size
         self._flip = flip
         self._plot = plot
         random.seed(random_state)
-        self._post_processed_model_by_attribute = None
+        self._post_processed_predictor_by_attribute = None
 
-    def fit(self, X, y, sensitive_features, **kwargs):
+    def fit(self, X, y, *, sensitive_features, **kwargs):
         self._validate_input_data(X, sensitive_features, y)
 
-        if self._unconstrained_estimator:
+        if self._estimator:
             # train estimator on data first
             self._validate_estimator()
-            self._unconstrained_estimator.fit(X, y, **kwargs)
-            self._unconstrained_model = self._unconstrained_estimator
+            self._estimator.fit(X, y, **kwargs)
+            self._unconstrained_predictor = self._estimator
 
-        self._validate_model()
+        self._validate_predictor()
 
-        scores = self._unconstrained_model.predict(X)
+        scores = self._unconstrained_predictor.predict(X)
         threshold_optimization_method = None
-        if self._parity_criteria == DEMOGRAPHIC_PARITY:
+        if self._constraints == DEMOGRAPHIC_PARITY:
             threshold_optimization_method = \
                 _threshold_optimization_demographic_parity
-        elif self._parity_criteria == EQUALIZED_ODDS:
+        elif self._constraints == EQUALIZED_ODDS:
             threshold_optimization_method = \
                 _threshold_optimization_equalized_odds
         else:
-            raise ValueError(NOT_SUPPORTED_PARITY_CRITERIA_ERROR_MESSAGE)
+            raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        self._post_processed_model_by_attribute = threshold_optimization_method(
-            sensitive_features, y, scores, self._gridsize, self._flip, self._plot)
+        self._post_processed_predictor_by_attribute = threshold_optimization_method(
+            sensitive_features, y, scores, self._grid_size, self._flip, self._plot)
 
-    def predict(self, X, sensitive_features):
-        self._validate_post_processed_model_is_fitted()
+    def predict(self, X, *, sensitive_features):
+        self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
-        unconstrained_predictions = self._unconstrained_model.predict(X)
+        unconstrained_predictions = self._unconstrained_predictor.predict(X)
 
-        positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
+        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_attribute,
                                                 sensitive_features,
                                                 unconstrained_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
-    def predict_proba(self, X, sensitive_features):
-        self._validate_post_processed_model_is_fitted()
+    def _pmf_predict(self, X, *, sensitive_features):
+        self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
-        positive_probs = _vectorized_prediction(self._post_processed_model_by_attribute,
+        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_attribute,
                                                 sensitive_features,
-                                                self._unconstrained_model.predict(X))
+                                                self._unconstrained_predictor.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
-    def _validate_post_processed_model_is_fitted(self):
-        if not self._post_processed_model_by_attribute:
+    def _validate_post_processed_predictor_is_fitted(self):
+        if not self._post_processed_predictor_by_attribute:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
     def _validate_input_data(self, X, sensitive_features, y=None):
@@ -152,13 +152,13 @@ class ThresholdOptimizer(PostProcessing):
             raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
 
 
-def _threshold_optimization_demographic_parity(attributes, labels, scores, gridsize=1000,
+def _threshold_optimization_demographic_parity(attributes, labels, scores, grid_size=1000,
                                                flip=True, plot=False):
     """ Calculates selection and error rates for every attribute value at different thresholds
     over the scores. Subsequently weighs each attribute value's error by the frequency of the
     attribute value in the data. The minimum error point is the selected solution, which is
     recreated by interpolating between two points on the convex hull of all solutions. Each
-    attribute value has its own model in the resulting post-processed model, which requires
+    attribute value has its own predictor in the resulting post-processed predictor, which requires
     the attribute value as an input.
 
     This method assumes that attributes, labels, and scores are non-empty data structures of
@@ -168,22 +168,22 @@ def _threshold_optimization_demographic_parity(attributes, labels, scores, grids
     :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
     :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    :param scores: the scores produced by a model's prediction
+    :param scores: the scores produced by a predictor's prediction
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    :param gridsize: The number of ticks on the grid over which we evaluate the curves.
-        A large gridsize means that we approximate the actual curve, so it increases the chance
+    :param grid_size: The number of ticks on the grid over which we evaluate the curves.
+        A large grid_size means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
-    :type gridsize: int
+    :type grid_size: int
     :param flip: allow flipping to negative weights if it improves accuracy.
     :type flip: bool
     :param plot: show selection-error plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the grouping attribute value
-        and the fairness unaware model's score as arguments to produce predictions
+    :return: the post-processed predictor as a function taking the grouping attribute value
+        and the fairness unaware predictor's score as arguments to produce predictions
     """
     n = len(labels)
     selection_error_curve = {}
-    x_grid = np.linspace(0, 1, gridsize + 1)
+    x_grid = np.linspace(0, 1, grid_size + 1)
     error_given_selection = 0 * x_grid
 
     data_grouped_by_attribute = _reformat_and_group_data(
@@ -261,7 +261,7 @@ def _threshold_optimization_demographic_parity(attributes, labels, scores, grids
     return predicted_DP_by_attribute
 
 
-def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=1000,
+def _threshold_optimization_equalized_odds(attributes, labels, scores, grid_size=1000,
                                            flip=True, plot=False):
     """ Calculates the ROC curve of every attribute value at different thresholds over the scores.
     Subsequently takes the overlapping region of the ROC curves, and finds the best solution by
@@ -274,18 +274,18 @@ def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=
     :type attributes: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     :param labels: the labels of the dataset
     :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    :param scores: the scores produced by a model's prediction
+    :param scores: the scores produced by a predictor's prediction
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    :param gridsize: The number of ticks on the grid over which we evaluate the curves.
-        A large gridsize means that we approximate the actual curve, so it increases the chance
+    :param grid_size: The number of ticks on the grid over which we evaluate the curves.
+        A large grid_size means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
-    :type gridsize: int
+    :type grid_size: int
     :param flip: allow flipping to negative weights if it improves accuracy.
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
-    :return: the post-processed model as a function taking the grouping attribute value
-        and the fairness unaware model's score as arguments to produce predictions
+    :return: the post-processed predictor as a function taking the grouping attribute value
+        and the fairness unaware predictor's score as arguments to produce predictions
     """
     data_grouped_by_attribute = _reformat_and_group_data(
         attributes, labels, scores)
@@ -298,7 +298,7 @@ def _threshold_optimization_equalized_odds(attributes, labels, scores, gridsize=
         n_positive = sum(labels)
     n_negative = n - n_positive
     roc = {}
-    x_grid = np.linspace(0, 1, gridsize + 1)
+    x_grid = np.linspace(0, 1, grid_size + 1)
     y_values = pd.DataFrame()
 
     for attribute, group in data_grouped_by_attribute:

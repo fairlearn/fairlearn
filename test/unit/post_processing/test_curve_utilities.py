@@ -10,7 +10,7 @@ from fairlearn.post_processing._roc_curve_utilities import (_calculate_roc_point
                                                             _get_roc,
                                                             _interpolate_curve)
 from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
-from .test_utilities import (example_attributes1, example_labels, example_scores,
+from .test_utilities import (sensitive_features_ex1, labels_ex, scores_ex,
                              _get_grouped_data_and_base_points)
 
 
@@ -83,9 +83,9 @@ def test_convex_hull(base_points, expected_remaining_indices):
 
 def test_calculate_roc_points():
     data = pd.DataFrame({
-        ATTRIBUTE_KEY: example_attributes1,
-        SCORE_KEY: example_scores,
-        LABEL_KEY: example_labels})
+        ATTRIBUTE_KEY: sensitive_features_ex1,
+        SCORE_KEY: scores_ex,
+        LABEL_KEY: labels_ex})
     grouped_data = data.groupby(ATTRIBUTE_KEY).get_group("A") \
         .sort_values(by=SCORE_KEY, ascending=False)
 
