@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from .metrics_engine import metric_by_group
+from ._metrics_engine import metric_by_group
 
 
 def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
