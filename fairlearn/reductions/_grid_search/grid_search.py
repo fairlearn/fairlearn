@@ -5,7 +5,7 @@ import copy
 import numpy as np
 import pandas as pd
 
-from fairlearn.input_validation import _validate_and_reformat_reductions_input
+from fairlearn._input_validation import _validate_and_reformat_reductions_input
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
