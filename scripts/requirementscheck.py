@@ -1,3 +1,26 @@
+"""Simple script for comparing two requirements files.
+
+Given two requirements files, this script:
+- Checks that they both contain the same list of packages
+- Checks that the package versions match according to the following
+  rules:
+    - If no version is specified for one, it must not be specified
+      for the other
+    - If a version is specified, then the only valid comparators are
+      '==' and '>='
+    - If a version is specified in one file, then the same version
+      must be specified in the other
+The purposes of these comparisons is to ensure that our
+`requirements.txt` and `requirements-fixed.txt` files are kept in
+sync.
+
+If any of the checks fail, then the script will write out information
+about the failures (preprended for highlighting as an error in Azure
+Dev Ops) and return 1 instead of 0.
+
+At present there is no support for parsing `setup.py` and checking
+the packages listed there.
+"""
 # Simple script which finds all files matching requirements*.txt in a given directory
 # and makes sure that they match up to '>=' vs '=='
 
