@@ -24,6 +24,9 @@ jobs:
 
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+    
+  - script: python ./scripts/requirementscheck.py --fixed requirements-fixed.txt --lowerbound requirements.txt
+    displayName: "Run check on requirements files"
 
   - script: flake8 .
     displayName: "Run flake8"
