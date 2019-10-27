@@ -13,7 +13,7 @@ import pandas as pd
 import random
 
 from fairlearn.exceptions import NotFittedException
-from fairlearn.post_processing import PostProcessing
+from fairlearn.postprocessing import PostProcessing
 from ._constants import (LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
