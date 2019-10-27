@@ -3,6 +3,6 @@
 
 import setuptools
 
-import fairlearn
+import fairlearn  # noqa:F401
 
 setuptools.setup()
