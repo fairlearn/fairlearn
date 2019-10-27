@@ -122,15 +122,17 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         presentationArea: {
             display: "flex",
             flexDirection: "row",
-            padding: "20px 40px 30px 90px"
+            padding: "20px 0 30px 90px"
         },
         chartWrapper: {
-            flex: 1,
+            flex: "1 0 40%",
             paddingTop: "23px"
         },
         mainRight: {
+            minWidth: "200px",
             paddingLeft: "35px",
-            width: "300px"
+            flexBasis: "300px",
+            flexShrink: 1
         },
         rightTitle: {
             color: "#333333",
@@ -141,12 +143,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             borderBottom: "1px solid #CCCCCC"
         },
         rightText: {
-            paddingTop: "16px",
+            padding: "16px 15px 30px 0",
             color: "#333333",
             fontSize: "15px",
             lineHeight: "18px",
             fontWeight: "400",
-            paddingBottom: "30px",
             borderBottom: "0.5px dashed #CCCCCC"
         },
         insights: {
@@ -163,6 +164,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             lineHeight: "16px",
             fontWeight: "400",
             paddingBottom: "18px",
+            paddingRight: "15px",
             borderBottom: "1px solid #CCCCCC"
         },
         tableWrapper: {

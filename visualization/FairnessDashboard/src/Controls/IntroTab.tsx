@@ -43,6 +43,9 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
             flexGrow: 1
         },
         stepsContainer: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
             borderBottom: "1px solid #CCCCCC",
             paddingBottom: "38px"
         },
@@ -50,8 +53,9 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
             fontSize: "18px",
             lineHeight: "24px",
             fontWeight: "500",
-            width: "300px",
-            paddingRight: "50px"
+            maxWidth: "300px",
+            paddingRight: "30px",
+            flex: 1,
         },
         numericLabel: {
             display:"inline-block",
@@ -70,7 +74,8 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
             fontSize: "15px",
             lineHeight: "20px",
             color: "#666666",
-            width: "300px"
+            maxWidth: "300px",
+            flex: 1
         },
         getStarted: {
             paddingTop: "30px",
@@ -86,23 +91,23 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                 <div className={IntroTab.classNames.firstSectionBody}>{localization.loremIpsum}</div>
             </div>
             <div className={IntroTab.classNames.lowerSection}>
-                <Stack wrap horizontal horizontalAlign={"space-between"} className={IntroTab.classNames.stepsContainer}>
+                <div className={IntroTab.classNames.stepsContainer}>
                     <div className={IntroTab.classNames.boldStep}>{localization.loremIpsum}</div>
-                    <div>
+                    <div className={IntroTab.classNames.explanatoryStep}>
                         <div>
                             <span className={IntroTab.classNames.numericLabel}>01</span>
                             <span className={IntroTab.classNames.stepLabel}>Features</span>
                         </div>
                         <div className={IntroTab.classNames.explanatoryStep}>{localization.loremIpsum}</div>
                     </div>
-                    <div>
+                    <div className={IntroTab.classNames.explanatoryStep}>
                         <div>
                             <span className={IntroTab.classNames.numericLabel}>02</span>
                             <span className={IntroTab.classNames.stepLabel}>Accuracy</span>
                         </div>
-                        <div className={IntroTab.classNames.explanatoryStep}>{localization.loremIpsum}</div>
+                        <div >{localization.loremIpsum}</div>
                     </div>
-                </Stack>
+                </div>
                 <Stack horizontalAlign={"center"}>
                     <ActionButton 
                         iconProps={{iconName: "Forward"}}

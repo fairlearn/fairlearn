@@ -119,7 +119,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             flexDirection: "row"
         },
         mainRight: {
-            padding: "30px 90px 0 35px",
+            padding: "30px 0 0 35px",
             width: "300px"
         },
         rightTitle: {
@@ -131,12 +131,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             borderBottom: "1px solid #CCCCCC"
         },
         rightText: {
-            paddingTop: "16px",
+            padding: "16px 15px 30px 0",
             color: "#333333",
             fontSize: "15px",
             lineHeight: "18px",
             fontWeight: "400",
-            paddingBottom: "30px",
             borderBottom: "0.5px dashed #CCCCCC"
         },
         insights: {
@@ -153,10 +152,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             lineHeight: "16px",
             fontWeight: "400",
             paddingBottom: "18px",
+            paddingRight: "15px",
             borderBottom: "1px solid #CCCCCC"
         },
         chart: {
-            padding: "60px 0 100px 35px",
+            padding: "60px 0 100px 0",
             flex: 1
         },
         textSection: {
