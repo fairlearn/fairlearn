@@ -131,7 +131,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                     <div className={SummaryTable.classNames.groupLabel}>{localization.Report.groupLabel}</div>
                     <div className={SummaryTable.classNames.flexCol}>
                         {this.props.binLabels.map((label, index) => {
-                            return (<div className={SummaryTable.classNames.binBox}>
+                            return (<div className={SummaryTable.classNames.binBox} key={index}>
                                 <div className={SummaryTable.classNames.binTitle}>{label}</div>
                                 <Stack horizontal>
                                     {minIndexes.includes(index) && <div className={SummaryTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
@@ -144,9 +144,9 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                 <div className={SummaryTable.classNames.metricCol}>
                     <div className={SummaryTable.classNames.metricLabel}>{this.props.metricLabel}</div>
                     <div className={SummaryTable.classNames.flexCol}>
-                        {this.props.formattedBinValues.map((value) => {
+                        {this.props.formattedBinValues.map((value, index) => {
                             return (
-                            <div className={SummaryTable.classNames.metricBox}>
+                            <div className={SummaryTable.classNames.metricBox} key={index}>
                                 {value}
                             </div>);
                         })}

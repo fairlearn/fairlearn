@@ -63,7 +63,7 @@ export class TileList extends React.PureComponent<ITileListProps> {
     render(): React.ReactNode {
         return (
             <div className={TileList.classNames.container}>
-                {this.props.items.map(item => this._onRenderCell(item, undefined))}
+                {this.props.items.map((item, index) => this._onRenderCell(item, index))}
             </div>
         );
     }
@@ -74,6 +74,7 @@ export class TileList extends React.PureComponent<ITileListProps> {
           <div
             className={TileList.classNames.itemCell}
             onClick={item.onSelect.bind(this)}
+            key={index}
             data-is-focusable={true}>
             {item.selected && (<Icon iconName="CompletedSolid" className={TileList.classNames.iconClass}/>)}
             <h2 className={TileList.classNames.title}>{item.title}</h2>

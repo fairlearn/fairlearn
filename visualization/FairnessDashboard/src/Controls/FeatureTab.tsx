@@ -151,7 +151,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                     <ActionButton 
                     iconProps={{iconName: "Back"}}
                     onClick={this.updateExpandedList.bind(this)}>{localization.Feature.hideCategories}</ActionButton>
-                    {!!item.categories && item.categories.map(category => <div>{category}</div>)}
+                    {!!item.categories && item.categories.map((category, index) => <div key={index}>{category}</div>)}
                 </div>)}
           </div>
         );
