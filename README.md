@@ -4,10 +4,10 @@
 
 Fairlearn
 =============================================================
-Fairlearn is a practical machine learning fairness toolkit that makes it easier for anyone involved in the development of an Artificial Intelligence (AI) systems to monitor and understand the impact of unfairness in their machine learning lifecycle, and use state-of-the-art techniques to mitigate the observed unfairness. Fairlearn repository contains an SDK and Jupyter notebooks with examples to showcase its use.
+Fairlearn is a machine learning fairness toolkit that makes it easier for anyone involved in the development of Artificial Intelligence (AI) systems to monitor and understand the impact of unfairness in their machine learning lifecycle, and use state-of-the-art techniques to mitigate the observed unfairness. Fairlearn repository contains an SDK and Jupyter notebooks with examples to showcase its use.
 
-- [Context](#context)
 - [Overview of Fairlearn](#intro)
+- [Target Audience](#target)
 - [Fairness Assessment Dashboard](#getting-started)
 - [Unfairness Mitigation Techniques](#models)
 - [Install Fairlearn](#install)
@@ -17,43 +17,91 @@ Fairlearn is a practical machine learning fairness toolkit that makes it easier 
 - [Additional References](#refs)
 
 
-# <a name="context"></a>
-# Context
-We are at an age where many processes and applications have become or are becoming automated by Artificial Intelligence (AI) and machine learning systems. AI is the product of human processes and decisions used to create it, the data used to train it, and the environment used to test it.  The AI system can exhibit different, sometimes harmful, behaviors as a result of this process and systematically discriminate against people based on certain attributes protected by law. Therefore, regulated industries, or any other industry with legal, moral and ethical responsibilities, need tools to ensure the fairness of models and the predictions they produce. 
+
  
 # <a name="intro"></a>
 # Overview of Fairlearn
 
-Fairlearn is an open source unfairness assessment and mitigation toolkit that provides business stakeholders, executives, developers, and data scientists with insights into the unfairness of their model predictions, and techniques to mitigate that. In particular, Fairlearn assists in 
+We are at an age where many processes and applications have become or are becoming automated by AI systems. AI is the product of human processes and decisions used to create it, the data used to train it, and the environment used to test it.  The AI system can exhibit different, sometimes harmful, behaviors as a result of this process and systematically discriminate against people based on certain attributes protected by law (e.g., gender, ethnicity). Therefore, regulated industries, or any other industry with legal, moral and ethical responsibilities, need tools to ensure the fairness of models and the predictions they produce. 
+
+
+`Fairlearn` is an open source unfairness assessment and mitigation toolkit that provides business stakeholders, executives, developers, and data scientists with insights into the unfairness of their model predictions, and techniques to mitigate that. In particular, Fairlearn assists in 
 
 1) Raising awareness of inherent unfairness in model predictions among those involved in developing AI applications by demonstrating harms visited on vulnerable groups
 
 2) Providing state-of-the-art techniques to mitigate the observed unfairness
 
 
-At the assessment phase, Fairlearn provides a dashboard with a rich set of visualizations that uses a set of disparity and accuracy metrics and user-defined protected attributes (e.g., age, gender, ethnicity) to monitors the accuracy and fairness of a model’s predictions.
+At the assessment phase, Fairlearn provides a dashboard with a rich set of visualizations that uses a set of disparity and accuracy metrics and user-defined protected attributes (e.g., age, gender, ethnicity) to monitor the accuracy and fairness of a model’s predictions.
 
 
-At the mitigation phase, it incorporates Microsoft Research and proven third-party's state-of-the-art unfairness mitigation techniques to mitigate the unfairness observed at the previous assessment phase. Fairlearn’s mitigation stage works regression and binary classification models trained on tabular data.
+At the mitigation phase, it incorporates state-of-the-art unfairness mitigation techniques to mitigate the unfairness observed at the previous assessment phase. Fairlearn’s mitigation stage supports regression and binary classification models trained on tabular data.
 
 
 
+# <a name="target"></a>
+# Target Audience
+
+
+
+1. Machine Learning Fairness Researchers: ML researchers can easily add their unfairness mitigation techniques to this repository and use the assessment toolkit to load their original and refined model predictions to get insights into how much they have improved the disparity metrics of interest.
+
+
+2. Developers/ ML Engineers/ Data Scientists: Having a variety of curated unfairness mitigations techniques in one place makes it easier for data scientists and (ML) developers to experiment with different unfairness techniques in a seamless manner. The set of rich interactive visualizations allow developers and data scientists to easily visualize the unfairness happening in their machine learning models instead of wasting time and effort on generating customized visualizations.
+
+3. Business Executives: The set of provided visualizations are beneficial for raising awareness among those involved in developing AI applications, allow them to audit model predictions for potential unfairness, and establish a strong governance framework around the use of AI applications.
 
 # <a name="assessment"></a>
 # Fairness Assessment Dashboard 
+The assessment dashboard automatically analyzes a model’s predictions, provides user with a set of insights into how the model is treating different buckets (e.g., female, male, other gender) of a protected attribute/feature (e.g., gender).  
+
+
+
+These insights are calculated via a set of disparity metrics that showcase:
+
+1) [Disparity in Accuracy]: How the model accuracy differs across different buckets of a selected protected attribute (e.g., how accuracy of the model differs for "females" vs. "males" vs. "other gender" data points),
+
+2_ [Disparity in Predictions] How the model predictions differ across different buckets of a selected protected attribute  (e.g., how many "females" have received prediction `Approved` on their loan application in contrast to "males" and "other gender" data points?). 
+
+The toolkit surfaces a “wizard” flow that allows you to set up accuracy and disparity metrics and then view them alongside various visualizations on a dashboard. 
+
+After loading the visualizations via the following API call, you will see the following steps: TBC
+
+
+
+
+
+
+
 
 # <a name="mitigation"></a>
 # Unfairness Mitigation Techniques
 
+
+
+
+
 Fairlearn includes a Python package that implements a variety of fairness-related algorithms to mitigate bias including:
+
+## Pre-processing and In-processing:
+
+Fairlearn shows that given access to a learning oracle for a class H, there is an efficient algorithm to find the lowest-error distribution over classifiers in H subject to equalizing false positive rates across polynomially many subgroups.
 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
 | `fairlearn.` `reductions.` `ExponentiatedGradient` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
 | `fairlearn.` `reductions.` `GridSearch` | Black-box approach described in Section 3.4 of the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP |
 | `fairlearn.` `reductions.` `GridSearch` | Grid search for regression | regression | binary | BGL |
-| `fairlearn.` `post_processing.` `ThresholdOptimizer` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
 
+
+
+
+## Post-processing: 
+| algorithm | description | classification/regression | protected attributes | supported fairness definitions |
+| --- | --- | --- | --- | --- |
+| `fairlearn.` `post_processing.` `ThresholdOptimizer` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf). This technique takes as input any classifier’s prediction and the sensitive attribute, and derives a monotone transformation of the classifier’s prediction to remove any disparity with respect to the training examples. This postprocessing technique developes a method for constructing randomized decision rules that ensure equal opportunity and equalized odds are equal across protected groups.
+
+| binary classification | categorical | DP, EO |
 
 > [Note]
 > DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a new issue. 
@@ -142,7 +190,7 @@ To contribute please check our [Contributing guide](CONTRIBUTING.md).
 
 # <a name="code"></a>
 
-### Code of Conduct
+# Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](CONTRIBUTING.md#api)
