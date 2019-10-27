@@ -3,4 +3,6 @@
 
 import setuptools
 
+import fairlearn
+
 setuptools.setup()
