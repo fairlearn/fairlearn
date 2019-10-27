@@ -14,7 +14,7 @@ A Python package that implements a variety of algorithms that mitigate unfairnes
 
 #  Algorithms
 
-A variety of fairness-related algorithms to mitigate bias are included:
+The following unfairness mitigation algorithms are included:
 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
