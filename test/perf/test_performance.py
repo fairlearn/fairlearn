@@ -6,10 +6,10 @@ import pytest
 from time import time
 from tempeh.configurations import models, datasets
 
-from fairlearn.post_processing import ThresholdOptimizer
-from fairlearn.post_processing.threshold_optimizer import DEMOGRAPHIC_PARITY
+from fairlearn.postprocessing import ThresholdOptimizer
+from fairlearn.postprocessing._threshold_optimizer import DEMOGRAPHIC_PARITY
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
-from fairlearn.reductions.moments import DemographicParity
+from fairlearn.reductions import DemographicParity
 
 from conftest import get_all_perf_test_configurations
 
@@ -46,6 +46,8 @@ def test_perf(perf_test_configuration, request):
         # TODO add another case where we use sex as well, or both (?)
         sensitive_features_train = dataset.race_train
         sensitive_features_test = dataset.race_test
+        dataset.y_train = dataset.y_train.astype(int)
+        dataset.y_test = dataset.y_test.astype(int)
     else:
         raise ValueError("Sensitive features unknown for dataset {}"
                          .format(perf_test_configuration.dataset))
@@ -58,9 +60,8 @@ def test_perf(perf_test_configuration, request):
 
     start_time = time()
     if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-        mitigator = ThresholdOptimizer(unconstrained_model=unconstrained_predictor,
-                                       parity_criteria=DEMOGRAPHIC_PARITY,
-                                       random_state=1)
+        mitigator = ThresholdOptimizer(unconstrained_predictor=unconstrained_predictor,
+                                       constraints=DEMOGRAPHIC_PARITY)
     elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
         mitigator = ExponentiatedGradient(estimator=estimator,
                                           constraints=DemographicParity())
@@ -75,7 +76,8 @@ def test_perf(perf_test_configuration, request):
     mitigator.fit(dataset.X_train, dataset.y_train, sensitive_features=sensitive_features_train)
 
     if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-        mitigator.predict(dataset.X_test, sensitive_features=sensitive_features_test)
+        mitigator.predict(dataset.X_test, sensitive_features=sensitive_features_test,
+                          random_state=1)
     else:
         mitigator.predict(dataset.X_test)
 
