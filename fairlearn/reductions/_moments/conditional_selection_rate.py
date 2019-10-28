@@ -82,6 +82,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         return signed_weights
 
 
+# Ensure that ConditionalSelectionRate shows up in correct place in documentation
+# when it is used as a base class
 ConditionalSelectionRate.__module__ = "fairlearn.reductions"
 
 

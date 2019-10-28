@@ -40,6 +40,8 @@ class Moment:
         raise NotImplementedError()
 
 
+# Ensure that Moment shows up in correct place in documentation
+# when it is used as a base class
 Moment.__module__ = "fairlearn.reductions"
 
 
@@ -48,6 +50,8 @@ class ClassificationMoment(Moment):
     """
 
 
+# Ensure that ClassificationMoment shows up in correct place in documentation
+# when it is used as a base class
 ClassificationMoment.__module__ = "fairlearn.reductions"
 
 
@@ -60,4 +64,6 @@ class LossMoment(Moment):
         self.reduction_loss = loss
 
 
+# Ensure that LossMoment shows up in correct place in documentation
+# when it is used as a base class
 LossMoment.__module__ = "fairlearn.reductions"

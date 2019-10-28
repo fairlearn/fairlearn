@@ -62,6 +62,8 @@ class ConditionalLossMoment(LossMoment):
         return signed_weights
 
 
+# Ensure that ConditionalLossMoment shows up in correct place in documentation
+# when it is used as a base class
 ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
@@ -103,10 +105,12 @@ class AbsoluteLoss:
                       - np.clip(y_pred, self.min_val, self.max_val))
 
 
+# Ensure that AbsoluteLoss shows up in correct place in documentation
+# when it is used as a base class
+AbsoluteLoss.__module__ = "fairlearn.reductions"
+
+
 class ZeroOneLoss(AbsoluteLoss):
 
     def __init__(self):
         super().__init__(0, 1)
-
-
-ZeroOneLoss.__module__ = "fairlearn.reductions"

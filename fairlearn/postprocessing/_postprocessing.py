@@ -53,4 +53,6 @@ class PostProcessing:
             raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
 
 
+# Ensure that PostProcessing shows up in correct place in documentation
+# when it is used as a base class
 PostProcessing.__module__ = "fairlearn.postprocessing"
