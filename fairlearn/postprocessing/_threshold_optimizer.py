@@ -44,8 +44,7 @@ logger = logging.getLogger(__name__)
 
 class ThresholdOptimizer(PostProcessing):
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
-                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True, plot=False,
-                 random_state=None):
+                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True, plot=False):
         """ Creates the post processing object.
 
         :param unconstrained_predictor: the trained predictor whose output will be post processed
@@ -61,8 +60,6 @@ class ThresholdOptimizer(PostProcessing):
         :type flip: bool
         :param plot: show ROC/selection-error plot if True
         :type plot: bool
-        :param random_state: set to a constant for reproducibility
-        :type random_state: int
         """
         super(ThresholdOptimizer, self).__init__(
             unconstrained_predictor=unconstrained_predictor,
@@ -76,7 +73,6 @@ class ThresholdOptimizer(PostProcessing):
         self._grid_size = grid_size
         self._flip = flip
         self._plot = plot
-        random.seed(random_state)
         self._post_processed_predictor_by_attribute = None
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
@@ -104,7 +100,14 @@ class ThresholdOptimizer(PostProcessing):
         self._post_processed_predictor_by_attribute = threshold_optimization_method(
             sensitive_features, y, scores, self._grid_size, self._flip, self._plot)
 
-    def predict(self, X, *, sensitive_features):
+    def predict(self, X, *, sensitive_features, random_state=None):
+        """
+        :param random_state: set to a constant for reproducibility
+        :type random_state: int
+        """
+        if random_state:
+            random.seed(random_state)
+
         self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
         unconstrained_predictions = self._unconstrained_predictor.predict(X)
