@@ -4,7 +4,16 @@ export interface IDatasetSummary {
     categoricalMap?: {[key: number]: string[]};
 }
 
-export type PredictionTypes = "classes" | "regression" | "probability" | "logOdds";
+export enum PredictionTypes {
+    binaryClassification = "binaryClassification",
+    regression = "regression",
+    probability = "probability"
+}
+
+export type PredictionType = 
+    PredictionTypes.binaryClassification |
+    PredictionTypes.probability |
+    PredictionTypes.regression;
 
 export interface IMetricResponse {
     global?: number;
@@ -26,8 +35,9 @@ export interface IFairnessProps {
     trueY: number[];
     theme?: any;
     stringParams?: any;
-    supportedClassificationAccuracyKeys: string[];
+    supportedBinaryClassificationAccuracyKeys: string[];
     supportedRegressionAccuracyKeys: string[];
+    supportedProbabilityAccuracyKeys: string[];
     // The request hook
     requestMetrics: ( request: IMetricRequest, abortSignal?: AbortSignal) =>  Promise<IMetricResponse>;
 }

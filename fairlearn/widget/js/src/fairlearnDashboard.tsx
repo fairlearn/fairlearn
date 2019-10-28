@@ -58,16 +58,18 @@ export class FairlearnView extends DOMWidgetView {
             testData={data.dataset}
             predictedY={data.predicted_ys}
             trueY={data.true_y}
-            supportedClassificationAccuracyKeys={data.classification_methods}
+            supportedBinaryClassificationAccuracyKeys={data.classification_methods}
             supportedRegressionAccuracyKeys={data.regression_methods}
+            supportedProbabilityAccuracyKeys={data.regression_methods}
             requestMetrics={this.makeRequest.bind(this)}
-            predictionType={data.is_classifier === false ? "regression" : undefined}
+            predictionType={data.is_classifier === false ? "regression" : undefined as any}
         />, root_element);
         this.el.appendChild(root_element)
     }
 
     private makeRequest(data: any, abortSignal?: AbortSignal): Promise<any> {
         const promise = new Promise<any>((resolve, reject) => {
+            const request = _.cloneDeep(this.model.get('request'));
             const requestIndex = this.requestIndex;
             this.requestIndex++;
             // handle timeout (set to 3 minutes)
@@ -78,7 +80,9 @@ export class FairlearnView extends DOMWidgetView {
                 }
             }, 180000);
             this.promiseDict[requestIndex] = {resolve, reject, timeout};
-            this.model.set('request', {id: requestIndex, data});
+
+            request[requestIndex] = data;
+            this.model.set('request', request);
             this.touch();
 
             // handle abort
@@ -95,27 +99,32 @@ export class FairlearnView extends DOMWidgetView {
 
     private resolvePromise(): void {
         const response = this.model.get('response');
-        if (response === undefined || response.id === undefined) {
+        if (response === undefined) {
             return;
         }
-        const promise = this.promiseDict[response.id];
-        if (promise === undefined) {
-            return;
-        }
-        if (response.data === undefined) {
-            promise.reject('Null response');
-        }
-        else if (response.error !== undefined) {
-            promise.reject(new DOMException(response.error, 'PythonError'));
-        }
-        else {
-            const keys = Object.keys(response.data.bins);
-            const resultArray = new Array(Math.max(...(keys as any[])) + 1);
-            keys.forEach(i => resultArray[i] = response.data.bins[i]);
-            response.data.bins = resultArray;
-            promise.resolve(response.data);
-        }
-        clearTimeout(promise.timeout);
-        delete this.promiseDict[response.id];
+        const knownKeys = Object.keys(response);
+        knownKeys.forEach(key => {
+            const promise = this.promiseDict[key];
+            const responseItem = response[key];
+            if (promise === undefined) {
+                return;
+            }
+            if (responseItem === undefined) {
+                promise.reject('Null response');
+            }
+            else if (responseItem.error !== undefined) {
+                promise.reject(new DOMException(responseItem.error, 'PythonError'));
+            }
+            else {
+                const keys = Object.keys(responseItem.bins);
+                const resultArray = new Array(Math.max(...(keys as any[])) + 1);
+                keys.forEach(i => resultArray[i] = responseItem.bins[i]);
+                responseItem.bins = resultArray;
+                promise.resolve(responseItem);
+            }
+            clearTimeout(promise.timeout);
+            delete this.promiseDict[key];
+        });
+        // TODO clear handled objects if possible
     }
 };

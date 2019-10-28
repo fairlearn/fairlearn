@@ -1,7 +1,7 @@
 {
   "name": "fairlearn-dashboard",
-  "version": "0.0.1",
-  "license": "See license file 'LICENSE'",
+  "version": "0.0.3",
+  "license": "MIT",
   "description": "Dashboard for evaluating the fairness of models.",
   "main": "rel/index.js",
   "module": "rel/index.js",
@@ -19,7 +19,7 @@
     "@types/jest": "^24.0.15",
     "@types/lodash": "4.14.123",
     "@types/memoize-one": "4.1.1",
-    "@types/plotly.js": "1.44.0",
+    "@types/plotly.js-dist": "npm:@types/plotly.js",
     "@types/react": "16.8.10",
     "@types/uuid": "3.4.4",
     "identity-obj-proxy": "^3.0.0",
@@ -38,12 +38,9 @@
     "localized-strings": "^0.2.2",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.2",
-    "mlchartlib": "0.1.28",
+    "mlchartlib": "0.1.30",
     "moment": "^2.24.0",
     "office-ui-fabric-react": "7.21.0",
-    "plotly.js": "^1.45.3",
-    "react": ">=16.3.2-0 <17.0.0",
-    "react-dom": ">=16.3.2-0 <17.0.0",
     "uuid": "^3.3.2"
   }
 }
