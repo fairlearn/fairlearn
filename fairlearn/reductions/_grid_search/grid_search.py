@@ -77,8 +77,9 @@ class _GridGenerator:
 
 
 class GridSearch(Reduction):
-    """Learner to perform a grid search given a blackbox estimator algorithm. The approach used
+    """Estimator to perform a grid search given a blackbox estimator algorithm. The approach used
     is taken from section 3.4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
 
     :param estimator: The underlying estimator to be used. Must provide a
         fit(X, y, sample_weights) method
@@ -86,6 +87,26 @@ class GridSearch(Reduction):
     :param constraints: Object describing the parity constraints. This provides the reweighting
         and relabelling
     :type constraints: fairlearn.moments.Moment
+
+    :param selection_rule: Specifies the procedure for selecting the best model found by the
+        grid search. At the present time, the only valid value is "tradeoff_optimizatin" which
+        minimises a weighted sum of the error rate and constraint violation.
+    :type selection_rule: str
+
+    :param constraint_weight: When the `selection_rule` is "tradeoff_optimization" this specifies
+        the relative weight put on the constraint violation when selecting the best model.
+        The weight placed on the error rate will be `1-constraint_weight`
+    :type constraint_weight: float
+
+    :param grid_size: The number of Lagrange multipliers to generate in the grid
+    :type grid_size: int
+
+    :param grid_limit: The largest Lagrange multiplier to generate. The grid will contain values
+        `[-grid_limit, grid_limit]` by default
+    :type grid_limit: float
+
+    :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
+        set of Lagrange multipliers they desire using this argument.
     """
     _MESSAGE_Y_NOT_BINARY = "Supplied y labels are not 0 or 1"
 
