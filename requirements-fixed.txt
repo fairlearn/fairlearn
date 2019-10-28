@@ -1,9 +1,9 @@
 # Required for fairlearn
-matplotlib>=3.0.3
-numpy>=1.17.2
-pandas>=0.25.1
-scikit-learn>=0.21.3
-scipy>=1.3.1
+matplotlib==3.0.3
+numpy==1.17.2
+pandas==0.25.1
+scikit-learn==0.21.3
+scipy==1.3.1
 
 # Required for environment
 autopep8
@@ -14,7 +14,7 @@ requirements-parser
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
-tempeh>=0.1.5
+tempeh>=0.1.4
 
 # Required for notebooks
 jupyter

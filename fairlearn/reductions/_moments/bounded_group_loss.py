@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from .moment import LossMoment
 from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
-from fairlearn import _KW_SENSITIVE_FEATURES
+from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 
 
 class ConditionalLossMoment(LossMoment):

@@ -4,12 +4,12 @@
 import numpy as np
 import pandas as pd
 import pytest
-from fairlearn.post_processing._threshold_operation import ThresholdOperation
-from fairlearn.post_processing._roc_curve_utilities import (_calculate_roc_points,
-                                                            _filter_points_to_get_convex_hull,
-                                                            _get_roc,
-                                                            _interpolate_curve)
-from fairlearn.post_processing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
+from fairlearn.postprocessing._threshold_operation import ThresholdOperation
+from fairlearn.postprocessing._roc_curve_utilities import (_calculate_roc_points,
+                                                           _filter_points_to_get_convex_hull,
+                                                           _get_roc,
+                                                           _interpolate_curve)
+from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
 from .test_utilities import (sensitive_features_ex1, labels_ex, scores_ex,
                              _get_grouped_data_and_base_points)
 
@@ -43,36 +43,36 @@ def test_interpolate_curve():
 
 @pytest.mark.parametrize("base_points,expected_remaining_indices",
                          [(pd.DataFrame({
-                               "x":         [0, 1],
-                               "y":         [0, 1],
-                               "operation": ["i", "r"]
-                           }), [0, 1]),
-                          (pd.DataFrame({
-                               "x":         [0, 0.5, 1],
-                               "y":         [0, 0.5, 1],
-                               "operation": ["i", "r", "e"]
-                           }), [0, 2]),
-                          (pd.DataFrame({
-                               "x":         [0, 0.5, 1],
-                               "y":         [0, 0.51, 1],
-                               "operation": ["i", "r", "e"]
-                           }), [0, 1, 2]),
-                          (pd.DataFrame({
-                               "x":         [0, 0.2, 0.3,  0.5, 1],
-                               "y":         [0, 0.3, 0.35, 0.7, 1],
-                               "operation": ["i", "r", "r", "e", "l"]
-                           }), [0, 1, 3, 4]),
-                          (pd.DataFrame({
-                               "x":         [0, 0.1, 0.2, 0.5, 1],
-                               "y":         [0, 0.3, 0.5, 0.9, 1],
-                               "operation": ["i", "r", "r", "e", "l"]
-                           }), [0, 1, 2, 3, 4]),
-                          (pd.DataFrame({
-                               "x":         [0, 0.2, 0.3,  0.5, 1],
-                               "y":         [0, 0.3, 0.8, 0.82, 1],
-                               "operation": ["i", "r", "r", "e", "l"]
-                           }), [0, 2, 4])
-                          ])
+                             "x":         [0, 1],
+                             "y":         [0, 1],
+                             "operation": ["i", "r"]
+                         }), [0, 1]),
+                             (pd.DataFrame({
+                              "x":         [0, 0.5, 1],
+                              "y":         [0, 0.5, 1],
+                              "operation": ["i", "r", "e"]
+                              }), [0, 2]),
+                             (pd.DataFrame({
+                              "x":         [0, 0.5, 1],
+                              "y":         [0, 0.51, 1],
+                              "operation": ["i", "r", "e"]
+                              }), [0, 1, 2]),
+                             (pd.DataFrame({
+                              "x":         [0, 0.2, 0.3,  0.5, 1],
+                              "y":         [0, 0.3, 0.35, 0.7, 1],
+                              "operation": ["i", "r", "r", "e", "l"]
+                              }), [0, 1, 3, 4]),
+                             (pd.DataFrame({
+                              "x":         [0, 0.1, 0.2, 0.5, 1],
+                              "y":         [0, 0.3, 0.5, 0.9, 1],
+                              "operation": ["i", "r", "r", "e", "l"]
+                              }), [0, 1, 2, 3, 4]),
+                             (pd.DataFrame({
+                              "x":         [0, 0.2, 0.3,  0.5, 1],
+                              "y":         [0, 0.3, 0.8, 0.82, 1],
+                              "operation": ["i", "r", "r", "e", "l"]
+                              }), [0, 2, 4])
+                         ])
 def test_convex_hull(base_points, expected_remaining_indices):
     convex_hull = _filter_points_to_get_convex_hull(base_points)
     assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()

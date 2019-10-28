@@ -12,7 +12,7 @@ from fairlearn.reductions import Reduction
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
-from fairlearn import _KW_SENSITIVE_FEATURES
+from fairlearn._input_validation import _validate_and_reformat_reductions_input
 
 logger = logging.getLogger(__name__)
 
@@ -117,18 +117,7 @@ class ExponentiatedGradient(Reduction):
         """ Return a fair classifier under specified fairness constraints via
             exponentiated-gradient reduction.
         """
-        # TODO: validate input data; unify between grid search and expgrad?
-        if type(X) in [np.ndarray, list]:
-            X_train = pd.DataFrame(X)
-        else:
-            X_train = X
-
-        if type(y) in [np.ndarray, list]:
-            y_train = pd.Series(y)
-        else:
-            y_train = y
-
-        A = kwargs[_KW_SENSITIVE_FEATURES]
+        X_train, y_train, A = _validate_and_reformat_reductions_input(X, y, **kwargs)
 
         n = X_train.shape[0]
 
