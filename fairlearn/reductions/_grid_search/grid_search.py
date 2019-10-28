@@ -89,7 +89,7 @@ class GridSearch(Reduction):
     :type constraints: fairlearn.moments.Moment
 
     :param selection_rule: Specifies the procedure for selecting the best model found by the
-        grid search. At the present time, the only valid value is "tradeoff_optimizatin" which
+        grid search. At the present time, the only valid value is "tradeoff_optimization" which
         minimises a weighted sum of the error rate and constraint violation.
     :type selection_rule: str
 
