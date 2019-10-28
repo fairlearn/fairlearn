@@ -13,6 +13,7 @@ from fairlearn.metrics import group_accuracy_score, group_precision_score,\
     group_mean_underprediction, group_mean_prediction
 from IPython.display import display
 from scipy.sparse import issparse
+import copy
 import numpy as np
 import pandas as pd
 
@@ -131,9 +132,7 @@ class FairlearnDashboard(object):
             "predicted_ys": self._convertToList(predicted_ys),
             "dataset": self._convertToList(sensitive_features),
             "classification_methods": classification_methods,
-            "regression_methods": regression_methods,
-            "request": {},
-            "response": {}
+            "regression_methods": regression_methods
         }
 
         if feature_names is not None:
@@ -152,23 +151,24 @@ class FairlearnDashboard(object):
     def _on_request(self, change):
         try:
             new = change.new
-            self._widget_instance.response
+            response = copy.deepcopy(self._widget_instance.response)
             for id in new:
                 try:
-                if id not in self._widget_instance.response:
+                if id not in response:
                     data = new[id]
                     method = self._metric_methods.get(data["metricKey"]).get("function")
                     binVector = data["binVector"]
                     prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
-                    self._widget_instance.response[id] = {
+                    response[id] = {
                             "global": prediction.overall,
                             "bins": prediction.by_group
                             }
                     except Exception as ed:
-                        self._widget_instance.response[id] = {
+                        esponse[id] = {
                             "error": ed,
                             "global": 0,
                             "bins": []}
+            self._widget_instance.response = response
         except Exception as ed:
             raise ValueError("Error while making request")
 

@@ -19,5 +19,5 @@ class FairlearnWidget(widgets.DOMWidget):
     _view_module_version = Unicode('^0.1.1').tag(sync=True)
     _model_module_version = Unicode('^0.1.1').tag(sync=True)
     value = Dict().tag(sync=True)
-    request = Dict().tag(sync=True)
-    response = Dict().tag(sync=True)
+    request = Dict({}).tag(sync=True)
+    response = Dict({}).tag(sync=True)
