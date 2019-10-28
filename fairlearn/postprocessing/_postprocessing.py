@@ -51,3 +51,6 @@ class PostProcessing:
         if not predict_function or not fit_function or not callable(predict_function) or \
                 not callable(fit_function):
             raise ValueError(MISSING_FIT_PREDICT_ERROR_MESSAGE)
+
+
+PostProcessing.__module__ = "fairlearn.postprocessing"

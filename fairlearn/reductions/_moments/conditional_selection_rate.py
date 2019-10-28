@@ -82,6 +82,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         return signed_weights
 
 
+ConditionalSelectionRate.__module__ = "fairlearn.reductions"
+
+
 class DemographicParity(ConditionalSelectionRate):
     """ Demographic parity
     A classifier h satisfies DemographicParity if

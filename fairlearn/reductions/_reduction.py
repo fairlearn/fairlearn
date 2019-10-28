@@ -14,3 +14,6 @@ class Reduction:
 
     def predict_proba(self, X):
         raise NotImplementedError()
+
+
+Reduction.__module__ = "fairlearn.reductions"

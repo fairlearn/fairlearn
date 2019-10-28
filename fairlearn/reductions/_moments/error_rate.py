@@ -29,3 +29,6 @@ class ErrorRate(ClassificationMoment):
             return 2 * self.tags[_LABEL] - 1
         else:
             return lambda_vec[_ALL] * (2 * self.tags[_LABEL] - 1)
+
+
+ErrorRate.__module__ = "fairlearn.reductions"

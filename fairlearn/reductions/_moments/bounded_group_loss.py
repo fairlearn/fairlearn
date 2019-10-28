@@ -62,6 +62,9 @@ class ConditionalLossMoment(LossMoment):
         return signed_weights
 
 
+ConditionalLossMoment.__module__ = "fairlearn.reductions"
+
+
 class AverageLossMoment(ConditionalLossMoment):
 
     def __init__(self, loss):
@@ -104,3 +107,6 @@ class ZeroOneLoss(AbsoluteLoss):
 
     def __init__(self):
         super().__init__(0, 1)
+
+
+ZeroOneLoss.__module__ = "fairlearn.reductions"
