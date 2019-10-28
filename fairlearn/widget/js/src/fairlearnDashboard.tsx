@@ -82,7 +82,7 @@ export class FairlearnView extends DOMWidgetView {
             this.promiseDict[requestIndex] = {resolve, reject, timeout};
 
             request[requestIndex] = data;
-            this.model.set('request', request);
+            // this.model.set('request', request);
             this.touch();
 
             // handle abort
