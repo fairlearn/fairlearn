@@ -131,7 +131,9 @@ class FairlearnDashboard(object):
             "predicted_ys": self._convertToList(predicted_ys),
             "dataset": self._convertToList(sensitive_features),
             "classification_methods": classification_methods,
-            "regression_methods": regression_methods
+            "regression_methods": regression_methods,
+            "request": {},
+            "response": {}
         }
 
         if feature_names is not None:
@@ -149,21 +151,26 @@ class FairlearnDashboard(object):
 
     def _on_request(self, change):
         try:
-            data = change.new["data"]
-            method = self._metric_methods.get(data["metricKey"]).get("function")
-            binVector = data["binVector"]
-            prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
-            self._widget_instance.response = {
-                "data": {
-                    "global": prediction.overall,
-                    "bins": prediction.by_group
-                    },
-                "id": change.new["id"]}
+            new = change.new
+            self._widget_instance.response
+            for id in new:
+                try:
+                if id not in self._widget_instance.response:
+                    data = new[id]
+                    method = self._metric_methods.get(data["metricKey"]).get("function")
+                    binVector = data["binVector"]
+                    prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
+                    self._widget_instance.response[id] = {
+                            "global": prediction.overall,
+                            "bins": prediction.by_group
+                            }
+                    except Exception as ed:
+                        self._widget_instance.response[id] = {
+                            "error": ed,
+                            "global": 0,
+                            "bins": []}
         except Exception as ed:
-            self._widget_instance.response = {
-                "error": ed,
-                "data": {},
-                "id": change.new["id"]}
+            raise ValueError("Error while making request")
 
     def _show(self):
         display(self._widget_instance)
