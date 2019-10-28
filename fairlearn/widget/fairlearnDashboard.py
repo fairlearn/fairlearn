@@ -154,20 +154,20 @@ class FairlearnDashboard(object):
             response = copy.deepcopy(self._widget_instance.response)
             for id in new:
                 try:
-                if id not in response:
-                    data = new[id]
-                    method = self._metric_methods.get(data["metricKey"]).get("function")
-                    binVector = data["binVector"]
-                    prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
+                    if id not in response:
+                        data = new[id]
+                        method = self._metric_methods.get(data["metricKey"]).get("function")
+                        binVector = data["binVector"]
+                        prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
+                        response[id] = {
+                                "global": prediction.overall,
+                                "bins": prediction.by_group
+                                }
+                except Exception as ed:
                     response[id] = {
-                            "global": prediction.overall,
-                            "bins": prediction.by_group
-                            }
-                    except Exception as ed:
-                        esponse[id] = {
-                            "error": ed,
-                            "global": 0,
-                            "bins": []}
+                        "error": ed,
+                        "global": 0,
+                        "bins": []}
             self._widget_instance.response = response
         except Exception as ed:
             raise ValueError("Error while making request")
