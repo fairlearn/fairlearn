@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 """The fairlearn package contains a number of tools for
-analysing and mitigating disparity in Machine Learning models.
+analyzing and mitigating disparity in Machine Learning models.
 """
 
 __name__ = "fairlearn"
