@@ -69,7 +69,7 @@ export class FairlearnView extends DOMWidgetView {
 
     private makeRequest(data: any, abortSignal?: AbortSignal): Promise<any> {
         const promise = new Promise<any>((resolve, reject) => {
-            const request = this.model.get('request');
+            const request = _.cloneDeep(this.model.get('request'));
             const requestIndex = this.requestIndex;
             this.requestIndex++;
             // handle timeout (set to 3 minutes)
@@ -82,7 +82,7 @@ export class FairlearnView extends DOMWidgetView {
             this.promiseDict[requestIndex] = {resolve, reject, timeout};
 
             request[requestIndex] = data;
-            // this.model.set('request', request);
+            this.model.set('request', request);
             this.touch();
 
             // handle abort
