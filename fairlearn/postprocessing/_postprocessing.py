@@ -26,13 +26,32 @@ class PostProcessing:
             raise ValueError(PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
-        """ Fit the model based on training features and labels, auxiliary data,
+        """ Fit the model based on training features and labels, sensitive features,
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
         in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
+
+        :param X: feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+        :param y: label vector
+        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        :param sensitive_features: sensitive features to identify groups by, currently allows
+            only a single column
+        :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
+            or pandas.Series
         """
         raise NotImplementedError(self.fit.__name__ + " is not implemented")
 
-    def predict(self, X, sensitive_features):
+    def predict(self, X, *, sensitive_features):
+        """ Predict label for each sample in X while taking into account sensitive features.
+
+        :param X: feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+        :param sensitive_features: sensitive features to identify groups by, currently allows
+            only a single column
+        :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
+            or pandas.Series
+        :return: predictions in numpy.ndarray
+        """
         raise NotImplementedError(self.predict.__name__ + " is not implemented")
 
     def _pmf_predict(self, X, *, sensitive_features):
