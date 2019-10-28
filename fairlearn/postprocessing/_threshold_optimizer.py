@@ -76,6 +76,19 @@ class ThresholdOptimizer(PostProcessing):
         self._post_processed_predictor_by_attribute = None
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
+        """ Fit the model based on training features and labels, sensitive features,
+        as well as the fairness-unaware predictor or estimator. If an estimator was passed
+        in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
+
+        :param X: feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+        :param y: label vector
+        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        :param sensitive_features: sensitive features to identify groups by, currently allows
+            only a single column
+        :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
+            or pandas.Series
+        """
         self._validate_input_data(X, sensitive_features, y)
 
         if self._estimator:
@@ -101,9 +114,17 @@ class ThresholdOptimizer(PostProcessing):
             sensitive_features, y, scores, self._grid_size, self._flip, self._plot)
 
     def predict(self, X, *, sensitive_features, random_state=None):
-        """
+        """ Predict label for each sample in X while taking into account sensitive features.
+
+        :param X: feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+        :param sensitive_features: sensitive features to identify groups by, currently allows
+            only a single column
+        :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
+            or pandas.Series
         :param random_state: set to a constant for reproducibility
         :type random_state: int
+        :return: predictions in numpy.ndarray
         """
         if random_state:
             random.seed(random_state)
