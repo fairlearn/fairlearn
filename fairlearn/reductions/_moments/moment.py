@@ -40,13 +40,30 @@ class Moment:
         raise NotImplementedError()
 
 
+# Ensure that Moment shows up in correct place in documentation
+# when it is used as a base class
+Moment.__module__ = "fairlearn.reductions"
+
+
 class ClassificationMoment(Moment):
-    """Moment that can be expressed as weighted classification error"""
+    """Moment that can be expressed as weighted classification error
+    """
+
+
+# Ensure that ClassificationMoment shows up in correct place in documentation
+# when it is used as a base class
+ClassificationMoment.__module__ = "fairlearn.reductions"
 
 
 class LossMoment(Moment):
-    """Moment that can be expressed as weighted loss"""
+    """Moment that can be expressed as weighted loss
+    """
 
     def __init__(self, loss):
         super().__init__()
         self.reduction_loss = loss
+
+
+# Ensure that LossMoment shows up in correct place in documentation
+# when it is used as a base class
+LossMoment.__module__ = "fairlearn.reductions"
