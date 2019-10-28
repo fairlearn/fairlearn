@@ -62,7 +62,7 @@ def group_precision_score(y_true, y_pred, group_membership, *,
 
 def group_recall_score(y_true, y_pred, group_membership, *,
                        labels=None, pos_label=1, average='binary',
-                       sample_weight=None):                
+                       sample_weight=None):
     """A wrapper around the :any:`sklearn.metrics.recall_score` routine.
     The arguments remain the same, with `group_membership` added.
     However, the only positional arguments supported are `y_true`,
