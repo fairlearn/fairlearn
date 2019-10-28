@@ -158,7 +158,10 @@ class FairlearnDashboard(object):
                         data = new[id]
                         method = self._metric_methods.get(data["metricKey"]).get("function")
                         binVector = data["binVector"]
-                        prediction = method(self._true_y, self._predicted_ys[data["modelIndex"]], binVector)
+                        prediction = method(
+                            self._true_y,
+                            self._predicted_ys[data["modelIndex"]],
+                            binVector)
                         response[id] = {
                                 "global": prediction.overall,
                                 "bins": prediction.by_group
@@ -169,7 +172,7 @@ class FairlearnDashboard(object):
                         "global": 0,
                         "bins": []}
             self._widget_instance.response = response
-        except Exception as ed:
+        except Exception:
             raise ValueError("Error while making request")
 
     def _show(self):
