@@ -9,6 +9,9 @@ from ._metrics_engine import metric_by_group
 def group_accuracy_score(y_true, y_pred, group_membership, *,
                          normalize=True,
                          sample_weight=None):
+    """A wrapper around the :any:`sklearn.metrics.accuracy_score` routine.
+    The arguments remain the same, with `group_membership` added.
+    """
 
     def internal_acc_wrapper(y_true, y_pred, sample_weight=None):
         return skm.accuracy_score(y_true, y_pred,
