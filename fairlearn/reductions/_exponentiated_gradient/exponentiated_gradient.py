@@ -34,19 +34,12 @@ class ExponentiatedGradientResult:
                  n_oracle_calls):
         """ Result object for the exponentiated gradient reduction operation.
         """
-
         self._best_classifier = best_classifier
-
         self._best_gap = best_gap
-
         self._classifiers = classifiers
-
         self._weights = weights
-
         self._last_t = last_t
-
         self._best_t = best_t
-
         self._n_oracle_calls = n_oracle_calls
 
     @property
