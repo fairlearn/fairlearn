@@ -234,6 +234,9 @@ class ExponentiatedGradient(Reduction):
         """Provide a prediction for the given input data.
         Note that this is non-deterministic, due to the nature of the
         exponentiated gradient algorithm
+
+        :param X: The data for which predictions are required
+        :type X: Array
         """
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
