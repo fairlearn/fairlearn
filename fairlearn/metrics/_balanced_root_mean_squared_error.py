@@ -12,11 +12,12 @@ def balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
     """
     Used for binary logistic regression, this computes the error as
     [RMSE(Y=0) + RMSE(Y=1)]/2
-    The classes are constrained to be {0, 1}. The y_true values must
-    always be one of these, while y_pred can be a continuous probability
+    The classes are constrained to be {0, 1}. The `y_true` values must
+    always be one of these, while `y_pred` can be a continuous probability
     (which could be thresholded to get a predicted class).
 
-    Internally, this builds on mean_squared_error from scikit-learn
+    Internally, this builds on the
+    :any:`sklearn.metrics.mean_squared_error` routine.
     """
 
     y_ta = np.squeeze(np.asarray(y_true))

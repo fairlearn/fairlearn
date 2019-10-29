@@ -16,7 +16,8 @@ def specificity_score(y_true, y_pred, sample_weight=None):
     """
     The specificity score is also known as the True Negative Rate.
     At the present time, this routine only supports binary
-    classifiers with labels taken from {0, 1}
+    classifiers with labels taken from {0, 1}.
+    The calculation uses the :any:`sklearn.metrics.confusion_matrix` routine.
     """
     cm = skm.confusion_matrix(y_true, y_pred, sample_weight=sample_weight)
     # Taken from
@@ -30,7 +31,10 @@ def miss_rate(y_true, y_pred, sample_weight=None):
     """
     The miss rate is also known as the False Negative Rate.
     At the present time, this routine only supports binary
-    classifiers with labels taken from {0, 1}
+    classifiers with labels taken from {0, 1}.
+    By definition, this is the complement of the True Positive
+    Rate, so this routine uses the
+    :any:`sklearn.metrics.recall_score` routine.
     """
     # aka False Negative Rate
     tpr = skm.recall_score(y_true, y_pred, sample_weight=sample_weight)
@@ -43,7 +47,10 @@ def fallout_rate(y_true, y_pred, sample_weight=None):
     """
     The fallout rate is also known as the False Positive Rate.
     At the present time, this routine only supports binary
-    classifiers with labels taken from {0, 1}
+    classifiers with labels taken from {0, 1}.
+    By definition, this is the complement of the
+    Specificity, and so uses :any:`specificity_score` in its
+    calculation.
     """
     # aka False Positive Rate
     # Since we use specificity, also restricted to binary classification
