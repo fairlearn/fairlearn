@@ -25,8 +25,7 @@ class FairlearnDashboard(object):
             self, *,
             sensitive_features,
             true_y, predicted_ys,
-            class_names=None,
-            feature_names=None,
+            sensitive_feature_names=None,
             is_classifier=None):
 
         """Initialize the fairlearn Dashboard.
@@ -40,16 +39,12 @@ class FairlearnDashboard(object):
         :type trueY: numpy.array or list[]
         :param predicted_ys: Array of output predictions from models to be evaluated
         :type predicted_ys: numpy.array or list[][]
-        :param class_names: The class names
-        :type class_names: numpy.array or list[]
-        :param feature_names: Feature names
-        :type feature_names: numpy.array or list[]
+        :param sensitive_feature_names: Feature names
+        :type sensitive_feature_names: numpy.array or list[]
         """
         self._widget_instance = FairlearnWidget()
         if sensitive_features is None or true_y is None or predicted_ys is None:
             raise ValueError("Required parameters not provided")
-        self._true_y = true_y
-        self._predicted_ys = predicted_ys
 
         self._metric_methods = {
             "accuracy_score": {
@@ -126,20 +121,34 @@ class FairlearnDashboard(object):
                                   if "classification" in method[1]["model_type"]]
         regression_methods = [method[0] for method in self._metric_methods.items()
                               if "regression" in method[1]["model_type"]]
+        
+        dataset = self._sanitizeDataShape(sensitive_features)
+        self._predicted_ys = self._convertToList(predicted_ys)
+        if len(np.shape(self._predicted_ys)) == 1:
+            self._predicted_ys = [self._predicted_ys]
+        self._true_y = self._convertToList(true_y)
+
+        if np.shape(self._true_y)[0] != np.shape(self._predicted_ys)[1]:
+            raise ValueError("Predicted Y does not match true y shape")
+        
+        if np.shape(self._true_y)[0] != np.shape(dataset)[0]:
+            raise ValueError("Sensitive features shape does not match true y shape")
+
 
         dataArg = {
-            "true_y": self._convertToList(true_y),
-            "predicted_ys": self._convertToList(predicted_ys),
-            "dataset": self._convertToList(sensitive_features),
+            "true_y": self._true_y,
+            "predicted_ys": self._predicted_ys,
+            "dataset": dataset,
             "classification_methods": classification_methods,
             "regression_methods": regression_methods
         }
 
-        if feature_names is not None:
-            dataArg["features"] = self._convertToList(feature_names)
-
-        if class_names is not None:
-            dataArg["classes"] = self._convertToList(class_names)
+        if sensitive_feature_names is not None:
+            sensitive_feature_names =  self._convertToList(sensitive_feature_names)
+            if np.shape(dataset)[1] != np.shape(sensitive_feature_names)[0]:
+                raise Warning("Feature names shape does not match dataset, ignoring")
+            else:
+                dataArg["features"] = sensitive_feature_names
 
         if is_classifier is not None and isinstance(is_classifier, bool):
             dataArg["is_classifier"] = is_classifier
@@ -178,12 +187,20 @@ class FairlearnDashboard(object):
     def _show(self):
         display(self._widget_instance)
 
+    def _sanitizeDataShape(self, dataset):
+        result = self._convertToList(dataset)
+        # Dataset should be 2d, if not we need to map
+        if (len(np.shape(result)) == 2):
+            return result
+        return list(map(lambda x: [x], result))
+
     def _convertToList(self, array):
         if issparse(array):
             if array.shape[1] > 1000:
                 raise ValueError("Exceeds maximum number of features for visualization (1000)")
             return array.toarray().tolist()
-        if (isinstance(array, pd.DataFrame)):
+        
+        if (isinstance(array, pd.DataFrame) or isinstance(array, pd.Series)):
             return array.values.tolist()
         if (isinstance(array, np.ndarray)):
             return array.tolist()
