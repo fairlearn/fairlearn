@@ -20,6 +20,15 @@ class Moment:
         self.data_loaded = False
 
     def load_data(self, X, y, **kwargs):
+        """Load a set of data for use by this object. The keyword arguments
+        can contain a `sensitive_features` array.
+
+        :param X: The feature data
+        :type X: array
+
+        :param y: The true label data
+        :type X: array
+        """
         assert self.data_loaded is False, \
             "data can be loaded only once"
         self.X = X
