@@ -121,19 +121,18 @@ class FairlearnDashboard(object):
                                   if "classification" in method[1]["model_type"]]
         regression_methods = [method[0] for method in self._metric_methods.items()
                               if "regression" in method[1]["model_type"]]
-        
-        dataset = self._sanitizeDataShape(sensitive_features)
-        self._predicted_ys = self._convertToList(predicted_ys)
+
+        dataset = self._sanitize_data_shape(sensitive_features)
+        self._predicted_ys = self._convert_to_list(predicted_ys)
         if len(np.shape(self._predicted_ys)) == 1:
             self._predicted_ys = [self._predicted_ys]
-        self._true_y = self._convertToList(true_y)
+        self._true_y = self._convert_to_list(true_y)
 
         if np.shape(self._true_y)[0] != np.shape(self._predicted_ys)[1]:
-            raise ValueError("Predicted Y does not match true y shape")
-        
+            raise ValueError("Predicted y does not match true y shape")
+
         if np.shape(self._true_y)[0] != np.shape(dataset)[0]:
             raise ValueError("Sensitive features shape does not match true y shape")
-
 
         dataArg = {
             "true_y": self._true_y,
@@ -144,7 +143,7 @@ class FairlearnDashboard(object):
         }
 
         if sensitive_feature_names is not None:
-            sensitive_feature_names =  self._convertToList(sensitive_feature_names)
+            sensitive_feature_names = self._convert_to_list(sensitive_feature_names)
             if np.shape(dataset)[1] != np.shape(sensitive_feature_names)[0]:
                 raise Warning("Feature names shape does not match dataset, ignoring")
             else:
@@ -187,19 +186,19 @@ class FairlearnDashboard(object):
     def _show(self):
         display(self._widget_instance)
 
-    def _sanitizeDataShape(self, dataset):
-        result = self._convertToList(dataset)
+    def _sanitize_data_shape(self, dataset):
+        result = self._convert_to_list(dataset)
         # Dataset should be 2d, if not we need to map
         if (len(np.shape(result)) == 2):
             return result
         return list(map(lambda x: [x], result))
 
-    def _convertToList(self, array):
+    def _convert_to_list(self, array):
         if issparse(array):
             if array.shape[1] > 1000:
                 raise ValueError("Exceeds maximum number of features for visualization (1000)")
             return array.toarray().tolist()
-        
+
         if (isinstance(array, pd.DataFrame) or isinstance(array, pd.Series)):
             return array.values.tolist()
         if (isinstance(array, np.ndarray)):
