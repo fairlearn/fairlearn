@@ -27,7 +27,7 @@ class Moment:
         :type X: array
 
         :param y: The true label data
-        :type X: array
+        :type y: array
         """
         assert self.data_loaded is False, \
             "data can be loaded only once"
