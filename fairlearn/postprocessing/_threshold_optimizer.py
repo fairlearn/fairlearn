@@ -80,7 +80,7 @@ class ThresholdOptimizer(PostProcessing):
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model based on training features and labels, sensitive features,
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
-        in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
+        in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
 
         :param X: feature matrix
         :type X: numpy.ndarray or pandas.DataFrame

@@ -30,13 +30,13 @@ class PostProcessing:
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """ Fit the model based on training features and labels, sensitive features,
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
-        in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
+        in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
 
-        :param X: feature matrix
+        :param X: Feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
-        :param y: label vector
+        :param y: Label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
-        :param sensitive_features: sensitive features to identify groups by, currently allows
+        :param sensitive_features: Sensitive features to identify groups by, currently allows
             only a single column
         :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
@@ -46,11 +46,11 @@ class PostProcessing:
     def predict(self, X, *, sensitive_features):
         """ Predict label for each sample in X while taking into account sensitive features.
 
-        :param X: feature matrix
+        :param X: Feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
-        :param sensitive_features: sensitive features to identify groups by, currently allows
+        :param sensitive_features: Sensitive features to identify groups by, currently allows
             only a single column
-        :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
+        :type sensitive_features: Currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
         :return: predictions in numpy.ndarray
         """
