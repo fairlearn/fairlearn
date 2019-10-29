@@ -29,42 +29,64 @@ class ExponentiatedGradientResult:
     """Class to hold the result of an ExponentiatedGradient
     estimator
     """
+
     def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
                  n_oracle_calls):
         """ Result object for the exponentiated gradient reduction operation.
         """
+        self._best_classifier = best_classifier
+        self._best_gap = best_gap
+        self._classifiers = classifiers
+        self._weights = weights
+        self._last_t = last_t
+        self._best_t = best_t
+        self._n_oracle_calls = n_oracle_calls
 
+    @property
+    def best_classifier(self):
         """ A function that maps a DataFrame X containing covariates to a Series containing the
         corresponding probabilistic decisions in [0,1]
         """
-        self._best_classifier = best_classifier
+        return self._best_classifier
 
+    @property
+    def best_gap(self):
         """ The quality of best_classifier; if the algorithm has converged then best_gap <= nu;
         the solution best_classifier is guaranteed to have the classification error within
         2*best_gap of the best error under constraint eps; the constraint violation is at most
         2*(eps+best_gap)
         """
-        self._best_gap = best_gap
+        return self._best_gap
 
+    @property
+    def classifiers(self):
         """ The base classifiers generated (instances of estimator).
         """
-        self._classifiers = classifiers
+        return self._classifiers
 
+    @property
+    def weights(self):
         """ The weights of those classifiers within best_classifier.
         """
-        self._weights = weights
+        return self._weights
 
+    @property
+    def last_t(self):
         """ The last executed iteration; always last_t < T.
         """
-        self._last_t = last_t
+        return self._last_t
 
+    @property
+    def best_t(self):
         """ The iteration in which best_classifier was obtained.
         """
-        self._best_t = best_t
+        return self._best_t
 
+    @property
+    def n_oracle_calls(self):
         """ The number of times the estimator was called.
         """
-        self._n_oracle_calls = n_oracle_calls
+        return self._n_oracle_calls
 
     def _as_dict(self):
         return {
@@ -81,29 +103,27 @@ class ExponentiatedGradientResult:
 class ExponentiatedGradient(Reduction):
     """An Estimator which implements the exponentiated gradient approach to
     reductions described by `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
-    """
-    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
-        """ The constructor for a mitigator object that applies the exponentiated gradient
-        reduction to a provided estimator to achieve the given constraints.
 
-        :param estimator: an estimator implementing methods fit(X, y, sample_weight) and
-            predict(X), where X is the set of features, y is the set of labels, and
-            sample_weight is a set of weights; labels y and predictions returned by predict(X)
-            are either 0 or 1.
-        :type estimator: an estimator
-        :param constraints: the disparity constraints expressed as moments
-        :type constraints: fairlearn.reductions.moments.Moment
-        :param eps: allowed fairness constraint violation (default 0.01)
-        :type eps: float
-        :param T: max number of iterations (default 50)
-        :type T: int
-        :param nu: convergence threshold for the duality gap (default None), corresponding to a
-            conservative automatic setting based on the statistical uncertainty in measuring
-            classification error)
-        :type nu: float
-        :param eta_mul: initial setting of the learning rate (default 2.0)
-        :type eta_mul: float
-        """
+    :param estimator: An estimator implementing methods fit(X, y, sample_weight) and
+        predict(X), where X is the set of features, y is the set of labels, and
+        sample_weight is a set of weights; labels y and predictions returned by predict(X)
+        are either 0 or 1.
+    :type estimator: An estimator
+    :param constraints: The disparity constraints expressed as moments
+    :type constraints: fairlearn.reductions.Moment
+    :param eps: Allowed fairness constraint violation
+    :type eps: float
+    :param T: Maximum number of iterations
+    :type T: int
+    :param nu: Convergence threshold for the duality gap, corresponding to a
+        conservative automatic setting based on the statistical uncertainty in measuring
+        classification error)
+    :type nu: float
+    :param eta_mul: Initial setting of the learning rate
+    :type eta_mul: float
+    """
+
+    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
         self._estimator = estimator
         self._constraints = constraints
         self._eps = eps
@@ -211,6 +231,13 @@ class ExponentiatedGradient(Reduction):
         # TODO: figure out whether we should keep the remaining data of the result object
 
     def predict(self, X):
+        """Provide a prediction for the given input data.
+        Note that this is non-deterministic, due to the nature of the
+        exponentiated gradient algorithm
+
+        :param X: The data for which predictions are required
+        :type X: Array
+        """
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
