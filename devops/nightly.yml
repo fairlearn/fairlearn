@@ -34,4 +34,5 @@ jobs:
 
 - template: notebook-job-template.yml
   parameters:
+    name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
