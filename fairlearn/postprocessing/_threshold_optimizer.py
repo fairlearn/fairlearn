@@ -43,24 +43,26 @@ logger = logging.getLogger(__name__)
 
 
 class ThresholdOptimizer(PostProcessing):
-    def __init__(self, *, unconstrained_predictor=None, estimator=None,
-                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True, plot=False):
-        """ Creates the post processing object.
+    """An Estimator which implements the threshold optimization approach of
+    `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_.
 
-        :param unconstrained_predictor: the trained predictor whose output will be post processed
-        :type unconstrained_predictor: a trained predictor
-        :param estimator: an untrained estimator that will be trained, and
-            subsequently its output will be post processed
-        :type estimator: an untrained estimator
-        :param grid_size: The number of ticks on the grid over which we evaluate the curves.
+    :param unconstrained_predictor: The trained predictor whose output will be post processed
+    :type unconstrained_predictor: A trained predictor
+    :param estimator: An untrained estimator that will be trained, and
+        subsequently its output will be post processed
+    :type estimator: An untrained estimator
+    :param grid_size: The number of ticks on the grid over which we evaluate the curves.
         A large grid_size means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
-        :type grid_size: int
-        :param flip: allow flipping to negative weights if it improves accuracy.
-        :type flip: bool
-        :param plot: show ROC/selection-error plot if True
-        :type plot: bool
-        """
+    :type grid_size: int
+    :param flip: Allow flipping to negative weights if it improves accuracy.
+    :type flip: bool
+    :param plot: Show ROC/selection-error plot if True
+    :type plot: bool
+    """
+
+    def __init__(self, *, unconstrained_predictor=None, estimator=None,
+                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True, plot=False):
         super(ThresholdOptimizer, self).__init__(
             unconstrained_predictor=unconstrained_predictor,
             estimator=estimator,
@@ -76,9 +78,9 @@ class ThresholdOptimizer(PostProcessing):
         self._post_processed_predictor_by_attribute = None
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
-        """ Fit the model based on training features and labels, sensitive features,
+        """Fit the model based on training features and labels, sensitive features,
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
-        in the constructor this fit method will call fit(X, y, **kwargs) on said estimator.
+        in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
 
         :param X: feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
