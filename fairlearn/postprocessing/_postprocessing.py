@@ -10,6 +10,8 @@ MISSING_PREDICT_ERROR_MESSAGE = "The predictor does not have a callable 'predict
 
 
 class PostProcessing:
+    """Base class for postprocessing approaches to disparith mitigation
+    """
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
                  constraints=None):
         if unconstrained_predictor and estimator:
