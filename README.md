@@ -78,7 +78,7 @@ After loading the visualizations via the following API call, you will see the fo
 
 
 
-`fairlearn` is a Python package that implements a variety of fairness-related algorithms to mitigate bias including:
+`fairlearn` is a Python package that implements a variety of fairness-related algorithms to mitigate unfairness including:
 
 ## Preprocessing and In-processing
 
