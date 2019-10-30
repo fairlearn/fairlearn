@@ -26,3 +26,5 @@ jobs:
     pyVersions: [3.7] 
 
 - template: notebook-job-template.yml
+  parameters:
+    pyVersions: [3.6]
