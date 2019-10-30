@@ -61,3 +61,21 @@ post_processor.predict(X, sensitive_features=sensitive_features)
 post_processor._pmf_predict(X, sensitive_features=sensitive_features)
 ```
 </div>
+
+
+# Creating new releases
+
+If you are one of the current maintainers of this project, follow this checklist to create a new release:
+
+1. Create a branch for the release: `git checkout -b release-vxx.xx`
+1. Ensure that all builds run successfully on all operating systems and python versions on that branch
+1. Bump the module version in `fairlearn/__init__.py`
+1. Make a pull request to fairlearn/fairlearn
+1. Merge fairlearn/fairlearn pull request
+1. Tag and push: `git tag vxx.xx; git push --tags`
+1. Remove old build files: `git clean -xdf`
+1. Upload new package version to pypi
+    ```python
+    python setup.py sdist bdist_wheel
+    python -m twine upload  dist/* --verbose
+    ```

@@ -2,40 +2,37 @@
 
 
 
-# Fairlearn
+# fairlearn
 
-Fairlearn is a machine learning fairness toolkit that makes it easier for anyone involved in the development of Artificial Intelligence (AI) systems to monitor and understand the impact of unfairness in their machine learning lifecycle, and use state-of-the-art techniques to mitigate the observed unfairness. Fairlearn repository contains an SDK and Jupyter notebooks with examples to showcase its use.
+`fairlearn` is a machine learning fairness toolkit that makes it easier for anyone involved in the development of Artificial Intelligence (AI) systems to monitor and understand the impact of unfairness in their machine learning lifecycle, and use state-of-the-art techniques to mitigate the observed unfairness. The fairlearn repository contains an SDK and Jupyter notebooks with examples to showcase its use.
 
-- [Overview of Fairlearn](#intro)
+- [Overview of fairlearn](#intro)
 - [Target Audience](#target)
-- [Fairness Assessment Dashboard](#getting-started)
-- [Unfairness Mitigation Techniques](#models)
-- [Install Fairlearn](#install)
+- [Fairness Assessment Dashboard](#assessment)
+- [Unfairness Mitigation Techniques](#mitigation)
+- [Install fairlearn](#install)
 - [Contributing](#contributing)
-- [Code of Conduct](#code)
-- [Build Status](#build-status)
-- [Additional References](#refs)
-
-
+- [Maintainers](#maintainers)
+- [Issues](#issues)
 
  
 # <a name="intro"></a>
-# Overview of Fairlearn
+# Overview of fairlearn
 
 We are at an age where many processes and applications have become or are becoming automated by AI systems. AI is the product of human processes and decisions used to create it, the data used to train it, and the environment used to test it.  The AI system can exhibit different, sometimes harmful, behaviors as a result of this process and systematically discriminate against people based on certain attributes protected by law (e.g., gender, ethnicity). Therefore, regulated industries, or any other industry with legal, moral and ethical responsibilities, need tools to ensure the fairness of models and the predictions they produce. 
 
 
-`Fairlearn` is an open source unfairness assessment and mitigation toolkit that provides business stakeholders, executives, developers, and data scientists with insights into the unfairness of their model predictions, and techniques to mitigate that. In particular, Fairlearn assists in 
+`fairlearn` is an open source unfairness assessment and mitigation toolkit that provides business stakeholders, executives, developers, and data scientists with insights into the unfairness of their model predictions, and techniques to mitigate that. In particular, `fairlearn` assists in 
 
-1) Raising awareness of inherent unfairness in model predictions among those involved in developing AI applications by demonstrating harms visited on vulnerable groups
+1) raising awareness of inherent unfairness in model predictions among those involved in developing AI applications by demonstrating harms visited on vulnerable groups
 
-2) Providing state-of-the-art techniques to mitigate the observed unfairness
-
-
-At the assessment phase, Fairlearn provides a dashboard with a rich set of visualizations that uses a set of disparity and accuracy metrics and user-defined protected attributes (e.g., age, gender, ethnicity) to monitor the accuracy and fairness of a model’s predictions.
+2) providing state-of-the-art techniques to mitigate the observed unfairness
 
 
-At the mitigation phase, it incorporates state-of-the-art unfairness mitigation techniques to mitigate the unfairness observed at the previous assessment phase. Fairlearn’s mitigation stage supports regression and binary classification models trained on tabular data.
+At the assessment phase, fairlearn provides a dashboard with a rich set of visualizations that uses a set of disparity and accuracy metrics and user-defined protected attributes (e.g., age, gender, ethnicity) to monitor the accuracy and fairness of a model’s predictions.
+
+
+At the mitigation phase, it incorporates state-of-the-art unfairness mitigation techniques to mitigate the unfairness observed at the previous assessment phase. `fairlearn`’s mitigation stage supports regression and binary classification models trained on tabular data.
 
 
 
@@ -81,11 +78,11 @@ After loading the visualizations via the following API call, you will see the fo
 
 
 
-Fairlearn includes a Python package that implements a variety of fairness-related algorithms to mitigate bias including:
+`fairlearn` is a Python package that implements a variety of fairness-related algorithms to mitigate bias including:
 
 ## Pre-processing and In-processing:
 
-Fairlearn shows that given access to a learning oracle for a class H, there is an efficient algorithm to find the lowest-error distribution over classifiers in H subject to equalizing false positive rates across polynomially many subgroups.
+`fairlearn` shows that given access to a learning oracle for a class H, there is an efficient algorithm to find the lowest-error distribution over classifiers in H subject to equalizing false positive rates across polynomially many subgroups.
 =======
 # Fairness in machine learning - Mitigation algorithms
 
@@ -93,7 +90,7 @@ A Python package that implements a variety of algorithms that mitigate unfairnes
 
 ## Current Release
 
-* The current stable release is available at [FairLearn v0.2.0](https://github.com/fairlearn/fairlearn/tree/v0.2.0).
+* The current stable release is available at [fairLearn v0.2.0](https://github.com/fairlearn/fairlearn/tree/v0.2.0).
 
 * Our latest work differs substantively from version 0.2.0, please visit the repo for further information. In particular, look at [Existing users: How to onboard to fairlearn v0.3+](#existing).
 
@@ -121,8 +118,8 @@ A variety of fairness-related algorithms to mitigate bias are included:
 > DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a new issue. 
 
 
-# <a name="how-to"></a>
-# Install Fairlearn
+# <a name="install"></a>
+# Install fairlearn
 ## Existing Users:
 
 Use the following guide to onboard to fairlearn v0.3+:
@@ -190,10 +187,12 @@ python -m pytest -s ./test
 
 For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](CONTRIBUTING.md#api)
 
+# <a name="contributing"></a>
 # Contributing
 
 To contribute please check our [Contributing guide](CONTRIBUTING.md).
 
+# <a name="maintainers"></a>
 # Maintainers
 
 fairlearn is maintained by:
@@ -204,17 +203,8 @@ fairlearn is maintained by:
 - **@romanlutz**
 - **@bethz**
 
-## Releasing
 
-If you are the current maintainer of this project:
-
-1. Create a branch for the release: `git checkout -b release-vxx.xx`
-1. Ensure that all tests return "ok": `python -m pytest -s ./test`
-1. Bump the module version in `fairlearn/__init__.py`
-1. Make a pull request to fairlearn/fairlearn
-1. Merge fairlearn/fairlearn pull request
-1. Tag and push: `git tag vxx.xx; git push --tags`
-
+# <a name="issues"></a>
 # Issues
 
 ## Regular (non-security) issues
