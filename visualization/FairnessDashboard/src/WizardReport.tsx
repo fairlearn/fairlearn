@@ -577,12 +577,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex, 
                     this.props.selectedModelIndex,
-                    "miss_rate")).bins;
+                    "false_negative_over_total")).bins;
                 binnedFPR = (await this.props.metricsCache.getMetric(
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex, 
                     this.props.selectedModelIndex,
-                    "fallout_rate")).bins;
+                    "false_positive_over_total")).bins;
                 outcomes = await this.props.metricsCache.getMetric(
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex, 
