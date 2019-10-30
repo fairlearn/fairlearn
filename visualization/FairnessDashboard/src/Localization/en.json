@@ -48,7 +48,8 @@
         "insightsText3": "The most accurate predictor achieves {0} of {1} and a disparity of {2}.",
         "insightsText4": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}.",
         "disparityInOutcomes": "Disparity in outcomes",
-        "disparityInAccuracy": "Disparity in {0}"
+        "disparityInAccuracy": "Disparity in {0}",
+        "howToMeasureDisparity": "How should disparity be measured?"
     },
     "Report": {
         "modelName": "Model {0}",
