@@ -59,6 +59,20 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         isMinimization: true,
         isPercentage: true
     },
+    "false_positive_over_total": {
+        key: "false_positive_over_total",
+        title: localization.Metrics.falloutRate,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: true
+    },
+    "false_negative_over_total": {
+        key: "false_negative_over_total",
+        title: localization.Metrics.falloutRate,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: true
+    },
     "max_error": {
         key: "max_error",
         title: localization.Metrics.maxError,
@@ -90,6 +104,13 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
     "median_absolute_error": {
         key: "median_absolute_error",
         title: localization.Metrics.medianAbsoluteError,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: false
+    },
+    "balanced_root_mean_squared_error": {
+        key: "balanced_root_mean_squared_error",
+        title: localization.Metrics.balancedRootMeanSquaredError,
         description: localization.loremIpsum,
         isMinimization: true,
         isPercentage: false
