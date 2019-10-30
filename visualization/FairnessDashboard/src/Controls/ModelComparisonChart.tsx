@@ -6,7 +6,7 @@ import { MetricsCache } from "../MetricsCache";
 import { IAccuracyPickerProps, IParityPickerProps, IFeatureBinPickerProps } from "../FairnessWizard";
 import { ParityModes } from "../ParityMetrics";
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
-import { Text } from "office-ui-fabric-react/lib/Text";
+import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
 import { localization } from "../Localization/localization";
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { mergeStyleSets } from "@uifabric/styling";
@@ -158,11 +158,15 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             borderBottom: "1px solid #CCCCCC"
         },
         chart: {
-            padding: "60px 0 100px 0",
+            padding: "60px 0 0 0",
             flex: 1
         },
         textSection: {
             paddingBottom: "5px"
+        },
+        radio: {
+            paddingBottom: "30px",
+            paddingLeft: "75px"
         }
     });
 
@@ -285,6 +289,25 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         </div>
                     </div>
                 </div>
+                <div>
+                    <ChoiceGroup
+                        className={ModelComparisonChart.classNames.radio}
+                        selectedKey={this.state.disparityInOutcomes ? "outcomes" : "accuracy"}
+                        options={[
+                            {
+                            key: 'accuracy',
+                            text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
+                                AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title) as string
+                            },
+                            {
+                            key: 'outcomes',
+                            text: localization.ModelComparison.disparityInOutcomes
+                            }
+                        ]}
+                        onChange={this.disparityChanged}
+                        label={localization.ModelComparison.howToMeasureDisparity}
+                        ></ChoiceGroup>
+                </div>
             </Stack>);
     }
 
@@ -305,7 +328,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 return this.props.metricsCache.getDisparityMetric(
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex,
-                    modelIndex, this.props.parityPickerProps.selectedParityKey,
+                    modelIndex, 
+                    disparityMetric,
                     ParityModes.difference);
             });
 
@@ -314,6 +338,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             this.setState({accuracyArray, disparityArray});
         } catch {
             // todo;
+        }
+    }
+
+    private readonly disparityChanged = (ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): void => {
+        const disparityInOutcomes = option.key !== "accuracy";
+        if (this.state.disparityInOutcomes !== disparityInOutcomes) {
+            this.setState({disparityInOutcomes, disparityArray: undefined});
         }
     }
     // TODO: Reuse if multiselect re-enters design
