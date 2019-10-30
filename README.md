@@ -56,9 +56,9 @@ The assessment dashboard automatically analyzes a model’s predictions, provide
 
 These insights are calculated via a set of disparity metrics that showcase:
 
-1) [Disparity in Accuracy]: How the model accuracy differs across different buckets of a selected protected attribute (e.g., how accuracy of the model differs for "females" vs. "males" vs. "other gender" data points),
+1. [Disparity in Accuracy]: How the model accuracy differs across different buckets of a selected sensitive feature (e.g., how accuracy of the model differs for "females" vs. "males" vs. "other gender" data points),
 
-2_ [Disparity in Predictions] How the model predictions differ across different buckets of a selected protected attribute  (e.g., how many "females" have received prediction `Approved` on their loan application in contrast to "males" and "other gender" data points?). 
+1. [Disparity in Predictions] How the model predictions differ across different buckets of a selected sensitive feature (e.g., how many "females" have received prediction `Approved` on their loan application in contrast to "males" and "other gender" data points?). 
 
 The toolkit surfaces a “wizard” flow that allows you to set up accuracy and disparity metrics and then view them alongside various visualizations on a dashboard. 
 
