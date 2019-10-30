@@ -14,7 +14,10 @@
     "calculating": "Calculating...",
     "Accuracy": {
         "header": "How do you want to measure accuracy",
-        "body": "We have determined that your model generates {0} predictions. Based on the information, we recommend the following accuracy metrics:"
+        "body": "We have determined that your model is a {0}. Based on this, we recommend the following accuracy metrics:",
+        "binaryClassifier": "binary classifier",
+        "probabalisticRegressor": "probit regressor",
+        "regressor": "regressor"
     },
     "Parity": {
         "header": "Fairness measured in terms of disparity",
@@ -43,7 +46,9 @@
         "insightsText1": "The chart shows {0} and disparity of {1} predictors.",
         "insightsText2": "{0} of the predictors ranges from {1} to {2}. The disparity of the predictors ranges from {3} to {4}.",
         "insightsText3": "The most accurate predictor achieves {0} of {1} and a disparity of {2}.",
-        "insightsText4": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}."
+        "insightsText4": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}.",
+        "disparityInOutcomes": "Disparity in outcomes",
+        "disparityInAccuracy": "Disparity in {0}"
     },
     "Report": {
         "modelName": "Model {0}",
@@ -91,6 +96,7 @@
         "average": "Average",
         "selectionRate": "Selection rate",
         "overprediction": "Overprediction",
-        "underprediction": "Underprediction"
+        "underprediction": "Underprediction",
+        "balancedRootMeanSquaredError": "Balanced root mean squared error"
     }
 }

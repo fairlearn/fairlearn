@@ -75,6 +75,14 @@ class FairlearnDashboard(object):
                 "model_type": ["classification"],
                 "function": group_fallout_rate
             },
+            "false_positive_over_total": {
+                "model_type": [],
+                "function": group_fallout_rate
+            },
+            "false_negative_over_total": {
+                "model_type": [],
+                "function": group_miss_rate
+            },
             "selection_rate": {
                 "model_type": [],
                 "function": group_selection_rate
@@ -100,7 +108,7 @@ class FairlearnDashboard(object):
                 "function": group_median_absolute_error
             },
             "balanced_root_mean_squared_error": {
-                "model_type": ["regression"],
+                "model_type": [],
                 "function": group_balanced_root_mean_squared_error
             },
             "overprediction": {
