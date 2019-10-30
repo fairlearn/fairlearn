@@ -122,7 +122,7 @@ class FairlearnDashboard(object):
             "average": {
                 "model_type": [],
                 "function": group_mean_prediction
-            },
+            }
         }
 
         classification_methods = [method[0] for method in self._metric_methods.items()
