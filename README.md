@@ -29,7 +29,7 @@ We are at an age where many processes and applications have become or are becomi
 2) providing state-of-the-art techniques to mitigate the observed unfairness
 
 
-At the assessment phase, fairlearn provides a dashboard with a rich set of visualizations that uses a set of disparity and accuracy metrics and user-defined protected attributes (e.g., age, gender, ethnicity) to monitor the accuracy and fairness of a model’s predictions.
+At the assessment phase, fairlearn provides a dashboard with a rich set of visualizations that uses a set of disparity and accuracy metrics and user-defined sensitive features (e.g., age, gender, ethnicity) to monitor the accuracy and fairness of a model’s predictions.
 
 
 At the mitigation phase, it incorporates state-of-the-art unfairness mitigation techniques to mitigate the unfairness observed at the previous assessment phase. `fairlearn`’s mitigation stage supports regression and binary classification models trained on tabular data.
@@ -50,7 +50,7 @@ At the mitigation phase, it incorporates state-of-the-art unfairness mitigation 
 
 # <a name="assessment"></a>
 # Fairness Assessment Dashboard 
-The assessment dashboard automatically analyzes a model’s predictions, provides user with a set of insights into how the model is treating different buckets (e.g., female, male, other gender) of a protected attribute/feature (e.g., gender).  
+The assessment dashboard automatically analyzes a model’s predictions, provides user with a set of insights into how the model is treating different buckets (e.g., female, male, other gender) of a sensitive feature (e.g., gender).  
 
 
 
@@ -98,7 +98,7 @@ A Python package that implements a variety of algorithms that mitigate unfairnes
 
 A variety of fairness-related algorithms to mitigate unfairness are included:
 
-| algorithm | description | classification/regression | protected attributes | supported fairness definitions |
+| algorithm | description | classification/regression | sensitive features | supported fairness definitions |
 | --- | --- | --- | --- | --- |
 | `fairlearn.` `reductions.` `ExponentiatedGradient` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
 | `fairlearn.` `reductions.` `GridSearch` | Black-box approach described in Section 3.4 of the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP |
@@ -108,7 +108,7 @@ A variety of fairness-related algorithms to mitigate unfairness are inc
 
 
 ## Postprocessing: 
-| algorithm | description | classification/regression | protected attributes | supported fairness definitions |
+| algorithm | description | classification/regression | sensitive features | supported fairness definitions |
 | --- | --- | --- | --- | --- |
 | `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf). This technique takes as input any classifier’s prediction and the sensitive feature, and derives a monotone transformation of the classifier’s prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
