@@ -69,4 +69,5 @@ def mean_underprediction(y_true, y_pred, sample_weight=None):
     err = y_p - y_t
     err[err > 0] = 0
 
-    return np.dot(err, s_w) / s_w.sum()
+    # Error metrics should decrease to 0 so have to flip sign
+    return -np.dot(err, s_w) / s_w.sum()
