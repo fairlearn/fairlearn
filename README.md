@@ -2,8 +2,8 @@
 
 
 
-Fairlearn
-=============================================================
+# Fairlearn
+
 Fairlearn is a machine learning fairness toolkit that makes it easier for anyone involved in the development of Artificial Intelligence (AI) systems to monitor and understand the impact of unfairness in their machine learning lifecycle, and use state-of-the-art techniques to mitigate the observed unfairness. Fairlearn repository contains an SDK and Jupyter notebooks with examples to showcase its use.
 
 - [Overview of Fairlearn](#intro)
@@ -86,6 +86,20 @@ Fairlearn includes a Python package that implements a variety of fairness-relate
 ## Pre-processing and In-processing:
 
 Fairlearn shows that given access to a learning oracle for a class H, there is an efficient algorithm to find the lowest-error distribution over classifiers in H subject to equalizing false positive rates across polynomially many subgroups.
+=======
+# Fairness in machine learning - Mitigation algorithms
+
+A Python package that implements a variety of algorithms that mitigate unfairness in supervised machine learning.
+
+## Current Release
+
+* The current stable release is available at [FairLearn v0.2.0](https://github.com/fairlearn/fairlearn/tree/v0.2.0).
+
+* Our latest work differs substantively from version 0.2.0, please visit the repo for further information. In particular, look at [Existing users: How to onboard to fairlearn v0.3+](#existing).
+
+#  Algorithms
+
+A variety of fairness-related algorithms to mitigate bias are included:
 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
@@ -151,6 +165,7 @@ Please open a new issue if you encounter any problems.
 
 </details>
 
+
 ## New Users
 The package can be installed via
 
@@ -170,40 +185,23 @@ To verify that it works run
 pip install -r requirements.txt
 python -m pytest -s ./test
 ```
+
 # Usage
-
-The function `expgrad` in the module `fairlearn.classred` implements the reduction of fair classification to weighted binary classification. Any learner that supports weighted binary classification can be provided as input for this reduction. Two common fairness definitions are provided in the module `fairlearn.moments`: demographic parity (class `DP`) and equalized odds (class `EO`). See the file `test_fairlearn.py` for example usage of `expgrad`.
-
-# <a name="contributing"></a>
-
-# Contributing
-
-This project welcomes contributions and suggestions.
-
-### Contributor License Agreement
-
-Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.microsoft.com.
-
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repositories using our CLA.
-
-To contribute please check our [Contributing guide](CONTRIBUTING.md).
-
-# <a name="code"></a>
-
-# Code of Conduct
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](CONTRIBUTING.md#api)
 
+# Contributing
 
+To contribute please check our [Contributing guide](CONTRIBUTING.md).
 
 # Maintainers
 
 fairlearn is maintained by:
 
 - **@MiroDudik**
-- **@romanlutz**
 - **@riedgar-ms**
+- **@rihorn2**
+- **@romanlutz**
 - **@bethz**
 
 ## Releasing

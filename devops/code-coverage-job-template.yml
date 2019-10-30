@@ -1,0 +1,36 @@
+parameters:
+  name: 'CodeCoverage'
+  vmImage: 'ubuntu-latest'
+  pyVersion: 3.6
+
+jobs:
+- job:  ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python ${{ parameters.pyVersion }}'
+    inputs:
+      versionSpec: ${{ parameters.pyVersion }} 
+      addToPath: true
+
+  - script: pip install -r requirements.txt
+    displayName: 'Install required packages'
+
+  - script: python -m pytest test/unit --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="${{ parameters.name }}"
+    displayName: 'Run tests'
+
+  # Publish code coverage results
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'cobertura'
+      summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
+      pathToSources: $(System.DefaultWorkingDirectory)
+      additionalCodeCoverageFiles: $(System.DefaultWorkingDirectory)/htmlcov/**
+      failIfCoverageEmpty: false
+      displayName: "Publish Code Coverage"
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()

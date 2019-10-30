@@ -1,0 +1,16 @@
+# Code Coverage build pipeline
+
+trigger: none
+
+pr: none
+
+schedules:
+- cron: "30 5 * * *" # Time is UTC
+  displayName: Nightly Code Coverage Build
+  branches:
+    include:
+      - master
+  always: true
+
+jobs:
+- template: code-coverage-job-template.yml

@@ -1,0 +1,39 @@
+parameters:
+  name: ''
+  vmImage: ''
+  pyVersions: [3.5, 3.6, 3.7]
+  requirementsFile: 'requirements.txt'
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    maxParallel: 2
+    matrix:
+      ${{ each pyVer in parameters.pyVersions }}:
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
+
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(PyVer)'
+    inputs:
+      versionSpec: '$(PyVer)' 
+      addToPath: true
+
+  - script: pip install -r ${{ parameters.requirementsFile }}
+    displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+    
+  - script: python ./scripts/requirementscheck.py --fixed requirements-fixed.txt --lowerbound requirements.txt
+    displayName: "Run check on requirements files"
+
+  - script: flake8 .
+    displayName: "Run flake8"
+
+  - script: python -m pytest test/ --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+    displayName: 'Run tests'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()

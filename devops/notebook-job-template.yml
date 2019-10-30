@@ -1,0 +1,39 @@
+parameters:
+  name: 'Notebooks'
+  vmImage: 'ubuntu-latest'
+  pyVersions: [3.5, 3.6, 3.7]
+  requirementsFile: 'requirements.txt'
+
+jobs:
+- job:  ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    maxParallel: 2
+    matrix:
+      ${{ each pyVer in parameters.pyVersions }}:
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
+
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(PyVer)'
+    inputs:
+      versionSpec: '$(PyVer)' 
+      addToPath: true
+
+  - script: pip install -r ${{ parameters.requirementsFile }}
+    displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+
+  - script: pip install -e .
+    displayName: 'Install fairlearn in edit mode'
+
+  - script: pip install 'azureml-contrib-explain-model<=0.1.50' --extra-index-url 'https://azuremlsdktestpypi.azureedge.net/azureml-core-run-submit-tests/5132569'
+    displayName: 'Install fairness dashboard (preview)'
+
+  - script: python -m pytest notebooks/ --nbval --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
+    displayName: 'Run notebooks as tests'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()

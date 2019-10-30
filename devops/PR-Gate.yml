@@ -1,0 +1,31 @@
+pr:
+- master
+- release/*
+
+trigger: none # No CI build
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- template: all-tests-job-template.yml
+  parameters:
+    name: Linux
+    vmImage: 'ubuntu-16.04'
+    pyVersions: [3.5]
+
+- template: all-tests-job-template.yml
+  parameters:
+    name: Windows
+    vmImage:  'vs2017-win2016'
+    pyVersions: [3.6]
+    
+- template: all-tests-job-template.yml
+  parameters:
+    name: MacOS
+    vmImage:  'macOS-10.13'
+    pyVersions: [3.7] 
+
+- template: notebook-job-template.yml
+  parameters:
+    pyVersions: [3.6]

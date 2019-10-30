@@ -1,0 +1,96 @@
+{
+    "loremIpsum": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "defaultClassNames": "Class {0}",
+    "defaultFeatureNames": "Feature {0}",
+    "accuracyTab": "Fairness in Accuracy",
+    "opportunityTab": "Fairness in Opportunity",
+    "modelComparisonTab": "Model Comparison",
+    "tableTab": "Detail View",
+    "dataSpecifications": "Data Specifications",
+    "attributes": "Attributes",
+    "attributesCount": "{0} attributes",
+    "instanceCount": "{0} instances",
+    "close": "Close",
+    "calculating": "Calculating...",
+    "Accuracy": {
+        "header": "How do you want to measure accuracy",
+        "body": "We have determined that your model generates {0} predictions. Based on the information, we recommend the following accuracy metrics:"
+    },
+    "Parity": {
+        "header": "Fairness measured in terms of disparity",
+        "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are two kinds of disparity metrics: more to come...."
+    },
+    "Header": {
+        "title": "FairLearn Toolkit",
+        "documentation": "Documentation"
+    },
+    "Footer": {
+        "back": "Back",
+        "next": "Next"
+    },
+    "Intro": {
+        "welcome": "Welcome to the",
+        "explanatoryStep": "Setting up your fairness assessment is easy",
+        "getStarted": "Get started"
+    },
+    "ModelComparison": {
+        "title": "Model Comparison",
+        "howToRead": "How to read this chart",
+        "lower": "lower",
+        "higher": "higher",
+        "howToReadText": "This chart represents each of the {0} models as a selectable point. The x-axis represents {1}, with {2} being better. The y-axis represents disparity, with lower being better.",
+        "insights": "Insights",
+        "insightsText1": "The chart shows {0} and disparity of {1} predictors.",
+        "insightsText2": "{0} of the predictors ranges from {1} to {2}. The disparity of the predictors ranges from {3} to {4}.",
+        "insightsText3": "The most accurate predictor achieves {0} of {1} and a disparity of {2}.",
+        "insightsText4": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}."
+    },
+    "Report": {
+        "modelName": "Model {0}",
+        "title": "Disparity in Accuracy",
+        "globalAccuracyText": "Is your overall accuracy score",
+        "accuracyDisparityText": "Is the overall difference",
+        "editConfiguration": "Edit Configuration",
+        "backToComparisons": "Multimodel view",
+        "outcomesTitle": "Disparity in Predictions",
+        "globalOutcomeText": "Is your average prediction",
+        "outcomeDisparityText": "Is your disparity in predictions",
+        "minTag": "Min",
+        "maxTag": "Max",
+        "groupLabel": "Subgroup",
+        "underestimationError": "Underestimation error",
+        "overestimationError": "Overestimation error",
+        "classificationOutcomesHowToRead": "This chart shows the selection rate, the number of points in each group that were classified as 1 divided by the size of the group",
+        "regressionOutcomesHowToRead": "This chart shows the distribution of predictions for each group. The individual points are overlaid on the box plot.",
+        "classificationAccuracyHowToRead": "Underestimation error rate is the number of points where the model predicted 0 when the true value was 1, divided by the group size. Overestimation error rate is the number of points where the model predicted 1 when the true value was 0, divided by the group size.",
+        "probabilityAccuracyHowToRead": "Underestimation error rate is the sum of all negative errors within a group divided by the group size. Overestimation error rate is the sum of all positive errors in a group divided by the group size.",
+        "regressionAccuracyHowToRead": "This chart shows the error distribution for each group. The error is the predicted value minus the true value."
+    },
+    "Feature": {
+        "header": "Along which features would you like to evaluate your model's fairness?",
+        "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's accuracy and outputs differ across these splits.",
+        "learnMore": "Learn more",
+        "summaryCategoricalCount": "Your data contains {0} categorical values",
+        "showCategories": "Show categories",
+        "hideCategories": "Hide categories",
+        "categoriesOverflow": "   and {0} additional categories"
+    },
+    "Metrics": {
+        "accuracyScore": "Accuracy score",
+        "precisionScore": "Precision score",
+        "recallScore": "Recall score",
+        "zeroOneLoss": "Zero-one loss",
+        "specificityScore": "Specificity score",
+        "missRate": "Miss rate",
+        "falloutRate": "Fallout rate",
+        "maxError": "Max error",
+        "meanAbsoluteError": "Mean absolute error",
+        "meanSquaredError": "Mean squared error",
+        "meanSquaredLogError": "Mean squared log error",
+        "medianAbsoluteError": "Median absolute error",
+        "average": "Average",
+        "selectionRate": "Selection rate",
+        "overprediction": "Overprediction",
+        "underprediction": "Underprediction"
+    }
+}
