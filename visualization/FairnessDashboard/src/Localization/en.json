@@ -47,7 +47,7 @@
         "insightsText2": "{0} of the predictors ranges from {1} to {2}. The disparity of the predictors ranges from {3} to {4}.",
         "insightsText3": "The most accurate predictor achieves {0} of {1} and a disparity of {2}.",
         "insightsText4": "The lowest-disparity predictor achieves {0} of {1} and a disparity of {2}.",
-        "disparityInOutcomes": "Disparity in outcomes",
+        "disparityInOutcomes": "Disparity in predictions",
         "disparityInAccuracy": "Disparity in {0}",
         "howToMeasureDisparity": "How should disparity be measured?"
     },
