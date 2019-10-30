@@ -67,7 +67,6 @@ post_processor._pmf_predict(X, sensitive_features=sensitive_features)
 
 If you are one of the current maintainers of this project, follow this checklist to create a new release:
 
-1. Create a branch for the release: `git checkout -b release-vxx.xx`
 1. Ensure that all builds run successfully on all operating systems and python versions on that branch
 1. Bump the module version in `fairlearn/__init__.py`
 1. Make a pull request to fairlearn/fairlearn

@@ -40,7 +40,7 @@ At the mitigation phase, it incorporates state-of-the-art unfairness mitigation 
 
 # <a name="assessment"></a>
 # Fairness Assessment Dashboard 
-The assessment dashboard automatically analyzes a model’s predictions, provides user with a set of insights into how the model is treating different buckets (e.g., female, male, other gender) of a sensitive feature (e.g., gender).  
+The assessment dashboard automatically analyzes a model's predictions, provides user with a set of insights into how the model is treating different buckets (e.g., female, male, other gender) of a sensitive feature (e.g., gender).  
 
 These insights are calculated via a set of disparity metrics that showcase:
 
@@ -48,7 +48,7 @@ These insights are calculated via a set of disparity metrics that showcase:
 
 1. [Disparity in Predictions] How the model predictions differ across different buckets of a selected sensitive feature (e.g., how many "females" have received prediction `Approved` on their loan application in contrast to "males" and "other gender" data points?).
 
-The toolkit surfaces a “wizard” flow that allows you to set up accuracy and disparity metrics and then view them alongside various visualizations on a dashboard.
+The toolkit surfaces a "wizard" flow that allows you to set up accuracy and disparity metrics and then view them alongside various visualizations on a dashboard.
 
 After loading the visualizations via the following API call, you will see the following steps: TBC
 
