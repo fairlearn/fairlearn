@@ -151,7 +151,7 @@ To verify that it works run
 
 ```python
 pip install -r requirements.txt
-python -m pytest -s ./test
+python -m pytest -s ./test/unit
 ```
 
 # Usage
