@@ -80,10 +80,10 @@ After loading the visualizations via the following API call, you will see the fo
 
 `fairlearn` is a Python package that implements a variety of fairness-related algorithms to mitigate bias including:
 
-## Pre-processing and In-processing:
+## Preprocessing and In-processing
 
 `fairlearn` shows that given access to a learning oracle for a class H, there is an efficient algorithm to find the lowest-error distribution over classifiers in H subject to equalizing false positive rates across polynomially many subgroups.
-=======
+
 # Fairness in machine learning - Mitigation algorithms
 
 A Python package that implements a variety of algorithms that mitigate unfairness in supervised machine learning.
@@ -107,12 +107,10 @@ A variety of fairness-related algorithms to mitigate bias are included:
 
 
 
-## Post-processing: 
+## Postprocessing: 
 | algorithm | description | classification/regression | protected attributes | supported fairness definitions |
 | --- | --- | --- | --- | --- |
-| `fairlearn.` `post_processing.` `ThresholdOptimizer` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf). This technique takes as input any classifier’s prediction and the sensitive attribute, and derives a monotone transformation of the classifier’s prediction to remove any disparity with respect to the training examples. This postprocessing technique developes a method for constructing randomized decision rules that ensure equal opportunity and equalized odds are equal across protected groups.
-
-| binary classification | categorical | DP, EO |
+| `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf). This technique takes as input any classifier’s prediction and the sensitive attribute, and derives a monotone transformation of the classifier’s prediction to remove any disparity with respect to the training examples. This postprocessing technique developes a method for constructing randomized decision rules that ensure equal opportunity and equalized odds are equal across protected groups. | binary classification | categorical | DP, EO |
 
 > [Note]
 > DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a new issue. 
