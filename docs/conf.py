@@ -22,7 +22,7 @@ copyright = '2019, Microsoft'
 author = 'Microsoft'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.0-pre-alpha-interim'
+release = '0.3.0'
 
 
 # -- General configuration ---------------------------------------------------
