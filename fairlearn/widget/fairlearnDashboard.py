@@ -60,19 +60,19 @@ class FairlearnDashboard(object):
                 "function": group_recall_score
             },
             "zero_one_loss": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_zero_one_loss
             },
             "specificity_score": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_specificity_score
             },
             "miss_rate": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_miss_rate
             },
             "fallout_rate": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_fallout_rate
             },
             "false_positive_over_total": {

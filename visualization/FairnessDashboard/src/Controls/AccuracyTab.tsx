@@ -66,11 +66,11 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
                     <h2 className={AccuracyTab.classNames.header}>
                         {localization.Accuracy.header}
                     </h2>
-                    <p className={AccuracyTab.classNames.textBody}>{localization.formatString(localization.Accuracy.body,
+                    {/* <p className={AccuracyTab.classNames.textBody}>{localization.formatString(localization.Accuracy.body,
                         this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
                             localization.Accuracy.binaryClassifier :
                             localization.Accuracy.regressor
-                        )}</p>
+                        )}</p> */}
                     <StackItem grow={2} className={AccuracyTab.classNames.itemsList}>
                         <TileList
                             items={this.props.accuracyPickerProps.accuracyOptions.map((accuracy, index) => {

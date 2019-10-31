@@ -215,7 +215,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
              <Stack className={FairnessWizard.classNames.frame}>
                 <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
                     <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
-                    <div className={FairnessWizard.classNames.headerRight}>{localization.Header.documentation}</div>
+                    {/* <div className={FairnessWizard.classNames.headerRight}>{localization.Header.documentation}</div> */}
                 </Stack>
                 {(this.state.activeTabKey === introTabKey) &&
                     <StackItem grow={2} className={FairnessWizard.classNames.body}>
@@ -235,7 +235,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                             }}
                             selectedKey={this.state.activeTabKey}
                             onLinkClick={this.handleTabClick}>
-                            <PivotItem headerText={"Protected Attributes"} itemKey={featureBinTabKey} style={{height: "100%"}}>
+                            <PivotItem headerText={localization.Intro.features} itemKey={featureBinTabKey} style={{height: "100%"}}>
                                 <FeatureTab
                                     dashboardContext={this.state.dashboardContext}
                                     selectedFeatureChange={this.setBinIndex}
@@ -244,7 +244,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     onNext={this.setTab.bind(this, accuracyTabKey)}
                                 />
                             </PivotItem>
-                            <PivotItem headerText={"Accuracy"} itemKey={accuracyTabKey}>
+                            <PivotItem headerText={localization.Intro.accuracy} itemKey={accuracyTabKey}>
                                 <AccuracyTab
                                     dashboardContext={this.state.dashboardContext}
                                     accuracyPickerProps={accuracyPickerProps}
