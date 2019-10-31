@@ -31,19 +31,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ),
     include_package_data=True,
-    data_files=[
-        ('share/jupyter/nbextensions/fairlearn-widget', [
-            'fairlearn/widget/static/extension.js',
-            'fairlearn/widget/static/extension.js.map',
-            'fairlearn/widget/static/index.js',
-            'fairlearn/widget/static/index.js.map'
-        ]),
-        ("etc/jupyter/nbconfig/notebook.d", [
-            "jupyter-config/nbconfig/notebook.d/fairlearn-widget.json"
-        ]),
-        ('share/jupyter/lab/extensions', [
-            'fairlearn/widget/js/'
-            'fairlearn_widget/labextension/fairlearn-widget-0.1.0.tgz'
-        ])],
     zip_safe=False,
 )
