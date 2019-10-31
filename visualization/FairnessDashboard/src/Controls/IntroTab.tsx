@@ -87,7 +87,7 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
         return (<Stack style={{height: "100%"}}>
             <div className={IntroTab.classNames.firstSection}>
                 <div className={IntroTab.classNames.firstSectionTitle}>{localization.Intro.welcome}</div>
-                <div className={IntroTab.classNames.firstSectionSubtitle}>{localization.Header.title}</div>
+                <div className={IntroTab.classNames.firstSectionSubtitle}>{localization.Intro.fairlearnDashboard}</div>
                 <div className={IntroTab.classNames.firstSectionBody}>{localization.loremIpsum}</div>
             </div>
             <div className={IntroTab.classNames.lowerSection}>

@@ -297,7 +297,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                             {
                             key: 'accuracy',
                             text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
-                                AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title) as string
+                                AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title.toLowerCase()) as string
                             },
                             {
                             key: 'outcomes',
