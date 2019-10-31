@@ -2,7 +2,7 @@
 
 ### v0.3.0, 2019-11-01
 
-* Major changes to the API. Please refer to the [ReadMe](readme.md) file for information on how to upgrade
+* Major changes to the API. In particular the `expgrad` function is now implemented by the `ExponentiatedGradient` class. Please refer to the [ReadMe](readme.md) file for information on how to upgrade
 
 * Added new algorithms
   * Threshold Optimization
