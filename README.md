@@ -17,7 +17,7 @@ The project `fairlearn` seeks to enable anyone involved in the development of ar
 
 - The current stable release is available at [fairlearn v0.3.0](https://github.com/fairlearn/fairlearn/tree/v0.3.0).
 
-- Our current version differs substantively from version 0.2 or earlier. If you were using these older versions, please visit [Onboarding guide for users of version 0.2 or earlier](#onboarding-guide).
+- Our current version differs substantively from version 0.2 or earlier. If you were using these older versions, please visit our [onboarding guide](#onboarding-guide).
 
 ## What we mean by _fairness_
 
@@ -112,7 +112,7 @@ For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guid
 
 ## Contributing
 
-To contribute please check our [Contributing guide](CONTRIBUTING.md).
+To contribute please check our [contributing guide](CONTRIBUTING.md).
 
 ## Maintainers
 
