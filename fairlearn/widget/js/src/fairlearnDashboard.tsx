@@ -48,7 +48,7 @@ export class FairlearnView extends DOMWidgetView {
     private promiseDict: {[key: number]: IPromiseResolvers} = {};
 
     public render() {
-        this.el.style.cssText = "width: 100%";
+        this.el.style.cssText = "width: 100%; overflow-x: 'auto'";
         let root_element = document.createElement("div");
         root_element.style.cssText = "width: 100%;";
         this.model.on('change:response', this.resolvePromise, this);

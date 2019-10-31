@@ -126,6 +126,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
     private static readonly classNames = mergeStyleSets({
         frame: {
             minHeight: "800px",
+            minWidth: "800px",
             fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`
         },
         thinHeader: {
@@ -154,6 +155,10 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             flex: 1,
             display: "flex",
             flexDirection: "column"
+        },
+        errorMessage: {
+            padding: "50px",
+            fontSize: "18px"
         }
     });
 
@@ -170,8 +175,10 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         }});
 
         const featureBins = this.buildFeatureBins(fairnessContext.modelMetadata);
-        fairnessContext.binVector = this.generateBinVectorForBin(featureBins[0], fairnessContext.dataset);
-        fairnessContext.groupNames = this.generateStringLabelsForBins(featureBins[0], fairnessContext.modelMetadata);
+        if (featureBins.length > 0) {
+            fairnessContext.binVector = this.generateBinVectorForBin(featureBins[0], fairnessContext.dataset);
+            fairnessContext.groupNames = this.generateStringLabelsForBins(featureBins[0], fairnessContext.modelMetadata);
+        }
 
         let accuracyMetrics = fairnessContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
             this.props.supportedBinaryClassificationAccuracyKeys.map(key => AccuracyOptions[key]) :
@@ -211,7 +218,18 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             selectedBinIndex: this.state.selectedBinIndex,
             onBinChange: this.setBinIndex
         };
-         return (
+        if (this.state.featureBins.length === 0) {
+            return (<Stack className={FairnessWizard.classNames.frame}>
+                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
+                    <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
+                    {/* <div className={FairnessWizard.classNames.headerRight}>{localization.Header.documentation}</div> */}
+                </Stack>
+                <Stack.Item grow={2} className={FairnessWizard.classNames.body}>
+                    <div>{localization.errorOnInputs}</div>
+                </Stack.Item>
+            </Stack>);
+        }
+        return (
              <Stack className={FairnessWizard.classNames.frame}>
                 <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
                     <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
@@ -244,7 +262,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     onNext={this.setTab.bind(this, accuracyTabKey)}
                                 />
                             </PivotItem>
-                            <PivotItem headerText={localization.Intro.accuracy} itemKey={accuracyTabKey}>
+                            <PivotItem headerText={localization.accuracyMetric} itemKey={accuracyTabKey}>
                                 <AccuracyTab
                                     dashboardContext={this.state.dashboardContext}
                                     accuracyPickerProps={accuracyPickerProps}

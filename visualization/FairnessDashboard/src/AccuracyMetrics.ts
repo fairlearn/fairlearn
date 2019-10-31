@@ -13,21 +13,21 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
     "accuracy_score": {
         key: "accuracy_score",
         title: localization.Metrics.accuracyScore,
-        description: localization.loremIpsum,
+        description: localization.Metrics.accuracyDescription,
         isMinimization: false,
         isPercentage: true
     },
     "precision_score": {
         key: "precision_score",
         title: localization.Metrics.precisionScore,
-        description: localization.loremIpsum,
+        description: localization.Metrics.precisionDescription,
         isMinimization: false,
         isPercentage: true
     },
     "recall_score": {
         key: "recall_score",
         title: localization.Metrics.recallScore,
-        description: localization.loremIpsum,
+        description: localization.Metrics.recallDescription,
         isMinimization: false,
         isPercentage: true
     },
