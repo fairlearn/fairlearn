@@ -9,7 +9,7 @@
     "dataSpecifications": "Data statistics",
     "attributes": "Attributes",
     "singleAttributeCount": "1 sensitive feature",
-    "attributesCount": "{0} sensitive feature",
+    "attributesCount": "{0} sensitive features",
     "instanceCount": "{0} instances",
     "close": "Close",
     "calculating": "Calculating...",
@@ -34,13 +34,14 @@
     },
     "Intro": {
         "welcome": "Welcome to the",
+        "fairlearnDashboard": "fairlearn dashboard",
         "explanatoryStep": "Setting up your fairness assessment is easy",
         "getStarted": "Get started",
         "features": "Sensitive features",
         "accuracy": "Accuracy"
     },
     "ModelComparison": {
-        "title": "Model Comparison",
+        "title": "Model comparison",
         "howToRead": "How to read this chart",
         "lower": "lower",
         "higher": "higher",
