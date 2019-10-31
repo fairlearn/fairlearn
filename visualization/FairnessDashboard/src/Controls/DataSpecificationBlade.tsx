@@ -20,7 +20,8 @@ export class DataSpecificationBlade extends React.PureComponent<IDataSpecProps> 
             paddingBottom: "10px"
         },
         frame: {
-            width: "180px"
+            paddingLeft:"60px",
+            width: "120px"
         },
         text: {
             fontSize: "12px",
