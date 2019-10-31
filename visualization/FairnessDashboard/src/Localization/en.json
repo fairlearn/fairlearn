@@ -13,6 +13,8 @@
     "instanceCount": "{0} instances",
     "close": "Close",
     "calculating": "Calculating...",
+    "accuracyMetric": "Accuracy metric",
+    "errorOnInputs": "Error with input. Sensitive features must be categorical values at this time. Please map values to binned categories and retry.",
     "Accuracy": {
         "header": "How do you want to measure accuracy?",
         "body": "We have determined that your model is a {0}. Based on this, we recommend the following accuracy metrics:",
@@ -35,10 +37,13 @@
     "Intro": {
         "welcome": "Welcome to the",
         "fairlearnDashboard": "fairlearn dashboard",
-        "explanatoryStep": "Setting up your fairness assessment is easy",
+        "introBody": "The fairlearn dashboard enables you to assess tradeoffs between accuracy and fairness of your models",
+        "explanatoryStep": "To set up the assessment, you need to specify a sensitive feature and an accuracy metric.",
         "getStarted": "Get started",
         "features": "Sensitive features",
-        "accuracy": "Accuracy"
+        "featuresInfo": "Sensitive features are used to split your data into groups. Fairness of your model across these groups is measured by disparity metrics. Disparity metrics quantify how much your model's behavior varies across these groups.",
+        "accuracy": "Accuracy metric",
+        "accuracyInfo": "Accuracy metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy."
     },
     "ModelComparison": {
         "title": "Model comparison",
@@ -68,9 +73,9 @@
         "groupLabel": "Subgroup",
         "underestimationError": "Underestimation error",
         "overestimationError": "Overestimation error",
-        "classificationOutcomesHowToRead": "This chart shows the selection rate, the number of points in each group that were classified as 1 divided by the size of the group",
+        "classificationOutcomesHowToRead": "The bar chart shows the selection rate in each group, meaning the fraction of points classified as 1.",
         "regressionOutcomesHowToRead": "This chart shows the distribution of predictions for each group. The individual points are overlaid on the box plot.",
-        "classificationAccuracyHowToRead": "Underestimation error rate is the number of points where the model predicted 0 when the true value was 1, divided by the group size. Overestimation error rate is the number of points where the model predicted 1 when the true value was 0, divided by the group size.",
+        "classificationAccuracyHowToRead": "The bar chart shows the distribution of errors in each group. Errors are split into overprediction errors (predicting 1 when the true label is 0), and underprediction errors (predicting 0 when the true label is 1). The reported rates are obtained by dividing the number of errors by the overall group size.",
         "probabilityAccuracyHowToRead": "Underestimation error rate is the sum of all negative errors within a group divided by the group size. Overestimation error rate is the sum of all positive errors in a group divided by the group size.",
         "regressionAccuracyHowToRead": "This chart shows the error distribution for each group. The error is the predicted value minus the true value."
     },
@@ -100,6 +105,9 @@
         "selectionRate": "Selection rate",
         "overprediction": "Overprediction",
         "underprediction": "Underprediction",
-        "balancedRootMeanSquaredError": "Balanced root mean squared error"
+        "balancedRootMeanSquaredError": "Balanced root mean squared error",
+        "accuracyDescription": "The fraction of data points classified correctly.",
+        "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
+        "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity."
     }
 }
