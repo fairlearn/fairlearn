@@ -46,6 +46,7 @@ export class FairlearnView extends DOMWidgetView {
     el: any;
     private requestIndex: number = 0;
     private promiseDict: {[key: number]: IPromiseResolvers} = {};
+    private refreshTimeout;
 
     public render() {
         this.el.style.cssText = "width: 100%; overflow-x: 'auto'";
@@ -84,6 +85,18 @@ export class FairlearnView extends DOMWidgetView {
             request[requestIndex] = data;
             this.model.set('request', request);
             this.touch();
+
+            if(this.refreshTimeout) {
+                clearTimeout(this.refreshTimeout);
+            }
+            this.refreshTimeout = window.setTimeout(() => {
+                if (this.promiseDict[requestIndex] !== undefined) {
+                    const request = _.cloneDeep(this.model.get('request'));
+                    this.model.set('request', request);
+                    this.touch();
+                    clearTimeout(this.refreshTimeout);
+                }
+            }, 3000);
 
             // handle abort
             if (abortSignal) {
