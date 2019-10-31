@@ -302,6 +302,22 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
                     font: {color:'#666666', size: 10}
+                },
+                {
+                    text: localization.Report.underpredictionExplanation,
+                    x: 0.02,
+                    y: 0.97,
+                    yref: 'paper', xref: 'paper',
+                    showarrow: false,
+                    font: {color:'#666666', size: 10}
+                },
+                    {
+                    text: localization.Report.overpredictionExplanation,
+                    x: 0.98,
+                    y: 0.97,
+                    yref: 'paper', xref: 'paper',
+                    showarrow: false,
+                    font: {color:'#666666', size: 10}
                 }
             ];
             accuracyPlot.layout.xaxis.tickformat = ',.0%';
