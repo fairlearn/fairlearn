@@ -2,7 +2,7 @@
 
 # fairlearn
 
-The project `fairlearn` seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
+The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
 
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
@@ -17,7 +17,7 @@ The project `fairlearn` seeks to enable anyone involved in the development of ar
 
 - The current stable release is available at [fairlearn v0.3.0](https://github.com/fairlearn/fairlearn/tree/v0.3.0).
 
-- Our current version differs substantively from version 0.2 or earlier. If you were using these older versions, please visit our [onboarding guide](#onboarding-guide).
+- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
 ## What we mean by _fairness_
 
