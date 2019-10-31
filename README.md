@@ -4,16 +4,16 @@
 
 The project `fairlearn` seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
 
-- [Current release](#current)
-- [What we mean by _fairness_](#what-we-mean)
-- [Overview of fairlearn](#overview)
-- [Install fairlearn](#install)
+- [Current release](#current-release)
+- [What we mean by _fairness_](#what-we-mean-by-fairness)
+- [Overview of fairlearn](#overview-of-fairlearn)
+- [Install fairlearn](#install-fairlearn)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Maintainers](#maintainers)
 - [Issues](#issues)
 
-## Current release
+## Current release
 
 - The current stable release is available at [fairlearn v0.3.0](https://github.com/fairlearn/fairlearn/tree/v0.3.0).
 
@@ -94,8 +94,7 @@ randomized_predictions = (positive_probabilities >= np.random.rand(len(positive_
 the equivalent operation is now
 
 ```python
-from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions.moments import DemographicParity
+from fairlearn.reductions import ExponentiatedGradient, DemographicParity
 
 estimator = LogisticRegression()  # or any other estimator
 exponentiated_gradient = ExponentiatedGradient(estimator, constraints=DemographicParity())
