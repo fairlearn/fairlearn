@@ -51,7 +51,7 @@ export class FairlearnView extends DOMWidgetView {
     public render() {
         this.el.style.cssText = "width: 100%; overflow-x: 'auto'";
         let root_element = document.createElement("div");
-        root_element.style.cssText = "width: 100%;";
+        root_element.style.cssText = "width: 100%; overflow-x: 'auto'";
         this.model.on('change:response', this.resolvePromise, this);
         const data = this.model.get('value');
         ReactDOM.render(<FairnessWizard
