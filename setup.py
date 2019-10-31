@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name=fairlearn.__name__,
     version=fairlearn.__version__,
-    author="Miroslav Dudik, Richard Edgar, Brandon Horn, Roman Lutz",
+    author="Miroslav Dudik, Richard Edgar, Brandon Horn, Roman Lutz, Beth Zeranski",
     author_email="azuremlfairness@microsoft.com",
     description="Algorithms for fair classification",
     long_description=long_description,
