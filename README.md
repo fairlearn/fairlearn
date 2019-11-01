@@ -43,11 +43,11 @@ The `fairlearn` package contains the following algorithms for mitigating unfairn
 | --- | --- | --- | --- | --- |
 | `fairlearn.` `reductions.` `ExponentiatedGradient` | Black-box approach to fair classification described in [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
 | `fairlearn.` `reductions.` `GridSearch` | Black-box approach described in Section 3.4 of [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP, EO |
-| `fairlearn.` `reductions.` `GridSearch` | Black-box approach that implements a grid-search variant of the algorithm described in Section 5 of [Fair Regression: Quantitative Definitions and Reduction-based Algorithms](https://arxiv.org/1905.12843) | regression | binary | BGL |
-| `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier’s prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
+| `fairlearn.` `reductions.` `GridSearch` | Black-box approach that implements a grid-search variant of the algorithm described in Section 5 of [Fair Regression: Quantitative Definitions and Reduction-based Algorithms](https://arxiv.org/abs/1905.12843) | regression | binary | BGL |
+| `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/abs/1610.02413). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier’s prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
 > _Note_:
-> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a new issue.
+> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a new [issue](https://github.com/fairlearn/fairlearn/issues).
 
 ## Install fairlearn
 
@@ -104,7 +104,7 @@ exponentiated_gradient.fit(X, y, sensitive_features=sensitive_features)
 randomized_predictions = exponentiated_gradient.predict(X)
 ```
 
-Please open a new issue if you encounter any problems.
+Please open a [new issue](https://github.com/fairlearn/fairlearn/issues) if you encounter any problems.
 
 </details>
 
@@ -118,7 +118,7 @@ To contribute please check our [contributing guide](CONTRIBUTING.md).
 
 ## Maintainers
 
-fairlearn is maintained by:
+The fairlearn project is maintained by:
 
 - **@MiroDudik**
 - **@riedgar-ms**
@@ -131,11 +131,11 @@ fairlearn is maintained by:
 ### Regular (non-security) issues
 
 Please submit a report through [GitHub issues](https://github.com/fairlearn/fairlearn/issues). A maintainer will respond promptly as follows:
-- bug: triage as `bug` and provide estimated timeline based on severity
-- feature request: triage as `feature request` and provide estimated timeline
-- question or discussion: triage as `question` and respond or notify/identify a suitable expert to respond
+- **bug**: triage as `bug` and provide estimated timeline based on severity
+- **feature request**: triage as `feature request` and provide estimated timeline
+- **question** or **discussion**: triage as `question` and either respond or notify/identify a suitable expert to respond
 
-Maintainers are supposed to link duplicate issues when possible.
+Maintainers will try to link duplicate issues when possible.
 
 ### Reporting security issues
 
