@@ -12,7 +12,7 @@ setuptools.setup(
     version=fairlearn.__version__,
     author="Miroslav Dudik, Richard Edgar, Brandon Horn, Roman Lutz, Beth Zeranski",
     author_email="azuremlfairness@microsoft.com",
-    description="Algorithms for fair classification",
+    description="Algorithms for mitigating unfairness in supervised machine learning",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/fairlearn/fairlearn",
