@@ -110,7 +110,7 @@ Please open a [new issue](https://github.com/fairlearn/fairlearn/issues) if you 
 
 ## Usage
 
-For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](https://github.com/fairlearn/fairlearn/blob/v0.3.0/CONTRIBUTING.md#api)
+For common usage refer to the [Jupyter notebooks](https://github.com/fairlearn/fairlearn/tree/v0.3.0/notebooks) and our [API guide](https://github.com/fairlearn/fairlearn/blob/v0.3.0/CONTRIBUTING.md#api)
 
 ## Contributing
 
