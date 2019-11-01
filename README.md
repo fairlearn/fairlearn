@@ -42,7 +42,7 @@ The `fairlearn` package contains the following algorithms for mitigating unfairn
 | algorithm | description | classification/regression | sensitive features | supported fairness definitions |
 | --- | --- | --- | --- | --- |
 | `fairlearn.` `reductions.` `ExponentiatedGradient` | Black-box approach to fair classification described in [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
-| `fairlearn.` `reductions.` `GridSearch` | Black-box approach described in Section 3.4 of [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP |
+| `fairlearn.` `reductions.` `GridSearch` | Black-box approach described in Section 3.4 of [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP, EO |
 | `fairlearn.` `reductions.` `GridSearch` | Black-box approach that implements a grid-search variant of the algorithm described in Section 5 of [Fair Regression: Quantitative Definitions and Reduction-based Algorithms](https://arxiv.org/1905.12843) | regression | binary | BGL |
 | `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier’s prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
