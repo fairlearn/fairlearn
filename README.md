@@ -80,7 +80,7 @@ Onboarding guide for users of version 0.2 or earlier
 </strong>
 </summary>
 
-Up to the version 0.2, fairlearn contained only the exponentiated gradient method. The fairlearn repository now has a more comprehensive scope and aims to incorporate other methods as specified above. The same exponentiated gradient technique is now located under `fairlearn.reductions.ExponentiatedGradient` as a class. While in the past you could have run
+Up to version 0.2, fairlearn contained only the exponentiated gradient method. The fairlearn repository now has a more comprehensive scope and aims to incorporate other methods as specified above. The same exponentiated gradient technique is now the class `fairlearn.reductions.ExponentiatedGradient`. While in the past exponentiated gradient was invoked via
 
 ```python
 import numpy as np
