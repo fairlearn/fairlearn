@@ -33,7 +33,7 @@ Group fairness is formalized by a set of constraints, which require that some as
 To learn more about our definitions of fairness, please visit our [terminology page](TERMINOLOGY.md#fairness-of-ai-systems).
 
 >_Note_:
-> Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Since there are many quantitative fairness metrics, which cannot be all simultaneously satisfied, our goal is to enable humans to try out different mitigation strategies and then make suitable trade-offs depending on the context.
+> Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
 
 ## Overview of fairlearn
 
