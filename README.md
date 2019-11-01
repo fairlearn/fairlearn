@@ -63,7 +63,7 @@ or you can clone the repository locally via
 git clone git@github.com:fairlearn/fairlearn.git
 ```
 
-To verify that it works run
+To verify that the cloned repository works (the pip package does not include the tests), run
 
 ```python
 pip install -r requirements.txt
