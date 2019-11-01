@@ -13,21 +13,21 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
     "accuracy_score": {
         key: "accuracy_score",
         title: localization.Metrics.accuracyScore,
-        description: localization.loremIpsum,
+        description: localization.Metrics.accuracyDescription,
         isMinimization: false,
         isPercentage: true
     },
     "precision_score": {
         key: "precision_score",
         title: localization.Metrics.precisionScore,
-        description: localization.loremIpsum,
+        description: localization.Metrics.precisionDescription,
         isMinimization: false,
         isPercentage: true
     },
     "recall_score": {
         key: "recall_score",
         title: localization.Metrics.recallScore,
-        description: localization.loremIpsum,
+        description: localization.Metrics.recallDescription,
         isMinimization: false,
         isPercentage: true
     },
@@ -54,6 +54,20 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
     },
     "fallout_rate": {
         key: "fallout_rate",
+        title: localization.Metrics.falloutRate,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: true
+    },
+    "false_positive_over_total": {
+        key: "false_positive_over_total",
+        title: localization.Metrics.falloutRate,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: true
+    },
+    "false_negative_over_total": {
+        key: "false_negative_over_total",
         title: localization.Metrics.falloutRate,
         description: localization.loremIpsum,
         isMinimization: true,
@@ -90,6 +104,13 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
     "median_absolute_error": {
         key: "median_absolute_error",
         title: localization.Metrics.medianAbsoluteError,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: false
+    },
+    "balanced_root_mean_squared_error": {
+        key: "balanced_root_mean_squared_error",
+        title: localization.Metrics.balancedRootMeanSquaredError,
         description: localization.loremIpsum,
         isMinimization: true,
         isPercentage: false

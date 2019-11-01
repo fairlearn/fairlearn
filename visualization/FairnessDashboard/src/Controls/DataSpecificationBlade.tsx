@@ -20,7 +20,9 @@ export class DataSpecificationBlade extends React.PureComponent<IDataSpecProps> 
             paddingBottom: "10px"
         },
         frame: {
-            width: "180px"
+            paddingLeft:"60px",
+            width: "120px",
+            boxSizing: "content-box"
         },
         text: {
             fontSize: "12px",
@@ -34,7 +36,9 @@ export class DataSpecificationBlade extends React.PureComponent<IDataSpecProps> 
                 {localization.dataSpecifications}
             </div>
             <div className={DataSpecificationBlade.classNames.text}>
-                {localization.formatString(localization.attributesCount, this.props.featureNames.length)}
+                {this.props.featureNames.length === 1 ?
+                    localization.singleAttributeCount :
+                    localization.formatString(localization.attributesCount, this.props.featureNames.length)}
             </div>
             <div className={DataSpecificationBlade.classNames.text}>
                 {localization.formatString(localization.instanceCount, this.props.numberRows)}

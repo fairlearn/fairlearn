@@ -60,20 +60,28 @@ class FairlearnDashboard(object):
                 "function": group_recall_score
             },
             "zero_one_loss": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_zero_one_loss
             },
             "specificity_score": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_specificity_score
             },
             "miss_rate": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_miss_rate
             },
             "fallout_rate": {
-                "model_type": ["classification"],
+                "model_type": [],
                 "function": group_fallout_rate
+            },
+            "false_positive_over_total": {
+                "model_type": [],
+                "function": group_fallout_rate
+            },
+            "false_negative_over_total": {
+                "model_type": [],
+                "function": group_miss_rate
             },
             "selection_rate": {
                 "model_type": [],
@@ -100,7 +108,7 @@ class FairlearnDashboard(object):
                 "function": group_median_absolute_error
             },
             "balanced_root_mean_squared_error": {
-                "model_type": ["regression"],
+                "model_type": [],
                 "function": group_balanced_root_mean_squared_error
             },
             "overprediction": {
@@ -114,7 +122,7 @@ class FairlearnDashboard(object):
             "average": {
                 "model_type": [],
                 "function": group_mean_prediction
-            },
+            }
         }
 
         classification_methods = [method[0] for method in self._metric_methods.items()

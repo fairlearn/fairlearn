@@ -2,12 +2,12 @@ import React from "react";
 import { localization } from "../Localization/localization";
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { DataSpecificationBlade } from "./DataSpecificationBlade";
-import { Separator } from "office-ui-fabric-react/lib/Separator";
 import { IWizardTabProps } from "../IWizardTabProps";
 import { WizardFooter } from "./WizardFooter";
 import { TileList } from "./TileList";
 import { IAccuracyPickerProps } from "../FairnessWizard";
 import { mergeStyleSets } from "@uifabric/styling";
+import { PredictionTypes } from "../IFairnessProps";
 
 export interface IAccuracyPickingTabProps extends IWizardTabProps {
     accuracyPickerProps: IAccuracyPickerProps
@@ -66,7 +66,11 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
                     <h2 className={AccuracyTab.classNames.header}>
                         {localization.Accuracy.header}
                     </h2>
-                    <p className={AccuracyTab.classNames.textBody}>{localization.Accuracy.body}</p>
+                    {/* <p className={AccuracyTab.classNames.textBody}>{localization.formatString(localization.Accuracy.body,
+                        this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
+                            localization.Accuracy.binaryClassifier :
+                            localization.Accuracy.regressor
+                        )}</p> */}
                     <StackItem grow={2} className={AccuracyTab.classNames.itemsList}>
                         <TileList
                             items={this.props.accuracyPickerProps.accuracyOptions.map((accuracy, index) => {
