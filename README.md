@@ -47,7 +47,7 @@ The `fairlearn` package contains the following algorithms for mitigating unfairn
 | `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/abs/1610.02413). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier’s prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
 > _Note_:
-> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a new [issue](https://github.com/fairlearn/fairlearn/issues).
+> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
 
 ## Install fairlearn
 
