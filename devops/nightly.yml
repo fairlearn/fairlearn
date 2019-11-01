@@ -30,7 +30,7 @@ jobs:
   parameters:
     name: MacOS
     vmImage:  'macOS-10.13'
-    pyVersions: [3.6, 3.7] 
+    pyVersions: [3.5, 3.6, 3.7] 
 
 - template: notebook-job-template.yml
   parameters:
