@@ -4,20 +4,20 @@
 
 The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
 
-- [Current release](#current-release)
-- [What we mean by _fairness_](#what-we-mean-by-fairness)
-- [Overview of fairlearn](#overview-of-fairlearn)
-- [Install fairlearn](#install-fairlearn)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [Maintainers](#maintainers)
-- [Issues](#issues)
+- [Current release](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#current-release)
+- [What we mean by _fairness_](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#what-we-mean-by-fairness)
+- [Overview of fairlearn](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#overview-of-fairlearn)
+- [Install fairlearn](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#install-fairlearn)
+- [Usage](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#usage)
+- [Contributing](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#contributing)
+- [Maintainers](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#maintainers)
+- [Issues](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#issues)
 
 ## Current release
 
 - The current stable release is available at [fairlearn v0.3.0](https://github.com/fairlearn/fairlearn/tree/v0.3.0).
 
-- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
+- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://github.com/fairlearn/fairlearn/tree/v0.3.0/ReadMe.md#onboarding-guide).
 
 ## What we mean by _fairness_
 
@@ -110,7 +110,7 @@ Please open a [new issue](https://github.com/fairlearn/fairlearn/issues) if you 
 
 ## Usage
 
-For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](https://github.com/fairlearn/fairlearn/tree/v0.3.0CONTRIBUTING.md#api)
+For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](https://github.com/fairlearn/fairlearn/tree/v0.3.0/CONTRIBUTING.md#api)
 
 ## Contributing
 
