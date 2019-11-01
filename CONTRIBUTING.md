@@ -1,4 +1,4 @@
-# Contributing to FairLearn
+# Contributing to fairlearn
 
 This project welcomes contributions and suggestions.
 
@@ -21,28 +21,28 @@ For every pull request to `master` with automated tests you can check the logs o
 ## API
 <div id="api">
 
-This section heavily relies on the definitions from our [terminology guide](TERMINOLOGY.md). Specifically, we use the terms "reduction", "group data", "moment", and "parity" in the following.
+This section heavily relies on the definitions from our [terminology guide](TERMINOLOGY.md). Specifically, we use the terms "reduction", "sensitive features", "moment", and "parity" in the following.
 
 For all disparity mitigation methods algorithm-specific parameters are passed to the constructor. The methods to fit a mitigator and predict values with the resulting model shall resemble the APIs used by scikit-learn as much as possible for the sake of ease of use. Any deviations are noted below.
 
 ### Reductions
 
-Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. The constraints for reductions are all moments (see `fairlearn.reductions.moments`) passed as instances of classes inheriting from `Moment`. Moments are vector functions that we use to formalize our constraints. The moment objects need to be passed as constraints to the constructor of a reduction technique, which internally uses the constraints to solve the optimization problem.
+Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. The constraints for reductions are all moments (see `fairlearn.reductions`) passed as instances of classes inheriting from `Moment`. Moments are vector functions that we use to formalize our constraints. The moment objects need to be passed as constraints to the constructor of a reduction technique, which internally uses the constraints to solve the optimization problem.
 
 ```python
 constraints = Moment()
-reduction = Reduction(estimator, objective=objective, constraints=constraints, use_predict_proba=False, **kwargs)
+reduction = Reduction(estimator, objective=objective, constraints=constraints, **kwargs)
 ```
 
-Reduction-based disparity mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `predict_proba` methods with the following signatures:
+Reduction-based disparity mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `_pmf_predict` methods with the following signatures:
 
 ```python
-reduction.fit(X, Y, group_data)
+reduction.fit(X, Y, sensitive_features=sensitive_features)
 reduction.predict(X)
-reduction.predict_proba(X)
+reduction._pmf_predict(X)
 ```
 
-where `group_data` contains data on which group a sample belongs to. As of now, grouping data can only be provided through `group_data`. In the future we plan to allow specifying specific columns of `X` as grouping data, in which case `group_data` would be optional.
+where `sensitive_features` contains data on which group a sample belongs to. As of now, sensitive features can only be provided through `sensitive_features`. In the future we plan to allow specifying specific columns of `X` as sensitive features, in which case `sensitive_features` would be optional.
 
 ### Post-processing methods
 
@@ -53,7 +53,7 @@ post_processor = PostProcessing(unconstrained_predictor=predictor, constraints=c
 post_processor = PostProcessing(estimator=estimator, constraints=constraints, **kwargs)
 ```
 
-Post-processing methods (such as the ones under `fairlearn.post_processing`) also provide the same functions as the reductions above albeit with `group_data` as a required argument for `predict` and `_pmf_predict`. In the future we will make `sensitive_features` optional if the grouping data is already provided through `X`.
+Post-processing methods (such as the ones under `fairlearn.post_processing`) also provide the same functions as the reductions above albeit with `sensitive_features` as a required argument for `predict` and `_pmf_predict`. In the future we will make `sensitive_features` optional if the sensitive features are already provided through `X`.
 
 ```python
 post_processor.fit(X, Y, sensitive_features=sensitive_features)
@@ -61,3 +61,20 @@ post_processor.predict(X, sensitive_features=sensitive_features)
 post_processor._pmf_predict(X, sensitive_features=sensitive_features)
 ```
 </div>
+
+
+# Creating new releases
+
+If you are one of the current maintainers of this project, follow this checklist to create a new release:
+
+1. Ensure that all builds run successfully on all operating systems and python versions on that branch
+1. Bump the module version in `fairlearn/__init__.py`
+1. Make a pull request to fairlearn/fairlearn
+1. Merge fairlearn/fairlearn pull request
+1. Tag and push: `git tag vxx.xx; git push --tags`
+1. Remove old build files: `git clean -xdf`
+1. Upload new package version to pypi
+    ```python
+    python setup.py sdist bdist_wheel
+    python -m twine upload  dist/* --verbose
+    ```
