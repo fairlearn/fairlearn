@@ -2,68 +2,68 @@
 
 This project welcomes contributions and suggestions.
 
-## Contributor License Agreement
-Contributions require you to sign a Developer Certificate of Origin (DCO) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://developercertificate.org/.
+## Developer certificate of origin
+Contributions require you to sign a _developer certificate of origin_ (DCO) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://developercertificate.org/.
 
 When you submit a pull request, a DCO-bot will automatically determine whether you need to provide a DCO and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repositories using our DCO.
 
-## Code of Conduct
-This project has adopted the [GitHub Community Guidelines](https://help.github.com/en/github/site-policy/github-community-guidelines).
+## Code of conduct
+This project has adopted the [GitHub community guidelines](https://help.github.com/en/github/site-policy/github-community-guidelines).
 
-## Development Process
-Development happens against the `master` branch following the [GitHub flow model](https://guides.github.com/introduction/flow/). Contributors create feature branches off of `master`, and their pull requests should target the `master` branch. Maintainers will review pull requests within two business days.
+## Development process
+Development happens against the `master` branch following the [GitHub flow model](https://guides.github.com/introduction/flow/). Contributors create feature branches off of `master`, and their pull requests should target the `master` branch. Maintainers are responsible for prompt review of pull requests.
 
-Pull requests against `master` trigger automated pipelines that are run through Azure DevOps. Additional test suites are run periodically. When adding new code paths or features tests are a requirement to complete a pull request. They should be added in the `test` directory.
+Pull requests against `master` trigger automated tests that are run through Azure DevOps. Additional test suites are run periodically. When adding new code paths or features, tests are a requirement to complete a pull request. They should be added in the `test` directory.
 
 ### Investigating automated test failures
-For every pull request to `master` with automated tests you can check the logs of the tests to find the root cause of failures. Our tests currently run through Azure Pipelines with steps for setup, test suites, and teardown. The `Checks` view of a pull request contains a link to the [Azure Pipelines Page](dev.azure.com/responsibleai/fairlearn/_build/results). All the steps are represented in the Azure Pipelines page, and you can see logs by clicking on a specific step. If you encounter problems with this workflow please reach out through the `Issues`.
+For every pull request to `master` with automated tests, you can check the logs of the tests to find the root cause of failures. Our tests currently run through Azure Pipelines with steps for setup, testing, and teardown. The `Checks` tab of a pull request contains a link to the [Azure Pipelines page](dev.azure.com/responsibleai/fairlearn/_build/results), where you can review the logs by clicking on a specific step in the automated test sequence. If you encounter problems with this workflow, please reach out through [GitHub issues](https://github.com/fairlearn/fairlearn/issues).
 
-## API
-<div id="api">
+## API conventions
 
-This section heavily relies on the definitions from our [terminology guide](TERMINOLOGY.md). Specifically, we use the terms "reduction", "sensitive features", "moment", and "parity" in the following.
+This section relies on the definitions from our [terminology guide](TERMINOLOGY.md), including the definitions of "estimator", "reduction", "sensitive features", "moment", and "parity".
 
-For all disparity mitigation methods algorithm-specific parameters are passed to the constructor. The methods to fit a mitigator and predict values with the resulting model shall resemble the APIs used by scikit-learn as much as possible for the sake of ease of use. Any deviations are noted below.
+### Unfairness mitigation algorithms
 
-### Reductions
+Unfairness mitigation algorithms take form of scikit-learn-style estimators. Any algorithm-specific parameters are passed to the constructor. The resulting instance of the algorithm should support methods `fit` and `predict` with APIs resembling those of scikit-learn as much as possible. Any deviations are noted below.
 
-Reductions require an estimator to be passed that implements the `fit` method with the `sample_weight` argument. The constraints for reductions are all moments (see `fairlearn.reductions`) passed as instances of classes inheriting from `Moment`. Moments are vector functions that we use to formalize our constraints. The moment objects need to be passed as constraints to the constructor of a reduction technique, which internally uses the constraints to solve the optimization problem.
+#### Reductions
+
+Reduction constructors require a parameter corresponding to an estimator that implements the `fit` method with the `sample_weight` argument. Parity constraints for reductions are expressed via instances of various subclasses of the class `fairlearn.reductions.Moment`. Formally, instances of the class `Moment` implement vector-valued random variables whose sample averages over the data are required to be bounded (above and/or below).
 
 ```python
 constraints = Moment()
-reduction = Reduction(estimator, objective=objective, constraints=constraints, **kwargs)
+reduction = Reduction(estimator, constraints)
 ```
 
-Reduction-based disparity mitigation algorithms (such as the ones under `fairlearn.reductions`) provide `fit`, `predict`, and `_pmf_predict` methods with the following signatures:
+Reductions  provide `fit`, `predict`, and `_pmf_predict` methods with the following signatures:
 
 ```python
-reduction.fit(X, Y, sensitive_features=sensitive_features)
+reduction.fit(X, y, **kwargs)
 reduction.predict(X)
 reduction._pmf_predict(X)
 ```
 
-where `sensitive_features` contains data on which group a sample belongs to. As of now, sensitive features can only be provided through `sensitive_features`. In the future we plan to allow specifying specific columns of `X` as sensitive features, in which case `sensitive_features` would be optional.
+All of the currently supported parity constraints (subclasses of `Moment`) are based on sensitive features that need to be provided to `fit` as a keyword argument `sensitive_features`. In the future, we will also allow providing sensitive features as columns of `X`.
 
-### Post-processing methods
+#### Post-processing algorithms
 
-Post-processing methods require an already trained predictor. For consistency we also provide the option to pass an estimator instead, and will call `fit` internally. For post-processing methods we provide the `constraints` argument in the form of a string.
-
-```python
-post_processor = PostProcessing(unconstrained_predictor=predictor, constraints=constraints, **kwargs)
-post_processor = PostProcessing(estimator=estimator, constraints=constraints, **kwargs)
-```
-
-Post-processing methods (such as the ones under `fairlearn.post_processing`) also provide the same functions as the reductions above albeit with `sensitive_features` as a required argument for `predict` and `_pmf_predict`. In the future we will make `sensitive_features` optional if the sensitive features are already provided through `X`.
+The constructors of post-processing algorithms require an already trained predictor as an argument. For consistency, we also allow providing an estimator instead, and the estimator is then fitted on the data at the beginning of the execution of `fit`. For post-processing algorithms, the `constraints` argument is provided as a string.
 
 ```python
-post_processor.fit(X, Y, sensitive_features=sensitive_features)
-post_processor.predict(X, sensitive_features=sensitive_features)
-post_processor._pmf_predict(X, sensitive_features=sensitive_features)
+postprocessor = PostProcessing(unconstrained_predictor=predictor, constraints=constraints)
+postprocessor = PostProcessing(estimator=estimator, constraints=constraints)
 ```
-</div>
+
+Post-processing algorithms (such as the ones under `fairlearn.postprocessing`) provide the same functions as the reductions above albeit with `sensitive_features` as a required argument for both `predict` and `_pmf_predict`. In the future, we will make `sensitive_features` optional if the sensitive features are already provided through `X`.
+
+```python
+postprocessor.fit(X, y, sensitive_features=sensitive_features)
+postprocessor.predict(X, sensitive_features=sensitive_features)
+postprocessor._pmf_predict(X, sensitive_features=sensitive_features)
+```
 
 
-# Creating new releases
+## Creating new releases
 
 If you are one of the current maintainers of this project, follow this checklist to create a new release:
 
