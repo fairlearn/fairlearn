@@ -74,11 +74,11 @@ If you are one of the current maintainers of this project, follow this checklist
 1. Verify Nightly builds are Green for the release branch
 1. Manually run the notebooks from the release branch
 1. Remove old build files: `git clean -xdf`
-1. Follow the (instructions to push to PyPI-Test)[https://packaging.python.org/tutorials/packaging-projects/]
-1. Verify that package downloads with correct version
-1. Use the (PyPI instructions)[https://packaging.python.org/tutorials/packaging-projects/] to push to PyPI itself
+1. Follow the [instructions to push to PyPI-Test](https://packaging.python.org/tutorials/packaging-projects/)
+1. Verify that package downloads with correct version from PyPI-Test and that the project landing page on PyPI-Test is correct
+1. Use the [PyPI instructions](https://packaging.python.org/tutorials/packaging-projects/) to push to PyPI itself
 1. In a new conda environment, run `pip install fairlearn`
-1. Copy the contents of `test/unit` to temporary directory (out of the checked out github directory) and run `python -m pytest -s test/unit` in the new conda environment. Check that all tests pass
+1. Copy the contents of `test/unit` to temporary directory (outside the cloned github directory) and run `python -m pytest -s test/unit` in the new conda environment. Check that all tests pass
 1. If necessary, update the position of the version tag on the release branch: `git tag vxx.xx; git push --tags --force`
 
 If updates are required from master in the release branch, these should be cherry picked. Be sure to do a *regular merge* for cherry picks, and **not** a squash merge. This will ensure the identity of the updates is maintained between the branches. This also applies if there are bug fixes in the release branch which need to be migrated into master.
