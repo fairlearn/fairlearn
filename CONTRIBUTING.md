@@ -65,14 +65,20 @@ postprocessor.predict(X, sensitive_features=sensitive_features)
 
 If you are one of the current maintainers of this project, follow this checklist to create a new release:
 
-1. Ensure that all builds run successfully on all operating systems and python versions on that branch
+1. Ensure that all builds run successfully on all operating systems and python versions
+1. Tag and push the branch point: `git tag vxx.xx-branch; git push --tags`
+1. Create a release branch at this tag: `git checkout -b release/vxx.xx`
+1. Convert all relative links in `README.md` to direct links to the prospective version tag in GitHub
 1. Bump the module version in `fairlearn/__init__.py`
-1. Make a pull request to fairlearn/fairlearn
-1. Merge fairlearn/fairlearn pull request
 1. Tag and push: `git tag vxx.xx; git push --tags`
+1. Verify Nightly builds are Green for the release branch
+1. Manually run the notebooks from the release branch
 1. Remove old build files: `git clean -xdf`
-1. Upload new package version to pypi
-    ```python
-    python setup.py sdist bdist_wheel
-    python -m twine upload  dist/* --verbose
-    ```
+1. Follow the (instructions to push to PyPI-Test)[https://packaging.python.org/tutorials/packaging-projects/]
+1. Verify that package downloads with correct version
+1. Use the (PyPI instructions)[https://packaging.python.org/tutorials/packaging-projects/] to push to PyPI itself
+1. In a new conda environment, run `pip install fairlearn`
+1. Copy the contents of `test/unit` to temporary directory (out of the checked out github directory) and run `python -m pytest -s test/unit` in the new conda environment. Check that all tests pass
+1. If necessary, update the position of the version tag on the release branch: `git tag vxx.xx; git push --tags --force`
+
+If updates are required from master in the release branch, these should be cherry picked. Be sure to do a *regular merge* for cherry picks, and **not** a squash merge. This will ensure the identity of the updates is maintained between the branches. This also applies if there are bug fixes in the release branch which need to be migrated into master.
