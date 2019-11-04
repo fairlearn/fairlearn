@@ -11,6 +11,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
   - Grid Search
   - Moments
   - Documentation
+  - User study
 - [Richard Edgar](https://github.com/riedgar-ms)
   - Grid Search implementation
   - Metrics
@@ -28,14 +29,17 @@ All names are sorted alphabetically by last name. Contributors, please add your 
   - Notebooks
   - DevOps Pipelines
 - [Vanessa Milan](https://www.microsoft.com/en-us/research/people/vmilan/)
-  - UX design
+  - UX design, mockups and prototypes
+  - User study
 - [Sangeeta Mudnal](https://www.microsoft.com/en-us/research/people/smudnal/)
   - Customer engagement
+  - User study
 - [Mehrnoosh Sameki](https://github.com/mesameki)
   - Managing project deliverables
   - Coordinating features
   - Customer engagement
   - Documentation
+  - User study
 - [Hanna Wallach](https://www.microsoft.com/en-us/research/people/wallach/)
   - Exponentiated Gradient research
 - [Vincent Xu](https://github.com/vingu)
