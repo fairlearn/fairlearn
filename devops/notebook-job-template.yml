@@ -1,7 +1,7 @@
 parameters:
   name: 'Notebooks'
   vmImage: 'ubuntu-latest'
-  pyVersions: [3.6, 3.7] # Trouble with 3.5 right now
+  pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
 
 jobs:
