@@ -253,7 +253,7 @@ class ExponentiatedGradient(Reduction):
 
         :param X: The data for which predictions are required
         :type X: Array
-        :return: Array of tuples with the probabilities of predicting 0 and q.
+        :return: Array of tuples with the probabilities of predicting 0 and 1.
         :rtype: Array
         """
         positive_probs = self._best_classifier(X)
