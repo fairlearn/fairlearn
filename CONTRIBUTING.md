@@ -35,31 +35,29 @@ constraints = Moment()
 reduction = Reduction(estimator, constraints)
 ```
 
-Reductions  provide `fit`, `predict`, and `_pmf_predict` methods with the following signatures:
+Reductions provide `fit` and `predict` methods with the following signatures:
 
 ```python
 reduction.fit(X, y, **kwargs)
 reduction.predict(X)
-reduction._pmf_predict(X)
 ```
 
-All of the currently supported parity constraints (subclasses of `Moment`) are based on sensitive features that need to be provided to `fit` as a keyword argument `sensitive_features`. In the future, we will also allow providing sensitive features as columns of `X`.
+All of the currently supported parity constraints (subclasses of `Moment`) are based on sensitive features that need to be provided to `fit` as a keyword argument `sensitive_features`. In the future, it will also be possible to provide sensitive features as columns of `X`.
 
 #### Post-processing algorithms
 
-The constructors of post-processing algorithms require an already trained predictor as an argument. For consistency, we also allow providing an estimator instead, and the estimator is then fitted on the data at the beginning of the execution of `fit`. For post-processing algorithms, the `constraints` argument is provided as a string.
+The constructors of post-processing algorithms require an already trained predictor as an argument. As an alternative, it is possible to provide an estimator, and the estimator is then fitted on the data at the beginning of the execution of `fit`. For post-processing algorithms, the `constraints` argument is provided as a string.
 
 ```python
 postprocessor = PostProcessing(unconstrained_predictor=predictor, constraints=constraints)
 postprocessor = PostProcessing(estimator=estimator, constraints=constraints)
 ```
 
-Post-processing algorithms (such as the ones under `fairlearn.postprocessing`) provide the same functions as the reductions above albeit with `sensitive_features` as a required argument for both `predict` and `_pmf_predict`. In the future, we will make `sensitive_features` optional if the sensitive features are already provided through `X`.
+Post-processing algorithms (such as the ones under `fairlearn.postprocessing`) provide the same functions as the reductions above albeit with `sensitive_features` as a required argument for `predict`. In the future, we will make `sensitive_features` optional if the sensitive features are already provided through `X`.
 
 ```python
 postprocessor.fit(X, y, sensitive_features=sensitive_features)
 postprocessor.predict(X, sensitive_features=sensitive_features)
-postprocessor._pmf_predict(X, sensitive_features=sensitive_features)
 ```
 
 
