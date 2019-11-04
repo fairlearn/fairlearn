@@ -14,7 +14,6 @@ from test_utilities import sensitive_features, X1, X2, X3, labels
 
 class TestExpgradSmoke:
     def setup_method(self, method):
-        print("setup_method      method:%s" % method.__name__)
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
         self.A = pd.Series(sensitive_features)
