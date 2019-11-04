@@ -21,7 +21,7 @@ The fairlearn project seeks to enable anyone involved in the development of arti
 
 ## What we mean by _fairness_
 
-An AI system can behave unfairly for a variety of reasons. In fairlearn, we define whether an AI system is behaving unfairly in terms of its impact on people – i.e., in terms of harms. We focus on two kinds of harms:
+An AI system can behave unfairly for a variety of reasons. In fairlearn, we define whether an AI system is behaving unfairly in terms of its impact on people &ndash; i.e., in terms of harms. We focus on two kinds of harms:
 
 - _Allocation harms._ These harms can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
