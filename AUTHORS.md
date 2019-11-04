@@ -1,0 +1,46 @@
+# Contributors
+
+All names are sorted alphabetically by last name. Contributors, please add your name to the list when you submit a patch to the project.
+
+- [Sarah Bird](https://github.com/slbird)
+  - Managing project deliverables
+  - Coordinating features
+  - Customer engagement
+- [Miro Dudik](https://github.com/MiroDudik)
+  - Exponentiated Gradient: research & implementation
+  - Grid Search
+  - Moments
+  - Documentation
+- [Richard Edgar](https://github.com/riedgar-ms)
+  - Grid Search implementation
+  - Metrics
+  - Documentation and doc generation
+  - Notebooks
+  - DevOps Pipelines
+- [Brandon Horn](https://github.com/rihorn2)
+  - fairlearn dashboard
+  - Metrics
+- [Roman Lutz](https://github.com/romanlutz)
+  - Threshold Optimizer Post Processing implementation
+  - Exponentiated Gradient implementation
+  - Performance Tests using [tempeh](https://github.com/microsoft/tempeh)
+  - Documentation
+  - Notebooks
+  - DevOps Pipelines
+- [Vanessa Milan](https://www.microsoft.com/en-us/research/people/vmilan/)
+  - UX design
+- [Sangeeta Mudnal](https://www.microsoft.com/en-us/research/people/smudnal/)
+  - Customer engagement
+- [Mehrnoosh Sameki](https://github.com/mesameki)
+  - Managing project deliverables
+  - Coordinating features
+  - Customer engagement
+  - Documentation
+- [Hanna Wallach](https://www.microsoft.com/en-us/research/people/wallach/)
+  - Exponentiated Gradient research
+- [Vincent Xu](https://github.com/vingu)
+  - Managing project deliverables
+  - Coordinating features
+  - Customer engagement
+- [Beth Zeranski](https://github.com/bethz)
+  - DevOps Pipelines
