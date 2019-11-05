@@ -198,14 +198,19 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
     assert 1 == adjusted_predictor([sensitive_feature_names_ex1[2]], [100])
 
     # Assert Demographic Parity actually holds
-    predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(adjusted_predictor,
-                                                             sensitive_features_ex1,
-                                                             scores_ex, labels_ex)
+    predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(
+        adjusted_predictor, sensitive_features_ex1, scores_ex, labels_ex)
 
-    average_probabilities_by_sensitive_feature = \
-        [np.sum([lp.prediction for lp in predictions_by_sensitive_feature[sensitive_feature_value]])
-         / len(predictions_by_sensitive_feature[sensitive_feature_value])
-         for sensitive_feature_value in sorted(predictions_by_sensitive_feature)]
+    def _average_prediction(sensitive_feature_value, predictions_by_sensitive_feature):
+        relevant_predictions = predictions_by_sensitive_feature[sensitive_feature_value]
+        predictions = [lp.prediction for lp in relevant_predictions]
+        return np.sum(predictions) / len(relevant_predictions)
+
+    average_probabilities_by_sensitive_feature = []
+    for sensitive_feature_value in sorted(predictions_by_sensitive_feature):
+        average_probabilities_by_sensitive_feature \
+            .append(_average_prediction(sensitive_feature_value,
+                                        predictions_by_sensitive_feature))
     assert np.isclose(average_probabilities_by_sensitive_feature, [0.572] * 3).all()
 
 
@@ -273,17 +278,23 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
         p_ignore == adjusted_predictor([sensitive_feature_names_ex1[2]], [100])
 
     # Assert Equalized Odds actually holds
-    predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(adjusted_predictor,
-                                                             sensitive_features_ex1,
-                                                             scores_ex, labels_ex)
+    predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(
+        adjusted_predictor, sensitive_features_ex1, scores_ex, labels_ex)
 
-    predictions_based_on_label = {}
+    def _average_prediction_for_label(label, sensitive_feature_value,
+                                      predictions_by_sensitive_feature):
+        relevant_predictions = predictions_by_sensitive_feature[sensitive_feature_value]
+        predictions_for_label = [lp.prediction for lp in relevant_predictions if lp.label == label]
+        sum_of_predictions_for_label = np.sum(predictions_for_label)
+        n_predictions_for_label = len([lp for lp in relevant_predictions if lp.label == label])
+        return sum_of_predictions_for_label / n_predictions_for_label
+
+    predictions_based_on_label = {0: [], 1: []}
     for label in [0, 1]:
-        predictions_based_on_label[label] = \
-            [np.sum([lp.prediction for lp in predictions_by_sensitive_feature[sensitive_feature_value]
-                     if lp.label == label])
-             / len([lp for lp in predictions_by_sensitive_feature[sensitive_feature_value] if lp.label == label])
-             for sensitive_feature_value in sorted(predictions_by_sensitive_feature)]
+        for sensitive_feature_value in sorted(predictions_by_sensitive_feature):
+            predictions_based_on_label[label] \
+                .append(_average_prediction_for_label(label, sensitive_feature_value,
+                        predictions_by_sensitive_feature))
 
     # assert counts of positive predictions for negative labels
     assert np.isclose(predictions_based_on_label[0], [0.334] * 3).all()
@@ -389,8 +400,8 @@ def test_predict_output_0_or_1(sensitive_features, sensitive_feature_names, X_tr
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_predict_multiple_sensitive_features_columns_error(sensitive_features, sensitive_feature_names,
-                                                   X_transform, y_transform, constraints):
+def test_predict_multiple_sensitive_features_columns_error(
+        sensitive_features, sensitive_feature_names, X_transform, y_transform, constraints):
     X = X_transform(_format_as_list_of_lists(sensitive_features))
     y = y_transform(labels_ex)
     sensitive_features_ = pd.DataFrame({"A1": sensitive_features, "A2": sensitive_features})

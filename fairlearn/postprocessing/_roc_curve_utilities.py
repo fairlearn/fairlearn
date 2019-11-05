@@ -69,7 +69,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]
              (2) min and max in x_grid are below/above min and max in data[x_col]
              (3) data is indexed 0,...,len(data)
-    
+
     :param data: the convex hull data points
     :type data: pandas.DataFrame
     :param x_col: name of the x-column in `data`
@@ -134,8 +134,8 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
 
     if n_positive == 0 or n_negative == 0:
-        raise ValueError("Degenerate labels for sensitive feature value {}" \
-            .format(sensitive_feature_value))
+        raise ValueError("Degenerate labels for sensitive feature value {}"
+                         .format(sensitive_feature_value))
 
     scores.append(-np.inf)
     labels.append(np.nan)

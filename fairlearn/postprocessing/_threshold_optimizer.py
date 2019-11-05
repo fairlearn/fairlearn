@@ -136,9 +136,9 @@ class ThresholdOptimizer(PostProcessing):
         self._validate_input_data(X, sensitive_features)
         unconstrained_predictions = self._unconstrained_predictor.predict(X)
 
-        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_sensitive_feature,
-                                                sensitive_features,
-                                                unconstrained_predictions)
+        positive_probs = _vectorized_prediction(
+            self._post_processed_predictor_by_sensitive_feature, sensitive_features,
+            unconstrained_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X, *, sensitive_features):
@@ -154,9 +154,9 @@ class ThresholdOptimizer(PostProcessing):
         """
         self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
-        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_sensitive_feature,
-                                                sensitive_features,
-                                                self._unconstrained_predictor.predict(X))
+        positive_probs = _vectorized_prediction(
+            self._post_processed_predictor_by_sensitive_feature, sensitive_features,
+            self._unconstrained_predictor.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
     def _validate_post_processed_predictor_is_fitted(self):
@@ -268,8 +268,8 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
             plot_curve(sensitive_feature_value, 'selection', 'error',
                        selection_error_curve[sensitive_feature_value])
 
-    # Find minimum error point given that at each point the selection rate for each sensitive_feature_value
-    # value is identical by design.
+    # Find minimum error point given that at each point the selection rate for each sensitive
+    # feature value is identical by design.
     i_best_DP = error_given_selection.idxmin()
     x_best = x_grid[i_best_DP]
 
@@ -305,8 +305,8 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
     scores. Subsequently takes the overlapping region of the ROC curves, and finds the best
     solution by selecting the point on the curve with minimal error.
 
-    This method assumes that sensitive_features, labels, and scores are non-empty data structures of
-    equal length, and labels contains only binary labels 0 and 1.
+    This method assumes that sensitive_features, labels, and scores are non-empty data structures
+    of equal length, and labels contains only binary labels 0 and 1.
 
     :param sensitive_features: the feature data that determines the groups for which the parity
         constraints are enforced
@@ -342,7 +342,8 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
 
     for sensitive_feature_value, group in data_grouped_by_sensitive_feature:
         roc_convex_hull = _get_roc(group, sensitive_feature_value, flip=flip)
-        roc[sensitive_feature_value] = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
+        roc[sensitive_feature_value] = \
+            _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
         y_values[sensitive_feature_value] = roc[sensitive_feature_value]['y']
 
         logger.debug(OUTPUT_SEPARATOR)
@@ -451,9 +452,9 @@ def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
 
 
 def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_feature_names=None):
-    """ Reformats the provided three categories of data (`sensitive_features`, `labels`, `scores`) into
-    a newly created pandas.DataFrame. That DataFrame is grouped by sensitive feature values so
-    that subsequently each group can be handled separately.
+    """ Reformats the provided three categories of data (`sensitive_features`, `labels`, `scores`)
+    into a newly created pandas.DataFrame. That DataFrame is grouped by sensitive feature values
+    so that subsequently each group can be handled separately.
 
     :param sensitive_features: the sensitive features based on which the grouping is determined;
         currently only a single sensitive feature is supported
