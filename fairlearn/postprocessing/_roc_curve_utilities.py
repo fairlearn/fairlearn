@@ -134,7 +134,7 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
 
     if n_positive == 0 or n_negative == 0:
-        raise ValueError("Degenerate labels for attribute value {}" \
+        raise ValueError("Degenerate labels for sensitive feature value {}" \
             .format(sensitive_feature_value))
 
     scores.append(-np.inf)

@@ -5,7 +5,7 @@ from collections import defaultdict, namedtuple
 import numpy as np
 import pandas as pd
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
-from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, ATTRIBUTE_KEY
+from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
 
 sensitive_feature_names_ex1 = ["A", "B", "C"]
@@ -45,16 +45,16 @@ class ExampleNotEstimator2():
         pass
 
 
-def _get_grouped_data_and_base_points(attribute_value):
+def _get_grouped_data_and_base_points(sensitive_feature_value):
     data = pd.DataFrame({
-        ATTRIBUTE_KEY: sensitive_features_ex1,
+        SENSITIVE_FEATURE_KEY: sensitive_features_ex1,
         SCORE_KEY: scores_ex,
         LABEL_KEY: labels_ex})
-    grouped_data = data.groupby(ATTRIBUTE_KEY).get_group(attribute_value) \
+    grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group(sensitive_feature_value) \
         .sort_values(by=SCORE_KEY, ascending=False)
     x_grid = np.linspace(0, 1, 100)
 
-    if attribute_value == "A":
+    if sensitive_feature_value == "A":
         expected_roc_points = pd.DataFrame({
             "x": [0, 0.25, 0.5, 0.5, 1],
             "y": [0, 1/3,  2/3, 1,   1],
@@ -66,7 +66,7 @@ def _get_grouped_data_and_base_points(attribute_value):
         })
         ignore_for_base_points = [1, 2]
 
-    if attribute_value == "B":
+    if sensitive_feature_value == "B":
         expected_roc_points = pd.DataFrame({
             "x": [0, 1/3, 1],
             "y": [0, 3/4, 1],
@@ -76,7 +76,7 @@ def _get_grouped_data_and_base_points(attribute_value):
         })
         ignore_for_base_points = []
 
-    if attribute_value == "C":
+    if sensitive_feature_value == "C":
         expected_roc_points = pd.DataFrame({
             "x": [0, 0,   2/3, 1],
             "y": [0, 1/3,  1,  1],
@@ -90,12 +90,12 @@ def _get_grouped_data_and_base_points(attribute_value):
     return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
 
 
-def _get_predictions_by_attribute(adjusted_predictor, attributes, scores, labels):
+def _get_predictions_by_sensitive_feature(adjusted_predictor, sensitive_features, scores, labels):
     labels_and_predictions = defaultdict(list)
-    for i in range(len(attributes)):
-        labels_and_predictions[attributes[i]].append(
+    for i in range(len(sensitive_features)):
+        labels_and_predictions[sensitive_features[i]].append(
             LabelAndPrediction(labels[i],
-                               adjusted_predictor([attributes[i]], [scores[i]])))
+                               adjusted_predictor([sensitive_features[i]], [scores[i]])))
     return labels_and_predictions
 
 

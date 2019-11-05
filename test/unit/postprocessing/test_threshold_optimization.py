@@ -23,7 +23,7 @@ from fairlearn.postprocessing._postprocessing import \
     MISSING_FIT_PREDICT_ERROR_MESSAGE, MISSING_PREDICT_ERROR_MESSAGE
 from .test_utilities import (sensitive_features_ex1, sensitive_features_ex2, labels_ex,
                              scores_ex, sensitive_feature_names_ex1, sensitive_feature_names_ex2,
-                             _get_predictions_by_attribute, _format_as_list_of_lists,
+                             _get_predictions_by_sensitive_feature, _format_as_list_of_lists,
                              ExamplePredictor, ExampleEstimator, ExampleNotPredictor,
                              ExampleNotEstimator1, ExampleNotEstimator2)
 
@@ -198,15 +198,15 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
     assert 1 == adjusted_predictor([sensitive_feature_names_ex1[2]], [100])
 
     # Assert Demographic Parity actually holds
-    predictions_by_attribute = _get_predictions_by_attribute(adjusted_predictor,
+    predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(adjusted_predictor,
                                                              sensitive_features_ex1,
                                                              scores_ex, labels_ex)
 
-    average_probabilities_by_attribute = \
-        [np.sum([lp.prediction for lp in predictions_by_attribute[attribute_value]])
-         / len(predictions_by_attribute[attribute_value])
-         for attribute_value in sorted(predictions_by_attribute)]
-    assert np.isclose(average_probabilities_by_attribute, [0.572] * 3).all()
+    average_probabilities_by_sensitive_feature = \
+        [np.sum([lp.prediction for lp in predictions_by_sensitive_feature[sensitive_feature_value]])
+         / len(predictions_by_sensitive_feature[sensitive_feature_value])
+         for sensitive_feature_value in sorted(predictions_by_sensitive_feature)]
+    assert np.isclose(average_probabilities_by_sensitive_feature, [0.572] * 3).all()
 
 
 @pytest.mark.parametrize("score_transform", ALLOWED_INPUT_DATA_TYPES)
@@ -222,7 +222,7 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
-    # with p_ignore != 0 and prediction_constant != 0 for at least some attributes values.
+    # with p_ignore != 0 and prediction_constant != 0 for at least some sensitive feature values.
     prediction_constant = 0.334
 
     # sensitive feature value A
@@ -273,17 +273,17 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
         p_ignore == adjusted_predictor([sensitive_feature_names_ex1[2]], [100])
 
     # Assert Equalized Odds actually holds
-    predictions_by_attribute = _get_predictions_by_attribute(adjusted_predictor,
+    predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(adjusted_predictor,
                                                              sensitive_features_ex1,
                                                              scores_ex, labels_ex)
 
     predictions_based_on_label = {}
     for label in [0, 1]:
         predictions_based_on_label[label] = \
-            [np.sum([lp.prediction for lp in predictions_by_attribute[attribute_value]
+            [np.sum([lp.prediction for lp in predictions_by_sensitive_feature[sensitive_feature_value]
                      if lp.label == label])
-             / len([lp for lp in predictions_by_attribute[attribute_value] if lp.label == label])
-             for attribute_value in sorted(predictions_by_attribute)]
+             / len([lp for lp in predictions_by_sensitive_feature[sensitive_feature_value] if lp.label == label])
+             for sensitive_feature_value in sorted(predictions_by_sensitive_feature)]
 
     # assert counts of positive predictions for negative labels
     assert np.isclose(predictions_based_on_label[0], [0.334] * 3).all()
@@ -389,7 +389,7 @@ def test_predict_output_0_or_1(sensitive_features, sensitive_feature_names, X_tr
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_predict_multiple_attributes_columns_error(sensitive_features, sensitive_feature_names,
+def test_predict_multiple_sensitive_features_columns_error(sensitive_features, sensitive_feature_names,
                                                    X_transform, y_transform, constraints):
     X = X_transform(_format_as_list_of_lists(sensitive_features))
     y = y_transform(labels_ex)
@@ -432,8 +432,8 @@ def test_predict_different_argument_lengths(sensitive_features, sensitive_featur
 
 
 def create_adjusted_predictor(threshold_optimization_method, sensitive_features, labels, scores):
-    post_processed_predictor_by_attribute = threshold_optimization_method(
+    post_processed_predictor_by_sensitive_feature = threshold_optimization_method(
         sensitive_features, labels, scores)
 
     return lambda sensitive_features_, scores: _vectorized_prediction(
-        post_processed_predictor_by_attribute, sensitive_features_, scores)
+        post_processed_predictor_by_sensitive_feature, sensitive_features_, scores)

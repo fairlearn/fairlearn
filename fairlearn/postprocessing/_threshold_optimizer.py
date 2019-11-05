@@ -14,7 +14,7 @@ import random
 
 from fairlearn.exceptions import NotFittedException
 from fairlearn.postprocessing import PostProcessing
-from ._constants import (LABEL_KEY, SCORE_KEY, ATTRIBUTE_KEY, OUTPUT_SEPARATOR,
+from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
 from ._curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
@@ -32,8 +32,8 @@ NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supporte
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
     "column in {}."
-ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "An attribute named {} or {} was detected. " \
-    "Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
+SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "A sensitive feature named {} or {} " \
+    "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
@@ -76,7 +76,7 @@ class ThresholdOptimizer(PostProcessing):
         self._grid_size = grid_size
         self._flip = flip
         self._plot = plot
-        self._post_processed_predictor_by_attribute = None
+        self._post_processed_predictor_by_sensitive_feature = None
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model based on training features and labels, sensitive features,
@@ -113,7 +113,7 @@ class ThresholdOptimizer(PostProcessing):
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        self._post_processed_predictor_by_attribute = threshold_optimization_method(
+        self._post_processed_predictor_by_sensitive_feature = threshold_optimization_method(
             sensitive_features, y, scores, self._grid_size, self._flip, self._plot)
 
     def predict(self, X, *, sensitive_features, random_state=None):
@@ -136,7 +136,7 @@ class ThresholdOptimizer(PostProcessing):
         self._validate_input_data(X, sensitive_features)
         unconstrained_predictions = self._unconstrained_predictor.predict(X)
 
-        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_attribute,
+        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_sensitive_feature,
                                                 sensitive_features,
                                                 unconstrained_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
@@ -154,13 +154,13 @@ class ThresholdOptimizer(PostProcessing):
         """
         self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
-        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_attribute,
+        positive_probs = _vectorized_prediction(self._post_processed_predictor_by_sensitive_feature,
                                                 sensitive_features,
                                                 self._unconstrained_predictor.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
     def _validate_post_processed_predictor_is_fitted(self):
-        if not self._post_processed_predictor_by_attribute:
+        if not self._post_processed_predictor_by_sensitive_feature:
             raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
     def _validate_input_data(self, X, sensitive_features, y=None):
@@ -191,15 +191,15 @@ class ThresholdOptimizer(PostProcessing):
 
 def _threshold_optimization_demographic_parity(sensitive_features, labels, scores, grid_size=1000,
                                                flip=True, plot=False):
-    """ Calculates selection and error rates for every attribute value at different thresholds
-    over the scores. Subsequently weighs each attribute value's error by the frequency of the
-    attribute value in the data. The minimum error point is the selected solution, which is
-    recreated by interpolating between two points on the convex hull of all solutions. Each
-    attribute value has its own predictor in the resulting post-processed predictor, which requires
-    the attribute value as an input.
+    """ Calculates selection and error rates for every sensitive feature value at different
+    thresholds over the scores. Subsequently weighs each sensitive feature value's error by the
+    frequency of the sensitive feature value in the data. The minimum error point is the selected
+    solution, which is recreated by interpolating between two points on the convex hull of all
+    solutions. Each sensitive feature value has its own predictor in the resulting postprocessed
+    predictor, which requires the sensitive feature value as an input.
 
-    This method assumes that sensitive_features, labels, and scores are non-empty data structures of
-    equal length, and labels contains only binary labels 0 and 1.
+    This method assumes that sensitive_features, labels, and scores are non-empty data structures
+    of equal length, and labels contains only binary labels 0 and 1.
 
     :param sensitive_features: the feature data that determines the groups for which the parity
         constraints are enforced
@@ -216,7 +216,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
     :type flip: bool
     :param plot: show selection-error plot if True
     :type plot: bool
-    :return: the post-processed predictor as a function taking the sensitive feature value
+    :return: the postprocessed predictor as a function taking the sensitive feature value
         and the fairness unaware predictor's score as arguments to produce predictions
     """
     n = len(labels)
@@ -224,10 +224,10 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
     x_grid = np.linspace(0, 1, grid_size + 1)
     error_given_selection = 0 * x_grid
 
-    data_grouped_by_attribute = _reformat_and_group_data(
+    data_grouped_by_sensitive_feature = _reformat_and_group_data(
         sensitive_features, labels, scores)
 
-    for sensitive_feature_value, group in data_grouped_by_attribute:
+    for sensitive_feature_value, group in data_grouped_by_sensitive_feature:
         # determine probability of current sensitive feature group based on data
         n_group = len(group)
         n_positive = sum(group[LABEL_KEY])
@@ -275,12 +275,12 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
 
     # create the solution as interpolation of multiple points with a separate predictor per
     # sensitive feature value
-    predicted_DP_by_attribute = {}
+    predicted_DP_by_sensitive_feature = {}
     for sensitive_feature_value in selection_error_curve.keys():
         # For DP we already have the predictor directly without complex interpolation.
         selection_error_curve_result = selection_error_curve[sensitive_feature_value].transpose()[
             i_best_DP]
-        predicted_DP_by_attribute[sensitive_feature_value] = \
+        predicted_DP_by_sensitive_feature[sensitive_feature_value] = \
             InterpolatedPredictor(0, 0,
                                   selection_error_curve_result.p0,
                                   selection_error_curve_result.operation0,
@@ -296,7 +296,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
         plot_solution_and_show_plot(
             x_best, None, "DP solution", "selection rate", "error")
 
-    return predicted_DP_by_attribute
+    return predicted_DP_by_sensitive_feature
 
 
 def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, grid_size=1000,
@@ -323,10 +323,10 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
     :type flip: bool
     :param plot: show ROC plot if True
     :type plot: bool
-    :return: the post-processed predictor as a function taking the sensitive feature value
+    :return: the postprocessed predictor as a function taking the sensitive feature value
         and the fairness unaware predictor's score as arguments to produce predictions
     """
-    data_grouped_by_attribute = _reformat_and_group_data(
+    data_grouped_by_sensitive_feature = _reformat_and_group_data(
         sensitive_features, labels, scores)
 
     n = len(labels)
@@ -340,7 +340,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
     x_grid = np.linspace(0, 1, grid_size + 1)
     y_values = pd.DataFrame()
 
-    for sensitive_feature_value, group in data_grouped_by_attribute:
+    for sensitive_feature_value, group in data_grouped_by_sensitive_feature:
         roc_convex_hull = _get_roc(group, sensitive_feature_value, flip=flip)
         roc[sensitive_feature_value] = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
         y_values[sensitive_feature_value] = roc[sensitive_feature_value]['y']
@@ -373,7 +373,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
 
     # create the solution as interpolation of multiple points with a separate predictor
     # per sensitive feature
-    predicted_EO_by_attribute = {}
+    predicted_EO_by_sensitive_feature = {}
     for sensitive_feature_value in roc.keys():
         roc_result = roc[sensitive_feature_value].transpose()[i_best_EO]
         # p_ignore * x_best represent the diagonal of the ROC plot.
@@ -383,12 +383,12 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
         else:
             # Calculate p_ignore to change prediction P to y_best
             # p_ignore * x_best + (1 - p_ignore) * P
-            difference_from_best_predictor_for_attribute = roc_result.y - y_best
+            difference_from_best_predictor_for_sensitive_feature = roc_result.y - y_best
             vertical_distance_from_diagonal = roc_result.y - roc_result.x
-            p_ignore = difference_from_best_predictor_for_attribute / \
+            p_ignore = difference_from_best_predictor_for_sensitive_feature / \
                 vertical_distance_from_diagonal
 
-        predicted_EO_by_attribute[sensitive_feature_value] = \
+        predicted_EO_by_sensitive_feature[sensitive_feature_value] = \
             InterpolatedPredictor(p_ignore, x_best, roc_result.p0, roc_result.operation0,
                                   roc_result.p1, roc_result.operation1)
 
@@ -402,7 +402,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
         plot_solution_and_show_plot(x_best, y_best, 'EO solution', "$P[\\hat{Y}=1|Y=0]$",
                                     "$P[\\hat{Y}=1|Y=1]$")
 
-    return predicted_EO_by_attribute
+    return predicted_EO_by_sensitive_feature
 
 
 def _vectorized_prediction(function_dict, sensitive_features, scores):
@@ -474,13 +474,13 @@ def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_featu
     # TODO: extend to multiple columns for additional group data
     # and name columns after original column names if possible
     # or store the original column names
-    sensitive_feature_name = ATTRIBUTE_KEY
+    sensitive_feature_name = SENSITIVE_FEATURE_KEY
     if sensitive_feature_names is not None:
         if sensitive_feature_name in [SCORE_KEY, LABEL_KEY]:
-            raise ValueError(ATTRIBUTE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
+            raise ValueError(SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
         sensitive_feature_name = sensitive_feature_names[0]
 
-    _reformat_data_into_dict(sensitive_feature_names, data_dict, sensitive_features)
+    _reformat_data_into_dict(sensitive_feature_name, data_dict, sensitive_features)
     _reformat_data_into_dict(SCORE_KEY, data_dict, scores)
     _reformat_data_into_dict(LABEL_KEY, data_dict, labels)
 
@@ -509,7 +509,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         else:
             data_dict[key] = additional_data.reshape(-1)
     elif type(additional_data) == pd.DataFrame:
-        # TODO: extend to multiple columns for additional_data by using attribute_column
+        # TODO: extend to multiple columns for additional_data by using column names
         for attribute_column in additional_data.columns:
             data_dict[key] = additional_data[attribute_column].values
     elif type(additional_data) == pd.Series:

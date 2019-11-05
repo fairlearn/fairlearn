@@ -11,6 +11,17 @@ MISSING_PREDICT_ERROR_MESSAGE = "The predictor does not have a callable 'predict
 
 class PostProcessing:
     """Abstract base class for postprocessing approaches for disparity mitigation
+
+    :param unconstrained_predictor: a predictor with a `predict` function that has already been
+        trained on the training data; the predictor will subsequently be used in the mitigator
+        for unconstrained predictions; can only be specified if `estimator` is None
+    :type unconstrainted_predictor: predictor
+    :param estimator: an estimator with a `fit` and `predict` function that will be trained on the
+        training data and subsequently used in the mitigator for unconstrained predictions; can
+        only be specified if `unconstrainted_predictor` is None
+    :type estimator: estimator
+    :param constraints: the parity constraints to be enforced represented as a string
+    :type constraints: str
     """
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
                  constraints=None):
