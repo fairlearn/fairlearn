@@ -21,11 +21,12 @@ from fairlearn.postprocessing._threshold_optimizer import \
 from fairlearn.postprocessing._postprocessing import \
     PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE, EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE, \
     MISSING_FIT_PREDICT_ERROR_MESSAGE, MISSING_PREDICT_ERROR_MESSAGE
+from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
 from .test_utilities import (sensitive_features_ex1, sensitive_features_ex2, labels_ex,
-                             scores_ex, sensitive_feature_names_ex1, sensitive_feature_names_ex2,
-                             _get_predictions_by_sensitive_feature, _format_as_list_of_lists,
-                             ExamplePredictor, ExampleEstimator, ExampleNotPredictor,
-                             ExampleNotEstimator1, ExampleNotEstimator2)
+                             degenerate_labels_ex, scores_ex, sensitive_feature_names_ex1,
+                             sensitive_feature_names_ex2, _get_predictions_by_sensitive_feature,
+                             _format_as_list_of_lists, ExamplePredictor, ExampleEstimator,
+                             ExampleNotPredictor, ExampleNotEstimator1, ExampleNotEstimator2)
 
 
 ALLOWED_INPUT_DATA_TYPES = [lambda x: x, np.array, pd.DataFrame, pd.Series]
@@ -116,6 +117,23 @@ def test_threshold_optimization_non_binary_labels(X_transform, y_transform,
                                             constraints=constraints)
 
     with pytest.raises(ValueError, match=NON_BINARY_LABELS_ERROR_MESSAGE):
+        adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
+
+
+@pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
+@pytest.mark.parametrize("y_transform", ALLOWED_INPUT_DATA_TYPES)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_INPUT_DATA_TYPES)
+@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+def test_threshold_optimization_degenerate_labels(X_transform, y_transform,
+                                                  sensitive_features_transform, constraints):
+    X = X_transform(_format_as_list_of_lists(sensitive_features_ex1))
+    y = y_transform(degenerate_labels_ex)
+    sensitive_features = sensitive_features_transform(sensitive_features_ex1)
+
+    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
+                                            constraints=constraints)
+
+    with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format('A')):
         adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
 
 

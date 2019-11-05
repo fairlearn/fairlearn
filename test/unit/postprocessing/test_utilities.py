@@ -13,6 +13,7 @@ sensitive_features_ex1 = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
 sensitive_feature_names_ex2 = ["x", "Y"]
 sensitive_features_ex2 = [x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
 labels_ex = [int(x) for x in '0110100' '0010111' '000111']
+degenerate_labels_ex = [int(x) for x in '0000000' '0000000' '000000']
 scores_ex = [int(x) for x in '0011233' '0001111' '011112']
 
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')

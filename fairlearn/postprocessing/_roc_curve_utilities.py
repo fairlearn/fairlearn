@@ -7,6 +7,8 @@ import pandas as pd
 from ._constants import LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY
 from ._threshold_operation import ThresholdOperation
 
+DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
+
 
 def _get_roc(data, sensitive_feature_value, flip=True):
     """Get ROC curve's convex hull based on data columns 'score' and 'label'
@@ -134,8 +136,7 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
 
     if n_positive == 0 or n_negative == 0:
-        raise ValueError("Degenerate labels for sensitive feature value {}"
-                         .format(sensitive_feature_value))
+        raise ValueError(DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value))
 
     scores.append(-np.inf)
     labels.append(np.nan)
