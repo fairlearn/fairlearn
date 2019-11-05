@@ -10,7 +10,7 @@ MISSING_PREDICT_ERROR_MESSAGE = "The predictor does not have a callable 'predict
 
 
 class PostProcessing:
-    """Base class for postprocessing approaches to disparith mitigation
+    """Abstract base class for postprocessing approaches for disparity mitigation
     """
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
                  constraints=None):
@@ -58,15 +58,27 @@ class PostProcessing:
 
     def _pmf_predict(self, X, *, sensitive_features):
         """ Probabilistic mass function
+
+        :param X: Feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+        :param sensitive_features: Sensitive features to identify groups by, currently allows
+            only a single column
+        :type sensitive_features: Currently 1D array as numpy.ndarray, list, pandas.DataFrame,
+            or pandas.Series
+        :return: array of tuples with probabilities for predicting 0 or 1, respectively
         """
         raise NotImplementedError(self._pmf_predict.__name__ + " is not implemented")
 
     def _validate_predictor(self):
+        """ Validate that the _unconstrained_predictor member has a predict function.
+        """
         predict_function = getattr(self._unconstrained_predictor, "predict", None)
         if not predict_function or not callable(predict_function):
             raise ValueError(MISSING_PREDICT_ERROR_MESSAGE)
 
     def _validate_estimator(self):
+        """ Validate that the `_estimator` member has both a fit and a predict function.
+        """
         fit_function = getattr(self._estimator, "fit", None)
         predict_function = getattr(self._estimator, "predict", None)
         if not predict_function or not fit_function or not callable(predict_function) or \
