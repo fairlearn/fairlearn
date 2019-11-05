@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import copy
+import logging
 import numpy as np
 import pandas as pd
 
@@ -11,6 +12,8 @@ from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from .grid_search_result import GridSearchResult
+
+logger = logging.getLogger(__name__)
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
@@ -175,17 +178,22 @@ class GridSearch(Reduction):
             X, y, enforce_binary_sensitive_feature=True, **kwargs)
 
         if isinstance(self.constraints, ClassificationMoment):
+            logger.debug("Classification problem detected")
+            is_classification_reduction = True
             # We have a classification problem
             # Need to make sure that y is binary (for now)
             unique_labels = np.unique(y_train)
             if not set(unique_labels).issubset({0, 1}):
                 raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
+        else:
+            logger.debug("Regression problem detected")
+            is_classification_reduction = False
 
         # Prep the parity constraints and objective
+        logger.debug("Preparing constraints and objective")
         self.constraints.load_data(X_train, y_train, **kwargs)
         objective = self.constraints.default_objective()
         objective.load_data(X_train, y_train, **kwargs)
-        is_classification_reduction = isinstance(self.constraints, ClassificationMoment)
 
         # Basis information
         pos_basis = self.constraints.pos_basis
@@ -194,6 +202,7 @@ class GridSearch(Reduction):
         objective_in_the_span = (self.constraints.default_objective_lambda_vec is not None)
 
         if self.grid is None:
+            logger.debug("Creating grid of size {0}".format(self.grid_size))
             grid = _GridGenerator(self.grid_size,
                                   self.grid_limit,
                                   pos_basis,
@@ -201,31 +210,39 @@ class GridSearch(Reduction):
                                   neg_allowed,
                                   objective_in_the_span).grid
         else:
+            logger.debug("Using supplied grid")
             grid = self.grid
 
         # Fit the estimates
+        logger.debug("Setup complete. Starting grid search")
         self._all_results = []
         for i in grid.columns:
             lambda_vec = grid[i]
+            logger.debug("Obtaining weights")
             weights = self.constraints.signed_weights(lambda_vec)
             if not objective_in_the_span:
                 weights = weights + objective.signed_weights()
+
             if is_classification_reduction:
+                logger.debug("Applying relabelling for classification problem")
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
                 y_reduction = y_train
 
             current_estimator = copy.deepcopy(self.estimator)
+            logger.debug("Calling underlying estimator")
             current_estimator.fit(X, y_reduction, sample_weight=weights)
-            def predict_fct(X): return current_estimator.predict(X)
+            logger.debug("Call to underlying estimator complete")
 
+            def predict_fct(X): return current_estimator.predict(X)
             nxt = GridSearchResult(current_estimator,
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
                                    self.constraints.gamma(predict_fct))
             self._all_results.append(nxt)
 
+        logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(x):
                 return self.objective_weight * x.objective + self.constraint_weight * x.gamma.max()
