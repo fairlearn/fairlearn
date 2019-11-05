@@ -142,5 +142,26 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         description: localization.loremIpsum,
         isMinimization: true,
         isPercentage: false
+    },
+    "r2_score": {
+        key: "r2_score",
+        title: localization.Metrics.r2_score,
+        description: localization.loremIpsum,
+        isMinimization: false,
+        isPercentage: false
+    },
+    "root_mean_squared_error": {
+        key: "root_mean_squared_error",
+        title: localization.Metrics.rms_error,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: false
+    },
+    "auc": {
+        key: "auc",
+        title: localization.Metrics.auc,
+        description: localization.loremIpsum,
+        isMinimization: false,
+        isPercentage: false
     }
 };
