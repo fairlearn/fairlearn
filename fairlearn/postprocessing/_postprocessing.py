@@ -76,7 +76,9 @@ class PostProcessing:
             only a single column
         :type sensitive_features: Currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
-        :return: array of tuples with probabilities for predicting 0 or 1, respectively
+        :return: array of tuples with probabilities for predicting 0 or 1, respectively. The sum
+            of the two numbers in each tuple needs to add up to 1.
+        :rtype: numpy.ndarray
         """
         raise NotImplementedError(self._pmf_predict.__name__ + " is not implemented")
 

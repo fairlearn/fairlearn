@@ -150,7 +150,9 @@ class ThresholdOptimizer(PostProcessing):
             only a single column
         :type sensitive_features: Currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
-        :return: array of tuples with probabilities for predicting 0 or 1, respectively
+        :return: array of tuples with probabilities for predicting 0 or 1, respectively. The sum
+            of the two numbers in each tuple needs to add up to 1.
+        :rtype: numpy.ndarray
         """
         self._validate_post_processed_predictor_is_fitted()
         self._validate_input_data(X, sensitive_features)
