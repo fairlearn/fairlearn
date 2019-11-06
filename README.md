@@ -126,6 +126,8 @@ The fairlearn project is maintained by:
 - **@romanlutz**
 - **@bethz**
 
+For a full list of contributors refer to the [authors page](AUTHORS.md)
+
 ## Issues
 
 ### Regular (non-security) issues
