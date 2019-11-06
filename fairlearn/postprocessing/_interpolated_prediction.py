@@ -21,6 +21,7 @@ class InterpolatedPredictor:
         :param p1: interpolation multiplier for prediction from the second predictor
         :param operation1: threshold rule for the second predictor
         :return: an anonymous function that scales the original prediction to the desired one
+        :rtype: lambda
         """
         self._operation0 = operation0
         self._operation1 = operation1
@@ -45,6 +46,15 @@ class InterpolatedPredictor:
                     self._p1, self._operation1)
 
     def predict(self, scores):
+        """ Creates the interpolated prediction based on two threshold operations and the
+        transformation adjustment.
+
+        :param scores: the scores from an unconstrained predictor to which the threshold
+            operations are applied
+        :type scores: numpy.ndarray
+        :return: the interpolated prediction
+        :rtype: numpy.ndarray
+        """
         transformation_adjustment = self._p_ignore * self._prediction_constant
         weighted_predictions0 = self._p0 * self._operation0.get_predictor_from_operation()(scores)
         weighted_predictions1 = self._p1 * self._operation1.get_predictor_from_operation()(scores)
