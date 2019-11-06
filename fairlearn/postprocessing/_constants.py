@@ -3,7 +3,7 @@
 
 SCORE_KEY = "score"
 LABEL_KEY = "label"
-ATTRIBUTE_KEY = "attribute"
+SENSITIVE_FEATURE_KEY = "sensitive_feature"
 P0_KEY = "p0"
 P1_KEY = "p1"
 
