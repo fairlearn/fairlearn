@@ -1,6 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+""" Utilities for plotting curves
+"""
+
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors
@@ -37,7 +40,7 @@ def plot_overlap(x_grid, y_min):
     line.zorder -= 1
 
 
-def plot_curve(attribute, x_col, y_col, points):
-    color = _get_debug_color(attribute)
+def plot_curve(sensitive_feature, x_col, y_col, points):
+    color = _get_debug_color(sensitive_feature)
     plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0,
-             label='attribute value ' + str(attribute))
+             label='sensitive feature value ' + str(sensitive_feature))
