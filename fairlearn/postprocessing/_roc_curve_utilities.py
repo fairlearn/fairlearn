@@ -7,12 +7,24 @@ import pandas as pd
 from ._constants import LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY
 from ._threshold_operation import ThresholdOperation
 
+DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
 
-def _get_roc(data, x_grid, attribute, flip=True):
+
+def _get_roc(data, sensitive_feature_value, flip=True):
     """Get ROC curve's convex hull based on data columns 'score' and 'label'
     Scores represent output values from the predictor.
+
+    :param data: the DataFrame containing scores and labels
+    :type data: pandas.DataFrame
+    :param sensitive_feature_value: the sensitive feature value of the samples provided in `data`
+    :type sensitive_feature_value: str or int
+    :param flip: if True flip points below the ROC diagonal into points above by applying negative
+        weights; if False does not allow flipping; default True
+    :type flip: bool
+    :return: the convex hull over the ROC curve points
+    :rtype: pandas.DataFrame
     """
-    roc_sorted = _calculate_roc_points(data, attribute, flip)
+    roc_sorted = _calculate_roc_points(data, sensitive_feature_value, flip)
     roc_selected = _filter_points_to_get_convex_hull(roc_sorted)
     roc_convex_hull = pd.DataFrame(roc_selected)[['x', 'y', 'operation']]
     return roc_convex_hull
@@ -24,6 +36,11 @@ def _filter_points_to_get_convex_hull(roc_sorted):
     to get the convex hull. Since we can assume the points (0,0) and (1,1) to be part
     of the convex hull the problem is simpler and we only need to make a single pass
     through the data.
+
+    :param roc_sorted: DataFrame with ROC curve points sorted by 'x'
+    :type roc_sorted: pandas.DataFrame
+    :return: the list of points that make up the convex hull
+    :rtype: list of named tuples
     """
     selected = []
     for r2 in roc_sorted.itertuples():
@@ -50,10 +67,24 @@ def _filter_points_to_get_convex_hull(roc_sorted):
 
 
 def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
-    """Interpolates the data frame in "data" along the values in "x_grid".
+    """Interpolates the DataFrame in `data` along the values in `x_grid`.
     Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]
              (2) min and max in x_grid are below/above min and max in data[x_col]
-             (3) data is indexed 0,...,len(data)"""
+             (3) data is indexed 0,...,len(data)
+
+    :param data: the convex hull data points
+    :type data: pandas.DataFrame
+    :param x_col: name of the x-column in `data`
+    :type x_col: str
+    :param y_col: name of the y-column in `data`
+    :type y_col: str
+    :param content_col: name of the column in `data` with a description of the data point
+    :type content_col: str
+    :param x_grid: the grid of x-values for which the y-values need to be calculated
+    :type x_grid: numpy.ndarray
+    :return: DataFrame with the points of the interpolated curve
+    :type: pandas.DataFrame
+    """
     data_transpose = data.transpose()
 
     content_col_0 = content_col + '0'
@@ -88,11 +119,24 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
 
 
-def _calculate_roc_points(data, attribute, flip=True):
+def _calculate_roc_points(data, sensitive_feature_value, flip=True):
+    """ Calculates the ROC points from the scores and labels by iterating through all possible
+    thresholds that could be set based on the available scores.
+
+    :param data: the DataFrame containing scores and labels
+    :type data: pandas.DataFrame
+    :param sensitive_feature_value: the sensitive feature value of the samples provided in `data`
+    :type sensitive_feature_value: str or int
+    :param flip: if True flip points below the ROC diagonal into points above by applying negative
+        weights; if False does not allow flipping; default True
+    :type flip: bool
+    :return: the ROC curve points with their corresponding threshold operations
+    :rtype: pandas.DataFrame
+    """
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
 
     if n_positive == 0 or n_negative == 0:
-        raise ValueError("Degenerate labels for attribute value {}".format(attribute))
+        raise ValueError(DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value))
 
     scores.append(-np.inf)
     labels.append(np.nan)
@@ -132,6 +176,15 @@ def _calculate_roc_points(data, attribute, flip=True):
 
 
 def _get_scores_labels_and_counts(data):
+    """ Order samples by scores (ascending), and count the number of positive, negative, and
+    overall samples.
+
+    :param data: the DataFrame containing scores and labels
+    :type data: pandas.DataFrame
+    :return: a tuple containing the sorted scores, labels, the number of samples, the number
+        of positive samples, and the number of negative samples
+    :rtype: tuple of list, list, int, int, int
+    """
     data_sorted = data.sort_values(by=SCORE_KEY, ascending=False)
 
     scores = list(data_sorted[SCORE_KEY])
@@ -143,6 +196,13 @@ def _get_scores_labels_and_counts(data):
 
 
 def _get_counts(labels):
+    """ Returns the overall, positive, and negative counts of the labels.
+
+    :param labels: the labels of the samples
+    :type labels: list
+    :return: a tuple containing the overall, positive, and negative counts of the labels
+    :rtype: tuple of int, int, int
+    """
     n = len(labels)
     n_positive = sum(labels)
     n_negative = n - n_positive
