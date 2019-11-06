@@ -1,0 +1,36 @@
+# Nightly build pipeline which uses the requirements-fixed.txt file
+# This does not run on MacOS due to issues with the pinned requirements
+
+trigger: none # No CI build
+
+pr: none # Not for pull requests
+
+schedules:
+- cron: "0 8 * * *" # Time is UTC
+  displayName: Nightly Build
+  branches:
+    include:
+      - master
+  always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- template: all-tests-job-template.yml
+  parameters:
+    name: Linux
+    vmImage: 'ubuntu-16.04'
+    requirementsFile: 'requirements-fixed.txt'
+
+- template: all-tests-job-template.yml
+  parameters:
+    name: Windows
+    vmImage:  'vs2017-win2016'
+    requirementsFile: 'requirements-fixed.txt'
+
+- template: notebook-job-template.yml
+  parameters:
+    name: LinuxNotebooks
+    vmImage: 'ubuntu-16.04'
+    requirementsFile: 'requirements-fixed.txt'

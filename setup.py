@@ -10,14 +10,21 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name=fairlearn.__name__,
     version=fairlearn.__version__,
-    author="Miroslav Dudik",
-    author_email="mdudik@gmail.com",
-    description="Algorithms for fair classification",
+    author="Miroslav Dudik, Richard Edgar, Brandon Horn, Roman Lutz, Beth Zeranski",
+    author_email="fairlearn@microsoft.com",
+    description="Algorithms for mitigating unfairness in supervised machine learning",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/fairlearn/fairlearn",
     packages=setuptools.find_packages(),
-    install_requires=["numpy", "scipy", "pandas", "scikit-learn"],
+    python_requires='>=3.5',
+    install_requires=[
+        "matplotlib>=3.0.3",
+        "numpy>=1.17.2",
+        "pandas>=0.25.1",
+        "scikit-learn>=0.21.3",
+        "scipy>=1.3.1"
+    ],
     classifiers=(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

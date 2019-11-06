@@ -4,24 +4,30 @@
     "defaultFeatureNames": "Feature {0}",
     "accuracyTab": "Fairness in Accuracy",
     "opportunityTab": "Fairness in Opportunity",
-    "modelComparisonTab": "Model Comparison",
+    "modelComparisonTab": "Model comparison",
     "tableTab": "Detail View",
-    "dataSpecifications": "Data Specifications",
+    "dataSpecifications": "Data statistics",
     "attributes": "Attributes",
-    "attributesCount": "{0} attributes",
+    "singleAttributeCount": "1 sensitive feature",
+    "attributesCount": "{0} sensitive features",
     "instanceCount": "{0} instances",
     "close": "Close",
     "calculating": "Calculating...",
+    "accuracyMetric": "Accuracy metric",
+    "errorOnInputs": "Error with input. Sensitive features must be categorical values at this time. Please map values to binned categories and retry.",
     "Accuracy": {
-        "header": "How do you want to measure accuracy",
-        "body": "We have determined that your model generates {0} predictions. Based on the information, we recommend the following accuracy metrics:"
+        "header": "How do you want to measure accuracy?",
+        "body": "We have determined that your model is a {0}. Based on this, we recommend the following accuracy metrics:",
+        "binaryClassifier": "binary classifier",
+        "probabalisticRegressor": "probit regressor",
+        "regressor": "regressor"
     },
     "Parity": {
         "header": "Fairness measured in terms of disparity",
         "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are two kinds of disparity metrics: more to come...."
     },
     "Header": {
-        "title": "FairLearn Toolkit",
+        "title": "fairlearn",
         "documentation": "Documentation"
     },
     "Footer": {
@@ -30,22 +36,80 @@
     },
     "Intro": {
         "welcome": "Welcome to the",
-        "explanatoryStep": "Setting up your fairness assessment is easy",
-        "getStarted": "Get started"
+        "fairlearnDashboard": "fairlearn dashboard",
+        "introBody": "The fairlearn dashboard enables you to assess tradeoffs between accuracy and fairness of your models",
+        "explanatoryStep": "To set up the assessment, you need to specify a sensitive feature and an accuracy metric.",
+        "getStarted": "Get started",
+        "features": "Sensitive features",
+        "featuresInfo": "Sensitive features are used to split your data into groups. Fairness of your model across these groups is measured by disparity metrics. Disparity metrics quantify how much your model's behavior varies across these groups.",
+        "accuracy": "Accuracy metric",
+        "accuracyInfo": "Accuracy metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy."
+    },
+    "ModelComparison": {
+        "title": "Model comparison",
+        "howToRead": "How to read this chart",
+        "lower": "lower",
+        "higher": "higher",
+        "howToReadText": "This chart represents each of the {0} models as a selectable point. The x-axis represents {1}, with {2} being better. The y-axis represents disparity, with lower being better.",
+        "insights": "Insights",
+        "insightsText1": "The chart shows {0} and disparity of {1} models.",
+        "insightsText2": "{0} ranges from {1} to {2}. The disparity ranges from {3} to {4}.",
+        "insightsText3": "The most accurate model achieves {0} of {1} and a disparity of {2}.",
+        "insightsText4": "The lowest-disparity model achieves {0} of {1} and a disparity of {2}.",
+        "disparityInOutcomes": "Disparity in predictions",
+        "disparityInAccuracy": "Disparity in {0}",
+        "howToMeasureDisparity": "How should disparity be measured?"
     },
     "Report": {
-        "title": "Accuracy and fairness assessment",
-        "globalAccuracyText": "Is your overall accuracy score",
-        "accuracyDisparityText": "Is the overall difference",
-        "editConfiguration": "Edit Configuration",
+        "modelName": "Model {0}",
+        "title": "Disparity in accuracy",
+        "globalAccuracyText": "Is the overall {0}",
+        "accuracyDisparityText": "Is the disparity in {0}",
+        "editConfiguration": "Edit configuration",
         "backToComparisons": "Multimodel view",
-        "globalOutcomeText": "Is your average prediction",
-        "outcomeDisparityText": "Is your disparity in predictions"
+        "outcomesTitle": "Disparity in predictions",
+        "minTag": "Min",
+        "maxTag": "Max",
+        "groupLabel": "Subgroup",
+        "underestimationError": "Underprediction",
+        "underpredictionExplanation": "(predicted = 0, true = 1)",
+        "overpredictionExplanation": "(predicted = 1, true = 0)",
+        "overestimationError": "Overprediction",
+        "classificationOutcomesHowToRead": "The bar chart shows the selection rate in each group, meaning the fraction of points classified as 1.",
+        "regressionOutcomesHowToRead": "This chart shows the distribution of predictions for each group. The individual points are overlaid on the box plot.",
+        "classificationAccuracyHowToRead": "The bar chart shows the distribution of errors in each group. Errors are split into overprediction errors (predicting 1 when the true label is 0), and underprediction errors (predicting 0 when the true label is 1). The reported rates are obtained by dividing the number of errors by the overall group size.",
+        "probabilityAccuracyHowToRead": "Underestimation error rate is the sum of all negative errors within a group divided by the group size. Overestimation error rate is the sum of all positive errors in a group divided by the group size.",
+        "regressionAccuracyHowToRead": "This chart shows the error distribution for each group. The error is the predicted value minus the true value."
     },
     "Feature": {
         "header": "Along which features would you like to evaluate your model's fairness?",
-        "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's accuracy and outputs differ across these splits.",
+        "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's accuracy and predictions differ across these splits.",
         "learnMore": "Learn more",
-        "summaryCategoricalCount": "Your data contains {0} categorical values"
+        "summaryCategoricalCount": "This feature has {0} unique values",
+        "showCategories": "Show values",
+        "hideCategories": "Hide categories",
+        "categoriesOverflow": "   and {0} additional categories"
+    },
+    "Metrics": {
+        "accuracyScore": "Accuracy",
+        "precisionScore": "Precision",
+        "recallScore": "Recall",
+        "zeroOneLoss": "Zero-one loss",
+        "specificityScore": "Specificity score",
+        "missRate": "Miss rate",
+        "falloutRate": "Fallout rate",
+        "maxError": "Max error",
+        "meanAbsoluteError": "Mean absolute error",
+        "meanSquaredError": "Mean squared error",
+        "meanSquaredLogError": "Mean squared log error",
+        "medianAbsoluteError": "Median absolute error",
+        "average": "Average prediction",
+        "selectionRate": "Selection rate",
+        "overprediction": "Overprediction",
+        "underprediction": "Underprediction",
+        "balancedRootMeanSquaredError": "Balanced root mean squared error",
+        "accuracyDescription": "The fraction of data points classified correctly.",
+        "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
+        "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity."
     }
 }
