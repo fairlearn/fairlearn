@@ -89,7 +89,7 @@ class GridSearch(Reduction):
 
     :param constraints: Object describing the parity constraints. This provides the reweighting
         and relabelling
-    :type constraints: fairlearn.moments.Moment
+    :type constraints: fairlearn.reductions.Moment
 
     :param selection_rule: Specifies the procedure for selecting the best model found by the
         grid search. At the present time, the only valid value is "tradeoff_optimization" which
