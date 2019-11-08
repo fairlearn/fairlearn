@@ -121,7 +121,11 @@ class _Lagrangian:
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
         dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)]  # noqa: E501
-        result_dual = opt.linprog(dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds)
+        result_dual = opt.linprog(dual_c,
+                                  A_ub=dual_A_ub,
+                                  b_ub=dual_b_ub,
+                                  bounds=dual_bounds,
+                                  method='simplex')
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
         self.last_linprog_result = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
