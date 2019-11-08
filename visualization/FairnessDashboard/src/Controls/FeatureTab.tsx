@@ -10,7 +10,10 @@ import { mergeStyleSets } from "@uifabric/styling";
 import { Icon } from "office-ui-fabric-react/lib/Icon";
 import { IBinnedResponse } from "../IBinnedResponse";
 import { Text } from "office-ui-fabric-react/lib/Text";
+import { Modal } from 'office-ui-fabric-react/lib/Modal';
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import BinDialog from "./BinDialog";
+import { INumericRange, RangeTypes } from "mlchartlib";
 
 interface IFeatureItem {
     title: string;
@@ -24,10 +27,12 @@ export interface IFeatureTabProps extends IWizardTabProps {
     featureBins: IBinnedResponse[];
     selectedFeatureIndex: number;
     selectedFeatureChange: (value: number) => void;
+    saveBin: (bin: IBinnedResponse) => void;
 }
 
 interface IState {
     expandedBins: number[];
+    editingFeatureIndex: number | undefined;
 }
 
 export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
@@ -96,12 +101,27 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
 
     constructor(props: IFeatureTabProps) {
         super(props);
-        this.state = { expandedBins: []};
+        this.state = { 
+            expandedBins: [],
+            editingFeatureIndex: undefined
+        };
     }
     
     render(): React.ReactNode {
         return(
             <Stack horizontal horizontalAlign="space-between" className={FeatureTab.classNames.frame}>
+                <Modal
+                    isOpen={this.state.editingFeatureIndex !== undefined}
+                    isBlocking={false}
+                    onDismiss={this.hideModal}>
+                    { this.state.editingFeatureIndex !== undefined && <BinDialog
+                        range={this.props.dashboardContext.modelMetadata.featureRanges[this.state.editingFeatureIndex] as INumericRange}
+                        bins={this.props.featureBins[this.state.editingFeatureIndex]}
+                        dataset={this.props.dashboardContext.dataset}
+                        index={this.state.editingFeatureIndex}
+                        onSave={this.onBinSave}
+                        onCancel={this.hideModal}/>}
+                </Modal>
                 <Stack className={FeatureTab.classNames.main}>
                     <h2 className={FeatureTab.classNames.header}>
                         {localization.Feature.header}
@@ -110,15 +130,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                     <div className={FeatureTab.classNames.tableHeader}></div>
                     <StackItem grow={2} className={FeatureTab.classNames.itemsList}>
                         <List
-                            items={this.props.featureBins.map((bin, index) => {
-                                return {
-                                    title: this.props.dashboardContext.modelMetadata.featureNames[bin.featureIndex],
-                                    description: localization.formatString(localization.Feature.summaryCategoricalCount, bin.array.length) as string,
-                                    onSelect: this.props.selectedFeatureChange.bind(this, bin.featureIndex),
-                                    selected: this.props.selectedFeatureIndex === bin.featureIndex,
-                                    categories: bin.array as string[]
-                                };
-                            })}
+                            items={this.props.featureBins}
                             onRenderCell={this._onRenderCell}
                         />
                     </StackItem>
@@ -131,19 +143,38 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
         );
     }
 
-    private readonly _onRenderCell = (item: IFeatureItem, index: number | undefined): JSX.Element => {
+    private readonly hideModal = (): void => {
+        this.setState({editingFeatureIndex: undefined});
+    }
+
+    private readonly onBinSave = (bin: IBinnedResponse): void => {
+        this.setState({editingFeatureIndex: undefined});
+        this.props.saveBin(bin);
+    }
+
+    private readonly editBins = (index: number) => {
+        this.setState({editingFeatureIndex: index});
+    }
+
+    private readonly _onRenderCell = (item: IBinnedResponse, index: number | undefined): JSX.Element => {
         return (
           <div
             key={index}
             className={FeatureTab.classNames.itemCell}
-            onClick={item.onSelect.bind(this)}
+            onClick={this.props.selectedFeatureChange.bind(this, index)}
             data-is-focusable={true}
           >
-            {item.selected && (<Icon iconName="CompletedSolid" className={FeatureTab.classNames.iconClass}/>)}
-            <h2 className={FeatureTab.classNames.itemTitle}>{item.title}</h2>
-            <p className={FeatureTab.classNames.valueCount}>{item.description}</p>
-            {!this.state.expandedBins.includes(index) && (
+            {this.props.selectedFeatureIndex === index && (<Icon iconName="CompletedSolid" className={FeatureTab.classNames.iconClass}/>)}
+            <h2 className={FeatureTab.classNames.itemTitle}>{this.props.dashboardContext.modelMetadata.featureNames[index]}</h2>
+            {item.rangeType === RangeTypes.categorical &&
+                <p className={FeatureTab.classNames.valueCount}>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</p>
+            }
+            {!this.props.dashboardContext.modelMetadata.featureIsCategorical[index] && 
                 <ActionButton 
+                    onClick={this.editBins.bind(this, index)}>{localization.Feature.editBinning}</ActionButton>
+            }
+            {!this.state.expandedBins.includes(index) && (
+                <ActionButton
                     iconProps={{iconName: "Forward"}}
                     onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>)}
             {this.state.expandedBins.includes(index) && (
@@ -151,7 +182,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                     <ActionButton 
                     iconProps={{iconName: "Back"}}
                     onClick={this.updateExpandedList.bind(this)}>{localization.Feature.hideCategories}</ActionButton>
-                    {!!item.categories && item.categories.map((category, index) => <div key={index}>{category}</div>)}
+                    {!!item.labelArray && item.labelArray.map((category, index) => <div key={index}>{category}</div>)}
                 </div>)}
           </div>
         );

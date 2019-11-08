@@ -245,7 +245,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             );
         }
 
-        const alternateHeight = this.props.featureBinPickerProps.featureBins.length * 60 + 106;
+        const alternateHeight = this.props.featureBinPickerProps.featureBins[this.props.featureBinPickerProps.selectedBinIndex].labelArray.length * 60 + 106;
         const areaHeights = Math.max(460, alternateHeight);
 
         const accuracyKey = this.props.accuracyPickerProps.selectedAccuracyKey;

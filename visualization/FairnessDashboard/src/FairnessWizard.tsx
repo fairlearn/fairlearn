@@ -19,6 +19,7 @@ import { Text } from "office-ui-fabric-react/lib/Text";
 import { IntroTab } from "./Controls/IntroTab";
 import { number } from "prop-types";
 import { mergeStyleSets } from "@uifabric/styling";
+import { BinnedResponseBuilder } from "./BinnedResponseBuilder";
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -174,10 +175,10 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             this.setSelectedModel(numbers[0]);
         }});
 
-        const featureBins = this.buildFeatureBins(fairnessContext.modelMetadata);
+        const featureBins = this.buildFeatureBins(fairnessContext);
         if (featureBins.length > 0) {
             fairnessContext.binVector = this.generateBinVectorForBin(featureBins[0], fairnessContext.dataset);
-            fairnessContext.groupNames = this.generateStringLabelsForBins(featureBins[0], fairnessContext.modelMetadata);
+            fairnessContext.groupNames = featureBins[0].labelArray;
         }
 
         let accuracyMetrics = fairnessContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
@@ -260,6 +261,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     selectedFeatureIndex={this.state.selectedBinIndex}
                                     featureBins={this.state.featureBins.filter(x => !!x)}
                                     onNext={this.setTab.bind(this, accuracyTabKey)}
+                                    saveBin={this.saveBin}
                                 />
                             </PivotItem>
                             <PivotItem headerText={localization.accuracyMetric} itemKey={accuracyTabKey}>
@@ -341,9 +343,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             return;
         }
         const newContext = _.cloneDeep(this.state.dashboardContext);
- 
+
         newContext.binVector = this.generateBinVectorForBin(value, this.state.dashboardContext.dataset);
-        newContext.groupNames = this.generateStringLabelsForBins(value, this.state.dashboardContext.modelMetadata);
+        newContext.groupNames = value.labelArray;
 
         this.setState({dashboardContext: newContext, selectedBinIndex: value.featureIndex});
     }
@@ -352,51 +354,24 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         return dataset.map((row, rowIndex) => {
             const featureValue = row[value.featureIndex];
             if (value.rangeType === RangeTypes.categorical) {
+                // this handles categorical, as well as integers when user requests to treat as categorical
                 return value.array.indexOf(featureValue);
             } else {
-                return value.array.findIndex((group, groupIndex) => { return groupIndex > value.array.length || value.array[groupIndex + 1] > featureValue});
+                return value.array.findIndex((upperLimit, groupIndex) => { return upperLimit >= featureValue; });
             }
         });
     }
 
-    private generateStringLabelsForBins(bin: IBinnedResponse, modelMetadata: IFairnessModelMetadata): string[] {
-        if (bin.rangeType === RangeTypes.categorical) {
-            if (bin.array.length === (modelMetadata.featureRanges[bin.featureIndex] as ICategoricalRange).uniqueValues.length) {
-                return (bin.array as string[]);
-            } else {
-                return [].concat(...bin.array, "Other");
-            }
-        }
-        const length = bin.array.length;
-        return bin.array.map((val, index) => {
-            if (index === length - 1) {
-                if (typeof val === "number") {
-                    val = val.toFixed(3);
-                }
-                return `> ${val}`;
-            }
-            let b = bin.array[index + 1];
-            if (typeof val === "number") {
-                val = val.toFixed(3);
-            }
-            if (typeof b === "number") {
-                b = b.toFixed(3);
-            }
-            return `${val} - ${b}`;
+    private readonly buildFeatureBins = (fairnessContext: IFairnessContext): IBinnedResponse[] => {
+        return fairnessContext.modelMetadata.featureNames.map((name, index) => {
+            return BinnedResponseBuilder.buildDefaultBin(fairnessContext.modelMetadata.featureRanges[index], index, fairnessContext.dataset);
         });
     }
 
-    private readonly buildFeatureBins = (metadata: IModelMetadata): IBinnedResponse[] => {
-        return metadata.featureNames.map((name, index) => {
-            if (metadata.featureIsCategorical[index]) {
-                return {
-                    hasError: false,
-                    array: (metadata.featureRanges[index] as ICategoricalRange).uniqueValues,
-                    featureIndex: index,
-                    rangeType: RangeTypes.categorical
-                };
-            }
-        });
+    private readonly saveBin = (bin: IBinnedResponse): void => {
+        this.state.featureBins[bin.featureIndex] = bin;
+        this.state.metricCache.clearCache(bin.featureIndex);
+        this.binningSet(bin);
     }
 
     private readonly onMetricError = (error: any): void => {

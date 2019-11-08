@@ -88,7 +88,8 @@
         "summaryCategoricalCount": "This feature has {0} unique values",
         "showCategories": "Show values",
         "hideCategories": "Hide categories",
-        "categoriesOverflow": "   and {0} additional categories"
+        "categoriesOverflow": "   and {0} additional categories",
+        "editBinning": "Edit binning"
     },
     "Metrics": {
         "accuracyScore": "Accuracy",
@@ -111,5 +112,12 @@
         "accuracyDescription": "The fraction of data points classified correctly.",
         "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
         "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity."
+    },
+    "BinDialog": {
+        "header": "Configure bins",
+        "makeCategorical": "Treat as categorical",
+        "save": "Save",
+        "cancel": "Cancel",
+        "numberOfBins": "Number of bins:"
     }
 }
