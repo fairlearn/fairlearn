@@ -36,8 +36,10 @@ export class MetricsCache {
             this.cache[featureIndex][modelIndex][key] = value;
         }
 
-        const min = Math.min(...(value.bins as number[]));
-        const max = Math.max(...(value.bins as number[]));
+        const bins = value.bins.slice().filter(x => x !== undefined && !isNaN(x));
+
+        const min = Math.min(...(bins as number[]));
+        const max = Math.max(...(bins as number[]));
         if (isNaN(min) || isNaN(max) || (max === 0 && disparityMethod === ParityModes.ratio)) {
             return Number.NaN;
         }

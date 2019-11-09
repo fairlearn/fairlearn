@@ -34,6 +34,7 @@ import {regression} from "../__mock-data/regression";
       generateRandomMetrics(data, signal) {
         const binSize = Math.max(...data.binVector);
         const bins = new Array(binSize + 1).fill(0).map(x => Math.random())
+        bins[2] = undefined
         let promise = new Promise((resolve, reject) => {
           let timeout = setTimeout(() => {resolve({
             global: Math.random(),

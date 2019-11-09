@@ -147,7 +147,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                         {this.props.formattedBinValues.map((value, index) => {
                             return (
                             <div className={SummaryTable.classNames.metricBox} key={index}>
-                                {value}
+                                {value !== undefined ? value : 'empty'}
                             </div>);
                         })}
                     </div>

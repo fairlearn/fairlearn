@@ -265,7 +265,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 {
                     x: this.state.metrics.binnedOverprediction,
                     y: nameIndex,
-                    text: this.state.metrics.binnedOverprediction.map(num => (num as number).toLocaleString(undefined, {style: "percent", maximumSignificantDigits: 2})),
+                    text: this.state.metrics.binnedOverprediction.map(num => this.formatNumbers((num as number), "overprediction", false, 2)),
                     name: localization.Metrics.overprediction,
                     width: 0.5,
                     color: ChartColors[0],
@@ -276,7 +276,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 } as any, {
                     x: this.state.metrics.binnedUnderprediction.map(x => -1 * x),
                     y: nameIndex,
-                    text: this.state.metrics.binnedUnderprediction.map(num => (num as number).toLocaleString(undefined, {style: "percent", maximumSignificantDigits: 2})),
+                    text: this.state.metrics.binnedUnderprediction.map(num => this.formatNumbers((num as number), "underprediction", false, 2)),
                     name: localization.Metrics.underprediction,
                     width: 0.5,
                     color: ChartColors[1],
@@ -325,7 +325,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 {
                     x: this.state.metrics.binnedOutcome,
                     y: nameIndex,
-                    text: this.state.metrics.binnedOutcome.map(num => (num as number).toLocaleString(undefined, {style: "percent", maximumSignificantDigits: 2})),
+                    text: this.state.metrics.binnedOutcome.map(num => this.formatNumbers((num as number), "selection_rate", false, 2)),
                     name: outcomeMetric.title,
                     color: ChartColors[0],
                     orientation: 'h',
@@ -354,7 +354,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 {
                     x: this.state.metrics.binnedOverprediction,
                     y: nameIndex,
-                    text: this.state.metrics.binnedOverprediction.map(num => (num as number).toLocaleString(undefined, {style: "percent", maximumSignificantDigits: 2})),
+                    text: this.state.metrics.binnedOverprediction.map(num => this.formatNumbers((num as number), "overprediction", false, 2)),
                     name: localization.Metrics.overprediction,
                     width: 0.5,
                     color: ChartColors[0],
@@ -365,7 +365,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 } as any, {
                     x: this.state.metrics.binnedUnderprediction.map(x => -1 * x),
                     y: nameIndex,
-                    text: this.state.metrics.binnedUnderprediction.map(num => (num as number).toLocaleString(undefined, {style: "percent", maximumSignificantDigits: 2})),
+                    text: this.state.metrics.binnedUnderprediction.map(num => this.formatNumbers((num as number), "underprediction", false, 2)),
                     name: localization.Metrics.underprediction,
                     width: 0.5,
                     color: ChartColors[1],
@@ -546,11 +546,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         </div>);
     }
 
-    private readonly formatNumbers = (value: number, key: string, isRatio: boolean = false): string => {
-        if (value === null || value === undefined) {
+    private readonly formatNumbers = (value: number, key: string, isRatio: boolean = false, sigDigits: number = 3): string => {
+        if (value === null || value === undefined || value === NaN) {
             return NaN.toString();
         }
-        const styleObject = {maximumSignificantDigits: 3};
+        const styleObject = {maximumSignificantDigits: sigDigits};
         if (AccuracyOptions[key].isPercentage && !isRatio) {
             (styleObject as any).style = "percent";
         }
