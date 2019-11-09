@@ -20,8 +20,18 @@ export interface IBinDialogProps {
 
 export default class BinDialog extends React.PureComponent<IBinDialogProps, IBinnedResponse> {
     private static readonly classNames = mergeStyleSets({
+        frame: {
+            height: "400px",
+            width: "500px",
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: "#F2F2F2"
+        },
         header: {
-            color: "#333333",
+            padding: "12px",
+            textAlign: "center",
+            backgroundColor: "#333333",
+            color: "#FFFFFF",
             fontSize: "24px",
             lineHeight: "30px",
             fontWeight: "100"
@@ -29,8 +39,7 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
         buttons: {
             display: "inline-flex",
             flexDirection: "row-reverse",
-            paddingTop: "10px",
-            paddingBottom: "10px"
+            padding: "10px"
         },
         saveButton: {
             height: "44px",
@@ -51,7 +60,30 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
             backgroundColor: "#FFFFFF",
             fontWeight: "400"
         },
-        binCounter: { }
+        binCounter: { },
+        main: {
+            flexGrow: 1,
+            padding: "20px 40px"
+        },
+        categoryHeader: {
+
+        },
+        checkbox: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "20px",
+            fontWeight: "500"
+        },
+        controls: {
+            display: "inline-flex",
+            width: "100%",
+            justifyContent: "space-between",
+            height: "30px",
+            alignItems: "center",
+            paddingBottom: "10px",
+            borderBottom: "1px solid #CCCCCC",
+            marginBottom: "10px"
+        }
     });
 
     private static minBins = 1;
@@ -64,32 +96,50 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
 
     public render(): React.ReactNode {
         return (
-            <div>
+            <div className={BinDialog.classNames.frame}>
                 <div className={BinDialog.classNames.header}>{localization.BinDialog.header}</div>
-                {this.props.range.rangeType === RangeTypes.integer &&
-                    <Checkbox
-                        label={localization.BinDialog.makeCategorical}
-                        checked={this.state.rangeType === RangeTypes.categorical}
-                        onChange={this.toggleCategorical}/>
-                }
-                {this.state.rangeType !== RangeTypes.categorical &&
-                    <div>
-                        <div className={BinDialog.classNames.binCounter}>
-                            <div>{localization.BinDialog.numberOfBins}</div>
-                            <SpinButton
-                                min={BinDialog.minBins}
-                                max={BinDialog.maxBins}
-                                value={this.state.array.length.toString()}
-                                onIncrement={this.setBinCount.bind(this, 1)}
-                                onDecrement={this.setBinCount.bind(this, -1)}
-                                onValidate={this.setBinCount.bind(this, 0)}
-                            />
-                        </div>
-                        {this.state.labelArray.map(val => {
-                            return <div>{val}</div>;
-                        })}
+                <div className={BinDialog.classNames.main}>
+                    <div className={BinDialog.classNames.controls}>
+                        {this.props.range.rangeType === RangeTypes.integer &&
+                            <Checkbox
+                                className={BinDialog.classNames.checkbox}
+                                label={localization.BinDialog.makeCategorical}
+                                checked={this.state.rangeType === RangeTypes.categorical}
+                                onChange={this.toggleCategorical}/>
+                        }
+                        {this.state.rangeType !== RangeTypes.categorical &&
+                            <div className={BinDialog.classNames.binCounter}>
+                                <SpinButton
+                                    styles={{
+                                        spinButtonWrapper: {maxWidth: "98px"},
+                                        labelWrapper: { alignSelf: "center"},
+                                        root: {
+                                            display: "inline-flex",
+                                            float: "right",
+                                            selectors: {
+                                                "> div": {
+                                                    maxWidth: "108px"
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    label={localization.BinDialog.numberOfBins}
+                                    min={BinDialog.minBins}
+                                    max={BinDialog.maxBins}
+                                    value={this.state.array.length.toString()}
+                                    onIncrement={this.setBinCount.bind(this, 1)}
+                                    onDecrement={this.setBinCount.bind(this, -1)}
+                                    onValidate={this.setBinCount.bind(this, 0)}
+                                />
+                            </div>
+                        }
                     </div>
-                }
+
+                    <div className={BinDialog.classNames.categoryHeader}>{localization.BinDialog.categoryHeader}</div>
+                    {this.state.labelArray.map((val, i) => {
+                        return <div key={i}>{val}</div>;
+                    })}
+                </div>
                 <div className={BinDialog.classNames.buttons}>
                     <PrimaryButton className={BinDialog.classNames.saveButton} text={localization.BinDialog.save} onClick={this.onSave}/>
                     <DefaultButton

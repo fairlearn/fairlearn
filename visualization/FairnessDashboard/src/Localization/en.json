@@ -118,6 +118,7 @@
         "makeCategorical": "Treat as categorical",
         "save": "Save",
         "cancel": "Cancel",
-        "numberOfBins": "Number of bins:"
+        "numberOfBins": "Number of bins:",
+        "categoryHeader": "Bin values:"
     }
 }
