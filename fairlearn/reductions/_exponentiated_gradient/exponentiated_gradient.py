@@ -26,8 +26,7 @@ def _mean_pred(X, hs, weights):
 
 
 class ExponentiatedGradientResult:
-    """Class to hold the result of an ExponentiatedGradient
-    estimator
+    """Class to hold the result of an ExponentiatedGradient estimator
     """
 
     def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
@@ -111,7 +110,9 @@ class ExponentiatedGradient(Reduction):
     :type estimator: An estimator
     :param constraints: The disparity constraints expressed as moments
     :type constraints: fairlearn.reductions.Moment
-    :param eps: Allowed fairness constraint violation
+    :param eps: Allowed fairness constraint violation; the solution best_classifier is
+        guaranteed to have the classification error within 2*best_gap of the best error
+        under constraint eps; the constraint violation is at most 2*(eps+best_gap)
     :type eps: float
     :param T: Maximum number of iterations
     :type T: int
@@ -135,7 +136,12 @@ class ExponentiatedGradient(Reduction):
 
     def fit(self, X, y, **kwargs):
         """ Return a fair classifier under specified fairness constraints via
-            exponentiated-gradient reduction.
+        exponentiated-gradient reduction.
+
+        :param X: The array of training features
+        :type X: Array
+        :param y: The array of training labels
+        :type y: 1-dimensional Array
         """
         X_train, y_train, A = _validate_and_reformat_reductions_input(X, y, **kwargs)
 
@@ -228,7 +234,6 @@ class ExponentiatedGradient(Reduction):
 
         self._best_classifier = self._expgrad_result._best_classifier
         self._classifiers = self._expgrad_result._classifiers
-        # TODO: figure out whether we should keep the remaining data of the result object
 
     def predict(self, X):
         """Provide a prediction for the given input data.
@@ -237,11 +242,20 @@ class ExponentiatedGradient(Reduction):
 
         :param X: The data for which predictions are required
         :type X: Array
+        :return: Array of predictions as 0 or 1.
+        :rtype: Array
         """
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X):
+        """Probability mass function for the given input data.
+
+        :param X: The data for which predictions are required
+        :type X: Array
+        :return: Array of tuples with the probabilities of predicting 0 and 1.
+        :rtype: Array
+        """
         positive_probs = self._best_classifier(X)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
 
