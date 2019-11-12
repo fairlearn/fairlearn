@@ -36,18 +36,12 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
 
     # Make everything a numpy array
     # This allows for fast slicing of the groups
-    y_a = np.squeeze(np.asarray(y_true))
-    y_p = np.squeeze(np.asarray(y_pred))
-    g_d = np.squeeze(np.asarray(group_membership))
+    y_a = _convert_to_1d_array(y_true)
+    y_p = _convert_to_1d_array(y_pred)
+    g_d = _convert_to_1d_array(group_membership)
     s_w = None
     if sample_weight is not None:
-        s_w = np.squeeze(np.asarray(sample_weight))
-
-    print()
-    print("y_a", y_a, "y_true", y_true)
-    print("y_p", y_p)
-    print("g_d", g_d)
-    print("s_w", s_w)
+        s_w = _convert_to_1d_array(sample_weight)
 
     # Evaluate the overall metric with the numpy arrays
     # This ensures consistency in how metric_function is called
@@ -117,6 +111,16 @@ def make_group_metric(metric_function):
 
     return wrapper
 
+
+def _convert_to_1d_array(input):
+    result = np.asarray(input)
+
+    if len(result) > 1:
+        result = np.squeeze(result)
+    else:
+        result = result.reshape(1)
+
+    return result
 
 def _check_array_sizes(a, b, a_name, b_name):
     if len(a) != len(b):

@@ -254,10 +254,10 @@ class TestMetricByGroup:
             return len(y_true) + len(y_pred)
 
         result = metrics.metric_by_group(sum_lengths, y_t, y_p, gid)
-        assert result.overall == 3
+        assert result.overall == 4
         assert result.by_group[0] == 2
         assert result.by_group[1] == 2
-        assert result.miniumm == 2
+        assert result.minimum == 2
         assert result.maximum == 2
         assert result.range == 0
         assert result.range_ratio == 1
