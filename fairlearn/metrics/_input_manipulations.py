@@ -4,7 +4,7 @@
 import numpy as np
 
 
-def _convert_to_ndarray_and_squeeze(input, input_name):
+def _convert_to_ndarray_and_squeeze(input):
     """Converts to a numpy.ndarray and calls squeeze (to dispose of unit length dimensions),
     with a special case to stop single element arrays being converted to scalars.
     """

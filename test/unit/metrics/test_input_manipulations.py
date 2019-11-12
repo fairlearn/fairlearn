@@ -10,7 +10,7 @@ class TestConvertToNDArrayAndSqueeze:
     def test_simple_list(self):
         X = [0, 1, 2]
 
-        result = fmim._convert_to_ndarray_and_squeeze(X, "X")
+        result = fmim._convert_to_ndarray_and_squeeze(X)
 
         assert isinstance(result, np.ndarray)
         assert result.shape == (3,)
@@ -21,7 +21,7 @@ class TestConvertToNDArrayAndSqueeze:
     def test_multi_rows(self):
         X = [[0], [1]]
 
-        result = fmim._convert_to_ndarray_and_squeeze(X, "X")
+        result = fmim._convert_to_ndarray_and_squeeze(X)
 
         assert isinstance(result, np.ndarray)
         assert result.shape == (2,)
@@ -31,7 +31,7 @@ class TestConvertToNDArrayAndSqueeze:
     def test_multi_columns(self):
         X = [[0, 1]]
 
-        result = fmim._convert_to_ndarray_and_squeeze(X, "X")
+        result = fmim._convert_to_ndarray_and_squeeze(X)
 
         assert isinstance(result, np.ndarray)
         assert result.shape == (2,)
@@ -41,7 +41,7 @@ class TestConvertToNDArrayAndSqueeze:
     def test_single_element(self):
         X = [[[1]]]
 
-        result = fmim._convert_to_ndarray_and_squeeze(X, "X")
+        result = fmim._convert_to_ndarray_and_squeeze(X)
 
         assert isinstance(result, np.ndarray)
         assert result.shape == (1,)

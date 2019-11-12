@@ -22,11 +22,11 @@ def balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
     :any:`sklearn.metrics.mean_squared_error` routine.
     """
 
-    y_ta = _convert_to_ndarray_and_squeeze(y_true, "y_true")
-    y_pa = _convert_to_ndarray_and_squeeze(y_pred, "y_pred")
+    y_ta = _convert_to_ndarray_and_squeeze(y_true)
+    y_pa = _convert_to_ndarray_and_squeeze(y_pred)
     s_w = np.ones(len(y_ta))
     if sample_weight is not None:
-        s_w = _convert_to_ndarray_and_squeeze(sample_weight, "sample_weight")
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight)
 
     y_ta_values = np.unique(y_ta)
     if not np.array_equal(y_ta_values, [0, 1]):
