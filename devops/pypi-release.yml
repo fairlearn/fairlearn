@@ -76,19 +76,19 @@ stages:
   dependsOn: DeployToTest
 
   jobs:
-- job: "Deploy to PyPI-Test"
-  pool:
-    vmImage: 'ubuntu-latest'
+  - job: "Deploy to PyPI-Test"
+    pool:
+      vmImage: 'ubuntu-latest'
 
-  steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python 3.6'
-      inputs:
-        versionSpec: 3.6
-        addToPath: true
+    steps:
+      - task: UsePythonVersion@0
+        displayName: 'Use Python 3.6'
+        inputs:
+          versionSpec: 3.6
+          addToPath: true
 
-    - script: ls -R
-      displayName: "List files again"
+      - script: ls -R
+        displayName: "List files again"
 
 
 
