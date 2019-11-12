@@ -3,8 +3,6 @@
 
 import numpy as np
 
-_ARRAY_NOT_REALLY_1D = "'{0}' has more than one dimension longer than 1"
-
 
 def _ensure_1d_ndarray(input, input_name):
     """Ensures that the input is represented as a 1d numpy.ndarray.
@@ -22,9 +20,9 @@ def _ensure_1d_ndarray(input, input_name):
     """
     result = np.asarray(input)
 
-    old_shape = np.asarray(result.shape)
+    if result.size > 1:
+        result = np.squeeze(result)
+    else:
+        result = result.reshape(1)
 
-    if np.count_nonzero(old_shape > 1) > 1:
-        raise ValueError(_ARRAY_NOT_REALLY_1D.format(input_name))
-
-    return result.reshape(old_shape.max())
+    return result

@@ -48,21 +48,3 @@ class TestEnsure1DNDArray:
         assert result.shape == (1,)
         assert result[0] == 1
 
-    def test_multid_rejected_simple(self):
-        X = [[0, 1], [2, 3]]
-
-        with pytest.raises(ValueError) as exception_context:
-            _ = fmim._ensure_1d_ndarray(X, "X")
-
-        expected = "'X' has more than one dimension longer than 1"
-        assert exception_context.value.args[0] == expected
-
-    def test_multid_rejected_complex(self):
-        X = [[[[0], [1]], [[2], [3]]]]
-        assert np.asarray(X).shape == (1, 2, 2, 1)
-
-        with pytest.raises(ValueError) as exception_context:
-            _ = fmim._ensure_1d_ndarray(X, "X")
-
-        expected = "'X' has more than one dimension longer than 1"
-        assert exception_context.value.args[0] == expected
