@@ -22,12 +22,9 @@ def _ensure_1d_ndarray(input, input_name):
     """
     result = np.asarray(input)
 
-    if np.count_nonzero(np.asarray(result.shape) > 1) > 1:
+    old_shape = np.asarray(result.shape)
+
+    if np.count_nonzero(old_shape > 1) > 1:
         raise ValueError(_ARRAY_NOT_REALLY_1D.format(input_name))
 
-    if result.size > 1:
-        result = np.squeeze(result)
-    else:
-        result = result.reshape(1)
-
-    return result
+    return result.reshape(old_shape.max())
