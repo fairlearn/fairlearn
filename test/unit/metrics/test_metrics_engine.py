@@ -228,6 +228,40 @@ class TestMetricByGroup:
         # Following is special case
         assert result.range_ratio == 1
 
+    def test_single_element_input(self):
+        y_t = [0]
+        y_p = [0]
+        gid = [0]
+        s_w = [0]
+
+        def sum_lengths(y_true, y_pred, sample_weight):
+            return len(y_true) + len(y_pred) + len(sample_weight)
+
+        result = metrics.metric_by_group(sum_lengths, y_t, y_p, gid, sample_weight=s_w)
+        assert result.overall == 3
+        assert result.by_group[0] == 3
+        assert result.minimum == 3
+        assert result.maximum == 3
+        assert result.range == 0
+        assert result.range_ratio == 1
+
+    def test_groups_only_one_element(self):
+        y_t = [1, 2]
+        y_p = [1, 2]
+        gid = [0, 1]
+
+        def sum_lengths(y_true, y_pred):
+            return len(y_true) + len(y_pred)
+
+        result = metrics.metric_by_group(sum_lengths, y_t, y_p, gid)
+        assert result.overall == 4
+        assert result.by_group[0] == 2
+        assert result.by_group[1] == 2
+        assert result.minimum == 2
+        assert result.maximum == 2
+        assert result.range == 0
+        assert result.range_ratio == 1
+
 
 class TestMakeGroupMetric:
     def test_smoke(self):

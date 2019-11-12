@@ -14,7 +14,7 @@ requirements-parser
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
-tempeh==0.1.7
+tempeh==0.1.8
 
 # Required for notebooks
 jupyter
