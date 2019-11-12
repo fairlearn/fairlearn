@@ -27,27 +27,28 @@ def test_perf(perf_test_configuration, request):
     print("Starting with test case {}".format(request.node.name))
     print("Downloading dataset")
     dataset = datasets[perf_test_configuration.dataset]()
+    X_train, X_test = dataset.get_X()
+    y_train, y_test = dataset.get_y()
     print("Done downloading dataset")
 
     if perf_test_configuration.dataset == "adult_uci":
         # sensitive feature is 8th column (sex)
-        sensitive_features_train = dataset.X_train[:, 7]
-        sensitive_features_test = dataset.X_test[:, 7]
+        sensitive_features_train = X_train[:, 7]
+        sensitive_features_test = X_test[:, 7]
     elif perf_test_configuration.dataset == "diabetes_sklearn":
         # sensitive feature is 2nd column (sex)
         # features have been scaled, but sensitive feature needs to be str or int
-        sensitive_features_train = dataset.X_train[:, 1].astype(str)
-        sensitive_features_test = dataset.X_test[:, 1].astype(str)
+        sensitive_features_train = X_train[:, 1].astype(str)
+        sensitive_features_test = X_test[:, 1].astype(str)
         # labels can't be floats as of now
-        dataset.y_train = dataset.y_train.astype(int)
-        dataset.y_test = dataset.y_test.astype(int)
+        y_train = y_train.astype(int)
+        y_test = y_test.astype(int)
     elif perf_test_configuration.dataset == "compas":
         # sensitive feature is either race or sex
         # TODO add another case where we use sex as well, or both (?)
-        sensitive_features_train = dataset.race_train
-        sensitive_features_test = dataset.race_test
-        dataset.y_train = dataset.y_train.astype(int)
-        dataset.y_test = dataset.y_test.astype(int)
+        sensitive_features_train, sensitive_features_test = dataset.get_sensitive_features('race')
+        y_train = y_train.astype(int)
+        y_test = y_test.astype(int)
     else:
         raise ValueError("Sensitive features unknown for dataset {}"
                          .format(perf_test_configuration.dataset))
@@ -55,7 +56,7 @@ def test_perf(perf_test_configuration, request):
     print("Fitting estimator")
     estimator = models[perf_test_configuration.predictor]()
     unconstrained_predictor = models[perf_test_configuration.predictor]()
-    unconstrained_predictor.fit(dataset.X_train, dataset.y_train)
+    unconstrained_predictor.fit(X_train, y_train)
     print("Done fitting estimator")
 
     start_time = time()
@@ -73,13 +74,13 @@ def test_perf(perf_test_configuration, request):
 
     print("Fitting mitigator")
 
-    mitigator.fit(dataset.X_train, dataset.y_train, sensitive_features=sensitive_features_train)
+    mitigator.fit(X_train, y_train, sensitive_features=sensitive_features_train)
 
     if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-        mitigator.predict(dataset.X_test, sensitive_features=sensitive_features_test,
+        mitigator.predict(X_test, sensitive_features=sensitive_features_test,
                           random_state=1)
     else:
-        mitigator.predict(dataset.X_test)
+        mitigator.predict(X_test)
 
     # TODO evaluate accuracy/fairness tradeoff
 

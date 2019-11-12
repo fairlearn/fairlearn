@@ -94,6 +94,12 @@ class ThresholdOptimizer(PostProcessing):
         """
         self._validate_input_data(X, sensitive_features, y)
 
+        # postprocessing can't handle 0/1 as floating point numbers, so this converts it to int
+        if type(y) in [np.ndarray, pd.DataFrame, pd.Series]:
+            y = y.astype(int)
+        else:
+            y = [int(y_val) for y_val in y]
+
         if self._estimator:
             # train estimator on data first
             self._validate_estimator()
@@ -137,7 +143,8 @@ class ThresholdOptimizer(PostProcessing):
         unconstrained_predictions = self._unconstrained_predictor.predict(X)
 
         positive_probs = _vectorized_prediction(
-            self._post_processed_predictor_by_sensitive_feature, sensitive_features,
+            self._post_processed_predictor_by_sensitive_feature,
+            sensitive_features,
             unconstrained_predictions)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
