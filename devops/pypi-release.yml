@@ -55,40 +55,40 @@ stages:
       - script: ls -R
         displayName: "List files again"
 
-  - stage: CheckTestPackage
-    dependsOn: DeployToTest
+- stage: CheckTestPackage
+  dependsOn: DeployToTest
 
-    jobs:
-    - job: "Check Test Package"
-      pool:
-        vmImage: 'ubuntu-latest'
-
-      steps:
-      - task: UsePythonVersion@0
-        displayName: 'Use Python 3.6'
-        inputs:
-          versionSpec: 3.6
-          addToPath: true
-
-      - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
-
-  - stage: DeployToProd
-    dependsOn: DeployToTest
-
-    jobs:
-  - job: "Deploy to PyPI-Test"
+  jobs:
+  - job: "Check Test Package"
     pool:
       vmImage: 'ubuntu-latest'
 
     steps:
-      - task: UsePythonVersion@0
-        displayName: 'Use Python 3.6'
-        inputs:
-          versionSpec: 3.6
-          addToPath: true
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.6'
+      inputs:
+        versionSpec: 3.6
+        addToPath: true
 
-      - script: ls -R
-        displayName: "List files again"
+    - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
+
+- stage: DeployToProd
+  dependsOn: DeployToTest
+
+  jobs:
+- job: "Deploy to PyPI-Test"
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.6'
+      inputs:
+        versionSpec: 3.6
+        addToPath: true
+
+    - script: ls -R
+      displayName: "List files again"
 
 
 
