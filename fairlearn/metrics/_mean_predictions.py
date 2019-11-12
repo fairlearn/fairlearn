@@ -43,11 +43,11 @@ def mean_underprediction(y_true, y_pred, sample_weight=None):
     the (weighted) mean of the error where any positive errors
     (i.e. overpredictions) are set to zero
     """
-    y_t = np.squeeze(np.asarray(y_true))
-    y_p = np.squeeze(np.asarray(y_pred))
+    y_t = _ensure_1d_ndarray(y_true, "y_true")
+    y_p = _ensure_1d_ndarray(y_pred, "y_pred")
     s_w = np.ones(len(y_p))
     if sample_weight is not None:
-        s_w = np.squeeze(np.asarray(sample_weight))
+        s_w = _ensure_1d_ndarray(sample_weight, "sample_weight")
 
     err = y_p - y_t
     err[err > 0] = 0

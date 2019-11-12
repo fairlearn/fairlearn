@@ -89,6 +89,15 @@ def test_mean_underprediction_unweighted():
     assert result == 1
 
 
+def test_mean_underprediction_unweighted_single():
+    y_pred = [0]
+    y_true = [1]
+
+    result = metrics.mean_underprediction(y_true, y_pred)
+
+    assert result == 1
+
+
 def test_mean_underprediction_weighted():
     y_pred = [0, 1, 5, 3, 1]
     y_true = [1, 1, 2, 0, 2]
@@ -97,3 +106,13 @@ def test_mean_underprediction_weighted():
     result = metrics.mean_underprediction(y_true, y_pred, weight)
 
     assert result == 0.5
+
+
+def test_mean_underprediction_weighted_single():
+    y_pred = [0]
+    y_true = [42]
+    weight = [2]
+
+    result = metrics.mean_underprediction(y_true, y_pred, weight)
+
+    assert result == 42
