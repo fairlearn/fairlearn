@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from ._input_manipulations import _ensure_1d_ndarray
+from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 
 def mean_prediction(y_true, y_pred, sample_weight=None):
@@ -12,10 +12,10 @@ def mean_prediction(y_true, y_pred, sample_weight=None):
     to maintain a consistent interface
     """
 
-    y_p = _ensure_1d_ndarray(y_pred, "y_pred")
+    y_p = _convert_to_ndarray_and_squeeze(y_pred, "y_pred")
     s_w = np.ones(len(y_p))
     if sample_weight is not None:
-        s_w = _ensure_1d_ndarray(sample_weight, "sample_weight")
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight, "sample_weight")
 
     return np.dot(y_p, s_w) / s_w.sum()
 
@@ -26,11 +26,11 @@ def mean_overprediction(y_true, y_pred, sample_weight=None):
     (i.e. underpredictions) are set to zero
     """
 
-    y_t = _ensure_1d_ndarray(y_true, "y_true")
-    y_p = _ensure_1d_ndarray(y_pred, "y_pred")
+    y_t = _convert_to_ndarray_and_squeeze(y_true, "y_true")
+    y_p = _convert_to_ndarray_and_squeeze(y_pred, "y_pred")
     s_w = np.ones(len(y_p))
     if sample_weight is not None:
-        s_w = _ensure_1d_ndarray(sample_weight, "sample_weight")
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight, "sample_weight")
 
     err = y_p - y_t
     err[err < 0] = 0
@@ -43,11 +43,11 @@ def mean_underprediction(y_true, y_pred, sample_weight=None):
     the (weighted) mean of the error where any positive errors
     (i.e. overpredictions) are set to zero
     """
-    y_t = _ensure_1d_ndarray(y_true, "y_true")
-    y_p = _ensure_1d_ndarray(y_pred, "y_pred")
+    y_t = _convert_to_ndarray_and_squeeze(y_true, "y_true")
+    y_p = _convert_to_ndarray_and_squeeze(y_pred, "y_pred")
     s_w = np.ones(len(y_p))
     if sample_weight is not None:
-        s_w = _ensure_1d_ndarray(sample_weight, "sample_weight")
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight, "sample_weight")
 
     err = y_p - y_t
     err[err > 0] = 0

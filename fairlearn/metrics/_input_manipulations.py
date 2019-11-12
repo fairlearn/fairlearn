@@ -4,19 +4,9 @@
 import numpy as np
 
 
-def _ensure_1d_ndarray(input, input_name):
-    """Ensures that the input is represented as a 1d numpy.ndarray.
-
-    The goal of this routine is to ensure that input arrays of shape
-    (1,n) and (n,1), not to mention (1,1,n,1,1) can all be treated as
-    an array of shape (n). However, an array of shape (2,2) will be
-    rejected.
-
-    This routine relies on the behaviour of numpy.asarray, and is not
-    comprehensive as a result. For example
-    numpy.asarray([[1,2], [2]])
-    will result in a 1D ndarray, with two elements, each of which is a
-    list. This method is not built to detect that issue
+def _convert_to_ndarray_and_squeeze(input, input_name):
+    """Converts to a numpy.ndarray and calls squeeze (to dispose of unit length dimensions),
+    with a special case to stop single element arrays being converted to scalars.
     """
     result = np.asarray(input)
 

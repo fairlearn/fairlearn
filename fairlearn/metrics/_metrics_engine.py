@@ -4,7 +4,7 @@
 import numpy as np
 
 from ._group_metric_result import GroupMetricResult
-from ._input_manipulations import _ensure_1d_ndarray
+from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
@@ -37,16 +37,16 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
 
     # Make everything a numpy array
     # This allows for fast slicing of the groups
-    y_a = _ensure_1d_ndarray(y_true, "y_true")
-    y_p = _ensure_1d_ndarray(y_pred, "y_pred")
-    g_d = _ensure_1d_ndarray(group_membership, "group_membership")
+    y_a = _convert_to_ndarray_and_squeeze(y_true, "y_true")
+    y_p = _convert_to_ndarray_and_squeeze(y_pred, "y_pred")
+    g_d = _convert_to_ndarray_and_squeeze(group_membership, "group_membership")
 
     _check_array_sizes(y_a, y_p, 'y_true', 'y_pred')
     _check_array_sizes(y_a, g_d, 'y_true', 'group_membership')
 
     s_w = None
     if sample_weight is not None:
-        s_w = _ensure_1d_ndarray(sample_weight, "sample_weight")
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight, "sample_weight")
         _check_array_sizes(y_a, s_w, 'y_true', 'sample_weight')
 
     # Evaluate the overall metric with the numpy arrays
