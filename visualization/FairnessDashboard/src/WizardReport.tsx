@@ -265,7 +265,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 {
                     x: this.state.metrics.binnedOverprediction,
                     y: nameIndex,
-                    text: this.state.metrics.binnedOverprediction.map(num => this.formatNumbers((num as number), "overprediction", false, 2)),
+                    text: this.state.metrics.binnedOverprediction.map(num => this.formatNumbers((num as number), "accuracy_score", false, 2)),
                     name: localization.Metrics.overprediction,
                     width: 0.5,
                     color: ChartColors[0],
@@ -276,7 +276,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 } as any, {
                     x: this.state.metrics.binnedUnderprediction.map(x => -1 * x),
                     y: nameIndex,
-                    text: this.state.metrics.binnedUnderprediction.map(num => this.formatNumbers((num as number), "underprediction", false, 2)),
+                    text: this.state.metrics.binnedUnderprediction.map(num => this.formatNumbers((num as number), "accuracy_score", false, 2)),
                     name: localization.Metrics.underprediction,
                     width: 0.5,
                     color: ChartColors[1],
