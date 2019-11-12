@@ -242,8 +242,25 @@ class TestMetricByGroup:
         assert result.by_group[0] == 3
         assert result.minimum == 3
         assert result.maximum == 3
-        assert result.range == 3
-        assert result.range_ration == 1
+        assert result.range == 0
+        assert result.range_ratio == 1
+
+    def test_groups_only_one_element(self):
+        y_t = [1, 2]
+        y_p = [1, 2]
+        gid = [0, 1]
+
+        def sum_lengths(y_true, y_pred):
+            return len(y_true) + len(y_pred)
+
+        result = metrics.metric_by_group(sum_lengths, y_t, y_p, gid)
+        assert result.overall == 3
+        assert result.by_group[0] == 2
+        assert result.by_group[1] == 2
+        assert result.miniumm == 2
+        assert result.maximum == 2
+        assert result.range == 0
+        assert result.range_ratio == 1
 
 
 class TestMakeGroupMetric:

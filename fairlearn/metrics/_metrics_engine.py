@@ -43,6 +43,12 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
     if sample_weight is not None:
         s_w = np.squeeze(np.asarray(sample_weight))
 
+    print()
+    print("y_a", y_a, "y_true", y_true)
+    print("y_p", y_p)
+    print("g_d", g_d)
+    print("s_w", s_w)
+
     # Evaluate the overall metric with the numpy arrays
     # This ensures consistency in how metric_function is called
     if s_w is not None:
