@@ -33,7 +33,7 @@ stages:
 - stage: DeployToTest
   dependsOn: Tests
   jobs:
-  - job: "Deploy to PyPI-Test"
+  - job: "Deploy_to_PyPI_Test"
     pool:
       vmImage: 'ubuntu-latest'
 
@@ -59,7 +59,7 @@ stages:
   dependsOn: DeployToTest
 
   jobs:
-  - job: "Check Test Package"
+  - job: "Check_Test_Package"
     pool:
       vmImage: 'ubuntu-latest'
 
@@ -76,7 +76,7 @@ stages:
   dependsOn: DeployToTest
 
   jobs:
-  - job: "Deploy to PyPI-Test"
+  - job: "Deploy_to_PyPI"
     pool:
       vmImage: 'ubuntu-latest'
 
