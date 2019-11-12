@@ -60,19 +60,35 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
             backgroundColor: "#FFFFFF",
             fontWeight: "400"
         },
-        binCounter: { },
+        binCounter: {
+            selectors: {
+                "& label": {
+                    color: "#333333",
+                    fontSize: "15px",
+                    lineHeight: "20px",
+                    fontWeight: "500"
+                }
+            }
+        },
         main: {
             flexGrow: 1,
-            padding: "20px 40px"
+            padding: "20px 40px",
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column"
         },
         categoryHeader: {
 
         },
         checkbox: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "20px",
-            fontWeight: "500"
+            selectors: {
+                "& span": {
+                    color: "#333333",
+                    fontSize: "15px",
+                    lineHeight: "20px",
+                    fontWeight: "500"
+                }
+            }
         },
         controls: {
             display: "inline-flex",
@@ -83,6 +99,20 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
             paddingBottom: "10px",
             borderBottom: "1px solid #CCCCCC",
             marginBottom: "10px"
+        },
+        scrollArea: {
+            overflowY: "auto",
+            overflowX: "hidden",
+            flexGrow:"2"
+        },
+        groupLabel: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "20px",
+            fontWeight: "400",
+            height: "25px",
+            borderBottom: "1px solid #CCCCCC",
+            paddingLeft: "12px"
         }
     });
 
@@ -134,11 +164,12 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
                             </div>
                         }
                     </div>
-
                     <div className={BinDialog.classNames.categoryHeader}>{localization.BinDialog.categoryHeader}</div>
-                    {this.state.labelArray.map((val, i) => {
-                        return <div key={i}>{val}</div>;
-                    })}
+                    <div className={BinDialog.classNames.scrollArea}>
+                        {this.state.labelArray.map((val, i) => {
+                            return <div className={BinDialog.classNames.groupLabel} key={i}>{val}</div>;
+                        })}
+                    </div>
                 </div>
                 <div className={BinDialog.classNames.buttons}>
                     <PrimaryButton className={BinDialog.classNames.saveButton} text={localization.BinDialog.save} onClick={this.onSave}/>

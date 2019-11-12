@@ -87,7 +87,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             if (props.testData && props.testData[0] !== undefined) {
                 featureLength = props.testData[0].length;
             }
-            featureNames = ModelMetadata.buildIndexedNames(featureLength, localization.defaultFeatureNames);
+            featureNames = featureLength === 1 ?
+                [localization.defaultSingleFeatureName] :
+                ModelMetadata.buildIndexedNames(featureLength, localization.defaultFeatureNames);
         }
         const classNames = props.dataSummary.classNames || ModelMetadata.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
         const featureIsCategorical = ModelMetadata.buildIsCategorical(featureNames.length, props.testData, props.dataSummary.categoricalMap);
@@ -150,7 +152,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             display: "flex",
             flexDirection: "column",
             backgroundColor: "#F2F2F2",
-            padding: "30px 90px 0 90px"
+            padding: "30px 90px 0 82px"
         },
         body: {
             flex: 1,
@@ -254,7 +256,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                             }}
                             selectedKey={this.state.activeTabKey}
                             onLinkClick={this.handleTabClick}>
-                            <PivotItem headerText={localization.Intro.features} itemKey={featureBinTabKey} style={{height: "100%"}}>
+                            <PivotItem headerText={localization.Intro.features} itemKey={featureBinTabKey} style={{height: "100%", paddingLeft:"8px"}}>
                                 <FeatureTab
                                     dashboardContext={this.state.dashboardContext}
                                     selectedFeatureChange={this.setBinIndex}
@@ -264,7 +266,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     saveBin={this.saveBin}
                                 />
                             </PivotItem>
-                            <PivotItem headerText={localization.accuracyMetric} itemKey={accuracyTabKey}>
+                            <PivotItem headerText={localization.accuracyMetric} itemKey={accuracyTabKey} style={{height: "100%", paddingLeft:"8px"}}>
                                 <AccuracyTab
                                     dashboardContext={this.state.dashboardContext}
                                     accuracyPickerProps={accuracyPickerProps}

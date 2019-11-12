@@ -37,25 +37,20 @@ interface IState {
 
 export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
     private static readonly classNames = mergeStyleSets({
-        itemCell: [
-          {
-            padding: "30px 36px 20px 0",
+        itemCell: {
+            display: "flex",
+            flexDirection: "row",
+            padding: "20px 0",
             width: "100%",
-            position: "relative",
-            float: "left",
             cursor: "pointer",
             boxSizing: "border-box",
             borderBottom: "1px solid #CCCCCC",
             selectors: {
               '&:hover': { background: "lightgray" }
             }
-          }
-        ],
+        },
         iconClass: {
-            fontSize: "20px",
-            position: "absolute",
-            right: "10px",
-            top: "10px"
+            fontSize: "20px"
         },
         itemsList: {
             overflowY: "auto"
@@ -78,9 +73,18 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             paddingTop: "12px",
             fontSize: "18px",
             lineHeight: "24px",
-            fontWeight: "300"
+            fontWeight: "300",
+            marginBottom: "15px"
         },
         tableHeader: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingBottom: "15px",
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "18px",
+            fontWeight: "500",
             borderBottom: "1px solid #CCCCCC"
         },
         itemTitle: {
@@ -95,7 +99,37 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             color: "#333333",
             fontSize: "15px",
             lineHeight: "18px",
-            fontWeight: "500"
+            fontWeight: "500",
+            marginBottom: "15px"
+        },
+        iconWrapper: {
+            paddingTop: "4px",
+            paddingLeft: "5px",
+            width: "30px"
+        },
+        featureDescriptionSection: {
+            flex: 1,
+            paddingRight: "20px"
+        },
+        binSection:{
+            width:"130px",
+
+        },
+        expandButton: {
+            paddingLeft: 0,
+            selectors: {
+                "& i":{
+                    marginLeft: 0
+                }
+            }
+        },
+        category: {
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            overflow: "hidden"
+        },
+        subgroupHeader: {
+            width: "130px"
         }
     });
 
@@ -127,7 +161,10 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                         {localization.Feature.header}
                     </h2>
                     <p className={FeatureTab.classNames.textBody}>{localization.Feature.body}</p>
-                    <div className={FeatureTab.classNames.tableHeader}></div>
+                    <div className={FeatureTab.classNames.tableHeader}>
+                        <div>{localization.Intro.features}</div>
+                        <div className={FeatureTab.classNames.subgroupHeader}>{localization.Feature.subgroups}</div>
+                    </div>
                     <StackItem grow={2} className={FeatureTab.classNames.itemsList}>
                         <List
                             items={this.props.featureBins}
@@ -164,27 +201,49 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             onClick={this.props.selectedFeatureChange.bind(this, index)}
             data-is-focusable={true}
           >
-            {this.props.selectedFeatureIndex === index && (<Icon iconName="CompletedSolid" className={FeatureTab.classNames.iconClass}/>)}
-            <h2 className={FeatureTab.classNames.itemTitle}>{this.props.dashboardContext.modelMetadata.featureNames[index]}</h2>
-            {item.rangeType === RangeTypes.categorical &&
-                <p className={FeatureTab.classNames.valueCount}>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</p>
-            }
-            {!this.props.dashboardContext.modelMetadata.featureIsCategorical[index] && 
-                <ActionButton 
-                    onClick={this.editBins.bind(this, index)}>{localization.Feature.editBinning}</ActionButton>
-            }
-            {!this.state.expandedBins.includes(index) && (
-                <ActionButton
-                    iconProps={{iconName: "Forward"}}
-                    onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>)}
-            {this.state.expandedBins.includes(index) && (
-                <div>
+            <div className={FeatureTab.classNames.iconWrapper}>
+                <Icon iconName={this.props.selectedFeatureIndex === index ? "RadioBtnOn" : "RadioBtnOff"} className={FeatureTab.classNames.iconClass}/>
+            </div>
+            <div className={FeatureTab.classNames.featureDescriptionSection}>
+                <h2 className={FeatureTab.classNames.itemTitle}>{this.props.dashboardContext.modelMetadata.featureNames[index]}</h2>
+                {item.rangeType === RangeTypes.categorical &&
+                    <div className={FeatureTab.classNames.valueCount}>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</div>
+                }
+                {item.rangeType !== RangeTypes.categorical &&
+                    <div className={FeatureTab.classNames.valueCount}>
+                    {localization.formatString(localization.Feature.summaryNumericCount, 
+                        (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).min, 
+                        (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).max, 
+                        item.labelArray.length) as string}</div>
+                }
+                {!this.props.dashboardContext.modelMetadata.featureIsCategorical[index] && 
                     <ActionButton 
-                    iconProps={{iconName: "Back"}}
-                    onClick={this.updateExpandedList.bind(this)}>{localization.Feature.hideCategories}</ActionButton>
-                    {!!item.labelArray && item.labelArray.map((category, index) => <div key={index}>{category}</div>)}
-                </div>)}
-          </div>
+                        className={FeatureTab.classNames.expandButton}
+                        iconProps={{iconName: "Edit"}}
+                        onClick={this.editBins.bind(this, index)}>{localization.Feature.editBinning}</ActionButton>
+                }
+            </div>
+            <div className={FeatureTab.classNames.binSection}>
+                {!this.state.expandedBins.includes(index) && !!item.labelArray && 
+                    <div> 
+                        {item.labelArray.slice(0,7).map((category, index) => <div key={index} className={FeatureTab.classNames.category}>{category}</div>)}
+                        {item.labelArray.length > 7 && <ActionButton
+                            className={FeatureTab.classNames.expandButton}
+                            iconProps={{iconName: "ChevronDownMed"}}
+                            onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>}
+                    </div>
+                }
+                {this.state.expandedBins.includes(index) && !!item.labelArray &&
+                <div>
+                    {item.labelArray.map((category, index) => <div key={index} className={FeatureTab.classNames.category}>{category}</div>)}
+                    {<ActionButton 
+                        className={FeatureTab.classNames.expandButton}
+                        iconProps={{iconName: "ChevronUpMed"}}
+                        onClick={this.updateExpandedList.bind(this)}>{localization.Feature.hideCategories}</ActionButton>}
+                </div>
+                }
+            </div>
+        </div>
         );
     }
 

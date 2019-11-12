@@ -295,26 +295,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     showarrow: false,
                     font: {color:'#666666', size: 10}
                 },
-                    {
+                {
                     text: localization.Report.overestimationError,
                     x: 0.98,
                     y: 1,
-                    yref: 'paper', xref: 'paper',
-                    showarrow: false,
-                    font: {color:'#666666', size: 10}
-                },
-                {
-                    text: localization.Report.underpredictionExplanation,
-                    x: 0.02,
-                    y: 0.97,
-                    yref: 'paper', xref: 'paper',
-                    showarrow: false,
-                    font: {color:'#666666', size: 10}
-                },
-                    {
-                    text: localization.Report.overpredictionExplanation,
-                    x: 0.98,
-                    y: 0.97,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
                     font: {color:'#666666', size: 10}
@@ -337,12 +321,18 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             opportunityPlot.layout.xaxis.tickformat = ',.0%';
             howToReadAccuracySection = (<div>
                 <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
-                    <div>{localization.Report.overestimationError}</div>
+                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                    <div>
+                        <div>{localization.Report.underestimationError}</div>
+                        <div>{localization.Report.underpredictionExplanation}</div>
+                    </div>
                 </div>
                 <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
-                    <div>{localization.Report.underestimationError}</div>
+                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                    <div>
+                        <div>{localization.Report.overestimationError}</div>
+                        <div>{localization.Report.underpredictionExplanation}</div>
+                    </div>
                 </div>
                 <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead}</div>
             </div>);
@@ -494,6 +484,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             </div>
             <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
+                        binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         binLabels={this.props.dashboardContext.groupNames}
                         formattedBinValues={formattedBinAccuracyValues}
                         metricLabel={AccuracyOptions[accuracyKey].title}
@@ -525,6 +516,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             </div>
             <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
+                        binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         binLabels={this.props.dashboardContext.groupNames}
                         formattedBinValues={formattedBinOutcomeValues}
                         metricLabel={outcomeMetric.title}

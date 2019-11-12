@@ -1,7 +1,8 @@
 {
     "loremIpsum": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     "defaultClassNames": "Class {0}",
-    "defaultFeatureNames": "Feature {0}",
+    "defaultFeatureNames": "Sensitive feature {0}",
+    "defaultSingleFeatureName": "Sensitive feature",
     "accuracyTab": "Fairness in Accuracy",
     "opportunityTab": "Fairness in Opportunity",
     "modelComparisonTab": "Model comparison",
@@ -17,10 +18,14 @@
     "errorOnInputs": "Error with input. Sensitive features must be categorical values at this time. Please map values to binned categories and retry.",
     "Accuracy": {
         "header": "How do you want to measure accuracy?",
-        "body": "We have determined that your model is a {0}. Based on this, we recommend the following accuracy metrics:",
+        "modelMakes": "model makes",
+        "modelsMake": "models make",
+        "body": "Your data contains {0} labels and your {2} {1} predictions. Based on that information, we recommend the following metrics. Please select one metric from the list.",
         "binaryClassifier": "binary classifier",
         "probabalisticRegressor": "probit regressor",
-        "regressor": "regressor"
+        "regressor": "regressor",
+        "binary": "binary",
+        "continuous": "continuous"
     },
     "Parity": {
         "header": "Fairness measured in terms of disparity",
@@ -86,10 +91,12 @@
         "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's accuracy and predictions differ across these splits.",
         "learnMore": "Learn more",
         "summaryCategoricalCount": "This feature has {0} unique values",
-        "showCategories": "Show values",
-        "hideCategories": "Hide categories",
+        "summaryNumericCount": "This numeric feature ranges from {0} to {1}, and is grouped into {2} bins.",
+        "showCategories": "Show all",
+        "hideCategories": "Collapse",
         "categoriesOverflow": "   and {0} additional categories",
-        "editBinning": "Edit binning"
+        "editBinning": "Edit groups",
+        "subgroups": "Subgroups"
     },
     "Metrics": {
         "accuracyScore": "Accuracy",
