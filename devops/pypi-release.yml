@@ -1,0 +1,95 @@
+trigger: none # No CI build
+
+pr: none # Not for pull requests
+
+
+stages:
+- stage: Tests
+  pool:
+    vmImage: 'ubuntu-latest'
+    
+  jobs:
+  - template: all-tests-job-template.yml
+    parameters:
+      name: Linux
+      vmImage: 'ubuntu-16.04'
+
+  - template: all-tests-job-template.yml
+    parameters:
+      name: Windows
+      vmImage:  'vs2017-win2016'
+      
+  - template: all-tests-job-template.yml
+    parameters:
+      name: MacOS
+      vmImage:  'macOS-10.13'
+      pyVersions: [3.6, 3.7] 
+
+  - template: notebook-job-template.yml
+    parameters:
+      name: LinuxNotebooks
+      vmImage: 'ubuntu-16.04'
+
+- stage: DeployToTest
+  dependsOn: Tests
+  jobs:
+  - job: "Deploy to PyPI-Test"
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+      - task: UsePythonVersion@0
+        displayName: 'Use Python 3.6'
+        inputs:
+          versionSpec: 3.6
+          addToPath: true
+
+      - script: pip install setuptools wheel 
+        displayName: 'Install setuptools'
+
+      - script: ls -R
+        displayName: "List files"
+
+      - script: python setup.py sdist bdist_wheel
+
+      - script: ls -R
+        displayName: "List files again"
+
+  - stage: CheckTestPackage
+    dependsOn: DeployToTest
+
+    jobs:
+    - job: "Check Test Package"
+      pool:
+        vmImage: 'ubuntu-latest'
+
+      steps:
+      - task: UsePythonVersion@0
+        displayName: 'Use Python 3.6'
+        inputs:
+          versionSpec: 3.6
+          addToPath: true
+
+      - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
+
+  - stage: DeployToProd
+    dependsOn: DeployToTest
+
+    jobs:
+  - job: "Deploy to PyPI-Test"
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+      - task: UsePythonVersion@0
+        displayName: 'Use Python 3.6'
+        inputs:
+          versionSpec: 3.6
+          addToPath: true
+
+      - script: ls -R
+        displayName: "List files again"
+
+
+
+      
