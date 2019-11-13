@@ -56,8 +56,8 @@ stages:
 
     - task: PowerShell@2
       inputs:
-      - filePath: scripts/build-test-wheels.ps1
-      - pwsh: true
+        filePath: scripts/build-test-wheels.ps1
+        pwsh: true
 
     - task: PublishPipelineArtifact@1
       inputs:
