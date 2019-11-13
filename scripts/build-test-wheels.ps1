@@ -10,6 +10,10 @@ if ( [string]::IsNullOrEmpty($Env:FAIRLEARN_RC))
     throw "Environment variable FAIRLEARN_RC null or empty!"
 }
 
+Write-Host
+ls
+Write-Host
+
 Write-Host "FAIRLEARN_RC = $Env:FAIRLEARN_RC"
 
 # Set environment variable
