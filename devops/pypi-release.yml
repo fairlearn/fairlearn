@@ -151,7 +151,7 @@ stages:
 
     - task: PublishTestResults@2
       displayName: 'Publish Test Results **/TEST-*.xml'
-      workingDirectory: $(Agent.TempDirectory)/
+      searchFolder: $(Agent.TempDirectory)/
       condition: succeededOrFailed()
       
 - stage: ValidateTestPyPIPackateNotebooks
