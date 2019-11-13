@@ -23,6 +23,5 @@ Write-Host
 Write-Host "Creating Packages"
 python setup.py sdist bdist_wheel
 
-# Set the appropriate environment variable
 Write-Host
-Write-Host "##vso[task.setvariable variable=FAIRLEARN_TEST_VERSION;isOutput=true]$Env:FAIRLEARN_TEST_VERSION"
+Write-Host "Package created"
