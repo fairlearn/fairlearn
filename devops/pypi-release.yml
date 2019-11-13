@@ -68,6 +68,11 @@ stages:
       inputs:
         path: $(System.DefaultWorkingDirectory)/dist
         artifact: TestPackages
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/test-version.txt
+        artifact: TestVersionFile
       
 - stage: DeployToPyPITest
   dependsOn: CreateTestPyPIPackage
@@ -76,8 +81,6 @@ stages:
     environment: "PyPI-Test Deployment"
     pool:
       vmImage: $(PoolImage)
-    variables:
-      FairlearnTestVersion: $[ dependencies.CreateTestPyPIPackage.outputs['BuildTestWheelsTask.FAIRLEARN_TEST_VERSION'] ]
 
     strategy:
       runOnce:
@@ -95,9 +98,6 @@ stages:
           - script: ls -R $(Pipeline.Workspace)
             displayName: "List files in Pipeline.Workspace"
 
-          - script: echo $(FairlearnTestVersion)
-            displayName: "Show test version"
-
           - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/TestPackages/*"
             displayName: "Upload to PyPI-Test"
 
@@ -112,8 +112,6 @@ stages:
   - job: "Validate_Test_Package_Unit"
     pool:
       vmImage: $(PoolImage)
-    variables:
-      FairlearnTestVersion: $[ dependencies.CreateTestPyPIPackage.outputs['BuildTestWheelsTask.FAIRLEARN_TEST_VERSION'] ]
 
     steps:
     - task: UsePythonVersion@0
@@ -121,6 +119,14 @@ stages:
       inputs:
         versionSpec: $(poolPythonVersion)
         addToPath: true
+    
+    - task: PowerShell@2
+        name: SetVariableTask
+        displayName: 'Fetch PyPI-Test version from artifact'
+        inputs:
+          filePath: scripts/set-variable-from-file.ps1
+          arguments: "-baseDir $(Pipeline.Workspace) -subDir TestVersionFile -fileName test-version.txt -targetVariable PyPITestVersion"
+          pwsh: true
 
     - script: cp -r $(Build.Repository.LocalPath)/test/ $(Agent.TempDirectory)/
       displayName: "Copy Tests to temp directory"
@@ -131,6 +137,9 @@ stages:
 
     - script: pip install -r requirements.txt
       displayName: "Install fairlearn requirements from regular PyPI"
+
+    - script: echo $(PyPITestVersion)
+      displayName: "Show PyPITestVersion"
 
     - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
       displayName: "Install fairlearn from PyPI-Test"
