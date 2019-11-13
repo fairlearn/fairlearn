@@ -30,6 +30,7 @@ stages:
     parameters:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
+      pyVersions: [3.6] # Will want to add other versions etc. back in eventually
 
 - stage: CreateTestPyPIPackage
   dependsOn:
