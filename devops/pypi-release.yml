@@ -92,9 +92,10 @@ stages:
           - task: DownloadPipelineArtifact@2
             inputs:
               artifact: TestPackages
+              targetPath: $(Pipeline.Workspace)/test
 
-          - script: ls -R
-            displayName: "List files"
+          - script: ls -R $(Pipeline.Workspace)
+            displayName: "List files in Pipeline.Workspace"
 
 - stage: CheckTestPyPIPackage
   dependsOn: DeployToPyPITest
