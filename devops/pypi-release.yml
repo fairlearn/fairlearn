@@ -64,10 +64,6 @@ stages:
         path: $(System.DefaultWorkingDirectory)/dist
         artifact: TestPackages
       
-
-
-
-
 - stage: DeployToPyPITest
   dependsOn: CreateTestPyPIPackage
   jobs:
@@ -89,13 +85,10 @@ stages:
           - script: pip install twine
             displayName: 'Install twine'
 
-          - task: DownloadPipelineArtifact@2
-            inputs:
-              artifact: TestPackages
-              targetPath: $(Pipeline.Workspace)/test
-
           - script: ls -R $(Pipeline.Workspace)
             displayName: "List files in Pipeline.Workspace"
+
+          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/TestPackages/*"
 
 - stage: CheckTestPyPIPackage
   dependsOn: DeployToPyPITest
@@ -112,5 +105,18 @@ stages:
         versionSpec: $(poolPythonVersion)
         addToPath: true
 
+    - script: cp -r $(Build.Repository.LocalPath)/test/unit/ $(Agent.TempDirectory)/
+      displayName: "Copy Tests to temp directory"
+
+    - script: cd $(Agent.TempDirectory)/
+      displayName: "Move to temp directory"
+
+    - script: ls -R
+      displayName: "List files"
+
+    - script: pip install -r requirements.txt
+      displayName: "Install fairlearn requirements from regular PyPI"
+
     - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
+      displayName: "Install fairlearn from PyPI-Test"
       
