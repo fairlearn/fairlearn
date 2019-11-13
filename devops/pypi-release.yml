@@ -121,12 +121,12 @@ stages:
         addToPath: true
     
     - task: PowerShell@2
-        name: SetVariableTask
-        displayName: 'Fetch PyPI-Test version from artifact'
-        inputs:
-          filePath: scripts/set-variable-from-file.ps1
-          arguments: "-baseDir $(Pipeline.Workspace) -subDir TestVersionFile -fileName test-version.txt -targetVariable PyPITestVersion"
-          pwsh: true
+      name: SetVariableTask
+      displayName: 'Fetch PyPI-Test version from artifact'
+      inputs:
+        filePath: scripts/set-variable-from-file.ps1
+        arguments: "-baseDir $(Pipeline.Workspace) -subDir TestVersionFile -fileName test-version.txt -targetVariable PyPITestVersion"
+        pwsh: true
 
     - script: cp -r $(Build.Repository.LocalPath)/test/ $(Agent.TempDirectory)/
       displayName: "Copy Tests to temp directory"
