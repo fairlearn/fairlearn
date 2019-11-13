@@ -139,6 +139,10 @@ stages:
     - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="PyPI-Test-Validation"
       displayName: "Run Unit Tests"
       workingDirectory: $(Agent.TempDirectory)/
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results **/TEST-*.xml'
+      condition: succeededOrFailed()
       
 - stage: ValidateTestPyPIPackateNotebooks
   dependsOn: DeployToPyPITest
