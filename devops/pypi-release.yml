@@ -17,18 +17,8 @@ stages:
   - template: all-tests-job-template.yml
     parameters:
       name: Linux
-      vmImage: 'ubuntu-16.04'
-
-  - template: all-tests-job-template.yml
-    parameters:
-      name: Windows
-      vmImage:  'vs2017-win2016'
-      
-  - template: all-tests-job-template.yml
-    parameters:
-      name: MacOS
-      vmImage:  'macOS-10.13'
-      pyVersions: [3.6, 3.7] 
+      vmImage: 'ubuntu-16.04' # Will want to add other platforms and pyVersions back in eventually
+      pyVersions: [3.6] 
 
 - stage: PreNotebooks
   dependsOn: []
@@ -41,38 +31,42 @@ stages:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
 
-- stage: DeployToTest
+- stage: DeployToPyPITest
   dependsOn:
   - PreUnit
   - PreNotebooks
   jobs:
-  - job: "Deploy_to_PyPI_Test"
+  - deployment: "Deploy_to_PyPI_Test"
+    environment: "PyPI-Test"
     pool:
       vmImage: $(PoolImage)
 
-    steps:
-      - task: UsePythonVersion@0
-        displayName: 'Use Python $(poolPythonVersion)'
-        inputs:
-          versionSpec: $(poolPythonVersion)
-          addToPath: true
+    strategy:
+      runOnce:
+       deploy:
+        steps:
+          - task: UsePythonVersion@0
+            displayName: 'Use Python $(poolPythonVersion)'
+            inputs:
+              versionSpec: $(poolPythonVersion)
+              addToPath: true
 
-      - script: pip install setuptools wheel 
-        displayName: 'Install setuptools'
+          - script: pip install setuptools wheel 
+            displayName: 'Install setuptools'
 
-      - script: ls -R
-        displayName: "List files"
+          - script: ls -R
+            displayName: "List files"
 
-      - script: echo $FAIRLEARN_RC
-        displayName: "Show FAIRLEARN_RC"
+          - script: echo $FAIRLEARN_RC
+            displayName: "Show FAIRLEARN_RC"
 
-      - script: python setup.py sdist bdist_wheel
+          - script: python setup.py sdist bdist_wheel
 
-      - script: ls -R
-        displayName: "List files again"
+          - script: ls -R
+            displayName: "List files again"
 
-- stage: CheckTestPackage
-  dependsOn: DeployToTest
+- stage: CheckTestPyPIPackage
+  dependsOn: DeployToPyPITest
 
   jobs:
   - job: "Check_Test_Package"
@@ -87,25 +81,4 @@ stages:
         addToPath: true
 
     - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
-
-- stage: DeployToProd
-  dependsOn: DeployToTest
-
-  jobs:
-  - job: "Deploy_to_PyPI"
-    pool:
-      vmImage: $(PoolImage)
-
-    steps:
-      - task: UsePythonVersion@0
-        displayName: 'Use Python $(poolPythonVersion)'
-        inputs:
-          versionSpec: $(poolPythonVersion)
-          addToPath: true
-
-      - script: ls -R
-        displayName: "List files again"
-
-
-
       
