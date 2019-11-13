@@ -10,13 +10,10 @@ if ( [string]::IsNullOrEmpty($Env:FAIRLEARN_RC))
     throw "Environment variable FAIRLEARN_RC null or empty!"
 }
 
-Write-Host
-ls
-Write-Host
-
 Write-Host "FAIRLEARN_RC = $Env:FAIRLEARN_RC"
 
 # Set environment variable
+pip install .
 $versionScript = Join-Path -resolve scripts fairlearn_version.py
 $Env:FAIRLEARN_TEST_VERSION = python $versionScript
 Write-Host "FAIRLEARN_TEST_VERSION = $Env:FAIRLEARN_TEST_VERSION"

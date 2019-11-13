@@ -6,6 +6,9 @@
 
 # This is meant to be run from an environment where fairlearn has
 # not been pip installed, so have to fiddle with the path
+# The path manipulation assumes that the current working directory
+# is the repository root (that is one level above the current
+# scripts directory)
 
 import os
 import sys
