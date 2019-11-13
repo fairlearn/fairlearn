@@ -30,7 +30,7 @@ stages:
       vmImage:  'macOS-10.13'
       pyVersions: [3.6, 3.7] 
 
--stage: PreNotebooks
+- stage: PreNotebooks
   dependsOn: []
   - template: notebook-job-template.yml
     parameters:
