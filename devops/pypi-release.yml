@@ -71,7 +71,7 @@ stages:
   dependsOn: CreateTestPyPIPackage
   jobs:
   - deployment: "Deploy_to_PyPI_Test"
-    environment: "PyPI-Test"
+    environment: "PyPI-Test Deployment"
     pool:
       vmImage: $(PoolImage)
 
@@ -111,30 +111,32 @@ stages:
         versionSpec: $(poolPythonVersion)
         addToPath: true
 
-    - script: cp -r $(Build.Repository.LocalPath)/test/unit/ $(Agent.TempDirectory)/
+    - script: cp -r $(Build.Repository.LocalPath)/test/ $(Agent.TempDirectory)/
       displayName: "Copy Tests to temp directory"
-
-    - script: cd $(Agent.TempDirectory)/
-      displayName: "Move to temp directory"
 
     - script: ls -R
       displayName: "List files"
+      workingDirectory: $(Agent.TempDirectory)/
 
     - script: pip install -r requirements.txt
       displayName: "Install fairlearn requirements from regular PyPI"
 
     - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
       displayName: "Install fairlearn from PyPI-Test"
+
+      # Will want to adjust the set of tests run...
+    - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="PyPI-Test-Validation"
+      displayName: "Run Unit Tests"
+      workingDirectory: $(Agent.TempDirectory)/
       
 - stage: ValidateTestPyPIPackateNotebooks
   dependsOn: DeployToPyPITest
 
   jobs:
-  - job: "Validate_Test_Package_Unit"
+  - job: "Validate_Test_Package_Notebooks"
     pool:
       vmImage: $(PoolImage)
 
-      
     steps:
     - task: UsePythonVersion@0
       displayName: 'Use Python $(poolPythonVersion)'
@@ -173,3 +175,31 @@ stages:
       inputs:
         path: $(System.DefaultWorkingDirectory)/dist
         artifact: Packages
+
+              
+- stage: DeployToPyPI
+  dependsOn: CreatePyPIPackage
+  jobs:
+  - deployment: "Deploy_to_PyPI"
+    environment: "PyPI Deployment"
+    pool:
+      vmImage: $(PoolImage)
+
+    strategy:
+      runOnce:
+       deploy:
+        steps:
+          - task: UsePythonVersion@0
+            displayName: 'Use Python $(poolPythonVersion)'
+            inputs:
+              versionSpec: $(poolPythonVersion)
+              addToPath: true
+
+          - script: pip install twine
+            displayName: 'Install twine'
+
+          - script: ls -R $(Pipeline.Workspace)
+            displayName: "List files in Pipeline.Workspace"
+
+          - script: echo "python twine upload $(Pipeline.Workspace)/Packages/*"
+            displayName: "Upload to PyPI"
