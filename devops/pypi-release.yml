@@ -122,7 +122,7 @@ stages:
     
     - script: ls -R
       displayName: "List files"
-      workingDirectory: $(Agent.TempDirectory)/
+      workingDirectory: $(Pipeline.Workspace)/
 
     - task: PowerShell@2
       name: SetVariableTask
