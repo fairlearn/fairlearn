@@ -1,12 +1,17 @@
+variables:
+  poolImage: "ubuntu-latest"
+  poolPythonVersion: 3.6
+
 trigger: none # No CI build
 
 pr: none # Not for pull requests
 
 
 stages:
-- stage: Tests
+- stage: PreUnit
+  dependsOn: []
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: $(PoolImage)
     
   jobs:
   - template: all-tests-job-template.yml
@@ -25,23 +30,27 @@ stages:
       vmImage:  'macOS-10.13'
       pyVersions: [3.6, 3.7] 
 
+-stage: PreNotebooks
+  dependsOn: []
   - template: notebook-job-template.yml
     parameters:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
 
 - stage: DeployToTest
-  dependsOn: Tests
+  dependsOn:
+    PreUnit
+    PreNotebooks
   jobs:
   - job: "Deploy_to_PyPI_Test"
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: $(PoolImage)
 
     steps:
       - task: UsePythonVersion@0
-        displayName: 'Use Python 3.6'
+        displayName: 'Use Python $(poolPythonVersion)'
         inputs:
-          versionSpec: 3.6
+          versionSpec: $(poolPythonVersion)
           addToPath: true
 
       - script: pip install setuptools wheel 
@@ -49,6 +58,9 @@ stages:
 
       - script: ls -R
         displayName: "List files"
+
+      - script: echo $FAIRLEARN_RC
+        displayName: "Show FAIRLEARN_RC"
 
       - script: python setup.py sdist bdist_wheel
 
@@ -61,13 +73,13 @@ stages:
   jobs:
   - job: "Check_Test_Package"
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: $(PoolImage)
 
     steps:
     - task: UsePythonVersion@0
-      displayName: 'Use Python 3.6'
+      displayName: 'Use Python $(poolPythonVersion)'
       inputs:
-        versionSpec: 3.6
+        versionSpec: $(poolPythonVersion)
         addToPath: true
 
     - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
@@ -78,13 +90,13 @@ stages:
   jobs:
   - job: "Deploy_to_PyPI"
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: $(PoolImage)
 
     steps:
       - task: UsePythonVersion@0
-        displayName: 'Use Python 3.6'
+        displayName: 'Use Python $(poolPythonVersion)'
         inputs:
-          versionSpec: 3.6
+          versionSpec: $(poolPythonVersion)
           addToPath: true
 
       - script: ls -R
