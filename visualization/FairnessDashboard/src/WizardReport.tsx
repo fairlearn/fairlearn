@@ -334,7 +334,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         <div>{localization.Report.underpredictionExplanation}</div>
                     </div>
                 </div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead}</div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead1}</div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead2}</div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead3}</div>
             </div>);
             howToReadOutcomesSection = (<div>
                 <div className={WizardReport.classNames.textRow}>{localization.Report.classificationOutcomesHowToRead}</div>

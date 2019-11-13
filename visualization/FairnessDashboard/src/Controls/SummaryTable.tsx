@@ -41,7 +41,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         groupLabel: {
             color: "#333333",
             fontSize: "12px",
-            lineHeight: "16px",
+            lineHeight: "12px",
             fontWeight: "500",
             height: "26px"
         },
@@ -78,7 +78,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         metricLabel: {
             color: "#333333",
             fontSize: "12px",
-            lineHeight: "16px",
+            lineHeight: "12px",
             fontWeight: "500",
             height: "26px",
             paddingLeft: "10px"

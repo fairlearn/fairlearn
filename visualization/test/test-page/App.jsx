@@ -74,7 +74,7 @@ import {regression} from "../__mock-data/regression";
               {App.choices.map((item, index) => <option key={item.label} value={index}>{item.label}</option>)}
             </select>
               <div style={{ width: '80vw', backgroundColor: 'white', margin:'50px auto'}}>
-                  <div style={{ width: '740px'}}>
+                  <div style={{ width: '940px'}}>
                       <FairnessWizard
                         modelInformation={{modelClass: 'blackbox'}}
                         dataSummary={{featureNames: data.featureNames, classNames: data.classNames}}

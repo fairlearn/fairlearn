@@ -57,7 +57,8 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
             paddingTop: "12px",
             fontSize: "18px",
             lineHeight: "24px",
-            fontWeight: "300"
+            fontWeight: "300",
+            paddingBottom: "12px"
         }
     });
     render(): React.ReactNode {

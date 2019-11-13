@@ -99,8 +99,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             color: "#333333",
             fontSize: "15px",
             lineHeight: "18px",
-            fontWeight: "500",
-            marginBottom: "15px"
+            fontWeight: "500"
         },
         iconWrapper: {
             paddingTop: "4px",
@@ -109,7 +108,8 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
         },
         featureDescriptionSection: {
             flex: 1,
-            paddingRight: "20px"
+            paddingRight: "20px",
+            minHeight:"75px"
         },
         binSection:{
             width:"130px",

@@ -82,7 +82,9 @@
         "overestimationError": "Overprediction",
         "classificationOutcomesHowToRead": "The bar chart shows the selection rate in each group, meaning the fraction of points classified as 1.",
         "regressionOutcomesHowToRead": "This chart shows the distribution of predictions for each group. The individual points are overlaid on the box plot.",
-        "classificationAccuracyHowToRead": "The bar chart shows the distribution of errors in each group. Errors are split into overprediction errors (predicting 1 when the true label is 0), and underprediction errors (predicting 0 when the true label is 1). The reported rates are obtained by dividing the number of errors by the overall group size.",
+        "classificationAccuracyHowToRead1": "The bar chart shows the distribution of errors in each group.",
+        "classificationAccuracyHowToRead2": "Errors are split into overprediction errors (predicting 1 when the true label is 0), and underprediction errors (predicting 0 when the true label is 1).",
+        "classificationAccuracyHowToRead3": "The reported rates are obtained by dividing the number of errors by the overall group size.",
         "probabilityAccuracyHowToRead": "Underestimation error rate is the sum of all negative errors within a group divided by the group size. Overestimation error rate is the sum of all positive errors in a group divided by the group size.",
         "regressionAccuracyHowToRead": "This chart shows the error distribution for each group. The error is the predicted value minus the true value."
     },
