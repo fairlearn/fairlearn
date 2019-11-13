@@ -37,7 +37,7 @@ stages:
   - PreNotebooks
 
   jobs:
-    job: Create_PyPI_Test_Package
+  - job: Create_PyPI_Test_Package
     pool:
       vmImage: $(PoolImage)
 
