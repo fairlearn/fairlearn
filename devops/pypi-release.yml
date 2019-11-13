@@ -43,8 +43,8 @@ stages:
 
 - stage: DeployToTest
   dependsOn:
-    PreUnit
-    PreNotebooks
+  - PreUnit
+  - PreNotebooks
   jobs:
   - job: "Deploy_to_PyPI_Test"
     pool:
