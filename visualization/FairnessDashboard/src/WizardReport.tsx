@@ -103,9 +103,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "400",
-            padding: "0 17px 0 12px",
-            alignSelf: "center",
-            maxWidth: "90px",
+            padding: "8px 12px 0 12px",
+            maxWidth: "120px",
             borderRight: "1px solid #CCCCCC",
             marginRight: "20px"
         },
@@ -114,7 +113,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "400",
-            alignSelf: "center",
+            paddingTop: "8px",
             maxWidth: "130px"
         },
         presentationArea: {
@@ -124,7 +123,19 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         },
         chartWrapper: {
             flex: "1 0 40%",
-            paddingTop: "23px"
+            display: "flex",
+            flexDirection: "column"
+        },
+        chartBody: {
+            flex: 1
+        },
+        chartHeader: {
+            height: "23px",
+            paddingLeft: "10px",
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "12px",
+            fontWeight: "500"
         },
         mainRight: {
             minWidth: "200px",
@@ -134,7 +145,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         },
         rightTitle: {
             color: "#333333",
-            fontSize: "15px",
+            fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "500",
             paddingBottom: "11px",
@@ -259,6 +270,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         let insightsAccuracySection: React.ReactNode;
         let howToReadOutcomesSection: React.ReactNode;
         let insightsOutcomesSection: React.ReactNode;
+        let accuracyChartHeader: string = "";
+        let opportunityChartHeader: string = "";
 
         if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification) {
             accuracyPlot.data = [
@@ -385,15 +398,22 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     font: {color:'#666666', size: 10}
                 }
             ];
+            const opportunityText = this.state.metrics.predictions.map(val => {
+                return localization.formatString(localization.Report.tooltipPrediction, 
+                    this.formatNumbers((val as number), "average", false, 3));
+            });
             opportunityPlot.data = [
                 {
                     x: this.state.metrics.predictions,
                     y: this.props.dashboardContext.binVector,
+                    text: opportunityText,
                     type: 'box',
                     color: ChartColors[0],
                     boxmean: true,
                     orientation: 'h',
                     boxpoints: 'all',
+                    hoverinfo: 'text',
+                    hoveron: "points",
                     jitter: 0.4,
                     pointpos: 0,
                 } as any
@@ -407,20 +427,37 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
                     <div>{localization.Report.underestimationError}</div>
                 </div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead}</div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead1}</div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead2}</div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead3}</div>
             </div>);
             howToReadOutcomesSection = (<div>
                 <div className={WizardReport.classNames.textRow}>{localization.Report.regressionOutcomesHowToRead}</div>
             </div>);
+            opportunityChartHeader = localization.Report.distributionOfPredictions;
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
+            const opportunityText = this.state.metrics.predictions.map(val => {
+                return localization.formatString(localization.Report.tooltipPrediction, val);
+            });
+            const accuracyText = this.state.metrics.predictions.map((val, index) => {
+                return `${localization.formatString(
+                        localization.Report.tooltipError, 
+                        this.formatNumbers((this.state.metrics.errors[index] as number), "average", false, 3))
+                    }<br>${localization.formatString(
+                        localization.Report.tooltipPrediction, 
+                        this.formatNumbers((val as number), "average", false, 3))}`;
+            });
             accuracyPlot.data = [
                 {
                     x: this.state.metrics.errors,
                     y: this.props.dashboardContext.binVector,
+                    text: accuracyText,
                     type: 'box',
                     color: ChartColors[0],
                     orientation: 'h',
                     boxmean: true,
+                    hoveron: "points",
+                    hoverinfo: 'text',
                     boxpoints: 'all',
                     jitter: 0.4,
                     pointpos: 0,
@@ -430,11 +467,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 {
                     x: this.state.metrics.predictions,
                     y: this.props.dashboardContext.binVector,
+                    text: opportunityText,
                     type: 'box',
                     color: ChartColors[0],
                     boxmean: true,
                     orientation: 'h',
+                    hoveron: "points",
                     boxpoints: 'all',
+                    hoverinfo: 'text',
                     jitter: 0.4,
                     pointpos: 0,
                 } as any
@@ -445,6 +485,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             howToReadOutcomesSection = (<div>
                 <div className={WizardReport.classNames.textRow}>{localization.Report.regressionOutcomesHowToRead}</div>
             </div>);
+            opportunityChartHeader = localization.Report.distributionOfPredictions;
+            accuracyChartHeader = localization.Report.distributionOfErrors;
         }
         
         const globalAccuracyString = this.formatNumbers(this.state.metrics.globalAccuracy, accuracyKey);
@@ -492,11 +534,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         metricLabel={AccuracyOptions[accuracyKey].title}
                         binValues={this.state.metrics.binnedAccuracy}/>
                     <div className={WizardReport.classNames.chartWrapper}>
-                        <AccessibleChart
-                            plotlyProps={accuracyPlot}
-                            sharedSelectionContext={undefined}
-                            theme={undefined}
-                        />
+                        <div className={WizardReport.classNames.chartHeader}>{accuracyChartHeader}</div>
+                        <div className={WizardReport.classNames.chartBody}>
+                            <AccessibleChart
+                                plotlyProps={accuracyPlot}
+                                sharedSelectionContext={undefined}
+                                theme={undefined}
+                            />
+                        </div>
                     </div>
                     <div className={WizardReport.classNames.mainRight}>
                         <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
@@ -524,11 +569,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         metricLabel={outcomeMetric.title}
                         binValues={this.state.metrics.binnedOutcome}/>
                     <div className={WizardReport.classNames.chartWrapper}>
-                        <AccessibleChart
-                            plotlyProps={opportunityPlot}
-                            sharedSelectionContext={undefined}
-                            theme={undefined}
-                        />
+                        <div className={WizardReport.classNames.chartHeader}>{opportunityChartHeader}</div>
+                        <div className={WizardReport.classNames.chartBody}>
+                            <AccessibleChart
+                                plotlyProps={opportunityPlot}
+                                sharedSelectionContext={undefined}
+                                theme={undefined}
+                            />
+                        </div>
                     </div>
                     <div className={WizardReport.classNames.mainRight}>
                         <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
