@@ -31,10 +31,45 @@ stages:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
 
-- stage: DeployToPyPITest
+- stage: CreateTestPyPIPackage
   dependsOn:
   - PreUnit
   - PreNotebooks
+
+  jobs:
+    job: Create_PyPI_Test_Package
+    pool:
+      vmImage: $(PoolImage)
+
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(poolPythonVersion)'
+      inputs:
+        versionSpec: $(poolPythonVersion)
+        addToPath: true
+    
+    - script: pip install setuptools wheel 
+      displayName: 'Install setuptools'
+
+    - script: pip install -r requirements.txt
+      displayName: "Install fairlearn requirements"
+
+    - task: PowerShell@2
+      inputs:
+      - filePath: scripts/build-test-wheels.ps1
+      - pwsh: true
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/dist
+        artifact: TestPackages
+      
+
+
+
+
+- stage: DeployToPyPITest
+  dependsOn: CreateTestPyPIPackage
   jobs:
   - deployment: "Deploy_to_PyPI_Test"
     environment: "PyPI-Test"
