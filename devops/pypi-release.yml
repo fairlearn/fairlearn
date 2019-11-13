@@ -58,6 +58,8 @@ stages:
       displayName: "Install fairlearn requirements"
 
     - task: PowerShell@2
+      name: BuildTestWheelsTask
+      displayName: 'Build wheels for test'
       inputs:
         filePath: scripts/build-test-wheels.ps1
         pwsh: true
@@ -74,6 +76,8 @@ stages:
     environment: "PyPI-Test Deployment"
     pool:
       vmImage: $(PoolImage)
+    variables:
+      FairlearnTestVersion: $[ dependencies.CreateTestPyPIPackage.outputs['BuildTestWheelsTask.FAIRLEARN_TEST_VERSION'] ]
 
     strategy:
       runOnce:
@@ -91,18 +95,25 @@ stages:
           - script: ls -R $(Pipeline.Workspace)
             displayName: "List files in Pipeline.Workspace"
 
+          - script: echo $(FairlearnTestVersion)
+            displayName: "Show test version"
+
           - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/TestPackages/*"
+            displayName: "Upload to PyPI-Test"
 
 
 # =================================================================================================================
 
 - stage: ValidateTestPyPIPackageUnit
   dependsOn: DeployToPyPITest
+  
 
   jobs:
   - job: "Validate_Test_Package_Unit"
     pool:
       vmImage: $(PoolImage)
+    variables:
+      FairlearnTestVersion: $[ dependencies.CreateTestPyPIPackage.outputs['BuildTestWheelsTask.FAIRLEARN_TEST_VERSION'] ]
 
     steps:
     - task: UsePythonVersion@0
@@ -143,6 +154,8 @@ stages:
       inputs:
         versionSpec: $(poolPythonVersion)
         addToPath: true
+    
+    - script: 
 
 # =================================================================================================================
 

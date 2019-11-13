@@ -6,7 +6,7 @@ Machine Learning models.
 """
 
 __name__ = "fairlearn"
-__version__ = "0.3.0-alpha"
+__version__ = "0.3.1"
 
 
 _NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
