@@ -19,11 +19,6 @@ stages:
       name: Linux
       vmImage: 'ubuntu-16.04' # Will want to add other platforms and pyVersions back in eventually
       pyVersions: [3.6] 
-  - template: all-tests-job-template.yml
-    parameters:
-      name: MacOS
-      vmImage:  'macOS-10.13'
-      pyVersions: [3.7] 
 
 - stage: PreNotebooks
   dependsOn: []
