@@ -32,6 +32,9 @@ stages:
 
 - stage: PreNotebooks
   dependsOn: []
+  pool:
+    vmImage: $(PoolImage)
+
   - template: notebook-job-template.yml
     parameters:
       name: LinuxNotebooks
