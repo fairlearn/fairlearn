@@ -35,6 +35,7 @@ stages:
   pool:
     vmImage: $(PoolImage)
 
+  jobs:
   - template: notebook-job-template.yml
     parameters:
       name: LinuxNotebooks
