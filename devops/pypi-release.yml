@@ -86,19 +86,15 @@ stages:
               versionSpec: $(poolPythonVersion)
               addToPath: true
 
-          - script: pip install setuptools wheel 
-            displayName: 'Install setuptools'
+          - script: pip install twine
+            displayName: 'Install twine'
+
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifact: TestPackages
 
           - script: ls -R
             displayName: "List files"
-
-          - script: echo $FAIRLEARN_RC
-            displayName: "Show FAIRLEARN_RC"
-
-          - script: python setup.py sdist bdist_wheel
-
-          - script: ls -R
-            displayName: "List files again"
 
 - stage: CheckTestPyPIPackage
   dependsOn: DeployToPyPITest
