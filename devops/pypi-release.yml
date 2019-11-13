@@ -120,6 +120,10 @@ stages:
         versionSpec: $(poolPythonVersion)
         addToPath: true
     
+    - script: ls -R
+      displayName: "List files"
+      workingDirectory: $(Agent.TempDirectory)/
+
     - task: PowerShell@2
       name: SetVariableTask
       displayName: 'Fetch PyPI-Test version from artifact'
@@ -130,10 +134,6 @@ stages:
 
     - script: cp -r $(Build.Repository.LocalPath)/test/ $(Agent.TempDirectory)/
       displayName: "Copy Tests to temp directory"
-
-    - script: ls -R
-      displayName: "List files"
-      workingDirectory: $(Agent.TempDirectory)/
 
     - script: pip install -r requirements.txt
       displayName: "Install fairlearn requirements from regular PyPI"
