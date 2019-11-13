@@ -32,6 +32,8 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6] # Will want to add other versions etc. back in eventually
 
+# =================================================================================================================
+
 - stage: CreateTestPyPIPackage
   dependsOn:
   - PreUnit
@@ -91,11 +93,14 @@ stages:
 
           - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/TestPackages/*"
 
-- stage: CheckTestPyPIPackage
+
+# =================================================================================================================
+
+- stage: ValidateTestPyPIPackageUnit
   dependsOn: DeployToPyPITest
 
   jobs:
-  - job: "Check_Test_Package"
+  - job: "Validate_Test_Package_Unit"
     pool:
       vmImage: $(PoolImage)
 
@@ -121,3 +126,50 @@ stages:
     - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
       displayName: "Install fairlearn from PyPI-Test"
       
+- stage: ValidateTestPyPIPackateNotebooks
+  dependsOn: DeployToPyPITest
+
+  jobs:
+  - job: "Validate_Test_Package_Unit"
+    pool:
+      vmImage: $(PoolImage)
+
+      
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(poolPythonVersion)'
+      inputs:
+        versionSpec: $(poolPythonVersion)
+        addToPath: true
+
+# =================================================================================================================
+
+- stage: CreatePyPIPackage
+  dependsOn:
+  - ValidateTestPyPIPackageUnit
+  - ValidateTestPyPIPackateNotebooks
+  jobs:
+  - job: Create_PyPI_Package
+    pool:
+      vmImage: $(PoolImage)
+
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(poolPythonVersion)'
+      inputs:
+        versionSpec: $(poolPythonVersion)
+        addToPath: true
+    
+    - script: pip install setuptools wheel 
+      displayName: 'Install setuptools'
+
+    - script: pip install -r requirements.txt
+      displayName: "Install fairlearn requirements"
+
+    - script: python setup.py sdist bdist_wheel
+      displayName: "Create wheels"
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/dist
+        artifact: Packages
