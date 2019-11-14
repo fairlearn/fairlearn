@@ -8,7 +8,8 @@ param(
     [string]$baseDir,
     [Parameter(Mandatory)]
     [string]$targetVariable,
-    [string]$gitCheckout = "master"
+    [Parameter(Mandatory)]
+    [string]$gitCheckout
 )
 
 Write-Host "Changing directory to $baseDir"
