@@ -116,7 +116,7 @@ stages:
       vmImage: $(PoolImage)
 
     steps:
-    -checkout: none
+    - checkout: none
 
     - task: UsePythonVersion@0
       displayName: 'Use Python $(poolPythonVersion)'
