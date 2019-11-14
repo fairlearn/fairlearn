@@ -139,7 +139,7 @@ class FairlearnDashboard(object):
         regression_methods = [method[0] for method in self._metric_methods.items()
                               if "regression" in method[1]["model_type"]]
         probability_methods = [method[0] for method in self._metric_methods.items()
-                              if "probability" in method[1]["model_type"]]
+                               if "probability" in method[1]["model_type"]]
 
         dataset = self._sanitize_data_shape(sensitive_features)
         self._predicted_ys = self._convert_to_list(predicted_ys)
