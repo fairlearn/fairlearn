@@ -31,7 +31,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6]
       gitUrl: https://github.com/fairlearn/fairlearn.git
-      gitTag: v0.3.0
+      gitCheckoutTarget: v0.3.0
       usePyPITest: true
       pipVersionfairlearn: 0.3.1
 
