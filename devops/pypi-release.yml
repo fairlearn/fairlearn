@@ -137,9 +137,6 @@ stages:
         pwsh: true
 
   - template: unit-tests-pypi-job-template.yml
-    dependsOn: FetchTestPyPIVersion
-    variables:
-      desiredPyPITestVersion: $[ dependencies.FetchTestPyPIVersion.outputs['SetVariableTask.PyPITestVersion'] ]
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
@@ -147,7 +144,8 @@ stages:
       gitUrl: https://github.com/fairlearn/fairlearn.git
       gitCheckoutTarget: $(Build.SourceVersion)
       usePyPITest: true
-      pipVersionfairlearn: $(desiredPyPITestVersion)
+      pipVersionfairlearn: $[ dependencies.FetchTestPyPIVersion.outputs['SetVariableTask.PyPITestVersion'] ]
+      prerequisiteJob: FetchTestPyPIVersion
 
 
   - job: "Validate_Test_Package_Notebooks"

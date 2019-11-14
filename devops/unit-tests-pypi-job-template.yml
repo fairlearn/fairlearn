@@ -7,9 +7,11 @@ parameters:
   gitCheckoutTarget: $(Build.SourceVersion) # This is the safe default, which should select the code version for the current pipeline
   usePyPITest: true
   pipVersionfairlearn:
+  prerequisiteJob:
 
 jobs:
 - job: ${{ parameters.name }}
+  dependsOn: ${{parameters.preprequisiteJob}}
   pool:
     vmImage: ${{ parameters.vmImage }}
 
