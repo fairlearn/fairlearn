@@ -33,7 +33,7 @@ stages:
       gitUrl: https://github.com/fairlearn/fairlearn.git
       gitCheckoutTarget: master
       usePyPITest: true
-      pipVersionfairlearn: 0.3.0a0
+      pipVersionfairlearn: 0.3.1
 
 
 # =================================================================================================================
