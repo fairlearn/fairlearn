@@ -4,7 +4,7 @@ parameters:
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
   gitUrl: https://github.com/fairlearn/fairlearn.git
-  gitTag: 
+  gitCheckoutTarget: masterful
   pipUrl: https://test.pypi.org/simple/
   pipVersionArtifact:
 
@@ -28,11 +28,8 @@ jobs:
 
   - task: PowerShell@2
     name: BuildTestWheelsTask
-    displayName: 'Create directory for run'
+    displayName: "Clone from git and checkout $(gitCheckoutTarget)"
     inputs:
-      targetType: inline
-      script: "
-          Write-Host 'Hello'
-          Write-Host 'Goodbye'
-          "
+      filePath: scripts/prepare-git-pypi-test.ps1
+      arguments: "-gitUrl $(gitUrl) -baseDir $(Agent.TempDirectory) -targetVariable ClonedRepoDir -gitCheckout $(gitCheckoutTarget)"
       pwsh: true
