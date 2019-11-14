@@ -6,7 +6,7 @@ parameters:
   gitUrl: https://github.com/fairlearn/fairlearn.git
   gitCheckoutTarget: $(Build.SourceVersion) # This is the safe default, which should select the code version for the current pipeline
   usePyPITest: true
-  pipVersionfairlearn:
+  pipVersionfairlearn: Something
   prerequisiteJob:
 
 jobs:

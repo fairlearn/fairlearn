@@ -142,7 +142,7 @@ stages:
       gitUrl: https://github.com/fairlearn/fairlearn.git
       gitCheckoutTarget: $(Build.SourceVersion)
       usePyPITest: true
-      pipVersionfairlearn: $[ dependencies.FetchTestPyPIVersion.outputs['SetVariableTask.PyPITestVersion'] ]
+      pipVersionfairlearn: "$[ dependencies.FetchTestPyPIVersion.outputs['SetVariableTask.PyPITestVersion'] ]"
       prerequisiteJob: FetchTestPyPIVersion
 
 
