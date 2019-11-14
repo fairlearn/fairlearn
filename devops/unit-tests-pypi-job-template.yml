@@ -48,3 +48,15 @@ jobs:
 
   - script: pip install --index-url $(pypiUrl) fairlearn==${{parameters.pipVersionfairlearn}}
     displayName: "Install fairlearn version ${{parameters.pipVersionfairlearn}} from $(pypiUrl)"
+
+    # DO NOT CHECK IN FOLLOWING LINE WITHOUT FIXING TEST PATH
+  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) git=${{gitcheckoutTarget}} test=${{parameters.usePyPITest}} pipVersion=${{parameters.pipVersionfairlearn}}"
+    displayName: 'Run tests'
+    workingDirectory: $(ClonedRepoDir)
+
+  
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    inputs:
+      searchFolder: $(ClonedRepoDir)
+    condition: succeededOrFailed()
