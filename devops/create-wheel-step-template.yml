@@ -29,9 +29,9 @@ steps:
 - task: PublishPipelineArtifact@1
   inputs:
     path: $(System.DefaultWorkingDirectory)/dist
-    artifact: {{parameters.packageArtifactName}}
+    artifact: "{{parameters.packageArtifactName}}"
 
 - task: PublishPipelineArtifact@1
   inputs:
     path: $(System.DefaultWorkingDirectory)/{{parameters.versionFilename}}
-    artifact: {{parameters.versionArtifactName}}
+    artifact: "{{parameters.versionArtifactName}}"
