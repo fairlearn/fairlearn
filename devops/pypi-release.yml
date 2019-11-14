@@ -8,8 +8,7 @@ pr: none # Not for pull requests
 
 
 stages:
-- stage: PreUnit
-  dependsOn: []
+- stage: PreDeploymentValidation
   pool:
     vmImage: $(PoolImage)
     
@@ -20,12 +19,6 @@ stages:
       vmImage: 'ubuntu-16.04' # Will want to add other platforms and pyVersions back in eventually
       pyVersions: [3.6] 
 
-- stage: PreNotebooks
-  dependsOn: []
-  pool:
-    vmImage: $(PoolImage)
-
-  jobs:
   - template: notebook-job-template.yml
     parameters:
       name: LinuxNotebooks
@@ -36,8 +29,7 @@ stages:
 
 - stage: CreateTestPyPIPackage
   dependsOn:
-  - PreUnit
-  - PreNotebooks
+  - PreDeploymentValidation
 
   jobs:
   - job: Create_PyPI_Test_Package
@@ -104,10 +96,9 @@ stages:
 
 # =================================================================================================================
 
-- stage: ValidateTestPyPIPackageUnit
+- stage: TestDeploymentValidation
   dependsOn: DeployToPyPITest
   
-
   jobs:
   - job: "Validate_Test_Package_Unit"
     pool:
@@ -158,11 +149,7 @@ stages:
       inputs:
         searchFolder: $(Agent.TempDirectory)/
       condition: succeededOrFailed()
-      
-- stage: ValidateTestPyPIPackateNotebooks
-  dependsOn: DeployToPyPITest
 
-  jobs:
   - job: "Validate_Test_Package_Notebooks"
     pool:
       vmImage: $(PoolImage)
@@ -173,15 +160,13 @@ stages:
       inputs:
         versionSpec: $(poolPythonVersion)
         addToPath: true
-    
-    - script: 
 
 # =================================================================================================================
 
 - stage: CreatePyPIPackage
   dependsOn:
-  - ValidateTestPyPIPackageUnit
-  - ValidateTestPyPIPackateNotebooks
+  - TestDeploymentValidation
+  
   jobs:
   - job: Create_PyPI_Package
     pool:
