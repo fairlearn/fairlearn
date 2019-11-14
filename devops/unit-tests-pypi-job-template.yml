@@ -31,5 +31,5 @@ jobs:
     displayName: "Clone from git and checkout $(gitCheckoutTarget)"
     inputs:
       filePath: scripts/prepare-git-pypi-test.ps1
-      arguments: "-gitUrl ${parameters.gitUrl}-baseDir $(Agent.TempDirectory) -targetVariable ClonedRepoDir -gitCheckout ${parameters.gitCheckoutTarget"
+      arguments: "-gitUrl ${{parameters.gitUrl}} -baseDir $(Agent.TempDirectory) -targetVariable ClonedRepoDir -gitCheckout ${{parameters.gitCheckoutTarget}}"
       pwsh: true
