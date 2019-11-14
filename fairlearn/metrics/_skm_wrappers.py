@@ -149,7 +149,7 @@ def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
     """
 
     def internal_rmse_wrapper(y_true, y_pred, sample_weight=None):
-        return math.sqrt(skm.mean_squared_error(y_true, y_pred,
+        return sqrt(skm.mean_squared_error(y_true, y_pred,
                          multioutput=multioutput,
                          sample_weight=sample_weight))
 

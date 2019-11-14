@@ -176,8 +176,8 @@ def test_group_zero_one_loss_unnormalized():
 
     assert result.overall == expected_overall
 
-
 # =============================================================================================
+
 
 def test_group_mean_squared_error_multioutput_single_ndarray():
     y_t = np.random.rand(len(groups), 2)
@@ -189,6 +189,7 @@ def test_group_mean_squared_error_multioutput_single_ndarray():
     assert np.array_equal(result.overall, expected_overall)
 
 # =============================================================================================
+
 
 def test_group_r2_score_multioutput():
     y_t = np.random.rand(len(groups), 2)
@@ -204,6 +205,7 @@ def test_group_r2_score_multioutput():
         assert np.array_equal(result.by_group[target_group], expected)
 
 # =============================================================================================
+
 
 def test_group_mean_squared_error_multioutput_list_ndarray():
     y_t = [np.random.rand(2) for x in groups]
