@@ -19,11 +19,7 @@ stages:
       vmImage: 'ubuntu-16.04' # Will want to add other platforms and pyVersions back in eventually
       pyVersions: [3.6] 
 
-  - template: notebook-job-template.yml
-    parameters:
-      name: LinuxNotebooks
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.6] # Will want to add other versions etc. back in eventually
+  # Remove notebooks in the interests of speed
 
   - template: unit-tests-pypi-job-template.yml
     parameters:
