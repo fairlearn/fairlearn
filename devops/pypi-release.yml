@@ -115,25 +115,6 @@ stages:
     pool:
       vmImage: $(PoolImage)
 
-    steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python $(poolPythonVersion)'
-      inputs:
-        versionSpec: $(poolPythonVersion)
-        addToPath: true
-
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        artifactName: TestVersionFile
-
-    - task: PowerShell@2
-      name: SetVariableTask
-      displayName: 'Fetch PyPI-Test version from artifact'
-      inputs:
-        filePath: scripts/set-variable-from-file.ps1
-        arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName test-version.txt -targetVariable PyPITestVersion"
-        pwsh: true
-
   - template: unit-tests-pypi-job-template.yml
     parameters:
       name: Linux
@@ -142,8 +123,8 @@ stages:
       gitUrl: https://github.com/fairlearn/fairlearn.git
       gitCheckoutTarget: $(Build.SourceVersion)
       usePyPITest: true
-      pipVersionfairlearn: "$[ dependencies.FetchTestPyPIVersion.outputs['SetVariableTask.PyPITestVersion'] ]"
-      prerequisiteJob: FetchTestPyPIVersion
+      versionFileArtifact: TestVersionFile
+      versionFileName: test-version.txt
 
 
   - job: "Validate_Test_Package_Notebooks"

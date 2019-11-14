@@ -8,6 +8,8 @@ parameters:
   usePyPITest: true
   pipVersionfairlearn:
   prerequisiteJob:
+  versionFileArtifact:
+  versionFileName:
 
 jobs:
 - job: ${{ parameters.name }}
@@ -20,6 +22,7 @@ jobs:
       pypiUrl: https://test.pypi.org/simple/
     ${{ if eq(parameters.usePyPITest, 'false') }}:
       pypiUrl: https://pypi.org/simple/
+    fairlearnVersionForpip: ${{parameters.pipVersionfairlearn}}
         
 
   strategy:
@@ -30,6 +33,13 @@ jobs:
           PyVer: ${{ pyVer }}
 
   steps:
+  - ${{ if eq(parameters.pipVersionfairlearn, '') }}:
+    - template: fetch-version-from-artifacts-steps-template.yml
+      parameters:
+        artifactName: ${{parameters.versionFileArtifact}}
+        artifactFile: ${{parameters.versionFileName}}
+        targetVariable: fairlearnVersionForpip
+
   - task: UsePythonVersion@0
     displayName: 'Use Python $(PyVer)'
     inputs:
@@ -48,11 +58,11 @@ jobs:
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
     workingDirectory: $(ClonedRepoDir)
 
-  - script: pip install --index-url $(pypiUrl) fairlearn==${{parameters.pipVersionfairlearn}}
-    displayName: "Install fairlearn version ${{parameters.pipVersionfairlearn}} from $(pypiUrl)"
+  - script: pip install --index-url $(pypiUrl) fairlearn==$(fairlearnVersionForpip)
+    displayName: "Install fairlearn version $(fairlearnVersionForpip) from $(pypiUrl)"
 
     # DO NOT CHECK IN FOLLOWING LINE WITHOUT FIXING TEST PATH
-  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) git=${{parameters.gitcheckoutTarget}} test=${{parameters.usePyPITest}} pipVersion=${{parameters.pipVersionfairlearn}}"
+  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) git=${{parameters.gitcheckoutTarget}} test=${{parameters.usePyPITest}} pipVersion=$(fairlearnVersionForpip)"
     displayName: 'Run tests'
     workingDirectory: $(ClonedRepoDir)
 

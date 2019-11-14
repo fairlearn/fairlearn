@@ -1,0 +1,17 @@
+parameters:
+  artifactName: ''
+  artifactFile: ''
+  targetVariable: ''
+
+
+steps:
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifactName: ${{parameters.artifactName}}
+
+- task: PowerShell@2
+  displayName: 'Fetch Artifact and set pipeline variable from file contents'
+  inputs:
+    filePath: scripts/set-variable-from-file.ps1
+    arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName ${{parameters.artifactFile}} -targetVariable ${{parameters.targetVariable}}"
+    pwsh: true
