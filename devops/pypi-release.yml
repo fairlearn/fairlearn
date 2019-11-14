@@ -28,7 +28,7 @@ stages:
   - template: unit-tests-pypi-job-template.yml
     parameters:
       name: ForTestOnly
-      vmImage: 'ubunti-16.04'
+      vmImage: 'ubuntu-16.04'
       pyVersions: [3.6]
 
 
