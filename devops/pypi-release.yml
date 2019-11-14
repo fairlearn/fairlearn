@@ -124,7 +124,7 @@ stages:
       inputs:
         artifactName: TestVersionFile
 
-    - script: ls -R $(Pipeline.Workspace)
+    - script: ls $(Pipeline.Workspace)
       displayName: "List files"
       workingDirectory: $(Pipeline.Workspace)
 
@@ -133,7 +133,7 @@ stages:
       displayName: 'Fetch PyPI-Test version from artifact'
       inputs:
         filePath: scripts/set-variable-from-file.ps1
-        arguments: "-baseDir . -subDir . -fileName test-version.txt -targetVariable PyPITestVersion"
+        arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName test-version.txt -targetVariable PyPITestVersion"
         pwsh: true
 
     - script: cp -r $(Build.Repository.LocalPath)/test/ $(Agent.TempDirectory)/
