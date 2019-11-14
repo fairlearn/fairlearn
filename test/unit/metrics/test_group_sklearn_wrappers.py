@@ -179,7 +179,7 @@ def test_group_zero_one_loss_unnormalized():
 
 # =============================================================================================
 
-def test_group_mean_squared_error_multioutput():
+def test_group_mean_squared_error_multioutput_single_ndarray():
     y_t = np.random.rand(len(groups), 2)
     y_p = np.random.rand(len(groups), 2)
     result = metrics.group_mean_squared_error(y_t, y_p, groups, multioutput='raw_values')
@@ -198,3 +198,28 @@ def test_group_r2_score_multioutput():
     expected_overall = skm.r2_score(y_t, y_p, multioutput='raw_values')
 
     assert np.array_equal(result.overall, expected_overall)
+    for target_group in np.unique(groups):
+        mask = np.asarray(groups) == target_group
+        expected = skm.mean_squared_error(y_t[mask], y_p[mask], multioutput='raw_values')
+        assert np.array_equal(result.by_group[target_group], expected)
+
+# =============================================================================================
+
+def test_group_mean_squared_error_multioutput_list_ndarray():
+    y_t = [np.random.rand(2) for x in groups]
+    y_p = [np.random.rand(2) for x in groups]
+    result = metrics.group_mean_squared_error(y_t, y_p, groups, multioutput='raw_values')
+
+    expected_overall = skm.mean_squared_error(y_t, y_p, multioutput='raw_values')
+
+    assert np.array_equal(result.overall, expected_overall)
+
+    for target_group in np.unique(groups):
+        y_true = []
+        y_pred = []
+        for i in range(len(groups)):
+            if groups[i] == target_group:
+                y_true.append(y_t[i])
+                y_pred.append(y_p[i])
+        expected = skm.mean_squared_error(y_true, y_pred, multioutput='raw_values')
+        assert np.array_equal(result.by_group[target_group], expected)

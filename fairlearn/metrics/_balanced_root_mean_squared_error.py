@@ -5,6 +5,8 @@ import math
 import numpy as np
 import sklearn.metrics as skm
 
+from ._input_manipulations import _convert_to_ndarray_and_squeeze
+
 _Y_TRUE_NOT_0_1 = "Only 0 and 1 are allowed in y_true and both must be present"
 
 
@@ -20,11 +22,11 @@ def balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
     :any:`sklearn.metrics.mean_squared_error` routine.
     """
 
-    y_ta = np.squeeze(np.asarray(y_true))
-    y_pa = np.squeeze(np.asarray(y_pred))
+    y_ta = _convert_to_ndarray_and_squeeze(y_true)
+    y_pa = _convert_to_ndarray_and_squeeze(y_pred)
     s_w = np.ones(len(y_ta))
     if sample_weight is not None:
-        s_w = np.squeeze(np.asarray(sample_weight))
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight)
 
     y_ta_values = np.unique(y_ta)
     if not np.array_equal(y_ta_values, [0, 1]):
