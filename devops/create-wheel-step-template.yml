@@ -1,6 +1,6 @@
 parameters:
   pyVer: 3.6
-  isTest: 'True'
+  isTest: Unspecified
   versionFilename: ''
   packageArtifactName: ''
   versionArtifactName: ''

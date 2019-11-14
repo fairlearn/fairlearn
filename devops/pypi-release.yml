@@ -52,7 +52,7 @@ stages:
     steps:
     - template: create-wheel-step-template.yml
       parameters:
-        isTest: 'True'
+        isTest: 1
         packageArtifactName: $(testPackageArtifact)
         versionArtifactName: $(testVersionArtifact)
         versionFilename: $(testVersionFilename)
@@ -117,7 +117,7 @@ stages:
     steps:
     - template: create-wheel-step-template.yml
       parameters:
-        isTest: 'True'
+        isTest: 0
         packageArtifactName: $(prodPackageArtifact)
         versionArtifactName: $(prodVersionArtifact)
         versionFilename: $(prodVersionFilename)
