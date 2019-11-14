@@ -31,7 +31,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6]
       gitUrl: https://github.com/fairlearn/fairlearn.git
-      gitCheckoutTarget: $(Build.SourceBranchName)
+      gitCheckoutTarget: $(Build.SourceVersion)
       usePyPITest: true
       pipVersionfairlearn: 0.3.1
 
@@ -111,11 +111,13 @@ stages:
   dependsOn: DeployToPyPITest
   
   jobs:
-  - job: "Validate_Test_Package_Unit"
+  - job: "FetchTestPyPIVersion"
     pool:
       vmImage: $(PoolImage)
 
     steps:
+    -checkout: none
+
     - task: UsePythonVersion@0
       displayName: 'Use Python $(poolPythonVersion)'
       inputs:
@@ -126,10 +128,6 @@ stages:
       inputs:
         artifactName: TestVersionFile
 
-    - script: ls $(Pipeline.Workspace)
-      displayName: "List files"
-      workingDirectory: $(Pipeline.Workspace)
-
     - task: PowerShell@2
       name: SetVariableTask
       displayName: 'Fetch PyPI-Test version from artifact'
@@ -138,32 +136,24 @@ stages:
         arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName test-version.txt -targetVariable PyPITestVersion"
         pwsh: true
 
-    - script: cp -r $(Build.Repository.LocalPath)/test/ $(Agent.TempDirectory)/
-      displayName: "Copy Tests to temp directory"
+  - template: unit-tests-pypi-job-template.yml
+    dependsOn: FetchTestPyPIVersion
+    variables:
+      desiredPyPITestVersion: $[ dependencies.FetchTestPyPIVersion.outputs['SetVariableTask.PyPITestVersion'] ]
+    parameters:
+      name: Linux
+      vmImage: 'ubuntu-16.04'
+      pyVersions: [3.6]
+      gitUrl: https://github.com/fairlearn/fairlearn.git
+      gitCheckoutTarget: $(Build.SourceVersion)
+      usePyPITest: true
+      pipVersionfairlearn: $(desiredPyPITestVersion)
 
-    - script: pip install -r requirements.txt
-      displayName: "Install fairlearn requirements from regular PyPI"
-
-    - script: echo $(PyPITestVersion)
-      displayName: "Show PyPITestVersion"
-
-    - script: pip install --index-url https://test.pypi.org/simple/ --no-deps fairlearn
-      displayName: "Install fairlearn from PyPI-Test"
-
-      # Will want to adjust the set of tests run...
-    - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="PyPI-Test-Validation"
-      displayName: "Run Unit Tests"
-      workingDirectory: $(Agent.TempDirectory)/
-
-    - task: PublishTestResults@2
-      displayName: 'Publish Test Results **/TEST-*.xml'
-      inputs:
-        searchFolder: $(Agent.TempDirectory)/
-      condition: succeededOrFailed()
 
   - job: "Validate_Test_Package_Notebooks"
     pool:
       vmImage: $(PoolImage)
+    dependsOn: FetchTestPyPIVersion
 
     steps:
     - task: UsePythonVersion@0

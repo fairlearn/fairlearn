@@ -4,7 +4,7 @@ parameters:
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
   gitUrl: https://github.com/fairlearn/fairlearn.git
-  gitCheckoutTarget: master
+  gitCheckoutTarget: $(Build.SourceVersion) # This is the safe default, which should select the code version for the current pipeline
   usePyPITest: true
   pipVersionfairlearn:
 
