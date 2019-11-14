@@ -1,0 +1,37 @@
+parameters:
+  pyVer: 3.6
+  isTest: 'True'
+  versionFilename: ''
+  packageArtifactName: ''
+  versionArtifactName: ''
+
+
+steps:
+- task: UsePythonVersion@0
+  displayName: 'Use Python ${{parameters.pyVer}}'
+  inputs:
+    versionSpec: ${{parameters.pyVer}}
+    addToPath: true
+
+- script: pip install setuptools wheel 
+  displayName: 'Install setuptools'
+
+- script: pip install -r requirements.txt
+  displayName: "Install fairlearn requirements"
+
+- task: PowerShell@2
+  displayName: 'Build wheels for test'
+  inputs:
+    filePath: scripts/build-wheels.ps1
+    arguments: "-isTest ${{parameters.isTest}} -versionFilename {{parameters.versionFilename}}"
+    pwsh: true
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    path: $(System.DefaultWorkingDirectory)/dist
+    artifact: {{parameters.packageArtifactName}}
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    path: $(System.DefaultWorkingDirectory)/{{parameters.versionFilename}}
+    artifact: {{parameters.versionArtifactName}}

@@ -1,6 +1,12 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
+  testPackageArtifact: TestPackages
+  testVersionArtifact: TestVersion
+  testVersionFilename: 'version-test.txt'
+  prodPackageArtifact: ProdPackages
+  prodVersionArtifact: ProdVersion
+  prodVersionFilename: 'version.txt'
 
 trigger: none # No CI build
 
@@ -44,34 +50,12 @@ stages:
       vmImage: $(PoolImage)
 
     steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python $(poolPythonVersion)'
-      inputs:
-        versionSpec: $(poolPythonVersion)
-        addToPath: true
-    
-    - script: pip install setuptools wheel 
-      displayName: 'Install setuptools'
-
-    - script: pip install -r requirements.txt
-      displayName: "Install fairlearn requirements"
-
-    - task: PowerShell@2
-      name: BuildTestWheelsTask
-      displayName: 'Build wheels for test'
-      inputs:
-        filePath: scripts/build-test-wheels.ps1
-        pwsh: true
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        path: $(System.DefaultWorkingDirectory)/dist
-        artifact: TestPackages
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        path: $(System.DefaultWorkingDirectory)/test-version.txt
-        artifact: TestVersionFile
+    - template: create-wheel-step-template.yml
+      parameters:
+        isTest: 'True'
+        packageArtifactName: $(testPackageArtifact)
+        versionArtifactName: $(testVersionArtifact)
+        versionFilename: $(testVersionFilename)
       
 - stage: DeployToPyPITest
   dependsOn: CreateTestPyPIPackage
@@ -97,7 +81,7 @@ stages:
           - script: ls -R $(Pipeline.Workspace)
             displayName: "List files in Pipeline.Workspace"
 
-          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/TestPackages/*"
+          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/$(testPackageArtifact)/*"
             displayName: "Upload to PyPI-Test"
 
 
@@ -115,8 +99,8 @@ stages:
       gitUrl: https://github.com/fairlearn/fairlearn.git
       gitCheckoutTarget: $(Build.SourceVersion)
       usePyPITest: true
-      versionFileArtifact: TestVersionFile
-      versionFileName: test-version.txt
+      versionFileArtifact: $(testVersionArtifact)
+      versionFileName: $(testVersionFilename)
 
 
 # =================================================================================================================
@@ -126,30 +110,12 @@ stages:
   - TestDeploymentValidation
 
   jobs:
-  - job: Create_PyPI_Package
-    pool:
-      vmImage: $(PoolImage)
-
-    steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python $(poolPythonVersion)'
-      inputs:
-        versionSpec: $(poolPythonVersion)
-        addToPath: true
-    
-    - script: pip install setuptools wheel 
-      displayName: 'Install setuptools'
-
-    - script: pip install -r requirements.txt
-      displayName: "Install fairlearn requirements"
-
-    - script: python setup.py sdist bdist_wheel
-      displayName: "Create wheels"
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        path: $(System.DefaultWorkingDirectory)/dist
-        artifact: Packages
+    - template: create-wheel-step-template.yml
+      parameters:
+        isTest: 'True'
+        packageArtifactName: $(prodPackageArtifact)
+        versionArtifactName: $(prodVersionArtifact)
+        versionFilename: $(prodVersionFilename)
 
               
 - stage: DeployToPyPI
