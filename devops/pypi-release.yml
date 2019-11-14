@@ -110,6 +110,11 @@ stages:
   - TestDeploymentValidation
 
   jobs:
+  - job: Create_PyPI_Test_Package
+    pool:
+      vmImage: $(PoolImage)
+
+    steps:
     - template: create-wheel-step-template.yml
       parameters:
         isTest: 'True'
