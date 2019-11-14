@@ -110,7 +110,7 @@ stages:
   - TestDeploymentValidation
 
   jobs:
-  - job: Create_PyPI_Test_Package
+  - job: Create_PyPI_Package
     pool:
       vmImage: $(PoolImage)
 
