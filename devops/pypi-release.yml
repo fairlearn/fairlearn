@@ -107,10 +107,6 @@ stages:
   dependsOn: DeployToPyPITest
   
   jobs:
-  - job: "FetchTestPyPIVersion"
-    pool:
-      vmImage: $(PoolImage)
-
   - template: unit-tests-pypi-job-template.yml
     parameters:
       name: Linux
