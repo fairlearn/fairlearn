@@ -109,7 +109,7 @@
         "underprediction": "Underprediction",
         "r2_score": "R-squared score",
         "rms_error": "Root mean squared error",
-        "auc": "AUC",
+        "auc": "Area under ROC curve",
         "balancedRootMeanSquaredError": "Balanced root mean squared error",
         "accuracyDescription": "The fraction of data points classified correctly.",
         "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
