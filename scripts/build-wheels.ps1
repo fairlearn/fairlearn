@@ -28,7 +28,7 @@ else
 {
     # Not running for test; make sure that the FAIRLEARN_RC
     # variable is not set
-    Remove-Variable $Env:FAIRLEARN_RC
+    Remove-Variable env:FAIRLEARN_RC
 }
 
 
