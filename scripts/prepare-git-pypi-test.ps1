@@ -13,7 +13,11 @@ param(
 
 Set-Location $baseDir
 
-git checkout $gitURL
+git clone $gitURL
+if($LASTEXITCODE -ne 0)
+{
+    throw "Error from git clone. Aborting"
+}
 
 $repoRoot = Join-Path -Resolve $baseDir fairlearn
 
@@ -23,7 +27,7 @@ Write-Host "##vso[task.setvariable variable=$targetVariable]$repoRoot"
 
 Set-Location $repoRoot
 
-WriteHost "Attempting checkout of $gitCheckout"
+Write-Host "Attempting checkout of $gitCheckout"
 
 git checkout $gitCheckout
 if($LASTEXITCODE -ne 0)
