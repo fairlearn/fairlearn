@@ -136,9 +136,10 @@ def group_mean_squared_error(y_true, y_pred, group_membership, *,
     return metric_by_group(internal_mse_wrapper,
                            y_true, y_pred, group_membership, sample_weight=sample_weight)
 
+
 def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
-                             multioutput='uniform_average',
-                             sample_weight=None):
+                                  multioutput='uniform_average',
+                                  sample_weight=None):
     """A wrapper around the :any:`sklearn.metrics.mean_squared_error` routine.
     The arguments remain the same, with `group_membership` added.
     The result is then square rooted.
@@ -149,15 +150,16 @@ def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
 
     def internal_rmse_wrapper(y_true, y_pred, sample_weight=None):
         return math.sqrt(skm.mean_squared_error(y_true, y_pred,
-                                      multioutput=multioutput,
-                                      sample_weight=sample_weight))
+                         multioutput=multioutput,
+                         sample_weight=sample_weight))
 
     return metric_by_group(internal_rmse_wrapper,
                            y_true, y_pred, group_membership, sample_weight=sample_weight)
 
+
 def group_r2_score(y_true, y_pred, group_membership, *,
-                             multioutput='uniform_average',
-                             sample_weight=None):
+                   multioutput='uniform_average',
+                   sample_weight=None):
     """A wrapper around the :any:`sklearn.metrics.r2_score` routine.
     The arguments remain the same, with `group_membership` added.
     However, the only positional arguments supported are `y_true`,
@@ -167,8 +169,8 @@ def group_r2_score(y_true, y_pred, group_membership, *,
 
     def internal_r2_wrapper(y_true, y_pred, sample_weight=None):
         return skm.r2_score(y_true, y_pred,
-                                      multioutput=multioutput,
-                                      sample_weight=sample_weight)
+                            multioutput=multioutput,
+                            sample_weight=sample_weight)
 
     return metric_by_group(internal_r2_wrapper,
                            y_true, y_pred, group_membership, sample_weight=sample_weight)
