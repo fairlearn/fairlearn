@@ -24,6 +24,12 @@ if( $isTest )
     }
     Write-Host "FAIRLEARN_RC = $Env:FAIRLEARN_RC"
 }
+else
+{
+    # Not running in test; make sure that the FAIRLEARN_RC
+    # variable is not set
+    Remove-Variable $Env:FAIRLEARN_RC
+}
 
 
 # Set environment variable
