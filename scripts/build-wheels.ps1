@@ -26,7 +26,7 @@ if( $isTest )
 }
 else
 {
-    # Not running in test; make sure that the FAIRLEARN_RC
+    # Not running for test; make sure that the FAIRLEARN_RC
     # variable is not set
     Remove-Variable $Env:FAIRLEARN_RC
 }
