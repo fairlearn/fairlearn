@@ -36,7 +36,7 @@ if($LASTEXITCODE -ne 0)
 }
 
 Write-Host "Removing fairlearn subdirectory from repoRoot"
-Remove-Item -Recurse fairlearn
+Remove-Item -Recurse -Force fairlearn
 
 Write-Host
 Get-ChildItem
