@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import sklearn.metrics as skm
-import math
+from math import sqrt
 from ._metrics_engine import metric_by_group
 
 

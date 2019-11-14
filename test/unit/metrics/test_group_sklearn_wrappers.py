@@ -36,7 +36,8 @@ supported_metrics_weighted = [(skm.accuracy_score, metrics.group_accuracy_score)
 supported_metrics_weighted_binary = [(skm.precision_score, metrics.group_precision_score),
                                      (skm.recall_score, metrics.group_recall_score),
                                      (skm.roc_auc_score, metrics.group_roc_auc_score),
-                                     (skm.mean_squared_error, metrics.group_mean_squared_error)]
+                                     (skm.mean_squared_error, metrics.group_mean_squared_error),
+                                     (skm.r2_score, metrics.group_r2_score)]
 supported_metrics_weighted_binary = supported_metrics_weighted_binary + supported_metrics_weighted
 
 
@@ -184,5 +185,16 @@ def test_group_mean_squared_error_multioutput():
     result = metrics.group_mean_squared_error(y_t, y_p, groups, multioutput='raw_values')
 
     expected_overall = skm.mean_squared_error(y_t, y_p, multioutput='raw_values')
+
+    assert np.array_equal(result.overall, expected_overall)
+
+# =============================================================================================
+
+def test_group_r2_score_multioutput():
+    y_t = np.random.rand(len(groups), 2)
+    y_p = np.random.rand(len(groups), 2)
+    result = metrics.group_r2_score(y_t, y_p, groups, multioutput='raw_values')
+
+    expected_overall = skm.r2_score(y_t, y_p, multioutput='raw_values')
 
     assert np.array_equal(result.overall, expected_overall)

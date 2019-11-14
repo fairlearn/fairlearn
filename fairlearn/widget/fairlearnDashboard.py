@@ -92,10 +92,6 @@ class FairlearnDashboard(object):
                 "model_type": ["probability"],
                 "function": group_roc_auc_score
             },
-            "mean_squared_error": {
-                "model_type": ["regression", "probability"],
-                "function": group_mean_squared_error
-            },
             "root_mean_squared_error": {
                 "model_type": ["regression", "probability"],
                 "function": group_root_mean_squared_error
@@ -104,17 +100,21 @@ class FairlearnDashboard(object):
                 "model_type": ["probability"],
                 "function": group_balanced_root_mean_squared_error
             },
-            "r2_score": {
+            "mean_squared_error": {
                 "model_type": ["regression", "probability"],
+                "function": group_mean_squared_error
+            },
+            "mean_absolute_error": {
+                "model_type": ["regression", "probability"],
+                "function": group_mean_absolute_error
+            },
+            "r2_score": {
+                "model_type": ["regression"],
                 "function": group_r2_score
             },
             "max_error": {
                 "model_type": [],
                 "function": group_max_error
-            },
-            "mean_absolute_error": {
-                "model_type": ["regression", "probability"],
-                "function": group_mean_absolute_error
             },
             "median_absolute_error": {
                 "model_type": [],
