@@ -19,18 +19,20 @@ steps:
   displayName: "Install fairlearn requirements"
 
 - task: PowerShell@2
-  displayName: 'Build wheels for test'
+  displayName: 'Build wheels'
   inputs:
     filePath: scripts/build-wheels.ps1
     arguments: '-isTest ${{parameters.isTest}} -versionFilename ${{parameters.versionFilename}}'
     pwsh: true
 
 - task: PublishPipelineArtifact@1
+  displayName: "Publish wheels"
   inputs:
     path: $(System.DefaultWorkingDirectory)/dist
     artifact: '${{parameters.packageArtifactName}}'
 
 - task: PublishPipelineArtifact@1
+  displayName: "Publish version information file"
   inputs:
     path: '$(System.DefaultWorkingDirectory)/${{parameters.versionFilename}}'
     artifact: '${{parameters.versionArtifactName}}'
