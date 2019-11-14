@@ -34,3 +34,9 @@ if($LASTEXITCODE -ne 0)
 {
     throw "Error from git checkout. Aborting"
 }
+
+Write-Host "Removing fairlearn subdirectory from repoRoot"
+Remove-Item -Recurse fairlearn
+
+Write-Host
+Get-ChildItem

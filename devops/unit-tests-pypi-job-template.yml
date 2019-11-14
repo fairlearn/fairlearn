@@ -4,7 +4,7 @@ parameters:
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
   gitUrl: https://github.com/fairlearn/fairlearn.git
-  gitCheckoutTarget: masterful
+  gitCheckoutTarget: master
   pipUrl: https://test.pypi.org/simple/
   pipVersionArtifact:
 
@@ -28,8 +28,12 @@ jobs:
 
   - task: PowerShell@2
     name: PrepareGit
-    displayName: "Clone from git and checkout $(gitCheckoutTarget)"
+    displayName: "Clone from GitHub and checkout $(gitCheckoutTarget)"
     inputs:
       filePath: scripts/prepare-git-pypi-test.ps1
       arguments: "-gitUrl ${{parameters.gitUrl}} -baseDir $(Agent.TempDirectory) -targetVariable ClonedRepoDir -gitCheckout ${{parameters.gitCheckoutTarget}}"
       pwsh: true
+
+  - script: pip install -r ${{ parameters.requirementsFile }}
+    displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+    workingDirectory: $(ClonedRepoDir)
