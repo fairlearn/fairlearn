@@ -5,13 +5,21 @@ parameters:
   requirementsFile: 'requirements.txt'
   gitUrl: https://github.com/fairlearn/fairlearn.git
   gitCheckoutTarget: master
-  pipUrl: https://test.pypi.org/simple/
-  pipVersionArtifact:
+  usePyPITest: true
+  pipVersionfairlearn:
 
 jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+
+  variables:
+    ${{ if eq(parameters.usePyPITest, 'true') }}:
+      pypiUrl: https://test.pypi.org/simple/
+    ${{ if eq(parameters.usePyPITest, 'false') }}:
+      pypiUrl: https://pypi.org/simple/
+        
+
   strategy:
     maxParallel: 2
     matrix:
@@ -28,7 +36,7 @@ jobs:
 
   - task: PowerShell@2
     name: PrepareGit
-    displayName: "Clone from GitHub and checkout $(gitCheckoutTarget)"
+    displayName: "Clone from GitHub and checkout ${{parameters.gitCheckoutTarget}}"
     inputs:
       filePath: scripts/prepare-git-pypi-test.ps1
       arguments: "-gitUrl ${{parameters.gitUrl}} -baseDir $(Agent.TempDirectory) -targetVariable ClonedRepoDir -gitCheckout ${{parameters.gitCheckoutTarget}}"
@@ -37,3 +45,6 @@ jobs:
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
     workingDirectory: $(ClonedRepoDir)
+
+  - script: pip install --index-url $(pypiUrl) fairlearn==${{parameters.pipVersionfairlearn}}
+    displayName: "Install fairlearn version ${{parameters.pipVersionfairlearn}} from $(pypiUrl)"

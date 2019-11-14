@@ -11,6 +11,7 @@ param(
     [string]$gitCheckout = "master"
 )
 
+Write-Host "Changing directory to $baseDir"
 Set-Location $baseDir
 
 git clone $gitURL
@@ -18,6 +19,7 @@ if($LASTEXITCODE -ne 0)
 {
     throw "Error from git clone. Aborting"
 }
+Write-Host
 
 $repoRoot = Join-Path -Resolve $baseDir fairlearn
 
@@ -25,6 +27,7 @@ Write-Host "repoRoot: $repoRoot"
 Write-Host "Setting $targetVariable to repoRoot"
 Write-Host "##vso[task.setvariable variable=$targetVariable]$repoRoot"
 
+Write-Host "Changing directory to $repoRoot"
 Set-Location $repoRoot
 
 Write-Host "Attempting checkout of $gitCheckout"
@@ -34,6 +37,7 @@ if($LASTEXITCODE -ne 0)
 {
     throw "Error from git checkout. Aborting"
 }
+Write-Host
 
 Write-Host "Removing fairlearn subdirectory from repoRoot"
 Remove-Item -Recurse -Force fairlearn
