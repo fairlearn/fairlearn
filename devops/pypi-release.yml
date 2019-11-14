@@ -119,18 +119,6 @@ stages:
       versionFileName: test-version.txt
 
 
-  - job: "Validate_Test_Package_Notebooks"
-    pool:
-      vmImage: $(PoolImage)
-    dependsOn: FetchTestPyPIVersion
-
-    steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python $(poolPythonVersion)'
-      inputs:
-        versionSpec: $(poolPythonVersion)
-        addToPath: true
-
 # =================================================================================================================
 
 - stage: CreatePyPIPackage
