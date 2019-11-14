@@ -113,6 +113,12 @@
         "balancedRootMeanSquaredError": "Balanced root mean squared error",
         "accuracyDescription": "The fraction of data points classified correctly.",
         "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
-        "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity."
+        "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity.",
+        "rmseDescription": "Square root of the average of squared errors.",
+        "mseDescription": "The average of squared errors.",
+        "meanAbsoluteErrorDescription": "The average of absolute values of errors. More robust to outliers than MSE.",
+        "r2Description": "The fraction of variance in the labels explained by the model.",
+        "aucDescription": "The quality of the predictions, viewed as scores, in separating positive examples from negative examples.",
+        "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying is highly imbalanced."
     }
 }
