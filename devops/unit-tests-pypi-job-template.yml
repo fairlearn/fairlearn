@@ -27,12 +27,12 @@ jobs:
       addToPath: true
 
   - task: PowerShell@2
-      name: BuildTestWheelsTask
-      displayName: 'Create directory for run'
-      inputs:
-        targetType: inline
-        script: "
-            Write-Host 'Hello'
-            Write-Host 'Goodbye'
-            "
-        pwsh: true
+    name: BuildTestWheelsTask
+    displayName: 'Create directory for run'
+    inputs:
+      targetType: inline
+      script: "
+          Write-Host 'Hello'
+          Write-Host 'Goodbye'
+          "
+      pwsh: true
