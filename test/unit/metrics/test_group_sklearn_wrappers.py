@@ -201,7 +201,7 @@ def test_group_r2_score_multioutput():
     assert np.array_equal(result.overall, expected_overall)
     for target_group in np.unique(groups):
         mask = np.asarray(groups) == target_group
-        expected = skm.mean_squared_error(y_t[mask], y_p[mask], multioutput='raw_values')
+        expected = skm.r2_score(y_t[mask], y_p[mask], multioutput='raw_values')
         assert np.array_equal(result.by_group[target_group], expected)
 
 # =============================================================================================
