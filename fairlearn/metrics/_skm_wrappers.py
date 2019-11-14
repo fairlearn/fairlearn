@@ -150,8 +150,8 @@ def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
 
     def internal_rmse_wrapper(y_true, y_pred, sample_weight=None):
         return sqrt(skm.mean_squared_error(y_true, y_pred,
-                         multioutput=multioutput,
-                         sample_weight=sample_weight))
+                                           multioutput=multioutput,
+                                           sample_weight=sample_weight))
 
     return metric_by_group(internal_rmse_wrapper,
                            y_true, y_pred, group_membership, sample_weight=sample_weight)
