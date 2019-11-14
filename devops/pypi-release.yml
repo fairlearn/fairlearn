@@ -119,7 +119,11 @@ stages:
       inputs:
         versionSpec: $(poolPythonVersion)
         addToPath: true
-    
+
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifactName: TestVersionFile
+
     - script: ls -R
       displayName: "List files"
       workingDirectory: $(Pipeline.Workspace)/
