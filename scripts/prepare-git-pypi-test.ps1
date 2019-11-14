@@ -26,3 +26,7 @@ Set-Location $repoRoot
 WriteHost "Attempting checkout of $gitCheckout"
 
 git checkout $gitCheckout
+if($LASTEXITCODE -ne 0)
+{
+    throw "Error from git checkout. Aborting"
+}
