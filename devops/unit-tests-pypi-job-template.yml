@@ -1,0 +1,38 @@
+parameters:
+  name: ''
+  vmImage: ''
+  pyVersions: [3.5, 3.6, 3.7]
+  requirementsFile: 'requirements.txt'
+  gitUrl: https://github.com/fairlearn/fairlearn.git
+  gitTag: 
+  pipUrl: https://test.pypi.org/simple/
+  pipVersionArtifact:
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    maxParallel: 2
+    matrix:
+      ${{ each pyVer in parameters.pyVersions }}:
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
+
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(PyVer)'
+    inputs:
+      versionSpec: '$(PyVer)' 
+      addToPath: true
+
+  - task: PowerShell@2
+      name: BuildTestWheelsTask
+      displayName: 'Create directory for run'
+      inputs:
+        targetType: inline
+        script: "
+            Write-Host 'Hello'
+            Write-Host 'Goodbye'
+            "
+        pwsh: true

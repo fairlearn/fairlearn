@@ -25,6 +25,13 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6] # Will want to add other versions etc. back in eventually
 
+  - template: unit-tests-pypi-job-template.yml
+    parameters:
+      name: ForTestOnly
+      vmImage: 'ubunti-16.04'
+      pyVersions: [3.6]
+
+
 # =================================================================================================================
 
 - stage: CreateTestPyPIPackage
@@ -166,7 +173,7 @@ stages:
 - stage: CreatePyPIPackage
   dependsOn:
   - TestDeploymentValidation
-  
+
   jobs:
   - job: Create_PyPI_Package
     pool:
