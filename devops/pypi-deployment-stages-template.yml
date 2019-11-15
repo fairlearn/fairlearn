@@ -1,3 +1,11 @@
+# This template contains the core steps for deploying to PyPI:
+# 1. Create the package
+# 2. Upload the package to PyPI
+# 3. Validate the package by installing from PyPI and running the tests
+
+# In order to share the version between the stages, an Artifact is created
+# which contains a single file, the contents of which are the version
+
 parameters:
   poolImage: ''
   poolPythonVersion: 3.6
@@ -8,6 +16,8 @@ parameters:
   versionFileStem: 'versionInfo'
 
 stages:
+# Create the PyPI package and save as a artifact
+# Also save the 'version file' artifact
 - stage: 'Create_PyPI_Package_${{parameters.targetType}}'
 
   jobs:
@@ -24,6 +34,7 @@ stages:
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
 
+# Upload the package to the appropriate PyPI index
 - stage: 'Upload_Package_To_PyPI_${{parameters.targetType}}'
 
   jobs:
@@ -59,6 +70,7 @@ stages:
             displayName: "Run twine for upload"
 
 
+# Fetch the package from the PyPI index and run tests against it
 - stage: 'Validate_Package_from_PyPI_${{parameters.targetType}}'
   
   jobs:
