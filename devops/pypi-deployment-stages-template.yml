@@ -24,13 +24,16 @@ stages:
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
 
-- stage: 'Upload_Package_To_PyPI_{{parameters.targetType}}'
+- stage: 'Upload_Package_To_PyPI_${{parameters.targetType}}'
 
   jobs:
   - deployment: "PyPI_{{parameters.targetType}}"
     environment: ${{parameters.targetEnvironment}}
     pool:
       vmImage: ${{parameters.poolImage}}
+
+    variables:
+      packageDirectory: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
 
     strategy:
       runOnce:
@@ -45,5 +48,5 @@ stages:
           - script: pip install twine
             displayName: 'Install twine'
 
-          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/${{parameters.packageArtifactStem}}${{parameters.targetType}}/*"
+          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/$(PackageDirectory/*"
             displayName: "Run twine for upload"
