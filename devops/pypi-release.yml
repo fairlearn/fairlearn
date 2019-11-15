@@ -40,6 +40,8 @@ stages:
 
 # =================================================================================================================
 
+# We rely on the implicit dependence on the previous stage
+# No fan out/fan in of stages
 - template: pypi-deployment-stages-template.yml
   parameters:
     poolImage: $(PoolImage)
