@@ -43,7 +43,7 @@ stages:
 
     steps:
     - script: ls
-    - script: rm -rf fairlearn/
+    - script: rm -rf fairlearn/ *.md docs/ devops/
     - script: ls 
 
 
