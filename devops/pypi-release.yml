@@ -34,7 +34,7 @@ stages:
       pyVersions: [3.6]
       gitUrl: https://github.com/fairlearn/fairlearn.git
       gitCheckoutTarget: $(Build.SourceVersion)
-      usePyPITest: true
+      targetType: 'Test'
       pipVersionfairlearn: 0.3.1
 
 
