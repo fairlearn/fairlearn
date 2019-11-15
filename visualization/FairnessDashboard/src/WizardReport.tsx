@@ -509,6 +509,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             {localization.Report.backToComparisons}
                         </ActionButton>
                         <div className={WizardReport.classNames.modelLabel}>
+                            {this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}
                             {localization.formatString(localization.Report.modelName, this.props.selectedModelIndex)}
                         </div>
                     </div>}

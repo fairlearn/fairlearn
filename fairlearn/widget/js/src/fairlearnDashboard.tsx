@@ -64,7 +64,6 @@ export class FairlearnView extends DOMWidgetView {
             supportedRegressionAccuracyKeys={data.regression_methods}
             supportedProbabilityAccuracyKeys={data.probability_methods}
             requestMetrics={this.makeRequest.bind(this)}
-            predictionType={data.is_classifier === false ? "regression" : undefined as any}
         />, root_element);
         this.el.appendChild(root_element)
     }
