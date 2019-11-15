@@ -38,8 +38,9 @@ class FairlearnDashboard(object):
         :param y_true: The true labels for the provided dataset. Will overwrite any set on
             explanation object already
         :type y_true: numpy.array or list[]
-        :param y_pred: Array of output predictions from models to be evaluated
-        :type y_pred: numpy.array or list[][]
+        :param y_pred: Array of output predictions from models to be evaluated. Can be a single array of predictions,
+            or a 2D list over multiple models. Can be a dictionary of named model predictions.
+        :type y_pred: numpy.array or list[][] or list[] or dict {string: list[]}
         :param sensitive_feature_names: Feature names
         :type sensitive_feature_names: numpy.array or list[]
         """
