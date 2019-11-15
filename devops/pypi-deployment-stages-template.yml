@@ -27,7 +27,7 @@ stages:
 
   jobs:
   - deployment: "PyPI_{{parameters.targetType}}"
-    - ${{ if eq(parameters.targetType, 'Test')}}
+    ${{ if eq(parameters.targetType, 'Test')}}
       environment: "PyPI-Test Deployment"
     pool:
       vmImage: ${{parameters.poolImage}}
