@@ -9,10 +9,10 @@ parameters:
 
 stages:
 - stage:
-  - ${{ if eq(parameters.deployToTest}, 'true') }}:
-    name: "Create_PyPI_Package_Test"
-  - ${{ if eq(parameters.deployToTest}, 'false') }}:
-    name: "Create_PyPI_Package_Prod"
+- ${{ if eq(parameters.deployToTest}, 'true') }}:
+  name: "Create_PyPI_Package_Test"
+- ${{ if eq(parameters.deployToTest}, 'false') }}:
+  name: "Create_PyPI_Package_Prod"
 
   dependsOn:
   - ${{parameters.dependsOnStage}}
