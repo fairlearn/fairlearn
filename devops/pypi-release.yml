@@ -14,6 +14,9 @@
 # candidates' so that minor fixes can be made without requiring a separate checkin
 # to release to PyPI itself. See the logic in __init__.py
 
+# TODO:
+# Use Azure KeyVault so that uploads to PyPI actually occur
+
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
