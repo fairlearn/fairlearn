@@ -47,7 +47,6 @@ stages:
     targetType: 'Test'
       
 - stage: DeployToPyPITest
-  dependsOn: CreateTestPyPIPackage
   jobs:
   - deployment: "Deploy_to_PyPI_Test"
     environment: "PyPI-Test Deployment"
