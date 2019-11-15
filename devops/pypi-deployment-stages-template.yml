@@ -6,18 +6,21 @@ parameters:
   versionArtifactStem: 'Version'
   versionFileStem: 'versionInfo'
 
-variables:
-- ${{ if eq(parameters.deployToTest}, 'true') }}:
-  isTestDeployment: 1
-  nameSuffix: 'Test'
-- ${{ if eq(parameters.deployToTest}, 'false') }}:
-  isTestDeployment: 0
-  nameSuffix: 'Prod'
 
 stages:
-- stage: 'Create_PyPI_Package_$(nameSuffix)'
+- stage:
+  - ${{ if eq(parameters.deployToTest}, 'true') }}:
+    name: "Create_PyPI_Package_Test"
+  - ${{ if eq(parameters.deployToTest}, 'false') }}:
+    name: "Create_PyPI_Package_Prod"
+
   dependsOn:
   - ${{parameters.dependsOnStage}}
+
+  variables:
+  - template: variables-template.yml
+    parameters:
+      deployToTest: ${{parameters.deployToTest}}
 
   jobs:
   - job:

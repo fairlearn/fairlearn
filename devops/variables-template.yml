@@ -1,0 +1,10 @@
+parameters:
+  deployToTest: 'true'
+
+variables:
+- ${{ if eq(parameters.deployToTest}, 'true') }}:
+  isTestDeployment: 1
+  nameSuffix: 'Test'
+- ${{ if eq(parameters.deployToTest}, 'false') }}:
+  isTestDeployment: 0
+  nameSuffix: 'Prod'
