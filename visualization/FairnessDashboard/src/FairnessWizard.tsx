@@ -65,6 +65,8 @@ const flights = {
 
 export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardState> {
     private static buildInitialFairnessContext(props: IFairnessProps): IFairnessContext {
+        const modelNames = (!!props.modelNames && props.modelNames.length === props.predictedY.length) ?
+            props.modelNames : props.predictedY.map((unused, modelIndex) => `Model ${modelIndex}`)
         return {
             dataset: props.testData,
             trueY: props.trueY,
@@ -72,7 +74,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             binVector: [],
             groupNames: [],
             modelMetadata: FairnessWizard.buildModelMetadata(props),
-            modelNames: props.predictedY.map((unused, modelIndex) => `model ${modelIndex}`)
+            modelNames
         };
     }   
 

@@ -25,7 +25,7 @@ class FairlearnDashboard(object):
     def __init__(
             self, *,
             sensitive_features,
-            y_true, predicted_ys,
+            y_true, y_pred,
             sensitive_feature_names=None,
             is_classifier=None):
 
@@ -38,13 +38,13 @@ class FairlearnDashboard(object):
         :param y_true: The true labels for the provided dataset. Will overwrite any set on
             explanation object already
         :type y_true: numpy.array or list[]
-        :param predicted_ys: Array of output predictions from models to be evaluated
-        :type predicted_ys: numpy.array or list[][]
+        :param y_pred: Array of output predictions from models to be evaluated
+        :type y_pred: numpy.array or list[][]
         :param sensitive_feature_names: Feature names
         :type sensitive_feature_names: numpy.array or list[]
         """
         self._widget_instance = FairlearnWidget()
-        if sensitive_features is None or y_true is None or predicted_ys is None:
+        if sensitive_features is None or y_true is None or y_pred is None:
             raise ValueError("Required parameters not provided")
 
         self._metric_methods = {
@@ -142,12 +142,20 @@ class FairlearnDashboard(object):
                                if "probability" in method[1]["model_type"]]
 
         dataset = self._sanitize_data_shape(sensitive_features)
-        self._predicted_ys = self._convert_to_list(predicted_ys)
-        if len(np.shape(self._predicted_ys)) == 1:
-            self._predicted_ys = [self._predicted_ys]
+        model_names = None
+        if isinstance(y_pred, dict):
+            model_names = []
+            self._y_pred = []
+            for k, v in y_pred.items():
+                model_names.append(k)
+                self._y_pred.append(self._convert_to_list(v))
+        else:
+            self._y_pred = self._convert_to_list(y_pred)
+        if len(np.shape(self._y_pred)) == 1:
+            self._y_pred = [self._y_pred]
         self._y_true = self._convert_to_list(y_true)
 
-        if np.shape(self._y_true)[0] != np.shape(self._predicted_ys)[1]:
+        if np.shape(self._y_true)[0] != np.shape(self._y_pred)[1]:
             raise ValueError("Predicted y does not match true y shape")
 
         if np.shape(self._y_true)[0] != np.shape(dataset)[0]:
@@ -155,11 +163,12 @@ class FairlearnDashboard(object):
 
         dataArg = {
             "true_y": self._y_true,
-            "predicted_ys": self._predicted_ys,
+            "predicted_ys": self._y_pred,
             "dataset": dataset,
             "classification_methods": classification_methods,
             "regression_methods": regression_methods,
-            "probability_methods": probability_methods
+            "probability_methods": probability_methods,
+            "model_names": model_names
         }
 
         if sensitive_feature_names is not None:
@@ -188,7 +197,7 @@ class FairlearnDashboard(object):
                         binVector = data["binVector"]
                         prediction = method(
                             self._y_true,
-                            self._predicted_ys[data["modelIndex"]],
+                            self._y_pred[data["modelIndex"]],
                             binVector)
                         response[id] = {
                                 "global": prediction.overall,

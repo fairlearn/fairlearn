@@ -32,6 +32,7 @@ export interface IFairnessProps {
     predictionType?: PredictionTypes;
     // One array per each model;
     predictedY: number[][];
+    modelNames?: string[]
     trueY: number[];
     theme?: any;
     stringParams?: any;

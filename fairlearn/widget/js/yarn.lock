@@ -1311,10 +1311,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-fairlearn-dashboard@0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/fairlearn-dashboard/-/fairlearn-dashboard-0.0.7.tgz#a8a0612cb97aa22924f0178932fb8768002c2fe2"
-  integrity sha512-aN8Qw+/hKJaZ6jBn8FSyRh8EBdoc0OyoTuSn7d1ic447pbEPkcP+2YvkJktPaWD/n51dGqVt+2Twt8nsIssiGw==
+fairlearn-dashboard@0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/fairlearn-dashboard/-/fairlearn-dashboard-0.0.8.tgz#99e36dcaf6ead762c8dbb3790e0267f9f18e0b62"
+  integrity sha512-K4ToFTAjFlKk4paFjLjYheM3RVnFqAR7C8YTvb9IuKUH4NTQo4/rb70bVE9zrgTErrgji+6HVNv+G9DewCMJ8w==
   dependencies:
     jmespath "^0.15.0"
     localized-strings "^0.2.2"
