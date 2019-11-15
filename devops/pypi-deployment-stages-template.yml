@@ -15,9 +15,9 @@ stages:
 
   variables:
   - ${{ if eq(parameters.targetType, 'Test')}}
-    - isTest: 1
+    - isTestDeployment: 1
   - ${{ if eq(parameters.targetType, 'Prod')}}
-    - isTest: 0
+    - isTestDeployment: 0
 
   jobs:
   - job:
