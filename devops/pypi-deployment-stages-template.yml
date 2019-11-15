@@ -1,0 +1,33 @@
+parameters:
+  dependsOnStage: ''
+  poolImage: ''
+  deployToTest: true
+  packageArtifactStem: 'Packages'
+  versionArtifactStem: 'Version'
+  versionFileStem: 'versionInfo'
+
+variables:
+- ${{ if eq(parameters.deployToTest}, 'true') }}:
+  isTestDeployment: 1
+  nameSuffix: 'Test'
+- ${{ if eq(parameters.deployToTest}, 'false') }}:
+  isTestDeployment: 0
+  nameSuffix: 'Prod'
+
+stages:
+- stage: 'Create_PyPI_Package_$(nameSuffix)'
+  dependsOn:
+  - ${{parameters.dependsOnStage}}
+
+  jobs:
+  - job:
+    pool:
+      vmImage: ${{parameters.poolImage}}
+
+    steps:
+    - template: create-wheel-step-template.yml
+      parameters:
+        isTest: $(isTestDeployment)
+        packageArtifactName: '${{parameters.packageArtifactStem}}$(nameSuffix)'
+        versionArtifactName: '${{parameters.versionArtifactStem}}$(nameSuffix)'
+        versionFilename: '${{parameters.versionFileStem}}$(nameSuffix)'
