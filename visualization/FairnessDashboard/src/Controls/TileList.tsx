@@ -51,6 +51,7 @@ export class TileList extends React.PureComponent<ITileListProps> {
             fontSize: "18px",
             lineHeight: "22px",
             fontWeight: "500",
+            paddingRight: "16px",
             margin: 0
         },
         description: {
