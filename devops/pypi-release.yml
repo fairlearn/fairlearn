@@ -49,7 +49,6 @@ stages:
 # =================================================================================================================
 
 - stage: TestDeploymentValidation
-  dependsOn: DeployToPyPITest
   
   jobs:
   - template: unit-tests-pypi-job-template.yml
