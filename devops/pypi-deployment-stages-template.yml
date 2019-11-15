@@ -34,6 +34,10 @@ stages:
 
     variables:
       packageDirectory: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
+      ${{ if eq(parameters.targetType, 'Test') }}:
+        pypiUrl: https://test.pypi.org/legacy/
+      ${{ if eq(parameters.targetType, 'Prod') }}:
+        pypiUrl: https://upload.pypi.org/legacy/
 
     strategy:
       runOnce:
@@ -51,5 +55,20 @@ stages:
           - script: ls -R $(Pipeline.Workspace)/$(PackageDirectory)
             displayName: "Files in $(Pipeline.Workspace)/$(PackageDirectory)"
 
-          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/$(PackageDirectory)/*"
+          - script: echo "python twine upload --repository-url $(pypiUrl) $(Pipeline.Workspace)/$(PackageDirectory)/*"
             displayName: "Run twine for upload"
+
+
+- stage: 'Validate_Package_from_PyPI_${{parameters.targetType}}'
+  
+  jobs:
+  - template: unit-tests-pypi-job-template.yml
+    parameters:
+      name: Linux
+      vmImage: 'ubuntu-16.04'
+      pyVersions: [3.6, 3.7]
+      gitUrl: https://github.com/fairlearn/fairlearn.git
+      gitCheckoutTarget: $(Build.SourceVersion)
+      targetType: ${{parameters.targetType}}
+      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'

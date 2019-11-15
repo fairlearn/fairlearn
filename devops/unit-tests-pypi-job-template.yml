@@ -5,7 +5,7 @@ parameters:
   requirementsFile: 'requirements.txt'
   gitUrl: https://github.com/fairlearn/fairlearn.git
   gitCheckoutTarget: $(Build.SourceVersion) # This is the safe default, which should select the code version for the current pipeline
-  usePyPITest: true
+  targetType:
   pipVersionfairlearn:
   prerequisiteJob:
   versionFileArtifact:
@@ -18,9 +18,9 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
 
   variables:
-    ${{ if eq(parameters.usePyPITest, 'true') }}:
+    ${{ if eq(parameters.targetType, 'Test') }}:
       pypiUrl: https://test.pypi.org/simple/
-    ${{ if eq(parameters.usePyPITest, 'false') }}:
+    ${{ if eq(parameters.targetType, 'Prod') }}:
       pypiUrl: https://pypi.org/simple/
     fairlearnVersionForpip: ${{parameters.pipVersionfairlearn}}
         
@@ -33,6 +33,7 @@ jobs:
           PyVer: ${{ pyVer }}
 
   steps:
+  # If we don't specify pipVersionfairlearn as a parameter then get it from the artifact
   - ${{ if eq(parameters.pipVersionfairlearn, '') }}:
     - template: fetch-version-from-artifacts-steps-template.yml
       parameters:
@@ -62,11 +63,10 @@ jobs:
     displayName: "Install fairlearn with pip"
 
     # DO NOT CHECK IN FOLLOWING LINE WITHOUT FIXING TEST PATH
-  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) git=${{parameters.gitcheckoutTarget}} test=${{parameters.usePyPITest}} pipVersion=$(fairlearnVersionForpip)"
+  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip) git=${{parameters.gitcheckoutTarget}} "
     displayName: 'Run tests'
     workingDirectory: $(ClonedRepoDir)
 
-  
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
     inputs:

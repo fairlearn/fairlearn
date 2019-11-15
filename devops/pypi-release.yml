@@ -48,28 +48,10 @@ stages:
     targetType: 'Test'
 
 
-# =================================================================================================================
-
-- stage: TestDeploymentValidation
-  
-  jobs:
-  - template: unit-tests-pypi-job-template.yml
-    parameters:
-      name: Linux
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.6]
-      gitUrl: https://github.com/fairlearn/fairlearn.git
-      gitCheckoutTarget: $(Build.SourceVersion)
-      usePyPITest: true
-      versionFileArtifact: $(testVersionArtifact)
-      versionFileName: $(testVersionFilename)
-
 
 # =================================================================================================================
 
 - stage: CreatePyPIPackage
-  dependsOn:
-  - TestDeploymentValidation
 
   jobs:
   - job: Create_PyPI_Package
