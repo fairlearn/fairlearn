@@ -48,5 +48,8 @@ stages:
           - script: pip install twine
             displayName: 'Install twine'
 
-          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/$(PackageDirectory/*"
+          - script: ls -R $(Pipeline.Workspace)/$(PackageDirectory)
+            displayName: "Files in $(Pipeline.Workspace)/$(PackageDirectory)"
+
+          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/$(PackageDirectory)/*"
             displayName: "Run twine for upload"
