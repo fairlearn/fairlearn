@@ -2,6 +2,7 @@ parameters:
   poolImage: ''
   poolPythonVersion: 3.6
   targetType: 'Test'
+  targetEnvironment: 'PyPI-Test Deployment'
   packageArtifactStem: 'Packages'
   versionArtifactStem: 'Version'
   versionFileStem: 'versionInfo'
@@ -27,8 +28,7 @@ stages:
 
   jobs:
   - deployment: "PyPI_{{parameters.targetType}}"
-    ${{ if eq(parameters.targetType, 'Test')}}
-      - environment: "PyPI-Test Deployment"
+    environment: ${{parameters.targetEnvironment}}
     pool:
       vmImage: ${{parameters.poolImage}}
 
