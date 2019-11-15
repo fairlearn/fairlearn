@@ -60,8 +60,8 @@ jobs:
   - script: pip install --index-url $(pypiUrl) fairlearn==$(fairlearnVersionForpip)
     displayName: "Install fairlearn with pip"
 
-    # DO NOT CHECK IN FOLLOWING LINE WITHOUT FIXING TEST PATH
-  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip)"
+  # Run the tests
+  - script: python -m pytest test/ --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip)"
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
