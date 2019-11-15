@@ -3,36 +3,23 @@ param(
     [Parameter(Mandatory)]
     [bool]$isTest,
     [Parameter(Mandatory)]
+    [uint64]$rcVersion,
+    [Parameter(Mandatory)]
     [string]$versionFilename
 )
 
+if( Test-Path env:FAIRLEARN_RC )
+{
+    throw "Environment variable FAIRLEARN_RC must not be set"
+}
+
 if( $isTest )
 {
-    # Ensure that the FAIRLEARN_RC variable is set     
-    Write-Host "Checking for FAIRLEARN_RC"
-    if (-not (Test-Path env:FAIRLEARN_RC))
-    {
-        throw "Environment variable FAIRLEARN_RC not set!"
-    }
-    if ( [string]::IsNullOrEmpty($Env:FAIRLEARN_RC))
-    {
-        throw "Environment variable FAIRLEARN_RC null or empty!"
-    }
-    if ( [string]::IsNullOrWhiteSpace($Env:FAIRLEARN_RC))
-    {
-        throw "Environment variable FAIRLEARN_RC null or whitespace!"
-    }
-    Write-Host "FAIRLEARN_RC = $Env:FAIRLEARN_RC"
-}
-else
-{
-    # Not running for test; make sure that the FAIRLEARN_RC
-    # variable is not set
-    Remove-Variable env:FAIRLEARN_RC
+    $Env:FAIRLEARN_RC = $rcVersion
 }
 
 
-# Set environment variable
+# Store fairlearn version (including FAIRLEARN_RC) in the file
 pip install .
 $versionScript = Join-Path -resolve scripts fairlearn_version.py
 python $versionScript > $versionFilename

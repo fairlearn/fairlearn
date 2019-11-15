@@ -22,7 +22,7 @@ steps:
   displayName: 'Build wheels'
   inputs:
     filePath: scripts/build-wheels.ps1
-    arguments: '-isTest ${{parameters.isTest}} -versionFilename ${{parameters.versionFilename}}'
+    arguments: '-isTest ${{parameters.isTest}} -versionFilename ${{parameters.versionFilename}}' -rcVersion $(RC_VERSION)
     pwsh: true
 
 - task: PublishPipelineArtifact@1
