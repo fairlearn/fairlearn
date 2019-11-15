@@ -44,7 +44,7 @@ stages:
   parameters:
     dependsOnStage: PreDeploymentValidation
     poolImage: $(PoolImage)
-    deployToTest: true
+    targetType: 'Test'
       
 - stage: DeployToPyPITest
   dependsOn: CreateTestPyPIPackage
