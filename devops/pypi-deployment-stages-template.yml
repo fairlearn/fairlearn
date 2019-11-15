@@ -1,6 +1,6 @@
 parameters:
-  dependsOnStage: ''
   poolImage: ''
+  poolPythonVersion: 3.6
   targetType: 'Test'
   packageArtifactStem: 'Packages'
   versionArtifactStem: 'Version'
@@ -8,9 +8,6 @@ parameters:
 
 stages:
 - stage: 'Create_PyPI_Package_${{parameters.targetType}}'
-
-  dependsOn:
-  - ${{parameters.dependsOnStage}}
 
   jobs:
   - job: 'Create_Package'
@@ -24,3 +21,29 @@ stages:
         packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+
+
+- stage: 'Upload_Package_To_PyPI_{{parameters.targetType}}'
+
+  jobs:
+  - deployment: "PyPI_{{parameters.targetType}}"
+    - ${{ if eq(parameters.targetType, 'Test')}}
+      environment: "PyPI-Test Deployment"
+    pool:
+      vmImage: ${{parameters.poolImage}}
+
+    strategy:
+      runOnce:
+       deploy:
+        steps:
+          - task: UsePythonVersion@0
+            displayName: 'Use Python ${{parameters.poolPythonVersion}}'
+            inputs:
+              versionSpec: ${{parameters.poolPythonVersion}}
+              addToPath: true
+
+          - script: pip install twine
+            displayName: 'Install twine'
+
+          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/${{parameters.packageArtifactStem}}${{parameters.targetType}}/*"
+            displayName: "Run twine for upload"

@@ -42,32 +42,8 @@ stages:
 
 - template: pypi-deployment-stages-template.yml
   parameters:
-    dependsOnStage: PreDeploymentValidation
     poolImage: $(PoolImage)
     targetType: 'Test'
-      
-- stage: DeployToPyPITest
-  jobs:
-  - deployment: "Deploy_to_PyPI_Test"
-    environment: "PyPI-Test Deployment"
-    pool:
-      vmImage: $(PoolImage)
-
-    strategy:
-      runOnce:
-       deploy:
-        steps:
-          - task: UsePythonVersion@0
-            displayName: 'Use Python $(poolPythonVersion)'
-            inputs:
-              versionSpec: $(poolPythonVersion)
-              addToPath: true
-
-          - script: pip install twine
-            displayName: 'Install twine'
-
-          - script: echo "python twine upload --repository-url https://test.pypi.org/legacy/ $(Pipeline.Workspace)/$(testPackageArtifact)/*"
-            displayName: "Upload to PyPI-Test"
 
 
 # =================================================================================================================
