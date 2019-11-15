@@ -8,8 +8,7 @@ parameters:
 
 
 stages:
-- stage:
-  name: "Create_PyPI_Package_${{parameters.targetType}}"
+- stage: 'Create_PyPI_Package_${{parameters.targetType}}'
 
   dependsOn:
   - ${{parameters.dependsOnStage}}
