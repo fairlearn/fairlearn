@@ -6,14 +6,11 @@ parameters:
   gitUrl: https://github.com/fairlearn/fairlearn.git
   gitCheckoutTarget: $(Build.SourceVersion) # This is the safe default, which should select the code version for the current pipeline
   targetType:
-  pipVersionfairlearn:
-  prerequisiteJob:
   versionFileArtifact:
   versionFileName:
 
 jobs:
 - job: ${{ parameters.name }}
-  dependsOn: ${{parameters.prerequisiteJob}}
   pool:
     vmImage: ${{ parameters.vmImage }}
 
@@ -22,7 +19,6 @@ jobs:
       pypiUrl: https://test.pypi.org/simple/
     ${{ if eq(parameters.targetType, 'Prod') }}:
       pypiUrl: https://pypi.org/simple/
-    fairlearnVersionForpip: ${{parameters.pipVersionfairlearn}}
         
 
   strategy:
@@ -33,42 +29,38 @@ jobs:
           PyVer: ${{ pyVer }}
 
   steps:
-  # If we don't specify pipVersionfairlearn as a parameter then get it from the artifact
-  - ${{ if eq(parameters.pipVersionfairlearn, '') }}:
-    - template: fetch-version-from-artifacts-steps-template.yml
-      parameters:
-        artifactName: ${{parameters.versionFileArtifact}}
-        artifactFile: ${{parameters.versionFileName}}
-        targetVariable: fairlearnVersionForpip
+  # Remove the fairlearn/ directory (and some others)
+  # This is to ensure we test against the pip install
+  - template: prepare-repo-for-pip-testing-steps-template.yml
 
+  # Get the pip version to install from the artifacts created
+  # by earlier build stages
+  # Store this in fairlearnVersionForpip
+  - template: fetch-version-from-artifacts-steps-template.yml
+    parameters:
+      artifactName: ${{parameters.versionFileArtifact}}
+      artifactFile: ${{parameters.versionFileName}}
+      targetVariable: fairlearnVersionForpip
+
+  # Specify the version of Python to use
   - task: UsePythonVersion@0
     displayName: 'Use Python $(PyVer)'
     inputs:
       versionSpec: '$(PyVer)' 
       addToPath: true
 
-  - task: PowerShell@2
-    name: PrepareGit
-    displayName: "Clone from GitHub and checkout ${{parameters.gitCheckoutTarget}}"
-    inputs:
-      filePath: scripts/prepare-git-pypi-test.ps1
-      arguments: "-gitUrl ${{parameters.gitUrl}} -baseDir $(Agent.TempDirectory) -targetVariable ClonedRepoDir -gitCheckout ${{parameters.gitCheckoutTarget}}"
-      pwsh: true
-
+  # Install our requirements from regular PyPI
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
-    workingDirectory: $(ClonedRepoDir)
 
+  # Install fairlearn withe the specified version from the appropriate PyPI index
   - script: pip install --index-url $(pypiUrl) fairlearn==$(fairlearnVersionForpip)
     displayName: "Install fairlearn with pip"
 
     # DO NOT CHECK IN FOLLOWING LINE WITHOUT FIXING TEST PATH
-  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip) git=${{parameters.gitcheckoutTarget}} "
+  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip)"
     displayName: 'Run tests'
-    workingDirectory: $(ClonedRepoDir)
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
-    inputs:
-      searchFolder: $(ClonedRepoDir)
     condition: succeededOrFailed()

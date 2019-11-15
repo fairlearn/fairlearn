@@ -67,8 +67,6 @@ stages:
       name: Linux
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6, 3.7]
-      gitUrl: https://github.com/fairlearn/fairlearn.git
-      gitCheckoutTarget: $(Build.SourceVersion)
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
