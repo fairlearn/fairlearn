@@ -35,9 +35,9 @@ class FairlearnDashboard(object):
             these can be from the initial dataset, or reserved from training. Currently only
             categorical features are supported
         :type sensitive_features: numpy.array or list[][] or Pandas Dataframe
-        :param trueY: The true labels for the provided dataset. Will overwrite any set on
+        :param y_true: The true labels for the provided dataset. Will overwrite any set on
             explanation object already
-        :type trueY: numpy.array or list[]
+        :type y_true: numpy.array or list[]
         :param predicted_ys: Array of output predictions from models to be evaluated
         :type predicted_ys: numpy.array or list[][]
         :param sensitive_feature_names: Feature names
