@@ -42,9 +42,9 @@ stages:
       vmImage: $(PoolImage)
 
     steps:
-      script: ls
-      script: rm -rf fairlearn/
-      script: ls 
+    - script: ls
+    - script: rm -rf fairlearn/
+    - script: ls 
 
 
 # =================================================================================================================
