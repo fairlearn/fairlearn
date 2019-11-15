@@ -83,14 +83,14 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
     "mean_absolute_error": {
         key: "mean_absolute_error",
         title: localization.Metrics.meanAbsoluteError,
-        description: localization.loremIpsum,
+        description: localization.Metrics.meanAbsoluteErrorDescription,
         isMinimization: true,
         isPercentage: false
     },
     "mean_squared_error": {
         key: "mean_squared_error",
         title: localization.Metrics.meanSquaredError,
-        description: localization.loremIpsum,
+        description: localization.Metrics.mseDescription,
         isMinimization: true,
         isPercentage: false
     },
@@ -111,7 +111,7 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
     "balanced_root_mean_squared_error": {
         key: "balanced_root_mean_squared_error",
         title: localization.Metrics.balancedRootMeanSquaredError,
-        description: localization.loremIpsum,
+        description: localization.Metrics.balancedRMSEDescription,
         isMinimization: true,
         isPercentage: false
     },
@@ -141,6 +141,27 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         title: localization.Metrics.underprediction,
         description: localization.loremIpsum,
         isMinimization: true,
+        isPercentage: false
+    },
+    "r2_score": {
+        key: "r2_score",
+        title: localization.Metrics.r2_score,
+        description: localization.Metrics.r2Description,
+        isMinimization: false,
+        isPercentage: false
+    },
+    "root_mean_squared_error": {
+        key: "root_mean_squared_error",
+        title: localization.Metrics.rms_error,
+        description: localization.Metrics.rmseDescription,
+        isMinimization: true,
+        isPercentage: false
+    },
+    "auc": {
+        key: "auc",
+        title: localization.Metrics.auc,
+        description: localization.Metrics.aucDescription,
+        isMinimization: false,
         isPercentage: false
     }
 };

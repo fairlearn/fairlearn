@@ -32,6 +32,8 @@ from ._skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa:
 from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
 from ._skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
 from ._skm_wrappers import group_mean_squared_error  # noqa: F401
+from ._skm_wrappers import group_root_mean_squared_error  # noqa: F401
+from ._skm_wrappers import group_r2_score  # noqa: F401
 
 from ._group_metric_result import GroupMetricResult  # noqa: F401
 from ._metrics_engine import make_group_metric, metric_by_group  # noqa: F401
@@ -113,8 +115,10 @@ _group_metrics = [
     "group_median_absolute_error",
     "group_miss_rate",
     "group_precision_score",
+    "group_r2_score",
     "group_recall_score",
     "group_roc_auc_score",
+    "group_root_mean_squared_error",
     "group_selection_rate",
     "group_specificity_score",
     "group_zero_one_loss"
