@@ -6,18 +6,11 @@ parameters:
   versionArtifactStem: 'Version'
   versionFileStem: 'versionInfo'
 
-
 stages:
 - stage: 'Create_PyPI_Package_${{parameters.targetType}}'
 
   dependsOn:
   - ${{parameters.dependsOnStage}}
-
-  variables:
-  - ${{ if eq(parameters.targetType, 'Test')}}
-    - isTestDeployment: 1
-  - ${{ if eq(parameters.targetType, 'Prod')}}
-    - isTestDeployment: 0
 
   jobs:
   - job:
@@ -27,7 +20,7 @@ stages:
     steps:
     - template: create-wheel-step-template.yml
       parameters:
-        isTest: $(isTestDeployment)
+        targetType: ${{parameters.targetType}}
         packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'

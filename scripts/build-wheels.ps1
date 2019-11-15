@@ -1,12 +1,19 @@
 # Script to build wheels and drop the version file
 param(
     [Parameter(Mandatory)]
-    [bool]$isTest,
+    [string]$targetType,
     [Parameter(Mandatory)]
     [uint64]$rcVersion,
     [Parameter(Mandatory)]
     [string]$versionFilename
 )
+
+$allowedTargetTypes = @("Test", "Prod")
+
+if( !$allowedTargetTypes.Contains($targetType) )
+{
+    throw "Unrecognised targetType: $targetType"
+}
 
 if( Test-Path env:FAIRLEARN_RC )
 {

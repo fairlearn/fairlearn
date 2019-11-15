@@ -1,6 +1,6 @@
 parameters:
   pyVer: 3.6
-  isTest: Unspecified
+  targetType: ''
   versionFilename: ''
   packageArtifactName: ''
   versionArtifactName: ''
@@ -22,7 +22,7 @@ steps:
   displayName: 'Build wheels'
   inputs:
     filePath: scripts/build-wheels.ps1
-    arguments: '-isTest ${{parameters.isTest}} -versionFilename ${{parameters.versionFilename}} -rcVersion $(RC_VERSION)'
+    arguments: '-targetType ${{parameters.targetType}} -versionFilename ${{parameters.versionFilename}} -rcVersion $(RC_VERSION)'
     pwsh: true
 
 - task: PublishPipelineArtifact@1
