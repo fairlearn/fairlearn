@@ -13,7 +13,7 @@ stages:
   - ${{parameters.dependsOnStage}}
 
   jobs:
-  - job:
+  - job: 'Create_Package'
     pool:
       vmImage: ${{parameters.poolImage}}
 

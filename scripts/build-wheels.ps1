@@ -20,7 +20,7 @@ if( Test-Path env:FAIRLEARN_RC )
     throw "Environment variable FAIRLEARN_RC must not be set"
 }
 
-if( $isTest )
+if( $targetType -eq "Test" )
 {
     $Env:FAIRLEARN_RC = $rcVersion
 }
