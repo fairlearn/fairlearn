@@ -31,8 +31,7 @@ jobs:
   - script: flake8 .
     displayName: "Run flake8"
 
-  # DO NOT CHECKIN WITHOUT FIXING TEST PATH!
-  - script: python -m pytest test/unit/metrics --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest test/ --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
