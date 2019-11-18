@@ -10,7 +10,10 @@ import { mergeStyleSets } from "@uifabric/styling";
 import { Icon } from "office-ui-fabric-react/lib/Icon";
 import { IBinnedResponse } from "../IBinnedResponse";
 import { Text } from "office-ui-fabric-react/lib/Text";
+import { Modal } from 'office-ui-fabric-react/lib/Modal';
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import BinDialog from "./BinDialog";
+import { INumericRange, RangeTypes } from "mlchartlib";
 
 interface IFeatureItem {
     title: string;
@@ -24,33 +27,30 @@ export interface IFeatureTabProps extends IWizardTabProps {
     featureBins: IBinnedResponse[];
     selectedFeatureIndex: number;
     selectedFeatureChange: (value: number) => void;
+    saveBin: (bin: IBinnedResponse) => void;
 }
 
 interface IState {
     expandedBins: number[];
+    editingFeatureIndex: number | undefined;
 }
 
 export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
     private static readonly classNames = mergeStyleSets({
-        itemCell: [
-          {
-            padding: "30px 36px 20px 0",
+        itemCell: {
+            display: "flex",
+            flexDirection: "row",
+            padding: "20px 0",
             width: "100%",
-            position: "relative",
-            float: "left",
             cursor: "pointer",
             boxSizing: "border-box",
             borderBottom: "1px solid #CCCCCC",
             selectors: {
               '&:hover': { background: "lightgray" }
             }
-          }
-        ],
+        },
         iconClass: {
-            fontSize: "20px",
-            position: "absolute",
-            right: "10px",
-            top: "10px"
+            fontSize: "20px"
         },
         itemsList: {
             overflowY: "auto"
@@ -73,9 +73,18 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             paddingTop: "12px",
             fontSize: "18px",
             lineHeight: "24px",
-            fontWeight: "300"
+            fontWeight: "300",
+            marginBottom: "15px"
         },
         tableHeader: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingBottom: "15px",
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "18px",
+            fontWeight: "500",
             borderBottom: "1px solid #CCCCCC"
         },
         itemTitle: {
@@ -91,34 +100,74 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             fontSize: "15px",
             lineHeight: "18px",
             fontWeight: "500"
+        },
+        iconWrapper: {
+            paddingTop: "4px",
+            paddingLeft: "5px",
+            width: "30px"
+        },
+        featureDescriptionSection: {
+            flex: 1,
+            paddingRight: "20px",
+            minHeight:"75px"
+        },
+        binSection:{
+            width:"130px",
+
+        },
+        expandButton: {
+            paddingLeft: 0,
+            selectors: {
+                "& i":{
+                    marginLeft: 0
+                }
+            }
+        },
+        category: {
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            overflow: "hidden"
+        },
+        subgroupHeader: {
+            width: "130px"
         }
     });
 
     constructor(props: IFeatureTabProps) {
         super(props);
-        this.state = { expandedBins: []};
+        this.state = { 
+            expandedBins: [],
+            editingFeatureIndex: undefined
+        };
     }
     
     render(): React.ReactNode {
         return(
             <Stack horizontal horizontalAlign="space-between" className={FeatureTab.classNames.frame}>
+                <Modal
+                    isOpen={this.state.editingFeatureIndex !== undefined}
+                    isBlocking={false}
+                    onDismiss={this.hideModal}>
+                    { this.state.editingFeatureIndex !== undefined && <BinDialog
+                        range={this.props.dashboardContext.modelMetadata.featureRanges[this.state.editingFeatureIndex] as INumericRange}
+                        bins={this.props.featureBins[this.state.editingFeatureIndex]}
+                        dataset={this.props.dashboardContext.dataset}
+                        index={this.state.editingFeatureIndex}
+                        onSave={this.onBinSave}
+                        onCancel={this.hideModal}/>}
+                </Modal>
                 <Stack className={FeatureTab.classNames.main}>
                     <h2 className={FeatureTab.classNames.header}>
                         {localization.Feature.header}
                     </h2>
                     <p className={FeatureTab.classNames.textBody}>{localization.Feature.body}</p>
-                    <div className={FeatureTab.classNames.tableHeader}></div>
+                    <div className={FeatureTab.classNames.tableHeader}>
+                        <div>{localization.Intro.features}</div>
+                        <div className={FeatureTab.classNames.subgroupHeader}>{localization.Feature.subgroups}</div>
+                    </div>
                     <StackItem grow={2} className={FeatureTab.classNames.itemsList}>
                         <List
-                            items={this.props.featureBins.map((bin, index) => {
-                                return {
-                                    title: this.props.dashboardContext.modelMetadata.featureNames[bin.featureIndex],
-                                    description: localization.formatString(localization.Feature.summaryCategoricalCount, bin.array.length) as string,
-                                    onSelect: this.props.selectedFeatureChange.bind(this, bin.featureIndex),
-                                    selected: this.props.selectedFeatureIndex === bin.featureIndex,
-                                    categories: bin.array as string[]
-                                };
-                            })}
+                            items={this.props.featureBins}
                             onRenderCell={this._onRenderCell}
                         />
                     </StackItem>
@@ -131,29 +180,70 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
         );
     }
 
-    private readonly _onRenderCell = (item: IFeatureItem, index: number | undefined): JSX.Element => {
+    private readonly hideModal = (): void => {
+        this.setState({editingFeatureIndex: undefined});
+    }
+
+    private readonly onBinSave = (bin: IBinnedResponse): void => {
+        this.setState({editingFeatureIndex: undefined});
+        this.props.saveBin(bin);
+    }
+
+    private readonly editBins = (index: number) => {
+        this.setState({editingFeatureIndex: index});
+    }
+
+    private readonly _onRenderCell = (item: IBinnedResponse, index: number | undefined): JSX.Element => {
         return (
           <div
             key={index}
             className={FeatureTab.classNames.itemCell}
-            onClick={item.onSelect.bind(this)}
+            onClick={this.props.selectedFeatureChange.bind(this, index)}
             data-is-focusable={true}
           >
-            {item.selected && (<Icon iconName="CompletedSolid" className={FeatureTab.classNames.iconClass}/>)}
-            <h2 className={FeatureTab.classNames.itemTitle}>{item.title}</h2>
-            <p className={FeatureTab.classNames.valueCount}>{item.description}</p>
-            {!this.state.expandedBins.includes(index) && (
-                <ActionButton 
-                    iconProps={{iconName: "Forward"}}
-                    onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>)}
-            {this.state.expandedBins.includes(index) && (
-                <div>
+            <div className={FeatureTab.classNames.iconWrapper}>
+                <Icon iconName={this.props.selectedFeatureIndex === index ? "RadioBtnOn" : "RadioBtnOff"} className={FeatureTab.classNames.iconClass}/>
+            </div>
+            <div className={FeatureTab.classNames.featureDescriptionSection}>
+                <h2 className={FeatureTab.classNames.itemTitle}>{this.props.dashboardContext.modelMetadata.featureNames[index]}</h2>
+                {item.rangeType === RangeTypes.categorical &&
+                    <div className={FeatureTab.classNames.valueCount}>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</div>
+                }
+                {item.rangeType !== RangeTypes.categorical &&
+                    <div className={FeatureTab.classNames.valueCount}>
+                    {localization.formatString(localization.Feature.summaryNumericCount, 
+                        (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).min, 
+                        (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).max, 
+                        item.labelArray.length) as string}</div>
+                }
+                {!this.props.dashboardContext.modelMetadata.featureIsCategorical[index] && 
                     <ActionButton 
-                    iconProps={{iconName: "Back"}}
-                    onClick={this.updateExpandedList.bind(this)}>{localization.Feature.hideCategories}</ActionButton>
-                    {!!item.categories && item.categories.map((category, index) => <div key={index}>{category}</div>)}
-                </div>)}
-          </div>
+                        className={FeatureTab.classNames.expandButton}
+                        iconProps={{iconName: "Edit"}}
+                        onClick={this.editBins.bind(this, index)}>{localization.Feature.editBinning}</ActionButton>
+                }
+            </div>
+            <div className={FeatureTab.classNames.binSection}>
+                {!this.state.expandedBins.includes(index) && !!item.labelArray && 
+                    <div> 
+                        {item.labelArray.slice(0,7).map((category, index) => <div key={index} className={FeatureTab.classNames.category}>{category}</div>)}
+                        {item.labelArray.length > 7 && <ActionButton
+                            className={FeatureTab.classNames.expandButton}
+                            iconProps={{iconName: "ChevronDownMed"}}
+                            onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>}
+                    </div>
+                }
+                {this.state.expandedBins.includes(index) && !!item.labelArray &&
+                <div>
+                    {item.labelArray.map((category, index) => <div key={index} className={FeatureTab.classNames.category}>{category}</div>)}
+                    {<ActionButton 
+                        className={FeatureTab.classNames.expandButton}
+                        iconProps={{iconName: "ChevronUpMed"}}
+                        onClick={this.updateExpandedList.bind(this)}>{localization.Feature.hideCategories}</ActionButton>}
+                </div>
+                }
+            </div>
+        </div>
         );
     }
 

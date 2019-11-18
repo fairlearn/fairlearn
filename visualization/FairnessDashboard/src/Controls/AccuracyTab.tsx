@@ -50,13 +50,15 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
             color: "#333333",
             fontSize: "32px",
             lineHeight: "39px",
-            fontWeight: "100"
+            fontWeight: "100",
+            margin: "26px 0"
         },
         textBody: {
             paddingTop: "12px",
             fontSize: "18px",
             lineHeight: "24px",
-            fontWeight: "300"
+            fontWeight: "300",
+            paddingBottom: "12px"
         }
     });
     render(): React.ReactNode {
@@ -66,11 +68,17 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
                     <h2 className={AccuracyTab.classNames.header}>
                         {localization.Accuracy.header}
                     </h2>
-                    {/* <p className={AccuracyTab.classNames.textBody}>{localization.formatString(localization.Accuracy.body,
+                    <p className={AccuracyTab.classNames.textBody}>{localization.formatString(localization.Accuracy.body,
+                        this.props.dashboardContext.modelMetadata.predictionType !== PredictionTypes.regression ?
+                            localization.Accuracy.binary :
+                            localization.Accuracy.continuous,
                         this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
-                            localization.Accuracy.binaryClassifier :
-                            localization.Accuracy.regressor
-                        )}</p> */}
+                            localization.Accuracy.binary :
+                            localization.Accuracy.continuous,
+                        this.props.dashboardContext.predictions.length === 1 ?
+                            localization.Accuracy.modelMakes :
+                            localization.Accuracy.modelsMake
+                        )}</p>
                     <StackItem grow={2} className={AccuracyTab.classNames.itemsList}>
                         <TileList
                             items={this.props.accuracyPickerProps.accuracyOptions.map((accuracy, index) => {

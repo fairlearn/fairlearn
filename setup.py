@@ -19,6 +19,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires='>=3.5',
     install_requires=[
+        "ipywidgets>=7.5.0",
         "matplotlib>=3.0.3",
         "numpy>=1.17.2",
         "pandas>=0.25.1",

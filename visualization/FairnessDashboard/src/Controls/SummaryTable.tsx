@@ -11,6 +11,7 @@ export interface ISummaryTableProps {
     formattedBinValues: string[];
     binLabels: string[];
     metricLabel: string;
+    binGroup: string;
 }
 
 interface IBinItem {
@@ -40,7 +41,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         groupLabel: {
             color: "#333333",
             fontSize: "12px",
-            lineHeight: "16px",
+            lineHeight: "12px",
             fontWeight: "500",
             height: "26px"
         },
@@ -79,8 +80,8 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             fontSize: "12px",
             lineHeight: "12px",
             fontWeight: "500",
-            alignSelf: "center",
-            height: "26px"
+            height: "26px",
+            paddingLeft: "10px"
         },
         metricBox: {
             flex: 1,
@@ -128,7 +129,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         return (
             <div className={SummaryTable.classNames.frame}>
                 <div className={SummaryTable.classNames.groupCol}>
-                    <div className={SummaryTable.classNames.groupLabel}>{localization.Report.groupLabel}</div>
+                    <div className={SummaryTable.classNames.groupLabel}>{this.props.binGroup}</div>
                     <div className={SummaryTable.classNames.flexCol}>
                         {this.props.binLabels.map((label, index) => {
                             return (<div className={SummaryTable.classNames.binBox} key={index}>
@@ -147,7 +148,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                         {this.props.formattedBinValues.map((value, index) => {
                             return (
                             <div className={SummaryTable.classNames.metricBox} key={index}>
-                                {value}
+                                {value !== undefined ? value : 'empty'}
                             </div>);
                         })}
                     </div>

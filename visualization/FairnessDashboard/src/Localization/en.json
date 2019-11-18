@@ -1,7 +1,8 @@
 {
     "loremIpsum": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     "defaultClassNames": "Class {0}",
-    "defaultFeatureNames": "Feature {0}",
+    "defaultFeatureNames": "Sensitive feature {0}",
+    "defaultSingleFeatureName": "Sensitive feature",
     "accuracyTab": "Fairness in Accuracy",
     "opportunityTab": "Fairness in Opportunity",
     "modelComparisonTab": "Model comparison",
@@ -17,10 +18,14 @@
     "errorOnInputs": "Error with input. Sensitive features must be categorical values at this time. Please map values to binned categories and retry.",
     "Accuracy": {
         "header": "How do you want to measure accuracy?",
-        "body": "We have determined that your model is a {0}. Based on this, we recommend the following accuracy metrics:",
+        "modelMakes": "model makes",
+        "modelsMake": "models make",
+        "body": "Your data contains {0} labels and your {2} {1} predictions. Based on that information, we recommend the following metrics. Please select one metric from the list.",
         "binaryClassifier": "binary classifier",
         "probabalisticRegressor": "probit regressor",
-        "regressor": "regressor"
+        "regressor": "regressor",
+        "binary": "binary",
+        "continuous": "continuous"
     },
     "Parity": {
         "header": "Fairness measured in terms of disparity",
@@ -76,19 +81,30 @@
         "overpredictionExplanation": "(predicted = 1, true = 0)",
         "overestimationError": "Overprediction",
         "classificationOutcomesHowToRead": "The bar chart shows the selection rate in each group, meaning the fraction of points classified as 1.",
-        "regressionOutcomesHowToRead": "This chart shows the distribution of predictions for each group. The individual points are overlaid on the box plot.",
-        "classificationAccuracyHowToRead": "The bar chart shows the distribution of errors in each group. Errors are split into overprediction errors (predicting 1 when the true label is 0), and underprediction errors (predicting 0 when the true label is 1). The reported rates are obtained by dividing the number of errors by the overall group size.",
-        "probabilityAccuracyHowToRead": "Underestimation error rate is the sum of all negative errors within a group divided by the group size. Overestimation error rate is the sum of all positive errors in a group divided by the group size.",
-        "regressionAccuracyHowToRead": "This chart shows the error distribution for each group. The error is the predicted value minus the true value."
+        "regressionOutcomesHowToRead": "Box plots show the distribution of predictions in each group. Individual data points are overlaid on top.",
+        "classificationAccuracyHowToRead1": "The bar chart shows the distribution of errors in each group.",
+        "classificationAccuracyHowToRead2": "Errors are split into overprediction errors (predicting 1 when the true label is 0), and underprediction errors (predicting 0 when the true label is 1).",
+        "classificationAccuracyHowToRead3": "The reported rates are obtained by dividing the number of errors by the overall group size.",
+        "probabilityAccuracyHowToRead1": "The bar chart shows mean absolute error in each group, split into overprediction and underprediction.",
+        "probabilityAccuracyHowToRead2": "On each example, we measure the difference between the prediction and the label. If it is positive, we call it overprediction and if it is negative, we call it underprediction.",
+        "probabilityAccuracyHowToRead3": "We report the sum of overprediction errors and the sum of underprediction errors divided by the overall group size.",
+        "regressionAccuracyHowToRead": "Error is the difference between the prediction and the label. Box plots show the distribution of errors in each group. Individual data points are overlaid on top.",
+        "distributionOfPredictions": "Distribution of predictions",
+        "distributionOfErrors": "Distribution of errors",
+        "tooltipPrediction": "Prediction: {0}",
+        "tooltipError": "Error: {0}"
     },
     "Feature": {
         "header": "Along which features would you like to evaluate your model's fairness?",
         "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's accuracy and predictions differ across these splits.",
         "learnMore": "Learn more",
         "summaryCategoricalCount": "This feature has {0} unique values",
-        "showCategories": "Show values",
-        "hideCategories": "Hide categories",
-        "categoriesOverflow": "   and {0} additional categories"
+        "summaryNumericCount": "This numeric feature ranges from {0} to {1}, and is grouped into {2} bins.",
+        "showCategories": "Show all",
+        "hideCategories": "Collapse",
+        "categoriesOverflow": "   and {0} additional categories",
+        "editBinning": "Edit groups",
+        "subgroups": "Subgroups"
     },
     "Metrics": {
         "accuracyScore": "Accuracy",
@@ -120,5 +136,13 @@
         "r2Description": "The fraction of variance in the labels explained by the model.",
         "aucDescription": "The quality of the predictions, viewed as scores, in separating positive examples from negative examples.",
         "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying is highly imbalanced."
+    },
+    "BinDialog": {
+        "header": "Configure bins",
+        "makeCategorical": "Treat as categorical",
+        "save": "Save",
+        "cancel": "Cancel",
+        "numberOfBins": "Number of bins:",
+        "categoryHeader": "Bin values:"
     }
 }

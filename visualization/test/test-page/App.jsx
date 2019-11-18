@@ -36,6 +36,7 @@ import { probit } from "../__mock-data/probit";
       generateRandomMetrics(data, signal) {
         const binSize = Math.max(...data.binVector);
         const bins = new Array(binSize + 1).fill(0).map(x => Math.random())
+        bins[2] = undefined
         let promise = new Promise((resolve, reject) => {
           let timeout = setTimeout(() => {resolve({
             global: Math.random(),
@@ -75,7 +76,7 @@ import { probit } from "../__mock-data/probit";
               {App.choices.map((item, index) => <option key={item.label} value={index}>{item.label}</option>)}
             </select>
               <div style={{ width: '80vw', backgroundColor: 'white', margin:'50px auto'}}>
-                  <div style={{ width: '740px'}}>
+                  <div style={{ width: '940px'}}>
                       <FairnessWizard
                         modelInformation={{modelClass: 'blackbox'}}
                         dataSummary={{featureNames: data.featureNames, classNames: data.classNames}}
