@@ -71,9 +71,6 @@ stages:
               keyVaultName:  ${{parameters.kvVaultName}}
               secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
 
-          - script: printenv
-            displayName: "Showing environment"
-
           - script: pip install twine
             displayName: 'Install twine'
 
