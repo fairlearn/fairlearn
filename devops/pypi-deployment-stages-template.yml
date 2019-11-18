@@ -80,7 +80,7 @@ stages:
     
   - job: PyPI_Pause
     pool: server
-    dependsOn: 'PyPI_${{parameters.targetType}}'
+    dependsOn: 'PyPI_${{parameters.targetType}}_Upload'
 
     steps:
     - task: Delay@1
