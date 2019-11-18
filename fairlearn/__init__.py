@@ -11,7 +11,7 @@ import sys
 _FAIRLEARN_RC_KEY = "FAIRLEARN_RC"
 
 
-_base_version = "0.3.0"
+_base_version = "0.3.1"
 _rc_version = ""
 
 if _FAIRLEARN_RC_KEY in os.environ.keys():

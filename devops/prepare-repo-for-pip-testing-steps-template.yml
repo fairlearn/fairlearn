@@ -1,0 +1,24 @@
+# The set of steps to run to prepare a repository for testing against a pip package
+# This mainly involves removing the 'fairlearn' directory from the repo root, but
+# we also tidy up some other unneeded files
+
+parameters:
+  targetDirectory: $(System.DefaultWorkingDirectory)
+
+steps:
+  - script: ls
+    displayName: "List repo root before deletion"
+    workingDirectory: ${{parameters.targetDirectory}}
+
+  - script: rm -rf fairlearn/
+    displayName: "Remove fairlearn directory"
+    workingDirectory: ${{parameters.targetDirectory}}
+
+  - script: rm -rf devops/ docs/ *.md
+    displayName: "Remove other files"
+    workingDirectory: ${{parameters.targetDirectory}}
+  
+  - script: ls
+    displayName: "List repo root after deletion"
+    workingDirectory: ${{parameters.targetDirectory}}
+
