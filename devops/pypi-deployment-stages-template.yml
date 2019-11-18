@@ -83,7 +83,7 @@ stages:
 
           - script: ls -alF dist/
 
-          - script: 'python -m twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) dist/*'
+          - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) dist/*'
             displayName: "Run twine for upload"
 
 
