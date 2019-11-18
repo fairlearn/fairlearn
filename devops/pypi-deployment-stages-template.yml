@@ -14,6 +14,10 @@ parameters:
   packageArtifactStem: 'Packages'
   versionArtifactStem: 'Version'
   versionFileStem: 'versionInfo'
+  kvSubscription:
+  kvVaultName:
+  kvUsername:
+  kvPassword:
 
 stages:
 # Create the PyPI package and save as a artifact
@@ -59,6 +63,16 @@ stages:
             inputs:
               versionSpec: ${{parameters.poolPythonVersion}}
               addToPath: true
+
+          - task: AzureKeyVault@1
+            displayName: "Fetch deployment secrets from KeyVault"
+            inputs:
+              azureSubscription: ${{parameters.kvSubscription}}
+              keyVaultName:  ${{parameters.kvVaultName}}
+              secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
+
+          - script: echo $kvUsername
+            displayName: "Showing username from KeyVault"
 
           - script: pip install twine
             displayName: 'Install twine'
