@@ -42,7 +42,7 @@ stages:
 - stage: 'Upload_Package_To_PyPI_${{parameters.targetType}}'
 
   jobs:
-  - deployment: 'PyPI_${{parameters.targetType}}'
+  - deployment: 'PyPI_${{parameters.targetType}}_Upload'
     environment: ${{parameters.targetEnvironment}}
     pool:
       vmImage: ${{parameters.poolImage}}
