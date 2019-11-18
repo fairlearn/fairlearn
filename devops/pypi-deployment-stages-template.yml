@@ -71,7 +71,7 @@ stages:
               keyVaultName:  ${{parameters.kvVaultName}}
               secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
 
-          - script: echo $kvUsername
+          - script: echo $(kvUsername)
             displayName: "Showing username from KeyVault"
 
           - script: pip install twine
