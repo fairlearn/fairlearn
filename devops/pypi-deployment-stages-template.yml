@@ -80,7 +80,7 @@ stages:
           - script: ls -R $(Pipeline.Workspace)/$(PackageDirectory)
             displayName: "Files in $(Pipeline.Workspace)/$(PackageDirectory)"
 
-          - script: 'python -m twine upload --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) dist $(Pipeline.Workspace)/$(PackageDirectory)/*'
+          - script: 'python -m twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) $(Pipeline.Workspace)/$(PackageDirectory)/*'
             displayName: "Run twine for upload"
 
 
