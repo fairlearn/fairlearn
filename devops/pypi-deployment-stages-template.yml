@@ -71,8 +71,10 @@ stages:
               keyVaultName:  ${{parameters.kvVaultName}}
               secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
 
-          - script: echo $(kvUsername)
-            displayName: "Showing username from KeyVault"
+          - script: printenv
+            displayName: "Showing environment"
+
+          - script: 'echo $(${{parameters.kvUsername}})'
 
           - script: pip install twine
             displayName: 'Install twine'
@@ -80,7 +82,7 @@ stages:
           - script: ls -R $(Pipeline.Workspace)/$(PackageDirectory)
             displayName: "Files in $(Pipeline.Workspace)/$(PackageDirectory)"
 
-          - script: echo "python twine upload --repository-url $(pypiUrl) $(Pipeline.Workspace)/$(PackageDirectory)/*"
+          - script: 'python twine upload --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) $(Pipeline.Workspace)/$(PackageDirectory)/*''
             displayName: "Run twine for upload"
 
 
