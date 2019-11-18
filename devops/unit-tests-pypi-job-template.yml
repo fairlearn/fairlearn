@@ -1,0 +1,69 @@
+# Job template for running our unit tests against a pip package
+
+# To ensure that we really run against the pip install, we first remove
+# the fairlearn/ directory from the checked out code
+
+parameters:
+  name: ''
+  vmImage: ''
+  pyVersions: [3.5, 3.6, 3.7]
+  requirementsFile: 'requirements.txt'
+  targetType:
+  versionFileArtifact:
+  versionFileName:
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  variables:
+    ${{ if eq(parameters.targetType, 'Test') }}:
+      pypiUrl: https://test.pypi.org/simple/
+    ${{ if eq(parameters.targetType, 'Prod') }}:
+      pypiUrl: https://pypi.org/simple/
+        
+
+  strategy:
+    maxParallel: 2
+    matrix:
+      ${{ each pyVer in parameters.pyVersions }}:
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
+
+  steps:
+  # Remove the fairlearn/ directory (and some others)
+  # This is to ensure we test against the pip install
+  - template: prepare-repo-for-pip-testing-steps-template.yml
+
+  # Get the pip version to install from the artifacts created
+  # by earlier build stages
+  # Store this in fairlearnVersionForpip
+  - template: fetch-version-from-artifacts-steps-template.yml
+    parameters:
+      artifactName: ${{parameters.versionFileArtifact}}
+      artifactFile: ${{parameters.versionFileName}}
+      targetVariable: fairlearnVersionForpip
+
+  # Specify the version of Python to use
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(PyVer)'
+    inputs:
+      versionSpec: '$(PyVer)' 
+      addToPath: true
+
+  # Install our requirements from regular PyPI
+  - script: pip install -r ${{ parameters.requirementsFile }}
+    displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+
+  # Install fairlearn withe the specified version from the appropriate PyPI index
+  - script: pip install --index-url $(pypiUrl) fairlearn==$(fairlearnVersionForpip)
+    displayName: "Install fairlearn with pip"
+
+  # Run the tests
+  - script: python -m pytest test/ --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip)"
+    displayName: 'Run tests'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()

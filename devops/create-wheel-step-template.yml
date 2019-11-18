@@ -1,0 +1,38 @@
+parameters:
+  pyVer: 3.6
+  targetType: ''
+  versionFilename: ''
+  packageArtifactName: ''
+  versionArtifactName: ''
+
+steps:
+- task: UsePythonVersion@0
+  displayName: 'Use Python ${{parameters.pyVer}}'
+  inputs:
+    versionSpec: ${{parameters.pyVer}}
+    addToPath: true
+
+- script: pip install setuptools wheel 
+  displayName: 'Install setuptools'
+
+- script: pip install -r requirements.txt
+  displayName: "Install fairlearn requirements"
+
+- task: PowerShell@2
+  displayName: 'Build wheels'
+  inputs:
+    filePath: scripts/build-wheels.ps1
+    arguments: '-targetType ${{parameters.targetType}} -versionFilename ${{parameters.versionFilename}} -rcVersion $(RC_VERSION)'
+    pwsh: true
+
+- task: PublishPipelineArtifact@1
+  displayName: "Publish wheels"
+  inputs:
+    path: $(System.DefaultWorkingDirectory)/dist
+    artifact: '${{parameters.packageArtifactName}}'
+
+- task: PublishPipelineArtifact@1
+  displayName: "Publish version information file"
+  inputs:
+    path: '$(System.DefaultWorkingDirectory)/${{parameters.versionFilename}}'
+    artifact: '${{parameters.versionArtifactName}}'
