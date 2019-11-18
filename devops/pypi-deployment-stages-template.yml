@@ -74,7 +74,7 @@ stages:
           - script: pip install twine
             displayName: 'Install twine'
 
-          - script: ls -R $(Pipeline.Workspace)/$(PackageDirectory)
+          - script: ls -alFR $(Pipeline.Workspace)/$(PackageDirectory)
             displayName: "Files in $(Pipeline.Workspace)/$(PackageDirectory)"
 
           - script: 'python -m twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) $(Pipeline.Workspace)/$(PackageDirectory)/*'
