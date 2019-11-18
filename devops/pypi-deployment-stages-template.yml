@@ -86,7 +86,7 @@ stages:
     - task: Delay@1
       displayName: "Pause to allow PyPI updates to complete"
       inputs:
-        delayForMinutes: "1"
+        delayForMinutes: "2"
 
 
 # Fetch the package from the PyPI index and run tests against it
