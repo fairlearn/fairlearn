@@ -113,19 +113,18 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             || specifiedType === PredictionTypes.regression) {
             return specifiedType;
         }
-        const trueIsInteger = trueY.every(x => Number.isInteger(x));
-        const predictedIsInteger = predictedYs.every(predictionVector => predictionVector.every(x => Number.isInteger(x)));
+        const predictedIsPossibleProba = predictedYs.every(predictionVector => predictionVector.every(x => x >= 0 && x <= 1));
         const trueIsBinary = _.uniq(trueY).length < 3;
-        if (!trueIsInteger) {
+        if (!trueIsBinary) {
             return PredictionTypes.regression;
         }
-        if (!predictedIsInteger) {
+        if (!predictedIsPossibleProba) {
             return PredictionTypes.probability;
         }
         if (trueIsBinary && _.uniq(_.flatten(predictedYs)).length < 3) {
-            return PredictionTypes.binaryClassification
+            return PredictionTypes.binaryClassification;
         }
-        return PredictionTypes.regression
+        return PredictionTypes.regression;
     }
 
     private static readonly classNames = mergeStyleSets({
