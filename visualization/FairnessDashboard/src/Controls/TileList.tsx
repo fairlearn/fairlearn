@@ -50,7 +50,9 @@ export class TileList extends React.PureComponent<ITileListProps> {
             color: "#333333",
             fontSize: "18px",
             lineHeight: "22px",
-            fontWeight: "500"
+            fontWeight: "500",
+            paddingRight: "16px",
+            margin: 0
         },
         description: {
             paddingTop: "10px",
@@ -76,7 +78,7 @@ export class TileList extends React.PureComponent<ITileListProps> {
             onClick={item.onSelect.bind(this)}
             key={index}
             data-is-focusable={true}>
-            {item.selected && (<Icon iconName="CompletedSolid" className={TileList.classNames.iconClass}/>)}
+            <Icon iconName={item.selected ? "RadioBtnOn" : "RadioBtnOff"} className={TileList.classNames.iconClass}/>
             <h2 className={TileList.classNames.title}>{item.title}</h2>
             <p className={TileList.classNames.description}>{item.description}</p>
           </div>

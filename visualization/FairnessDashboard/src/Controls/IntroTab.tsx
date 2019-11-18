@@ -66,21 +66,28 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
             width: "30px"
         },
         stepLabel: {
+            color: "#333333",
             fontSize: "18px",
             lineHeight: "24px",
             fontWeight: "500",
         },
         explanatoryStep: {
-            fontSize: "15px",
-            lineHeight: "20px",
-            color: "#666666",
             maxWidth: "300px",
             paddingRight: "20px",
             flex: 1
         },
+        explanatoryText: {
+            paddingTop: "15px",
+            fontSize: "15px",
+            lineHeight: "20px",
+            color: "#666666"
+        },
         getStarted: {
             paddingTop: "30px",
-            fontSize: "30px"
+            color: "#333333",
+            fontSize: "18px",
+            lineHeight: "24px",
+            fontWeight: "500"
         }
     });
 
@@ -99,14 +106,14 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                             <span className={IntroTab.classNames.numericLabel}>01</span>
                             <span className={IntroTab.classNames.stepLabel}>{localization.Intro.features}</span>
                         </div>
-                        <div className={IntroTab.classNames.explanatoryStep}>{localization.Intro.featuresInfo}</div>
+                        <div className={IntroTab.classNames.explanatoryText}>{localization.Intro.featuresInfo}</div>
                     </div>
                     <div className={IntroTab.classNames.explanatoryStep}>
                         <div>
                             <span className={IntroTab.classNames.numericLabel}>02</span>
                             <span className={IntroTab.classNames.stepLabel}>{localization.Intro.accuracy}</span>
                         </div>
-                        <div >{localization.Intro.accuracyInfo}</div>
+                        <div className={IntroTab.classNames.explanatoryText}>{localization.Intro.accuracyInfo}</div>
                     </div>
                 </div>
                 <Stack horizontalAlign={"center"}>

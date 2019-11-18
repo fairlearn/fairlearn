@@ -6,8 +6,8 @@ export class MetricsCache {
 
     // Top index is featureBin index, second index is model index. Third string key is metricKey
     private cache: Array<Array<{[key: string]: IMetricResponse}>>;
-    constructor(featureCount: number,
-        numberOfModels: number,
+    constructor(private featureCount: number,
+        private numberOfModels: number,
         private fetchMethod: (request: IMetricRequest) =>  Promise<IMetricResponse>) {
         this.cache = new Array(featureCount).fill(0).map(y => new Array(numberOfModels).fill(0).map(x => {return {};}));
     }
@@ -36,13 +36,23 @@ export class MetricsCache {
             this.cache[featureIndex][modelIndex][key] = value;
         }
 
-        const min = Math.min(...(value.bins as number[]));
-        const max = Math.max(...(value.bins as number[]));
+        const bins = value.bins.slice().filter(x => x !== undefined && !isNaN(x));
+
+        const min = Math.min(...(bins as number[]));
+        const max = Math.max(...(bins as number[]));
         if (isNaN(min) || isNaN(max) || (max === 0 && disparityMethod === ParityModes.ratio)) {
             return Number.NaN;
         }
         return disparityMethod === ParityModes.difference ?
             max - min :
             min / max;
+    }
+
+    public clearCache(binIndex?: number): void {
+        if (binIndex !== undefined) {
+            this.cache[binIndex] = new Array(this.numberOfModels).fill(0).map(x => {return {};});
+        } else {
+            this.cache = new Array(this.featureCount).fill(0).map(y => new Array(this.numberOfModels).fill(0).map(x => {return {};}));
+        }
     }
 }
