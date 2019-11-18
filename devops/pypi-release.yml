@@ -66,7 +66,7 @@ stages:
     kvSubscription: fairlearn-pipeline-learning # 84d6bb98-69b0-41e6-9794-6b24214da700 # a3096a9b-cf1a-4ed9-9d74-7ff3858aa973 # To be fixed
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
-    kvPasswordname: 'passwordtest'
+    kvPassword: 'passwordtest'
 
 # =================================================================================================================
 
