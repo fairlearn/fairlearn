@@ -77,9 +77,14 @@ stages:
           - script: ls -alFR $(Pipeline.Workspace)/$(PackageDirectory)
             displayName: "Files in $(Pipeline.Workspace)/$(PackageDirectory)"
 
-          - script: 'python -m twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) $(PackageDirectory)/*'
+          - script: mkdir dist
+
+          - script: cp $(Pipeline.Workspace)/$(PackageDirectory)/* dist/
+
+          - script: ls -alF dist/
+
+          - script: 'python -m twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p $(${{parameters.kvPassword}}) dist/*'
             displayName: "Run twine for upload"
-            workingDirectory: $(Pipeline.Workspace)
 
 
 # Fetch the package from the PyPI index and run tests against it
