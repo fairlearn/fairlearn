@@ -1,3 +1,6 @@
+# Step templates to create the wheels and file specifying the current version
+# Note that this uses the DEV_VERSION variable
+
 parameters:
   pyVer: 3.6
   targetType: ''
@@ -22,7 +25,7 @@ steps:
   displayName: 'Build wheels'
   inputs:
     filePath: scripts/build-wheels.ps1
-    arguments: '-targetType ${{parameters.targetType}} -versionFilename ${{parameters.versionFilename}} -rcVersion $(RC_VERSION)'
+    arguments: '-targetType ${{parameters.targetType}} -versionFilename ${{parameters.versionFilename}} -devVersion $(DEV_VERSION)'
     pwsh: true
 
 - task: PublishPipelineArtifact@1
