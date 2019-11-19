@@ -9,7 +9,7 @@
 #    - Run tests against package on PyPI-Test
 # 3. Release to PyPI itself, repeating the same stages
 
-# Note that the pipeline MUST be queued with a variable RC_VERSION set to an
+# Note that the pipeline MUST be queued with a variable DEV_VERSION set to an
 # integer value. This is used to make the packages on PyPI-Test 'release
 # candidates' so that minor fixes can be made without requiring a separate checkin
 # to release to PyPI itself. See the logic in __init__.py
