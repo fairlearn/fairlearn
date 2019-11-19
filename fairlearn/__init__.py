@@ -8,24 +8,24 @@ Machine Learning models.
 import os
 import sys
 
-_FAIRLEARN_RC_KEY = "FAIRLEARN_RC"
+_FAIRLEARN_DEV_VERSION_ENV_VAR = "FAIRLEARN_DEV_VERSION"
 
 
-_base_version = "0.4.0"
-_rc_version = ""
+_base_version = "0.4.0a0"
+_dev_version = ""
 
-if _FAIRLEARN_RC_KEY in os.environ.keys():
-    rc_string = os.environ[_FAIRLEARN_RC_KEY]
+if _FAIRLEARN_DEV_VERSION_ENV_VAR in os.environ.keys():
+    dev_version_string = os.environ[_FAIRLEARN_DEV_VERSION_ENV_VAR]
     try:
-        rc_value = int(rc_string)
-        _rc_version = "rc{0}".format(rc_value)
+        dev_version_value = int(dev_version_string)
+        _dev_version = ".dev{0}".format(dev_version_value)
     except ValueError:
         msg = "Value of {0} in {1} did not parse to integer. Ignoring"
-        print(msg.format(rc_string, _FAIRLEARN_RC_KEY), file=sys.stderr)
+        print(msg.format(dev_version_string, _FAIRLEARN_DEV_VERSION_ENV_VAR), file=sys.stderr)
 
 
 __name__ = "fairlearn"
-__version__ = "{0}{1}".format(_base_version, _rc_version)
+__version__ = "{0}{1}".format(_base_version, _dev_version)
 
 
 _NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
