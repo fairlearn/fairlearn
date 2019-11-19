@@ -163,5 +163,12 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         description: localization.Metrics.aucDescription,
         isMinimization: false,
         isPercentage: false
+    },
+    "balanced_accuracy_score": {
+        key: "balanced_accuracy_score",
+        title: localization.Metrics.balancedAccuracy,
+        description: localization.Metrics.balancedAccuracyDescription,
+        isMinimization: false,
+        isPercentage: true
     }
 };
