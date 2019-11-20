@@ -126,7 +126,7 @@
         "r2_score": "R-squared score",
         "rms_error": "RMSE (root mean squared error)",
         "auc": "Area under ROC curve",
-        "balancedRootMeanSquaredError": "Balanced root mean squared error",
+        "balancedRootMeanSquaredError": "Balanced RMSE",
         "accuracyDescription": "The fraction of data points classified correctly.",
         "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
         "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity.",
