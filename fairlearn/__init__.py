@@ -12,7 +12,7 @@ _FAIRLEARN_DEV_VERSION_ENV_VAR = "FAIRLEARN_DEV_VERSION"
 
 
 _base_version = "0.4.0a0"
-_dev_version = ""
+_rc_version = ""
 
 if _FAIRLEARN_DEV_VERSION_ENV_VAR in os.environ.keys():
     dev_version_string = os.environ[_FAIRLEARN_DEV_VERSION_ENV_VAR]

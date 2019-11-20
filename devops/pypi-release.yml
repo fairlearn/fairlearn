@@ -47,7 +47,7 @@ stages:
   - template: all-tests-job-template.yml
     parameters:
       name: MacOS
-      vmImage:  'macOS-10.14'
+      vmImage:  'macos-latest'
       pyVersions: [3.6, 3.7] 
 
   - template: notebook-job-template.yml
