@@ -54,6 +54,10 @@ class FairlearnDashboard(object):
                 "model_type": ["classification"],
                 "function": group_accuracy_score
             },
+            "balanced_accuracy_score": {
+                "model_type": ["classification"],
+                "function": group_roc_auc_score
+            },
             "precision_score": {
                 "model_type": ["classification"],
                 "function": group_precision_score

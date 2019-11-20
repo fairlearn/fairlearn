@@ -114,7 +114,7 @@ stages:
   - template: unit-tests-pypi-job-template.yml
     parameters:
       name: MacOS
-      vmImage: 'macOS-10.13'
+      vmImage: 'macos-latest'
       pyVersions: [3.6, 3.7]
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'

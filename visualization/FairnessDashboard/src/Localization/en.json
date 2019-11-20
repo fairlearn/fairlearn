@@ -135,7 +135,9 @@
         "meanAbsoluteErrorDescription": "The average of absolute values of errors. More robust to outliers than MSE.",
         "r2Description": "The fraction of variance in the labels explained by the model.",
         "aucDescription": "The quality of the predictions, viewed as scores, in separating positive examples from negative examples.",
-        "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying is highly imbalanced."
+        "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying is highly imbalanced.",
+        "balancedAccuracy": "Balanced accuracy",
+        "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying is highly imbalanced."
     },
     "BinDialog": {
         "header": "Configure bins",

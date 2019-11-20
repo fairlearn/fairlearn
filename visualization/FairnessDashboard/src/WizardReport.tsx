@@ -510,7 +510,6 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         </ActionButton>
                         <div className={WizardReport.classNames.modelLabel}>
                             {this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}
-                            {localization.formatString(localization.Report.modelName, this.props.selectedModelIndex)}
                         </div>
                     </div>}
                 <div className={WizardReport.classNames.headerTitle}>{localization.Report.title}</div>
