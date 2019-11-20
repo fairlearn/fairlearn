@@ -63,22 +63,9 @@ postprocessor.predict(X, sensitive_features=sensitive_features)
 
 ## Creating new releases
 
-If you are one of the current maintainers of this project, follow this checklist to create a new release:
+We have a [Azure DevOps Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary) which takes care of building wheels and pushing to PyPI. Validations are also performed prior to any deployments, and also following the uploads to Test-PyPI and PyPI. To use it:
+1. Ensure that `_base_version` in `fairlearn/__init__.py` is set correctly for PyPI
+1. When queuing the pipeline, set the variable `DEV_VERSION` to an integer
+1. When the package is uploaded to Test-PyPI, this number will be appended to the version as a `dev[n]` suffix
 
-1. Ensure that all builds run successfully on all operating systems and python versions
-1. Tag and push the branch point: `git tag vxx.xx-branch; git push --tags`
-1. Create a release branch at this tag: `git checkout -b release/vxx.xx`
-1. Convert all relative links in `README.md` to direct links to the prospective version tag in GitHub
-1. Bump the module version in `fairlearn/__init__.py`
-1. Tag and push: `git tag vxx.xx; git push --tags`
-1. Verify Nightly builds are Green for the release branch
-1. Manually run the notebooks from the release branch
-1. Remove old build files: `git clean -xdf`
-1. Follow the [PyPI instructions](https://packaging.python.org/tutorials/packaging-projects) to push to **TestPyPI**
-1. Verify that package downloads with correct version from TestPyPI and that the project landing page on TestPyPI is correct
-1. Use the [PyPI instructions](https://packaging.python.org/tutorials/packaging-projects/) to push to **PyPI** itself
-1. In a new Python environment, run `pip install fairlearn`
-1. Copy the contents of `test/unit` to temporary directory (outside the cloned github directory) and run `python -m pytest -s test/unit` in the new environment. Check that all tests pass
-1. If necessary, update the position of the version tag on the release branch: `git tag vxx.xx; git push --tags --force`
-
-If updates are required from master in the release branch, these should be cherry picked. Be sure to do a *regular merge* for cherry picks, and **not** a squash merge. This will ensure the identity of the updates is maintained between the branches. This also applies if there are bug fixes in the release branch which need to be migrated into master.
+The pipeline requires sign offs immediately prior to the deployments to Test-PyPI and PyPI. One feature currently missing from the pipeline is tagging the released version. This can be done manually in the github page.
