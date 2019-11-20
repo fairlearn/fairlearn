@@ -116,7 +116,7 @@
         "falloutRate": "Fallout rate",
         "maxError": "Max error",
         "meanAbsoluteError": "Mean absolute error",
-        "meanSquaredError": "Mean squared error",
+        "meanSquaredError": " MSE (mean squared error)",
         "meanSquaredLogError": "Mean squared log error",
         "medianAbsoluteError": "Median absolute error",
         "average": "Average prediction",
@@ -124,7 +124,7 @@
         "overprediction": "Overprediction",
         "underprediction": "Underprediction",
         "r2_score": "R-squared score",
-        "rms_error": "Root mean squared error",
+        "rms_error": "RMSE (root mean squared error)",
         "auc": "Area under ROC curve",
         "balancedRootMeanSquaredError": "Balanced root mean squared error",
         "accuracyDescription": "The fraction of data points classified correctly.",
@@ -135,9 +135,9 @@
         "meanAbsoluteErrorDescription": "The average of absolute values of errors. More robust to outliers than MSE.",
         "r2Description": "The fraction of variance in the labels explained by the model.",
         "aucDescription": "The quality of the predictions, viewed as scores, in separating positive examples from negative examples.",
-        "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying is highly imbalanced.",
+        "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced.",
         "balancedAccuracy": "Balanced accuracy",
-        "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying is highly imbalanced."
+        "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced."
     },
     "BinDialog": {
         "header": "Configure bins",
