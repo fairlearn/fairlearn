@@ -50,7 +50,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 type: 'scatter',
                 xAccessor: 'Accuracy',
                 yAccessor: 'Parity',
-                hoverinfo: 'none'
+                hoverinfo: 'text'
             }
         ],
         layout: {
@@ -258,6 +258,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
             series.name = this.props.dashboardContext.modelNames[series.name];
+            series.text = this.props.dashboardContext.modelNames;
             return series;
         });
         const accuracyMetricTitle = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title 
