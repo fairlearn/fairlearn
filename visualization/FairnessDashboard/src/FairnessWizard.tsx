@@ -118,7 +118,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         if (!trueIsBinary) {
             return PredictionTypes.regression;
         }
-        if (!predictedIsPossibleProba) {
+        if (predictedIsPossibleProba) {
             return PredictionTypes.probability;
         }
         if (trueIsBinary && _.uniq(_.flatten(predictedYs)).length < 3) {
