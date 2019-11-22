@@ -21,7 +21,7 @@ steps:
 - script: pip install -r requirements.txt
   displayName: "Install fairlearn requirements"
 
-- task: @PowerShell@2
+- task: PowerShell@2
   displayName: 'Build widget'
   inputs:
     filePath: scripts/build-widget.ps1
