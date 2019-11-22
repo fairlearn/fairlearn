@@ -18,6 +18,7 @@ try
         throw "Build failed with result code $LASTEXITCODE"
     }
 
+    Write-Host "Removing extra directories"
     # Tidy up
     Remove-Item -Recurse dist
     Remove-Item -Recurse lib
