@@ -20,9 +20,9 @@ try
 
     Write-Host "Removing extra directories"
     # Tidy up
-    Remove-Item -Recurse dist
-    Remove-Item -Recurse lib
-    Remove-Item -Recurse node_modules
+    Remove-Item -Force -Recurse dist
+    Remove-Item -Force -Recurse lib
+    Remove-Item -Force -Recurse node_modules
 }
 finally
 {
