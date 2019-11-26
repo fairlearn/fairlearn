@@ -62,6 +62,16 @@ or you can clone the repository locally via
 ```python
 git clone git@github.com:fairlearn/fairlearn.git
 ```
+If you clone from git and wish to use the Fairness dashboard, you will need to [install Yarn](https://yarnpkg.com/lang/en/docs/install), and then do the following:
+```bash
+cd fairlearn/widget/js
+yarn install
+yarn build:all
+rm -rf dist
+rm -rf lib
+rm -rf node_modules
+```
+These commands only need to be run when you want the latest version of the dashboard (after pulling from our GitHub repository).
 
 To verify that the cloned repository works (the pip package does not include the tests), run
 
