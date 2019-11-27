@@ -17,7 +17,7 @@ class LeastSquaresBinaryClassifierLearner:
         self.weights = pd.Series(self.lsqinfo[0], index=list(X))
 
     def predict(self, X):
-        pred = X.dot(self.weights)
+        pred = X.dot(np.asarray(self.weights))
         return 1 * (pred > 0.5)
 
 

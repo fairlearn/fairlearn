@@ -8,8 +8,8 @@ import pytest
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import ErrorRate
-from simple_learners import LeastSquaresBinaryClassifierLearner
-from test_utilities import sensitive_features, X1, X2, X3, labels
+from .simple_learners import LeastSquaresBinaryClassifierLearner
+from .test_utilities import sensitive_features, X1, X2, X3, labels
 
 
 class TestExpgradSmoke:
