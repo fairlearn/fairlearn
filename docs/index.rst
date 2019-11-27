@@ -6,7 +6,7 @@
 Welcome to fairlearn's documentation!
 =====================================
 
-The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. See <fairlearn> for more information.
+The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. See `fairlearn` for more information.
 
 .. toctree::
    :maxdepth: 2
