@@ -10,6 +10,7 @@ Welcome to fairlearn's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+Fairlearn has some text on the index page.
 
 
 Indices and tables
