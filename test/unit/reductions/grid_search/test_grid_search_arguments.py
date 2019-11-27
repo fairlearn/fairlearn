@@ -12,47 +12,15 @@ from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
 
+from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
+
 # ==============================================================
-
-# The following are functions which convert ndarrays into other datatypes
-# They are used to generate different argument types for calls to
-# GridSearch
-
-
-def identity(X):
-    return X
-
-
-def pylist(X):
-    return X.tolist()
-
-
-def pandasdf(X):
-    return pd.DataFrame(X)
-
-
-def pandasseries(X):
-    # Will not work if ndarray has more than one dimension
-    return pd.Series(X)
-
-
-def ndarray2d(X):
-    # Adds a second dimension of length 1 onto a 1D
-    # array. This is for checking that shapes n and
-    # n*1 behave the same
-    if len(X.shape) != 1:
-        raise RuntimeError("ndarray2d requires 1d ndarray")
-
-    X = np.expand_dims(X, 1)
-    assert len(X.shape) == 2
-    return X
-
 
 # List the different datatypes which need to succeed for
 # all GridSearch calls
-candidate_X_transforms = [identity, pandasdf]
-candidate_Y_transforms = [identity, pylist, pandasdf, pandasseries, ndarray2d]
-candidate_A_transforms = [identity, pylist, pandasdf, pandasseries, ndarray2d]
+candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
+candidate_Y_transforms = conversions_for_1d
+candidate_A_transforms = conversions_for_1d
 
 
 # Base class for tests
