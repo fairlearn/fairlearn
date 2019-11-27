@@ -10,7 +10,8 @@ from traitlets import Unicode, Dict
 
 @widgets.register
 class FairlearnWidget(widgets.DOMWidget):
-    """The python widget definition for the Fairlearn."""
+    """The python widget definition for the Fairlearn dashboard.
+    """
 
     _view_name = Unicode('FairlearnView').tag(sync=True)
     _model_name = Unicode('FairlearnModel').tag(sync=True)
