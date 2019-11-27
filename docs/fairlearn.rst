@@ -1,7 +1,7 @@
 fairlearn package
 =================
 
-This is a package description from the fairlearn reST file itself.
+The fairlearn package contains several sub-packages.
 
 Subpackages
 -----------
