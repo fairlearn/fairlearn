@@ -9,6 +9,7 @@ Welcome to fairlearn's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   
    fairlearn
 
 Fairlearn has some text on the index page.
