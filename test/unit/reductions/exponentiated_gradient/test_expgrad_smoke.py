@@ -12,7 +12,7 @@ from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
 
 
-class TestExpgradSmoke:
+class TestExponentiatedGradientSmoke:
     def setup_method(self, method):
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
