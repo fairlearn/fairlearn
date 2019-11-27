@@ -9,6 +9,7 @@ Welcome to fairlearn's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+        fairlearn <fairlearn.rst>
 
 Fairlearn has some text on the index page.
 
@@ -16,5 +17,4 @@ Fairlearn has some text on the index page.
 Indices and tables
 ==================
 
-* :ref:`modules`
 * :ref:`search`
