@@ -16,6 +16,5 @@ Fairlearn has some text on the index page.
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
+* :ref:`modules`
 * :ref:`search`
