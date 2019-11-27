@@ -1,8 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import pytest
+
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
+
+from workspace import get_workspace
 
 
 THRESHOLD_OPTIMIZER = ThresholdOptimizer.__name__
@@ -100,3 +104,8 @@ def get_all_perf_test_configurations():
                                           max_memory_consumption))
 
     return perf_test_configurations
+
+
+@pytest.fixture(scope="session")
+def workspace():
+    return get_workspace()

@@ -111,3 +111,16 @@ venv.bak/
 
 # Documentation
 docbuild/
+
+# generated widget files
+fairlearn/widget/static/index.js
+fairlearn/widget/static/index.js.map
+fairlearn/widget/static/extension.js
+fairlearn/widget/static/extension.js.map
+fairlearn/widget/js/fairlearn_widget/labextension/fairlearn-widget-*.tgz
+
+# generated perf test scripts
+test/perf/scripts/**
+
+# perf test setup secrets
+test/perf/setenv.ps1

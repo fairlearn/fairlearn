@@ -2,90 +2,59 @@
 # Licensed under the MIT License.
 
 import logging
+import os
 import pytest
-from time import time
-from tempeh.configurations import models, datasets
+import time
 
-from fairlearn.postprocessing import ThresholdOptimizer
-from fairlearn.postprocessing._threshold_optimizer import DEMOGRAPHIC_PARITY
-from fairlearn.reductions import ExponentiatedGradient, GridSearch
-from fairlearn.reductions import DemographicParity
+from azureml.core import Experiment, RunConfiguration, ScriptRunConfig
+from azureml.core.environment import CondaDependencies
 
 from conftest import get_all_perf_test_configurations
+from environment_setup import configure_environment
+from script_generation import generate_script
 
 all_perf_test_configurations = get_all_perf_test_configurations()
 all_perf_test_configurations_descriptions = \
     [config.__repr__().replace(' ', '') for config in all_perf_test_configurations]
 
+SCRIPT_DIRECTORY = os.path.join('test', 'perf', 'scripts')
+EXPERIMENT_NAME = 'perftest'
 
 logging.basicConfig(level=logging.DEBUG)
 
 
+# ensure the tests are run from the fairlearn repository base directory
+if not os.getcwd().endswith("fairlearn") or not os.path.exists("test"):
+    raise Exception("Please run perf tests from the fairlearn repository base directory.")
+
+
 @pytest.mark.parametrize("perf_test_configuration", all_perf_test_configurations,
                          ids=all_perf_test_configurations_descriptions)
-def test_perf(perf_test_configuration, request):
+def test_perf(perf_test_configuration, workspace, request):
     print("Starting with test case {}".format(request.node.name))
-    print("Downloading dataset")
-    dataset = datasets[perf_test_configuration.dataset]()
-    X_train, X_test = dataset.get_X()
-    y_train, y_test = dataset.get_y()
-    print("Done downloading dataset")
 
-    if perf_test_configuration.dataset == "adult_uci":
-        # sensitive feature is 8th column (sex)
-        sensitive_features_train = X_train[:, 7]
-        sensitive_features_test = X_test[:, 7]
-    elif perf_test_configuration.dataset == "diabetes_sklearn":
-        # sensitive feature is 2nd column (sex)
-        # features have been scaled, but sensitive feature needs to be str or int
-        sensitive_features_train = X_train[:, 1].astype(str)
-        sensitive_features_test = X_test[:, 1].astype(str)
-        # labels can't be floats as of now
-        y_train = y_train.astype(int)
-        y_test = y_test.astype(int)
-    elif perf_test_configuration.dataset == "compas":
-        # sensitive feature is either race or sex
-        # TODO add another case where we use sex as well, or both (?)
-        sensitive_features_train, sensitive_features_test = dataset.get_sensitive_features('race')
-        y_train = y_train.astype(int)
-        y_test = y_test.astype(int)
-    else:
-        raise ValueError("Sensitive features unknown for dataset {}"
-                         .format(perf_test_configuration.dataset))
+    script_name = determine_script_name(request.node.name)
+    generate_script(request, perf_test_configuration, script_name, SCRIPT_DIRECTORY)
+    
+    experiment = Experiment(workspace=workspace, name=EXPERIMENT_NAME)
+    compute_target = workspace.get_default_compute_target(type='cpu')
+    run_config = RunConfiguration()
+    run_config.target = compute_target
+    environment = configure_environment(workspace)
+    run_config.environment = environment
+    environment.register(workspace=workspace)
+    script_run_config = ScriptRunConfig(source_directory=SCRIPT_DIRECTORY, script=script_name, run_config=run_config)
+    print("submitting run")
+    run = experiment.submit(config=script_run_config)
+    print("submitted run")
+    run.wait_for_completion()
+    print("run completed")
+    while run.get_status() == "Finalizing":
+        time.sleep(1)
+    assert run.get_status() == "Completed"
 
-    print("Fitting estimator")
-    estimator = models[perf_test_configuration.predictor]()
-    unconstrained_predictor = models[perf_test_configuration.predictor]()
-    unconstrained_predictor.fit(X_train, y_train)
-    print("Done fitting estimator")
 
-    start_time = time()
-    if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-        mitigator = ThresholdOptimizer(unconstrained_predictor=unconstrained_predictor,
-                                       constraints=DEMOGRAPHIC_PARITY)
-    elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
-        mitigator = ExponentiatedGradient(estimator=estimator,
-                                          constraints=DemographicParity())
-    elif perf_test_configuration.mitigator == GridSearch.__name__:
-        mitigator = GridSearch(estimator=estimator,
-                               constraints=DemographicParity())
-    else:
-        raise Exception("Unknown mitigation technique.")
-
-    print("Fitting mitigator")
-
-    mitigator.fit(X_train, y_train, sensitive_features=sensitive_features_train)
-
-    if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-        mitigator.predict(X_test, sensitive_features=sensitive_features_test,
-                          random_state=1)
-    else:
-        mitigator.predict(X_test)
-
-    # TODO evaluate accuracy/fairness tradeoff
-
-    total_time = time() - start_time
-    print("Total time taken: {}s".format(total_time))
-    print("Maximum allowed time: {}s".format(perf_test_configuration.max_time_consumption))
-    assert total_time <= perf_test_configuration.max_time_consumption
-    print("\n\n===============================================================\n\n")
+def determine_script_name(test_case_name):
+    hashed_test_case_name = hash(test_case_name)
+    hashed_test_case_name = hashed_test_case_name if hashed_test_case_name >= 0 else -1 * hashed_test_case_name
+    return "{}.py".format(str(hashed_test_case_name))
