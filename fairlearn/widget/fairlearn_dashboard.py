@@ -22,11 +22,9 @@ class FairlearnDashboard(object):
     """The dashboard class, wraps the dashboard component.
 
     :param sensitive_features:  A matrix of feature vector examples (# examples x # features),
-        these can be from the initial dataset, or reserved from training. Currently only
-        categorical features are supported
+        these can be from the initial dataset, or reserved from training.
     :type sensitive_features: numpy.array or list[][] or Pandas Dataframe
-    :param y_true: The true labels for the provided dataset. Will overwrite any set on
-        explanation object already
+    :param y_true: The true labels or values for the provided dataset.
     :type y_true: numpy.array or list[]
     :param y_pred: Array of output predictions from models to be evaluated. Can be a single
         array of predictions, or a 2D list over multiple models. Can be a dictionary
