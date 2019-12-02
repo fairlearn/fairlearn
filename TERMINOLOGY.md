@@ -11,7 +11,7 @@ The fairlearn package largely follows the [terminology established by scikit-lea
 
 ## Fairness of AI systems
 
-AI systems can behave unfairly for a variety of reasons. Sometimes it is because of societal biases reflected in the training data and in the decisions made during the development and deployment of these systems. In other cases, AI systems behave unfairly not because of societal biases, but because of characteristics of the data (e.g., too few data points about some group of people) or characteristics of the systems themselves. Because it can be hard to distinguish between these reasons (and these reasons are not mutually exclusive and often exacerbate one another), we define whether an AI system is behaving unfairly in terms of its impact on people – i.e., in terms of harms – and not in terms of specific causes, such as societal biases, or in terms of intent, such as prejudice.
+AI systems can behave unfairly for a variety of reasons. Sometimes societal biases are reflected in the training data and in the decisions made during the development and deployment of these systems. In other cases, AI systems behave unfairly because of characteristics of the data (e.g., too few data points about some group of people) or characteristics of the systems themselves. It can be hard to distinguish between these reasons, especially since they are not mutually exclusive and often exacerbate one another. Therefore we define whether an AI system is behaving unfairly in terms of its impact on people – i.e., in terms of harms – and not in terms of specific causes, such as societal biases, or in terms of intent, such as prejudice.
 
 **Usage of the word _bias_.** Since we define fairness in terms of harms rather than specific causes (such as societal biases), we avoid the usage of the words _bias_ or _debiasing_ in describing the functionality of fairlearn.
 
@@ -19,9 +19,9 @@ AI systems can behave unfairly for a variety of reasons. Sometimes it is because
 
 There are many types of harms (see, e.g., the [keynote by K. Crawford at NeurIPS 2017](https://www.youtube.com/watch?v=fMym_BKWQzk)). The fairlearn package is most applicable to two kinds of harms:
 
-- _Allocation harms_. These harms can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
+- _Allocation harms_ can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
-- _Quality-of-service harms_. Quality of service refers to whether a system works as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld.
+- _Quality-of-service harms_ can occur when a system does not work as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld. Examples include varying accuracy in face recognition or hate speech detection.
 
 ### Fairness assessment and unfairness mitigation
 
@@ -44,25 +44,25 @@ For example, in fairlearn, we consider the following types of parity constraints
 
 _Binary classification_:
 
-- _Demographic parity_ (also known as _statistical parity_): A classifier _h_ satisfies demographic parity under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is statistically independent of the sensitive feature _A_. This is equivalent to E[_h_(_X_) | _A_=_a_] = E[_h_(_X_)] for all _a_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+- _Demographic parity_ (also known as _statistical parity_): A classifier _h_ satisfies demographic parity under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is statistically independent of the sensitive feature _A_. This is equivalent to ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%20%3D%20%5Cmathbb%7BE%7D%5Bh%28X%29%5D%20%5Cquad%20%5Cforall%20a). [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
 
-- _Equalized odds_: A classifier _h_ satisfies equalized odds under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is conditionally independent of the sensitive feature _A_ given the label _Y_. This is equivalent to E[_h_(_X_) | _A_=_a_, _Y_=_y_] = E[_h_(_X_) | _Y_=_y_] for all _a, y_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+- _Equalized odds_: A classifier _h_ satisfies equalized odds under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is conditionally independent of the sensitive feature _A_ given the label _Y_. This is equivalent to ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%2C%20Y%3Dy%5D%20%3D%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20Y%3Dy%5D%20%5Cquad%20%5Cforall%20a%2C%20y). [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
 
 - _Equal opportunity_: a relaxed version of equalized odds that only considers conditional expectations with respect positive labels, i.e., _Y_=1. [[Hardt et al.]]( https://ttic.uchicago.edu/~nati/Publications/HardtPriceSrebro2016.pdf)
 
 _Regression_:
 
-- _Demographic parity_: A predictor _f_ satisfies demographic parity under a distribution over (_X, A, Y_) if _f_(_X_) is independent of the sensitive feature _A_. This is equivalent to P[_f_(_X_) ≥ _z_ | _A_=_a_] = P[_f_(_X_) ≥ _z_] for all _a_ and _z_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+- _Demographic parity_: A predictor _f_ satisfies demographic parity under a distribution over (_X, A, Y_) if _f_(_X_) is independent of the sensitive feature _A_. This is equivalent to ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BP%7D%5Bf%28X%29%20%5Cgeq%20z%20%7C%20A%3Da%5D%20%3D%20%5Cmathbb%7BP%7D%5Bf%28X%29%20%5Cgeq%20z%5D%20%5Cquad%20%5Cforall%20a%2C%20z). [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
 
-- _Bounded group loss_: A predictor _f_ satisfies bounded group loss at level _ζ_ under a distribution over (_X, A, Y_) if E[loss(_Y_, _f_(_X_)) | _A_=_a_] ≤ _ζ_ for all _a_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+- _Bounded group loss_: A predictor _f_ satisfies bounded group loss at level _ζ_ under a distribution over (_X, A, Y_) if ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BE%7D%5B%5Ctext%7Bloss%7D%28Y%2C%20f%28X%29%29%20%7C%20A%3Da%5D%20%5Cleq%20%5Czeta%20%5Cquad%20%5Cforall%20a). [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
 
-Above, demographic parity seeks to mitigate allocation harms, whereas bounded group loss primarily seek to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
+Above, demographic parity seeks to mitigate allocation harms, whereas bounded group loss primarily seeks to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
 
 #### Disparity metrics, group metrics
 
 Disparity metrics evaluate how far a given predictor departs from satisfying a parity constraint. They can either compare the behavior across different groups in terms of ratios or in terms of differences. For example, for binary classification:
 
-- _Demographic parity difference_ = (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) - (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
-- _Demographic parity ratio_ = (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) / (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
+- _Demographic parity difference_ = ![equation](https://latex.codecogs.com/gif.latex?%28%5Cmax_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%29%20-%20%28%5Cmin_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%29).
+- _Demographic parity ratio_ = ![equation](https://latex.codecogs.com/gif.latex?%5Cleft%5C%28%5Cmin_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29%20/%20%5Cleft%5C%28%5Cmax_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29).
 
 The fairlearn package provides the functionality to convert common accuracy and error metrics from `scikit-learn` to _group metrics_, i.e., metrics that are evaluated on the entire data set and also on each group individually. Additionally, group metrics yield the minimum and maximum metric value and for which groups these values were observed, as well as the difference and ratio between the maximum and the minimum values. For more information refer to the subpackage `fairlearn.metrics`.
