@@ -3,7 +3,7 @@
 
 """Defines the fairlearn dashboard class."""
 
-from .fairlearnWidget import FairlearnWidget
+from ._fairlearn_widget import FairlearnWidget
 from fairlearn.metrics import group_accuracy_score, group_precision_score,\
     group_recall_score, group_zero_one_loss, group_max_error, group_mean_absolute_error,\
     group_mean_squared_error, group_median_absolute_error,\
