@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Fairlearn widget for Jupyter notebooks",
   "author": "Brandon Horn (rihorn@microsoft.com)",
-  "license": "See license file 'LICENSE'",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "repository": {
