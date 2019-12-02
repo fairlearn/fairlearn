@@ -104,9 +104,9 @@ class ExponentiatedGradient(Reduction):
     reductions described by `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
-        `predict(X)`, where `X` is the set of features, `y` is the set of labels, and
-        `sample_weight` is a set of weights; labels `y` and predictions returned by `predict(X)`
-        are either 0 or 1.
+        :code:`predict(X)`, where `X` is the set of features, `y` is the set of labels, and
+        `sample_weight` is a set of weights; labels `y` and predictions returned by
+        :code:`predict(X)` are either 0 or 1.
     :type estimator: An estimator
     :param constraints: The disparity constraints expressed as moments
     :type constraints: fairlearn.reductions.Moment
