@@ -1,8 +1,6 @@
 fairlearn\.reductions package
 =============================
 
-Some specific text from the reductions reST file
-
 Module contents
 ---------------
 
