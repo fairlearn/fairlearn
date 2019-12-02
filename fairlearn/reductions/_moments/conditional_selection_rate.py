@@ -90,7 +90,9 @@ ConditionalSelectionRate.__module__ = "fairlearn.reductions"
 class DemographicParity(ConditionalSelectionRate):
     """Implementation of Demographic Parity as a moment.
     A classifier :math:`h(X)` satisfies DemographicParity if
-    :math:`P[h(X) = y' | A = a] = P[h(X) = y'] \all a, y'`
+
+    .. math::
+      P[h(X) = y' | A = a] = P[h(X) = y'] \forall a, y'
     """
     short_name = "DemographicParity"
 
@@ -101,7 +103,9 @@ class DemographicParity(ConditionalSelectionRate):
 class EqualizedOdds(ConditionalSelectionRate):
     """Implementation of Equalized Odds as a moment.
     Adds conditioning on label compared to Demographic parity, i.e.
-    :math:`P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \all a, y, y'
+    
+    .. math::
+       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \forall a, y, y'
     """
     short_name = "EqualizedOdds"
 
