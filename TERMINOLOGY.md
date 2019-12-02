@@ -70,7 +70,7 @@ Above, demographic parity seeks to mitigate allocation harms, whereas bounded gr
 
 Disparity metrics evaluate how far a given predictor departs from satisfying a parity constraint. They can either compare the behavior across different groups in terms of ratios or in terms of differences. For example, for binary classification:
 
-- ![equation](https://latex.codecogs.com/gif.latex?%5Ctext%7BDemographic%20parity%20difference%7D%20%3D%28%5Cmax_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%29%20-%20%28%5Cmin_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%29).
-- ![equation](https://latex.codecogs.com/gif.latex?%5Ctext%7BDemographic%20parity%20ratio%7D%20%3D%5Cleft%5C%28%5Cmin_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29%20/%20%5Cleft%5C%28%5Cmax_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29).
+- ![equation](https://latex.codecogs.com/gif.latex?%5Ctext%7BDemographic%20parity%20difference%7D%20%3D%20%5Cleft%5C%28%5Cmax_a%5Cmathbb%7BE%7D%5Bh%28X%29%7CA%3Da%5D%5Cright%5C%29%20-%20%5Cleft%5C%28%5Cmin_a%5Cmathbb%7BE%7D%5Bh%28X%29%7CA%3Da%5D%5Cright%5C%29)
+- ![equation](https://latex.codecogs.com/gif.latex?%5Ctext%7BDemographic%20parity%20ratio%7D%20%3D%5Cleft%5C%28%5Cmin_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29%20/%20%5Cleft%5C%28%5Cmax_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29)
 
 The fairlearn package provides the functionality to convert common accuracy and error metrics from `scikit-learn` to _group metrics_, i.e., metrics that are evaluated on the entire data set and also on each group individually. Additionally, group metrics yield the minimum and maximum metric value and for which groups these values were observed, as well as the difference and ratio between the maximum and the minimum values. For more information refer to the subpackage `fairlearn.metrics`.
