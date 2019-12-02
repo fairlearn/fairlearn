@@ -30,4 +30,4 @@ jobs:
   parameters:
     pyVersions: [3.6]
 
--template: build-widget-job-template.yml
+- template: build-widget-job-template.yml
