@@ -48,7 +48,7 @@ All of the currently supported parity constraints (subclasses of `Moment`) are b
 
 #### Post-processing algorithms
 
-The constructors of post-processing algorithms require an already trained predictor as an argument or, alternatively, an estimator that is subsequently fitted on the data when executing `fit`. For post-processing algorithms, the `constraints` argument is provided as a string.
+The constructors of post-processing algorithms require either an already trained predictor or an estimator (which is trained on the data when executing `fit`). For post-processing algorithms, the `constraints` argument is provided as a string.
 
 ```python
 postprocessor = PostProcessing(unconstrained_predictor=predictor, constraints=constraints)
