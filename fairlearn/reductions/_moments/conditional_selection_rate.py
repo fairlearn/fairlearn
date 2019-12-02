@@ -92,7 +92,7 @@ class DemographicParity(ConditionalSelectionRate):
     A classifier :math:`h(X)` satisfies DemographicParity if
 
     .. math::
-      P[h(X) = y' | A = a] = P[h(X) = y'] \forall a, y'
+      P[h(X) = y' | A = a] = P[h(X) = y'] \\forall a, y'
     """
     short_name = "DemographicParity"
 
@@ -105,7 +105,7 @@ class EqualizedOdds(ConditionalSelectionRate):
     Adds conditioning on label compared to Demographic parity, i.e.
     
     .. math::
-       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \forall a, y, y'
+       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \\forall a, y, y'
     """
     short_name = "EqualizedOdds"
 
