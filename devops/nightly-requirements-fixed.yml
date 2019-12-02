@@ -34,3 +34,5 @@ jobs:
     name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
+
+- template: build-widget-job-template.yml
