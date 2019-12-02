@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 import { DOMWidgetModel, DOMWidgetView } from '@jupyter-widgets/base';
 import { FairnessWizard } from 'fairlearn-dashboard';
 import * as _ from 'lodash';
