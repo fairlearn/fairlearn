@@ -23,7 +23,7 @@ candidate_A_transforms = conversions_for_1d
 # ================================================================
 
 
-class TestExpGradArguments:
+class TestExponentiatedGradientArguments:
     def setup_method(self, method):
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
