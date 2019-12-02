@@ -103,7 +103,7 @@ class DemographicParity(ConditionalSelectionRate):
 class EqualizedOdds(ConditionalSelectionRate):
     """Implementation of Equalized Odds as a moment.
     Adds conditioning on label compared to Demographic parity, i.e.
-    
+
     .. math::
        P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \\, \\forall a, y, y'
     """
