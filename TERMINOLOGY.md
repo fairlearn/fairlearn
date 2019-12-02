@@ -44,25 +44,17 @@ For example, in fairlearn, we consider the following types of parity constraints
 
 _Binary classification_:
 
-- _Demographic parity_ (also known as _statistical parity_): A classifier _h_ satisfies demographic parity under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is statistically independent of the sensitive feature _A_. This is equivalent to \
-  ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%20%3D%20%5Cmathbb%7BE%7D%5Bh%28X%29%5D%20%5Cquad%20%5Cforall%20a) \
-  [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+- _Demographic parity_ (also known as _statistical parity_): A classifier _h_ satisfies demographic parity under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is statistically independent of the sensitive feature _A_. This is equivalent to E[_h_(_X_) | _A_=_a_] = E[_h_(_X_)] for all _a_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
 
-- _Equalized odds_: A classifier _h_ satisfies equalized odds under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is conditionally independent of the sensitive feature _A_ given the label _Y_. This is equivalent to \
-  ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%2C%20Y%3Dy%5D%20%3D%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20Y%3Dy%5D%20%5Cquad%20%5Cforall%20a%2C%20y) \
-  [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
+- _Equalized odds_: A classifier _h_ satisfies equalized odds under a distribution over (_X, A, Y_) if its prediction _h_(_X_) is conditionally independent of the sensitive feature _A_ given the label _Y_. This is equivalent to E[_h_(_X_) | _A_=_a_, _Y_=_y_] = E[_h_(_X_) | _Y_=_y_] for all _a, y_. [[Agarwal et al.]](https://arxiv.org/pdf/1803.02453.pdf)
 
 - _Equal opportunity_: a relaxed version of equalized odds that only considers conditional expectations with respect positive labels, i.e., _Y_=1. [[Hardt et al.]]( https://ttic.uchicago.edu/~nati/Publications/HardtPriceSrebro2016.pdf)
 
 _Regression_:
 
-- _Demographic parity_: A predictor _f_ satisfies demographic parity under a distribution over (_X, A, Y_) if _f_(_X_) is independent of the sensitive feature _A_. This is equivalent to \
-  ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BP%7D%5Bf%28X%29%20%5Cgeq%20z%20%7C%20A%3Da%5D%20%3D%20%5Cmathbb%7BP%7D%5Bf%28X%29%20%5Cgeq%20z%5D%20%5Cquad%20%5Cforall%20a%2C%20z) \
-  [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+- _Demographic parity_: A predictor _f_ satisfies demographic parity under a distribution over (_X, A, Y_) if _f_(_X_) is independent of the sensitive feature _A_. This is equivalent to P[_f_(_X_) ≥ _z_ | _A_=_a_] = P[_f_(_X_) ≥ _z_] for all _a_ and _z_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
 
-- _Bounded group loss_: A predictor _f_ satisfies bounded group loss at level _ζ_ under a distribution over (_X, A, Y_) if \
-  ![equation](https://latex.codecogs.com/gif.latex?%5Cmathbb%7BE%7D%5B%5Ctext%7Bloss%7D%28Y%2C%20f%28X%29%29%20%7C%20A%3Da%5D%20%5Cleq%20%5Czeta%20%5Cquad%20%5Cforall%20a) \
-  [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
+- _Bounded group loss_: A predictor _f_ satisfies bounded group loss at level _ζ_ under a distribution over (_X, A, Y_) if E[loss(_Y_, _f_(_X_)) | _A_=_a_] ≤ _ζ_ for all _a_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded group loss primarily seeks to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
 
@@ -70,9 +62,7 @@ Above, demographic parity seeks to mitigate allocation harms, whereas bounded gr
 
 Disparity metrics evaluate how far a given predictor departs from satisfying a parity constraint. They can either compare the behavior across different groups in terms of ratios or in terms of differences. For example, for binary classification:
 
-- _Demographic parity difference_ \
-  ![equation](https://latex.codecogs.com/gif.latex?%5Cleft%5C%28%5Cmax_a%5Cmathbb%7BE%7D%5Bh%28X%29%7CA%3Da%5D%5Cright%5C%29%20-%20%5Cleft%5C%28%5Cmin_a%5Cmathbb%7BE%7D%5Bh%28X%29%7CA%3Da%5D%5Cright%5C%29)
-- _Demographic parity ratio_ \
-  ![equation](https://latex.codecogs.com/gif.latex?%5Cleft%5C%28%5Cmin_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29%20/%20%5Cleft%5C%28%5Cmax_a%20%5Cmathbb%7BE%7D%5Bh%28X%29%20%7C%20A%3Da%5D%5Cright%5C%29)
+- _Demographic parity difference_ = (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) - (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
+- _Demographic parity ratio_ = (min<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]) / (max<sub>_a_</sub> E[_h_(_X_) | _A_=_a_]).
 
 The fairlearn package provides the functionality to convert common accuracy and error metrics from `scikit-learn` to _group metrics_, i.e., metrics that are evaluated on the entire data set and also on each group individually. Additionally, group metrics yield the minimum and maximum metric value and for which groups these values were observed, as well as the difference and ratio between the maximum and the minimum values. For more information refer to the subpackage `fairlearn.metrics`.
