@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath('../'))
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 [print(p) for p in sys.path]
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-import fairlearn
+import fairlearn  # noqa: E402
 print(fairlearn.__version__)
 print("================================")
 
