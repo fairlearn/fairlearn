@@ -103,7 +103,7 @@ class ExponentiatedGradient(Reduction):
     """An Estimator which implements the exponentiated gradient approach to
     reductions described by `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: An estimator implementing methods `fit(X, y, sample_weight)` and
+    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
         `predict(X)`, where `X` is the set of features, `y` is the set of labels, and
         `sample_weight` is a set of weights; labels `y` and predictions returned by `predict(X)`
         are either 0 or 1.
