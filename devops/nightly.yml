@@ -36,3 +36,5 @@ jobs:
   parameters:
     name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
+
+- template: build-widget-job-template.yml
