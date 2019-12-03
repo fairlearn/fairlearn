@@ -11,7 +11,8 @@ DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value
 
 
 def _get_roc(data, sensitive_feature_value, flip=True):
-    """Get ROC curve's convex hull based on data columns 'score' and 'label'
+    """Get ROC curve's convex hull based on data columns 'score' and 'label'.
+
     Scores represent output values from the predictor.
 
     :param data: the DataFrame containing scores and labels
@@ -31,7 +32,9 @@ def _get_roc(data, sensitive_feature_value, flip=True):
 
 
 def _filter_points_to_get_convex_hull(roc_sorted):
-    """ Uses a simplified version of Andrew's monotone chain convex hull algorithm
+    """Finds the convex hull.
+
+    Uses a simplified version of Andrew's monotone chain convex hull algorithm
     https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
     to get the convex hull. Since we can assume the points (0,0) and (1,1) to be part
     of the convex hull the problem is simpler and we only need to make a single pass
@@ -68,6 +71,7 @@ def _filter_points_to_get_convex_hull(roc_sorted):
 
 def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     """Interpolates the DataFrame in `data` along the values in `x_grid`.
+
     Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]
              (2) min and max in x_grid are below/above min and max in data[x_col]
              (3) data is indexed 0,...,len(data)
@@ -120,7 +124,9 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
 
 def _calculate_roc_points(data, sensitive_feature_value, flip=True):
-    """ Calculates the ROC points from the scores and labels by iterating through all possible
+    """Calculates the ROC points from the scores and labels.
+
+    This is done by iterating through all possible
     thresholds that could be set based on the available scores.
 
     :param data: the DataFrame containing scores and labels
@@ -176,8 +182,9 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
 
 
 def _get_scores_labels_and_counts(data):
-    """ Order samples by scores (ascending), and count the number of positive, negative, and
-    overall samples.
+    """Order samples by scores, counting number of positive, negative, and overall samples.
+
+    The samples are sorted into ascending order.
 
     :param data: the DataFrame containing scores and labels
     :type data: pandas.DataFrame
@@ -196,7 +203,7 @@ def _get_scores_labels_and_counts(data):
 
 
 def _get_counts(labels):
-    """ Returns the overall, positive, and negative counts of the labels.
+    """Returns the overall, positive, and negative counts of the labels.
 
     :param labels: the labels of the samples
     :type labels: list
