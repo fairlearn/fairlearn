@@ -10,7 +10,7 @@ _DIFF = "diff"
 
 
 class ConditionalSelectionRate(ClassificationMoment):
-    """Generic fairness metric including DemographicParity and EqualizedOdds"""
+    """Generic fairness metric including :class:`DemographicParity` and :class:`EqualizedOdds`."""
 
     def default_objective(self):
         return ErrorRate()
@@ -45,9 +45,7 @@ class ConditionalSelectionRate(ClassificationMoment):
                 i += 1
 
     def gamma(self, predictor):
-        """ Calculates the degree to which constraints are currently violated by
-        the predictor.
-        """
+        """Calculates degree to which constraints are currently violated by the predictor."""
         pred = predictor(self.X)
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
@@ -88,12 +86,14 @@ ConditionalSelectionRate.__module__ = "fairlearn.reductions"
 
 
 class DemographicParity(ConditionalSelectionRate):
-    """Implementation of Demographic Parity as a moment.
+    r"""Implementation of Demographic Parity as a moment.
+
     A classifier :math:`h(X)` satisfies DemographicParity if
 
     .. math::
-      P[h(X) = y' | A = a] = P[h(X) = y'] \\; \\forall a, y'
+      P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
     """
+
     short_name = "DemographicParity"
 
     def load_data(self, X, y, **kwargs):
@@ -101,12 +101,14 @@ class DemographicParity(ConditionalSelectionRate):
 
 
 class EqualizedOdds(ConditionalSelectionRate):
-    """Implementation of Equalized Odds as a moment.
+    r"""Implementation of Equalized Odds as a moment.
+
     Adds conditioning on label compared to Demographic parity, i.e.
 
     .. math::
-       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \\; \\forall a, y, y'
+       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
     """
+
     short_name = "EqualizedOdds"
 
     def load_data(self, X, y, **kwargs):
