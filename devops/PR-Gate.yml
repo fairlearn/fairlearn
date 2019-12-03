@@ -12,22 +12,26 @@ jobs:
   parameters:
     name: Linux
     vmImage: 'ubuntu-16.04'
+    requirementsFile: 'requirements-fixed.txt'
     pyVersions: [3.5]
 
 - template: all-tests-job-template.yml
   parameters:
     name: Windows
     vmImage:  'vs2017-win2016'
+    requirementsFile: 'requirements-fixed.txt'
     pyVersions: [3.6]
     
 - template: all-tests-job-template.yml
   parameters:
     name: MacOS
     vmImage:  'macos-latest'
+    requirementsFile: 'requirements-fixed.txt'
     pyVersions: [3.7] 
 
 - template: notebook-job-template.yml
   parameters:
     pyVersions: [3.6]
+    requirementsFile: 'requirements-fixed.txt'
 
 - template: build-widget-job-template.yml
