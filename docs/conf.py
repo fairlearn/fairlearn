@@ -12,7 +12,13 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../'))
+print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+[print(p) for p in sys.path]
+print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+import fairlearn  # noqa: E402
+print(fairlearn.__version__)
+print("================================")
 
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +28,7 @@ copyright = '2019, Microsoft'
 author = 'Microsoft'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.0-pre-alpha-interim'
+release = '0.4.0a1'
 
 
 # -- General configuration ---------------------------------------------------

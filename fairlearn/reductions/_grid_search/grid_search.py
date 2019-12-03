@@ -85,7 +85,7 @@ class GridSearch(Reduction):
 
 
     :param estimator: The underlying estimator to be used. Must provide a
-        fit(X, y, sample_weights) method
+        :code:`fit(X, y, sample_weights)` method
 
     :param constraints: Object describing the parity constraints. This provides the reweighting
         and relabelling
@@ -105,7 +105,7 @@ class GridSearch(Reduction):
     :type grid_size: int
 
     :param grid_limit: The largest Lagrange multiplier to generate. The grid will contain values
-        `[-grid_limit, grid_limit]` by default
+        :math:`[-grid_limit, grid_limit]` by default
     :type grid_limit: float
 
     :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
@@ -156,13 +156,13 @@ class GridSearch(Reduction):
         """The best result found from the grid search.
         The predictor contained in this instance of
         :class:`GridSearchResult` is used in calls to
-        ``predict`` and ``predict_proba``.
+        :code:`predict`` and :code:`predict_proba.
         """
         return self._best_result
 
     def fit(self, X, y, **kwargs):
         """Runs the grid search. This will result in multiple copies of the
-        estimator being made, and the `fit` method of each one called.
+        estimator being made, and the :code:`fit` method of each one called.
 
         :param X: The feature data for the machine learning problem
         :type X: Array
@@ -268,9 +268,9 @@ class GridSearch(Reduction):
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
-        """Provides the result of ``predict_proba`` from the
+        """Provides the result of :code:`predict_proba` from the
         best model found by the grid search. The underlying
-        estimator must support ``predict_proba`` for this
+        estimator must support :code:`predict_proba` for this
         to work.
 
         :param X: The data for which predictions are required

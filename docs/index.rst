@@ -6,15 +6,19 @@
 Welcome to fairlearn's documentation!
 =====================================
 
+The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness.
+See :ref:`fairlearn` for more information.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   fairlearn
+
 
 
 
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
