@@ -13,7 +13,7 @@ jobs:
     name: Linux
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
-    pyVersions: [3.5]
+    pyVersions: [3.6]
 
 - template: all-tests-job-template.yml
   parameters:
