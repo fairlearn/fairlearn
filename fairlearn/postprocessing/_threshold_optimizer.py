@@ -275,7 +275,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
             selection_error_curve[sensitive_feature_value]['error']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing {0}", str(sensitive_feature_value))
+        logger.debug("Processing {}", str(sensitive_feature_value))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
@@ -365,7 +365,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
         y_values[sensitive_feature_value] = roc[sensitive_feature_value]['y']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing {0}", str(sensitive_feature_value))
+        logger.debug("Processing {}", str(sensitive_feature_value))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
