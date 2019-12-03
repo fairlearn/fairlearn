@@ -3,9 +3,9 @@
 
 """Threshold Optimization Post Processing algorithm.
 
-This is based on M. Hardt,
-E. Price, N. Srebro's paper "`Equality of Opportunity in Supervised
-Learning <https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
+This is based on M. Hardt, E. Price, N. Srebro's paper
+"`Equality of Opportunity in Supervised Learning
+<https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
 classification with one categorical sensitive feature.
 """
 
