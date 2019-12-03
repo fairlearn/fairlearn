@@ -21,7 +21,7 @@ class Moment:
 
     def load_data(self, X, y, **kwargs):
         """Load a set of data for use by this object. The keyword arguments
-        can contain a `sensitive_features` array.
+        can contain a :code:`sensitive_features` array.
 
         :param X: The feature data
         :type X: array

@@ -44,16 +44,16 @@ class ExponentiatedGradientResult:
     @property
     def best_classifier(self):
         """ A function that maps a DataFrame X containing covariates to a Series containing the
-        corresponding probabilistic decisions in [0,1]
+        corresponding probabilistic decisions in :math:`[0,1]`
         """
         return self._best_classifier
 
     @property
     def best_gap(self):
-        """ The quality of best_classifier; if the algorithm has converged then best_gap <= nu;
+        """ The quality of best_classifier; if the algorithm has converged then `best_gap <= nu`;
         the solution best_classifier is guaranteed to have the classification error within
-        2*best_gap of the best error under constraint eps; the constraint violation is at most
-        2*(eps+best_gap)
+        `2*best_gap` of the best error under constraint eps; the constraint violation is at most
+        `2*(eps+best_gap)`
         """
         return self._best_gap
 
@@ -71,7 +71,7 @@ class ExponentiatedGradientResult:
 
     @property
     def last_t(self):
-        """ The last executed iteration; always last_t < T.
+        """ The last executed iteration; always `last_t < T`.
         """
         return self._last_t
 
@@ -103,16 +103,16 @@ class ExponentiatedGradient(Reduction):
     """An Estimator which implements the exponentiated gradient approach to
     reductions described by `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: An estimator implementing methods fit(X, y, sample_weight) and
-        predict(X), where X is the set of features, y is the set of labels, and
-        sample_weight is a set of weights; labels y and predictions returned by predict(X)
-        are either 0 or 1.
+    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
+        :code:`predict(X)`, where `X` is the set of features, `y` is the set of labels, and
+        `sample_weight` is a set of weights; labels `y` and predictions returned by
+        :code:`predict(X)` are either 0 or 1.
     :type estimator: An estimator
     :param constraints: The disparity constraints expressed as moments
     :type constraints: fairlearn.reductions.Moment
     :param eps: Allowed fairness constraint violation; the solution best_classifier is
-        guaranteed to have the classification error within 2*best_gap of the best error
-        under constraint eps; the constraint violation is at most 2*(eps+best_gap)
+        guaranteed to have the classification error within `2*best_gap` of the best error
+        under constraint eps; the constraint violation is at most `2*(eps+best_gap)`
     :type eps: float
     :param T: Maximum number of iterations
     :type T: int
