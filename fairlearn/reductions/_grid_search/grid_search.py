@@ -98,14 +98,14 @@ class GridSearch(Reduction):
 
     :param constraint_weight: When the `selection_rule` is "tradeoff_optimization" this specifies
         the relative weight put on the constraint violation when selecting the best model.
-        The weight placed on the error rate will be `1-constraint_weight`
+        The weight placed on the error rate will be :code:`1-constraint_weight`
     :type constraint_weight: float
 
     :param grid_size: The number of Lagrange multipliers to generate in the grid
     :type grid_size: int
 
     :param grid_limit: The largest Lagrange multiplier to generate. The grid will contain values
-        :math:`[-grid_limit, grid_limit]` by default
+        distributed between :code:`-grid_limit` and :code:`grid_limit` by default
     :type grid_limit: float
 
     :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
