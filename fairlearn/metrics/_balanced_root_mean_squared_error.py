@@ -16,7 +16,7 @@ def balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
     Used for binary logistic regression, this computes the error as
 
     .. math::
-       \frac{RMSE(Y=0) + RMSE(Y=1)}{2}
+       \frac{\text{RMSE}(Y=0) + \text{RMSE}(Y=1)}{2}
 
     The classes are constrained to be :math:`\in {0, 1}`. The :code:`y_true` values must
     always be one of these, while :code:`y_pred` can be a continuous probability
