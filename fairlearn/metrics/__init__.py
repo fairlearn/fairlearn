@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# noqa: RST902
+
 """Functionality for computing metrics, with a particular focus on group metrics.
 
 For our purpose, a metric is a function with signature
@@ -130,4 +132,4 @@ _engine = [
 ]
 
 
-__all__ = _engine + _extra_metrics + _group_metrics  # noqa: RST902
+__all__ = _engine + _extra_metrics + _group_metrics
