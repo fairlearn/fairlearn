@@ -32,12 +32,12 @@ class InterpolatedPredictor:
         self._p1 = p1
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("p_ignore: {}", p_ignore)
-        logger.debug("prediction_constant: {}", prediction_constant)
-        logger.debug("p0: {}", p0)
-        logger.debug("operation0: {}", operation0)
-        logger.debug("p1: {}", p1)
-        logger.debug("operation1: {}", operation1)
+        logger.debug("p_ignore: %s", p_ignore)
+        logger.debug("prediction_constant: %s", prediction_constant)
+        logger.debug("p0: %s", p0)
+        logger.debug("operation0: %s", operation0)
+        logger.debug("p1: %s", p1)
+        logger.debug("operation1: %s", operation1)
         logger.debug(OUTPUT_SEPARATOR)
 
     def __repr__(self):  # noqa: D105

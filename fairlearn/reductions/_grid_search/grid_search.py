@@ -204,7 +204,7 @@ class GridSearch(Reduction):
         objective_in_the_span = (self.constraints.default_objective_lambda_vec is not None)
 
         if self.grid is None:
-            logger.debug("Creating grid of size {0}", self.grid_size)
+            logger.debug("Creating grid of size %i", self.grid_size)
             grid = _GridGenerator(self.grid_size,
                                   self.grid_limit,
                                   pos_basis,

@@ -275,7 +275,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
             selection_error_curve[sensitive_feature_value]['error']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing {}", str(sensitive_feature_value))
+        logger.debug("Processing %s", str(sensitive_feature_value))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
@@ -306,7 +306,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
-    logger.debug("Best DP: error={0:.3f}, selection rate={1:.3f}",
+    logger.debug("Best DP: error=%.3f, selection rate=%.3f",
                  error_given_selection[i_best_DP], x_best)
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
@@ -365,7 +365,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
         y_values[sensitive_feature_value] = roc[sensitive_feature_value]['y']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing {}", str(sensitive_feature_value))
+        logger.debug("Processing %s", str(sensitive_feature_value))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
@@ -413,7 +413,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
-    logger.debug("Best EO: error={0:.3f}, FP rate={1:.3f}, TP rate={2:.3f}",
+    logger.debug("Best EO: error=%.3f}, FP rate=%.3f}, TP rate=%.3f}",
                  error_given_x[i_best_EO], x_best, y_best)
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
