@@ -3,8 +3,7 @@
 
 
 class Reduction:
-    """Base class for our reduction-implementing estimators
-    """
+    """Base class for our reduction-implementing estimators."""
 
     def fit(self, X, y, **kwargs):
         raise NotImplementedError()

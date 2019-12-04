@@ -1,8 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""This module contains a variety of extra metrics which are useful for assessing fairness
-which are not available as part of scikit-learn.
+"""A variety of extra metrics useful for assessing fairness.
+
+These are metrics which are not part of `scikit-learn`.
 """
 
 import sklearn.metrics as skm
@@ -13,10 +14,10 @@ from ._selection_rate import selection_rate  # noqa: F401,E501
 
 
 def specificity_score(y_true, y_pred, sample_weight=None):
-    """
-    The specificity score is also known as the True Negative Rate.
+    r"""The specificity score is also known as the True Negative Rate.
+
     At the present time, this routine only supports binary
-    classifiers with labels taken from {0, 1}.
+    classifiers with labels :math:`\in {0, 1}`.
     The calculation uses the :any:`sklearn.metrics.confusion_matrix` routine.
     """
     cm = skm.confusion_matrix(y_true, y_pred, sample_weight=sample_weight)
@@ -28,10 +29,10 @@ def specificity_score(y_true, y_pred, sample_weight=None):
 
 
 def miss_rate(y_true, y_pred, sample_weight=None):
-    """
-    The miss rate is also known as the False Negative Rate.
+    r"""The miss rate is also known as the False Negative Rate.
+
     At the present time, this routine only supports binary
-    classifiers with labels taken from {0, 1}.
+    classifiers with labels :math:`\in {0, 1}`.
     By definition, this is the complement of the True Positive
     Rate, so this routine uses the
     :any:`sklearn.metrics.recall_score` routine.
@@ -44,10 +45,10 @@ def miss_rate(y_true, y_pred, sample_weight=None):
 
 
 def fallout_rate(y_true, y_pred, sample_weight=None):
-    """
-    The fallout rate is also known as the False Positive Rate.
+    r"""The fallout rate is also known as the False Positive Rate.
+
     At the present time, this routine only supports binary
-    classifiers with labels taken from {0, 1}.
+    classifiers with labels :math:`\in {0, 1}`.
     By definition, this is the complement of the
     Specificity, and so uses :any:`specificity_score` in its
     calculation.

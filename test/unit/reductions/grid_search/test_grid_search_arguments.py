@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import logging
 import numpy as np
 import pandas as pd
 import pytest
@@ -259,7 +258,6 @@ class ConditionalOpportunityTests(ArgumentTests):
 # Set up DemographicParity
 class TestDemographicParity(ConditionalOpportunityTests):
     def setup_method(self, method):
-        logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LogisticRegression(solver='liblinear')
         self.disparity_criterion = DemographicParity()
 
@@ -267,7 +265,6 @@ class TestDemographicParity(ConditionalOpportunityTests):
 # Test EqualizedOdds
 class TestEqualizedOdds(ConditionalOpportunityTests):
     def setup_method(self, method):
-        logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LogisticRegression(solver='liblinear')
         self.disparity_criterion = EqualizedOdds()
 
@@ -275,6 +272,5 @@ class TestEqualizedOdds(ConditionalOpportunityTests):
 # Tests specific to BoundedGroupLoss
 class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
-        logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LinearRegression()
         self.disparity_criterion = GroupLossMoment(ZeroOneLoss())

@@ -1,9 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-""" Threshold Optimization Post Processing algorithm based on M. Hardt,
-E. Price, N. Srebro's paper "`Equality of Opportunity in Supervised
-Learning <https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
+"""Threshold Optimization Post Processing algorithm.
+
+This is based on M. Hardt, E. Price, N. Srebro's paper
+"`Equality of Opportunity in Supervised Learning
+<https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
 classification with one categorical sensitive feature.
 """
 
@@ -44,7 +46,9 @@ logger = logging.getLogger(__name__)
 
 
 class ThresholdOptimizer(PostProcessing):
-    """An Estimator which implements the threshold optimization approach of
+    """An Estimator based on the threshold optimization approach.
+
+    The procedure followed is described in detail in
     `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_.
 
     :param unconstrained_predictor: The trained predictor whose output will be post processed
@@ -79,7 +83,9 @@ class ThresholdOptimizer(PostProcessing):
         self._post_processed_predictor_by_sensitive_feature = None
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
-        """Fit the model based on training features and labels, sensitive features,
+        """Fit the model.
+
+        The fit is based on training features and labels, sensitive features,
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
         in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
 
@@ -123,7 +129,7 @@ class ThresholdOptimizer(PostProcessing):
             sensitive_features, y, scores, self._grid_size, self._flip, self._plot)
 
     def predict(self, X, *, sensitive_features, random_state=None):
-        """ Predict label for each sample in X while taking into account sensitive features.
+        """Predict label for each sample in X while taking into account sensitive features.
 
         :param X: feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
@@ -149,7 +155,7 @@ class ThresholdOptimizer(PostProcessing):
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X, *, sensitive_features):
-        """ Probabilistic mass function
+        """Probabilistic mass function.
 
         :param X: Feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
@@ -200,7 +206,9 @@ class ThresholdOptimizer(PostProcessing):
 
 def _threshold_optimization_demographic_parity(sensitive_features, labels, scores, grid_size=1000,
                                                flip=True, plot=False):
-    """ Calculates selection and error rates for every sensitive feature value at different
+    """Calculates selection and error rates for every sensitive feature value.
+
+    These calculations are made at different
     thresholds over the scores. Subsequently weighs each sensitive feature value's error by the
     frequency of the sensitive feature value in the data. The minimum error point is the selected
     solution, which is recreated by interpolating between two points on the convex hull of all
@@ -267,7 +275,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
             selection_error_curve[sensitive_feature_value]['error']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing " + str(sensitive_feature_value))
+        logger.debug("Processing %s", str(sensitive_feature_value))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
@@ -298,8 +306,8 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
-    logger.debug("Best DP: error={0:.3f}, selection rate={1:.3f}"
-                 .format(error_given_selection[i_best_DP], x_best))
+    logger.debug("Best DP: error=%.3f, selection rate=%.3f",
+                 error_given_selection[i_best_DP], x_best)
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
         plot_solution_and_show_plot(
@@ -310,8 +318,9 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
 
 def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, grid_size=1000,
                                            flip=True, plot=False):
-    """ Calculates the ROC curve of every sensitive feature value at different thresholds over the
-    scores. Subsequently takes the overlapping region of the ROC curves, and finds the best
+    """Calculates the ROC curve of every sensitive feature value at different thresholds.
+
+    Subsequently takes the overlapping region of the ROC curves, and finds the best
     solution by selecting the point on the curve with minimal error.
 
     This method assumes that sensitive_features, labels, and scores are non-empty data structures
@@ -356,7 +365,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
         y_values[sensitive_feature_value] = roc[sensitive_feature_value]['y']
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("Processing " + str(sensitive_feature_value))
+        logger.debug("Processing %s", str(sensitive_feature_value))
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("DATA")
         logger.debug(group)
@@ -404,8 +413,8 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
 
     logger.debug(OUTPUT_SEPARATOR)
     logger.debug("From ROC curves")
-    logger.debug("Best EO: error={0:.3f}, FP rate={1:.3f}, TP rate={2:.3f}"
-                 .format(error_given_x[i_best_EO], x_best, y_best))
+    logger.debug("Best EO: error=%.3f}, FP rate=%.3f}, TP rate=%.3f}",
+                 error_given_x[i_best_EO], x_best, y_best)
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
         plot_overlap(x_grid, y_min)
@@ -416,8 +425,10 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
 
 
 def _vectorized_prediction(function_dict, sensitive_features, scores):
-    """ Make predictions for all samples with all provided functions, but use only the results
-    from the function that corresponds to the sensitive feature value of the sample.
+    """Make predictions for all samples with all provided functions.
+
+    However, only use the results from the function that corresponds to the
+    sensitive feature value of the sample.
 
     This method assumes that sensitive_features and scores are of equal length.
 
@@ -438,7 +449,7 @@ def _vectorized_prediction(function_dict, sensitive_features, scores):
 
 
 def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
-    """ Converts input data from list, pandas.Series, or pandas.DataFrame to numpy.ndarray.
+    """Converts input data from list, pandas.Series, or pandas.DataFrame to numpy.ndarray.
 
     :param data: the data to be converted into a numpy.ndarray
     :type data: numpy.ndarray, pandas.Series, pandas.DataFrame, or list
@@ -461,9 +472,11 @@ def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
 
 
 def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_feature_names=None):
-    """ Reformats the provided three categories of data (`sensitive_features`, `labels`, `scores`)
-    into a newly created pandas.DataFrame. That DataFrame is grouped by sensitive feature values
-    so that subsequently each group can be handled separately.
+    """Reformats the data into a new pandas.DataFrame and group by sensitive feature values.
+
+    The data are provided as three arguments (`sensitive_features`, `labels`, `scores`) and
+    the new  DataFrame is grouped by sensitive feature values so that subsequently each group
+    can be handled separately.
 
     :param sensitive_features: the sensitive features based on which the grouping is determined;
         currently only a single sensitive feature is supported
@@ -498,8 +511,10 @@ def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_featu
 
 
 def _reformat_data_into_dict(key, data_dict, additional_data):
-    """ Reformat `additional_data` into numpy.ndarray or list and add it to the provided
-    `data_dict` dictionary at the indicated `key`.
+    """Add `additional_data` to `data_dict` with key `key`.
+
+    Before `additional_data` is added to `data_dict` it is first
+    reformatted into a numpy.ndarray or list.
 
     :param key: the key in `data_dict` at which `additional_data` should be stored;
         `key` should describe the purpose of `additional_data` in `data_dict`

@@ -7,9 +7,9 @@ from ._metrics_engine import metric_by_group
 
 
 def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
-    """
-    The selection rate is the fraction of predicted labels which
-    match the 'good' outcome (as specified by `pos_label`)
+    """The fraction of predicted labels matching the 'good' outcome.
+
+    The argument `pos_label` specifies the 'good' outcome.
     """
     selected = (np.squeeze(np.asarray(y_pred)) == pos_label)
     s_w = np.ones(len(selected))
@@ -22,10 +22,10 @@ def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
 def group_selection_rate(y_true, y_pred, group_membership,
                          *, pos_label=1, sample_weight=None):
     """This is the grouped version of :func:`selection_rate`.
+
     The arguments are the same, with the addition of the
     `group_membership` array.
     """
-
     def internal_sel_wrapper(y_true, y_pred, sample_weight=None):
         return selection_rate(y_true, y_pred, pos_label=pos_label, sample_weight=sample_weight)
 

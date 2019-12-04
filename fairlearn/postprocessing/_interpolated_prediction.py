@@ -9,8 +9,9 @@ logger = logging.getLogger(__name__)
 
 class InterpolatedPredictor:
     def __init__(self, p_ignore, prediction_constant, p0, operation0, p1, operation1):
-        """ Creates the interpolated prediction between two predictions. The predictions
-        are represented through the threshold rules operation0 and operation1.
+        """Creates the interpolated prediction between two predictions.
+
+        The predictions are represented through the threshold rules operation0 and operation1.
 
         :param p_ignore: p_ignore changes the interpolated prediction P to the desired
             solution using the transformation p_ignore * prediction_constant + (1 - p_ignore) * P
@@ -31,22 +32,24 @@ class InterpolatedPredictor:
         self._p1 = p1
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("p_ignore: {}".format(p_ignore))
-        logger.debug("prediction_constant: {}".format(prediction_constant))
-        logger.debug("p0: {}".format(p0))
-        logger.debug("operation0: {}".format(operation0))
-        logger.debug("p1: {}".format(p1))
-        logger.debug("operation1: {}".format(operation1))
+        logger.debug("p_ignore: %s", p_ignore)
+        logger.debug("prediction_constant: %s", prediction_constant)
+        logger.debug("p0: %s", p0)
+        logger.debug("operation0: %s", operation0)
+        logger.debug("p1: %s", p1)
+        logger.debug("operation1: %s", operation1)
         logger.debug(OUTPUT_SEPARATOR)
 
-    def __repr__(self):
+    def __repr__(self):  # noqa: D105
         return "[p_ignore: {}, prediction_constant: {}, " \
             "p0: {}, operation0: {}, p1: {}, operation1: {}]" \
             .format(self._p_ignore, self._prediction_constant, self._p0, self._operation0,
                     self._p1, self._operation1)
 
     def predict(self, scores):
-        """ Creates the interpolated prediction based on two threshold operations and the
+        """Creates the interpolated prediction.
+
+        The interpolation is based on two threshold operations and the
         transformation adjustment.
 
         :param scores: the scores from an unconstrained predictor to which the threshold

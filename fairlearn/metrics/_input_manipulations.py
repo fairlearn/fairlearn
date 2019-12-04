@@ -4,11 +4,12 @@
 import numpy as np
 
 
-def _convert_to_ndarray_and_squeeze(input):
-    """Converts to a numpy.ndarray and calls squeeze (to dispose of unit length dimensions),
-    with a special case to stop single element arrays being converted to scalars.
+def _convert_to_ndarray_and_squeeze(target):
+    """Converts to a `numpy.ndarray` and calls squeeze (to dispose of unit length dimensions).
+
+    There is a special case to stop single element arrays being converted to scalars.
     """
-    result = np.asarray(input)
+    result = np.asarray(target)
 
     if result.size > 1:
         result = np.squeeze(result)
