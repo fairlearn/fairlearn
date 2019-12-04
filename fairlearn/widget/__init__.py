@@ -3,7 +3,7 @@
 
 """Module for Fairlearn Dashboard widget."""
 
-from .fairlearn_dashboard import FairlearnDashboard
+from ._fairlearn_dashboard import FairlearnDashboard
 
 __all__ = ['FairlearnDashboard']
 
