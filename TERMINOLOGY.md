@@ -11,7 +11,7 @@ The fairlearn package largely follows the [terminology established by scikit-lea
 
 ## Fairness of AI systems
 
-AI systems can behave unfairly for a variety of reasons. Sometimes societal biases are reflected in the training data and in the decisions made during the development and deployment of these systems. In other cases, AI systems behave unfairly because of characteristics of the data (e.g. too few data points about some group of people) or characteristics of the systems themselves. It can be hard to distinguish between these reasons, especially since they are not mutually exclusive and often exacerbate one another. Therefore we define whether an AI system is behaving unfairly in terms of its impact on people – i.e. in terms of harms – and not in terms of specific causes, such as societal biases, or in terms of intent, such as prejudice.
+AI systems can behave unfairly for a variety of reasons. Sometimes it is because of societal biases reflected in the training data and in the decisions made during the development and deployment of these systems. In other cases, AI systems behave unfairly not because of societal biases, but because of characteristics of the data (e.g., too few data points about some group of people) or characteristics of the systems themselves. It can be hard to distinguish between these reasons, especially since they are not mutually exclusive and often exacerbate one another. Therefore, we define whether an AI system is behaving unfairly in terms of its impact on people — i.e., in terms of harms—and not in terms of specific causes, such as societal biases, or in terms of intent, such as prejudice.
 
 **Usage of the word _bias_.** Since we define fairness in terms of harms rather than specific causes (such as societal biases), we avoid the usage of the words _bias_ or _debiasing_ in describing the functionality of fairlearn.
 
@@ -21,7 +21,7 @@ There are many types of harms (see, e.g., the [keynote by K. Crawford at NeurIPS
 
 - _Allocation harms_ can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
-- _Quality-of-service harms_ can occur when a system does not work as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld. Examples include varying accuracy in face recognition or hate speech detection.
+- _Quality-of-service harms_ can occur when a system does not work as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld. Examples include varying accuracy in face recognition, document search, or product recommendation.
 
 ### Fairness assessment and unfairness mitigation
 
