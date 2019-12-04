@@ -29,3 +29,5 @@ jobs:
 - template: notebook-job-template.yml
   parameters:
     pyVersions: [3.6]
+
+- template: build-widget-job-template.yml

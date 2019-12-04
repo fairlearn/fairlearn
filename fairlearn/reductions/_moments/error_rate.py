@@ -7,7 +7,8 @@ from .moment import _ALL, _LABEL
 
 
 class ErrorRate(ClassificationMoment):
-    """Misclassification error"""
+    """Misclassification error."""
+
     short_name = "Err"
 
     def load_data(self, X, y, **kwargs):

@@ -10,7 +10,7 @@ MISSING_PREDICT_ERROR_MESSAGE = "The predictor does not have a callable 'predict
 
 
 class PostProcessing:
-    """Abstract base class for postprocessing approaches for disparity mitigation
+    """Abstract base class for postprocessing approaches for disparity mitigation.
 
     :param unconstrained_predictor: a predictor with a `predict` function that has already been
         trained on the training data; the predictor will subsequently be used in the mitigator
@@ -23,6 +23,7 @@ class PostProcessing:
     :param constraints: the parity constraints to be enforced represented as a string
     :type constraints: str
     """
+
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
                  constraints=None):
         if unconstrained_predictor and estimator:
@@ -39,9 +40,12 @@ class PostProcessing:
             raise ValueError(PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
-        """ Fit the model based on training features and labels, sensitive features,
+        """Fits the model.
+
+        The fit is based on training features and labels, sensitive features,
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
-        in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
+        in the constructor this fit method will call :code:`fit(X, y, **kwargs)` on said
+        estimator.
 
         :param X: Feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
@@ -55,7 +59,7 @@ class PostProcessing:
         raise NotImplementedError(self.fit.__name__ + " is not implemented")
 
     def predict(self, X, *, sensitive_features):
-        """ Predict label for each sample in X while taking into account sensitive features.
+        """Predict label for each sample in X while taking into account sensitive features.
 
         :param X: Feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
@@ -68,7 +72,7 @@ class PostProcessing:
         raise NotImplementedError(self.predict.__name__ + " is not implemented")
 
     def _pmf_predict(self, X, *, sensitive_features):
-        """ Probabilistic mass function
+        """Probabilistic mass function.
 
         :param X: Feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
@@ -83,15 +87,13 @@ class PostProcessing:
         raise NotImplementedError(self._pmf_predict.__name__ + " is not implemented")
 
     def _validate_predictor(self):
-        """ Validate that the _unconstrained_predictor member has a predict function.
-        """
+        """Validate that the _unconstrained_predictor member has a predict function."""
         predict_function = getattr(self._unconstrained_predictor, "predict", None)
         if not predict_function or not callable(predict_function):
             raise ValueError(MISSING_PREDICT_ERROR_MESSAGE)
 
     def _validate_estimator(self):
-        """ Validate that the `_estimator` member has both a fit and a predict function.
-        """
+        """Validate that the `_estimator` member has both a fit and a predict function."""
         fit_function = getattr(self._estimator, "fit", None)
         predict_function = getattr(self._estimator, "predict", None)
         if not predict_function or not fit_function or not callable(predict_function) or \

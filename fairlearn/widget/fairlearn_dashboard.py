@@ -40,9 +40,7 @@ class FairlearnDashboard(object):
             y_true, y_pred,
             sensitive_feature_names=None,
             is_classifier=None):
-
-        """Initialize the fairlearn Dashboard.
-        """
+        """Initialize the fairlearn Dashboard."""
         self._widget_instance = FairlearnWidget()
         if sensitive_features is None or y_true is None or y_pred is None:
             raise ValueError("Required parameters not provided")
@@ -193,7 +191,7 @@ class FairlearnDashboard(object):
         try:
             new = change.new
             response = copy.deepcopy(self._widget_instance.response)
-            for id in new:
+            for id in new:  # noqa: A001
                 try:
                     if id not in response:
                         data = new[id]

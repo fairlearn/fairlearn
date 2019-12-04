@@ -3,5 +3,4 @@
 
 
 class NotFittedException(ValueError):
-    """ Exception to use if predict is called before fit.
-    """
+    """Exception to use if predict is called before fit."""

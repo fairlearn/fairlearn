@@ -9,7 +9,7 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 
 
 class ConditionalLossMoment(LossMoment):
-    """A moment that quantifies a loss by group"""
+    """A moment that quantifies a loss by group."""
 
     def __init__(self, loss, no_groups=False):
         super().__init__(loss)
@@ -42,9 +42,7 @@ class ConditionalLossMoment(LossMoment):
             i += 1
 
     def gamma(self, predictor):
-        """ Calculates the degree to which constraints are currently violated by
-        the predictor.
-        """
+        """Calculates degree to which constraints are currently violated by the predictor."""
         self.tags[_PREDICTION] = predictor(self.X)
         self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
@@ -87,7 +85,7 @@ class SquareLoss:
         self.min = 0
         self.max = (max_val-min_val) ** 2
 
-    def eval(self, y_true, y_pred):
+    def eval(self, y_true, y_pred):  # noqa: A003
         return (np.clip(y_true, self.min_val, self.max_val)
                 - np.clip(y_pred, self.min_val, self.max_val)) ** 2
 
@@ -100,7 +98,7 @@ class AbsoluteLoss:
         self.min = 0
         self.max = np.abs(max_val-min_val)
 
-    def eval(self, y_true, y_pred):
+    def eval(self, y_true, y_pred):  # noqa: A003
         return np.abs(np.clip(y_true, self.min_val, self.max_val)
                       - np.clip(y_pred, self.min_val, self.max_val))
 
