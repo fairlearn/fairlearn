@@ -17,8 +17,3 @@ The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
     fairlearn.reductions
     fairlearn.widget
 
-
-Indices and tables
-==================
-
-* :ref:`search`
