@@ -1,9 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""The fairlearn package contains a number of tools for analyzing and mitigating disparity in
-Machine Learning models.
-"""
+"""Tools for analyzing and mitigating disparity in Machine Learning models."""
 
 import os
 import sys
@@ -50,7 +48,7 @@ if fairlearn_logs is not None:
     logger.addHandler(handler)
     logger.info('Initializing logging file for fairlearn')
 
-    def close_handler():
+    def close_handler():  # noqa: D103
         handler.close()
         logger.removeHandler(handler)
     atexit.register(close_handler)

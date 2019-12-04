@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+"""Holds the various Moments."""
+
 from .moment import Moment  # noqa: F401
 from .moment import ClassificationMoment, LossMoment  # noq: F401
 
