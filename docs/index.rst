@@ -10,12 +10,12 @@ The fairlearn project seeks to enable anyone involved in the development of arti
 See :ref:`fairlearn` for more information.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-   fairlearn
-
-
+    fairlearn.exceptions
+    fairlearn.metrics
+    fairlearn.postprocessing
+    fairlearn.reductions
+    fairlearn.widget
 
 
 Indices and tables
