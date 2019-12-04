@@ -9,25 +9,6 @@ import time
 from azureml.core import Environment
 
 
-
-def configure_environment(workspace):
-    # collect external requirements from requirements file 
-    environment = Environment.from_pip_requirements(name="env", file_path="requirements.txt")
-    
-    # build fairlearn wheel and push to workspace blob
-    wheel_file = build_package()
-    private_pkg = environment.add_private_pip_wheel(workspace, file_path=wheel_file)
-    environment.python.conda_dependencies.add_pip_package(private_pkg)
-
-    # add azureml-sdk to log metrics
-    environment.python.conda_dependencies.add_pip_package("azureml-sdk")
-
-    # set docker to enabled for AmlCompute
-    environment.docker.enabled = True
-    print("environment successfully configured")
-    return environment
-
-
 def build_package():
     print('removing build directory')
     shutil.rmtree("build", True)

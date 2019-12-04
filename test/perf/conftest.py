@@ -6,7 +6,7 @@ import pytest
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
 
-from workspace import get_workspace
+from tempeh.execution.azureml.workspace import get_workspace
 
 
 THRESHOLD_OPTIMIZER = ThresholdOptimizer.__name__
