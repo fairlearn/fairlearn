@@ -18,6 +18,8 @@ Pull requests against `master` trigger automated tests that are run through Azur
 ### Investigating automated test failures
 For every pull request to `master` with automated tests, you can check the logs of the tests to find the root cause of failures. Our tests currently run through Azure Pipelines with steps for setup, testing, and teardown. The `Checks` tab of a pull request contains a link to the [Azure Pipelines page](dev.azure.com/responsibleai/fairlearn/_build/results), where you can review the logs by clicking on a specific step in the automated test sequence. If you encounter problems with this workflow, please reach out through [GitHub issues](https://github.com/fairlearn/fairlearn/issues).
 
+To run the same tests locally, find the corresponding pipeline definition (a `yml` file) in the `devops` directory. It either directly contains the command to execute the tests (usually starting with `python -m pytest`) or it refers to a template file with the command.
+
 ## API conventions
 
 This section relies on the definitions from our [terminology guide](TERMINOLOGY.md), including the definitions of "estimator", "reduction", "sensitive features", "moment", and "parity".
@@ -46,7 +48,7 @@ All of the currently supported parity constraints (subclasses of `Moment`) are b
 
 #### Post-processing algorithms
 
-The constructors of post-processing algorithms require an already trained predictor as an argument. As an alternative, it is possible to provide an estimator, and the estimator is then fitted on the data at the beginning of the execution of `fit`. For post-processing algorithms, the `constraints` argument is provided as a string.
+The constructors of post-processing algorithms require either an already trained predictor or an estimator (which is trained on the data when executing `fit`). For post-processing algorithms, the `constraints` argument is provided as a string.
 
 ```python
 postprocessor = PostProcessing(unconstrained_predictor=predictor, constraints=constraints)
