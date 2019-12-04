@@ -4,18 +4,10 @@ fairlearn\.widget package
 Submodules
 ----------
 
-fairlearn\.widget\.fairlearnDashboard module
---------------------------------------------
+fairlearn\.widget\.fairlearn\_dashboard module
+----------------------------------------------
 
-.. automodule:: fairlearn.widget.fairlearnDashboard
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-fairlearn\.widget\.fairlearnWidget module
------------------------------------------
-
-.. automodule:: fairlearn.widget.fairlearnWidget
+.. automodule:: fairlearn.widget.fairlearn_dashboard
     :members:
     :undoc-members:
     :show-inheritance:
