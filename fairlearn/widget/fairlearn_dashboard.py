@@ -3,7 +3,7 @@
 
 """Defines the fairlearn dashboard class."""
 
-from .fairlearnWidget import FairlearnWidget
+from ._fairlearn_widget import FairlearnWidget
 from fairlearn.metrics import group_accuracy_score, group_precision_score,\
     group_recall_score, group_zero_one_loss, group_max_error, group_mean_absolute_error,\
     group_mean_squared_error, group_median_absolute_error,\
@@ -22,11 +22,9 @@ class FairlearnDashboard(object):
     """The dashboard class, wraps the dashboard component.
 
     :param sensitive_features:  A matrix of feature vector examples (# examples x # features),
-        these can be from the initial dataset, or reserved from training. Currently only
-        categorical features are supported
-    :type sensitive_features: numpy.array or list[][] or Pandas Dataframe
-    :param y_true: The true labels for the provided dataset. Will overwrite any set on
-        explanation object already
+        these can be from the initial dataset, or reserved from training.
+    :type sensitive_features: numpy.array or list[][] or pandas.DataFrame or pandas.Series
+    :param y_true: The true labels or values for the provided dataset.
     :type y_true: numpy.array or list[]
     :param y_pred: Array of output predictions from models to be evaluated. Can be a single
         array of predictions, or a 2D list over multiple models. Can be a dictionary
@@ -40,8 +38,7 @@ class FairlearnDashboard(object):
             self, *,
             sensitive_features,
             y_true, y_pred,
-            sensitive_feature_names=None,
-            is_classifier=None):
+            sensitive_feature_names=None):
         """Initialize the fairlearn Dashboard."""
         self._widget_instance = FairlearnWidget()
         if sensitive_features is None or y_true is None or y_pred is None:
@@ -181,9 +178,6 @@ class FairlearnDashboard(object):
                 raise Warning("Feature names shape does not match dataset, ignoring")
             else:
                 dataArg["features"] = sensitive_feature_names
-
-        if is_classifier is not None and isinstance(is_classifier, bool):
-            dataArg["is_classifier"] = is_classifier
 
         self._widget_instance.value = dataArg
         self._widget_instance.observe(self._on_request, names="request")
