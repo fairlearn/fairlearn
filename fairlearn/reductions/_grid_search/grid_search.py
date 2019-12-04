@@ -19,8 +19,7 @@ TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
 
 
 class _GridGenerator:
-    """A generator of a grid of points with a bounded L1 norm.
-    """
+    """A generator of a grid of points with a bounded L1 norm."""
 
     def __init__(self, grid_size, grid_limit, pos_basis, neg_basis, neg_allowed, force_L1_norm):
         # grid parameters
@@ -80,9 +79,10 @@ class _GridGenerator:
 
 
 class GridSearch(Reduction):
-    """Estimator to perform a grid search given a blackbox estimator algorithm. The approach used
-    is taken from section 3.4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    """Estimator to perform a grid search given a blackbox estimator algorithm.
 
+    The approach used is taken from section 3.4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     :param estimator: The underlying estimator to be used. Must provide a
         :code:`fit(X, y, sample_weights)` method
@@ -98,19 +98,20 @@ class GridSearch(Reduction):
 
     :param constraint_weight: When the `selection_rule` is "tradeoff_optimization" this specifies
         the relative weight put on the constraint violation when selecting the best model.
-        The weight placed on the error rate will be `1-constraint_weight`
+        The weight placed on the error rate will be :code:`1-constraint_weight`
     :type constraint_weight: float
 
     :param grid_size: The number of Lagrange multipliers to generate in the grid
     :type grid_size: int
 
     :param grid_limit: The largest Lagrange multiplier to generate. The grid will contain values
-        :math:`[-grid_limit, grid_limit]` by default
+        distributed between :code:`-grid_limit` and :code:`grid_limit` by default
     :type grid_limit: float
 
     :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
         set of Lagrange multipliers they desire using this argument.
     """
+
     _MESSAGE_Y_NOT_BINARY = "Supplied y labels are not 0 or 1"
 
     def __init__(self,
@@ -121,8 +122,7 @@ class GridSearch(Reduction):
                  grid_size=10,
                  grid_limit=2.0,
                  grid=None):
-        """Constructor for a GridSearch object
-        """
+        """Constructor for a GridSearch object."""
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")
@@ -146,23 +146,25 @@ class GridSearch(Reduction):
 
     @property
     def all_results(self):
-        """A list of :class:`GridSearchResult` from each
-        point in the grid
-        """
+        """A list of :class:`GridSearchResult` from each point in the grid."""
         return self._all_results
 
     @property
     def best_result(self):
         """The best result found from the grid search.
+
         The predictor contained in this instance of
         :class:`GridSearchResult` is used in calls to
-        :code:`predict`` and :code:`predict_proba.
+        :code:`predict` and :code:`predict_proba`.
         """
         return self._best_result
 
     def fit(self, X, y, **kwargs):
-        """Runs the grid search. This will result in multiple copies of the
-        estimator being made, and the :code:`fit` method of each one called.
+        """Runs the grid search.
+
+        This will result in multiple copies of the
+        estimator being made, and the :code:`fit` method
+        of each one called.
 
         :param X: The feature data for the machine learning problem
         :type X: Array
@@ -202,7 +204,7 @@ class GridSearch(Reduction):
         objective_in_the_span = (self.constraints.default_objective_lambda_vec is not None)
 
         if self.grid is None:
-            logger.debug("Creating grid of size {0}".format(self.grid_size))
+            logger.debug("Creating grid of size %i", self.grid_size)
             grid = _GridGenerator(self.grid_size,
                                   self.grid_limit,
                                   pos_basis,
@@ -253,8 +255,7 @@ class GridSearch(Reduction):
         return
 
     def predict(self, X):
-        """Provides a prediction for the given input data based
-        on the best model found by the grid search.
+        """Provides a prediction for the given input data based on the best model found by the grid search.
 
         :param X: The data for which predictions are required
         :type X: Array
@@ -268,9 +269,9 @@ class GridSearch(Reduction):
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
-        """Provides the result of :code:`predict_proba` from the
-        best model found by the grid search. The underlying
-        estimator must support :code:`predict_proba` for this
+        """Provides the result of :code:`predict_proba` from the best model found by the grid search.
+
+        The underlying estimator must support :code:`predict_proba` for this
         to work.
 
         :param X: The data for which predictions are required

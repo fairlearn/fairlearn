@@ -61,7 +61,6 @@ def load_requirements_file(filename):
     """Loads the specified requirements file
     and checks that the specs are OK by themselves
     """
-
     print("Loading {0}".format(filename))
 
     good_requirements = True

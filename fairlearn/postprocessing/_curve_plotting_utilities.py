@@ -1,8 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-""" Utilities for plotting curves
-"""
+"""Utilities for plotting curves."""
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm

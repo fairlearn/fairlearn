@@ -10,7 +10,7 @@ _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
 
 def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_weight=None):
-    """ Applies a metric to each subgroup of a set of data
+    """Applies a metric to each subgroup of a set of data.
 
     :param metric_function: Function with signature ``(y_true, y_pred, sample_weight=None)``
      which returns a scalar
@@ -91,7 +91,7 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
 
 
 def make_group_metric(metric_function):
-    """Function to turn a regular metric into a grouped metric
+    """Function to turn a regular metric into a grouped metric.
 
     :param metric_function: The function to be wrapped. This must have signature
         ``(y_true, y_pred, sample_weight)``
