@@ -24,7 +24,7 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = 'fairlearn'
-copyright = '2019, Microsoft'
+copyright = '2019, Microsoft.'
 author = 'Microsoft'
 
 # The full version, including alpha/beta/rc tags
