@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""Module for Fairlearn Dashboard widget."""
+"""Package for the fairlearn Dashboard widget."""
 
-from .fairlearn_dashboard import FairlearnDashboard
+from ._fairlearn_dashboard import FairlearnDashboard
 
 __all__ = ['FairlearnDashboard']
 
