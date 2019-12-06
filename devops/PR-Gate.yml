@@ -11,7 +11,7 @@ jobs:
 - template: all-tests-job-template.yml
   parameters:
     name: Linux
-    vmImage: 'ubuntu-latest'
+    vmImage: 'ubuntu-16.04'
     pyVersions: [3.6]
 
 - template: all-tests-job-template.yml
