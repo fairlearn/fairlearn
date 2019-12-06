@@ -12,13 +12,13 @@ jobs:
   parameters:
     name: Linux
     vmImage: 'ubuntu-16.04'
-    pyVersions: [3.5]
+    pyVersions: [3.6]
 
 - template: all-tests-job-template.yml
   parameters:
     name: Windows
     vmImage:  'vs2017-win2016'
-    pyVersions: [3.6]
+    pyVersions: [3.5]
     
 - template: all-tests-job-template.yml
   parameters:
