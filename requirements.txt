@@ -28,3 +28,6 @@ shap
 
 # Required for documentation
 sphinx
+
+# Required by something
+colorama==0.4.1
