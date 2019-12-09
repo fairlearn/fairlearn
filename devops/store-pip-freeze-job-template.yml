@@ -1,6 +1,6 @@
 parameters:
-  poolImage: ''
-  poolPythonVersion: 3.6
+  vmImage: ''
+  pythonVersion: 3.6
   requirementsFile: 'requirements.txt'
   freezeArtifact: 'PipFreeze'
   freezeFile: 'requirements-freeze.txt'
