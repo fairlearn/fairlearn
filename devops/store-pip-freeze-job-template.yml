@@ -12,9 +12,9 @@ jobs:
   
   steps:
   - task: UsePythonVersion@0
-    displayName: 'Use Python ${{parameters.pyVer}}'
+    displayName: 'Use Python ${{parameters.pythonVersion}}'
     inputs:
-      versionSpec: ${{parameters.pyVer}}
+      versionSpec: ${{parameters.pythonVersion}}
       addToPath: true
 
   - script: pip install -r ${{parameters.requirementsFile}}
