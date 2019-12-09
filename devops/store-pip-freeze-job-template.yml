@@ -1,0 +1,30 @@
+parameters:
+  poolImage: ''
+  poolPythonVersion: 3.6
+  requirementsFile: 'requirements.txt'
+  freezeArtifact: 'PipFreeze'
+  freezeFile: 'requirements-freeze.txt'
+
+jobs:
+- job: "Save pip freeze to artifact"
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python ${{parameters.pyVer}}'
+    inputs:
+      versionSpec: ${{parameters.pyVer}}
+      addToPath: true
+
+  - script: pip install -r ${{parameters.requirementsFile}}
+    displayName: "Install fairlearn requirements from ${{parameters.requirementsFile}}"
+
+  - script: pip freeze > ${{parameters.FreezeFile}}
+    displayName: "Run pip freeze"
+
+  - task: PublishPipelineArtifact@1
+    displayName: "Publish pip freeze file"
+    inputs:
+      path: '$(System.DefaultWorkingDirectory)/${{parameters.freezeFile}}'
+      artifact: '${{parameters.freezeArtifact}}'
