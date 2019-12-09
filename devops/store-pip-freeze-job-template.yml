@@ -6,7 +6,7 @@ parameters:
   freezeFile: 'requirements-freeze.txt'
 
 jobs:
-- job: "Save pip freeze to artifact"
+- job: "pip_freeze_to_Artifact"
   pool:
     vmImage: ${{ parameters.vmImage }}
   
