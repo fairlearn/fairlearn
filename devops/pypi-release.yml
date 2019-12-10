@@ -41,6 +41,7 @@ stages:
       pyVersions: [3.6,3.7]
       storeFreeze: true
       freezeArtifactFormat: $(freezeArtifactFormat)
+      freezeFile: $(freezeFile)
 
   - template: all-tests-job-template.yml
     parameters:
@@ -49,6 +50,7 @@ stages:
       pyVersions: [3.5, 3.6, 3.7]
       storeFreeze: true
       freezeArtifactFormat: $(freezeArtifactFormat)
+      freezeFile: $(freezeFile)
       
   - template: all-tests-job-template.yml
     parameters:
@@ -57,6 +59,7 @@ stages:
       pyVersions: [3.6, 3.7] 
       storeFreeze: true
       freezeArtifactFormat: $(freezeArtifactFormat)
+      freezeFile: $(freezeFile)
 
   - template: notebook-job-template.yml
     parameters:
