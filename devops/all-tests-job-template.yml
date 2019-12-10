@@ -42,7 +42,7 @@ jobs:
     displayName: 'Publish Test Results **/TEST-*.xml'
     condition: succeededOrFailed()
 
-  - ${{ if parameters.storeFreeze }}
+  - ${{ if parameters.storeFreeze }}:
     - script: pip freeze > $(FreezeFile)
       displayName: "Run pip freeze"
 
