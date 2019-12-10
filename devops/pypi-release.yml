@@ -20,7 +20,7 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
-  freezeArtifact: "PipFreeze"
+  freezeArtifactFormat: "PipFreeze{0}{1}"
   freezeFile: "requirements-freeze.txt"
 
 trigger: none # No CI build
@@ -40,7 +40,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6,3.7]
       storeFreeze: true
-      freezeArtifact: $(freezeArtifact)
+      freezeArtifactFormat: $(freezeArtifactFormat)
 
   - template: all-tests-job-template.yml
     parameters:
@@ -48,7 +48,7 @@ stages:
       vmImage:  'vs2017-win2016'
       pyVersions: [3.5, 3.6, 3.7]
       storeFreeze: true
-      freezeArtifact: $(freezeArtifact)
+      freezeArtifactFormat: $(freezeArtifactFormat)
       
   - template: all-tests-job-template.yml
     parameters:
@@ -56,7 +56,7 @@ stages:
       vmImage:  'macos-latest'
       pyVersions: [3.6, 3.7] 
       storeFreeze: true
-      freezeArtifact: $(freezeArtifact)
+      freezeArtifactFormat: $(freezeArtifactFormat)
 
   - template: notebook-job-template.yml
     parameters:
@@ -75,7 +75,7 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
-    freezeArtifact: $(freezeArtifact)
+    freezeArtifact: 
     freezeFile: $(freezeFile)
 
 # =================================================================================================================
@@ -89,5 +89,5 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
-    freezeArtifact: $(freezeArtifact)
+    freezeArtifact: 
     freezeFile: $(freezeFile)
