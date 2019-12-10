@@ -63,6 +63,7 @@ stages:
 
   - template: notebook-job-template.yml
     parameters:
+      name: Notebooks_Linux
       pyVersions: [3.6]
       storeFreeze: true
       freezeArtifactStem: $(FreezeArtifactStem)
