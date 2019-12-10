@@ -11,6 +11,8 @@ parameters:
   poolPythonVersion: 3.6
   targetType: 'Test'
   targetEnvironment: 'PyPI-Test Deployment'
+  freezeArtifact: 'PipFreeze'
+  freezeFile: 'requirements-freeze.txt'
   packageArtifactStem: 'Packages'
   versionArtifactStem: 'Version'
   versionFileStem: 'versionInfo'
@@ -18,6 +20,8 @@ parameters:
   kvVaultName:
   kvUsername:
   kvPassword:
+  freezeArtifact: 'PipFreeze'
+  freezeFile: 'requirements-freeze.txt'
 
 stages:
 # Create the PyPI package and save as a artifact
@@ -36,6 +40,8 @@ stages:
         packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+        freezeArtifact: ${{parameters.freezeArtifact}}
+        freeseFile: ${{parameters.freezeFile}}
 
 
 # Upload the package to the appropriate PyPI index
@@ -101,6 +107,8 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      freezeArtifact: ${{parameters.freezeArtifact}}
+      freeseFile: ${{parameters.freezeFile}}
 
   - template: unit-tests-pypi-job-template.yml
     parameters:
@@ -110,6 +118,8 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      freezeArtifact: ${{parameters.freezeArtifact}}
+      freeseFile: ${{parameters.freezeFile}}
 
   - template: unit-tests-pypi-job-template.yml
     parameters:
@@ -119,6 +129,8 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      freezeArtifact: ${{parameters.freezeArtifact}}
+      freeseFile: ${{parameters.freezeFile}}
 
   - template: notebook-pypi-job-template.yml
     parameters:
@@ -128,3 +140,5 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      freezeArtifact: ${{parameters.freezeArtifact}}
+      freeseFile: ${{parameters.freezeFile}}

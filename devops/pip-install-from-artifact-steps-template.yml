@@ -1,0 +1,9 @@
+parameters:
+  freezeArtifact: 'PipFreeze'
+  freezeFile: 'requirements-freeze.txt'
+
+steps:
+- script: ls -R $(Pipeline.Workspace)
+
+- script: pip install -r $(Pipeline.Workspace)/${{parameters.freezeArtifact}}/${{parameters.freezeFile}}
+  displayName: "Install fairlearn requirements from ${{parameters.freezeArtifact}}/${{parameters.freezeFile}}"

@@ -20,6 +20,8 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
+  freezeArtifact: "PipFreeze"
+  freezeFile: "requirements-freeze.txt"
 
 trigger: none # No CI build
 
@@ -58,6 +60,8 @@ stages:
     parameters:
       vmImage: 'ubuntu-16.04'
       pythonVersion: 3.6
+      freezeArtifact: $(freezeArtifact)
+      freezeFile: $(freezeFile)
 
 
 # =================================================================================================================
@@ -72,6 +76,8 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
+    freezeArtifact: $(freezeArtifact)
+    freezeFile: $(freezeFile)
 
 # =================================================================================================================
 
@@ -84,3 +90,5 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
+    freezeArtifact: $(freezeArtifact)
+    freezeFile: $(freezeFile)
