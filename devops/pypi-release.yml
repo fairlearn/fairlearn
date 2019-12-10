@@ -78,7 +78,7 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
-    freezeArtifact: 
+    freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 
 # =================================================================================================================
@@ -92,5 +92,5 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
-    freezeArtifact: 
+    freezeArtifactStem: 
     freezeFile: $(freezeFile)

@@ -11,8 +11,8 @@ parameters:
   poolPythonVersion: 3.6
   targetType: 'Test'
   targetEnvironment: 'PyPI-Test Deployment'
-  freezeArtifact:
-  freezeFile:
+  freezeArtifactStem:
+  freezeFile: 
   packageArtifactStem: 'Packages'
   versionArtifactStem: 'Version'
   versionFileStem: 'versionInfo'
@@ -38,7 +38,7 @@ stages:
         packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-        freezeArtifact: ${{parameters.freezeArtifact}}
+        freezeArtifactStem: ${{parameters.freezeArtifactStem}}
         freezeFile: ${{parameters.freezeFile}}
 
 

@@ -11,8 +11,8 @@ parameters:
   targetType:
   versionFileArtifact:
   versionFileName:
-  freezeArtifact: ''
-  freezeFile: ''
+  freezeArtifactStem:
+  freezeFile: 
 
 jobs:
 - job: ${{ parameters.name }}
@@ -32,6 +32,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
 
   steps:
   # Remove the fairlearn/ directory (and some others)
