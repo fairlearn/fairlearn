@@ -105,7 +105,7 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-      freezeArtifact: ${{parameters.freezeArtifact}}
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
       freeseFile: ${{parameters.freezeFile}}
 
   - template: unit-tests-pypi-job-template.yml
@@ -116,7 +116,7 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-      freezeArtifact: ${{parameters.freezeArtifact}}
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
       freeseFile: ${{parameters.freezeFile}}
 
   - template: unit-tests-pypi-job-template.yml
@@ -127,7 +127,7 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-      freezeArtifact: ${{parameters.freezeArtifact}}
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
       freeseFile: ${{parameters.freezeFile}}
 
   - template: notebook-pypi-job-template.yml
@@ -138,5 +138,5 @@ stages:
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-      freezeArtifact: ${{parameters.freezeArtifact}}
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
       freeseFile: ${{parameters.freezeFile}}

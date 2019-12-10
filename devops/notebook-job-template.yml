@@ -3,6 +3,9 @@ parameters:
   vmImage: 'ubuntu-latest'
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
+  storeFreeze: false
+  freezeArtifactStem:
+  freezeFile: 
 
 jobs:
 - job:  ${{ parameters.name }}
@@ -14,6 +17,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
 
   steps:
   - task: UsePythonVersion@0
@@ -34,3 +38,9 @@ jobs:
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
     condition: succeededOrFailed()
+
+  - template: pip-freeze-to-artifact-template.yml
+    parameters:
+      storeFreeze: ${{parameters.storeFreeze}}
+      freezeArtifact: $(FreezeArtifact)
+      freezeFile: ${{parameters.freezeFile}}

@@ -10,8 +10,8 @@ parameters:
   targetType:
   versionFileArtifact:
   versionFileName:
-  freezeArtifact: ''
-  freezeFile: ''
+  freezeArtifactStem:
+  freezeFile: 
 
 jobs:
 - job: ${{ parameters.name }}
@@ -31,6 +31,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
 
   steps:
   # Remove the fairlearn/ directory (and some others)
@@ -56,7 +57,7 @@ jobs:
   # Install our requirements from regular PyPI
   - template: pip-install-from-artifact-steps-template.yml
     parameters:
-      freezeArtifact: ${{parameters.freezeArtifact}}
+      freezeArtifact: $(FreezeArtifact)
       freeseFile: ${{parameters.freezeFile}}
 
   # Install fairlearn withe the specified version from the appropriate PyPI index

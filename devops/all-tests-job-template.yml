@@ -42,12 +42,8 @@ jobs:
     displayName: 'Publish Test Results **/TEST-*.xml'
     condition: succeededOrFailed()
 
-  - ${{ if parameters.storeFreeze }}:
-    - script: pip freeze > ${{parameters.freezeFile}}
-      displayName: "Run pip freeze"
-
-    - task: PublishPipelineArtifact@1
-      displayName: "Publish pip freeze file to artifact $(FreezeArtifact)"
-      inputs:
-        path: '$(System.DefaultWorkingDirectory)/${{parameters.freezeFile}}'
-        artifact: $(FreezeArtifact)
+  - template: pip-freeze-to-artifact-template.yml
+    parameters:
+      storeFreeze: ${{parameters.storeFreeze}}
+      freezeArtifact: $(FreezeArtifact)
+      freezeFile: ${{parameters.freezeFile}}

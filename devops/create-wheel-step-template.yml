@@ -7,7 +7,7 @@ parameters:
   versionFilename: ''
   packageArtifactName: ''
   versionArtifactName: ''
-  freezeArtifact: ''
+  freezeArtifactStem: ''
   freezeFile: ''
 
 steps:
@@ -22,7 +22,7 @@ steps:
 
 - template: pip-install-from-artifact-steps-template.yml
   parameters:
-    freezeArtifact: ${{parameters.freezeArtifact}}
+    freezeArtifactStem: ${{parameters.freezeArtifactStem}}
     freeseFile: ${{parameters.freezeFile}}
 
 
