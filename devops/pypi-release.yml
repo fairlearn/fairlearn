@@ -40,7 +40,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6,3.7]
       storeFreeze: true
-      freezeArtifactFormat: $(freezeArtifactFormat)
+      freezeArtifactFormat: 'PipFreeze{0}{1}'
       freezeFile: $(freezeFile)
 
   - template: all-tests-job-template.yml
