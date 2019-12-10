@@ -4,7 +4,7 @@ parameters:
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
   storeFreeze: false
-  freezeArtifactFormat:
+  freezeArtifactStem:
   freezeFile: 
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
-          FreezeArtifact: ${{ format( parameters.freezeArtifactFormat, parameters.name, pyVer)}}
+          FreezeArtifact: ${{ format( '{0}{1}{2}', parameters.freezeArtifactStem, parameters.name, pyVer)}}
 
   steps:
   - task: UsePythonVersion@0
