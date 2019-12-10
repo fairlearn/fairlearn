@@ -20,7 +20,7 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
-  freezeArtifactFormat: 'PipFreeze{0}{1}'
+  freezeArtifactFormat: "PipFreeze{0}{1}"
   freezeFile: "requirements-freeze.txt"
 
 trigger: none # No CI build
