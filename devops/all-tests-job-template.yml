@@ -17,7 +17,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
-          FreezeArtifact: ${{ format( '{0}{1}{2}', parameters.freezeArtifactStem, parameters.name, pyVer)}}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
 
   steps:
   - task: UsePythonVersion@0
