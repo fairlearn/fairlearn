@@ -3,6 +3,9 @@ parameters:
   vmImage: ''
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
+  storeFreeze: false
+  freezeArtifact: ''
+  freezeFilenameFormat: 'requirements-freeze-{0}-{1}.txt'
 
 jobs:
 - job: ${{ parameters.name }}
@@ -14,6 +17,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+          FreezeFile: ${{ format(parameters.freezeFilenameFormat, parameters.name, pyVer)}}
 
   steps:
   - task: UsePythonVersion@0
@@ -37,3 +41,13 @@ jobs:
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
     condition: succeededOrFailed()
+
+  - ${{ if parameters.storeFreeze }}
+    - script: pip freeze > $(FreezeFile)
+      displayName: "Run pip freeze"
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish pip freeze file"
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)/$(FreezeFile)'
+        artifact: '${{parameters.freezeArtifact}}'
