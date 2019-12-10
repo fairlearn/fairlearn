@@ -55,7 +55,7 @@ jobs:
       addToPath: true
 
   # Install our requirements from regular PyPI
-  - template: pip-install-from-artifact-steps.template.yml
+  - template: pip-install-from-artifact-steps-template.yml
     parameters:
       freezeArtifact: ${{parameters.freezeArtifact}}
       freeseFile: ${{parameters.freezeFile}}
