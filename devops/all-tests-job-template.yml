@@ -17,7 +17,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
-          FreezeArtifact: ${{ format(parameters.freezeArtifactFormat, parameters.name, pyVer)}}
+          FreezeArtifact: ${{ format('PipFreeze{0}{1}', parameters.name, pyVer)}}
 
   steps:
   - task: UsePythonVersion@0
@@ -47,7 +47,7 @@ jobs:
       displayName: "Run pip freeze"
 
     - task: PublishPipelineArtifact@1
-      displayName: "Publish pip freeze file"
+      displayName: "Publish pip freeze file to artifact $(FreezeArtifact)"
       inputs:
         path: '$(System.DefaultWorkingDirectory)/${{parameters.freezeFile}}'
         artifact: $(FreezeArtifact)
