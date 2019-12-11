@@ -1,6 +1,6 @@
 parameters:
-  freezeArtifact: 
-  freezeFile: 
+  freezeArtifact: "NeedOverride"
+  freezeFile: "FileNeedsOverride"
 
 steps:
 - task: DownloadPipelineArtifact@2

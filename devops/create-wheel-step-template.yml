@@ -22,8 +22,8 @@ steps:
 
 - template: pip-install-from-artifact-steps-template.yml
   parameters:
-    freezeArtifactStem: ${{parameters.freezeArtifactStem}}
-    freeseFile: ${{parameters.freezeFile}}
+    freezeArtifact: '${{parameters.freezeArtifactStem}}Linux${{parameters.pyVer}}'
+    freezeFile: ${{parameters.freezeFile}}
 
 
 - task: PowerShell@2
