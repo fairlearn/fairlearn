@@ -4,20 +4,20 @@
 
 The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
 
-- [Current release](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#current-release)
-- [What we mean by _fairness_](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#what-we-mean-by-fairness)
-- [Overview of fairlearn](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#overview-of-fairlearn)
-- [Install fairlearn](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#install-fairlearn)
-- [Usage](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#usage)
-- [Contributing](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#contributing)
-- [Maintainers](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#maintainers)
-- [Issues](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#issues)
+- [Current release](#current-release)
+- [What we mean by _fairness_](#what-we-mean-by-fairness)
+- [Overview of fairlearn](#overview-of-fairlearn)
+- [Install fairlearn](#install-fairlearn)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Maintainers](#maintainers)
+- [Issues](#issues)
 
 ## Current release
 
 - The current stable release is available at [fairlearn v0.4.0](https://github.com/fairlearn/fairlearn/tree/release/0.4.0).
 
-- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#onboarding-guide).
+- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
 ## What we mean by _fairness_
 
