@@ -4,20 +4,20 @@
 
 The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
 
-- [Current release](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#current-release)
-- [What we mean by _fairness_](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#what-we-mean-by-fairness)
-- [Overview of fairlearn](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#overview-of-fairlearn)
-- [Install fairlearn](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#install-fairlearn)
-- [Usage](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#usage)
-- [Contributing](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#contributing)
-- [Maintainers](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#maintainers)
-- [Issues](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#issues)
+- [Current release](#current-release)
+- [What we mean by _fairness_](#what-we-mean-by-fairness)
+- [Overview of fairlearn](#overview-of-fairlearn)
+- [Install fairlearn](#install-fairlearn)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Maintainers](#maintainers)
+- [Issues](#issues)
 
 ## Current release
 
 - The current stable release is available at [fairlearn v0.4.0](https://github.com/fairlearn/fairlearn/tree/release/0.4.0).
 
-- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://github.com/fairlearn/fairlearn/tree/release/0.4.0#onboarding-guide).
+- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
 ## What we mean by _fairness_
 
@@ -30,7 +30,7 @@ An AI system can behave unfairly for a variety of reasons. In fairlearn, we defi
 We follow the approach known as **group fairness**, which asks: _Which groups of individuals are at risk for experiencing harms?_ The relevant groups need to be specified by the data scientist and are application specific.
 
 Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The fairlearn package enables assessment and mitigation of unfairness under several common definitions.
-To learn more about our definitions of fairness, please visit our [terminology page](https://github.com/fairlearn/fairlearn/tree/release/0.4.0/TERMINOLOGY.md#fairness-of-ai-systems).
+To learn more about our definitions of fairness, please visit our [terminology page](./TERMINOLOGY.md#fairness-of-ai-systems).
 
 >_Note_:
 > Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
@@ -47,7 +47,7 @@ The `fairlearn` package contains the following algorithms for mitigating unfairn
 | `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/abs/1610.02413). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier's prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
 > _Note_:
-> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](https://github.com/fairlearn/fairlearn/tree/release/0.4.0/TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
+> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](./TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
 
 ## Install fairlearn
 
@@ -120,11 +120,11 @@ Please open a [new issue](https://github.com/fairlearn/fairlearn/issues) if you 
 
 ## Usage
 
-For common usage refer to the [Jupyter notebooks](https://github.com/fairlearn/fairlearn/tree/release/0.4.0/notebooks) and our [API guide](https://github.com/fairlearn/fairlearn/tree/release/0.4.0/CONTRIBUTING.md#api)
+For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](./CONTRIBUTING.md#api)
 
 ## Contributing
 
-To contribute please check our [contributing guide](https://github.com/fairlearn/fairlearn/tree/release/0.4.0/CONTRIBUTING.md).
+To contribute please check our [contributing guide](./CONTRIBUTING.md).
 
 ## Maintainers
 
@@ -136,7 +136,7 @@ The fairlearn project is maintained by:
 - **@romanlutz**
 - **@bethz**
 
-For a full list of contributors refer to the [authors page](https://github.com/fairlearn/fairlearn/tree/release/0.4.0/AUTHORS.md)
+For a full list of contributors refer to the [authors page](./AUTHORS.md)
 
 ## Issues
 
@@ -151,4 +151,4 @@ Maintainers will try to link duplicate issues when possible.
 
 ### Reporting security issues
 
-Please take a look at our guidelines for reporting [security issues](https://github.com/fairlearn/fairlearn/tree/release/0.4.0/SECURITY.md).
+Please take a look at our guidelines for reporting [security issues](./SECURITY.md).
