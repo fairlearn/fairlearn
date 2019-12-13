@@ -39,8 +39,12 @@ if ($LASTEXITCODE -ne 0)
 # Update the ReadMe file
 Write-Host
 Write-Host "Updating ReadMe file"
+Write-Host
+Get-ChildItem
+
 $readMeScript = Join-Path -resolve scripts process_readme.py
-python $readMeScript --input ReadMe.md --output ReadMe.md --loglevel INFO
+$target = Join-Path -resolve $(Get-Location) README.md
+python $readMeScript --input $target --output $target --loglevel INFO
 if ($LASTEXITCODE -ne 0)
 {
     throw "process_readme.py failed with result code $LASTEXITCODE"
