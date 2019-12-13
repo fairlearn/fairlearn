@@ -5,7 +5,7 @@ import sys
 _BASE_URI_FORMAT = "https://github.com/fairlearn/fairlearn/tree/release/{0}"
 _CURRENT_RELEASE_PATTERN = r"\[fairlearn v(\d+\.\d+\.\d+)\]\(https://github.com/fairlearn/fairlearn/tree/release/\1\)"
 _OTHER_MD_REF_PATTERN = r"\]\(\./(\w+\.md)"
-_SAME_MD_REF_PATTERN = r"\]\((#\w+)\)"
+_SAME_MD_REF_PATTERN = r"\]\((#.+)\)"
 
 
 def build_argument_parser():
@@ -39,7 +39,6 @@ def update_other_markdown_references(line, target_version):
     result = line
     match = markdown_ref_pattern.search(line)
     if match:
-        print(line)
         for m in match.groups():
             old_str = "./{0}".format(m)
             new_str = "{0}/{1}".format(get_base_path(target_version), m)
@@ -48,12 +47,24 @@ def update_other_markdown_references(line, target_version):
     return result
 
 
+def update_same_page_references(line, target_version):
+    same_page_ref_pattern = re.compile(_SAME_MD_REF_PATTERN)
+    result = line
+    match = same_page_ref_pattern.search(line)
+    if match:
+        print(line)
+        for m in match.groups():
+            old_str = m
+            new_str = "{0}{1}".format(get_base_path(target_version), m)
+            result = result.replace(old_str, new_str)
 
+    return result
 
 
 def process_line(line, target_version):
     result = update_current_version(line, target_version)
     result = update_other_markdown_references(result, target_version)
+    result = update_same_page_references(result, target_version)
 
     return result
 
