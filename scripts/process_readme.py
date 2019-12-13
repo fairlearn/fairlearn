@@ -12,7 +12,6 @@ of `fairlearn`) exists in the repo. Otherwise, the links won't work.
 
 import argparse
 import logging
-import os
 import re
 import sys
 
@@ -38,7 +37,6 @@ def build_argument_parser():
 
 
 def get_fairlearn_version():
-    sys.path.insert(0, os.getcwd())
     import fairlearn
     return fairlearn.__version__
 

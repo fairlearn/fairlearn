@@ -27,9 +27,16 @@ if( $targetType -eq "Test" )
 
 
 # Store fairlearn version (including FAIRLEARN_DEV_VERSION) in the file
+Write-Host "Storing fairlearn version i $versionFilename"
 pip install .
 $versionScript = Join-Path -resolve scripts fairlearn_version.py
 python $versionScript > $versionFilename
+
+# Update the ReadMe file
+Write-Host
+Write-Host "Updating ReadMe file"
+$readMeScript = Join-Path -resolve scripts process_readme.py
+python $readMeScript --input ReadMe.md --ouput ReadMe.md --loglevel INFO
 
 # Create the packages
 Write-Host
