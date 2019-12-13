@@ -12,9 +12,9 @@ def build_argument_parser():
     return parser
 
 
-def read_file_by_lines(input_file_path):
-    with open(input_file_path, 'r') as f:
-        return f.readlines()
+def process_line(line):
+    result = line
+    return result
 
 
 def main(argv):
@@ -25,8 +25,10 @@ def main(argv):
     with open(args.input, 'r') as f:
         text_lines = f.readlines()
 
+    result_lines = [process_line(l) for l in text_lines]
+
     with open(args.output, 'w') as f:
-        f.writelines(text_lines)
+        f.writelines(result_lines)
 
 
 if __name__ == "__main__":
