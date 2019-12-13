@@ -1,3 +1,15 @@
+"""Script to dynamically update the ReadMe file for a particular release
+
+Since PyPI and GitHub have slightly different ideas about markdown, we have to update
+the ReadMe file when we upload to PyPI. This script makes the necessary changes.
+Most of the updates performed should be fairly robust. The one which may give trouble
+is in 'update_current_version' which looks for _CURRENT_RELEASE_PATTERN in the
+text in order to update both the text and the link.
+
+The produced file assumes that a tag 'vX' (where X corresponds to the current version
+of `fairlearn`) exists in the repo. Otherwise, the links won't work.
+"""
+
 import argparse
 import logging
 import os
