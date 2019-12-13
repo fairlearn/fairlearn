@@ -31,12 +31,20 @@ Write-Host "Storing fairlearn version i $versionFilename"
 pip install .
 $versionScript = Join-Path -resolve scripts fairlearn_version.py
 python $versionScript > $versionFilename
+if ($LASTEXITCODE -ne 0)
+{
+    throw "fairlearn_version.py failed with result code $LASTEXITCODE"
+}
 
 # Update the ReadMe file
 Write-Host
 Write-Host "Updating ReadMe file"
 $readMeScript = Join-Path -resolve scripts process_readme.py
 python $readMeScript --input ReadMe.md --output ReadMe.md --loglevel INFO
+if ($LASTEXITCODE -ne 0)
+{
+    throw "process_readme.py failed with result code $LASTEXITCODE"
+}
 
 # Create the packages
 Write-Host
