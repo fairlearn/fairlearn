@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import re
 import sys
 
@@ -17,9 +18,17 @@ def build_argument_parser():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--input", help="Path to the file to be processed", required=True)
     parser.add_argument("--output", help="Path to store the processed file", required=True)
-    parser.add_argument("--version", help="Target version", required=True)
+    parser.add_argument("--loglevel",
+                        help="Set log level",
+                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'])
 
     return parser
+
+
+def get_fairlearn_version():
+    sys.path.insert(0, os.getcwd())
+    import fairlearn
+    return fairlearn.__version__
 
 
 def get_base_path(target_version):
@@ -34,10 +43,10 @@ def update_current_version(line, target_version):
     match = current_release_pattern.search(line)
     result = line
     if match:
-        logger.critical("Matched %s", match)
+        logger.info("Matched %s", match)
         # Replace with the updated version
         result = result.replace(match.groups()[0], target_version)
-        logger.critical("Updated string: %s", result.rstrip())
+        logger.info("Updated string: %s", result.rstrip())
     return result
 
 
@@ -86,12 +95,18 @@ def main(argv):
     parser = build_argument_parser()
     args = parser.parse_args(argv)
 
+    if args.loglevel:
+        logging.basicConfig(level=getattr(logging, args.loglevel))
+
+    target_version = get_fairlearn_version()
+    logger.info("Fairlearn version: %s", target_version)
+
     logger.debug("Reading file %s", args.input)
     text_lines = []
     with open(args.input, 'r') as f:
         text_lines = f.readlines()
 
-    result_lines = [process_line(l, args.version) for l in text_lines]
+    result_lines = [process_line(l, target_version) for l in text_lines]
 
     logger.debug("Writing file %s", args.output)
     with open(args.output, 'w') as f:
