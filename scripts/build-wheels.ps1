@@ -36,7 +36,7 @@ python $versionScript > $versionFilename
 Write-Host
 Write-Host "Updating ReadMe file"
 $readMeScript = Join-Path -resolve scripts process_readme.py
-python $readMeScript --input ReadMe.md --ouput ReadMe.md --loglevel INFO
+python $readMeScript --input ReadMe.md --output ReadMe.md --loglevel INFO
 
 # Create the packages
 Write-Host
