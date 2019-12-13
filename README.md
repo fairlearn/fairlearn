@@ -15,7 +15,7 @@ The fairlearn project seeks to enable anyone involved in the development of arti
 
 ## Current release
 
-- The current stable release is available at [fairlearn v0.4.0](https://github.com/fairlearn/fairlearn/tree/release/0.4.0).
+- The current stable release is available at [fairlearn v0.4.0](https://github.com/fairlearn/fairlearn/tree/v0.4.0).
 
 - Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
