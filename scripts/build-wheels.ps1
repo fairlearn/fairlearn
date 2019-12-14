@@ -39,9 +39,6 @@ if ($LASTEXITCODE -ne 0)
 # Update the ReadMe file
 Write-Host
 Write-Host "Updating ReadMe file"
-Write-Host
-Get-ChildItem
-
 $readMeScript = Join-Path -resolve scripts process_readme.py
 $target = Join-Path -resolve $(Get-Location) README.md
 python $readMeScript --input $target --output $target --loglevel INFO
