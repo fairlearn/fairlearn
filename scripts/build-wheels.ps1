@@ -20,6 +20,9 @@ if( Test-Path env:FAIRLEARN_DEV_VERSION )
     throw "Environment variable FAIRLEARN_DEV_VERSION must not be set"
 }
 
+# Install ourselves
+pip install -e .
+
 # Update the ReadMe file
 # Do this before setting FAIRLEARN_DEV_VERSION so that the links
 # on Test-PyPI are still correct
@@ -41,7 +44,6 @@ if( $targetType -eq "Test" )
 
 # Store fairlearn version (including FAIRLEARN_DEV_VERSION) in the specified file
 Write-Host "Storing fairlearn version i $versionFilename"
-pip install .
 $versionScript = Join-Path -resolve scripts fairlearn_version.py
 python $versionScript > $versionFilename
 if ($LASTEXITCODE -ne 0)
