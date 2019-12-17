@@ -3,6 +3,9 @@ parameters:
   vmImage: ''
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
+  storeFreeze: false
+  freezeArtifactStem: 
+  freezeFile:
 
 jobs:
 - job: ${{ parameters.name }}
@@ -14,6 +17,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
 
   steps:
   - task: UsePythonVersion@0
@@ -24,6 +28,12 @@ jobs:
 
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+
+  - template: pip-freeze-to-artifact-steps-template.yml
+    parameters:
+      storeFreeze: ${{parameters.storeFreeze}}
+      freezeArtifact: $(FreezeArtifact)
+      freezeFile: ${{parameters.FreezeFile}}
     
   - script: python ./scripts/requirementscheck.py --fixed requirements-fixed.txt --lowerbound requirements.txt
     displayName: "Run check on requirements files"

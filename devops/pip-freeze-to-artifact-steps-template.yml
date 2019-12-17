@@ -1,0 +1,16 @@
+parameters:
+  storeFreeze: false
+  freezeArtifact:
+  freezeFile:
+
+  
+steps:
+  - ${{ if parameters.storeFreeze }}:
+    - script: pip freeze > ${{parameters.freezeFile}}
+      displayName: "Run pip freeze"
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish pip freeze file to artifact ${{parameters.freezeArtifact}}"
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)/${{parameters.freezeFile}}'
+        artifact: ${{parameters.freezeArtifact}}
