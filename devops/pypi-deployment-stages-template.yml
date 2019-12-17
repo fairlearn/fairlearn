@@ -18,6 +18,9 @@ parameters:
   kvVaultName:
   kvUsername:
   kvPassword:
+  storeFreeze: false
+  freezeArtifactStem: 
+  freezeFile:
 
 stages:
 # Create the PyPI package and save as a artifact
@@ -36,6 +39,9 @@ stages:
         packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+        storeFreeze: ${{parameters.storeFreeze}}
+        freezeArtifactStem: '${{parameters.freezeArtifactStem}}${{parameters.targetType}}'
+        freezeFile: ${{parameters.freezeFile}}
 
 
 # Upload the package to the appropriate PyPI index
