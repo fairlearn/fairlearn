@@ -2,7 +2,7 @@
 # This does not run on MacOS due to issues with the pinned requirements
 
 variables:
-  StoreFreeze: true
+  StoreFreeze: True
   FreezeArtifactStem: 'freeze'
   FreezeFile: 'requirements-freeze.txt'
 

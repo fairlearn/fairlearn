@@ -1,5 +1,5 @@
 variables:
-  StoreFreeze: true
+  StoreFreeze: True
   FreezeArtifactStem: 'freeze'
   FreezeFile: 'requirements-freeze.txt'
 
