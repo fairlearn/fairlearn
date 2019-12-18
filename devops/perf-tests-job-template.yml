@@ -3,15 +3,6 @@ parameters:
   vmImage: 'ubuntu-latest'
   pyVersions: [3.7]
 
-variables:
-- group: "Key Vault"
-- name: VARIABLE_NAME_SERVICE_PRINCIPAL_PASSWORD
-  value: "fairlearnautomationspsecret"
-- name: VARIABLE_NAME_SERVICE_PRINCIPAL_ID
-  value: "fairlearnautomationspid"
-- name: $env:VARIABLE_NAME_TENANT_ID
-  value: "fairlearnautomationsptenantid"
-
 jobs:
 - job: ${{ parameters.name }}
   pool:

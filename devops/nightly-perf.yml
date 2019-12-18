@@ -4,6 +4,15 @@ trigger: none # No CI build
 
 pr: none # Not for pull requests
 
+variables:
+- group: "Key Vault"
+- name: VARIABLE_NAME_SERVICE_PRINCIPAL_PASSWORD
+  value: "fairlearnautomationspsecret"
+- name: VARIABLE_NAME_SERVICE_PRINCIPAL_ID
+  value: "fairlearnautomationspid"
+- name: $env:VARIABLE_NAME_TENANT_ID
+  value: "fairlearnautomationsptenantid"
+
 schedules:
 - cron: "0 6 * * *" # Time is UTC
   displayName: Nightly Perf Test
