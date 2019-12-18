@@ -38,7 +38,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6,3.7]
       freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements.txt"
+      freezeFile: "requirements-freeze.txt"
 
   - template: all-tests-job-template.yml
     parameters:
@@ -46,7 +46,7 @@ stages:
       vmImage:  'vs2017-win2016'
       pyVersions: [3.5, 3.6, 3.7]
       freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements.txt"
+      freezeFile: "requirements-freeze.txt"
       
   - template: all-tests-job-template.yml
     parameters:
@@ -54,13 +54,13 @@ stages:
       vmImage:  'macos-latest'
       pyVersions: [3.6, 3.7] 
       freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements.txt"
+      freezeFile: "requirements-freeze.txt"
 
   - template: notebook-job-template.yml
     parameters:
       pyVersions: [3.6]
       freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements.txt"
+      freezeFile: "requirements-freeze.txt"
 
 
 # =================================================================================================================
