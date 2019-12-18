@@ -45,7 +45,7 @@ class ConditionalSelectionRate(ClassificationMoment):
                 i += 1
 
     def gamma(self, predictor):
-        """Calculates degree to which constraints are currently violated by the predictor."""
+        """Calculate the degree to which constraints are currently violated by the predictor."""
         pred = predictor(self.X)
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
