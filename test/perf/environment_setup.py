@@ -6,8 +6,6 @@ import shutil
 import subprocess
 import time
 
-from azureml.core import Environment
-
 
 def build_package():
     print('removing build directory')
@@ -37,7 +35,8 @@ def build_package():
                 print("Found wheel {}".format(file))
                 # change wheel name to be unique for every run
                 src = os.path.join("dist", file)
-                dst = os.path.join("dist", "fairlearn-0.4.0a{}-py3-none-any.whl".format(time.time()))
+                dst = os.path.join("dist", "fairlearn-0.4.0a{}-py3-none-any.whl"
+                                   .format(time.time()))
                 shutil.copy(src, dst)
                 return dst
 

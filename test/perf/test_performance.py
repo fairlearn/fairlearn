@@ -7,7 +7,6 @@ import pytest
 import time
 
 from azureml.core import Experiment, RunConfiguration, ScriptRunConfig
-from azureml.core.environment import CondaDependencies
 
 from tempeh.execution.azureml.environment_setup import configure_environment
 
@@ -38,16 +37,18 @@ def test_perf(perf_test_configuration, workspace, request):
     script_name = determine_script_name(request.node.name)
     generate_script(request, perf_test_configuration, script_name, SCRIPT_DIRECTORY)
     wheel_file = build_package()
-    
+
     experiment = Experiment(workspace=workspace, name=EXPERIMENT_NAME)
     compute_target = workspace.get_default_compute_target(type='cpu')
     run_config = RunConfiguration()
     run_config.target = compute_target
-    
+
     environment = configure_environment(workspace, wheel_file=wheel_file)
     run_config.environment = environment
     environment.register(workspace=workspace)
-    script_run_config = ScriptRunConfig(source_directory=SCRIPT_DIRECTORY, script=script_name, run_config=run_config)
+    script_run_config = ScriptRunConfig(source_directory=SCRIPT_DIRECTORY,
+                                        script=script_name,
+                                        run_config=run_config)
     print("submitting run")
     run = experiment.submit(config=script_run_config)
     print("submitted run")
@@ -60,5 +61,6 @@ def test_perf(perf_test_configuration, workspace, request):
 
 def determine_script_name(test_case_name):
     hashed_test_case_name = hash(test_case_name)
-    hashed_test_case_name = hashed_test_case_name if hashed_test_case_name >= 0 else -1 * hashed_test_case_name
+    hashed_test_case_name = hashed_test_case_name if hashed_test_case_name >= 0 \
+        else -1 * hashed_test_case_name
     return "{}.py".format(str(hashed_test_case_name))

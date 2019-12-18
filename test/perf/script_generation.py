@@ -5,7 +5,6 @@ import os
 
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
-from fairlearn.reductions import DemographicParity
 
 
 def generate_script(request, perf_test_configuration, script_name, script_directory):
