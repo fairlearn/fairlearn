@@ -5,7 +5,7 @@ parameters:
 
   
 steps:
-  - ${{ if parameters.storeFreeze }}:
+  - ${{ if eq( 'True', parameters.storeFreeze ) }}:
     - script: pip freeze > ${{parameters.freezeFile}}
       displayName: "Run pip freeze"
 
