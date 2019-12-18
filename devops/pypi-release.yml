@@ -20,7 +20,7 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
-  FreezeFileStem: 'requirements-freeze'
+  FreezeFileStem: 'requirements-freeze-predeploy'
 
 trigger: none # No CI build
 
@@ -75,7 +75,7 @@ stages:
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
     freezeArtifactStem: 'Freeze'
-    freezeFileStem: $(FreezeFileStem)
+    freezeFileStem: 'requirements-freeze'
 
 # =================================================================================================================
 
@@ -89,4 +89,4 @@ stages:
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
     freezeArtifactStem: 'Freeze'
-    freezeFileStem: $(FreezeFileStem)
+    freezeFileStem: 'requirements-freeze'
