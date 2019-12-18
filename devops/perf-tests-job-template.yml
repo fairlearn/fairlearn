@@ -25,6 +25,9 @@ jobs:
   - script: pip install -r requirements.txt
     displayName: 'Install required packages'
 
+  - script: pip install azureml-sdk
+    displayName: 'Install azureml-sdk'
+
   - script: python -m pytest -s test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run Perf tests'
 
