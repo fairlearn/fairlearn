@@ -24,7 +24,7 @@ jobs:
   parameters:
     name: Linux
     vmImage: 'ubuntu-16.04'
-    pyVersions: [3.6, 3.7]
+    pyVersions: [3.5, 3.6, 3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
