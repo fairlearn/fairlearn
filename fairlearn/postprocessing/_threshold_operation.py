@@ -23,7 +23,7 @@ class ThresholdOperation():
 
     @property
     def threshold(self):
-        """Return the stored threshold"""
+        """Return the stored threshold."""
         return self._threshold
 
     @property
