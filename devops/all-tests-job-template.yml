@@ -3,7 +3,7 @@ parameters:
   vmImage: ''
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
-  storeFreeze: false
+  storeFreeze: False
   freezeArtifactStem: 
   freezeFile:
 

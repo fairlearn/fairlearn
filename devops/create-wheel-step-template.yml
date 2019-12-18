@@ -7,7 +7,7 @@ parameters:
   versionFilename: ''
   packageArtifactName: ''
   versionArtifactName: ''
-  storeFreeze: false
+  storeFreeze: False
   freezeArtifactStem: 
   freezeFile:
 

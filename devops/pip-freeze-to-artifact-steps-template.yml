@@ -1,5 +1,5 @@
 parameters:
-  storeFreeze: false
+  storeFreeze: False
   freezeArtifact:
   freezeFile:
 
