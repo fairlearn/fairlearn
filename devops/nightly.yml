@@ -1,7 +1,7 @@
 # Nightly build pipeline
 
 variables:
-  StoreFreeze: True
+  StoreFreeze: 'True'
   FreezeArtifactStem: 'freeze'
   FreezeFile: 'requirements-freeze.txt'
 

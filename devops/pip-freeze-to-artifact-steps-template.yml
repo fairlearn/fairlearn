@@ -1,11 +1,11 @@
 parameters:
-  storeFreeze: False
+  storeFreeze: 'False'
   freezeArtifact:
   freezeFile:
 
   
 steps:
-  - ${{ if eq( 'True', parameters.storeFreeze ) }}:
+  - ${{ if eq( parameters.storeFreeze, 'True' ) }}:
     - script: pip freeze > ${{parameters.freezeFile}}
       displayName: "Run pip freeze"
 
