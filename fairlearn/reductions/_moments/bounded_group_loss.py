@@ -9,16 +9,18 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 
 
 class ConditionalLossMoment(LossMoment):
-    """A moment that quantifies a loss by group"""
+    """A moment that quantifies a loss by group."""
 
     def __init__(self, loss, no_groups=False):
         super().__init__(loss)
         self.no_groups = no_groups
 
     def default_objective(self):
+        """Return a default objective."""
         return AverageLossMoment(self.reduction_loss)
 
     def load_data(self, X, y, **kwargs):
+        """Load data into the moment object."""
         kwargs_mod = kwargs.copy()
         if self.no_groups:
             kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
@@ -42,9 +44,7 @@ class ConditionalLossMoment(LossMoment):
             i += 1
 
     def gamma(self, predictor):
-        """ Calculates the degree to which constraints are currently violated by
-        the predictor.
-        """
+        """Calculate the degree to which constraints are currently violated by the predictor."""
         self.tags[_PREDICTION] = predictor(self.X)
         self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
@@ -52,9 +52,11 @@ class ConditionalLossMoment(LossMoment):
         return expect_attr[_LOSS]
 
     def project_lambda(self, lambda_vec):
+        """Return the lambda values."""
         return lambda_vec
 
     def signed_weights(self, lambda_vec):
+        """Return the signed weights."""
         adjust = lambda_vec / self.prob_attr
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_GROUP_ID]], axis=1
@@ -87,7 +89,8 @@ class SquareLoss:
         self.min = 0
         self.max = (max_val-min_val) ** 2
 
-    def eval(self, y_true, y_pred):
+    def eval(self, y_true, y_pred):  # noqa: A003
+        """Evaluate the square loss for the given set of true and predicted values."""
         return (np.clip(y_true, self.min_val, self.max_val)
                 - np.clip(y_pred, self.min_val, self.max_val)) ** 2
 
@@ -100,7 +103,8 @@ class AbsoluteLoss:
         self.min = 0
         self.max = np.abs(max_val-min_val)
 
-    def eval(self, y_true, y_pred):
+    def eval(self, y_true, y_pred):  # noqa: A003
+        """Evaluate the absolute loss for the given set of true and predicted values."""
         return np.abs(np.clip(y_true, self.min_val, self.max_val)
                       - np.clip(y_pred, self.min_val, self.max_val))
 

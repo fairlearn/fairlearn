@@ -14,14 +14,15 @@ _SIGN = "sign"
 
 
 class Moment:
-    """Generic moment"""
+    """Generic moment."""
 
     def __init__(self):
         self.data_loaded = False
 
     def load_data(self, X, y, **kwargs):
-        """Load a set of data for use by this object. The keyword arguments
-        can contain a `sensitive_features` array.
+        """Load a set of data for use by this object.
+
+        The keyword arguments can contain a :code:`sensitive_features` array.
 
         :param X: The feature data
         :type X: array
@@ -39,13 +40,13 @@ class Moment:
         self.data_loaded = True
         self._gamma_descr = None
 
-    def gamma(self, predictor):
+    def gamma(self, predictor):  # noqa: D102
         raise NotImplementedError()
 
-    def project_lambda(self, lambda_vec):
+    def project_lambda(self, lambda_vec):  # noqa: D102
         raise NotImplementedError()
 
-    def signed_weights(self, lambda_vec):
+    def signed_weights(self, lambda_vec):  # noqa: D102
         raise NotImplementedError()
 
 
@@ -55,8 +56,7 @@ Moment.__module__ = "fairlearn.reductions"
 
 
 class ClassificationMoment(Moment):
-    """Moment that can be expressed as weighted classification error
-    """
+    """Moment that can be expressed as weighted classification error."""
 
 
 # Ensure that ClassificationMoment shows up in correct place in documentation
@@ -65,8 +65,7 @@ ClassificationMoment.__module__ = "fairlearn.reductions"
 
 
 class LossMoment(Moment):
-    """Moment that can be expressed as weighted loss
-    """
+    """Moment that can be expressed as weighted loss."""
 
     def __init__(self, loss):
         super().__init__()

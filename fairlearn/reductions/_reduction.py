@@ -1,10 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# flake8: noqa: D102
 
 class Reduction:
-    """Base class for our reduction-implementing estimators
-    """
+    """Base class for our reduction-implementing estimators."""
 
     def fit(self, X, y, **kwargs):
         raise NotImplementedError()

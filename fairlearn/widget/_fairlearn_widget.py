@@ -1,6 +1,5 @@
-# ---------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
-# ---------------------------------------------------------
+# Licensed under the MIT License.
 
 """Defines the python side of the shared state of the fairlearn widget."""
 
@@ -10,7 +9,7 @@ from traitlets import Unicode, Dict
 
 @widgets.register
 class FairlearnWidget(widgets.DOMWidget):
-    """The python widget definition for the Fairlearn."""
+    """The python widget definition for the fairlearn dashboard."""
 
     _view_name = Unicode('FairlearnView').tag(sync=True)
     _model_name = Unicode('FairlearnModel').tag(sync=True)

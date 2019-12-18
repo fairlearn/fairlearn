@@ -15,7 +15,7 @@ The fairlearn project seeks to enable anyone involved in the development of arti
 
 ## Current release
 
-- The current stable release is available at [fairlearn v0.3.0](https://github.com/fairlearn/fairlearn/tree/v0.3.0).
+- The current stable release is available at [fairlearn v0.4.0](https://github.com/fairlearn/fairlearn/tree/v0.4.0).
 
 - Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
@@ -30,7 +30,7 @@ An AI system can behave unfairly for a variety of reasons. In fairlearn, we defi
 We follow the approach known as **group fairness**, which asks: _Which groups of individuals are at risk for experiencing harms?_ The relevant groups need to be specified by the data scientist and are application specific.
 
 Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The fairlearn package enables assessment and mitigation of unfairness under several common definitions.
-To learn more about our definitions of fairness, please visit our [terminology page](TERMINOLOGY.md#fairness-of-ai-systems).
+To learn more about our definitions of fairness, please visit our [terminology page](./TERMINOLOGY.md#fairness-of-ai-systems).
 
 >_Note_:
 > Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
@@ -47,7 +47,7 @@ The `fairlearn` package contains the following algorithms for mitigating unfairn
 | `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/abs/1610.02413). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier's prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
 > _Note_:
-> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
+> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](./TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
 
 ## Install fairlearn
 
@@ -62,6 +62,16 @@ or you can clone the repository locally via
 ```python
 git clone git@github.com:fairlearn/fairlearn.git
 ```
+If you clone from git and wish to use the Fairness dashboard, you will need to [install Yarn](https://yarnpkg.com/lang/en/docs/install), and then do the following:
+```bash
+cd fairlearn/widget/js
+yarn install
+yarn build:all
+rm -rf dist
+rm -rf lib
+rm -rf node_modules
+```
+These commands only need to be run when you want the latest version of the dashboard (after pulling from our GitHub repository).
 
 To verify that the cloned repository works (the pip package does not include the tests), run
 
@@ -110,11 +120,11 @@ Please open a [new issue](https://github.com/fairlearn/fairlearn/issues) if you 
 
 ## Usage
 
-For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](CONTRIBUTING.md#api)
+For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](./CONTRIBUTING.md#api)
 
 ## Contributing
 
-To contribute please check our [contributing guide](CONTRIBUTING.md).
+To contribute please check our [contributing guide](./CONTRIBUTING.md).
 
 ## Maintainers
 
@@ -126,7 +136,7 @@ The fairlearn project is maintained by:
 - **@romanlutz**
 - **@bethz**
 
-For a full list of contributors refer to the [authors page](AUTHORS.md)
+For a full list of contributors refer to the [authors page](./AUTHORS.md)
 
 ## Issues
 
@@ -141,4 +151,4 @@ Maintainers will try to link duplicate issues when possible.
 
 ### Reporting security issues
 
-Please take a look at our guidelines for reporting [security issues](SECURITY.md).
+Please take a look at our guidelines for reporting [security issues](./SECURITY.md).

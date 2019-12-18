@@ -11,7 +11,7 @@ The fairlearn package largely follows the [terminology established by scikit-lea
 
 ## Fairness of AI systems
 
-AI systems can behave unfairly for a variety of reasons. Sometimes it is because of societal biases reflected in the training data and in the decisions made during the development and deployment of these systems. In other cases, AI systems behave unfairly not because of societal biases, but because of characteristics of the data (e.g., too few data points about some group of people) or characteristics of the systems themselves. Because it can be hard to distinguish between these reasons (and these reasons are not mutually exclusive and often exacerbate one another), we define whether an AI system is behaving unfairly in terms of its impact on people – i.e., in terms of harms – and not in terms of specific causes, such as societal biases, or in terms of intent, such as prejudice.
+AI systems can behave unfairly for a variety of reasons. Sometimes it is because of societal biases reflected in the training data and in the decisions made during the development and deployment of these systems. In other cases, AI systems behave unfairly not because of societal biases, but because of characteristics of the data (e.g., too few data points about some group of people) or characteristics of the systems themselves. It can be hard to distinguish between these reasons, especially since they are not mutually exclusive and often exacerbate one another. Therefore, we define whether an AI system is behaving unfairly in terms of its impact on people — i.e., in terms of harms—and not in terms of specific causes, such as societal biases, or in terms of intent, such as prejudice.
 
 **Usage of the word _bias_.** Since we define fairness in terms of harms rather than specific causes (such as societal biases), we avoid the usage of the words _bias_ or _debiasing_ in describing the functionality of fairlearn.
 
@@ -19,9 +19,9 @@ AI systems can behave unfairly for a variety of reasons. Sometimes it is because
 
 There are many types of harms (see, e.g., the [keynote by K. Crawford at NeurIPS 2017](https://www.youtube.com/watch?v=fMym_BKWQzk)). The fairlearn package is most applicable to two kinds of harms:
 
-- _Allocation harms_. These harms can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
+- _Allocation harms_ can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
-- _Quality-of-service harms_. Quality of service refers to whether a system works as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld.
+- _Quality-of-service harms_ can occur when a system does not work as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld. Examples include varying accuracy in face recognition, document search, or product recommendation.
 
 ### Fairness assessment and unfairness mitigation
 
@@ -56,7 +56,7 @@ _Regression_:
 
 - _Bounded group loss_: A predictor _f_ satisfies bounded group loss at level _ζ_ under a distribution over (_X, A, Y_) if E[loss(_Y_, _f_(_X_)) | _A_=_a_] ≤ _ζ_ for all _a_. [[Agarwal et al.]]( https://arxiv.org/pdf/1905.12843.pdf)
 
-Above, demographic parity seeks to mitigate allocation harms, whereas bounded group loss primarily seek to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
+Above, demographic parity seeks to mitigate allocation harms, whereas bounded group loss primarily seeks to mitigate quality-of-service harms. Equalized odds and equal opportunity can be used as a diagnostic for both allocation harms as well as quality-of-service harms.
 
 #### Disparity metrics, group metrics
 

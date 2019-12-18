@@ -18,6 +18,8 @@ parameters:
   kvVaultName:
   kvUsername:
   kvPassword:
+  freezeArtifactStem: 
+  freezeFileStem:
 
 stages:
 # Create the PyPI package and save as a artifact
@@ -36,6 +38,8 @@ stages:
         packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+        freezeArtifactStem: '${{parameters.freezeArtifactStem}}${{parameters.targetType}}'
+        freezeFile: '${{parameters.freezeFileStem}}-${{parameters.targetType}}-create-wheel.txt'
 
 
 # Upload the package to the appropriate PyPI index
@@ -97,7 +101,7 @@ stages:
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.6, 3.7]
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'

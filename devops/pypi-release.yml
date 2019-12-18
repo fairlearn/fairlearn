@@ -20,6 +20,7 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
+  FreezeFileStem: 'requirements-freeze-predeploy'
 
 trigger: none # No CI build
 
@@ -36,19 +37,25 @@ stages:
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5,3.6,3.7]
+      pyVersions: [3.6,3.7]
+      freezeArtifactStem: "PreDeployment"
+      freezeFileStem: $(FreezeFileStem)
 
   - template: all-tests-job-template.yml
     parameters:
       name: Windows
       vmImage:  'vs2017-win2016'
       pyVersions: [3.5, 3.6, 3.7]
+      freezeArtifactStem: "PreDeployment"
+      freezeFileStem: $(FreezeFileStem)
       
   - template: all-tests-job-template.yml
     parameters:
       name: MacOS
       vmImage:  'macos-latest'
       pyVersions: [3.6, 3.7] 
+      freezeArtifactStem: "PreDeployment"
+      freezeFileStem: $(FreezeFileStem)
 
   - template: notebook-job-template.yml
     parameters:
@@ -67,6 +74,8 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
+    freezeArtifactStem: 'Freeze'
+    freezeFileStem: 'requirements-freeze'
 
 # =================================================================================================================
 
@@ -79,3 +88,5 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
+    freezeArtifactStem: 'Freeze'
+    freezeFileStem: 'requirements-freeze'

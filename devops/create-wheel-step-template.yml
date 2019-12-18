@@ -7,6 +7,8 @@ parameters:
   versionFilename: ''
   packageArtifactName: ''
   versionArtifactName: ''
+  freezeArtifactStem: 
+  freezeFile:
 
 steps:
 - task: UsePythonVersion@0
@@ -20,6 +22,11 @@ steps:
 
 - script: pip install -r requirements.txt
   displayName: "Install fairlearn requirements"
+
+- template: pip-freeze-to-artifact-steps-template.yml
+  parameters:
+    freezeArtifact: '${{parameters.freezeArtifactStem}}CreateWheel'
+    freezeFile: ${{parameters.FreezeFile}}
 
 - task: PowerShell@2
   displayName: 'Build widget'

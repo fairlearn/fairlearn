@@ -1,0 +1,16 @@
+parameters:
+  name: 'BuildWidget'
+  vmImage: 'ubuntu-latest'
+  pyVersion: 3.6
+
+jobs:
+- job:  ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  steps:
+  - task: PowerShell@2
+    displayName: 'Build widget'
+    inputs:
+      filePath: scripts/build-widget.ps1
+      pwsh: true
