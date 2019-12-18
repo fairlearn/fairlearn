@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class InterpolatedPredictor:
     def __init__(self, p_ignore, prediction_constant, p0, operation0, p1, operation1):
-        """Creates the interpolated prediction between two predictions.
+        """Create the interpolated prediction between two predictions.
 
         The predictions are represented through the threshold rules operation0 and operation1.
 
@@ -47,7 +47,7 @@ class InterpolatedPredictor:
                     self._p1, self._operation1)
 
     def predict(self, scores):
-        """Creates the interpolated prediction.
+        """Create the interpolated prediction.
 
         The interpolation is based on two threshold operations and the
         transformation adjustment.

@@ -32,7 +32,7 @@ def _get_roc(data, sensitive_feature_value, flip=True):
 
 
 def _filter_points_to_get_convex_hull(roc_sorted):
-    """Finds the convex hull.
+    """Find the convex hull.
 
     Uses a simplified version of Andrew's monotone chain convex hull algorithm
     https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
@@ -124,7 +124,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
 
 def _calculate_roc_points(data, sensitive_feature_value, flip=True):
-    """Calculates the ROC points from the scores and labels.
+    """Calculate the ROC points from the scores and labels.
 
     This is done by iterating through all possible
     thresholds that could be set based on the available scores.
@@ -203,7 +203,7 @@ def _get_scores_labels_and_counts(data):
 
 
 def _get_counts(labels):
-    """Returns the overall, positive, and negative counts of the labels.
+    """Return the overall, positive, and negative counts of the labels.
 
     :param labels: the labels of the samples
     :type labels: list

@@ -13,9 +13,11 @@ class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness metric including :class:`DemographicParity` and :class:`EqualizedOdds`."""
 
     def default_objective(self):
+        """Return the default objective for moments of this kind."""
         return ErrorRate()
 
     def load_data(self, X, y, event=None, **kwargs):
+        """Load the specified data into this object."""
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
         self.prob_event = self.tags.groupby(_EVENT).size() / self.n
@@ -45,7 +47,7 @@ class ConditionalSelectionRate(ClassificationMoment):
                 i += 1
 
     def gamma(self, predictor):
-        """Calculates degree to which constraints are currently violated by the predictor."""
+        """Calculate the degree to which constraints are currently violated by the predictor."""
         pred = predictor(self.X)
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
@@ -61,6 +63,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec):
+        """Return the projected lambda values."""
         lambda_pos = lambda_vec["+"] - lambda_vec["-"]
         lambda_neg = -lambda_pos
         lambda_pos[lambda_pos < 0.0] = 0.0
@@ -71,6 +74,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         return lambda_projected
 
     def signed_weights(self, lambda_vec):
+        """Return the signed weights."""
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
             - lambda_signed / self.prob_group_event
@@ -97,6 +101,7 @@ class DemographicParity(ConditionalSelectionRate):
     short_name = "DemographicParity"
 
     def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
 
 
@@ -112,6 +117,7 @@ class EqualizedOdds(ConditionalSelectionRate):
     short_name = "EqualizedOdds"
 
     def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
                           **kwargs)

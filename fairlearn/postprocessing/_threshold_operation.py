@@ -23,14 +23,16 @@ class ThresholdOperation():
 
     @property
     def threshold(self):
+        """Return the stored threshold."""
         return self._threshold
 
     @property
     def operator(self):
+        """Return the stored threshold operator."""
         return self._operator
 
     def get_predictor_from_operation(self):
-        """Encodes the threshold rule `Y_hat > t` or `Y_hat < t`.
+        """Encode the threshold rule `Y_hat > t` or `Y_hat < t`.
 
         :return: a function that takes a single argument to evaluate it against the threshold rule
         :rtype: lambda

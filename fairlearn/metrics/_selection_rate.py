@@ -7,7 +7,7 @@ from ._metrics_engine import metric_by_group
 
 
 def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
-    """The fraction of predicted labels matching the 'good' outcome.
+    """Calculate the fraction of predicted labels matching the 'good' outcome.
 
     The argument `pos_label` specifies the 'good' outcome.
     """
@@ -21,7 +21,7 @@ def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
 
 def group_selection_rate(y_true, y_pred, group_membership,
                          *, pos_label=1, sample_weight=None):
-    """This is the grouped version of :func:`selection_rate`.
+    """Wrap :func:`selection_rate` as a group metric.
 
     The arguments are the same, with the addition of the
     `group_membership` array.
