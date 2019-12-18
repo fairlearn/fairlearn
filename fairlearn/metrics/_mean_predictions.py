@@ -7,7 +7,7 @@ from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 
 def mean_prediction(y_true, y_pred, sample_weight=None):
-    """Returns the (weighted) mean prediction.
+    """Calculate the (weighted) mean prediction.
 
     The true values are ignored, but required as an argument in order
     to maintain a consistent interface
@@ -21,7 +21,7 @@ def mean_prediction(y_true, y_pred, sample_weight=None):
 
 
 def mean_overprediction(y_true, y_pred, sample_weight=None):
-    """Returns the (weighted) mean overprediction.
+    """Calculate the (weighted) mean overprediction.
 
     This is the (weighted) mean of the error where any negative
     errors (i.e. underpredictions) are set to zero
@@ -39,7 +39,7 @@ def mean_overprediction(y_true, y_pred, sample_weight=None):
 
 
 def mean_underprediction(y_true, y_pred, sample_weight=None):
-    """Returns the (weighted) mean underprediction.
+    """Calculate the (weighted) mean underprediction.
 
     This is the (weighted) mean of the error where any
     positive errors (i.e. overpredictions) are set to zero.

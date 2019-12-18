@@ -14,7 +14,7 @@ from ._selection_rate import selection_rate  # noqa: F401,E501
 
 
 def specificity_score(y_true, y_pred, sample_weight=None):
-    r"""The specificity score is also known as the True Negative Rate.
+    r"""Calculate the specificity score (also called the True Negative Rate).
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
@@ -29,7 +29,7 @@ def specificity_score(y_true, y_pred, sample_weight=None):
 
 
 def miss_rate(y_true, y_pred, sample_weight=None):
-    r"""The miss rate is also known as the False Negative Rate.
+    r"""Calculate the miss rate (also called the False Negative Rate).
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
@@ -45,7 +45,7 @@ def miss_rate(y_true, y_pred, sample_weight=None):
 
 
 def fallout_rate(y_true, y_pred, sample_weight=None):
-    r"""The fallout rate is also known as the False Positive Rate.
+    r"""Calculate the fallout rate (also called the False Positive Rate).
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
