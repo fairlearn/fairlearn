@@ -59,8 +59,6 @@ stages:
   - template: notebook-job-template.yml
     parameters:
       pyVersions: [3.6]
-      freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements-freeze.txt"
 
 
 # =================================================================================================================

@@ -39,7 +39,5 @@ jobs:
 - template: notebook-job-template.yml
   parameters:
     pyVersions: [3.6]
-    freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFile: $(freezeFile)
 
 - template: build-widget-job-template.yml
