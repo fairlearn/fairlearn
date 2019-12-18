@@ -37,7 +37,7 @@ stages:
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.6,3.7]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
@@ -53,15 +53,9 @@ stages:
     parameters:
       name: MacOS
       vmImage:  'macos-latest'
-      pyVersions: [3.5, 3.6, 3.7] 
+      pyVersions: [3.6, 3.7] 
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
-
-  - template: templates/notebook-job-template.yml
-    parameters:
-      name: LinuxNotebooks
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
 
   - template: templates/notebook-job-template.yml
     parameters:
