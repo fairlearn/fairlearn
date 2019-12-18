@@ -24,6 +24,7 @@ def _get_debug_color(key):
 
 
 def plot_solution_and_show_plot(x_best, y_best, solution_label, xlabel, ylabel):
+    """Plot the given solution with appropriate labels."""
     if y_best is None:
         plt.axvline(x=x_best, label=solution_label, ls='--')
     else:
@@ -35,11 +36,13 @@ def plot_solution_and_show_plot(x_best, y_best, solution_label, xlabel, ylabel):
 
 
 def plot_overlap(x_grid, y_min):
+    """Plot the overlap region."""
     line, = plt.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
     line.zorder -= 1
 
 
 def plot_curve(sensitive_feature, x_col, y_col, points):
+    """Plot the given curve with labels."""
     color = _get_debug_color(sensitive_feature)
     plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0,
              label='sensitive feature value ' + str(sensitive_feature))

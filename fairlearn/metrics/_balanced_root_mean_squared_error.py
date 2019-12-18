@@ -11,7 +11,7 @@ _Y_TRUE_NOT_0_1 = "Only 0 and 1 are allowed in y_true and both must be present"
 
 
 def balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
-    r"""The mean of the root mean squared error (RMSE) for the positive and negative cases.
+    r"""Calculate the mean of the root mean squared error (RMSE) for the positive and negative cases.
 
     Used for binary logistic regression, this computes the error as
 

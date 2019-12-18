@@ -122,7 +122,7 @@ class GridSearch(Reduction):
                  grid_size=10,
                  grid_limit=2.0,
                  grid=None):
-        """Constructor for a GridSearch object."""
+        """Construct a GridSearch object."""
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")
@@ -146,12 +146,12 @@ class GridSearch(Reduction):
 
     @property
     def all_results(self):
-        """A list of :class:`GridSearchResult` from each point in the grid."""
+        """Return a list of :class:`GridSearchResult` from each point in the grid."""
         return self._all_results
 
     @property
     def best_result(self):
-        """The best result found from the grid search.
+        """Return the best result found from the grid search.
 
         The predictor contained in this instance of
         :class:`GridSearchResult` is used in calls to
@@ -160,7 +160,7 @@ class GridSearch(Reduction):
         return self._best_result
 
     def fit(self, X, y, **kwargs):
-        """Runs the grid search.
+        """Run the grid search.
 
         This will result in multiple copies of the
         estimator being made, and the :code:`fit` method
@@ -255,7 +255,7 @@ class GridSearch(Reduction):
         return
 
     def predict(self, X):
-        """Provides a prediction for the given input data based on the best model found by the grid search.
+        """Provide a prediction for the given input data based on the best model found by the grid search.
 
         :param X: The data for which predictions are required
         :type X: Array
@@ -269,7 +269,7 @@ class GridSearch(Reduction):
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
-        """Provides the result of :code:`predict_proba` from the best model found by the grid search.
+        """Provide the result of :code:`predict_proba` from the best model found by the grid search.
 
         The underlying estimator must support :code:`predict_proba` for this
         to work.
