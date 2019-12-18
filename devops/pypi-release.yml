@@ -67,7 +67,6 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
-    storeFreeze: True
     freezeArtifactStem: 'Freeze'
     freezeFile: 'requirements-freeze.txt'
 
@@ -82,6 +81,5 @@ stages:
     kvVaultName: fairlearndeploy
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
-    storeFreeze: True
     freezeArtifactStem: 'Freeze'
     freezeFile: 'requirements-freeze.txt'

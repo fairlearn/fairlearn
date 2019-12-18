@@ -18,7 +18,6 @@ parameters:
   kvVaultName:
   kvUsername:
   kvPassword:
-  storeFreeze: False
   freezeArtifactStem: 
   freezeFile:
 
@@ -39,7 +38,6 @@ stages:
         packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-        storeFreeze: ${{parameters.storeFreeze}}
         freezeArtifactStem: '${{parameters.freezeArtifactStem}}${{parameters.targetType}}'
         freezeFile: ${{parameters.freezeFile}}
 

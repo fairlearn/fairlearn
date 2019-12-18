@@ -1,5 +1,4 @@
 variables:
-  StoreFreeze: 'True'
   FreezeArtifactStem: 'freeze'
   FreezeFile: 'requirements-freeze.txt'
 
@@ -18,7 +17,6 @@ jobs:
     name: Linux
     vmImage: 'ubuntu-16.04'
     pyVersions: [3.6]
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 
@@ -27,7 +25,6 @@ jobs:
     name: Windows
     vmImage:  'vs2017-win2016'
     pyVersions: [3.5]
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
     
@@ -35,15 +32,13 @@ jobs:
   parameters:
     name: MacOS
     vmImage:  'macos-latest'
-    pyVersions: [3.7] 
-    storeFreeze: $(StoreFreeze)
+    pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 
 - template: notebook-job-template.yml
   parameters:
     pyVersions: [3.6]
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 

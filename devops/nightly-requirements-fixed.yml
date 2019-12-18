@@ -2,7 +2,6 @@
 # This does not run on MacOS due to issues with the pinned requirements
 
 variables:
-  StoreFreeze: 'True'
   FreezeArtifactStem: 'freeze'
   FreezeFile: 'requirements-freeze.txt'
 
@@ -28,7 +27,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
     pyVersions: [3.6, 3.7]
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 
@@ -37,7 +35,6 @@ jobs:
     name: Windows
     vmImage:  'vs2017-win2016'
     requirementsFile: 'requirements-fixed.txt'
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 

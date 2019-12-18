@@ -3,7 +3,6 @@ parameters:
   vmImage: ''
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
-  storeFreeze: False
   freezeArtifactStem: 
   freezeFile:
 
@@ -31,7 +30,6 @@ jobs:
 
   - template: pip-freeze-to-artifact-steps-template.yml
     parameters:
-      storeFreeze: ${{parameters.storeFreeze}}
       freezeArtifact: $(FreezeArtifact)
       freezeFile: ${{parameters.FreezeFile}}
     

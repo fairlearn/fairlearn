@@ -1,7 +1,6 @@
 # Nightly build pipeline
 
 variables:
-  StoreFreeze: 'True'
   FreezeArtifactStem: 'freeze'
   FreezeFile: 'requirements-freeze.txt'
 
@@ -26,7 +25,6 @@ jobs:
     name: Linux
     vmImage: 'ubuntu-16.04'
     pyVersions: [3.6, 3.7]
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 
@@ -34,7 +32,6 @@ jobs:
   parameters:
     name: Windows
     vmImage:  'vs2017-win2016'
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
     
@@ -43,7 +40,6 @@ jobs:
     name: MacOS
     vmImage:  'macos-latest'
     pyVersions: [3.6, 3.7]
-    storeFreeze: $(StoreFreeze)
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFile: $(freezeFile)
 
