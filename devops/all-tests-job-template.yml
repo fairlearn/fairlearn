@@ -4,7 +4,7 @@ parameters:
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
   freezeArtifactStem: 
-  freezeFile:
+  freezeFileStem:
 
 jobs:
 - job: ${{ parameters.name }}
@@ -17,6 +17,7 @@ jobs:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
           FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
+          FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
 
   steps:
   - task: UsePythonVersion@0
@@ -31,7 +32,7 @@ jobs:
   - template: pip-freeze-to-artifact-steps-template.yml
     parameters:
       freezeArtifact: $(FreezeArtifact)
-      freezeFile: ${{parameters.FreezeFile}}
+      freezeFile: $(FreezeFile)
     
   - script: python ./scripts/requirementscheck.py --fixed requirements-fixed.txt --lowerbound requirements.txt
     displayName: "Run check on requirements files"

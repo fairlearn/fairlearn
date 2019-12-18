@@ -20,6 +20,7 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
+  FreezeFileStem: 'requirements-freeze'
 
 trigger: none # No CI build
 
@@ -38,7 +39,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.6,3.7]
       freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements-freeze.txt"
+      freezeFileStem: $(FreezeFileStem)
 
   - template: all-tests-job-template.yml
     parameters:
@@ -46,7 +47,7 @@ stages:
       vmImage:  'vs2017-win2016'
       pyVersions: [3.5, 3.6, 3.7]
       freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements-freeze.txt"
+      freezeFileStem: $(FreezeFileStem)
       
   - template: all-tests-job-template.yml
     parameters:
@@ -54,7 +55,7 @@ stages:
       vmImage:  'macos-latest'
       pyVersions: [3.6, 3.7] 
       freezeArtifactStem: "PreDeployment"
-      freezeFile: "requirements-freeze.txt"
+      freezeFileStem: $(FreezeFileStem)
 
   - template: notebook-job-template.yml
     parameters:
@@ -74,7 +75,7 @@ stages:
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
     freezeArtifactStem: 'Freeze'
-    freezeFile: 'requirements-freeze.txt'
+    freezeFileStem: $(FreezeFileStem)
 
 # =================================================================================================================
 
@@ -88,4 +89,4 @@ stages:
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
     freezeArtifactStem: 'Freeze'
-    freezeFile: 'requirements-freeze.txt'
+    freezeFileStem: $(FreezeFileStem)

@@ -1,6 +1,6 @@
 variables:
   FreezeArtifactStem: 'freeze'
-  FreezeFile: 'requirements-freeze.txt'
+  FreezeFileStem: 'requirements-freeze'
 
 pr:
 - master
@@ -18,7 +18,7 @@ jobs:
     vmImage: 'ubuntu-16.04'
     pyVersions: [3.6]
     freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFile: $(freezeFile)
+    freezeFileStem: $(FreezeFileStem)
 
 - template: all-tests-job-template.yml
   parameters:
@@ -26,7 +26,7 @@ jobs:
     vmImage:  'vs2017-win2016'
     pyVersions: [3.5]
     freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFile: $(freezeFile)
+    freezeFileStem: $(FreezeFileStem)
     
 - template: all-tests-job-template.yml
   parameters:
@@ -34,7 +34,7 @@ jobs:
     vmImage:  'macos-latest'
     pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFile: $(freezeFile)
+    freezeFileStem: $(FreezeFileStem)
 
 - template: notebook-job-template.yml
   parameters:

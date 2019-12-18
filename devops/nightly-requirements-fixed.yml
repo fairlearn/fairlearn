@@ -3,7 +3,7 @@
 
 variables:
   FreezeArtifactStem: 'freeze'
-  FreezeFile: 'requirements-freeze.txt'
+  FreezeFileStem: 'requirements-freeze'
 
 trigger: none # No CI build
 
@@ -28,7 +28,7 @@ jobs:
     requirementsFile: 'requirements-fixed.txt'
     pyVersions: [3.6, 3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFile: $(freezeFile)
+    freezeFileStem: $(FreezeFileStem)
 
 - template: all-tests-job-template.yml
   parameters:
@@ -36,7 +36,7 @@ jobs:
     vmImage:  'vs2017-win2016'
     requirementsFile: 'requirements-fixed.txt'
     freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFile: $(freezeFile)
+    freezeFileStem: $(FreezeFileStem)
 
 - template: notebook-job-template.yml
   parameters:
