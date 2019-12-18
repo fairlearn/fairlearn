@@ -23,10 +23,12 @@ class ThresholdOperation():
 
     @property
     def threshold(self):
+        """Return the stored threshold"""
         return self._threshold
 
     @property
     def operator(self):
+        """Return the stored threshold operator."""
         return self._operator
 
     def get_predictor_from_operation(self):
