@@ -49,7 +49,7 @@ class ExponentiatedGradient(Reduction):
     :type eta_mul: float
     """
 
-    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
+    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):  # noqa: D103
         self._estimator = estimator
         self._constraints = constraints
         self._eps = eps
