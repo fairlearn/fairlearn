@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class InterpolatedPredictor:
-    """Predictor for computing predictions between two actual predictions.
+    def __init__(self, p_ignore, prediction_constant, p0, operation0, p1, operation1):
+        """Create the interpolated prediction between two predictions.
 
     The predictions are represented through the threshold rules operation0 and operation1.
 

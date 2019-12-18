@@ -427,6 +427,29 @@ def _vectorized_prediction(function_dict, sensitive_features, scores):
                 for a in function_dict])
 
 
+def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
+    """Convert the input data from list, pandas.Series, or pandas.DataFrame to numpy.ndarray.
+
+    :param data: the data to be converted into a numpy.ndarray
+    :type data: numpy.ndarray, pandas.Series, pandas.DataFrame, or list
+    :param dataframe_multiple_columns_error_message: the error message to show in case the
+        provided data is more than 1-dimensional
+    :type dataframe_multiple_columns_error_message:
+    :return: the input data formatted as numpy.ndarray
+    :rtype: numpy.ndarray
+    """
+    if type(data) == list:
+        data = np.array(data)
+    elif type(data) == pd.DataFrame:
+        if len(data.columns) > 1:
+            # TODO: extend to multiple columns for additional group data
+            raise ValueError(dataframe_multiple_columns_error_message)
+        data = data[data.columns[0]].values
+    elif type(data) == pd.Series:
+        data = data.values
+    return data
+
+
 def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_feature_names=None):
     """Reformats the data into a new pandas.DataFrame and group by sensitive feature values.
 

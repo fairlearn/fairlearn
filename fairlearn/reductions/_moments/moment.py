@@ -45,21 +45,13 @@ class Moment:
         self.data_loaded = True
         self._gamma_descr = None
 
-    @property
-    def total_samples(self):
-        """Return the number of samples in the data."""
-        return self.X.shape[0]
-
     def gamma(self, predictor):  # noqa: D102
-        """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
 
     def project_lambda(self, lambda_vec):  # noqa: D102
-        """Return the projected lambda values."""
         raise NotImplementedError()
 
     def signed_weights(self, lambda_vec):  # noqa: D102
-        """Return the signed weights."""
         raise NotImplementedError()
 
 
