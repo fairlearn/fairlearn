@@ -26,11 +26,7 @@ jobs:
       versionSpec: '$(PyVer)' 
       addToPath: true
 
-  - script: pip install --upgrade pip
-    displayName: 'Upgrade pip to latest version'
-
-  - script: pip install --upgrade setuptools
-    displayName: 'Upgrade setuptools'
+  - template: python-infra-upgrade-steps-template.yml
 
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'

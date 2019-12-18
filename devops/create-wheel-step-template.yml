@@ -17,6 +17,8 @@ steps:
     versionSpec: ${{parameters.pyVer}}
     addToPath: true
 
+- template: python-infra-upgrade-steps-template.yml
+
 - script: pip install setuptools wheel 
   displayName: 'Install setuptools'
 
