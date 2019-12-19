@@ -45,12 +45,6 @@ jobs:
   parameters:
     name: WindowsNotebooks
     vmImage: 'vs2017-win2016'
-    pyVersions: [3.6] 
-
-- template: notebook-job-template.yml
-  parameters:
-    name: MacOSNotebooks
-    vmImage: 'macos-latest'
-    pyVersions: [3.7] 
+    pyVersions: [3.7]
 
 - template: build-widget-job-template.yml
