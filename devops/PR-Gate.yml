@@ -41,12 +41,10 @@ jobs:
     name: LinuxNotebooks
     pyVersions: [3.5]
 
-- template: templates/notebook-job-template.yml
+- template: notebook-job-template.yml
   parameters:
     name: WindowsNotebooks
     vmImage: 'vs2017-win2016'
     pyVersions: [3.7]
-
-- template: templates/build-widget-job-template.yml
 
 - template: templates/limited-installation-job-template.yml

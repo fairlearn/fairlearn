@@ -45,4 +45,10 @@ jobs:
     requirementsFile: 'requirements-fixed.txt'
     pyVersions: [3.5, 3.6, 3.7]
 
-- template: templates/build-widget-job-template.yml
+- template: notebook-job-template.yml
+  parameters:
+    name: WindowsNotebooks
+    vmImage: 'vs2017-win2016'
+    pyVersions: [3.5, 3.6, 3.7] 
+
+- template: build-widget-job-template.yml
