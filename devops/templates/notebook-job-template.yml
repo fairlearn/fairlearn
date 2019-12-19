@@ -25,10 +25,6 @@ jobs:
   
   - template: python-infra-upgrade-steps-template.yml
 
-  - script: python scripts/requirements_pin.py --input requirements.txt --output requirements-fixed.txt --loglevel INFO
-    displayName: "Pin Requirements file"
-    condition: eq('${{parameters.pinRequirements}}', True)
-
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
 
