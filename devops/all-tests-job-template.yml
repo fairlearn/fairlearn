@@ -26,6 +26,8 @@ jobs:
       versionSpec: '$(PyVer)' 
       addToPath: true
 
+  - template: python-infra-upgrade-steps-template.yml
+
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
 

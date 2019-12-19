@@ -37,7 +37,7 @@ stages:
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.6,3.7]
+      pyVersions: [3.5, 3.6, 3.7]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
@@ -59,7 +59,7 @@ stages:
 
   - template: notebook-job-template.yml
     parameters:
-      pyVersions: [3.6]
+      pyVersions: [3.5, 3.6]
 
 
 # =================================================================================================================
