@@ -26,7 +26,7 @@ jobs:
     name: Linux
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
-    pyVersions: [3.6, 3.7]
+    pyVersions: [3.5, 3.6, 3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
@@ -43,6 +43,6 @@ jobs:
     name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
-    pyVersions: [3.6, 3.7]
+    pyVersions: [3.5, 3.6, 3.7]
 
 - template: build-widget-job-template.yml
