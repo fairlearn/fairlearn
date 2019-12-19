@@ -50,6 +50,8 @@ jobs:
   parameters:
     name: WindowsNotebooks
     vmImage: 'vs2017-win2016'
+    requirementsFile: 'requirements-fixed.txt'
+    pinRequirements: True
     pyVersions: [3.5, 3.6, 3.7] 
 
 - template: build-widget-job-template.yml
