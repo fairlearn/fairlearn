@@ -12,7 +12,6 @@ variables:
   value: "FAIRLEARNAUTOMATIONSPID"
 - name: VARIABLE_NAME_TENANT_ID
   value: "FAIRLEARNAUTOMATIONSPTENANTID"
--
 
 schedules:
 - cron: "0 6 * * *" # Time is UTC
