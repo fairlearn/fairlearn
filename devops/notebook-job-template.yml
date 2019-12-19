@@ -2,6 +2,7 @@ parameters:
   name: 'Notebooks'
   vmImage: 'ubuntu-latest'
   pyVersions: [3.5, 3.6, 3.7]
+  pinRequirements: False
   requirementsFile: 'requirements.txt'
 
 jobs:
@@ -23,6 +24,10 @@ jobs:
       addToPath: true
   
   - template: python-infra-upgrade-steps-template.yml
+
+  - script: python scripts/requirements_pin.py --input requirements.txt --output ${{parameters.requirements.File}} --loglevel INFO
+    displayName: "Pin Requirements file"
+    condition: eq('${{parameters.pinRequirements}}', True)
 
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'

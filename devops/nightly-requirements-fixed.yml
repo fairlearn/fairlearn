@@ -43,6 +43,7 @@ jobs:
     name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
+    pinRequirements: True
     pyVersions: [3.5, 3.6, 3.7]
 
 - template: notebook-job-template.yml
