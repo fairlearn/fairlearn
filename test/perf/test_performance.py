@@ -25,9 +25,15 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 # ensure the tests are run from the fairlearn repository base directory
-if not os.getcwd().endswith("fairlearn") or not os.path.exists("test"):
-    raise Exception("Please run perf tests from the fairlearn repository base directory. " \
-                    "Current working directory: {}".format(os.getcwd()))
+if not os.getcwd().endswith("fairlearn"):
+    if not os.path.exists("test") or not os.path.exists("fairlearn"):
+        raise Exception("Please run perf tests from the fairlearn repository base directory. "
+                        "Current working directory: {}".format(os.getcwd()))
+
+
+@pytest.mark.parametrize("perf_test_configuration", all_perf_test_configurations,
+                         ids=all_perf_test_configurations_descriptions)
+def test_perf(perf_test_configuration, workspace, request):
     print("Starting with test case {}".format(request.node.name))
 
     script_name = determine_script_name(request.node.name)
