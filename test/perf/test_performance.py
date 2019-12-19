@@ -23,7 +23,6 @@ EXPERIMENT_NAME = 'perftest'
 
 logging.basicConfig(level=logging.DEBUG)
 
-print(list(os.environ.keys()))
 
 # ensure the tests are run from the fairlearn repository base directory
 if not os.getcwd().endswith("fairlearn"):

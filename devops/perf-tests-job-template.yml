@@ -34,6 +34,10 @@ jobs:
       SERVICE_PRINCIPAL_PASSWORD: $(fairlearnautomationspsecret)
       SERVICE_PRINCIPAL_ID: $(fairlearnautomationspid)
       TENANT_ID: $(fairlearnautomationsptenantid)
+      SUBSCRIPTION_ID: cecafb73-04ae-4432-9f96-d96925d28058
+      RESOURCE_GROUP_NAME: fairlearn-automation
+      WORKSPACE_NAME: fairlearnperf
+      WORKSPACE_LOCATION: canadacentral
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
