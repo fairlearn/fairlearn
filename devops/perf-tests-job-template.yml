@@ -30,6 +30,7 @@ jobs:
 
   - script: python -m pytest -s test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run Perf tests'
+    workingDirectory: fairlearn  # need to be inside the repository's root directory
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
