@@ -23,6 +23,8 @@ EXPERIMENT_NAME = 'perftest'
 
 logging.basicConfig(level=logging.DEBUG)
 
+print(os.getenv("VARIABLE_NAME_SERVICE_PRINCIPAL_ID"))
+print(os.getenv(os.getenv("VARIABLE_NAME_SERVICE_PRINCIPAL_ID")))
 
 # ensure the tests are run from the fairlearn repository base directory
 if not os.getcwd().endswith("fairlearn"):
