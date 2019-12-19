@@ -12,6 +12,12 @@ variables:
   value: "FAIRLEARNAUTOMATIONSPID"
 - name: VARIABLE_NAME_TENANT_ID
   value: "FAIRLEARNAUTOMATIONSPTENANTID"
+- name: FAIRLEARNAUTOMATIONSPSECRET
+  value: $(fairlearnautomationspsecret)
+- name: FAIRLEARNAUTOMATIONSPID
+  value: $(fairlearnautomationspid)
+- name: FAIRLEARNAUTOMATIONSPTENANTID
+  value: $(fairlearnautomationsptenantid)
 
 schedules:
 - cron: "0 6 * * *" # Time is UTC
