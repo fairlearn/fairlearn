@@ -84,11 +84,13 @@ class GridSearch(Reduction):
     The approach used is taken from section 3.4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: The underlying estimator to be used. Must provide a
-        :code:`fit(X, y, sample_weights)` method
+    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
+        `sample_weight` is a vector of weights; labels `y` and predictions returned by
+        :code:`predict(X)` are either 0 or 1.
+    :type estimator: estimator
 
-    :param constraints: Object describing the parity constraints. This provides the reweighting
-        and relabelling
+    :param constraints: The disparity constraints expressed as moments.
     :type constraints: fairlearn.reductions.Moment
 
     :param selection_rule: Specifies the procedure for selecting the best model found by the
@@ -163,18 +165,18 @@ class GridSearch(Reduction):
         """Run the grid search.
 
         This will result in multiple copies of the
-        estimator being made, and the :code:`fit` method
+        estimator being made, and the :code:`fit(X)` method
         of each one called.
 
-        :param X: The feature data for the machine learning problem
-        :type X: Array
+        :param X: The feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
 
-        :param y: The ground truth labels for the machine learning problem
-        :type y: 1-D array
+        :param y: The label vector
+        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
 
         :param sensitive_features: A (currently) required keyword argument listing the
             feature used by the constraints object
-        :type sensitive_features: 1-D array (for now)
+        :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
         """
         X_train, y_train, _ = _validate_and_reformat_reductions_input(
             X, y, enforce_binary_sensitive_feature=True, **kwargs)
@@ -255,14 +257,13 @@ class GridSearch(Reduction):
         return
 
     def predict(self, X):
-        """Provide a prediction for the given input data based on the best model found by the grid search.
+        """Provide a prediction using the best model found by the grid search.
 
-        :param X: The data for which predictions are required
-        :type X: Array
+        This dispatches `X` to the :code:`predict(X)` method of the
+        selected estimator, and hence the return type is dependent on that method.
 
-        :return: The prediction. If X represents the data for a single example
-            the result will be a scalar. Otherwise the result will be an
-        :rtype: Scalar or array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
         """
         if self.best_result is None:
             raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
@@ -271,11 +272,11 @@ class GridSearch(Reduction):
     def predict_proba(self, X):
         """Provide the result of :code:`predict_proba` from the best model found by the grid search.
 
-        The underlying estimator must support :code:`predict_proba` for this
-        to work.
+        The underlying estimator must support :code:`predict_proba(X)` for this
+        to work. The return type is determined by this method.
 
-        :param X: The data for which predictions are required
-        :type X: Array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
         """
         if self.best_result is None:
             raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
