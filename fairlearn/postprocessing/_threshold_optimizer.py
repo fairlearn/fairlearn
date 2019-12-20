@@ -89,9 +89,9 @@ class ThresholdOptimizer(PostProcessing):
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
         in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
 
-        :param X: feature matrix
+        :param X: The feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
-        :param y: label vector
+        :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         :param sensitive_features: sensitive features to identify groups by, currently allows
             only a single column
