@@ -26,7 +26,8 @@ jobs:
     name: Linux
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
-    pyVersions: [3.6, 3.7]
+    pinRequirements: True
+    pyVersions: [3.5, 3.6, 3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
@@ -35,6 +36,7 @@ jobs:
     name: Windows
     vmImage:  'vs2017-win2016'
     requirementsFile: 'requirements-fixed.txt'
+    pinRequirements: True
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
@@ -43,6 +45,15 @@ jobs:
     name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
     requirementsFile: 'requirements-fixed.txt'
-    pyVersions: [3.6, 3.7]
+    pinRequirements: True
+    pyVersions: [3.5, 3.6, 3.7]
+
+- template: notebook-job-template.yml
+  parameters:
+    name: WindowsNotebooks
+    vmImage: 'vs2017-win2016'
+    requirementsFile: 'requirements-fixed.txt'
+    pinRequirements: True
+    pyVersions: [3.5, 3.6, 3.7] 
 
 - template: build-widget-job-template.yml

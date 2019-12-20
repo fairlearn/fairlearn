@@ -52,6 +52,9 @@ jobs:
       versionSpec: '$(PyVer)' 
       addToPath: true
 
+  # Ensure tools such as pip are up-to-date
+  - template: python-infra-upgrade-steps-template.yml
+
   # Install our requirements from regular PyPI
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
