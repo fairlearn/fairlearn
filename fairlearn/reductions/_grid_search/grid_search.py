@@ -257,7 +257,7 @@ class GridSearch(Reduction):
         return
 
     def predict(self, X):
-        """Provide a prediction for the given input data based on the best model found by the grid search.
+        """Provide a prediction using the best model found by the grid search.
 
         This dispatches `X` to the :code:`predict(X)` method of the
         selected estimator, and hence the return type is dependent on that method.
