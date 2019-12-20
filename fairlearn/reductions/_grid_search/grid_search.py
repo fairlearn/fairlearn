@@ -257,8 +257,9 @@ class GridSearch(Reduction):
         return
 
     def predict(self, X):
-        """Provide a prediction for the given input data based on the best model found by the
-        grid search. This works by dispatching `X` to the :code:`predict(X)` method of the
+        """Provide a prediction using the best model found by the grid search.
+
+        This dispatches `X` to the :code:`predict(X)` method of the
         selected estimator, and hence the return type is dependent on that method.
 
         :param X: Feature data
@@ -272,7 +273,7 @@ class GridSearch(Reduction):
         """Provide the result of :code:`predict_proba` from the best model found by the grid search.
 
         The underlying estimator must support :code:`predict_proba(X)` for this
-        to work. The return type is determined by this method. 
+        to work. The return type is determined by this method.
 
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
