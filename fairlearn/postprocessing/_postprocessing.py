@@ -12,14 +12,16 @@ MISSING_PREDICT_ERROR_MESSAGE = "The predictor does not have a callable 'predict
 class PostProcessing:
     """Abstract base class for postprocessing approaches for disparity mitigation.
 
-    :param unconstrained_predictor: a predictor with a `predict` function that has already been
-        trained on the training data; the predictor will subsequently be used in the mitigator
-        for unconstrained predictions; can only be specified if `estimator` is None
+    :param unconstrained_predictor: A predictor with a :code:`predict(X)` method that has already
+        been trained on the training data; the predictor will subsequently be used in the mitigator
+        for unconstrained predictions; can only be specified if `estimator` is `None`
     :type unconstrainted_predictor: predictor
-    :param estimator: an estimator with a `fit` and `predict` function that will be trained on the
-        training data and subsequently used in the mitigator for unconstrained predictions; can
-        only be specified if `unconstrainted_predictor` is None
+
+    :param estimator: An estimator implementing :code:`fit(X, y)` and :code:`predict(X)` methods
+        that will be trained on the training data and subsequently used in the mitigator for
+        unconstrained predictions; can only be specified if `unconstrainted_predictor` is `None`
     :type estimator: estimator
+
     :param constraints: the parity constraints to be enforced represented as a string
     :type constraints: str
     """
@@ -59,7 +61,7 @@ class PostProcessing:
         raise NotImplementedError(self.fit.__name__ + " is not implemented")
 
     def predict(self, X, *, sensitive_features):
-        """Predict label for each sample in X while taking into account sensitive features.
+        """Predict label for each sample in `X` while taking into account sensitive features.
 
         :param X: Feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
