@@ -35,7 +35,7 @@ def build_package():
                 print("Found wheel {}".format(file))
                 # change wheel name to be unique for every run
                 src = os.path.join("dist", file)
-                dst = os.path.join("dist", "fairlearn-0.4.0a{}-py3-none-any.whl"
+                dst = os.path.join("dist", "fairlearn-v{}-py3-none-any.whl"
                                    .format(time.time()))
                 shutil.copy(src, dst)
                 return dst

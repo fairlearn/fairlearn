@@ -20,6 +20,7 @@ requirements-parser
 pytest==5.0.1
 pytest-cov
 tempeh==0.1.11a3
+wheel
 
 # Required for notebooks
 jupyter
