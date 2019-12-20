@@ -3,6 +3,7 @@ parameters:
   vmImage: ''
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
+  pinRequirements: False
   freezeArtifactStem: 
   freezeFileStem:
 
@@ -28,6 +29,10 @@ jobs:
 
   - template: python-infra-upgrade-steps-template.yml
 
+  - script: python scripts/requirements_pin.py --input requirements.txt --output requirements-fixed.txt --loglevel INFO
+    displayName: "Pin Requirements file"
+    condition: eq('${{parameters.pinRequirements}}', True)
+
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
 
@@ -36,9 +41,6 @@ jobs:
       freezeArtifact: $(FreezeArtifact)
       freezeFile: $(FreezeFile)
     
-  - script: python ./scripts/requirementscheck.py --fixed requirements-fixed.txt --lowerbound requirements.txt
-    displayName: "Run check on requirements files"
-
   - script: flake8 .
     displayName: "Run flake8"
 
