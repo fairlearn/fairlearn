@@ -90,8 +90,6 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     script_lines.append('total_time = time() - start_time')
     script_lines.append('run.log("total_time", total_time)')
     script_lines.append('print("Total time taken: {}s".format(total_time))')
-    script_lines.append('print("Maximum allowed time: {}s")'.format(perf_test_configuration.max_time_consumption))
-    script_lines.append('assert total_time <= {}'.format(perf_test_configuration.max_time_consumption))
     print("\n\n===============================================================\n\n")
 
     with open(os.path.join(script_directory, script_name), 'w') as script_file:  # noqa: E501

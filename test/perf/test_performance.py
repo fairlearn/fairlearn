@@ -10,13 +10,9 @@ from azureml.core import Experiment, RunConfiguration, ScriptRunConfig
 
 from tempeh.execution.azureml.environment_setup import configure_environment
 
-from conftest import get_all_perf_test_configurations
 from environment_setup import build_package
 from script_generation import generate_script
 
-all_perf_test_configurations = get_all_perf_test_configurations()
-all_perf_test_configurations_descriptions = \
-    [config.__repr__().replace(' ', '') for config in all_perf_test_configurations]
 
 SCRIPT_DIRECTORY = os.path.join('test', 'perf', 'scripts')
 EXPERIMENT_NAME = 'perftest'
@@ -31,8 +27,6 @@ if not os.getcwd().endswith("fairlearn"):
                         "Current working directory: {}".format(os.getcwd()))
 
 
-@pytest.mark.parametrize("perf_test_configuration", all_perf_test_configurations,
-                         ids=all_perf_test_configurations_descriptions)
 def test_perf(perf_test_configuration, workspace, request):
     print("Starting with test case {}".format(request.node.name))
 

@@ -2,17 +2,26 @@ parameters:
   name: 'Performance'
   vmImage: 'ubuntu-latest'
   pyVersions: [3.7]
+  datasets: ["adult_uci", "compas"]
+  predictors: ["rbm_svm", "decision_tree_classifier"]
+  mitigators: ["GridSearch", "ExponentiatedGradient", "ThresholdOptimizer"]
 
 jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
-    maxParallel: 2
+    maxParallel: 10
     matrix:
       ${{ each pyVer in parameters.pyVersions }}:
-        ${{ pyVer }}:
-          PyVer: ${{ pyVer }}
+        ${{ each dataset in parameters.datasets}}:
+          ${{ each predictor in parameters.predictors}}:
+            ${{ each mitigator in parameters.mitigators}}:
+              ${{ pyVer }}:
+                PyVer: ${{ pyVer }}
+                dataset: ${{ dataset }}
+                predictor: ${{ predictor }}
+                mitigator: ${{ mitigator }}
   timeoutInMinutes: 120
 
   steps:
@@ -28,7 +37,7 @@ jobs:
   - script: pip install azureml-sdk
     displayName: 'Install azureml-sdk'
 
-  - script: python -m pytest -s test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest -s test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)" --dataset $(dataset) --predictor $(predictor) --mitigator $(mitigator)
     displayName: 'Run Perf tests'
     env:
       SERVICE_PRINCIPAL_PASSWORD: $(fairlearnautomationspsecret)
