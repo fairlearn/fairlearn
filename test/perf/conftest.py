@@ -4,10 +4,30 @@
 import pytest
 
 from fairlearn.postprocessing import ThresholdOptimizer
-from fairlearn.reductions import ExponentiatedGradient, GridSearch
-from fairlearn.reductions import EqualizedOdds, DemographicParity, GroupLossMoment
+from fairlearn.reductions import ExponentiatedGradient, GridSearch, EqualizedOdds, \
+    DemographicParity
 
 from tempeh.execution.azureml.workspace import get_workspace
+
+from environment_setup import build_package
+
+
+THRESHOLD_OPTIMIZER = ThresholdOptimizer.__name__
+EXPONENTIATED_GRADIENT = ExponentiatedGradient.__name__
+GRID_SEARCH = GridSearch.__name__
+
+MEMORY = "memory"
+TIME = "time"
+
+ADULT_UCI = 'adult_uci'
+COMPAS = 'compas'
+
+RBM_SVM = 'rbm_svm'
+DECISION_TREE_CLASSIFIER = 'decision_tree_classifier'
+
+DATASETS = [ADULT_UCI, COMPAS]
+PREDICTORS = [RBM_SVM, DECISION_TREE_CLASSIFIER]
+MITIGATORS = [THRESHOLD_OPTIMIZER, EXPONENTIATED_GRADIENT, GRID_SEARCH]
 
 
 class PerfTestConfiguration:
@@ -22,29 +42,32 @@ class PerfTestConfiguration:
                .format(self.dataset, self.predictor, self.mitigator, self.disparity_metric)
 
 
-def pytest_addoption(parser):
-    parser.addoption("--dataset", action="store")
-    parser.addoption("--predictor", action="store")
-    parser.addoption("--mitigator", action="store")
-    
+def get_all_perf_test_configurations():
+    perf_test_configurations = []
+    for dataset in DATASETS:
+        for predictor in PREDICTORS:
+            for mitigator in MITIGATORS:
+                if mitigator == THRESHOLD_OPTIMIZER:
+                    disparity_metrics = ["equalized_odds", "demographic_parity"]
+                elif mitigator == EXPONENTIATED_GRADIENT:
+                    disparity_metrics = [EqualizedOdds.__name__, DemographicParity.__name__]
+                elif mitigator == GRID_SEARCH:
+                    disparity_metrics = [EqualizedOdds.__name__, DemographicParity.__name__]
+                else:
+                    raise Exception("Unknown mitigator {}".format(mitigator))
 
-def pytest_generate_tests(metafunc):
-    if metafunc.config.option.mitigator == ExponentiatedGradient.__name__:
-        disparity_metrics = [EqualizedOdds, DemographicParity]
-    elif metafunc.config.option.mitigator == GridSearch.__name__:
-        disparity_metrics = [EqualizedOdds, DemographicParity]
-    elif metafunc.config.option.mitigator == ThresholdOptimizer.__name__:
-        disparity_metrics = ["equalized_odds", "demographic_parity"]
+                for disparity_metric in disparity_metrics:
+                    perf_test_configurations.append(
+                        PerfTestConfiguration(dataset, predictor, mitigator, disparity_metric))
 
-    configurations = [PerfTestConfiguration(
-        metafunc.config.option.dataset,
-        metafunc.config.option.predictor,
-        metafunc.config.option.mitigator,
-        disparity_metric) for disparity_metric in disparity_metrics]
-
-    metafunc.parametrize("perf_test_configuration", configurations)
+    return perf_test_configurations
 
 
 @pytest.fixture(scope="session")
 def workspace():
     return get_workspace()
+
+
+@pytest.fixture(scope="session")
+def wheel_file():
+    return build_package()

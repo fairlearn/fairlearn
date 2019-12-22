@@ -14,14 +14,8 @@ jobs:
     maxParallel: 10
     matrix:
       ${{ each pyVer in parameters.pyVersions }}:
-        ${{ each dataset in parameters.datasets}}:
-          ${{ each predictor in parameters.predictors}}:
-            ${{ each mitigator in parameters.mitigators}}:
-              ${{ pyVer }}-${{dataset}}-${{predictor}}-${{mitigator}}:
-                PyVer: ${{ pyVer }}
-                dataset: ${{ dataset }}
-                predictor: ${{ predictor }}
-                mitigator: ${{ mitigator }}
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
   timeoutInMinutes: 120
 
   steps:
@@ -37,7 +31,7 @@ jobs:
   - script: pip install azureml-sdk
     displayName: 'Install azureml-sdk'
 
-  - script: python -m pytest -s test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)" --dataset $(dataset) --predictor $(predictor) --mitigator $(mitigator)
+  - script: python -m pytest -s test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run Perf tests'
     env:
       SERVICE_PRINCIPAL_PASSWORD: $(fairlearnautomationspsecret)

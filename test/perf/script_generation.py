@@ -15,10 +15,9 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     # imports
     script_lines.append('from time import time')
     script_lines.append('from tempeh.configurations import models, datasets')
-    script_lines.append('from fairlearn.postprocessing._threshold_optimizer import DEMOGRAPHIC_PARITY')
     script_lines.append('from fairlearn.postprocessing import ThresholdOptimizer')
     script_lines.append('from fairlearn.reductions import ExponentiatedGradient, GridSearch')
-    script_lines.append('from fairlearn.reductions import DemographicParity')
+    script_lines.append('from fairlearn.reductions import DemographicParity, EqualizedOdds')
     script_lines.append('from azureml.core.run import Run')
 
     script_lines.append("")
@@ -63,14 +62,14 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
         script_lines.append('mitigator = ThresholdOptimizer('
                             'unconstrained_predictor=unconstrained_predictor,'
-                            'constraints=DEMOGRAPHIC_PARITY)')
+                            'constraints="{}")'.format(perf_test_configuration.disparity_metric))
     elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
         script_lines.append('mitigator = ExponentiatedGradient('
                             'estimator=estimator,'
-                            'constraints=DemographicParity())')
+                            'constraints={}())'.format(perf_test_configuration.disparity_metric))
     elif perf_test_configuration.mitigator == GridSearch.__name__:
         script_lines.append('mitigator = GridSearch(estimator=estimator,'
-                            'constraints=DemographicParity())')
+                            'constraints={}())'.format(perf_test_configuration.disparity_metric))
     else:
         raise Exception("Unknown mitigation technique.")
 
@@ -83,13 +82,14 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
                             'sensitive_features=sensitive_features_test,'
                             'random_state=1)')
     else:
-        script_lines.append('mitigator.predict(X_test)')
+        script_lines.append('predictions = mitigator.predict(X_test)')
 
     # TODO evaluate accuracy/fairness tradeoff
 
     script_lines.append('total_time = time() - start_time')
     script_lines.append('run.log("total_time", total_time)')
     script_lines.append('print("Total time taken: {}s".format(total_time))')
+
     print("\n\n===============================================================\n\n")
 
     with open(os.path.join(script_directory, script_name), 'w') as script_file:  # noqa: E501
