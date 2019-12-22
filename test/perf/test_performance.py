@@ -48,11 +48,6 @@ def test_perf(perf_test_configuration, workspace, request):
     print("submitting run")
     run = experiment.submit(config=script_run_config)
     print("submitted run")
-    run.wait_for_completion()
-    print("run completed")
-    while run.get_status() == "Finalizing":
-        time.sleep(1)
-    assert run.get_status() == "Completed"
 
 
 def determine_script_name(test_case_name):
