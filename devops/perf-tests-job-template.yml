@@ -17,10 +17,11 @@ jobs:
         ${{ each dataset in parameters.datasets}}:
           ${{ each predictor in parameters.predictors}}:
             ${{ each mitigator in parameters.mitigators}}:
-              PyVer: ${{ pyVer }}
-              dataset: ${{ dataset }}
-              predictor: ${{ predictor }}
-              mitigator: ${{ mitigator }}
+              ${{ pyVer }}-${{dataset}}-${{predictor}}-${{mitigator}}:
+                PyVer: ${{ pyVer }}
+                dataset: ${{ dataset }}
+                predictor: ${{ predictor }}
+                mitigator: ${{ mitigator }}
   timeoutInMinutes: 120
 
   steps:
