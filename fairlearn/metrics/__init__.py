@@ -130,4 +130,4 @@ _engine = [
 ]
 
 
-__all__ = _engine + _extra_metrics + _group_metrics  # noqa: RST902
+__all__ = _engine + _extra_metrics + _group_metrics
