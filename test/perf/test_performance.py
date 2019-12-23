@@ -4,7 +4,6 @@
 import logging
 import os
 import pytest
-import time
 
 from azureml.core import Experiment, RunConfiguration, ScriptRunConfig
 
@@ -50,7 +49,7 @@ def test_perf(perf_test_configuration, workspace, request, wheel_file):
                                         script=script_name,
                                         run_config=run_config)
     print("submitting run")
-    run = experiment.submit(config=script_run_config, tags=perf_test_configuration.__dict__)
+    experiment.submit(config=script_run_config, tags=perf_test_configuration.__dict__)
     print("submitted run")
 
 

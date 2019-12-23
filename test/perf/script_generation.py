@@ -20,6 +20,7 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     script_lines.append('start_time = time()')
     add_mitigation(script_lines, perf_test_configuration)
     add_evaluation(script_lines)
+    script_lines.append("")
 
     print("\n\n{}\n\n".format("="*100))
 
@@ -65,7 +66,7 @@ def add_dataset_setup(script_lines, perf_test_configuration):
         raise ValueError("Sensitive features unknown for dataset {}"
                          .format(perf_test_configuration.dataset))
 
-    
+
 def add_unconstrained_estimator_fitting(script_lines, perf_test_configuration):
     script_lines.append('print("Fitting estimator")')
     script_lines.append('estimator = models["{}"]()'.format(perf_test_configuration.predictor))
@@ -77,14 +78,14 @@ def add_unconstrained_estimator_fitting(script_lines, perf_test_configuration):
 def add_mitigation(script_lines, perf_test_configuration):
     if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
         script_lines.append('mitigator = ThresholdOptimizer('
-                            'unconstrained_predictor=unconstrained_predictor,'
+                            'unconstrained_predictor=unconstrained_predictor, '
                             'constraints="{}")'.format(perf_test_configuration.disparity_metric))
     elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
         script_lines.append('mitigator = ExponentiatedGradient('
-                            'estimator=estimator,'
+                            'estimator=estimator, '
                             'constraints={}())'.format(perf_test_configuration.disparity_metric))
     elif perf_test_configuration.mitigator == GridSearch.__name__:
-        script_lines.append('mitigator = GridSearch(estimator=estimator,'
+        script_lines.append('mitigator = GridSearch(estimator=estimator, '
                             'constraints={}())'.format(perf_test_configuration.disparity_metric))
     else:
         raise Exception("Unknown mitigation technique.")
@@ -95,7 +96,7 @@ def add_mitigation(script_lines, perf_test_configuration):
     if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
         script_lines.append('mitigator.predict('
                             'X_test, '
-                            'sensitive_features=sensitive_features_test,'
+                            'sensitive_features=sensitive_features_test, '
                             'random_state=1)')
     else:
         script_lines.append('predictions = mitigator.predict(X_test)')
