@@ -31,7 +31,6 @@ if not os.getcwd().endswith("fairlearn"):
 
 @pytest.mark.parametrize("perf_test_configuration", all_perf_test_configurations,
                          ids=all_perf_test_configurations_descriptions)
-@pytest.mark.perf
 def test_perf(perf_test_configuration, workspace, request, wheel_file):
     print("Starting with test case {}".format(request.node.name))
 

@@ -21,8 +21,7 @@ papermill
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
-nteract-scrapbook
-tempeh==0.1.12
+tempeh==0.1.11
 wheel
 
 # Required for notebooks
