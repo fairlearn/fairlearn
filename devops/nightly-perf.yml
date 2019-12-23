@@ -4,9 +4,6 @@ trigger: none # No CI build
 
 pr: none # Not for pull requests
 
-variables:
-- group: "Key Vault"
-
 schedules:
 - cron: "0 6 * * *" # Time is UTC
   displayName: Nightly Perf Test
