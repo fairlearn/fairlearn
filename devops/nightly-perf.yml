@@ -2,7 +2,13 @@
 
 trigger: none # No CI build
 
-pr: none # Not for pull requests
+pr: # run on PRs only if perf tests were changed
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - test/perf/*
 
 schedules:
 - cron: "0 6 * * *" # Time is UTC
