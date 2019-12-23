@@ -49,7 +49,7 @@ jobs:
   - script: python -m pytest -s test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run Perf tests'
     env:
-      SERVICE_PRINCIPAL_PASSWORD: "$(${{parameters.servicePrincipalIdKeyVaultSecretName}})"
+      SERVICE_PRINCIPAL_PASSWORD: "$(${{parameters.servicePrincipalSecretKeyVaultSecretName}})"
       SERVICE_PRINCIPAL_ID: "$(${{parameters.servicePrincipalIdKeyVaultSecretName}})"
       TENANT_ID: "$(${{parameters.servicePrincipalTenantIdKeyVaultSecretName}})"
       SUBSCRIPTION_ID: ${{parameters.subscriptionId}}
