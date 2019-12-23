@@ -1,9 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# Class is just for holding results so 'imperative mode' makes
-# little sense
-# flake8: noqa: D401
 
 class GroupMetricResult:
     """Class to hold the result of a grouped metric.
@@ -33,7 +30,7 @@ class GroupMetricResult:
 
     @property
     def overall(self):
-        """The metric calculated over the entire dataset."""
+        """Return the metric calculated over the entire dataset."""
         return self._overall
 
     @overall.setter
@@ -42,7 +39,7 @@ class GroupMetricResult:
 
     @property
     def by_group(self):
-        """The metric calculated for each sub-group in the dataset.
+        """Return the metric calculated for each sub-group in the dataset.
 
         This is a dictionary whose keys are the unique members of
         the ``group_membership`` data. The corresponding values are
@@ -57,7 +54,7 @@ class GroupMetricResult:
 
     @property
     def minimum(self):
-        """The minimum value of the metric in the ``by_group`` dictionary.
+        """Return the minimum value of the metric in the ``by_group`` dictionary.
 
         This is only set if the metric is a scalar.
         """
@@ -69,7 +66,7 @@ class GroupMetricResult:
 
     @property
     def maximum(self):
-        """The maximum value of the metric in the ``by_group`` dictionary.
+        """Return the maximum value of the metric in the ``by_group`` dictionary.
 
         This is only set if the metric is a scalar.
         """
@@ -81,7 +78,7 @@ class GroupMetricResult:
 
     @property
     def argmin_set(self):
-        """The set of groups corresponding to the ``minimum``.
+        """Return the set of groups corresponding to the ``minimum``.
 
         This is only set if the metric is a scalar, and will be
         a set of keys to tbe ``by_group`` dictionary.
@@ -94,7 +91,7 @@ class GroupMetricResult:
 
     @property
     def argmax_set(self):
-        """The set of groups corresponding to the ``minimum``.
+        """Return the set of groups corresponding to the ``minimum``.
 
         This is only set if the metric is a scalar, and will be
         a set of keys to tbe ``by_group`` dictionary.
@@ -107,7 +104,7 @@ class GroupMetricResult:
 
     @property  # noqa: A003
     def range(self):
-        """The value of :code:`maximum-minimum`.
+        """Return the value of :code:`maximum-minimum`.
 
         This is only set if the metric is a scalar.
         """
@@ -119,7 +116,7 @@ class GroupMetricResult:
 
     @property
     def range_ratio(self):
-        """The value of :code:`minimum/maximum`.
+        """Return the value of :code:`minimum/maximum`.
 
         This is only set if the metric is a scalar.
         """
