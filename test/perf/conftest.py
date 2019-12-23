@@ -9,7 +9,7 @@ from fairlearn.reductions import ExponentiatedGradient, GridSearch, EqualizedOdd
 
 try:
     from tempeh.execution.azureml.workspace import get_workspace
-except ModuleNotFoundError:
+except ImportError:
     raise Exception("fairlearn performance tests require azureml-sdk to be installed.")
 
 from environment_setup import build_package
