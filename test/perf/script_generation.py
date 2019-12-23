@@ -12,7 +12,22 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
         os.makedirs(script_directory)
 
     script_lines = []
-    # imports
+    add_imports(script_lines)
+    script_lines.append("")
+    script_lines.append("run = Run.get_context()")
+    add_dataset_setup(script_lines, perf_test_configuration)
+    add_unconstrained_estimator_fitting(script_lines, perf_test_configuration)
+    script_lines.append('start_time = time()')
+    add_mitigation(script_lines, perf_test_configuration)
+    add_evaluation(script_lines)
+
+    print("\n\n===============================================================\n\n")
+
+    with open(os.path.join(script_directory, script_name), 'w') as script_file:  # noqa: E501
+        script_file.write("\n".join(script_lines))
+
+
+def add_imports(script_lines):
     script_lines.append('from time import time')
     script_lines.append('from tempeh.configurations import models, datasets')
     script_lines.append('from fairlearn.postprocessing import ThresholdOptimizer')
@@ -20,10 +35,8 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     script_lines.append('from fairlearn.reductions import DemographicParity, EqualizedOdds')
     script_lines.append('from azureml.core.run import Run')
 
-    script_lines.append("")
 
-    # logic
-    script_lines.append("run = Run.get_context()")
+def add_dataset_setup(script_lines, perf_test_configuration):
     script_lines.append('print("Downloading dataset")')
     script_lines.append('dataset = datasets["{}"]()'.format(perf_test_configuration.dataset))
     script_lines.append('X_train, X_test = dataset.get_X()')
@@ -52,13 +65,16 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
         raise ValueError("Sensitive features unknown for dataset {}"
                          .format(perf_test_configuration.dataset))
 
+    
+def add_unconstrained_estimator_fitting(script_lines, perf_test_configuration):
     script_lines.append('print("Fitting estimator")')
     script_lines.append('estimator = models["{}"]()'.format(perf_test_configuration.predictor))
     script_lines.append('unconstrained_predictor = models["{}"]()'.format(perf_test_configuration.predictor))
     script_lines.append('unconstrained_predictor.fit(X_train, y_train)')
     script_lines.append('print("Done fitting estimator")')
 
-    script_lines.append('start_time = time()')
+
+def add_mitigation(script_lines, perf_test_configuration):
     if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
         script_lines.append('mitigator = ThresholdOptimizer('
                             'unconstrained_predictor=unconstrained_predictor,'
@@ -84,13 +100,10 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     else:
         script_lines.append('predictions = mitigator.predict(X_test)')
 
+
+def add_evaluation(script_lines):
     # TODO evaluate accuracy/fairness tradeoff
 
     script_lines.append('total_time = time() - start_time')
     script_lines.append('run.log("total_time", total_time)')
     script_lines.append('print("Total time taken: {}s".format(total_time))')
-
-    print("\n\n===============================================================\n\n")
-
-    with open(os.path.join(script_directory, script_name), 'w') as script_file:  # noqa: E501
-        script_file.write("\n".join(script_lines))
