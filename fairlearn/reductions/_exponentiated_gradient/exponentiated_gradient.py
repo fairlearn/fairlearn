@@ -29,22 +29,27 @@ class ExponentiatedGradient(Reduction):
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
-        :code:`predict(X)`, where `X` is the set of features, `y` is the set of labels, and
-        `sample_weight` is a set of weights; labels `y` and predictions returned by
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
+        `sample_weight` is a vector of weights; labels `y` and predictions returned by
         :code:`predict(X)` are either 0 or 1.
-    :type estimator: An estimator
+    :type estimator: estimator
+
     :param constraints: The disparity constraints expressed as moments
     :type constraints: fairlearn.reductions.Moment
+
     :param eps: Allowed fairness constraint violation; the solution best_classifier is
         guaranteed to have the classification error within :code:`2*best_gap` of the best error
         under constraint eps; the constraint violation is at most :code:`2*(eps+best_gap)`
     :type eps: float
+
     :param T: Maximum number of iterations
     :type T: int
+
     :param nu: Convergence threshold for the duality gap, corresponding to a
         conservative automatic setting based on the statistical uncertainty in measuring
         classification error
     :type nu: float
+
     :param eta_mul: Initial setting of the learning rate
     :type eta_mul: float
     """
@@ -62,10 +67,11 @@ class ExponentiatedGradient(Reduction):
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
 
-        :param X: The array of training features
-        :type X: Array
-        :param y: The array of training labels
-        :type y: 1-dimensional Array
+        :param X: The feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+
+        :param y: The label vector
+        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
         X_train, y_train, A = _validate_and_reformat_reductions_input(X, y, **kwargs)
 
@@ -165,10 +171,12 @@ class ExponentiatedGradient(Reduction):
         Note that this is non-deterministic, due to the nature of the
         exponentiated gradient algorithm.
 
-        :param X: The data for which predictions are required
-        :type X: Array
-        :return: Array of predictions as 0 or 1.
-        :rtype: Array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
+
+        :return: The prediction. If `X` represents the data for a single example
+            the result will be a scalar. Otherwise the result will be a vector
+        :rtype: Scalar or vector
         """
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
