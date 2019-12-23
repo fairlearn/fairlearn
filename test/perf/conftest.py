@@ -7,7 +7,10 @@ from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch, EqualizedOdds, \
     DemographicParity
 
-from tempeh.execution.azureml.workspace import get_workspace
+try:
+    from tempeh.execution.azureml.workspace import get_workspace
+except ModuleNotFoundError:
+    raise Exception("fairlearn performance tests require azureml-sdk to be installed.")
 
 from environment_setup import build_package
 
