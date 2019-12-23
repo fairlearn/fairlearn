@@ -41,15 +41,15 @@ from ._metrics_engine import make_group_metric, metric_by_group  # noqa: F401
 
 # Classification metrics
 group_specificity_score = make_group_metric(specificity_score)
-"""A grouped metric for the :any:`specificity_score`
+"""A grouped metric for the :py:func:`specificity_score`
 """
 
 group_miss_rate = make_group_metric(miss_rate)
-"""A grouped metric for the :any:`miss_rate`
+"""A grouped metric for the :py:func:`miss_rate`
 """
 
 group_fallout_rate = make_group_metric(fallout_rate)
-"""A grouped metric for the :any:`fallout_rate`
+"""A grouped metric for the :py:func:`fallout_rate`
 """
 
 # Regression metrics
@@ -71,19 +71,19 @@ group_median_absolute_error = make_group_metric(skm.median_absolute_error)
 
 group_balanced_root_mean_squared_error = make_group_metric(
     balanced_root_mean_squared_error)
-"""A grouped wrapper around the :any:`balanced_root_mean_squared_error` routine
+"""A grouped wrapper around the :py:func:`balanced_root_mean_squared_error` routine
 """
 
 group_mean_prediction = make_group_metric(mean_prediction)
-"""A grouped wrapper around the :any:`mean_prediction` routine
+"""A grouped wrapper around the :py:func:`mean_prediction` routine
 """
 
 group_mean_overprediction = make_group_metric(mean_overprediction)
-"""A grouped wrapper around the :any:`mean_overprediction` routine
+"""A grouped wrapper around the :py:func:`mean_overprediction` routine
 """
 
 group_mean_underprediction = make_group_metric(mean_underprediction)
-"""A grouped wapper around the :any:`mean_underprediction` routine
+"""A grouped wapper around the :py:func:`mean_underprediction` routine
 """
 
 # -------------------------------------------

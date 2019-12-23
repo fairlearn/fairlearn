@@ -18,7 +18,7 @@ def specificity_score(y_true, y_pred, sample_weight=None):
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
-    The calculation uses the :sklearn:py:function:`sklearn.metrics.confusion_matrix` routine.
+    The calculation uses the :any:`sklearn.metrics.confusion_matrix` routine.
     """
     cm = skm.confusion_matrix(y_true, y_pred, sample_weight=sample_weight)
     # Taken from
@@ -50,7 +50,7 @@ def fallout_rate(y_true, y_pred, sample_weight=None):
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
     By definition, this is the complement of the
-    Specificity, and so uses :any:`specificity_score` in its
+    Specificity, and so uses :py:func:`specificity_score` in its
     calculation.
     """
     # aka False Positive Rate
