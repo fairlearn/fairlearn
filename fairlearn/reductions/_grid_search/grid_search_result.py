@@ -1,9 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# Class is just for holding results so 'imperative mode' makes
-# little sense
-# flake8: noqa: D401
 
 class GridSearchResult:
     """Class to hold a single result from the :class:`GridSearch` class."""

@@ -13,20 +13,7 @@ class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness moment for selection rates.
 
     This serves as the base class for both :class:`DemographicParity`
-    and :class:`EqualizedOdds`. The two are distinguished by
-    the events they define, which in turn affect the
-    `index` field created by :meth:`load_data()`.
-
-    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the rows of
-    the DataFrames either required as arguments or returned by several
-    of the methods of the `ConditionalSelectionRate` class. It is the cartesian
-    product of:
-
-    - The unique events defined for the particular object
-    - The unique values for the sensitive feature
-    - The characters `+` and `-`, corresponding to the Lagrange multipliers
-      for positive and negative violations of the constraint
-
+    and :class:`EqualizedOdds`.
     """
 
     def default_objective(self):

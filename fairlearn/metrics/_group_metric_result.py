@@ -1,9 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# Class is just for holding results so 'imperative mode' makes
-# little sense
-# flake8: noqa: D401
 
 class GroupMetricResult:
     """Class to hold the result of a grouped metric.
@@ -45,13 +42,27 @@ class GroupMetricResult:
 
     @property
     def minimum(self):
-        """Return the minimum value of the metric in the ``by_group`` dictionary."""
-        return min(self.by_group.values())
+        """Return the minimum value of the metric in the ``by_group`` dictionary.
+
+        This is only set if the metric is a scalar.
+        """
+        return self._minimum
+
+    @minimum.setter
+    def minimum(self, value):
+        self._minimum = value
 
     @property
     def maximum(self):
-        """Return the maximum value of the metric in the ``by_group`` dictionary."""
-        return max(self.by_group.values())
+        """Return the maximum value of the metric in the ``by_group`` dictionary.
+
+        This is only set if the metric is a scalar.
+        """
+        return self._maximum
+
+    @maximum.setter
+    def maximum(self, value):
+        self._maximum = value
 
     @property
     def argmin_set(self):
@@ -71,8 +82,15 @@ class GroupMetricResult:
 
     @property  # noqa: A003
     def range(self):
-        """Return the value of :code:`maximum-minimum`."""
-        return self.maximum - self.minimum
+        """Return the value of :code:`maximum-minimum`.
+
+        This is only set if the metric is a scalar.
+        """
+        return self._range
+
+    @range.setter  # noqa: A003
+    def range(self, value):
+        self._range = value
 
     @property
     def range_ratio(self):

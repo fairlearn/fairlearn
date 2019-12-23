@@ -9,7 +9,7 @@ from ._metrics_engine import make_group_metric, metric_by_group
 def group_accuracy_score(y_true, y_pred, group_membership, *,
                          normalize=True,
                          sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.accuracy_score` routine.
+    """Wrap the :py:func:`sklearn.metrics.accuracy_score` routine.
 
 group_confusion_matrix = make_group_metric(skm.confusion_matrix)
 """A grouped wrapper around the :py:func:`sklearn.metrics.confusion_matrix` routine."""
@@ -25,7 +25,7 @@ group_recall_score = make_group_metric(skm.recall_score)
 def group_confusion_matrix(y_true, y_pred, group_membership, *,
                            labels=None,
                            sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.confusion_matrix` routine.
+    """Wrap the :py:func:`sklearn.metrics.confusion_matrix` routine.
 
 group_zero_one_loss = make_group_metric(skm.zero_one_loss)
 """A grouped wrapper around the :py:func:`sklearn.metrics.zero_one_loss` routine
@@ -35,7 +35,7 @@ group_zero_one_loss = make_group_metric(skm.zero_one_loss)
 def group_precision_score(y_true, y_pred, group_membership, *,
                           labels=None, pos_label=1, average='binary',
                           sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.precision_score` routine.
+    """Wrap the :py:func:`sklearn.metrics.precision_score` routine.
 
     The arguments remain the same, with `group_membership` added.
     However, the only positional arguments supported are `y_true`,
@@ -53,7 +53,7 @@ def group_precision_score(y_true, y_pred, group_membership, *,
 def group_recall_score(y_true, y_pred, group_membership, *,
                        labels=None, pos_label=1, average='binary',
                        sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.recall_score` routine.
+    """Wrap the :py:func:`sklearn.metrics.recall_score` routine.
 
     The arguments remain the same, with `group_membership` added.
     However, the only positional arguments supported are `y_true`,
@@ -72,7 +72,7 @@ def group_recall_score(y_true, y_pred, group_membership, *,
 def group_roc_auc_score(y_true, y_pred, group_membership, *,
                         average='macro', max_fpr=None,
                         sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.roc_auc_score` routine.
+    """Wrap the :py:func:`sklearn.metrics.roc_auc_score` routine.
 
     The arguments remain the same, with `group_membership` added.
     However, the only positional arguments supported are `y_true`,
@@ -91,7 +91,7 @@ def group_roc_auc_score(y_true, y_pred, group_membership, *,
 def group_zero_one_loss(y_true, y_pred, group_membership, *,
                         normalize=True,
                         sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.zero_one_loss` routine.
+    """Wrap the :py:func:`sklearn.metrics.zero_one_loss` routine.
 
     The arguments remain the same, with `group_membership` added.
     However, the only positional arguments supported are `y_true`,
@@ -111,7 +111,7 @@ def group_zero_one_loss(y_true, y_pred, group_membership, *,
 def group_mean_squared_error(y_true, y_pred, group_membership, *,
                              multioutput='uniform_average',
                              sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.mean_squared_error` routine.
+    """Wrap the :py:func:`sklearn.metrics.mean_squared_error` routine.
 
     The arguments remain the same, with `group_membership` added.
     However, the only positional arguments supported are `y_true`,
@@ -130,7 +130,7 @@ def group_mean_squared_error(y_true, y_pred, group_membership, *,
 def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
                                   multioutput='uniform_average',
                                   sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.mean_squared_error` routine.
+    """Wrap the :py:func:`sklearn.metrics.mean_squared_error` routine.
 
     The arguments remain the same, with `group_membership` added.
     The result is then square rooted.
@@ -150,7 +150,7 @@ def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
 def group_r2_score(y_true, y_pred, group_membership, *,
                    multioutput='uniform_average',
                    sample_weight=None):
-    """Wrap the :any:`sklearn.metrics.r2_score` routine.
+    """Wrap the :py:func:`sklearn.metrics.r2_score` routine.
 
 group_max_error = make_group_metric(skm.max_error)
 """A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
