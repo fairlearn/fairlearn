@@ -68,7 +68,6 @@ class ThresholdOptimizer(PostProcessing):
 
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
                  constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True, plot=False):
-        """Construct a ThresholdOptimizer"""
         super(ThresholdOptimizer, self).__init__(
             unconstrained_predictor=unconstrained_predictor,
             estimator=estimator,
