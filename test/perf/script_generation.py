@@ -21,7 +21,7 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     add_mitigation(script_lines, perf_test_configuration)
     add_evaluation(script_lines)
 
-    print("\n\n===============================================================\n\n")
+    print("\n\n{}\n\n".format("="*100))
 
     with open(os.path.join(script_directory, script_name), 'w') as script_file:  # noqa: E501
         script_file.write("\n".join(script_lines))
