@@ -78,7 +78,7 @@ stages:
   parameters:
     poolImage: $(PoolImage)
     targetType: 'Test'
-    kvSubscription: fairlearn-pipeline-learning # This is actually the name of the service connection from the Project Settings page
+    kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)" # This is actually the name of the service connection from the Project Settings page
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
