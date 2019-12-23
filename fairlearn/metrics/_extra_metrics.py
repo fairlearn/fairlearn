@@ -18,7 +18,7 @@ def specificity_score(y_true, y_pred, sample_weight=None):
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
-    The calculation uses the :sklearn:`sklearn.metrics.confusion_matrix` routine.
+    The calculation uses the :py:`sklearn.metrics.confusion_matrix` routine.
     """
     cm = skm.confusion_matrix(y_true, y_pred, sample_weight=sample_weight)
     # Taken from
