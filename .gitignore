@@ -121,6 +121,3 @@ fairlearn/widget/js/fairlearn_widget/labextension/fairlearn-widget-*.tgz
 
 # generated perf test scripts
 test/perf/scripts/**
-
-# perf test setup secrets
-test/perf/setenv.ps1
