@@ -70,18 +70,21 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
 class AverageLossMoment(ConditionalLossMoment):
+    """Moment for Average Loss."""
 
     def __init__(self, loss):
         super().__init__(loss, no_groups=True)
 
 
 class GroupLossMoment(ConditionalLossMoment):
+    """Moment for Group Loss."""
 
     def __init__(self, loss):
         super().__init__(loss, no_groups=False)
 
 
 class SquareLoss:
+    """Class to evaluate the square loss."""
 
     def __init__(self, min_val, max_val):
         self.min_val = min_val
@@ -96,6 +99,7 @@ class SquareLoss:
 
 
 class AbsoluteLoss:
+    """Class to evaluate absolute loss."""
 
     def __init__(self, min_val, max_val):
         self.min_val = min_val
@@ -115,6 +119,7 @@ AbsoluteLoss.__module__ = "fairlearn.reductions"
 
 
 class ZeroOneLoss(AbsoluteLoss):
+    """Class to evaluate a zero-one loss."""
 
     def __init__(self):
         super().__init__(0, 1)

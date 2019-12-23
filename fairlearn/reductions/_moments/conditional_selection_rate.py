@@ -10,7 +10,11 @@ _DIFF = "diff"
 
 
 class ConditionalSelectionRate(ClassificationMoment):
-    """Generic fairness metric including :class:`DemographicParity` and :class:`EqualizedOdds`."""
+    """Generic fairness moment for selection rates.
+
+    This serves as the base class for both :class:`DemographicParity`
+    and :class:`EqualizedOdds`.
+    """
 
     def default_objective(self):
         """Return the default objective for moments of this kind."""
