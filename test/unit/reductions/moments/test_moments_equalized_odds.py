@@ -100,7 +100,7 @@ def test_construct_and_load():
 def test_project_lambda_smoke_negatives():
     eqo = EqualizedOdds()
 
-    events = ['all']
+    events = ['label=False', 'label=True']
     signs = ['+', '-']
     labels = ['a', 'b']
     midx = pd.MultiIndex.from_product(
@@ -124,7 +124,7 @@ def test_project_lambda_smoke_positives():
     # the '+' indices larger
     eqo = EqualizedOdds()
 
-    events = ['all']
+    events = ['label=False', 'label=True']
     signs = ['+', '-']
     labels = ['a', 'b']
     midx = pd.MultiIndex.from_product(
@@ -145,7 +145,7 @@ def test_project_lambda_smoke_positives():
 
 def test_signed_weights():
     eqo = EqualizedOdds()
-    assert eqo.short_name == "DemographicParity"
+    assert eqo.short_name == "EqualizedOdds"
 
     num_samples_a0 = 10
     num_samples_a1 = 30
@@ -164,7 +164,7 @@ def test_signed_weights():
     # Load up the (rigged) data
     eqo.load_data(X, Y, sensitive_features=A)
 
-    events = ["all"]
+    events = ['label=False', 'label=True']
     signs = ["+", "-"]
     labels = [a0_label, a1_label]
     midx = pd.MultiIndex.from_product(
