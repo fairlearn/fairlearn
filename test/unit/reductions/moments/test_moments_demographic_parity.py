@@ -32,11 +32,11 @@ def simple_threshold_data(number_a0, number_a1,
 
 def test_construct_and_load():
     dp = DemographicParity()
-
     assert dp.short_name == "DemographicParity"
 
-    num_samples_a0 = 5
-    num_samples_a1 = 7
+    num_samples_a0 = 10
+    num_samples_a1 = 30
+    num_samples = num_samples_a0 + num_samples_a1
 
     a0_threshold = 0.2
     a1_threshold = 0.7
@@ -48,10 +48,27 @@ def test_construct_and_load():
                                     a0_threshold, a1_threshold,
                                     a0_label, a1_label)
 
+    # Load up the (rigged) data
     dp.load_data(X, Y, sensitive_features=A)
     assert dp.data_loaded
     assert dp.n == num_samples_a0 + num_samples_a1
-    print("==========================")
-    print(dp.tags)
+
+    # Examine the tags DF
     assert dp.tags['label'].equals(pd.Series(Y))
     assert dp.tags['group_id'].equals(pd.Series(A))
+    assert dp.tags['event'].map(lambda x: x == 'all').all()
+
+    # Examine the prob_event DF
+    # There's only the 'all' event and everything belongs to it
+    assert len(dp.prob_event.index) == 1
+    assert dp.prob_event.loc['all'] == 1
+
+    # Examine the prob_group_event DP
+    # There's only an 'all' event but this records the fractions
+    # of each label in the population
+    assert len(dp.prob_group_event.index) == 2
+    assert dp.prob_group_event.loc[('all', a0_label)] == num_samples_a0 / num_samples
+    assert dp.prob_group_event.loc[('all', a1_label)] == num_samples_a1 / num_samples
+
+    print(dp.neg_basis)
+    assert len(dp.neg_basis.index)==10
