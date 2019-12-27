@@ -105,7 +105,7 @@ def test_project_lambda_smoke_negatives():
 
 def test_project_lambda_smoke_positives():
     # This is a repeat of the _negatives method but with
-    # the '+' indices arger
+    # the '+' indices larger
     dp = DemographicParity()
 
     events = ['all']
