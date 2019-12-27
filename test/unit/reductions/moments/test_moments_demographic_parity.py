@@ -146,3 +146,41 @@ def test_project_lambda_smoke_positives():
     expected = pd.DataFrame()
     expected = 0 + pd.Series([18, 12, 0, 0], index=midx)
     assert expected.equals(ls)
+
+
+def test_signed_weights():
+    dp = DemographicParity()
+    assert dp.short_name == "DemographicParity"
+
+    num_samples_a0 = 10
+    num_samples_a1 = 30
+    num_samples = num_samples_a0 + num_samples_a1
+
+    a0_threshold = 0.2
+    a1_threshold = 0.7
+
+    a0_label = 2
+    a1_label = 3
+
+    X, Y, A = simple_threshold_data(num_samples_a0, num_samples_a1,
+                                    a0_threshold, a1_threshold,
+                                    a0_label, a1_label)
+
+    # Load up the (rigged) data
+    dp.load_data(X, Y, sensitive_features=A)
+
+    events = ["all"]
+    signs = ["+", "-"]
+    labels = [a0_label, a1_label]
+    midx = pd.MultiIndex.from_product(
+        [signs, events, labels],
+        names=[_SIGN, _EVENT, _GROUP_ID])
+
+    lambda_vec = pd.Series([2000, 1000, 500, 100], index=midx, name=0)
+
+    print(lambda_vec)
+    print('========================')
+
+    signed_weights = dp.signed_weights(lambda_vec)
+    print(signed_weights)
+    assert False
