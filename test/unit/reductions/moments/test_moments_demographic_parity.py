@@ -78,6 +78,7 @@ def test_construct_and_load():
     assert dp.pos_basis[0]['-', 'all', a1_label] == 0
 
     # Examine the neg_basis_present DF
+    assert len(dp.neg_basis_present) == 1
     assert dp.neg_basis_present[0]
 
 
