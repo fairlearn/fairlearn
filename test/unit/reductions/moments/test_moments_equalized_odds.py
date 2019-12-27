@@ -169,16 +169,33 @@ def test_signed_weights():
         [signs, events, labels],
         names=[_SIGN, _EVENT, _GROUP_ID])
 
-    lambda_vec = pd.Series([2000, 1000, 500, 100], index=midx, name=0)
-    lambda_a0 = 2000 - 500
-    lambda_a1 = 1000 - 100
+    lambda_vec = pd.Series([2000, 1000, 4000, 5000, 500, 100, 700, 900], index=midx, name=0)
 
-    sw_a0 = (lambda_a0 + lambda_a1) - lambda_a0 * (num_samples / num_samples_a0)
-    sw_a1 = (lambda_a0 + lambda_a1) - lambda_a1 * (num_samples / num_samples_a1)
+    lambda_a0_F = 2000 - 500
+    lambda_a0_T = 4000 - 700
+    num_a0_F = int(a0_threshold * num_samples_a0)
+    num_a0_T = num_samples_a0 - num_a0_F
 
-    w_a0 = np.full(num_samples_a0, sw_a0)
-    w_a1 = np.full(num_samples_a1, sw_a1)
-    expected = np.concatenate((w_a0, w_a1), axis=None)
+    lambda_a1_F = 1000 - 100
+    lambda_a1_T = 5000 - 900
+    num_a1_F = int(a1_threshold * num_samples_a1)
+    num_a1_T = num_samples_a1 - num_a1_F
+
+    sw_a0_F = (lambda_a0_F + lambda_a1_F) / (1 - sum(Y) / len(Y)) - \
+        lambda_a0_F * (num_samples / num_a0_F)
+    sw_a1_F = (lambda_a0_F + lambda_a1_F) / (1 - sum(Y) / len(Y)) - \
+        lambda_a1_F * (num_samples / num_a1_F)
+    sw_a0_T = (lambda_a0_T + lambda_a1_T) / (sum(Y) / len(Y)) - \
+        lambda_a0_T * (num_samples / num_a0_T)
+    sw_a1_T = (lambda_a0_T + lambda_a1_T) / (sum(Y) / len(Y)) - \
+        lambda_a1_T * (num_samples / num_a1_T)
+
+    w_a0_F = np.full(num_a0_F, sw_a0_F)
+    w_a0_T = np.full(num_a0_T, sw_a0_T)
+    w_a1_F = np.full(num_a1_F, sw_a1_F)
+    w_a1_T = np.full(num_a1_T, sw_a1_T)
+    expected = np.concatenate((w_a0_F, w_a0_T, w_a1_F, w_a1_T), axis=None)
 
     signed_weights = eqo.signed_weights(lambda_vec)
+    # Be bold and test for equality
     assert np.array_equal(expected, signed_weights)
