@@ -71,7 +71,8 @@ def test_construct_and_load():
     assert dp.prob_group_event.loc[('all', a1_label)] == num_samples_a1 / num_samples
 
     # Examine the neg_basis DF
-    # This is obviously looking at the \lambda_{-} values in some way
+    # This is obviously looking at the \lambda_{-} values and picking
+    # out the one associated with the first label
     assert len(dp.neg_basis.index) == 4
     assert dp.neg_basis[0]['+', 'all', a0_label] == 0
     assert dp.neg_basis[0]['+', 'all', a1_label] == 0
@@ -87,5 +88,5 @@ def test_construct_and_load():
     assert dp.pos_basis[0]['-', 'all', a0_label] == 0
     assert dp.pos_basis[0]['-', 'all', a1_label] == 0
 
-    print(dp.neg_basis_present)
-    assert False
+    # Examine the neg_basis_present DF
+    assert dp.neg_basis_present[0] == True
