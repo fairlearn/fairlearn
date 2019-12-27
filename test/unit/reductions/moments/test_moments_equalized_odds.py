@@ -108,14 +108,13 @@ def test_project_lambda_smoke_negatives():
         names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
-    # Note that the '-' indices (11 and 19) are larger
-    # than the '+' indices (1 and 2)
-    df = 0 + pd.Series([1, 2, 11, 19], index=midx)
+    # Note that the '-' labels are larger
+    df = 0 + pd.Series([1, 2, 11, 19, 1001, 1110, 1230, 1350], index=midx)
 
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 10, 17], index=midx)
+    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx)
     assert expected.equals(ls)
 
 
@@ -132,14 +131,13 @@ def test_project_lambda_smoke_positives():
         names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
-    # Note that the '-' indices (11 and 19) are larger
-    # than the '+' indices (1 and 2)
-    df = 0 + pd.Series([23, 19, 5, 7], index=midx)
+    # Note that the '-' indices are now smaller
+    df = 0 + pd.Series([200, 300, 100, 600, 4, 5, 6, 7], index=midx)
 
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([18, 12, 0, 0], index=midx)
+    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx)
     assert expected.equals(ls)
 
 

@@ -116,8 +116,8 @@ def test_project_lambda_smoke_positives():
         names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
-    # Note that the '-' indices (11 and 19) are larger
-    # than the '+' indices (1 and 2)
+    # Note that the '-' indices are smaller than
+    # the '+' ones
     df = 0 + pd.Series([23, 19, 5, 7], index=midx)
 
     ls = dp.project_lambda(df)
