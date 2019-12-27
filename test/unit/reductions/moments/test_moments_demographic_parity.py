@@ -177,10 +177,15 @@ def test_signed_weights():
         names=[_SIGN, _EVENT, _GROUP_ID])
 
     lambda_vec = pd.Series([2000, 1000, 500, 100], index=midx, name=0)
+    lambda_a0 = 2000 - 500
+    lambda_a1 = 1000 - 100
 
-    print(lambda_vec)
-    print('========================')
+    sw_a0 = (lambda_a0 + lambda_a1) - lambda_a0 * (num_samples / num_samples_a0)
+    sw_a1 = (lambda_a0 + lambda_a1) - lambda_a1 * (num_samples / num_samples_a1)
+
+    w_a0 = np.full(num_samples_a0, sw_a0)
+    w_a1 = np.full(num_samples_a1, sw_a1)
+    expected = np.concatenate((w_a0, w_a1), axis=None)
 
     signed_weights = dp.signed_weights(lambda_vec)
-    print(signed_weights)
-    assert False
+    assert np.array_equal(expected, signed_weights)
