@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from fairlearn.reductions import DemographicParity
+from fairlearn.reductions._moments.moment import _EVENT, _GROUP_ID, _SIGN
 
 
 def simple_threshold_data(number_a0, number_a1,
@@ -58,6 +59,15 @@ def test_construct_and_load():
     assert dp.tags['group_id'].equals(pd.Series(A))
     assert dp.tags['event'].map(lambda x: x == 'all').all()
 
+    # Examine the index MultiIndex
+    events = ['all']
+    signs = ['+', '-']
+    labels = [2, 3]
+    expected_index = pd.MultiIndex.from_product(
+        [signs, events, labels],
+        names=[_SIGN, _EVENT, _GROUP_ID])
+    assert dp.index.equals(expected_index)
+
     # Examine the prob_event DF
     # There's only the 'all' event and everything belongs to it
     assert len(dp.prob_event.index) == 1
@@ -90,3 +100,16 @@ def test_construct_and_load():
 
     # Examine the neg_basis_present DF
     assert dp.neg_basis_present[0] == True
+
+
+def test_project_lambda_smoke():
+    dp = DemographicParity()
+    df = pd.DataFrame()
+
+    df[0]['+', 'all', 'a'] = 1
+    df[0]['+', 'all', 'b'] = 2
+    df[0]['-', 'all', 'a'] = 11
+    df[0]['-', 'all', 'b'] = 19
+    ls = dp.project_lambda(df)
+    print(ls)
+    assert False
