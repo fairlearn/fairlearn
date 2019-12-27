@@ -102,14 +102,47 @@ def test_construct_and_load():
     assert dp.neg_basis_present[0] == True
 
 
-def test_project_lambda_smoke():
+def test_project_lambda_smoke_negatives():
     dp = DemographicParity()
-    df = pd.DataFrame()
 
-    df[0]['+', 'all', 'a'] = 1
-    df[0]['+', 'all', 'b'] = 2
-    df[0]['-', 'all', 'a'] = 11
-    df[0]['-', 'all', 'b'] = 19
+    events = ['all']
+    signs = ['+', '-']
+    labels = ['a', 'b']
+    midx = pd.MultiIndex.from_product(
+        [signs, events, labels],
+        names=[_SIGN, _EVENT, _GROUP_ID])
+
+    df = pd.DataFrame()
+    # Note that the '-' indices (11 and 19) are larger
+    # than the '+' indices (1 and 2)
+    df = 0 + pd.Series([1, 2, 11, 19], index=midx)
+
     ls = dp.project_lambda(df)
-    print(ls)
-    assert False
+
+    expected = pd.DataFrame()
+    expected = 0 + pd.Series([0, 0, 10, 17], index=midx)
+    assert expected.equals(ls)
+
+
+def test_project_lambda_smoke_positives():
+    # This is a repeat of the _negatives method but with
+    # the '+' indices arger
+    dp = DemographicParity()
+
+    events = ['all']
+    signs = ['+', '-']
+    labels = ['a', 'b']
+    midx = pd.MultiIndex.from_product(
+        [signs, events, labels],
+        names=[_SIGN, _EVENT, _GROUP_ID])
+
+    df = pd.DataFrame()
+    # Note that the '-' indices (11 and 19) are larger
+    # than the '+' indices (1 and 2)
+    df = 0 + pd.Series([23, 19, 5, 7], index=midx)
+
+    ls = dp.project_lambda(df)
+
+    expected = pd.DataFrame()
+    expected = 0 + pd.Series([18, 12, 0, 0], index=midx)
+    assert expected.equals(ls)
