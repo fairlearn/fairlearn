@@ -94,7 +94,7 @@ def test_construct_and_load():
     assert eqo.pos_basis[0]['-', 'label=True', a1_label] == 0
 
     # Examine the neg_basis_present DF
-    assert eqo.neg_basis_present[0] == True
+    assert eqo.neg_basis_present[0] is True
 
 
 def test_project_lambda_smoke_negatives():
