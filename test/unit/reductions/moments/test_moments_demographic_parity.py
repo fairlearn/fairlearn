@@ -78,7 +78,7 @@ def test_construct_and_load():
     assert dp.pos_basis[0]['-', 'all', a1_label] == 0
 
     # Examine the neg_basis_present DF
-    assert dp.neg_basis_present[0] is True
+    assert dp.neg_basis_present[0]
 
 
 def test_project_lambda_smoke_negatives():
