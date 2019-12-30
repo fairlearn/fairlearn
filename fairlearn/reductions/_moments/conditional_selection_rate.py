@@ -246,6 +246,10 @@ class EqualizedOdds(ConditionalSelectionRate):
     the number of unique values for the sensitive feature, multiplied by
     the number of unique values of the `Y` array, multiplied by two (for
     the positive and negative Lagrange multipliers).
+
+    With these definitions, the :method:`signed_weights` method
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     """
 
     short_name = "EqualizedOdds"
