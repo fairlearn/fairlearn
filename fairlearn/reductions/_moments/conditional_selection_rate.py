@@ -159,10 +159,10 @@ class ConditionalSelectionRate(ClassificationMoment):
         :math:`\lambda = \lambda_{+} - \lambda_{-}`. Since it makes little
         sense to the positive and negative constraints violated at the same time,
         this routine rebalances between them. For example, if we have
-        :math:`\lambda{+}=3` and :math:`\lambda_{-}=1` then this method will
-        make :math:`\lambda{+}=2` and :math:`\lambda_{-}=0`. Similarly if
-        :math:`\lambda{+}=2` and :math:`\lambda_{-}=3` then this method will
-        yield :math:`\lambda{+}=0` and :math:`\lambda_{-}=1`.
+        :math:`\lambda_{+}=3` and :math:`\lambda_{-}=1` then this method will
+        make :math:`\lambda_{+}=2` and :math:`\lambda_{-}=0`. Similarly if
+        :math:`\lambda_{+}=2` and :math:`\lambda_{-}=3` then this method will
+        yield :math:`\lambda_{+}=0` and :math:`\lambda_{-}=1`.
 
         The supplied DataFrame must have the same :py:`pandas.MultiIndex` as `index`
         and the resultant DataFrame will have that `index` as well.
