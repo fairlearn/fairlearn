@@ -2,16 +2,11 @@
 # Licensed under the MIT License.
 
 
-# Class is just for holding results so 'imperative mode' makes
-# little sense
-# flake8: noqa: D401
-
 class ExponentiatedGradientResult:
     """Class to hold the result of an `ExponentiatedGradient` estimator."""
 
     def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
                  n_oracle_calls):
-        """Result object for the exponentiated gradient reduction operation."""
         self._best_classifier = best_classifier
         self._best_gap = best_gap
         self._classifiers = classifiers
@@ -22,7 +17,7 @@ class ExponentiatedGradientResult:
 
     @property
     def best_classifier(self):
-        """The best classifier found by the algorithm.
+        """Return the best classifier found by the algorithm.
 
         A function that maps a DataFrame `X` containing covariates to a Series containing the
         corresponding probabilistic decisions in :math:`[0,1]`
@@ -31,7 +26,7 @@ class ExponentiatedGradientResult:
 
     @property
     def best_gap(self):
-        """The quality of `best_classifier`.
+        """Return the quality of `best_classifier`.
 
         If the algorithm has converged then :code:`best_gap <= nu`;
         the solution `best_classifier` is guaranteed to have the classification error within
@@ -42,27 +37,27 @@ class ExponentiatedGradientResult:
 
     @property
     def classifiers(self):
-        """The base classifiers generated (instances of estimator)."""
+        """Return the base classifiers generated (instances of estimator)."""
         return self._classifiers
 
     @property
     def weights(self):
-        """The weights of those classifiers within `best_classifier`."""
+        """Return the weights of those classifiers within `best_classifier`."""
         return self._weights
 
     @property
     def last_t(self):
-        """The last executed iteration; always :code:`last_t < T`."""
+        """Return the last executed iteration; always :code:`last_t < T`."""
         return self._last_t
 
     @property
     def best_t(self):
-        """The iteration in which best_classifier was obtained."""
+        """Return the iteration in which best_classifier was obtained."""
         return self._best_t
 
     @property
     def n_oracle_calls(self):
-        """The number of times the estimator was called."""
+        """Return the number of times the estimator was called."""
         return self._n_oracle_calls
 
     def _as_dict(self):
