@@ -68,7 +68,7 @@ class Moment:
 
     @property
     def data_loaded(self):
-        """Return whether this `Moment` object has been loaded with data"""
+        """Return whether this `Moment` object has been loaded with data."""
         return self._data_loaded
 
     @data_loaded.setter
