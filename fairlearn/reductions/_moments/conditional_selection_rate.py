@@ -151,7 +151,25 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec):
-        """Return the projected lambda values."""
+        r"""Return the rebalanced Lagrange multipliers.
+
+        For each constraint, we have two Lagrange multipliers corresponding to the
+        positive and negative violations of the constraint, with both multipliers
+        constrained to be positive. The 'true' Lagrange multiplier is then
+        :math:`\lambda = \lambda_{+} - \lambda_{-}`. Since it makes little
+        sense to the positive and negative constraints violated at the same time,
+        this routine rebalances between them. For example, if we have
+        :math:`\lambda{+}=3` and :math:`\lambda_{-}=1` then this method will
+        make :math:`\lambda{+}=2` and :math:`\lambda_{-}=0`. Similarly if
+        :math:`\lambda{+}=2` and :math:`\lambda_{-}=3` then this method will
+        yield :math:`\lambda{+}=0` and :math:`\lambda_{-}=1`.
+
+        The supplied DataFrame must have the same :py:`pandas.MultiIndex` as `index`
+        and the resultant DataFrame will have that `index` as well.
+
+        :param lambda_vec: The set of Lagrange multipliers indexed by `index`
+        :type labmda_vec: :py:`pandas.DataFrame`
+        """
         lambda_pos = lambda_vec["+"] - lambda_vec["-"]
         lambda_neg = -lambda_pos
         lambda_pos[lambda_pos < 0.0] = 0.0
