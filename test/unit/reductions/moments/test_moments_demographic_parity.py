@@ -14,6 +14,7 @@ def test_construct_and_load():
     dp = DemographicParity()
     assert dp.short_name == "DemographicParity"
 
+    # Generate some (rigged) data
     num_samples_a0 = 10
     num_samples_a1 = 30
     num_samples = num_samples_a0 + num_samples_a1

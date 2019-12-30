@@ -14,6 +14,7 @@ def test_construct_and_load():
     eqo = EqualizedOdds()
     assert eqo.short_name == "EqualizedOdds"
 
+    # Generate some rigged data
     num_samples_a0 = 10
     num_samples_a1 = 30
     num_samples = num_samples_a0 + num_samples_a1
