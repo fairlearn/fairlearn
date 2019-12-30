@@ -25,7 +25,7 @@ class ConditionalLossMoment(LossMoment):
         if self.no_groups:
             kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
         super().load_data(X, y, **kwargs_mod)
-        self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.n
+        self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.n_samples
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr
 

@@ -49,7 +49,7 @@ class Moment:
         self._X = value
 
     @property
-    def n(self):
+    def n_samples(self):
         """Return the number of samples in the data."""
         return self.X.shape[0]
 
