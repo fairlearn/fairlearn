@@ -168,7 +168,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         and the resultant DataFrame will have that `index` as well.
 
         :param lambda_vec: The set of Lagrange multipliers indexed by `index`
-        :type labmda_vec: :class:`pandas:pandas.DataFrame`
+        :type lambda_vec: :class:`pandas:pandas.DataFrame`
         """
         lambda_pos = lambda_vec["+"] - lambda_vec["-"]
         lambda_neg = -lambda_pos
@@ -216,6 +216,9 @@ class DemographicParity(ConditionalSelectionRate):
     Similarly, the `index` property will have twice as many entries
     (corresponding to the positive and negative Lagrange multipliers)
     as there are unique values for the sensitive feature.
+    The :method:`signed_weights` method will compute the costs according
+    to Example 3 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     """
 
     short_name = "DemographicParity"
