@@ -52,11 +52,13 @@ class ConditionalSelectionRate(ClassificationMoment):
         the DataFrames either required as arguments or returned by several
         of the methods of the `ConditionalSelectionRate` class.
 
-        The `MultiIndex` itself is the cartesian product of:
+        The :class:`pandas:pandas.MultiIndex` itself is the cartesian product of:
+
         - The unique events defined for the particular object
         - The unique values for the sensitive feature
         - The characters `+` and `-`, corresponding to the Lagrange multipliers
-        for positive and negative violations of the constraint
+          for positive and negative violations of the constraint
+
         """
         return self._index
 
@@ -168,8 +170,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         :math:`\lambda_{+}=2` and :math:`\lambda_{-}=3` then this method will
         yield :math:`\lambda_{+}=0` and :math:`\lambda_{-}=1`.
 
-        The supplied DataFrame must have the same :class:`pandas:pandas.MultiIndex` as `index`
-        and the resultant DataFrame will have that `index` as well.
+        The supplied :class:`pandas:pandas.DataFrame` must have the same
+        :class:`pandas:pandas.MultiIndex` as `index` and the resultant
+        :class:`pandas:pandas.DataFrame` will have that `index` as well.
 
         :param lambda_vec: The set of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.DataFrame`
@@ -218,7 +221,8 @@ class DemographicParity(ConditionalSelectionRate):
       P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
 
     This implementation of :class:`ConditionalSelectionRate` defines
-    a single event, `all`. Consequently, the `prob_event` DataFrame
+    a single event, `all`. Consequently, the `prob_event`
+    :class:`pandas:pandas.DataFrame`
     will only have a single entry, which will be equal to 1.
     Similarly, the `index` property will have twice as many entries
     (corresponding to the positive and negative Lagrange multipliers)
@@ -246,8 +250,9 @@ class EqualizedOdds(ConditionalSelectionRate):
     This implementation of :class:`ConditionalSelectionRate` defines
     events corresponding to the unique values of the `Y` array.
 
-    The `prob_event` DataFrame will record the fraction of the samples
-    corresponding to each unique value in the `Y` array.
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    fraction of the samples corresponding to each unique value in
+    the `Y` array.
 
     The `index` MultiIndex will have a number of entries equal to
     the number of unique values for the sensitive feature, multiplied by
