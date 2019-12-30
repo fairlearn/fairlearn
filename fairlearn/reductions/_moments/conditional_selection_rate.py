@@ -30,6 +30,76 @@ class ConditionalSelectionRate(ClassificationMoment):
     def prob_event(self, value):
         self._prob_event = value
 
+    @property
+    def prob_group_event(self):
+        """Return the probability of each event for each subgroup.
+
+        The resultant DataFrame will have a number of rows equal to
+        the number of unique events multiplied by the number of
+        unique values for the sensitive feature.
+        """
+        return self._prob_group_event
+
+    @prob_group_event.setter
+    def prob_group_event(self, value):
+        self._prob_group_event = value
+
+    @property
+    def index(self):
+        """Return the schema for many of the computations of this object.
+
+        This is a :py:`pandas.MultiIndex` corresponding to the rows of
+        the DataFrames either required as arguments or returned by several
+        of the methods of the `ConditionalSelectionRate` class.
+
+        The `MultiIndex` itself is the cartesian product of:
+        - The unique events defined for the particular object
+        - The unique values for the sensitive feature
+        - The characters `+` and `-`, corresponding to the Lagrange multipliers
+        for positive and negative violations of the constraint
+        """
+        return self._index
+
+    @index.setter
+    def index(self, value):
+        self._index = value
+
+    @property
+    def default_objective_lambda_vec(self):
+        """Return the default objective lambda vector."""
+        return self._default_objective_lambda_vec
+
+    @default_objective_lambda_vec.setter
+    def default_objective_lambda_vec(self, value):
+        self._default_objective_lambda_vec = value
+
+    @property
+    def pos_basis(self):
+        """Return a DataFrame indexed by `index` flagging something."""
+        return self._pos_basis
+
+    @pos_basis.setter
+    def pos_basis(self, value):
+        self._pos_basis = value
+
+    @property
+    def neg_basis(self):
+        """Return a DataFrame indexed by `index` flagging something else."""
+        return self._neg_basis
+
+    @neg_basis.setter
+    def neg_basis(self, value):
+        self._neg_basis = value
+
+    @property
+    def neg_basis_present(self):
+        """Return a pandas Series indexed by `index` flagging another thing."""
+        return self._neg_basis_present
+
+    @neg_basis_present.setter
+    def neg_basis_present(self, value):
+        self._neg_basis_present = value
+
     def default_objective(self):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
@@ -116,7 +186,11 @@ class DemographicParity(ConditionalSelectionRate):
       P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
 
     This implementation of :class:`ConditionalSelectionRate` defines
-    a single event, `all`.
+    a single event, `all`. Consequently, the `prob_event` DataFrame
+    will only have a single entry, which will be equal to 1.
+    Similarly, the `index` property will have twice as many entries
+    (corresponding to the positive and negative Lagrange multipliers)
+    as there are unique values for the sensitive feature.
     """
 
     short_name = "DemographicParity"
@@ -136,6 +210,14 @@ class EqualizedOdds(ConditionalSelectionRate):
 
     This implementation of :class:`ConditionalSelectionRate` defines
     events corresponding to the unique values of the `Y` array.
+
+    The `prob_event` DataFrame will record the fraction of the samples
+    corresponding to each unique value in the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to
+    the number of unique values for the sensitive feature, multiplied by
+    the number of unique values of the `Y` array, multiplied by two (for
+    the positive and negative Lagrange multipliers).
     """
 
     short_name = "EqualizedOdds"
