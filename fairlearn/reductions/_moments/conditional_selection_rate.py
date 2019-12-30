@@ -180,7 +180,14 @@ class ConditionalSelectionRate(ClassificationMoment):
         return lambda_projected
 
     def signed_weights(self, lambda_vec):
-        """Return the signed weights."""
+        """Compute the signed weights.
+
+        Uses the equations for :math:`C_i^0` and :math:`C_i^1` as defined
+        in Section 3.2 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_
+        in the 'best response of the Q-player' subsection to compute the
+        signed weights to be applied to the data by the next call to the underlying
+        Estimator.
+        """
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
             - lambda_signed / self.prob_group_event

@@ -81,7 +81,12 @@ class Moment:
     def project_lambda(self, lambda_vec):  # noqa: D102
         raise NotImplementedError()
 
-    def signed_weights(self, lambda_vec):  # noqa: D102
+    def signed_weights(self, lambda_vec):
+        r"""Return the signed weights corresponding to the given Lagrange multipliers.
+
+        Subclasses must override this method and return the signed weights
+        :math:`W_i = C_i^0 - C_i^1` for the given :math:`\lambda` values.
+        """
         raise NotImplementedError()
 
 
