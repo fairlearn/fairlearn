@@ -8,7 +8,18 @@ import pandas as pd
 def simple_binary_threshold_data(number_a0, number_a1,
                                  a0_threshold, a1_threshold,
                                  a0_label, a1_label):
+    """Generate some simple (biased) thresholded data.
 
+    This is based on a rigged credit scoring scenario, with two
+    classes in the sensitive feature, denoted by a0 and a1. The
+    specified number of samples for each are uniformly generated in
+    the range zero to one, but the threshold for each class to get
+    a positive result in the Y array can be set differently for each.
+
+    The uniformly distributed score is set in the 'example_feature'
+    of the resultant X array; the sensitive feature is included in
+    this array under the label 'example_sensitive_feature'
+    """
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
 
@@ -23,6 +34,6 @@ def simple_binary_threshold_data(number_a0, number_a1,
 
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
-    X = pd.DataFrame({"credit_score_feature": score_feature,
+    X = pd.DataFrame({"example_feature": score_feature,
                       "example_sensitive_feature": A})
     return X, Y, A
