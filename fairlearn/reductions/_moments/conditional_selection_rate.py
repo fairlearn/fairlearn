@@ -48,7 +48,7 @@ class ConditionalSelectionRate(ClassificationMoment):
     def index(self):
         """Return the schema for many of the computations of this object.
 
-        This is a :py:`pandas.MultiIndex` corresponding to the rows of
+        This is a :class:`pandas:pandas.MultiIndex` corresponding to the rows of
         the DataFrames either required as arguments or returned by several
         of the methods of the `ConditionalSelectionRate` class.
 
@@ -164,11 +164,11 @@ class ConditionalSelectionRate(ClassificationMoment):
         :math:`\lambda_{+}=2` and :math:`\lambda_{-}=3` then this method will
         yield :math:`\lambda_{+}=0` and :math:`\lambda_{-}=1`.
 
-        The supplied DataFrame must have the same :py:`pandas.MultiIndex` as `index`
+        The supplied DataFrame must have the same :class:`pandas:pandas.MultiIndex` as `index`
         and the resultant DataFrame will have that `index` as well.
 
         :param lambda_vec: The set of Lagrange multipliers indexed by `index`
-        :type labmda_vec: :py:`pandas.DataFrame`
+        :type labmda_vec: :class:`pandas:pandas.DataFrame`
         """
         lambda_pos = lambda_vec["+"] - lambda_vec["-"]
         lambda_neg = -lambda_pos
