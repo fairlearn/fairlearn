@@ -106,7 +106,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     def load_data(self, X, y, event=None, **kwargs):
         """Load the specified data into this object.
-        
+
         This adds a column named `event` to the :meth:`Moment.tags`
         property.
         """
