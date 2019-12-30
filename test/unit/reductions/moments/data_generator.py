@@ -19,6 +19,33 @@ def simple_binary_threshold_data(number_a0, number_a1,
     The uniformly distributed score is set in the 'example_feature'
     of the resultant X array; the sensitive feature is included in
     this array under the label 'example_sensitive_feature'
+
+    :param number_a0: Number of samples to generate with the label a0
+    :type number_a0: int
+
+    :param number_a1: Number of samples to generate with the label a1
+    :type number_a1: int
+
+    :param a0_threshold: Threshold value for samples with label a0 to
+        get a result of '1' in the Y array
+    :type a0_threshold: float
+
+    :param a1_threshold: Threshold value for samples with label a1 to
+        get a result of '1' in the Y array
+    :type a1_threshold: float
+
+    :param a0_label: The label value for the a0 class
+    :type a0_label: int, string
+
+    :param a1_label: The label value for the a1 class
+    :type a1_label: int, string
+
+    Returns X, Y, A:
+        X is the feature array (containing the uniformly distributed feature
+        and the sensitive feature labels)
+        Y is the classification array (either 0 or 1)
+        A is the array of sensitive features (which will duplicate a column
+        in the X array)
     """
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
