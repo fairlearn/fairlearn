@@ -16,6 +16,20 @@ class ConditionalSelectionRate(ClassificationMoment):
     and :class:`EqualizedOdds`.
     """
 
+    @property
+    def prob_event(self):
+        """Return the probability of each event.
+
+        The events themselves are defined in the subclasses. This
+        returns the fraction of rows in `X` which correspond to
+        each event.
+        """
+        return self._prob_event
+
+    @prob_event.setter
+    def prob_event(self, value):
+        self._prob_event = value
+
     def default_objective(self):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
@@ -100,6 +114,9 @@ class DemographicParity(ConditionalSelectionRate):
 
     .. math::
       P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    a single event, `all`.
     """
 
     short_name = "DemographicParity"
@@ -116,6 +133,9 @@ class EqualizedOdds(ConditionalSelectionRate):
 
     .. math::
        P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    events corresponding to the unique values of the `Y` array.
     """
 
     short_name = "EqualizedOdds"
