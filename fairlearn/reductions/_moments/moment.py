@@ -33,12 +33,47 @@ class Moment:
         assert self.data_loaded is False, \
             "data can be loaded only once"
         self.X = X
-        self.n = self.X.shape[0]
         self.tags = pd.DataFrame({_LABEL: y})
         if _KW_SENSITIVE_FEATURES in kwargs:
             self.tags[_GROUP_ID] = kwargs[_KW_SENSITIVE_FEATURES]
         self.data_loaded = True
         self._gamma_descr = None
+
+    @property
+    def X(self):
+        """Return the array of features."""
+        return self._X
+
+    @X.setter
+    def X(self, value):
+        self._X = value
+
+    @property
+    def n(self):
+        """Return the number of samples in the data."""
+        return self.X.shape[0]
+
+    @property
+    def tags(self):
+        """Return a DataFrame providing convenient means of masking the data samples.
+
+        The base class provides two columns, corresponding to the label data `Y`
+        and the sensitive feature data. Subclasses may add others.
+        """
+        return self._tags
+
+    @tags.setter
+    def tags(self, value):
+        self._tags = value
+
+    @property
+    def data_loaded(self):
+        """Return whether this `Moment` object has been loaded with data"""
+        return self._data_loaded
+
+    @data_loaded.setter
+    def data_loaded(self, value):
+        self._data_loaded = value
 
     def gamma(self, predictor):  # noqa: D102
         raise NotImplementedError()
