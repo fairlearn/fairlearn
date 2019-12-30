@@ -75,7 +75,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     @property
     def pos_basis(self):
-        """Return a DataFrame indexed by `index` flagging something."""
+        """Return a :class:`pandas:pandas.DataFrame` indexed by `index` flagging something."""
         return self._pos_basis
 
     @pos_basis.setter
@@ -84,7 +84,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     @property
     def neg_basis(self):
-        """Return a DataFrame indexed by `index` flagging something else."""
+        """Return a :class:`pandas:pandas.DataFrame` indexed by `index` flagging something else."""
         return self._neg_basis
 
     @neg_basis.setter
@@ -93,7 +93,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     @property
     def neg_basis_present(self):
-        """Return a pandas Series indexed by `index` flagging another thing."""
+        """Return a :class:`pandas:pandas.Series` indexed by `index` flagging another thing."""
         return self._neg_basis_present
 
     @neg_basis_present.setter
@@ -105,7 +105,11 @@ class ConditionalSelectionRate(ClassificationMoment):
         return ErrorRate()
 
     def load_data(self, X, y, event=None, **kwargs):
-        """Load the specified data into this object."""
+        """Load the specified data into this object.
+        
+        This adds a column named `event` to the :meth:`Moment.tags`
+        property.
+        """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
         self.prob_event = self.tags.groupby(_EVENT).size() / self.n

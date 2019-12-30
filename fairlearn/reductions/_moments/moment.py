@@ -55,10 +55,11 @@ class Moment:
 
     @property
     def tags(self):
-        """Return a DataFrame providing convenient means of masking the data samples.
+        """Return a :class:`pandas:pandas.DataFrame` masks for the data samples.
 
         The base class provides two columns, corresponding to the label data `Y`
-        and the sensitive feature data. Subclasses may add others.
+        (with name `label`) and the sensitive feature data (with name `group_id`).
+        Subclasses may add others.
         """
         return self._tags
 
@@ -68,7 +69,7 @@ class Moment:
 
     @property
     def data_loaded(self):
-        """Return whether this `Moment` object has been loaded with data."""
+        """Return whether this :class:`Moment` object has been loaded with data."""
         return self._data_loaded
 
     @data_loaded.setter
