@@ -187,6 +187,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         in the 'best response of the Q-player' subsection to compute the
         signed weights to be applied to the data by the next call to the underlying
         Estimator.
+
+        :param lambda_vec: The set of Lagrange multipliers indexed by :meth:`index`
+        :type lambda_vec: :class:`pandas:pandas.Series`
         """
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
@@ -216,7 +219,7 @@ class DemographicParity(ConditionalSelectionRate):
     Similarly, the `index` property will have twice as many entries
     (corresponding to the positive and negative Lagrange multipliers)
     as there are unique values for the sensitive feature.
-    The :method:`signed_weights` method will compute the costs according
+    The :meth:`signed_weights` method will compute the costs according
     to Example 3 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     """
@@ -247,7 +250,7 @@ class EqualizedOdds(ConditionalSelectionRate):
     the number of unique values of the `Y` array, multiplied by two (for
     the positive and negative Lagrange multipliers).
 
-    With these definitions, the :method:`signed_weights` method
+    With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     """
