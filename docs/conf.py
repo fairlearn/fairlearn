@@ -44,7 +44,8 @@ extensions = [
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None)}
+                       'sklearn': ('https://scikit-learn.org/stable/', None),
+                       'azureml-core': ('https://docs.microsoft.com/en-us/python/api/azureml-core/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
