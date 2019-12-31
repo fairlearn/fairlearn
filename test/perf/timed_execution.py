@@ -44,6 +44,6 @@ class TimedExecution:
                                  .format(execution_time_variable_name, start_time_variable_name))
         self.script_lines.append("run.log('{0}', {0})"
                                  .format(execution_time_variable_name))
-        self.script_lines.append('print("{} time taken: {{}}s).format({})'
+        self.script_lines.append('print("{} time taken: {{}}s".format({}))'
                                  .format(self.procedure_name, execution_time_variable_name))
         self.script_lines.append('print("Finished {}")'.format(self.procedure_name))

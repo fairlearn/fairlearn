@@ -117,6 +117,6 @@ def add_additional_metric_calculation(script_lines):
     }
     for metric_name, operator in additional_metrics.items():
         script_lines.append("{} = {} {} {}"
-                            .format(metric_name, estimator_fit_time_variable_name, operator,
-                                    mitigation_time_variable_name))
+                            .format(metric_name, mitigation_time_variable_name, operator,
+                                    estimator_fit_time_variable_name))
         script_lines.append("run.log('{0}', {0})".format(metric_name))
