@@ -106,7 +106,7 @@ def add_mitigation(script_lines, perf_test_configuration):
             script_lines.append('predictions = mitigator.predict(X_test)')
 
 
-def add_additional_metric_calculation(script_lines):
+def add_additional_metric_calculation(script_lines, perf_test_configuration):
     # We need to know how much overhead fairlearn adds on top of the basic estimator fit.
     estimator_fit_time_variable_name = _ESTIMATOR_FIT + _EXECUTION_TIME
     mitigation_time_variable_name = _MITIGATION + _EXECUTION_TIME
@@ -120,3 +120,7 @@ def add_additional_metric_calculation(script_lines):
                             .format(metric_name, mitigation_time_variable_name, operator,
                                     estimator_fit_time_variable_name))
         script_lines.append("run.log('{0}', {0})".format(metric_name))
+
+    # ExponentiatedGradient tells us how many oracle calls were made.
+    if perf_test_configuration.mitigatior == ExponentiatedGradient.__name__:
+        script_lines.append("run.log('n_oracle_calls', mitigator._expgrad_result.n_oracle_calls)")
