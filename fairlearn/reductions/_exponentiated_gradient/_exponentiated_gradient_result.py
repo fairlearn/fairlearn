@@ -59,7 +59,7 @@ class ExponentiatedGradientResult:
     def n_oracle_calls(self):
         """Return the number of times the estimator was called."""
         return self._n_oracle_calls
-    
+
     @property
     def oracle_calls_execution_time(self):
         """Return the number of times the estimator was called."""
