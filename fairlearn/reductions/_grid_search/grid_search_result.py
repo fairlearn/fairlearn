@@ -38,5 +38,5 @@ class GridSearchResult:
 
     @property
     def oracle_call_execution_time(self):
-        """The time it took to make the oracle call."""
+        """Measures the time it took to make the oracle call."""
         return self._oracle_call_execution_time

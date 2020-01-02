@@ -19,7 +19,7 @@ class TimedExecution:
     script_lines.append('from azureml.core.run import Run')
     script_lines.append()"run = Run.get_context()")
     with TimedExecution("special_period", script_lines):
-        # do something
+    #     do something
 
     The execution time within the with-statement is automatically tracked and saved to the
     run as a metric.
@@ -37,7 +37,7 @@ class TimedExecution:
     def __enter__(self):
         self.script_lines.append("{} = time()".format(self.procedure_name + _START_TIME))
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback):  # noqa: A002
         execution_time_variable_name = self.procedure_name + _EXECUTION_TIME
         start_time_variable_name = self.procedure_name + _START_TIME
         self.script_lines.append("{} = time() - {}"
