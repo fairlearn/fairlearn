@@ -26,6 +26,7 @@ class TimedExecution:
         The execution time within the with-statement is automatically tracked and saved to the
         run as a metric.
     """
+
     def __init__(self, procedure_name, script_lines):
         # The procedure name is used in variable names to make them unique,
         # so it cannot contain whitespace.

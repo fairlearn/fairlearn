@@ -5,6 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
+from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_reductions_input
 from fairlearn import _NO_PREDICT_BEFORE_FIT
