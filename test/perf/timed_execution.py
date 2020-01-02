@@ -6,13 +6,13 @@ _EXECUTION_TIME = "_execution_time"
 
 
 class TimedExecution:
-    r"""TimedExecution automatically generates the python script lines measuring the execution
+    """TimedExecution automatically generates the python script lines measuring the execution
     time that happens from the start to the end of the with-statement that TimedExecution is used
     for.
 
     .. remarks::
         TimedExecution writes the code under the assumption that an Azure Machine Learning
-        :class:`azureml-core:azureml.core.Run` object called `run` exists and logs the metric
+        `azureml-core:azureml.core.Run` object called `run` exists and logs the metric
         under that run.
 
         .. code-block:: python
