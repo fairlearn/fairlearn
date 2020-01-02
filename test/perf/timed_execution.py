@@ -7,25 +7,22 @@ _EXECUTION_TIME = "_execution_time"
 
 class TimedExecution:
     """TimedExecution generates the python script to measure execution times.
-    
+
     Specifically, it measures the time that passes from the start to the end of the
     with-statement that TimedExecution is used for.
 
-    .. remarks::
-        TimedExecution writes the code under the assumption that an Azure Machine Learning
-        `azureml-core:azureml.core.Run` object called `run` exists and logs the metric
-        under that run.
+    TimedExecution writes the code under the assumption that an Azure Machine Learning
+    `azureml-core:azureml.core.Run` object called `run` exists and logs the metric
+    under that run.
 
-        .. code-block:: python
+    script_lines = []
+    script_lines.append('from azureml.core.run import Run')
+    script_lines.append()"run = Run.get_context()")
+    with TimedExecution("special_period", script_lines):
+        # do something
 
-            script_lines = []
-            script_lines.append('from azureml.core.run import Run')
-            script_lines.append()"run = Run.get_context()")
-            with TimedExecution("special_period", script_lines):
-                # do something
-
-        The execution time within the with-statement is automatically tracked and saved to the
-        run as a metric.
+    The execution time within the with-statement is automatically tracked and saved to the
+    run as a metric.
     """
 
     def __init__(self, procedure_name, script_lines):
