@@ -6,9 +6,10 @@ _EXECUTION_TIME = "_execution_time"
 
 
 class TimedExecution:
-    """TimedExecution automatically generates the python script lines measuring the execution
-    time that happens from the start to the end of the with-statement that TimedExecution is used
-    for.
+    """TimedExecution generates the python script to measure execution times.
+    
+    Specifically, it measures the time that passes from the start to the end of the
+    with-statement that TimedExecution is used for.
 
     .. remarks::
         TimedExecution writes the code under the assumption that an Azure Machine Learning
