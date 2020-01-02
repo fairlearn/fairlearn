@@ -11,8 +11,9 @@ class TimedExecution:
     for.
 
     .. remarks::
-        TimedExecution writes the code under the assumption that an Azure Machine Learning :class:`azureml-core:azureml.core.Run`
-        object called `run` exists and logs the metric under that run.
+        TimedExecution writes the code under the assumption that an Azure Machine Learning
+        :class:`azureml-core:azureml.core.Run` object called `run` exists and logs the metric
+        under that run.
 
         .. code-block:: python
 

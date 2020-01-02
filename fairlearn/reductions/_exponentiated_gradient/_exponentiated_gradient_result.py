@@ -5,15 +5,15 @@
 class ExponentiatedGradientResult:
     """Class to hold the result of an `ExponentiatedGradient` estimator."""
 
-    def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
-                 n_oracle_calls):
+    def __init__(self, best_classifier, best_gap, lagrangian, weights, last_t, best_t):
         self._best_classifier = best_classifier
         self._best_gap = best_gap
-        self._classifiers = classifiers
+        self._classifiers = lagrangian.classifiers
         self._weights = weights
         self._last_t = last_t
         self._best_t = best_t
-        self._n_oracle_calls = n_oracle_calls
+        self._n_oracle_calls = lagrangian.n_oracle_calls
+        self._oracle_calls_execution_time = lagrangian.oracle_calls_execution_time
 
     @property
     def best_classifier(self):
@@ -59,6 +59,11 @@ class ExponentiatedGradientResult:
     def n_oracle_calls(self):
         """Return the number of times the estimator was called."""
         return self._n_oracle_calls
+    
+    @property
+    def oracle_calls_execution_time(self):
+        """Return the number of times the estimator was called."""
+        return self._oracle_calls_execution_time
 
     def _as_dict(self):
         return {
@@ -68,5 +73,6 @@ class ExponentiatedGradientResult:
             "weights": self._weights,
             "last_t": self._last_t,
             "best_t": self._best_t,
-            "n_oracle_calls": self._n_oracle_calls
+            "n_oracle_calls": self._n_oracle_calls,
+            "oracle_calls_execution_time": self._oracle_calls_execution_time
         }

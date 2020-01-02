@@ -12,6 +12,12 @@ from timed_execution import TimedExecution, _EXECUTION_TIME
 _MITIGATION = "mitigation"
 _ESTIMATOR_FIT = 'estimator_fit'
 
+_N_ORACLE_CALLS_METRIC_NAME = "n_oracle_calls"
+_ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME = "oracle_calls_execution_time"
+_ORACLE_CALLS_MAX_EXECUTION_TIME_METRIC_NAME = "oracle_calls_max_execution_time"
+_ORACLE_CALLS_MIN_EXECUTION_TIME_METRIC_NAME = "oracle_calls_min_execution_time"
+_ORACLE_CALLS_MEAN_EXECUTION_TIME_METRIC_NAME = "oracle_calls_mean_execution_time"
+
 
 def generate_script(request, perf_test_configuration, script_name, script_directory):
     if not os.path.exists(script_directory):
@@ -24,7 +30,7 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     add_dataset_setup(script_lines, perf_test_configuration)
     add_unconstrained_estimator_fitting(script_lines, perf_test_configuration)
     add_mitigation(script_lines, perf_test_configuration)
-    add_additional_metric_calculation(script_lines)
+    add_additional_metric_calculation(script_lines, perf_test_configuration)
     script_lines.append("")
 
     print("\n\n{}\n\n".format("="*100))
@@ -121,6 +127,20 @@ def add_additional_metric_calculation(script_lines, perf_test_configuration):
                                     estimator_fit_time_variable_name))
         script_lines.append("run.log('{0}', {0})".format(metric_name))
 
-    # ExponentiatedGradient tells us how many oracle calls were made.
-    if perf_test_configuration.mitigatior == ExponentiatedGradient.__name__:
-        script_lines.append("run.log('n_oracle_calls', mitigator._expgrad_result.n_oracle_calls)")
+    if perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
+        script_lines.append("n_oracle_calls = mitigator._expgrad_result.n_oracle_calls")
+        script_lines.append("oracle_calls_execution_time = mitigator._expgrad_result.oracle_calls_execution_time")
+    elif perf_test_configuration.mitigator == GridSearch.__name__:
+        script_lines.append("n_oracle_calls = len(mitigator._all_results)")
+        script_lines.append("oracle_calls_execution_time = [result._oracle_call_execution_time for result in mitigator._all_results]")
+
+    if perf_test_configuration.mitigator in [ExponentiatedGradient.__name__, GridSearch.__name__]:
+        metrics_to_log = {
+            _N_ORACLE_CALLS_METRIC_NAME: "n_oracle_calls",
+            _ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME: "oracle_calls_execution_time",
+            _ORACLE_CALLS_MIN_EXECUTION_TIME_METRIC_NAME: "min(oracle_calls_execution_time)",
+            _ORACLE_CALLS_MAX_EXECUTION_TIME_METRIC_NAME: "max(oracle_calls_execution_time)",
+            _ORACLE_CALLS_MEAN_EXECUTION_TIME_METRIC_NAME: "sum(oracle_calls_execution_time)/len(oracle_calls_execution_time)",
+        }
+        for metric_name, metric_calculation_code in metrics_to_log.items():
+            script_lines.append("run.log('{}', {})".format(metric_name, metric_calculation_code))

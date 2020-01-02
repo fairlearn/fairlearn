@@ -210,11 +210,10 @@ class ExponentiatedGradient(Reduction):
         result = ExponentiatedGradientResult(
             best_classifier,
             best_gap,
-            lagrangian.classifiers,
+            lagrangian,
             weights,
             last_t,
-            best_t,
-            lagrangian.n_oracle_calls)
+            best_t)
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
                      self._eps, B, self._nu, self._T, eta_min)
