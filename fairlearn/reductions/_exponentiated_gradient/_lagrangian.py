@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import scipy.optimize as opt
+from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
@@ -51,6 +52,7 @@ class _Lagrangian:
         self.lambdas = pd.DataFrame()
         self.n = self.X.shape[0]
         self.n_oracle_calls = 0
+        self.oracle_calls_execution_time = []
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
 
@@ -142,7 +144,9 @@ class _Lagrangian:
         redW = self.n * redW / redW.sum()
 
         classifier = pickle.loads(self.pickled_estimator)
+        oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
+        self.oracle_calls_execution_time.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
         def h(X): return classifier.predict(X)

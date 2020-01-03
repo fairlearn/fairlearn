@@ -5,6 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
+from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_reductions_input
 from fairlearn import _NO_PREDICT_BEFORE_FIT
@@ -236,14 +237,17 @@ class GridSearch(Reduction):
 
             current_estimator = copy.deepcopy(self.estimator)
             logger.debug("Calling underlying estimator")
+            oracle_call_start_time = time()
             current_estimator.fit(X, y_reduction, sample_weight=weights)
+            oracle_call_execution_time = time() - oracle_call_start_time
             logger.debug("Call to underlying estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
             nxt = GridSearchResult(current_estimator,
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
-                                   self.constraints.gamma(predict_fct))
+                                   self.constraints.gamma(predict_fct),
+                                   oracle_call_execution_time)
             self._all_results.append(nxt)
 
         logger.debug("Selecting best_result")
