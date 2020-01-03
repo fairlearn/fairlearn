@@ -62,7 +62,11 @@ class ExponentiatedGradientResult:
 
     @property
     def oracle_calls_execution_time(self):
-        """Return the number of times the estimator was called."""
+        """Measures the time it took to make the oracle calls.
+        
+        :return: the execution times for all oracle calls
+        :rtype: list of floats
+        """
         return self._oracle_calls_execution_time
 
     def _as_dict(self):
