@@ -6,6 +6,18 @@ import os
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
 
+from timed_execution import TimedExecution, _EXECUTION_TIME
+
+
+_MITIGATION = "mitigation"
+_ESTIMATOR_FIT = 'estimator_fit'
+
+_N_ORACLE_CALLS_METRIC_NAME = "n_oracle_calls"
+_ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME = "oracle_calls_execution_time"
+_ORACLE_CALLS_MAX_EXECUTION_TIME_METRIC_NAME = "oracle_calls_max_execution_time"
+_ORACLE_CALLS_MIN_EXECUTION_TIME_METRIC_NAME = "oracle_calls_min_execution_time"
+_ORACLE_CALLS_MEAN_EXECUTION_TIME_METRIC_NAME = "oracle_calls_mean_execution_time"
+
 
 def generate_script(request, perf_test_configuration, script_name, script_directory):
     if not os.path.exists(script_directory):
@@ -17,9 +29,8 @@ def generate_script(request, perf_test_configuration, script_name, script_direct
     script_lines.append("run = Run.get_context()")
     add_dataset_setup(script_lines, perf_test_configuration)
     add_unconstrained_estimator_fitting(script_lines, perf_test_configuration)
-    script_lines.append('start_time = time()')
     add_mitigation(script_lines, perf_test_configuration)
-    add_evaluation(script_lines)
+    add_additional_metric_calculation(script_lines, perf_test_configuration)
     script_lines.append("")
 
     print("\n\n{}\n\n".format("="*100))
@@ -68,43 +79,68 @@ def add_dataset_setup(script_lines, perf_test_configuration):
 
 
 def add_unconstrained_estimator_fitting(script_lines, perf_test_configuration):
-    script_lines.append('print("Fitting estimator")')
-    script_lines.append('estimator = models["{}"]()'.format(perf_test_configuration.predictor))
-    script_lines.append('unconstrained_predictor = models["{}"]()'.format(perf_test_configuration.predictor))
-    script_lines.append('unconstrained_predictor.fit(X_train, y_train)')
-    script_lines.append('print("Done fitting estimator")')
+    with TimedExecution(_ESTIMATOR_FIT, script_lines):
+        script_lines.append('estimator = models["{}"]()'.format(perf_test_configuration.predictor))
+        script_lines.append('unconstrained_predictor = models["{}"]()'.format(perf_test_configuration.predictor))
+        script_lines.append('unconstrained_predictor.fit(X_train, y_train)')
 
 
 def add_mitigation(script_lines, perf_test_configuration):
-    if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-        script_lines.append('mitigator = ThresholdOptimizer('
-                            'unconstrained_predictor=unconstrained_predictor, '
-                            'constraints="{}")'.format(perf_test_configuration.disparity_metric))
-    elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
-        script_lines.append('mitigator = ExponentiatedGradient('
-                            'estimator=estimator, '
-                            'constraints={}())'.format(perf_test_configuration.disparity_metric))
+    with TimedExecution(_MITIGATION, script_lines):
+        if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
+            script_lines.append('mitigator = ThresholdOptimizer('
+                                'unconstrained_predictor=unconstrained_predictor, '
+                                'constraints="{}")'.format(perf_test_configuration.disparity_metric))
+        elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
+            script_lines.append('mitigator = ExponentiatedGradient('
+                                'estimator=estimator, '
+                                'constraints={}())'.format(perf_test_configuration.disparity_metric))
+        elif perf_test_configuration.mitigator == GridSearch.__name__:
+            script_lines.append('mitigator = GridSearch(estimator=estimator, '
+                                'constraints={}())'.format(perf_test_configuration.disparity_metric))
+        else:
+            raise Exception("Unknown mitigation technique.")
+
+        script_lines.append('mitigator.fit(X_train, y_train, sensitive_features=sensitive_features_train)')
+
+        if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
+            script_lines.append('mitigator.predict('
+                                'X_test, '
+                                'sensitive_features=sensitive_features_test, '
+                                'random_state=1)')
+        else:
+            script_lines.append('predictions = mitigator.predict(X_test)')
+
+
+def add_additional_metric_calculation(script_lines, perf_test_configuration):
+    # We need to know how much overhead fairlearn adds on top of the basic estimator fit.
+    estimator_fit_time_variable_name = _ESTIMATOR_FIT + _EXECUTION_TIME
+    mitigation_time_variable_name = _MITIGATION + _EXECUTION_TIME
+
+    additional_metrics = {
+        'mitigation_time_overhead_absolute': '-',
+        'mitigation_time_overhead_relative': '/'
+    }
+    for metric_name, operator in additional_metrics.items():
+        script_lines.append("{} = {} {} {}"
+                            .format(metric_name, mitigation_time_variable_name, operator,
+                                    estimator_fit_time_variable_name))
+        script_lines.append("run.log('{0}', {0})".format(metric_name))
+
+    if perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
+        script_lines.append("n_oracle_calls = mitigator._expgrad_result.n_oracle_calls")
+        script_lines.append("oracle_calls_execution_time = mitigator._expgrad_result.oracle_calls_execution_time")
     elif perf_test_configuration.mitigator == GridSearch.__name__:
-        script_lines.append('mitigator = GridSearch(estimator=estimator, '
-                            'constraints={}())'.format(perf_test_configuration.disparity_metric))
-    else:
-        raise Exception("Unknown mitigation technique.")
+        script_lines.append("n_oracle_calls = len(mitigator._all_results)")
+        script_lines.append("oracle_calls_execution_time = [result._oracle_call_execution_time for result in mitigator._all_results]")
 
-    script_lines.append('print("Fitting mitigator")')
-    script_lines.append('mitigator.fit(X_train, y_train, sensitive_features=sensitive_features_train)')
-
-    if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-        script_lines.append('mitigator.predict('
-                            'X_test, '
-                            'sensitive_features=sensitive_features_test, '
-                            'random_state=1)')
-    else:
-        script_lines.append('predictions = mitigator.predict(X_test)')
-
-
-def add_evaluation(script_lines):
-    # TODO evaluate accuracy/fairness tradeoff
-
-    script_lines.append('total_time = time() - start_time')
-    script_lines.append('run.log("total_time", total_time)')
-    script_lines.append('print("Total time taken: {}s".format(total_time))')
+    if perf_test_configuration.mitigator in [ExponentiatedGradient.__name__, GridSearch.__name__]:
+        metrics_to_log = {
+            _N_ORACLE_CALLS_METRIC_NAME: "n_oracle_calls",
+            _ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME: "oracle_calls_execution_time",
+            _ORACLE_CALLS_MIN_EXECUTION_TIME_METRIC_NAME: "min(oracle_calls_execution_time)",
+            _ORACLE_CALLS_MAX_EXECUTION_TIME_METRIC_NAME: "max(oracle_calls_execution_time)",
+            _ORACLE_CALLS_MEAN_EXECUTION_TIME_METRIC_NAME: "sum(oracle_calls_execution_time)/len(oracle_calls_execution_time)",
+        }
+        for metric_name, metric_calculation_code in metrics_to_log.items():
+            script_lines.append("run.log('{}', {})".format(metric_name, metric_calculation_code))
