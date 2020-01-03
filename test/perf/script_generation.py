@@ -143,4 +143,9 @@ def add_additional_metric_calculation(script_lines, perf_test_configuration):
             _ORACLE_CALLS_MEAN_EXECUTION_TIME_METRIC_NAME: "sum(oracle_calls_execution_time)/len(oracle_calls_execution_time)",
         }
         for metric_name, metric_calculation_code in metrics_to_log.items():
-            script_lines.append("run.log('{}', {})".format(metric_name, metric_calculation_code))
+            if metric_name == _ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME:
+                # lists require a special log method
+                log_method = "log_list"
+            else:
+                log_method = "log"
+            script_lines.append("run.{}('{}', {})".format(log_method, metric_name, metric_calculation_code))
