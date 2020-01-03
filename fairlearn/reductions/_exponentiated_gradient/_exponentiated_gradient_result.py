@@ -63,7 +63,7 @@ class ExponentiatedGradientResult:
     @property
     def oracle_calls_execution_time(self):
         """Measures the time it took to make the oracle calls.
-        
+
         :return: the execution times for all oracle calls
         :rtype: list of floats
         """

@@ -39,7 +39,7 @@ class GridSearchResult:
     @property
     def oracle_call_execution_time(self):
         """Measures the time it took to make the oracle call.
-        
+
         :return: the execution time of the oracle call
         :rtype: float
         """
