@@ -14,7 +14,7 @@ class ScrapSpec:
 
     @property
     def code(self):
-        """Return the code to be inserted (string)."""
+        """The code to be inserted (string)."""  # noqa:D401
         return self._code
 
     @code.setter
@@ -23,7 +23,7 @@ class ScrapSpec:
 
     @property
     def expected(self):
-        """Return the expected evaluation of the code (Python object)."""
+        """The expected evaluation of the code (Python object)."""  # noqa:D401
         return self._expected
 
     @expected.setter
@@ -51,6 +51,19 @@ def append_scrapbook_commands(input_nb_path, output_nb_path, scrap_specs):
 
 
 def assay_one_notebook(notebook_name, test_values):
+    """Test a single notebook.
+
+    This uses nbformat to append `nteract-scrapbook` commands to the
+    specified notebook. The content of the commands and their expected
+    values are stored in the `test_values` dictionary. The keys of this
+    dictionary are strings to be used as scrapbook keys. They corresponding
+    value is a `ScrapSpec` tuple. The `code` member of this tuple is
+    the code (as a string) to be run to generate the scrapbook value. The
+    `expected` member is a Python object which is checked for equality with
+    the scrapbook value
+
+    Makes certain assumptions about directory layout.
+    """
     input_notebook = "notebooks/" + notebook_name + ".ipynb"
     processed_notebook = "./test/notebooks/" + notebook_name + ".processed.ipynb"
     output_notebook = "./test/notebooks/" + notebook_name + ".output.ipynb"
