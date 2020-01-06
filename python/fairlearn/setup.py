@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import os
 from setuptools import setup, find_packages
 import fairlearn
 
-with open("README.md", "r") as fh:
+with open(os.path.join('..', '..', "README.md"), "r") as fh:
     long_description = fh.read()
 
 setup(
