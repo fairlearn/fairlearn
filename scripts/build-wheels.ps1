@@ -21,6 +21,7 @@ if( Test-Path env:FAIRLEARN_DEV_VERSION )
 }
 
 # Install ourselves
+pip install -e python/fairlearn-core/.
 pip install -e python/fairlearn/.
 
 # Update the ReadMe file
@@ -54,6 +55,8 @@ if ($LASTEXITCODE -ne 0)
 # Create the packages
 Write-Host
 Write-Host "Creating Packages"
+Write-Host (Get-Item -Path ".\").FullName
+python python/fairlearn-core/setup.py sdist bdist_wheel
 python python/fairlearn/setup.py sdist bdist_wheel
 
 Write-Host

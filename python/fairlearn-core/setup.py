@@ -5,7 +5,16 @@ import os
 from setuptools import setup, find_packages
 import fairlearn
 
-with open(os.path.join('..', '..', "README.md"), "r") as fh:
+# README lives in repository root
+if os.getcwd() == os.path.dirname(os.path.realpath(__file__)):
+    # look two levels up for README
+    readme_directory = os.path.join("..", "..")
+elif os.path.commonprefix([os.getcwd(), os.path.dirname(os.path.realpath(__file__))]) == os.getcwd():
+    readme_directory = os.getcwd()
+else:
+    raise Exception("Cannot locate README file. Please execute setup.py from repository root.")
+
+with open(os.path.join(readme_directory, "README.md"), "r") as fh:
     long_description = fh.read()
 
 setup(
@@ -26,14 +35,14 @@ setup(
         "scikit-learn>=0.21.3",
         "scipy>=1.3.1"
     ],
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha"
-    ),
+    ],
     include_package_data=True,
     zip_safe=False,
 )
