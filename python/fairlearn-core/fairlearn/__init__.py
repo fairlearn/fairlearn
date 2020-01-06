@@ -26,7 +26,7 @@ if _FAIRLEARN_DEV_VERSION_ENV_VAR in os.environ.keys():
         print(msg.format(dev_version_string, _FAIRLEARN_DEV_VERSION_ENV_VAR), file=sys.stderr)
 
 
-__name__ = "fairlearn"
+__name__ = "fairlearn-core"
 __version__ = "{0}{1}".format(_base_version, _dev_version)
 
 

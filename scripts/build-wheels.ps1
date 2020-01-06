@@ -21,7 +21,7 @@ if( Test-Path env:FAIRLEARN_DEV_VERSION )
 }
 
 # Install ourselves
-pip install -e .
+pip install -e python/fairlearn/.
 
 # Update the ReadMe file
 # Do this before setting FAIRLEARN_DEV_VERSION so that the links
@@ -43,7 +43,7 @@ if( $targetType -eq "Test" )
 }
 
 # Store fairlearn version (including FAIRLEARN_DEV_VERSION) in the specified file
-Write-Host "Storing fairlearn version i $versionFilename"
+Write-Host "Storing fairlearn version in $versionFilename"
 $versionScript = Join-Path -resolve scripts fairlearn_version.py
 python $versionScript > $versionFilename
 if ($LASTEXITCODE -ne 0)
@@ -54,7 +54,7 @@ if ($LASTEXITCODE -ne 0)
 # Create the packages
 Write-Host
 Write-Host "Creating Packages"
-python setup.py sdist bdist_wheel
+python python/fairlearn/setup.py sdist bdist_wheel
 
 Write-Host
 Write-Host "Package created"
