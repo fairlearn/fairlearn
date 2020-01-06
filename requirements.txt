@@ -16,9 +16,11 @@ flake8-rst-docstrings
 requirements-parser
 
 # Required for test
+papermill
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
+scrapbook
 tempeh==0.1.11
 wheel
 
