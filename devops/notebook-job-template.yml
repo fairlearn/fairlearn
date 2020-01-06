@@ -35,7 +35,7 @@ jobs:
   - script: pip install -e .
     displayName: 'Install fairlearn in edit mode'
 
-  - script: python -m pytest notebooks/ --nbval --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest test/notebooks/ --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run notebooks as tests'
 
   - task: PublishTestResults@2
