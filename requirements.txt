@@ -16,6 +16,7 @@ flake8-rst-docstrings
 requirements-parser
 
 # Required for test
+nbformat
 papermill
 # Pin pytest due to VS Code issue
 pytest==5.0.1
