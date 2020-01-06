@@ -20,7 +20,7 @@ papermill
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
-scrapbook
+nteract-scrapbook
 tempeh==0.1.11
 wheel
 
