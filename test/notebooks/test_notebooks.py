@@ -87,3 +87,16 @@ def test_group_metrics_notebook():
         "results.by_group", {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0})
 
     assay_one_notebook("Group Metrics", test_values)
+
+
+@pytest.mark.notebooks
+def test_grid_search_for_binary_classification():
+    nb_name = "Grid Search for Binary Classification"
+
+    test_values = {}
+    test_values["best_lambda_second_grid"] = ScrapSpec(
+        "lambda_best_second", pytest.approx(0.8333333333))
+    test_values["best_coeff_second0"] = ScrapSpec(
+        "second_sweep.best_result.predictor.coef_[0][0]", pytest.approx(2.53725364))
+
+    assay_one_notebook(nb_name, test_values)
