@@ -3,15 +3,19 @@
 
 """Utilities for plotting curves."""
 
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.colors
+try:
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
+    import matplotlib.colors
 
-tab10_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
-tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
-debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
-debug_ncolors = len(debug_colors)
-debug_colormap = {}
+    tab10_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
+    tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
+    debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
+    debug_ncolors = len(debug_colors)
+    debug_colormap = {}
+except ImportError:
+    print("Please install matplotlib to use postprocessing plots.")
+
 
 highlight_color = [0.95, 0.90, 0.40]
 

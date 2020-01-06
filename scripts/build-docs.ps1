@@ -17,7 +17,8 @@ try
     $scriptpath = Resolve-FullPath (Split-Path -parent $PSCommandPath)
     $rootpath = Resolve-FullPath ([System.IO.Path]::Combine($scriptpath, ".."))
 
-    $codepath = [System.IO.Path]::Combine($rootpath, "fairlearn")
+    $codepathfairlearncore = [System.IO.Path]::Combine($rootpath, "python", "fairlearn-core", "fairlearn")
+    $codepathfairlearn = [System.IO.Path]::Combine($rootpath, "python", "fairlearn", "fairlearn")
     $docbuildpath = [System.IO.Path]::Combine($rootpath, "docbuild")
     $docconfigpath = [System.IO.Path]::Combine($rootpath, "docs")
 
@@ -39,7 +40,8 @@ try
     New-Item "_templates" -ItemType Directory -Force
 
     Write-Host "Building API doc"
-    & sphinx-apidoc "$codepath" -o "$docbuildpath"
+    & sphinx-apidoc "$codepathfairlearncore" -o "$docbuildpath"
+    & sphinx-apidoc "$codepathfairlearn" -o "$docbuildpath"
 
     Write-Host "Building Docs" 
     & sphinx-build . _build

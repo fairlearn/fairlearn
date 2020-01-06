@@ -29,7 +29,6 @@ setup(
     packages=find_packages(),
     python_requires='>=3.5',
     install_requires=[
-        "matplotlib>=3.0.3",
         "numpy>=1.17.2",
         "pandas>=0.25.1",
         "scikit-learn>=0.21.3",
@@ -45,4 +44,9 @@ setup(
     ],
     include_package_data=True,
     zip_safe=False,
+    extras_require={
+        "postprocessingplot": [
+            "matplotlib>=3.0.3"
+        ]
+    }
 )
