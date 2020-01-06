@@ -7,6 +7,43 @@ import pytest
 import scrapbook as sb
 
 
+class ScrapSpec:
+    def __init__(self, key, command):
+        self.scrap_key = key
+        self.scrap_command = command
+
+    @property
+    def scrap_key(self):
+        return self._scrap_key
+
+    @scrap_key.setter
+    def scrap_key(self, value):
+        self._scrap_key = value
+
+    @property
+    def scrap_command(self):
+        return self._scrap_command
+
+    @scrap_command.setter
+    def scrap_command(self, value):
+        self._scrap_command = value
+
+
+def append_scrapbook_commands(input_nb_path, output_nb_path, scrap_specs):
+    notebook = nbf.read(input_nb_path, as_version=nbf.NO_CONVERT)
+
+    scrapbook_cells = []
+    scrapbook_cells.append(nbf.v4.new_code_cell(source="import scrapbook as sb"))
+
+    for s in scrap_specs:
+        source = "sb.glue(\"{0}\", {1})".format(s.scrap_key, s.scrap_command)
+        scrapbook_cells.append(nbf.v4.new_code_cell(source=source))
+
+    [notebook['cells'].append(c) for c in scrapbook_cells]
+
+    nbf.write(notebook, output_nb_path)
+
+
 @pytest.mark.notebooks
 def test_group_metrics_notebook():
     notebookname = "Group Metrics"
@@ -14,18 +51,11 @@ def test_group_metrics_notebook():
     processed_notebook = "./test/notebooks/" + notebookname + ".processed.ipynb"
     output_notebook = "./test/notebooks/" + notebookname + ".output.ipynb"
 
-    notebook = nbf.read(input_notebook, as_version=nbf.NO_CONVERT)
-    # sb.glue("overall_recall", group_metrics.overall)
-    # sb.glue("recall_by_groups", results.by_group)
-    scrapbook_cells = []
-    scrapbook_cells.append(nbf.v4.new_code_cell(source="import scrapbook as sb"))
-    scrapbook_cells.append(nbf.v4.new_code_cell(
-        source="sb.glue(\"overall_recall\", group_metrics.overall)"))
-    scrapbook_cells.append(nbf.v4.new_code_cell(
-        source="sb.glue(\"recall_by_groups\", results.by_group)"))
-    [notebook['cells'].append(c) for c in scrapbook_cells]
+    cmds = []
+    cmds.append(ScrapSpec("overall_recall", "group_metrics.overall"))
+    cmds.append(ScrapSpec("recall_by_groups", "results.by_group"))
 
-    nbf.write(notebook, processed_notebook)
+    append_scrapbook_commands(input_notebook, processed_notebook, cmds)
 
     pm.execute_notebook(processed_notebook, output_notebook)
 
