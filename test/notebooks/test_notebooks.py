@@ -121,3 +121,13 @@ def test_grid_search_with_census_data():
     test_values = {}
     test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 13)
     assay_one_notebook(nb_name, test_values)
+
+
+@pytest.mark.notebooks
+def test_mitigating_disparities_in_ranking_from_binary_data():
+    nb_name = "Mitigating Disparities in Ranking from Binary Data"
+    test_values = {}
+    test_values["sel_eg_X_alt_disparity"] = ScrapSpec(
+        "sel_expgrad_X_alt.loc[ 'disparity', :][0]",
+        pytest.approx(1.36446))
+    assay_one_notebook(nb_name, test_values)
