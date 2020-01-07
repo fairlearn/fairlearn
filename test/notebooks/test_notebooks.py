@@ -100,3 +100,16 @@ def test_grid_search_for_binary_classification():
         "second_sweep.best_result.predictor.coef_[0][0]", pytest.approx(2.53725364))
 
     assay_one_notebook(nb_name, test_values)
+
+
+@pytest.mark.notebooks
+def test_binary_classification_on_compas_dataset():
+    nb_name = "Binary Classification on COMPAS dataset"
+
+    test_values = {}
+    test_values["pp_eo_aa_pignore"] = ScrapSpec(
+        "postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature['African-American']._p_ignore",  # noqa: E501
+        pytest.approx(0.2320703126)
+    )
+
+    assay_one_notebook(nb_name, test_values)
