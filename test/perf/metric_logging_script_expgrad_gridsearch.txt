@@ -1,0 +1,25 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+assert 'mitigation_execution_time' in vars(), "mitigation_execution_time is expected to be defined"
+assert 'estimator_fit_execution_time' in vars(), "estimator_fit_execution_time is expected to be defined"
+assert 'n_oracle_calls' in vars(), "n_oracle_calls is expected to be defined"
+assert 'oracle_calls_execution_time' in vars(), "oracle_calls_execution_time is expected to be defined"
+
+sum_oracle_calls_execution_time = sum(oracle_calls_execution_time)
+
+# compare mitigation time with the unconstrained estimator fit time
+run.log('mitigation_time_overhead_vs_no_mitigation_absolute', mitigation_execution_time - estimator_fit_execution_time)
+run.log('mitigation_time_overhead_relative', mitigation_execution_time / estimator_fit_execution_time)
+
+# analyze the mitigation time without oracle calls
+mitigation_time_overhead_without_oracle_absolute = mitigation_execution_time - sum_oracle_calls_execution_time
+run.log('mitigation_time_overhead_without_oracle_absolute', mitigation_time_overhead_without_oracle_absolute)
+run.log('mitigation_time_overhead_without_oracle_relative', mitigation_time_overhead_without_oracle_absolute / mitigation_execution_time)
+
+run.log('n_oracle_calls', n_oracle_calls)
+run.log_list('oracle_calls_execution_time', oracle_calls_execution_time)
+run.log('oracle_calls_min_execution_time', min(oracle_calls_execution_time))
+run.log('oracle_calls_max_execution_time', max(oracle_calls_execution_time))
+run.log('oracle_calls_mean_execution_time', sum_oracle_calls_execution_time/len(oracle_calls_execution_time))
+run.log('oracle_calls_sum_execution_time', sum_oracle_calls_execution_time)
