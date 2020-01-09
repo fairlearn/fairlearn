@@ -8,7 +8,5 @@ Subpackages
 
 .. toctree::
 
-    fairlearn.exceptions
-    fairlearn.metrics
-    fairlearn.postprocessing
-    fairlearn.reductions
+    fairlearn.widget
+

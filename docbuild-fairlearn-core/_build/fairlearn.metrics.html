@@ -1,0 +1,481 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>fairlearn.metrics package &#8212; fairlearn 0.4.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="fairlearn.postprocessing package" href="fairlearn.postprocessing.html" />
+    <link rel="prev" title="fairlearn.exceptions module" href="fairlearn.exceptions.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-fairlearn.metrics">
+<span id="fairlearn-metrics-package"></span><h1>fairlearn.metrics package<a class="headerlink" href="#module-fairlearn.metrics" title="Permalink to this headline">¶</a></h1>
+<p>Functionality for computing metrics, with a particular focus on group metrics.</p>
+<p>For our purpose, a metric is a function with signature
+<code class="docutils literal notranslate"><span class="pre">f(y_true,</span> <span class="pre">y_pred,</span> <span class="pre">....)</span></code>
+where <code class="docutils literal notranslate"><span class="pre">y_true</span></code> are the set of true values and <code class="docutils literal notranslate"><span class="pre">y_pred</span></code> are
+values predicted by a machine learning algorithm. Other
+arguments may be present (most often sample weights), which will
+affect how the metric is calculated.</p>
+<p>The group metrics in this module have signatures
+<code class="docutils literal notranslate"><span class="pre">g(y_true,</span> <span class="pre">y_pred,</span> <span class="pre">group_membership,</span> <span class="pre">...)</span></code>
+where <code class="docutils literal notranslate"><span class="pre">group_membership</span></code> is an array of values indicating
+a group to which each pair of true and predicted values belong.
+The metric is evaluated for the entire set of data, and also
+for each subgroup identified in <code class="docutils literal notranslate"><span class="pre">group_membership</span></code>.</p>
+<dl class="class">
+<dt id="fairlearn.metrics.GroupMetricResult">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">GroupMetricResult</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to hold the result of a grouped metric.</p>
+<p>Grouped metrics are produced by the <a class="reference internal" href="#fairlearn.metrics.metric_by_group" title="fairlearn.metrics.metric_by_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">metric_by_group()</span></code></a>
+function.</p>
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.argmax_set">
+<em class="property">property </em><code class="sig-name descname">argmax_set</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.argmax_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the set of groups corresponding to the <code class="docutils literal notranslate"><span class="pre">minimum</span></code>.</p>
+<p>This is only set if the metric is a scalar, and will be
+a set of keys to tbe <code class="docutils literal notranslate"><span class="pre">by_group</span></code> dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.argmin_set">
+<em class="property">property </em><code class="sig-name descname">argmin_set</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.argmin_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the set of groups corresponding to the <code class="docutils literal notranslate"><span class="pre">minimum</span></code>.</p>
+<p>This is only set if the metric is a scalar, and will be
+a set of keys to tbe <code class="docutils literal notranslate"><span class="pre">by_group</span></code> dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.by_group">
+<em class="property">property </em><code class="sig-name descname">by_group</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.by_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the metric calculated for each sub-group in the dataset.</p>
+<p>This is a dictionary whose keys are the unique members of
+the <code class="docutils literal notranslate"><span class="pre">group_membership</span></code> data. The corresponding values are
+the result of applying the metric function to the set of
+<code class="docutils literal notranslate"><span class="pre">y_true</span></code> and <code class="docutils literal notranslate"><span class="pre">y_pred</span></code> entries for each key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.maximum">
+<em class="property">property </em><code class="sig-name descname">maximum</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.maximum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the maximum value of the metric in the <code class="docutils literal notranslate"><span class="pre">by_group</span></code> dictionary.</p>
+<p>This is only set if the metric is a scalar.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.minimum">
+<em class="property">property </em><code class="sig-name descname">minimum</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the minimum value of the metric in the <code class="docutils literal notranslate"><span class="pre">by_group</span></code> dictionary.</p>
+<p>This is only set if the metric is a scalar.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.overall">
+<em class="property">property </em><code class="sig-name descname">overall</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.overall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the metric calculated over the entire dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.range">
+<em class="property">property </em><code class="sig-name descname">range</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of <code class="code docutils literal notranslate"><span class="pre">maximum-minimum</span></code>.</p>
+<p>This is only set if the metric is a scalar.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.metrics.GroupMetricResult.range_ratio">
+<em class="property">property </em><code class="sig-name descname">range_ratio</code><a class="headerlink" href="#fairlearn.metrics.GroupMetricResult.range_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of <code class="code docutils literal notranslate"><span class="pre">minimum/maximum</span></code>.</p>
+<p>This is only set if the metric is a scalar.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.make_group_metric">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">make_group_metric</code><span class="sig-paren">(</span><em class="sig-param">metric_function</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.make_group_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn a regular metric into a grouped metric.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>metric_function</strong> (<em>func</em>) – The function to be wrapped. This must have signature
+<code class="docutils literal notranslate"><span class="pre">(y_true,</span> <span class="pre">y_pred,</span> <span class="pre">sample_weight)</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A wrapped version of the supplied metric_function. It will have
+signature <code class="docutils literal notranslate"><span class="pre">(y_true,</span> <span class="pre">y_pred,</span> <span class="pre">group_membership,</span> <span class="pre">sample_weight)</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>func</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.metric_by_group">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">metric_by_group</code><span class="sig-paren">(</span><em class="sig-param">metric_function</em>, <em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.metric_by_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a metric to each subgroup of a set of data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_function</strong> – Function with signature <code class="docutils literal notranslate"><span class="pre">(y_true,</span> <span class="pre">y_pred,</span> <span class="pre">sample_weight=None)</span></code>
+which returns a scalar</p></li>
+<li><p><strong>y_true</strong> – Array of ground-truth values</p></li>
+<li><p><strong>y_pred</strong> – Array of predicted values</p></li>
+<li><p><strong>group_membership</strong> – Array Indicating the group to which each input value belongs</p></li>
+<li><p><strong>sample_weight</strong> – Optional weights to apply to each input value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Object containing the result of applying <code class="docutils literal notranslate"><span class="pre">metric_function</span></code> to the entire dataset
+and to each group identified in <code class="docutils literal notranslate"><span class="pre">group_membership</span></code>.
+If the <code class="docutils literal notranslate"><span class="pre">metric_function</span></code> returns a scalar, then additional fields are populated</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fairlearn.metrics.GroupMetricResult" title="fairlearn.metrics.GroupMetricResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">GroupMetricResult</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.balanced_root_mean_squared_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">balanced_root_mean_squared_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.balanced_root_mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the mean of the root mean squared error (RMSE) for the positive and negative cases.</p>
+<p>Used for binary logistic regression, this computes the error as</p>
+<div class="math notranslate nohighlight">
+\[\frac{\text{RMSE}(Y=0) + \text{RMSE}(Y=1)}{2}\]</div>
+<p>The classes are constrained to be <span class="math notranslate nohighlight">\(\in {0, 1}\)</span>. The <code class="code docutils literal notranslate"><span class="pre">y_true</span></code> values must
+always be one of these, while <code class="code docutils literal notranslate"><span class="pre">y_pred</span></code> can be a continuous probability
+(which could be thresholded to get a predicted class).</p>
+<p>Internally, this builds on the
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.mean_squared_error()</span></code></a> routine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.fallout_rate">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">fallout_rate</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.fallout_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the fallout rate (also called the False Positive Rate).</p>
+<p>At the present time, this routine only supports binary
+classifiers with labels <span class="math notranslate nohighlight">\(\in {0, 1}\)</span>.
+By definition, this is the complement of the
+Specificity, and so uses <a class="reference internal" href="#fairlearn.metrics.specificity_score" title="fairlearn.metrics.specificity_score"><code class="xref py py-func docutils literal notranslate"><span class="pre">specificity_score()</span></code></a> in its
+calculation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.mean_prediction">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">mean_prediction</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.mean_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the (weighted) mean prediction.</p>
+<p>The true values are ignored, but required as an argument in order
+to maintain a consistent interface</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.mean_overprediction">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">mean_overprediction</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.mean_overprediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the (weighted) mean overprediction.</p>
+<p>This is the (weighted) mean of the error where any negative
+errors (i.e. underpredictions) are set to zero</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.mean_underprediction">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">mean_underprediction</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.mean_underprediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the (weighted) mean underprediction.</p>
+<p>This is the (weighted) mean of the error where any
+positive errors (i.e. overpredictions) are set to zero.
+The absolute value of the underpredictions is used, so the
+returned value is always positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.miss_rate">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">miss_rate</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.miss_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the miss rate (also called the False Negative Rate).</p>
+<p>At the present time, this routine only supports binary
+classifiers with labels <span class="math notranslate nohighlight">\(\in {0, 1}\)</span>.
+By definition, this is the complement of the True Positive
+Rate, so this routine uses the
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html#sklearn.metrics.recall_score" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.recall_score()</span></code></a> routine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.selection_rate">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">selection_rate</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">*</em>, <em class="sig-param">pos_label=1</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.selection_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the fraction of predicted labels matching the ‘good’ outcome.</p>
+<p>The argument <cite>pos_label</cite> specifies the ‘good’ outcome.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.specificity_score">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">specificity_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.specificity_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the specificity score (also called the True Negative Rate).</p>
+<p>At the present time, this routine only supports binary
+classifiers with labels <span class="math notranslate nohighlight">\(\in {0, 1}\)</span>.
+The calculation uses the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.confusion_matrix()</span></code></a> routine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_accuracy_score">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_accuracy_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">normalize=True</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_accuracy_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.accuracy_score()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_balanced_root_mean_squared_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_balanced_root_mean_squared_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_balanced_root_mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wrapper around the <a class="reference internal" href="#fairlearn.metrics.balanced_root_mean_squared_error" title="fairlearn.metrics.balanced_root_mean_squared_error"><code class="xref py py-func docutils literal notranslate"><span class="pre">balanced_root_mean_squared_error()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_confusion_matrix">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">labels=None</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.confusion_matrix()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_fallout_rate">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_fallout_rate</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_fallout_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped metric for the <a class="reference internal" href="#fairlearn.metrics.fallout_rate" title="fairlearn.metrics.fallout_rate"><code class="xref py py-func docutils literal notranslate"><span class="pre">fallout_rate()</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_max_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_max_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_max_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wrapper around the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.max_error.html#sklearn.metrics.max_error" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.max_error()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_mean_absolute_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_mean_absolute_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_mean_absolute_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wrapper around the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html#sklearn.metrics.mean_absolute_error" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.mean_absolute_error()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_mean_prediction">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_mean_prediction</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_mean_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wrapper around the <a class="reference internal" href="#fairlearn.metrics.mean_prediction" title="fairlearn.metrics.mean_prediction"><code class="xref py py-func docutils literal notranslate"><span class="pre">mean_prediction()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_mean_overprediction">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_mean_overprediction</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_mean_overprediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wrapper around the <a class="reference internal" href="#fairlearn.metrics.mean_overprediction" title="fairlearn.metrics.mean_overprediction"><code class="xref py py-func docutils literal notranslate"><span class="pre">mean_overprediction()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_mean_squared_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_mean_squared_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">multioutput='uniform_average'</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.mean_squared_error()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_mean_squared_log_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_mean_squared_log_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_mean_squared_log_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wrapper around the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_log_error.html#sklearn.metrics.mean_squared_log_error" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.mean_squared_log_error()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_mean_underprediction">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_mean_underprediction</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_mean_underprediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wapper around the <a class="reference internal" href="#fairlearn.metrics.mean_underprediction" title="fairlearn.metrics.mean_underprediction"><code class="xref py py-func docutils literal notranslate"><span class="pre">mean_underprediction()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_median_absolute_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_median_absolute_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_median_absolute_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped wrapper around the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.median_absolute_error.html#sklearn.metrics.median_absolute_error" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.median_absolute_error()</span></code></a> routine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_miss_rate">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_miss_rate</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_miss_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped metric for the <a class="reference internal" href="#fairlearn.metrics.miss_rate" title="fairlearn.metrics.miss_rate"><code class="xref py py-func docutils literal notranslate"><span class="pre">miss_rate()</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_precision_score">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_precision_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">labels=None</em>, <em class="sig-param">pos_label=1</em>, <em class="sig-param">average='binary'</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_precision_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html#sklearn.metrics.precision_score" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.precision_score()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_r2_score">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_r2_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">multioutput='uniform_average'</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_r2_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html#sklearn.metrics.r2_score" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.r2_score()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_recall_score">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_recall_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">labels=None</em>, <em class="sig-param">pos_label=1</em>, <em class="sig-param">average='binary'</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_recall_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html#sklearn.metrics.recall_score" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.recall_score()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_roc_auc_score">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_roc_auc_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">average='macro'</em>, <em class="sig-param">max_fpr=None</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_roc_auc_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.roc_auc_score()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_root_mean_squared_error">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_root_mean_squared_error</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">multioutput='uniform_average'</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_root_mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.mean_squared_error()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+The result is then square rooted.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_selection_rate">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_selection_rate</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">pos_label=1</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_selection_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap <a class="reference internal" href="#fairlearn.metrics.selection_rate" title="fairlearn.metrics.selection_rate"><code class="xref py py-func docutils literal notranslate"><span class="pre">selection_rate()</span></code></a> as a group metric.</p>
+<p>The arguments are the same, with the addition of the
+<cite>group_membership</cite> array.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_specificity_score">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_specificity_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_specificity_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>A grouped metric for the <a class="reference internal" href="#fairlearn.metrics.specificity_score" title="fairlearn.metrics.specificity_score"><code class="xref py py-func docutils literal notranslate"><span class="pre">specificity_score()</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fairlearn.metrics.group_zero_one_loss">
+<code class="sig-prename descclassname">fairlearn.metrics.</code><code class="sig-name descname">group_zero_one_loss</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">group_membership</em>, <em class="sig-param">*</em>, <em class="sig-param">normalize=True</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.metrics.group_zero_one_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.zero_one_loss.html#sklearn.metrics.zero_one_loss" title="(in scikit-learn v0.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.zero_one_loss()</span></code></a> routine.</p>
+<p>The arguments remain the same, with <cite>group_membership</cite> added.
+However, the only positional arguments supported are <cite>y_true</cite>,
+<cite>y_pred</cite> and <cite>group_membership</cite>.
+All others must be specified by name.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">fairlearn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.exceptions.html">fairlearn.exceptions module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">fairlearn.metrics package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.postprocessing.html">fairlearn.postprocessing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.reductions.html">fairlearn.reductions package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="fairlearn.exceptions.html" title="previous chapter">fairlearn.exceptions module</a></li>
+      <li>Next: <a href="fairlearn.postprocessing.html" title="next chapter">fairlearn.postprocessing package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Microsoft Corporation..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/fairlearn.metrics.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -25,7 +25,7 @@ try
 
     $codepath = [System.IO.Path]::Combine($rootpath, "python", $package, "fairlearn")
     $docbuildpath = [System.IO.Path]::Combine($rootpath, "docbuild-$package")
-    $docconfigpathfairlearn = [System.IO.Path]::Combine($rootpath, "docs", $package)
+    $docconfigpath = [System.IO.Path]::Combine($rootpath, "docs", $package)
 
     # Make sure we have a clean slate
     Remove-Item -Path $docbuildpath -Recurse -Force -ErrorAction SilentlyContinue
@@ -34,6 +34,7 @@ try
     Set-Location -Path $rootpath
 
     # Copy the doc configurations to the build path
+    Copy-Item $docconfigpath/../conf.py -Destination $docconfigpath
     Copy-Item $docconfigpath -Destination "$docbuildpath" -Recurse -Force
 
     # Move into the docbuild directory

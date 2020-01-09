@@ -125,3 +125,7 @@ test/perf/scripts/**
 # copied README files
 python/fairlearn/README.md
 python/fairlearn-core/README.md
+
+# copied conf.py files from doc generation
+docs/fairlearn/conf.py
+docs/fairlearn-core/conf.py

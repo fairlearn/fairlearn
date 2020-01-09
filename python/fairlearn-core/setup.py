@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from setuptools import setup, find_packages
-import fairlearn
+import fairlearn_core
 
 
 # README lives in repository root, copy over before running setup.py
@@ -10,8 +10,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name=fairlearn.__name__,
-    version=fairlearn.__version__,
+    name=fairlearn_core.__name__,
+    version=fairlearn_core.__version__,
     author="Miroslav Dudik, Richard Edgar, Brandon Horn, Roman Lutz",
     author_email="fairlearn@microsoft.com",
     description="Algorithms for mitigating unfairness in supervised machine learning",

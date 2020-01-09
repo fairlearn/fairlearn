@@ -1,0 +1,612 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>fairlearn.reductions package &#8212; fairlearn 0.4.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="fairlearn.postprocessing package" href="fairlearn.postprocessing.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-fairlearn.reductions">
+<span id="fairlearn-reductions-package"></span><h1>fairlearn.reductions package<a class="headerlink" href="#module-fairlearn.reductions" title="Permalink to this headline">¶</a></h1>
+<p>This module contains algorithms implementing the reductions approach to disparity mitigation.</p>
+<p>In this approach, disparity constraints are cast as Lagrange multipliers, which cause the
+reweighting and relabelling of the input data. This <em>reduces</em> the problem back to standard machine
+learning training.</p>
+<dl class="class">
+<dt id="fairlearn.reductions.Reduction">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">Reduction</code><a class="headerlink" href="#fairlearn.reductions.Reduction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for our reduction-implementing estimators.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.Reduction.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.Reduction.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.Reduction.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.Reduction.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.Reduction.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.Reduction.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.ExponentiatedGradient">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">ExponentiatedGradient</code><span class="sig-paren">(</span><em class="sig-param">estimator</em>, <em class="sig-param">constraints</em>, <em class="sig-param">eps=0.01</em>, <em class="sig-param">T=50</em>, <em class="sig-param">nu=None</em>, <em class="sig-param">eta_mul=2.0</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.Reduction" title="fairlearn.reductions.Reduction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.Reduction</span></code></a></p>
+<p>An Estimator which implements the exponentiated gradient approach to reductions.</p>
+<p>The exponentiated gradient algorithm is described in detail by
+<a class="reference external" href="https://arxiv.org/abs/1803.02453">Agarwal et al. (2018)</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<em>estimator</em>) – An estimator implementing methods <code class="code docutils literal notranslate"><span class="pre">fit(X,</span> <span class="pre">y,</span> <span class="pre">sample_weight)</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">predict(X)</span></code>, where <cite>X</cite> is the matrix of features, <cite>y</cite> is the vector of labels, and
+<cite>sample_weight</cite> is a vector of weights; labels <cite>y</cite> and predictions returned by
+<code class="code docutils literal notranslate"><span class="pre">predict(X)</span></code> are either 0 or 1.</p></li>
+<li><p><strong>constraints</strong> (<a class="reference internal" href="#fairlearn.reductions.Moment" title="fairlearn.reductions.Moment"><em>fairlearn.reductions.Moment</em></a>) – The disparity constraints expressed as moments</p></li>
+<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Allowed fairness constraint violation; the solution best_classifier is
+guaranteed to have the classification error within <code class="code docutils literal notranslate"><span class="pre">2*best_gap</span></code> of the best error
+under constraint eps; the constraint violation is at most <code class="code docutils literal notranslate"><span class="pre">2*(eps+best_gap)</span></code></p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Maximum number of iterations</p></li>
+<li><p><strong>nu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Convergence threshold for the duality gap, corresponding to a
+conservative automatic setting based on the statistical uncertainty in measuring
+classification error</p></li>
+<li><p><strong>eta_mul</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Initial setting of the learning rate</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradient.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradient.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a fair classifier under specified fairness constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – The feature matrix</p></li>
+<li><p><strong>y</strong> (<em>numpy.ndarray</em><em>, </em><em>pandas.DataFrame</em><em>, </em><em>pandas.Series</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – The label vector</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradient.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradient.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a prediction for the given input data.</p>
+<p>Note that this is non-deterministic, due to the nature of the
+exponentiated gradient algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – Feature data</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The prediction. If <cite>X</cite> represents the data for a single example
+the result will be a scalar. Otherwise the result will be a vector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Scalar or vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">ExponentiatedGradientResult</code><span class="sig-paren">(</span><em class="sig-param">best_classifier</em>, <em class="sig-param">best_gap</em>, <em class="sig-param">lagrangian</em>, <em class="sig-param">weights</em>, <em class="sig-param">last_t</em>, <em class="sig-param">best_t</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to hold the result of an <cite>ExponentiatedGradient</cite> estimator.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.best_classifier">
+<em class="property">property </em><code class="sig-name descname">best_classifier</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.best_classifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the best classifier found by the algorithm.</p>
+<p>A function that maps a DataFrame <cite>X</cite> containing covariates to a Series containing the
+corresponding probabilistic decisions in <span class="math notranslate nohighlight">\([0,1]\)</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.best_gap">
+<em class="property">property </em><code class="sig-name descname">best_gap</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.best_gap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the quality of <cite>best_classifier</cite>.</p>
+<p>If the algorithm has converged then <code class="code docutils literal notranslate"><span class="pre">best_gap</span> <span class="pre">&lt;=</span> <span class="pre">nu</span></code>;
+the solution <cite>best_classifier</cite> is guaranteed to have the classification error within
+<code class="code docutils literal notranslate"><span class="pre">2*best_gap</span></code> of the best error under constraint <cite>eps</cite>; the constraint violation
+is at most <code class="code docutils literal notranslate"><span class="pre">2*(eps+best_gap)</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.best_t">
+<em class="property">property </em><code class="sig-name descname">best_t</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.best_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the iteration in which best_classifier was obtained.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.classifiers">
+<em class="property">property </em><code class="sig-name descname">classifiers</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.classifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the base classifiers generated (instances of estimator).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.last_t">
+<em class="property">property </em><code class="sig-name descname">last_t</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.last_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the last executed iteration; always <code class="code docutils literal notranslate"><span class="pre">last_t</span> <span class="pre">&lt;</span> <span class="pre">T</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.n_oracle_calls">
+<em class="property">property </em><code class="sig-name descname">n_oracle_calls</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.n_oracle_calls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of times the estimator was called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.oracle_calls_execution_time">
+<em class="property">property </em><code class="sig-name descname">oracle_calls_execution_time</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.oracle_calls_execution_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the time it took to make the oracle calls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the execution times for all oracle calls</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ExponentiatedGradientResult.weights">
+<em class="property">property </em><code class="sig-name descname">weights</code><a class="headerlink" href="#fairlearn.reductions.ExponentiatedGradientResult.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the weights of those classifiers within <cite>best_classifier</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.GridSearch">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">GridSearch</code><span class="sig-paren">(</span><em class="sig-param">estimator</em>, <em class="sig-param">constraints</em>, <em class="sig-param">selection_rule='tradeoff_optimization'</em>, <em class="sig-param">constraint_weight=0.5</em>, <em class="sig-param">grid_size=10</em>, <em class="sig-param">grid_limit=2.0</em>, <em class="sig-param">grid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.GridSearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.Reduction" title="fairlearn.reductions.Reduction"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.Reduction</span></code></a></p>
+<p>Estimator to perform a grid search given a blackbox estimator algorithm.</p>
+<p>The approach used is taken from section 3.4 of
+<a class="reference external" href="https://arxiv.org/abs/1803.02453">Agarwal et al. (2018)</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<em>estimator</em>) – An estimator implementing methods <code class="code docutils literal notranslate"><span class="pre">fit(X,</span> <span class="pre">y,</span> <span class="pre">sample_weight)</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">predict(X)</span></code>, where <cite>X</cite> is the matrix of features, <cite>y</cite> is the vector of labels, and
+<cite>sample_weight</cite> is a vector of weights; labels <cite>y</cite> and predictions returned by
+<code class="code docutils literal notranslate"><span class="pre">predict(X)</span></code> are either 0 or 1.</p></li>
+<li><p><strong>constraints</strong> (<a class="reference internal" href="#fairlearn.reductions.Moment" title="fairlearn.reductions.Moment"><em>fairlearn.reductions.Moment</em></a>) – The disparity constraints expressed as moments.</p></li>
+<li><p><strong>selection_rule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Specifies the procedure for selecting the best model found by the
+grid search. At the present time, the only valid value is “tradeoff_optimization” which
+minimises a weighted sum of the error rate and constraint violation.</p></li>
+<li><p><strong>constraint_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – When the <cite>selection_rule</cite> is “tradeoff_optimization” this specifies
+the relative weight put on the constraint violation when selecting the best model.
+The weight placed on the error rate will be <code class="code docutils literal notranslate"><span class="pre">1-constraint_weight</span></code></p></li>
+<li><p><strong>grid_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of Lagrange multipliers to generate in the grid</p></li>
+<li><p><strong>grid_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The largest Lagrange multiplier to generate. The grid will contain values
+distributed between <code class="code docutils literal notranslate"><span class="pre">-grid_limit</span></code> and <code class="code docutils literal notranslate"><span class="pre">grid_limit</span></code> by default</p></li>
+<li><p><strong>grid</strong> – Instead of supplying a size and limit for the grid, users may specify the exact
+set of Lagrange multipliers they desire using this argument.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearch.all_results">
+<em class="property">property </em><code class="sig-name descname">all_results</code><a class="headerlink" href="#fairlearn.reductions.GridSearch.all_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of <a class="reference internal" href="#fairlearn.reductions.GridSearchResult" title="fairlearn.reductions.GridSearchResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridSearchResult</span></code></a> from each point in the grid.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearch.best_result">
+<em class="property">property </em><code class="sig-name descname">best_result</code><a class="headerlink" href="#fairlearn.reductions.GridSearch.best_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the best result found from the grid search.</p>
+<p>The predictor contained in this instance of
+<a class="reference internal" href="#fairlearn.reductions.GridSearchResult" title="fairlearn.reductions.GridSearchResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridSearchResult</span></code></a> is used in calls to
+<code class="code docutils literal notranslate"><span class="pre">predict</span></code> and <code class="code docutils literal notranslate"><span class="pre">predict_proba</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearch.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.GridSearch.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the grid search.</p>
+<p>This will result in multiple copies of the
+estimator being made, and the <code class="code docutils literal notranslate"><span class="pre">fit(X)</span></code> method
+of each one called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – The feature matrix</p></li>
+<li><p><strong>y</strong> (<em>numpy.ndarray</em><em>, </em><em>pandas.DataFrame</em><em>, </em><em>pandas.Series</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – The label vector</p></li>
+<li><p><strong>sensitive_features</strong> (<em>numpy.ndarray</em><em>, </em><em>pandas.DataFrame</em><em>, </em><em>pandas.Series</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em> (</em><em>for now</em><em>)</em>) – A (currently) required keyword argument listing the
+feature used by the constraints object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearch.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.GridSearch.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a prediction using the best model found by the grid search.</p>
+<p>This dispatches <cite>X</cite> to the <code class="code docutils literal notranslate"><span class="pre">predict(X)</span></code> method of the
+selected estimator, and hence the return type is dependent on that method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – Feature data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearch.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.GridSearch.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide the result of <code class="code docutils literal notranslate"><span class="pre">predict_proba</span></code> from the best model found by the grid search.</p>
+<p>The underlying estimator must support <code class="code docutils literal notranslate"><span class="pre">predict_proba(X)</span></code> for this
+to work. The return type is determined by this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – Feature data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.GridSearchResult">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">GridSearchResult</code><span class="sig-paren">(</span><em class="sig-param">predictor</em>, <em class="sig-param">lambda_vec</em>, <em class="sig-param">objective</em>, <em class="sig-param">gamma</em>, <em class="sig-param">oracle_call_execution_time</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.GridSearchResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to hold a single result from the <a class="reference internal" href="#fairlearn.reductions.GridSearch" title="fairlearn.reductions.GridSearch"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridSearch</span></code></a> class.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearchResult.gamma">
+<em class="property">property </em><code class="sig-name descname">gamma</code><a class="headerlink" href="#fairlearn.reductions.GridSearchResult.gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description goes here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearchResult.lambda_vec">
+<em class="property">property </em><code class="sig-name descname">lambda_vec</code><a class="headerlink" href="#fairlearn.reductions.GridSearchResult.lambda_vec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Lagrange multiplier corresponding to this result.</p>
+<p>The exact contents of this are defined by the <cite>constraints</cite>
+argument passed to <a class="reference internal" href="#fairlearn.reductions.GridSearch" title="fairlearn.reductions.GridSearch"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridSearch</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearchResult.objective">
+<em class="property">property </em><code class="sig-name descname">objective</code><a class="headerlink" href="#fairlearn.reductions.GridSearchResult.objective" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description goes here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearchResult.oracle_call_execution_time">
+<em class="property">property </em><code class="sig-name descname">oracle_call_execution_time</code><a class="headerlink" href="#fairlearn.reductions.GridSearchResult.oracle_call_execution_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the time it took to make the oracle call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the execution time of the oracle call</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.GridSearchResult.predictor">
+<em class="property">property </em><code class="sig-name descname">predictor</code><a class="headerlink" href="#fairlearn.reductions.GridSearchResult.predictor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the predictor trained for this particular result from <a class="reference internal" href="#fairlearn.reductions.GridSearch" title="fairlearn.reductions.GridSearch"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridSearch</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.AbsoluteLoss">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">AbsoluteLoss</code><span class="sig-paren">(</span><em class="sig-param">min_val</em>, <em class="sig-param">max_val</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.AbsoluteLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to evaluate absolute loss.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.AbsoluteLoss.eval">
+<code class="sig-name descname">eval</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.AbsoluteLoss.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the absolute loss for the given set of true and predicted values.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.Moment">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">Moment</code><a class="headerlink" href="#fairlearn.reductions.Moment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Generic moment.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.Moment.gamma">
+<code class="sig-name descname">gamma</code><span class="sig-paren">(</span><em class="sig-param">predictor</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.Moment.gamma" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.Moment.load_data">
+<code class="sig-name descname">load_data</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.Moment.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a set of data for use by this object.</p>
+<p>The keyword arguments can contain a <code class="code docutils literal notranslate"><span class="pre">sensitive_features</span></code> array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array</em>) – The feature data</p></li>
+<li><p><strong>y</strong> (<em>array</em>) – The true label data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.Moment.project_lambda">
+<code class="sig-name descname">project_lambda</code><span class="sig-paren">(</span><em class="sig-param">lambda_vec</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.Moment.project_lambda" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.Moment.signed_weights">
+<code class="sig-name descname">signed_weights</code><span class="sig-paren">(</span><em class="sig-param">lambda_vec</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.Moment.signed_weights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.ClassificationMoment">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">ClassificationMoment</code><a class="headerlink" href="#fairlearn.reductions.ClassificationMoment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.Moment" title="fairlearn.reductions.Moment"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.Moment</span></code></a></p>
+<p>Moment that can be expressed as weighted classification error.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.ConditionalSelectionRate">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">ConditionalSelectionRate</code><a class="headerlink" href="#fairlearn.reductions.ConditionalSelectionRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.ClassificationMoment" title="fairlearn.reductions.ClassificationMoment"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.ClassificationMoment</span></code></a></p>
+<p>Generic fairness moment for selection rates.</p>
+<p>This serves as the base class for both <a class="reference internal" href="#fairlearn.reductions.DemographicParity" title="fairlearn.reductions.DemographicParity"><code class="xref py py-class docutils literal notranslate"><span class="pre">DemographicParity</span></code></a>
+and <a class="reference internal" href="#fairlearn.reductions.EqualizedOdds" title="fairlearn.reductions.EqualizedOdds"><code class="xref py py-class docutils literal notranslate"><span class="pre">EqualizedOdds</span></code></a>.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.ConditionalSelectionRate.default_objective">
+<code class="sig-name descname">default_objective</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ConditionalSelectionRate.default_objective" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the default objective for moments of this kind.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ConditionalSelectionRate.gamma">
+<code class="sig-name descname">gamma</code><span class="sig-paren">(</span><em class="sig-param">predictor</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ConditionalSelectionRate.gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the degree to which constraints are currently violated by the predictor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ConditionalSelectionRate.load_data">
+<code class="sig-name descname">load_data</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">event=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ConditionalSelectionRate.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the specified data into this object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ConditionalSelectionRate.project_lambda">
+<code class="sig-name descname">project_lambda</code><span class="sig-paren">(</span><em class="sig-param">lambda_vec</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ConditionalSelectionRate.project_lambda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the projected lambda values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ConditionalSelectionRate.signed_weights">
+<code class="sig-name descname">signed_weights</code><span class="sig-paren">(</span><em class="sig-param">lambda_vec</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ConditionalSelectionRate.signed_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the signed weights.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.DemographicParity">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">DemographicParity</code><a class="headerlink" href="#fairlearn.reductions.DemographicParity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.ConditionalSelectionRate" title="fairlearn.reductions.ConditionalSelectionRate"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.ConditionalSelectionRate</span></code></a></p>
+<p>Implementation of Demographic Parity as a moment.</p>
+<p>A classifier <span class="math notranslate nohighlight">\(h(X)\)</span> satisfies DemographicParity if</p>
+<div class="math notranslate nohighlight">
+\[P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'\]</div>
+<dl class="method">
+<dt id="fairlearn.reductions.DemographicParity.load_data">
+<code class="sig-name descname">load_data</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.DemographicParity.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the specified data into the object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fairlearn.reductions.DemographicParity.short_name">
+<code class="sig-name descname">short_name</code><em class="property"> = 'DemographicParity'</em><a class="headerlink" href="#fairlearn.reductions.DemographicParity.short_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.EqualizedOdds">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">EqualizedOdds</code><a class="headerlink" href="#fairlearn.reductions.EqualizedOdds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.ConditionalSelectionRate" title="fairlearn.reductions.ConditionalSelectionRate"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.ConditionalSelectionRate</span></code></a></p>
+<p>Implementation of Equalized Odds as a moment.</p>
+<p>Adds conditioning on label compared to Demographic parity, i.e.</p>
+<div class="math notranslate nohighlight">
+\[P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'\]</div>
+<dl class="method">
+<dt id="fairlearn.reductions.EqualizedOdds.load_data">
+<code class="sig-name descname">load_data</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.EqualizedOdds.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the specified data into the object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fairlearn.reductions.EqualizedOdds.short_name">
+<code class="sig-name descname">short_name</code><em class="property"> = 'EqualizedOdds'</em><a class="headerlink" href="#fairlearn.reductions.EqualizedOdds.short_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.ErrorRate">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">ErrorRate</code><a class="headerlink" href="#fairlearn.reductions.ErrorRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.ClassificationMoment" title="fairlearn.reductions.ClassificationMoment"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.ClassificationMoment</span></code></a></p>
+<p>Misclassification error.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.ErrorRate.gamma">
+<code class="sig-name descname">gamma</code><span class="sig-paren">(</span><em class="sig-param">predictor</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ErrorRate.gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the gamma values for the given predictor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ErrorRate.load_data">
+<code class="sig-name descname">load_data</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ErrorRate.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the specified data into the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ErrorRate.project_lambda">
+<code class="sig-name descname">project_lambda</code><span class="sig-paren">(</span><em class="sig-param">lambda_vec</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ErrorRate.project_lambda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the lambda values.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fairlearn.reductions.ErrorRate.short_name">
+<code class="sig-name descname">short_name</code><em class="property"> = 'Err'</em><a class="headerlink" href="#fairlearn.reductions.ErrorRate.short_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.reductions.ErrorRate.signed_weights">
+<code class="sig-name descname">signed_weights</code><span class="sig-paren">(</span><em class="sig-param">lambda_vec=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.ErrorRate.signed_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the signed weights.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.GroupLossMoment">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">GroupLossMoment</code><span class="sig-paren">(</span><em class="sig-param">loss</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.GroupLossMoment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.ConditionalLossMoment</span></code></p>
+<p>Moment for Group Loss.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.LossMoment">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">LossMoment</code><span class="sig-paren">(</span><em class="sig-param">loss</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.LossMoment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.Moment" title="fairlearn.reductions.Moment"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.Moment</span></code></a></p>
+<p>Moment that can be expressed as weighted loss.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.SquareLoss">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">SquareLoss</code><span class="sig-paren">(</span><em class="sig-param">min_val</em>, <em class="sig-param">max_val</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.SquareLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to evaluate the square loss.</p>
+<dl class="method">
+<dt id="fairlearn.reductions.SquareLoss.eval">
+<code class="sig-name descname">eval</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.reductions.SquareLoss.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the square loss for the given set of true and predicted values.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.reductions.ZeroOneLoss">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.reductions.</code><code class="sig-name descname">ZeroOneLoss</code><a class="headerlink" href="#fairlearn.reductions.ZeroOneLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.reductions.AbsoluteLoss" title="fairlearn.reductions.AbsoluteLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.reductions.AbsoluteLoss</span></code></a></p>
+<p>Class to evaluate a zero-one loss.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">fairlearn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.exceptions.html">fairlearn.exceptions module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.metrics.html">fairlearn.metrics package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.postprocessing.html">fairlearn.postprocessing package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">fairlearn.reductions package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="fairlearn.postprocessing.html" title="previous chapter">fairlearn.postprocessing package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Microsoft Corporation..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/fairlearn.reductions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>fairlearn.postprocessing package &#8212; fairlearn 0.4.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="fairlearn.reductions package" href="fairlearn.reductions.html" />
+    <link rel="prev" title="fairlearn.metrics package" href="fairlearn.metrics.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-fairlearn.postprocessing">
+<span id="fairlearn-postprocessing-package"></span><h1>fairlearn.postprocessing package<a class="headerlink" href="#module-fairlearn.postprocessing" title="Permalink to this headline">¶</a></h1>
+<p>This module contains methods which operate on a predictor, rather than an estimator.</p>
+<p>The predictor’s output is adjusted to fulfill specified parity constraints. The postprocessors
+learn how to adjust the predictor’s output from the training data.</p>
+<dl class="class">
+<dt id="fairlearn.postprocessing.PostProcessing">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.postprocessing.</code><code class="sig-name descname">PostProcessing</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">unconstrained_predictor=None</em>, <em class="sig-param">estimator=None</em>, <em class="sig-param">constraints=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.postprocessing.PostProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Abstract base class for postprocessing approaches for disparity mitigation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unconstrained_predictor</strong> – A predictor with a <code class="code docutils literal notranslate"><span class="pre">predict(X)</span></code> method that has already
+been trained on the training data; the predictor will subsequently be used in the mitigator
+for unconstrained predictions; can only be specified if <cite>estimator</cite> is <cite>None</cite></p></li>
+<li><p><strong>estimator</strong> (<em>estimator</em>) – An estimator implementing <code class="code docutils literal notranslate"><span class="pre">fit(X,</span> <span class="pre">y)</span></code> and <code class="code docutils literal notranslate"><span class="pre">predict(X)</span></code> methods
+that will be trained on the training data and subsequently used in the mitigator for
+unconstrained predictions; can only be specified if <cite>unconstrainted_predictor</cite> is <cite>None</cite></p></li>
+<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the parity constraints to be enforced represented as a string</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="fairlearn.postprocessing.PostProcessing.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">*</em>, <em class="sig-param">sensitive_features</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.postprocessing.PostProcessing.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits the model.</p>
+<p>The fit is based on training features and labels, sensitive features,
+as well as the fairness-unaware predictor or estimator. If an estimator was passed
+in the constructor this fit method will call <code class="code docutils literal notranslate"><span class="pre">fit(X,</span> <span class="pre">y,</span> <span class="pre">**kwargs)</span></code> on said
+estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – Feature matrix</p></li>
+<li><p><strong>y</strong> (<em>numpy.ndarray</em><em>, </em><em>pandas.DataFrame</em><em>, </em><em>pandas.Series</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Label vector</p></li>
+<li><p><strong>sensitive_features</strong> (<em>currently 1D array as numpy.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>pandas.DataFrame</em><em>,
+or </em><em>pandas.Series</em>) – Sensitive features to identify groups by, currently allows
+only a single column</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.postprocessing.PostProcessing.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">*</em>, <em class="sig-param">sensitive_features</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.postprocessing.PostProcessing.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict label for each sample in <cite>X</cite> while taking into account sensitive features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – Feature matrix</p></li>
+<li><p><strong>sensitive_features</strong> (<em>Currently 1D array as numpy.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>pandas.DataFrame</em><em>,
+or </em><em>pandas.Series</em>) – Sensitive features to identify groups by, currently allows
+only a single column</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>predictions in numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fairlearn.postprocessing.ThresholdOptimizer">
+<em class="property">class </em><code class="sig-prename descclassname">fairlearn.postprocessing.</code><code class="sig-name descname">ThresholdOptimizer</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">unconstrained_predictor=None</em>, <em class="sig-param">estimator=None</em>, <em class="sig-param">constraints='demographic_parity'</em>, <em class="sig-param">grid_size=1000</em>, <em class="sig-param">flip=True</em>, <em class="sig-param">plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.postprocessing.ThresholdOptimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fairlearn.postprocessing.PostProcessing" title="fairlearn.postprocessing.PostProcessing"><code class="xref py py-class docutils literal notranslate"><span class="pre">fairlearn.postprocessing.PostProcessing</span></code></a></p>
+<p>An Estimator based on the threshold optimization approach.</p>
+<p>The procedure followed is described in detail in
+<a class="reference external" href="https://arxiv.org/abs/1610.02413">Hardt et al. (2016)</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unconstrained_predictor</strong> (<em>A trained predictor</em>) – The trained predictor whose output will be post processed</p></li>
+<li><p><strong>estimator</strong> (<em>An untrained estimator</em>) – An untrained estimator that will be trained, and
+subsequently its output will be post processed</p></li>
+<li><p><strong>grid_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of ticks on the grid over which we evaluate the curves.
+A large grid_size means that we approximate the actual curve, so it increases the chance
+of being very close to the actual best solution.</p></li>
+<li><p><strong>flip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Allow flipping to negative weights if it improves accuracy.</p></li>
+<li><p><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Show ROC/selection-error plot if True</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="fairlearn.postprocessing.ThresholdOptimizer.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">*</em>, <em class="sig-param">sensitive_features</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.postprocessing.ThresholdOptimizer.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the model.</p>
+<p>The fit is based on training features and labels, sensitive features,
+as well as the fairness-unaware predictor or estimator. If an estimator was passed
+in the constructor this fit method will call <cite>fit(X, y, **kwargs)</cite> on said estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – The feature matrix</p></li>
+<li><p><strong>y</strong> (<em>numpy.ndarray</em><em>, </em><em>pandas.DataFrame</em><em>, </em><em>pandas.Series</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – The label vector</p></li>
+<li><p><strong>sensitive_features</strong> (<em>currently 1D array as numpy.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>pandas.DataFrame</em><em>,
+or </em><em>pandas.Series</em>) – sensitive features to identify groups by, currently allows
+only a single column</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fairlearn.postprocessing.ThresholdOptimizer.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">*</em>, <em class="sig-param">sensitive_features</em>, <em class="sig-param">random_state=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fairlearn.postprocessing.ThresholdOptimizer.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict label for each sample in X while taking into account sensitive features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em><em> or </em><em>pandas.DataFrame</em>) – feature matrix</p></li>
+<li><p><strong>sensitive_features</strong> (<em>currently 1D array as numpy.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>pandas.DataFrame</em><em>,
+or </em><em>pandas.Series</em>) – sensitive features to identify groups by, currently allows
+only a single column</p></li>
+<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – set to a constant for reproducibility</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>predictions in numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">fairlearn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.exceptions.html">fairlearn.exceptions module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.metrics.html">fairlearn.metrics package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">fairlearn.postprocessing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fairlearn.reductions.html">fairlearn.reductions package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="fairlearn.metrics.html" title="previous chapter">fairlearn.metrics package</a></li>
+      <li>Next: <a href="fairlearn.reductions.html" title="next chapter">fairlearn.reductions package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Microsoft Corporation..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/fairlearn.postprocessing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
