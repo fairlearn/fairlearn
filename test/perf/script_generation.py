@@ -6,17 +6,11 @@ import os
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
 
-from timed_execution import TimedExecution, _EXECUTION_TIME
+from timed_execution import TimedExecution
 
 
 _MITIGATION = "mitigation"
 _ESTIMATOR_FIT = 'estimator_fit'
-
-_N_ORACLE_CALLS_METRIC_NAME = "n_oracle_calls"
-_ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME = "oracle_calls_execution_time"
-_ORACLE_CALLS_MAX_EXECUTION_TIME_METRIC_NAME = "oracle_calls_max_execution_time"
-_ORACLE_CALLS_MIN_EXECUTION_TIME_METRIC_NAME = "oracle_calls_min_execution_time"
-_ORACLE_CALLS_MEAN_EXECUTION_TIME_METRIC_NAME = "oracle_calls_mean_execution_time"
 
 
 def generate_script(request, perf_test_configuration, script_name, script_directory):
@@ -103,30 +97,20 @@ def add_mitigation(script_lines, perf_test_configuration):
 
         script_lines.append('mitigator.fit(X_train, y_train, sensitive_features=sensitive_features_train)')
 
-        if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-            script_lines.append('mitigator.predict('
-                                'X_test, '
-                                'sensitive_features=sensitive_features_test, '
-                                'random_state=1)')
-        else:
-            script_lines.append('predictions = mitigator.predict(X_test)')
+    if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
+        script_lines.append('mitigator.predict('
+                            'X_test, '
+                            'sensitive_features=sensitive_features_test, '
+                            'random_state=1)')
+    else:
+        script_lines.append('predictions = mitigator.predict(X_test)')
 
 
 def add_additional_metric_calculation(script_lines, perf_test_configuration):
-    # We need to know how much overhead fairlearn adds on top of the basic estimator fit.
-    estimator_fit_time_variable_name = _ESTIMATOR_FIT + _EXECUTION_TIME
-    mitigation_time_variable_name = _MITIGATION + _EXECUTION_TIME
-
-    additional_metrics = {
-        'mitigation_time_overhead_absolute': '-',
-        'mitigation_time_overhead_relative': '/'
-    }
-    for metric_name, operator in additional_metrics.items():
-        script_lines.append("{} = {} {} {}"
-                            .format(metric_name, mitigation_time_variable_name, operator,
-                                    estimator_fit_time_variable_name))
-        script_lines.append("run.log('{0}', {0})".format(metric_name))
-
+    # In certain mitigation methods we re-run the estimators many times.
+    # For that reason we need metrics to compare the mitigation time with the time that the
+    # estimators took since fairlearn only controls the mitigation overhead and not the estimator
+    # training time.
     if perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
         script_lines.append("n_oracle_calls = mitigator._expgrad_result.n_oracle_calls")
         script_lines.append("oracle_calls_execution_time = mitigator._expgrad_result.oracle_calls_execution_time")
@@ -135,17 +119,18 @@ def add_additional_metric_calculation(script_lines, perf_test_configuration):
         script_lines.append("oracle_calls_execution_time = [result._oracle_call_execution_time for result in mitigator._all_results]")
 
     if perf_test_configuration.mitigator in [ExponentiatedGradient.__name__, GridSearch.__name__]:
-        metrics_to_log = {
-            _N_ORACLE_CALLS_METRIC_NAME: "n_oracle_calls",
-            _ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME: "oracle_calls_execution_time",
-            _ORACLE_CALLS_MIN_EXECUTION_TIME_METRIC_NAME: "min(oracle_calls_execution_time)",
-            _ORACLE_CALLS_MAX_EXECUTION_TIME_METRIC_NAME: "max(oracle_calls_execution_time)",
-            _ORACLE_CALLS_MEAN_EXECUTION_TIME_METRIC_NAME: "sum(oracle_calls_execution_time)/len(oracle_calls_execution_time)",
-        }
-        for metric_name, metric_calculation_code in metrics_to_log.items():
-            if metric_name == _ORACLE_CALLS_EXECUTION_TIME_METRIC_NAME:
-                # lists require a special log method
-                log_method = "log_list"
-            else:
-                log_method = "log"
-            script_lines.append("run.{}('{}', {})".format(log_method, metric_name, metric_calculation_code))
+        add_metric_logging_script(script_lines, "metric_logging_script_expgrad_gridsearch.txt")
+    elif perf_test_configuration.mitigator in [ThresholdOptimizer.__name__]:
+        add_metric_logging_script(script_lines, "metric_logging_script_postprocessing.txt")
+
+
+def add_metric_logging_script(script_lines, metric_logging_script_file_name):
+    skip_lines = [
+        "# Copyright (c) Microsoft Corporation. All rights reserved."
+        "# Licensed under the MIT License."
+    ]
+    script_directory = os.path.dirname(__file__)
+    with open(os.path.join(script_directory, metric_logging_script_file_name), 'r') as metric_logging_script_file:
+        for line in metric_logging_script_file.readlines():
+            if line not in skip_lines:
+                script_lines.append(line.replace("\n", ""))

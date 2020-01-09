@@ -50,7 +50,7 @@ jobs:
   - script: flake8 .
     displayName: "Run flake8"
 
-  - script: python -m pytest test/ --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest test/ --ignore=test/perf -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
