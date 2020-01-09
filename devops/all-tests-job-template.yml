@@ -40,7 +40,7 @@ jobs:
 
   - template: requirements-pin-steps-template.yml
 
-  - temaplte: pip-install-steps-template.yml
+  - template: pip-install-steps-template.yml
 
   - template: pip-freeze-to-artifact-steps-template.yml
     parameters:
