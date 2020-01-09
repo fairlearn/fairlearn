@@ -3,6 +3,9 @@
 
 """Utilities for plotting curves."""
 
+_MATPLOTLIB_NOT_INSTALLED_ERROR = "Please install fairlearn-core[postprocessingplot] to get the" \
+    " dependencies for postprocessing plots."
+
 try:
     import matplotlib.pyplot as plt
     import matplotlib.cm as cm
@@ -14,8 +17,7 @@ try:
     debug_ncolors = len(debug_colors)
     debug_colormap = {}
 except ImportError:
-    print("Please install fairlearn-core[postprocessingplot] to get the dependencies for "
-          "postprocessing plots.")
+    print(_MATPLOTLIB_NOT_INSTALLED_ERROR)
 
 
 highlight_color = [0.95, 0.90, 0.40]

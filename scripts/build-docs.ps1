@@ -1,3 +1,9 @@
+# Script to build docs
+param(
+    [Parameter(Mandatory)]
+    [string]$package
+)
+
 function Resolve-FullPath($path) 
 {
     if (Test-Path $path)
@@ -17,10 +23,9 @@ try
     $scriptpath = Resolve-FullPath (Split-Path -parent $PSCommandPath)
     $rootpath = Resolve-FullPath ([System.IO.Path]::Combine($scriptpath, ".."))
 
-    $codepathfairlearncore = [System.IO.Path]::Combine($rootpath, "python", "fairlearn-core", "fairlearn")
-    $codepathfairlearn = [System.IO.Path]::Combine($rootpath, "python", "fairlearn", "fairlearn")
-    $docbuildpath = [System.IO.Path]::Combine($rootpath, "docbuild")
-    $docconfigpath = [System.IO.Path]::Combine($rootpath, "docs")
+    $codepath = [System.IO.Path]::Combine($rootpath, "python", $package, "fairlearn")
+    $docbuildpath = [System.IO.Path]::Combine($rootpath, "docbuild-$package")
+    $docconfigpathfairlearn = [System.IO.Path]::Combine($rootpath, "docs", $package)
 
     # Make sure we have a clean slate
     Remove-Item -Path $docbuildpath -Recurse -Force -ErrorAction SilentlyContinue
@@ -33,18 +38,18 @@ try
 
     # Move into the docbuild directory
     Set-Location -Path $docbuildpath
-
+    
     # Create some expected directories
     New-Item "_static" -ItemType Directory -Force
     New-Item "_build" -ItemType Directory -Force
     New-Item "_templates" -ItemType Directory -Force
-
-    Write-Host "Building API doc"
-    & sphinx-apidoc "$codepathfairlearncore" -o "$docbuildpath"
-    & sphinx-apidoc "$codepathfairlearn" -o "$docbuildpath"
-
-    Write-Host "Building Docs" 
+    
+    Write-Host "Building API doc for $package"
+    & sphinx-apidoc "$codepath" -o "$docbuildpath"
+    
+    Write-Host "Building Docs for $package" 
     & sphinx-build . _build
+    
 }
 finally
 {
