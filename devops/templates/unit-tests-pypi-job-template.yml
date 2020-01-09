@@ -64,7 +64,7 @@ jobs:
     displayName: "Install fairlearn with pip"
 
   # Run the tests
-  - script: python -m pytest test/ --ignore=test/perf --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip)"
+  - script: python -m pytest test/ --ignore=test/perf -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip)"
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
