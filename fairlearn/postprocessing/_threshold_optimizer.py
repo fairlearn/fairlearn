@@ -89,9 +89,9 @@ class ThresholdOptimizer(PostProcessing):
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
         in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
 
-        :param X: feature matrix
+        :param X: The feature matrix
         :type X: numpy.ndarray or pandas.DataFrame
-        :param y: label vector
+        :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         :param sensitive_features: sensitive features to identify groups by, currently allows
             only a single column
@@ -206,7 +206,7 @@ class ThresholdOptimizer(PostProcessing):
 
 def _threshold_optimization_demographic_parity(sensitive_features, labels, scores, grid_size=1000,
                                                flip=True, plot=False):
-    """Calculates selection and error rates for every sensitive feature value.
+    """Calculate the selection and error rates for every sensitive feature value.
 
     These calculations are made at different
     thresholds over the scores. Subsequently weighs each sensitive feature value's error by the
@@ -318,7 +318,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
 
 def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, grid_size=1000,
                                            flip=True, plot=False):
-    """Calculates the ROC curve of every sensitive feature value at different thresholds.
+    """Calculate the ROC curve of every sensitive feature value at different thresholds.
 
     Subsequently takes the overlapping region of the ROC curves, and finds the best
     solution by selecting the point on the curve with minimal error.
@@ -449,7 +449,7 @@ def _vectorized_prediction(function_dict, sensitive_features, scores):
 
 
 def _convert_to_ndarray(data, dataframe_multiple_columns_error_message):
-    """Converts input data from list, pandas.Series, or pandas.DataFrame to numpy.ndarray.
+    """Convert the input data from list, pandas.Series, or pandas.DataFrame to numpy.ndarray.
 
     :param data: the data to be converted into a numpy.ndarray
     :type data: numpy.ndarray, pandas.Series, pandas.DataFrame, or list

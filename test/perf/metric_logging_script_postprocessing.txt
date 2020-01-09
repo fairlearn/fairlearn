@@ -1,0 +1,8 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+assert 'mitigation_execution_time' in vars(), "mitigation_execution_time is expected to be defined"
+assert 'estimator_fit_execution_time' in vars(), "estimator_fit_execution_time is expected to be defined"
+
+# compare mitigation time with the unconstrained estimator fit time
+run.log('mitigation_time_overhead_relative', (mitigation_execution_time + estimator_fit_execution_time) / estimator_fit_execution_time)

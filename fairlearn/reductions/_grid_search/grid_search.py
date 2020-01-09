@@ -5,6 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
+from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_reductions_input
 from fairlearn import _NO_PREDICT_BEFORE_FIT
@@ -84,11 +85,13 @@ class GridSearch(Reduction):
     The approach used is taken from section 3.4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: The underlying estimator to be used. Must provide a
-        :code:`fit(X, y, sample_weights)` method
+    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
+        `sample_weight` is a vector of weights; labels `y` and predictions returned by
+        :code:`predict(X)` are either 0 or 1.
+    :type estimator: estimator
 
-    :param constraints: Object describing the parity constraints. This provides the reweighting
-        and relabelling
+    :param constraints: The disparity constraints expressed as moments.
     :type constraints: fairlearn.reductions.Moment
 
     :param selection_rule: Specifies the procedure for selecting the best model found by the
@@ -122,7 +125,7 @@ class GridSearch(Reduction):
                  grid_size=10,
                  grid_limit=2.0,
                  grid=None):
-        """Constructor for a GridSearch object."""
+        """Construct a GridSearch object."""
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")
@@ -146,12 +149,12 @@ class GridSearch(Reduction):
 
     @property
     def all_results(self):
-        """A list of :class:`GridSearchResult` from each point in the grid."""
+        """Return a list of :class:`GridSearchResult` from each point in the grid."""
         return self._all_results
 
     @property
     def best_result(self):
-        """The best result found from the grid search.
+        """Return the best result found from the grid search.
 
         The predictor contained in this instance of
         :class:`GridSearchResult` is used in calls to
@@ -160,21 +163,21 @@ class GridSearch(Reduction):
         return self._best_result
 
     def fit(self, X, y, **kwargs):
-        """Runs the grid search.
+        """Run the grid search.
 
         This will result in multiple copies of the
-        estimator being made, and the :code:`fit` method
+        estimator being made, and the :code:`fit(X)` method
         of each one called.
 
-        :param X: The feature data for the machine learning problem
-        :type X: Array
+        :param X: The feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
 
-        :param y: The ground truth labels for the machine learning problem
-        :type y: 1-D array
+        :param y: The label vector
+        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
 
         :param sensitive_features: A (currently) required keyword argument listing the
             feature used by the constraints object
-        :type sensitive_features: 1-D array (for now)
+        :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
         """
         X_train, y_train, _ = _validate_and_reformat_reductions_input(
             X, y, enforce_binary_sensitive_feature=True, **kwargs)
@@ -234,14 +237,17 @@ class GridSearch(Reduction):
 
             current_estimator = copy.deepcopy(self.estimator)
             logger.debug("Calling underlying estimator")
+            oracle_call_start_time = time()
             current_estimator.fit(X, y_reduction, sample_weight=weights)
+            oracle_call_execution_time = time() - oracle_call_start_time
             logger.debug("Call to underlying estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
             nxt = GridSearchResult(current_estimator,
                                    lambda_vec,
                                    objective.gamma(predict_fct)[0],
-                                   self.constraints.gamma(predict_fct))
+                                   self.constraints.gamma(predict_fct),
+                                   oracle_call_execution_time)
             self._all_results.append(nxt)
 
         logger.debug("Selecting best_result")
@@ -255,27 +261,26 @@ class GridSearch(Reduction):
         return
 
     def predict(self, X):
-        """Provides a prediction for the given input data based on the best model found by the grid search.
+        """Provide a prediction using the best model found by the grid search.
 
-        :param X: The data for which predictions are required
-        :type X: Array
+        This dispatches `X` to the :code:`predict(X)` method of the
+        selected estimator, and hence the return type is dependent on that method.
 
-        :return: The prediction. If X represents the data for a single example
-            the result will be a scalar. Otherwise the result will be an
-        :rtype: Scalar or array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
         """
         if self.best_result is None:
             raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
-        """Provides the result of :code:`predict_proba` from the best model found by the grid search.
+        """Provide the result of :code:`predict_proba` from the best model found by the grid search.
 
-        The underlying estimator must support :code:`predict_proba` for this
-        to work.
+        The underlying estimator must support :code:`predict_proba(X)` for this
+        to work. The return type is determined by this method.
 
-        :param X: The data for which predictions are required
-        :type X: Array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
         """
         if self.best_result is None:
             raise NotFittedException(_NO_PREDICT_BEFORE_FIT)

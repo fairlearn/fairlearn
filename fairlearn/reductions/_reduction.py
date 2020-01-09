@@ -5,13 +5,13 @@
 class Reduction:
     """Base class for our reduction-implementing estimators."""
 
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y, **kwargs):  # noqa: D102
         raise NotImplementedError()
 
-    def predict(self, X):
+    def predict(self, X):  # noqa: D102
         raise NotImplementedError()
 
-    def predict_proba(self, X):
+    def predict_proba(self, X):  # noqa: D102
         raise NotImplementedError()
 
 

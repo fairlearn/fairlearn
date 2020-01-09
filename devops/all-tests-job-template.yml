@@ -3,6 +3,9 @@ parameters:
   vmImage: ''
   pyVersions: [3.5, 3.6, 3.7]
   requirementsFile: 'requirements.txt'
+  pinRequirements: False
+  freezeArtifactStem: 
+  freezeFileStem:
 
 jobs:
 - job: ${{ parameters.name }}
@@ -14,6 +17,8 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
+          FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
 
   steps:
   - task: UsePythonVersion@0
@@ -22,16 +27,24 @@ jobs:
       versionSpec: '$(PyVer)' 
       addToPath: true
 
+  - template: python-infra-upgrade-steps-template.yml
+
+  - script: python scripts/requirements_pin.py --input requirements.txt --output requirements-fixed.txt --loglevel INFO
+    displayName: "Pin Requirements file"
+    condition: eq('${{parameters.pinRequirements}}', True)
+
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
-    
-  - script: python ./scripts/requirementscheck.py --fixed requirements-fixed.txt --lowerbound requirements.txt
-    displayName: "Run check on requirements files"
 
+  - template: pip-freeze-to-artifact-steps-template.yml
+    parameters:
+      freezeArtifact: $(FreezeArtifact)
+      freezeFile: $(FreezeFile)
+    
   - script: flake8 .
     displayName: "Run flake8"
 
-  - script: python -m pytest test/ --ignore=test/perf --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest test/ --ignore=test/perf -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run tests'
 
   - task: PublishTestResults@2

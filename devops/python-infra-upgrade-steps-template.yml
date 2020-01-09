@@ -1,0 +1,6 @@
+steps:
+  - script: pip install --upgrade pip
+    displayName: 'Upgrade pip to latest version'
+
+  - script: pip install --upgrade setuptools
+    displayName: 'Upgrade setuptools'

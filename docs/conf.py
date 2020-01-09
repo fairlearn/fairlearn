@@ -24,11 +24,11 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = 'fairlearn'
-copyright = '2019, Microsoft'
+copyright = '2019, Microsoft Corporation.'
 author = 'Microsoft'
 
 # The full version, including alpha/beta/rc tags
-release = '0.4.0a1'
+release = fairlearn._base_version
 
 
 # -- General configuration ---------------------------------------------------

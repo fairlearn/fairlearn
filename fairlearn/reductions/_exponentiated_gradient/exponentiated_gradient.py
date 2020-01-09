@@ -8,6 +8,7 @@ from fairlearn.reductions import Reduction
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
+from ._exponentiated_gradient_result import ExponentiatedGradientResult
 from fairlearn._input_validation import _validate_and_reformat_reductions_input
 
 logger = logging.getLogger(__name__)
@@ -21,77 +22,6 @@ def _mean_pred(X, hs, weights):
     return pred[weights.index].dot(weights)
 
 
-class ExponentiatedGradientResult:
-    """Class to hold the result of an `ExponentiatedGradient` estimator."""
-
-    def __init__(self, best_classifier, best_gap, classifiers, weights, last_t, best_t,
-                 n_oracle_calls):
-        """Result object for the exponentiated gradient reduction operation."""
-        self._best_classifier = best_classifier
-        self._best_gap = best_gap
-        self._classifiers = classifiers
-        self._weights = weights
-        self._last_t = last_t
-        self._best_t = best_t
-        self._n_oracle_calls = n_oracle_calls
-
-    @property
-    def best_classifier(self):
-        """The best classifier found by the algorithm.
-
-        A function that maps a DataFrame `X` containing covariates to a Series containing the
-        corresponding probabilistic decisions in :math:`[0,1]`
-        """
-        return self._best_classifier
-
-    @property
-    def best_gap(self):
-        """The quality of `best_classifier`.
-
-        If the algorithm has converged then :code:`best_gap <= nu`;
-        the solution `best_classifier` is guaranteed to have the classification error within
-        :code:`2*best_gap` of the best error under constraint `eps`; the constraint violation
-        is at most :code:`2*(eps+best_gap)`
-        """
-        return self._best_gap
-
-    @property
-    def classifiers(self):
-        """The base classifiers generated (instances of estimator)."""
-        return self._classifiers
-
-    @property
-    def weights(self):
-        """The weights of those classifiers within `best_classifier`."""
-        return self._weights
-
-    @property
-    def last_t(self):
-        """The last executed iteration; always :code:`last_t < T`."""
-        return self._last_t
-
-    @property
-    def best_t(self):
-        """The iteration in which best_classifier was obtained."""
-        return self._best_t
-
-    @property
-    def n_oracle_calls(self):
-        """The number of times the estimator was called."""
-        return self._n_oracle_calls
-
-    def _as_dict(self):
-        return {
-            "best_classifier": self._best_classifier,
-            "best_gap": self._best_gap,
-            "classifiers": self._classifiers,
-            "weights": self._weights,
-            "last_t": self._last_t,
-            "best_t": self._best_t,
-            "n_oracle_calls": self._n_oracle_calls
-        }
-
-
 class ExponentiatedGradient(Reduction):
     """An Estimator which implements the exponentiated gradient approach to reductions.
 
@@ -99,27 +29,32 @@ class ExponentiatedGradient(Reduction):
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
-        :code:`predict(X)`, where `X` is the set of features, `y` is the set of labels, and
-        `sample_weight` is a set of weights; labels `y` and predictions returned by
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
+        `sample_weight` is a vector of weights; labels `y` and predictions returned by
         :code:`predict(X)` are either 0 or 1.
-    :type estimator: An estimator
+    :type estimator: estimator
+
     :param constraints: The disparity constraints expressed as moments
     :type constraints: fairlearn.reductions.Moment
+
     :param eps: Allowed fairness constraint violation; the solution best_classifier is
         guaranteed to have the classification error within :code:`2*best_gap` of the best error
         under constraint eps; the constraint violation is at most :code:`2*(eps+best_gap)`
     :type eps: float
+
     :param T: Maximum number of iterations
     :type T: int
+
     :param nu: Convergence threshold for the duality gap, corresponding to a
         conservative automatic setting based on the statistical uncertainty in measuring
         classification error
     :type nu: float
+
     :param eta_mul: Initial setting of the learning rate
     :type eta_mul: float
     """
 
-    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):
+    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):  # noqa: D103
         self._estimator = estimator
         self._constraints = constraints
         self._eps = eps
@@ -132,10 +67,11 @@ class ExponentiatedGradient(Reduction):
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
 
-        :param X: The array of training features
-        :type X: Array
-        :param y: The array of training labels
-        :type y: 1-dimensional Array
+        :param X: The feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+
+        :param y: The label vector
+        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
         X_train, y_train, A = _validate_and_reformat_reductions_input(X, y, **kwargs)
 
@@ -235,10 +171,12 @@ class ExponentiatedGradient(Reduction):
         Note that this is non-deterministic, due to the nature of the
         exponentiated gradient algorithm.
 
-        :param X: The data for which predictions are required
-        :type X: Array
-        :return: Array of predictions as 0 or 1.
-        :rtype: Array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
+
+        :return: The prediction. If `X` represents the data for a single example
+            the result will be a scalar. Otherwise the result will be a vector
+        :rtype: Scalar or vector
         """
         positive_probs = self._best_classifier(X)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
@@ -272,11 +210,10 @@ class ExponentiatedGradient(Reduction):
         result = ExponentiatedGradientResult(
             best_classifier,
             best_gap,
-            lagrangian.classifiers,
+            lagrangian,
             weights,
             last_t,
-            best_t,
-            lagrangian.n_oracle_calls)
+            best_t)
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
                      self._eps, B, self._nu, self._T, eta_min)

@@ -20,6 +20,7 @@
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
+  FreezeFileStem: 'requirements-freeze-predeploy'
 
 trigger: none # No CI build
 
@@ -36,23 +37,37 @@ stages:
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5,3.6,3.7]
+      pyVersions: [3.5, 3.6, 3.7]
+      freezeArtifactStem: "PreDeployment"
+      freezeFileStem: $(FreezeFileStem)
 
   - template: all-tests-job-template.yml
     parameters:
       name: Windows
       vmImage:  'vs2017-win2016'
       pyVersions: [3.5, 3.6, 3.7]
+      freezeArtifactStem: "PreDeployment"
+      freezeFileStem: $(FreezeFileStem)
       
   - template: all-tests-job-template.yml
     parameters:
       name: MacOS
       vmImage:  'macos-latest'
       pyVersions: [3.6, 3.7] 
+      freezeArtifactStem: "PreDeployment"
+      freezeFileStem: $(FreezeFileStem)
 
   - template: notebook-job-template.yml
     parameters:
-      pyVersions: [3.6]
+      name: LinuxNotebooks
+      vmImage: 'ubuntu-16.04'
+      pyVersions: [3.5, 3.6, 3.7]
+
+  - template: notebook-job-template.yml
+    parameters:
+      name: WindowsNotebooks
+      vmImage: 'vs2017-win2016'
+      pyVersions: [3.5, 3.6, 3.7] 
 
 
 # =================================================================================================================
@@ -63,10 +78,12 @@ stages:
   parameters:
     poolImage: $(PoolImage)
     targetType: 'Test'
-    kvSubscription: fairlearn-pipeline-learning # This is actually the name of the service connection from the Project Settings page
+    kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)" # This is actually the name of the service connection from the Project Settings page
     kvVaultName: fairlearndeploy
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
+    freezeArtifactStem: 'Freeze'
+    freezeFileStem: 'requirements-freeze'
 
 # =================================================================================================================
 
@@ -75,7 +92,9 @@ stages:
     poolImage: $(PoolImage)
     targetType: 'Prod'
     targetEnvironment: 'PyPI Deployment'
-    kvSubscription: fairlearn-pipeline-learning # This is actually the name of the service connection from the Project Settings page
+    kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)" # This is actually the name of the service connection from the Project Settings page
     kvVaultName: fairlearndeploy
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
+    freezeArtifactStem: 'Freeze'
+    freezeFileStem: 'requirements-freeze'

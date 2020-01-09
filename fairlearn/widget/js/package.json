@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Fairlearn widget for Jupyter notebooks",
   "author": "Brandon Horn (rihorn@microsoft.com)",
-  "license": "See license file 'LICENSE'",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "repository": {
@@ -42,7 +42,9 @@
     "source-map-loader": "^0.2.4",
     "ts-loader": "^5.2.1",
     "typescript": "~3.1.2",
-    "webpack": "4.30.0",
+    "terser-webpack-plugin": "^1.4.2",
+    "serialize-javascript": ">=2.1.1",
+    "webpack": "4.41.2",
     "webpack-cli": "^3.3.1"
   },
   "dependencies": {

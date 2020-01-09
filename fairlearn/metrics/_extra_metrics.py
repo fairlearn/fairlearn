@@ -14,11 +14,11 @@ from ._selection_rate import selection_rate  # noqa: F401,E501
 
 
 def specificity_score(y_true, y_pred, sample_weight=None):
-    r"""The specificity score is also known as the True Negative Rate.
+    r"""Calculate the specificity score (also called the True Negative Rate).
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
-    The calculation uses the :any:`sklearn.metrics.confusion_matrix` routine.
+    The calculation uses the :py:func:`sklearn.metrics.confusion_matrix` routine.
     """
     cm = skm.confusion_matrix(y_true, y_pred, sample_weight=sample_weight)
     # Taken from
@@ -29,13 +29,13 @@ def specificity_score(y_true, y_pred, sample_weight=None):
 
 
 def miss_rate(y_true, y_pred, sample_weight=None):
-    r"""The miss rate is also known as the False Negative Rate.
+    r"""Calculate the miss rate (also called the False Negative Rate).
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
     By definition, this is the complement of the True Positive
     Rate, so this routine uses the
-    :any:`sklearn.metrics.recall_score` routine.
+    :py:func:`sklearn.metrics.recall_score` routine.
     """
     # aka False Negative Rate
     tpr = skm.recall_score(y_true, y_pred, sample_weight=sample_weight)
@@ -45,12 +45,12 @@ def miss_rate(y_true, y_pred, sample_weight=None):
 
 
 def fallout_rate(y_true, y_pred, sample_weight=None):
-    r"""The fallout rate is also known as the False Positive Rate.
+    r"""Calculate the fallout rate (also called the False Positive Rate).
 
     At the present time, this routine only supports binary
     classifiers with labels :math:`\in {0, 1}`.
     By definition, this is the complement of the
-    Specificity, and so uses :any:`specificity_score` in its
+    Specificity, and so uses :py:func:`specificity_score` in its
     calculation.
     """
     # aka False Positive Rate
