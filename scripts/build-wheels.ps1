@@ -36,6 +36,11 @@ if ($LASTEXITCODE -ne 0)
 {
     throw "process_readme.py failed with result code $LASTEXITCODE"
 }
+Write-Host
+Write-Host "Copying REAMDE.md to package directories python/fairlearn-core and python/fairlearn"
+cp README.md python/fairlearn-core/.
+cp README.md python/fairlearn/.
+
 
 # Set the environment variable for test if required
 if( $targetType -eq "Test" )

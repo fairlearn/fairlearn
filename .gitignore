@@ -121,3 +121,7 @@ python/fairlearn/fairlearn/widget/js/fairlearn_widget/labextension/fairlearn-wid
 
 # generated perf test scripts
 test/perf/scripts/**
+
+# copied README files
+python/fairlearn/README.md
+python/fairlearn-core/README.md

@@ -17,12 +17,11 @@ def build_package():
 
     # perf tests don't need dashboard, so we're faking the required files
     required_files = [
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'extension.js'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'extension.js.map'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'index.js'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'index.js.map'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'js', 'fairlearn_widget', 'labextension',
-                     'fairlearn-widget-0.1.0.tgz')
+        os.path.join(os.getcwd(), 'python', 'fairlearn', 'fairlearn', 'widget', 'static', 'extension.js'),  # noqa: E501
+        os.path.join(os.getcwd(), 'python', 'fairlearn', 'fairlearn', 'widget', 'static', 'extension.js.map'),  # noqa: E501
+        os.path.join(os.getcwd(), 'python', 'fairlearn', 'fairlearn', 'widget', 'static', 'index.js'),  # noqa: E501
+        os.path.join(os.getcwd(), 'python', 'fairlearn', 'fairlearn', 'widget', 'static', 'index.js.map'),  # noqa: E501
+        os.path.join(os.getcwd(), 'python', 'fairlearn', 'fairlearn', 'widget', 'js', 'fairlearn_widget', 'labextension', 'fairlearn-widget-0.1.0.tgz')  # noqa: E501
     ]
     for file_path in required_files:
         directory = os.path.dirname(file_path)
