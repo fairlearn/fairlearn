@@ -30,7 +30,7 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         "ipywidgets>=7.5.0",
-        "fairlearn-core>=0.4.0"
+        "fairlearn-core[postprocessingplot]>=0.4.0"
     ],
     classifiers=[
         "Programming Language :: Python :: 3.5",
@@ -56,4 +56,15 @@ setup(
             'fairlearn_widget/labextension/fairlearn-widget-0.1.0.tgz'
         ])],
     zip_safe=False,
+    extras_require={
+        "doc": [
+            "fairlearn-core[doc]>={}".format(fairlearn.__version__)
+        ],
+        "devenv": [
+            "fairlearn-core[devenv]>={}".format(fairlearn.__version__)
+        ],
+        "test": [
+            "fairlearn-core[test]>={}".format(fairlearn.__version__)
+        ]
+    }
 )

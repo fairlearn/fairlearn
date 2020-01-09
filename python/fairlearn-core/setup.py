@@ -47,6 +47,29 @@ setup(
     extras_require={
         "postprocessingplot": [
             "matplotlib>=3.0.3"
+        ],
+        "doc": [
+            "sphinx"
+        ],
+        "devenv": [
+            "autopep8",
+            "flake8",
+            "flake8-blind-except",
+            "flake8-builtins",
+            "flake8-docstrings",
+            "flake8-logging-format",
+            "flake8-rst-docstrings",
+            "requirements-parser"
+        ],
+        "test": [
+            "pytest==5.0.1",  # pinned due to VSCode issue
+            "pytest-cov",
+            "tempeh==0.1.11",
+            "wheel",
+            # notebook test requirements
+            "jupyter",
+            "nbval",
+            "shap"
         ]
     }
 )

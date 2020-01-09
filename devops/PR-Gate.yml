@@ -23,7 +23,7 @@ jobs:
 - template: all-tests-job-template.yml
   parameters:
     name: Windows
-    vmImage:  'vs2017-win2016'
+    vmImage: 'vs2017-win2016'
     pyVersions: [3.5]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
@@ -31,7 +31,7 @@ jobs:
 - template: all-tests-job-template.yml
   parameters:
     name: MacOS
-    vmImage:  'macos-latest'
+    vmImage: 'macos-latest'
     pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)

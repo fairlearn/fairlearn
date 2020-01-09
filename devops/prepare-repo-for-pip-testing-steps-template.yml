@@ -1,5 +1,5 @@
 # The set of steps to run to prepare a repository for testing against a pip package
-# This mainly involves removing the 'fairlearn' directory from the repo root, but
+# This mainly involves removing the 'python' directory from the repo root, but
 # we also tidy up some other unneeded files
 
 parameters:
@@ -10,8 +10,8 @@ steps:
     displayName: "List repo root before deletion"
     workingDirectory: ${{parameters.targetDirectory}}
 
-  - script: rm -rf fairlearn/
-    displayName: "Remove fairlearn directory"
+  - script: rm -rf python/
+    displayName: "Remove python directory"
     workingDirectory: ${{parameters.targetDirectory}}
 
   - script: rm -rf devops/ docs/ *.md

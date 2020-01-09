@@ -1,0 +1,15 @@
+# The set of steps to pin the requirements for both fairlearn and fairlearn-core at the minimum
+# specified version (if any). This overwrites the original setup.py file.
+
+parameters:
+  pinRequirements: ''
+
+steps:
+  - script: python scripts/requirements_pin.py --input python/fairlearn-core/setup.py --output python/fairlearn-core/setup.py --loglevel INFO
+    displayName: "Pin requirements for fairlearn-core"
+    condition: eq('${{parameters.pinRequirements}}', True)
+  
+  - script: python scripts/requirements_pin.py --input python/fairlearn/setup.py --output python/fairlearn/setup.py --loglevel INFO
+    displayName: "Pin requirements for fairlearn"
+    condition: eq('${{parameters.pinRequirements}}', True)
+

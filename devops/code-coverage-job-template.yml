@@ -17,7 +17,7 @@ jobs:
 
   - template: python-infra-upgrade-steps-template.yml
 
-  - script: pip install -r requirements.txt
+  - script: pip install python/fairlearn/.
     displayName: 'Install required packages'
 
   - script: python -m pytest test/unit --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="${{ parameters.name }}"

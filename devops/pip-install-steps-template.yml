@@ -1,0 +1,15 @@
+# The set of steps to pip install fairlearn-core and/or fairlearn. If fairlearn needs to be
+# installed we need to install the current version of fairlearn-core first.
+
+parameters:
+  Package: ''
+  PackageExtensions: []
+
+steps:
+  - script: pip install python/fairlearn-core/. & pip install python/fairlearn/.[${{parameters.PackageExtensions}}]
+    displayName: "Install fairlearn-core and all its extensions, followed by fairlearn itself."
+    condition: eq('${{parameters.Package}}', 'fairlearn')
+  
+  - script: pip install python/fairlearn-core/.[${{parameters.PackageExtensions}}]
+    displayName: "Install fairlearn-core and specific extensions."
+    condition: eq('${{parameters.Package}}', 'fairlearn-core')
