@@ -40,8 +40,7 @@ jobs:
 
   - template: requirements-pin-steps-template.yml
 
-  - script: pip install python/${{ Package }}
-    displayName: 'Install required packages specified in python/${{ Package }}/setup.py'
+  - temaplte: pip-install-steps-template.yml
 
   - template: pip-freeze-to-artifact-steps-template.yml
     parameters:

@@ -6,6 +6,9 @@ parameters:
   PackageExtensions: []
 
 steps:
+  - script: cp README.md python/fairlearn/. & cp README.md python/fairlearn-core/.
+    displayName: copy README.md into directories where setup.py will be called.
+
   - script: pip install python/fairlearn-core/. & pip install python/fairlearn/.[${{parameters.PackageExtensions}}]
     displayName: "Install fairlearn-core and all its extensions, followed by fairlearn itself."
     condition: eq('${{parameters.Package}}', 'fairlearn')

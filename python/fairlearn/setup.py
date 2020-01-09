@@ -5,16 +5,9 @@ import os
 from setuptools import setup, find_packages
 import fairlearn
 
-# README lives in repository root
-if os.getcwd() == os.path.dirname(os.path.realpath(__file__)):
-    # look two levels up for README
-    readme_directory = os.path.join("..", "..")
-elif os.path.commonprefix([os.getcwd(), os.path.dirname(os.path.realpath(__file__))]) == os.getcwd():
-    readme_directory = os.getcwd()
-else:
-    raise Exception("Cannot locate README file. Please execute setup.py from repository root.")
 
-with open(os.path.join(readme_directory, "README.md"), "r") as fh:
+# README lives in repository root, copy over before running setup.py
+with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
@@ -30,7 +23,7 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         "ipywidgets>=7.5.0",
-        "fairlearn-core[postprocessingplot]>=0.4.0"
+        "fairlearn-core[postprocessingplot]>={}".format(fairlearn.__version__)
     ],
     classifiers=[
         "Programming Language :: Python :: 3.5",

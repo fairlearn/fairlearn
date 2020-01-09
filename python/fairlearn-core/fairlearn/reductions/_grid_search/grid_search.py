@@ -8,7 +8,6 @@ import pandas as pd
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_reductions_input
-from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn.exceptions import NotFittedException
 from fairlearn.reductions import Reduction
 from fairlearn.reductions._moments import Moment, ClassificationMoment
@@ -17,6 +16,8 @@ from .grid_search_result import GridSearchResult
 logger = logging.getLogger(__name__)
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
+
+_NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
 
 
 class _GridGenerator:

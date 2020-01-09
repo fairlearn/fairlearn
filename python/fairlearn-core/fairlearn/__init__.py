@@ -30,10 +30,6 @@ __name__ = "fairlearn-core"
 __version__ = "{0}{1}".format(_base_version, _dev_version)
 
 
-# Common strings
-_NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
-
-
 # Setup logging infrastructure
 import logging  # noqa: E402
 import atexit  # noqa: E402
