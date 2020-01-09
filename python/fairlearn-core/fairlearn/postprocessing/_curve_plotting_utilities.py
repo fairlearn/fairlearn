@@ -14,7 +14,8 @@ try:
     debug_ncolors = len(debug_colors)
     debug_colormap = {}
 except ImportError:
-    print("Please install fairlearn-core[postprocessingplot] to get the dependencies for postprocessing plots.")
+    print("Please install fairlearn-core[postprocessingplot] to get the dependencies for "
+          "postprocessing plots.")
 
 
 highlight_color = [0.95, 0.90, 0.40]

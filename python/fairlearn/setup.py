@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import os
 from setuptools import setup, find_packages
 import fairlearn
 
@@ -45,7 +44,7 @@ setup(
             "python/fairlearn/jupyter-config/nbconfig/notebook.d/fairlearn-widget.json"
         ]),
         ('share/jupyter/lab/extensions', [
-            'python/fairlearn/fairlearn/widget/js/fairlearn_widget/labextension/fairlearn-widget-0.1.0.tgz'
+            'python/fairlearn/fairlearn/widget/js/fairlearn_widget/labextension/fairlearn-widget-0.1.0.tgz'  # noqa: E501
         ])],
     zip_safe=False,
     extras_require={
