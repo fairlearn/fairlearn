@@ -50,15 +50,16 @@ setup(
             "flake8-builtins",
             "flake8-docstrings",
             "flake8-logging-format",
-            "flake8-rst-docstrings",
-            "requirements-parser"
+            "flake8-rst-docstrings"
         ],
         "test": [
             "pytest==5.0.1",  # pinned due to VSCode issue
             "pytest-cov",
             "tempeh==0.1.11",
             "wheel",
-            # notebook test requirements
+            "nteract-scrapbook",
+            "nbformat",
+            "papermill",
             "jupyter",
             "nbval",
             "shap"
