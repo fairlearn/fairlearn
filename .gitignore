@@ -110,7 +110,8 @@ venv.bak/
 /.vscode
 
 # Documentation
-docbuild/
+docbuild-fairlearn/**
+docbuild-fairlearn-core/**
 
 # generated widget files
 python/fairlearn/fairlearn/widget/static/index.js
