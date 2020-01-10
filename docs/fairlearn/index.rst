@@ -11,5 +11,8 @@ The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
 
 .. toctree::
 
+    fairlearn.metrics
+    fairlearn.postprocessing
+    fairlearn.reductions
     fairlearn.widget
 

@@ -66,7 +66,7 @@ class ConditionalLossMoment(LossMoment):
 
 # Ensure that ConditionalLossMoment shows up in correct place in documentation
 # when it is used as a base class
-ConditionalLossMoment.__module__ = "fairlearn.reductions"
+ConditionalLossMoment.__module__ = "fairlearn_core.reductions"
 
 
 class AverageLossMoment(ConditionalLossMoment):
@@ -115,7 +115,7 @@ class AbsoluteLoss:
 
 # Ensure that AbsoluteLoss shows up in correct place in documentation
 # when it is used as a base class
-AbsoluteLoss.__module__ = "fairlearn.reductions"
+AbsoluteLoss.__module__ = "fairlearn_core.reductions"
 
 
 class ZeroOneLoss(AbsoluteLoss):

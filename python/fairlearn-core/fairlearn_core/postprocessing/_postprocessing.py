@@ -105,4 +105,4 @@ class PostProcessing:
 
 # Ensure that PostProcessing shows up in correct place in documentation
 # when it is used as a base class
-PostProcessing.__module__ = "fairlearn.postprocessing"
+PostProcessing.__module__ = "fairlearn_core.postprocessing"

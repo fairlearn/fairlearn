@@ -90,7 +90,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
 # Ensure that ConditionalSelectionRate shows up in correct place in documentation
 # when it is used as a base class
-ConditionalSelectionRate.__module__ = "fairlearn.reductions"
+ConditionalSelectionRate.__module__ = "fairlearn_core.reductions"
 
 
 class DemographicParity(ConditionalSelectionRate):

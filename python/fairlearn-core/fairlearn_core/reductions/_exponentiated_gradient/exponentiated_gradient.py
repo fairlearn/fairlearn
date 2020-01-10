@@ -35,7 +35,7 @@ class ExponentiatedGradient(Reduction):
     :type estimator: estimator
 
     :param constraints: The disparity constraints expressed as moments
-    :type constraints: fairlearn.reductions.Moment
+    :type constraints: fairlearn_core.reductions.Moment
 
     :param eps: Allowed fairness constraint violation; the solution best_classifier is
         guaranteed to have the classification error within :code:`2*best_gap` of the best error

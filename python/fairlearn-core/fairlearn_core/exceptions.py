@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""Module holding specialised exceptions for fairlearn."""
+"""Module holding specialised exceptions for fairlearn_core."""
 
 
 class NotFittedException(ValueError):

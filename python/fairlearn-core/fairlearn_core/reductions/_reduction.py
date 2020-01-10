@@ -17,4 +17,4 @@ class Reduction:
 
 # Ensure that Reduction shows up in correct place in documentation
 # when it is used as a base class
-Reduction.__module__ = "fairlearn.reductions"
+Reduction.__module__ = "fairlearn_core.reductions"

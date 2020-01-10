@@ -11,7 +11,6 @@ The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
 
 .. toctree::
 
-    fairlearn_core.exceptions
     fairlearn_core.metrics
     fairlearn_core.postprocessing
     fairlearn_core.reductions

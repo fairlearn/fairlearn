@@ -6,16 +6,12 @@
 import os
 import sys
 
-# add fairlearn_core modules so that they are available under the fairlearn name
-import fairlearn_core.metrics as metrics  # noqa: F401
-import fairlearn_core.postprocessing as postprocessing  # noqa: F401
-import fairlearn_core.reductions as reductions  # noqa: F401
-
+import fairlearn_core
 
 # Finesse the version
 _FAIRLEARN_DEV_VERSION_ENV_VAR = "FAIRLEARN_DEV_VERSION"
 
-_base_version = "0.4.0"
+_base_version = fairlearn_core.__version__
 _dev_version = ""
 
 if _FAIRLEARN_DEV_VERSION_ENV_VAR in os.environ.keys():

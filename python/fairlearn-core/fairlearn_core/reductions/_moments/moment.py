@@ -52,7 +52,7 @@ class Moment:
 
 # Ensure that Moment shows up in correct place in documentation
 # when it is used as a base class
-Moment.__module__ = "fairlearn.reductions"
+Moment.__module__ = "fairlearn_core.reductions"
 
 
 class ClassificationMoment(Moment):
@@ -61,7 +61,7 @@ class ClassificationMoment(Moment):
 
 # Ensure that ClassificationMoment shows up in correct place in documentation
 # when it is used as a base class
-ClassificationMoment.__module__ = "fairlearn.reductions"
+ClassificationMoment.__module__ = "fairlearn_core.reductions"
 
 
 class LossMoment(Moment):
@@ -74,4 +74,4 @@ class LossMoment(Moment):
 
 # Ensure that LossMoment shows up in correct place in documentation
 # when it is used as a base class
-LossMoment.__module__ = "fairlearn.reductions"
+LossMoment.__module__ = "fairlearn_core.reductions"

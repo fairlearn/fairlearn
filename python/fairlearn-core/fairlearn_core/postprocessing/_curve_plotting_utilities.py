@@ -3,7 +3,7 @@
 
 """Utilities for plotting curves."""
 
-_MATPLOTLIB_NOT_INSTALLED_ERROR = "Please install fairlearn-core[postprocessingplot] to get the" \
+_MATPLOTLIB_NOT_INSTALLED_ERROR = "Please install fairlearn_core[postprocessingplot] to get the" \
     " dependencies for postprocessing plots."
 
 try:

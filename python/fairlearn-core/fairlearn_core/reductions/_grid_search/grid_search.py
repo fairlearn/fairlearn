@@ -93,7 +93,7 @@ class GridSearch(Reduction):
     :type estimator: estimator
 
     :param constraints: The disparity constraints expressed as moments.
-    :type constraints: fairlearn.reductions.Moment
+    :type constraints: fairlearn_core.reductions.Moment
 
     :param selection_rule: Specifies the procedure for selecting the best model found by the
         grid search. At the present time, the only valid value is "tradeoff_optimization" which

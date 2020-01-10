@@ -26,7 +26,7 @@ class _Lagrangian:
     :type estimator: an estimator that has a `fit` method with arguments X, y, and sample_weight
     :param constraints: Object describing the parity constraints. This provides the reweighting
         and relabelling
-    :type constraints: `fairlearn.reductions.Moment`
+    :type constraints: `fairlearn_core.reductions.Moment`
     :param eps: allowed constraint violation
     :type eps: float
     :param B:
