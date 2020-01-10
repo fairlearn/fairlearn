@@ -1,5 +1,5 @@
 fairlearn\.postprocessing package
-=========================
+=================================
 
 .. automodule:: fairlearn.postprocessing
     :members:

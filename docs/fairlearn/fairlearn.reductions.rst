@@ -1,5 +1,5 @@
 fairlearn\.reductions package
-=========================
+=============================
 
 .. automodule:: fairlearn.reductions
     :members:
