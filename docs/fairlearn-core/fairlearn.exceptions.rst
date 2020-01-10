@@ -1,7 +1,7 @@
-fairlearn\.exceptions module
+fairlearn_core\.exceptions module
 ----------------------------
 
-.. automodule:: fairlearn.exceptions
+.. automodule:: fairlearn_core.exceptions
     :members:
     :undoc-members:
     :show-inheritance:

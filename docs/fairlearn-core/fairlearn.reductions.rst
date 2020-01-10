@@ -1,7 +1,7 @@
-fairlearn\.reductions package
+fairlearn_core\.reductions package
 =============================
 
-.. automodule:: fairlearn.reductions
+.. automodule:: fairlearn_core.reductions
     :members:
     :undoc-members:
     :show-inheritance:

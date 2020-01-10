@@ -23,7 +23,7 @@ try
     $scriptpath = Resolve-FullPath (Split-Path -parent $PSCommandPath)
     $rootpath = Resolve-FullPath ([System.IO.Path]::Combine($scriptpath, ".."))
 
-    $codepath = [System.IO.Path]::Combine($rootpath, "python", $package, "fairlearn")
+    $codepath = [System.IO.Path]::Combine($rootpath, "python", $package, ($package -replace "-", "_"))
     $docbuildpath = [System.IO.Path]::Combine($rootpath, "docbuild-$package")
     $docconfigpath = [System.IO.Path]::Combine($rootpath, "docs", $package)
 
@@ -34,7 +34,6 @@ try
     Set-Location -Path $rootpath
 
     # Copy the doc configurations to the build path
-    Copy-Item $docconfigpath/../conf.py -Destination $docconfigpath
     Copy-Item $docconfigpath -Destination "$docbuildpath" -Recurse -Force
 
     # Move into the docbuild directory

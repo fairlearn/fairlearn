@@ -1,7 +1,7 @@
-fairlearn\.metrics package
+fairlearn_core\.metrics package
 ==========================
 
-.. automodule:: fairlearn.metrics
+.. automodule:: fairlearn_core.metrics
     :members:
     :undoc-members:
     :show-inheritance:

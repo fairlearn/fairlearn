@@ -1,7 +1,7 @@
-fairlearn\.postprocessing package
+fairlearn_core\.postprocessing package
 =================================
 
-.. automodule:: fairlearn.postprocessing
+.. automodule:: fairlearn_core.postprocessing
     :members:
     :undoc-members:
     :show-inheritance:

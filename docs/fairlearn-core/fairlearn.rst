@@ -1,14 +1,14 @@
-fairlearn package
+fairlearn_core package
 =================
 
-The fairlearn package contains several sub-packages and sub-modules.
+The fairlearn_core package contains several sub-packages and sub-modules.
 
 Subpackages
 -----------
 
 .. toctree::
 
-    fairlearn.exceptions
-    fairlearn.metrics
-    fairlearn.postprocessing
-    fairlearn.reductions
+    fairlearn_core.exceptions
+    fairlearn_core.metrics
+    fairlearn_core.postprocessing
+    fairlearn_core.reductions
