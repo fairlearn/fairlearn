@@ -1,5 +1,5 @@
 fairlearn_core\.metrics package
-==========================
+===============================
 
 .. automodule:: fairlearn_core.metrics
     :members:

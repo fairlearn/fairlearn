@@ -1,5 +1,5 @@
 fairlearn_core\.exceptions module
-----------------------------
+---------------------------------
 
 .. automodule:: fairlearn_core.exceptions
     :members:

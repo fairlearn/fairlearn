@@ -1,5 +1,5 @@
 fairlearn_core package
-=================
+======================
 
 The fairlearn_core package contains several sub-packages and sub-modules.
 

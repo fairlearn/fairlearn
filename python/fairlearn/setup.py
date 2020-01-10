@@ -22,7 +22,7 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         "ipywidgets>=7.5.0",
-        "fairlearn-core[postprocessingplot]=={}".format(fairlearn.__version__)
+        "fairlearn_core[postprocessingplot]>={}".format(fairlearn.__version__)
     ],
     classifiers=[
         "Programming Language :: Python :: 3.5",
@@ -49,13 +49,13 @@ setup(
     zip_safe=False,
     extras_require={
         "doc": [
-            "fairlearn-core[doc]=={}".format(fairlearn.__version__)
+            "fairlearn_core[doc]>={}".format(fairlearn.__version__)
         ],
         "devenv": [
-            "fairlearn-core[devenv]=={}".format(fairlearn.__version__)
+            "fairlearn_core[devenv]>={}".format(fairlearn.__version__)
         ],
         "test": [
-            "fairlearn-core[test]=={}".format(fairlearn.__version__)
+            "fairlearn_core[test]>={}".format(fairlearn.__version__)
         ]
     }
 )
