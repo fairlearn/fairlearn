@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name=fairlearn.__name__,
     version=fairlearn.__version__,
-    author="Miroslav Dudik, Richard Edgar, Brandon Horn, Roman Lutz, Beth Zeranski",
+    author="Miroslav Dudik, Richard Edgar, Brandon Horn, Roman Lutz",
     author_email="fairlearn@microsoft.com",
     description="Algorithms for mitigating unfairness in supervised machine learning",
     long_description=long_description,
@@ -19,17 +19,26 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires='>=3.5',
     install_requires=[
-        "ipywidgets>=7.5.0",
-        "matplotlib>=3.0.3",
         "numpy>=1.17.2",
         "pandas>=0.25.1",
         "scikit-learn>=0.21.3",
         "scipy>=1.3.1"
     ],
+    extras_require={
+        "widget": [
+            "ipywidgets>=7.5.0"
+        ],
+        "customplots": [
+            "matplotlib>=3.0.3"
+        ]
+    },
     classifiers=(
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
+        "Development Status :: 3 - Alpha"
     ),
     include_package_data=True,
     data_files=[

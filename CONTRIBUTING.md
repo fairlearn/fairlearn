@@ -15,6 +15,17 @@ Development happens against the `master` branch following the [GitHub flow model
 
 Pull requests against `master` trigger automated tests that are run through Azure DevOps. Additional test suites are run periodically. When adding new code paths or features, tests are a requirement to complete a pull request. They should be added in the `test` directory.
 
+To build the fairlearn dashboard after making changes to it, [install Yarn](https://yarnpkg.com/lang/en/docs/install), and then do the following:
+
+```bash
+cd fairlearn/widget/js
+yarn install
+yarn build:all
+rm -rf dist
+rm -rf lib
+rm -rf node_modules
+```
+
 ### Investigating automated test failures
 For every pull request to `master` with automated tests, you can check the logs of the tests to find the root cause of failures. Our tests currently run through Azure Pipelines with steps for setup, testing, and teardown. The `Checks` tab of a pull request contains a link to the [Azure Pipelines page](dev.azure.com/responsibleai/fairlearn/_build/results), where you can review the logs by clicking on a specific step in the automated test sequence. If you encounter problems with this workflow, please reach out through [GitHub issues](https://github.com/fairlearn/fairlearn/issues).
 
@@ -61,7 +72,6 @@ Post-processing algorithms (such as the ones under `fairlearn.postprocessing`) p
 postprocessor.fit(X, y, sensitive_features=sensitive_features)
 postprocessor.predict(X, sensitive_features=sensitive_features)
 ```
-
 
 ## Creating new releases
 
