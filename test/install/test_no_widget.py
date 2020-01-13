@@ -8,5 +8,5 @@ from fairlearn import _INSTALL_WIDGET_ERROR
 
 def test_no_matplotlib():
     with pytest.raises(RuntimeError) as exc:
-        import fairlearn.widget
+        import fairlearn.widget  # noqa: F401
         assert str(exc.value) == _INSTALL_WIDGET_ERROR
