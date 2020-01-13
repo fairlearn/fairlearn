@@ -3,7 +3,13 @@
 
 """Package for the fairlearn Dashboard widget."""
 
-from ._fairlearn_dashboard import FairlearnDashboard
+from fairlearn import _INSTALL_WIDGET_ERROR
+
+try:
+    from ._fairlearn_dashboard import FairlearnDashboard
+except ImportError:
+    raise RuntimeError(_INSTALL_WIDGET_ERROR)
+
 
 __all__ = ['FairlearnDashboard']
 

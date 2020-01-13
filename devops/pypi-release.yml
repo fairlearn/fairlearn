@@ -33,7 +33,7 @@ stages:
     vmImage: $(PoolImage)
     
   jobs:
-  - template: all-tests-job-template.yml
+  - template: templates/all-tests-job-template.yml
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
@@ -41,7 +41,7 @@ stages:
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
-  - template: all-tests-job-template.yml
+  - template: templates/all-tests-job-template.yml
     parameters:
       name: Windows
       vmImage:  'vs2017-win2016'
@@ -49,7 +49,7 @@ stages:
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
       
-  - template: all-tests-job-template.yml
+  - template: templates/all-tests-job-template.yml
     parameters:
       name: MacOS
       vmImage:  'macos-latest'
@@ -57,24 +57,26 @@ stages:
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
-  - template: notebook-job-template.yml
+  - template: templates/notebook-job-template.yml
     parameters:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.5, 3.6, 3.7]
 
-  - template: notebook-job-template.yml
+  - template: templates/notebook-job-template.yml
     parameters:
       name: WindowsNotebooks
       vmImage: 'vs2017-win2016'
       pyVersions: [3.5, 3.6, 3.7] 
+  
+  - template: templates/limited-installation-job-template.yml
 
 
 # =================================================================================================================
 
 # We rely on the implicit dependence on the previous stage
 # No fan out/fan in of stages
-- template: pypi-deployment-stages-template.yml
+- template: templates/pypi-deployment-stages-template.yml
   parameters:
     poolImage: $(PoolImage)
     targetType: 'Test'
@@ -87,7 +89,7 @@ stages:
 
 # =================================================================================================================
 
-- template: pypi-deployment-stages-template.yml
+- template: templates/pypi-deployment-stages-template.yml
   parameters:
     poolImage: $(PoolImage)
     targetType: 'Prod'

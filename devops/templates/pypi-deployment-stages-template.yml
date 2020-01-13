@@ -97,7 +97,7 @@ stages:
 - stage: 'Validate_Package_from_PyPI_${{parameters.targetType}}'
   
   jobs:
-  - template: unit-tests-pypi-job-template.yml
+  - template: templates/unit-tests-pypi-job-template.yml
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
@@ -106,7 +106,7 @@ stages:
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: unit-tests-pypi-job-template.yml
+  - template: templates/unit-tests-pypi-job-template.yml
     parameters:
       name: Windows
       vmImage: 'vs2017-win2016'
@@ -115,7 +115,7 @@ stages:
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: unit-tests-pypi-job-template.yml
+  - template: templates/unit-tests-pypi-job-template.yml
     parameters:
       name: MacOS
       vmImage: 'macos-latest'
@@ -124,7 +124,7 @@ stages:
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: notebook-pypi-job-template.yml
+  - template: templates/notebook-pypi-job-template.yml
     parameters:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
@@ -133,7 +133,7 @@ stages:
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: notebook-pypi-job-template.yml
+  - template: templates/notebook-pypi-job-template.yml
     parameters:
       name: WindowsNotebooks
       vmImage: 'vs2017-win2016'

@@ -32,6 +32,8 @@ __version__ = "{0}{1}".format(_base_version, _dev_version)
 
 # Common strings
 _NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
+_INSTALL_WIDGET_ERROR = "Please make sure to install fairlearn[widget] to use the fairlearn " \
+                        "dashboard."
 
 
 # Setup logging infrastructure
