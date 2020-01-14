@@ -1,12 +1,14 @@
 # Validates that the checked in files required for the widget are up to date.
 # Specifically, this means that they were regenerated after changes
 
-$widgetstaticpath = 'python/fairlearn-core/widget/static' 
+$widgetstaticpath = 'python/fairlearn-core/fairlearn/widget/static' 
 $tempwidgetstaticpath = 'temp/static'
+
+New-Item -ItemType Directory -Force -Path $tempwidgetstaticpath
 
 Copy-Item $widgetstaticpath -Destination $tempwidgetstaticpath -Recurse
 
-build-widget.ps1
+Invoke-Expression "scripts/build-widget.ps1"
 
 Get-ChildItem $tempwidgetstaticpath | ForEach-Object {
     filename = [System.IO.Path]::GetFileName($_)
