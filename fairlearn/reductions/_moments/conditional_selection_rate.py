@@ -162,13 +162,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         For each constraint, we have two Lagrange multipliers corresponding to the
         positive and negative violations of the constraint, with both multipliers
         constrained to be positive. The 'true' Lagrange multiplier is then
-        :math:`\lambda = \lambda_{+} - \lambda_{-}`. Since it makes little
-        sense to the positive and negative constraints violated at the same time,
-        this routine rebalances between them. For example, if we have
-        :math:`\lambda_{+}=3` and :math:`\lambda_{-}=1` then this method will
-        make :math:`\lambda_{+}=2` and :math:`\lambda_{-}=0`. Similarly if
-        :math:`\lambda_{+}=2` and :math:`\lambda_{-}=3` then this method will
-        yield :math:`\lambda_{+}=0` and :math:`\lambda_{-}=1`.
+        :math:`\lambda = \lambda_{+} - \lambda_{-}`. This method makes the smaller
+        of the two multipliers zero while maintaining the same overall value
+        for :math:`lambda`.
 
         The supplied :class:`pandas:pandas.DataFrame` must have the same
         :class:`pandas:pandas.MultiIndex` as `index` and the resultant
