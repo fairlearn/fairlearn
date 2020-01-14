@@ -100,6 +100,17 @@ class DemographicParity(ConditionalSelectionRate):
 
     .. math::
       P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    a single event, `all`. Consequently, the `prob_event`
+    :class:`pandas:pandas.DataFrame`
+    will only have a single entry, which will be equal to 1.
+    Similarly, the `index` property will have twice as many entries
+    (corresponding to the positive and negative Lagrange multipliers)
+    as there are unique values for the sensitive feature.
+    The :meth:`signed_weights` method will compute the costs according
+    to Example 3 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     """
 
     short_name = "DemographicParity"
@@ -116,6 +127,22 @@ class EqualizedOdds(ConditionalSelectionRate):
 
     .. math::
        P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    events corresponding to the unique values of the `Y` array.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    fraction of the samples corresponding to each unique value in
+    the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to
+    the number of unique values for the sensitive feature, multiplied by
+    the number of unique values of the `Y` array, multiplied by two (for
+    the positive and negative Lagrange multipliers).
+
+    With these definitions, the :meth:`signed_weights` method
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     """
 
     short_name = "EqualizedOdds"
