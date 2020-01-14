@@ -17,7 +17,7 @@ steps:
     versionSpec: ${{parameters.pyVer}}
     addToPath: true
 
-- template: templates/python-infra-upgrade-steps-template.yml
+- template: python-infra-upgrade-steps-template.yml
 
 - script: pip install setuptools wheel 
   displayName: 'Install setuptools'
@@ -25,7 +25,7 @@ steps:
 - script: pip install -r requirements.txt
   displayName: "Install fairlearn requirements"
 
-- template: templates/pip-freeze-to-artifact-steps-template.yml
+- template: pip-freeze-to-artifact-steps-template.yml
   parameters:
     freezeArtifact: '${{parameters.freezeArtifactStem}}CreateWheel'
     freezeFile: ${{parameters.FreezeFile}}

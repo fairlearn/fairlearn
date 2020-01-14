@@ -23,7 +23,7 @@ jobs:
       versionSpec: '$(PyVer)' 
       addToPath: true
   
-  - template: templates/python-infra-upgrade-steps-template.yml
+  - template: python-infra-upgrade-steps-template.yml
 
   - script: python scripts/requirements_pin.py --input requirements.txt --output requirements-fixed.txt --loglevel INFO
     displayName: "Pin Requirements file"

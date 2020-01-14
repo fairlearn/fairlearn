@@ -34,12 +34,12 @@ jobs:
   steps:
   # Remove the fairlearn/ directory (and some others)
   # This is to ensure we test against the pip install
-  - template: templates/prepare-repo-for-pip-testing-steps-template.yml
+  - template: prepare-repo-for-pip-testing-steps-template.yml
 
   # Get the pip version to install from the artifacts created
   # by earlier build stages
   # Store this in fairlearnVersionForpip
-  - template: templates/fetch-version-from-artifacts-steps-template.yml
+  - template: fetch-version-from-artifacts-steps-template.yml
     parameters:
       artifactName: ${{parameters.versionFileArtifact}}
       artifactFile: ${{parameters.versionFileName}}
@@ -53,7 +53,7 @@ jobs:
       addToPath: true
 
   # Ensure infrastructure such as pip are up-to-date
-  - template: templates/python-infra-upgrade-steps-template.yml
+  - template: python-infra-upgrade-steps-template.yml
 
   # Install our requirements from regular PyPI
   - script: pip install -r ${{ parameters.requirementsFile }}

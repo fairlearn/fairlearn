@@ -30,7 +30,7 @@ jobs:
       versionSpec: '$(PyVer)' 
       addToPath: true
 
-  - template: templates/python-infra-upgrade-steps-template.yml
+  - template: python-infra-upgrade-steps-template.yml
 
   - script: python scripts/requirements_pin.py --input requirements.txt --output requirements-fixed.txt --loglevel INFO
     displayName: "Pin Requirements file"
@@ -39,7 +39,7 @@ jobs:
   - script: pip install -r ${{ parameters.requirementsFile }}
     displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
 
-  - template: templates/pip-freeze-to-artifact-steps-template.yml
+  - template: pip-freeze-to-artifact-steps-template.yml
     parameters:
       freezeArtifact: $(FreezeArtifact)
       freezeFile: $(FreezeFile)
