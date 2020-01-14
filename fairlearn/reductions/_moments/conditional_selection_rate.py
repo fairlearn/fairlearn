@@ -102,7 +102,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed weights to be applied to the data by the next call to the underlying
         Estimator.
 
-        :param lambda_vec: The set of Lagrange multipliers indexed by :meth:`index`
+        :param lambda_vec: The set of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
