@@ -14,7 +14,13 @@ _SIGN = "sign"
 
 
 class Moment:
-    """Generic moment."""
+    """Generic moment.
+
+    Our implementations of the reductions approach to fairness described
+    in `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ make use
+    of :class:`Moment` objects to describe the disparity constraints
+    imposed on the solution. This is an abstract class for all such objects.
+    """
 
     def __init__(self):
         self.data_loaded = False
@@ -45,12 +51,15 @@ class Moment:
         return self.X.shape[0]
 
     def gamma(self, predictor):  # noqa: D102
+        """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
 
     def project_lambda(self, lambda_vec):  # noqa: D102
+        """Return the projected lambda values."""
         raise NotImplementedError()
 
     def signed_weights(self, lambda_vec):  # noqa: D102
+        """Return the signed weights."""
         raise NotImplementedError()
 
 
