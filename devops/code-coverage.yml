@@ -4,11 +4,6 @@ trigger: none
 
 pr: none
 
-parameters:
-  name: 'CodeCoverage'
-  vmImage: 'ubuntu-latest'
-  pyVersion: 3.6
-
 schedules:
 - cron: "30 5 * * *" # Time is UTC
   displayName: Nightly Code Coverage Build
@@ -21,6 +16,10 @@ jobs:
 - job:  ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
+  parameters:
+    name: 'CodeCoverage'
+    vmImage: 'ubuntu-latest'
+    pyVersion: 3.6
 
   steps:
   - task: UsePythonVersion@0
