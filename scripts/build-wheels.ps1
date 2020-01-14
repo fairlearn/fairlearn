@@ -57,7 +57,26 @@ if ($LASTEXITCODE -ne 0)
 # Create the packages
 Write-Host
 Write-Host "Creating Packages"
-python python/fairlearn-core/setup.py sdist bdist_wheel
+
+try
+{
+    Push-Location python/fairlearn-core
+    python setup.py sdist bdist_wheel
+}
+finally
+{
+    Pop-Location
+}  
+
+try
+{
+    Push-Location python/fairlearn
+    python setup.py sdist bdist_wheel
+}
+finally
+{
+    Pop-Location
+}
 
 Write-Host
 Write-Host "Package created"

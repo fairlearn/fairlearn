@@ -20,6 +20,7 @@ parameters:
   kvPassword:
   freezeArtifactStem: 
   freezeFileStem:
+  packageNames: []
 
 stages:
 # Create the PyPI package and save as a artifact
@@ -35,7 +36,7 @@ stages:
     - template: create-wheel-step-template.yml
       parameters:
         targetType: ${{parameters.targetType}}
-        packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
+        packageArtifactPrefix: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
         freezeArtifactStem: '${{parameters.freezeArtifactStem}}${{parameters.targetType}}'
@@ -51,37 +52,38 @@ stages:
     pool:
       vmImage: ${{parameters.poolImage}}
 
-    variables:
-      packageDirectory: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
-      ${{ if eq(parameters.targetType, 'Test') }}:
-        pypiUrl: https://test.pypi.org/legacy/
-      ${{ if eq(parameters.targetType, 'Prod') }}:
-        pypiUrl: https://upload.pypi.org/legacy/
-
     strategy:
-      runOnce:
-       deploy:
-        steps:
-          - task: UsePythonVersion@0
-            displayName: 'Use Python ${{parameters.poolPythonVersion}}'
-            inputs:
-              versionSpec: ${{parameters.poolPythonVersion}}
-              addToPath: true
+      matrix:
+        ${{ each packageName in parameters.packackeNames }}:
+          ${{ packageName }}:
+            packageDirectory: '${{parameters.packageArtifactStem}}${{parameters.targetType}}${{packageName}}'
+            ${{ if eq(parameters.targetType, 'Test') }}:
+              pypiUrl: https://test.pypi.org/legacy/
+            ${{ if eq(parameters.targetType, 'Prod') }}:
+              pypiUrl: https://upload.pypi.org/legacy/
+       
+    deploy:
+      steps:
+        - task: UsePythonVersion@0
+          displayName: 'Use Python ${{parameters.poolPythonVersion}}'
+          inputs:
+            versionSpec: ${{parameters.poolPythonVersion}}
+            addToPath: true
 
-          - task: AzureKeyVault@1
-            displayName: "Fetch deployment secrets from KeyVault"
-            inputs:
-              azureSubscription: ${{parameters.kvSubscription}}
-              keyVaultName:  ${{parameters.kvVaultName}}
-              secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
+        - task: AzureKeyVault@1
+          displayName: "Fetch deployment secrets from KeyVault"
+          inputs:
+            azureSubscription: ${{parameters.kvSubscription}}
+            keyVaultName:  ${{parameters.kvVaultName}}
+            secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
 
-          - script: pip install twine
-            displayName: 'Install twine'
+        - script: pip install twine
+          displayName: 'Install twine'
 
-          # Quote the password argument in case it contains characters the shell might try to parse
-          - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p "$(${{parameters.kvPassword}})" $(Pipeline.Workspace)/$(PackageDirectory)/*'
-            displayName: "Run twine for upload"
-    
+        # Quote the password argument in case it contains characters the shell might try to parse
+        - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p "$(${{parameters.kvPassword}})" $(Pipeline.Workspace)/$(PackageDirectory)/*'
+          displayName: "Run twine for upload"
+  
   - job: PyPI_Pause
     pool: server
     dependsOn: 'PyPI_${{parameters.targetType}}_Upload'

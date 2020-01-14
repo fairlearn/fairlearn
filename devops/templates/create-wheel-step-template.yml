@@ -5,7 +5,7 @@ parameters:
   pyVer: 3.6
   targetType: ''
   versionFilename: ''
-  packageArtifactName: ''
+  packageArtifactPrefix: ''
   versionArtifactName: ''
   freezeArtifactStem: 
   freezeFile:
@@ -44,10 +44,16 @@ steps:
     pwsh: true
 
 - task: PublishPipelineArtifact@1
-  displayName: "Publish wheels"
+  displayName: "Publish fairlearn-core wheels"
   inputs:
-    path: $(System.DefaultWorkingDirectory)/dist
-    artifact: '${{parameters.packageArtifactName}}'
+    path: $(System.DefaultWorkingDirectory)/python/fairlearn-core/dist
+    artifact: '${{parameters.packageArtifactPrefix}}FairlearnCore'
+
+- task: PublishPipelineArtifact@1
+  displayName: "Publish fairlearn wheels"
+  inputs:
+    path: $(System.DefaultWorkingDirectory)/python/fairlearn/dist
+    artifact: '${{parameters.packageArtifactPrefix}}Fairlearn'
 
 - task: PublishPipelineArtifact@1
   displayName: "Publish version information file"

@@ -2,7 +2,7 @@
 
 try
 {
-    Push-Location fairlearn/widget/js
+    Push-Location python/fairlearn-core/fairlearn/widget/js
 
     # Install dependencies
     yarn install
