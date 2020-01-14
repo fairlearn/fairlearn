@@ -1,3 +1,5 @@
+# template for building the widget/fairlearn dashboard
+
 parameters:
   name: 'BuildWidget'
   vmImage: 'ubuntu-latest'

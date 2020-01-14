@@ -1,3 +1,5 @@
+
+
 parameters:
   name: 'Performance'
   pyVersions: [3.7]
@@ -36,6 +38,7 @@ jobs:
   - script: pip install -r requirements.txt
     displayName: 'Install required packages'
 
+  # The performance tests currently rely on Azure ML to persist results. 
   - script: pip install azureml-sdk
     displayName: 'Install azureml-sdk'
   

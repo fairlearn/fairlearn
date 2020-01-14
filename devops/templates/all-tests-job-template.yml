@@ -1,3 +1,6 @@
+# template for setting up the python environment (with optional pinned requirements)
+# and running all tests (except for perf tests)
+
 parameters:
   name: ''
   vmImage: ''

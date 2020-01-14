@@ -1,3 +1,6 @@
+# template to save a list of installed packages to an artifact
+# in order to reuse it at a later point.
+
 parameters:
   freezeArtifact:
   freezeFile:
