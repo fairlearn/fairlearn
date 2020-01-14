@@ -164,7 +164,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         constrained to be positive. The 'true' Lagrange multiplier is then
         :math:`\lambda = \lambda_{+} - \lambda_{-}`. This method makes the smaller
         of the two multipliers zero while maintaining the same overall value
-        for :math:`lambda`.
+        for :math:`\lambda`.
 
         The supplied :class:`pandas:pandas.DataFrame` must have the same
         :class:`pandas:pandas.MultiIndex` as `index` and the resultant
