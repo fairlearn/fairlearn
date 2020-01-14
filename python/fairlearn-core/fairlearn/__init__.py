@@ -26,13 +26,13 @@ if _FAIRLEARN_DEV_VERSION_ENV_VAR in os.environ.keys():
         print(msg.format(dev_version_string, _FAIRLEARN_DEV_VERSION_ENV_VAR), file=sys.stderr)
 
 
-__name__ = "fairlearn"
+__name__ = "fairlearn-core"
 __version__ = "{0}{1}".format(_base_version, _dev_version)
 
 
 # Common strings
 _NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
-_INSTALL_WIDGET_ERROR = "Please make sure to install fairlearn[widget] to use the fairlearn " \
+_INSTALL_WIDGET_ERROR = "Please make sure to install fairlearn-core[widget] to use the fairlearn " \
                         "dashboard."
 
 

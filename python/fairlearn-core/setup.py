@@ -32,14 +32,14 @@ setuptools.setup(
             "matplotlib>=3.0.3"
         ]
     },
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha"
-    ),
+    ],
     include_package_data=True,
     data_files=[
         ('share/jupyter/nbextensions/fairlearn-widget', [

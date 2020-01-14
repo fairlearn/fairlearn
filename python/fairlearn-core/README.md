@@ -1,0 +1,1 @@
+Please refer to the repository root [README.md](../../README.md) for information about fairlearn-core. This is only a placeholder to enable editable installations of fairlearn-core using `pip install -e .`.

@@ -57,7 +57,7 @@ The package can be installed via
 pip install fairlearn
 ```
 
-and optionally with extensions such as `pip install fairlearn[widget]` to get the fairlearn dashboard.
+or to get a reduced feature set without widget using `pip install fairlearn-core`.
 
 or you can clone the repository locally via
 
