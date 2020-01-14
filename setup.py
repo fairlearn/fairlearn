@@ -19,15 +19,13 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires='>=3.5',
     install_requires=[
+        "ipywidgets>=7.5.0",
         "numpy>=1.17.2",
         "pandas>=0.25.1",
         "scikit-learn>=0.21.3",
         "scipy>=1.3.1"
     ],
     extras_require={
-        "widget": [
-            "ipywidgets>=7.5.0"
-        ],
         "customplots": [
             "matplotlib>=3.0.3"
         ]

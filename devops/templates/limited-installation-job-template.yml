@@ -1,5 +1,5 @@
 # template for installing limited versions of fairlearn and testing them.
-# Specifically, this installs fairlearn-core without extensions before
+# Specifically, this installs fairlearn without extensions before
 # executing the tests under test/install.
 
 parameters:
@@ -31,8 +31,8 @@ jobs:
 
   - template: python-infra-upgrade-steps-template.yml
 
-  - script: pip install python/fairlearn-core/.
-    displayName: 'Install fairlearn without widget or customplots extensions'
+  - script: pip install python/fairlearn/.
+    displayName: 'Install fairlearn without customplots extensions'
 
   - script: pip install pytest
     displayName: 'Install pytest'

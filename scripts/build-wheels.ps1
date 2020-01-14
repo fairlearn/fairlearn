@@ -21,8 +21,7 @@ if( Test-Path env:FAIRLEARN_DEV_VERSION )
 }
 
 # Install ourselves
-pip install -e python/fairlearn-core/.[widget,customplots]
-pip install -e python/fairlearn/.
+pip install -e.[customplots]
 
 # Update the ReadMe file
 # Do this before setting FAIRLEARN_DEV_VERSION so that the links
@@ -36,8 +35,6 @@ if ($LASTEXITCODE -ne 0)
 {
     throw "process_readme.py failed with result code $LASTEXITCODE"
 }
-Copy-Item README.md python/fairlearn-core/.
-Copy-Item README.md python/fairlearn/.
 
 # Set the environment variable for test if required
 if( $targetType -eq "Test" )
@@ -58,25 +55,7 @@ if ($LASTEXITCODE -ne 0)
 Write-Host
 Write-Host "Creating Packages"
 
-try
-{
-    Push-Location python/fairlearn-core
-    python setup.py sdist bdist_wheel
-}
-finally
-{
-    Pop-Location
-}  
-
-try
-{
-    Push-Location python/fairlearn
-    python setup.py sdist bdist_wheel
-}
-finally
-{
-    Pop-Location
-}
+python setup.py sdist bdist_wheel
 
 Write-Host
 Write-Host "Package created"

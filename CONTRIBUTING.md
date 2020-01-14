@@ -26,15 +26,6 @@ For every pull request to `master` with automated tests, you can check the logs 
 
 To run the same tests locally, find the corresponding pipeline definition (a `yml` file) in the `devops` directory. It either directly contains the command to execute the tests (usually starting with `python -m pytest`) or it refers to a template file with the command.
 
-## Repository structure
-
-In order to enable users to get exactly the set of features they want without having to install unnecessary packages we provide two packages:
-
-| package | code location | functionality |
-| --- | --- | --- | --- |
-| `fairlearn-core` | `python/fairlearn-core` | `fairlearn-core` consists of all the unfairness mitigation algorithms and metrics code. It provides various extensions to add functionality such as the fairlearn dashboard. When installing `fairlearn-core` these [extensions are added through square brackets](https://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-extras-optional-features-with-their-own-dependencies), e.g. `pip install fairlearn-core[widget]`. |
-| `fairlearn` | `python/fairlearn` | `fairlearn` provides all the functionality that exists in this repository. Installing `fairlearn` is identical to installing `fairlearn-core` with all extensions. |
-
 ## API conventions
 
 This section relies on the definitions from our [terminology guide](TERMINOLOGY.md), including the definitions of "estimator", "reduction", "sensitive features", "moment", and "parity".
@@ -80,7 +71,7 @@ postprocessor.predict(X, sensitive_features=sensitive_features)
 ## Creating new releases
 
 We have a [Azure DevOps Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary) which takes care of building wheels and pushing to PyPI. Validations are also performed prior to any deployments, and also following the uploads to Test-PyPI and PyPI. To use it:
-1. Ensure that `_base_version` in `python/fairlearn-core/fairlearn/__init__.py` and `_VERSION` in `python/fairlearn/setup.py` are set correctly for PyPI.
+1. Ensure that `_base_version` in `python/fairlearn/fairlearn/__init__.py` is set correctly for PyPI.
 1. Put down a tag corresponding to this `_base_version` but preprended with `v`. For example, version `0.5.0` should be tagged wtih `v0.5.0`
 1. Queue the pipeline at this tag, with a variable `DEV_VERSION` set to zero. When the package is uploaded to Test-PyPI, this number will be appended to the version as a `dev[n]` suffix
 

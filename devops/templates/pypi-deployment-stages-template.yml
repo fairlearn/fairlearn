@@ -20,7 +20,6 @@ parameters:
   kvPassword:
   freezeArtifactStem: 
   freezeFileStem:
-  packageNames: []
 
 stages:
 # Create the PyPI package and save as a artifact
@@ -36,7 +35,7 @@ stages:
     - template: create-wheel-step-template.yml
       parameters:
         targetType: ${{parameters.targetType}}
-        packageArtifactPrefix: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
+        packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
         versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
         versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
         freezeArtifactStem: '${{parameters.freezeArtifactStem}}${{parameters.targetType}}'

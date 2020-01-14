@@ -86,7 +86,6 @@ stages:
     kvPassword: 'passwordtest'
     freezeArtifactStem: 'Freeze'
     freezeFileStem: 'requirements-freeze'
-    packageNames: ['FairlearnCore', 'Fairlearn']
 
 # =================================================================================================================
 
@@ -101,4 +100,3 @@ stages:
     kvPassword: 'passwordprod'
     freezeArtifactStem: 'Freeze'
     freezeFileStem: 'requirements-freeze'
-    packageNames: ['FairlearnCore', 'Fairlearn']

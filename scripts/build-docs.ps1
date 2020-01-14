@@ -17,7 +17,7 @@ try
     $scriptpath = Resolve-FullPath (Split-Path -parent $PSCommandPath)
     $rootpath = Resolve-FullPath ([System.IO.Path]::Combine($scriptpath, ".."))
 
-    $codepath = [System.IO.Path]::Combine($rootpath, "python", "fairlearn-core", "fairlearn")
+    $codepath = [System.IO.Path]::Combine($rootpath, "fairlearn")
     $docbuildpath = [System.IO.Path]::Combine($rootpath, "docbuild")
     $docconfigpath = [System.IO.Path]::Combine($rootpath, "docs")
 

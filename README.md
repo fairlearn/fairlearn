@@ -57,7 +57,7 @@ The package can be installed via
 pip install fairlearn
 ```
 
-or to get a reduced feature set without widget using `pip install fairlearn-core`.
+or optionally with a full feature set by adding extras, e.g. `pip install fairlearn[customplots]`.
 
 or you can clone the repository locally via
 
