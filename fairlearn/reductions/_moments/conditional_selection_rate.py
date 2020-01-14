@@ -24,9 +24,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Load the specified data into this object."""
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        self.prob_event = self.tags.groupby(_EVENT).size() / self.n
+        self.prob_event = self.tags.groupby(_EVENT).size() / self.n_samples
         self.prob_group_event = self.tags.groupby(
-            [_EVENT, _GROUP_ID]).size() / self.n
+            [_EVENT, _GROUP_ID]).size() / self.n_samples
         signed = pd.concat([self.prob_group_event, self.prob_group_event],
                            keys=["+", "-"],
                            names=[_SIGN, _EVENT, _GROUP_ID])

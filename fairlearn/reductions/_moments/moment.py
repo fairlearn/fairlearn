@@ -33,12 +33,16 @@ class Moment:
         assert self.data_loaded is False, \
             "data can be loaded only once"
         self.X = X
-        self.n = self.X.shape[0]
         self.tags = pd.DataFrame({_LABEL: y})
         if _KW_SENSITIVE_FEATURES in kwargs:
             self.tags[_GROUP_ID] = kwargs[_KW_SENSITIVE_FEATURES]
         self.data_loaded = True
         self._gamma_descr = None
+
+    @property
+    def n_samples(self):
+        """Return the number of samples in the data."""
+        return self.X.shape[0]
 
     def gamma(self, predictor):  # noqa: D102
         raise NotImplementedError()
