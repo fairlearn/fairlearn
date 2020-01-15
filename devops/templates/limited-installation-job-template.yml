@@ -31,7 +31,7 @@ jobs:
 
   - template: python-infra-upgrade-steps-template.yml
 
-  - script: pip install python/fairlearn/.
+  - script: pip install .
     displayName: 'Install fairlearn without customplots extensions'
 
   - script: pip install pytest
