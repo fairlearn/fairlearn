@@ -32,7 +32,7 @@ def test_construct_and_load():
     # Load up the (rigged) data
     dp.load_data(X, Y, sensitive_features=A)
     assert dp.data_loaded
-    assert dp.n == num_samples_a0 + num_samples_a1
+    assert dp.total_samples == num_samples_a0 + num_samples_a1
 
     # Examine the tags DF
     assert dp.tags['label'].equals(pd.Series(Y))
