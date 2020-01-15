@@ -100,7 +100,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         in Section 3.2 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_
         in the 'best response of the Q-player' subsection to compute the
         signed weights to be applied to the data by the next call to the underlying
-        Estimator.
+        estimator.
 
         :param lambda_vec: The set of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
