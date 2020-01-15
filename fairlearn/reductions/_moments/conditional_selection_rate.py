@@ -102,7 +102,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed weights to be applied to the data by the next call to the underlying
         estimator.
 
-        :param lambda_vec: The set of Lagrange multipliers indexed by `index`
+        :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
@@ -132,7 +132,7 @@ class DemographicParity(ConditionalSelectionRate):
     :class:`pandas:pandas.DataFrame`
     will only have a single entry, which will be equal to 1.
     Similarly, the `index` property will have twice as many entries
-    (corresponding to the positive and negative Lagrange multipliers)
+    (corresponding to the Lagrange multipliers for positive and negative constraints)
     as there are unique values for the sensitive feature.
     The :meth:`signed_weights` method will compute the costs according
     to Example 3 of
