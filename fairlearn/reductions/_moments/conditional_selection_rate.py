@@ -13,7 +13,20 @@ class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness moment for selection rates.
 
     This serves as the base class for both :class:`DemographicParity`
-    and :class:`EqualizedOdds`.
+    and :class:`EqualizedOdds`. The two are distinguished by
+    the events they define, which in turn affect the
+    `index` field created by :meth:`load_data()`.
+
+    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the rows of
+    the DataFrames either required as arguments or returned by several
+    of the methods of the `ConditionalSelectionRate` class. It is the cartesian
+    product of:
+
+    - The unique events defined for the particular object
+    - The unique values for the sensitive feature
+    - The characters `+` and `-`, corresponding to the Lagrange multipliers
+      for positive and negative violations of the constraint
+
     """
 
     def default_objective(self):
@@ -21,7 +34,10 @@ class ConditionalSelectionRate(ClassificationMoment):
         return ErrorRate()
 
     def load_data(self, X, y, event=None, **kwargs):
-        """Load the specified data into this object."""
+        """Load the specified data into this object.
+
+        This adds a column `event` to the `tags` field.
+        """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
@@ -78,7 +94,17 @@ class ConditionalSelectionRate(ClassificationMoment):
         return lambda_projected
 
     def signed_weights(self, lambda_vec):
-        """Return the signed weights."""
+        """Compute the signed weights.
+
+        Uses the equations for :math:`C_i^0` and :math:`C_i^1` as defined
+        in Section 3.2 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_
+        in the 'best response of the Q-player' subsection to compute the
+        signed weights to be applied to the data by the next call to the underlying
+        estimator.
+
+        :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
+        :type lambda_vec: :class:`pandas:pandas.Series`
+        """
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
             - lambda_signed / self.prob_group_event
