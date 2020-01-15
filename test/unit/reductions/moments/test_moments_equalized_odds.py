@@ -32,7 +32,7 @@ def test_construct_and_load():
     # Load up the (rigged) data
     eqo.load_data(X, Y, sensitive_features=A)
     assert eqo.data_loaded
-    assert eqo.n_samples == num_samples_a0 + num_samples_a1
+    assert eqo.total_samples == num_samples_a0 + num_samples_a1
 
     # Examine the tags DF
     assert eqo.tags['label'].equals(pd.Series(Y))

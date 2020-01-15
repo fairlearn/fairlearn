@@ -46,7 +46,7 @@ class Moment:
         self._gamma_descr = None
 
     @property
-    def n_samples(self):
+    def total_samples(self):
         """Return the number of samples in the data."""
         return self.X.shape[0]
 
