@@ -3,7 +3,7 @@
 # executing the tests under test/install.
 
 parameters:
-  name: ''
+  name: 'Limited Installation (without matplotlib)'
   vmImage: ''
   pyVersions: [3.5, 3.6, 3.7]
   freezeArtifactStem: 
