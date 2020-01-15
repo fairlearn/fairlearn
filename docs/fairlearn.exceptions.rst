@@ -1,5 +1,5 @@
-fairlearn\.exceptions package
-==========================
+fairlearn\.exceptions module
+----------------------------
 
 .. automodule:: fairlearn.exceptions
     :members:
