@@ -39,7 +39,7 @@ jobs:
   parameters:
     name: MacOS
     vmImage:  'macos-latest'
-    pyVersions: [3.6, 3.7]
+    pyVersions: [3.5, 3.6, 3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
