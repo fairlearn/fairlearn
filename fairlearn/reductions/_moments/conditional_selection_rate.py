@@ -164,7 +164,7 @@ class EqualizedOdds(ConditionalSelectionRate):
     The `index` MultiIndex will have a number of entries equal to
     the number of unique values for the sensitive feature, multiplied by
     the number of unique values of the `Y` array, multiplied by two (for
-    the positive and negative Lagrange multipliers).
+    the Lagrange multipliers for positive and negative constraints).
 
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
