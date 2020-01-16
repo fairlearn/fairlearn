@@ -13,4 +13,4 @@ schedules:
   always: true
 
 jobs:
-- template: code-coverage-job-template.yml
+- template: templates/code-coverage-job-template.yml
