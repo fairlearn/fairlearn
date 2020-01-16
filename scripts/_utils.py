@@ -8,8 +8,8 @@ logging.basicConfig(level=logging.INFO)
 def _ensure_cwd_is_fairlearn_root_dir():
     # To ensure we're in the right directory check both the directory name
     # and that there's a fairlearn directory inside.
-    if not os.path.basename(os.getcwd()) == 'fairlearn' or \
-            not os.path.exists(os.path.join(os.getcwd(), "fairlearn")):
+    if not os.path.exists(os.path.join(os.getcwd(), "fairlearn")) or \
+            not os.path.exists(os.path.join(os.getcwd(), "README.md")):
         raise Exception("Please run this from the fairlearn root directory. "
                         "Current directory: {}".format(os.getcwd()))
 
