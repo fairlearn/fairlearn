@@ -11,11 +11,6 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
 
   steps:
-  - script: ls /usr/bin
-    displayName: "find yarn path /usr/bin"
-  
-  - script: ls /usr/bin/yarn
-    displayName: "find yarn path /usr/bin/yarn"
-
   - script: python scripts/build_widget.py --assert-no-changes --yarn-path /usr/bin/yarn
     displayName: 'Build widget'
+    workingDirectory: "fairlearn"
