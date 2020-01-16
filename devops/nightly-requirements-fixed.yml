@@ -21,7 +21,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- template: all-tests-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
     name: Linux
     vmImage: 'ubuntu-16.04'
@@ -31,7 +31,7 @@ jobs:
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
-- template: all-tests-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
     name: Windows
     vmImage:  'vs2017-win2016'
@@ -40,7 +40,7 @@ jobs:
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
-- template: notebook-job-template.yml
+- template: templates/notebook-job-template.yml
   parameters:
     name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
@@ -48,7 +48,7 @@ jobs:
     pinRequirements: True
     pyVersions: [3.5, 3.6, 3.7]
 
-- template: notebook-job-template.yml
+- template: templates/notebook-job-template.yml
   parameters:
     name: WindowsNotebooks
     vmImage: 'vs2017-win2016'
@@ -56,4 +56,4 @@ jobs:
     pinRequirements: True
     pyVersions: [3.5, 3.6, 3.7] 
 
-- template: build-widget-job-template.yml
+- template: templates/build-widget-job-template.yml

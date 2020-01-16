@@ -1,0 +1,26 @@
+# Steps to retrieve the version of fairlearn which is currently being released. The
+# version information is in a file store in the pipeline artifacts. Once the version
+# has been read from this file, it is stored in a pipeline variable for use in subsequent
+# stages of the same job
+
+# We do this since pipeline variables cannot be shared between pipeline stages, and
+# sharing between pipeline jobs is nontrivial
+
+parameters:
+  artifactName: ''
+  artifactFile: ''
+  targetVariable: ''
+
+
+steps:
+- task: DownloadPipelineArtifact@2
+  displayName: "Download version Artifact"
+  inputs:
+    artifactName: ${{parameters.artifactName}}
+
+- task: PowerShell@2
+  displayName: 'Read version Artifact and set pipeline variable from file contents'
+  inputs:
+    filePath: scripts/set-variable-from-file.ps1
+    arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName ${{parameters.artifactFile}} -targetVariable ${{parameters.targetVariable}}"
+    pwsh: true

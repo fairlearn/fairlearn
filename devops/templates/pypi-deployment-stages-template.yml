@@ -1,0 +1,144 @@
+# This template contains the core steps for deploying to PyPI:
+# 1. Create the package
+# 2. Upload the package to PyPI
+# 3. Validate the package by installing from PyPI and running the tests
+
+# In order to share the version between the stages, an Artifact is created
+# which contains a single file, the contents of which are the version
+
+parameters:
+  poolImage: ''
+  poolPythonVersion: 3.6
+  targetType: 'Test'
+  targetEnvironment: 'PyPI-Test Deployment'
+  packageArtifactStem: 'Packages'
+  versionArtifactStem: 'Version'
+  versionFileStem: 'versionInfo'
+  kvSubscription:
+  kvVaultName:
+  kvUsername:
+  kvPassword:
+  freezeArtifactStem: 
+  freezeFileStem:
+
+stages:
+# Create the PyPI package and save as a artifact
+# Also save the 'version file' artifact
+- stage: 'Create_PyPI_Package_${{parameters.targetType}}'
+
+  jobs:
+  - job: 'Create_Package'
+    pool:
+      vmImage: ${{parameters.poolImage}}
+
+    steps:
+    - template: create-wheel-step-template.yml
+      parameters:
+        targetType: ${{parameters.targetType}}
+        packageArtifactName: '${{parameters.packageArtifactStem}}${{parameters.targetType}}'
+        versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+        versionFilename: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+        freezeArtifactStem: '${{parameters.freezeArtifactStem}}${{parameters.targetType}}'
+        freezeFile: '${{parameters.freezeFileStem}}-${{parameters.targetType}}-create-wheel.txt'
+
+
+# Upload the package to the appropriate PyPI index
+- stage: 'Upload_Package_To_PyPI_${{parameters.targetType}}'
+
+  jobs:
+  - deployment: 'PyPI_${{parameters.targetType}}_Upload'
+    environment: ${{parameters.targetEnvironment}}
+    pool:
+      vmImage: ${{parameters.poolImage}}
+
+    strategy:
+      matrix:
+        ${{ each packageName in parameters.packackeNames }}:
+          ${{ packageName }}:
+            packageDirectory: '${{parameters.packageArtifactStem}}${{parameters.targetType}}${{packageName}}'
+            ${{ if eq(parameters.targetType, 'Test') }}:
+              pypiUrl: https://test.pypi.org/legacy/
+            ${{ if eq(parameters.targetType, 'Prod') }}:
+              pypiUrl: https://upload.pypi.org/legacy/
+       
+    deploy:
+      steps:
+        - task: UsePythonVersion@0
+          displayName: 'Use Python ${{parameters.poolPythonVersion}}'
+          inputs:
+            versionSpec: ${{parameters.poolPythonVersion}}
+            addToPath: true
+
+        - task: AzureKeyVault@1
+          displayName: "Fetch deployment secrets from KeyVault"
+          inputs:
+            azureSubscription: ${{parameters.kvSubscription}}
+            keyVaultName:  ${{parameters.kvVaultName}}
+            secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
+
+        - script: pip install twine
+          displayName: 'Install twine'
+
+        # Quote the password argument in case it contains characters the shell might try to parse
+        - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p "$(${{parameters.kvPassword}})" $(Pipeline.Workspace)/$(PackageDirectory)/*'
+          displayName: "Run twine for upload"
+  
+  - job: PyPI_Pause
+    pool: server
+    dependsOn: 'PyPI_${{parameters.targetType}}_Upload'
+
+    steps:
+    - task: Delay@1
+      displayName: "Pause to allow PyPI updates to complete"
+      inputs:
+        delayForMinutes: "5"
+
+
+# Fetch the package from the PyPI index and run tests against it
+- stage: 'Validate_Package_from_PyPI_${{parameters.targetType}}'
+  
+  jobs:
+  - template: unit-tests-pypi-job-template.yml
+    parameters:
+      name: Linux
+      vmImage: 'ubuntu-16.04'
+      pyVersions: [3.5, 3.6, 3.7]
+      targetType: ${{parameters.targetType}}
+      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+
+  - template: unit-tests-pypi-job-template.yml
+    parameters:
+      name: Windows
+      vmImage: 'vs2017-win2016'
+      pyVersions: [3.5, 3.6, 3.7]
+      targetType: ${{parameters.targetType}}
+      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+
+  - template: unit-tests-pypi-job-template.yml
+    parameters:
+      name: MacOS
+      vmImage: 'macos-latest'
+      pyVersions: [3.6, 3.7]
+      targetType: ${{parameters.targetType}}
+      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+
+  - template: notebook-pypi-job-template.yml
+    parameters:
+      name: LinuxNotebooks
+      vmImage: 'ubuntu-16.04'
+      pyVersions: [3.5, 3.6, 3.7]
+      targetType: ${{parameters.targetType}}
+      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+
+  - template: notebook-pypi-job-template.yml
+    parameters:
+      name: WindowsNotebooks
+      vmImage: 'vs2017-win2016'
+      pyVersions: [3.5, 3.6, 3.7]
+      targetType: ${{parameters.targetType}}
+      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
