@@ -32,5 +32,5 @@ jobs:
   - script: ls /usr/bin
     displayName: "find yarn path /usr/bin"
 
-  - task: python scripts/build_widget.py --assert-no-changes --yarn-path yarn
+  - script: python scripts/build_widget.py --assert-no-changes --yarn-path yarn
     displayName: 'Build widget'
