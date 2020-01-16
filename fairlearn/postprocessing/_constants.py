@@ -11,3 +11,6 @@ OUTPUT_SEPARATOR = "-"*65
 
 DEMOGRAPHIC_PARITY = "demographic_parity"
 EQUALIZED_ODDS = "equalized_odds"
+
+_MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install fairlearn[customplots] to use " \
+                                   "the postprocessing plots."
