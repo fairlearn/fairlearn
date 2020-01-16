@@ -1,0 +1,55 @@
+# template for setting up the python environment (with optional pinned requirements)
+# and running all tests (except for perf and install tests)
+
+parameters:
+  name: ''
+  vmImage: ''
+  pyVersions: [3.5, 3.6, 3.7]
+  requirementsFile: 'requirements.txt'
+  pinRequirements: False
+  freezeArtifactStem: 
+  freezeFileStem:
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    maxParallel: 2
+    matrix:
+      ${{ each pyVer in parameters.pyVersions }}:
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
+          FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
+
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(PyVer)'
+    inputs:
+      versionSpec: '$(PyVer)' 
+      addToPath: true
+
+  - template: python-infra-upgrade-steps-template.yml
+
+  - script: python scripts/requirements_pin.py --input requirements.txt --output requirements-fixed.txt --loglevel INFO
+    displayName: "Pin Requirements file"
+    condition: eq('${{parameters.pinRequirements}}', True)
+
+  - script: pip install -r ${{ parameters.requirementsFile }}
+    displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+
+  - template: pip-freeze-to-artifact-steps-template.yml
+    parameters:
+      freezeArtifact: $(FreezeArtifact)
+      freezeFile: $(FreezeFile)
+    
+  - script: flake8 .
+    displayName: "Run flake8"
+
+  - script: python -m pytest test/ --ignore=test/perf --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+    displayName: 'Run tests'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()

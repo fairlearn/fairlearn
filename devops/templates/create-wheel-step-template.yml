@@ -1,0 +1,56 @@
+# Step templates to create the wheels and file specifying the current version
+# Note that this uses the DEV_VERSION variable
+
+parameters:
+  pyVer: 3.6
+  targetType: ''
+  versionFilename: ''
+  packageArtifactName: ''
+  versionArtifactName: ''
+  freezeArtifactStem: 
+  freezeFile:
+
+steps:
+- task: UsePythonVersion@0
+  displayName: 'Use Python ${{parameters.pyVer}}'
+  inputs:
+    versionSpec: ${{parameters.pyVer}}
+    addToPath: true
+
+- template: python-infra-upgrade-steps-template.yml
+
+- script: pip install setuptools wheel 
+  displayName: 'Install setuptools'
+
+- script: pip install -r requirements.txt
+  displayName: "Install fairlearn requirements"
+
+- template: pip-freeze-to-artifact-steps-template.yml
+  parameters:
+    freezeArtifact: '${{parameters.freezeArtifactStem}}CreateWheel'
+    freezeFile: ${{parameters.FreezeFile}}
+
+- task: PowerShell@2
+  displayName: 'Build widget'
+  inputs:
+    filePath: scripts/build-widget.ps1
+    pwsh: true
+
+- task: PowerShell@2
+  displayName: 'Build wheels'
+  inputs:
+    filePath: scripts/build-wheels.ps1
+    arguments: '-targetType ${{parameters.targetType}} -versionFilename ${{parameters.versionFilename}} -devVersion $(DEV_VERSION)'
+    pwsh: true
+
+- task: PublishPipelineArtifact@1
+  displayName: "Publish wheels"
+  inputs:
+    path: $(System.DefaultWorkingDirectory)/dist
+    artifact: '${{parameters.packageArtifactName}}'
+
+- task: PublishPipelineArtifact@1
+  displayName: "Publish version information file"
+  inputs:
+    path: '$(System.DefaultWorkingDirectory)/${{parameters.versionFilename}}'
+    artifact: '${{parameters.versionArtifactName}}'

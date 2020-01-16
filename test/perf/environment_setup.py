@@ -15,24 +15,6 @@ def build_package():
     print('removing dist directory')
     shutil.rmtree("dist", True)
 
-    # perf tests don't need dashboard, so we're faking the required files
-    required_files = [
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'extension.js'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'extension.js.map'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'index.js'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'static', 'index.js.map'),
-        os.path.join(os.getcwd(), 'fairlearn', 'widget', 'js', 'fairlearn_widget', 'labextension',
-                     'fairlearn-widget-0.1.0.tgz')
-    ]
-    for file_path in required_files:
-        directory = os.path.dirname(file_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as new_file:
-                new_file.write('')
-
     print('running python setup.py bdist_wheel')
     subprocess.Popen(["python", "setup.py", "bdist_wheel"], cwd=os.getcwd(), shell=True).wait()
     for root, dirs, files in os.walk("dist"):
