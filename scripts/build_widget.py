@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import sys
 
-from _utils import _ensure_cwd_is_fairlearn_root_dir, LogWrapper
+from _utils import _ensure_cwd_is_fairlearn_root_dir, _LogWrapper
 
 
 _logger = logging.getLogger(__file__)
@@ -44,27 +44,27 @@ def main(argv):
     parser = build_argument_parser()
     args = parser.parse_args(argv)
 
-    with LogWrapper("yarn install of dependencies"):
+    with _LogWrapper("yarn install of dependencies"):
         subprocess.check_call([args.yarn_path, "install"],
                               cwd=os.path.join(os.getcwd(), _widget_js_directory))
 
-    with LogWrapper("yarn build"):
+    with _LogWrapper("yarn build"):
         subprocess.check_call([args.yarn_path, "build:all"],
                               cwd=os.path.join(os.getcwd(), _widget_js_directory))
 
-    with LogWrapper("removal of extra directories"):
+    with _LogWrapper("removal of extra directories"):
         shutil.rmtree(os.path.join(_widget_js_directory, "dist"))
         shutil.rmtree(os.path.join(_widget_js_directory, "lib"))
         shutil.rmtree(os.path.join(_widget_js_directory, "node_modules"))
 
     if args.assert_no_changes:
-        with LogWrapper("comparison between old and newly generated widget files."):
+        with _LogWrapper("comparison between old and newly generated widget files."):
             for file_path in _widget_generated_files:
                 diff_result = subprocess.check_output(["git", "diff", os.path.abspath(file_path)])
                 if diff_result == b'':
-                    _logger.info("File {} has not changed.".format(file_path))
+                    _logger.info("File {} has not changed.", file_path)
                 else:
-                    _logger.error("File {} has changed unexpectedly.".format(file_path))
+                    _logger.error("File {} has changed unexpectedly.", file_path)
 
 
 if __name__ == "__main__":

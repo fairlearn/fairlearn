@@ -14,7 +14,7 @@ import logging
 import re
 import sys
 
-from _utils import LogWrapper
+from _utils import _LogWrapper
 
 _logger = logging.getLogger(__name__)
 
@@ -90,13 +90,13 @@ def process_readme(input_file_name, output_file_name):
     _logger.info("fairlearn version: %s", target_version)
 
     text_lines = []
-    with LogWrapper("reading file {}".format(input_file_name)):
-        
+    with _LogWrapper("reading file {}".format(input_file_name)):
+
         with open(input_file_name, 'r') as input_file:
             text_lines = input_file.readlines()
 
     result_lines = [_process_line(line, target_version) for line in text_lines]
 
-    with LogWrapper("writing file {}".format(output_file_name)):
+    with _LogWrapper("writing file {}".format(output_file_name)):
         with open(output_file_name, 'w') as output_file:
             output_file.writelines(result_lines)

@@ -1,11 +1,10 @@
 import argparse
 import logging
 import os
-import shutil
 import subprocess
 import sys
 
-from _utils import _ensure_cwd_is_fairlearn_root_dir, LogWrapper
+from _utils import _ensure_cwd_is_fairlearn_root_dir, _LogWrapper
 from process_readme import process_readme
 
 
@@ -41,24 +40,26 @@ def main(argv):
     args = parser.parse_args(argv)
 
     if "FAIRLEARN_DEV_VERSION" in os.environ:
-        raise Exception("Environment variable {} must not be set".format(_fairlearn_dev_version_env_var_name))
+        raise Exception("Environment variable {} must not be set"
+                        .format(_fairlearn_dev_version_env_var_name))
 
-    with LogWrapper("installation of fairlearn"):
+    with _LogWrapper("installation of fairlearn"):
         subprocess.check_call(["pip", "install", "-e", ".[customplots]"])
 
-    with LogWrapper("processing README.md"):
+    with _LogWrapper("processing README.md"):
         process_readme("README.md", "README.md")
 
     if args.target_type == "Test":
         os.environ[_fairlearn_dev_version_env_var_name] = args.dev_version
 
-    with LogWrapper("storing fairlearn version in {}".format(args.version_filename)):
+    with _LogWrapper("storing fairlearn version in {}".format(args.version_filename)):
         import fairlearn
         with open(args.version_filename, 'w') as version_file:
             version_file.write(fairlearn.__version__)
 
-    with LogWrapper("creation of packages"):
+    with _LogWrapper("creation of packages"):
         subprocess.check_call(["python", "setup.py", "sdist", "bdist_wheel"])
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

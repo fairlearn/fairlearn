@@ -14,15 +14,15 @@ def _ensure_cwd_is_fairlearn_root_dir():
                         "Current directory: {}".format(os.getcwd()))
 
 
-class LogWrapper:
+class _LogWrapper:
     def __init__(self, description):
         self._description = description
 
     def __enter__(self):
-        _logger.info("Starting {}".format(self._description))
+        _logger.info("Starting {}", self._description)
 
     def __exit__(self, type, value, traceback):  # noqa: A002
         # raise exceptions if any occurred
         if value is not None:
             raise value
-        _logger.info("Completed {}".format(self._description))
+        _logger.info("Completed {}", self._description)
