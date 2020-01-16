@@ -109,7 +109,7 @@ def main(argv):
         logging.basicConfig(level=getattr(logging, args.loglevel))
 
     target_version = get_fairlearn_version()
-    logger.info("Fairlearn version: %s", target_version)
+    logger.info("fairlearn version: %s", target_version)
 
     logger.debug("Reading file %s", args.input)
     text_lines = []

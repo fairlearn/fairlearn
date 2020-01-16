@@ -19,7 +19,6 @@ from fairlearn.postprocessing import PostProcessing
 from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
-from ._curve_plotting_utilities import plot_solution_and_show_plot, plot_overlap, plot_curve
 from ._interpolated_prediction import InterpolatedPredictor
 
 # various error messages
@@ -282,6 +281,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
         logger.debug("ROC curve: convex")
         logger.debug(roc_convex_hull)
         if plot:
+            from ._curve_plotting_utilities import plot_curve
             plot_curve(sensitive_feature_value, 'selection', 'error',
                        selection_error_curve[sensitive_feature_value])
 
@@ -310,6 +310,7 @@ def _threshold_optimization_demographic_parity(sensitive_features, labels, score
                  error_given_selection[i_best_DP], x_best)
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
+        from ._curve_plotting_utilities import plot_solution_and_show_plot
         plot_solution_and_show_plot(
             x_best, None, "DP solution", "selection rate", "error")
 
@@ -372,6 +373,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
         logger.debug("ROC curve: convex")
         logger.debug(roc_convex_hull)
         if plot:
+            from ._curve_plotting_utilities import plot_curve
             plot_curve(sensitive_feature_value, 'x', 'y', roc[sensitive_feature_value])
 
     # Calculate the overlap of the ROC curves by taking the lowest y value
@@ -417,6 +419,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
                  error_given_x[i_best_EO], x_best, y_best)
     logger.debug(OUTPUT_SEPARATOR)
     if plot:
+        from ._curve_plotting_utilities import plot_overlap, plot_solution_and_show_plot
         plot_overlap(x_grid, y_min)
         plot_solution_and_show_plot(x_best, y_best, 'EO solution', "$P[\\hat{Y}=1|Y=0]$",
                                     "$P[\\hat{Y}=1|Y=1]$")

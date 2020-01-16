@@ -20,6 +20,6 @@ schedules:
 
 
 jobs:
-- template: perf-tests-job-template.yml
+- template: templates/perf-tests-job-template.yml
   parameters:
     vmImage: 'vs2017-win2016'
