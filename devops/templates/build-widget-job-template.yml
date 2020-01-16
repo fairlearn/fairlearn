@@ -18,6 +18,6 @@ jobs:
     displayName: 'ls fairlearn'
     workingDirectory: "fairlearn"
 
-  - script: python scripts/build_widget.py --assert-no-changes --yarn-path /usr/bin/yarn
+  - script: python ./scripts/build_widget.py --assert-no-changes --yarn-path /usr/bin/yarn
     displayName: 'Build widget'
-    workingDirectory: "fairlearn"
+
