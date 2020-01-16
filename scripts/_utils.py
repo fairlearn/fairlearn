@@ -22,4 +22,7 @@ class LogWrapper:
         _logger.info("Starting {}".format(self._description))
 
     def __exit__(self, type, value, traceback):  # noqa: A002
+        # raise exceptions if any occurred
+        if value is not None:
+            raise value
         _logger.info("Completed {}".format(self._description))
