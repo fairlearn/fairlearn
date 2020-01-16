@@ -22,9 +22,15 @@ jobs:
   
   - script: ls /bin
     displayName: "find yarn path /bin"
+  
+  - script: ls /var
+    displayName: "find yarn path /var"
+  
+  - script: ls /var/lib/dpkg/info
+    displayName: "find yarn path /var/lib/dpkg/info"
 
-  - task: PowerShell@2
+  - script: ls /usr/bin
+    displayName: "find yarn path /usr/bin"
+
+  - task: python scripts/build_widget.py --assert-no-changes --yarn-path yarn
     displayName: 'Build widget'
-    inputs:
-      filePath: python scripts/build_widget.py --assert-no-changes --yarn-path yarn
-      pwsh: true
