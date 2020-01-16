@@ -11,26 +11,11 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
 
   steps:
-  - script: ls
-    displayName: "find yarn path"
-  
-  - script: ls /
-    displayName: "find yarn path /"
-  
-  - script: ls /etc
-    displayName: "find yarn path /etc"
-  
-  - script: ls /bin
-    displayName: "find yarn path /bin"
-  
-  - script: ls /var
-    displayName: "find yarn path /var"
-  
-  - script: ls /var/lib/dpkg/info
-    displayName: "find yarn path /var/lib/dpkg/info"
-
   - script: ls /usr/bin
     displayName: "find yarn path /usr/bin"
+  
+  - script: ls /usr/bin/yarn
+    displayName: "find yarn path /usr/bin/yarn"
 
-  - script: python scripts/build_widget.py --assert-no-changes --yarn-path yarn
+  - script: python scripts/build_widget.py --assert-no-changes --yarn-path /usr/bin/yarn
     displayName: 'Build widget'
