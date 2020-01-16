@@ -3,19 +3,25 @@
 This project welcomes contributions and suggestions.
 
 ## Developer certificate of origin
+
 Contributions require you to sign a _developer certificate of origin_ (DCO) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://developercertificate.org/.
 
 When you submit a pull request, a DCO-bot will automatically determine whether you need to provide a DCO and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repositories using our DCO.
 
 ## Code of conduct
+
 This project has adopted the [GitHub community guidelines](https://help.github.com/en/github/site-policy/github-community-guidelines).
 
 ## Development process
+
 Development happens against the `master` branch following the [GitHub flow model](https://guides.github.com/introduction/flow/). Contributors create feature branches off of `master`, and their pull requests should target the `master` branch. Maintainers are responsible for prompt review of pull requests.
 
 Pull requests against `master` trigger automated tests that are run through Azure DevOps. Additional test suites are run periodically. When adding new code paths or features, tests are a requirement to complete a pull request. They should be added in the `test` directory.
 
+To build the fairlearn dashboard after making changes to it, [install Yarn](https://yarnpkg.com/lang/en/docs/install), and then run the [widget build script](scripts/build-widget.ps1).
+
 ### Investigating automated test failures
+
 For every pull request to `master` with automated tests, you can check the logs of the tests to find the root cause of failures. Our tests currently run through Azure Pipelines with steps for setup, testing, and teardown. The `Checks` tab of a pull request contains a link to the [Azure Pipelines page](dev.azure.com/responsibleai/fairlearn/_build/results), where you can review the logs by clicking on a specific step in the automated test sequence. If you encounter problems with this workflow, please reach out through [GitHub issues](https://github.com/fairlearn/fairlearn/issues).
 
 To run the same tests locally, find the corresponding pipeline definition (a `yml` file) in the `devops` directory. It either directly contains the command to execute the tests (usually starting with `python -m pytest`) or it refers to a template file with the command.
@@ -62,11 +68,10 @@ postprocessor.fit(X, y, sensitive_features=sensitive_features)
 postprocessor.predict(X, sensitive_features=sensitive_features)
 ```
 
-
 ## Creating new releases
 
 We have a [Azure DevOps Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary) which takes care of building wheels and pushing to PyPI. Validations are also performed prior to any deployments, and also following the uploads to Test-PyPI and PyPI. To use it:
-1. Ensure that `_base_version` in `fairlearn/__init__.py` is set correctly for PyPI
+1. Ensure that `_base_version` in `python/fairlearn/fairlearn/__init__.py` is set correctly for PyPI.
 1. Put down a tag corresponding to this `_base_version` but preprended with `v`. For example, version `0.5.0` should be tagged wtih `v0.5.0`
 1. Queue the pipeline at this tag, with a variable `DEV_VERSION` set to zero. When the package is uploaded to Test-PyPI, this number will be appended to the version as a `dev[n]` suffix
 

@@ -3,17 +3,22 @@
 
 """Utilities for plotting curves."""
 
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.colors
+from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 
-tab10_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
-tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
-debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
-debug_ncolors = len(debug_colors)
-debug_colormap = {}
+try:
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
+    import matplotlib.colors
 
-highlight_color = [0.95, 0.90, 0.40]
+    tab10_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
+    tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
+    debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
+    debug_ncolors = len(debug_colors)
+    debug_colormap = {}
+
+    highlight_color = [0.95, 0.90, 0.40]
+except ImportError:
+    raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
 
 def _get_debug_color(key):
