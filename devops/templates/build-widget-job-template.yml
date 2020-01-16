@@ -11,8 +11,20 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
 
   steps:
+  - script: ls
+    displayName: "find yarn path"
+  
+  - script: ls /
+    displayName: "find yarn path /"
+  
+  - script: ls /etc
+    displayName: "find yarn path /etc"
+  
+  - script: ls /bin
+    displayName: "find yarn path /bin"
+
   - task: PowerShell@2
     displayName: 'Build widget'
     inputs:
-      filePath: scripts/build-widget.ps1
+      filePath: python scripts/build_widget.py --assert-no-changes --yarn-path yarn
       pwsh: true
