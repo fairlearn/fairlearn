@@ -5,7 +5,12 @@ import numpy as np
 
 
 def logging_all_close(a, b, rtol=1e-05, atol=1e-08, equal_nan=False):
-    """Wrap numpy.all_close functionality with print() on failure."""
+    """Wrap numpy.all_close functionality with print() on failure.
+
+    Function arguments match numpy.all_close (assuming that it uses
+    numpy.isclose), but if there are failures, then some diagnostics
+    will be printed to stdout.
+    """
     aa = np.asarray(a)
     ba = np.asarray(b)
 
