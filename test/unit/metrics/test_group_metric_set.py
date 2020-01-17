@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from fairlearn.metrics import GroupMetricSet
+from fairlearn.metrics import GroupMetricSet, GroupMetricResult
 
 
 def test_model_type_property():
@@ -54,4 +54,30 @@ def test_group_names_values_not_string():
     with pytest.raises(ValueError) as exception_context:
         target.group_names = {0: 1, 2: 3}
     expected = "Values not strings"
+    assert exception_context.value.args[0] == expected
+
+
+def test_metrics():
+    target = GroupMetricSet()
+    my_metric = GroupMetricResult()
+    my_metric.overall = 10222
+    target.metrics = {"60bdb14d-83fb-4374-ab2e-4c371f22b21e": my_metric}
+    assert target.metrics["60bdb14d-83fb-4374-ab2e-4c371f22b21e"].overall == 10222
+
+
+def test_metrics_keys_not_string():
+    target = GroupMetricSet()
+    my_metric = GroupMetricResult()
+    my_metric.overall = 10222
+    with pytest.raises(ValueError) as exception_context:
+        target.metrics = {0: my_metric}
+    expected = "Keys not strings"
+    assert exception_context.value.args[0] == expected
+
+
+def test_metrics_values_not_groupmetricresult():
+    target = GroupMetricSet()
+    with pytest.raises(ValueError) as exception_context:
+        target.metrics = {"a": 0}
+    expected = "Values not GroupMetricResults"
     assert exception_context.value.args[0] == expected

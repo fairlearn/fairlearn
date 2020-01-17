@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import fairlearn.metrics as fm
 import fairlearn.metrics._input_manipulations as fmim
 
 
@@ -17,6 +18,7 @@ class GroupMetricSet:
         self._y_pred = None
         self._groups = None
         self._group_names = None
+        self._metrics = None
 
     @property
     def model_type(self):
@@ -69,3 +71,18 @@ class GroupMetricSet:
             raise ValueError("Values not strings")
 
         self._group_names = value
+
+    @property
+    def metrics(self):
+        """Return the GUID-GroupMetricResult dictionary of group metrics."""
+        return self._metrics
+
+    @metrics.setter
+    def metrics(self, value):
+        key_types = set(type(k) for k in value.keys())
+        if key_types != {str}:
+            raise ValueError("Keys not strings")
+        value_types = set(type(v) for v in value.values())
+        if value_types != {fm.GroupMetricResult}:
+            raise ValueError("Values not GroupMetricResults")
+        self._metrics = value
