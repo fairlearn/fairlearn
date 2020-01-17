@@ -33,6 +33,9 @@ class GroupMetricSet:
     GROUP_SPECIFICITY_SCORE = "53649e54-3d2b-495c-827e-bf4b201d7597"
     GROUP_ZERO_ONE_LOSS = "3c2805a7-04b5-4b19-baa9-33928fe3d121"
 
+    BINARY_CLASSIFICATION_METRICS = {}
+    BINARY_CLASSIFICATION_METRICS[GROUP_ACCURACY_SCORE] = fm.group_accuracy_score
+
     def __init__(self):
         self._model_type = None
         self._y_true = None
@@ -107,3 +110,19 @@ class GroupMetricSet:
         if value_types != {fm.GroupMetricResult}:
             raise ValueError("Values not GroupMetricResults")
         self._metrics = value
+
+    def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION, group_names=None):
+        """Compute the default metrics."""
+        self.y_true = y_true
+        self.y_pred = y_pred
+        self.groups = groups
+        self.model_type = model_type
+        if group_names is not None:
+            self.group_names = group_names
+
+        computed_metrics = {}
+        if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
+            for k, f in GroupMetricSet.BINARY_CLASSIFICATION_METRICS.items():
+                computed_metrics[k] = f(self.y_true, self.y_pred, self.groups)
+
+        self.metrics = computed_metrics

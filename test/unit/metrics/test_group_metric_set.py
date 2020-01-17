@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from fairlearn.metrics import GroupMetricSet, GroupMetricResult
+from fairlearn.metrics import group_accuracy_score, GroupMetricSet, GroupMetricResult
 
 
 def test_model_type_property():
@@ -81,3 +81,24 @@ def test_metrics_values_not_groupmetricresult():
         target.metrics = {"a": 0}
     expected = "Values not GroupMetricResults"
     assert exception_context.value.args[0] == expected
+
+
+Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+Y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+groups = [0, 1, 2, 3, 2, 1, 2, 1, 3, 1, 0, 1, 0, 2, 0, 1, 2, 0]
+
+
+def test_compute_binary():
+    target = GroupMetricSet()
+
+    target.compute(Y_true, Y_pred, groups, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+
+    sample_expected = group_accuracy_score(Y_true, Y_pred, groups)
+
+    assert np.array_equal(Y_true, target.y_true)
+    assert np.array_equal(Y_pred, target.y_pred)
+    assert np.array_equal(groups, target.groups)
+    assert target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE].overall == sample_expected.overall
+    for g in np.unique(groups):
+        assert (target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE].by_group[g] ==
+                sample_expected.by_group[g])
