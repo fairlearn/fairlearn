@@ -98,6 +98,7 @@ def test_compute_binary():
     assert np.array_equal(Y_true, target.y_true)
     assert np.array_equal(Y_pred, target.y_pred)
     assert np.array_equal(groups, target.groups)
+    assert len(target.metrics) == 8
     assert target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE].overall == sample_expected.overall
     for g in np.unique(groups):
         assert (target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE].by_group[g] ==

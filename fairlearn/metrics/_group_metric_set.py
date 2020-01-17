@@ -35,6 +35,17 @@ class GroupMetricSet:
 
     BINARY_CLASSIFICATION_METRICS = {}
     BINARY_CLASSIFICATION_METRICS[GROUP_ACCURACY_SCORE] = fm.group_accuracy_score
+    # BINARY_CLASSIFICATION_METRICS[GROUP_FALLOUT_RATE] = fm.group_fallout_rate
+    # BINARY_CLASSIFICATION_METRICS[GROUP_MISS_RATE] = fm.group_miss_rate
+    BINARY_CLASSIFICATION_METRICS[GROUP_PRECISION_SCORE] = fm.group_precision_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_RECALL_SCORE] = fm.group_recall_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_ROC_AUC_SCORE] = fm.group_roc_auc_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_SELECTION_RATE] = fm.group_selection_rate
+    # BINARY_CLASSIFICATION_METRICS[GROUP_SPECIFICITY_SCORE] = fm.group_specificity_score
+
+    REGRESSION_METRICS = {}
+    # REGRESSION_METRICS[GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR] = fm.group_balanced_root_mean_squared_error  # noqa:E501
+    # REGRESSION_METRICS[GROUP_MAX_ERROR] = fm.group_max_error
 
     def __init__(self):
         self._model_type = None
