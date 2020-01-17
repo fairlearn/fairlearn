@@ -16,6 +16,7 @@ class GroupMetricSet:
         self._y_true = None
         self._y_pred = None
         self._groups = None
+        self._group_names = None
 
     @property
     def model_type(self):
@@ -52,3 +53,19 @@ class GroupMetricSet:
     @groups.setter
     def groups(self, value):
         self._groups = fmim._convert_to_ndarray_1d(value)
+
+    @property
+    def group_names(self):
+        """Return the group_names dictionary."""
+        return self._group_names
+
+    @group_names.setter
+    def group_names(self, value):
+        key_types = set(type(k) for k in value.keys())
+        if key_types != {int}:
+            raise ValueError("Keys not integers")
+        value_types = set(type(v) for v in value.values())
+        if value_types != {str}:
+            raise ValueError("Values not strings")
+
+        self._group_names = value
