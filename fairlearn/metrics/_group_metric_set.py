@@ -15,6 +15,7 @@ class GroupMetricSet:
         self._model_type = None
         self._y_true = None
         self._y_pred = None
+        self._groups = None
 
     @property
     def model_type(self):
@@ -42,3 +43,12 @@ class GroupMetricSet:
     @y_pred.setter
     def y_pred(self, value):
         self._y_pred = fmim._convert_to_ndarray_1d(value)
+
+    @property
+    def groups(self):
+        """Return the array of group values."""
+        return self._groups
+
+    @groups.setter
+    def groups(self, value):
+        self._groups = fmim._convert_to_ndarray_1d(value)

@@ -24,3 +24,10 @@ def test_y_pred():
     target.y_pred = [1, 2]
     assert isinstance(target.y_pred, np.ndarray)
     assert np.array_equal(target.y_pred, [1, 2])
+
+
+def test_groups():
+    target = GroupMetricSet()
+    target.groups = [4, 5, 6]
+    assert isinstance(target.groups, np.ndarray)
+    assert np.array_equal(target.groups, [4, 5, 6])
