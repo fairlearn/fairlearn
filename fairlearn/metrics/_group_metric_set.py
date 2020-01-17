@@ -7,6 +7,8 @@ class GroupMetricSet:
 
     BINARY_CLASSIFICATION = 'binary_classification'
 
+    REGRESSION = 'regression'
+
     @property
     def model_type(self):
         """Return the type of model being described."""

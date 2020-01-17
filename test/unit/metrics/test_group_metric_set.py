@@ -4,5 +4,7 @@
 from fairlearn.metrics import GroupMetricSet
 
 
-def test_model_types():
-    assert GroupMetricSet.BINARY_CLASSIFICATION == "binary_classification"
+def test_model_type():
+    target = GroupMetricSet()
+    target.mode_type = GroupMetricSet.BINARY_CLASSIFICATION
+    assert target.mode_type == "binary_classification"
