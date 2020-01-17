@@ -30,9 +30,7 @@ from ._extra_metrics import group_specificity_score  # noqa: F401
 from ._extra_metrics import group_balanced_root_mean_squared_error  # noqa: F401
 from ._extra_metrics import group_mean_overprediction  # noqa: F401
 from ._extra_metrics import group_mean_prediction  # noqa: F401
-from ._extra_metrics import group_mean_squared_log_error  # noqa: F401
 from ._extra_metrics import group_mean_underprediction  # noqa: F401
-from ._extra_metrics import group_median_absolute_error  # noqa: F401
 
 from ._selection_rate import group_selection_rate  # noqa: F401
 
@@ -46,6 +44,24 @@ from ._skm_wrappers import group_r2_score  # noqa: F401
 from ._group_metric_result import GroupMetricResult  # noqa: F401
 from ._group_metric_set import GroupMetricSet  # noqa: F401
 from ._metrics_engine import make_group_metric, metric_by_group  # noqa: F401
+
+# -------------------------------------------
+
+group_max_error = make_group_metric(skm.max_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
+"""
+
+group_mean_absolute_error = make_group_metric(skm.mean_absolute_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_absolute_error` routine
+"""
+
+group_mean_squared_log_error = make_group_metric(skm.mean_squared_log_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_squared_log_error` routine
+"""
+
+group_median_absolute_error = make_group_metric(skm.median_absolute_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.median_absolute_error` routine
+"""
 
 # -------------------------------------------
 

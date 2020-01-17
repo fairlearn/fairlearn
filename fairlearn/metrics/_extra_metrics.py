@@ -83,23 +83,6 @@ group_balanced_root_mean_squared_error = make_group_metric(
 """A grouped wrapper around the :py:func:`balanced_root_mean_squared_error` routine
 """
 
-group_max_error = make_group_metric(skm.max_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
-"""
-
-group_mean_absolute_error = make_group_metric(skm.mean_absolute_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_absolute_error` routine
-"""
-
-group_mean_squared_log_error = make_group_metric(skm.mean_squared_log_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_squared_log_error` routine
-"""
-
-group_median_absolute_error = make_group_metric(skm.median_absolute_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.median_absolute_error` routine
-"""
-
-
 group_mean_prediction = make_group_metric(mean_prediction)
 """A grouped wrapper around the :py:func:`mean_prediction` routine
 """
