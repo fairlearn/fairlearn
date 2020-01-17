@@ -1,8 +1,19 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import fairlearn.metrics as fm
-import fairlearn.metrics._input_manipulations as fmim
+from . import group_accuracy_score, group_balanced_root_mean_squared_error
+from . import group_fallout_rate, group_max_error
+from . import group_mean_absolute_error, group_mean_overprediction
+from . import group_mean_squared_error, group_mean_squared_log_error
+from . import group_mean_underprediction, group_median_absolute_error
+from . import group_mean_prediction
+from . import group_miss_rate, group_precision_score, group_r2_score
+from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_error
+from . import group_selection_rate, group_specificity_score, group_zero_one_loss
+
+from . import GroupMetricResult
+
+from fairlearn.metrics._input_manipulations import _convert_to_ndarray_1d
 
 
 class GroupMetricSet:
@@ -34,27 +45,28 @@ class GroupMetricSet:
     GROUP_ZERO_ONE_LOSS = "3c2805a7-04b5-4b19-baa9-33928fe3d121"
 
     BINARY_CLASSIFICATION_METRICS = {}
-    BINARY_CLASSIFICATION_METRICS[GROUP_ACCURACY_SCORE] = fm.group_accuracy_score
-    BINARY_CLASSIFICATION_METRICS[GROUP_FALLOUT_RATE] = fm.group_fallout_rate
-    BINARY_CLASSIFICATION_METRICS[GROUP_MISS_RATE] = fm.group_miss_rate
-    BINARY_CLASSIFICATION_METRICS[GROUP_PRECISION_SCORE] = fm.group_precision_score
-    BINARY_CLASSIFICATION_METRICS[GROUP_RECALL_SCORE] = fm.group_recall_score
-    BINARY_CLASSIFICATION_METRICS[GROUP_ROC_AUC_SCORE] = fm.group_roc_auc_score
-    BINARY_CLASSIFICATION_METRICS[GROUP_SELECTION_RATE] = fm.group_selection_rate
-    BINARY_CLASSIFICATION_METRICS[GROUP_SPECIFICITY_SCORE] = fm.group_specificity_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_ACCURACY_SCORE] = group_accuracy_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_FALLOUT_RATE] = group_fallout_rate
+    BINARY_CLASSIFICATION_METRICS[GROUP_MISS_RATE] = group_miss_rate
+    BINARY_CLASSIFICATION_METRICS[GROUP_PRECISION_SCORE] = group_precision_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_RECALL_SCORE] = group_recall_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_ROC_AUC_SCORE] = group_roc_auc_score
+    BINARY_CLASSIFICATION_METRICS[GROUP_SELECTION_RATE] = group_selection_rate
+    BINARY_CLASSIFICATION_METRICS[GROUP_SPECIFICITY_SCORE] = group_specificity_score
 
     REGRESSION_METRICS = {}
-    REGRESSION_METRICS[GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR] = fm.group_balanced_root_mean_squared_error  # noqa:E501
-    REGRESSION_METRICS[GROUP_MAX_ERROR] = fm.group_max_error
-    REGRESSION_METRICS[GROUP_MEAN_ABSOLUTE_ERROR] = fm.group_mean_absolute_error
-    REGRESSION_METRICS[GROUP_MEAN_OVERPREDICTION] = fm.group_mean_overprediction
-    REGRESSION_METRICS[GROUP_MEAN_PREDICTION] = fm.group_mean_prediction
-    REGRESSION_METRICS[GROUP_MEAN_SQUARED_ERROR] = fm.group_mean_squared_error
-    REGRESSION_METRICS[GROUP_MEAN_UNDERPREDICTION] = fm.group_mean_underprediction
-    REGRESSION_METRICS[GROUP_MEDIAN_ABSOLUTE_ERROR] = fm.group_median_absolute_error
-    REGRESSION_METRICS[GROUP_R2_SCORE] = fm.group_r2_score
-    REGRESSION_METRICS[GROUP_ROOT_MEAN_SQUARED_ERROR] = fm.group_root_mean_squared_error
-    REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = fm.group_zero_one_loss
+    REGRESSION_METRICS[GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR] = group_balanced_root_mean_squared_error  # noqa:E501
+    REGRESSION_METRICS[GROUP_MAX_ERROR] = group_max_error
+    REGRESSION_METRICS[GROUP_MEAN_ABSOLUTE_ERROR] = group_mean_absolute_error
+    REGRESSION_METRICS[GROUP_MEAN_OVERPREDICTION] = group_mean_overprediction
+    REGRESSION_METRICS[GROUP_MEAN_PREDICTION] = group_mean_prediction
+    REGRESSION_METRICS[GROUP_MEAN_SQUARED_ERROR] = group_mean_squared_error
+    REGRESSION_METRICS[GROUP_MEAN_SQUARED_LOG_ERROR] = group_mean_squared_log_error
+    REGRESSION_METRICS[GROUP_MEAN_UNDERPREDICTION] = group_mean_underprediction
+    REGRESSION_METRICS[GROUP_MEDIAN_ABSOLUTE_ERROR] = group_median_absolute_error
+    REGRESSION_METRICS[GROUP_R2_SCORE] = group_r2_score
+    REGRESSION_METRICS[GROUP_ROOT_MEAN_SQUARED_ERROR] = group_root_mean_squared_error
+    REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 
     def __init__(self):
         self._model_type = None
@@ -84,7 +96,7 @@ class GroupMetricSet:
 
     @y_true.setter
     def y_true(self, value):
-        self._y_true = fmim._convert_to_ndarray_1d(value)
+        self._y_true = _convert_to_ndarray_1d(value)
 
     @property
     def y_pred(self):
@@ -93,7 +105,7 @@ class GroupMetricSet:
 
     @y_pred.setter
     def y_pred(self, value):
-        self._y_pred = fmim._convert_to_ndarray_1d(value)
+        self._y_pred = _convert_to_ndarray_1d(value)
 
     @property
     def groups(self):
@@ -102,7 +114,7 @@ class GroupMetricSet:
 
     @groups.setter
     def groups(self, value):
-        self._groups = fmim._convert_to_ndarray_1d(value)
+        self._groups = _convert_to_ndarray_1d(value)
 
     @property
     def group_names(self):
@@ -131,7 +143,7 @@ class GroupMetricSet:
         if key_types != {str}:
             raise ValueError("Keys not strings")
         value_types = set(type(v) for v in value.values())
-        if value_types != {fm.GroupMetricResult}:
+        if value_types != {GroupMetricResult}:
             raise ValueError("Values not GroupMetricResults")
         self._metrics = value
 

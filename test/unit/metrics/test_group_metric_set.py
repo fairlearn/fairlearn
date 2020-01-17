@@ -127,7 +127,7 @@ def test_compute_regression():
     assert np.array_equal(Y_true, target.y_true)
     assert np.array_equal(Y_pred, target.y_pred)
     assert np.array_equal(groups, target.groups)
-    assert len(target.metrics) == 11
+    assert len(target.metrics) == 12
     assert target.metrics[GroupMetricSet.GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR].overall == sample_expected.overall  # noqa: E501
     for g in np.unique(groups):
         assert (target.metrics[GroupMetricSet.GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR].by_group[g]
