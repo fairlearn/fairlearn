@@ -9,8 +9,8 @@ class GroupMetricSet:
     """Class to hold a collection of GroupMetricResult objects."""
 
     BINARY_CLASSIFICATION = 'binary_classification'
-
     REGRESSION = 'regression'
+    _allowed_model_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
 
     GROUP_ACCURACY_SCORE = "4c038715-e944-4902-9eb2-973a8fd6b51e"
     GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR = "1e37c604-8a14-4d57-8fe6-2c88c06ae3c0"
@@ -71,6 +71,10 @@ class GroupMetricSet:
 
     @model_type.setter
     def model_type(self, value):
+        if value not in GroupMetricSet._allowed_model_types:
+            msg_format = "model_type '{0}' not in {1}"
+            msg = msg_format.format(value, sorted(list(GroupMetricSet._allowed_model_types)))
+            raise ValueError(msg)
         self._model_type = value
 
     @property

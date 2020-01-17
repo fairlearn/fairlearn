@@ -10,8 +10,19 @@ from fairlearn.metrics import GroupMetricSet, GroupMetricResult
 
 def test_model_type_property():
     target = GroupMetricSet()
-    target.mode_type = GroupMetricSet.BINARY_CLASSIFICATION
-    assert target.mode_type == "binary_classification"
+
+    for mt in GroupMetricSet._allowed_model_types:
+        target.model_type = mt
+        assert target.model_type == mt
+
+
+def test_model_type_not_allowed():
+    target = GroupMetricSet()
+
+    with pytest.raises(ValueError) as exception_context:
+        target.model_type = "Something Random"
+    expected = "model_type 'Something Random' not in ['binary_classification', 'regression']"
+    assert exception_context.value.args[0] == expected
 
 
 def test_y_true():
