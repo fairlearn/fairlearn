@@ -17,3 +17,16 @@ def _convert_to_ndarray_and_squeeze(target):
         result = result.reshape(1)
 
     return result
+
+
+def _convert_to_ndarray_1d(target):
+    """Convert the input to a `numpy.ndarray` with a single dimension.
+
+    If the input is multi-dimension, this will raise an exception
+    """
+    result = _convert_to_ndarray_and_squeeze(target)
+
+    if len(result.shape) > 1:
+        raise ValueError("Input not 1D")
+
+    return result
