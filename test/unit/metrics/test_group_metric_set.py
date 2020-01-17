@@ -85,7 +85,7 @@ def test_metrics_values_not_groupmetricresult():
 
 Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 Y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
-groups = [0, 1, 2, 3, 2, 1, 2, 1, 3, 1, 0, 1, 0, 2, 0, 1, 2, 0]
+groups = [0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0]
 
 
 def test_compute_binary():
