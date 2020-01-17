@@ -17,8 +17,8 @@ class GroupMetricSet:
     GROUP_FALLOUT_RATE = "dacb8b66-bd5c-4b71-b8eb-410792aad99d"
     GROUP_MAX_ERROR = "83abd9f8-bef1-4602-a87c-5fa55b429261"
     GROUP_MEAN_ABSOLUTE_ERROR = "12c23096-536e-40c5-b29d-261a9053a2a9"
-    GROUP_MEAN_PREDICTION = "7c6af4a9-c148-4890-8acb-465d2bbfe0bb"
     GROUP_MEAN_OVERPREDICTION = "c20da0b0-1412-451e-977d-951ff815b4f7"
+    GROUP_MEAN_PREDICTION = "7c6af4a9-c148-4890-8acb-465d2bbfe0bb"
     GROUP_MEAN_SQUARED_ERROR = "f36190c7-7b05-4837-97cf-f7fb3da19752"
     GROUP_MEAN_SQUARED_LOG_ERROR = "6d106114-4433-40a2-b091-8983ab540a53"
     GROUP_MEAN_UNDERPREDICTION = "e7e2ca86-b7b2-4eb3-8cc3-b63fa0a8e37f"
@@ -44,8 +44,17 @@ class GroupMetricSet:
     BINARY_CLASSIFICATION_METRICS[GROUP_SPECIFICITY_SCORE] = fm.group_specificity_score
 
     REGRESSION_METRICS = {}
-    # REGRESSION_METRICS[GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR] = fm.group_balanced_root_mean_squared_error  # noqa:E501
-    # REGRESSION_METRICS[GROUP_MAX_ERROR] = fm.group_max_error
+    REGRESSION_METRICS[GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR] = fm.group_balanced_root_mean_squared_error  # noqa:E501
+    REGRESSION_METRICS[GROUP_MAX_ERROR] = fm.group_max_error
+    REGRESSION_METRICS[GROUP_MEAN_ABSOLUTE_ERROR] = fm.group_mean_absolute_error
+    REGRESSION_METRICS[GROUP_MEAN_OVERPREDICTION] = fm.group_mean_overprediction
+    REGRESSION_METRICS[GROUP_MEAN_PREDICTION] = fm.group_mean_prediction
+    REGRESSION_METRICS[GROUP_MEAN_SQUARED_ERROR] = fm.group_mean_squared_error
+    REGRESSION_METRICS[GROUP_MEAN_UNDERPREDICTION] = fm.group_mean_underprediction
+    REGRESSION_METRICS[GROUP_MEDIAN_ABSOLUTE_ERROR] = fm.group_median_absolute_error
+    REGRESSION_METRICS[GROUP_R2_SCORE] = fm.group_r2_score
+    REGRESSION_METRICS[GROUP_ROOT_MEAN_SQUARED_ERROR] = fm.group_root_mean_squared_error
+    REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = fm.group_zero_one_loss
 
     def __init__(self):
         self._model_type = None
@@ -135,5 +144,10 @@ class GroupMetricSet:
         if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
             for k, f in GroupMetricSet.BINARY_CLASSIFICATION_METRICS.items():
                 computed_metrics[k] = f(self.y_true, self.y_pred, self.groups)
+        elif self.model_type == GroupMetricSet.REGRESSION:
+            for k, f in GroupMetricSet.REGRESSION_METRICS.items():
+                computed_metrics[k] = f(self.y_true, self.y_pred, self.groups)
+        else:
+            raise RuntimeError("Cannot get here")
 
         self.metrics = computed_metrics

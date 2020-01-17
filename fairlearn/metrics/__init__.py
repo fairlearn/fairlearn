@@ -18,8 +18,6 @@ The metric is evaluated for the entire set of data, and also
 for each subgroup identified in ``group_membership``.
 """
 
-import sklearn.metrics as skm
-
 from ._extra_metrics import balanced_root_mean_squared_error, fallout_rate  # noqa: F401
 from ._extra_metrics import mean_overprediction, mean_prediction  # noqa: F401
 from ._extra_metrics import mean_underprediction, miss_rate  # noqa: F401
@@ -37,31 +35,17 @@ from ._selection_rate import group_selection_rate  # noqa: F401
 from ._skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
 from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
 from ._skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
+from ._skm_wrappers import group_max_error  # noqa: F401
+from ._skm_wrappers import group_mean_absolute_error  # noqa: F401
 from ._skm_wrappers import group_mean_squared_error  # noqa: F401
+from ._skm_wrappers import group_mean_squared_log_error  # noqa: F401
+from ._skm_wrappers import group_median_absolute_error  # noqa: F401
 from ._skm_wrappers import group_root_mean_squared_error  # noqa: F401
 from ._skm_wrappers import group_r2_score  # noqa: F401
 
 from ._group_metric_result import GroupMetricResult  # noqa: F401
 from ._group_metric_set import GroupMetricSet  # noqa: F401
 from ._metrics_engine import make_group_metric, metric_by_group  # noqa: F401
-
-# -------------------------------------------
-
-group_max_error = make_group_metric(skm.max_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
-"""
-
-group_mean_absolute_error = make_group_metric(skm.mean_absolute_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_absolute_error` routine
-"""
-
-group_mean_squared_log_error = make_group_metric(skm.mean_squared_log_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_squared_log_error` routine
-"""
-
-group_median_absolute_error = make_group_metric(skm.median_absolute_error)
-"""A grouped wrapper around the :py:func:`sklearn.metrics.median_absolute_error` routine
-"""
 
 # -------------------------------------------
 
