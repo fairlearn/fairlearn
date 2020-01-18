@@ -5,6 +5,7 @@ import numpy as np
 
 _ARRAY_NOT_1D = "Supplied input array has more than one non-trivial dimension"
 
+
 def _convert_to_ndarray_and_squeeze(target):
     """Convert input to a `numpy.ndarray` and calls squeeze (to dispose of unit length dimensions).
 
