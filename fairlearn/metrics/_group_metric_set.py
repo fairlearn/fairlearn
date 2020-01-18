@@ -162,14 +162,17 @@ class GroupMetricSet:
         if group_names is not None:
             self.group_names = group_names
 
-        computed_metrics = {}
+        function_dict = None
         if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
-            for k, f in GroupMetricSet.BINARY_CLASSIFICATION_METRICS.items():
-                computed_metrics[k] = f(self.y_true, self.y_pred, self.groups)
+            function_dict = GroupMetricSet.BINARY_CLASSIFICATION_METRICS
         elif self.model_type == GroupMetricSet.REGRESSION:
-            for k, f in GroupMetricSet.REGRESSION_METRICS.items():
-                computed_metrics[k] = f(self.y_true, self.y_pred, self.groups)
+            function_dict = GroupMetricSet.REGRESSION_METRICS
         else:
             raise RuntimeError("Cannot get here")
+
+        computed_metrics = {}
+        for metric_key, metric_function in function_dict.items():
+            computed_metrics[metric_key] = metric_function(
+                self.y_true, self.y_pred, self.groups)
 
         self.metrics = computed_metrics
