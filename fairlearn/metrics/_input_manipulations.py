@@ -3,6 +3,7 @@
 
 import numpy as np
 
+_ARRAY_NOT_1D = "Supplied input array has more than one non-trivial dimension"
 
 def _convert_to_ndarray_and_squeeze(target):
     """Convert input to a `numpy.ndarray` and calls squeeze (to dispose of unit length dimensions).
@@ -27,6 +28,6 @@ def _convert_to_ndarray_1d(target):
     result = _convert_to_ndarray_and_squeeze(target)
 
     if len(result.shape) > 1:
-        raise ValueError("Input not 1D")
+        raise ValueError(_ARRAY_NOT_1D)
 
     return result

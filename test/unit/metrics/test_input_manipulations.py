@@ -87,5 +87,5 @@ class TestConvertToNDArray1D:
         with pytest.raises(ValueError) as exception_context:
             _ = fmim._convert_to_ndarray_1d(X)
 
-        expected = "Input not 1D"
+        expected = "Supplied input array has more than one non-trivial dimension"
         assert exception_context.value.args[0] == expected
