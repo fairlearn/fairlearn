@@ -15,6 +15,11 @@ from . import GroupMetricResult
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_1d
 
+_GROUP_NAMES_KEYS_MSG = "Keys for group_names dictionary must be integers"
+_GROUP_NAMES_VALUES_MSG = "Values for group_names dictionary must be strings"
+_METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
+_METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
+
 
 class GroupMetricSet:
     """Class to hold a collection of GroupMetricResult objects."""
@@ -85,7 +90,8 @@ class GroupMetricSet:
     def model_type(self, value):
         if value not in GroupMetricSet._allowed_model_types:
             msg_format = "model_type '{0}' not in {1}"
-            msg = msg_format.format(value, sorted(list(GroupMetricSet._allowed_model_types)))
+            msg = msg_format.format(value, sorted(
+                list(GroupMetricSet._allowed_model_types)))
             raise ValueError(msg)
         self._model_type = value
 
@@ -125,10 +131,10 @@ class GroupMetricSet:
     def group_names(self, value):
         key_types = set(type(k) for k in value.keys())
         if key_types != {int}:
-            raise ValueError("Keys not integers")
+            raise ValueError(_GROUP_NAMES_KEYS_MSG)
         value_types = set(type(v) for v in value.values())
         if value_types != {str}:
-            raise ValueError("Values not strings")
+            raise ValueError(_GROUP_NAMES_VALUES_MSG)
 
         self._group_names = value
 
@@ -141,10 +147,10 @@ class GroupMetricSet:
     def metrics(self, value):
         key_types = set(type(k) for k in value.keys())
         if key_types != {str}:
-            raise ValueError("Keys not strings")
+            raise ValueError(_METRICS_KEYS_MSG)
         value_types = set(type(v) for v in value.values())
         if value_types != {GroupMetricResult}:
-            raise ValueError("Values not GroupMetricResults")
+            raise ValueError(_METRICS_VALUES_MSG)
         self._metrics = value
 
     def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION, group_names=None):
