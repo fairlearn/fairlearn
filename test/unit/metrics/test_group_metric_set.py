@@ -57,7 +57,7 @@ def test_group_names_keys_not_int():
     target = GroupMetricSet()
     with pytest.raises(ValueError) as exception_context:
         target.group_names = {'a': 'b', 'c': 'd'}
-    expected = "Keys not integers"
+    expected = "Keys for group_names dictionary must be integers"
     assert exception_context.value.args[0] == expected
 
 
@@ -65,7 +65,7 @@ def test_group_names_values_not_string():
     target = GroupMetricSet()
     with pytest.raises(ValueError) as exception_context:
         target.group_names = {0: 1, 2: 3}
-    expected = "Values not strings"
+    expected = "Values for group_names dictionary must be strings"
     assert exception_context.value.args[0] == expected
 
 
@@ -83,7 +83,7 @@ def test_metrics_keys_not_string():
     my_metric.overall = 10222
     with pytest.raises(ValueError) as exception_context:
         target.metrics = {0: my_metric}
-    expected = "Keys not strings"
+    expected = "Keys for metrics dictionary must be strings"
     assert exception_context.value.args[0] == expected
 
 
@@ -91,7 +91,7 @@ def test_metrics_values_not_groupmetricresult():
     target = GroupMetricSet()
     with pytest.raises(ValueError) as exception_context:
         target.metrics = {"a": 0}
-    expected = "Values not GroupMetricResults"
+    expected = "Values for metrics dictionary must be of type GroupMetricResult"
     assert exception_context.value.args[0] == expected
 
 
