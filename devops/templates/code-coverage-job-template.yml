@@ -20,7 +20,7 @@ jobs:
   - script: pip install -r requirements.txt
     displayName: 'Install required packages'
 
-  - script: python -m pytest test -m "not notebooks" --ignore=test/perf --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="${{ parameters.name }}"
+  - script: python -m pytest test -m "not notebooks" --ignore=test/perf --ignore=test/install --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="${{ parameters.name }}"
     displayName: 'Run tests'
 
   # Publish code coverage results
