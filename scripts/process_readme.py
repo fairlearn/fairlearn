@@ -103,13 +103,14 @@ def process_readme(input_file_name, output_file_name):
             output_file.writelines(result_lines)
 
 
-
 def build_argument_parser():
     desc = "Process ReadMe file for PyPI"
 
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--input-file-name", help="Path to the file to be processed", required=True)
-    parser.add_argument("--output-file-name", help="Path to store the processed file", required=True)
+    parser.add_argument("--input-file-name", help="Path to the file to be processed",
+                        required=True)
+    parser.add_argument("--output-file-name", help="Path to store the processed file",
+                        required=True)
 
     return parser
 
