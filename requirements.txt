@@ -22,7 +22,7 @@ papermill
 pytest==5.0.1
 pytest-cov
 nteract-scrapbook
-tempeh==0.1.11
+tempeh==0.1.12
 wheel
 
 # Required for notebooks
