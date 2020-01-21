@@ -3,7 +3,7 @@
 
 import sklearn.metrics as skm
 from math import sqrt
-from ._metrics_engine import metric_by_group
+from ._metrics_engine import make_group_metric, metric_by_group
 
 
 def group_accuracy_score(y_true, y_pred, group_membership, *,
@@ -174,3 +174,20 @@ def group_r2_score(y_true, y_pred, group_membership, *,
 
     return metric_by_group(internal_r2_wrapper,
                            y_true, y_pred, group_membership, sample_weight=sample_weight)
+
+
+group_max_error = make_group_metric(skm.max_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
+"""
+
+group_mean_absolute_error = make_group_metric(skm.mean_absolute_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_absolute_error` routine
+"""
+
+group_mean_squared_log_error = make_group_metric(skm.mean_squared_log_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_squared_log_error` routine
+"""
+
+group_median_absolute_error = make_group_metric(skm.median_absolute_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.median_absolute_error` routine
+"""
