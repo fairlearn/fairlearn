@@ -156,6 +156,14 @@ group_max_error = make_group_metric(skm.max_error)
 """A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
 """
 
+    return metric_by_group(internal_r2_wrapper,
+                           y_true, y_pred, group_membership, sample_weight=sample_weight)
+
+
+group_max_error = make_group_metric(skm.max_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
+"""
+
 group_mean_absolute_error = make_group_metric(skm.mean_absolute_error)
 """A grouped wrapper around the :py:func:`sklearn.metrics.mean_absolute_error` routine
 """
