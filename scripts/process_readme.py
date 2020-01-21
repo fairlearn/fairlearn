@@ -10,6 +10,7 @@ The produced file assumes that a tag 'vX' (where X corresponds to the current ve
 of `fairlearn`) exists in the repo. Otherwise, the links won't work.
 """
 
+import argparse
 import logging
 import re
 import sys
@@ -100,3 +101,25 @@ def process_readme(input_file_name, output_file_name):
     with _LogWrapper("writing file {}".format(output_file_name)):
         with open(output_file_name, 'w') as output_file:
             output_file.writelines(result_lines)
+
+
+
+def build_argument_parser():
+    desc = "Process ReadMe file for PyPI"
+
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--input-file-name", help="Path to the file to be processed", required=True)
+    parser.add_argument("--output-file-name", help="Path to store the processed file", required=True)
+
+    return parser
+
+
+def main(argv):
+    parser = build_argument_parser()
+    args = parser.parse_args(argv)
+
+    process_readme(args.input_file_name, args.output_file_name)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
