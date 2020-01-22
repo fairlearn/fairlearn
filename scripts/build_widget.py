@@ -60,10 +60,11 @@ def main(argv):
     if args.assert_no_changes:
         with _LogWrapper("comparison between old and newly generated widget files."):
             for file_path in _widget_generated_files:
-                # git diff occasionally leaves out some of the JS files so use git status
-                diff_result = subprocess.check_output(["git", "status"])
-                if file_path in diff_result.decode('utf-8'):
-                    raise Exception("File {} was unexpectedly modified.".format(file_path))
+                diff_result = subprocess.check_output(["git", "diff", os.path.abspath(file_path)])
+                if diff_result == b'':
+                    _logger.info("File {} has not changed.", file_path)
+                else:
+                    _logger.error("File {} has changed unexpectedly.", file_path)
 
 
 if __name__ == "__main__":

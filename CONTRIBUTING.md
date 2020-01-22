@@ -42,7 +42,7 @@ Yarn](https://yarnpkg.com/lang/en/docs/install), and then run the [widget build
 script](scripts/build_widget.py). To validate that you did not make changes
 that affect the generated files simply add the `--assert-no-changes` option.
 
-To build the fairlearn dashboard after making changes to it, [install Yarn](https://yarnpkg.com/lang/en/docs/install), and then run the [widget build script](scripts/build-widget.ps1).
+To build the fairlearn dashboard after making changes to it, [install Yarn](https://yarnpkg.com/lang/en/docs/install), and then run the [widget build script](scripts/build_widget.py). To validate that you did not make changes that affect the generated files simply add the `--assert-no-changes` option.
 
 ### Investigating automated test failures
 
@@ -136,4 +136,4 @@ The pipeline requires sign offs immediately prior to the deployments to Test-PyP
 
 The `DEV_VERSION` variable is to work around the PyPI behaviour where uploads are immutable and published immediately. This means that each upload to PyPI 'uses up' that particular version (on that particular PyPI instance). Since we wish to deploy exactly the same bits to both Test-PyPI and PyPI, without this workaround the version released to PyPI would depend on the number of issues discovered when uploading to Test-PyPI. If PyPI updates their release process to separate the 'upload' and 'publish' steps (i.e. until a package is published, it remains hidden and mutable) then the code associated with `DEV_VERSION` should be removed.
 
-As part of the release process, the `build-wheels.ps1` script uses `process_readme.py` to turn all the relative links in the ReadMe file into absolute ones (this is the reason why the applied tag has be of the form `v[_base_version]`). The `process_readme.py` script is slightly fragile with respect to the contents of the ReadMe, so after significant changes its output should be verified.
+As part of the release process, the `build_wheels.py` script uses `process_readme.py` to turn all the relative links in the ReadMe file into absolute ones (this is the reason why the applied tag has be of the form `v[_base_version]`). The `process_readme.py` script is slightly fragile with respect to the contents of the ReadMe, so after significant changes its output should be verified.
