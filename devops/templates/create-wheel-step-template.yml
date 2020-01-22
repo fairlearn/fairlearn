@@ -30,18 +30,10 @@ steps:
     freezeArtifact: '${{parameters.freezeArtifactStem}}CreateWheel'
     freezeFile: ${{parameters.FreezeFile}}
 
-- task: PowerShell@2
-  displayName: 'Build widget'
-  inputs:
-    filePath: scripts/build-widget.ps1
-    pwsh: true
+- template: build-widget-job-template.yml
 
-- task: PowerShell@2
+- script: python ./scripts/build_wheels.py --target-type ${{parameters.targetType}} --version-filename ${{parameters.versionFilename}} --dev-version $(DEV_VERSION)
   displayName: 'Build wheels'
-  inputs:
-    filePath: scripts/build-wheels.ps1
-    arguments: '-targetType ${{parameters.targetType}} -versionFilename ${{parameters.versionFilename}} -devVersion $(DEV_VERSION)'
-    pwsh: true
 
 - task: PublishPipelineArtifact@1
   displayName: "Publish wheels"
