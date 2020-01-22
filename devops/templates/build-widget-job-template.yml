@@ -11,8 +11,6 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
 
   steps:
-  - task: PowerShell@2
+  - script: python ./scripts/build_widget.py --assert-no-changes --yarn-path /usr/bin/yarn
     displayName: 'Build widget'
-    inputs:
-      filePath: scripts/build-widget.ps1
-      pwsh: true
+

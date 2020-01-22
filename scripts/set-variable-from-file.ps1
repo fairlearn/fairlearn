@@ -1,4 +1,5 @@
 # Script to set a pipeline variable from the contents of a file
+# This script is only required for Azure DevOps pipelines.
 param(
     [Parameter(Mandatory)]
     [string]$baseDir,
