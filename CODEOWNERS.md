@@ -8,7 +8,7 @@
 /fairlearn/widget/ @rihorn2
 /jupyter-config @rihorn2
 /notebooks @romanlutz @riedgar-ms @rihorn2 @MiroDudik
-/scripts @riedgar-ms
+/scripts @riedgar-ms @romanlutz
 /test/perf @romanlutz
 /test/unit/metrics @riedgar-ms @rihorn2
 /test/unit/postprocessing/ @romanlutz
