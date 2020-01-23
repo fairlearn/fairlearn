@@ -15,7 +15,7 @@ The fairlearn project seeks to enable anyone involved in the development of arti
 
 ## Current release
 
-- The current stable release is available at [fairlearn v0.4.0](https://github.com/fairlearn/fairlearn/tree/v0.4.0).
+- The current stable release is available at [fairlearn v0.4.1](https://github.com/fairlearn/fairlearn/tree/v0.4.1).
 
 - Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
@@ -57,21 +57,13 @@ The package can be installed via
 pip install fairlearn
 ```
 
+or optionally with a full feature set by adding extras, e.g. `pip install fairlearn[customplots]`.
+
 or you can clone the repository locally via
 
 ```python
 git clone git@github.com:fairlearn/fairlearn.git
 ```
-If you clone from git and wish to use the Fairness dashboard, you will need to [install Yarn](https://yarnpkg.com/lang/en/docs/install), and then do the following:
-```bash
-cd fairlearn/widget/js
-yarn install
-yarn build:all
-rm -rf dist
-rm -rf lib
-rm -rf node_modules
-```
-These commands only need to be run when you want the latest version of the dashboard (after pulling from our GitHub repository).
 
 To verify that the cloned repository works (the pip package does not include the tests), run
 
@@ -134,7 +126,6 @@ The fairlearn project is maintained by:
 - **@riedgar-ms**
 - **@rihorn2**
 - **@romanlutz**
-- **@bethz**
 
 For a full list of contributors refer to the [authors page](./AUTHORS.md)
 

@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
+from test.unit.utility_functions import logging_all_close
+
 
 def _simple_regression_data(number_a0, number_a1,
                             a0_factor, a1_factor,
@@ -66,14 +68,15 @@ def test_bgl_unfair():
     assert np.allclose([-1.91764706,  9.61176471], best_predict)
 
     all_predict = [r.predictor.predict(test_X) for r in target.all_results]
-    assert np.allclose([[3.2, 11.2],
-                        [-3.47346939, 10.64897959],
-                        [-2.68, 10.12],
-                        [-1.91764706, 9.61176471],
-                        [-1.18461538,  9.12307692],
-                        [-0.47924528,  8.65283019],
-                        [0.2, 0.7]],
-                       all_predict)
+
+    assert logging_all_close([[3.2, 11.2],
+                              [-3.47346939, 10.64897959],
+                              [-2.68, 10.12],
+                              [-1.91764706, 9.61176471],
+                              [-1.18461538,  9.12307692],
+                              [-0.47924528,  8.65283019],
+                              [0.2, 0.7]],
+                             all_predict)
 
 
 def test_bgl_unmitigated_same():

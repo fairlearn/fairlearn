@@ -1,6 +1,6 @@
 # Each line is a file pattern followed by one or more owners
 
-/devops @riedgar-ms @romanlutz @bethz
+/devops @riedgar-ms @romanlutz
 /docs @riedgar-ms
 /fairlearn/metrics/ @riedgar-ms @rihorn2
 /fairlearn/postprocessing/ @romanlutz
@@ -8,7 +8,7 @@
 /fairlearn/widget/ @rihorn2
 /jupyter-config @rihorn2
 /notebooks @romanlutz @riedgar-ms @rihorn2 @MiroDudik
-/scripts @riedgar-ms
+/scripts @riedgar-ms @romanlutz
 /test/perf @romanlutz
 /test/unit/metrics @riedgar-ms @rihorn2
 /test/unit/postprocessing/ @romanlutz

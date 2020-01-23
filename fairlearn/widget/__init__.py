@@ -5,6 +5,7 @@
 
 from ._fairlearn_dashboard import FairlearnDashboard
 
+
 __all__ = ['FairlearnDashboard']
 
 
