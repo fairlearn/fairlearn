@@ -29,11 +29,12 @@ def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_featu
     sensitive_features_vector = _make_vector(kwargs[_KW_SENSITIVE_FEATURES],
                                              _KW_SENSITIVE_FEATURES)
 
+    '''
     if enforce_binary_sensitive_feature:
         unique_labels = np.unique(sensitive_features_vector)
         if len(unique_labels) > 2:
             raise RuntimeError("Sensitive features contain more than two unique values")
-
+    '''
     # Extract the Y values
     y_vector = _make_vector(y, "y")
 
