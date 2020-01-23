@@ -120,40 +120,13 @@ postprocessor.predict(X, sensitive_features=sensitive_features)
 
 ## Creating new releases
 
-First add a description of the changes introduced in the package version you
-want to release to [CHANGES.md](CHANGES.md).
+We have a [Azure DevOps Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary) which takes care of building wheels and pushing to PyPI. Validations are also performed prior to any deployments, and also following the uploads to Test-PyPI and PyPI. To use it:
+1. Ensure that `_base_version` in `fairlearn/__init__.py` is set correctly for PyPI.
+1. Put down a tag corresponding to this `_base_version` but preprended with `v`. For example, version `0.5.0` should be tagged wtih `v0.5.0`
+1. Queue the pipeline at this tag, with a variable `DEV_VERSION` set to zero. When the package is uploaded to Test-PyPI, this number will be appended to the version as a `dev[n]` suffix
 
-We have a [Azure DevOps
-Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary)
-which takes care of building wheels and pushing to PyPI. Validations are also
-performed prior to any deployments, and also following the uploads to Test-PyPI
-and PyPI. To use it:
-1. Ensure that `_base_version` in `fairlearn/__init__.py` is set correctly for
-   PyPI.
-1. Put down a tag corresponding to this `_base_version` but preprended with
-   `v`. For example, version `0.5.0` should be tagged wtih `v0.5.0`
-1. Queue the pipeline at this tag, with a variable `DEV_VERSION` set to zero.
-   When the package is uploaded to Test-PyPI, this number will be appended to
-   the version as a `dev[n]` suffix
+The pipeline requires sign offs immediately prior to the deployments to Test-PyPI and PyPI. If there is an issue found, then after applying the fix, update the location of the tag, and queue a new release pipeline with the value of `DEV_VERSION` increased by one.
 
-The pipeline requires sign offs immediately prior to the deployments to
-Test-PyPI and PyPI. If there is an issue found, then after applying the fix,
-update the location of the tag, and queue a new release pipeline with the value
-of `DEV_VERSION` increased by one.
+The `DEV_VERSION` variable is to work around the PyPI behaviour where uploads are immutable and published immediately. This means that each upload to PyPI 'uses up' that particular version (on that particular PyPI instance). Since we wish to deploy exactly the same bits to both Test-PyPI and PyPI, without this workaround the version released to PyPI would depend on the number of issues discovered when uploading to Test-PyPI. If PyPI updates their release process to separate the 'upload' and 'publish' steps (i.e. until a package is published, it remains hidden and mutable) then the code associated with `DEV_VERSION` should be removed.
 
-The `DEV_VERSION` variable is to work around the PyPI behaviour where uploads
-are immutable and published immediately. This means that each upload to PyPI
-'uses up' that particular version (on that particular PyPI instance). Since we
-wish to deploy exactly the same bits to both Test-PyPI and PyPI, without this
-workaround the version released to PyPI would depend on the number of issues
-discovered when uploading to Test-PyPI. If PyPI updates their release process
-to separate the 'upload' and 'publish' steps (i.e. until a package is
-published, it remains hidden and mutable) then the code associated with
-`DEV_VERSION` should be removed.
-
-As part of the release process, the `build_wheels.py` script uses
-`process_readme.py` to turn all the relative links in the ReadMe file into
-absolute ones (this is the reason why the applied tag has be of the form
-`v[_base_version]`). The `process_readme.py` script is slightly fragile with
-respect to the contents of the ReadMe, so after significant changes its output
-should be verified.
+As part of the release process, the `build_wheels.py` script uses `process_readme.py` to turn all the relative links in the ReadMe file into absolute ones (this is the reason why the applied tag has be of the form `v[_base_version]`). The `process_readme.py` script is slightly fragile with respect to the contents of the ReadMe, so after significant changes its output should be verified.
