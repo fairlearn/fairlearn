@@ -1,5 +1,8 @@
 # Changes
 
+### v0.4.2, 2020-01-23
+* Separated out matplotlib dependency into an extension that can be installed via `pip install fairlearn[customplots]`.
+
 ### v0.4.1, 2020-01-09
 * Fix to determine whether operating as binary classifier or regressor in dashboard
 
