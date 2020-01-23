@@ -76,32 +76,66 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         sensitive_features = \
             _compress_multiple_sensitive_features_into_single_column(sensitive_features)
 
+    '''
     if enforce_binary_sensitive_feature:
-        if len(np.unique(sensitive_features)) > 2:
-            raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
+        unique_labels = np.unique(sensitive_features_vector)
+        if len(unique_labels) > 2:
+            raise RuntimeError("Sensitive features contain more than two unique values")
+    '''
+    # Extract the Y values
+    y_vector = _make_vector(y, "y")
 
-    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
+    X_rows, _ = _get_matrix_shape(X, "X")
+    if X_rows != y_vector.shape[0]:
+        raise RuntimeError(_MESSAGE_X_Y_ROWS)
+    if X_rows != sensitive_features_vector.shape[0]:
+        raise RuntimeError(_MESSAGE_X_SENSITIVE_ROWS)
+
+    return pd.DataFrame(X), y_vector, sensitive_features_vector
 
 
-def _compress_multiple_sensitive_features_into_single_column(sensitive_features):
-    """Compress multiple sensitive features into a single column.
+def _make_vector(formless, formless_name):
+    formed_vector = None
+    if isinstance(formless, list):
+        formed_vector = pd.Series(formless)
+    elif isinstance(formless, pd.DataFrame):
+        if len(formless.columns) == 1:
+            formed_vector = formless.iloc[:, 0]
+        else:
+            msgfmt = "{0} is a DataFrame with more than one column"
+            raise RuntimeError(msgfmt.format(formless_name))
+    elif isinstance(formless, pd.Series):
+        formed_vector = formless
+    elif isinstance(formless, np.ndarray):
+        if len(formless.shape) == 1:
+            formed_vector = pd.Series(formless)
+        elif len(formless.shape) == 2 and formless.shape[1] == 1:
+            formed_vector = pd.Series(formless[:, 0])
+        else:
+            msgfmt = "{0} is an ndarray with more than one column"
+            raise RuntimeError(msgfmt.format(formless_name))
+    else:
+        msgfmt = "{0} not an ndarray, Series or DataFrame"
+        raise RuntimeError(msgfmt.format(formless_name))
 
-    The resulting mapping converts multiple dimensions into the Cartesian product of the
-    individual columns.
+    return formed_vector
 
-    :param sensitive_features: multi-dimensional array of sensitive features
-    :type sensitive_features: `numpy.ndarray`
-    :return: one-dimensional array of mapped sensitive features
-    """
-    if not isinstance(sensitive_features, np.ndarray):
-        raise ValueError("Received argument of type {} instead of expected numpy.ndarray"
-                         .format(type(sensitive_features).__name__))
-    return np.apply_along_axis(
-        lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
-            [str(row[i])
-                .replace("\\", "\\\\")  # escape backslash and separator
-                .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
-                         "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
-                for i in range(len(row))]),
-        axis=1,
-        arr=sensitive_features)
+
+def _get_matrix_shape(formless, formless_name):
+    num_rows = -1
+    num_cols = -1
+
+    if isinstance(formless, pd.DataFrame):
+        num_cols = len(formless.columns)
+        num_rows = len(formless.index)
+    elif isinstance(formless, np.ndarray):
+        if len(formless.shape) == 2:
+            num_rows = formless.shape[0]
+            num_cols = formless.shape[1]
+        else:
+            msgfmt = "{0} is an ndarray which is not 2D"
+            raise RuntimeError(msgfmt.format(formless_name))
+    else:
+        msgfmt = "{0} not an ndarray or DataFrame"
+        raise RuntimeError(msgfmt.format(formless_name))
+    return num_rows, num_cols
