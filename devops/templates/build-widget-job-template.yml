@@ -13,4 +13,3 @@ jobs:
   steps:
   - script: python ./scripts/build_widget.py --assert-no-changes --yarn-path /usr/bin/yarn
     displayName: 'Build widget'
-
