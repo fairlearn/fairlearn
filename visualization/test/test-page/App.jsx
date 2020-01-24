@@ -2,6 +2,7 @@ import React from 'react';
 import { FairnessWizard } from 'fairlearn-dashboard';
 import { binaryClassifier } from '../__mock-data/binaryClassifier';
 import {regression} from "../__mock-data/regression";
+import { precomputedBinary } from "../__mock-data/precomputedBinary";
 import { probit } from "../__mock-data/probit";
 
     class App extends React.Component {
@@ -15,7 +16,8 @@ import { probit } from "../__mock-data/probit";
       static choices = [
         {label: 'binaryClassifier', data: binaryClassifier},
         {label: 'regression', data: regression},
-        {label: "probit", data: probit}
+        {label: "probit", data: probit},
+        {label: "precomputed binary", data: precomputedBinary}
       ]
 
       messages = {
@@ -83,6 +85,9 @@ import { probit } from "../__mock-data/probit";
                         testData={data.augmentedData}
                         predictedY={data.predictedYs}
                         trueY={data.trueY}
+                        precomputedMetrics={data.precomputedMetrics}
+                        precomputedFeatureBins={data.precomputedBins}
+                        predictionType={data.predictionType}
                         supportedBinaryClassificationAccuracyKeys={["accuracy_score", "balanced_accuracy_score","precision_score", "recall_score"]}
                         supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}
                         supportedProbabilityAccuracyKeys={["auc", "root_mean_squared_error", "balanced_root_mean_squared_error", "r2_score", "mean_squared_error", "mean_absolute_error"]}
