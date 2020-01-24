@@ -73,8 +73,8 @@ def test_bgl_unfair():
     # due to some ignored data points at the edge resulting in another solution with the same
     # least squares loss (i.e. both solutions acceptable).
     # Reflects https://github.com/fairlearn/fairlearn/issues/265
-    assert logging_all_close([[3.2, 11.2]], all_predict[0]) or \
-        logging_all_close([[3.03010885, 11.2]], all_predict[0])
+    assert logging_all_close([[3.2, 11.2]], [all_predict[0]]) or \
+        logging_all_close([[3.03010885, 11.2]], [all_predict[0]])
 
     assert logging_all_close([[-3.47346939, 10.64897959],
                               [-2.68, 10.12],
