@@ -9,7 +9,7 @@ import sys
 # Finesse the version
 _FAIRLEARN_DEV_VERSION_ENV_VAR = "FAIRLEARN_DEV_VERSION"
 
-_base_version = "0.4.1"
+_base_version = "0.4.2"
 _dev_version = ""
 
 if _FAIRLEARN_DEV_VERSION_ENV_VAR in os.environ.keys():
