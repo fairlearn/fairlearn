@@ -102,13 +102,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
     private static buildPrecomputedModelMetadata(props: IFairnessProps): IFairnessModelMetadata {
         let featureNames = props.dataSummary.featureNames;
         if (!featureNames) {
-            let featureLength = 0;
-            if (props.testData && props.testData[0] !== undefined) {
-                featureLength = props.testData[0].length;
-            }
-            featureNames = featureLength === 1 ?
-                [localization.defaultSingleFeatureName] :
-                ModelMetadata.buildIndexedNames(featureLength, localization.defaultFeatureNames);
+            featureNames = props.precomputedFeatureBins.map((binObject, index) => {
+                return binObject.featureBinName ||  localization.formatString(localization.defaultFeatureNames, index);
+            }) as string[];
         }
         const classNames = props.dataSummary.classNames || ModelMetadata.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
         const featureRanges = props.precomputedFeatureBins.map(binMeta => {
@@ -228,7 +224,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             let readonlyFeatureBins = this.props.precomputedFeatureBins.map((initialBin, index) => {
                 return {
                     hasError: false,
-                    array: initialBin.binVector,
+                    array: initialBin.binLabels,
                     labelArray: initialBin.binLabels,
                     featureIndex: index,
                     rangeType: RangeTypes.categorical
