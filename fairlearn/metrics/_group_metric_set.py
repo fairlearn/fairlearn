@@ -28,26 +28,29 @@ class GroupMetricSet:
     REGRESSION = 'regression'
     _allowed_model_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
 
-    GROUP_ACCURACY_SCORE = "4c038715-e944-4902-9eb2-973a8fd6b51e"
-    GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR = "1e37c604-8a14-4d57-8fe6-2c88c06ae3c0"
-    GROUP_FALLOUT_RATE = "dacb8b66-bd5c-4b71-b8eb-410792aad99d"
-    GROUP_MAX_ERROR = "83abd9f8-bef1-4602-a87c-5fa55b429261"
-    GROUP_MEAN_ABSOLUTE_ERROR = "12c23096-536e-40c5-b29d-261a9053a2a9"
-    GROUP_MEAN_OVERPREDICTION = "c20da0b0-1412-451e-977d-951ff815b4f7"
-    GROUP_MEAN_PREDICTION = "7c6af4a9-c148-4890-8acb-465d2bbfe0bb"
-    GROUP_MEAN_SQUARED_ERROR = "f36190c7-7b05-4837-97cf-f7fb3da19752"
+    # The following keys need to match those of _metric_methods in
+    # _fairlearn_dashboard.py
+    # Issue 269 is about unifying the two sets
+    GROUP_ACCURACY_SCORE = "accuracy_score"
+    GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR = "balanced_root_mean_squared_error"
+    GROUP_FALLOUT_RATE = "fallout_rate"
+    GROUP_MAX_ERROR = "max_error"
+    GROUP_MEAN_ABSOLUTE_ERROR = "mean_absolute_error"
+    GROUP_MEAN_OVERPREDICTION = "overprediction"
+    GROUP_MEAN_PREDICTION = "average"
+    GROUP_MEAN_SQUARED_ERROR = "mean_squared_error"
     GROUP_MEAN_SQUARED_LOG_ERROR = "6d106114-4433-40a2-b091-8983ab540a53"
-    GROUP_MEAN_UNDERPREDICTION = "e7e2ca86-b7b2-4eb3-8cc3-b63fa0a8e37f"
-    GROUP_MEDIAN_ABSOLUTE_ERROR = "66e6c952-f83f-48b8-a884-931f511dd7da"
-    GROUP_MISS_RATE = "5f4e4f9c-f09b-4aee-998a-0e9eeba208c6"
-    GROUP_PRECISION_SCORE = "d2dcd0a6-3aba-4d91-8715-2655fb37674b"
-    GROUP_R2_SCORE = "445c1bec-9c6c-4085-bdea-26e37cea6194"
-    GROUP_RECALL_SCORE = "1e72002d-449d-40d9-b94c-5f053fd26032"
-    GROUP_ROC_AUC_SCORE = "5322378d-1839-4d91-8bb3-e54d295ed3cd"
-    GROUP_ROOT_MEAN_SQUARED_ERROR = "e8abde62-5511-4a67-b2c0-08b344227d7e"
-    GROUP_SELECTION_RATE = "adad0b7b-55b6-4e2f-9583-fdecc2ad9cb9"
-    GROUP_SPECIFICITY_SCORE = "53649e54-3d2b-495c-827e-bf4b201d7597"
-    GROUP_ZERO_ONE_LOSS = "3c2805a7-04b5-4b19-baa9-33928fe3d121"
+    GROUP_MEAN_UNDERPREDICTION = "underprediction"
+    GROUP_MEDIAN_ABSOLUTE_ERROR = "median_absolute_error"
+    GROUP_MISS_RATE = "miss_rate"
+    GROUP_PRECISION_SCORE = "precision_score"
+    GROUP_R2_SCORE = "r2_score"
+    GROUP_RECALL_SCORE = "recall_score"
+    GROUP_ROC_AUC_SCORE = "balanced_accuracy_score"
+    GROUP_ROOT_MEAN_SQUARED_ERROR = "root_mean_squared_error"
+    GROUP_SELECTION_RATE = "selection_rate"
+    GROUP_SPECIFICITY_SCORE = "specificity_score"
+    GROUP_ZERO_ONE_LOSS = "zero_one_loss"
 
     BINARY_CLASSIFICATION_METRICS = {}
     BINARY_CLASSIFICATION_METRICS[GROUP_ACCURACY_SCORE] = group_accuracy_score
