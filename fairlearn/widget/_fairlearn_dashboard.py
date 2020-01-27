@@ -44,6 +44,8 @@ class FairlearnDashboard(object):
         if sensitive_features is None or y_true is None or y_pred is None:
             raise ValueError("Required parameters not provided")
 
+        # The following mappings should match those in the GroupMetricSet
+        # Issue 269 has been opened to track the work for unifying the two
         self._metric_methods = {
             "accuracy_score": {
                 "model_type": ["classification"],
