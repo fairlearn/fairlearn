@@ -22,6 +22,10 @@ export const precomputedBinary = {
         "overprediction": {
             global: 0.5,
             bins: [0.2, 0.8]
+        },
+        "guid123": {
+            global: 0.2,
+            bins: [0.2, 0.22, 0.18]
         }
     }, 
     // Model 2 metrics
@@ -41,6 +45,10 @@ export const precomputedBinary = {
         "overprediction": {
             global: 0.5,
             bins: [0.2, 0.8]
+        },
+        "guid123": {
+            global: 0.2,
+            bins: [0.2, 0.22, 0.18]
         }
     }],
     // Feature 2, serious real feature
@@ -62,6 +70,10 @@ export const precomputedBinary = {
             "overprediction": {
                 global: 0.5,
                 bins: [0.2, 0.8, 0.44]
+            },
+            "guid123": {
+                global: 0.2,
+                bins: [0.2, 0.22, 0.18]
             }
         }, 
         // Model 2 metrics
@@ -81,6 +93,10 @@ export const precomputedBinary = {
             "overprediction": {
                 global: 0.5,
                 bins: [0.2, 0.8, 0.44]
+            },
+            "guid123": {
+                global: 0.2,
+                bins: [0.2, 0.22, 0.18]
             }
         }]
     ],
@@ -96,5 +112,14 @@ export const precomputedBinary = {
             featureBinName: "serious real feature"
         }
     ],
-    predictionType: "binaryClassification"
+    predictionType: "binaryClassification",
+    // feel free to come up with a better name
+    customMetrics: [
+        {
+            name: "the best metric",
+            description: "Measure profitability of company using model vs not using model",
+            id: "guid123",
+            // how would a function be in here???
+        }
+    ]
 }

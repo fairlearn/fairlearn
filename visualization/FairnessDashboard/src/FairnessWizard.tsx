@@ -220,7 +220,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         // handle the case of precomputed metrics separately. As it becomes more defined, can integrate with existing code path.
         if (this.props.precomputedMetrics && this.props.precomputedFeatureBins) {
             // we must assume that the same accuracy metrics are provided across models and bins
-            accuracyMetrics = Object.keys(this.props.precomputedMetrics[0][0]).map(key => AccuracyOptions[key]);
+            accuracyMetrics = this.buildAccuracyListForPrecomputedMetrics();
             let readonlyFeatureBins = this.props.precomputedFeatureBins.map((initialBin, index) => {
                 return {
                     hasError: false,
@@ -378,6 +378,34 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                     />}
              </Stack>
          );
+    }
+
+    private readonly buildAccuracyListForPrecomputedMetrics = (): IAccuracyOption[] => {
+        const customMetrics: IAccuracyOption[] = [];
+        const providedMetrics: IAccuracyOption[] = [];
+        Object.keys(this.props.precomputedMetrics[0][0]).forEach(key => {
+            let metric = AccuracyOptions[key];
+            if (metric !== undefined) {
+                if (metric.userVisible) {
+                    providedMetrics.push(metric);
+                }
+            } else {
+                const customIndex = this.props.customMetrics.findIndex((metric) => metric.id === key);
+                const customMetric = customIndex !== -1 ?
+                    this.props.customMetrics[customIndex] :
+                    {id: key};
+
+                customMetrics.push({
+                    key,
+                    title: customMetric.name ||
+                        localization.formatString(localization.defaultCustomMetricName, customMetrics.length) as string,
+                    isMinimization: true,
+                    isPercentage: true,
+                    description: customMetric.description
+                });
+            }
+        });
+        return customMetrics.concat(providedMetrics);
     }
 
     private readonly setTab = (key: string) => {

@@ -33,12 +33,19 @@ export interface IFeatureBinMeta {
     featureBinName: string;
 }
 
+export interface ICustomMetric {
+    name?: string;
+    description?: string;
+    id: string;
+}
+
 export interface IFairnessProps {
     startingTabIndex?: number;
     dataSummary: IDatasetSummary;
     testData?: any[][];
     precomputedMetrics?: Array<Array<{[key: string]: IMetricResponse}>>;
     precomputedFeatureBins?: IFeatureBinMeta[];
+    customMetrics:ICustomMetric[];
     predictionType?: PredictionTypes;
     // One array per each model;
     predictedY: number[][];
