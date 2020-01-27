@@ -33,7 +33,7 @@ steps:
 - script: python ./scripts/build_widget.py --assert-no-changes --yarn-path /usr/bin/yarn
   displayName: 'Build widget'
 
-- script: python ./scripts/build_wheels.py --target-type ${{parameters.targetType}} --version-filename ${{parameters.versionFilename}} --dev-version '$(DEV_VERSION)'
+- script: python ./scripts/build_wheels.py --target-type ${{parameters.targetType}} --version-filename ${{parameters.versionFilename}} --dev-version $(DEV_VERSION)
   displayName: 'Build wheels'
 
 - task: PublishPipelineArtifact@1
