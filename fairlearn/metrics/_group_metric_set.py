@@ -30,6 +30,7 @@ class GroupMetricSet:
 
     # The following keys need to match those of _metric_methods in
     # _fairlearn_dashboard.py
+    # Issue 269 is about unifying the two sets
     GROUP_ACCURACY_SCORE = "accuracy_score"
     GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR = "balanced_root_mean_squared_error"
     GROUP_FALLOUT_RATE = "fallout_rate"
