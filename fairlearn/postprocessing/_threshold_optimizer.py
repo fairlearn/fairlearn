@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import random
 
-from fairlearn.exceptions import NotFittedException
+from sklearn.exceptions import NotFittedError
 from fairlearn.postprocessing import PostProcessing
 from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
@@ -175,7 +175,7 @@ class ThresholdOptimizer(PostProcessing):
 
     def _validate_post_processed_predictor_is_fitted(self):
         if not self._post_processed_predictor_by_sensitive_feature:
-            raise NotFittedException(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
+            raise NotFittedError(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
     def _validate_input_data(self, X, sensitive_features, y=None):
         allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
