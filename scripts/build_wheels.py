@@ -39,18 +39,18 @@ def main(argv):
     parser = build_argument_parser()
     args = parser.parse_args(argv)
 
-    if "FAIRLEARN_DEV_VERSION" in os.environ:
+    if _fairlearn_dev_version_env_var_name in os.environ:
         raise Exception("Environment variable {} must not be set"
                         .format(_fairlearn_dev_version_env_var_name))
+
+    if args.target_type == "Test":
+        os.environ[_fairlearn_dev_version_env_var_name] = args.dev_version
 
     with _LogWrapper("installation of fairlearn"):
         subprocess.check_call(["pip", "install", "-e", ".[customplots]"])
 
     with _LogWrapper("processing README.md"):
         process_readme("README.md", "README.md")
-
-    if args.target_type == "Test":
-        os.environ[_fairlearn_dev_version_env_var_name] = args.dev_version
 
     with _LogWrapper("storing fairlearn version in {}".format(args.version_filename)):
         import fairlearn
