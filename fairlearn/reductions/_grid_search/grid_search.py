@@ -9,7 +9,7 @@ from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_reductions_input
 from fairlearn import _NO_PREDICT_BEFORE_FIT
-from fairlearn.exceptions import NotFittedException
+from sklearn.exceptions import NotFittedError
 from fairlearn.reductions import Reduction
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from .grid_search_result import GridSearchResult
@@ -270,7 +270,7 @@ class GridSearch(Reduction):
         :type X: numpy.ndarray or pandas.DataFrame
         """
         if self.best_result is None:
-            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
+            raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict(X)
 
     def predict_proba(self, X):
@@ -283,5 +283,5 @@ class GridSearch(Reduction):
         :type X: numpy.ndarray or pandas.DataFrame
         """
         if self.best_result is None:
-            raise NotFittedException(_NO_PREDICT_BEFORE_FIT)
+            raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
         return self.best_result.predictor.predict_proba(X)

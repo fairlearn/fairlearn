@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
-from fairlearn.exceptions import NotFittedException
+from sklearn.exceptions import NotFittedError
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
@@ -202,7 +202,7 @@ class ArgumentTests:
         X, _, _ = self._quick_data()
 
         message = str("Must call fit before attempting to make predictions")
-        with pytest.raises(NotFittedException) as execInfo:
+        with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
 
         assert message == execInfo.value.args[0]
@@ -212,7 +212,7 @@ class ArgumentTests:
         X, _, _ = self._quick_data()
 
         message = str("Must call fit before attempting to make predictions")
-        with pytest.raises(NotFittedException) as execInfo:
+        with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
 
         assert message == execInfo.value.args[0]
