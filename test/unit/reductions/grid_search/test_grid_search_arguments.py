@@ -7,11 +7,6 @@ import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from sklearn.exceptions import NotFittedError
-from fairlearn import _NO_PREDICT_BEFORE_FIT
-from fairlearn._input_validation import \
-    (_MESSAGE_Y_NONE,
-     _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE,
-     _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
@@ -205,6 +200,7 @@ class ArgumentTests:
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, _, _ = self._quick_data()
 
+        message = str("Must call fit before attempting to make predictions")
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
 
@@ -214,6 +210,7 @@ class ArgumentTests:
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, _, _ = self._quick_data()
 
+        message = str("Must call fit before attempting to make predictions")
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
 

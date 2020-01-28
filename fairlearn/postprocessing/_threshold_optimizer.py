@@ -179,6 +179,31 @@ class ThresholdOptimizer(PostProcessing):
         if not self._post_processed_predictor_by_sensitive_feature:
             raise NotFittedError(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
+    def _validate_input_data(self, X, sensitive_features, y=None):
+        allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
+        if type(X) not in allowed_input_types or \
+                type(sensitive_features) not in allowed_input_types or \
+                (y is not None and type(y) not in allowed_input_types):
+            raise TypeError(INPUT_DATA_FORMAT_ERROR_MESSAGE
+                            .format(type(X).__name__,
+                                    type(y).__name__,
+                                    type(sensitive_features).__name__))
+
+        if len(X) == 0 or len(sensitive_features) == 0 or (y is not None and len(y) == 0):
+            raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
+
+        if y is None:
+            if len(X) != len(sensitive_features) or (y is not None and len(X) != len(y)):
+                raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
+                                 .format("X and sensitive_features"))
+        else:
+            if len(X) != len(sensitive_features) or (y is not None and len(X) != len(y)):
+                raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
+                                 .format("X, sensitive_features, and y"))
+
+        if set(np.unique(y)) > set([0, 1]):
+            raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
+
 
 def _threshold_optimization_demographic_parity(sensitive_features, labels, scores, grid_size=1000,
                                                flip=True, plot=False):
