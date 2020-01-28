@@ -25,9 +25,11 @@ def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_featu
         msg = "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES)
         raise RuntimeError(msg)
 
-    # Extract the target attribute
+    # Extract the sensitive features. If there are multiple sensitive features compress them into
+    # a single column which will serve as the binning vector.
     sensitive_features_vector = _make_vector(kwargs[_KW_SENSITIVE_FEATURES],
-                                             _KW_SENSITIVE_FEATURES)
+                                             _KW_SENSITIVE_FEATURES,
+                                             compress_multiple_columns=True)
 
     '''
     if enforce_binary_sensitive_feature:
@@ -47,13 +49,18 @@ def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_featu
     return pd.DataFrame(X), y_vector, sensitive_features_vector
 
 
-def _make_vector(formless, formless_name):
+def _make_vector(formless, formless_name, compress_multiple_columns=False):
     formed_vector = None
     if isinstance(formless, list):
         formed_vector = pd.Series(formless)
     elif isinstance(formless, pd.DataFrame):
         if len(formless.columns) == 1:
             formed_vector = formless.iloc[:, 0]
+        elif compress_multiple_columns:
+            formed_vector = formless.apply(
+                lambda row: "-".join(
+                    [str(row[col]).replace("-", "_") for col in formless.columns]),
+                axis=1)
         else:
             msgfmt = "{0} is a DataFrame with more than one column"
             raise RuntimeError(msgfmt.format(formless_name))
@@ -64,6 +71,11 @@ def _make_vector(formless, formless_name):
             formed_vector = pd.Series(formless)
         elif len(formless.shape) == 2 and formless.shape[1] == 1:
             formed_vector = pd.Series(formless[:, 0])
+        elif compress_multiple_columns:
+            formed_vector = np.apply_along_axis(
+                lambda row: "-".join([str(row[i]).replace("-", "_") for i in range(len(row))]),
+                axis=1,
+                arr=formless)
         else:
             msgfmt = "{0} is an ndarray with more than one column"
             raise RuntimeError(msgfmt.format(formless_name))
