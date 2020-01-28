@@ -4,7 +4,7 @@ parameters:
   pyVersion: 3.6
 
 jobs:
-- job:  ${{ parameters.name }}
+- job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
 

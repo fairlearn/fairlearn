@@ -70,8 +70,10 @@ postprocessor.predict(X, sensitive_features=sensitive_features)
 
 ## Creating new releases
 
+First add a description of the changes introduced in the package version you want to release to [CHANGES.md](CHANGES.md).
+
 We have a [Azure DevOps Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary) which takes care of building wheels and pushing to PyPI. Validations are also performed prior to any deployments, and also following the uploads to Test-PyPI and PyPI. To use it:
-1. Ensure that `_base_version` in `python/fairlearn/fairlearn/__init__.py` is set correctly for PyPI.
+1. Ensure that `_base_version` in `fairlearn/__init__.py` is set correctly for PyPI.
 1. Put down a tag corresponding to this `_base_version` but preprended with `v`. For example, version `0.5.0` should be tagged wtih `v0.5.0`
 1. Queue the pipeline at this tag, with a variable `DEV_VERSION` set to zero. When the package is uploaded to Test-PyPI, this number will be appended to the version as a `dev[n]` suffix
 
