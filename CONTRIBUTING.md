@@ -10,13 +10,11 @@ use your contribution. For details, visit https://developercertificate.org/.
 
 When you submit a pull request, a DCO-bot will automatically determine whether
 you need to provide a DCO and decorate the PR appropriately (e.g., label,
-comment). Simply follow the instructions provided by the bot. You will only
-need to do this once across all repositories using our DCO.
+comment).
 
-It basically means you need to sign off your commits with your `gpg` key,
-meaning you need to have a key in your `gpg` setup, and then you can set that
-key to be the default using the guidelines in [this
-post](https://stackoverflow.com/questions/10161198/is-there-a-way-to-autosign-commits-in-git-with-a-gpg-key).
+Signing off means you need to have your name and email address attached as a
+commit comment, which you can automate using git hooks as shown
+[here](https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#46536244).
 
 ## Code of conduct
 
