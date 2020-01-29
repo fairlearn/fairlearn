@@ -225,7 +225,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const formattedMaxAccuracy = FormatMetrics.formatNumbers(maxAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
         const formattedMinDisparity = FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
         const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
-        const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
+        let selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
+        // handle custom metric case
+        if (selectedMetric === undefined) {
+            selectedMetric = this.props.accuracyPickerProps.accuracyOptions.find(metric => metric.key === this.props.accuracyPickerProps.selectedAccuracyKey)
+        }
         const insights2 = localization.formatString(
             localization.ModelComparison.insightsText2,
             selectedMetric.title,
@@ -261,7 +265,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             series.text = this.props.dashboardContext.modelNames;
             return series;
         });
-        const accuracyMetricTitle = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title 
+        const accuracyMetricTitle = selectedMetric.title;
         props.layout.xaxis.title = accuracyMetricTitle;
         props.layout.yaxis.title = this.state.disparityInOutcomes ? localization.ModelComparison.disparityInOutcomes :
             localization.formatString(localization.ModelComparison.disparityInAccuracy, accuracyMetricTitle.toLowerCase()) as string
@@ -298,7 +302,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                             {
                             key: 'accuracy',
                             text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
-                                AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title.toLowerCase()) as string
+                                accuracyMetricTitle.toLowerCase()) as string
                             },
                             {
                             key: 'outcomes',

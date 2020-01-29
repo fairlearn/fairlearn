@@ -3,6 +3,7 @@ import { FairnessWizard } from 'fairlearn-dashboard';
 import { binaryClassifier } from '../__mock-data/binaryClassifier';
 import {regression} from "../__mock-data/regression";
 import { precomputedBinary } from "../__mock-data/precomputedBinary";
+import { precomputedBinary2 } from "../__mock-data/precomputedBinary2"
 import { probit } from "../__mock-data/probit";
 
     class App extends React.Component {
@@ -17,7 +18,8 @@ import { probit } from "../__mock-data/probit";
         {label: 'binaryClassifier', data: binaryClassifier},
         {label: 'regression', data: regression},
         {label: "probit", data: probit},
-        {label: "precomputed binary", data: precomputedBinary}
+        {label: "precomputed binary", data: precomputedBinary},
+        {label: "precomputed binary2", data: precomputedBinary2}
       ]
 
       messages = {

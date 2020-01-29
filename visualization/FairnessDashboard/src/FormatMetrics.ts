@@ -6,7 +6,7 @@ export class FormatMetrics {
         return NaN.toString();
     }
     const styleObject = {maximumSignificantDigits: 3};
-    if (AccuracyOptions[key].isPercentage && !isRatio) {
+    if (AccuracyOptions[key] && AccuracyOptions[key].isPercentage && !isRatio) {
         (styleObject as any).style = "percent";
     }
     return value.toLocaleString(undefined, styleObject);
