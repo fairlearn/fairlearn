@@ -153,6 +153,7 @@ class GroupMetricResult:
         return result
 
     def __ne__(self, other):
+        """Compare two `GroupMetricResult` objects for inequality."""
         are_equal = self.__eq__(other)
         if are_equal is NotImplemented:
             return are_equal
