@@ -15,7 +15,9 @@ def test_simple_equality():
     b = group_accuracy_score(Y_true, Y_pred, groups)
 
     assert a == b
+    assert b == a
     assert not(a != b)
+    assert not(b != a)
 
 
 def test_simple_inequality():
@@ -23,11 +25,36 @@ def test_simple_inequality():
     b = group_accuracy_score(Y_true, Y_pred, gr_inv)
 
     assert not(a == b)
+    assert not(b == a)
     assert a != b
+    assert b != a
+
 
 def test_complex_equality():
     a = group_confusion_matrix(Y_true, Y_pred, groups)
     b = group_confusion_matrix(Y_true, Y_pred, groups)
 
     assert a == b
+    assert b == a
     assert not(a != b)
+    assert not(b != a)
+
+
+def test_complex_inequality():
+    a = group_confusion_matrix(Y_true, Y_pred, groups)
+    b = group_confusion_matrix(Y_true, Y_pred, gr_inv)
+
+    assert not(a == b)
+    assert not(b == a)
+    assert a != b
+    assert b != a
+
+
+def test_mixed_types():
+    a = group_accuracy_score(Y_true, Y_pred, groups)
+    b = group_confusion_matrix(Y_true, Y_pred, groups)
+
+    assert not(a == b)
+    assert not(b == a)
+    assert a != b
+    assert b != a
