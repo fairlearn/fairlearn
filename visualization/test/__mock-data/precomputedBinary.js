@@ -25,7 +25,7 @@ export const precomputedBinary = {
         },
         "guid123": {
             global: 0.2,
-            bins: [0.2, 0.22, 0.18]
+            bins: [0.2, 0.22]
         }
     }, 
     // Model 2 metrics
@@ -48,7 +48,7 @@ export const precomputedBinary = {
         },
         "guid123": {
             global: 0.2,
-            bins: [0.2, 0.22, 0.18]
+            bins: [0.2, 0.22]
         }
     }],
     // Feature 2, serious real feature
