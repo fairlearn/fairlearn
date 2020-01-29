@@ -125,3 +125,23 @@ class GroupMetricResult:
     @range_ratio.setter
     def range_ratio(self, value):
         self._range_ratio = value
+
+    def __eq__(self, other):
+        result = NotImplemented
+        if isinstance(other, GroupMetricResult):
+            result = self.overall == other.overall
+            result = result and self.by_group == other.by_group
+            result = result and self.maximum == other.maximum
+            result = result and self.minimum == other.minimum
+            result = result and self.argmax_set == other.argmax_set
+            result = result and self.argmin_set == other.argmin_set
+            result = result and self.range == other.range
+            result = result and self.range_ratio == other.range_ratio
+        return result
+
+    def __ne__(self, other):
+        are_equal = self.__eq__(other)
+        if are_equal is NotImplemented:
+            return are_equal
+        else:
+            return not are_equal
