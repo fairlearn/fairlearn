@@ -41,9 +41,33 @@ def test_y_pred():
 
 def test_groups():
     target = GroupMetricSet()
-    target.groups = [4, 5, 6]
+    target.groups = [0, 1, 2]
     assert isinstance(target.groups, np.ndarray)
-    assert np.array_equal(target.groups, [4, 5, 6])
+    assert np.array_equal(target.groups, [0, 1, 2])
+
+
+def test_groups_not_from_zero():
+    target = GroupMetricSet()
+    with pytest.raises(ValueError) as exception_context:
+        target.groups = [4, 5, 6]
+    msg = "The unique values of the groups property must be sequential integers from zero"
+    assert exception_context.value.args[0] == msg
+
+
+def test_groups_not_sequential():
+    target = GroupMetricSet()
+    with pytest.raises(ValueError) as exception_context:
+        target.groups = [0, 2, 4]
+    msg = "The unique values of the groups property must be sequential integers from zero"
+    assert exception_context.value.args[0] == msg
+
+
+def test_groups_strings():
+    target = GroupMetricSet()
+    with pytest.raises(ValueError) as exception_context:
+        target.groups = ['0', '1', '2']
+    msg = "The unique values of the groups property must be sequential integers from zero"
+    assert exception_context.value.args[0] == msg
 
 
 def test_group_names():

@@ -17,6 +17,7 @@ from . import GroupMetricResult
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_1d
 
+_GROUPS_NOT_SEQUENTIAL_INTEGERS = "The unique values of the groups property must be sequential integers from zero"  # noqa: E501
 _GROUP_NAMES_MSG = "The group_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
 _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
@@ -121,11 +122,17 @@ class GroupMetricSet:
 
     @property
     def groups(self):
-        """Return the array of group values."""
+        """Return the array of group values.
+
+        The unique values will always be sequential integers from zero.
+        """
         return self._groups
 
     @groups.setter
     def groups(self, value):
+        unique_values = np.unique(value)
+        if not np.array_equal(unique_values, np.array(range(len(unique_values)))):
+            raise ValueError(_GROUPS_NOT_SEQUENTIAL_INTEGERS)
         self._groups = _convert_to_ndarray_1d(value)
 
     @property
@@ -159,7 +166,12 @@ class GroupMetricSet:
         self._metrics = value
 
     def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION):
-        """Compute the default metrics."""
+        """Compute the default metrics.
+
+        This will also automatically provide a remapping of the groups so that
+        the unique values of the stored `groups` property will be sequential
+        integers from zero.
+        """
         self.y_true = y_true
         self.y_pred = y_pred
         self.model_type = model_type
