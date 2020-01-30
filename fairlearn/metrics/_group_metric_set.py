@@ -86,6 +86,7 @@ class GroupMetricSet:
         self._y_pred = None
         self._groups = None
         self._group_names = None
+        self._group_title = None
         self._metrics = None
 
     @property
@@ -151,6 +152,15 @@ class GroupMetricSet:
         self._group_names = value
 
     @property
+    def group_title(self):
+        """Return the title for the groups."""
+        return self._group_title
+
+    @group_title.setter
+    def group_title(self, value):
+        self._group_title = str(value)
+
+    @property
     def metrics(self):
         """Return the GUID-GroupMetricResult dictionary of group metrics."""
         return self._metrics
@@ -200,6 +210,7 @@ class GroupMetricSet:
         result = NotImplemented
         if isinstance(other, GroupMetricSet):
             result = self.model_type == other.model_type
+            result = result and self.group_title == other.group_title
             result = result and np.array_equal(self.y_true, other.y_true)
             result = result and np.array_equal(self.y_pred, other.y_pred)
             result = result and np.array_equal(self.groups, other.groups)
