@@ -155,7 +155,7 @@ def test_groups_alphabetical():
     target = GroupMetricSet()
     regular = GroupMetricSet()
 
-    # Make 'target' the same as 'regular' but with different integers for the groups
+    # Make 'target' the same as 'regular' but with strings for the groups
     target.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
     regular.compute(Y_true, Y_pred, groups, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
 
