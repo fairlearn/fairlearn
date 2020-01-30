@@ -9,8 +9,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.exceptions import NotFittedError
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn._input_validation import \
-    (_MESSAGE_SENSITIVE_FEATURES_NONE,
-     _MESSAGE_X_NONE,
+    (_MESSAGE_X_NONE,
      _MESSAGE_X_SENSITIVE_ROWS,
      _MESSAGE_X_Y_ROWS,
      _MESSAGE_Y_NONE,
