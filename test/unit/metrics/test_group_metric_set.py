@@ -148,12 +148,7 @@ def test_groups_not_sequential_int():
 
     assert np.array_equal(['2', '4'], target.group_names)
 
-    tm = target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE]
-    rm = target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE]
-
-    assert tm.overall == rm.overall
-    assert tm.by_group == rm.by_group
-    assert tm == rm
+    assert target.metrics == regular.metrics
 
 
 def test_groups_alphabetical():
@@ -172,3 +167,5 @@ def test_groups_alphabetical():
     assert tm.overall == rm.overall
     assert tm.by_group == rm.by_group
     assert tm == rm
+    
+    assert target.metrics == regular.metrics
