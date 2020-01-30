@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import numpy as np
+
 from . import group_accuracy_score, group_balanced_root_mean_squared_error
 from . import group_fallout_rate, group_max_error
 from . import group_mean_absolute_error, group_mean_overprediction
@@ -156,14 +158,15 @@ class GroupMetricSet:
             raise ValueError(_METRICS_VALUES_MSG)
         self._metrics = value
 
-    def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION, group_names=None):
+    def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION):
         """Compute the default metrics."""
         self.y_true = y_true
         self.y_pred = y_pred
-        self.groups = groups
         self.model_type = model_type
-        if group_names is not None:
-            self.group_names = group_names
+
+        unique_groups = sorted(list(np.unique(groups)))
+        self.group_names = [str(x) for x in unique_groups]
+        self.groups = [unique_groups.index(x) for x in groups]
 
         function_dict = None
         if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
