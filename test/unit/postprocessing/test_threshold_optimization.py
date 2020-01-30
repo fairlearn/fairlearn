@@ -7,13 +7,11 @@ import pytest
 from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 from fairlearn._input_validation import \
     (_EMPTY_INPUT_ERROR_MESSAGE,
-     _INPUT_DATA_FORMAT_ERROR_MESSAGE,
      _MESSAGE_X_NONE,
      _MESSAGE_Y_NONE,
      _MESSAGE_SENSITIVE_FEATURES_NONE,
      _MESSAGE_X_Y_ROWS,
      _MESSAGE_X_SENSITIVE_ROWS,
-     _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE,
      _LABELS_NOT_0_1_ERROR_MESSAGE,
      _ALLOWED_INPUT_TYPES_X,
      _ALLOWED_INPUT_TYPES_Y,
@@ -44,7 +42,7 @@ ALLOWED_TYPES_Y_CONSTRUCTORS = [np.array if f == np.ndarray else f for f in _ALL
 
 
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 @pytest.mark.parametrize("predict_method_name", ['predict', '_pmf_predict'])
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_predict_before_fit_error(X_transform, sensitive_features_transform, predict_method_name,
@@ -120,7 +118,7 @@ def test_none_input_data(X, y, sensitive_features, constraints):
 
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
     non_binary_y = deepcopy(data_X_y_sf.y)
@@ -140,7 +138,7 @@ _degenerate_labels_feature_name = {
 
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constraints):
     y = y_transform(degenerate_labels_ex)
@@ -156,7 +154,7 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
 
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints):
     n = len(X_ex)
@@ -183,7 +181,7 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
 
 @pytest.mark.parametrize("score_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                                    sensitive_features_transform):
     y = y_transform(labels_ex)
@@ -245,7 +243,7 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
 
 @pytest.mark.parametrize("score_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 def test_threshold_optimization_equalized_odds(score_transform, y_transform,
                                                sensitive_features_transform):
     y = y_transform(labels_ex)
@@ -336,7 +334,7 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
                           (sensitive_features_ex2, sensitive_feature_names_ex2, 0.6, 0.4)])
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 def test_threshold_optimization_demographic_parity_e2e(sensitive_features,
                                                        sensitive_feature_names,
                                                        expected_p0, expected_p1,
@@ -371,7 +369,7 @@ def test_threshold_optimization_demographic_parity_e2e(sensitive_features,
                            0.112, 0.888, 0.334, 0.666)])
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 def test_threshold_optimization_equalized_odds_e2e(
         sensitive_features, sensitive_feature_names, expected_positive_p0, expected_positive_p1,
         expected_negative_p0, expected_negative_p1, X_transform, y_transform,
@@ -415,7 +413,7 @@ def test_threshold_optimization_equalized_odds_e2e(
                           (sensitive_features_ex2, sensitive_feature_names_ex2)])
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_predict_output_0_or_1(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
@@ -451,7 +449,7 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
                           (sensitive_features_ex2, sensitive_feature_names_ex2)])
 @pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
 @pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS)  # noqa: E501
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_predict_different_argument_lengths(sensitive_features, sensitive_feature_names,
                                             X_transform, y_transform,
