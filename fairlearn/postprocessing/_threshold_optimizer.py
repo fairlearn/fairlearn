@@ -16,6 +16,7 @@ import random
 
 from sklearn.exceptions import NotFittedError
 from fairlearn.postprocessing import PostProcessing
+from fairlearn._input_validation import _validate_and_reformat_input
 from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
@@ -23,11 +24,7 @@ from ._interpolated_prediction import InterpolatedPredictor
 
 # various error messages
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
-EMPTY_INPUT_ERROR_MESSAGE = "At least one of sensitive_features, labels, or scores are empty."
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
-INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats are: " \
-                                  "list, numpy.ndarray, pandas.DataFrame, pandas.Series. " \
-                                  "Your provided data was of types ({}, {}, {})"
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supported " \
     "constraints.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
@@ -97,7 +94,8 @@ class ThresholdOptimizer(PostProcessing):
         :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
         """
-        self._validate_input_data(X, sensitive_features, y)
+        _validate_and_reformat_input(X, y, sensitive_features=sensitive_features,
+                                     enforce_binary_labels=True)
 
         # postprocessing can't handle 0/1 as floating point numbers, so this converts it to int
         if type(y) in [np.ndarray, pd.DataFrame, pd.Series]:
@@ -144,7 +142,9 @@ class ThresholdOptimizer(PostProcessing):
             random.seed(random_state)
 
         self._validate_post_processed_predictor_is_fitted()
-        self._validate_input_data(X, sensitive_features)
+        _validate_and_reformat_input(X, y=None, sensitive_features=sensitive_features,
+                                     expect_y=False,
+                                     enforce_binary_labels=True)
         unconstrained_predictions = self._unconstrained_predictor.predict(X)
 
         positive_probs = _vectorized_prediction(
@@ -167,7 +167,9 @@ class ThresholdOptimizer(PostProcessing):
         :rtype: numpy.ndarray
         """
         self._validate_post_processed_predictor_is_fitted()
-        self._validate_input_data(X, sensitive_features)
+        _validate_and_reformat_input(X, y=None, sensitive_features=sensitive_features,
+                                     expect_y=False,
+                                     enforce_binary_labels=True)
         positive_probs = _vectorized_prediction(
             self._post_processed_predictor_by_sensitive_feature, sensitive_features,
             self._unconstrained_predictor.predict(X))
@@ -176,31 +178,6 @@ class ThresholdOptimizer(PostProcessing):
     def _validate_post_processed_predictor_is_fitted(self):
         if not self._post_processed_predictor_by_sensitive_feature:
             raise NotFittedError(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
-
-    def _validate_input_data(self, X, sensitive_features, y=None):
-        allowed_input_types = [list, np.ndarray, pd.DataFrame, pd.Series]
-        if type(X) not in allowed_input_types or \
-                type(sensitive_features) not in allowed_input_types or \
-                (y is not None and type(y) not in allowed_input_types):
-            raise TypeError(INPUT_DATA_FORMAT_ERROR_MESSAGE
-                            .format(type(X).__name__,
-                                    type(y).__name__,
-                                    type(sensitive_features).__name__))
-
-        if len(X) == 0 or len(sensitive_features) == 0 or (y is not None and len(y) == 0):
-            raise ValueError(EMPTY_INPUT_ERROR_MESSAGE)
-
-        if y is None:
-            if len(X) != len(sensitive_features) or (y is not None and len(X) != len(y)):
-                raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X and sensitive_features"))
-        else:
-            if len(X) != len(sensitive_features) or (y is not None and len(X) != len(y)):
-                raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                                 .format("X, sensitive_features, and y"))
-
-        if set(np.unique(y)) > set([0, 1]):
-            raise ValueError(NON_BINARY_LABELS_ERROR_MESSAGE)
 
 
 def _threshold_optimization_demographic_parity(sensitive_features, labels, scores, grid_size=1000,

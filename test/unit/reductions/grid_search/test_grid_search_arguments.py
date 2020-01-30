@@ -7,6 +7,16 @@ import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from sklearn.exceptions import NotFittedError
+from fairlearn import _NO_PREDICT_BEFORE_FIT
+from fairlearn._input_validation import \
+    (_MESSAGE_SENSITIVE_FEATURES_NONE,
+     _MESSAGE_X_NONE,
+     _MESSAGE_X_SENSITIVE_ROWS,
+     _MESSAGE_X_Y_ROWS,
+     _MESSAGE_Y_NONE,
+     _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE,
+     _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE,
+     _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
@@ -57,13 +67,12 @@ class ArgumentTests:
         gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=3)
         _, Y, A = self._quick_data()
 
-        message = str("Must supply X")
         with pytest.raises(ValueError) as execInfo:
             gs.fit(None,
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _MESSAGE_X_NONE == execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -71,13 +80,12 @@ class ArgumentTests:
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, _, A = self._quick_data()
 
-        message = str("Must supply y")
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    None,
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _MESSAGE_Y_NONE == execInfo.value.args[0]
 
     # ----------------------------
 
@@ -89,13 +97,12 @@ class ArgumentTests:
         X, _, A = self._quick_data()
         Y = np.random.randint(2, size=len(A)+1)
 
-        message = str("X and y must have same number of rows")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _MESSAGE_X_Y_ROWS == execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -105,13 +112,12 @@ class ArgumentTests:
         X, Y, _ = self._quick_data()
         A = np.random.randint(2, size=len(Y)+1)
 
-        message = str("X and the sensitive features must have same number of rows")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _MESSAGE_X_SENSITIVE_ROWS == execInfo.value.args[0]
 
     # ----------------------------
 
@@ -125,13 +131,12 @@ class ArgumentTests:
         A[1] = 1
         A[2] = 2
 
-        message = str("Sensitive features contain more than two unique values")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE == execInfo.value.args[0]
 
     # ----------------------------
 
@@ -142,13 +147,13 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
-        message = str("y is a DataFrame with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_df,
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE.format("y", pd.DataFrame.__name__) == \
+            execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -157,65 +162,33 @@ class ArgumentTests:
         X, Y, A = self._quick_data()
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
-        message = str("y is an ndarray with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE.format("y", np.ndarray.__name__) == \
+            execInfo.value.args[0]
 
     # ----------------------------
-
-    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
-    @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_A_df_bad_columns(self, transformX, transformY):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, A = self._quick_data()
-
-        A_two_col_df = pd.DataFrame({"a": A, "b": A})
-        message = str("sensitive_features is a DataFrame with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(transformX(X),
-                   transformY(Y),
-                   sensitive_features=A_two_col_df)
-
-        assert message == execInfo.value.args[0]
-
-    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
-    @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_A_ndarray_bad_columns(self, transformX, transformY):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, A = self._quick_data()
-
-        A_two_col_ndarray = np.stack((A, A), -1)
-        message = str("sensitive_features is an ndarray with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(transformX(X),
-                   transformY(Y),
-                   sensitive_features=A_two_col_ndarray)
-
-        assert message == execInfo.value.args[0]
 
     def test_no_predict_before_fit(self):
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, _, _ = self._quick_data()
 
-        message = str("Must call fit before attempting to make predictions")
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
 
-        assert message == execInfo.value.args[0]
+        assert _NO_PREDICT_BEFORE_FIT == execInfo.value.args[0]
 
     def test_no_predict_proba_before_fit(self):
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, _, _ = self._quick_data()
 
-        message = str("Must call fit before attempting to make predictions")
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
 
-        assert message == execInfo.value.args[0]
+        assert _NO_PREDICT_BEFORE_FIT == execInfo.value.args[0]
 
 
 # Tests specific to Classification
@@ -230,13 +203,12 @@ class ConditionalOpportunityTests(ArgumentTests):
         Y[1] = 1
         Y[2] = 2
 
-        message = str("Supplied y labels are not 0 or 1")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -246,13 +218,12 @@ class ConditionalOpportunityTests(ArgumentTests):
         X, Y, A = self._quick_data()
         Y = Y + 1
 
-        message = str("Supplied y labels are not 0 or 1")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
 
 
 # Set up DemographicParity
