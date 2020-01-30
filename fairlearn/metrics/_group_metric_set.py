@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import numpy as np
+
 from . import group_accuracy_score, group_balanced_root_mean_squared_error
 from . import group_fallout_rate, group_max_error
 from . import group_mean_absolute_error, group_mean_overprediction
@@ -15,8 +17,8 @@ from . import GroupMetricResult
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_1d
 
-_GROUP_NAMES_KEYS_MSG = "Keys for group_names dictionary must be integers"
-_GROUP_NAMES_VALUES_MSG = "Values for group_names dictionary must be strings"
+_GROUPS_NOT_SEQUENTIAL_INTEGERS = "The unique values of the groups property must be sequential integers from zero"  # noqa: E501
+_GROUP_NAMES_MSG = "The group_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
 _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
 
@@ -84,6 +86,7 @@ class GroupMetricSet:
         self._y_pred = None
         self._groups = None
         self._group_names = None
+        self._group_title = 'Group Title Not Set'
         self._metrics = None
 
     @property
@@ -120,28 +123,42 @@ class GroupMetricSet:
 
     @property
     def groups(self):
-        """Return the array of group values."""
+        """Return the array of group values.
+
+        The unique values will always be sequential integers from zero.
+        """
         return self._groups
 
     @groups.setter
     def groups(self, value):
+        unique_values = np.unique(value)
+        if not np.array_equal(unique_values, np.array(range(len(unique_values)))):
+            raise ValueError(_GROUPS_NOT_SEQUENTIAL_INTEGERS)
         self._groups = _convert_to_ndarray_1d(value)
 
     @property
     def group_names(self):
-        """Return the group_names dictionary."""
+        """Return the group_names list."""
         return self._group_names
 
     @group_names.setter
     def group_names(self, value):
-        key_types = set(type(k) for k in value.keys())
-        if key_types != {int}:
-            raise ValueError(_GROUP_NAMES_KEYS_MSG)
-        value_types = set(type(v) for v in value.values())
+        if not type(value) is list:
+            raise ValueError(_GROUP_NAMES_MSG)
+        value_types = set(type(v) for v in value)
         if value_types != {str}:
-            raise ValueError(_GROUP_NAMES_VALUES_MSG)
+            raise ValueError(_GROUP_NAMES_MSG)
 
         self._group_names = value
+
+    @property
+    def group_title(self):
+        """Return the title for the groups."""
+        return self._group_title
+
+    @group_title.setter
+    def group_title(self, value):
+        self._group_title = str(value)
 
     @property
     def metrics(self):
@@ -158,14 +175,20 @@ class GroupMetricSet:
             raise ValueError(_METRICS_VALUES_MSG)
         self._metrics = value
 
-    def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION, group_names=None):
-        """Compute the default metrics."""
+    def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION):
+        """Compute the default metrics.
+
+        This will also automatically provide a remapping of the groups so that
+        the unique values of the stored `groups` property will be sequential
+        integers from zero.
+        """
         self.y_true = y_true
         self.y_pred = y_pred
-        self.groups = groups
         self.model_type = model_type
-        if group_names is not None:
-            self.group_names = group_names
+
+        unique_groups = sorted(list(np.unique(groups)))
+        self.group_names = [str(x) for x in unique_groups]
+        self.groups = [unique_groups.index(x) for x in groups]
 
         function_dict = None
         if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
@@ -181,3 +204,24 @@ class GroupMetricSet:
                 self.y_true, self.y_pred, self.groups)
 
         self.metrics = computed_metrics
+
+    def __eq__(self, other):
+        """Compare two `GroupMetricSet` objects for equality."""
+        result = NotImplemented
+        if isinstance(other, GroupMetricSet):
+            result = self.model_type == other.model_type
+            result = result and self.group_title == other.group_title
+            result = result and np.array_equal(self.y_true, other.y_true)
+            result = result and np.array_equal(self.y_pred, other.y_pred)
+            result = result and np.array_equal(self.groups, other.groups)
+            result = result and np.array_equal(self.group_names, other.group_names)
+            result = result and self.metrics == other.metrics
+        return result
+
+    def __ne__(self, other):
+        """Compare two `GroupMetricSet` objects for inequality."""
+        are_equal = self.__eq__(other)
+        if are_equal is NotImplemented:
+            return are_equal
+        else:
+            return not are_equal

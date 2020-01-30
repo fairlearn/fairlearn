@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import numpy as np
+
 
 class GroupMetricResult:
     """Class to hold the result of a grouped metric.
@@ -126,6 +128,12 @@ class GroupMetricResult:
             else:
                 result = self.overall == other.overall
                 result = result and self.by_group == other.by_group
+                result = result and self.maximum == other.maximum
+                result = result and self.minimum == other.minimum
+                result = result and self.argmax_set == other.argmax_set
+                result = result and self.argmin_set == other.argmin_set
+                result = result and self.range == other.range
+                result = result and self.range_ratio == other.range_ratio
         return result
 
     def __ne__(self, other):
