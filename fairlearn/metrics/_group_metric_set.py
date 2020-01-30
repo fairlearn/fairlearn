@@ -86,7 +86,7 @@ class GroupMetricSet:
         self._y_pred = None
         self._groups = None
         self._group_names = None
-        self._group_title = None
+        self._group_title = 'Group Title Not Set'
         self._metrics = None
 
     @property
