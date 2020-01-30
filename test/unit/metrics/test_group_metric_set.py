@@ -41,31 +41,55 @@ def test_y_pred():
 
 def test_groups():
     target = GroupMetricSet()
-    target.groups = [4, 5, 6]
+    target.groups = [0, 1, 2]
     assert isinstance(target.groups, np.ndarray)
-    assert np.array_equal(target.groups, [4, 5, 6])
+    assert np.array_equal(target.groups, [0, 1, 2])
+
+
+def test_groups_not_from_zero():
+    target = GroupMetricSet()
+    with pytest.raises(ValueError) as exception_context:
+        target.groups = [4, 5, 6]
+    msg = "The unique values of the groups property must be sequential integers from zero"
+    assert exception_context.value.args[0] == msg
+
+
+def test_groups_not_sequential():
+    target = GroupMetricSet()
+    with pytest.raises(ValueError) as exception_context:
+        target.groups = [0, 2, 4]
+    msg = "The unique values of the groups property must be sequential integers from zero"
+    assert exception_context.value.args[0] == msg
+
+
+def test_groups_strings():
+    target = GroupMetricSet()
+    with pytest.raises(ValueError) as exception_context:
+        target.groups = ['0', '1', '2']
+    msg = "The unique values of the groups property must be sequential integers from zero"
+    assert exception_context.value.args[0] == msg
 
 
 def test_group_names():
     target = GroupMetricSet()
-    target.group_names = {0: 'a', 1: 'b'}
+    target.group_names = ['a', 'b']
     assert target.group_names[0] == 'a'
     assert target.group_names[1] == 'b'
 
 
-def test_group_names_keys_not_int():
+def test_group_names_not_list():
     target = GroupMetricSet()
     with pytest.raises(ValueError) as exception_context:
         target.group_names = {'a': 'b', 'c': 'd'}
-    expected = "Keys for group_names dictionary must be integers"
+    expected = "The group_names property must be a list of strings"
     assert exception_context.value.args[0] == expected
 
 
 def test_group_names_values_not_string():
     target = GroupMetricSet()
     with pytest.raises(ValueError) as exception_context:
-        target.group_names = {0: 1, 2: 3}
-    expected = "Values for group_names dictionary must be strings"
+        target.group_names = [0, 1, 2, 'a']
+    expected = "The group_names property must be a list of strings"
     assert exception_context.value.args[0] == expected
 
 
@@ -98,6 +122,8 @@ def test_metrics_values_not_groupmetricresult():
 Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 Y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 groups = [0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0]
+gr_in2 = [2*(x+1) for x in groups]
+gr_alp = ['a' if x == 0 else 'b' for x in groups]
 
 
 def test_compute_binary():
@@ -110,6 +136,7 @@ def test_compute_binary():
     assert np.array_equal(Y_true, target.y_true)
     assert np.array_equal(Y_pred, target.y_pred)
     assert np.array_equal(groups, target.groups)
+    assert np.array_equal(['0', '1'], target.group_names)
     assert len(target.metrics) == 10
     assert target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE].overall == sample_expected.overall
     for g in np.unique(groups):
@@ -127,8 +154,64 @@ def test_compute_regression():
     assert np.array_equal(Y_true, target.y_true)
     assert np.array_equal(Y_pred, target.y_pred)
     assert np.array_equal(groups, target.groups)
+    assert np.array_equal(['0', '1'], target.group_names)
     assert len(target.metrics) == 12
     assert target.metrics[GroupMetricSet.GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR].overall == sample_expected.overall  # noqa: E501
     for g in np.unique(groups):
         assert (target.metrics[GroupMetricSet.GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR].by_group[g]
                 == sample_expected.by_group[g])
+
+
+def test_groups_not_sequential_int():
+    target = GroupMetricSet()
+    regular = GroupMetricSet()
+
+    # Make 'target' the same as 'regular' but with different integers for the groups
+    target.compute(Y_true, Y_pred, gr_in2, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+    regular.compute(Y_true, Y_pred, groups, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+
+    assert np.array_equal(['2', '4'], target.group_names)
+
+    assert target.metrics == regular.metrics
+
+
+def test_groups_alphabetical():
+    target = GroupMetricSet()
+    regular = GroupMetricSet()
+
+    # Make 'target' the same as 'regular' but with strings for the groups
+    target.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+    regular.compute(Y_true, Y_pred, groups, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+
+    assert np.array_equal(['a', 'b'], target.group_names)
+
+    tm = target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE]
+    rm = target.metrics[GroupMetricSet.GROUP_ACCURACY_SCORE]
+
+    assert tm.overall == rm.overall
+    assert tm.by_group == rm.by_group
+    assert tm == rm
+
+    assert target.metrics == regular.metrics
+
+
+def test_equality():
+    a = GroupMetricSet()
+    b = GroupMetricSet()
+
+    a.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+    b.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+
+    assert a == b
+    assert not(a != b)
+
+
+def test_inequality():
+    a = GroupMetricSet()
+    b = GroupMetricSet()
+
+    a.compute(Y_true, Y_pred, groups, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+    b.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+
+    assert not(a == b)
+    assert a != b
