@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from time import time
 
-from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
+from fairlearn._input_validation import _validate_and_reformat_input
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from sklearn.exceptions import NotFittedError
 from fairlearn.reductions import Reduction
@@ -184,11 +184,9 @@ class GridSearch(Reduction):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        X_train, y_train, sensitive_features_train = _validate_and_reformat_input(
+        X_train, y_train, _ = _validate_and_reformat_input(
             X, y, enforce_binary_sensitive_feature=True,
             enforce_binary_labels=is_classification_reduction, **kwargs)
-
-        kwargs[_KW_SENSITIVE_FEATURES] = sensitive_features_train
 
         # Prep the parity constraints and objective
         logger.debug("Preparing constraints and objective")

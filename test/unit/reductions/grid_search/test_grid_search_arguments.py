@@ -7,6 +7,16 @@ import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from sklearn.exceptions import NotFittedError
+from fairlearn import _NO_PREDICT_BEFORE_FIT
+from fairlearn._input_validation import \
+    (_MESSAGE_SENSITIVE_FEATURES_NONE,
+     _MESSAGE_X_NONE,
+     _MESSAGE_X_SENSITIVE_ROWS,
+     _MESSAGE_X_Y_ROWS,
+     _MESSAGE_Y_NONE,
+     _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE,
+     _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE,
+     _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
@@ -73,7 +83,7 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert "Expected 2D array, got scalar array instead" in execInfo.value.args[0]
+        assert _MESSAGE_X_NONE == execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -107,8 +117,7 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        expected_exception_message = "Found input variables with inconsistent numbers of samples"
-        assert expected_exception_message in execInfo.value.args[0]
+        assert _MESSAGE_X_Y_ROWS == execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -127,8 +136,7 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        expected_exception_message = "Found input variables with inconsistent numbers of samples"
-        assert expected_exception_message in execInfo.value.args[0]
+        assert _MESSAGE_X_SENSITIVE_ROWS == execInfo.value.args[0]
 
     # ----------------------------
 
@@ -176,7 +184,8 @@ class ArgumentTests:
                    Y_two_col_df,
                    sensitive_features=transformA(A))
 
-        assert "bad input shape" in execInfo.value.args[0]
+        assert _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE.format("y", pd.DataFrame.__name__) == \
+            execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -192,7 +201,8 @@ class ArgumentTests:
                    Y_two_col_ndarray,
                    sensitive_features=transformA(A))
 
-        assert "bad input shape" in execInfo.value.args[0]
+        assert _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE.format("y", np.ndarray.__name__) == \
+            execInfo.value.args[0]
 
     # ----------------------------
 
@@ -200,7 +210,6 @@ class ArgumentTests:
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, _, _ = self._quick_data()
 
-        message = str("Must call fit before attempting to make predictions")
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
 
@@ -210,7 +219,6 @@ class ArgumentTests:
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, _, _ = self._quick_data()
 
-        message = str("Must call fit before attempting to make predictions")
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
 
