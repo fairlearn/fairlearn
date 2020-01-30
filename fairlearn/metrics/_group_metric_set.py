@@ -194,25 +194,6 @@ class GroupMetricSet:
             raise ValueError(_METRICS_VALUES_MSG)
         self._metrics = value
 
-    def check_consistency(self):
-        """Check all properties are set consistently."""
-        num_y_true = len(self.y_true)
-        num_y_pred = len(self.y_pred)
-        num_groups = len(self.groups)
-
-        # Check for size consistency
-        if (num_y_true != num_y_pred) or (num_y_true != num_groups):
-            raise ValueError(_ARRAYS_NOT_SAME_LENGTH)
-
-        unique_groups = frozenset(self.groups)
-        for metric_key, metric_result in self.metrics.items():
-            if set(metric_result.by_group.keys()) != unique_groups:
-                raise ValueError(
-                    _BIN_MISMATCH_FOR_METRIC.format(metric_key))
-
-        if len(unique_groups) != len(self.group_names):
-            raise ValueError(_GROUP_NAMES_BAD_COUNT)
-
     def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION):
         """Compute the default metrics.
 
@@ -242,84 +223,6 @@ class GroupMetricSet:
                 self.y_true, self.y_pred, self.groups)
 
         self.metrics = computed_metrics
-
-    def to_dict(self):
-        """Create a dictionary matching the Dashboard cache schema."""
-        self.check_consistency()
-
-        result = dict()
-
-        result[_Y_TRUE] = self.y_true.tolist()
-        # Dashboard actually allows for multiple models, so have nested list
-        # This happens for the metrics and bins as well
-        result[_Y_PRED] = [self.y_pred.tolist()]
-
-        # Handle the metrics
-        metric_dict = dict()
-        unique_groups = sorted(list(frozenset(self.groups)))
-        for metric_key, metric_result in self.metrics.items():
-            metric = {}
-            metric[_GLOBAL] = metric_result.overall
-
-            metric[_BINS] = []
-            for g in unique_groups:
-                metric[_BINS].append(metric_result.by_group[g])
-            metric_dict[metric_key] = metric
-
-        result[_PRECOMPUTED_METRICS] = [[metric_dict]]
-
-        # Handle the bins
-        bin_dict = dict()
-        bin_dict[_BIN_VECTOR] = self.groups.tolist()
-        bin_dict[_FEATURE_BIN_NAME] = self.group_title
-        if self.group_names is not None:
-            bin_dict[_BIN_LABELS] = [self.group_names[i] for i in unique_groups]
-        else:
-            bin_dict[_BIN_LABELS] = [str(x) for x in unique_groups]
-
-        result[_PRECOMPUTED_BINS] = [bin_dict]
-
-        if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
-            result[_PREDICTION_TYPE] = _PREDICTION_BINARY_CLASSIFICATION
-        else:
-            msg = _UNSUPPORTED_MODEL_TYPE.format(self.model_type)
-            raise ValueError(msg)
-
-        return result
-
-    @staticmethod
-    def from_dict(gms_dict):
-        """Deserialize a dictionary matching the Dashboard cache schema."""
-        result = GroupMetricSet()
-
-        result.y_true = gms_dict[_Y_TRUE]
-
-        if len(gms_dict[_Y_PRED]) > 1:
-            raise ValueError(_DICT_TOO_MANY_Y_PRED)
-        result.y_pred = gms_dict[_Y_PRED][0]
-        result.groups = gms_dict[_PRECOMPUTED_BINS][0][_BIN_VECTOR]
-
-        result.group_names = gms_dict[_PRECOMPUTED_BINS][0][_BIN_LABELS]
-        result.group_title = gms_dict[_PRECOMPUTED_BINS][0][_FEATURE_BIN_NAME]
-
-        metrics_dict = dict()
-        for metric_name, metric in gms_dict[_PRECOMPUTED_METRICS][0][0].items():
-            m = GroupMetricResult()
-            m.overall = metric[_GLOBAL]
-            by_group_dict = dict()
-            for i, val in enumerate(metric[_BINS]):
-                by_group_dict[i] = val
-            m.by_group = by_group_dict
-            metrics_dict[metric_name] = m
-        result.metrics = metrics_dict
-
-        if gms_dict[_PREDICTION_TYPE] == _PREDICTION_BINARY_CLASSIFICATION:
-            result.model_type = GroupMetricSet.BINARY_CLASSIFICATION
-        else:
-            raise ValueError(_UNSUPPORTED_MODEL_TYPE.format(
-                gms_dict[_PREDICTION_TYPE]))
-
-        return result
 
     def __eq__(self, other):
         """Compare two `GroupMetricSet` objects for equality."""
