@@ -167,5 +167,27 @@ def test_groups_alphabetical():
     assert tm.overall == rm.overall
     assert tm.by_group == rm.by_group
     assert tm == rm
-    
+
     assert target.metrics == regular.metrics
+
+
+def test_equality():
+    a = GroupMetricSet()
+    b = GroupMetricSet()
+
+    a.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+    b.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+
+    assert a == b
+    assert not(a != b)
+
+
+def test_inequality():
+    a = GroupMetricSet()
+    b = GroupMetricSet()
+
+    a.compute(Y_true, Y_pred, groups, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+    b.compute(Y_true, Y_pred, gr_alp, model_type=GroupMetricSet.BINARY_CLASSIFICATION)
+
+    assert not(a == b)
+    assert a != b
