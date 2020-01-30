@@ -15,8 +15,7 @@ from . import GroupMetricResult
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_1d
 
-_GROUP_NAMES_KEYS_MSG = "Keys for group_names dictionary must be integers"
-_GROUP_NAMES_VALUES_MSG = "Values for group_names dictionary must be strings"
+_GROUP_NAMES_MSG = "The group_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
 _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
 
@@ -129,17 +128,16 @@ class GroupMetricSet:
 
     @property
     def group_names(self):
-        """Return the group_names dictionary."""
+        """Return the group_names list."""
         return self._group_names
 
     @group_names.setter
     def group_names(self, value):
-        key_types = set(type(k) for k in value.keys())
-        if key_types != {int}:
-            raise ValueError(_GROUP_NAMES_KEYS_MSG)
-        value_types = set(type(v) for v in value.values())
+        if not type(value) is list:
+            raise ValueError(_GROUP_NAMES_MSG)
+        value_types = set(type(v) for v in value)
         if value_types != {str}:
-            raise ValueError(_GROUP_NAMES_VALUES_MSG)
+            raise ValueError(_GROUP_NAMES_MSG)
 
         self._group_names = value
 
