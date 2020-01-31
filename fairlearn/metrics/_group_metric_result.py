@@ -44,27 +44,13 @@ class GroupMetricResult:
 
     @property
     def minimum(self):
-        """Return the minimum value of the metric in the ``by_group`` dictionary.
-
-        This is only set if the metric is a scalar.
-        """
-        return self._minimum
-
-    @minimum.setter
-    def minimum(self, value):
-        self._minimum = value
+        """Return the minimum value of the metric in the ``by_group`` dictionary."""
+        return min(self.by_group.values())
 
     @property
     def maximum(self):
-        """Return the maximum value of the metric in the ``by_group`` dictionary.
-
-        This is only set if the metric is a scalar.
-        """
-        return self._maximum
-
-    @maximum.setter
-    def maximum(self, value):
-        self._maximum = value
+        """Return the maximum value of the metric in the ``by_group`` dictionary."""
+        return max(self.by_group.values())
 
     @property
     def argmin_set(self):
@@ -84,15 +70,8 @@ class GroupMetricResult:
 
     @property  # noqa: A003
     def range(self):
-        """Return the value of :code:`maximum-minimum`.
-
-        This is only set if the metric is a scalar.
-        """
-        return self._range
-
-    @range.setter  # noqa: A003
-    def range(self, value):
-        self._range = value
+        """Return the value of :code:`maximum-minimum`."""
+        return self.maximum - self.minimum
 
     @property
     def range_ratio(self):
@@ -128,12 +107,6 @@ class GroupMetricResult:
             else:
                 result = self.overall == other.overall
                 result = result and self.by_group == other.by_group
-                result = result and self.maximum == other.maximum
-                result = result and self.minimum == other.minimum
-                result = result and self.argmax_set == other.argmax_set
-                result = result and self.argmin_set == other.argmin_set
-                result = result and self.range == other.range
-                result = result and self.range_ratio == other.range_ratio
         return result
 
     def __ne__(self, other):
