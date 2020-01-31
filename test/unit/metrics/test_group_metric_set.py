@@ -153,16 +153,13 @@ class TestConsistencyCheck:
         expected = "The groups for metric bad_metric do not match the groups property"
         assert exception_context.value.args[0] == expected
 
-
-class TestDictionaryConversions:
-    def test_to_dict_smoke(self):
+    def test_group_names_do_not_match_groups(self):
         target = GroupMetricSet()
 
         target.model_type = GroupMetricSet.BINARY_CLASSIFICATION
         target.y_true = [0, 1, 0, 0]
         target.y_pred = [1, 1, 1, 0]
         target.groups = [0, 1, 1, 0]
-        target.group_title = 'A string'
 
         # Some wholly synthetic metrics
         firstMetric = GroupMetricResult()
@@ -178,27 +175,16 @@ class TestDictionaryConversions:
 
         target.metrics = metric_dict
 
-        result = target.to_dict()
+        target.group_names = ['First']
+        target.group_title = "Some string"
+        with pytest.raises(ValueError) as exception_context:
+            target.check_consistency()
+        expected = "Count of group_names not the same as the number of unique groups"
+        assert exception_context.value.args[0] == expected
 
-        assert result['predictionType'] == 'binaryClassification'
-        assert np.array_equal(target.y_true, result['trueY'])
-        assert len(result['predictedYs']) == 1
-        assert np.array_equal(result['predictedYs'][0], target.y_pred)
 
-        assert len(result['precomputedMetrics']) == 1
-        assert len(result['precomputedMetrics'][0]) == 1
-        rmd = result['precomputedMetrics'][0][0]
-        assert len(rmd) == 2
-        assert rmd['accuracy_score']['global'] == 0.2
-        assert rmd['accuracy_score']['bins'][0] == 0.3
-        assert rmd['accuracy_score']['bins'][1] == 0.4
-        assert rmd['miss_rate']['global'] == 0.6
-        assert rmd['miss_rate']['bins'][0] == 0.7
-        assert rmd['miss_rate']['bins'][1] == 0.8
-
-        assert result['precomputedBins'][0]['featureBinName'] == "A string"
-
-    def test_to_dict_group_names_smoke(self):
+class TestDictionaryConversions:
+    def test_to_dict_smoke(self):
         target = GroupMetricSet()
 
         target.model_type = GroupMetricSet.BINARY_CLASSIFICATION
@@ -226,9 +212,54 @@ class TestDictionaryConversions:
         result = target.to_dict()
 
         assert result['predictionType'] == 'binaryClassification'
+        assert np.array_equal(target.y_true, result['trueY'])
+        assert len(result['predictedYs']) == 1
+        assert np.array_equal(result['predictedYs'][0], target.y_pred)
+
+        assert len(result['precomputedMetrics']) == 1
+        assert len(result['precomputedMetrics'][0]) == 1
+        rmd = result['precomputedMetrics'][0][0]
+        assert len(rmd) == 2
+        assert rmd['accuracy_score']['global'] == 0.2
+        assert rmd['accuracy_score']['bins'][0] == 0.3
+        assert rmd['accuracy_score']['bins'][1] == 0.4
+        assert rmd['miss_rate']['global'] == 0.6
+        assert rmd['miss_rate']['bins'][0] == 0.7
+        assert rmd['miss_rate']['bins'][1] == 0.8
         assert result['precomputedBins'][0]['featureBinName'] == "Some string"
         assert np.array_equal(result['precomputedBins'][0]['binLabels'],
                               ['First', 'Second'])
+
+    def test_round_trip_smoke(self):
+        original = GroupMetricSet()
+
+        original.model_type = GroupMetricSet.BINARY_CLASSIFICATION
+        original.y_true = [0, 1, 0, 0]
+        original.y_pred = [1, 1, 1, 0]
+        original.groups = [0, 1, 2, 0]
+        original.group_title = 123
+
+        # Some wholly synthetic metrics
+        firstMetric = GroupMetricResult()
+        firstMetric.overall = 0.2
+        firstMetric.by_group[0] = 0.25
+        firstMetric.by_group[1] = 0.5
+        firstMetric.by_group[2] = 0.2
+        secondMetric = GroupMetricResult()
+        secondMetric.overall = 0.6
+        secondMetric.by_group[0] = 0.75
+        secondMetric.by_group[1] = 0.25
+        secondMetric.by_group[2] = 0.25
+        metric_dict = {GroupMetricSet.GROUP_ACCURACY_SCORE: firstMetric,
+                       GroupMetricSet.GROUP_MISS_RATE: secondMetric}
+        original.metrics = metric_dict
+        original.group_names = ['First', 'Second', 'Something else']
+
+        intermediate_dict = original.to_dict()
+
+        result = GroupMetricSet.from_dict(intermediate_dict)
+
+        assert original == result
 
 
 Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]

@@ -24,6 +24,7 @@ _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetric
 
 _ARRAYS_NOT_SAME_LENGTH = "Lengths of y_true, y_pred and groups must match"
 _BIN_MISMATCH_FOR_METRIC = "The groups for metric {0} do not match the groups property"
+_GROUP_NAMES_BAD_COUNT = "Count of group_names not the same as the number of unique groups"
 
 _Y_TRUE = 'trueY'
 _Y_PRED = 'predictedYs'
@@ -36,6 +37,9 @@ _BIN_LABELS = 'binLabels'
 _FEATURE_BIN_NAME = 'featureBinName'
 _PREDICTION_TYPE = 'predictionType'
 _PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
+
+_UNSUPPORTED_MODEL_TYPE = "The specified model_type of '{0}' is not supported"
+_DICT_TOO_MANY_Y_PRED = 'Too many y_pred values in dictionary'
 
 
 class GroupMetricSet:
@@ -206,6 +210,9 @@ class GroupMetricSet:
                 raise ValueError(
                     _BIN_MISMATCH_FOR_METRIC.format(metric_key))
 
+        if len(unique_groups) != len(self.group_names):
+            raise ValueError(_GROUP_NAMES_BAD_COUNT)
+
     def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION):
         """Compute the default metrics.
 
@@ -275,7 +282,42 @@ class GroupMetricSet:
         if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
             result[_PREDICTION_TYPE] = _PREDICTION_BINARY_CLASSIFICATION
         else:
-            raise ValueError("model_type not supported")
+            msg = _UNSUPPORTED_MODEL_TYPE.format(self.model_type)
+            raise ValueError(msg)
+
+        return result
+
+    @staticmethod
+    def from_dict(gms_dict):
+        """Deserialize a dictionary matching the Dashboard cache schema."""
+        result = GroupMetricSet()
+
+        result.y_true = gms_dict[_Y_TRUE]
+
+        if len(gms_dict[_Y_PRED]) > 1:
+            raise ValueError(_DICT_TOO_MANY_Y_PRED)
+        result.y_pred = gms_dict[_Y_PRED][0]
+        result.groups = gms_dict[_PRECOMPUTED_BINS][0][_BIN_VECTOR]
+
+        result.group_names = gms_dict[_PRECOMPUTED_BINS][0][_BIN_LABELS]
+        result.group_title = gms_dict[_PRECOMPUTED_BINS][0][_FEATURE_BIN_NAME]
+
+        metrics_dict = dict()
+        for metric_name, metric in gms_dict[_PRECOMPUTED_METRICS][0][0].items():
+            m = GroupMetricResult()
+            m.overall = metric[_GLOBAL]
+            by_group_dict = dict()
+            for i, val in enumerate(metric[_BINS]):
+                by_group_dict[i] = val
+            m.by_group = by_group_dict
+            metrics_dict[metric_name] = m
+        result.metrics = metrics_dict
+
+        if gms_dict[_PREDICTION_TYPE] == _PREDICTION_BINARY_CLASSIFICATION:
+            result.model_type = GroupMetricSet.BINARY_CLASSIFICATION
+        else:
+            raise ValueError(_UNSUPPORTED_MODEL_TYPE.format(
+                gms_dict[_PREDICTION_TYPE]))
 
         return result
 
