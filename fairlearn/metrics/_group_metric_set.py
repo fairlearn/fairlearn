@@ -22,6 +22,21 @@ _GROUP_NAMES_MSG = "The group_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
 _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
 
+_ARRAYS_NOT_SAME_LENGTH = "Lengths of y_true, y_pred and groups must match"
+_BIN_MISMATCH_FOR_METRIC = "The groups for metric {0} do not match the groups property"
+
+_Y_TRUE = 'trueY'
+_Y_PRED = 'predictedYs'
+_PRECOMPUTED_METRICS = 'precomputedMetrics'
+_GLOBAL = 'global'
+_BINS = 'bins'
+_PRECOMPUTED_BINS = 'precomputedBins'
+_BIN_VECTOR = 'binVector'
+_BIN_LABELS = 'binLabels'
+_FEATURE_BIN_NAME = 'featureBinName'
+_PREDICTION_TYPE = 'predictionType'
+_PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
+
 
 class GroupMetricSet:
     """Class to hold a collection of GroupMetricResult objects."""
@@ -175,6 +190,22 @@ class GroupMetricSet:
             raise ValueError(_METRICS_VALUES_MSG)
         self._metrics = value
 
+    def check_consistency(self):
+        """Check all properties are set consistently."""
+        num_y_true = len(self.y_true)
+        num_y_pred = len(self.y_pred)
+        num_groups = len(self.groups)
+
+        # Check for size consistency
+        if (num_y_true != num_y_pred) or (num_y_true != num_groups):
+            raise ValueError(_ARRAYS_NOT_SAME_LENGTH)
+
+        unique_groups = frozenset(self.groups)
+        for metric_key, metric_result in self.metrics.items():
+            if set(metric_result.by_group.keys()) != unique_groups:
+                raise ValueError(
+                    _BIN_MISMATCH_FOR_METRIC.format(metric_key))
+
     def compute(self, y_true, y_pred, groups, model_type=BINARY_CLASSIFICATION):
         """Compute the default metrics.
 
@@ -204,6 +235,49 @@ class GroupMetricSet:
                 self.y_true, self.y_pred, self.groups)
 
         self.metrics = computed_metrics
+
+    def to_dict(self):
+        """Create a dictionary matching the Dashboard cache schema."""
+        self.check_consistency()
+
+        result = dict()
+
+        result[_Y_TRUE] = self.y_true.tolist()
+        # Dashboard actually allows for multiple models, so have nested list
+        # This happens for the metrics and bins as well
+        result[_Y_PRED] = [self.y_pred.tolist()]
+
+        # Handle the metrics
+        metric_dict = dict()
+        unique_groups = sorted(list(frozenset(self.groups)))
+        for metric_key, metric_result in self.metrics.items():
+            metric = {}
+            metric[_GLOBAL] = metric_result.overall
+
+            metric[_BINS] = []
+            for g in unique_groups:
+                metric[_BINS].append(metric_result.by_group[g])
+            metric_dict[metric_key] = metric
+
+        result[_PRECOMPUTED_METRICS] = [[metric_dict]]
+
+        # Handle the bins
+        bin_dict = dict()
+        bin_dict[_BIN_VECTOR] = self.groups.tolist()
+        bin_dict[_FEATURE_BIN_NAME] = self.group_title
+        if self.group_names is not None:
+            bin_dict[_BIN_LABELS] = [self.group_names[i] for i in unique_groups]
+        else:
+            bin_dict[_BIN_LABELS] = [str(x) for x in unique_groups]
+
+        result[_PRECOMPUTED_BINS] = [bin_dict]
+
+        if self.model_type == GroupMetricSet.BINARY_CLASSIFICATION:
+            result[_PREDICTION_TYPE] = _PREDICTION_BINARY_CLASSIFICATION
+        else:
+            raise ValueError("model_type not supported")
+
+        return result
 
     def __eq__(self, other):
         """Compare two `GroupMetricSet` objects for equality."""

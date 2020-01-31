@@ -8,115 +8,227 @@ from fairlearn.metrics import group_accuracy_score, group_balanced_root_mean_squ
 from fairlearn.metrics import GroupMetricSet, GroupMetricResult
 
 
-def test_model_type_property():
-    target = GroupMetricSet()
+class TestProperties:
+    def test_model_type_property(self):
+        target = GroupMetricSet()
 
-    for mt in GroupMetricSet._allowed_model_types:
-        target.model_type = mt
-        assert target.model_type == mt
+        for mt in GroupMetricSet._allowed_model_types:
+            target.model_type = mt
+            assert target.model_type == mt
 
+    def test_model_type_not_allowed(self):
+        target = GroupMetricSet()
 
-def test_model_type_not_allowed():
-    target = GroupMetricSet()
+        with pytest.raises(ValueError) as exception_context:
+            target.model_type = "Something Random"
+        expected = "model_type 'Something Random' not in ['binary_classification', 'regression']"
+        assert exception_context.value.args[0] == expected
 
-    with pytest.raises(ValueError) as exception_context:
-        target.model_type = "Something Random"
-    expected = "model_type 'Something Random' not in ['binary_classification', 'regression']"
-    assert exception_context.value.args[0] == expected
+    def test_y_true(self):
+        target = GroupMetricSet()
+        target.y_true = [1, 2, 3]
+        assert isinstance(target.y_true, np.ndarray)
+        assert np.array_equal(target.y_true, [1, 2, 3])
 
+    def test_y_pred(self):
+        target = GroupMetricSet()
+        target.y_pred = [1, 2]
+        assert isinstance(target.y_pred, np.ndarray)
+        assert np.array_equal(target.y_pred, [1, 2])
 
-def test_y_true():
-    target = GroupMetricSet()
-    target.y_true = [1, 2, 3]
-    assert isinstance(target.y_true, np.ndarray)
-    assert np.array_equal(target.y_true, [1, 2, 3])
+    def test_groups(self):
+        target = GroupMetricSet()
+        target.groups = [0, 1, 2]
+        assert isinstance(target.groups, np.ndarray)
+        assert np.array_equal(target.groups, [0, 1, 2])
 
+    def test_groups_not_from_zero(self):
+        target = GroupMetricSet()
+        with pytest.raises(ValueError) as exception_context:
+            target.groups = [4, 5, 6]
+        msg = "The unique values of the groups property must be sequential integers from zero"
+        assert exception_context.value.args[0] == msg
 
-def test_y_pred():
-    target = GroupMetricSet()
-    target.y_pred = [1, 2]
-    assert isinstance(target.y_pred, np.ndarray)
-    assert np.array_equal(target.y_pred, [1, 2])
+    def test_groups_not_sequential(self):
+        target = GroupMetricSet()
+        with pytest.raises(ValueError) as exception_context:
+            target.groups = [0, 2, 4]
+        msg = "The unique values of the groups property must be sequential integers from zero"
+        assert exception_context.value.args[0] == msg
 
+    def test_groups_strings(self):
+        target = GroupMetricSet()
+        with pytest.raises(ValueError) as exception_context:
+            target.groups = ['0', '1', '2']
+        msg = "The unique values of the groups property must be sequential integers from zero"
+        assert exception_context.value.args[0] == msg
 
-def test_groups():
-    target = GroupMetricSet()
-    target.groups = [0, 1, 2]
-    assert isinstance(target.groups, np.ndarray)
-    assert np.array_equal(target.groups, [0, 1, 2])
+    def test_group_names(self):
+        target = GroupMetricSet()
+        target.group_names = ['a', 'b']
+        assert target.group_names[0] == 'a'
+        assert target.group_names[1] == 'b'
 
+    def test_group_names_not_list(self):
+        target = GroupMetricSet()
+        with pytest.raises(ValueError) as exception_context:
+            target.group_names = {'a': 'b', 'c': 'd'}
+        expected = "The group_names property must be a list of strings"
+        assert exception_context.value.args[0] == expected
 
-def test_groups_not_from_zero():
-    target = GroupMetricSet()
-    with pytest.raises(ValueError) as exception_context:
-        target.groups = [4, 5, 6]
-    msg = "The unique values of the groups property must be sequential integers from zero"
-    assert exception_context.value.args[0] == msg
+    def test_group_names_values_not_string(self):
+        target = GroupMetricSet()
+        with pytest.raises(ValueError) as exception_context:
+            target.group_names = [0, 1, 2, 'a']
+        expected = "The group_names property must be a list of strings"
+        assert exception_context.value.args[0] == expected
 
+    def test_metrics(self):
+        target = GroupMetricSet()
+        my_metric = GroupMetricResult()
+        my_metric.overall = 10222
+        target.metrics = {"60bdb14d-83fb-4374-ab2e-4c371f22b21e": my_metric}
+        assert target.metrics["60bdb14d-83fb-4374-ab2e-4c371f22b21e"].overall == 10222
 
-def test_groups_not_sequential():
-    target = GroupMetricSet()
-    with pytest.raises(ValueError) as exception_context:
-        target.groups = [0, 2, 4]
-    msg = "The unique values of the groups property must be sequential integers from zero"
-    assert exception_context.value.args[0] == msg
+    def test_metrics_keys_not_string(self):
+        target = GroupMetricSet()
+        my_metric = GroupMetricResult()
+        my_metric.overall = 10222
+        with pytest.raises(ValueError) as exception_context:
+            target.metrics = {0: my_metric}
+        expected = "Keys for metrics dictionary must be strings"
+        assert exception_context.value.args[0] == expected
 
-
-def test_groups_strings():
-    target = GroupMetricSet()
-    with pytest.raises(ValueError) as exception_context:
-        target.groups = ['0', '1', '2']
-    msg = "The unique values of the groups property must be sequential integers from zero"
-    assert exception_context.value.args[0] == msg
-
-
-def test_group_names():
-    target = GroupMetricSet()
-    target.group_names = ['a', 'b']
-    assert target.group_names[0] == 'a'
-    assert target.group_names[1] == 'b'
-
-
-def test_group_names_not_list():
-    target = GroupMetricSet()
-    with pytest.raises(ValueError) as exception_context:
-        target.group_names = {'a': 'b', 'c': 'd'}
-    expected = "The group_names property must be a list of strings"
-    assert exception_context.value.args[0] == expected
-
-
-def test_group_names_values_not_string():
-    target = GroupMetricSet()
-    with pytest.raises(ValueError) as exception_context:
-        target.group_names = [0, 1, 2, 'a']
-    expected = "The group_names property must be a list of strings"
-    assert exception_context.value.args[0] == expected
-
-
-def test_metrics():
-    target = GroupMetricSet()
-    my_metric = GroupMetricResult()
-    my_metric.overall = 10222
-    target.metrics = {"60bdb14d-83fb-4374-ab2e-4c371f22b21e": my_metric}
-    assert target.metrics["60bdb14d-83fb-4374-ab2e-4c371f22b21e"].overall == 10222
-
-
-def test_metrics_keys_not_string():
-    target = GroupMetricSet()
-    my_metric = GroupMetricResult()
-    my_metric.overall = 10222
-    with pytest.raises(ValueError) as exception_context:
-        target.metrics = {0: my_metric}
-    expected = "Keys for metrics dictionary must be strings"
-    assert exception_context.value.args[0] == expected
+    def test_metrics_values_not_groupmetricresult(self):
+        target = GroupMetricSet()
+        with pytest.raises(ValueError) as exception_context:
+            target.metrics = {"a": 0}
+        expected = "Values for metrics dictionary must be of type GroupMetricResult"
+        assert exception_context.value.args[0] == expected
 
 
-def test_metrics_values_not_groupmetricresult():
-    target = GroupMetricSet()
-    with pytest.raises(ValueError) as exception_context:
-        target.metrics = {"a": 0}
-    expected = "Values for metrics dictionary must be of type GroupMetricResult"
-    assert exception_context.value.args[0] == expected
+class TestConsistencyCheck:
+    def test_length_mismatch_y_true(self):
+        target = GroupMetricSet()
+        target.y_true = [0, 1, 0]
+        target.y_pred = [0, 1, 1, 1]
+        target.groups = [0, 1, 1, 1]
+
+        with pytest.raises(ValueError) as exception_context:
+            target.check_consistency()
+        assert exception_context.value.args[0] == "Lengths of y_true, y_pred and groups must match"
+
+    def test_length_mismatch_y_pred(self):
+        target = GroupMetricSet()
+        target.y_true = [0, 1, 0, 1]
+        target.y_pred = [0, 1, 1]
+        target.groups = [0, 1, 1, 1]
+
+        with pytest.raises(ValueError) as exception_context:
+            target.check_consistency()
+        assert exception_context.value.args[0] == "Lengths of y_true, y_pred and groups must match"
+
+    def test_length_mismatch_groups(self):
+        target = GroupMetricSet()
+        target.y_true = [0, 1, 0, 1]
+        target.y_pred = [0, 1, 1, 0]
+        target.groups = [0, 1, 1]
+
+        with pytest.raises(ValueError) as exception_context:
+            target.check_consistency()
+        assert exception_context.value.args[0] == "Lengths of y_true, y_pred and groups must match"
+
+    def test_metric_has_bad_groups(self):
+        target = GroupMetricSet()
+        target.y_true = [0, 1, 1, 1, 0]
+        target.y_pred = [1, 1, 1, 0, 0]
+        target.groups = [0, 1, 0, 1, 1]
+        bad_metric = GroupMetricResult()
+        bad_metric.by_group[0] = 0.1
+        metric_dict = {'bad_metric': bad_metric}
+        target.metrics = metric_dict
+
+        with pytest.raises(ValueError) as exception_context:
+            target.check_consistency()
+        expected = "The groups for metric bad_metric do not match the groups property"
+        assert exception_context.value.args[0] == expected
+
+
+class TestDictionaryConversions:
+    def test_to_dict_smoke(self):
+        target = GroupMetricSet()
+
+        target.model_type = GroupMetricSet.BINARY_CLASSIFICATION
+        target.y_true = [0, 1, 0, 0]
+        target.y_pred = [1, 1, 1, 0]
+        target.groups = [0, 1, 1, 0]
+        target.group_title = 'A string'
+
+        # Some wholly synthetic metrics
+        firstMetric = GroupMetricResult()
+        firstMetric.overall = 0.2
+        firstMetric.by_group[0] = 0.3
+        firstMetric.by_group[1] = 0.4
+        secondMetric = GroupMetricResult()
+        secondMetric.overall = 0.6
+        secondMetric.by_group[0] = 0.7
+        secondMetric.by_group[1] = 0.8
+        metric_dict = {GroupMetricSet.GROUP_ACCURACY_SCORE: firstMetric,
+                       GroupMetricSet.GROUP_MISS_RATE: secondMetric}
+
+        target.metrics = metric_dict
+
+        result = target.to_dict()
+
+        assert result['predictionType'] == 'binaryClassification'
+        assert np.array_equal(target.y_true, result['trueY'])
+        assert len(result['predictedYs']) == 1
+        assert np.array_equal(result['predictedYs'][0], target.y_pred)
+
+        assert len(result['precomputedMetrics']) == 1
+        assert len(result['precomputedMetrics'][0]) == 1
+        rmd = result['precomputedMetrics'][0][0]
+        assert len(rmd) == 2
+        assert rmd['accuracy_score']['global'] == 0.2
+        assert rmd['accuracy_score']['bins'][0] == 0.3
+        assert rmd['accuracy_score']['bins'][1] == 0.4
+        assert rmd['miss_rate']['global'] == 0.6
+        assert rmd['miss_rate']['bins'][0] == 0.7
+        assert rmd['miss_rate']['bins'][1] == 0.8
+
+        assert result['precomputedBins'][0]['featureBinName'] == "A string"
+
+    def test_to_dict_group_names_smoke(self):
+        target = GroupMetricSet()
+
+        target.model_type = GroupMetricSet.BINARY_CLASSIFICATION
+        target.y_true = [0, 1, 0, 0]
+        target.y_pred = [1, 1, 1, 0]
+        target.groups = [0, 1, 1, 0]
+
+        # Some wholly synthetic metrics
+        firstMetric = GroupMetricResult()
+        firstMetric.overall = 0.2
+        firstMetric.by_group[0] = 0.3
+        firstMetric.by_group[1] = 0.4
+        secondMetric = GroupMetricResult()
+        secondMetric.overall = 0.6
+        secondMetric.by_group[0] = 0.7
+        secondMetric.by_group[1] = 0.8
+        metric_dict = {GroupMetricSet.GROUP_ACCURACY_SCORE: firstMetric,
+                       GroupMetricSet.GROUP_MISS_RATE: secondMetric}
+
+        target.metrics = metric_dict
+
+        target.group_names = ['First', 'Second']
+        target.group_title = "Some string"
+
+        result = target.to_dict()
+
+        assert result['predictionType'] == 'binaryClassification'
+        assert result['precomputedBins'][0]['featureBinName'] == "Some string"
+        assert np.array_equal(result['precomputedBins'][0]['binLabels'],
+                              ['First', 'Second'])
 
 
 Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
