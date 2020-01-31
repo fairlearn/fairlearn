@@ -66,27 +66,6 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
         else:
             result.by_group[group] = metric_function(group_actual, group_predict)
 
-    try:
-        result.minimum = min(result.by_group.values())
-        result.maximum = max(result.by_group.values())
-
-        result.argmin_set = set([k for k, v in result.by_group.items() if v == result.minimum])  # noqa:E501
-        result.argmax_set = set([k for k, v in result.by_group.items() if v == result.maximum])  # noqa:E501
-
-        result.range = result.maximum - result.minimum
-        if result.minimum < 0:
-            result.range_ratio = np.nan
-        elif result.maximum == 0:
-            # We have min=max=0
-            result.range_ratio = 1
-        else:
-            result.range_ratio = result.minimum / result.maximum
-    except ValueError:
-        # Nothing to do
-        # Failed to compute an extra result, most likely because operation (such as min)
-        # was not defined for the return type (e.g. doing confusion matrices)
-        pass
-
     return result
 
 
