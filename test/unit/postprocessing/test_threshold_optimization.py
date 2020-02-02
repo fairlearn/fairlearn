@@ -11,12 +11,8 @@ from fairlearn.postprocessing._threshold_optimizer import \
     (_vectorized_prediction,
      _threshold_optimization_demographic_parity,
      _threshold_optimization_equalized_odds,
-     DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE,
-     EMPTY_INPUT_ERROR_MESSAGE,
      NON_BINARY_LABELS_ERROR_MESSAGE,
-     INPUT_DATA_FORMAT_ERROR_MESSAGE,
      NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
-     PREDICT_BEFORE_FIT_ERROR_MESSAGE,
      MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE)
 from fairlearn.postprocessing._postprocessing import \
     PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE, EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE, \
@@ -30,34 +26,13 @@ from .test_utilities import (sensitive_features_ex1, sensitive_features_ex2, lab
 
 
 ALLOWED_INPUT_DATA_TYPES = [lambda x: x, np.array, pd.DataFrame, pd.Series]
-
-
-@pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("sensitive_features_transform", ALLOWED_INPUT_DATA_TYPES)
-@pytest.mark.parametrize("predict_method_name", ['predict', '_pmf_predict'])
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_predict_before_fit_error(X_transform, sensitive_features_transform, predict_method_name,
-                                  constraints):
-    X = X_transform(_format_as_list_of_lists(sensitive_features_ex1))
-    sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
-                                            constraints=constraints)
-
-    with pytest.raises(ValueError, match=PREDICT_BEFORE_FIT_ERROR_MESSAGE):
-        getattr(adjusted_predictor, predict_method_name)(X, sensitive_features=sensitive_features)
-
-
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_both_predictor_and_estimator_error(constraints):
-    with pytest.raises(ValueError, match=EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE):
-        ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
-                           estimator=ExampleEstimator(),
-                           constraints=constraints)
+DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = ("Found input variables with "
+                                        "inconsistent numbers of")
 
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_no_predictor_or_estimator_error(constraints):
-    with pytest.raises(ValueError, match=PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE):
+    with pytest.raises(ValueError, match="needs a classifier to work on"):
         ThresholdOptimizer(constraints=constraints)
 
 
@@ -80,24 +55,6 @@ def test_not_predictor(constraints):
     with pytest.raises(ValueError, match=MISSING_PREDICT_ERROR_MESSAGE):
         ThresholdOptimizer(unconstrained_predictor=ExampleNotPredictor(),
                            constraints=constraints)
-
-
-@pytest.mark.parametrize("X", [None, _format_as_list_of_lists(sensitive_features_ex1)])
-@pytest.mark.parametrize("y", [None, labels_ex])
-@pytest.mark.parametrize("sensitive_features", [None, sensitive_features_ex1])
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_inconsistent_input_data_types(X, y, sensitive_features, constraints):
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
-                                            constraints=constraints)
-
-    error_message = INPUT_DATA_FORMAT_ERROR_MESSAGE.format(type(X).__name__,
-                                                           type(y).__name__,
-                                                           type(sensitive_features).__name__)
-
-    if X is None or y is None and sensitive_features is None:
-        with pytest.raises(TypeError) as exception:
-            adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-        assert str(exception.value) == error_message
 
 
 @pytest.mark.parametrize("X_transform", ALLOWED_INPUT_DATA_TYPES)
@@ -146,8 +103,8 @@ def test_threshold_optimization_different_input_lengths(X_transform, y_transform
                                                         constraints):
     n = len(sensitive_features_ex1)
     for permutation in [(0, 1), (1, 0)]:
-        with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                           .format("X, sensitive_features, and y")):
+        with pytest.raises(ValueError,
+                           match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
             X = X_transform(_format_as_list_of_lists(
                 sensitive_features_ex1)[:n - permutation[0]])
             y = y_transform(labels_ex[:n - permutation[1]])
@@ -155,18 +112,6 @@ def test_threshold_optimization_different_input_lengths(X_transform, y_transform
 
             adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                                     constraints=constraints)
-            adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-
-    # try providing empty lists in all combinations
-    for permutation in [(0, n), (n, 0)]:
-        X = X_transform(_format_as_list_of_lists(
-            sensitive_features_ex1)[:n - permutation[0]])
-        y = y_transform(labels_ex[:n - permutation[1]])
-        sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-
-        adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
-                                                constraints=constraints)
-        with pytest.raises(ValueError, match=EMPTY_INPUT_ERROR_MESSAGE):
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
 
 
@@ -449,13 +394,11 @@ def test_predict_different_argument_lengths(sensitive_features, sensitive_featur
                                             constraints=constraints)
     adjusted_predictor.fit(X, y, sensitive_features=sensitive_features_)
 
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                       .format("X and sensitive_features")):
+    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
         adjusted_predictor.predict(
             X, sensitive_features=sensitive_features_transform(sensitive_features[:-1]))
 
-    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE
-                       .format("X and sensitive_features")):
+    with pytest.raises(ValueError, match=DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE):
         adjusted_predictor.predict(X_transform(_format_as_list_of_lists(sensitive_features))[:-1],
                                    sensitive_features=sensitive_features_)
 
