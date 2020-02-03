@@ -29,7 +29,7 @@
     },
     "Parity": {
         "header": "Fairness measured in terms of disparity",
-        "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are two kinds of disparity metrics: more to come...."
+        "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are four kinds of disparity metrics: more to come...."
     },
     "Header": {
         "title": "fairlearn",
