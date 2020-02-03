@@ -5,90 +5,64 @@ from collections import defaultdict, namedtuple
 import numpy as np
 import pandas as pd
 import pytest
+from fairlearn._input_validation import \
+    (_ALLOWED_INPUT_TYPES_X,
+     _ALLOWED_INPUT_TYPES_Y,
+     _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES)
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
-from test.unit.constants import MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON
-from test.unit.input_convertors import ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, \
-    ensure_dataframe, ensure_series, _map_into_single_column
-
-
-X_ex = np.stack(([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-                 [5, 4, 3, 2, 7, 8, 3, 4, 4, 3, 6,  5,  7,  5,  2,  1,  9,  4,  8,  0],
-                 [9, 2, 4, 2, 9, 3, 1, 8, 1, 1, 2,  9,  6,  7,  4,  2,  56, 1,  2,  34]), -1)
 
 sensitive_feature_names_ex1 = ["A", "B", "C"]
-sensitive_features_ex1 = np.array([x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']).reshape(-1, 1)
-
+sensitive_features_ex1_flat = [x for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
+sensitive_features_ex1 = [[x] for x in sensitive_features_ex1_flat]
 sensitive_feature_names_ex2 = ["x", "Y"]
-sensitive_features_ex2 = np.array([x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']).reshape(-1, 1)
-
-labels_ex = np.array([int(x) for x in '0110100' '0010111' '000111'])
-degenerate_labels_ex = np.array([int(x) for x in '0000000' '0000000' '000000'])
-scores_ex = np.array([int(x) for x in '0011233' '0001111' '011112'])
-
+sensitive_features_ex2_flat = [x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']
+sensitive_features_ex2 = [[x] for x in sensitive_features_ex2_flat]
+labels_ex = [int(x) for x in '0110100' '0010111' '000111']
+degenerate_labels_ex = [int(x) for x in '0000000' '0000000' '000000']
+scores_ex = [int(x) for x in '0011233' '0001111' '011112']
 # combine earlier examples for a new scenario with multiple sensitive features
-sensitive_features_ex3 = np.hstack((sensitive_features_ex1, sensitive_features_ex2))
-sensitive_feature_names_ex3 = ["A,x", "A,Y", "B,x", "B,Y", "C,Y"]
+sensitive_features_ex3 = [[sensitive_features_ex1[i], sensitive_features_ex2[i]]
+                          for i in range(len(sensitive_features_ex1))]
 
-candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
-candidate_Y_transforms = [ensure_list_1d, ensure_ndarray, ensure_series, ensure_dataframe]
-candidate_A_transforms = [ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, ensure_series,
-                          ensure_dataframe]
+ALLOWED_TYPES_X_CONSTRUCTORS = [np.array if f == np.ndarray else f for f in _ALLOWED_INPUT_TYPES_X]  # noqa: E501
+ALLOWED_TYPES_Y_CONSTRUCTORS = [np.array if f == np.ndarray else f for f in _ALLOWED_INPUT_TYPES_Y]  # noqa: E501
+ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS = [np.array if f == np.ndarray else f for f in _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES]  # noqa: E501
+
+
 
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
-_data = namedtuple('_data', 'example_name feature_names sensitive_features X y scores')
+
+_data = namedtuple('_data', 'feature_names sensitive_features X labels scores')
+
+@pytest.fixture
+@pytest.mark.parametrize("feature_names,flat_data,labels,scores",
+                         [
+                             (sensitive_feature_names_ex1,
+                              sensitive_features_ex1_flat,
+                              labels_ex,
+                              scores_ex),
+                             (sensitive_feature_names_ex2,
+                              sensitive_features_ex2_flat,
+                              labels_ex,
+                              scores_ex)
+                         ])
+def data(feature_names, flat_data, labels, scores):
+    feature_data = [[x] for x in flat_data]
+    return _data(feature_names, flat_data, feature_data, labels, scores)
 
 
-@pytest.fixture(params=[
-    _data("example 1",
-          sensitive_feature_names_ex1,
-          sensitive_features_ex1,
-          X_ex,
-          labels_ex,
-          scores_ex),
-    _data("example 2",
-          sensitive_feature_names_ex2,
-          sensitive_features_ex2,
-          X_ex,
-          labels_ex,
-          scores_ex),
-    _data("example 3",
-          sensitive_feature_names_ex3,
-          sensitive_features_ex3,
-          X_ex,
-          labels_ex,
-          scores_ex)])
-def data(request):
-    return request.param
-
-
-@pytest.fixture(params=candidate_A_transforms)
-def data_sf(data, request):
-    sensitive_feature_transform = request.param
-    # Skip combinations where the multi-column sensitive features would have to be compressed
-    # into a one-dimensional data structure.
-    if (data.sensitive_features == sensitive_features_ex3).all() and \
-            sensitive_feature_transform in [ensure_list_1d, ensure_series]:
-        pytest.skip(MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON)
-
-    data._replace(sensitive_features=sensitive_feature_transform(data.sensitive_features))
+@pytest.fixture
+@pytest.mark.parametrize("X_transform", ALLOWED_TYPES_X_CONSTRUCTORS)
+@pytest.mark.parametrize("y_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
+@pytest.mark.parametrize("sensitive_feature_transform", ALLOWED_TYPES_Y_CONSTRUCTORS)
+def data_X_y_sf(data, X_transform, y_transform, sensitive_feature_transform):
+    data.X = X_transform(data.X)
+    data.labels = y_transform(data.labels)
+    data.sensitive_features = sensitive_feature_transform(data.sensitive_features)
     return data
-
-
-@pytest.fixture(params=candidate_X_transforms)
-def data_X_sf(data_sf, request):
-    X_transform = request.param
-    data_sf._replace(X=X_transform(data_sf.X))
-    return data_sf
-
-
-@pytest.fixture(params=candidate_Y_transforms)
-def data_X_y_sf(data_X_sf, request):
-    y_transform = request.param
-    data_X_sf._replace(y=y_transform(data_X_sf.y))
-    return data_X_sf
 
 
 class ExamplePredictor():
@@ -120,9 +94,9 @@ class ExampleNotEstimator2():
 
 def _get_grouped_data_and_base_points(sensitive_feature_value):
     data = pd.DataFrame({
-        SENSITIVE_FEATURE_KEY: sensitive_features_ex1.reshape(-1),
-        SCORE_KEY: scores_ex.reshape(-1),
-        LABEL_KEY: labels_ex.reshape(-1)})
+        SENSITIVE_FEATURE_KEY: sensitive_features_ex1_flat,
+        SCORE_KEY: scores_ex,
+        LABEL_KEY: labels_ex})
     grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group(sensitive_feature_value) \
         .sort_values(by=SCORE_KEY, ascending=False)
     x_grid = np.linspace(0, 1, 100)
@@ -165,9 +139,8 @@ def _get_grouped_data_and_base_points(sensitive_feature_value):
 
 def _get_predictions_by_sensitive_feature(adjusted_predictor, sensitive_features, scores, labels):
     labels_and_predictions = defaultdict(list)
-    sensitive_features_mapped = _map_into_single_column(sensitive_features)
-    for i in range(len(sensitive_features_mapped)):
-        labels_and_predictions[sensitive_features_mapped[i]].append(
+    for i in range(len(sensitive_features)):
+        labels_and_predictions[sensitive_features[i]].append(
             LabelAndPrediction(labels[i],
-                               adjusted_predictor([sensitive_features_mapped[i]], [scores[i]])))
+                               adjusted_predictor([sensitive_features[i]], [scores[i]])))
     return labels_and_predictions
