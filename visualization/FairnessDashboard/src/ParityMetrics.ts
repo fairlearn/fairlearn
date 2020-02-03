@@ -13,14 +13,14 @@ export enum ParityModes {
 export const ParityOptions: {[key: string]: IParityOption} = {
     "difference": {
         key: "difference",
-        title: "Accuracy",
-        description: "Disparity on Accuracy",
+        title: "Difference",
+        description: "Disparity using difference",
         parityModes: [ParityModes.difference]
     },
     "ratio" : {
         key: "ratio",
-        title: "Prediction",
-        description: "Disparity in Prediction",
+        title: "Ratio",
+        description: "Disparity using ratio",
         parityModes: [ParityModes.ratio]
     }
 };

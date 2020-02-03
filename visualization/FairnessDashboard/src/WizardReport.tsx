@@ -630,7 +630,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 this.props.featureBinPickerProps.selectedBinIndex, 
                 this.props.selectedModelIndex,
                 this.props.accuracyPickerProps.selectedAccuracyKey,
-                ParityModes.difference);
+                ParityModes[this.props.parityPickerProps.selectedParityKey]);
             if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification) {
                 binnedUnderprediction = (await this.props.metricsCache.getMetric(
                     this.props.dashboardContext.binVector,
@@ -652,7 +652,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     this.props.featureBinPickerProps.selectedBinIndex, 
                     this.props.selectedModelIndex,
                     "selection_rate",
-                    ParityModes.difference);
+                    ParityModes[this.props.parityPickerProps.selectedParityKey]);
             } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
                 predictions = this.props.dashboardContext.predictions[this.props.selectedModelIndex];
                 binnedOverprediction = (await this.props.metricsCache.getMetric(
@@ -675,7 +675,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     this.props.featureBinPickerProps.selectedBinIndex, 
                     this.props.selectedModelIndex,
                     "average",
-                    ParityModes.difference);
+                    ParityModes[this.props.parityPickerProps.selectedParityKey]);
             } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
                 predictions = this.props.dashboardContext.predictions[this.props.selectedModelIndex];
                 errors = predictions.map((predicted, index) => {
@@ -691,7 +691,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     this.props.featureBinPickerProps.selectedBinIndex, 
                     this.props.selectedModelIndex,
                     "average",
-                    ParityModes.difference);
+                    ParityModes[this.props.parityPickerProps.selectedParityKey]);
             }
             this.setState({
                 metrics: {
