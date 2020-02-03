@@ -51,7 +51,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 xAccessor: 'Accuracy',
                 yAccessor: 'Parity',
                 hoverinfo: 'text'
-            }
+            } as any
         ],
         layout: {
             autosize: true,

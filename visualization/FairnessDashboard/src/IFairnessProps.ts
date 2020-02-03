@@ -37,6 +37,7 @@ export interface IFairnessProps {
     theme?: any;
     stringParams?: any;
     supportedBinaryClassificationAccuracyKeys: string[];
+    supportedBinaryClassificationParityKeys: string[];
     supportedRegressionAccuracyKeys: string[];
     supportedProbabilityAccuracyKeys: string[];
     // The request hook

@@ -211,7 +211,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             {
                 orientation: 'h',
                 type: 'bar'
-            }
+            } as any
         ],
         layout: {
             autosize: true,
