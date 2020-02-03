@@ -31,11 +31,6 @@ scores_ex = np.array([int(x) for x in '0011233' '0001111' '011112'])
 sensitive_features_ex3 = np.hstack((sensitive_features_ex1, sensitive_features_ex2))
 sensitive_feature_names_ex3 = ["A,x", "A,Y", "B,x", "B,Y", "C,Y"]
 
-candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
-candidate_Y_transforms = [ensure_list_1d, ensure_ndarray, ensure_series, ensure_dataframe]
-candidate_A_transforms = [ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, ensure_series,
-                          ensure_dataframe]
-
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 _data = namedtuple('_data', 'example_name feature_names sensitive_features X y scores')
