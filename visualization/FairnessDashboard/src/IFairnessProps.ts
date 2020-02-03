@@ -40,6 +40,8 @@ export interface IFairnessProps {
     supportedBinaryClassificationParityKeys: string[];
     supportedRegressionAccuracyKeys: string[];
     supportedProbabilityAccuracyKeys: string[];
+    supportedRegressionParityKeys: string[];
+    supportedProbabilityParityKeys: string[];
     // The request hook
     requestMetrics: ( request: IMetricRequest, abortSignal?: AbortSignal) =>  Promise<IMetricResponse>;
 }

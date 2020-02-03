@@ -87,6 +87,8 @@ import { probit } from "../__mock-data/probit";
                         supportedBinaryClassificationParityKeys={["difference", "ratio"]}
                         supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}
                         supportedProbabilityAccuracyKeys={["auc", "root_mean_squared_error", "balanced_root_mean_squared_error", "r2_score", "mean_squared_error", "mean_absolute_error"]}
+                        supportedRegressionParityKeys={["difference", "ratio"]}
+                        supportedProbabilityParityKeys={["difference", "ratio"]}
                         stringParams={{contextualHelp: this.messages}}
                         requestMetrics={this.generateRandomMetrics.bind(this)}
                         key={new Date()}

@@ -64,6 +64,8 @@ export class FairlearnView extends DOMWidgetView {
             supportedBinaryClassificationParityKeys={["difference", "ratio"]}
             supportedRegressionAccuracyKeys={data.regression_methods}
             supportedProbabilityAccuracyKeys={data.probability_methods}
+            supportedRegressionParityKeys={["difference", "ratio"]}
+            supportedProbabilityParityKeys={["difference", "ratio"]}
             requestMetrics={this.makeRequest.bind(this)}
         />, root_element);
         this.el.appendChild(root_element)
