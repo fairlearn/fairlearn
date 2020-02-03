@@ -31,7 +31,6 @@ ALLOWED_TYPES_Y_CONSTRUCTORS = [np.array if f == np.ndarray else f for f in _ALL
 ALLOWED_TYPES_SENSITIVE_FEATURES_CONSTRUCTORS = [np.array if f == np.ndarray else f for f in _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES]  # noqa: E501
 
 
-
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 
