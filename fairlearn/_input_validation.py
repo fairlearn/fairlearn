@@ -124,7 +124,10 @@ def _make_vector(formless, formless_name, compress_multiple_columns=False):
             formed_vector = pd.Series(formless[:, 0])
         elif compress_multiple_columns:
             formed_vector = np.apply_along_axis(
-                lambda row: "-".join([str(row[i]).replace("-", "_") for i in range(len(row))]),
+                lambda row: ",".join([str(row[i])
+                                      .replace("\\", "\\\\")  # escape backslash
+                                      .replace(",", "\\,")  # escape commas using backslash
+                                      for i in range(len(row))]),
                 axis=1,
                 arr=formless)
         else:
