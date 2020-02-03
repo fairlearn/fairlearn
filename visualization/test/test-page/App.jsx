@@ -84,11 +84,11 @@ import { probit } from "../__mock-data/probit";
                         predictedY={data.predictedYs}
                         trueY={data.trueY}
                         supportedBinaryClassificationAccuracyKeys={["accuracy_score", "balanced_accuracy_score","precision_score", "recall_score"]}
-                        supportedBinaryClassificationParityKeys={["parity_difference", "parity_ratio", "error_rate_difference", "equal_opportunity_difference"]}
+                        supportedBinaryClassificationParityKeys={["selection_rate", "zero_one_loss", "recall_score"]}
                         supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}
                         supportedProbabilityAccuracyKeys={["auc", "root_mean_squared_error", "balanced_root_mean_squared_error", "r2_score", "mean_squared_error", "mean_absolute_error"]}
-                        supportedRegressionParityKeys={["parity_difference", "parity_ratio", "error_rate_difference", "equal_opportunity_difference"]}
-                        supportedProbabilityParityKeys={["parity_difference", "parity_ratio", "error_rate_difference", "equal_opportunity_difference"]}
+                        supportedRegressionParityKeys={["selection_rate", "zero_one_loss", "recall_score"]}
+                        supportedProbabilityParityKeys={["selection_rate", "zero_one_loss", "recall_score"]}
                         stringParams={{contextualHelp: this.messages}}
                         requestMetrics={this.generateRandomMetrics.bind(this)}
                         key={new Date()}

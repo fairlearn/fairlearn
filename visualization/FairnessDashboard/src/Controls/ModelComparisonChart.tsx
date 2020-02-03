@@ -332,7 +332,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     this.props.featureBinPickerProps.selectedBinIndex,
                     modelIndex, 
                     disparityMetric,
-                    ParityModes[this.props.parityPickerProps.selectedParityKey]);
+                    ParityModes.difference);
             });
 
             const accuracyArray = (await Promise.all(accuracyPromises)).map(metric => metric.global);

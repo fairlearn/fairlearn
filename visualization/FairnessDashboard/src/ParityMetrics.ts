@@ -11,28 +11,28 @@ export enum ParityModes {
 }
 
 export const ParityOptions: {[key: string]: IParityOption} = {
-    "parity_difference": {
-        key: "parity_difference",
+    "selection_rate": {
+        key: "selection_rate",
         title: "Parity difference",
         description: "Parity differenece",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
+        parityModes: [ParityModes.difference]
     },
-    "parity_ratio": {
-        key: "parity_ratio",
+    "selction_rate": {
+        key: "selction_rate",
         title: "Parity ratio",
         description: "Parity ratio",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
+        parityModes: [ParityModes.ratio]
     },
-    "error_rate_difference": {
-        key: "error_rate_difference",
+    "zero_one_loss": {
+        key: "zero_one_loss",
         title: "Error rate difference",
         description: "Error rate difference",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
+        parityModes: [ParityModes.difference]
     },
-    "equal_opportunity_difference": {
-        key: "equal_opportunity_difference",
+    "recall_score": {
+        key: "recall_score",
         title: "Equal opportunity difference",
         description: "Equal opportunity difference",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
+        parityModes: [ParityModes.difference]
     }
 };
