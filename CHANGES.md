@@ -2,7 +2,7 @@
 
 ### v0.4.3
 
-* Various tweaks to `GroupMetricResult` and `GroupMetricSet`
+* Various tweaks to `GroupMetricResult` and `GroupMetricSet` for AzureML integration
 
 ### v0.4.2
 
