@@ -13,10 +13,9 @@ def metric_by_group(metric_function,
                     y_true, y_pred, group_membership,
                     sample_weight=None,
                     **kwargs):
-    """Apply a metric to each subgroup of a set of data.
+    r"""Apply a metric to each subgroup of a set of data.
 
-    :param metric_function: Function with signature
-    ``(y_true, y_pred, sample_weight=None, **kwargs)``
+    :param metric_function: Function ``(y_true, y_pred, sample_weight=None, \*\*kwargs)``
 
     :param y_true: Array of ground-truth values
 
@@ -26,7 +25,7 @@ def metric_by_group(metric_function,
 
     :param sample_weight: Optional weights to apply to each input value
 
-    :param **kwargs: Optional arguments to be passed to the `metric_function`
+    :param \*\*kwargs: Optional arguments to be passed to the `metric_function`
 
     :return: Object containing the result of applying ``metric_function`` to the entire dataset
         and to each group identified in ``group_membership``.
