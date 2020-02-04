@@ -13,14 +13,24 @@ group_confusion_matrix = make_group_metric(skm.confusion_matrix)
 """A grouped wrapper around the :py:func:`sklearn.metrics.confusion_matrix` routine."""
 
 group_precision_score = make_group_metric(skm.precision_score)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.precision_score` routine
+"""
 
 group_recall_score = make_group_metric(skm.recall_score)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.recall_score` routine
+"""
 
 group_roc_auc_score = make_group_metric(skm.roc_auc_score)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.roc_auc_score` routine
+"""
 
 group_zero_one_loss = make_group_metric(skm.zero_one_loss)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.zero_one_loss` routine
+"""
 
 group_mean_squared_error = make_group_metric(skm.mean_squared_error)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.mean_squared_error` routine
+"""
 
 
 def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
@@ -44,6 +54,8 @@ def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
 
 
 group_r2_score = make_group_metric(skm.r2_score)
+"""A grouped wrapper around the :py:func:`sklearn.metrics.r2_score` routine
+"""
 
 group_max_error = make_group_metric(skm.max_error)
 """A grouped wrapper around the :py:func:`sklearn.metrics.max_error` routine
