@@ -1,5 +1,9 @@
 # Changes
 
+### v0.4.3
+
+* Various tweaks to `GroupMetricResult` and `GroupMetricSet` for AzureML integration
+
 ### v0.4.2
 
 * If methods such as `predict` are called before `fit`, `sklearn`'s
