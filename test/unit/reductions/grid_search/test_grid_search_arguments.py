@@ -82,7 +82,7 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert _MESSAGE_X_NONE == execInfo.value.args[0]
+        assert "Expected 2D array, got scalar array instead" in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -116,7 +116,7 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert _MESSAGE_X_Y_ROWS == execInfo.value.args[0]
+        assert "Found input variables with inconsistent numbers of samples" in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -135,7 +135,7 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert _MESSAGE_X_SENSITIVE_ROWS == execInfo.value.args[0]
+        assert "Found input variables with inconsistent numbers of samples" in execInfo.value.args[0]
 
     # ----------------------------
 
@@ -183,8 +183,7 @@ class ArgumentTests:
                    Y_two_col_df,
                    sensitive_features=transformA(A))
 
-        assert _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE.format("y", pd.DataFrame.__name__) == \
-            execInfo.value.args[0]
+        assert "bad input shape" in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -200,8 +199,7 @@ class ArgumentTests:
                    Y_two_col_ndarray,
                    sensitive_features=transformA(A))
 
-        assert _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE.format("y", np.ndarray.__name__) == \
-            execInfo.value.args[0]
+        assert "bad input shape" in execInfo.value.args[0]
 
     # ----------------------------
 
