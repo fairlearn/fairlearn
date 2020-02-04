@@ -18,6 +18,19 @@ def ensure_list(X):
     raise ValueError("Failed to convert to list")
 
 
+def ensure_list_1d(X):
+    assert X is not None
+    if isinstance(X, list):
+        return X
+    elif isinstance(X, np.ndarray):
+        return X.reshape(-1).tolist()
+    elif isinstance(X, pd.Series):
+        return X.tolist()
+    elif isinstance(X, pd.DataFrame):
+        return X.tolist()
+    raise ValueError("Failed to convert to list")
+
+
 def ensure_ndarray(X):
     assert X is not None
     if isinstance(X, list):
@@ -34,8 +47,10 @@ def ensure_ndarray(X):
 def ensure_ndarray_2d(X):
     assert X is not None
     tmp = ensure_ndarray(X)
+    if len(tmp.shape) == 2:
+        return tmp
     if len(tmp.shape) != 1:
-        raise ValueError("Requires 1d array")
+        raise ValueError("Requires 1d or 2d array")
     result = np.expand_dims(tmp, 1)
     assert len(result.shape) == 2
     return result
@@ -46,7 +61,10 @@ def ensure_series(X):
     if isinstance(X, list):
         return pd.Series(X)
     elif isinstance(X, np.ndarray):
-        return pd.Series(X)
+        if len(X.shape) == 1:
+            return pd.Series(X)
+        if X.shape[1] == 1:
+            return pd.Series(X.reshape(-1))
     elif isinstance(X, pd.Series):
         return X
     elif isinstance(X, pd.DataFrame):
