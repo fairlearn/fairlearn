@@ -15,8 +15,8 @@ def metric_by_group(metric_function,
                     **kwargs):
     """Apply a metric to each subgroup of a set of data.
 
-    :param metric_function: Function with signature ``(y_true, y_pred, sample_weight=None)``
-     which returns a scalar
+    :param metric_function: Function with signature
+    ``(y_true, y_pred, sample_weight=None, **kwargs)``
 
     :param y_true: Array of ground-truth values
 
@@ -25,6 +25,8 @@ def metric_by_group(metric_function,
     :param group_membership: Array Indicating the group to which each input value belongs
 
     :param sample_weight: Optional weights to apply to each input value
+
+    :param **kwargs: Optional arguments to be passed to the `metric_function`
 
     :return: Object containing the result of applying ``metric_function`` to the entire dataset
         and to each group identified in ``group_membership``.
@@ -79,11 +81,11 @@ def make_group_metric(metric_function):
     """Turn a regular metric into a grouped metric.
 
     :param metric_function: The function to be wrapped. This must have signature
-        ``(y_true, y_pred, sample_weight)``
+        ``(y_true, y_pred, sample_weight, **kwargs)``
     :type metric_function: func
 
     :return: A wrapped version of the supplied metric_function. It will have
-        signature ``(y_true, y_pred, group_membership, sample_weight)``
+        signature ``(y_true, y_pred, group_membership, sample_weight, **kwargs)``
     :rtype: func
     """
     def wrapper(y_true, y_pred, group_membership, sample_weight=None, **kwargs):
