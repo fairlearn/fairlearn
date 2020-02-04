@@ -4,7 +4,7 @@ import { IFairnessContext } from "../IFairnessContext";
 import _ from "lodash";
 import { MetricsCache } from "../MetricsCache";
 import { IAccuracyPickerProps, IParityPickerProps, IFeatureBinPickerProps } from "../FairnessWizard";
-import { ParityModes } from "../ParityMetrics";
+import { ParityModes, ParityOptions } from "../ParityMetrics";
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
 import { localization } from "../Localization/localization";
@@ -323,16 +323,17 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     this.props.accuracyPickerProps.selectedAccuracyKey);
             });
             const disparityMetric = this.state.disparityInOutcomes ?
-                (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
-                    "selection_rate" : "average") :
+            (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
+                this.props.parityPickerProps.selectedParityKey : "average") :
                 this.props.accuracyPickerProps.selectedAccuracyKey;
+            const parityMode = this.props.parityPickerProps.parityOptions.filter(option => option.key == this.props.parityPickerProps.selectedParityKey)[0].parityModes[0];
             const disparityPromises = new Array(this.props.modelCount).fill(0).map((unused, modelIndex) => {
                 return this.props.metricsCache.getDisparityMetric(
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex,
                     modelIndex, 
                     disparityMetric,
-                    ParityModes.difference);
+                    parityMode);
             });
 
             const accuracyArray = (await Promise.all(accuracyPromises)).map(metric => metric.global);
