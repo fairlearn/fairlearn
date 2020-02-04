@@ -94,8 +94,8 @@ class ThresholdOptimizer(PostProcessing):
         :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
         """
-        _validate_and_reformat_input(X, y, sensitive_features=sensitive_features,
-                                     enforce_binary_labels=True)
+        _, _, sensitive_feature_vector = _validate_and_reformat_input(
+            X, y, sensitive_features=sensitive_features, enforce_binary_labels=True)
 
         # postprocessing can't handle 0/1 as floating point numbers, so this converts it to int
         if type(y) in [np.ndarray, pd.DataFrame, pd.Series]:
@@ -142,9 +142,9 @@ class ThresholdOptimizer(PostProcessing):
             random.seed(random_state)
 
         self._validate_post_processed_predictor_is_fitted()
-        _validate_and_reformat_input(X, y=None, sensitive_features=sensitive_features,
-                                     expect_y=False,
-                                     enforce_binary_labels=True)
+        _, _, sensitive_feature_vector = _validate_and_reformat_input(
+            X, y=None, sensitive_features=sensitive_features, expect_y=False,
+            enforce_binary_labels=True)
         unconstrained_predictions = self._unconstrained_predictor.predict(X)
 
         positive_probs = _vectorized_prediction(
@@ -167,9 +167,9 @@ class ThresholdOptimizer(PostProcessing):
         :rtype: numpy.ndarray
         """
         self._validate_post_processed_predictor_is_fitted()
-        _validate_and_reformat_input(X, y=None, sensitive_features=sensitive_features,
-                                     expect_y=False,
-                                     enforce_binary_labels=True)
+        _, _, sensitive_feature_vector = _validate_and_reformat_input(
+            X, y=None, sensitive_features=sensitive_features, expect_y=False,
+            enforce_binary_labels=True)
         positive_probs = _vectorized_prediction(
             self._post_processed_predictor_by_sensitive_feature, sensitive_feature_vector,
             self._unconstrained_predictor.predict(X))
