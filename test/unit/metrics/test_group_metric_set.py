@@ -1,11 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from bunch import Bunch
 import numpy as np
 import pytest
 
 from fairlearn.metrics import group_accuracy_score, group_balanced_root_mean_squared_error
-from fairlearn.metrics import GroupMetricSet, GroupMetricResult
+from fairlearn.metrics import GroupMetricSet
 
 
 class TestProperties:
@@ -85,25 +86,18 @@ class TestProperties:
 
     def test_metrics(self):
         target = GroupMetricSet()
-        my_metric = GroupMetricResult()
+        my_metric = Bunch()
         my_metric.overall = 10222
         target.metrics = {"60bdb14d-83fb-4374-ab2e-4c371f22b21e": my_metric}
         assert target.metrics["60bdb14d-83fb-4374-ab2e-4c371f22b21e"].overall == 10222
 
     def test_metrics_keys_not_string(self):
         target = GroupMetricSet()
-        my_metric = GroupMetricResult()
+        my_metric = Bunch()
         my_metric.overall = 10222
         with pytest.raises(ValueError) as exception_context:
             target.metrics = {0: my_metric}
         expected = "Keys for metrics dictionary must be strings"
-        assert exception_context.value.args[0] == expected
-
-    def test_metrics_values_not_groupmetricresult(self):
-        target = GroupMetricSet()
-        with pytest.raises(ValueError) as exception_context:
-            target.metrics = {"a": 0}
-        expected = "Values for metrics dictionary must be of type GroupMetricResult"
         assert exception_context.value.args[0] == expected
 
 
@@ -143,8 +137,8 @@ class TestConsistencyCheck:
         target.y_true = [0, 1, 1, 1, 0]
         target.y_pred = [1, 1, 1, 0, 0]
         target.groups = [0, 1, 0, 1, 1]
-        bad_metric = GroupMetricResult()
-        bad_metric.by_group[0] = 0.1
+        bad_metric = Bunch()
+        bad_metric.by_group = {0: 0.1}
         metric_dict = {'bad_metric': bad_metric}
         target.metrics = metric_dict
 
@@ -162,14 +156,12 @@ class TestConsistencyCheck:
         target.groups = [0, 1, 1, 0]
 
         # Some wholly synthetic metrics
-        firstMetric = GroupMetricResult()
+        firstMetric = Bunch()
         firstMetric.overall = 0.2
-        firstMetric.by_group[0] = 0.3
-        firstMetric.by_group[1] = 0.4
-        secondMetric = GroupMetricResult()
+        firstMetric.by_group = {0: 0.3, 1: 0.4}
+        secondMetric = Bunch()
         secondMetric.overall = 0.6
-        secondMetric.by_group[0] = 0.7
-        secondMetric.by_group[1] = 0.8
+        secondMetric.by_group = {0: 0.8, 1: 0.8}
         metric_dict = {GroupMetricSet.GROUP_ACCURACY_SCORE: firstMetric,
                        GroupMetricSet.GROUP_MISS_RATE: secondMetric}
 
@@ -193,14 +185,12 @@ class TestDictionaryConversions:
         target.groups = [0, 1, 1, 0]
 
         # Some wholly synthetic metrics
-        firstMetric = GroupMetricResult()
+        firstMetric = Bunch()
         firstMetric.overall = 0.2
-        firstMetric.by_group[0] = 0.3
-        firstMetric.by_group[1] = 0.4
-        secondMetric = GroupMetricResult()
+        firstMetric.by_group = {0: 0.3, 1: 0.4}
+        secondMetric = Bunch()
         secondMetric.overall = 0.6
-        secondMetric.by_group[0] = 0.7
-        secondMetric.by_group[1] = 0.8
+        secondMetric.by_group = {0: 0.7, 1: 0.8}
         metric_dict = {GroupMetricSet.GROUP_ACCURACY_SCORE: firstMetric,
                        GroupMetricSet.GROUP_MISS_RATE: secondMetric}
 
@@ -240,16 +230,12 @@ class TestDictionaryConversions:
         original.group_title = 123
 
         # Some wholly synthetic metrics
-        firstMetric = GroupMetricResult()
+        firstMetric = Bunch()
         firstMetric.overall = 0.2
-        firstMetric.by_group[0] = 0.25
-        firstMetric.by_group[1] = 0.5
-        firstMetric.by_group[2] = 0.2
-        secondMetric = GroupMetricResult()
+        firstMetric.by_group = {0: 0.25, 1: 0.5, 2: 0.2}
+        secondMetric = Bunch()
         secondMetric.overall = 0.6
-        secondMetric.by_group[0] = 0.75
-        secondMetric.by_group[1] = 0.25
-        secondMetric.by_group[2] = 0.25
+        secondMetric.by_group = {0: 0.75, 1: 0.25, 2: 0.25}
         metric_dict = {GroupMetricSet.GROUP_ACCURACY_SCORE: firstMetric,
                        GroupMetricSet.GROUP_MISS_RATE: secondMetric}
         original.metrics = metric_dict
