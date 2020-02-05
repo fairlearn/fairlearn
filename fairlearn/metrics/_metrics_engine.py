@@ -9,8 +9,11 @@ from ._input_manipulations import _convert_to_ndarray_and_squeeze
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
 
-def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_weight=None):
-    """Apply a metric to each subgroup of a set of data.
+def metric_by_group(metric_function,
+                    y_true, y_pred, group_membership,
+                    sample_weight=None,
+                    **kwargs):
+    r"""Apply a metric to each subgroup of a set of data.
 
     :param metric_function: Function ``(y_true, y_pred, sample_weight=None, \*\*kwargs)``
 
@@ -66,7 +69,9 @@ def metric_by_group(metric_function, y_true, y_pred, group_membership, sample_we
                                                      sample_weight=group_weight,
                                                      **kwargs)
         else:
-            result.by_group[group] = metric_function(group_actual, group_predict)
+            result.by_group[group] = metric_function(group_actual,
+                                                     group_predict,
+                                                     **kwargs)
 
     return result
 
