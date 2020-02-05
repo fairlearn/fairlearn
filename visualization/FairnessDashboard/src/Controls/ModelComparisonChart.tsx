@@ -7,6 +7,7 @@ import { IAccuracyPickerProps, IParityPickerProps, IFeatureBinPickerProps } from
 import { ParityModes, ParityOptions } from "../ParityMetrics";
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
+import { Dropdown, DropdownMenuItemType, IDropdownStyles, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { localization } from "../Localization/localization";
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { mergeStyleSets } from "@uifabric/styling";
@@ -27,6 +28,7 @@ export interface IModelComparisonProps {
 }
 
 export interface IState {
+    accuracyKey?: string;
     accuracyArray?: number[];
     disparityArray?: number[];
     disparityInOutcomes: boolean;
@@ -95,7 +97,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         },
         header: {
             backgroundColor: "#EBEBEB",
-            padding: "0 90px",
+            padding: "0 50px",
             height: "90px",
             display: "inline-flex",
             flexDirection: "row",
@@ -107,6 +109,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             fontSize: "32px",
             lineHeight: "39px",
             fontWeight: "100"
+        },
+        headerOptions: {
+            backgroundColor: "#EBEBEB"
+        },
+        dropDown: {
+            margin: "10px 50px"
         },
         editButton: {
             color: "#333333",
@@ -173,7 +181,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     constructor(props: IModelComparisonProps) {
         super(props);
         this.state = {
-            disparityInOutcomes: true
+            disparityInOutcomes: true,
+            accuracyKey: this.props.accuracyPickerProps.selectedAccuracyKey
         };
     }
 
@@ -254,7 +263,10 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             selectedMetric.title.toLowerCase(),
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
-        
+        const options: IDropdownOption[] = Object.keys(AccuracyOptions).map(x => { return {key: AccuracyOptions[x].key, text: AccuracyOptions[x].title}});
+        const dropdownStyles: Partial<IDropdownStyles> = {
+            dropdown: { width: 200 }
+        };          
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
             series.name = this.props.dashboardContext.modelNames[series.name];
@@ -270,6 +282,17 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 <div className={ModelComparisonChart.classNames.header}>
                     <h2 className={ModelComparisonChart.classNames.headerTitle}>{localization.ModelComparison.title}</h2>
                     <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={ModelComparisonChart.classNames.editButton}>{localization.Report.editConfiguration}</ActionButton>
+                </div>
+                <div className={ModelComparisonChart.classNames.headerOptions}>
+                    <Dropdown
+                        className={ModelComparisonChart.classNames.dropDown}
+                        label="Accuracy"
+                        defaultSelectedKey={this.props.accuracyPickerProps.selectedAccuracyKey}
+                        options={options}
+                        disabled={false}
+                        onChange={this.accuracyChanged}
+                        styles={dropdownStyles}
+                    />
                 </div>
                 <div className={ModelComparisonChart.classNames.main}>
                     <div className={ModelComparisonChart.classNames.chart}>
@@ -341,6 +364,14 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             this.setState({accuracyArray, disparityArray});
         } catch {
             // todo;
+        }
+    }
+
+    private readonly accuracyChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
+        const accuracyKey = option.key.toString();
+        if (this.state.accuracyKey !== accuracyKey) {
+            this.props.accuracyPickerProps.selectedAccuracyKey = accuracyKey;
+            this.setState({accuracyKey: accuracyKey, disparityArray: undefined});
         }
     }
 
