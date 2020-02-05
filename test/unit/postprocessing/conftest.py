@@ -5,11 +5,7 @@ from collections import defaultdict, namedtuple
 import numpy as np
 import pandas as pd
 import pytest
-from fairlearn._input_validation import \
-    (_ALLOWED_INPUT_TYPES_X,
-     _ALLOWED_INPUT_TYPES_Y,
-     _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES,
-     _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
+from fairlearn._input_validation import _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
@@ -37,18 +33,20 @@ sensitive_feature_names_ex3 = ["A,x", "A,Y", "B,x", "B,Y", "C,Y"]
 
 candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
 candidate_Y_transforms = [ensure_list_1d, ensure_ndarray, ensure_series, ensure_dataframe]
-candidate_A_transforms = [ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, ensure_series, ensure_dataframe]
+candidate_A_transforms = [ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, ensure_series,
+                          ensure_dataframe]
+
+LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
+
+_data = namedtuple('_data', 'feature_names sensitive_features X y scores')
 
 
-def is_invalid_sensitive_feature_transformation(sensitive_features_data, sensitive_features_transform):
+def is_invalid_sensitive_feature_transformation(sensitive_features_data,
+                                                sensitive_features_transform):
     if (sensitive_features_data == sensitive_features_ex3).all() and \
             sensitive_features_transform in [ensure_list_1d, ensure_series]:
         return True
 
-LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
-
-
-_data = namedtuple('_data', 'feature_names sensitive_features X y scores')
 
 @pytest.fixture
 @pytest.mark.parametrize("feature_names,features,labels,scores",
@@ -64,7 +62,7 @@ _data = namedtuple('_data', 'feature_names sensitive_features X y scores')
                              (sensitive_feature_names_ex3,
                               sensitive_features_ex3,
                               labels_ex,
-                              scores_ex) 
+                              scores_ex)
                          ])
 def data(feature_names, features, labels, scores):
     # note that the features are identical with sensitive features in these tests

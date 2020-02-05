@@ -9,12 +9,8 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.exceptions import NotFittedError
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn._input_validation import \
-    (_MESSAGE_X_NONE,
-     _MESSAGE_X_SENSITIVE_ROWS,
-     _MESSAGE_X_Y_ROWS,
-     _MESSAGE_Y_NONE,
+    (_MESSAGE_Y_NONE,
      _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE,
-     _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
@@ -116,7 +112,8 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert "Found input variables with inconsistent numbers of samples" in execInfo.value.args[0]
+        expected_exception_message = "Found input variables with inconsistent numbers of samples"
+        assert expected_exception_message in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -135,7 +132,8 @@ class ArgumentTests:
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert "Found input variables with inconsistent numbers of samples" in execInfo.value.args[0]
+        expected_exception_message = "Found input variables with inconsistent numbers of samples"
+        assert expected_exception_message in execInfo.value.args[0]
 
     # ----------------------------
 
