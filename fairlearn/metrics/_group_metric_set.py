@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from bunch import Bunch
+from sklearn.utils import Bunch
 import numpy as np
 
 from . import group_accuracy_score, group_balanced_root_mean_squared_error

@@ -1,5 +1,4 @@
 # Required for fairlearn
-bunch
 matplotlib>=3.0.3
 numpy>=1.17.2
 pandas>=0.25.1
