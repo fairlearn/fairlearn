@@ -49,8 +49,14 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
     :type enforce_binary_labels: bool
     """
     if y is not None:
+        # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
+        if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
+            y = y.reshape(-1)
+        elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
+            y = y.to_numpy().reshape(-1)
+
         X, y = check_X_y(X, y)
-        y = check_array(y, ensure_2d=False, dtype=int)
+        y = check_array(y, ensure_2d=False, dtype='numeric')
         if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
             raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
     elif expect_y:
