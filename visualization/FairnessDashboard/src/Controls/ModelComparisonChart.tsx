@@ -45,7 +45,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         plotlyPath: 'customdata'
                     }
                 },
-                mode: PlotlyMode.markers,
+                mode: PlotlyMode.textMarkers,
                 marker: {
                     size: 14
                 },
@@ -170,7 +170,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             flex: 1
         },
         textSection: {
-            paddingBottom: "5px"
+            padding: "20px 0",
+            borderBottom: "1px solid #cccc"
+        },
+        textSectionLast: {
+            padding: "20px 0",
         },
         radio: {
             paddingBottom: "30px",
@@ -316,7 +320,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         <div className={ModelComparisonChart.classNames.insightsText}>
                             <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
                             <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
-                            <div>{insights4}</div>
+                            <div className={ModelComparisonChart.classNames.textSectionLast}>{insights4}</div>
                         </div>
                     </div>
                 </div>
