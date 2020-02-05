@@ -235,14 +235,21 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const formattedMinDisparity = FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
         const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
         const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
-        const insights2 = localization.formatString(
-            localization.ModelComparison.insightsText2,
-            selectedMetric.title,
-            formattedMinAccuracy,
-            formattedMaxAccuracy,
-            formattedMinDisparity,
-            formattedMaxDisparity
-        );
+        
+        const insights2 = [selectedMetric.title,
+            localization.ModelComparison.rangesFrom,
+            <strong>{formattedMinAccuracy}</strong>,
+            localization.ModelComparison.to,
+            <strong>{formattedMaxAccuracy}</strong>,
+            localization.ModelComparison.period,
+            localization.ModelComparison.disparity,
+            localization.ModelComparison.rangesFrom,
+            <strong>{formattedMinDisparity}</strong>,
+            localization.ModelComparison.to,
+            <strong>{formattedMaxDisparity}</strong>,
+            localization.ModelComparison.period
+        ];
+
         const insights3 = localization.formatString(
             localization.ModelComparison.insightsText3,
             selectedMetric.title.toLowerCase(),
