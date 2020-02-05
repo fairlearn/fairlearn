@@ -85,7 +85,7 @@ def test_not_predictor(constraints):
                            constraints=constraints)
 
 
-@pytest.mark.parametrize("X", [None, sensitive_features_ex1])
+@pytest.mark.parametrize("X", [None, X_ex])
 @pytest.mark.parametrize("y", [None, labels_ex])
 @pytest.mark.parametrize("sensitive_features", [None, sensitive_features_ex1])
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
