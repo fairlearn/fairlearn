@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from copy import deepcopy
 import numpy as np
 import pytest
 from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
@@ -20,19 +19,16 @@ from fairlearn.postprocessing._postprocessing import \
     PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE, EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE, \
     MISSING_FIT_PREDICT_ERROR_MESSAGE, MISSING_PREDICT_ERROR_MESSAGE
 from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
-from .conftest import (sensitive_features_ex1, sensitive_features_ex2,
-                       sensitive_features_ex3, labels_ex, degenerate_labels_ex,
+from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
-                       sensitive_feature_names_ex2, sensitive_feature_names_ex3,
                        _get_predictions_by_sensitive_feature, _map_into_single_column,
                        ExamplePredictor, ExampleEstimator, ExampleNotPredictor,
                        ExampleNotEstimator1, ExampleNotEstimator2,
-                       candidate_A_transforms, candidate_X_transforms, candidate_Y_transforms,
-                       is_invalid_sensitive_feature_transformation)
+                       candidate_A_transforms, candidate_X_transforms, candidate_Y_transforms)
 
 
 @pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)  # noqa: E501
+@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
 @pytest.mark.parametrize("predict_method_name", ['predict', '_pmf_predict'])
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_predict_before_fit_error(X_transform, sensitive_features_transform, predict_method_name,
@@ -106,24 +102,17 @@ def test_none_input_data(X, y, sensitive_features, constraints):
         pass
 
 
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)  # noqa: E501
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_threshold_optimization_non_binary_labels(X_transform, y_transform,
-                                                  sensitive_features_transform, constraints):
-    non_binary_labels = copy.deepcopy(labels_ex)
-    non_binary_labels[0] = 2
-
-    X = X_transform(X_ex)
-    y = y_transform(non_binary_labels)
-    sensitive_features = sensitive_features_transform(sensitive_features_ex1)
+def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
+    data_X_y_sf.y[0] = 2
 
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=constraints)
 
     with pytest.raises(ValueError, match=_LABELS_NOT_0_1_ERROR_MESSAGE):
-        adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
+        adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
+                               sensitive_features=data_X_y_sf.sensitive_features)
+
 
 _degenerate_labels_feature_name = {
     "example 1": "A",
@@ -131,15 +120,16 @@ _degenerate_labels_feature_name = {
     "example 3": "A,Y"
 }
 
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
+_degenerate_labels_feature_name = {
+    "example 1": "A",
+    "example 2": "Y",
+    "example 3": "A,Y"
+}
+
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)  # noqa: E501
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_threshold_optimization_degenerate_labels(X_transform, y_transform,
-                                                  sensitive_features_transform, constraints):
-    X = X_transform(X_ex)
+def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constraints):
     y = y_transform(degenerate_labels_ex)
-    sensitive_features = sensitive_features_transform(sensitive_features_ex1)
 
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=constraints)
@@ -150,22 +140,9 @@ def test_threshold_optimization_degenerate_labels(X_transform, y_transform,
                                sensitive_features=data_X_sf.sensitive_features)
 
 
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)  # noqa: E501
-@pytest.mark.parametrize("sensitive_features_data",
-                         [sensitive_features_ex1, sensitive_features_ex2, sensitive_features_ex3])
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_threshold_optimization_different_input_lengths(X_transform, y_transform,
-                                                        sensitive_features_transform,
-                                                        sensitive_features_data,
-                                                        constraints):
-    if is_invalid_sensitive_feature_transformation(sensitive_features_data,
-                                                   sensitive_features_transform):
-        return
-
+def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints):
     n = len(X_ex)
-    sensitive_features = sensitive_features_transform(sensitive_features_data)
     expected_exception_messages = {
         "inconsistent": 'Found input variables with inconsistent numbers of samples',
         "empty": 'Found array with 0 sample'
@@ -173,9 +150,6 @@ def test_threshold_optimization_different_input_lengths(X_transform, y_transform
     for permutation in [(0, 1), (1, 0)]:
         with pytest.raises(ValueError, match=expected_exception_messages['inconsistent']
                            .format("X, sensitive_features, and y")):
-            X = X_transform(X_ex[:n - permutation[0]])
-            y = y_transform(labels_ex[:n - permutation[1]])
-
             adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                                     constraints=constraints)
             adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
@@ -184,18 +158,17 @@ def test_threshold_optimization_different_input_lengths(X_transform, y_transform
 
     # try providing empty lists in all combinations
     for permutation in [(0, n, 'inconsistent'), (n, 0, 'empty')]:
-        X = X_transform(X_ex[:n - permutation[0]])
-        y = y_transform(labels_ex[:n - permutation[1]])
-
         adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                                 constraints=constraints)
         with pytest.raises(ValueError, match=expected_exception_messages[permutation[2]]):
-            adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
+            adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
+                                   data_X_y_sf.y[:n - permutation[1]],
+                                   sensitive_features=data_X_y_sf.sensitive_features)
 
 
 @pytest.mark.parametrize("score_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)  # noqa: E501
+@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
 def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                                    sensitive_features_transform):
     y = y_transform(labels_ex)
@@ -343,127 +316,123 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
     assert np.isclose(predictions_based_on_label[1], [0.66733333] * 3).all()
 
 
-@pytest.mark.parametrize("sensitive_feature_data,sensitive_feature_names,expected_p0,expected_p1",
-                         [(sensitive_features_ex1, sensitive_feature_names_ex1, 0.428, 0.572),
-                          (sensitive_features_ex2, sensitive_feature_names_ex2, 0.6, 0.4),
-                          (sensitive_features_ex3, sensitive_feature_names_ex3, 0.5, 0.5)])
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)  # noqa: E501
-def test_threshold_optimization_demographic_parity_e2e(
-        sensitive_feature_data, sensitive_feature_names, expected_p0, expected_p1, X_transform,
-        y_transform, sensitive_features_transform):
+_P0 = "p0"
+_P1 = "p1"
+_expected_ps_demographic_parity = {
+    "example 1": {
+        _P0: 0.428,
+        _P1: 0.572
+    },
+    "example 2": {
+        _P0: 0.6,
+        _P1: 0.4
+    },
+    "example 3": {
+        _P0: 0.5,
+        _P1: 0.5
+    }
+}
 
-    if is_invalid_sensitive_feature_transformation(sensitive_feature_data,
-                                                   sensitive_features_transform):
-        return
 
-    X = X_transform(X_ex)
-    y = y_transform(labels_ex)
-    sensitive_features = sensitive_features_transform(sensitive_feature_data)
-
+def test_threshold_optimization_demographic_parity_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=DEMOGRAPHIC_PARITY, plot=False)
-    adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-    predictions = adjusted_predictor._pmf_predict(X, sensitive_features=sensitive_features)
+    adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
+                           sensitive_features=data_X_y_sf.sensitive_features)
+    predictions = adjusted_predictor._pmf_predict(
+        data_X_y_sf.X, sensitive_features=data_X_y_sf.sensitive_features)
+
+    expected_ps = _expected_ps_demographic_parity[data_X_y_sf.example_name]
 
     # assert demographic parity
     for sensitive_feature_name in data_X_y_sf.feature_names:
         average_probs = np.average(
             predictions[
-                _map_into_single_column(sensitive_feature_data) == sensitive_feature_name
+                _map_into_single_column(data_X_y_sf.sensitive_features) == sensitive_feature_name
             ], axis=0)
-        assert np.isclose(average_probs[0], expected_p0)
-        assert np.isclose(average_probs[1], expected_p1)
+        assert np.isclose(average_probs[0], expected_ps[_P0])
+        assert np.isclose(average_probs[1], expected_ps[_P1])
 
 
-@pytest.mark.parametrize("sensitive_feature_data,sensitive_feature_names,"
-                         "expected_positive_p0,expected_positive_p1,"
-                         "expected_negative_p0,expected_negative_p1",
-                         [(sensitive_features_ex1, sensitive_feature_names_ex1,
-                           0.33266666, 0.66733333, 0.666, 0.334),
-                          (sensitive_features_ex2, sensitive_feature_names_ex2,
-                           0.112, 0.888, 0.334, 0.666)])
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)  # noqa: E501
-def test_threshold_optimization_equalized_odds_e2e(
-        sensitive_feature_data, sensitive_feature_names, expected_positive_p0,
-        expected_positive_p1, expected_negative_p0, expected_negative_p1, X_transform,
-        y_transform, sensitive_features_transform):
+_POS_P0 = "positive_p0"
+_POS_P1 = "positive_p1"
+_NEG_P0 = "negative_p0"
+_NEG_P1 = "negative_p1"
+_expected_ps_equalized_odds = {
+    "example 1": {
+        _POS_P0: 0.33266666,
+        _POS_P1: 0.66733333,
+        _NEG_P0: 0.666,
+        _NEG_P1: 0.334
+    },
+    "example 2": {
+        _POS_P0: 0.112,
+        _POS_P1: 0.888,
+        _NEG_P0: 0.334,
+        _NEG_P1: 0.666
+    },
+    "example 3": {
+        _POS_P0: 0.33333333333333337,
+        _POS_P1: 0.6666666666666666,
+        _NEG_P0: 0.5,
+        _NEG_P1: 0.5
+    }
+}
 
-    if is_invalid_sensitive_feature_transformation(sensitive_feature_data,
-                                                   sensitive_features_transform):
-        return
 
-    X = X_transform(X_ex)
-    y = y_transform(labels_ex)
-    sensitive_features = sensitive_features_transform(sensitive_feature_data)
+def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=EQUALIZED_ODDS)
-    adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
+    adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
+                           sensitive_features=data_X_y_sf.sensitive_features)
 
-    predictions = adjusted_predictor._pmf_predict(X, sensitive_features=sensitive_features)
+    predictions = adjusted_predictor._pmf_predict(
+        data_X_y_sf.X, sensitive_features=data_X_y_sf.sensitive_features)
+
+    expected_ps = _expected_ps_equalized_odds[data_X_y_sf.example_name]
+    mapped_sensitive_features = _map_into_single_column(data_X_y_sf.sensitive_features)
 
     # assert equalized odds
-    for a in sensitive_feature_names:
-        pos_indices = (_map_into_single_column(sensitive_feature_data) == a) * (labels_ex == 1)
-        neg_indices = (_map_into_single_column(sensitive_feature_data) == a) * (labels_ex == 0)
+    for a in data_X_y_sf.feature_names:
+        pos_indices = (mapped_sensitive_features == a) * (labels_ex == 1)
+        neg_indices = (mapped_sensitive_features == a) * (labels_ex == 0)
         average_probs_positive_indices = np.average(predictions[pos_indices], axis=0)
         average_probs_negative_indices = np.average(predictions[neg_indices], axis=0)
-        assert np.isclose(average_probs_positive_indices[0], expected_positive_p0)
-        assert np.isclose(average_probs_positive_indices[1], expected_positive_p1)
-        assert np.isclose(average_probs_negative_indices[0], expected_negative_p0)
-        assert np.isclose(average_probs_negative_indices[1], expected_negative_p1)
+        assert np.isclose(average_probs_positive_indices[0], expected_ps[_POS_P0])
+        assert np.isclose(average_probs_positive_indices[1], expected_ps[_POS_P1])
+        assert np.isclose(average_probs_negative_indices[0], expected_ps[_NEG_P0])
+        assert np.isclose(average_probs_negative_indices[1], expected_ps[_NEG_P1])
 
 
-@pytest.mark.parametrize("sensitive_feature_data,sensitive_feature_names",
-                         [(sensitive_features_ex1, sensitive_feature_names_ex1),
-                          (sensitive_features_ex2, sensitive_feature_names_ex2)])
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_predict_output_0_or_1(sensitive_feature_data, sensitive_feature_names, X_transform,
-                               y_transform, sensitive_features_transform, constraints):
-    X = X_transform(X_ex)
-    y = y_transform(labels_ex)
-    sensitive_features = sensitive_features_transform(sensitive_feature_data)
+def test_predict_output_0_or_1(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=constraints)
-    adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
+    adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
+                           sensitive_features=data_X_y_sf.sensitive_features)
 
-    predictions = adjusted_predictor.predict(X, sensitive_features=sensitive_features)
+    predictions = adjusted_predictor.predict(
+        data_X_y_sf.X, sensitive_features=data_X_y_sf.sensitive_features)
     for prediction in predictions:
         assert prediction in [0, 1]
 
 
-@pytest.mark.parametrize("sensitive_feature_data,sensitive_feature_names",
-                         [(sensitive_features_ex1, sensitive_feature_names_ex1),
-                          (sensitive_features_ex2, sensitive_feature_names_ex2)])
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_predict_different_argument_lengths(sensitive_feature_data, sensitive_feature_names,
-                                            X_transform, y_transform,
-                                            sensitive_features_transform, constraints):
-    X = X_transform(X_ex)
-    y = y_transform(labels_ex)
-    sensitive_features = sensitive_features_transform(sensitive_feature_data)
+def test_predict_different_argument_lengths(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=constraints)
-    adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
+    adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
+                           sensitive_features=data_X_y_sf.sensitive_features)
 
     with pytest.raises(ValueError,
                        match="Found input variables with inconsistent numbers of samples"):
-        adjusted_predictor.predict(
-            X, sensitive_features=sensitive_features_transform(sensitive_feature_data[:-1]))
+        adjusted_predictor.predict(data_X_y_sf.X,
+                                   sensitive_features=data_X_y_sf.sensitive_features[:-1])
 
     with pytest.raises(ValueError,
                        match="Found input variables with inconsistent numbers of samples"):
-        adjusted_predictor.predict(X_transform(X_ex)[:-1],
-                                   sensitive_features=sensitive_features)
+        adjusted_predictor.predict(data_X_y_sf.X[:-1],
+                                   sensitive_features=data_X_y_sf.sensitive_features)
 
 
 def create_adjusted_predictor(threshold_optimization_method, sensitive_features, labels, scores):
