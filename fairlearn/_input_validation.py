@@ -63,14 +63,14 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         raise ValueError(_MESSAGE_Y_NONE)
     else:
         X = check_array(X)
-    
+
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is None:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
     check_consistent_length(X, sensitive_features)
     sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
-    
+
     # compress multiple sensitive features into a single column
     if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
         sensitive_features = np.apply_along_axis(
@@ -82,9 +82,9 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
                      for i in range(len(row))]),
                 axis=1,
                 arr=sensitive_features)
-    
+
     if enforce_binary_sensitive_feature:
         if len(np.unique(sensitive_features)) > 2:
-            raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)        
+            raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
 
     return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.reshape(-1))
