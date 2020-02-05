@@ -38,46 +38,57 @@ candidate_A_transforms = [ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, ens
 
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
-_data = namedtuple('_data', 'feature_names sensitive_features X y scores')
+_data = namedtuple('_data', 'example_name feature_names sensitive_features X y scores')
 
 
-def is_invalid_sensitive_feature_transformation(sensitive_features_data,
-                                                sensitive_features_transform):
-    if (sensitive_features_data == sensitive_features_ex3).all() and \
-            sensitive_features_transform in [ensure_list_1d, ensure_series]:
-        return True
+@pytest.fixture(params=[
+    _data("example 1",
+          sensitive_feature_names_ex1,
+          sensitive_features_ex1,
+          X_ex,
+          labels_ex,
+          scores_ex),
+    _data("example 2",
+          sensitive_feature_names_ex2,
+          sensitive_features_ex2,
+          X_ex,
+          labels_ex,
+          scores_ex),
+    _data("example 3",
+          sensitive_feature_names_ex3,
+          sensitive_features_ex3,
+          X_ex,
+          labels_ex,
+          scores_ex)])
+def data(request):
+    return request.param
 
 
-@pytest.fixture
-@pytest.mark.parametrize("feature_names,features,labels,scores",
-                         [
-                             (sensitive_feature_names_ex1,
-                              sensitive_features_ex1,
-                              labels_ex,
-                              scores_ex),
-                             (sensitive_feature_names_ex2,
-                              sensitive_features_ex2,
-                              labels_ex,
-                              scores_ex),
-                             (sensitive_feature_names_ex3,
-                              sensitive_features_ex3,
-                              labels_ex,
-                              scores_ex)
-                         ])
-def data(feature_names, features, labels, scores):
-    # note that the features are identical with sensitive features in these tests
-    return _data(feature_names, features, features, labels, scores)
+@pytest.fixture(params=candidate_A_transforms)
+def data_sf(data, request):
+    sensitive_feature_transform = request.param
+    # Skip combinations where the multi-column sensitive features would have to be compressed
+    # into a one-dimensional data structure.
+    if (data.sensitive_features == sensitive_features_ex3).all() and \
+            sensitive_feature_transform in [ensure_list_1d, ensure_series]:
+        pytest.skip()
 
-
-@pytest.fixture
-@pytest.mark.parametrize("X_transform", candidate_X_transforms)
-@pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("sensitive_feature_transform", candidate_A_transforms)
-def data_X_y_sf(data, X_transform, y_transform, sensitive_feature_transform):
-    data.X = X_transform(data.X)
-    data.y = y_transform(data.y)
-    data.sensitive_features = sensitive_feature_transform(data.sensitive_features)
+    data._replace(sensitive_features=sensitive_feature_transform(data.sensitive_features))
     return data
+
+
+@pytest.fixture(params=candidate_X_transforms)
+def data_X_sf(data_sf, request):
+    X_transform = request.param
+    data_sf._replace(X=X_transform(data_sf.X))
+    return data_sf
+
+
+@pytest.fixture(params=candidate_Y_transforms)
+def data_X_y_sf(data_X_sf, request):
+    y_transform = request.param
+    data_X_sf._replace(y=y_transform(data_X_sf.y))
+    return data_X_sf
 
 
 class ExamplePredictor():
