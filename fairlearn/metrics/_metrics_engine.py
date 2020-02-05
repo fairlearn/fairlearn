@@ -69,7 +69,9 @@ def metric_by_group(metric_function,
                                                      sample_weight=group_weight,
                                                      **kwargs)
         else:
-            result.by_group[group] = metric_function(group_actual, group_predict)
+            result.by_group[group] = metric_function(group_actual,
+                                                     group_predict,
+                                                     **kwargs)
 
     return result
 
