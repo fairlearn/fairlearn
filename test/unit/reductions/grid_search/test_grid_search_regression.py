@@ -72,18 +72,17 @@ def test_bgl_unfair(A_two_dim):
                            "constant_ones_feature": [1, 1]})
 
     best_predict = target.predict(test_X)
-    assert np.allclose([-2.19596639,  9.31159664], best_predict)
+    assert np.allclose([-1.91764706,  9.61176471], best_predict)
 
     all_predict = [r.predictor.predict(test_X) for r in target.all_results]
 
-    # TODO why did these numbers change?
-    assert logging_all_close([[1.71914331, 10.92857143],
-                              [-3.77994169, 10.36758017],
-                              [-2.97211429,  9.82902857],
-                              [-2.19596639,  9.31159664],
-                              [-1.44967033,  8.81406593],
-                              [-0.73153639,  8.33530997],
-                              [-0.04,  0.36]],
+    assert logging_all_close([[3.2, 11.2],
+                              [-3.47346939, 10.64897959],
+                              [-2.68, 10.12],
+                              [-1.91764706, 9.61176471],
+                              [-1.18461538, 9.12307692],
+                              [-0.47924528, 8.65283019],
+                              [0.2,  0.7]],
                              all_predict)
 
 
@@ -123,7 +122,7 @@ def test_bgl_unmitigated_same(A_two_dim):
     gs_coef = target.best_result.predictor.coef_
     # Can't quite get exact match, but this should be very close
     # TODO: why did this change?
-    assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-1)
+    assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
 
 # TODO: enable two-dimensional A scenarios by investigating issues
