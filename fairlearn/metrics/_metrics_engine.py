@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from bunch import bunch
+from bunch import Bunch
 import numpy as np
 
 
@@ -38,7 +38,7 @@ def metric_by_group(metric_function,
     if sample_weight is not None:
         _check_array_sizes(y_true, sample_weight, 'y_true', 'sample_weight')
 
-    result = GroupMetricResult()
+    result = Bunch()
 
     # Make everything a numpy array
     # This allows for fast slicing of the groups
@@ -58,6 +58,7 @@ def metric_by_group(metric_function,
         result.overall = metric_function(y_a, y_p, **kwargs)
 
     groups = np.unique(group_membership)
+    result.by_group = dict()
     for group in groups:
         group_indices = (group == g_d)
         group_actual = y_a[group_indices]

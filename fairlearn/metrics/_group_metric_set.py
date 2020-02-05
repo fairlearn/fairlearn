@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from bunch import Bunch
 import numpy as np
 
 from . import group_accuracy_score, group_balanced_root_mean_squared_error
@@ -12,8 +13,6 @@ from . import group_mean_prediction
 from . import group_miss_rate, group_precision_score, group_r2_score
 from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_error
 from . import group_selection_rate, group_specificity_score, group_zero_one_loss
-
-from . import GroupMetricResult
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_1d
 
@@ -189,9 +188,6 @@ class GroupMetricSet:
         key_types = set(type(k) for k in value.keys())
         if key_types != {str}:
             raise ValueError(_METRICS_KEYS_MSG)
-        value_types = set(type(v) for v in value.values())
-        if value_types != {GroupMetricResult}:
-            raise ValueError(_METRICS_VALUES_MSG)
         self._metrics = value
 
     def check_consistency(self):
@@ -304,7 +300,7 @@ class GroupMetricSet:
 
         metrics_dict = dict()
         for metric_name, metric in gms_dict[_PRECOMPUTED_METRICS][0][0].items():
-            m = GroupMetricResult()
+            m = Bunch()
             m.overall = metric[_GLOBAL]
             by_group_dict = dict()
             for i, val in enumerate(metric[_BINS]):

@@ -43,7 +43,6 @@ from ._skm_wrappers import group_median_absolute_error  # noqa: F401
 from ._skm_wrappers import group_root_mean_squared_error  # noqa: F401
 from ._skm_wrappers import group_r2_score  # noqa: F401
 
-from ._group_metric_result import GroupMetricResult  # noqa: F401
 from ._group_metric_set import GroupMetricSet  # noqa: F401
 from ._metrics_engine import make_group_metric, metric_by_group  # noqa: F401
 
