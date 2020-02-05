@@ -121,7 +121,6 @@ def test_bgl_unmitigated_same(A_two_dim):
     raw_coef = unmitigated_estimator.coef_
     gs_coef = target.best_result.predictor.coef_
     # Can't quite get exact match, but this should be very close
-    # TODO: why did this change?
     assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
 
