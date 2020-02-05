@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from bunch import bunch
 import numpy as np
 
-from ._group_metric_result import GroupMetricResult
+
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
