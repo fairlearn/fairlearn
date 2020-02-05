@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""Threshold Optimization Post Processing algorithm.
+"""Threshold Optimization Postprocessing algorithm.
 
 This is based on M. Hardt, E. Price, N. Srebro's paper
 "`Equality of Opportunity in Supervised Learning
@@ -26,7 +26,7 @@ from ._interpolated_prediction import InterpolatedPredictor
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supported " \
     "constraints.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
-MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
+MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Postprocessing currently only supports a single " \
     "column in {}."
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "A sensitive feature named {} or {} " \
     "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
@@ -260,7 +260,7 @@ def _threshold_optimization_equalized_odds(sensitive_features, labels, scores, g
     return predicted_EO_by_sensitive_feature
 
 
-_SUPPORTED_CONSTRAINTS = {
+_SUPPORTED_MITIGATIONS = {
     DEMOGRAPHIC_PARITY: _threshold_optimization_demographic_parity,
     EQUALIZED_ODDS: _threshold_optimization_equalized_odds}
 
@@ -287,11 +287,11 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
     `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_.
 
     :param unconstrained_predictor: The trained predictor whose output will be
-    post processed
+    postprocessed
     :type unconstrained_predictor: A trained predictor
 
     :param estimator: An untrained estimator that will be trained, and
-        subsequently its output will be post processed
+        subsequently its output will be postprocessed
     :type estimator: An untrained estimator
 
     :param grid_size: The number of ticks on the grid over which we evaluate the
@@ -338,9 +338,11 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         :type sensitive_features: currently 1D array as numpy.ndarray, list,
             pandas.DataFrame, or pandas.Series
         """
-        if self.constraints not in _SUPPORTED_CONSTRAINTS:
+        if self.constraints not in _SUPPORTED_MITIGATIONS:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
-        threshold_optimizer = _SUPPORTED_CONSTRAINTS[self.constraints]
+        threshold_optimizer = _SUPPORTED_MITIGATIONS[self.constraints]
+
+        self.random_state_ = check_random_state(self.random_state)
 
         if not is_classifier(self.estimator):
             raise ValueError("{} needs a classifier to work on, and {} is not "
@@ -370,7 +372,6 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         :return: predictions in numpy.ndarray
         """
         check_is_fitted(self)
-        random_state = check_random_state(self.random_state)
 
         X, _, sensitive_features = self._validate_input_data(
             X, sensitive_features)
@@ -381,7 +382,8 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
             self._post_processed_predictor_by_sensitive_feature,
             sensitive_features,
             unconstrained_predictions)
-        return (positive_probs >= random_state.rand(len(positive_probs))) * 1
+        return (positive_probs >= self.random_state_.rand(
+            len(positive_probs))) * 1
 
     def _pmf_predict(self, X, *, sensitive_features):
         """Probabilistic mass function.
