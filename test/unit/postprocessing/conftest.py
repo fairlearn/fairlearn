@@ -8,6 +8,7 @@ import pytest
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
+from test.unit.constants import MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON
 from test.unit.input_convertors import ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, \
     ensure_dataframe, ensure_series, _map_into_single_column
 
@@ -70,7 +71,7 @@ def data_sf(data, request):
     # into a one-dimensional data structure.
     if (data.sensitive_features == sensitive_features_ex3).all() and \
             sensitive_feature_transform in [ensure_list_1d, ensure_series]:
-        pytest.skip()
+        pytest.skip(MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON)
 
     data._replace(sensitive_features=sensitive_feature_transform(data.sensitive_features))
     return data
