@@ -22,10 +22,11 @@ from fairlearn.postprocessing._postprocessing import \
 from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
 from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
-                       _get_predictions_by_sensitive_feature, _map_into_single_column,
+                       _get_predictions_by_sensitive_feature,
                        ExamplePredictor, ExampleEstimator, ExampleNotPredictor,
                        ExampleNotEstimator1, ExampleNotEstimator2,
                        candidate_A_transforms, candidate_X_transforms, candidate_Y_transforms)
+from test.unit.input_convertors import _map_into_single_column
 
 
 @pytest.mark.parametrize("X_transform", candidate_X_transforms)
