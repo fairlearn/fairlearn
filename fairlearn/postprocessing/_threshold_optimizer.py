@@ -305,18 +305,24 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
     :param plot: Show ROC/selection-error plot if True
     :type plot: bool
 
+    :param warm_start: Avoid refitting the underlying estimator if it's already
+        done in a previous fit.
+    :type warm_start: bool, default=False
+
     :param random_state: set to a constant for reproducibility
-    :type random_state: int, np.RandomState, or None
+    :type random_state: int, np.RandomState, default=None
     """
 
     def __init__(self, *, estimator=None, constraints=DEMOGRAPHIC_PARITY,
-                 grid_size=1000, flip=True, plot=False, random_state=None):
+                 grid_size=1000, flip=True, plot=False, warm_start=False,
+                 random_state=None):
 
         self.constraints = constraints
         self.grid_size = grid_size
         self.flip = flip
         self.plot = plot
         self.estimator = estimator
+        self.warm_start = warm_start
         self.random_state = random_state
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
@@ -342,7 +348,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
         threshold_optimizer = _SUPPORTED_MITIGATIONS[self.constraints]
 
-        self.random_state_ = check_random_state(self.random_state)
+        self._random_state = check_random_state(self.random_state)
 
         if not is_classifier(self.estimator):
             raise ValueError("{} needs a classifier to work on, and {} is not "
@@ -352,7 +358,8 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         X, y, sensitive_features = self._validate_input_data(
             X, sensitive_features, y)
 
-        self.estimator_ = self.estimator.fit(X, y, **kwargs)
+        if not hasattr(self, 'estimator_') or not self.warm_start:
+            self.estimator_ = self.estimator.fit(X, y, **kwargs)
 
         scores = _get_soft_predictions(self.estimator_, X)
         self._post_processed_predictor_by_sensitive_feature = threshold_optimizer(
@@ -382,7 +389,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
             self._post_processed_predictor_by_sensitive_feature,
             sensitive_features,
             unconstrained_predictions)
-        return (positive_probs >= self.random_state_.rand(
+        return (positive_probs >= self._random_state.rand(
             len(positive_probs))) * 1
 
     def _pmf_predict(self, X, *, sensitive_features):
