@@ -16,7 +16,6 @@ from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
 
-from test.unit.constants import MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe, \
     ensure_list, ensure_series
 
@@ -28,6 +27,9 @@ candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
 candidate_Y_transforms = conversions_for_1d
 candidate_A_transforms = conversions_for_1d
 
+def _skip_if_invalid_transformation(A, transform):
+    if len(A.shape) > 1 and A.shape[1] > 1 and transform in [ensure_list, ensure_series]:
+        pytest.skip()
 
 def _skip_if_invalid_transformation(A, transform):
     if len(A.shape) > 1 and A.shape[1] > 1 and transform in [ensure_list, ensure_series]:
@@ -151,7 +153,7 @@ class ArgumentTests:
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, Y, A = self._quick_data(A_two_dim)
         _skip_if_invalid_transformation(A, transformA)
-
+        
         if A_two_dim:
             A[0][0] = 0
             A[0][1] = 0
