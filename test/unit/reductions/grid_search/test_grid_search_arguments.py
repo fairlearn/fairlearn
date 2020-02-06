@@ -16,6 +16,7 @@ from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
 
+from test.unit.constants import MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe, \
     ensure_list, ensure_series
 
@@ -30,7 +31,7 @@ candidate_A_transforms = conversions_for_1d
 
 def _skip_if_invalid_transformation(A, transform):
     if len(A.shape) > 1 and A.shape[1] > 1 and transform in [ensure_list, ensure_series]:
-        pytest.skip()
+        pytest.skip(MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON)
 
 
 # Base class for tests
