@@ -49,10 +49,10 @@ def ensure_ndarray(X):
 def ensure_ndarray_2d(X):
     assert X is not None
     tmp = ensure_ndarray(X)
+    if len(tmp.shape) not in [1, 2]:
+        raise ValueError("Requires 1d or 2d array")
     if len(tmp.shape) == 2:
         return tmp
-    if len(tmp.shape) != 1:
-        raise ValueError("Requires 1d or 2d array")
     result = np.expand_dims(tmp, 1)
     assert len(result.shape) == 2
     return result
