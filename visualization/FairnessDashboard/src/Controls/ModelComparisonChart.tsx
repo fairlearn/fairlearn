@@ -279,8 +279,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
         const featureOptions: IDropdownOption[] = this.props.dashboardContext.modelMetadata.featureNames.map(x => { return {key: x, text: x}});
-        const accuracyOptions: IDropdownOption[] = Object.keys(AccuracyOptions).map(x => { return {key: AccuracyOptions[x].key, text: AccuracyOptions[x].title}});
-        const parityOptions: IDropdownOption[] = Object.keys(ParityOptions).map(x => { return {key: ParityOptions[x].key, text: ParityOptions[x].title}});
+        const accuracyOptions: IDropdownOption[] = this.props.accuracyPickerProps.accuracyOptions.map(x => { return {key: x.key, text: x.title}});
+        const parityOptions: IDropdownOption[] = this.props.parityPickerProps.parityOptions.map(x => { return {key: x.key, text: x.title}});
         const dropdownStyles: Partial<IDropdownStyles> = {
             dropdown: { width: 200 }
         };          
