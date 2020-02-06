@@ -28,7 +28,9 @@ export interface IModelComparisonProps {
 }
 
 export interface IState {
+    featureKey?: string;
     accuracyKey?: string;
+    parityKey?: string;
     accuracyArray?: number[];
     disparityArray?: number[];
     disparityInOutcomes: boolean;
@@ -111,10 +113,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             fontWeight: "100"
         },
         headerOptions: {
-            backgroundColor: "#EBEBEB"
+            backgroundColor: "#EBEBEB",
+            padding: "0 40px"
         },
         dropDown: {
-            margin: "10px 50px"
+            margin: "10px 10px",
+            display: "inline-block"
         },
         editButton: {
             color: "#333333",
@@ -274,7 +278,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             selectedMetric.title.toLowerCase(),
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
-        const options: IDropdownOption[] = Object.keys(AccuracyOptions).map(x => { return {key: AccuracyOptions[x].key, text: AccuracyOptions[x].title}});
+        const featureOptions: IDropdownOption[] = this.props.dashboardContext.modelMetadata.featureNames.map(x => { return {key: x, text: x}});
+        const accuracyOptions: IDropdownOption[] = Object.keys(AccuracyOptions).map(x => { return {key: AccuracyOptions[x].key, text: AccuracyOptions[x].title}});
+        const parityOptions: IDropdownOption[] = Object.keys(ParityOptions).map(x => { return {key: ParityOptions[x].key, text: ParityOptions[x].title}});
         const dropdownStyles: Partial<IDropdownStyles> = {
             dropdown: { width: 200 }
         };          
@@ -297,11 +303,29 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 <div className={ModelComparisonChart.classNames.headerOptions}>
                     <Dropdown
                         className={ModelComparisonChart.classNames.dropDown}
+                        label="Feature"
+                        defaultSelectedKey={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
+                        options={featureOptions}
+                        disabled={false}
+                        onChange={this.featureChanged}
+                        styles={dropdownStyles}
+                    />
+                    <Dropdown
+                        className={ModelComparisonChart.classNames.dropDown}
                         label="Accuracy"
                         defaultSelectedKey={this.props.accuracyPickerProps.selectedAccuracyKey}
-                        options={options}
+                        options={accuracyOptions}
                         disabled={false}
                         onChange={this.accuracyChanged}
+                        styles={dropdownStyles}
+                    />
+                    <Dropdown
+                        className={ModelComparisonChart.classNames.dropDown}
+                        label="Parity"
+                        defaultSelectedKey={this.props.parityPickerProps.selectedParityKey}
+                        options={parityOptions}
+                        disabled={false}
+                        onChange={this.parityChanged}
                         styles={dropdownStyles}
                     />
                 </div>
@@ -378,11 +402,27 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         }
     }
 
+    private readonly featureChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
+        const featureKey = option.key.toString();
+        if (this.state.featureKey !== featureKey) {
+            this.props.featureBinPickerProps.selectedBinIndex = this.props.dashboardContext.modelMetadata.featureNames.indexOf(featureKey);
+            this.setState({featureKey: featureKey, disparityArray: undefined});
+        }
+    }
+
     private readonly accuracyChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
         const accuracyKey = option.key.toString();
         if (this.state.accuracyKey !== accuracyKey) {
             this.props.accuracyPickerProps.selectedAccuracyKey = accuracyKey;
             this.setState({accuracyKey: accuracyKey, disparityArray: undefined});
+        }
+    }
+
+    private readonly parityChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
+        const parityKey = option.key.toString();
+        if (this.state.parityKey !== parityKey) {
+            this.props.parityPickerProps.selectedParityKey = parityKey;
+            this.setState({parityKey: parityKey, disparityArray: undefined});
         }
     }
 
