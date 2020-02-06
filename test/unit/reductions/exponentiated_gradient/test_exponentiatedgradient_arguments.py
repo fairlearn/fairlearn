@@ -30,7 +30,7 @@ _PRECISION = 1e-6
 def _get_data(A_two_dim=False):
     X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
     y = pd.Series(labels)
-    
+
     if A_two_dim:
         # Stacking the same column a few times will result in the identical groups
         # compared to using a single column, therefore results should be the same.
