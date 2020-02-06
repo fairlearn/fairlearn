@@ -12,7 +12,6 @@ from fairlearn.reductions import ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
 
-from test.unit.constants import MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, \
     ensure_dataframe, ensure_list, ensure_series, _map_into_single_column
 
@@ -31,7 +30,7 @@ _PRECISION = 1e-6
 def _get_data(A_two_dim=False):
     X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
     y = pd.Series(labels)
-
+    
     if A_two_dim:
         # Stacking the same column a few times will result in the identical groups
         # compared to using a single column, therefore results should be the same.
@@ -52,7 +51,7 @@ class TestExponentiatedGradientArguments:
         merged_A = _map_into_single_column(A)
 
         if A_two_dim and transformA in [ensure_list, ensure_series]:
-            pytest.skip(MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON)
+            pytest.skip()
 
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
