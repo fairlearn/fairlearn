@@ -32,7 +32,7 @@ def _simple_threshold_data(number_a0, number_a1,
     X = pd.DataFrame({"actual_feature": score_feature,
                       "sensitive_feature1": A,
                       "constant_ones_feature": np.ones(len(Y))})
-    
+
     if A_two_dim:
         A = np.stack((A, A), -1)
 
