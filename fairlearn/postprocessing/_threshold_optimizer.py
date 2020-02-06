@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 
 from sklearn.base import BaseEstimator, ClassifierMixin, is_classifier
+from sklearn.linear_model import SGDClassifier
 from sklearn.utils.validation import (check_X_y, check_consistent_length,
                                       check_array, check_random_state,
                                       check_is_fitted)
@@ -292,7 +293,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
 
     :param estimator: An untrained estimator that will be trained, and
         subsequently its output will be postprocessed
-    :type estimator: An untrained estimator
+    :type estimator: An untrained estimator, default=SGDClassifier()
 
     :param grid_size: The number of ticks on the grid over which we evaluate the
         curves. A large grid_size means that we approximate the actual curve, so
@@ -313,7 +314,8 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
     :type random_state: int, np.RandomState, default=None
     """
 
-    def __init__(self, *, estimator=None, constraints=DEMOGRAPHIC_PARITY,
+    def __init__(self, *, estimator=SGDClassifier(),
+                 constraints=DEMOGRAPHIC_PARITY,
                  grid_size=1000, flip=True, plot=False, warm_start=False,
                  random_state=None):
 
@@ -383,7 +385,8 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         X, _, sensitive_features = self._validate_input_data(
             X, sensitive_features)
 
-        unconstrained_predictions = self._unconstrained_predictor.predict(X)
+        unconstrained_predictions = _get_soft_predictions(
+            self.estimator_, X)
 
         positive_probs = _vectorized_prediction(
             self._post_processed_predictor_by_sensitive_feature,
@@ -414,11 +417,11 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
             X, sensitive_features)
         positive_probs = _vectorized_prediction(
             self._post_processed_predictor_by_sensitive_feature, sensitive_features,
-            self._unconstrained_predictor.predict(X))
+            _get_soft_predictions(self.estimator_, X))
         return np.array([[1.0 - p, p] for p in positive_probs])
 
     def _validate_input_data(self, X, sensitive_features, y=None):
-        if y:
+        if y is not None:
             X, y = check_X_y(X, y)
             y = check_array(y, ensure_2d=False, dtype=int)
         else:
