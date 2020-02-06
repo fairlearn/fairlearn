@@ -293,7 +293,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
 
     :param estimator: An untrained estimator that will be trained, and
         subsequently its output will be postprocessed
-    :type estimator: An untrained estimator, default=SGDClassifier()
+    :type estimator: An untrained estimator, default=SGDClassifier(loss='log')
 
     :param grid_size: The number of ticks on the grid over which we evaluate the
         curves. A large grid_size means that we approximate the actual curve, so
@@ -314,7 +314,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
     :type random_state: int, np.RandomState, default=None
     """
 
-    def __init__(self, *, estimator=SGDClassifier(),
+    def __init__(self, *, estimator=SGDClassifier(loss='log'),
                  constraints=DEMOGRAPHIC_PARITY,
                  grid_size=1000, flip=True, plot=False, warm_start=False,
                  random_state=None):
