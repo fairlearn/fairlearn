@@ -13,8 +13,7 @@ from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
 
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, \
-    ensure_dataframe, _map_into_single_column
-from test.unit.reductions.conftest import is_invalid_transformation
+    ensure_dataframe, ensure_list, ensure_series, _map_into_single_column
 
 # ===============================================================
 
@@ -31,7 +30,7 @@ _PRECISION = 1e-6
 def _get_data(A_two_dim=False):
     X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
     y = pd.Series(labels)
-
+    
     if A_two_dim:
         # Stacking the same column a few times will result in the identical groups
         # compared to using a single column, therefore results should be the same.
@@ -46,11 +45,13 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
-    @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_argument_types(self, transformX, transformY, transformA, A_two_dim):
         # This is an expanded-out version of one of the smoke tests
         X, y, A = _get_data(A_two_dim)
         merged_A = _map_into_single_column(A)
+
+        if A_two_dim and transformA in [ensure_list, ensure_series]:
+            pytest.skip()
 
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),

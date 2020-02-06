@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-from fairlearn._input_validation import _compress_multiple_sensitive_features_into_single_column
+from fairlearn._input_validation import _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR
 
 
 def ensure_list(X):
@@ -98,4 +98,12 @@ def _map_into_single_column(matrix):
     if len(np.array(matrix).shape) == 1:
         return np.array(matrix)
 
-    return _compress_multiple_sensitive_features_into_single_column(matrix)
+    return np.apply_along_axis(
+        lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
+            [str(row[i])
+             .replace("\\", "\\\\")  # escape backslash and separator
+             .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
+                      "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
+             for i in range(len(row))]),
+        axis=1,
+        arr=matrix)
