@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from copy import deepcopy
 import numpy as np
 import pytest
 from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
@@ -104,13 +105,14 @@ def test_none_input_data(X, y, sensitive_features, constraints):
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
-    data_X_y_sf.y[0] = 2
+    non_binary_y = deepcopy(data_X_y_sf.y)
+    non_binary_y[0] = 2
 
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=constraints)
 
     with pytest.raises(ValueError, match=_LABELS_NOT_0_1_ERROR_MESSAGE):
-        adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
+        adjusted_predictor.fit(data_X_y_sf.X, non_binary_y,
                                sensitive_features=data_X_y_sf.sensitive_features)
 
 
