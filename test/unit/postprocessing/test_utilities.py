@@ -4,6 +4,7 @@
 from collections import defaultdict, namedtuple
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator, ClassifierMixin
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
@@ -19,9 +20,15 @@ scores_ex = [int(x) for x in '0011233' '0001111' '011112']
 LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 
-class ExamplePredictor():
+class ExamplePredictor(ClassifierMixin, BaseEstimator):
+    def fit(self, *args, **kwargs):
+        return self
+
     def predict(self, X):
         return scores_ex
+    
+    def predict_proba(self, X):
+        return self.predict(X)
 
 
 class ExampleNotPredictor():
