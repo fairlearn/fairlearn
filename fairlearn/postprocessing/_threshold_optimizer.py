@@ -449,7 +449,8 @@ def _vectorized_prediction(function_dict, sensitive_features, scores):
     :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
     """
     # handle type conversion to ndarray for other types
-    sensitive_features_vector = check_array(sensitive_features, ensure_2d=False)
+    sensitive_features_vector = check_array(sensitive_features, ensure_2d=False,
+                                            dtype='O')
     scores_vector = check_array(scores, ensure_2d=False)
 
     return sum([(sensitive_features_vector == a) * function_dict[a].predict(scores_vector)

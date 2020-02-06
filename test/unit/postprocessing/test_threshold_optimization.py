@@ -254,7 +254,7 @@ def test_threshold_optimization_demographic_parity_e2e(sensitive_features,
     X = np.random.rand(len(sensitive_features_), 2)
     y = y_transform(labels_ex)
 
-    adjusted_predictor = ThresholdOptimizer(estimator=ExampleEstimator(),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(),
                                             constraints=DEMOGRAPHIC_PARITY)
     adjusted_predictor.fit(X, y, sensitive_features=sensitive_features_)
 
