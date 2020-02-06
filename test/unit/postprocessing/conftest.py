@@ -5,12 +5,11 @@ from collections import defaultdict, namedtuple
 import numpy as np
 import pandas as pd
 import pytest
-from fairlearn._input_validation import _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
 from test.unit.input_convertors import ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, \
-    ensure_dataframe, ensure_series
+    ensure_dataframe, ensure_series, _map_into_single_column
 
 
 X_ex = np.stack(([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
@@ -171,18 +170,3 @@ def _get_predictions_by_sensitive_feature(adjusted_predictor, sensitive_features
             LabelAndPrediction(labels[i],
                                adjusted_predictor([sensitive_features_mapped[i]], [scores[i]])))
     return labels_and_predictions
-
-
-def _map_into_single_column(matrix):
-    if len(np.array(matrix).shape) == 1:
-        return np.array(matrix)
-
-    return np.apply_along_axis(
-        lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
-            [str(row[i])
-             .replace("\\", "\\\\")  # escape backslash and separator
-             .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
-                      "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
-             for i in range(len(row))]),
-        axis=1,
-        arr=matrix)
