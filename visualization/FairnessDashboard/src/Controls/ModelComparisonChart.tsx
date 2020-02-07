@@ -244,19 +244,28 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
         const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
         
-        const insights2 = [selectedMetric.title,
-            localization.ModelComparison.rangesFrom,
-            <strong>{formattedMinAccuracy}</strong>,
-            localization.ModelComparison.to,
-            <strong>{formattedMaxAccuracy}</strong>,
-            localization.ModelComparison.period,
-            localization.ModelComparison.disparity,
-            localization.ModelComparison.rangesFrom,
-            <strong>{formattedMinDisparity}</strong>,
-            localization.ModelComparison.to,
-            <strong>{formattedMaxDisparity}</strong>,
-            localization.ModelComparison.period
-        ];
+        // const insights2 = [selectedMetric.title,
+        //     localization.ModelComparison.rangesFrom,
+        //     <strong>{formattedMinAccuracy}</strong>,
+        //     localization.ModelComparison.to,
+        //     <strong>{formattedMaxAccuracy}</strong>,
+        //     localization.ModelComparison.period,
+        //     localization.ModelComparison.disparity,
+        //     localization.ModelComparison.rangesFrom,
+        //     <strong>{formattedMinDisparity}</strong>,
+        //     localization.ModelComparison.to,
+        //     <strong>{formattedMaxDisparity}</strong>,
+        //     localization.ModelComparison.period
+        // ];
+
+        const insights2 = localization.formatString(
+            localization.ModelComparison.insightsText2, 
+            selectedMetric.title,
+            formattedMinAccuracy,
+            formattedMaxAccuracy,
+            formattedMinDisparity,
+            formattedMaxDisparity,
+        );
 
         const insights3 = localization.formatString(
             localization.ModelComparison.insightsText3,
@@ -282,7 +291,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const accuracyOptions: IDropdownOption[] = this.props.accuracyPickerProps.accuracyOptions.map(x => { return {key: x.key, text: x.title}});
         const parityOptions: IDropdownOption[] = this.props.parityPickerProps.parityOptions.map(x => { return {key: x.key, text: x.title}});
         const dropdownStyles: Partial<IDropdownStyles> = {
-            dropdown: { width: 200 }
+            dropdown: { width: 180 }
         };          
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {

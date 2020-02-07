@@ -17,12 +17,12 @@ export const ParityOptions: {[key: string]: IParityOption} = {
         description: "Parity differenece",
         parityModes: [ParityModes.difference]
     },
-    // "selction_rate": {
-    //     key: "selction_rate",
-    //     title: "Parity ratio",
-    //     description: "Parity ratio",
-    //     parityModes: [ParityModes.ratio]
-    // },
+    "selection_rate_ratio": {
+        key: "selection_rate_ratio",
+        title: "Parity ratio",
+        description: "Parity ratio",
+        parityModes: [ParityModes.ratio]
+    },
     "zero_one_loss": {
         key: "zero_one_loss",
         title: "Error rate difference",
