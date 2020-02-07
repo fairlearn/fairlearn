@@ -30,6 +30,6 @@
     "react": "16.8.6",
     "react-dom": "16.8.6",
 
-    "fairlearn-dashboard": "0.0.16-beta.1"
+    "fairlearn-dashboard": "0.0.16-beta.4"
   }
 }
