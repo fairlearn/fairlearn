@@ -1,11 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from sklearn.utils import Bunch
 import numpy as np
 
-
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
+
+_OVERALL = 'overall'
+_BY_GROUP_FORMAT = 'group_{0}'
+_MIN = 'min'
+_MAX = 'max'
+_RANGE = 'range'
+_RANGE_RATIO = 'range_ratio'
+_ARGMIN = 'argmin'
+_ARGMAX = 'argmax'
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
@@ -38,8 +45,6 @@ def metric_by_group(metric_function,
     if sample_weight is not None:
         _check_array_sizes(y_true, sample_weight, 'y_true', 'sample_weight')
 
-    result = Bunch()
-
     # Make everything a numpy array
     # This allows for fast slicing of the groups
     y_a = _convert_to_ndarray_and_squeeze(y_true)
@@ -50,30 +55,57 @@ def metric_by_group(metric_function,
     if sample_weight is not None:
         s_w = _convert_to_ndarray_and_squeeze(sample_weight)
 
-    # Evaluate the overall metric with the numpy arrays
-    # This ensures consistency in how metric_function is called
-    if s_w is not None:
-        result.overall = metric_function(y_a, y_p, sample_weight=s_w, **kwargs)
-    else:
-        result.overall = metric_function(y_a, y_p, **kwargs)
-
+    result = dict()
     groups = np.unique(group_membership)
-    result.by_group = dict()
     for group in groups:
         group_indices = (group == g_d)
         group_actual = y_a[group_indices]
         group_predict = y_p[group_indices]
         group_weight = None
+        group_key = _BY_GROUP_FORMAT.format(group)
         if s_w is not None:
             group_weight = s_w[group_indices]
-            result.by_group[group] = metric_function(group_actual,
-                                                     group_predict,
-                                                     sample_weight=group_weight,
-                                                     **kwargs)
+            result[group_key] = metric_function(group_actual,
+                                                group_predict,
+                                                sample_weight=group_weight,
+                                                **kwargs)
         else:
-            result.by_group[group] = metric_function(group_actual,
-                                                     group_predict,
-                                                     **kwargs)
+            result[group_key] = metric_function(group_actual,
+                                                group_predict,
+                                                **kwargs)
+
+    # Compute all the statistics, taking care not to stomp on our dictionary
+    try:
+        minimum = min(result.values())
+        argmin = [k for k, v in result.items() if v == minimum]
+        maximum = max(result.values())
+        argmax = [k for k, v in result.items() if v == maximum]
+        range = maximum - minimum
+
+        if minimum < 0:
+            range_ratio = np.nan
+        elif maximum == 0:
+            # min==max==0
+            range_ratio = 1
+        else:
+            range_ratio = minimum/maximum
+
+        result[_MIN] = minimum
+        result[_ARGMIN] = argmin
+        result[_MAX] = maximum
+        result[_ARGMAX] = argmax
+        result[_RANGE] = range
+        result[_RANGE_RATIO] = range_ratio
+    except ValueError:
+        # Nothing to do if the result type is not amenable to 'min' etc.
+        pass
+
+    # Evaluate the overall metric with the numpy arrays
+    # Do this last so that the other statistics are calculated correctly
+    if s_w is not None:
+        result[_OVERALL] = metric_function(y_a, y_p, sample_weight=s_w, **kwargs)
+    else:
+        result[_OVERALL] = metric_function(y_a, y_p, **kwargs)
 
     return result
 
