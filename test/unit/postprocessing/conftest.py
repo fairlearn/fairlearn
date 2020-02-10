@@ -8,7 +8,6 @@ import pytest
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
-from test.unit.constants import MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON
 from test.unit.input_convertors import ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, \
     ensure_dataframe, ensure_series, _map_into_single_column
 
@@ -100,6 +99,7 @@ def is_invalid_transformation(**kwargs):
     return False
 
 # ---------------------------------------------
+
 
 @pytest.fixture(params=candidate_A_transforms)
 def data_sf(data, request):
