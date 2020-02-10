@@ -488,7 +488,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             raise ValueError(
                 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
         else:
-            data_dict[key] = additional_data.reshape(-1)
+            data_dict[key] = additional_data.squeeze()
     elif type(additional_data) == pd.DataFrame:
         # TODO: extend to multiple columns for additional_data by using column names
         for attribute_column in additional_data.columns:
