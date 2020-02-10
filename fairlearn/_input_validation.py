@@ -51,9 +51,9 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
         if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
-            y = y.reshape(-1)
+            y = y.squeeze()
         elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
-            y = y.to_numpy().reshape(-1)
+            y = y.to_numpy().squeeze()
 
         X, y = check_X_y(X, y)
         y = check_array(y, ensure_2d=False, dtype='numeric')
@@ -61,6 +61,107 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
             raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
     elif expect_y:
         raise ValueError(_MESSAGE_Y_NONE)
+    else:
+        X = check_array(X)
+
+    sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
+    if sensitive_features is None:
+        raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
+
+    check_consistent_length(X, sensitive_features)
+    sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
+
+    # compress multiple sensitive features into a single column
+    if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
+        sensitive_features = \
+            _compress_multiple_sensitive_features_into_single_column(sensitive_features)
+
+    if enforce_binary_sensitive_feature:
+        if len(np.unique(sensitive_features)) > 2:
+            raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
+
+    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
+
+
+def _compress_multiple_sensitive_features_into_single_column(sensitive_features):
+    """Compress multiple sensitive features into a single column.
+
+    The resulting mapping converts multiple dimensions into the Cartesian product of the
+    individual columns.
+
+    :param sensitive_features: multi-dimensional array of sensitive features
+    :type sensitive_features: `numpy.ndarray`
+    :return: one-dimensional array of mapped sensitive features
+    """
+    if not isinstance(sensitive_features, np.ndarray):
+        raise ValueError("Received argument of type {} instead of expected numpy.ndarray"
+                         .format(type(sensitive_features).__name__))
+    return np.apply_along_axis(
+        lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
+            [str(row[i])
+                .replace("\\", "\\\\")  # escape backslash and separator
+                .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
+                         "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
+                for i in range(len(row))]),
+        axis=1,
+        arr=sensitive_features)
+
+
+def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_feature=False,
+                                            **kwargs):
+    # TODO: remove this function once reductions use _validate_and_reformat_input from above
+    if X is None:
+        raise ValueError(_MESSAGE_X_NONE)
+
+    if y is None:
+        raise ValueError(_MESSAGE_Y_NONE)
+
+    if _KW_SENSITIVE_FEATURES not in kwargs:
+        msg = "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES)
+        raise RuntimeError(msg)
+
+    # Extract the target attribute
+    sensitive_features_vector = _make_vector(kwargs[_KW_SENSITIVE_FEATURES],
+                                             _KW_SENSITIVE_FEATURES)
+
+    if enforce_binary_sensitive_feature:
+        unique_labels = np.unique(sensitive_features_vector)
+        if len(unique_labels) > 2:
+            raise RuntimeError("Sensitive features contain more than two unique values")
+
+    # Extract the Y values
+    y_vector = _make_vector(y, "y")
+
+    X_rows, _ = _get_matrix_shape(X, "X")
+    if X_rows != y_vector.shape[0]:
+        raise RuntimeError(_MESSAGE_X_Y_ROWS)
+    if X_rows != sensitive_features_vector.shape[0]:
+        raise RuntimeError(_MESSAGE_X_SENSITIVE_ROWS)
+
+    return pd.DataFrame(X), y_vector, sensitive_features_vector
+
+
+def _make_vector(formless, formless_name):
+    # TODO: remove this function once reductions use _validate_and_reformat_input from above
+    formed_vector = None
+    if isinstance(formless, list):
+        formed_vector = pd.Series(formless)
+    elif isinstance(formless, pd.DataFrame):
+        if len(formless.columns) == 1:
+            formed_vector = formless.iloc[:, 0]
+        else:
+            msgfmt = "{0} is a DataFrame with more than one column"
+            raise RuntimeError(msgfmt.format(formless_name))
+    elif isinstance(formless, pd.Series):
+        formed_vector = formless
+    elif isinstance(formless, np.ndarray):
+        if len(formless.shape) == 1:
+            formed_vector = pd.Series(formless)
+        elif len(formless.shape) == 2 and formless.shape[1] == 1:
+            formed_vector = pd.Series(formless[:, 0])
+        else:
+            msgfmt = "{0} is an ndarray with more than one column"
+            raise RuntimeError(msgfmt.format(formless_name))
     else:
         X = check_array(X)
 
@@ -83,8 +184,21 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
                 axis=1,
                 arr=sensitive_features)
 
-    if enforce_binary_sensitive_feature:
-        if len(np.unique(sensitive_features)) > 2:
-            raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
-
-    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.reshape(-1))
+def _get_matrix_shape(formless, formless_name):
+    # TODO: remove this function once reductions use _validate_and_reformat_input from above
+    num_rows = -1
+    num_cols = -1
+    if isinstance(formless, pd.DataFrame):
+        num_cols = len(formless.columns)
+        num_rows = len(formless.index)
+    elif isinstance(formless, np.ndarray):
+        if len(formless.shape) == 2:
+            num_rows = formless.shape[0]
+            num_cols = formless.shape[1]
+        else:
+            msgfmt = "{0} is an ndarray which is not 2D"
+            raise RuntimeError(msgfmt.format(formless_name))
+    else:
+        msgfmt = "{0} not an ndarray or DataFrame"
+        raise RuntimeError(msgfmt.format(formless_name))
+    return num_rows, num_cols

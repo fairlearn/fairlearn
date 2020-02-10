@@ -8,7 +8,6 @@ import pytest
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
-from test.unit.constants import MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON
 from test.unit.input_convertors import ensure_list_1d, ensure_ndarray, ensure_ndarray_2d, \
     ensure_dataframe, ensure_series, _map_into_single_column
 
@@ -64,15 +63,47 @@ def data(request):
     return request.param
 
 
+# ---------------------------------------------
+# The following pytest configurations are meant to allow silent skipping of tests for scenarios
+# that are not meant to happen. We don't want them to show up as skipped.
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "uncollect_if(*, func): function to unselect tests from parametrization")
+
+
+def pytest_collection_modifyitems(config, items):
+    removed = []
+    kept = []
+    for item in items:
+        marker = item.get_closest_marker('uncollect_if')
+        if marker:
+            func = marker.kwargs['func']
+            if func(**item.callspec.params):
+                removed.append(item)
+                continue
+        kept.append(item)
+    if removed:
+        config.hook.pytest_deselected(items=removed)
+        items[:] = kept
+
+
+def is_invalid_transformation(**kwargs):
+    sensitive_feature_transform = kwargs['data_sf']
+    sensitive_features = kwargs['data'].sensitive_features
+
+    # Skip combinations where the multi-column sensitive features would have to be compressed
+    # into a one-dimensional data structure.
+    if (sensitive_features == sensitive_features_ex3).all() and \
+            sensitive_feature_transform in [ensure_list_1d, ensure_series]:
+        return True
+    return False
+
+# ---------------------------------------------
+
+
 @pytest.fixture(params=candidate_A_transforms)
 def data_sf(data, request):
     sensitive_feature_transform = request.param
-    # Skip combinations where the multi-column sensitive features would have to be compressed
-    # into a one-dimensional data structure.
-    if (data.sensitive_features == sensitive_features_ex3).all() and \
-            sensitive_feature_transform in [ensure_list_1d, ensure_series]:
-        pytest.skip(MULTIPLE_SENSITIVE_FEATURE_COMPRESSION_SKIP_REASON)
-
     data._replace(sensitive_features=sensitive_feature_transform(data.sensitive_features))
     return data
 
@@ -120,9 +151,9 @@ class ExampleNotEstimator2():
 
 def _get_grouped_data_and_base_points(sensitive_feature_value):
     data = pd.DataFrame({
-        SENSITIVE_FEATURE_KEY: sensitive_features_ex1.reshape(-1),
-        SCORE_KEY: scores_ex.reshape(-1),
-        LABEL_KEY: labels_ex.reshape(-1)})
+        SENSITIVE_FEATURE_KEY: sensitive_features_ex1.squeeze(),
+        SCORE_KEY: scores_ex.squeeze(),
+        LABEL_KEY: labels_ex.squeeze()})
     grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group(sensitive_feature_value) \
         .sort_values(by=SCORE_KEY, ascending=False)
     x_grid = np.linspace(0, 1, 100)
