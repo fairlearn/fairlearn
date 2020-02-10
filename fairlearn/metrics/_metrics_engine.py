@@ -80,7 +80,7 @@ def metric_by_group(metric_function,
         argmin = [k for k, v in result.items() if v == minimum]
         maximum = max(result.values())
         argmax = [k for k, v in result.items() if v == maximum]
-        range = maximum - minimum
+        result_range = maximum - minimum
 
         if minimum < 0:
             range_ratio = np.nan
@@ -94,7 +94,7 @@ def metric_by_group(metric_function,
         result[_ARGMIN] = argmin
         result[_MAX] = maximum
         result[_ARGMAX] = argmax
-        result[_RANGE] = range
+        result[_RANGE] = result_range
         result[_RANGE_RATIO] = range_ratio
     except ValueError:
         # Nothing to do if the result type is not amenable to 'min' etc.

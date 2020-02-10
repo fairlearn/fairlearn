@@ -57,11 +57,16 @@ class TestMetricByGroup:
 
         result = metrics.metric_by_group(mock_func, y_a, y_p, gid)
 
-        assert result.overall == 5
-        assert len(result.by_group) == 3
-        assert result.by_group[a] == 1
-        assert result.by_group[b] == 1
-        assert result.by_group[c] == 3
+        assert result['overall'] == 5
+        assert result['group_ABC'] == 1
+        assert result['group_DEF'] == 1
+        assert result['group_GHI'] == 3
+        assert result['min'] == 1
+        assert np.array_equal(result['argmin'], ['group_ABC', 'group_DEF'])
+        assert result['max'] == 3
+        assert np.array_equal(result['argmax'], ['group_GHI'])
+        assert result['range'] == 2
+        assert result['range_ratio'] == pytest.approx(0.3333333333333)
 
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
@@ -76,10 +81,10 @@ class TestMetricByGroup:
 
         result = metrics.metric_by_group(mock_func_matrix_return, y_a, y_p, gid)
 
-        assert np.array_equal(result.overall, np.ones([8, 5]))
-        assert np.array_equal(result.by_group[a], np.ones([3, 2]))
-        assert np.array_equal(result.by_group[b], np.ones([2, 2]))
-        assert np.array_equal(result.by_group[c], np.ones([3, 1]))
+        assert np.array_equal(result['overall'], np.ones([8, 5]))
+        assert np.array_equal(result['group_ABC'], np.ones([3, 2]))
+        assert np.array_equal(result['group_DEF'], np.ones([2, 2]))
+        assert np.array_equal(result['group_GHI'], np.ones([3, 1]))
 
     @pytest.mark.parametrize("transform_s_w", conversions_for_1d)
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
@@ -93,11 +98,16 @@ class TestMetricByGroup:
 
         result = metrics.metric_by_group(mock_func_weight, y_a, y_p, gid, sample_weight=s_w)
 
-        assert result.overall == 10
-        assert len(result.by_group) == 3
-        assert result.by_group[0] == 2
-        assert result.by_group[1] == 2
-        assert result.by_group[2] == 6
+        assert result['overall'] == 10
+        assert result['group_0'] == 2
+        assert result['group_1'] == 2
+        assert result['group_2'] == 6
+        assert result['min'] == 2
+        assert np.array_equal(result['argmin'], ['group_0', 'group_1'])
+        assert result['max'] == 6
+        assert np.array_equal(result['argmax'], ['group_2'])
+        assert result['range'] == 4
+        assert result['range_ratio'] == pytest.approx(0.333333333333)
 
     @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_a", conversions_for_1d)
@@ -151,8 +161,15 @@ class TestMetricByGroup:
             return len(y_true) + len(y_pred) + len(sample_weight)
 
         result = metrics.metric_by_group(sum_lengths, y_t, y_p, gid, sample_weight=s_w)
-        assert result.overall == 3
-        assert result.by_group[0] == 3
+
+        assert result['overall'] == 3
+        assert result['group_0'] == 3
+        assert result['min'] == 3
+        assert np.array_equal(result['argmin'], ['group_0'])
+        assert result['max'] == 3
+        assert np.array_equal(result['argmax'], ['group_0'])
+        assert result['range'] == 0
+        assert result['range_ratio'] == 1
 
     def test_groups_only_one_element(self):
         y_t = [1, 2]
@@ -163,9 +180,33 @@ class TestMetricByGroup:
             return len(y_true) + len(y_pred)
 
         result = metrics.metric_by_group(sum_lengths, y_t, y_p, gid)
-        assert result.overall == 4
-        assert result.by_group[0] == 2
-        assert result.by_group[1] == 2
+        assert result['overall'] == 4
+        assert result['group_0'] == 2
+        assert result['group_1'] == 2
+        assert result['min'] == 2
+        assert np.array_equal(result['argmin'], ['group_0', 'group_1'])
+        assert result['max'] == 2
+        assert np.array_equal(result['argmax'], ['group_0', 'group_1'])
+        assert result['range'] == 0
+        assert result['range_ratio'] == 1
+
+    def test_negative_results(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 0, 1, 1, 1]
+
+        def negative_results(y_true, y_pred):
+            return -(len(y_true) + len(y_pred))
+
+        result = metrics.metric_by_group(negative_results, y_a, y_p, gid)
+
+        assert result['overall'] == -16
+        assert result['group_0'] == -10
+        assert result['group_1'] == -6
+        assert result['min'] == -10
+        assert result['max'] == -6
+        assert result['range'] == 4
+        assert np.isnan(result['range_ratio'])
 
 
 class TestMakeGroupMetric:
