@@ -4,6 +4,8 @@
 import numpy as np
 import pandas as pd
 
+from fairlearn._input_validation import _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR
+
 
 def ensure_list(X):
     assert X is not None
@@ -11,6 +13,19 @@ def ensure_list(X):
         return X
     elif isinstance(X, np.ndarray):
         return X.tolist()
+    elif isinstance(X, pd.Series):
+        return X.tolist()
+    elif isinstance(X, pd.DataFrame):
+        return X.tolist()
+    raise ValueError("Failed to convert to list")
+
+
+def ensure_list_1d(X):
+    assert X is not None
+    if isinstance(X, list):
+        return X
+    elif isinstance(X, np.ndarray):
+        return X.reshape(-1).tolist()
     elif isinstance(X, pd.Series):
         return X.tolist()
     elif isinstance(X, pd.DataFrame):
@@ -34,8 +49,10 @@ def ensure_ndarray(X):
 def ensure_ndarray_2d(X):
     assert X is not None
     tmp = ensure_ndarray(X)
-    if len(tmp.shape) != 1:
-        raise ValueError("Requires 1d array")
+    if len(tmp.shape) not in [1, 2]:
+        raise ValueError("Requires 1d or 2d array")
+    if len(tmp.shape) == 2:
+        return tmp
     result = np.expand_dims(tmp, 1)
     assert len(result.shape) == 2
     return result
@@ -46,7 +63,10 @@ def ensure_series(X):
     if isinstance(X, list):
         return pd.Series(X)
     elif isinstance(X, np.ndarray):
-        return pd.Series(X)
+        if len(X.shape) == 1:
+            return pd.Series(X)
+        if X.shape[1] == 1:
+            return pd.Series(X.reshape(-1))
     elif isinstance(X, pd.Series):
         return X
     elif isinstance(X, pd.DataFrame):
@@ -72,3 +92,18 @@ conversions_for_1d = [ensure_list,
                       ensure_ndarray_2d,
                       ensure_series,
                       ensure_dataframe]
+
+
+def _map_into_single_column(matrix):
+    if len(np.array(matrix).shape) == 1:
+        return np.array(matrix)
+
+    return np.apply_along_axis(
+        lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
+            [str(row[i])
+             .replace("\\", "\\\\")  # escape backslash and separator
+             .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
+                      "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
+             for i in range(len(row))]),
+        axis=1,
+        arr=matrix)
