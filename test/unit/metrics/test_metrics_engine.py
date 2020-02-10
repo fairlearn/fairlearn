@@ -208,6 +208,26 @@ class TestMetricByGroup:
         assert result['range'] == 4
         assert np.isnan(result['range_ratio'])
 
+    def test_metric_results_zero(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 0, 1, 1, 1]
+
+        def zero_results(y_true, y_pred):
+            # Arrays will always be same length
+            return len(y_true)-len(y_pred)
+
+        result = metrics.metric_by_group(zero_results, y_a, y_p, gid)
+
+        assert result['overall'] == 0
+        assert result['group_0'] == 0
+        assert result['group_1'] == 0
+        assert result['min'] == 0
+        assert result['max'] == 0
+        assert result['range'] == 0
+        # Following is the special case
+        assert result['range_ratio'] == 1
+
 
 class TestMakeGroupMetric:
     def test_smoke(self):
@@ -217,10 +237,15 @@ class TestMakeGroupMetric:
 
         grouped_metric_func = metrics.make_group_metric(mock_func)
         result = grouped_metric_func(y_a, y_p, gid)
-        assert result.overall == 5
-        assert len(result.by_group) == 2
-        assert result.by_group[0] == 2
-        assert result.by_group[1] == 3
+        assert result['overall'] == 5
+        assert result['group_0'] == 2
+        assert result['group_1'] == 3
+        assert result['min'] == 2
+        assert np.array_equal(result['argmin'], ['group_0'])
+        assert result['max'] == 3
+        assert np.array_equal(result['argmax'], ['group_1'])
+        assert result['range'] == 1
+        assert result['range_ratio'] == pytest.approx(0.666666666667)
 
     @pytest.mark.parametrize("transform_s_w", conversions_for_1d)
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
@@ -238,9 +263,15 @@ class TestMakeGroupMetric:
 
         grouped_metric_func = metrics.make_group_metric(mock_func_weight)
         result = grouped_metric_func(y_a, y_p, gid, s_w)
-        assert result.overall == 28
-        assert len(result.by_group) == 4
-        assert result.by_group[a] == 1
-        assert result.by_group[b] == 5
-        assert result.by_group[c] == 21
-        assert result.by_group[z] == 1
+
+        assert result['overall'] == 28
+        assert result['group_ABC'] == 1
+        assert result['group_DEF'] == 5
+        assert result['group_GHI'] == 21
+        assert result['group_something_longer'] == 1
+        assert result['min'] == 1
+        assert result['max'] == 21
+        assert np.array_equal(result['argmin'], ['group_ABC', 'group_something_longer'])
+        assert np.array_equal(result['argmax'], ['group_GHI'])
+        assert result['range'] == 20
+        assert result['range_ratio'] == pytest.approx(1.0/21.0)
