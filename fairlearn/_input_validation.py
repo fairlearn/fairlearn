@@ -51,9 +51,9 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
         if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
-            y = y.reshape(-1)
+            y = y.squeeze()
         elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
-            y = y.to_numpy().reshape(-1)
+            y = y.to_numpy().squeeze()
 
         X, y = check_X_y(X, y)
         y = check_array(y, ensure_2d=False, dtype='numeric')
@@ -73,21 +73,38 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
 
     # compress multiple sensitive features into a single column
     if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-        sensitive_features = np.apply_along_axis(
-                lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
-                    [str(row[i])
-                     .replace("\\", "\\\\")  # escape backslash and separator
-                     .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
-                              "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
-                     for i in range(len(row))]),
-                axis=1,
-                arr=sensitive_features)
+        sensitive_features = \
+            _compress_multiple_sensitive_features_into_single_column(sensitive_features)
 
     if enforce_binary_sensitive_feature:
         if len(np.unique(sensitive_features)) > 2:
             raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
 
-    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.reshape(-1))
+    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
+
+
+def _compress_multiple_sensitive_features_into_single_column(sensitive_features):
+    """Compress multiple sensitive features into a single column.
+
+    The resulting mapping converts multiple dimensions into the Cartesian product of the
+    individual columns.
+
+    :param sensitive_features: multi-dimensional array of sensitive features
+    :type sensitive_features: `numpy.ndarray`
+    :return: one-dimensional array of mapped sensitive features
+    """
+    if not isinstance(sensitive_features, np.ndarray):
+        raise ValueError("Received argument of type {} instead of expected numpy.ndarray"
+                         .format(type(sensitive_features).__name__))
+    return np.apply_along_axis(
+        lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
+            [str(row[i])
+                .replace("\\", "\\\\")  # escape backslash and separator
+                .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
+                         "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
+                for i in range(len(row))]),
+        axis=1,
+        arr=sensitive_features)
 
 
 def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_feature=False,
@@ -125,6 +142,7 @@ def _validate_and_reformat_reductions_input(X, y, enforce_binary_sensitive_featu
 
 
 def _make_vector(formless, formless_name):
+    # TODO: remove this function once reductions use _validate_and_reformat_input from above
     formed_vector = None
     if isinstance(formless, list):
         formed_vector = pd.Series(formless)
@@ -152,6 +170,7 @@ def _make_vector(formless, formless_name):
 
 
 def _get_matrix_shape(formless, formless_name):
+    # TODO: remove this function once reductions use _validate_and_reformat_input from above
     num_rows = -1
     num_cols = -1
     if isinstance(formless, pd.DataFrame):

@@ -83,9 +83,9 @@ def test_convex_hull(base_points, expected_remaining_indices):
 
 def test_calculate_roc_points():
     data = pd.DataFrame({
-        SENSITIVE_FEATURE_KEY: sensitive_features_ex1.reshape(-1),
-        SCORE_KEY: scores_ex.reshape(-1),
-        LABEL_KEY: labels_ex.reshape(-1)})
+        SENSITIVE_FEATURE_KEY: sensitive_features_ex1.squeeze(),
+        SCORE_KEY: scores_ex.squeeze(),
+        LABEL_KEY: labels_ex.squeeze()})
     grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group("A") \
         .sort_values(by=SCORE_KEY, ascending=False)
 

@@ -24,7 +24,7 @@ from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
                        _get_predictions_by_sensitive_feature,
                        ExamplePredictor, ExampleEstimator, ExampleNotPredictor,
-                       ExampleNotEstimator1, ExampleNotEstimator2,
+                       ExampleNotEstimator1, ExampleNotEstimator2, is_invalid_transformation,
                        candidate_A_transforms, candidate_X_transforms, candidate_Y_transforms)
 from test.unit.input_convertors import _map_into_single_column
 
@@ -105,6 +105,7 @@ def test_none_input_data(X, y, sensitive_features, constraints):
 
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.uncollect_if.with_args(func=is_invalid_transformation)
 def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
     non_binary_y = deepcopy(data_X_y_sf.y)
     non_binary_y[0] = 2
@@ -126,6 +127,7 @@ _degenerate_labels_feature_name = {
 
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.uncollect_if.with_args(func=is_invalid_transformation)
 def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constraints):
     y = y_transform(degenerate_labels_ex)
 
@@ -139,6 +141,7 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
 
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.uncollect_if.with_args(func=is_invalid_transformation)
 def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints):
     n = len(X_ex)
     expected_exception_messages = {
@@ -332,6 +335,7 @@ _expected_ps_demographic_parity = {
 }
 
 
+@pytest.mark.uncollect_if.with_args(func=is_invalid_transformation)
 def test_threshold_optimization_demographic_parity_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=DEMOGRAPHIC_PARITY, plot=False)
@@ -378,6 +382,7 @@ _expected_ps_equalized_odds = {
 }
 
 
+@pytest.mark.uncollect_if.with_args(func=is_invalid_transformation)
 def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=EQUALIZED_ODDS)
@@ -403,6 +408,7 @@ def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
 
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.uncollect_if.with_args(func=is_invalid_transformation)
 def test_predict_output_0_or_1(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=constraints)
@@ -416,6 +422,7 @@ def test_predict_output_0_or_1(data_X_y_sf, constraints):
 
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.uncollect_if.with_args(func=is_invalid_transformation)
 def test_predict_different_argument_lengths(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                                             constraints=constraints)
