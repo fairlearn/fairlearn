@@ -102,21 +102,21 @@ def is_invalid_transformation(**kwargs):
 
 
 @pytest.fixture(params=candidate_A_transforms)
-def data_sf(data, request):
+def data_sf(data, request):  # sf is an abbreviation for sensitive features
     sensitive_feature_transform = request.param
     data._replace(sensitive_features=sensitive_feature_transform(data.sensitive_features))
     return data
 
 
 @pytest.fixture(params=candidate_X_transforms)
-def data_X_sf(data_sf, request):
+def data_X_sf(data_sf, request):  # sf is an abbreviation for sensitive features
     X_transform = request.param
     data_sf._replace(X=X_transform(data_sf.X))
     return data_sf
 
 
 @pytest.fixture(params=candidate_Y_transforms)
-def data_X_y_sf(data_X_sf, request):
+def data_X_y_sf(data_X_sf, request):  # sf is an abbreviation for sensitive features
     y_transform = request.param
     data_X_sf._replace(y=y_transform(data_X_sf.y))
     return data_X_sf
