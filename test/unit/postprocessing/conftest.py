@@ -63,30 +63,6 @@ def data(request):
     return request.param
 
 
-# ---------------------------------------------
-# The following pytest configurations are meant to allow silent skipping of tests for scenarios
-# that are not meant to happen. We don't want them to show up as skipped.
-def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "uncollect_if(*, func): function to unselect tests from parametrization")
-
-
-def pytest_collection_modifyitems(config, items):
-    removed = []
-    kept = []
-    for item in items:
-        marker = item.get_closest_marker('uncollect_if')
-        if marker:
-            func = marker.kwargs['func']
-            if func(**item.callspec.params):
-                removed.append(item)
-                continue
-        kept.append(item)
-    if removed:
-        config.hook.pytest_deselected(items=removed)
-        items[:] = kept
-
-
 def is_invalid_transformation(**kwargs):
     sensitive_feature_transform = kwargs['data_sf']
     sensitive_features = kwargs['data'].sensitive_features
@@ -97,8 +73,6 @@ def is_invalid_transformation(**kwargs):
             sensitive_feature_transform in [ensure_list_1d, ensure_series]:
         return True
     return False
-
-# ---------------------------------------------
 
 
 @pytest.fixture(params=candidate_A_transforms)
