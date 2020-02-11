@@ -123,8 +123,11 @@ def data_X_y_sf(data_X_sf, request):
 
 
 class ExamplePredictor():
+    def __init__(self, scores):
+        self._scores = scores
+
     def predict(self, X):
-        return scores_ex
+        return self._scores
 
 
 class ExampleNotPredictor():
