@@ -29,7 +29,7 @@ def _get_debug_color(key):
     return debug_colormap[key]
 
 
-def _plot_solution_and_show_plot(x_best, y_best, solution_label, xlabel, ylabel):
+def _plot_solution(x_best, y_best, solution_label, xlabel, ylabel):
     """Plot the given solution with appropriate labels."""
     if y_best is None:
         plt.axvline(x=x_best, label=solution_label, ls='--')
@@ -38,7 +38,6 @@ def _plot_solution_and_show_plot(x_best, y_best, solution_label, xlabel, ylabel)
     plt.legend()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.show()
 
 
 def _plot_overlap(x_grid, y_min):
@@ -60,7 +59,7 @@ def _raise_if_not_threshold_optimizer(obj):
                          .format(obj.__name__, ThresholdOptimizer.__name__))
 
 
-def plot_selection_error_curve(threshold_optimizer):
+def plot_selection_error_curve(threshold_optimizer, show_plot=True):
     """Plot the selection/error curve to show the chosen solution.
 
     This will only work for `fairlearn.postprocessing.ThresholdOptimizer` objects
@@ -68,6 +67,9 @@ def plot_selection_error_curve(threshold_optimizer):
 
     :param threshold_optimizer: the `ThresholdOptimizer` instance for which the
         results should be illustrated.
+    :type threshold_optimizer: fairlearn.postprocessing.ThresholdOptimizer
+    :param show_plot: whether or not the generated plot should be shown, default True
+    :type show_plot: bool
     """
     _raise_if_not_threshold_optimizer(threshold_optimizer)
 
@@ -80,11 +82,13 @@ def plot_selection_error_curve(threshold_optimizer):
         _plot_curve(sensitive_feature_value, 'selection', 'error',
                     threshold_optimizer._selection_error_curve[sensitive_feature_value])
 
-    _plot_solution_and_show_plot(threshold_optimizer._x_best, None, "DP solution",
-                                 "selection rate", "error")
+    _plot_solution(threshold_optimizer._x_best, None, "DP solution",
+                   "selection rate", "error")
+    if show_plot:
+        plt.show()
 
 
-def plot_roc_curve(threshold_optimizer):
+def plot_roc_curve(threshold_optimizer, show_plot=True):
     """Plot the ROC curve to show the chosen solution.
 
     This will only work for `fairlearn.postprocessing.ThresholdOptimizer` objects
@@ -92,6 +96,9 @@ def plot_roc_curve(threshold_optimizer):
 
     :param threshold_optimizer: the `ThresholdOptimizer` instance for which the
         results should be illustrated.
+    :type threshold_optimizer: fairlearn.postprocessing.ThresholdOptimizer
+    :param show_plot: whether or not the generated plot should be shown, default True
+    :type show_plot: bool
     """
     _raise_if_not_threshold_optimizer(threshold_optimizer)
 
@@ -105,5 +112,7 @@ def plot_roc_curve(threshold_optimizer):
                     threshold_optimizer._roc_curve[sensitive_feature_value])
 
     _plot_overlap(threshold_optimizer._x_grid, threshold_optimizer._y_min)
-    _plot_solution_and_show_plot(threshold_optimizer._x_best, threshold_optimizer._y_best,
-                                 'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
+    _plot_solution(threshold_optimizer._x_best, threshold_optimizer._y_best,
+                   'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
+    if show_plot:
+        plt.show()
