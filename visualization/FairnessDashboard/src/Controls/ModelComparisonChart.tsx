@@ -293,8 +293,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const dropdownStyles: Partial<IDropdownStyles> = {
             dropdown: { width: 180 },
             label: { color: "#ffffff" },
-            title: { color: "#ffffff", backgroundColor: "#333333" },
-            dropdownItems: { color: "#ffffff", backgroundColor: "#333333" },
+            title: { color: "#ffffff", backgroundColor: "#333333", selectors: {
+                ':hover': {
+                    color: "#333333",
+                    backgroundColor: "#f3f2f1"
+                }
+            }},
             dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
         };          
         const props = _.cloneDeep(this.plotlyProps);
