@@ -10,8 +10,8 @@ from fairlearn.postprocessing._roc_curve_utilities import (_calculate_roc_points
                                                            _get_roc,
                                                            _interpolate_curve)
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
-from .test_utilities import (sensitive_features_ex1, labels_ex, scores_ex,
-                             _get_grouped_data_and_base_points)
+from .conftest import (sensitive_features_ex1, labels_ex, scores_ex,
+                       _get_grouped_data_and_base_points, sensitive_feature_names_ex1)
 
 
 def test_assert_interpolated_curve():
@@ -83,9 +83,9 @@ def test_convex_hull(base_points, expected_remaining_indices):
 
 def test_calculate_roc_points():
     data = pd.DataFrame({
-        SENSITIVE_FEATURE_KEY: sensitive_features_ex1,
-        SCORE_KEY: scores_ex,
-        LABEL_KEY: labels_ex})
+        SENSITIVE_FEATURE_KEY: sensitive_features_ex1.squeeze(),
+        SCORE_KEY: scores_ex.squeeze(),
+        LABEL_KEY: labels_ex.squeeze()})
     grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group("A") \
         .sort_values(by=SCORE_KEY, ascending=False)
 
@@ -110,7 +110,7 @@ def test_calculate_roc_points():
 
 
 def test_get_roc():
-    for sensitive_feature_value in ['A', 'B', 'C']:
+    for sensitive_feature_value in sensitive_feature_names_ex1:
         grouped_data, base_points, ignore_for_base_points, x_grid = \
             _get_grouped_data_and_base_points(sensitive_feature_value)
 
