@@ -22,11 +22,12 @@ def test_no_matplotlib(constraints):
     n_classes = 2
 
     threshold_optimizer = ThresholdOptimizer(unconstrained_predictor=FakePredictor(),
-                                             constraints=constraints,
-                                             plot=True)
+                                             constraints=constraints)
+    threshold_optimizer.fit(X=np.random.random((n_samples, n_features)),
+                            y=np.random.randint(n_classes, size=n_samples),
+                            sensitive_features=np.random.randint(n_sensitive_feature_values,
+                                                                 size=n_samples))
+    
     with pytest.raises(RuntimeError) as exc:
-        threshold_optimizer.fit(X=np.random.random((n_samples, n_features)),
-                                y=np.random.randint(n_classes, size=n_samples),
-                                sensitive_features=np.random.randint(n_sensitive_feature_values,
-                                                                     size=n_samples))
+        from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve
         assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE

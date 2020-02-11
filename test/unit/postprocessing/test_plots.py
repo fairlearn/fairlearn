@@ -10,9 +10,6 @@ from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_OD
 from .conftest import scores_ex, ExamplePredictor, is_invalid_transformation
 
 
-BASELINE_DIR = "baseline_plots"
-
-
 @pytest.mark.mpl_image_compare()
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_plot_equalized_odds(data_X_y_sf):
