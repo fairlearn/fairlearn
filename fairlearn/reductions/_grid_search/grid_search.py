@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from time import time
 
-from fairlearn._input_validation import _validate_and_reformat_reductions_input
+from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from sklearn.exceptions import NotFittedError
 from fairlearn.reductions import Reduction
@@ -115,8 +115,6 @@ class GridSearch(Reduction):
         set of Lagrange multipliers they desire using this argument.
     """
 
-    _MESSAGE_Y_NOT_BINARY = "Supplied y labels are not 0 or 1"
-
     def __init__(self,
                  estimator,
                  constraints,
@@ -179,20 +177,18 @@ class GridSearch(Reduction):
             feature used by the constraints object
         :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
         """
-        X_train, y_train, _ = _validate_and_reformat_reductions_input(
-            X, y, enforce_binary_sensitive_feature=True, **kwargs)
-
         if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
             is_classification_reduction = True
-            # We have a classification problem
-            # Need to make sure that y is binary (for now)
-            unique_labels = np.unique(y_train)
-            if not set(unique_labels).issubset({0, 1}):
-                raise RuntimeError(self._MESSAGE_Y_NOT_BINARY)
         else:
             logger.debug("Regression problem detected")
             is_classification_reduction = False
+
+        X_train, y_train, sensitive_features_train = _validate_and_reformat_input(
+            X, y, enforce_binary_sensitive_feature=True,
+            enforce_binary_labels=is_classification_reduction, **kwargs)
+
+        kwargs[_KW_SENSITIVE_FEATURES] = sensitive_features_train
 
         # Prep the parity constraints and objective
         logger.debug("Preparing constraints and objective")
