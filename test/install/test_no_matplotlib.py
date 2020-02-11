@@ -27,7 +27,7 @@ def test_no_matplotlib(constraints):
                             y=np.random.randint(n_classes, size=n_samples),
                             sensitive_features=np.random.randint(n_sensitive_feature_values,
                                                                  size=n_samples))
-    
+
     with pytest.raises(RuntimeError) as exc:
-        from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve
+        from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve  # noqa: F401
         assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
