@@ -3,7 +3,8 @@
 
 import matplotlib.pyplot as plt
 import pytest
-from fairlearn.postprocessing import plot_selection_error_curve, plot_roc_curve, ThresholdOptimizer
+from fairlearn.postprocessing import ThresholdOptimizer
+from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve
 from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 
 from .conftest import scores_ex, ExamplePredictor, is_invalid_transformation

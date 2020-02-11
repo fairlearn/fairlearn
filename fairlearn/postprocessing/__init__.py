@@ -9,7 +9,6 @@ learn how to adjust the predictor's output from the training data.
 
 from ._postprocessing import PostProcessing  # noqa: F401
 from ._threshold_optimizer import ThresholdOptimizer  # noqa: F401
-from ._curve_plotting_utilities import plot_roc_curve, plot_selection_error_curve  # noqa: F401
 
 __all__ = [
     "PostProcessing",
