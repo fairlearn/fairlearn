@@ -29,5 +29,5 @@ def test_no_matplotlib(constraints):
                                                                  size=n_samples))
 
     with pytest.raises(RuntimeError) as exc:
-        from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve  # noqa: F401
+        from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve  # noqa: F401, E501
         assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
