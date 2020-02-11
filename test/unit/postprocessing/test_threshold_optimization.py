@@ -149,16 +149,18 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     for permutation in [(0, 1), (1, 0)]:
         with pytest.raises(ValueError, match=expected_exception_messages['inconsistent']
                            .format("X, sensitive_features, and y")):
-            adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
-                                                    constraints=constraints)
+            adjusted_predictor = ThresholdOptimizer(
+                unconstrained_predictor=ExamplePredictor(scores_ex),
+                constraints=constraints)
             adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
                                    data_X_y_sf.y[:n - permutation[1]],
                                    sensitive_features=data_X_y_sf.sensitive_features)
 
     # try providing empty lists in all combinations
     for permutation in [(0, n, 'inconsistent'), (n, 0, 'empty')]:
-        adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
-                                                constraints=constraints)
+        adjusted_predictor = ThresholdOptimizer(
+            unconstrained_predictor=ExamplePredictor(scores_ex),
+            constraints=constraints)
         with pytest.raises(ValueError, match=expected_exception_messages[permutation[2]]):
             adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
                                    data_X_y_sf.y[:n - permutation[1]],
@@ -173,7 +175,8 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
     scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores), constraints=DEMOGRAPHIC_PARITY)
+    estimator = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores),
+                                   constraints=DEMOGRAPHIC_PARITY)
     estimator.fit(X_ex, y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
@@ -241,7 +244,8 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
     scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores), constraints=EQUALIZED_ODDS)
+    estimator = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores),
+                                   constraints=EQUALIZED_ODDS)
     estimator.fit(X_ex, y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
