@@ -98,7 +98,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             padding: "40px"
         },
         header: {
-            backgroundColor: "#EBEBEB",
+            backgroundColor: "#333333",
             padding: "0 50px",
             height: "90px",
             display: "inline-flex",
@@ -107,13 +107,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             alignItems: "center"
         },
         headerTitle: {
-            color: "#333333",
+            color: "#FFFFFF",
             fontSize: "32px",
             lineHeight: "39px",
             fontWeight: "100"
         },
         headerOptions: {
-            backgroundColor: "#EBEBEB",
+            backgroundColor: "#333333",
             padding: "0 40px"
         },
         dropDown: {
@@ -291,7 +291,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const accuracyOptions: IDropdownOption[] = this.props.accuracyPickerProps.accuracyOptions.map(x => { return {key: x.key, text: x.title}});
         const parityOptions: IDropdownOption[] = this.props.parityPickerProps.parityOptions.map(x => { return {key: x.key, text: x.title}});
         const dropdownStyles: Partial<IDropdownStyles> = {
-            dropdown: { width: 180 }
+            dropdown: { width: 180 },
+            label: { color: "#ffffff" },
+            title: { color: "#ffffff", backgroundColor: "#333333" },
+            dropdownItems: { color: "#ffffff", backgroundColor: "#333333" },
+            dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
         };          
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
