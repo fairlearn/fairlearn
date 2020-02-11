@@ -39,26 +39,29 @@ LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 _data = namedtuple('_data', 'example_name feature_names sensitive_features X y scores')
 
+_data_ex1 = _data("example 1",
+                  sensitive_feature_names_ex1,
+                  sensitive_features_ex1,
+                  X_ex,
+                  labels_ex,
+                  scores_ex)
 
-@pytest.fixture(params=[
-    _data("example 1",
-          sensitive_feature_names_ex1,
-          sensitive_features_ex1,
-          X_ex,
-          labels_ex,
-          scores_ex),
-    _data("example 2",
-          sensitive_feature_names_ex2,
-          sensitive_features_ex2,
-          X_ex,
-          labels_ex,
-          scores_ex),
-    _data("example 3",
-          sensitive_feature_names_ex3,
-          sensitive_features_ex3,
-          X_ex,
-          labels_ex,
-          scores_ex)])
+_data_ex2 = _data("example 2",
+                  sensitive_feature_names_ex2,
+                  sensitive_features_ex2,
+                  X_ex,
+                  labels_ex,
+                  scores_ex)
+
+_data_ex3 = _data("example 3",
+                  sensitive_feature_names_ex3,
+                  sensitive_features_ex3,
+                  X_ex,
+                  labels_ex,
+                  scores_ex)
+
+
+@pytest.fixture(params=[_data_ex1, _data_ex2, _data_ex3])
 def data(request):
     return request.param
 
