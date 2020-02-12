@@ -27,11 +27,11 @@ _BIN_MISMATCH_FOR_METRIC = "The groups for metric {0} do not match the groups pr
 _GROUP_NAMES_BAD_COUNT = "Count of group_names not the same as the number of unique groups"
 
 _Y_TRUE = 'trueY'
-_Y_PRED = 'predictedYs'
+_Y_PRED = 'predictedY'
 _PRECOMPUTED_METRICS = 'precomputedMetrics'
 _GLOBAL = 'global'
 _BINS = 'bins'
-_PRECOMPUTED_BINS = 'precomputedBins'
+_PRECOMPUTED_BINS = 'precomputedFeatureBins'
 _BIN_VECTOR = 'binVector'
 _BIN_LABELS = 'binLabels'
 _FEATURE_BIN_NAME = 'featureBinName'
