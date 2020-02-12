@@ -213,8 +213,8 @@ class TestDictionaryConversions:
 
         assert result['predictionType'] == 'binaryClassification'
         assert np.array_equal(target.y_true, result['trueY'])
-        assert len(result['predictedYs']) == 1
-        assert np.array_equal(result['predictedYs'][0], target.y_pred)
+        assert len(result['predictedY']) == 1
+        assert np.array_equal(result['predictedY'][0], target.y_pred)
 
         assert len(result['precomputedMetrics']) == 1
         assert len(result['precomputedMetrics'][0]) == 1
@@ -226,8 +226,8 @@ class TestDictionaryConversions:
         assert rmd['miss_rate']['global'] == 0.6
         assert rmd['miss_rate']['bins'][0] == 0.7
         assert rmd['miss_rate']['bins'][1] == 0.8
-        assert result['precomputedBins'][0]['featureBinName'] == "Some string"
-        assert np.array_equal(result['precomputedBins'][0]['binLabels'],
+        assert result['precomputedFeatureBins'][0]['featureBinName'] == "Some string"
+        assert np.array_equal(result['precomputedFeatureBins'][0]['binLabels'],
                               ['First', 'Second'])
 
     def test_round_trip_smoke(self):
