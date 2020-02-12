@@ -29,28 +29,28 @@ def _get_debug_color(key):
     return debug_colormap[key]
 
 
-def _plot_solution(x_best, y_best, solution_label, xlabel, ylabel):
+def _plot_solution(ax, x_best, y_best, solution_label, xlabel, ylabel):
     """Plot the given solution with appropriate labels."""
     if y_best is None:
-        plt.axvline(x=x_best, label=solution_label, ls='--')
+        ax.axvline(x=x_best, label=solution_label, ls='--')
     else:
-        plt.plot(x_best, y_best, 'm*', ms=10, label=solution_label)
-    plt.legend()
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+        ax.plot(x_best, y_best, 'm*', ms=10, label=solution_label)
+    ax.legend()
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
 
 
-def _plot_overlap(x_grid, y_min):
+def _plot_overlap(ax, x_grid, y_min):
     """Plot the overlap region."""
-    line, = plt.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
+    line, = ax.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
     line.zorder -= 1
 
 
-def _plot_curve(sensitive_feature, x_col, y_col, points):
+def _plot_curve(ax, sensitive_feature, x_col, y_col, points):
     """Plot the given curve with labels."""
     color = _get_debug_color(sensitive_feature)
-    plt.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0,
-             label='sensitive feature value ' + str(sensitive_feature))
+    ax.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0,
+            label='sensitive feature value ' + str(sensitive_feature))
 
 
 def _raise_if_not_threshold_optimizer(obj):
@@ -59,7 +59,7 @@ def _raise_if_not_threshold_optimizer(obj):
                          .format(obj.__name__, ThresholdOptimizer.__name__))
 
 
-def plot_selection_error_curve(threshold_optimizer, show_plot=True):
+def plot_selection_error_curve(threshold_optimizer, ax=None, show_plot=True):
     """Plot the selection/error curve to show the chosen solution.
 
     This will only work for `fairlearn.postprocessing.ThresholdOptimizer` objects
@@ -68,6 +68,8 @@ def plot_selection_error_curve(threshold_optimizer, show_plot=True):
     :param threshold_optimizer: the `ThresholdOptimizer` instance for which the
         results should be illustrated.
     :type threshold_optimizer: fairlearn.postprocessing.ThresholdOptimizer
+    :param ax: a custom `matplotlib.axes.Axes` object to use for the plots, default None
+    :type ax: `matplotlib.axes.Axes`
     :param show_plot: whether or not the generated plot should be shown, default True
     :type show_plot: bool
     """
@@ -79,16 +81,18 @@ def plot_selection_error_curve(threshold_optimizer, show_plot=True):
                          .format(DEMOGRAPHIC_PARITY))
 
     for sensitive_feature_value in threshold_optimizer._selection_error_curve.keys():
-        _plot_curve(sensitive_feature_value, 'selection', 'error',
+        _plot_curve(ax, sensitive_feature_value, 'selection', 'error',
                     threshold_optimizer._selection_error_curve[sensitive_feature_value])
 
-    _plot_solution(threshold_optimizer._x_best, None, "DP solution",
+    if ax is None:
+        ax = plt.figure()
+    _plot_solution(ax, threshold_optimizer._x_best, None, "DP solution",
                    "selection rate", "error")
     if show_plot:
         plt.show()
 
 
-def plot_roc_curve(threshold_optimizer, show_plot=True):
+def plot_roc_curve(threshold_optimizer, ax=None, show_plot=True):
     """Plot the ROC curve to show the chosen solution.
 
     This will only work for `fairlearn.postprocessing.ThresholdOptimizer` objects
@@ -108,11 +112,13 @@ def plot_roc_curve(threshold_optimizer, show_plot=True):
                          .format(DEMOGRAPHIC_PARITY))
 
     for sensitive_feature_value in threshold_optimizer._roc_curve.keys():
-        _plot_curve(sensitive_feature_value, 'x', 'y',
+        _plot_curve(ax, sensitive_feature_value, 'x', 'y',
                     threshold_optimizer._roc_curve[sensitive_feature_value])
 
-    _plot_overlap(threshold_optimizer._x_grid, threshold_optimizer._y_min)
-    _plot_solution(threshold_optimizer._x_best, threshold_optimizer._y_best,
+    if ax is None:
+        ax = plt.figure()
+    _plot_overlap(ax, threshold_optimizer._x_grid, threshold_optimizer._y_min)
+    _plot_solution(ax, threshold_optimizer._x_best, threshold_optimizer._y_best,
                    'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
     if show_plot:
         plt.show()
