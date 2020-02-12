@@ -42,6 +42,18 @@ _UNSUPPORTED_MODEL_TYPE = "The specified model_type of '{0}' is not supported"
 _DICT_TOO_MANY_Y_PRED = 'Too many y_pred values in dictionary'
 
 
+def create_group_metric_set(model_type, y_true, y_preds, group_memberships, model_titles=None, group_titles=None, extra_metrics=None):
+    if extra_metrics is not None:
+        raise NotImplementedError("No support for extra_metrics yet")
+
+    # We could consider checking that the length of y_preds matches model_titles
+    # and that the length of group_memberships matches group_titles
+
+    result = dict()
+
+
+    return result
+
 class GroupMetricSet:
     """Class to hold a collection of GroupMetricResult objects."""
 
