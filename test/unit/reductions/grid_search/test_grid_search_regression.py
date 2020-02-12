@@ -89,7 +89,6 @@ def test_bgl_unfair(A_two_dim):
                               [-1.18461538,  9.12307692],
                               [-0.47924528,  8.65283019],
                               [0.2, 0.7]],
-                             all_predict)
                              all_predict[1:])
 
 
