@@ -8,19 +8,20 @@ from fairlearn.metrics import group_accuracy_score, group_balanced_root_mean_squ
 from fairlearn.metrics import GroupMetricSet, GroupMetricResult
 from fairlearn.metrics._group_metric_set import create_group_metric_set
 
-Y_true = [0, 1, 0, 1]
-Y_pred = [[0, 1, 1, 1]]
-Groups = [['a', 'b', 'b', 'a']]
-
 
 class TestCreateGroupMetricSet:
     def test_bad_model_type(self):
         with pytest.raises(ValueError) as exception_context:
-            create_group_metric_set("Something Random", Y_true, Y_pred, Groups)
+            create_group_metric_set("Something Random", None, None, None)
         expected = "model_type 'Something Random' not in ['binary_classification', 'regression']"
         assert exception_context.value.args[0] == expected
 
     def test_smoke(self):
+        # Single model, single group vector, no names
+        Y_true = [0, 1, 0, 1]
+        Y_pred = [[0, 1, 1, 1]]
+        Groups = [['a', 'b', 'b', 'a']]
+
         result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
         assert result['predictionType'] == 'binaryClassification'
 
@@ -30,8 +31,15 @@ class TestCreateGroupMetricSet:
         assert isinstance(result['precomputedFeatureBins'], list)
         assert len(result['precomputedFeatureBins']) == 1
         bin_dict = result['precomputedFeatureBins'][0]
+        assert isinstance(bin_dict, dict)
         assert np.array_equal(bin_dict['binVector'], [0, 1, 1, 0])
         assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
+
+        assert isinstance(result['predictedY'], list)
+        assert len(result['predictedY']) == 1
+        y_p = result['predictedY'][0]
+        assert isinstance(y_p, list)
+        assert np.array_equal(y_p, Y_pred[0])
 
 
 class TestProperties:

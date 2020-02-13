@@ -140,6 +140,10 @@ def create_group_metric_set(model_type,
             bin_dict[_FEATURE_BIN_NAME] = group_titles[g]
         result[_PRECOMPUTED_BINS].append(bin_dict)
 
+        for m, model_pred in enumerate(y_preds):
+            _yp = np.asarray(model_pred).tolist()
+            result[_Y_PRED].append(_yp)
+
     return result
 
 
