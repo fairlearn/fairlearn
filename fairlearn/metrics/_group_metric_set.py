@@ -140,9 +140,21 @@ def create_group_metric_set(model_type,
             bin_dict[_FEATURE_BIN_NAME] = group_titles[g]
         result[_PRECOMPUTED_BINS].append(bin_dict)
 
+        model_list = []
         for m, model_pred in enumerate(y_preds):
             _yp = np.asarray(model_pred).tolist()
             result[_Y_PRED].append(_yp)
+
+            metric_dict = dict()
+            for metric_key, metric_func in function_dict.items():
+                gmr = metric_func(_yt, _yp, groups)
+                curr_dict = dict()
+                curr_dict[_GLOBAL] = gmr.overall
+                curr_dict[_BINS] = list(gmr.by_group.values())
+                metric_dict[metric_key] = curr_dict
+            model_list.append(metric_dict)
+        result[_PRECOMPUTED_METRICS].append(model_list)
+            
 
     return result
 

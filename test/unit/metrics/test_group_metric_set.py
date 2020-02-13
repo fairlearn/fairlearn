@@ -18,9 +18,10 @@ class TestCreateGroupMetricSet:
 
     def test_smoke(self):
         # Single model, single group vector, no names
-        Y_true = [0, 1, 0, 1]
-        Y_pred = [[0, 1, 1, 1]]
-        Groups = [['a', 'b', 'b', 'a']]
+        Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
+        Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
+        Groups = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b']]
+        gr_int = [int(x == 'b') for x in Groups[0]]
 
         result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
         assert result['predictionType'] == 'binaryClassification'
@@ -32,7 +33,7 @@ class TestCreateGroupMetricSet:
         assert len(result['precomputedFeatureBins']) == 1
         bin_dict = result['precomputedFeatureBins'][0]
         assert isinstance(bin_dict, dict)
-        assert np.array_equal(bin_dict['binVector'], [0, 1, 1, 0])
+        assert np.array_equal(bin_dict['binVector'], gr_int)
         assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
 
         assert isinstance(result['predictedY'], list)
@@ -40,6 +41,23 @@ class TestCreateGroupMetricSet:
         y_p = result['predictedY'][0]
         assert isinstance(y_p, list)
         assert np.array_equal(y_p, Y_pred[0])
+
+        assert isinstance(result['precomputedMetrics'], list)
+        assert len(result['precomputedMetrics']) == 1
+        metrics_group_0 = result['precomputedMetrics'][0]
+        assert isinstance(metrics_group_0, list)
+        assert len(metrics_group_0) == 1
+        metrics_g0_m0 = metrics_group_0[0]
+        assert isinstance(metrics_g0_m0, dict)
+        assert len(metrics_g0_m0) == 10
+        accuracy = metrics_g0_m0['accuracy_score']
+        assert isinstance(accuracy, dict)
+        gmr = group_accuracy_score(Y_true, Y_pred[0], Groups[0])
+        assert gmr.overall == pytest.approx(accuracy['global'])
+        assert isinstance(accuracy['bins'], list)
+        assert len(accuracy['bins']) == 2
+        assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
+        assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
 
 
 class TestProperties:
