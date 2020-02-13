@@ -6,6 +6,32 @@ import pytest
 
 from fairlearn.metrics import group_accuracy_score, group_balanced_root_mean_squared_error
 from fairlearn.metrics import GroupMetricSet, GroupMetricResult
+from fairlearn.metrics._group_metric_set import create_group_metric_set
+
+Y_true = [0, 1, 0, 1]
+Y_pred = [[0, 1, 1, 1]]
+Groups = [['a', 'b', 'b', 'a']]
+
+
+class TestCreateGroupMetricSet:
+    def test_bad_model_type(self):
+        with pytest.raises(ValueError) as exception_context:
+            create_group_metric_set("Something Random", Y_true, Y_pred, Groups)
+        expected = "model_type 'Something Random' not in ['binary_classification', 'regression']"
+        assert exception_context.value.args[0] == expected
+
+    def test_smoke(self):
+        result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
+        assert result['predictionType'] == 'binaryClassification'
+
+        assert isinstance(result['trueY'], list)
+        assert np.array_equal(result['trueY'], Y_true)
+
+        assert isinstance(result['precomputedFeatureBins'], list)
+        assert len(result['precomputedFeatureBins']) == 1
+        bin_dict = result['precomputedFeatureBins'][0]
+        assert np.array_equal(bin_dict['binVector'], [0, 1, 1, 0])
+        assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
 
 
 class TestProperties:

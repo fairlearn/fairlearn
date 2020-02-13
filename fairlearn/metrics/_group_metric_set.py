@@ -111,12 +111,41 @@ def create_group_metric_set(model_type,
 
     result = dict()
 
+    if model_type not in _allowed_model_types:
+        msg_format = "model_type '{0}' not in {1}"
+        msg = msg_format.format(model_type, sorted(
+            list(_allowed_model_types)))
+        raise ValueError(msg)
+
+    function_dict = None
+    if model_type == BINARY_CLASSIFICATION:
+        result[_PREDICTION_TYPE] = _PREDICTION_BINARY_CLASSIFICATION
+        function_dict = BINARY_CLASSIFICATION_METRICS
+    else:
+        raise NotImplementedError("No support yet for regression")
+
+    _yt = np.asarray(y_true)
+    result[_Y_TRUE] = _yt.tolist()
+
+    result[_Y_PRED] = []
+    result[_PRECOMPUTED_METRICS] = []
+    result[_PRECOMPUTED_BINS] = []
+    for g, group_membership in enumerate(group_memberships):
+        _gm = np.asarray(group_membership).tolist()
+        _unique_groups = sorted(list(np.unique(_gm)))
+        group_names = [str(x) for x in _unique_groups]
+        groups = [_unique_groups.index(x) for x in _gm]
+        bin_dict = {_BIN_VECTOR: groups, _BIN_LABELS: group_names}
+        if group_titles is not None:
+            bin_dict[_FEATURE_BIN_NAME] = group_titles[g]
+        result[_PRECOMPUTED_BINS].append(bin_dict)
+
     return result
 
 
 class GroupMetricSet:
     """Class to hold a collection of GroupMetricResult objects."""
-    
+
     BINARY_CLASSIFICATION = 'binary_classification'
     REGRESSION = 'regression'
     _allowed_model_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
