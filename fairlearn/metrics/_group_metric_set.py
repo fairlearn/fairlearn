@@ -41,8 +41,68 @@ _PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
 _UNSUPPORTED_MODEL_TYPE = "The specified model_type of '{0}' is not supported"
 _DICT_TOO_MANY_Y_PRED = 'Too many y_pred values in dictionary'
 
+BINARY_CLASSIFICATION = 'binary_classification'
+REGRESSION = 'regression'
+_allowed_model_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
 
-def create_group_metric_set(model_type, y_true, y_preds, group_memberships, model_titles=None, group_titles=None, extra_metrics=None):
+# The following keys need to match those of _metric_methods in
+# _fairlearn_dashboard.py
+# Issue 269 is about unifying the two sets
+GROUP_ACCURACY_SCORE = "accuracy_score"
+GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR = "balanced_root_mean_squared_error"
+GROUP_FALLOUT_RATE = "fallout_rate"
+GROUP_MAX_ERROR = "max_error"
+GROUP_MEAN_ABSOLUTE_ERROR = "mean_absolute_error"
+GROUP_MEAN_OVERPREDICTION = "overprediction"
+GROUP_MEAN_PREDICTION = "average"
+GROUP_MEAN_SQUARED_ERROR = "mean_squared_error"
+GROUP_MEAN_SQUARED_LOG_ERROR = "6d106114-4433-40a2-b091-8983ab540a53"
+GROUP_MEAN_UNDERPREDICTION = "underprediction"
+GROUP_MEDIAN_ABSOLUTE_ERROR = "median_absolute_error"
+GROUP_MISS_RATE = "miss_rate"
+GROUP_PRECISION_SCORE = "precision_score"
+GROUP_R2_SCORE = "r2_score"
+GROUP_RECALL_SCORE = "recall_score"
+GROUP_ROC_AUC_SCORE = "balanced_accuracy_score"
+GROUP_ROOT_MEAN_SQUARED_ERROR = "root_mean_squared_error"
+GROUP_SELECTION_RATE = "selection_rate"
+GROUP_SPECIFICITY_SCORE = "specificity_score"
+GROUP_ZERO_ONE_LOSS = "zero_one_loss"
+
+BINARY_CLASSIFICATION_METRICS = {}
+BINARY_CLASSIFICATION_METRICS[GROUP_ACCURACY_SCORE] = group_accuracy_score
+BINARY_CLASSIFICATION_METRICS[GROUP_FALLOUT_RATE] = group_fallout_rate
+BINARY_CLASSIFICATION_METRICS[GROUP_MEAN_OVERPREDICTION] = group_mean_overprediction
+BINARY_CLASSIFICATION_METRICS[GROUP_MEAN_UNDERPREDICTION] = group_mean_underprediction
+BINARY_CLASSIFICATION_METRICS[GROUP_MISS_RATE] = group_miss_rate
+BINARY_CLASSIFICATION_METRICS[GROUP_PRECISION_SCORE] = group_precision_score
+BINARY_CLASSIFICATION_METRICS[GROUP_RECALL_SCORE] = group_recall_score
+BINARY_CLASSIFICATION_METRICS[GROUP_ROC_AUC_SCORE] = group_roc_auc_score
+BINARY_CLASSIFICATION_METRICS[GROUP_SELECTION_RATE] = group_selection_rate
+BINARY_CLASSIFICATION_METRICS[GROUP_SPECIFICITY_SCORE] = group_specificity_score
+
+REGRESSION_METRICS = {}
+REGRESSION_METRICS[GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR] = group_balanced_root_mean_squared_error  # noqa:E501
+REGRESSION_METRICS[GROUP_MAX_ERROR] = group_max_error
+REGRESSION_METRICS[GROUP_MEAN_ABSOLUTE_ERROR] = group_mean_absolute_error
+REGRESSION_METRICS[GROUP_MEAN_OVERPREDICTION] = group_mean_overprediction
+REGRESSION_METRICS[GROUP_MEAN_PREDICTION] = group_mean_prediction
+REGRESSION_METRICS[GROUP_MEAN_SQUARED_ERROR] = group_mean_squared_error
+REGRESSION_METRICS[GROUP_MEAN_SQUARED_LOG_ERROR] = group_mean_squared_log_error
+REGRESSION_METRICS[GROUP_MEAN_UNDERPREDICTION] = group_mean_underprediction
+REGRESSION_METRICS[GROUP_MEDIAN_ABSOLUTE_ERROR] = group_median_absolute_error
+REGRESSION_METRICS[GROUP_R2_SCORE] = group_r2_score
+REGRESSION_METRICS[GROUP_ROOT_MEAN_SQUARED_ERROR] = group_root_mean_squared_error
+REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
+
+
+def create_group_metric_set(model_type,
+                            y_true,
+                            y_preds,
+                            group_memberships,
+                            model_titles=None,
+                            group_titles=None,
+                            extra_metrics=None):
     if extra_metrics is not None:
         raise NotImplementedError("No support for extra_metrics yet")
 
@@ -51,19 +111,16 @@ def create_group_metric_set(model_type, y_true, y_preds, group_memberships, mode
 
     result = dict()
 
-
     return result
+
 
 class GroupMetricSet:
     """Class to hold a collection of GroupMetricResult objects."""
-
+    
     BINARY_CLASSIFICATION = 'binary_classification'
     REGRESSION = 'regression'
     _allowed_model_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
 
-    # The following keys need to match those of _metric_methods in
-    # _fairlearn_dashboard.py
-    # Issue 269 is about unifying the two sets
     GROUP_ACCURACY_SCORE = "accuracy_score"
     GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR = "balanced_root_mean_squared_error"
     GROUP_FALLOUT_RATE = "fallout_rate"
