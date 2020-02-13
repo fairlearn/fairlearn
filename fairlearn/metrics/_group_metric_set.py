@@ -37,6 +37,7 @@ _BIN_LABELS = 'binLabels'
 _FEATURE_BIN_NAME = 'featureBinName'
 _PREDICTION_TYPE = 'predictionType'
 _PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
+_MODEL_NAMES = 'modelNames'
 
 _UNSUPPORTED_MODEL_TYPE = "The specified model_type of '{0}' is not supported"
 _DICT_TOO_MANY_Y_PRED = 'Too many y_pred values in dictionary'
@@ -130,6 +131,7 @@ def create_group_metric_set(model_type,
     result[_Y_PRED] = []
     result[_PRECOMPUTED_METRICS] = []
     result[_PRECOMPUTED_BINS] = []
+    result[_MODEL_NAMES] = []
     for g, group_membership in enumerate(group_memberships):
         _gm = np.asarray(group_membership).tolist()
         _unique_groups = sorted(list(np.unique(_gm)))
@@ -143,9 +145,12 @@ def create_group_metric_set(model_type,
         model_list = []
         for m, model_pred in enumerate(y_preds):
             _yp = np.asarray(model_pred).tolist()
-            # Only record each y_pred once
+
+            # Only record each y_pred and model name once
             if g == 0:
                 result[_Y_PRED].append(_yp)
+                if model_titles is not None:
+                    result[_MODEL_NAMES].append(model_titles[m])
 
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
