@@ -13,11 +13,6 @@ from . import group_miss_rate, group_precision_score, group_r2_score
 from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_error
 from . import group_selection_rate, group_specificity_score, group_zero_one_loss
 
-from . import GroupMetricResult
-
-from fairlearn.metrics._input_manipulations import _convert_to_ndarray_1d
-
-_GROUPS_NOT_SEQUENTIAL_INTEGERS = "The unique values of the groups property must be sequential integers from zero"  # noqa: E501
 _GROUP_NAMES_MSG = "The group_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
 _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
@@ -104,6 +99,7 @@ def create_group_metric_set(model_type,
                             model_titles=None,
                             group_titles=None,
                             extra_metrics=None):
+    """Create a dictionary matching the Dashboard's cache."""
     if extra_metrics is not None:
         raise NotImplementedError("No support for extra_metrics yet")
 
