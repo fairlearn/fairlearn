@@ -143,7 +143,9 @@ def create_group_metric_set(model_type,
         model_list = []
         for m, model_pred in enumerate(y_preds):
             _yp = np.asarray(model_pred).tolist()
-            result[_Y_PRED].append(_yp)
+            # Only record each y_pred once
+            if g == 0:
+                result[_Y_PRED].append(_yp)
 
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
@@ -154,7 +156,6 @@ def create_group_metric_set(model_type,
                 metric_dict[metric_key] = curr_dict
             model_list.append(metric_dict)
         result[_PRECOMPUTED_METRICS].append(model_list)
-            
 
     return result
 
