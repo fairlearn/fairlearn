@@ -172,6 +172,37 @@ class TestCreateGroupMetricSet:
         for i in range(3):
             assert gmr.by_group[i+4] == pytest.approx(accuracy['bins'][i])
 
+    def test_two_named_groups(self):
+        # Single model, two group vectors, no names
+        Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
+        Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
+        # First group is just 'a' and 'b'. Second is 4, 5 and 6
+        Groups = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
+                  [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
+        gr_int = [int(x == 'b') for x in Groups[0]]
+        group_titles = ['alpha', 'num']
+
+        result = create_group_metric_set('binary_classification',
+                                         Y_true, Y_pred, Groups,
+                                         group_titles=group_titles)
+        assert result['predictionType'] == 'binaryClassification'
+
+        assert isinstance(result['trueY'], list)
+        assert np.array_equal(result['trueY'], Y_true)
+
+        assert isinstance(result['precomputedFeatureBins'], list)
+        assert len(result['precomputedFeatureBins']) == 2
+        bin_dict0 = result['precomputedFeatureBins'][0]
+        assert isinstance(bin_dict0, dict)
+        assert np.array_equal(bin_dict0['binVector'], gr_int)
+        assert np.array_equal(bin_dict0['binLabels'], ['a', 'b'])
+        assert group_titles[0] == bin_dict0['featureBinName']
+        bin_dict1 = result['precomputedFeatureBins'][1]
+        assert isinstance(bin_dict1, dict)
+        assert np.array_equal(bin_dict1['binVector'], [x-4 for x in Groups[1]])
+        assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
+        assert group_titles[1] == bin_dict1['featureBinName']
+
 
 class TestProperties:
     def test_model_type_property(self):
