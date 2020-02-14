@@ -9,7 +9,7 @@ from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCR
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
 from ._exponentiated_gradient_result import ExponentiatedGradientResult
-from fairlearn._input_validation import _validate_and_reformat_reductions_input
+from fairlearn._input_validation import _validate_and_reformat_input
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class ExponentiatedGradient(Reduction):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        X_train, y_train, A = _validate_and_reformat_reductions_input(X, y, **kwargs)
+        X_train, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
 
         n = X_train.shape[0]
 
