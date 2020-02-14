@@ -48,7 +48,9 @@
         "features": "Sensitive features",
         "featuresInfo": "Sensitive features are used to split your data into groups. Fairness of your model across these groups is measured by disparity metrics. Disparity metrics quantify how much your model's behavior varies across these groups.",
         "accuracy": "Accuracy metric",
-        "accuracyInfo": "Accuracy metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy."
+        "accuracyInfo": "Accuracy metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy.",
+        "parity": "Parity metric",
+        "parityInfo": "Parity metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy."
     },
     "ModelComparison": {
         "title": "Model comparison",

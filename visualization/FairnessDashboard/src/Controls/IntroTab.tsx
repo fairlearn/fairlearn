@@ -115,6 +115,13 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                         </div>
                         <div className={IntroTab.classNames.explanatoryText}>{localization.Intro.accuracyInfo}</div>
                     </div>
+                    <div className={IntroTab.classNames.explanatoryStep}>
+                        <div>
+                            <span className={IntroTab.classNames.numericLabel}>03</span>
+                            <span className={IntroTab.classNames.stepLabel}>{localization.Intro.parity}</span>
+                        </div>
+                        <div className={IntroTab.classNames.explanatoryText}>{localization.Intro.parityInfo}</div>
+                    </div>
                 </div>
                 <Stack horizontalAlign={"center"}>
                     <ActionButton 
