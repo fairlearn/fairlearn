@@ -1,5 +1,12 @@
 # Changes
 
+### v0.4.4
+
+* Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
+* Add `to_dict()` and `__repr__()` methods to `GroupMetricResult`
+* Add basic support for multiple sensitive features
+* Refactor `ThresholdOptimizer` to use mixins from scikit-learn
+
 ### v0.4.3
 
 * Various tweaks to `GroupMetricResult` and `GroupMetricSet` for AzureML integration
