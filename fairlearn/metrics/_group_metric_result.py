@@ -1,8 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import copy
 import numpy as np
 
+_OVERALL = 'overall'
+_BY_GROUP = 'by_group'
+_MAX = 'maximum'
+_MIN = 'minimum'
+_RANGE = 'range'
+_RANGE_RATIO = 'range_ratio'
 
 class GroupMetricResult:
     """Class to hold the result of a grouped metric.
@@ -90,6 +97,20 @@ class GroupMetricResult:
     @range_ratio.setter
     def range_ratio(self, value):
         self._range_ratio = value
+
+    def to_dict(self, include_overall=True, include_by_group=True, include_derived=False):
+        """Return a dictionary representation of this object."""
+        result = dict()
+        if include_overall:
+            result[_OVERALL] = copy.deepcopy(self.overall)
+        if include_by_group:
+            result[_BY_GROUP] = copy.deepcopy(self.by_group)
+        if include_derived:
+            result[_MAX] = copy.deepcopy(self.maximum)
+            result[_MIN] = copy.deepcopy(self.minimum)
+            result[_RANGE] = copy.deepcopy(self.range)
+            result[_RANGE_RATIO] = copy.deepcopy(self.range_ratio)
+        return result
 
     def __eq__(self, other):
         """Compare two `GroupMetricResult` objects for equality."""
