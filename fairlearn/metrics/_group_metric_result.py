@@ -11,6 +11,7 @@ _MIN = 'minimum'
 _RANGE = 'range'
 _RANGE_RATIO = 'range_ratio'
 
+
 class GroupMetricResult:
     """Class to hold the result of a grouped metric.
 
@@ -111,6 +112,10 @@ class GroupMetricResult:
             result[_RANGE] = copy.deepcopy(self.range)
             result[_RANGE_RATIO] = copy.deepcopy(self.range_ratio)
         return result
+
+    def __repr__(self):
+        """Generate string representation of a `GroupMetricResult`."""
+        return repr(self.to_dict())
 
     def __eq__(self, other):
         """Compare two `GroupMetricResult` objects for equality."""

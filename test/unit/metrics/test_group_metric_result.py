@@ -160,6 +160,6 @@ class TestSerialization:
         a = group_accuracy_score(TestSerialization.y_true,
                                  TestSerialization.y_pred,
                                  TestSerialization.groups)
-        expected = r"{}"
+        expected = r"{'overall': 0.375, 'by_group': {0: 0.5, 1: 0.25}}"
         actual = repr(a)
         assert expected == actual
