@@ -1,4 +1,3 @@
-import { HelpMessageDict } from "mlchartlib";
 import { IFairnessContext } from "../IFairnessContext";
 import { MetricsCache } from "../MetricsCache";
 
@@ -11,7 +10,6 @@ export enum FairnessChartModes {
 
 export interface IFairnessChartProps {
     dashboardContext: IFairnessContext;
-    messages?: HelpMessageDict;
     theme?: string;
     metricsCache: MetricsCache;
     selectedBin: number;

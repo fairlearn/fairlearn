@@ -1,4 +1,5 @@
 import { IFairnessProps, PredictionType, PredictionTypes } from "./IFairnessProps";
+import { initializeIcons } from "@uifabric/icons";
 import React from "react";
 import { IFairnessContext, IFairnessModelMetadata } from "./IFairnessContext";
 import { localization } from "./Localization/localization";
@@ -64,6 +65,15 @@ const flights = {
 
 
 export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardState> {
+    private static iconsInitialized = false;
+    
+    private static initializeIcons(props: IFairnessProps): void {
+        if (FairnessWizard.iconsInitialized === false && props.shouldInitializeIcons !== false) {
+            initializeIcons(props.iconUrl);
+            FairnessWizard.iconsInitialized = true;
+        }
+    }
+    
     private static buildModelNames(props: IFairnessProps): string[] {
         return (!!props.modelNames && props.modelNames.length === props.predictedY.length) ?
         props.modelNames : props.predictedY.map((unused, modelIndex) => `Model ${modelIndex}`);
@@ -106,7 +116,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 return binObject.featureBinName ||  localization.formatString(localization.defaultFeatureNames, index);
             }) as string[];
         }
-        const classNames = props.dataSummary.classNames || ModelMetadata.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
+        const classNames = props.dataSummary.classNames || FairnessWizard.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
         const featureRanges = props.precomputedFeatureBins.map(binMeta => {
             return {
                 uniqueValues: binMeta.binLabels,
@@ -132,9 +142,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             }
             featureNames = featureLength === 1 ?
                 [localization.defaultSingleFeatureName] :
-                ModelMetadata.buildIndexedNames(featureLength, localization.defaultFeatureNames);
+                FairnessWizard.buildIndexedNames(featureLength, localization.defaultFeatureNames);
         }
-        const classNames = props.dataSummary.classNames || ModelMetadata.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
+        const classNames = props.dataSummary.classNames || FairnessWizard.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
         const featureIsCategorical = ModelMetadata.buildIsCategorical(featureNames.length, props.testData, props.dataSummary.categoricalMap);
         const featureRanges = ModelMetadata.buildFeatureRanges(props.testData, featureIsCategorical, props.dataSummary.categoricalMap);
         const predictionType = FairnessWizard.determinePredictionType(props.trueY, props.predictedY, props.predictionType);
@@ -146,6 +156,11 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             featureRanges,
             predictionType
         };
+    }
+
+    private static buildIndexedNames(length: number, baseString: string): string[] {
+        return Array.from(Array(length).keys())
+        .map(i => localization.formatString(baseString, i.toString()) as string);
     }
     
     private static determinePredictionType(trueY: number[], predictedYs: number[][], specifiedType?: PredictionType): PredictionType {
@@ -211,6 +226,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
 
     constructor(props: IFairnessProps) {
         super(props);
+        FairnessWizard.initializeIcons(props);
         let accuracyMetrics: IAccuracyOption[];
         this.selections = new SelectionContext("models", 1);
         this.selections.subscribe({selectionCallback: (strings: string[]) => {

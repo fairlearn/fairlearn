@@ -56,6 +56,8 @@ export interface IFairnessProps {
     supportedBinaryClassificationAccuracyKeys?: string[];
     supportedRegressionAccuracyKeys?: string[];
     supportedProbabilityAccuracyKeys?: string[];
+    shouldInitializeIcons?: boolean;
+    iconUrl?: string;
     // The request hook
     requestMetrics: ( request: IMetricRequest, abortSignal?: AbortSignal) =>  Promise<IMetricResponse>;
 }

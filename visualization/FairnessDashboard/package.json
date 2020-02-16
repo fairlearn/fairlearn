@@ -1,6 +1,6 @@
 {
   "name": "fairlearn-dashboard",
-  "version": "0.0.16",
+  "version": "0.0.16-beta.6",
   "license": "MIT",
   "description": "Dashboard for evaluating the fairness of models.",
   "main": "rel/index.js",
@@ -38,9 +38,9 @@
     "localized-strings": "^0.2.2",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.2",
-    "mlchartlib": "0.1.30",
+    "mlchartlib": "0.1.36",
     "moment": "^2.24.0",
-    "office-ui-fabric-react": "7.21.0",
+    "office-ui-fabric-react": "^7.74.1",
     "uuid": "^3.3.2"
   }
 }
