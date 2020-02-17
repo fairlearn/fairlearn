@@ -5,13 +5,24 @@ import matplotlib.pyplot as plt
 import pkg_resources
 import pytest
 from fairlearn.postprocessing import ThresholdOptimizer
-from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve
+from fairlearn.postprocessing.plotting import plot_threshold_optimizer
 from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 
 from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3
 
 
 PYTEST_MPL_NOT_INSTALLED_MSG = "skipping plotting tests because pytest-mpl is not installed"
+
+"""
+Right now the baseline plot comparison doesn't succeed consistently on every
+platform and is therefore disabled. To generate the baseline plots run the
+following command from the root directory of the repository
+python -m pytest .\test\unit\postprocessing\test_plots.py --mpl-generate-path=test/unit/postprocessing/baseline
+Make sure to have `pytest-mpl` installed or this will not work.
+pytest can run the tests either to check that there are no exceptions (using
+a typical pytest command without extra options) or to actually compare the
+generated images with the baseline plots (using pytest --mpl).
+"""
 
 
 def _fit_and_plot(constraints, plotting_data):
@@ -20,10 +31,7 @@ def _fit_and_plot(constraints, plotting_data):
     adjusted_predictor.fit(plotting_data.X, plotting_data.y,
                            sensitive_features=plotting_data.sensitive_features)
     fig, (ax) = plt.subplots(1, 1)
-    if constraints == EQUALIZED_ODDS:
-        plot_roc_curve(adjusted_predictor, ax=ax, show_plot=False)
-    elif constraints == DEMOGRAPHIC_PARITY:
-        plot_selection_error_curve(adjusted_predictor, ax=ax, show_plot=False)
+    plot_threshold_optimizer(adjusted_predictor, ax=ax, show_plot=False)
     return fig
 
 
