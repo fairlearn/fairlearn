@@ -86,7 +86,7 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
         if ax is None:
             ax = plt.figure()
         _plot_solution(ax, threshold_optimizer._x_best, None, "DP solution",
-                    "selection rate", "error")
+                       "selection rate", "error")
     elif threshold_optimizer.constraints == EQUALIZED_ODDS:
         for sensitive_feature_value in threshold_optimizer._roc_curve.keys():
             _plot_curve(ax, sensitive_feature_value, 'x', 'y',
@@ -96,7 +96,7 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
             ax = plt.figure()
         _plot_overlap(ax, threshold_optimizer._x_grid, threshold_optimizer._y_min)
         _plot_solution(ax, threshold_optimizer._x_best, threshold_optimizer._y_best,
-                    'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
+                       'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
     else:
         raise ValueError("The plot can only be generated for a ThresholdOptimizer "
                          "object with constraints {}."
