@@ -54,6 +54,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 marker: {
                     size: 14
                 },
+                textposition: 'top',
                 type: 'scatter',
                 xAccessor: 'Accuracy',
                 yAccessor: 'Parity',
@@ -433,7 +434,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         <div className={ModelComparisonChart.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
                     </div>
                 </div>
-                <div>
+                {/* <div>
                     <ChoiceGroup
                         className={ModelComparisonChart.classNames.radio}
                         selectedKey={this.state.disparityInOutcomes ? "outcomes" : "accuracy"}
@@ -452,7 +453,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         label={localization.ModelComparison.howToMeasureDisparity}
                         required={false}
                         ></ChoiceGroup>
-                </div>
+                </div> */}
             </Stack>);
     }
 
