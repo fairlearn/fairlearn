@@ -198,7 +198,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             fontSize: "15px",
             lineHeight: "16px",
             fontWeight: "400",
-            padding: "20px 80px",
+            paddingTop: "20px",
+            paddingBottom: "20px",
+            paddingLeft: "80px",
             border: "1px solid #CCCCCC"
         },
         chart: {
@@ -336,8 +338,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         };
         const modalStyles = {
             content : {
-                top                   : '33%',
-                left                  : '20%',
+                top                   : '50%',
+                left                  : '50%',
                 right                 : 'auto',
                 bottom                : 'auto',
                 marginRight           : '-50%',
