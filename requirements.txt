@@ -17,7 +17,8 @@ requirements-parser
 
 # Required for test
 nbformat
-papermill
+# Pin papermill due to notebook test issue on Windows with python 3.5 & 3.6
+papermill<2.0.0
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
