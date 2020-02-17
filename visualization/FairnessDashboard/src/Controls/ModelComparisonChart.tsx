@@ -119,25 +119,36 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             backgroundColor: "#333333",
             padding: "0 40px"
         },
-        introModal: {
-            color: "#FFFFFF",
-            backgroundColor: "#333333",
-            top: '20%',
-            // top: '35%',
-            // left: '50%',
-            // right: 'auto',
-            // bottom: 'auto',
-            width: '48% !important'
-        },
         dropDown: {
             margin: "10px 10px",
             display: "inline-block"
+        },
+        closeButton: {
+            float: "right",
+            fontFamily: "Arial",
+            fontSize: "20px",
+            lineHeight: "20px",
+            fontWeight: "400",
+            paddingLeft: "20px"
+        },
+        modalContentIntro: {
+            float: 'left',
+            textAlign: 'center',
+            paddingTop: '10px'
+        },
+        modalContentHelp: {
+            float: 'left',
+            paddingTop: '10px'
         },
         editButton: {
             color: "#333333",
             fontSize: "12px",
             lineHeight: "20px",
             fontWeight: "400"
+        },
+        howTo: {
+            paddingTop: "20px",
+            paddingLeft: "100px"
         },
         main: {
             height: "100%",
@@ -180,7 +191,14 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             fontWeight: "400",
             paddingBottom: "18px",
             paddingRight: "15px",
-            borderBottom: "1px solid #CCCCCC"
+        },
+        downloadReport: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "400",
+            padding: "20px 80px",
+            border: "1px solid #CCCCCC"
         },
         chart: {
             padding: "60px 0 0 0",
@@ -202,7 +220,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     constructor(props: IModelComparisonProps) {
         super(props);
         this.state = {
-            showModalIntro: false,
+            showModalIntro: true,
             disparityInOutcomes: true,
             accuracyKey: this.props.accuracyPickerProps.selectedAccuracyKey
         };
@@ -314,6 +332,22 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 }
             }},
             dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
+        };
+        const modalStyles = {
+            content : {
+                top                   : '33%',
+                left                  : '20%',
+                right                 : 'auto',
+                bottom                : 'auto',
+                marginRight           : '-50%',
+                paddingTop            : '5px',
+                paddingRight          : '10px',
+                paddingBottom         : '10px',
+                transform             : 'translate(-50%, -50%)',
+                fontFamily: "Segoe UI",
+                color: "#FFFFFF",
+                backgroundColor: "#333333"
+            }
         };          
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
@@ -360,23 +394,25 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         styles={dropdownStyles}
                     />
                 </div>
-                <div>
+                <div className={ModelComparisonChart.classNames.howTo}>
                     <ReactModal
-                        className={ModelComparisonChart.classNames.introModal}
+                        style={modalStyles}
                         appElement={document.getElementById('app') as HTMLElement}
                         isOpen={this.state.showModalIntro}
                         contentLabel="Intro Modal Example"
                         >
-                        <button onClick={this.handleCloseModalIntro}>X</button>
+                        <a className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</a>
+                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><a onClick={this.handleCloseModalIntro}><u>Done</u></a></p>
                     </ReactModal>
-                    <button onClick={this.handleOpenModalHelp}>Trigger Modal</button>
+                    <a onClick={this.handleOpenModalHelp}>{localization.ModelComparison.howToRead}</a>
                     <ReactModal
-                        className={ModelComparisonChart.classNames.introModal}
+                        style={modalStyles}
                         appElement={document.getElementById('app') as HTMLElement}
                         isOpen={this.state.showModalHelp}
                         contentLabel="Minimal Modal Example"
                         >
-                        <button onClick={this.handleCloseModalHelp}>X</button>
+                        <a className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</a>
+                        <p className={ModelComparisonChart.classNames.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.</p>
                     </ReactModal>
                 </div>
                 <div className={ModelComparisonChart.classNames.main}>
@@ -388,14 +424,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         />
                     </div>
                     <div className={ModelComparisonChart.classNames.mainRight}>
-                        <div className={ModelComparisonChart.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={ModelComparisonChart.classNames.rightText}>{howToReadText}</div>
                         <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
                         <div className={ModelComparisonChart.classNames.insightsText}>
                             <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
                             <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
                             <div className={ModelComparisonChart.classNames.textSectionLast}>{insights4}</div>
                         </div>
+                        <div className={ModelComparisonChart.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
                     </div>
                 </div>
                 <div>
