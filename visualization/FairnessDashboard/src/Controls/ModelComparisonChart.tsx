@@ -1,4 +1,5 @@
 import React from "react";
+import ReactModal from "react-modal";
 import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
 import { IFairnessContext } from "../IFairnessContext";
 import _ from "lodash";
@@ -28,6 +29,8 @@ export interface IModelComparisonProps {
 }
 
 export interface IState {
+    showModalIntro?: boolean;
+    showModalHelp?: boolean;
     featureKey?: string;
     accuracyKey?: string;
     parityKey?: string;
@@ -116,6 +119,16 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             backgroundColor: "#333333",
             padding: "0 40px"
         },
+        introModal: {
+            color: "#FFFFFF",
+            backgroundColor: "#333333",
+            top: '20%',
+            // top: '35%',
+            // left: '50%',
+            // right: 'auto',
+            // bottom: 'auto',
+            width: '48% !important'
+        },
         dropDown: {
             margin: "10px 10px",
             display: "inline-block"
@@ -189,6 +202,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     constructor(props: IModelComparisonProps) {
         super(props);
         this.state = {
+            showModalIntro: false,
             disparityInOutcomes: true,
             accuracyKey: this.props.accuracyPickerProps.selectedAccuracyKey
         };
@@ -346,6 +360,25 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         styles={dropdownStyles}
                     />
                 </div>
+                <div>
+                    <ReactModal
+                        className={ModelComparisonChart.classNames.introModal}
+                        appElement={document.getElementById('app') as HTMLElement}
+                        isOpen={this.state.showModalIntro}
+                        contentLabel="Intro Modal Example"
+                        >
+                        <button onClick={this.handleCloseModalIntro}>X</button>
+                    </ReactModal>
+                    <button onClick={this.handleOpenModalHelp}>Trigger Modal</button>
+                    <ReactModal
+                        className={ModelComparisonChart.classNames.introModal}
+                        appElement={document.getElementById('app') as HTMLElement}
+                        isOpen={this.state.showModalHelp}
+                        contentLabel="Minimal Modal Example"
+                        >
+                        <button onClick={this.handleCloseModalHelp}>X</button>
+                    </ReactModal>
+                </div>
                 <div className={ModelComparisonChart.classNames.main}>
                     <div className={ModelComparisonChart.classNames.chart}>
                         <AccessibleChart
@@ -449,6 +482,19 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             this.setState({disparityInOutcomes, disparityArray: undefined});
         }
     }
+
+    private readonly handleCloseModalIntro = (event): void => {
+        this.setState({ showModalIntro: false });
+    }
+
+    private readonly handleOpenModalHelp = (event): void => {
+        this.setState({ showModalHelp: true });
+    }
+
+    private readonly handleCloseModalHelp = (event): void => {
+        this.setState({ showModalHelp: false });
+    }
+
     // TODO: Reuse if multiselect re-enters design
     // private readonly applySelections = (chartId: string, selectionIds: string[], plotlyProps: IPlotlyProperty) => {
     //     if (!plotlyProps.data || plotlyProps.data.length === 0) {
