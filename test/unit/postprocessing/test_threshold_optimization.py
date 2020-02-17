@@ -13,17 +13,17 @@ from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import \
     (_vectorized_prediction,
      NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
-     PREDICT_BEFORE_FIT_ERROR_MESSAGE)
-from fairlearn.postprocessing._postprocessing import \
-    PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE, EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE, \
-    MISSING_FIT_PREDICT_ERROR_MESSAGE, MISSING_PREDICT_ERROR_MESSAGE
+     PREDICT_BEFORE_FIT_ERROR_MESSAGE,
+     EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE,
+     PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,)
 from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
 from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
                        _get_predictions_by_sensitive_feature,
-                       ExamplePredictor, ExampleEstimator, ExampleNotPredictor,
-                       ExampleNotEstimator1, ExampleNotEstimator2, is_invalid_transformation,
-                       candidate_A_transforms, candidate_X_transforms, candidate_Y_transforms)
+                       ExamplePredictor, ExampleEstimator,
+                       is_invalid_transformation,
+                       candidate_A_transforms, candidate_X_transforms,
+                       candidate_Y_transforms)
 from test.unit.input_convertors import _map_into_single_column
 
 
@@ -60,21 +60,6 @@ def test_constraints_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE):
         ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
                            constraints="UnsupportedConstraints")
-
-
-@pytest.mark.parametrize("not_estimator", [ExampleNotEstimator1(), ExampleNotEstimator2()])
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_not_estimator(not_estimator, constraints):
-    with pytest.raises(ValueError, match=MISSING_FIT_PREDICT_ERROR_MESSAGE):
-        ThresholdOptimizer(estimator=not_estimator,
-                           constraints=constraints)
-
-
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_not_predictor(constraints):
-    with pytest.raises(ValueError, match=MISSING_PREDICT_ERROR_MESSAGE):
-        ThresholdOptimizer(unconstrained_predictor=ExampleNotPredictor(),
-                           constraints=constraints)
 
 
 @pytest.mark.parametrize("X", [None, X_ex])

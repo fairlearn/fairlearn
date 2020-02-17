@@ -14,8 +14,9 @@ import numpy as np
 import pandas as pd
 import random
 
+from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.exceptions import NotFittedError
-from fairlearn.postprocessing import PostProcessing
+
 from fairlearn._input_validation import _validate_and_reformat_input
 from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
@@ -34,6 +35,10 @@ SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "A sensitive feature na
     "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
+EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'unconstrained_predictor' and " \
+                                              "'estimator' can be passed."
+PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'unconstrained_predictor' and " \
+                                                "'estimator' need to be passed."
 
 
 _SUPPORTED_CONSTRAINTS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
@@ -41,7 +46,7 @@ _SUPPORTED_CONSTRAINTS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 logger = logging.getLogger(__name__)
 
 
-class ThresholdOptimizer(PostProcessing):
+class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
     """An Estimator based on the threshold optimization approach.
 
     The procedure followed is described in detail in
@@ -62,10 +67,16 @@ class ThresholdOptimizer(PostProcessing):
 
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
                  constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True):
-        super(ThresholdOptimizer, self).__init__(
-            unconstrained_predictor=unconstrained_predictor,
-            estimator=estimator,
-            constraints=constraints)
+        if unconstrained_predictor and estimator:
+            raise ValueError(EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE)
+        elif unconstrained_predictor:
+            self._unconstrained_predictor = unconstrained_predictor
+            self._estimator = None
+        elif estimator:
+            self._unconstrained_predictor = None
+            self._estimator = estimator
+        else:
+            raise ValueError(PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
 
         self._constraints = constraints
         if self._constraints not in _SUPPORTED_CONSTRAINTS:
@@ -114,8 +125,6 @@ class ThresholdOptimizer(PostProcessing):
             self._validate_estimator()
             self._estimator.fit(X, y, **kwargs)
             self._unconstrained_predictor = self._estimator
-
-        self._validate_predictor()
 
         scores = self._unconstrained_predictor.predict(X)
         threshold_optimization_method = None
