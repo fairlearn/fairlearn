@@ -133,6 +133,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             fontWeight: "400",
             paddingLeft: "20px"
         },
+        doneButton: {
+            color: "#FFFFFF"
+        },
         modalContentIntro: {
             float: 'left',
             textAlign: 'center',
@@ -351,7 +354,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 fontFamily: "Segoe UI",
                 color: "#FFFFFF",
                 backgroundColor: "#333333"
-            }
+            },
+            overlay: {zIndex: 1000}
         };          
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
@@ -406,7 +410,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         contentLabel="Intro Modal Example"
                         >
                         <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton>
-                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton onClick={this.handleCloseModalIntro}><u>Done</u></ActionButton></p>
+                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalIntro}><u>Done</u></ActionButton></p>
                     </ReactModal>
                     <a onClick={this.handleOpenModalHelp}>{localization.ModelComparison.howToRead}</a>
                     <ReactModal
