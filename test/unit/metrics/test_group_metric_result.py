@@ -160,9 +160,12 @@ class TestSerialization:
         a = group_accuracy_score(TestSerialization.y_true,
                                  TestSerialization.y_pred,
                                  TestSerialization.groups)
-        expected = r"{'overall': 0.375, 'by_group': {0: 0.5, 1: 0.25}}"
+        # It appears the order of the keys in the serialized dict
+        # is not always the same
+        expected = [r"{'overall': 0.375, 'by_group': {0: 0.5, 1: 0.25}}",
+                    r"{'by_group': {0: 0.5, 1: 0.25}, 'overall': 0.375}"]
         actual = repr(a)
-        assert expected == actual
+        assert actual in expected
 
     def test_to_pandas_series_smoke(self):
         a = group_accuracy_score(TestSerialization.y_true,
