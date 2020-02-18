@@ -33,6 +33,8 @@ _FEATURE_BIN_NAME = 'featureBinName'
 _PREDICTION_TYPE = 'predictionType'
 _PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
 _MODEL_NAMES = 'modelNames'
+_SCHEMA = 'schemaType'
+_GROUP_METRIC_SET = 'groupMetricSet'
 _VERSION = 'schemaVersion'
 
 _UNSUPPORTED_MODEL_TYPE = "The specified model_type of '{0}' is not supported"
@@ -108,6 +110,7 @@ def create_group_metric_set(model_type,
     # and that the length of group_memberships matches group_titles
 
     result = dict()
+    result[_SCHEMA] = _GROUP_METRIC_SET
     result[_VERSION] = 0
 
     if model_type not in _allowed_model_types:
