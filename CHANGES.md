@@ -39,7 +39,7 @@
 * Added new algorithms
   * Threshold Optimization
   * Grid Search
-  
+
 * Added grouped metrics
 
 
