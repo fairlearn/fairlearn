@@ -26,6 +26,8 @@ def test_smoke():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_feature)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -82,6 +84,8 @@ def test_two_models():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -140,6 +144,8 @@ def test_two_sensitive_features():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -231,6 +237,8 @@ def test_two_named_sensitive_features():
                                      Y_true, Y_pred, sensitive_features,
                                      sensitive_feature_names=sensitive_feature_titles)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -262,6 +270,8 @@ def test_two_named_models():
                                      Y_true, Y_pred, sensitive_features,
                                      model_titles=model_names)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -290,6 +300,8 @@ def test_multiple_models_multiple_sensitive_features():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -390,6 +402,8 @@ def test_argument_types(transform_y_true,
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
