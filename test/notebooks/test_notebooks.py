@@ -129,6 +129,6 @@ def test_mitigating_disparities_in_ranking_from_binary_data():
     test_values = {}
     # Needs wider bound due to randomness in ExponentiatedGradient
     test_values["sel_eg_X_alt_disparity"] = ScrapSpec(
-        "sel_expgrad_X_alt.loc[ 'disparity', :][0]",
+        "sel_expgrad_X_alt['disparity']",
         pytest.approx(0.35, abs=0.08))
     assay_one_notebook(nb_name, test_values)
