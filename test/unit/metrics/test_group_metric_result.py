@@ -163,3 +163,81 @@ class TestSerialization:
         expected = r"{'overall': 0.375, 'by_group': {0: 0.5, 1: 0.25}}"
         actual = repr(a)
         assert expected == actual
+
+    def test_to_pandas_series_smoke(self):
+        a = group_accuracy_score(TestSerialization.y_true,
+                                 TestSerialization.y_pred,
+                                 TestSerialization.groups)
+
+        actual = a.to_pandas_series()
+        assert actual['overall'] == a.overall
+        assert actual['0'] == a.by_group[0]
+        assert actual['1'] == a.by_group[1]
+
+    def test_to_pandas_series_overall_only(self):
+        a = group_accuracy_score(TestSerialization.y_true,
+                                 TestSerialization.y_pred,
+                                 TestSerialization.groups)
+
+        actual = a.to_pandas_series(include_overall=True,
+                                    include_by_group=False,
+                                    include_derived=False)
+        assert len(actual) == 1
+        assert actual['overall'] == a.overall
+
+    def test_to_pandas_series_by_group_only(self):
+        a = group_accuracy_score(TestSerialization.y_true,
+                                 TestSerialization.y_pred,
+                                 TestSerialization.groups)
+
+        actual = a.to_pandas_series(include_overall=False,
+                                    include_by_group=True,
+                                    include_derived=False)
+        assert len(actual) == 2
+        assert actual['0'] == a.by_group[0]
+        assert actual['1'] == a.by_group[1]
+
+    def test_to_pandas_series_derived_only(self):
+        a = group_accuracy_score(TestSerialization.y_true,
+                                 TestSerialization.y_pred,
+                                 TestSerialization.groups)
+
+        actual = a.to_pandas_series(include_overall=False,
+                                    include_by_group=False,
+                                    include_derived=True)
+        assert len(actual) == 4
+        assert actual['maximum'] == 0.5
+        assert actual['minimum'] == 0.25
+        assert actual['range'] == 0.25
+        assert actual['range_ratio'] == 0.5
+
+    def test_to_pandas_series_all_with_title(self):
+        a = group_accuracy_score(TestSerialization.y_true,
+                                 TestSerialization.y_pred,
+                                 TestSerialization.groups)
+
+        title = "my_title"
+        actual = a.to_pandas_series(title=title,
+                                    include_derived=True)
+        assert actual.name == title
+        assert len(actual) == 7
+        assert actual['maximum'] == 0.5
+        assert actual['minimum'] == 0.25
+        assert actual['range'] == 0.25
+        assert actual['range_ratio'] == 0.5
+        assert actual['0'] == a.by_group[0]
+        assert actual['1'] == a.by_group[1]
+        assert actual['overall'] == a.overall
+
+    def test_to_pandas_series_empty(self):
+        a = group_accuracy_score(TestSerialization.y_true,
+                                 TestSerialization.y_pred,
+                                 TestSerialization.groups)
+
+        title = "my_title"
+        actual = a.to_pandas_series(title=title,
+                                    include_overall=False,
+                                    include_by_group=False,
+                                    include_derived=False)
+        assert actual.name == title
+        assert len(actual) == 0

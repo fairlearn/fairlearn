@@ -3,6 +3,7 @@
 
 import copy
 import numpy as np
+import pandas as pd
 
 _OVERALL = 'overall'
 _BY_GROUP = 'by_group'
@@ -112,6 +113,32 @@ class GroupMetricResult:
             result[_RANGE] = copy.deepcopy(self.range)
             result[_RANGE_RATIO] = copy.deepcopy(self.range_ratio)
         return result
+
+    def to_pandas_series(self,
+                         title=None,
+                         include_overall=True,
+                         include_by_group=True,
+                         include_derived=False):
+        """Construct a :class:`pandas:pandas.Series` from the current object.
+
+        If the `by_group` data are included, then the keys are converted to strings
+        prior to insertion into the result. Users are trusted to avoid key
+        collisions.
+        """
+        s = pd.Series()
+        s.name = title
+        if include_by_group:
+            for k, v in self.by_group.items():
+                s[str(k)] = v
+        if include_derived:
+            s['maximum'] = self.maximum
+            s['minimum'] = self.minimum
+            s['range'] = self.range
+            s['range_ratio'] = self.range_ratio
+        if include_overall:
+            s['overall'] = self.overall
+
+        return s
 
     def __repr__(self):
         """Generate string representation of a `GroupMetricResult`."""
