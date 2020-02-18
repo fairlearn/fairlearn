@@ -3,7 +3,7 @@
 ### v0.4.4
 
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
-* Add `to_dict()` and `__repr__()` methods to `GroupMetricResult`
+* Add `to_dict()`, `to_pandas_series()` and `__repr__()` methods to `GroupMetricResult`
 * Add basic support for multiple sensitive features
 * Refactor `ThresholdOptimizer` to use mixins from scikit-learn
 
