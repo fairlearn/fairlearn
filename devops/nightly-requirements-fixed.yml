@@ -54,6 +54,6 @@ jobs:
     vmImage: 'vs2017-win2016'
     requirementsFile: 'requirements-fixed.txt'
     pinRequirements: True
-    pyVersions: [3.5, 3.6, 3.7], 3.8 
+    pyVersions: [3.5, 3.6, 3.7, 3.8] 
 
 - template: templates/build-widget-job-template.yml
