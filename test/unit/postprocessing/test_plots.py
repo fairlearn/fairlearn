@@ -4,8 +4,7 @@
 import matplotlib.pyplot as plt
 import pkg_resources
 import pytest
-from fairlearn.postprocessing import ThresholdOptimizer
-from fairlearn.postprocessing.plotting import plot_threshold_optimizer
+from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 
 from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3
