@@ -26,6 +26,8 @@ def test_smoke():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -71,6 +73,8 @@ def test_two_models():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -119,6 +123,8 @@ def test_two_groups():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -190,6 +196,8 @@ def test_two_named_groups():
                                      Y_true, Y_pred, Groups,
                                      group_titles=group_titles)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -221,6 +229,8 @@ def test_two_named_models():
                                      Y_true, Y_pred, Groups,
                                      model_titles=model_names)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -250,6 +260,8 @@ def test_multiple_model_multiple_group():
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
@@ -331,6 +343,8 @@ def test_argument_types(transform_y_true,
 
     result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
     assert result['predictionType'] == 'binaryClassification'
+    assert result['schemaType'] == 'groupMetricSet'
+    assert result['schemaVersion'] == 0
 
     assert isinstance(result['trueY'], list)
     assert np.array_equal(result['trueY'], Y_true)
