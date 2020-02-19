@@ -37,7 +37,7 @@ stages:
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
@@ -45,7 +45,7 @@ stages:
     parameters:
       name: Windows
       vmImage:  'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
       
@@ -53,7 +53,7 @@ stages:
     parameters:
       name: MacOS
       vmImage:  'macos-latest'
-      pyVersions: [3.5, 3.6, 3.7] 
+      pyVersions: [3.5, 3.6, 3.7, 3.8] 
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
@@ -61,13 +61,13 @@ stages:
     parameters:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
 
   - template: templates/notebook-job-template.yml
     parameters:
       name: WindowsNotebooks
       vmImage: 'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7] 
+      pyVersions: [3.5, 3.6, 3.7, 3.8] 
   
   - template: templates/limited-installation-job-template.yml
 

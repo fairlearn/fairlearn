@@ -6,7 +6,7 @@
 parameters:
   name: ''
   vmImage: ''
-  pyVersions: [3.5, 3.6, 3.7]
+  pyVersions: [3.5, 3.6, 3.7, 3.8]
   requirementsFile: 'requirements.txt'
   targetType:
   versionFileArtifact:

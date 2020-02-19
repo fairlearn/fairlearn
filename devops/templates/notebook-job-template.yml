@@ -1,7 +1,7 @@
 parameters:
   name: 'Notebooks'
   vmImage: 'ubuntu-latest'
-  pyVersions: [3.5, 3.6, 3.7]
+  pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
   requirementsFile: 'requirements.txt'
 
