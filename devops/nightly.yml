@@ -47,7 +47,7 @@ jobs:
   parameters:
     name: LinuxNotebooks
     vmImage: 'ubuntu-16.04'
-    pyVersions: [3.5, 3.6, 3.7], 3.8
+    pyVersions: [3.5, 3.6, 3.7, 3.8]
 
 - template: templates/notebook-job-template.yml
   parameters:
