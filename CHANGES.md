@@ -1,5 +1,8 @@
 # Changes
 
+### v0.4.5
+* Separate plotting for `ThresholdOptimizer` into its own plotting function.
+
 ### v0.4.4
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
 * Add basic support for multiple sensitive features
