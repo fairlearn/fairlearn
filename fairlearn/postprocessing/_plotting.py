@@ -6,23 +6,19 @@
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE, DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 from ._threshold_optimizer import ThresholdOptimizer, _SUPPORTED_CONSTRAINTS
 
-try:
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
-    import matplotlib.colors
 
+def _get_debug_color(key):
+    try:
+        import matplotlib.cm as cm
+        import matplotlib.colors
+    except ImportError:
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
     tab10_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
     tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
     debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
     debug_ncolors = len(debug_colors)
     debug_colormap = {}
 
-    highlight_color = [0.95, 0.90, 0.40]
-except ImportError:
-    raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
-
-
-def _get_debug_color(key):
     if key not in debug_colormap:
         color = debug_colors[len(debug_colormap) % debug_ncolors]
         debug_colormap[key] = color
@@ -42,6 +38,7 @@ def _plot_solution(ax, x_best, y_best, solution_label, xlabel, ylabel):
 
 def _plot_overlap(ax, x_grid, y_min):
     """Plot the overlap region."""
+    highlight_color = [0.95, 0.90, 0.40]
     line, = ax.plot(x_grid, y_min, color=highlight_color, lw=8, label='overlap')
     line.zorder -= 1
 
@@ -76,6 +73,11 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
     :param show_plot: whether or not the generated plot should be shown, default True
     :type show_plot: bool
     """
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+
     _raise_if_not_threshold_optimizer(threshold_optimizer)
 
     if threshold_optimizer.constraints == DEMOGRAPHIC_PARITY:

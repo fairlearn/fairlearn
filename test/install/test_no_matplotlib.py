@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from fairlearn.postprocessing import ThresholdOptimizer
+from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 from fairlearn.postprocessing._threshold_optimizer import _SUPPORTED_CONSTRAINTS
 from fairlearn.postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 
@@ -29,5 +29,5 @@ def test_no_matplotlib(constraints):
                                                                  size=n_samples))
 
     with pytest.raises(RuntimeError) as exc:
-        from fairlearn.postprocessing.plotting import plot_selection_error_curve, plot_roc_curve  # noqa: F401, E501
+        plot_threshold_optimizer(threshold_optimizer)
         assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
