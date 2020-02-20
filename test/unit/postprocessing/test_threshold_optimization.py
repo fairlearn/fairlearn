@@ -60,7 +60,7 @@ def test_no_predictor_or_estimator_error(constraints):
 
 def test_constraints_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE):
-        ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+        ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(),
                            constraints="UnsupportedConstraints").fit(
                                X_ex, labels_ex,
                                sensitive_features=sensitive_features_ex1
