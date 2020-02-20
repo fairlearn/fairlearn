@@ -2,7 +2,7 @@
 matplotlib>=3.0.3
 numpy>=1.17.2
 pandas>=0.25.1
-scikit-learn>=0.21.3
+scikit-learn>=0.22.1
 scipy>=1.3.1
 
 # Required for environment
@@ -22,6 +22,7 @@ papermill<2.0.0
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
+pytest-mpl>=0.11
 nteract-scrapbook
 tempeh==0.1.12
 wheel
