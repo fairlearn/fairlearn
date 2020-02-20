@@ -116,7 +116,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         threshold_optimization_method = None
         if self.constraints == DEMOGRAPHIC_PARITY:
             threshold_optimization_method = \
-                _threshold_optimization_demographic_parity
+                self._threshold_optimization_demographic_parity
         elif self.constraints == EQUALIZED_ODDS:
             threshold_optimization_method = \
                 self._threshold_optimization_equalized_odds
@@ -244,6 +244,33 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
             # This will help us in identifying the minimum overall error.
             error_given_selection += p_sensitive_feature_value * \
                 self._selection_error_curve[sensitive_feature_value]['error']
+
+            logger.debug(OUTPUT_SEPARATOR)
+            logger.debug("Processing %s", str(sensitive_feature_value))
+            logger.debug(OUTPUT_SEPARATOR)
+            logger.debug("DATA")
+            logger.debug(group)
+            logger.debug("ROC curve: convex")
+            logger.debug(roc_convex_hull)
+
+        # Find minimum error point given that at each point the selection rate for each sensitive
+        # feature value is identical by design.
+        i_best_DP = error_given_selection.idxmin()
+        self._x_best = self._x_grid[i_best_DP]
+
+        # create the solution as interpolation of multiple points with a separate predictor per
+        # sensitive feature value
+        predicted_DP_by_sensitive_feature = {}
+        for sensitive_feature_value in self._selection_error_curve.keys():
+            # For DP we already have the predictor directly without complex interpolation.
+            selection_error_curve_result = self._selection_error_curve[sensitive_feature_value] \
+                .transpose()[i_best_DP]
+            predicted_DP_by_sensitive_feature[sensitive_feature_value] = \
+                InterpolatedPredictor(0, 0,
+                                      selection_error_curve_result.p0,
+                                      selection_error_curve_result.operation0,
+                                      selection_error_curve_result.p1,
+                                      selection_error_curve_result.operation1)
 
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("From ROC curves")
