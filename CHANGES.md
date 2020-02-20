@@ -4,6 +4,7 @@
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
 * Add basic support for multiple sensitive features
 * Refactor `ThresholdOptimizer` to use mixins from scikit-learn
+* Adjust `scipy`, `scikit-learn`, and `matplotlib` requirements to support python 3.8
 
 ### v0.4.3
 

@@ -27,7 +27,7 @@ setuptools.setup(
     ],
     extras_require={
         "customplots": [
-            "matplotlib>=3.0.3"
+            "matplotlib>=3.1.3"
         ]
     },
     classifiers=[
