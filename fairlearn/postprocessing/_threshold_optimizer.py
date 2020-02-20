@@ -142,7 +142,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         if random_state:
             random.seed(random_state)
 
-        check_is_fitted(self, attributes=None)
+        check_is_fitted(self)
         _, _, sensitive_feature_vector = _validate_and_reformat_input(
             X, y=None, sensitive_features=sensitive_features, expect_y=False,
             enforce_binary_labels=True)
