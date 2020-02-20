@@ -15,7 +15,6 @@ import pandas as pd
 import random
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 
 from fairlearn._input_validation import _validate_and_reformat_input
@@ -29,7 +28,6 @@ DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supported " \
     "constraints.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
-PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
     "column in {}."
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "A sensitive feature named {} or {} " \

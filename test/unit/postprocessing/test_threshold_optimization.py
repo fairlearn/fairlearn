@@ -15,7 +15,6 @@ from fairlearn.postprocessing._threshold_optimizer import \
      _threshold_optimization_demographic_parity,
      _threshold_optimization_equalized_odds,
      NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
-     PREDICT_BEFORE_FIT_ERROR_MESSAGE,
      EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE,
      PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,)
 from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
