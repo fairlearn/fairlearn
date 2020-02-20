@@ -15,7 +15,7 @@ import pandas as pd
 import random
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.exceptions import NotFittedError
+from sklearn.utils.validation import check_is_fitted
 
 from fairlearn._input_validation import _validate_and_reformat_input
 from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
@@ -28,7 +28,6 @@ DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supported " \
     "constraints.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
-PREDICT_BEFORE_FIT_ERROR_MESSAGE = "It is required to call 'fit' before 'predict'."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
     "column in {}."
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "A sensitive feature named {} or {} " \
@@ -69,25 +68,13 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
 
     def __init__(self, *, unconstrained_predictor=None, estimator=None,
                  constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True, plot=False):
-        if unconstrained_predictor and estimator:
-            raise ValueError(EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE)
-        elif unconstrained_predictor:
-            self._unconstrained_predictor = unconstrained_predictor
-            self._estimator = None
-        elif estimator:
-            self._unconstrained_predictor = None
-            self._estimator = estimator
-        else:
-            raise ValueError(PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
-
-        self._constraints = constraints
-        if self._constraints not in _SUPPORTED_CONSTRAINTS:
-            raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
-
-        self._grid_size = grid_size
-        self._flip = flip
-        self._plot = plot
-        self._post_processed_predictor_by_sensitive_feature = None
+        self.grid_size = grid_size
+        self.flip = flip
+        self.plot = plot
+        self.post_processed_predictor_by_sensitive_feature = None
+        self.constraints = constraints
+        self.unconstrained_predictor = unconstrained_predictor
+        self.estimator = estimator
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
@@ -105,6 +92,14 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
         """
+        if self.unconstrained_predictor and self.estimator:
+            raise ValueError(EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE)
+        elif not self.unconstrained_predictor and not self.estimator:
+            raise ValueError(PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
+
+        if self.constraints not in _SUPPORTED_CONSTRAINTS:
+            raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
+
         _, _, sensitive_feature_vector = _validate_and_reformat_input(
             X, y, sensitive_features=sensitive_features, enforce_binary_labels=True)
 
@@ -114,25 +109,25 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         else:
             y = [int(y_val) for y_val in y]
 
-        if self._estimator:
+        if self.estimator:
             # train estimator on data first
-            self._validate_estimator()
-            self._estimator.fit(X, y, **kwargs)
-            self._unconstrained_predictor = self._estimator
+            self.estimator_ = self.estimator.fit(X, y, **kwargs)
+        else:
+            self.estimator_ = self.unconstrained_predictor
 
-        scores = self._unconstrained_predictor.predict(X)
+        scores = self.estimator_.predict(X)
         threshold_optimization_method = None
-        if self._constraints == DEMOGRAPHIC_PARITY:
+        if self.constraints == DEMOGRAPHIC_PARITY:
             threshold_optimization_method = \
                 _threshold_optimization_demographic_parity
-        elif self._constraints == EQUALIZED_ODDS:
+        elif self.constraints == EQUALIZED_ODDS:
             threshold_optimization_method = \
                 _threshold_optimization_equalized_odds
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
         self._post_processed_predictor_by_sensitive_feature = threshold_optimization_method(
-            sensitive_feature_vector, y, scores, self._grid_size, self._flip, self._plot)
+            sensitive_feature_vector, y, scores, self.grid_size, self.flip, self.plot)
 
     def predict(self, X, *, sensitive_features, random_state=None):
         """Predict label for each sample in X while taking into account sensitive features.
@@ -150,11 +145,11 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         if random_state:
             random.seed(random_state)
 
-        self._validate_post_processed_predictor_is_fitted()
+        check_is_fitted(self)
         _, _, sensitive_feature_vector = _validate_and_reformat_input(
             X, y=None, sensitive_features=sensitive_features, expect_y=False,
             enforce_binary_labels=True)
-        unconstrained_predictions = self._unconstrained_predictor.predict(X)
+        unconstrained_predictions = self.estimator_.predict(X)
 
         positive_probs = _vectorized_prediction(
             self._post_processed_predictor_by_sensitive_feature,
@@ -175,18 +170,14 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
             of the two numbers in each tuple needs to add up to 1.
         :rtype: numpy.ndarray
         """
-        self._validate_post_processed_predictor_is_fitted()
+        check_is_fitted(self)
         _, _, sensitive_feature_vector = _validate_and_reformat_input(
             X, y=None, sensitive_features=sensitive_features, expect_y=False,
             enforce_binary_labels=True)
         positive_probs = _vectorized_prediction(
             self._post_processed_predictor_by_sensitive_feature, sensitive_feature_vector,
-            self._unconstrained_predictor.predict(X))
+            self.estimator_.predict(X))
         return np.array([[1.0 - p, p] for p in positive_probs])
-
-    def _validate_post_processed_predictor_is_fitted(self):
-        if not self._post_processed_predictor_by_sensitive_feature:
-            raise NotFittedError(PREDICT_BEFORE_FIT_ERROR_MESSAGE)
 
 
 def _threshold_optimization_demographic_parity(sensitive_features, labels, scores, grid_size=1000,
