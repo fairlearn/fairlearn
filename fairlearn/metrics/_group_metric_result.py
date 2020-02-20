@@ -69,7 +69,7 @@ class GroupMetricResult:
         return set([k for k, v in self.by_group.items() if v == self.maximum])
 
     @property  # noqa: A003
-    def range(self):
+    def range(self):  # noqa: A003
         """Return the value of :code:`maximum-minimum`."""
         return self.maximum - self.minimum
 
