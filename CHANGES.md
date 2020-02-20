@@ -2,6 +2,9 @@
 
 ### v0.4.5
 * Separate plotting for `ThresholdOptimizer` into its own plotting function.
+* `ThresholdOptimizer` now performs validations during `fit`, and not during
+  `__init__`. It also stores the fitted given estimator in the `estimator_`
+  attribute.
 
 ### v0.4.4
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method

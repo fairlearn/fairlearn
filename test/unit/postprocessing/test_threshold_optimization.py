@@ -13,7 +13,6 @@ from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import \
     (_vectorized_prediction,
      NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
-     PREDICT_BEFORE_FIT_ERROR_MESSAGE,
      EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE,
      PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,)
 from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
@@ -38,7 +37,7 @@ def test_predict_before_fit_error(X_transform, sensitive_features_transform, pre
     adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
                                             constraints=constraints)
 
-    with pytest.raises(ValueError, match=PREDICT_BEFORE_FIT_ERROR_MESSAGE):
+    with pytest.raises(ValueError, match='instance is not fitted yet'):
         getattr(adjusted_predictor, predict_method_name)(X, sensitive_features=sensitive_features)
 
 
@@ -47,19 +46,25 @@ def test_both_predictor_and_estimator_error(constraints):
     with pytest.raises(ValueError, match=EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE):
         ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
                            estimator=ExampleEstimator(),
-                           constraints=constraints)
+                           constraints=constraints).fit(
+                               X_ex, labels_ex,
+                               sensitive_features=sensitive_features_ex1)
 
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_no_predictor_or_estimator_error(constraints):
     with pytest.raises(ValueError, match=PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE):
-        ThresholdOptimizer(constraints=constraints)
+        ThresholdOptimizer(constraints=constraints).fit(
+            X_ex, labels_ex, sensitive_features=sensitive_features_ex1)
 
 
 def test_constraints_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE):
         ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
-                           constraints="UnsupportedConstraints")
+                           constraints="UnsupportedConstraints").fit(
+                               X_ex, labels_ex,
+                               sensitive_features=sensitive_features_ex1
+                           )
 
 
 @pytest.mark.parametrize("X", [None, X_ex])
