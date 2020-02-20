@@ -182,13 +182,13 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
 
         These calculations are made at different
         thresholds over the scores. Subsequently weighs each sensitive feature value's error by the
-        frequency of the sensitive feature value in the data. The minimum error point is the selected
-        solution, which is recreated by interpolating between two points on the convex hull of all
-        solutions. Each sensitive feature value has its own predictor in the resulting postprocessed
-        predictor, which requires the sensitive feature value as an input.
+        frequency of the sensitive feature value in the data. The minimum error point is the
+        selected solution, which is recreated by interpolating between two points on the convex
+        hull of all solutions. Each sensitive feature value has its own predictor in the resulting
+        postprocessed predictor, which requires the sensitive feature value as an input.
 
-        This method assumes that sensitive_features, labels, and scores are non-empty data structures
-        of equal length, and labels contains only binary labels 0 and 1.
+        This method assumes that sensitive_features, labels, and scores are non-empty data
+        structures of equal length, and labels contains only binary labels 0 and 1.
 
         :param sensitive_features: the feature data that determines the groups for which the parity
             constraints are enforced
@@ -198,8 +198,8 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         :param scores: the scores produced by a predictor's prediction
         :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
         :param grid_size: The number of ticks on the grid over which we evaluate the curves.
-            A large grid_size means that we approximate the actual curve, so it increases the chance
-            of being very close to the actual best solution.
+            A large grid_size means that we approximate the actual curve, so it increases the
+            chance of being very close to the actual best solution.
         :type grid_size: int
         :param flip: allow flipping to negative weights if it improves accuracy.
         :type flip: bool
@@ -240,8 +240,8 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
                 _interpolate_curve(roc_convex_hull, 'selection', 'error', 'operation',
                                    self._x_grid)
 
-            # Add up errors for the current group multiplied by the probability of the current group.
-            # This will help us in identifying the minimum overall error.
+            # Add up errors for the current group multiplied by the probability of the current
+            # group. This will help us in identifying the minimum overall error.
             error_given_selection += p_sensitive_feature_value * \
                 self._selection_error_curve[sensitive_feature_value]['error']
 
