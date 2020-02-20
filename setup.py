@@ -22,7 +22,7 @@ setuptools.setup(
         "ipywidgets>=7.5.0",
         "numpy>=1.17.2",
         "pandas>=0.25.1",
-        "scikit-learn>=0.21.3",
+        "scikit-learn>=0.22.1",
         "scipy>=1.3.1"
     ],
     extras_require={
