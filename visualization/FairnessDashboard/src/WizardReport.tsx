@@ -119,7 +119,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         presentationArea: {
             display: "flex",
             flexDirection: "row",
-            padding: "20px 0 30px 90px"
+            padding: "20px 0 30px 90px",
+            backgroundColor: 'white'
         },
         chartWrapper: {
             flex: "1 0 40%",
@@ -344,7 +345,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
                     <div>
                         <div>{localization.Report.overestimationError}</div>
-                        <div>{localization.Report.underpredictionExplanation}</div>
+                        <div>{localization.Report.overpredictionExplanation}</div>
                     </div>
                 </div>
                 <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead1}</div>
