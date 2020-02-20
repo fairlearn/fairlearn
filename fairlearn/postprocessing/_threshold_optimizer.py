@@ -73,15 +73,6 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         self.unconstrained_predictor = unconstrained_predictor
         self.estimator = estimator
 
-    @property
-    def constraints(self):
-        """Return the constraints that the ThresholdOptimizer is tasked to enforce.
-
-        :return: the name of the constraints
-        :rtype: str
-        """
-        return self._constraints
-
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
 
@@ -151,7 +142,7 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         if random_state:
             random.seed(random_state)
 
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=None)
         _, _, sensitive_feature_vector = _validate_and_reformat_input(
             X, y=None, sensitive_features=sensitive_features, expect_y=False,
             enforce_binary_labels=True)
