@@ -126,6 +126,20 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             margin: "10px 10px",
             display: "inline-block"
         },
+        infoButton: {
+            float: "left",
+            width: "15px",
+            height: "15px",
+            textAlign: "center",
+            fontFamily: "Arial",
+            fontSize: "12px",
+            lineHeight: "15px",
+            fontWeight: "400",
+            borderRadius: "50%",
+            border: "1px solid",
+            marginTop: "3px",
+            marginRight: "3px"
+        },
         closeButton: {
             color: "#FFFFFF",
             float: "right",
@@ -210,7 +224,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             border: "1px solid #CCCCCC"
         },
         chart: {
-            padding: "60px 0 0 0",
+            padding: "0px 0 0 0",
             flex: 1
         },
         textSection: {
@@ -414,7 +428,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton>
                         <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalIntro}><u>Done</u></ActionButton></p>
                     </ReactModal>
-                    <a onClick={this.handleOpenModalHelp}>{localization.ModelComparison.howToRead}</a>
+                    <ActionButton onClick={this.handleOpenModalHelp}><div className={ModelComparisonChart.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
                     <ReactModal
                         style={modalStyles}
                         appElement={document.getElementById('app') as HTMLElement}
