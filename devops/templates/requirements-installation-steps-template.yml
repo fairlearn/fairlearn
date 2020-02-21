@@ -6,7 +6,7 @@ parameters:
 steps:
 - script: cp requirements.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
-   condition: ne('${{parameters.pyVer}}', '3.5')
+  condition: ne('${{parameters.pyVer}}', '3.5')
   
 - script: cp requirements-3.5.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
