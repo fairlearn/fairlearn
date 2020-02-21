@@ -23,11 +23,11 @@ setuptools.setup(
         "numpy>=1.17.2",
         "pandas>=0.25.1",
         "scikit-learn>=0.22.1",
-        "scipy>=1.4.1"
+        "scipy>=1.3.1"
     ],
     extras_require={
         "customplots": [
-            "matplotlib>=3.1.3"
+            "matplotlib>=3.0.3"
         ]
     },
     classifiers=[
