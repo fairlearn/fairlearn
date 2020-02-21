@@ -29,7 +29,7 @@
     },
     "Parity": {
         "header": "Fairness measured in terms of disparity",
-        "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are two kinds of disparity metrics: more to come...."
+        "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are four kinds of disparity metrics: more to come...."
     },
     "Header": {
         "title": "fairlearn",
@@ -48,7 +48,9 @@
         "features": "Sensitive features",
         "featuresInfo": "Sensitive features are used to split your data into groups. Fairness of your model across these groups is measured by disparity metrics. Disparity metrics quantify how much your model's behavior varies across these groups.",
         "accuracy": "Accuracy metric",
-        "accuracyInfo": "Accuracy metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy."
+        "accuracyInfo": "Accuracy metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy.",
+        "parity": "Parity metric",
+        "parityInfo": "Parity metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy."
     },
     "ModelComparison": {
         "title": "Model comparison",
@@ -56,7 +58,12 @@
         "lower": "lower",
         "higher": "higher",
         "howToReadText": "This chart represents each of the {0} models as a selectable point. The x-axis represents {1}, with {2} being better. The y-axis represents disparity, with lower being better.",
-        "insights": "Insights",
+        "insights": "Key Insights",
+        "downloadReport": "Download report",
+        "disparity": " The disparity ",
+        "rangesFrom": " ranges from ",
+        "to": " to ",
+        "period": ". ",
         "insightsText1": "The chart shows {0} and disparity of {1} models.",
         "insightsText2": "{0} ranges from {1} to {2}. The disparity ranges from {3} to {4}.",
         "insightsText3": "The most accurate model achieves {0} of {1} and a disparity of {2}.",

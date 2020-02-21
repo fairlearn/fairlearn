@@ -10,41 +10,29 @@ export enum ParityModes {
     "ratio"
 }
 
-export const ParityOptions: IParityOption[] = [
-    {
-        key: "m1",
-        title: "Method 1",
-        description: "uses science to get the answer",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
-    },
-    {
-        key: "m2",
-        title: "Method 2",
-        description: "guesses at truth",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
-    },
-    {
-        key: "m3",
-        title: "Method 3",
-        description: "guesses at truth",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
-    },
-    {
-        key: "m4",
-        title: "Method 4",
-        description: "guesses at truth",
-        parityModes: [ParityModes.difference, ParityModes.ratio]
-    },
-    {
-        key: "m5",
-        title: "Method 5",
-        description: "guesses at truth",
+export const ParityOptions: {[key: string]: IParityOption} = {
+    "selection_rate": {
+        key: "selection_rate",
+        title: "Parity difference",
+        description: "Parity differenece",
         parityModes: [ParityModes.difference]
     },
-    {
-        key: "m6",
-        title: "Method 6",
-        description: "guesses at truth",
+    "selection_rate_ratio": {
+        key: "selection_rate_ratio",
+        title: "Parity ratio",
+        description: "Parity ratio",
+        parityModes: [ParityModes.ratio]
+    },
+    "zero_one_loss": {
+        key: "zero_one_loss",
+        title: "Error rate difference",
+        description: "Error rate difference",
+        parityModes: [ParityModes.difference]
+    },
+    "recall_score": {
+        key: "recall_score",
+        title: "Equal opportunity difference",
+        description: "Equal opportunity difference",
         parityModes: [ParityModes.difference]
     }
-];
+};

@@ -1,12 +1,14 @@
 import React from "react";
+import ReactModal from "react-modal";
 import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
 import { IFairnessContext } from "../IFairnessContext";
 import _ from "lodash";
 import { MetricsCache } from "../MetricsCache";
 import { IAccuracyPickerProps, IParityPickerProps, IFeatureBinPickerProps } from "../FairnessWizard";
-import { ParityModes } from "../ParityMetrics";
+import { ParityModes, ParityOptions } from "../ParityMetrics";
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
+import { Dropdown, DropdownMenuItemType, IDropdownStyles, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { localization } from "../Localization/localization";
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { mergeStyleSets } from "@uifabric/styling";
@@ -27,6 +29,11 @@ export interface IModelComparisonProps {
 }
 
 export interface IState {
+    showModalIntro?: boolean;
+    showModalHelp?: boolean;
+    featureKey?: string;
+    accuracyKey?: string;
+    parityKey?: string;
     accuracyArray?: number[];
     disparityArray?: number[];
     disparityInOutcomes: boolean;
@@ -43,15 +50,16 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         plotlyPath: 'customdata'
                     }
                 },
-                mode: PlotlyMode.markers,
+                mode: PlotlyMode.textMarkers,
                 marker: {
                     size: 14
                 },
+                textposition: 'top',
                 type: 'scatter',
                 xAccessor: 'Accuracy',
                 yAccessor: 'Parity',
                 hoverinfo: 'text'
-            }
+            } as any
         ],
         layout: {
             autosize: true,
@@ -94,8 +102,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             padding: "40px"
         },
         header: {
-            backgroundColor: "#EBEBEB",
-            padding: "0 90px",
+            backgroundColor: "#333333",
+            padding: "0 50px",
             height: "90px",
             display: "inline-flex",
             flexDirection: "row",
@@ -103,16 +111,49 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             alignItems: "center"
         },
         headerTitle: {
-            color: "#333333",
+            color: "#FFFFFF",
             fontSize: "32px",
             lineHeight: "39px",
             fontWeight: "100"
+        },
+        headerOptions: {
+            backgroundColor: "#333333",
+            padding: "0 40px"
+        },
+        dropDown: {
+            margin: "10px 10px",
+            display: "inline-block"
+        },
+        closeButton: {
+            color: "#FFFFFF",
+            float: "right",
+            fontFamily: "Arial",
+            fontSize: "20px",
+            lineHeight: "20px",
+            fontWeight: "400",
+            paddingLeft: "20px"
+        },
+        doneButton: {
+            color: "#FFFFFF"
+        },
+        modalContentIntro: {
+            float: 'left',
+            textAlign: 'center',
+            paddingTop: '10px'
+        },
+        modalContentHelp: {
+            float: 'left',
+            paddingTop: '10px'
         },
         editButton: {
             color: "#333333",
             fontSize: "12px",
             lineHeight: "20px",
             fontWeight: "400"
+        },
+        howTo: {
+            paddingTop: "20px",
+            paddingLeft: "100px"
         },
         main: {
             height: "100%",
@@ -155,14 +196,27 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             fontWeight: "400",
             paddingBottom: "18px",
             paddingRight: "15px",
-            borderBottom: "1px solid #CCCCCC"
+        },
+        downloadReport: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "400",
+            paddingTop: "20px",
+            paddingBottom: "20px",
+            paddingLeft: "80px",
+            border: "1px solid #CCCCCC"
         },
         chart: {
             padding: "60px 0 0 0",
             flex: 1
         },
         textSection: {
-            paddingBottom: "5px"
+            padding: "20px 0",
+            borderBottom: "1px solid #cccc"
+        },
+        textSectionLast: {
+            padding: "20px 0",
         },
         radio: {
             paddingBottom: "30px",
@@ -173,7 +227,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     constructor(props: IModelComparisonProps) {
         super(props);
         this.state = {
-            disparityInOutcomes: true
+            showModalIntro: true,
+            disparityInOutcomes: true,
+            accuracyKey: this.props.accuracyPickerProps.selectedAccuracyKey
         };
     }
 
@@ -226,14 +282,30 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const formattedMinDisparity = FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
         const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
         const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
+        
+        // const insights2 = [selectedMetric.title,
+        //     localization.ModelComparison.rangesFrom,
+        //     <strong>{formattedMinAccuracy}</strong>,
+        //     localization.ModelComparison.to,
+        //     <strong>{formattedMaxAccuracy}</strong>,
+        //     localization.ModelComparison.period,
+        //     localization.ModelComparison.disparity,
+        //     localization.ModelComparison.rangesFrom,
+        //     <strong>{formattedMinDisparity}</strong>,
+        //     localization.ModelComparison.to,
+        //     <strong>{formattedMaxDisparity}</strong>,
+        //     localization.ModelComparison.period
+        // ];
+
         const insights2 = localization.formatString(
-            localization.ModelComparison.insightsText2,
+            localization.ModelComparison.insightsText2, 
             selectedMetric.title,
             formattedMinAccuracy,
             formattedMaxAccuracy,
             formattedMinDisparity,
-            formattedMaxDisparity
+            formattedMaxDisparity,
         );
+
         const insights3 = localization.formatString(
             localization.ModelComparison.insightsText3,
             selectedMetric.title.toLowerCase(),
@@ -254,7 +326,37 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             selectedMetric.title.toLowerCase(),
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
-        
+        const featureOptions: IDropdownOption[] = this.props.dashboardContext.modelMetadata.featureNames.map(x => { return {key: x, text: x}});
+        const accuracyOptions: IDropdownOption[] = this.props.accuracyPickerProps.accuracyOptions.map(x => { return {key: x.key, text: x.title}});
+        const parityOptions: IDropdownOption[] = this.props.parityPickerProps.parityOptions.map(x => { return {key: x.key, text: x.title}});
+        const dropdownStyles: Partial<IDropdownStyles> = {
+            dropdown: { width: 180 },
+            label: { color: "#ffffff" },
+            title: { color: "#ffffff", backgroundColor: "#333333", selectors: {
+                ':hover': {
+                    color: "#333333",
+                    backgroundColor: "#f3f2f1"
+                }
+            }},
+            dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
+        };
+        const modalStyles = {
+            content : {
+                top                   : '50%',
+                left                  : '50%',
+                right                 : 'auto',
+                bottom                : 'auto',
+                marginRight           : '-50%',
+                paddingTop            : '5px',
+                paddingRight          : '10px',
+                paddingBottom         : '10px',
+                transform             : 'translate(-50%, -50%)',
+                fontFamily: "Segoe UI",
+                color: "#FFFFFF",
+                backgroundColor: "#333333"
+            },
+            overlay: {zIndex: 1000}
+        };          
         const props = _.cloneDeep(this.plotlyProps);
         props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
             series.name = this.props.dashboardContext.modelNames[series.name];
@@ -269,7 +371,57 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             <Stack className={ModelComparisonChart.classNames.frame}>
                 <div className={ModelComparisonChart.classNames.header}>
                     <h2 className={ModelComparisonChart.classNames.headerTitle}>{localization.ModelComparison.title}</h2>
-                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={ModelComparisonChart.classNames.editButton}>{localization.Report.editConfiguration}</ActionButton>
+                    {/* <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={ModelComparisonChart.classNames.editButton}>{localization.Report.editConfiguration}</ActionButton> */}
+                </div>
+                <div className={ModelComparisonChart.classNames.headerOptions}>
+                    <Dropdown
+                        className={ModelComparisonChart.classNames.dropDown}
+                        label="Feature"
+                        defaultSelectedKey={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
+                        options={featureOptions}
+                        disabled={false}
+                        onChange={this.featureChanged}
+                        styles={dropdownStyles}
+                    />
+                    <Dropdown
+                        className={ModelComparisonChart.classNames.dropDown}
+                        label="Accuracy"
+                        defaultSelectedKey={this.props.accuracyPickerProps.selectedAccuracyKey}
+                        options={accuracyOptions}
+                        disabled={false}
+                        onChange={this.accuracyChanged}
+                        styles={dropdownStyles}
+                    />
+                    <Dropdown
+                        className={ModelComparisonChart.classNames.dropDown}
+                        label="Parity"
+                        defaultSelectedKey={this.props.parityPickerProps.selectedParityKey}
+                        options={parityOptions}
+                        disabled={false}
+                        onChange={this.parityChanged}
+                        styles={dropdownStyles}
+                    />
+                </div>
+                <div className={ModelComparisonChart.classNames.howTo}>
+                    <ReactModal
+                        style={modalStyles}
+                        appElement={document.getElementById('app') as HTMLElement}
+                        isOpen={this.state.showModalIntro}
+                        contentLabel="Intro Modal Example"
+                        >
+                        <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton>
+                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalIntro}><u>Done</u></ActionButton></p>
+                    </ReactModal>
+                    <a onClick={this.handleOpenModalHelp}>{localization.ModelComparison.howToRead}</a>
+                    <ReactModal
+                        style={modalStyles}
+                        appElement={document.getElementById('app') as HTMLElement}
+                        isOpen={this.state.showModalHelp}
+                        contentLabel="Minimal Modal Example"
+                        >
+                        <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton>
+                        <p className={ModelComparisonChart.classNames.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.</p>
+                    </ReactModal>
                 </div>
                 <div className={ModelComparisonChart.classNames.main}>
                     <div className={ModelComparisonChart.classNames.chart}>
@@ -280,17 +432,16 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         />
                     </div>
                     <div className={ModelComparisonChart.classNames.mainRight}>
-                        <div className={ModelComparisonChart.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={ModelComparisonChart.classNames.rightText}>{howToReadText}</div>
                         <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
                         <div className={ModelComparisonChart.classNames.insightsText}>
                             <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
                             <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
-                            <div>{insights4}</div>
+                            <div className={ModelComparisonChart.classNames.textSectionLast}>{insights4}</div>
                         </div>
+                        <div className={ModelComparisonChart.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
                     </div>
                 </div>
-                <div>
+                {/* <div>
                     <ChoiceGroup
                         className={ModelComparisonChart.classNames.radio}
                         selectedKey={this.state.disparityInOutcomes ? "outcomes" : "accuracy"}
@@ -309,7 +460,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         label={localization.ModelComparison.howToMeasureDisparity}
                         required={false}
                         ></ChoiceGroup>
-                </div>
+                </div> */}
             </Stack>);
     }
 
@@ -323,16 +474,17 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     this.props.accuracyPickerProps.selectedAccuracyKey);
             });
             const disparityMetric = this.state.disparityInOutcomes ?
-                (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
-                    "selection_rate" : "average") :
+            (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
+                this.props.parityPickerProps.selectedParityKey : "average") :
                 this.props.accuracyPickerProps.selectedAccuracyKey;
+            const parityMode = this.props.parityPickerProps.parityOptions.filter(option => option.key == this.props.parityPickerProps.selectedParityKey)[0].parityModes[0];
             const disparityPromises = new Array(this.props.modelCount).fill(0).map((unused, modelIndex) => {
                 return this.props.metricsCache.getDisparityMetric(
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex,
                     modelIndex, 
                     disparityMetric,
-                    ParityModes.difference);
+                    parityMode);
             });
 
             const accuracyArray = (await Promise.all(accuracyPromises)).map(metric => metric.global);
@@ -343,12 +495,49 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         }
     }
 
+    private readonly featureChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
+        const featureKey = option.key.toString();
+        if (this.state.featureKey !== featureKey) {
+            this.props.featureBinPickerProps.selectedBinIndex = this.props.dashboardContext.modelMetadata.featureNames.indexOf(featureKey);
+            this.setState({featureKey: featureKey, disparityArray: undefined});
+        }
+    }
+
+    private readonly accuracyChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
+        const accuracyKey = option.key.toString();
+        if (this.state.accuracyKey !== accuracyKey) {
+            this.props.accuracyPickerProps.selectedAccuracyKey = accuracyKey;
+            this.setState({accuracyKey: accuracyKey, disparityArray: undefined});
+        }
+    }
+
+    private readonly parityChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
+        const parityKey = option.key.toString();
+        if (this.state.parityKey !== parityKey) {
+            this.props.parityPickerProps.selectedParityKey = parityKey;
+            this.setState({parityKey: parityKey, disparityArray: undefined});
+        }
+    }
+
     private readonly disparityChanged = (ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): void => {
         const disparityInOutcomes = option.key !== "accuracy";
         if (this.state.disparityInOutcomes !== disparityInOutcomes) {
             this.setState({disparityInOutcomes, disparityArray: undefined});
         }
     }
+
+    private readonly handleCloseModalIntro = (event): void => {
+        this.setState({ showModalIntro: false });
+    }
+
+    private readonly handleOpenModalHelp = (event): void => {
+        this.setState({ showModalHelp: true });
+    }
+
+    private readonly handleCloseModalHelp = (event): void => {
+        this.setState({ showModalHelp: false });
+    }
+
     // TODO: Reuse if multiselect re-enters design
     // private readonly applySelections = (chartId: string, selectionIds: string[], plotlyProps: IPlotlyProperty) => {
     //     if (!plotlyProps.data || plotlyProps.data.length === 0) {
