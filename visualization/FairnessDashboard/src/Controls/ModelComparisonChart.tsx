@@ -18,6 +18,7 @@ import { FormatMetrics } from "../FormatMetrics";
 import { PredictionTypes } from "../IFairnessProps";
 
 export interface IModelComparisonProps {
+    showIntro: boolean,
     dashboardContext: IFairnessContext;
     selections: SelectionContext;
     metricsCache: MetricsCache;
@@ -25,6 +26,7 @@ export interface IModelComparisonProps {
     accuracyPickerProps: IAccuracyPickerProps;
     parityPickerProps: IParityPickerProps;
     featureBinPickerProps: IFeatureBinPickerProps;
+    onHideIntro: () => void;
     onEditConfigs: () => void;
 }
 
@@ -227,8 +229,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     constructor(props: IModelComparisonProps) {
         super(props);
         this.state = {
-            showModalIntro: true,
             disparityInOutcomes: true,
+            showModalIntro: this.props.showIntro,
             accuracyKey: this.props.accuracyPickerProps.selectedAccuracyKey
         };
     }
@@ -528,6 +530,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
 
     private readonly handleCloseModalIntro = (event): void => {
         this.setState({ showModalIntro: false });
+        this.props.onHideIntro();
     }
 
     private readonly handleOpenModalHelp = (event): void => {

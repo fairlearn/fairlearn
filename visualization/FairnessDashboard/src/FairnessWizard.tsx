@@ -40,6 +40,7 @@ export interface IFeatureBinPickerProps {
 }
 
 export interface IWizardState {
+    showIntro: boolean,
     activeTabKey: string;
     selectedModelId?: number;
     dashboardContext: IFairnessContext;
@@ -199,6 +200,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         parityMetrics = parityMetrics.filter(metric => !!metric);
 
         this.state = {
+            showIntro: true,
             accuracyMetrics,
             selectedAccuracyKey: accuracyMetrics[0].key,
             parityMetrics: parityMetrics,
@@ -295,7 +297,8 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         </Pivot>
                     </Stack.Item>}
                 {(this.state.activeTabKey === reportTabKey && this.state.selectedModelId !== undefined) &&
-                    <WizardReport 
+                    <WizardReport
+                        showIntro={this.state.showIntro}
                         dashboardContext={this.state.dashboardContext}
                         metricsCache={this.state.metricCache}
                         selections={this.selections}
@@ -304,10 +307,12 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
                         selectedModelIndex={this.state.selectedModelId}
+                        onHideIntro={this.hideIntro.bind(this)}
                         onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
                     />}
                 {(this.state.activeTabKey === reportTabKey && this.state.selectedModelId === undefined) &&
                     <ModelComparisonChart
+                        showIntro={this.state.showIntro}
                         dashboardContext={this.state.dashboardContext}
                         metricsCache={this.state.metricCache}
                         selections={this.selections}
@@ -315,10 +320,15 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         accuracyPickerProps={accuracyPickerProps}
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
+                        onHideIntro={this.hideIntro.bind(this)}
                         onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
                     />}
              </Stack>
          );
+    }
+
+    private readonly hideIntro = () => {
+        this.setState({ showIntro: false});
     }
 
     private readonly setTab = (key: string) => {
