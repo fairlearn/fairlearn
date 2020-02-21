@@ -4,15 +4,15 @@ parameters:
   pinRequirements:
 
 steps:
-- script: cp requirements.txt ${{requirementsFile}}
+- script: cp requirements.txt ${{parameters.requirementsFile}}
     displayName: "Copy requirements file"
-    condition: ne('${{pyVer}}', '3.5')
+    condition: ne('${{parameters.pyVer}}', '3.5')
   
-- script: cp requirements-3.5.txt ${{requirementsFile}}
+- script: cp requirements-3.5.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
-  condition: eq('${{pyVer}}', '3.5')
+  condition: eq('${{parameters.pyVer}}', '3.5')
 
-- script: python scripts/requirements_pin.py --input ${{requirementsFile}} --output requirements-fixed.txt --loglevel INFO
+- script: python scripts/requirements_pin.py --input ${{parameters.requirementsFile}} --output requirements-fixed.txt --loglevel INFO
   displayName: "Pin Requirements file"
   condition: eq('${{parameters.pinRequirements}}', True)
 
@@ -20,6 +20,6 @@ steps:
   displayName: 'Install required packages from requirements-fixed.txt'
   condition: eq('${{parameters.pinRequirements}}', True)
 
-- script: pip install -r ${{requirementsFile}}
-  displayName: 'Install required packages from ${{requirementsFile}}'
+- script: pip install -r ${{parameters.requirementsFile}}
+  displayName: 'Install required packages from ${{parameters.requirementsFile}}'
   condition: ne('${{parameters.pinRequirements}}', True)
