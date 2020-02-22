@@ -13,13 +13,11 @@ from . import group_miss_rate, group_precision_score, group_r2_score
 from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_error
 from . import group_selection_rate, group_specificity_score, group_zero_one_loss
 
-_GROUP_NAMES_MSG = "The group_names property must be a list of strings"
+_GROUP_NAMES_MSG = "The sensitive_feature_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
 _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
 
-_ARRAYS_NOT_SAME_LENGTH = "Lengths of y_true, y_pred and groups must match"
-_BIN_MISMATCH_FOR_METRIC = "The groups for metric {0} do not match the groups property"
-_GROUP_NAMES_BAD_COUNT = "Count of group_names not the same as the number of unique groups"
+_ARRAYS_NOT_SAME_LENGTH = "Lengths of y_true, y_pred and sensitive_features must match"
 
 _Y_TRUE = 'trueY'
 _Y_PRED = 'predictedY'
