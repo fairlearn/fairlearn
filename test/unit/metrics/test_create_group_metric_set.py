@@ -133,16 +133,16 @@ def test_two_models():
         assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
 
 
-def test_two_groups():
-    # Single model, two group vectors, no names
+def test_two_sensitive_features():
+    # Single model, two sensitive feature vectors, no names
     Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
     Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
-    # First group is just 'a' and 'b'. Second is 4, 5 and 6
-    Groups = [['b', 'a', 'a', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
-              [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
-    gr_int = [int(x == 'b') for x in Groups[0]]
+    # First sensitive feature is just 'a' and 'b'. Second is 4, 5 and 6
+    sensitive_features = [['b', 'a', 'a', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
+                          [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
+    sf_int = [int(x == 'b') for x in sensitive_features[0]]
 
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
+    result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
     assert result['predictionType'] == 'binaryClassification'
     assert result['schemaType'] == 'groupMetricSet'
     assert result['schemaVersion'] == 0
@@ -154,11 +154,11 @@ def test_two_groups():
     assert len(result['precomputedFeatureBins']) == 2
     bin_dict0 = result['precomputedFeatureBins'][0]
     assert isinstance(bin_dict0, dict)
-    assert np.array_equal(bin_dict0['binVector'], gr_int)
+    assert np.array_equal(bin_dict0['binVector'], sf_int)
     assert np.array_equal(bin_dict0['binLabels'], ['a', 'b'])
     bin_dict1 = result['precomputedFeatureBins'][1]
     assert isinstance(bin_dict1, dict)
-    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in Groups[1]])
+    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in sensitive_features[1]])
     assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
 
     assert isinstance(result['predictedY'], list)
@@ -177,14 +177,24 @@ def test_two_groups():
     metrics_g0_m0 = metrics_group_0[0]
     assert isinstance(metrics_g0_m0, dict)
     assert len(metrics_g0_m0) == 10
+
     accuracy = metrics_g0_m0['accuracy_score']
     assert isinstance(accuracy, dict)
-    gmr = group_accuracy_score(Y_true, Y_pred[0], Groups[0])
+    gmr = group_accuracy_score(Y_true, Y_pred[0], sensitive_features[0])
     assert gmr.overall == pytest.approx(accuracy['global'])
     assert isinstance(accuracy['bins'], list)
     assert len(accuracy['bins']) == 2
     assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
     assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
+
+    roc_auc = metrics_g0_m0['balanced_accuracy_score']
+    assert isinstance(roc_auc, dict)
+    gmr = group_roc_auc_score(Y_true, Y_pred[0], sensitive_features[0])
+    assert gmr.overall == pytest.approx(roc_auc['global'])
+    assert isinstance(roc_auc['bins'], list)
+    assert len(roc_auc['bins']) == 2
+    assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
+    assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
 
     # Check the second grouping (three unique numeric labels)
     metrics_group_1 = result['precomputedMetrics'][1]
@@ -193,29 +203,39 @@ def test_two_groups():
     metrics_g1_m0 = metrics_group_1[0]
     assert isinstance(metrics_g1_m0, dict)
     assert len(metrics_g1_m0) == 10
+
     accuracy = metrics_g1_m0['accuracy_score']
     assert isinstance(accuracy, dict)
-    gmr = group_accuracy_score(Y_true, Y_pred[0], Groups[1])
+    gmr = group_accuracy_score(Y_true, Y_pred[0], sensitive_features[1])
     assert gmr.overall == pytest.approx(accuracy['global'])
     assert isinstance(accuracy['bins'], list)
     assert len(accuracy['bins']) == 3
     for i in range(3):
         assert gmr.by_group[i+4] == pytest.approx(accuracy['bins'][i])
 
+    roc_auc = metrics_g1_m0['balanced_accuracy_score']
+    assert isinstance(roc_auc, dict)
+    gmr = group_roc_auc_score(Y_true, Y_pred[0], sensitive_features[1])
+    assert gmr.overall == pytest.approx(roc_auc['global'])
+    assert isinstance(roc_auc['bins'], list)
+    assert len(roc_auc['bins']) == 3
+    for i in range(3):
+        assert gmr.by_group[i+4] == pytest.approx(roc_auc['bins'][i])
 
-def test_two_named_groups():
-    # Single model, two group vectors, no names
+
+def test_two_named_sensitive_features():
+    # Single model, two sensitive feature vectors, no names
     Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
     Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
-    # First group is just 'a' and 'b'. Second is 4, 5 and 6
-    Groups = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
-              [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
-    gr_int = [int(x == 'b') for x in Groups[0]]
-    group_titles = ['alpha', 'num']
+    # First sensitive feature is just 'a' and 'b'. Second is 4, 5 and 6
+    sensitive_features = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
+                          [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
+    sf_int = [int(x == 'b') for x in sensitive_features[0]]
+    sensitive_feature_titles = ['alpha', 'num']
 
     result = create_group_metric_set('binary_classification',
-                                     Y_true, Y_pred, Groups,
-                                     sensitive_feature_names=group_titles)
+                                     Y_true, Y_pred, sensitive_features,
+                                     sensitive_feature_names=sensitive_feature_titles)
     assert result['predictionType'] == 'binaryClassification'
     assert result['schemaType'] == 'groupMetricSet'
     assert result['schemaVersion'] == 0
@@ -227,14 +247,14 @@ def test_two_named_groups():
     assert len(result['precomputedFeatureBins']) == 2
     bin_dict0 = result['precomputedFeatureBins'][0]
     assert isinstance(bin_dict0, dict)
-    assert np.array_equal(bin_dict0['binVector'], gr_int)
+    assert np.array_equal(bin_dict0['binVector'], sf_int)
     assert np.array_equal(bin_dict0['binLabels'], ['a', 'b'])
-    assert group_titles[0] == bin_dict0['featureBinName']
+    assert sensitive_feature_titles[0] == bin_dict0['featureBinName']
     bin_dict1 = result['precomputedFeatureBins'][1]
     assert isinstance(bin_dict1, dict)
-    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in Groups[1]])
+    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in sensitive_features[1]])
     assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
-    assert group_titles[1] == bin_dict1['featureBinName']
+    assert sensitive_feature_titles[1] == bin_dict1['featureBinName']
 
 
 def test_two_named_models():
