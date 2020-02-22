@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from fairlearn.metrics import group_accuracy_score
+from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
 from fairlearn.metrics import create_group_metric_set
 
 from test.unit.input_convertors import conversions_for_1d
@@ -21,10 +21,10 @@ def test_smoke():
     # Single model, single group vector, no names
     Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
     Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
-    Groups = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b']]
-    gr_int = [int(x == 'b') for x in Groups[0]]
+    sensitive_feature = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b']]
+    sf_int = [int(x == 'b') for x in sensitive_feature[0]]
 
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
+    result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_feature)
     assert result['predictionType'] == 'binaryClassification'
     assert result['schemaType'] == 'groupMetricSet'
     assert result['schemaVersion'] == 0
@@ -36,7 +36,7 @@ def test_smoke():
     assert len(result['precomputedFeatureBins']) == 1
     bin_dict = result['precomputedFeatureBins'][0]
     assert isinstance(bin_dict, dict)
-    assert np.array_equal(bin_dict['binVector'], gr_int)
+    assert np.array_equal(bin_dict['binVector'], sf_int)
     assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
 
     assert isinstance(result['predictedY'], list)
@@ -53,14 +53,24 @@ def test_smoke():
     metrics_g0_m0 = metrics_group_0[0]
     assert isinstance(metrics_g0_m0, dict)
     assert len(metrics_g0_m0) == 10
+
     accuracy = metrics_g0_m0['accuracy_score']
     assert isinstance(accuracy, dict)
-    gmr = group_accuracy_score(Y_true, Y_pred[0], Groups[0])
+    gmr = group_accuracy_score(Y_true, Y_pred[0], sensitive_feature[0])
     assert gmr.overall == pytest.approx(accuracy['global'])
     assert isinstance(accuracy['bins'], list)
     assert len(accuracy['bins']) == 2
     assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
     assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
+
+    roc_auc = metrics_g0_m0['balanced_accuracy_score']
+    assert isinstance(roc_auc, dict)
+    gmr = group_roc_auc_score(Y_true, Y_pred[0], sensitive_feature[0])
+    assert gmr.overall == pytest.approx(roc_auc['global'])
+    assert isinstance(roc_auc['bins'], list)
+    assert len(roc_auc['bins']) == 2
+    assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
+    assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
 
 
 def test_two_models():
@@ -102,6 +112,7 @@ def test_two_models():
         metrics_g0_m0 = metrics_group_0[i]
         assert isinstance(metrics_g0_m0, dict)
         assert len(metrics_g0_m0) == 10
+
         accuracy = metrics_g0_m0['accuracy_score']
         assert isinstance(accuracy, dict)
         gmr = group_accuracy_score(Y_true, Y_pred[i], Groups[0])
@@ -110,6 +121,15 @@ def test_two_models():
         assert len(accuracy['bins']) == 2
         assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
         assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
+
+        roc_auc = metrics_g0_m0['balanced_accuracy_score']
+        assert isinstance(roc_auc, dict)
+        gmr = group_roc_auc_score(Y_true, Y_pred[i], sensitive_feature[0])
+        assert gmr.overall == pytest.approx(roc_auc['global'])
+        assert isinstance(roc_auc['bins'], list)
+        assert len(roc_auc['bins']) == 2
+        assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
+        assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
 
 
 def test_two_groups():
