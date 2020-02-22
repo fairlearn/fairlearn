@@ -258,16 +258,16 @@ def test_two_named_sensitive_features():
 
 
 def test_two_named_models():
-    # Two models, single group vector, no names
+    # Two models, single sensitive feature vector, no names
     Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
     Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
               [1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0]]
-    Groups = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b']]
-    gr_int = [int(x == 'b') for x in Groups[0]]
+    sensitive_features = [['b', 'a', 'a', 'b', 'b', 'b', 'b', 'a', 'b', 'b', 'b']]
+    sf_int = [int(x == 'b') for x in sensitive_features[0]]
     model_names = ['firstModel', 'secondModel']
 
     result = create_group_metric_set('binary_classification',
-                                     Y_true, Y_pred, Groups,
+                                     Y_true, Y_pred, sensitive_features,
                                      model_titles=model_names)
     assert result['predictionType'] == 'binaryClassification'
     assert result['schemaType'] == 'groupMetricSet'
@@ -280,7 +280,7 @@ def test_two_named_models():
     assert len(result['precomputedFeatureBins']) == 1
     bin_dict = result['precomputedFeatureBins'][0]
     assert isinstance(bin_dict, dict)
-    assert np.array_equal(bin_dict['binVector'], gr_int)
+    assert np.array_equal(bin_dict['binVector'], sf_int)
     assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
 
     assert isinstance(result['modelNames'], list)
