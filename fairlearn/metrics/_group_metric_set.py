@@ -133,14 +133,14 @@ def create_group_metric_set(model_type,
     result[_PRECOMPUTED_METRICS] = []
     result[_PRECOMPUTED_BINS] = []
     result[_MODEL_NAMES] = []
-    for g, group_membership in enumerate(group_memberships):
+    for g, group_membership in enumerate(sensitive_features):
         _gm = np.asarray(group_membership).tolist()
         _unique_groups = sorted(list(np.unique(_gm)))
         group_names = [str(x) for x in _unique_groups]
         groups = [_unique_groups.index(x) for x in _gm]
         bin_dict = {_BIN_VECTOR: groups, _BIN_LABELS: group_names}
-        if group_titles is not None:
-            bin_dict[_FEATURE_BIN_NAME] = group_titles[g]
+        if sensitive_feature_names is not None:
+            bin_dict[_FEATURE_BIN_NAME] = sensitive_feature_names[g]
         result[_PRECOMPUTED_BINS].append(bin_dict)
 
         model_list = []
