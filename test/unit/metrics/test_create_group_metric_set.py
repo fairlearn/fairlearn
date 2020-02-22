@@ -287,19 +287,18 @@ def test_two_named_models():
     assert np.array_equal(result['modelNames'], model_names)
 
 
-def test_multiple_model_multiple_group():
-    # Three models, two groups, no names
-    # Single model, two group vectors, no names
+def test_multiple_models_multiple_sensitive_features():
+    # Three models, two sensitive feature vectors, no names
     Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
     Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
               [1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
               [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0]]
     # First group is just 'a' and 'b'. Second is 4, 5 and 6
-    Groups = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
-              [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
-    gr_int = [int(x == 'b') for x in Groups[0]]
+    sensitive_features = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
+                          [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
+    sf_int = [int(x == 'b') for x in sensitive_features[0]]
 
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
+    result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
     assert result['predictionType'] == 'binaryClassification'
     assert result['schemaType'] == 'groupMetricSet'
     assert result['schemaVersion'] == 0
@@ -311,11 +310,11 @@ def test_multiple_model_multiple_group():
     assert len(result['precomputedFeatureBins']) == 2
     bin_dict0 = result['precomputedFeatureBins'][0]
     assert isinstance(bin_dict0, dict)
-    assert np.array_equal(bin_dict0['binVector'], gr_int)
+    assert np.array_equal(bin_dict0['binVector'], sf_int)
     assert np.array_equal(bin_dict0['binLabels'], ['a', 'b'])
     bin_dict1 = result['precomputedFeatureBins'][1]
     assert isinstance(bin_dict1, dict)
-    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in Groups[1]])
+    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in sensitive_features[1]])
     assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
 
     assert isinstance(result['predictedY'], list)
@@ -337,14 +336,24 @@ def test_multiple_model_multiple_group():
         m_g0 = metrics_group_0[i]
         assert isinstance(m_g0, dict)
         assert len(m_g0) == 10
+
         accuracy = m_g0['accuracy_score']
         assert isinstance(accuracy, dict)
-        gmr = group_accuracy_score(Y_true, Y_pred[i], Groups[0])
+        gmr = group_accuracy_score(Y_true, Y_pred[i], sensitive_features[0])
         assert gmr.overall == pytest.approx(accuracy['global'])
         assert isinstance(accuracy['bins'], list)
         assert len(accuracy['bins']) == 2
         assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
         assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
+
+        roc_auc = m_g0['balanced_accuracy_score']
+        assert isinstance(roc_auc, dict)
+        gmr = group_roc_auc_score(Y_true, Y_pred[i], sensitive_features[0])
+        assert gmr.overall == pytest.approx(roc_auc['global'])
+        assert isinstance(roc_auc['bins'], list)
+        assert len(roc_auc['bins']) == 2
+        assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
+        assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
 
     # Check the second grouping (three unique numeric labels)
     metrics_group_1 = result['precomputedMetrics'][1]
@@ -357,13 +366,22 @@ def test_multiple_model_multiple_group():
         assert len(m_g1) == 10
         accuracy = m_g1['accuracy_score']
         assert isinstance(accuracy, dict)
-        gmr = group_accuracy_score(Y_true, Y_pred[i], Groups[1])
+        gmr = group_accuracy_score(Y_true, Y_pred[i], sensitive_features[1])
         assert gmr.overall == pytest.approx(accuracy['global'])
         assert isinstance(accuracy['bins'], list)
         assert len(accuracy['bins']) == 3
         # Use the fact that the groups are integers
         for j in range(3):
             assert gmr.by_group[j+4] == pytest.approx(accuracy['bins'][j])
+
+        roc_auc = m_g1['balanced_accuracy_score']
+        assert isinstance(roc_auc, dict)
+        gmr = group_roc_auc_score(Y_true, Y_pred[i], sensitive_features[1])
+        assert gmr.overall == pytest.approx(roc_auc['global'])
+        assert isinstance(roc_auc['bins'], list)
+        assert len(roc_auc['bins']) == 3
+        for i in range(3):
+            assert gmr.by_group[i+4] == pytest.approx(roc_auc['bins'][i])
 
 
 @pytest.mark.parametrize("transform_y_true", conversions_for_1d)
