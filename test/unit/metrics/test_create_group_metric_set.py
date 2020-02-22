@@ -117,7 +117,7 @@ def test_two_groups():
     Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
     Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
     # First group is just 'a' and 'b'. Second is 4, 5 and 6
-    Groups = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
+    Groups = [['b', 'a', 'a', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
               [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
     gr_int = [int(x == 'b') for x in Groups[0]]
 
@@ -194,7 +194,7 @@ def test_two_named_groups():
 
     result = create_group_metric_set('binary_classification',
                                      Y_true, Y_pred, Groups,
-                                     group_titles=group_titles)
+                                     sensitive_feature_names=group_titles)
     assert result['predictionType'] == 'binaryClassification'
     assert result['schemaType'] == 'groupMetricSet'
     assert result['schemaVersion'] == 0
