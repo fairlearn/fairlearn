@@ -98,16 +98,16 @@ REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 def create_group_metric_set(model_type,
                             y_true,
                             y_preds,
-                            group_memberships,
+                            sensitive_features,
                             model_titles=None,
-                            group_titles=None,
+                            sensitive_feature_names=None,
                             extra_metrics=None):
     """Create a dictionary matching the Dashboard's cache."""
     if extra_metrics is not None:
         raise NotImplementedError("No support for extra_metrics yet")
 
     # We could consider checking that the length of y_preds matches model_titles
-    # and that the length of group_memberships matches group_titles
+    # and that the length of sensitive_features matches sensitive_feature_names
 
     result = dict()
     result[_SCHEMA] = _GROUP_METRIC_SET
