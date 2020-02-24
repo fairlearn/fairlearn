@@ -521,10 +521,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         <div className={WizardReport.classNames.metricText}>{disparityAccuracyString}</div>
                         <div className={WizardReport.classNames.metricLabel}>{localization.formatString(localization.Report.accuracyDisparityText, AccuracyOptions[accuracyKey].title.toLowerCase())}</div>
                     </div>
-                    <ActionButton
+                    {/* <ActionButton
                         className={WizardReport.classNames.editButton}
                         iconProps={{iconName: "Edit"}}
-                        onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
+                        onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton> */}
                 </div>
             </div>
             <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
@@ -551,7 +551,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
                     </div>
             </div>
-            <div className={WizardReport.classNames.header}>
+            {/* <div className={WizardReport.classNames.header}>
                 <div className={WizardReport.classNames.headerTitle}>{localization.Report.outcomesTitle}</div>
                 <div className={WizardReport.classNames.bannerWrapper}>
                     <div className={WizardReport.classNames.headerBanner}>
@@ -582,10 +582,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     <div className={WizardReport.classNames.mainRight}>
                         <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
                         <div className={WizardReport.classNames.rightText}>{howToReadOutcomesSection}</div>
-                        {/* <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
+                        <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
                     </div>
-            </div>
+            </div> */}
         </div>);
     }
 
