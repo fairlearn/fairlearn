@@ -4,6 +4,7 @@ import { IModelComparisonProps } from "./Controls/ModelComparisonChart";
 import { Text } from "office-ui-fabric-react/lib/Text";
 import { localization } from "./Localization/localization";
 import { Separator } from "office-ui-fabric-react/lib/Separator";
+import { Dropdown, DropdownMenuItemType, IDropdownStyles, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { mergeStyleSets } from "@uifabric/styling";
 import _ from "lodash";
@@ -33,6 +34,7 @@ interface IMetrics {
 
 export interface IState {
     metrics?: IMetrics;
+    featureKey?: string;
 }
 
 export interface IReportProps extends IModelComparisonProps {
@@ -56,26 +58,28 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             padding: "40px"
         },
         header: {
-            padding: "0 90px",
-            backgroundColor: "#F2F2F2"
+            padding: "0px 90px 20px 90px",
+            backgroundColor: "#333333"
         },
         multimodelButton: {
             marginTop: "20px",
             padding: 0,
-            color: "#333333",
+            color: "#ffffff",
             fontSize: "12px",
-            lineHeight: "16px",
             fontWeight: "400"
         },
         headerTitle: {
             paddingTop: "10px",
-            color: "#333333",
+            color: "#ffffff",
             fontSize: "32px",
             lineHeight: "39px",
             fontWeight: "100"
         },
         headerBanner: {
             display: "flex"
+        },
+        headerOptions: {
+            backgroundColor: "#333333",
         },
         bannerWrapper: {
             width: "100%",
@@ -86,7 +90,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             justifyContent: "space-between"
         },
         editButton: {
-            color: "#333333",
+            color: "#ffffff",
             fontSize: "12px",
             lineHeight: "20px",
             fontWeight: "400"
@@ -138,6 +142,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             lineHeight: "12px",
             fontWeight: "500"
         },
+        dropDown: {
+            margin: "10px 0px",
+            display: "inline-block"
+        },
         mainRight: {
             minWidth: "200px",
             paddingLeft: "35px",
@@ -161,11 +169,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             borderBottom: "0.5px dashed #CCCCCC"
         },
         insights: {
-            textTransform: "uppercase",
+            // textTransform: "uppercase",
             color: "#333333",
             fontSize: "15px",
             lineHeight: "16px",
-            fontWeight: "500",
+            fontWeight: "600",
             padding: "18px 0",
         },
         insightsText: {
@@ -174,8 +182,18 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             lineHeight: "16px",
             fontWeight: "400",
             paddingBottom: "18px",
-            paddingRight: "15px",
-            borderBottom: "1px solid #CCCCCC"
+            paddingRight: "15px"
+            // borderBottom: "1px solid #CCCCCC"
+        },
+        downloadReport: {
+            color: "#333333",
+            fontSize: "15px",
+            lineHeight: "16px",
+            fontWeight: "400",
+            paddingTop: "20px",
+            paddingBottom: "20px",
+            paddingLeft: "60px",
+            border: "1px solid #CCCCCC"
         },
         tableWrapper: {
             paddingBottom: "20px"
@@ -197,12 +215,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         },
         modelLabel: {
             alignSelf: "center",
-            paddingLeft: "35px",
-            paddingTop: "16px",
-            color: "#333333",
+            color: "#ffffff",
             fontSize: "26px",
-            lineHeight: "16px",
-            fontWeight: "400"
+            fontWeight: "400",
+            paddingTop: "10px",
+            paddingBottom: "10px"
         }
     });
 
@@ -490,6 +507,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             accuracyChartHeader = localization.Report.distributionOfErrors;
         }
         
+        const featureOptions: IDropdownOption[] = this.props.dashboardContext.modelMetadata.featureNames.map(x => { return {key: x, text: x}});
         const globalAccuracyString = this.formatNumbers(this.state.metrics.globalAccuracy, accuracyKey);
         const disparityAccuracyString = this.formatNumbers(this.state.metrics.accuracyDisparity, accuracyKey);
         
@@ -499,6 +517,17 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             this.formatNumbers(value, accuracyKey));
         const formattedBinOutcomeValues = this.state.metrics.binnedOutcome.map(value => 
             this.formatNumbers(value, outcomeKey));
+        const dropdownStyles: Partial<IDropdownStyles> = {
+            dropdown: { width: 180 },
+            label: { color: "#ffffff" },
+            title: { color: "#ffffff", backgroundColor: "#333333", selectors: {
+                ':hover': {
+                    color: "#333333",
+                    backgroundColor: "#f3f2f1"
+                }
+            }},
+            dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
+        };
         return (<div style={{height: "100%", overflowY:"auto"}}>
             <div className={WizardReport.classNames.header}>
                 {this.props.modelCount > 1 &&
@@ -509,11 +538,22 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             onClick={this.clearModelSelection}>
                             {localization.Report.backToComparisons}
                         </ActionButton>
-                        <div className={WizardReport.classNames.modelLabel}>
-                            {this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}
-                        </div>
                     </div>}
-                <div className={WizardReport.classNames.headerTitle}>{localization.Report.title}</div>
+                    <div className={WizardReport.classNames.modelLabel}>
+                        {localization.Report.assessmentResults} <b>{this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}</b>
+                    </div>
+                    <div className={WizardReport.classNames.headerOptions}>
+                        <Dropdown
+                            className={WizardReport.classNames.dropDown}
+                            // label="Feature"
+                            defaultSelectedKey={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
+                            options={featureOptions}
+                            disabled={false}
+                            onChange={this.featureChanged}
+                            styles={dropdownStyles}
+                        />
+                    </div>
+                {/* <div className={WizardReport.classNames.headerTitle}>{localization.Report.title}</div>
                 <div className={WizardReport.classNames.bannerWrapper}>
                     <div className={WizardReport.classNames.headerBanner}>
                         <div className={WizardReport.classNames.metricText}>{globalAccuracyString}</div>
@@ -521,11 +561,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         <div className={WizardReport.classNames.metricText}>{disparityAccuracyString}</div>
                         <div className={WizardReport.classNames.metricLabel}>{localization.formatString(localization.Report.accuracyDisparityText, AccuracyOptions[accuracyKey].title.toLowerCase())}</div>
                     </div>
-                    {/* <ActionButton
+                    <ActionButton
                         className={WizardReport.classNames.editButton}
                         iconProps={{iconName: "Edit"}}
-                        onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton> */}
-                </div>
+                        onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
+                </div> */}
             </div>
             <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
@@ -545,10 +585,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         </div>
                     </div>
                     <div className={WizardReport.classNames.mainRight}>
-                        <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={WizardReport.classNames.rightText}>{howToReadAccuracySection}</div>
-                        {/* <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
+                        {/* <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div> */}
+                        {/* <div className={WizardReport.classNames.rightText}>{howToReadAccuracySection}</div> */}
+                        <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
+                        <div className={WizardReport.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
                     </div>
             </div>
             {/* <div className={WizardReport.classNames.header}>
@@ -609,6 +650,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             this.props.selections.onSelect([]);
         }
         this.props.onEditConfigs();
+    }
+
+    private readonly featureChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
+        const featureKey = option.key.toString();
+        if (this.state.featureKey !== featureKey) {
+            this.props.featureBinPickerProps.selectedBinIndex = this.props.dashboardContext.modelMetadata.featureNames.indexOf(featureKey);
+            this.setState({featureKey: featureKey});
+        }
     }
 
     private async loadData(): Promise<void> {

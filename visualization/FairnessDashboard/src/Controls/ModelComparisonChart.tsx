@@ -198,11 +198,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             borderBottom: "0.5px dashed #CCCCCC"
         },
         insights: {
-            textTransform: "uppercase",
+            // textTransform: "uppercase",
             color: "#333333",
             fontSize: "15px",
             lineHeight: "16px",
-            fontWeight: "500",
+            fontWeight: "600",
             padding: "18px 0",
         },
         insightsText: {
