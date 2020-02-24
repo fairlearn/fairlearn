@@ -142,7 +142,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                         })}
                     </div>
                 </div>
-                <div className={SummaryTable.classNames.metricCol}>
+                {/* <div className={SummaryTable.classNames.metricCol}>
                     <div className={SummaryTable.classNames.metricLabel}>{this.props.metricLabel}</div>
                     <div className={SummaryTable.classNames.flexCol}>
                         {this.props.formattedBinValues.map((value, index) => {
@@ -152,7 +152,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                             </div>);
                         })}
                     </div>
-                </div>
+                </div> */}
             </div>
         );
     }
