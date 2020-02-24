@@ -1,4 +1,5 @@
 import React from "react";
+import ReactModal from "react-modal";
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
 import { IModelComparisonProps } from "./Controls/ModelComparisonChart";
 import { Text } from "office-ui-fabric-react/lib/Text";
@@ -35,6 +36,7 @@ interface IMetrics {
 export interface IState {
     metrics?: IMetrics;
     featureKey?: string;
+    showModalHelp?: boolean;
 }
 
 export interface IReportProps extends IModelComparisonProps {
@@ -199,15 +201,51 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             paddingBottom: "20px"
         },
         textRow: {
+            float: "left",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            paddingBottom: "7px"
+            paddingBottom: "7px",
+            paddingLeft: "50px",
+            paddingRight: "50px"
+        },
+        infoButton: {
+            float: "left",
+            width: "15px",
+            height: "15px",
+            textAlign: "center",
+            fontFamily: "Arial",
+            fontSize: "12px",
+            lineHeight: "15px",
+            fontWeight: "400",
+            borderRadius: "50%",
+            border: "1px solid",
+            marginTop: "3px",
+            marginRight: "3px"
+        },
+        closeButton: {
+            color: "#FFFFFF",
+            float: "right",
+            fontFamily: "Arial",
+            fontSize: "20px",
+            lineHeight: "20px",
+            fontWeight: "400",
+            paddingLeft: "20px"
+        },
+        howTo: {
+            paddingTop: "20px",
+            paddingLeft: "100px"
         },
         colorBlock: {
             width: "15px",
             height: "15px",
             marginRight: "9px"
+        },
+        modalContentHelp: {
+            float: 'left',
+            paddingTop: '10px',
+            wordWrap: "break-word",
+            width: "300px"
         },
         multimodelSection: {
             display: "flex",
@@ -351,21 +389,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             ];
             opportunityPlot.layout.xaxis.tickformat = ',.0%';
             howToReadAccuracySection = (<div>
-                <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
-                    <div>
-                        <div>{localization.Report.underestimationError}</div>
-                        <div>{localization.Report.underpredictionExplanation}</div>
-                    </div>
-                </div>
-                <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
-                    <div>
-                        <div>{localization.Report.overestimationError}</div>
-                        <div>{localization.Report.overpredictionExplanation}</div>
-                    </div>
-                </div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead1}</div>
+                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead3}</div>
                 <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead2}</div>
                 <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead3}</div>
             </div>);
@@ -528,6 +552,23 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             }},
             dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
         };
+        const modalStyles = {
+            content : {
+                top                   : '50%',
+                left                  : '50%',
+                right                 : 'auto',
+                bottom                : 'auto',
+                marginRight           : '-50%',
+                paddingTop            : '5px',
+                paddingRight          : '10px',
+                paddingBottom         : '10px',
+                transform             : 'translate(-50%, -50%)',
+                fontFamily: "Segoe UI",
+                color: "#FFFFFF",
+                backgroundColor: "#333333"
+            },
+            overlay: {zIndex: 1000}
+        };
         return (<div style={{height: "100%", overflowY:"auto"}}>
             <div className={WizardReport.classNames.header}>
                 {this.props.modelCount > 1 &&
@@ -566,6 +607,18 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         iconProps={{iconName: "Edit"}}
                         onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div> */}
+            </div>
+            <div className={WizardReport.classNames.howTo}>
+                    <ActionButton onClick={this.handleOpenModalHelp}><div className={WizardReport.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
+                    <ReactModal
+                        style={modalStyles}
+                        appElement={document.getElementById('app') as HTMLElement}
+                        isOpen={this.state.showModalHelp}
+                        contentLabel="Minimal Modal Example"
+                        >
+                        <ActionButton className={WizardReport.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton>
+                        <p className={WizardReport.classNames.modalContentHelp}>{localization.Report.classificationAccuracyHowToRead1}<br/><br/>{localization.Report.classificationAccuracyHowToRead2}<br/><br/>{localization.Report.classificationAccuracyHowToRead3}</p>
+                    </ReactModal>
             </div>
             <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
@@ -627,6 +680,20 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
                     </div>
             </div> */}
+            <div className={WizardReport.classNames.textRow}>
+                <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                <div>
+                    <div>{localization.Report.underestimationError}</div>
+                    <div>{localization.Report.underpredictionExplanation}</div>
+                </div>
+            </div>
+            <div className={WizardReport.classNames.textRow}>
+                <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                <div>
+                    <div>{localization.Report.overestimationError}</div>
+                    <div>{localization.Report.overpredictionExplanation}</div>
+                </div>
+            </div>
         </div>);
     }
 
@@ -650,6 +717,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             this.props.selections.onSelect([]);
         }
         this.props.onEditConfigs();
+    }
+
+    private readonly handleOpenModalHelp = (event): void => {
+        this.setState({ showModalHelp: true });
+    }
+
+    private readonly handleCloseModalHelp = (event): void => {
+        this.setState({ showModalHelp: false });
     }
 
     private readonly featureChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
