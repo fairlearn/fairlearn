@@ -52,7 +52,7 @@ The `fairlearn` package contains the following algorithms for mitigating unfairn
 
 ## Visualizations
 
-This repository containts a visualization dashboard that enables data scientists, auditors, business decision makers, and other stakeholders to visually observe and analyze how their model is treating represented groups in datapoints (e.g., different ethnicities), get insights into (un)fairness of their model and potential ways of mitigating the obsereved unfairness.  
+This repository containts a visualization dashboard that enables data scientists, auditors, business decision makers, and other stakeholders to visually observe and analyze how their model predictions are impacting different groups of data points (e.g., different ethnicities). It provides a high-level and detailed view of prediction insights for assessing which groups are negatively impacted. Using this dashboard you get insights into (un)fairness of you model and gain ideas around potential ways of mitigating the obsereved unfairness.  
 
 ### Visualization: single model, pre-mitigation 
 
@@ -61,6 +61,11 @@ Load the visualization dashboard in your noteboook to observe and assess your mo
 ```python
 from fairlearn.widget import FairlearnDashboard
 
+# A_test containts your protected attributes (e.g., Age, Gender)
+# sensitive_feature_names containts your protected attributes names
+# y_true contains ground truth labels
+# y_pred contains prediction labels
+
 FairlearnDashboard(sensitive_features=A_test,
                    sensitive_feature_names=['Gender', 'Age'],
                    y_true=Y_test.tolist(),
@@ -68,15 +73,15 @@ FairlearnDashboard(sensitive_features=A_test,
 ```
 
 
-Pre-mitigation visualization dashboard consists of procedural steps for configuration and evaluation of model fairness insights. In the configuration stage, you select your (1) protected (sensitive) attributes of interest (e.g., gender with three values of female, male, and non-binary), and (2) disparity metric that you would like to evaluate across different groups of your selected protected attribute (e.g., model precision for females, model precision for males, model precision for people with non-binary gender). The evaluation stage uses these configurations to show relevant charts on how fair different subgroups of your selected protected attribute are being treated by your model. 
+Pre-mitigation visualization dashboard consists of procedural steps for configuration and evaluation of model fairness insights. In the configuration stage, you select your (1) protected (sensitive) attribute of interest (e.g., gender with three values of female, male, and non-binary), and (2) disparity metric that you would like to evaluate across different groups of your selected protected attribute (e.g., model precision). The evaluation stage uses these configurations to represent a detailed view of model's treatment across different subgroups of your selected protected attribute (e.g., model precision for females, model precision for males, model precision for people with non-binary gender). 
 
 
 
-The following plots provide a view of the configuration steps, where `gender` is selected as a protected attribute and `precision` is selected as the metric of interest to be analyzed for different subgroups of gender.
+The following plots provide a view of the configuration steps, where `gender` is selected as a protected attribute and `accuracy` is selected as the metric of interest to be analyzed for different subgroups of `gender`.
 
 
 
-![Visualization Dashboard Global](https://docs.microsoft.com/en-us/azure/machine-learning/service/media/machine-learning-interpretability-explainability/global-charts.png)
+![Visualization Dashboard Global](./img/fairlearn-dashboard-config.png)
 
 
 
@@ -84,28 +89,28 @@ The following plots provide a view of the configuration steps, where `gender` is
 
 |Plot|Description|
 |----|-----------|
-|Disparity in Accuracy| This panel (1) shows the accuracy of your model with respect to your selected accuracy metric (e.g., precision) (A) on the entire model, and (B) on different subgroups of your selected protected attribute (e.g., precision for females, precision for males, precision for datapoints with a non-binary gender), (2) highlights the disparity (difference) of selected accuracy metric across different subgroups of protected attribute. It also (3) shows the distribution of errors in each subgroup (e.g., female, male, non-binary gender) by spliting errors into overprediction errors (predicting 1 when the true label is 0 for binary classification or ... for regression), and underprediction errors (predicting 0 when the true label is 1 for binary classification and ... for regression).
-|Disparity in Predictions|This panel shows a bar chart that contains the selection rate in each group, meaning the fraction of points classified as 1 (in binary classification) and xxxxx in regression.|
+|Disparity in Accuracy| This panel (1) shows the accuracy of your model with respect to your selected accuracy metric (e.g., `accuracy`) (A) on the entire model, and (B) on different subgroups of your selected protected attribute (e.g., `accuracy` for females, `accuracy` for males, `accuracy` for datapoints with a non-binary gender), (2) highlights the disparity (difference) of selected accuracy metric across different subgroups of protected attribute. It also (3) shows the distribution of errors in each subgroup (e.g., female, male, non-binary gender). In the binary classification case, it will further split the errors into overprediction (predicting 1 when the true label is 0), and underprediction (predicting 0 when the true label is 1).
+|Disparity in Predictions|This panel shows a bar chart that contains the selection rate in each group. This means the fraction of points classified as 1 (in binary classification) and distribution of prediction values in regression.|
 
 
 
 The following plots provide a view of the final evaluation step.
 
 
-![Visualization Dashboard Global](https://docs.microsoft.com/en-us/azure/machine-learning/service/media/machine-learning-interpretability-explainability/global-charts.png)
+![Visualization Dashboard Global](./img/fairlearn-dashboard-results.png)
 
 ### Visualization: multiple models, post-mitigation 
 
-Post-mitigation visualization dashboard has been mainly designed for the reduction mitigation techniques `GridSearch` and `ExponentiatedGradient` where mitigation phase produces a selection of mitigated models. However, it can work with post-processing approach `ThresholdOptimizer` to showcase comparative chart of pre and post mitigation models.
+Post-mitigation visualization dashboard has been mainly designed for the reduction mitigation techniques `GridSearch` and `ExponentiatedGradient` where mitigation phase produces an array of mitigated models. However, it can work with post-processing approach `ThresholdOptimizer` to showcase comparative chart of pre and post mitigation models.
 
 
-The visualization dashboard consists of the same procedural steps for configuration and evaluation of model fairness insights. You still go through the configuration stage selecting you protected attribute and accuracy metric of interest. But before landing on the evaluation page, you are show a screen that compares optimal tradeoffs between error and disparity among the original, unmitigated predictor and mitigated predictors (output of the reduction technique). You can observe the trade-off (if exists) and compare the performance of different predictors for each selected attribute or accuracy metric of interest. You can next click on any of the predictors to land on the evaluation page for that selected predictor.
+The post-mitigation visualization dashboard consists of the same procedural steps for configuration and evaluation of model fairness insights. You still go through the configuration stage, select your protected attribute and accuracy metric of interest. After you select your parameters, before landing on the evaluation page, you are shown a screen that compares optimal tradeoffs between computed models' error values and disparity metrics (accuracy vs. disparity) for your original unmitigated predictor and all computed mitigated predictors (output of the reduction technique or the models generated by the post-processing approach). You can then observe the trade-off (if exists) and compare the performance vs. fairness of your different models, and click on any of the predictors to land on the evaluation page for that selected predictor.
 
-The following plots provide a view of the comparison and evaluation steps, where `gender` is selected as a protected attribute and `precision` is selected as the metric of interest to be analyzed for different subgroups of gender.
+The following plots provide a view of the comparison view, where `gender` is selected as a protected attribute and `accuracy` is selected as the metric of interest to be analyzed for different subgroups of gender.
 
 
 
-![Visualization Dashboard Global](https://docs.microsoft.com/en-us/azure/machine-learning/service/media/machine-learning-interpretability-explainability/global-charts.png)
+![Visualization Dashboard Global](./img/fairlearn-dashboard-models.png)
 
 
 
