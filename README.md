@@ -4,6 +4,14 @@
 
 The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
 
+ #### fairlearn components ####
+ * Assessment dashboard: high-level and detailed views, for assessing which groups are negatively impacted. 
+ * Mitigation strategies: easy to incorporate into existing machine-learning pipelines.
+
+Together, these components empower data scientists and business leaders to navigate any tradeoffs between fairness and performance, and to select the mitigation strategy that best fits their needs.
+
+
+
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
 - [Overview of fairlearn](#overview-of-fairlearn)
