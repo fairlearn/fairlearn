@@ -221,7 +221,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             borderRadius: "50%",
             border: "1px solid",
             marginTop: "3px",
-            marginRight: "3px"
+            marginRight: "3px",
+            marginLeft: "150px"
         },
         closeButton: {
             color: "#FFFFFF",
@@ -231,6 +232,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             lineHeight: "20px",
             fontWeight: "400",
             paddingLeft: "20px"
+        },
+        equalizedOdds: {
+            float: "left",
+            fontWeight: "600",
+            paddingTop: "10px",
+            paddingLeft: "100px"
         },
         howTo: {
             paddingTop: "20px",
@@ -608,6 +615,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div> */}
             </div>
+            <div className={WizardReport.classNames.equalizedOdds}>{localization.Report.equalizedOddsDisparity}</div>
             <div className={WizardReport.classNames.howTo}>
                     <ActionButton onClick={this.handleOpenModalHelp}><div className={WizardReport.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
                     <ReactModal
@@ -731,7 +739,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         const featureKey = option.key.toString();
         if (this.state.featureKey !== featureKey) {
             this.props.featureBinPickerProps.selectedBinIndex = this.props.dashboardContext.modelMetadata.featureNames.indexOf(featureKey);
-            this.setState({featureKey: featureKey});
+            this.setState({featureKey: featureKey, metrics: undefined});
         }
     }
 

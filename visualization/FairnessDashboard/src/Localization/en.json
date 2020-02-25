@@ -80,6 +80,7 @@
         "editConfiguration": "Edit configuration",
         "backToComparisons": "Back to all models",
         "assessmentResults": "Assessment results for",
+        "equalizedOddsDisparity": "Equalized odds disparity",
         "outcomesTitle": "Disparity in predictions",
         "minTag": "Min",
         "maxTag": "Max",
