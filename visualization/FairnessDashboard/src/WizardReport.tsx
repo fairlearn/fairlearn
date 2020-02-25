@@ -222,7 +222,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             border: "1px solid",
             marginTop: "3px",
             marginRight: "3px",
-            marginLeft: "150px"
+            marginLeft: "250px"
         },
         closeButton: {
             color: "#FFFFFF",
@@ -236,7 +236,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         equalizedOdds: {
             float: "left",
             fontWeight: "600",
-            paddingTop: "10px",
+            paddingTop: "30px",
             paddingLeft: "100px"
         },
         howTo: {
