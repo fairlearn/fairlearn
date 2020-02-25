@@ -89,7 +89,7 @@ The following plots provide a view of the configuration steps, where `gender` is
 
 
 
-![Visualization Dashboard Global](./img/fairlearn-dashboard-config.png)
+![Configuration Steps](./img/fairlearn-dashboard-config.png)
 
 
 
@@ -105,7 +105,7 @@ The following plots provide a view of the configuration steps, where `gender` is
 The following plots provide a view of the final evaluation step.
 
 
-![Visualization Dashboard Global](./img/fairlearn-dashboard-results.png)
+![Fairness Insights](./img/fairlearn-dashboard-results.png)
 
 ### Visualization: multiple models, post-mitigation 
 
@@ -118,7 +118,7 @@ The following plots provide a view of the comparison view, where `gender` is sel
 
 
 
-![Visualization Dashboard Global](./img/fairlearn-dashboard-models.png)
+![Accuracy Fairness Tradeoff](./img/fairlearn-dashboard-models.png)
 
 
 
