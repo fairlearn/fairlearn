@@ -13,13 +13,11 @@ from . import group_miss_rate, group_precision_score, group_r2_score
 from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_error
 from . import group_selection_rate, group_specificity_score, group_zero_one_loss
 
-_GROUP_NAMES_MSG = "The group_names property must be a list of strings"
+_GROUP_NAMES_MSG = "The sensitive_feature_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
 _METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
 
-_ARRAYS_NOT_SAME_LENGTH = "Lengths of y_true, y_pred and groups must match"
-_BIN_MISMATCH_FOR_METRIC = "The groups for metric {0} do not match the groups property"
-_GROUP_NAMES_BAD_COUNT = "Count of group_names not the same as the number of unique groups"
+_ARRAYS_NOT_SAME_LENGTH = "Lengths of y_true, y_pred and sensitive_features must match"
 
 _Y_TRUE = 'trueY'
 _Y_PRED = 'predictedY'
@@ -98,16 +96,16 @@ REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 def create_group_metric_set(model_type,
                             y_true,
                             y_preds,
-                            group_memberships,
+                            sensitive_features,
                             model_titles=None,
-                            group_titles=None,
+                            sensitive_feature_names=None,
                             extra_metrics=None):
     """Create a dictionary matching the Dashboard's cache."""
     if extra_metrics is not None:
         raise NotImplementedError("No support for extra_metrics yet")
 
     # We could consider checking that the length of y_preds matches model_titles
-    # and that the length of group_memberships matches group_titles
+    # and that the length of sensitive_features matches sensitive_feature_names
 
     result = dict()
     result[_SCHEMA] = _GROUP_METRIC_SET
@@ -133,14 +131,14 @@ def create_group_metric_set(model_type,
     result[_PRECOMPUTED_METRICS] = []
     result[_PRECOMPUTED_BINS] = []
     result[_MODEL_NAMES] = []
-    for g, group_membership in enumerate(group_memberships):
+    for g, group_membership in enumerate(sensitive_features):
         _gm = np.asarray(group_membership).tolist()
         _unique_groups = sorted(list(np.unique(_gm)))
         group_names = [str(x) for x in _unique_groups]
         groups = [_unique_groups.index(x) for x in _gm]
         bin_dict = {_BIN_VECTOR: groups, _BIN_LABELS: group_names}
-        if group_titles is not None:
-            bin_dict[_FEATURE_BIN_NAME] = group_titles[g]
+        if sensitive_feature_names is not None:
+            bin_dict[_FEATURE_BIN_NAME] = sensitive_feature_names[g]
         result[_PRECOMPUTED_BINS].append(bin_dict)
 
         model_list = []
