@@ -111,3 +111,5 @@ venv.bak/
 
 # Documentation
 docbuild/
+
+.idea/
