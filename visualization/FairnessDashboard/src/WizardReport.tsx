@@ -13,6 +13,7 @@ import { ParityModes } from "./ParityMetrics";
 import { IPlotlyProperty, AccessibleChart } from "mlchartlib";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
 import { SummaryTable } from "./Controls/SummaryTable";
+import { OverallTable } from "./Controls/OverallTable";
 import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
 import { AccuracyOptions } from "./AccuracyMetrics";
 import { NONAME } from "dns";
@@ -121,6 +122,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             fontWeight: "400",
             paddingTop: "8px",
             maxWidth: "130px"
+        },
+        overallArea: {
+            display: "flex",
+            flexDirection: "row",
+            padding: "20px 0 30px 90px",
+            backgroundColor: 'white'
         },
         presentationArea: {
             display: "flex",
@@ -614,6 +621,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         iconProps={{iconName: "Edit"}}
                         onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div> */}
+            </div>
+            <div className={WizardReport.classNames.overallArea} style={{height: `${areaHeights/2}px`}}>
+                    <OverallTable
+                        binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
+                        binLabels={this.props.dashboardContext.groupNames}
+                        formattedBinValues={formattedBinAccuracyValues}
+                        metricLabel={AccuracyOptions[accuracyKey].title}
+                        binValues={this.state.metrics.binnedAccuracy}/>
             </div>
             <div className={WizardReport.classNames.equalizedOdds}>{localization.Report.equalizedOddsDisparity}</div>
             <div className={WizardReport.classNames.howTo}>
