@@ -5,6 +5,7 @@ import pandas as pd
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
 from .error_rate import ErrorRate
+import numpy as np
 
 _DIFF = "diff"
 
@@ -40,6 +41,16 @@ class ConditionalSelectionRate(ClassificationMoment):
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
+        # print('Tags', self.tags)
+        # print('y', y==0)
+        # print('shape of X before removal of rows ', X.shape)
+        # print(type(y), type(X))
+        # self.tags.drop(inplace=True)
+        # print('shape of X after removal of rows ', X.shape)
+        # print('shape of X', X.shape)
+        self.dropped_X = self.X.drop(index= (y[y==0].index), inplace=True)
+        self.dropped_tags = self.tags.drop(index= (y[y==0].index), inplace=True)
+        # print('shape of X after', X.shape)
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -108,9 +119,17 @@ class ConditionalSelectionRate(ClassificationMoment):
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
             - lambda_signed / self.prob_group_event
+        print('Adjust shape: ', adjust)
+        print('Tags shape', self.tags.shape)
+        # self.X.append(self.dropped_X)
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
+        appending_term = self.dropped_tags.apply(
+            lambda row: 0, axis=1
+        )
+        print('signed weights', signed_weights)
+        signed_weights.append(appending_term)
         return signed_weights
 
 
@@ -144,6 +163,16 @@ class DemographicParity(ConditionalSelectionRate):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
+
+
+class EqualOpportunity(ConditionalSelectionRate):
+    short_name = "EqualOpportunity"
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(1)),
+                          **kwargs)
 
 
 class EqualizedOdds(ConditionalSelectionRate):
