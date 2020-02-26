@@ -75,17 +75,11 @@ def add_dataset_setup(script_lines, perf_test_configuration):
 def add_unconstrained_estimator_fitting(script_lines, perf_test_configuration):
     with TimedExecution(_ESTIMATOR_FIT, script_lines):
         script_lines.append('estimator = models["{}"]()'.format(perf_test_configuration.predictor))
-        script_lines.append('unconstrained_predictor = models["{}"]()'.format(perf_test_configuration.predictor))
-        script_lines.append('unconstrained_predictor.fit(X_train, y_train)')
 
 
 def add_mitigation(script_lines, perf_test_configuration):
     with TimedExecution(_MITIGATION, script_lines):
-        if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
-            script_lines.append('mitigator = ThresholdOptimizer('
-                                'unconstrained_predictor=unconstrained_predictor, '
-                                'constraints="{}")'.format(perf_test_configuration.disparity_metric))
-        elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
+        if perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
             script_lines.append('mitigator = ExponentiatedGradient('
                                 'estimator=estimator, '
                                 'constraints={}())'.format(perf_test_configuration.disparity_metric))

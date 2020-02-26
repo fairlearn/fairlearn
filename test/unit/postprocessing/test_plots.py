@@ -24,7 +24,7 @@ generated images with the baseline plots (using pytest --mpl)."""
 
 
 def _fit_and_plot(constraints, plotting_data):
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints)
     adjusted_predictor.fit(plotting_data.X, plotting_data.y,
                            sensitive_features=plotting_data.sensitive_features)
