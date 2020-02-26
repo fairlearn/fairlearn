@@ -11,6 +11,7 @@ export interface IOverallTableProps {
     formattedBinValues: string[];
     binLabels: string[];
     metricLabel: string;
+    overallMetric: string;
     binGroup: string;
 }
 
@@ -129,8 +130,11 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
         return (
             <div className={OverallTable.classNames.frame}>
                 <div className={OverallTable.classNames.groupCol}>
-                    <div className={OverallTable.classNames.groupLabel}>{this.props.binGroup}</div>
+                    <div className={OverallTable.classNames.groupLabel}>{/*this.props.binGroup*/}</div>
                     <div className={OverallTable.classNames.flexCol}>
+                        <div className={OverallTable.classNames.binBox}>
+                                <div className={OverallTable.classNames.binTitle}>{localization.Report.overallLabel}</div>
+                        </div>
                         {this.props.binLabels.map((label, index) => {
                             return (<div className={OverallTable.classNames.binBox} key={index}>
                                 <div className={OverallTable.classNames.binTitle}>{label}</div>
@@ -145,6 +149,43 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                 <div className={OverallTable.classNames.metricCol}>
                     <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
                     <div className={OverallTable.classNames.flexCol}>
+                        <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
+                        {this.props.formattedBinValues.map((value, index) => {
+                            return (
+                            <div className={OverallTable.classNames.metricBox} key={index}>
+                                {value !== undefined ? value : 'empty'}
+                            </div>);
+                        })}
+                    </div>
+                </div>
+                <div className={OverallTable.classNames.metricCol}>
+                    <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
+                    <div className={OverallTable.classNames.flexCol}>
+                        <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
+                        {this.props.formattedBinValues.map((value, index) => {
+                            return (
+                            <div className={OverallTable.classNames.metricBox} key={index}>
+                                {value !== undefined ? value : 'empty'}
+                            </div>);
+                        })}
+                    </div>
+                </div>
+                <div className={OverallTable.classNames.metricCol}>
+                    <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
+                    <div className={OverallTable.classNames.flexCol}>
+                        <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
+                        {this.props.formattedBinValues.map((value, index) => {
+                            return (
+                            <div className={OverallTable.classNames.metricBox} key={index}>
+                                {value !== undefined ? value : 'empty'}
+                            </div>);
+                        })}
+                    </div>
+                </div>
+                <div className={OverallTable.classNames.metricCol}>
+                    <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
+                    <div className={OverallTable.classNames.flexCol}>
+                    <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
                         {this.props.formattedBinValues.map((value, index) => {
                             return (
                             <div className={OverallTable.classNames.metricBox} key={index}>

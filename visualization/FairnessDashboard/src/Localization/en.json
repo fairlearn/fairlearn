@@ -85,6 +85,7 @@
         "minTag": "Min",
         "maxTag": "Max",
         "groupLabel": "Subgroup",
+        "overallLabel": "Overall",
         "underestimationError": "Underprediction",
         "underpredictionExplanation": "(predicted = 0, true = 1)",
         "overpredictionExplanation": "(predicted = 1, true = 0)",

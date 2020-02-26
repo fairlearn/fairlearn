@@ -628,6 +628,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         binLabels={this.props.dashboardContext.groupNames}
                         formattedBinValues={formattedBinAccuracyValues}
                         metricLabel={AccuracyOptions[accuracyKey].title}
+                        overallMetric={globalAccuracyString}
                         binValues={this.state.metrics.binnedAccuracy}/>
             </div>
             <div className={WizardReport.classNames.equalizedOdds}>{localization.Report.equalizedOddsDisparity}</div>
