@@ -21,7 +21,7 @@ def test_no_matplotlib(constraints):
     n_sensitive_feature_values = 2
     n_classes = 2
 
-    threshold_optimizer = ThresholdOptimizer(unconstrained_predictor=FakePredictor(),
+    threshold_optimizer = ThresholdOptimizer(estimator=FakePredictor(),
                                              constraints=constraints)
     threshold_optimizer.fit(X=np.random.random((n_samples, n_features)),
                             y=np.random.randint(n_classes, size=n_samples),
