@@ -1,10 +1,10 @@
 [![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)
 
-# fairlearn
+# Fairlearn
 
-The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
+The Fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The Fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
 
- #### fairlearn components ####
+ #### Fairlearn components ####
  * Assessment dashboard: high-level and detailed views, for assessing which groups are negatively impacted. 
  * Mitigation strategies: easy to incorporate into existing machine-learning pipelines.
 
@@ -14,8 +14,9 @@ Together, these components empower data scientists and business leaders to navig
 
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
-- [Overview of fairlearn](#overview-of-fairlearn)
-- [Install fairlearn](#install-fairlearn)
+- [Overview of Fairlearn](#overview-of-fairlearn)
+- [Install Fairlearn](#install-fairlearn)
+- [Visualizations](#visualizations)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Maintainers](#maintainers)
@@ -23,13 +24,13 @@ Together, these components empower data scientists and business leaders to navig
 
 ## Current release
 
-- The current stable release is available at [fairlearn v0.4.4](https://github.com/fairlearn/fairlearn/tree/v0.4.4).
+- The current stable release is available at [Fairlearn v0.4.3](https://github.com/fairlearn/fairlearn/tree/v0.4.4).
 
 - Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
 ## What we mean by _fairness_
 
-An AI system can behave unfairly for a variety of reasons. In fairlearn, we define whether an AI system is behaving unfairly in terms of its impact on people &ndash; i.e., in terms of harms. We focus on two kinds of harms:
+An AI system can behave unfairly for a variety of reasons. In Fairlearn, we define whether an AI system is behaving unfairly in terms of its impact on people &ndash; i.e., in terms of harms. We focus on two kinds of harms:
 
 - _Allocation harms._ These harms can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
@@ -37,13 +38,13 @@ An AI system can behave unfairly for a variety of reasons. In fairlearn, we defi
 
 We follow the approach known as **group fairness**, which asks: _Which groups of individuals are at risk for experiencing harms?_ The relevant groups need to be specified by the data scientist and are application specific.
 
-Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The fairlearn package enables assessment and mitigation of unfairness under several common definitions.
+Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The Fairlearn package enables assessment and mitigation of unfairness under several common definitions.
 To learn more about our definitions of fairness, please visit our [terminology page](./TERMINOLOGY.md#fairness-of-ai-systems).
 
 >_Note_:
 > Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
 
-## Overview of fairlearn
+## Overview of Fairlearn
 
 The `fairlearn` package contains the following algorithms for mitigatingunfairness in binary classification and regression:
 
@@ -89,7 +90,7 @@ The following plots provide a view of the configuration steps, where `gender` is
 
 
 
-![Configuration Steps](./img/fairlearn-dashboard-config.png)
+![Configuration Steps](img/fairlearn-dashboard-config.png)
 
 
 
@@ -105,7 +106,7 @@ The following plots provide a view of the configuration steps, where `gender` is
 The following plots provide a view of the final evaluation step.
 
 
-![Fairness Insights](./img/fairlearn-dashboard-results.png)
+![Fairness Insights](img/fairlearn-dashboard-results.png)
 
 ### Visualization: multiple models, post-mitigation 
 
@@ -118,13 +119,13 @@ The following plots provide a view of the comparison view, where `gender` is sel
 
 
 
-![Accuracy Fairness Tradeoff](./img/fairlearn-dashboard-models.png)
+![Accuracy Fairness Tradeoff](img/fairlearn-dashboard-models.png)
 
 
 
 
 
-## Install fairlearn
+## Install Fairlearn
 
 The package can be installed via
 
@@ -160,7 +161,7 @@ Onboarding guide for users of version 0.2 or earlier
 </summary>
 
 Up to version 0.2, fairlearn contained only the exponentiated gradient method.
-The fairlearn repository now has a more comprehensive scope and aims to
+The Fairlearn repository now has a more comprehensive scope and aims to
 incorporate other methods as specified above. The same exponentiated gradient
 technique is now the class `fairlearn.reductions.ExponentiatedGradient`. While
 in the past exponentiated gradient was invoked via
@@ -203,7 +204,7 @@ To contribute please check our [contributing guide](./CONTRIBUTING.md).
 
 ## Maintainers
 
-The fairlearn project is maintained by:
+The Fairlearn project is maintained by:
 
 - **@MiroDudik**
 - **@riedgar-ms**
