@@ -51,8 +51,8 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             display: "flex",
             flex: 1,
             flexDirection: "column",
-            borderTop: "1px solid #CCCCCC",
-            borderBottom: "1px solid #CCCCCC"
+            borderTop: "0.5px solid #CCCCCC",
+            borderBottom: "0.5px solid #CCCCCC"
         },
         binBox: {
             flex: 1,
@@ -103,9 +103,8 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            borderLeft: "0.5px dashed #CCCCCC",
+            // borderLeft: "0.5px dashed #CCCCCC",
             borderBottom: "0.5px dashed #CCCCCC"
-
         },
         frame: {
             paddingBottom: "19px",
@@ -142,7 +141,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                     <div className={OverallTable.classNames.groupLabel}>{/*this.props.binGroup*/}</div>
                     <div className={OverallTable.classNames.flexCol}>
                         <div className={OverallTable.classNames.binBox}>
-                                <div className={OverallTable.classNames.binTitle}>{localization.Report.overallLabel}</div>
+                                <div className={OverallTable.classNames.binTitle}><b>{localization.Report.overallLabel}</b></div>
                         </div>
                         {this.props.binLabels.map((label, index) => {
                             if (this.props.expandAttributes) return (<div className={OverallTable.classNames.binBox} key={index}>

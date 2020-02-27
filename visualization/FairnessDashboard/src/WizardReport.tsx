@@ -184,8 +184,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             color: "#333333",
             fontSize: "15px",
             lineHeight: "18px",
-            fontWeight: "400",
-            borderBottom: "0.5px dashed #CCCCCC"
+            fontWeight: "400"
+            // borderBottom: "0.5px dashed #CCCCCC"
         },
         insights: {
             // textTransform: "uppercase",
@@ -632,7 +632,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div> */}
             </div>
-            <div className={WizardReport.classNames.overallArea} style={{height: !this.state.expandAttributes && "100px" || this.state.expandAttributes && `${areaHeights/2}px` }}>
+            <div className={WizardReport.classNames.overallArea} style={{height: !this.state.expandAttributes && "150px" || this.state.expandAttributes && `${areaHeights/2}px` }}>
                     <OverallTable
                         binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         binLabels={this.props.dashboardContext.groupNames}
