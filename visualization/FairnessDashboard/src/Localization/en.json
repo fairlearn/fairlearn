@@ -82,6 +82,8 @@
         "assessmentResults": "Assessment results for",
         "equalizedOddsDisparity": "Equalized odds disparity",
         "outcomesTitle": "Disparity in predictions",
+        "expandSensitiveAttributes": "Expand sensitive attributes",
+        "collapseSensitiveAttributes": "Collapse sensitive attributes",
         "minTag": "Min",
         "maxTag": "Max",
         "groupLabel": "Subgroup",

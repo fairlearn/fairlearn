@@ -38,6 +38,7 @@ export interface IState {
     metrics?: IMetrics;
     featureKey?: string;
     showModalHelp?: boolean;
+    expandAttributes: boolean;
 }
 
 export interface IReportProps extends IModelComparisonProps {
@@ -122,6 +123,15 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             fontWeight: "400",
             paddingTop: "8px",
             maxWidth: "130px"
+        },
+        expandAttributes: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "12px",
+            fontWeight: "500",
+            height: "26px",
+            paddingLeft: "10px",
+            marginLeft: "80px"
         },
         overallArea: {
             display: "flex",
@@ -244,7 +254,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             float: "left",
             fontWeight: "600",
             paddingTop: "30px",
-            paddingLeft: "100px"
+            paddingLeft: "90px"
         },
         howTo: {
             paddingTop: "20px",
@@ -622,15 +632,17 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div> */}
             </div>
-            <div className={WizardReport.classNames.overallArea} style={{height: `${areaHeights/2}px`}}>
+            <div className={WizardReport.classNames.overallArea} style={{height: !this.state.expandAttributes && "100px" || this.state.expandAttributes && `${areaHeights/2}px` }}>
                     <OverallTable
                         binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         binLabels={this.props.dashboardContext.groupNames}
                         formattedBinValues={formattedBinAccuracyValues}
                         metricLabel={AccuracyOptions[accuracyKey].title}
+                        expandAttributes={this.state.expandAttributes}
                         overallMetric={globalAccuracyString}
                         binValues={this.state.metrics.binnedAccuracy}/>
             </div>
+            <div className={WizardReport.classNames.expandAttributes} onClick={this.expandAttributes}>{this.state.expandAttributes && localization.Report.collapseSensitiveAttributes || !this.state.expandAttributes && localization.Report.expandSensitiveAttributes}</div>
             <div className={WizardReport.classNames.equalizedOdds}>{localization.Report.equalizedOddsDisparity}</div>
             <div className={WizardReport.classNames.howTo}>
                     <ActionButton onClick={this.handleOpenModalHelp}><div className={WizardReport.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
@@ -734,6 +746,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
 
     private readonly clearModelSelection = (): void => {
         this.props.selections.onSelect([]);
+    }
+
+    private readonly expandAttributes = (): void => {
+        this.setState({ expandAttributes: !this.state.expandAttributes });
     }
 
     private readonly onEditConfigs = (): void => {

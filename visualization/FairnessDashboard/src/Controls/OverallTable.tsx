@@ -11,6 +11,7 @@ export interface IOverallTableProps {
     formattedBinValues: string[];
     binLabels: string[];
     metricLabel: string;
+    expandAttributes: boolean;
     overallMetric: string;
     binGroup: string;
 }
@@ -69,6 +70,14 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             fontSize: "15px",
             lineHeight: "18px",
             fontWeight: "400"
+        },
+        sensitiveAttributes: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "12px",
+            fontWeight: "500",
+            height: "26px",
+            paddingLeft: "10px"
         },
         metricCol: {
             display: "inline-flex",
@@ -136,7 +145,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                                 <div className={OverallTable.classNames.binTitle}>{localization.Report.overallLabel}</div>
                         </div>
                         {this.props.binLabels.map((label, index) => {
-                            return (<div className={OverallTable.classNames.binBox} key={index}>
+                            if (this.props.expandAttributes) return (<div className={OverallTable.classNames.binBox} key={index}>
                                 <div className={OverallTable.classNames.binTitle}>{label}</div>
                                 <Stack horizontal>
                                     {minIndexes.includes(index) && <div className={OverallTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
@@ -151,7 +160,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                     <div className={OverallTable.classNames.flexCol}>
                         <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
                         {this.props.formattedBinValues.map((value, index) => {
-                            return (
+                            if (this.props.expandAttributes) return (
                             <div className={OverallTable.classNames.metricBox} key={index}>
                                 {value !== undefined ? value : 'empty'}
                             </div>);
@@ -163,7 +172,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                     <div className={OverallTable.classNames.flexCol}>
                         <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
                         {this.props.formattedBinValues.map((value, index) => {
-                            return (
+                            if (this.props.expandAttributes) return (
                             <div className={OverallTable.classNames.metricBox} key={index}>
                                 {value !== undefined ? value : 'empty'}
                             </div>);
@@ -175,7 +184,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                     <div className={OverallTable.classNames.flexCol}>
                         <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
                         {this.props.formattedBinValues.map((value, index) => {
-                            return (
+                            if (this.props.expandAttributes) return (
                             <div className={OverallTable.classNames.metricBox} key={index}>
                                 {value !== undefined ? value : 'empty'}
                             </div>);
@@ -187,7 +196,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                     <div className={OverallTable.classNames.flexCol}>
                     <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
                         {this.props.formattedBinValues.map((value, index) => {
-                            return (
+                            if (this.props.expandAttributes) return (
                             <div className={OverallTable.classNames.metricBox} key={index}>
                                 {value !== undefined ? value : 'empty'}
                             </div>);
