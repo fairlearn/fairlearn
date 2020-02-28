@@ -58,7 +58,9 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
     :param flip: Allow flipping to negative weights if it improves accuracy.
     :type flip: bool
     :param refit: If ``False``, avoid re-fitting the given estimator if it's
-        already trained.
+        already trained. Note that when used with ``cross_val_score``,
+        ``GridSearchCV`` and similar utilities that clone the estimator,
+        the effective behavior is ``refit=True``. 
     :type: bool, default=True
     """
 
