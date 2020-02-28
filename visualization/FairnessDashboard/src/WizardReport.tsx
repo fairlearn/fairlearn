@@ -343,6 +343,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         const outcomeKey = this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ? "selection_rate" : "average";
         const outcomeMetric = AccuracyOptions[outcomeKey];
 
+        const overpredicitonKey = "overprediction";
+        const underpredictionKey = "underprediction";
+
         const accuracyPlot = _.cloneDeep(WizardReport.barPlotlyProps);
         const opportunityPlot = _.cloneDeep(WizardReport.barPlotlyProps);
         const nameIndex = this.props.dashboardContext.groupNames.map((unuxed, i) => i);
@@ -561,10 +564,20 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         
         const globalOutcomeString = this.formatNumbers(this.state.metrics.globalOutcome, outcomeKey);
         const disparityOutcomeString = this.formatNumbers(this.state.metrics.outcomeDisparity, outcomeKey);
+
         const formattedBinAccuracyValues = this.state.metrics.binnedAccuracy.map(value => 
             this.formatNumbers(value, accuracyKey));
         const formattedBinOutcomeValues = this.state.metrics.binnedOutcome.map(value => 
             this.formatNumbers(value, outcomeKey));
+        const formattedBinOverPredictionValues = this.state.metrics.binnedOverprediction.map(value => 
+            this.formatNumbers(value, overpredicitonKey));
+        const formattedBinUnderPredictionValues = this.state.metrics.binnedUnderprediction.map(value => 
+            this.formatNumbers(value, underpredictionKey));
+
+        const overallMetrics = [globalAccuracyString, globalOutcomeString, disparityAccuracyString, disparityOutcomeString];
+        const formattedBinValues = [formattedBinAccuracyValues, formattedBinOutcomeValues, formattedBinOverPredictionValues, formattedBinUnderPredictionValues];
+        const metricLabels = [AccuracyOptions[accuracyKey].title, AccuracyOptions[outcomeKey].title, AccuracyOptions[overpredicitonKey].title, AccuracyOptions[underpredictionKey].title];
+
         const dropdownStyles: Partial<IDropdownStyles> = {
             dropdown: { width: 180 },
             label: { color: "#ffffff" },
@@ -636,10 +649,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     <OverallTable
                         binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         binLabels={this.props.dashboardContext.groupNames}
-                        formattedBinValues={formattedBinAccuracyValues}
-                        metricLabel={AccuracyOptions[accuracyKey].title}
+                        formattedBinValues={formattedBinValues}
+                        metricLabels={metricLabels}
+                        overallMetrics={overallMetrics}
                         expandAttributes={this.state.expandAttributes}
-                        overallMetric={globalAccuracyString}
                         binValues={this.state.metrics.binnedAccuracy}/>
             </div>
             <div className={WizardReport.classNames.expandAttributes} onClick={this.expandAttributes}>{this.state.expandAttributes && localization.Report.collapseSensitiveAttributes || !this.state.expandAttributes && localization.Report.expandSensitiveAttributes}</div>

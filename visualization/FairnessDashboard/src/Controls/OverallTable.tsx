@@ -8,11 +8,11 @@ import { localization } from "../Localization/localization";
 
 export interface IOverallTableProps {
     binValues: number[];
-    formattedBinValues: string[];
+    formattedBinValues: string[][];
     binLabels: string[];
-    metricLabel: string;
+    metricLabels: string[];
     expandAttributes: boolean;
-    overallMetric: string;
+    overallMetrics: string[];
     binGroup: string;
 }
 
@@ -154,54 +154,22 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                         })}
                     </div>
                 </div>
-                <div className={OverallTable.classNames.metricCol}>
-                    <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
-                    <div className={OverallTable.classNames.flexCol}>
-                        <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
-                        {this.props.formattedBinValues.map((value, index) => {
-                            if (this.props.expandAttributes) return (
-                            <div className={OverallTable.classNames.metricBox} key={index}>
-                                {value !== undefined ? value : 'empty'}
-                            </div>);
-                        })}
-                    </div>
-                </div>
-                <div className={OverallTable.classNames.metricCol}>
-                    <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
-                    <div className={OverallTable.classNames.flexCol}>
-                        <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
-                        {this.props.formattedBinValues.map((value, index) => {
-                            if (this.props.expandAttributes) return (
-                            <div className={OverallTable.classNames.metricBox} key={index}>
-                                {value !== undefined ? value : 'empty'}
-                            </div>);
-                        })}
-                    </div>
-                </div>
-                <div className={OverallTable.classNames.metricCol}>
-                    <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
-                    <div className={OverallTable.classNames.flexCol}>
-                        <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
-                        {this.props.formattedBinValues.map((value, index) => {
-                            if (this.props.expandAttributes) return (
-                            <div className={OverallTable.classNames.metricBox} key={index}>
-                                {value !== undefined ? value : 'empty'}
-                            </div>);
-                        })}
-                    </div>
-                </div>
-                <div className={OverallTable.classNames.metricCol}>
-                    <div className={OverallTable.classNames.metricLabel}>{this.props.metricLabel}</div>
-                    <div className={OverallTable.classNames.flexCol}>
-                    <div className={OverallTable.classNames.metricBox}>{this.props.overallMetric}</div>
-                        {this.props.formattedBinValues.map((value, index) => {
-                            if (this.props.expandAttributes) return (
-                            <div className={OverallTable.classNames.metricBox} key={index}>
-                                {value !== undefined ? value : 'empty'}
-                            </div>);
-                        })}
-                    </div>
-                </div>
+                {this.props.metricLabels.map((metric, index) => {
+                    return (
+                        <div className={OverallTable.classNames.metricCol}>
+                        <div className={OverallTable.classNames.metricLabel}>{metric}</div>
+                        <div className={OverallTable.classNames.flexCol}>
+                            <div className={OverallTable.classNames.metricBox}>{this.props.overallMetrics[index]}</div>
+                            {this.props.formattedBinValues[index].map((value, index) => {
+                                if (this.props.expandAttributes) return (
+                                <div className={OverallTable.classNames.metricBox} key={index}>
+                                    {value !== undefined ? value : 'empty'}
+                                </div>);
+                            })}
+                        </div>
+                    </div>                        
+                    )
+                })}
             </div>
         );
     }
