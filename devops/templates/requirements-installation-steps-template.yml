@@ -6,11 +6,11 @@ parameters:
 steps:
 - script: echo '${{parameters.pyVer}}'
 
-- script: [ '${{parameters.pyVer}}' != '3.5' ] && cp requirements.txt ${{parameters.requirementsFile}}
+- bash: [ '${{parameters.pyVer}}' != '3.5' ] && cp requirements.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
   # condition: ne('${{parameters.pyVer}}', '3.5')
   
-- script: [ '${{parameters.pyVer}}' == '3.5' ] && cp requirements-3.5.txt ${{parameters.requirementsFile}}
+- bash: [ '${{parameters.pyVer}}' == '3.5' ] && cp requirements-3.5.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
   # condition: eq('${{parameters.pyVer}}', '3.5')
 
