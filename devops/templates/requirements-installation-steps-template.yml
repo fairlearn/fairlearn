@@ -6,11 +6,11 @@ parameters:
 steps:
 - script: cp requirements.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
-  condition: ne('${{parameters.pyVer}}', 3.5)
+  condition: ne('${{parameters.pyVer}}', '3.5')
   
 - script: cp requirements-3.5.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
-  condition: eq('${{parameters.pyVer}}', 3.5)
+  condition: eq('${{parameters.pyVer}}', '3.5')
 
 - script: python scripts/requirements_pin.py --input ${{parameters.requirementsFile}} --output requirements-fixed.txt --loglevel INFO
   displayName: "Pin Requirements file"

@@ -34,7 +34,7 @@ jobs:
 
   - template: requirements-installation-steps-template.yml
     parameters:
-      pyVer: $(PyVer)
+      pyVer: '$(PyVer)'
       requirementsFile: $(RequirementsFile)
       pinRequirements: ${{parameters.pinRequirements}}
 
