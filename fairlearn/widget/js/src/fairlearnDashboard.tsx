@@ -59,6 +59,7 @@ export class FairlearnView extends DOMWidgetView {
             testData={data.dataset}
             predictedY={data.predicted_ys}
             trueY={data.true_y}
+            showIntro={true}
             modelNames={data.model_names}
             supportedBinaryClassificationAccuracyKeys={data.classification_methods}
             supportedBinaryClassificationParityKeys={["selection_rate", "selection_rate_ratio", "zero_one_loss", "recall_score"]}

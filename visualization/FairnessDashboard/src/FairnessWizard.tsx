@@ -206,7 +206,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             parityMetrics: parityMetrics,
             selectedParityKey: parityMetrics[0].key,
             dashboardContext: fairnessContext,
-            activeTabKey: introTabKey,
+            activeTabKey: this.props.showIntro ? introTabKey : reportTabKey,
             featureBins,
             selectedBinIndex: 0,
             selectedModelId: this.props.predictedY.length === 1 ? 0 : undefined,

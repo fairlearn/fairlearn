@@ -83,6 +83,7 @@ import { probit } from "../__mock-data/probit";
                         testData={data.augmentedData}
                         predictedY={data.predictedYs}
                         trueY={data.trueY}
+                        showIntro={true}
                         supportedBinaryClassificationAccuracyKeys={["accuracy_score", "balanced_accuracy_score","precision_score", "recall_score"]}
                         supportedBinaryClassificationParityKeys={["selection_rate", "selection_rate_ratio", "zero_one_loss", "recall_score"]}
                         supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}
