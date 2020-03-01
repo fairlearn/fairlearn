@@ -146,10 +146,10 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                         {this.props.binLabels.map((label, index) => {
                             if (this.props.expandAttributes) return (<div className={OverallTable.classNames.binBox} key={index}>
                                 <div className={OverallTable.classNames.binTitle}>{label}</div>
-                                <Stack horizontal>
+                                {/* <Stack horizontal>
                                     {minIndexes.includes(index) && <div className={OverallTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
                                     {maxIndexes.includes(index) && <div className={OverallTable.classNames.minMaxLabel}>{localization.Report.maxTag}</div>}
-                                </Stack>
+                                </Stack> */}
                             </div>)
                         })}
                     </div>

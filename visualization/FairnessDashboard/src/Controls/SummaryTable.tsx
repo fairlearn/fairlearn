@@ -134,10 +134,10 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                         {this.props.binLabels.map((label, index) => {
                             return (<div className={SummaryTable.classNames.binBox} key={index}>
                                 <div className={SummaryTable.classNames.binTitle}>{label}</div>
-                                <Stack horizontal>
+                                {/* <Stack horizontal>
                                     {minIndexes.includes(index) && <div className={SummaryTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
                                     {maxIndexes.includes(index) && <div className={SummaryTable.classNames.minMaxLabel}>{localization.Report.maxTag}</div>}
-                                </Stack>
+                                </Stack> */}
                             </div>)
                         })}
                     </div>
