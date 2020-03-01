@@ -380,9 +380,10 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             return series;
         });
         const accuracyMetricTitle = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title 
+        const parityMetricTitle = ParityOptions[this.props.parityPickerProps.selectedParityKey].title;
         props.layout.xaxis.title = accuracyMetricTitle;
-        props.layout.yaxis.title = this.state.disparityInOutcomes ? localization.ModelComparison.disparityInOutcomes :
-            localization.formatString(localization.ModelComparison.disparityInAccuracy, accuracyMetricTitle.toLowerCase()) as string
+        props.layout.yaxis.title = parityMetricTitle;
+        
         return (
             <Stack className={ModelComparisonChart.classNames.frame}>
                 <div className={ModelComparisonChart.classNames.header}>
