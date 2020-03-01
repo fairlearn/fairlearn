@@ -4,6 +4,8 @@ parameters:
   pinRequirements:
 
 steps:
+- script: echo '${{parameters.pyVer}}'
+
 - script: cp requirements.txt ${{parameters.requirementsFile}}
   displayName: "Copy requirements file"
   condition: ne('${{parameters.pyVer}}', '3.5')
