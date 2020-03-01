@@ -5,6 +5,7 @@
 * `ThresholdOptimizer` now performs validations during `fit`, and not during
   `__init__`. It also stores the fitted given estimator in the `estimator_`
   attribute.
+* Rename arguments of `create_group_metric_set()` to match the dashboard
 
 ### v0.4.4
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
