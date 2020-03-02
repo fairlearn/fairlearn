@@ -4,15 +4,8 @@ parameters:
   pinRequirements:
 
 steps:
-- script: echo '${{parameters.pyVer}}'
-
-- bash: "[ '${{parameters.pyVer}}' != '3.5' ] && cp requirements.txt ${{parameters.requirementsFile}}"
-  displayName: "Copy requirements file"
-  # condition: ne('${{parameters.pyVer}}', '3.5')
-  
-- bash: "[ '${{parameters.pyVer}}' == '3.5' ] && cp requirements-3.5.txt ${{parameters.requirementsFile}}"
-  displayName: "Copy requirements file"
-  # condition: eq('${{parameters.pyVer}}', '3.5')
+- bash: python scripts/requirements_override.py --output ${{parameters.requirementsFile}}
+  displayName: "Copy requirements file" # for python version-specific overrides
 
 - script: python scripts/requirements_pin.py --input ${{parameters.requirementsFile}} --output requirements-fixed.txt --loglevel INFO
   displayName: "Pin Requirements file"
