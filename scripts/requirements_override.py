@@ -38,5 +38,6 @@ def main(argv):
                      .format(args.output, input_file)):
         shutil.copyfile(input_file, args.output)
 
+
 if __name__ == "__main__":
     main(sys.argv[1:])
