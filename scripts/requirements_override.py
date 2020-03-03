@@ -25,7 +25,6 @@ def main(argv):
 
     # extract minor version, e.g. '3.5'
     py_version = ".".join(platform.python_version().split(".")[:2])
-    py_version = "3.7"
 
     # override only if a requirements file for the specific version exists
     version_specific_requirements_file_path = "requirements-{}.txt".format(py_version)
