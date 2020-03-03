@@ -35,8 +35,11 @@ def main(argv):
 
     with _LogWrapper("Overriding {} with {}"
                      .format(args.output, input_file)):
-        shutil.copyfile(input_file, args.output)
-
+        try:
+            shutil.copyfile(input_file, args.output)
+        except shutil.SameFileError:
+            # destination is already identical with origin
+            pass
 
 if __name__ == "__main__":
     main(sys.argv[1:])
