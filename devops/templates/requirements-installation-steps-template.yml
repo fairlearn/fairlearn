@@ -1,0 +1,20 @@
+parameters:
+  pyVer:
+  requirementsFile:
+  pinRequirements:
+
+steps:
+- bash: python scripts/requirements_override.py --output ${{parameters.requirementsFile}}
+  displayName: "Copy requirements file" # for python version-specific overrides
+
+- script: python scripts/requirements_pin.py --input ${{parameters.requirementsFile}} --output requirements-fixed.txt --loglevel INFO
+  displayName: "Pin Requirements file"
+  condition: eq('${{parameters.pinRequirements}}', True)
+
+- script: pip install -r requirements-fixed.txt
+  displayName: 'Install required packages from requirements-fixed.txt'
+  condition: eq('${{parameters.pinRequirements}}', True)
+
+- script: pip install -r ${{parameters.requirementsFile}}
+  displayName: 'Install required packages from ${{parameters.requirementsFile}}'
+  condition: ne('${{parameters.pinRequirements}}', True)
