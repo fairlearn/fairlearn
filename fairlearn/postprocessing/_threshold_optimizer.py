@@ -57,22 +57,22 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
     :type grid_size: int
     :param flip: Allow flipping to negative weights if it improves accuracy.
     :type flip: bool
-    :param refit: If ``False``, avoid re-fitting the given estimator if it's
+    :param prefit: If ``True``, avoid re-fitting the given estimator if it's
         already trained. Note that when used with ``cross_val_score``,
         ``GridSearchCV`` and similar utilities that clone the estimator,
-        the effective behavior is ``refit=True``.
-    :type: bool, default=True
+        the effective behavior is ``prefit=False``.
+    :type: bool, default=False
     """
 
     def __init__(self, *, estimator=None,
                  constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True,
-                 refit=True):
+                 prefit=False):
         self.grid_size = grid_size
         self.flip = flip
         self.post_processed_predictor_by_sensitive_feature = None
         self.constraints = constraints
         self.estimator = estimator
-        self.refit = refit
+        self.prefit = prefit
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
@@ -105,7 +105,7 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
         else:
             y = [int(y_val) for y_val in y]
 
-        if self.refit:
+        if not self.prefit:
             self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
         else:
             try:

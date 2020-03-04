@@ -37,7 +37,7 @@ def test_predict_before_fit_error(X_transform, sensitive_features_transform, pre
     adjusted_predictor = ThresholdOptimizer(
         estimator=ExamplePredictor(scores_ex),
         constraints=constraints,
-        refit=False)
+        prefit=True)
 
     with pytest.raises(ValueError, match='instance is not fitted yet'):
         getattr(adjusted_predictor, predict_method_name)(X, sensitive_features=sensitive_features)
@@ -113,7 +113,7 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
 
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints,
-                                            refit=False)
+                                            prefit=True)
 
     feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
     with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)):

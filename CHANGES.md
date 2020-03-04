@@ -8,7 +8,7 @@
     attribute.
   * `ThresholdOptmizer` is now a scikit-learn meta-estimator, and accepts
     an estimator through the `estimator` parameter. To use a pre-fitted
-    estimator, pass `refit=False`.
+    estimator, pass `prefit=True`.
 * Rename arguments of `create_group_metric_set()` to match the dashboard
 
 ### v0.4.4
