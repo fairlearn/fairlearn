@@ -101,7 +101,7 @@ stages:
     parameters:
       name: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
@@ -110,7 +110,7 @@ stages:
     parameters:
       name: Windows
       vmImage: 'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
@@ -119,7 +119,7 @@ stages:
     parameters:
       name: MacOS
       vmImage: 'macos-latest'
-      pyVersions: [3.6, 3.7]
+      pyVersions: [3.6, 3.7, 3.8]
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
@@ -128,7 +128,7 @@ stages:
     parameters:
       name: LinuxNotebooks
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
@@ -137,7 +137,7 @@ stages:
     parameters:
       name: WindowsNotebooks
       vmImage: 'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7]
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'

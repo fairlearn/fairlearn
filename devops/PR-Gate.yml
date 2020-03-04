@@ -16,7 +16,7 @@ jobs:
   parameters:
     name: Linux
     vmImage: 'ubuntu-16.04'
-    pyVersions: [3.6]
+    pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
@@ -24,7 +24,7 @@ jobs:
   parameters:
     name: Windows
     vmImage:  'vs2017-win2016'
-    pyVersions: [3.5]
+    pyVersions: [3.6]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     
@@ -39,13 +39,13 @@ jobs:
 - template: templates/notebook-job-template.yml
   parameters:
     name: LinuxNotebooks
-    pyVersions: [3.5]
+    pyVersions: [3.6]
 
 - template: templates/notebook-job-template.yml
   parameters:
     name: WindowsNotebooks
     vmImage: 'vs2017-win2016'
-    pyVersions: [3.7]
+    pyVersions: [3.8]
 
 - template: templates/build-widget-job-template.yml
 

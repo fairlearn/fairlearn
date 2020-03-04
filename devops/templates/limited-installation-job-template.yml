@@ -5,7 +5,7 @@
 parameters:
   name: 'LimitedInstallation'
   vmImage: 'ubuntu-latest'
-  pyVersions: [3.5, 3.6, 3.7]
+  pyVersions: [3.5, 3.6, 3.7, 3.8]
   freezeArtifactStem: 
   freezeFileStem:
 
