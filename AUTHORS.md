@@ -6,6 +6,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Miro Dudik](https://github.com/MiroDudik)
 - [Richard Edgar](https://github.com/riedgar-ms)
 - [Brandon Horn](https://github.com/rihorn2)
+- [Adrin Jalali](https://github.com/adrinjalali)
 - [Roman Lutz](https://github.com/romanlutz)
 - [Vanessa Milan](https://www.microsoft.com/en-us/research/people/vmilan/)
 - [Sangeeta Mudnal](https://www.microsoft.com/en-us/research/people/smudnal/)
