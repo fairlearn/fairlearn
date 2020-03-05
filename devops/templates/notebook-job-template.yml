@@ -1,9 +1,8 @@
 parameters:
   name: 'Notebooks'
   vmImage: 'ubuntu-latest'
-  pyVersions: [3.5, 3.6, 3.7]
+  pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
-  requirementsFile: 'requirements.txt'
 
 jobs:
 - job:  ${{ parameters.name }}
@@ -15,6 +14,7 @@ jobs:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
+          RequirementsFile: requirements-${{pyVer}}.txt
 
   steps:
   - task: UsePythonVersion@0
@@ -25,12 +25,11 @@ jobs:
   
   - template: python-infra-upgrade-steps-template.yml
 
-  - script: python scripts/requirements_pin.py --input requirements.txt --output requirements-fixed.txt --loglevel INFO
-    displayName: "Pin Requirements file"
-    condition: eq('${{parameters.pinRequirements}}', True)
-
-  - script: pip install -r ${{ parameters.requirementsFile }}
-    displayName: 'Install required packages specified in ${{ parameters.requirementsFile }}'
+  - template: requirements-installation-steps-template.yml
+    parameters:
+      pyVer: $(PyVer)
+      requirementsFile: $(RequirementsFile)
+      pinRequirements: ${{parameters.pinRequirements}}
 
   - script: pip install -e .
     displayName: 'Install fairlearn in edit mode'
