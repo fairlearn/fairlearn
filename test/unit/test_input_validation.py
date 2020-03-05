@@ -18,4 +18,5 @@ def test_input_column_metadata_retained():
     X_checked, _, _ = _validate_and_reformat_input(X, sensitive_features=X.X1, expect_y=False)
 
     assert X_checked.dtypes[0] == np.float64
+    # The important part here is that it's 0, 1, 2, and not 0.0, 1.0, and 2.0
     assert X_checked.dtypes[1] == pd.CategoricalDtype(categories=[0, 1, 2])
