@@ -48,6 +48,16 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         values in the `y` data; default False
     :type enforce_binary_labels: bool
     """
+    # scikit-learn's check_array or check_X_y lose the column types. Some estimators rely on this
+    # metadata. To keep the column metadata we store it and later convert the column types back.
+    X_dtypes = None
+    if X is not None and type(X) == pd.DataFrame:
+        X_dtypes = X.dtypes
+        # X_dtypes contains the mapping from column name to data type. Through the conversion to
+        # numpy.ndarray we lose the column names. reset_index creates the "new" column names, i.e.
+        # 0, 1, ..., m and shows how they map to the original column names and their data types.
+        X_dtypes = X_dtypes.reset_index()
+
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
         if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
@@ -80,7 +90,11 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         if len(np.unique(sensitive_features)) > 2:
             raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
 
-    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
+    # Convert columns to the original type using the previously stored column metadata.
+    # X_dtypes's column 0 maps the "new" column names (0, 1, ..., m) to the data types.
+    X_df = pd.DataFrame(X).astype(X_dtypes[0])
+
+    return X_df, pd.Series(y), pd.Series(sensitive_features.squeeze())
 
 
 def _compress_multiple_sensitive_features_into_single_column(sensitive_features):
