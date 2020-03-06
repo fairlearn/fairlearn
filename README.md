@@ -2,21 +2,14 @@
 
 # Fairlearn
 
-The Fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness. The Fairlearn repository contains a Python package and Jupyter notebooks with the examples of usage.
-
- #### Fairlearn components ####
- * Assessment dashboard: high-level and detailed views, for assessing which groups are negatively impacted. 
- * Mitigation strategies: easy to incorporate into existing machine-learning pipelines.
-
-Together, these components empower data scientists and business leaders to navigate any tradeoffs between fairness and performance, and to select the mitigation strategy that best fits their needs.
-
-
+Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. This repository contains the Fairlearn Python package and Jupyter notebooks with the examples of its usage.
 
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
 - [Overview of Fairlearn](#overview-of-fairlearn)
+  - [Fairlearn algorithms](#fairlearn-algorithms)
+  - [Fairlearn dashboard](#fairlearn-dashboard)
 - [Install Fairlearn](#install-fairlearn)
-- [Visualizations](#visualizations)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Maintainers](#maintainers)
@@ -24,7 +17,7 @@ Together, these components empower data scientists and business leaders to navig
 
 ## Current release
 
-- The current stable release is available at [Fairlearn v0.4.3](https://github.com/fairlearn/fairlearn/tree/v0.4.4).
+- The current stable release is available at [Fairlearn v0.4.4](https://github.com/fairlearn/fairlearn/tree/v0.4.4).
 
 - Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
@@ -46,7 +39,15 @@ To learn more about our definitions of fairness, please visit our [terminology p
 
 ## Overview of Fairlearn
 
-The `fairlearn` package contains the following algorithms for mitigatingunfairness in binary classification and regression:
+The Fairlearn package has two components:
+
+- A _dashboard_ for assessing which groups are negatively impacted by a model, and for comparing multiple models in terms of various fairness and accuracy metrics.
+
+- _Algorithms_ for mitigating unfairness in a variety of AI tasks and along a variety of fairness definitions.
+
+### Fairlearn algorithms
+
+Fairlearn contains the following algorithms for mitigating unfairness in binary classification and regression:
 
 | algorithm | description | classification/regression | sensitive features | supported fairness definitions |
 | --- | --- | --- | --- | --- |
@@ -59,13 +60,13 @@ The `fairlearn` package contains the following algorithms for mitigatingunfairne
 > DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](./TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
 
 
-## Visualizations
+### Fairlearn dashboard
 
-This repository containts a visualization dashboard that enables data scientists, auditors, business decision makers, and other stakeholders to visually observe and analyze how their model predictions are impacting different groups of data points (e.g., different ethnicities). It provides a high-level and detailed view of prediction insights for assessing which groups are negatively impacted. Using this dashboard you get insights into (un)fairness of you model and gain ideas around potential ways of mitigating the obsereved unfairness.  
+Fairlearn dashboard is a Jupyter notebook widget for assessing how a model's predictions impact different groups (e.g., different ethnicities), and also for comparing multiple models along different fairness and accuracy metrics.  
 
-### Visualization: single model, pre-mitigation 
+#### Set-up and a single-model assessment
 
-Load the visualization dashboard in your noteboook to observe and assess your model's fairness using the following code:
+To load the visualization dashboard and assess a single model's fairness and accuracy, launch the dashboard widget within a Jupyter notebook as follows:
 
 ```python
 from fairlearn.widget import FairlearnDashboard
@@ -82,33 +83,28 @@ FairlearnDashboard(sensitive_features=A_test,
 ```
 
 
-Pre-mitigation visualization dashboard consists of procedural steps for configuration and evaluation of model fairness insights. In the configuration stage, you select your (1) protected (sensitive) attribute of interest (e.g., gender with three values of female, male, and non-binary), and (2) disparity metric that you would like to evaluate across different groups of your selected protected attribute (e.g., model precision). The evaluation stage uses these configurations to represent a detailed view of model's treatment across different subgroups of your selected protected attribute (e.g., model precision for females, model precision for males, model precision for people with non-binary gender). 
+After the launch, the widget walks the user through the assessment set-up, where the user is asked to select (1) the sensitive feature of interest (e.g., gender or age), and (2) the accuracy metric (e.g., model precision) along which to evaluate the overall model performance as well as any disparities across groups. These selections are then used to obtain the visualization of the model's impact on the subgroups (e.g., model precision for females and model precision for males).
+
+The following figures illustrate the setsup steps, where `gender` is selected as a sensitive feature and `accuracy` is selected as the accuracy metric.
 
 
 
-The following plots provide a view of the configuration steps, where `gender` is selected as a protected attribute and `accuracy` is selected as the metric of interest to be analyzed for different subgroups of `gender`.
+![Dashboard set-up](img/fairlearn-dashboard-config.png)
 
 
 
-![Configuration Steps](img/fairlearn-dashboard-config.png)
+After the set-up the dashboard presents the model assessment in two panels:
 
 
-
-
-
-|Plot|Description|
+|Panel|Description|
 |----|-----------|
-|Disparity in Accuracy| This panel (1) shows the accuracy of your model with respect to your selected accuracy metric (e.g., `accuracy`) (A) on the entire model, and (B) on different subgroups of your selected protected attribute (e.g., `accuracy` for females, `accuracy` for males, `accuracy` for datapoints with a non-binary gender), (2) highlights the disparity (difference) of selected accuracy metric across different subgroups of protected attribute. It also (3) shows the distribution of errors in each subgroup (e.g., female, male, non-binary gender). In the binary classification case, it will further split the errors into overprediction (predicting 1 when the true label is 0), and underprediction (predicting 0 when the true label is 1).
-|Disparity in Predictions|This panel shows a bar chart that contains the selection rate in each group. This means the fraction of points classified as 1 (in binary classification) and distribution of prediction values in regression.|
-
-
-
-The following plots provide a view of the final evaluation step.
+|Disparity in Accuracy| This panel shows: (1) the accuracy of your model with respect to your selected accuracy metric (e.g., `accuracy`) overall as well as on different subgroups based on your selected sensitive feature (e.g., `accuracy` for females, `accuracy` for males); (2) the disparity (difference) in the values  of the selected accuracy metric across different subgroups; (3) the distribution of errors in each subgroup (e.g., female, male). In the binary classification case, it will further split the errors into overprediction (predicting 1 when the true label is 0), and underprediction (predicting 0 when the true label is 1).
+|Disparity in Predictions|This panel shows a bar chart that contains the selection rate in each group. This means the fraction of data classified as 1 (in binary classification) and distribution of prediction values in regression.|
 
 
 ![Fairness Insights](img/fairlearn-dashboard-results.png)
 
-### Visualization: multiple models, post-mitigation 
+#### Comparing multiple models
 
 Post-mitigation visualization dashboard has been mainly designed for the reduction mitigation techniques `GridSearch` and `ExponentiatedGradient` where mitigation phase produces an array of mitigated models. However, it can work with post-processing approach `ThresholdOptimizer` to showcase comparative chart of pre and post mitigation models.
 
