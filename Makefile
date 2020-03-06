@@ -2,6 +2,7 @@
 
 PYTHON ?= python
 PYTEST ?= pytest
+SPHINX ?= python -m sphinx
 
 all: clean inplace test-unit
 
@@ -20,3 +21,6 @@ test-unit:
 
 test-perf:
 	$(PYTEST) ./test/perf
+
+doc:
+	$(SPHINX) -b html -j auto docs docs/_build/html
