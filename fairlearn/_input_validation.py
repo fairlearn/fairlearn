@@ -90,7 +90,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         if len(np.unique(sensitive_features)) > 2:
             raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
 
-    if X_dtypes:
+    if X_dtypes is not None:
         # Convert columns to the original type using the previously stored column metadata.
         # X_dtypes's column 0 maps the "new" column names (0, 1, ..., m) to the data types.
         X_df = pd.DataFrame(X).astype(X_dtypes[0])
