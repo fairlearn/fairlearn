@@ -66,7 +66,7 @@ Fairlearn dashboard is a Jupyter notebook widget for assessing how a model's pre
 
 #### Set-up and a single-model assessment
 
-To load the visualization dashboard and assess a single model's fairness and accuracy, launch the dashboard widget within a Jupyter notebook as follows:
+To assess a single model's fairness and accuracy, the dashboard widget can be launched within a Jupyter notebook as follows:
 
 ```python
 from fairlearn.widget import FairlearnDashboard
@@ -85,7 +85,7 @@ FairlearnDashboard(sensitive_features=A_test,
 
 After the launch, the widget walks the user through the assessment set-up, where the user is asked to select (1) the sensitive feature of interest (e.g., gender or age), and (2) the accuracy metric (e.g., model precision) along which to evaluate the overall model performance as well as any disparities across groups. These selections are then used to obtain the visualization of the model's impact on the subgroups (e.g., model precision for females and model precision for males).
 
-The following figures illustrate the setsup steps, where `gender` is selected as a sensitive feature and `accuracy rate` is selected as the accuracy metric.
+The following figures illustrate the set-up steps, where _gender_ is selected as a sensitive feature and _accuracy rate_ is selected as the accuracy metric.
 
 
 
@@ -98,8 +98,8 @@ After the set-up the dashboard presents the model assessment in two panels:
 
 |Panel|Description|
 |-----|-----------|
-| Disparity in accuracy | This panel shows: (1) the accuracy of your model with respect to your selected accuracy metric (e.g., `accuracy`) overall as well as on different subgroups based on your selected sensitive feature (e.g., `accuracy` for females, `accuracy` for males); (2) the disparity (difference) in the values  of the selected accuracy metric across different subgroups; (3) the distribution of errors in each subgroup (e.g., female, male). In the binary classification case, it will further split the errors into overprediction (predicting 1 when the true label is 0), and underprediction (predicting 0 when the true label is 1). |
-| Disparity in predictions | This panel shows a bar chart that contains the selection rate in each group. This means the fraction of data classified as 1 (in binary classification) and distribution of prediction values in regression. |
+| Disparity in accuracy | This panel shows: (1) the accuracy of your model with respect to your selected accuracy metric (e.g., _accuracy rate_) overall as well as on different subgroups based on your selected sensitive feature (e.g., _accuracy rate_ for females, _accuracy rate_ for males); (2) the disparity (difference) in the values  of the selected accuracy metric across different subgroups; (3) the distribution of errors in each subgroup (e.g., female, male). For binary classification, the errors are further split into overprediction (predicting 1 when the true label is 0), and underprediction (predicting 0 when the true label is 1). |
+| Disparity in predictions | This panel shows a bar chart that contains the selection rate in each group, meaning the fraction of data classified as 1 (in binary classification) or distribution of prediction values (in regression). |
 
 
 ![Fairness Insights](img/fairlearn-dashboard-results.png)
@@ -108,7 +108,7 @@ After the set-up the dashboard presents the model assessment in two panels:
 
 The dashboard also enables comparison of multiple models, such as the models produced by different learning algorithms and different mitigation approaches, including `fairlearn.reductions.GridSearch`, `fairlearn.reductions.ExponentiatedGradient` and `fairlearn.postprocessing.ThresholdOptimizer`.
 
-As before, the user is first asked to select the sensitive feature and the accuracy metric. The _model comparison_ view then depicts the accuracy and disparity of all the models in a scatter plot. This allows the user to examine the trade-offs between accuracy and fairness. Each of the dots can be clicked to open the assessment for the corresponding model. The figure below shows the model comparison view, with `gender` selected as a sensitive feature and `accuracy rate` selected as the accuracy metric.
+As before, the user is first asked to select the sensitive feature and the accuracy metric. The _model comparison_ view then depicts the accuracy and disparity of all the provided models in a scatter plot. This allows the user to examine trade-offs between accuracy and fairness. Each of the dots can be clicked to open the assessment of the corresponding model. The figure below shows the model comparison view with `gender` selected as a sensitive feature and `accuracy rate` selected as the accuracy metric.
 
 
 
