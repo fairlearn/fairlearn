@@ -15,7 +15,8 @@ from fairlearn.reductions import ExponentiatedGradient, GridSearch, DemographicP
 
 @pytest.mark.parametrize("Mitigator", [ExponentiatedGradient, GridSearch])
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
-@pytest.mark.parametrize("Estimator", [LGBMClassifier, LogisticRegression, SVC, DecisionTreeClassifier])
+@pytest.mark.parametrize("Estimator", [LGBMClassifier, LogisticRegression, SVC,
+                                       DecisionTreeClassifier])
 def test_smoke(Mitigator, Constraints, Estimator):
     # This test case ensures that input validation doesn't remove metadata from the input
     # matrix X, as described at https://github.com/fairlearn/fairlearn/issues/312
