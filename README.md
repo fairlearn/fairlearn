@@ -71,8 +71,8 @@ To assess a single model's fairness and accuracy, the dashboard widget can be la
 ```python
 from fairlearn.widget import FairlearnDashboard
 
-# A_test containts your protected attributes (e.g., Age, Gender)
-# sensitive_feature_names containts your protected attributes names
+# A_test containts your sensitive features (e.g., Age, Gender)
+# sensitive_feature_names containts your sensitive feature names
 # y_true contains ground truth labels
 # y_pred contains prediction labels
 
