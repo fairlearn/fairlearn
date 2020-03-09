@@ -93,7 +93,7 @@ The following figures illustrate the set-up steps, where _gender_ is selected as
 
 
 
-After the set-up the dashboard presents the model assessment in two panels:
+After the set-up, the dashboard presents the model assessment in two panels:
 
 
 |Panel|Description|
