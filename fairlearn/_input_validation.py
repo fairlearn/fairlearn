@@ -47,17 +47,12 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
     :param enforce_binary_labels: if True raise exception if there are more than two distinct
         values in the `y` data; default False
     :type enforce_binary_labels: bool
+    :return: the validated and reformatted X, y, and sensitive_features; note that certain
+        estimators rely on metadata encoded in X which may be stripped during the reformatting
+        process, so mitigation methods should ideally use the input X instead of the returned X
+        for training estimators and leave potential reformatting of X to the estimator.
+    :rtype: (pandas.DataFrame, pandas.Series, pandas.Series)
     """
-    # scikit-learn's check_array or check_X_y lose the column types. Some estimators rely on this
-    # metadata. To keep the column metadata we store it and later convert the column types back.
-    X_dtypes = None
-    if X is not None and type(X) == pd.DataFrame:
-        X_dtypes = X.dtypes
-        # X_dtypes contains the mapping from column name to data type. Through the conversion to
-        # numpy.ndarray we lose the column names. reset_index creates the "new" column names, i.e.
-        # 0, 1, ..., m and shows how they map to the original column names and their data types.
-        X_dtypes = X_dtypes.reset_index()
-
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
         if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
@@ -90,14 +85,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         if len(np.unique(sensitive_features)) > 2:
             raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
 
-    if X_dtypes is not None:
-        # Convert columns to the original type using the previously stored column metadata.
-        # X_dtypes's column 0 maps the "new" column names (0, 1, ..., m) to the data types.
-        X_df = pd.DataFrame(X).astype(X_dtypes[0])
-    else:
-        X_df = pd.DataFrame(X)
-
-    return X_df, pd.Series(y), pd.Series(sensitive_features.squeeze())
+    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
 
 
 def _compress_multiple_sensitive_features_into_single_column(sensitive_features):

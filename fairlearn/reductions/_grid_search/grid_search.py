@@ -184,7 +184,7 @@ class GridSearch(Reduction):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        X_train, y_train, sensitive_features_train = _validate_and_reformat_input(
+        _, y_train, sensitive_features_train = _validate_and_reformat_input(
             X, y, enforce_binary_sensitive_feature=True,
             enforce_binary_labels=is_classification_reduction, **kwargs)
 
@@ -192,9 +192,9 @@ class GridSearch(Reduction):
 
         # Prep the parity constraints and objective
         logger.debug("Preparing constraints and objective")
-        self.constraints.load_data(X_train, y_train, **kwargs)
+        self.constraints.load_data(X, y_train, **kwargs)
         objective = self.constraints.default_objective()
-        objective.load_data(X_train, y_train, **kwargs)
+        objective.load_data(X, y_train, **kwargs)
 
         # Basis information
         pos_basis = self.constraints.pos_basis
