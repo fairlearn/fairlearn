@@ -1,5 +1,18 @@
 # Changes
 
+### v0.4.5
+* Separate plotting for `ThresholdOptimizer` into its own plotting function.
+* `ThresholdOptimizer` now performs validations during `fit`, and not during
+  `__init__`. It also stores the fitted given estimator in the `estimator_`
+  attribute.
+* Rename arguments of `create_group_metric_set()` to match the dashboard
+
+### v0.4.4
+* Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
+* Add basic support for multiple sensitive features
+* Refactor `ThresholdOptimizer` to use mixins from scikit-learn
+* Adjust `scipy`, `scikit-learn`, and `matplotlib` requirements to support python 3.8
+
 ### v0.4.3
 
 * Various tweaks to `GroupMetricResult` and `GroupMetricSet` for AzureML integration
