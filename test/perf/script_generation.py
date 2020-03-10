@@ -78,6 +78,7 @@ def add_unconstrained_estimator_fitting(script_lines, perf_test_configuration):
         script_lines.append('unconstrained_predictor = models["{}"]()'.format(perf_test_configuration.predictor))
         script_lines.append('unconstrained_predictor.fit(X_train, y_train)')
 
+
 def add_mitigation(script_lines, perf_test_configuration):
     with TimedExecution(_MITIGATION, script_lines):
         if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
