@@ -33,7 +33,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, **kwargs):
+    def load_data(self, X, y, event=None, filter_value=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
