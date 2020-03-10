@@ -33,17 +33,21 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, **kwargs):
+    def load_data(self, X, y, event=None, filter_value=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        self.dropped_tags = self.tags.where(self.tags['label'] == 0).dropna()
-        self.tags = self.tags.where(self.tags['label'] == 1).dropna()
-        self.dropped_X =  self.X.drop(self.tags.index)
-        self.X = self.X.drop(self.dropped_tags.index)
+        if filter_value is not None:
+            self.dropped_tags = self.tags.where(self.tags['label'] == 0).dropna()
+            self.tags = self.tags.where(self.tags['label'] == 1).dropna()
+            self.dropped_X =  self.X.drop(self.tags.index)
+            self.X = self.X.drop(self.dropped_tags.index)
+            self.filtered = True
+        else:
+            self.filtered = False
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -115,7 +119,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
-        signed_weights = signed_weights.reindex(list(range(self.dropped_X.size + self.X.size)), fill_value=0)
+        if self.filtered:
+            signed_weights = signed_weights.reindex(list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0)
         # print(signed_weights)
         return signed_weights
 
@@ -191,6 +196,7 @@ class EqualOpportunity(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          filter_value=0,
                           **kwargs)
 
 
