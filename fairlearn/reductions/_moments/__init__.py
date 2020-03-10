@@ -24,6 +24,5 @@ __all__ = [
     "GroupLossMoment",
     "LossMoment",
     "SquareLoss",
-    "ZeroOneLoss",
-    "EqualOpportunity"
+    "ZeroOneLoss"
 ]

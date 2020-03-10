@@ -40,8 +40,7 @@ _moments = [
     "GroupLossMoment",
     "LossMoment",
     "SquareLoss",
-    "ZeroOneLoss",
-    "EqualOpportunity"
+    "ZeroOneLoss"
 ]
 
 __all__ = ["Reduction"] + _exponentiated_gradient + _grid_search + _moments
