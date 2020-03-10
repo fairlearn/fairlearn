@@ -39,12 +39,9 @@ class Moment:
         assert self.data_loaded is False, \
             "data can be loaded only once"
         self.X = X
-        # print('X')
-        # print(self.X)
         self.tags = pd.DataFrame({_LABEL: y})
         if _KW_SENSITIVE_FEATURES in kwargs:
             self.tags[_GROUP_ID] = kwargs[_KW_SENSITIVE_FEATURES]
-            # print(self.tags[_GROUP_ID])
         self.data_loaded = True
         self._gamma_descr = None
 
