@@ -6,7 +6,7 @@ import pytest
 
 
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import DemographicParity, EqualizedOdds
+from fairlearn.reductions import DemographicParity, EqualizedOdds, EqualOpportunity
 from fairlearn.reductions import ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
@@ -103,7 +103,7 @@ class TestExponentiatedGradientSmoke:
 
     def test_simple_fit_predict(self):
         estimator = LeastSquaresBinaryClassifierLearner()
-        constraints = DemographicParity()
+        constraints = EqualOpportunity()
         expgrad = ExponentiatedGradient(estimator, constraints)
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))

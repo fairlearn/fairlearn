@@ -41,16 +41,10 @@ class ConditionalSelectionRate(ClassificationMoment):
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        # print('Tags', self.tags)
-        # print('y', y==0)
-        # print('shape of X before removal of rows ', X.shape)
-        # print(type(y), type(X))
-        # self.tags.drop(inplace=True)
-        # print('shape of X after removal of rows ', X.shape)
-        # print('shape of X', X.shape)
-        self.dropped_X = self.X.drop(index= (y[y==0].index), inplace=True)
-        self.dropped_tags = self.tags.drop(index= (y[y==0].index), inplace=True)
-        # print('shape of X after', X.shape)
+        self.dropped_tags = self.tags.where(self.tags['label'] == 0).dropna()
+        self.tags = self.tags.where(self.tags['label'] == 1).dropna()
+        self.dropped_X =  self.X.drop(self.tags.index)
+        self.X = self.X.drop(self.dropped_tags.index)
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -61,7 +55,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         self.default_objective_lambda_vec = None
 
         # fill in the information about the basis
-        event_vals = self.tags[_EVENT].unique()
+        event_vals = self.tags[_EVENT].dropna().unique()
         group_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
@@ -125,11 +119,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
-        appending_term = self.dropped_tags.apply(
-            lambda row: 0, axis=1
-        )
-        print('signed weights', signed_weights)
-        signed_weights.append(appending_term)
+        signed_weights = signed_weights.reindex(list(range(self.dropped_X.size + self.X.size)), fill_value=0)
+        # print(signed_weights)
         return signed_weights
 
 
@@ -164,6 +155,38 @@ class DemographicParity(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
 
+class EqualOpportunity(ConditionalSelectionRate):
+    r"""Implementation of Equalized Odds as a moment.
+
+    Adds conditioning on label compared to Demographic parity, i.e.
+
+    .. math::
+       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    events corresponding to the unique values of the `Y` array.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    fraction of the samples corresponding to each unique value in
+    the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to
+    the number of unique values for the sensitive feature, multiplied by
+    the number of unique values of the `Y` array, multiplied by two (for
+    the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :meth:`signed_weights` method
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    """
+
+    short_name = "EqualizedOdds"
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          **kwargs)
 
 class EqualOpportunity(ConditionalSelectionRate):
     short_name = "EqualOpportunity"
@@ -171,7 +194,7 @@ class EqualOpportunity(ConditionalSelectionRate):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y,
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(1)),
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
                           **kwargs)
 
 
