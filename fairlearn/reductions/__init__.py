@@ -35,6 +35,7 @@ _moments = [
     "ConditionalSelectionRate",
     "DemographicParity",
     "EqualizedOdds",
+    "EqualOpportunity",
     "ErrorRate",
     "GroupLossMoment",
     "LossMoment",

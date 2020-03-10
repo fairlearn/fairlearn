@@ -19,6 +19,7 @@ __all__ = [
     "ConditionalSelectionRate",
     "DemographicParity",
     "EqualizedOdds",
+    "EqualOpportunity",
     "ErrorRate",
     "GroupLossMoment",
     "LossMoment",
