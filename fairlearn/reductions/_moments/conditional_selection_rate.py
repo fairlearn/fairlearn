@@ -50,7 +50,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         self.default_objective_lambda_vec = None
 
         # fill in the information about the basis
-        event_vals = self.tags[_EVENT].unique()
+        event_vals = self.tags[_EVENT].dropna().unique()
         group_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
@@ -145,6 +145,38 @@ class DemographicParity(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
 
+class EqualOpportunity(ConditionalSelectionRate):
+    r"""Implementation of Equalized Odds as a moment.
+
+    Adds conditioning on label compared to Demographic parity, i.e.
+
+    .. math::
+       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    events corresponding to the unique values of the `Y` array.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    fraction of the samples corresponding to each unique value in
+    the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to
+    the number of unique values for the sensitive feature, multiplied by
+    the number of unique values of the `Y` array, multiplied by two (for
+    the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :meth:`signed_weights` method
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    """
+
+    short_name = "EqualizedOdds"
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          **kwargs)
 
 class EqualizedOdds(ConditionalSelectionRate):
     r"""Implementation of Equalized Odds as a moment.
