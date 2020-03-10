@@ -69,7 +69,13 @@ class TestExponentiatedGradientSmoke:
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6}]
+                        "n_classifiers": 6},
+                       {"cons_class": EqualOpportunity, "eps": 0.005,
+                        "best_gap": 0.000000, "last_t": 5,
+                        "best_t": 5, "disp": 0.005000,
+                        "error": 0.442883, "n_oracle_calls": 19,
+                        "n_classifiers": 6}
+                       ]
 
     def run_smoke_test(self, data):
         expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
