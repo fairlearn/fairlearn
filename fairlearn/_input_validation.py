@@ -47,6 +47,11 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
     :param enforce_binary_labels: if True raise exception if there are more than two distinct
         values in the `y` data; default False
     :type enforce_binary_labels: bool
+    :return: the validated and reformatted X, y, and sensitive_features; note that certain
+        estimators rely on metadata encoded in X which may be stripped during the reformatting
+        process, so mitigation methods should ideally use the input X instead of the returned X
+        for training estimators and leave potential reformatting of X to the estimator.
+    :rtype: (pandas.DataFrame, pandas.Series, pandas.Series)
     """
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
