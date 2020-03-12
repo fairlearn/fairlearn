@@ -145,19 +145,20 @@ class DemographicParity(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
 
+
 class EqualOpportunity(ConditionalSelectionRate):
     r"""Implementation of Equalized Odds as a moment.
 
     Adds conditioning on label compared to Demographic parity, i.e.
 
     .. math::
-       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
+       P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a, y,
 
     This implementation of :class:`ConditionalSelectionRate` defines
     events corresponding to the unique values of the `Y` array.
 
     The `prob_event` :class:`pandas:pandas.DataFrame` will record the
-    fraction of the samples corresponding to each unique value in
+    fraction of the samples corresponding to each unique value of `y = 1` in
     the `Y` array.
 
     The `index` MultiIndex will have a number of entries equal to
@@ -167,7 +168,8 @@ class EqualOpportunity(ConditionalSelectionRate):
 
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ for all `y=1' samples and a weight of `0` for
+    all other samples.
     """
 
     short_name = "EqualizedOdds"
