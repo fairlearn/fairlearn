@@ -121,8 +121,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         )
         # this flag is set if a `filter_value` was sent to :meth:`load_data()`
         if self.filtered:
-            signed_weights = signed_weights.reindex(list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0
-                                                    )
+            signed_weights = signed_weights.reindex(
+                list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0
+            )
         return signed_weights
 
 
@@ -180,7 +181,8 @@ class EqualOpportunity(ConditionalSelectionRate):
 
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ for all `y=1' samples and a weight of `0` for
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ for all
+    `y=1' samples and a weight of `0` for
     all other samples.
     """
 
