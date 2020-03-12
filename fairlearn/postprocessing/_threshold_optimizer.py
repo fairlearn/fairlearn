@@ -14,7 +14,9 @@ import numpy as np
 import pandas as pd
 import random
 
-from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn import clone
+from sklearn.base import BaseEstimator, ClassifierMixin, MetaEstimatorMixin
+from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 
 from fairlearn._input_validation import _validate_and_reformat_input
@@ -34,44 +36,43 @@ SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "A sensitive feature na
     "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
-EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE = "Only one of 'unconstrained_predictor' and " \
-                                              "'estimator' can be passed."
-PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE = "One of 'unconstrained_predictor' and " \
-                                                "'estimator' need to be passed."
-
+ESTIMATOR_ERROR_MESSAGE = "'estimator' cannot be `None`."
 
 _SUPPORTED_CONSTRAINTS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 
 logger = logging.getLogger(__name__)
 
 
-class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
+class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
     """An Estimator based on the threshold optimization approach.
 
     The procedure followed is described in detail in
     `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_.
 
-    :param unconstrained_predictor: The trained predictor whose output will be post processed
-    :type unconstrained_predictor: A trained predictor
-    :param estimator: An untrained estimator that will be trained, and
-        subsequently its output will be post processed
-    :type estimator: An untrained estimator
+    :param estimator: An estimator whose output will be post processed
+    :type estimator: An estimator
     :param grid_size: The number of ticks on the grid over which we evaluate the curves.
         A large grid_size means that we approximate the actual curve, so it increases the chance
         of being very close to the actual best solution.
     :type grid_size: int
     :param flip: Allow flipping to negative weights if it improves accuracy.
     :type flip: bool
+    :param prefit: If ``True``, avoid re-fitting the given estimator if it's
+        already trained. Note that when used with ``cross_val_score``,
+        ``GridSearchCV`` and similar utilities that clone the estimator,
+        the effective behavior is ``prefit=False``.
+    :type: bool, default=False
     """
 
-    def __init__(self, *, unconstrained_predictor=None, estimator=None,
-                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True):
+    def __init__(self, *, estimator=None,
+                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True,
+                 prefit=False):
         self.grid_size = grid_size
         self.flip = flip
         self.post_processed_predictor_by_sensitive_feature = None
         self.constraints = constraints
-        self.unconstrained_predictor = unconstrained_predictor
         self.estimator = estimator
+        self.prefit = prefit
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
@@ -89,10 +90,8 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
             or pandas.Series
         """
-        if self.unconstrained_predictor and self.estimator:
-            raise ValueError(EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE)
-        elif not self.unconstrained_predictor and not self.estimator:
-            raise ValueError(PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE)
+        if self.estimator is None:
+            raise ValueError(ESTIMATOR_ERROR_MESSAGE)
 
         if self.constraints not in _SUPPORTED_CONSTRAINTS:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
@@ -106,11 +105,14 @@ class ThresholdOptimizer(ClassifierMixin, BaseEstimator):
         else:
             y = [int(y_val) for y_val in y]
 
-        if self.estimator:
-            # train estimator on data first
-            self.estimator_ = self.estimator.fit(X, y, **kwargs)
+        if not self.prefit:
+            self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
         else:
-            self.estimator_ = self.unconstrained_predictor
+            try:
+                check_is_fitted(self.estimator)
+                self.estimator_ = self.estimator
+            except NotFittedError:
+                self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
 
         scores = self.estimator_.predict(X)
         threshold_optimization_method = None
