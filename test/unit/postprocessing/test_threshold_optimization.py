@@ -13,13 +13,13 @@ from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import \
     (_vectorized_prediction,
      NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
-     EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE,
-     PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE,)
+     ESTIMATOR_ERROR_MESSAGE,
+     )
 from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
 from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
                        _get_predictions_by_sensitive_feature,
-                       ExamplePredictor, ExampleEstimator,
+                       ExamplePredictor,
                        is_invalid_transformation,
                        candidate_A_transforms, candidate_X_transforms,
                        candidate_Y_transforms)
@@ -34,33 +34,25 @@ def test_predict_before_fit_error(X_transform, sensitive_features_transform, pre
                                   constraints):
     X = X_transform(sensitive_features_ex1)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
-                                            constraints=constraints)
+    adjusted_predictor = ThresholdOptimizer(
+        estimator=ExamplePredictor(scores_ex),
+        constraints=constraints,
+        prefit=True)
 
     with pytest.raises(ValueError, match='instance is not fitted yet'):
         getattr(adjusted_predictor, predict_method_name)(X, sensitive_features=sensitive_features)
 
 
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_both_predictor_and_estimator_error(constraints):
-    with pytest.raises(ValueError, match=EITHER_PREDICTOR_OR_ESTIMATOR_ERROR_MESSAGE):
-        ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
-                           estimator=ExampleEstimator(),
-                           constraints=constraints).fit(
-                               X_ex, labels_ex,
-                               sensitive_features=sensitive_features_ex1)
-
-
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
-def test_no_predictor_or_estimator_error(constraints):
-    with pytest.raises(ValueError, match=PREDICTOR_OR_ESTIMATOR_REQUIRED_ERROR_MESSAGE):
+def test_no_estimator_error(constraints):
+    with pytest.raises(ValueError, match=ESTIMATOR_ERROR_MESSAGE):
         ThresholdOptimizer(constraints=constraints).fit(
             X_ex, labels_ex, sensitive_features=sensitive_features_ex1)
 
 
 def test_constraints_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE):
-        ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+        ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                            constraints="UnsupportedConstraints").fit(
                                X_ex, labels_ex,
                                sensitive_features=sensitive_features_ex1
@@ -72,7 +64,7 @@ def test_constraints_not_supported():
 @pytest.mark.parametrize("sensitive_features", [None, sensitive_features_ex1])
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 def test_none_input_data(X, y, sensitive_features, constraints):
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints)
 
     if y is None:
@@ -98,7 +90,7 @@ def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
     non_binary_y = deepcopy(data_X_y_sf.y)
     non_binary_y[0] = 2
 
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints)
 
     with pytest.raises(ValueError, match=_LABELS_NOT_0_1_ERROR_MESSAGE):
@@ -119,8 +111,9 @@ _degenerate_labels_feature_name = {
 def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constraints):
     y = y_transform(degenerate_labels_ex)
 
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
-                                            constraints=constraints)
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
+                                            constraints=constraints,
+                                            prefit=True)
 
     feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
     with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)):
@@ -140,7 +133,7 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
         with pytest.raises(ValueError, match=expected_exception_messages['inconsistent']
                            .format("X, sensitive_features, and y")):
             adjusted_predictor = ThresholdOptimizer(
-                unconstrained_predictor=ExamplePredictor(scores_ex),
+                estimator=ExamplePredictor(scores_ex),
                 constraints=constraints)
             adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
                                    data_X_y_sf.y[:n - permutation[1]],
@@ -149,7 +142,7 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     # try providing empty lists in all combinations
     for permutation in [(0, n, 'inconsistent'), (n, 0, 'empty')]:
         adjusted_predictor = ThresholdOptimizer(
-            unconstrained_predictor=ExamplePredictor(scores_ex),
+            estimator=ExamplePredictor(scores_ex),
             constraints=constraints)
         with pytest.raises(ValueError, match=expected_exception_messages[permutation[2]]):
             adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
@@ -165,7 +158,7 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
     scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores),
+    estimator = ThresholdOptimizer(estimator=ExamplePredictor(scores),
                                    constraints=DEMOGRAPHIC_PARITY)
     estimator.fit(X_ex, y, sensitive_features=sensitive_features)
 
@@ -234,7 +227,7 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
     scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores),
+    estimator = ThresholdOptimizer(estimator=ExamplePredictor(scores),
                                    constraints=EQUALIZED_ODDS)
     estimator.fit(X_ex, y, sensitive_features=sensitive_features)
 
@@ -341,7 +334,7 @@ _expected_ps_demographic_parity = {
 
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_demographic_parity_e2e(data_X_y_sf):
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=DEMOGRAPHIC_PARITY)
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
@@ -388,7 +381,7 @@ _expected_ps_equalized_odds = {
 
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=EQUALIZED_ODDS)
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
@@ -414,7 +407,7 @@ def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_predict_output_0_or_1(data_X_y_sf, constraints):
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints)
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
@@ -428,7 +421,7 @@ def test_predict_output_0_or_1(data_X_y_sf, constraints):
 @pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_predict_different_argument_lengths(data_X_y_sf, constraints):
-    adjusted_predictor = ThresholdOptimizer(unconstrained_predictor=ExamplePredictor(scores_ex),
+    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints)
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)

@@ -1,10 +1,14 @@
 # Changes
 
 ### v0.4.5
-* Separate plotting for `ThresholdOptimizer` into its own plotting function.
-* `ThresholdOptimizer` now performs validations during `fit`, and not during
-  `__init__`. It also stores the fitted given estimator in the `estimator_`
-  attribute.
+* Changes to `ThresholdOptimizer`:
+  * Separate plotting for `ThresholdOptimizer` into its own plotting function.
+  * `ThresholdOptimizer` now performs validations during `fit`, and not during
+    `__init__`. It also stores the fitted given estimator in the `estimator_`
+    attribute.
+  * `ThresholdOptmizer` is now a scikit-learn meta-estimator, and accepts
+    an estimator through the `estimator` parameter. To use a pre-fitted
+    estimator, pass `prefit=True`.
 * Rename arguments of `create_group_metric_set()` to match the dashboard
 
 ### v0.4.4
