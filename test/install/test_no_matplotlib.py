@@ -4,12 +4,17 @@
 import numpy as np
 import pytest
 
+from sklearn.base import BaseEstimator, ClassifierMixin
+
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 from fairlearn.postprocessing._threshold_optimizer import _SUPPORTED_CONSTRAINTS
 from fairlearn.postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 
 
-class FakePredictor:
+class FakePredictor(BaseEstimator, ClassifierMixin):
+    def fit(self, X, y=None, **kwargs):
+        return self
+
     def predict(self, X):
         return np.random.random(len(X))
 
@@ -21,7 +26,7 @@ def test_no_matplotlib(constraints):
     n_sensitive_feature_values = 2
     n_classes = 2
 
-    threshold_optimizer = ThresholdOptimizer(unconstrained_predictor=FakePredictor(),
+    threshold_optimizer = ThresholdOptimizer(estimator=FakePredictor(),
                                              constraints=constraints)
     threshold_optimizer.fit(X=np.random.random((n_samples, n_features)),
                             y=np.random.randint(n_classes, size=n_samples),
