@@ -3,6 +3,7 @@
     "defaultClassNames": "Class {0}",
     "defaultFeatureNames": "Sensitive feature {0}",
     "defaultSingleFeatureName": "Sensitive feature",
+    "defaultCustomMetricName": "Custom metric {0}",
     "accuracyTab": "Fairness in Accuracy",
     "opportunityTab": "Fairness in Opportunity",
     "modelComparisonTab": "Model comparison",

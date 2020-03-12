@@ -174,7 +174,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                     <WizardFooter onNext={this.props.onNext}/>
                 </Stack>
                 <DataSpecificationBlade
-                        numberRows={this.props.dashboardContext.dataset.length}
+                        numberRows={this.props.dashboardContext.trueY.length}
                         featureNames={this.props.dashboardContext.modelMetadata.featureNames}/>
             </Stack>
         );
