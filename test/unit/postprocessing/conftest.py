@@ -5,6 +5,9 @@ from collections import defaultdict, namedtuple
 import numpy as np
 import pandas as pd
 import pytest
+
+from sklearn.base import BaseEstimator, ClassifierMixin
+
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 
@@ -99,19 +102,22 @@ def data_X_y_sf(data_X_sf, request):  # sf is an abbreviation for sensitive feat
     return data_X_sf
 
 
-class ExamplePredictor():
+class ExamplePredictor(BaseEstimator, ClassifierMixin):
     def __init__(self, scores):
-        self._scores = scores
+        self.scores = scores
+
+    def fit(self, X, y=None, **kwargs):
+        return self
 
     def predict(self, X):
-        return self._scores
+        return self.scores
 
 
 class ExampleNotPredictor():
     pass
 
 
-class ExampleEstimator():
+class ExampleEstimator(BaseEstimator, ClassifierMixin):
     def fit(self, X, Y):
         pass
 
