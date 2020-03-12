@@ -87,12 +87,30 @@ class TestMetricByGroup:
         assert np.array_equal(result.by_group[a], np.ones([3, 2]))
         assert np.array_equal(result.by_group[b], np.ones([2, 2]))
         assert np.array_equal(result.by_group[c], np.ones([3, 1]))
-        assert result.minimum is None
-        assert result.argmin_set is None
-        assert result.maximum is None
-        assert result.argmax_set is None
-        assert result.range is None
-        assert result.range_ratio is None
+
+    def test_matrix_metric_other_properties(self):
+        a = "ABC"
+        b = "DEF"
+        c = "GHI"
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [a, a, a, b, b, c, c, c]
+
+        result = metrics.metric_by_group(mock_func_matrix_return, y_a, y_p, gid)
+
+        # Other fields should fail
+        with pytest.raises(ValueError):
+            _ = result.minimum
+        with pytest.raises(ValueError):
+            _ = result.maximum
+        with pytest.raises(ValueError):
+            _ = result.argmin_set
+        with pytest.raises(ValueError):
+            _ = result.argmax_set
+        with pytest.raises(ValueError):
+            _ = result.range
+        with pytest.raises(ValueError):
+            _ = result.range_ratio
 
     @pytest.mark.parametrize("transform_s_w", conversions_for_1d)
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
