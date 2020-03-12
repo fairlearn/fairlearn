@@ -6,7 +6,7 @@ import pytest
 
 
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import DemographicParity, EqualizedOdds
+from fairlearn.reductions import DemographicParity, EqualizedOdds, EqualOpportunity
 from fairlearn.reductions import ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
@@ -71,10 +71,10 @@ class TestExponentiatedGradientSmoke:
                         "error": 0.442883, "n_oracle_calls": 19,
                         "n_classifiers": 6},
                        {"cons_class": EqualOpportunity, "eps": 0.005,
-                        "best_gap": 0.000000, "last_t": 5,
+                        "best_gap": 0.0, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
-                        "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6}
+                        "error": 0.25, "n_oracle_calls": 16,
+                        "n_classifiers": 2}
                        ]
 
     def run_smoke_test(self, data):
@@ -106,8 +106,24 @@ class TestExponentiatedGradientSmoke:
 
     def test_simple_fit_predict(self):
         estimator = LeastSquaresBinaryClassifierLearner()
-        constraints = DemographicParity()
-        expgrad = ExponentiatedGradient(estimator, constraints)
+        constraints = EqualOpportunity()
+        expgrad = ExponentiatedGradient(estimator, constraints,eps=0.005)
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))
+        Q = expgrad._best_classifier
+        n_classifiers = len(expgrad._classifiers)
+
+        disparity_moment = EqualOpportunity()
+        disparity_moment.load_data(pd.DataFrame(X1), pd.Series(labels),
+                        sensitive_features=pd.Series(sensitive_features))
+        error = ErrorRate()
+        error.load_data(pd.DataFrame(X1), pd.Series(labels),
+                        sensitive_features=pd.Series(sensitive_features))
+        print('disparity:',disparity_moment.gamma(Q).max())
+        print('error =', error.gamma(Q)[0])
+        print('best_gap: ', expgrad._best_gap)
+        print('_last_t: ', expgrad._last_t)
+        print('_best_t: ', expgrad._best_t)
+        print('_n_oracle_calls: ', expgrad._n_oracle_calls)
+        print('n_classifiers: ', n_classifiers)
