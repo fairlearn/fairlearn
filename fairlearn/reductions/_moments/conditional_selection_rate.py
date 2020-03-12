@@ -168,7 +168,8 @@ class EqualOpportunity(ConditionalSelectionRate):
 
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ for all `y=1' samples and a weight of `0` for
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ for all
+    `y=1' samples and a weight of `0` for
     all other samples.
     """
 
