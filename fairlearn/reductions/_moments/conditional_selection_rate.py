@@ -147,9 +147,9 @@ class DemographicParity(ConditionalSelectionRate):
 
 
 class EqualOpportunity(ConditionalSelectionRate):
-    r"""Implementation of Equalized Odds as a moment.
+    r"""Implementation of Equal Opportunity as a moment.
 
-    Adds conditioning on label compared to Demographic parity, i.e.
+    Adds conditioning on `y=1` compared to Demographic parity, i.e.
 
     .. math::
        P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a, y,
@@ -167,10 +167,10 @@ class EqualOpportunity(ConditionalSelectionRate):
     the Lagrange multipliers for positive and negative constraints).
 
     With these definitions, the :meth:`signed_weights` method
-    will calculate the costs according to Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ for all
-    `y=1' samples and a weight of `0` for
-    all other samples.
+    will calculate the costs like how it is calculated in Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ but for all
+    `y=1' samples and subsequently, add a weight of `0` for
+    all other samples (for all `y=0`).
     """
 
     short_name = "EqualizedOdds"
