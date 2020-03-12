@@ -190,6 +190,7 @@ class EqualOpportunity(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          filter_value=0,
                           **kwargs)
 
 

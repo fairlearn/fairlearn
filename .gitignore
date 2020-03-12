@@ -114,3 +114,4 @@ docbuild/
 
 # generated perf test scripts
 test/perf/scripts/**
+.idea
