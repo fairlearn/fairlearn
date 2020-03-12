@@ -39,52 +39,31 @@ LabelAndPrediction = namedtuple('LabelAndPrediction', 'label prediction')
 
 _data = namedtuple('_data', 'example_name feature_names sensitive_features X y scores')
 
+_data_ex1 = _data("example 1",
+                  sensitive_feature_names_ex1,
+                  sensitive_features_ex1,
+                  X_ex,
+                  labels_ex,
+                  scores_ex)
 
-@pytest.fixture(params=[
-    _data("example 1",
-          sensitive_feature_names_ex1,
-          sensitive_features_ex1,
-          X_ex,
-          labels_ex,
-          scores_ex),
-    _data("example 2",
-          sensitive_feature_names_ex2,
-          sensitive_features_ex2,
-          X_ex,
-          labels_ex,
-          scores_ex),
-    _data("example 3",
-          sensitive_feature_names_ex3,
-          sensitive_features_ex3,
-          X_ex,
-          labels_ex,
-          scores_ex)])
+_data_ex2 = _data("example 2",
+                  sensitive_feature_names_ex2,
+                  sensitive_features_ex2,
+                  X_ex,
+                  labels_ex,
+                  scores_ex)
+
+_data_ex3 = _data("example 3",
+                  sensitive_feature_names_ex3,
+                  sensitive_features_ex3,
+                  X_ex,
+                  labels_ex,
+                  scores_ex)
+
+
+@pytest.fixture(params=[_data_ex1, _data_ex2, _data_ex3])
 def data(request):
     return request.param
-
-
-# ---------------------------------------------
-# The following pytest configurations are meant to allow silent skipping of tests for scenarios
-# that are not meant to happen. We don't want them to show up as skipped.
-def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "uncollect_if(*, func): function to unselect tests from parametrization")
-
-
-def pytest_collection_modifyitems(config, items):
-    removed = []
-    kept = []
-    for item in items:
-        marker = item.get_closest_marker('uncollect_if')
-        if marker:
-            func = marker.kwargs['func']
-            if func(**item.callspec.params):
-                removed.append(item)
-                continue
-        kept.append(item)
-    if removed:
-        config.hook.pytest_deselected(items=removed)
-        items[:] = kept
 
 
 def is_invalid_transformation(**kwargs):
@@ -98,33 +77,34 @@ def is_invalid_transformation(**kwargs):
         return True
     return False
 
-# ---------------------------------------------
-
 
 @pytest.fixture(params=candidate_A_transforms)
-def data_sf(data, request):
+def data_sf(data, request):  # sf is an abbreviation for sensitive features
     sensitive_feature_transform = request.param
     data._replace(sensitive_features=sensitive_feature_transform(data.sensitive_features))
     return data
 
 
 @pytest.fixture(params=candidate_X_transforms)
-def data_X_sf(data_sf, request):
+def data_X_sf(data_sf, request):  # sf is an abbreviation for sensitive features
     X_transform = request.param
     data_sf._replace(X=X_transform(data_sf.X))
     return data_sf
 
 
 @pytest.fixture(params=candidate_Y_transforms)
-def data_X_y_sf(data_X_sf, request):
+def data_X_y_sf(data_X_sf, request):  # sf is an abbreviation for sensitive features
     y_transform = request.param
     data_X_sf._replace(y=y_transform(data_X_sf.y))
     return data_X_sf
 
 
 class ExamplePredictor():
+    def __init__(self, scores):
+        self._scores = scores
+
     def predict(self, X):
-        return scores_ex
+        return self._scores
 
 
 class ExampleNotPredictor():

@@ -8,6 +8,7 @@ from fairlearn.reductions import SquareLoss, ZeroOneLoss
 import copy
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.linear_model import LinearRegression
 
 from test.unit.utility_functions import logging_all_close
@@ -15,7 +16,8 @@ from test.unit.utility_functions import logging_all_close
 
 def _simple_regression_data(number_a0, number_a1,
                             a0_factor, a1_factor,
-                            a0_label, a1_label):
+                            a0_label, a1_label,
+                            A_two_dim=False):
 
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
@@ -34,10 +36,15 @@ def _simple_regression_data(number_a0, number_a1,
     X = pd.DataFrame({"actual_feature": score_feature,
                       "sensitive_features": A,
                       "constant_ones_feature": np.ones(len(Y))})
+
+    if A_two_dim:
+        A = np.stack((A, A), -1)
+
     return X, Y, A
 
 
-def test_bgl_unfair():
+@pytest.mark.parametrize("A_two_dim", [False, True])
+def test_bgl_unfair(A_two_dim):
     a0_count = 5
     a1_count = 7
 
@@ -49,7 +56,7 @@ def test_bgl_unfair():
 
     X, Y, A = _simple_regression_data(a0_count, a1_count,
                                       a0_factor, a1_factor,
-                                      a0_label, a1_label)
+                                      a0_label, a1_label, A_two_dim)
 
     bgl_square_loss = GroupLossMoment(SquareLoss(-np.inf, np.inf))
     target = GridSearch(LinearRegression(),
@@ -85,7 +92,10 @@ def test_bgl_unfair():
                              all_predict[1:])
 
 
-def test_bgl_unmitigated_same():
+# TODO: enable two-dimensional A scenarios by investigating issues
+# with LinearRegression in this use case
+@pytest.mark.parametrize("A_two_dim", [False])
+def test_bgl_unmitigated_same(A_two_dim):
     a0_count = 4
     a1_count = 4
 
@@ -97,7 +107,7 @@ def test_bgl_unmitigated_same():
 
     X, y, A = _simple_regression_data(a0_count, a1_count,
                                       a0_factor, a1_factor,
-                                      a0_label, a1_label)
+                                      a0_label, a1_label, A_two_dim)
 
     estimator = LinearRegression()
 
@@ -120,7 +130,10 @@ def test_bgl_unmitigated_same():
     assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
 
-def test_bgl_lagrange_specifications():
+# TODO: enable two-dimensional A scenarios by investigating issues
+# with LinearRegression in this use case
+@pytest.mark.parametrize("A_two_dim", [False])
+def test_bgl_lagrange_specifications(A_two_dim):
     a0_count = 13
     a1_count = 4
 
@@ -132,7 +145,7 @@ def test_bgl_lagrange_specifications():
 
     X, y, A = _simple_regression_data(a0_count, a1_count,
                                       a0_factor, a1_factor,
-                                      a0_label, a1_label)
+                                      a0_label, a1_label, A_two_dim)
 
     estimator = LinearRegression()
 

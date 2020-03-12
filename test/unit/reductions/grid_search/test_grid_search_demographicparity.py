@@ -6,12 +6,14 @@ from fairlearn.reductions import GridSearch, DemographicParity
 import copy
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.linear_model import LogisticRegression
 
 
 def _simple_threshold_data(number_a0, number_a1,
                            a0_threshold, a1_threshold,
-                           a0_label, a1_label):
+                           a0_label, a1_label,
+                           A_two_dim=False):
 
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
@@ -28,12 +30,17 @@ def _simple_threshold_data(number_a0, number_a1,
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
     X = pd.DataFrame({"actual_feature": score_feature,
-                      "sensitive_features": A,
+                      "sensitive_feature1": A,
                       "constant_ones_feature": np.ones(len(Y))})
+
+    if A_two_dim:
+        A = np.stack((A, A), -1)
+
     return X, Y, A
 
 
-def test_demographicparity_fair_uneven_populations():
+@pytest.mark.parametrize("A_two_dim", [False, True])
+def test_demographicparity_fair_uneven_populations(A_two_dim):
     # Variant of test_demographicparity_already_fair, which has unequal
     # populations in the two classes
     # Also allow the threshold to be adjustable
@@ -48,7 +55,7 @@ def test_demographicparity_fair_uneven_populations():
 
     X, Y, A = _simple_threshold_data(number_a0, number_a1,
                                      score_threshold, score_threshold,
-                                     a0_label, a1_label)
+                                     a0_label, a1_label, A_two_dim)
 
     target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
                         constraints=DemographicParity(),
@@ -69,7 +76,9 @@ def test_demographicparity_fair_uneven_populations():
     assert np.array_equal(sample_results, [1, 0])
 
 
-def test_lambda_vec_zero_unchanged_model():
+# TODO: try with two-dimensional A, but liblinear solver has issues.
+@pytest.mark.parametrize("A_two_dim", [False])
+def test_lambda_vec_zero_unchanged_model(A_two_dim):
     score_threshold = 0.6
 
     number_a0 = 64
@@ -80,7 +89,7 @@ def test_lambda_vec_zero_unchanged_model():
 
     X, y, A = _simple_threshold_data(number_a0, number_a1,
                                      score_threshold, score_threshold,
-                                     a0_label, a1_label)
+                                     a0_label, a1_label, A_two_dim)
 
     estimator = LogisticRegression(solver='liblinear',
                                    fit_intercept=True,
@@ -108,7 +117,9 @@ def test_lambda_vec_zero_unchanged_model():
     assert np.array_equal(gs_coeff, um_coeff)
 
 
-def test_can_specify_and_generate_lambda_vecs():
+# TODO: try with two-dimensional A, but liblinear solver has issues.
+@pytest.mark.parametrize("A_two_dim", [False])
+def test_can_specify_and_generate_lambda_vecs(A_two_dim):
     score_threshold = 0.4
 
     number_a0 = 32
