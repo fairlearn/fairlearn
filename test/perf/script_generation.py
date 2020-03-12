@@ -83,7 +83,8 @@ def add_mitigation(script_lines, perf_test_configuration):
     with TimedExecution(_MITIGATION, script_lines):
         if perf_test_configuration.mitigator == ThresholdOptimizer.__name__:
             script_lines.append('mitigator = ThresholdOptimizer('
-                                'unconstrained_predictor=unconstrained_predictor, '
+                                'estimator=unconstrained_predictor, '
+                                'prefit=True, '
                                 'constraints="{}")'.format(perf_test_configuration.disparity_metric))
         elif perf_test_configuration.mitigator == ExponentiatedGradient.__name__:
             script_lines.append('mitigator = ExponentiatedGradient('
