@@ -41,9 +41,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
         if filter_value is not None:
-            self.dropped_tags = self.tags.where(self.tags['label'] == 0).dropna()
-            self.tags = self.tags.where(self.tags['label'] == 1).dropna()
-            self.dropped_X =  self.X.drop(self.tags.index)
+            self.dropped_tags = self.tags.where(self.tags['label'] == filter_value).dropna()
+            self.tags = self.tags.where(self.tags['label'] == int(not filter_value)).dropna()
+            self.dropped_X = self.X.drop(self.tags.index)
             self.X = self.X.drop(self.dropped_tags.index)
             self.filtered = True
         else:
@@ -119,9 +119,10 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
+        # this flag is set if a `filter_value` was sent to :meth:`load_data()`
         if self.filtered:
-            signed_weights = signed_weights.reindex(list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0)
-        # print(signed_weights)
+            signed_weights = signed_weights.reindex(list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0
+                                                    )
         return signed_weights
 
 
@@ -156,43 +157,11 @@ class DemographicParity(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
 
+
 class EqualOpportunity(ConditionalSelectionRate):
     r"""Implementation of Equalized Odds as a moment.
 
     Adds conditioning on label compared to Demographic parity, i.e.
-
-    .. math::
-       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
-
-    This implementation of :class:`ConditionalSelectionRate` defines
-    events corresponding to the unique values of the `Y` array.
-
-    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
-    fraction of the samples corresponding to each unique value in
-    the `Y` array.
-
-    The `index` MultiIndex will have a number of entries equal to
-    the number of unique values for the sensitive feature, multiplied by
-    the number of unique values of the `Y` array, multiplied by two (for
-    the Lagrange multipliers for positive and negative constraints).
-
-    With these definitions, the :meth:`signed_weights` method
-    will calculate the costs according to Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
-    """
-
-    short_name = "EqualizedOdds"
-
-    def load_data(self, X, y, **kwargs):
-        """Load the specified data into the object."""
-        super().load_data(X, y,
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
-                          **kwargs)
-
-class EqualOpportunity(ConditionalSelectionRate):
-    r"""Implementation of Equal Opportunity as a moment.
-
-    Adds conditioning on `y=1` compared to Demographic parity, i.e.
 
     .. math::
        P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a, y,
@@ -210,10 +179,9 @@ class EqualOpportunity(ConditionalSelectionRate):
     the Lagrange multipliers for positive and negative constraints).
 
     With these definitions, the :meth:`signed_weights` method
-    will calculate the costs like how it is calculated in Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ but for all
-    `y=1' samples and subsequently, add a weight of `0` for
-    all other samples (for all `y=0`).
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ for all `y=1' samples and a weight of `0` for
+    all other samples.
     """
 
     short_name = "EqualOpportunity"
@@ -222,7 +190,6 @@ class EqualOpportunity(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
-                          filter_value=0,
                           **kwargs)
 
 
