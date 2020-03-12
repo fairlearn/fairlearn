@@ -1,5 +1,5 @@
 # template for setting up the python environment (with optional pinned requirements)
-# and running all tests (except for perf and install tests)
+# and running all tests (except for install tests)
 
 parameters:
   name: ''
@@ -46,7 +46,7 @@ jobs:
   - script: flake8 .
     displayName: "Run flake8"
 
-  - script: python -m pytest test/ --ignore=test/perf --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
