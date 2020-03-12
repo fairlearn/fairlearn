@@ -91,10 +91,10 @@ import { probit } from "../__mock-data/probit";
                         precomputedFeatureBins={data.precomputedBins}
                         customMetrics={data.customMetrics}
                         predictionType={data.predictionType}
-                        // supportedBinaryClassificationAccuracyKeys={["accuracy_score", "balanced_accuracy_score","precision_score", "recall_score"]}
-                        // supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}
-                        // supportedProbabilityAccuracyKeys={["auc", "root_mean_squared_error", "balanced_root_mean_squared_error", "r2_score", "mean_squared_error", "mean_absolute_error"]}
-                        // stringParams={{contextualHelp: this.messages}}
+                        supportedBinaryClassificationAccuracyKeys={["accuracy_score", "balanced_accuracy_score","precision_score", "recall_score"]}
+                        supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}
+                        supportedProbabilityAccuracyKeys={["auc", "root_mean_squared_error", "balanced_root_mean_squared_error", "r2_score", "mean_squared_error", "mean_absolute_error"]}
+                        stringParams={{contextualHelp: this.messages}}
                         requestMetrics={this.generateRandomMetrics.bind(this)}
                         key={new Date()}
                       />
