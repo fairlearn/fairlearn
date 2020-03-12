@@ -6,7 +6,7 @@ import pytest
 
 
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import DemographicParity, EqualizedOdds, EqualOpportunity
+from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
@@ -69,8 +69,7 @@ class TestExponentiatedGradientSmoke:
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6}
-                       ]
+                        "n_classifiers": 6}]
 
     def run_smoke_test(self, data):
         expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
