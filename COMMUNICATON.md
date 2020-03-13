@@ -2,8 +2,7 @@
 
 ## Code of conduct
 
-This project has adopted the [GitHub community
-guidelines](https://help.github.com/en/github/site-policy/github-community-guidelines).
+This project has adopted the [GitHub community guidelines](https://help.github.com/en/github/site-policy/github-community-guidelines).
 
 ## Issues
 
