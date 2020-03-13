@@ -106,8 +106,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
-        adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
-            - lambda_signed / self.prob_group_event
+        adjust = (self.ratio * lambda_signed.sum(level=_EVENT) / self.prob_event) \
+            - (lambda_signed / self.prob_group_event)
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
@@ -141,6 +141,10 @@ class DemographicParity(ConditionalSelectionRate):
 
     short_name = "DemographicParity"
 
+    def __init__(self, ratio=1.0):
+        super(DemographicParity, self).__init__()
+        self.ratio = ratio
+
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
@@ -172,6 +176,10 @@ class EqualizedOdds(ConditionalSelectionRate):
     """
 
     short_name = "EqualizedOdds"
+
+    def __init__(self, ratio=1.0):
+        super(EqualizedOdds, self).__init__()
+        self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
