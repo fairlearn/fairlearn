@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from fairlearn.metrics import create_dashboard_dictionary
-from fairlearn.metrics import create_group_metric_set
+from fairlearn.metrics._group_metric_set import create_group_metric_set
 
 
 def test_create_dashboard_dictionary_smoke():
