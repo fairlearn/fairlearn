@@ -109,9 +109,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
         lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]) \
-                       .sum(level = _EVENT) / self.prob_event
+                      .sum(level=_EVENT) / self.prob_event
         lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
-                             self.prob_group_event
+                            self.prob_group_event
         adjust = self.multiplier[_MULTIPLIER].mul(lambda_event - lambda_group_event)
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
