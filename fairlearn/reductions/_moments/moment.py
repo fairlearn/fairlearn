@@ -11,7 +11,7 @@ _LOSS = "loss"
 _PREDICTION = "pred"
 _ALL = "all"
 _SIGN = "sign"
-
+_MULTIPLIER = "multiplier"
 
 class Moment:
     """Generic moment.
