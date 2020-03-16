@@ -160,6 +160,9 @@ class DemographicParity(ConditionalSelectionRate):
     """
 
     short_name = "DemographicParity"
+    def __init__(self, ratio=1.0):
+        super(DemographicParity, self).__init__()
+        self.ratio = ratio
 
     def __init__(self, ratio=1.0):
         super(DemographicParity, self).__init__()
@@ -198,6 +201,48 @@ class EqualizedOdds(ConditionalSelectionRate):
     """
 
     short_name = "EqualizedOdds"
+    def __init__(self, ratio=1.0):
+        super(EqualizedOdds, self).__init__()
+        self.ratio = ratio
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          **kwargs)
+
+
+class ErrorRatio(ConditionalSelectionRate):
+    r"""Implementation of Error Ratio as a moment.
+
+    Measures the ratio in errors between unprivileged and privileged attributes, i.e.
+    2 sided version of error ratio -
+    .. math::
+       1/r <= error(unpriv) / error(priv) <= r
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    events corresponding to the unique values of the `Y` array.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    fraction of the samples corresponding to each unique value in
+    the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to
+    the number of unique values for the sensitive feature, multiplied by
+    the number of unique values of the `Y` array, multiplied by two (for
+    the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :math:`signed_weights` method
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    """
+
+    short_name = "ErrorRatio"
+
+    def __init__(self, ratio=1.0):
+        """Intialise with the ratio value."""
+        super(ErrorRatio, self).__init__()
+        self.ratio = ratio
 
     def __init__(self, ratio=1.0):
         super(EqualizedOdds, self).__init__()
@@ -209,6 +254,7 @@ class EqualizedOdds(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          multiplier=pd.Series(y).apply(lambda y: 2*y - 1),
                           **kwargs)
 
 
