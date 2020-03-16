@@ -113,9 +113,13 @@ class ConditionalSelectionRate(ClassificationMoment):
         :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
-        adjust = self.multiplier[_MULTIPLIER].mul((lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
-                self.prob_event - (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
-                self.prob_group_event)
+        adjust = self.multiplier[_MULTIPLIER].mul(((lambda_vec["+"] -
+                                                    self.ratio * lambda_vec["-"])
+                                                    .sum(level=_EVENT) /
+                                                    self.prob_event) -
+                                                  ((self.ratio * lambda_vec["+"] -
+                                                    lambda_vec["-"]) /
+                                                    self.prob_group_event))
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
@@ -148,6 +152,7 @@ class DemographicParity(ConditionalSelectionRate):
     """
 
     short_name = "DemographicParity"
+
     def __init__(self, ratio=1.0):
         super(DemographicParity, self).__init__()
         self.ratio = ratio
@@ -183,6 +188,7 @@ class EqualizedOdds(ConditionalSelectionRate):
     """
 
     short_name = "EqualizedOdds"
+
     def __init__(self, ratio=1.0):
         super(EqualizedOdds, self).__init__()
         self.ratio = ratio
@@ -200,7 +206,7 @@ class ErrorRatio(ConditionalSelectionRate):
     Measures the ratio in errors between unprivileged and privileged attributes, i.e.
     2 sided version of error ratio -
     .. math::
-       1/r <= error(unpriv) / error(priv) <= r
+    1/r <= error(unpriv) / error(priv) <= r
 
     This implementation of :class:`ConditionalSelectionRate` defines
     events corresponding to the unique values of the `Y` array.
