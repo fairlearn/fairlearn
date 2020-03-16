@@ -27,6 +27,8 @@ def test_create_dashboard_dictionary_smoke():
                                        sensitive_feature_names=[g_name])
 
     assert expected == actual
+    assert actual['schemaType'] == 'dashboardDictionary'
+    assert actual['schemaVersion'] == 0
 
 
 def test_create_dashboard_dictionary_multiple_models_multiple_sensitive_features():
@@ -61,3 +63,5 @@ def test_create_dashboard_dictionary_multiple_models_multiple_sensitive_features
                                        sensitive_feature_names=[n_1, n_2])
 
     assert expected == actual
+    assert actual['schemaType'] == 'dashboardDictionary'
+    assert actual['schemaVersion'] == 0
