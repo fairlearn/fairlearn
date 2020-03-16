@@ -36,7 +36,7 @@ class ConditionalSelectionRate(ClassificationMoment):
     def load_data(self, X, y, event=None, multiplier=None, **kwargs):
         """Load the specified data into this object.
 
-        This adds a column `event` to the `tags` field.
+        This adds a column `event` and `multiplier` to the `tags` field.
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
@@ -113,13 +113,11 @@ class ConditionalSelectionRate(ClassificationMoment):
         :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
-        adjust = self.multiplier[_MULTIPLIER].mul(((lambda_vec["+"] -
-                                                    self.ratio * lambda_vec["-"])
-                                                   .sum(level=_EVENT) /
-                                                   self.prob_event) -
-                                                  ((self.ratio * lambda_vec["+"] -
-                                                    lambda_vec["-"]) /
-                                                   self.prob_group_event))
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]) \
+                       .sum(level = _EVENT) / self.prob_event
+        lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
+                             self.prob_group_event
+        adjust = self.multiplier[_MULTIPLIER].mul(lambda_event - lambda_group_event)
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
@@ -206,7 +204,7 @@ class ErrorRatio(ConditionalSelectionRate):
     Measures the ratio in errors between unprivileged and privileged attributes, i.e.
     2 sided version of error ratio -
     .. math::
-    1/r <= error(unpriv) / error(priv) <= r
+    1/ratio <= error(unpriv_attribute) / error(priv_attribute) <= ratio
 
     This implementation of :class:`ConditionalSelectionRate` defines
     events corresponding to the unique values of the `Y` array.
@@ -223,6 +221,11 @@ class ErrorRatio(ConditionalSelectionRate):
     With these definitions, the :math:`signed_weights` method
     will calculate the costs according to Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    The `ratio` defines the amount of relaxation that is allowed for the
+    constraint. The ratio of 1 means, the constraint is given no relaxation
+    and thus, the constraint tries to evaluate for -
+    error(unpriv) / error(priv) = 1.
     """
 
     short_name = "ErrorRatio"
