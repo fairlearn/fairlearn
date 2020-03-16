@@ -13,6 +13,7 @@ _ALL = "all"
 _SIGN = "sign"
 _MULTIPLIER = "multiplier"
 
+
 class Moment:
     """Generic moment.
 
