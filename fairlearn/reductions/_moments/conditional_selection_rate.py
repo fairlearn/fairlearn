@@ -51,9 +51,6 @@ class ConditionalSelectionRate(ClassificationMoment):
                            names=[_SIGN, _EVENT, _GROUP_ID])
         self.index = signed.index
         self.default_objective_lambda_vec = None
-        # else:
-        #     self.multiplier = multiplier
-        self
         self.multiplier = self.tags.groupby([_EVENT, _GROUP_ID]).mean()
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].unique()
