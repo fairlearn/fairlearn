@@ -3,7 +3,7 @@
 
 import pandas as pd
 from .moment import ClassificationMoment
-from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
+from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN, _MULTIPLIER
 from .error_rate import ErrorRate
 
 _DIFF = "diff"
@@ -33,13 +33,16 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, **kwargs):
+    def load_data(self, X, y, event=None, multiplier=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
+        if multiplier is None:
+            multiplier = pd.Series(y).apply(lambda y: 1)
+        self.tags[_MULTIPLIER] = multiplier
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -48,7 +51,10 @@ class ConditionalSelectionRate(ClassificationMoment):
                            names=[_SIGN, _EVENT, _GROUP_ID])
         self.index = signed.index
         self.default_objective_lambda_vec = None
-
+        # else:
+        #     self.multiplier = multiplier
+        self
+        self.multiplier = self.tags.groupby([_EVENT, _GROUP_ID]).mean()
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].unique()
         group_vals = self.tags[_GROUP_ID].unique()
@@ -105,9 +111,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
-        lambda_signed = lambda_vec["+"] - lambda_vec["-"]
-        adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
-            - lambda_signed / self.prob_group_event
+        adjust = self.multiplier[_MULTIPLIER].mul((lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
+                self.prob_event - (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
+                self.prob_group_event)
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
@@ -140,6 +146,9 @@ class DemographicParity(ConditionalSelectionRate):
     """
 
     short_name = "DemographicParity"
+    def __init__(self, ratio=1.0):
+        super(DemographicParity, self).__init__()
+        self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
@@ -172,9 +181,52 @@ class EqualizedOdds(ConditionalSelectionRate):
     """
 
     short_name = "EqualizedOdds"
+    def __init__(self, ratio=1.0):
+        super(EqualizedOdds, self).__init__()
+        self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          **kwargs)
+
+
+class ErrorRatio(ConditionalSelectionRate):
+    r"""Implementation of Error Ratio as a moment.
+
+    Measures the ratio in errors between unprivileged and privileged attributes, i.e.
+    2 sided version of error ratio -
+    .. math::
+       1/r <= error(unpriv) / error(priv) <= r
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    events corresponding to the unique values of the `Y` array.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    fraction of the samples corresponding to each unique value in
+    the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to
+    the number of unique values for the sensitive feature, multiplied by
+    the number of unique values of the `Y` array, multiplied by two (for
+    the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :math:`signed_weights` method
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    """
+
+    short_name = "ErrorRatio"
+
+    def __init__(self, ratio=1.0):
+        """Intialise with the ratio value."""
+        super(ErrorRatio, self).__init__()
+        self.ratio = ratio
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          multiplier=pd.Series(y).apply(lambda y: 2*y - 1),
                           **kwargs)
