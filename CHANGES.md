@@ -9,7 +9,7 @@
   * `ThresholdOptmizer` is now a scikit-learn meta-estimator, and accepts
     an estimator through the `estimator` parameter. To use a pre-fitted
     estimator, pass `prefit=True`.
-* Rename arguments of `create_group_metric_set()` to match the dashboard
+* Add `create_dashboard_dictionary()` for creating the Dashboard cache layer and rename arguments of `create_group_metric_set()`
 
 ### v0.4.4
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
