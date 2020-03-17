@@ -256,7 +256,7 @@ class ErrorRatio(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
-                          multiplier=pd.Series(y).apply(lambda y: 2*y - 1),
+                          multiplier=pd.Series(y).apply(lambda y: 1 - 2*y),
                           **kwargs)
 
 
