@@ -71,21 +71,21 @@ To assess a single model's fairness and accuracy, the dashboard widget can be la
 ```python
 from fairlearn.widget import FairlearnDashboard
 
-# A_test containts your sensitive features (e.g., Age, Gender)
+# A_test containts your sensitive features (e.g., age, binary gender)
 # sensitive_feature_names containts your sensitive feature names
 # y_true contains ground truth labels
 # y_pred contains prediction labels
 
 FairlearnDashboard(sensitive_features=A_test,
-                   sensitive_feature_names=['Gender', 'Age'],
+                   sensitive_feature_names=['BinaryGender', 'Age'],
                    y_true=Y_test.tolist(),
                    y_pred=[y_pred.tolist()])
 ```
 
 
-After the launch, the widget walks the user through the assessment set-up, where the user is asked to select (1) the sensitive feature of interest (e.g., gender or age), and (2) the accuracy metric (e.g., model precision) along which to evaluate the overall model performance as well as any disparities across groups. These selections are then used to obtain the visualization of the model's impact on the subgroups (e.g., model precision for females and model precision for males).
+After the launch, the widget walks the user through the assessment set-up, where the user is asked to select (1) the sensitive feature of interest (e.g., binary gender or age), and (2) the accuracy metric (e.g., model precision) along which to evaluate the overall model performance as well as any disparities across groups. These selections are then used to obtain the visualization of the model's impact on the subgroups (e.g., model precision for females and model precision for males).
 
-The following figures illustrate the set-up steps, where _gender_ is selected as a sensitive feature and _accuracy rate_ is selected as the accuracy metric.
+The following figures illustrate the set-up steps, where _binary gender_ is selected as a sensitive feature and _accuracy rate_ is selected as the accuracy metric.
 
 
 
@@ -108,7 +108,7 @@ After the set-up, the dashboard presents the model assessment in two panels:
 
 The dashboard also enables comparison of multiple models, such as the models produced by different learning algorithms and different mitigation approaches, including `fairlearn.reductions.GridSearch`, `fairlearn.reductions.ExponentiatedGradient` and `fairlearn.postprocessing.ThresholdOptimizer`.
 
-As before, the user is first asked to select the sensitive feature and the accuracy metric. The _model comparison_ view then depicts the accuracy and disparity of all the provided models in a scatter plot. This allows the user to examine trade-offs between accuracy and fairness. Each of the dots can be clicked to open the assessment of the corresponding model. The figure below shows the model comparison view with `gender` selected as a sensitive feature and `accuracy rate` selected as the accuracy metric.
+As before, the user is first asked to select the sensitive feature and the accuracy metric. The _model comparison_ view then depicts the accuracy and disparity of all the provided models in a scatter plot. This allows the user to examine trade-offs between accuracy and fairness. Each of the dots can be clicked to open the assessment of the corresponding model. The figure below shows the model comparison view with `binary gender` selected as a sensitive feature and `accuracy rate` selected as the accuracy metric.
 
 
 
