@@ -7,10 +7,10 @@ print(__doc__)
 
 ###############################################################################
 # Getting and preparing the data
-###############################################################################
-
+# ------------------------------
+#
 # To demonstrate the post processing algorithm we use the "COMPAS" dataset from
-# [ProPublica](https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv).
+# `ProPublica <https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv>`_.
 # The labels represent the two-year recidivism ID, i.e. whether a person got
 # rearrested within two years (label 1) or not (label 0). The features include
 # sex, age, as well as information on prior incidents.
@@ -31,8 +31,7 @@ X_train.loc[0], y_train[0]
 
 ###############################################################################
 # Create a fairness-unaware model
-###############################################################################
-
+# -------------------------------
 # First we set up a helper function that will help in analyzing the dataset as
 # well as predictions from our models. Feel free to skip to the next cell for
 # the actual logic.
@@ -92,6 +91,7 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
     plt.xticks(range(1, len(x_tick_labels)+1), x_tick_labels, rotation=45,
                horizontalalignment="right")
 
+###############################################################################
 # To get started we look at a very basic Logistic Regression model. We fit it
 # to the training data and plot some characteristics of training and test data
 # as well as the predictions of the model on those datasets.
@@ -109,6 +109,7 @@ from sklearn.linear_model import LogisticRegression
 unconstrained_predictor = LogisticRegression(solver='liblinear')
 unconstrained_predictor.fit(X_train, y_train)
     
+###############################################################################
 # print and plot data from training and test set as well as predictions with
 # fairness-unaware classifier on both sets show only test data related plots by
 # default - uncomment the following lines to see training data plots as well
@@ -129,20 +130,21 @@ plt.show()
 
 ###############################################################################
 # Postprocessing the model to get a fair model
-###############################################################################
-
+# --------------------------------------------
+# 
 # The idea behind postprocessing is to alter the output of the fairness-unaware
 # model to achieve fairness. The postprocessing algorithm requires three input
 # arguments:
 # - the matrix of samples X
 # - the vector of predictions y from the fairness-unaware model 
 # - the vector of group attribute values A (in the code we refer to it as `sensitive_features`)
-
+# 
 # The goal is to make the output fair with respect to constraints. The
 # postprocessing algorithm uses one of
-# - Demographic Parity (DP): $P\ [\ h(X)=\hat{y}\ |\ A=a] = P\ [\ h(X)=\hat{y}\ ] \qquad \forall a, \hat{y}$
-# - Equalized Odds (EO): $P\ [\ h(X)=\hat{y}\ |\ A=a, Y=y] = P\ [\ h(X)=\hat{y}\ |\ Y=y\ ] \qquad \forall a, \hat{y}$
-
+#
+# - Demographic Parity (DP): :math:`P\ [\ h(X)=\hat{y}\ |\ A=a] = P\ [\ h(X)=\hat{y}\ ] \qquad \forall a, \hat{y}`
+# - Equalized Odds (EO): :math:`P\ [\ h(X)=\hat{y}\ |\ A=a, Y=y] = P\ [\ h(X)=\hat{y}\ |\ Y=y\ ] \qquad \forall a, \hat{y}`
+# 
 # where $h(X)$ is the prediction based on the input $X$, $\hat{y}$ and $y$ are
 # labels, and $a$ is a sensitive feature value. In this example, we'd expect
 # the postprocessed model with DP to be balanced between races. In this
@@ -156,29 +158,30 @@ plt.show()
 # subgroups of each race without recidivism, but we have no parity between the
 # groups with different training labels. In mathematical terms at the example
 # of African-American and Caucasian:
-
-# $$
-# P\ [\ \text{recidivism predicted}\ |\ \text{African-American, recidivism}\ ] = P\ [\ \text{recidivism predicted}\ |\ \text{Caucasian, recidivism}\ ], \text{e.g. } 0.95\\
-# P\ [\ \text{recidivism predicted}\ |\ \text{African-American, no recidivism}\ ] = P\ [\ \text{recidivism predicted}\ |\ \text{Caucasian, no recidivism}\ ], \text{e.g. } 0.15
-# $$
-
+# 
+# .. math::
+#   P\ [\ \text{recidivism predicted}\ |\ \text{African-American, recidivism}\ ] = P\ [\ \text{recidivism predicted}\ |\ \text{Caucasian, recidivism}\ ], \text{e.g. } 0.95
+# 
+# .. math::
+#   P\ [\ \text{recidivism predicted}\ |\ \text{African-American, no recidivism}\ ] = P\ [\ \text{recidivism predicted}\ |\ \text{Caucasian, no recidivism}\ ], \text{e.g. } 0.15
+# 
 # but that also means that African-Americans (and Caucasians) of different
 # subgroup based on training labels don't necessarily have parity:
-
-# $$
-# P[\text{recidivism predicted} | \text{African-American, recidivism}] = 0.95 \neq 0.15 = P[\text{recidivism predicted} | \text{African-American, no recidivism}]
-# $$
-
+# 
+# .. math::
+#   P[\text{recidivism predicted} | \text{African-American, recidivism}] = 0.95 \neq 0.15 = P[\text{recidivism predicted} | \text{African-American, no recidivism}]
+# 
 # Assessing which disparity metric is indeed fair varies by application
 # scenario. In this case the evaluation focuses on Equalized Odds, because the
 # recidivism prediction should be accurate for each race, and for each subgroup
 # within. The plot for the training data shows the intended outcome, while the
 # plot for the test data exhibits slight variation which is likely due to
 # randomized predictions as well as a slightly different data distribution.
-
+# 
 # This wrapper around the unconstrained estimator serves the purpose of mapping
-# the predict method to predict_proba so that we can use real values to get
+# the predict method to ``predict_proba``` so that we can use real values to get
 # more accurate estimates.
+
 class LogisticRegressionAsRegression:
     def __init__(self, logistic_regression_estimator):
         self.logistic_regression_estimator = logistic_regression_estimator
@@ -224,14 +227,14 @@ plt.show()
 
 ###############################################################################
 # Post Processing in Detail
-###############################################################################
-
+# -------------------------
+# 
 # While this worked as the numbers show, it's not entirely obvious how it found
 # its solution. The following section will provide a deep dive on post
 # processing for Equalized Odds (EO).
-
-# The post processing method (based on work by [Hardt, Price,
-# Srebro](https://arxiv.org/pdf/1610.02413.pdf)) takes a fairness-unaware model
+# 
+# The post processing method (based on work by `Hardt, Price,
+# Srebro <https://arxiv.org/pdf/1610.02413.pdf>`_) takes a fairness-unaware model
 # and disparity constraints (such as EO) in the constructor and features (X),
 # labels (y), and a sensitive feature (sensitive_features) in the fit method.
 # It subsequently uses the model to make predictions for all samples in X. Note
@@ -242,21 +245,22 @@ scores = unconstrained_predictor_wrapper.predict(X_train)
 scores
 
 ###############################################################################
-## Finding threshold rules
-###############################################################################
-
+# Finding threshold rules
+# ***********************
+# 
 # The algorithm then tries to find all thresholding rules with which it could
 # divide the data. Any score for which the thresholding rule evaluates to true
 # is predicted to be 1. It does that for each group, so in this case for each
 # race. Depending on the unconstrained predictor's scores you could have lots
 # of thresholding rules, between each set of such values. For each rule we just
 # evaluate the following two probabilities empirically:
-
-# $$
-# P[\hat{Y} = 1 | Y = 0] \text{ which is labeled x below to indicate that it'll be plotted on the x-axis}\\
-# P[\hat{Y} = 1 | Y = 1] \text{ which is labeled y below to indicate that it'll be plotted on the y-axis}
-# $$
-
+# 
+# .. math::
+#   P[\hat{Y} = 1 | Y = 0] \text{ which is labeled x below to indicate that it'll be plotted on the x-axis}
+# 
+# .. math::
+#   P[\hat{Y} = 1 | Y = 1] \text{ which is labeled y below to indicate that it'll be plotted on the y-axis}
+# 
 # The former is the false negative rate (of that group), while the latter is
 # the true positive rate (of that group). In this example, the threshold rules
 # would be the ones shown below:
@@ -275,19 +279,21 @@ for group_name, group in data_grouped_by_sensitive_feature:
 print("Thresholding rules:")
 roc_points
 
+###############################################################################
 # The base points with (x,y) as (0,0) and (1,1) always exist, because that
 # essentially just means that we're predicting everything as 0 or everything as
 # 1 regardless of the scores from the fairness-unaware model. Let's look at
 # both cases:
+# 
 # - x=0, y=0, threshold rule ">inf": more than infinity is impossible, which
-#   means every sample is predicted as 0. That means $P[\hat{Y} = 1 | Y = 0] =
-#   0$ (represented as x) because the predictions $\hat{Y}$ are never 1, and
-#   similarly $P[\hat{Y} = 1 | Y = 1] = 0$ (represented as y).
+#   means every sample is predicted as 0. That means :math:`P[\hat{Y} = 1 | Y = 0] = 0`
+#   (represented as x) because the predictions $\hat{Y}$ are never 1, and
+#   similarly :math:`P[\hat{Y} = 1 | Y = 1] = 0` (represented as y).
 # - x=1, y=1, threshold rule ">-inf": more than infinity is always true, which
-#   means every sample is predicted as 1. That means $P[\hat{Y} = 1 | Y = 0] =
-#   1$ (represented as x) because the predictions $\hat{Y}$ are always 1, and
-#   similarly $P[\hat{Y} = 1 | Y = 1] = 1$ (represented as y).
-
+#   means every sample is predicted as 1. That means :math:`P[\hat{Y} = 1 | Y = 0] = 1`
+#   (represented as x) because the predictions $\hat{Y}$ are always 1, and
+#   similarly :math:`P[\hat{Y} = 1 | Y = 1] = 1` (represented as y).
+# 
 # The more interesting logic happens in between. The x and y values were
 # calculated as follows:
 
@@ -311,31 +317,32 @@ for group_name, group in data_grouped_by_sensitive_feature:
     print("    P[Ŷ = 1 | Y = 0] = {}".format(x_group_0_5))
     print("    P[Ŷ = 1 | Y = 1] = {}".format(y_group_0_5))
 
+###############################################################################
 # Note that it never makes sense to have $x>y$ because in that case you're
 # better off flipping labels, i.e. completely turning around the meaning of the
 # scores. The method automatically does that unless specified otherwise.
 
 ###############################################################################
-## Interpolated Predictions and Probabilistic Classifiers
-###############################################################################
-
+# Interpolated Predictions and Probabilistic Classifiers
+# ******************************************************
+# 
 # This way you end up with a set of points above the diagonal line connecting
 # (0,0) and (1,1). We calculate the convex hull based on that, because we can
 # reach any point in between two known thresholding points by interpolation. An
-# interpolation could be $p_0 (x_0, y_0) + p_1 (x_1, y_1)$. For the post
+# interpolation could be :math:`p_0 (x_0, y_0) + p_1 (x_1, y_1)`. For the post
 # processing algorithm that would mean that we use the rule defined by $(x_0,
 # y_0, \text{operation}_0)$ $\quad p_0$ percent of the time, and the rule
-# defined by $(x_1, y_1, \text{operation}_1)$ $\quad p_1$ percent of the time,
-# thus resulting in a probabilistic classifier. Depending on the data certain
-# fairness objectives can only be accomplished with probabilistic classifiers.
-# However, not every use case lends itself to probabilistic classifiers, since
-# it could mean that two people with identical features are classified
-# differently.
+# defined by :math:`(x_1, y_1, \text{operation}_1)` :math:`\quad p_1` percent
+# of the time, thus resulting in a probabilistic classifier. Depending on the
+# data certain fairness objectives can only be accomplished with probabilistic
+# classifiers. However, not every use case lends itself to probabilistic
+# classifiers, since it could mean that two people with identical features are
+# classified differently.
 
 ###############################################################################
-## Finding the Equalized Odds solution
-###############################################################################
-
+# Finding the Equalized Odds solution
+# ***********************************
+# 
 # From all the ROC points (see below) we need to extract the convex hull for
 # both groups/curves.
 
@@ -345,6 +352,7 @@ plt.xlabel("$P\ [\ \\hat{Y}=1\ |\ Y=0\ ]$")
 plt.ylabel("$P\ [\ \\hat{Y}=1\ |\ Y=1\ ]$")
 plt.show()
 
+###############################################################################
 # In the Equalized Odds case, we need to find a point where the presented
 # probabilities (false positive rate, true positive rate, and thereby also true
 # negative rate and false negative rate) for the corresponding groups match
@@ -357,18 +365,18 @@ plt.show()
 # as well. The result is that we have interpolated solutions for each group,
 # i.e. every prediction is calculated as the weighted result of two threshold
 # rules.
-
+# 
 # In this particular case the Caucasian curve is always below or matching the
 # African-American curve. That means that the area under the Caucasian curve is
 # also identical to the overlap. That does not always happen, though, and
 # overlaps can be fairly complex with multiple intersecting curves defining its
 # outline.
-
+# 
 # We can actually even look up the specific interpolations and interpret the
 # results. Keep in mind that these interpolations come up with a floating point
 # number between 0 and 1, and represent the probability of getting 0 or 1 in
 # the predicted outcome.
-
+# 
 # The result for African-Americans is a combination of two thresholding rules.
 # The first rule checks whether the score is above 0.542, the other whether it
 # is above 0.508. The first rule has a weight of 0.19, which means it
@@ -376,30 +384,28 @@ plt.show()
 # remaining 81%. In the chart the Caucasian curve is below the African-American
 # curve at the EO solution. This means that there is a slight adjustment
 # according to the formula presented below.
-
+# 
 # The Caucasian rules have somewhat lower thresholds: The first rule's
 # threshold is >0.421 and it is basically the deciding factor with a weight of
 # 99.3%, while the second rule's threshold is >0.404.
-
+# 
 # Overall, this means that the postprocessing algorithm learned to get
 # probabilities consistent with Equalized Odds and minimal error by setting
 # lower thresholds for Caucasians than for African-Americans. The resulting
 # probability from the formula below is then the probability to get label 1
 # from the probabilistic classifier.
-
+# 
 # Note that this does not necessarily mean it's fair. It simply enforced the
 # constraints we asked it to enforce, as described by Equalized Odds. The
 # societal context plays a crucial role in determining whether this is fair.
-
+# 
 # The parameters `p_ignore` and `prediction_constant` are irrelevant for cases
 # where the curves intersect in the minimum error point. When that doesn't
 # happen, and the minimum error point is only part of one curve, then the
-# interpolation is adjusted as follows
-
-# ```
-# p_ignore * prediction_constant + (1 - p_ignore) * (p0 * operation0(score) + p1 * operation1(score))
-# ```
-
+# interpolation is adjusted as follows::
+# 
+#   p_ignore * prediction_constant + (1 - p_ignore) * (p0 * operation0(score) + p1 * operation1(score))
+# 
 # The adjustment should happen to the higher one of the curves and essentially
 # brings it closer to the diagonal as represented by `prediction_constant`. In
 # this case this is not required since the curves intersect, but we are
