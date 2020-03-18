@@ -5,26 +5,26 @@ from ._group_metric_set import create_group_metric_set
 
 
 def create_dashboard_dictionary(
-        model_type,
+        prediction_type,
         y_true,
-        models,
+        predictions,
         sensitive_features):
     """Create a dictionary compatible with the dashboard.
 
-    :param model_type: Determines the metrics generated
-    :type model_type: str
+    :param prediction_type: Determines the metrics generated
+    :type prediction_type: str
     :param y_true: The array of 'true' values
     :type y_true: list
-    :param models: Dictionary of model names and y_pred values
-    :type models: dict(str,list)
+    :param predictions: Dictionary of model names and y_pred values
+    :type predictions: dict(str,list)
     :param sensitive_features: Dictionary of sensitive feature names and values
     :type sensitive_features: dict(str,list)
     """
     y_preds = []
     model_names = []
-    for n, v in models.items():
-        model_names.append(n)
-        y_preds.append(v)
+    for model_name, y_pred in predictions.items():
+        model_names.append(model_name)
+        y_preds.append(y_pred)
 
     s_f = []
     sf_names = []
@@ -32,7 +32,7 @@ def create_dashboard_dictionary(
         sf_names.append(n)
         s_f.append(v)
 
-    return create_group_metric_set(model_type,
+    return create_group_metric_set(prediction_type,
                                    y_true,
                                    y_preds,
                                    s_f,
