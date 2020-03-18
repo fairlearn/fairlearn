@@ -11,15 +11,15 @@ def test_create_dashboard_dictionary_smoke():
     groups = [1, 1, 1, 1, 2, 2, 2, 2]
     m_name = "my model"
     g_name = "my group"
-    model_type = 'binary_classification'
+    prediction_type = 'binary_classification'
 
     actual = create_dashboard_dictionary(
-        model_type,
+        prediction_type,
         y_true,
         {m_name: y_pred},
         {g_name: groups})
 
-    expected = create_group_metric_set(model_type,
+    expected = create_group_metric_set(prediction_type,
                                        y_true,
                                        [y_pred],
                                        [groups],
@@ -40,7 +40,7 @@ def test_create_dashboard_dictionary_multiple_models_multiple_sensitive_features
     m_1 = "M1"
     m_2 = "M2"
     m_3 = "M3"
-    models = {m_1: y_p1, m_2: y_p2, m_3: y_p3}
+    predictions = {m_1: y_p1, m_2: y_p2, m_3: y_p3}
 
     sf_1 = ['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b']
     sf_2 = [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]
@@ -48,14 +48,14 @@ def test_create_dashboard_dictionary_multiple_models_multiple_sensitive_features
     n_2 = "sf 2"
     sensitive_features = {n_1: sf_1, n_2: sf_2}
 
-    model_type = 'binary_classification'
+    prediction_type = 'binary_classification'
 
-    actual = create_dashboard_dictionary(model_type,
+    actual = create_dashboard_dictionary(prediction_type,
                                          y_true,
-                                         models,
+                                         predictions,
                                          sensitive_features)
 
-    expected = create_group_metric_set(model_type,
+    expected = create_group_metric_set(prediction_type,
                                        y_true,
                                        [y_p1, y_p2, y_p3],
                                        [sf_1, sf_2],
