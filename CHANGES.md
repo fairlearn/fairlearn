@@ -11,8 +11,7 @@
     estimator, pass `prefit=True`.
 * Rename arguments of `create_group_metric_set()` to match the dashboard
 * Remove `Reduction` base class for reductions methods and replace it with
-  `sklearn.base.BaseEstimator`, `sklearn.base.ClassifierMixin`, and
-  `sklearn.base.RegressorMixin`.
+  `sklearn.base.BaseEstimator` and `sklearn.base.MetaEstimatorMixin`.
 * Fix regression in input validation that dropped metadata from `X` if it is
   provided as a `pandas.DataFrame`.
 
