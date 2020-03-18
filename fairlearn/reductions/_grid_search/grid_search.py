@@ -6,7 +6,7 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
-from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
@@ -79,7 +79,7 @@ class _GridGenerator:
                 self.accumulate_integer_grid(index + 1, max_val - abs(current_value))   # noqa: E501
 
 
-class GridSearch(BaseEstimator, ClassifierMixin, RegressorMixin):
+class GridSearch(BaseEstimator, MetaEstimatorMixin):
     """Estimator to perform a grid search given a blackbox estimator algorithm.
 
     The approach used is taken from section 3.4 of
