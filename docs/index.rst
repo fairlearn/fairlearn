@@ -9,14 +9,11 @@ Welcome to fairlearn's documentation!
 The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness.
 The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
 
-.. include::
-
-   auto_examples
-
 .. toctree::
+   :maxdepth: 2
 
-   auto_examples
-   fairlearn.exceptions
+   auto_examples/binary_classification_COMPAS
+   examples/binary_classification_COMPAS
    fairlearn.metrics
    fairlearn.postprocessing
    fairlearn.reductions
