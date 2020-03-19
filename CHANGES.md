@@ -11,6 +11,10 @@
     estimator, pass `prefit=True`.
 * Add `create_dashboard_dictionary()` for creating the Dashboard cache layer
 * Make `create_group_metric_set()` private and change arguments
+* Remove `Reduction` base class for reductions methods and replace it with
+  `sklearn.base.BaseEstimator` and `sklearn.base.MetaEstimatorMixin`.
+* Fix regression in input validation that dropped metadata from `X` if it is
+  provided as a `pandas.DataFrame`.
 
 ### v0.4.4
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
