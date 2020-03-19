@@ -209,7 +209,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         self._last_t = len(Qs) - 1
         self._best_classifier = lambda X: _mean_pred(X, hs, self._weights)
-        self._best_gap = gaps[self._best_t],
+        self._best_gap = gaps[self._best_t]
         self._classifiers = lagrangian.classifiers
         self._n_oracle_calls = lagrangian.n_oracle_calls
         self._oracle_calls_execution_time = lagrangian.oracle_calls_execution_time
