@@ -5,12 +5,12 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
+from sklearn.exceptions import NotFittedError
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn import _NO_PREDICT_BEFORE_FIT
-from sklearn.exceptions import NotFittedError
-from fairlearn.reductions import Reduction
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from .grid_search_result import GridSearchResult
 
@@ -79,7 +79,7 @@ class _GridGenerator:
                 self.accumulate_integer_grid(index + 1, max_val - abs(current_value))   # noqa: E501
 
 
-class GridSearch(Reduction):
+class GridSearch(BaseEstimator, MetaEstimatorMixin):
     """Estimator to perform a grid search given a blackbox estimator algorithm.
 
     The approach used is taken from section 3.4 of
