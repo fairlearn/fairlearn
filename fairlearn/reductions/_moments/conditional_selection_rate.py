@@ -37,6 +37,14 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Load the specified data into this object.
 
         This adds a column `event` and `multiplier` to the `tags` field.
+
+        The `multiplier` is the factor with which the signed weights are
+        multiplied and correspond to g(X,A,Y,h(X)) mentioned in the paper
+        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
+        .. math::
+        multiplier = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
+
+        It defaults to 1 which implies that g(X,A,Y) defaults to h(X).
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
@@ -196,10 +204,11 @@ class EqualizedOdds(ConditionalSelectionRate):
 class ErrorRatio(ConditionalSelectionRate):
     r"""Implementation of Error Ratio as a moment.
 
-    Measures the ratio in errors between unprivileged and privileged attributes, i.e.
-    2 sided version of error ratio -
+    Measures the ratio in errors per attribute by overall error.
+    The 2-sided version of error ratio can be written as -
+    ratio <= error(A=a) / total_error <= 1/ratio
     .. math::
-    1/ratio <= error(unpriv_attribute) / error(priv_attribute) <= ratio
+    ratio <= E[abs(h(x) - y) = 1 | A = a] / E[abs(h(x) - y) = 1] <= 1/ratio\; \forall a
 
     This implementation of :class:`ConditionalSelectionRate` defines
     events corresponding to the unique values of the `Y` array.
@@ -218,9 +227,10 @@ class ErrorRatio(ConditionalSelectionRate):
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     The `ratio` defines the amount of relaxation that is allowed for the
-    constraint. The ratio of 1 means, the constraint is given no relaxation
-    and thus, the constraint tries to evaluate for -
-    error(unpriv) / error(priv) = 1.
+    constraint. The value varies between 0-1. The ratio of 1 means, the
+    constraint is given no relaxation and thus, the constraint tries to
+    evaluate for -
+    error(A=a) / total_error = 1
     """
 
     short_name = "ErrorRatio"
