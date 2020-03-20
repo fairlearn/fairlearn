@@ -10,9 +10,9 @@ The fairlearn project seeks to enable anyone involved in the development of arti
 The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   auto_examples/binary_classification_COMPAS
+   auto_examples/plot_binary_classification_COMPAS
    examples/binary_classification_COMPAS
    fairlearn.metrics
    fairlearn.postprocessing

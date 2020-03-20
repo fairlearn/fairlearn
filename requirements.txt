@@ -34,3 +34,4 @@ shap
 
 # Required for documentation
 sphinx
+sphinx-gallery
