@@ -10,7 +10,8 @@ print(__doc__)
 # ------------------------------
 #
 # To demonstrate the post processing algorithm we use the "COMPAS" dataset from
-# `ProPublica <https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv>`_.
+# `ProPublica
+# <https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv>`_.
 # The labels represent the two-year recidivism ID, i.e. whether a person got
 # rearrested within two years (label 1) or not (label 0). The features include
 # sex, age, as well as information on prior incidents.
@@ -142,8 +143,10 @@ plt.show()
 # The goal is to make the output fair with respect to constraints. The
 # postprocessing algorithm uses one of
 #
-# - Demographic Parity (DP): :math:`P\ [\ h(X)=\hat{y}\ |\ A=a] = P\ [\ h(X)=\hat{y}\ ] \qquad \forall a, \hat{y}`
-# - Equalized Odds (EO): :math:`P\ [\ h(X)=\hat{y}\ |\ A=a, Y=y] = P\ [\ h(X)=\hat{y}\ |\ Y=y\ ] \qquad \forall a, \hat{y}`
+# - Demographic Parity (DP):
+#   :math:`P\ [\ h(X)=\hat{y}\ |\ A=a] = P\ [\ h(X)=\hat{y}\ ] \qquad \forall a, \hat{y}`
+# - Equalized Odds (EO):
+#   :math:`P\ [\ h(X)=\hat{y}\ |\ A=a, Y=y] = P\ [\ h(X)=\hat{y}\ |\ Y=y\ ] \qquad \forall a, \hat{y}`
 # 
 # where $h(X)$ is the prediction based on the input $X$, $\hat{y}$ and $y$ are
 # labels, and $a$ is a sensitive feature value. In this example, we'd expect
@@ -416,7 +419,8 @@ plt.show()
 postprocessed_predictor_EO._plot = True
 postprocessed_predictor_EO.fit(X_train, y_train, sensitive_features=sensitive_features_train)
 
-for group, interpolation in postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature.items():
+for group, interpolation in \
+        postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature.items():
     print("{}:".format(group))
     print("\n ".join(interpolation.__repr__().split(',')))
     print("-----------------------------------")
