@@ -132,3 +132,10 @@ def test_mitigating_disparities_in_ranking_from_binary_data():
         "sel_expgrad_X_alt.loc[ 'disparity', :][0]",
         pytest.approx(0.35, abs=0.08))
     assay_one_notebook(nb_name, test_values)
+
+
+@pytest.mark.notebooks
+def test_binary_classification_with_the_uci_credit_card_payment_default_dataset():
+    nb_name = "Binary Classification with the UCI Credit Card Payment Default Dataset"
+    test_values = {}
+    assay_one_notebook(nb_name, test_values)
