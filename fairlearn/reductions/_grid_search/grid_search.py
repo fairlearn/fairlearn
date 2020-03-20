@@ -5,12 +5,12 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
+from sklearn.exceptions import NotFittedError
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn import _NO_PREDICT_BEFORE_FIT
-from sklearn.exceptions import NotFittedError
-from fairlearn.reductions import Reduction
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from .grid_search_result import GridSearchResult
 
@@ -79,7 +79,7 @@ class _GridGenerator:
                 self.accumulate_integer_grid(index + 1, max_val - abs(current_value))   # noqa: E501
 
 
-class GridSearch(Reduction):
+class GridSearch(BaseEstimator, MetaEstimatorMixin):
     """Estimator to perform a grid search given a blackbox estimator algorithm.
 
     The approach used is taken from section 3.4 of
@@ -184,7 +184,7 @@ class GridSearch(Reduction):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        X_train, y_train, sensitive_features_train = _validate_and_reformat_input(
+        _, y_train, sensitive_features_train = _validate_and_reformat_input(
             X, y, enforce_binary_sensitive_feature=True,
             enforce_binary_labels=is_classification_reduction, **kwargs)
 
@@ -192,9 +192,9 @@ class GridSearch(Reduction):
 
         # Prep the parity constraints and objective
         logger.debug("Preparing constraints and objective")
-        self.constraints.load_data(X_train, y_train, **kwargs)
+        self.constraints.load_data(X, y_train, **kwargs)
         objective = self.constraints.default_objective()
-        objective.load_data(X_train, y_train, **kwargs)
+        objective.load_data(X, y_train, **kwargs)
 
         # Basis information
         pos_basis = self.constraints.pos_basis

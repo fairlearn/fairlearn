@@ -4,7 +4,7 @@
 import logging
 import numpy as np
 import pandas as pd
-from fairlearn.reductions import Reduction
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
@@ -22,7 +22,7 @@ def _mean_pred(X, hs, weights):
     return pred[weights.index].dot(weights)
 
 
-class ExponentiatedGradient(Reduction):
+class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """An Estimator which implements the exponentiated gradient approach to reductions.
 
     The exponentiated gradient algorithm is described in detail by
@@ -73,14 +73,14 @@ class ExponentiatedGradient(Reduction):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        X_train, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
+        _, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
 
-        n = X_train.shape[0]
+        n = y_train.shape[0]
 
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self._eps
-        lagrangian = _Lagrangian(X_train, A, y_train, self._estimator, self._constraints,
+        lagrangian = _Lagrangian(X, A, y_train, self._estimator, self._constraints,
                                  self._eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
@@ -102,7 +102,7 @@ class ExponentiatedGradient(Reduction):
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
-            pred_h = h(X_train)
+            pred_h = h(X)
 
             if t == 0:
                 if self._nu is None:

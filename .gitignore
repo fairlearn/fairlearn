@@ -112,6 +112,3 @@ venv.bak/
 
 # Documentation
 docbuild/
-
-# generated perf test scripts
-test/perf/scripts/**

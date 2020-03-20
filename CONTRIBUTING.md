@@ -103,7 +103,6 @@ trained predictor or an estimator (which is trained on the data when executing
 as a string.
 
 ```python
-postprocessor = PostProcessing(unconstrained_predictor=predictor, constraints=constraints)
 postprocessor = PostProcessing(estimator=estimator, constraints=constraints)
 ```
 
