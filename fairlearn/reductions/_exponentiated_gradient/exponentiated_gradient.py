@@ -60,8 +60,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._T = T
         self._nu = nu
         self._eta_mul = eta_mul
-        self._best_classifier = None
-        self._classifiers = None
 
         self._best_classifier = None
         self._best_gap = None
