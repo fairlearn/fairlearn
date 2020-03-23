@@ -33,10 +33,6 @@ candidate_A_transforms = conversions_for_1d
 # Tests which must be passed by all calls to the GridSearch
 # go here
 class ArgumentTests:
-    
-
-    # ----------------------------
-
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
