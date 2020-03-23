@@ -49,7 +49,10 @@ class ConditionalSelectionRate(ClassificationMoment):
         self.index = signed.index
         self.default_objective_lambda_vec = None
 
-        # fill in the information about the basis
+        # Certain mitigation techniques require basis vectors representing the constraint space in
+        # order to generate a grid viable linear combinations. The basis vectors are stored in
+        # pos_basis and neg_basis. Including all constraints would make the vectors linearly
+        # dependent.
         event_vals = self.tags[_EVENT].unique()
         group_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
@@ -58,7 +61,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         zero_vec = pd.Series(0.0, self.index)
         i = 0
         for event_val in event_vals:
-            for group in group_vals[:-1]:
+            for group in group_vals[:-1]:  # Leave out last group to avoid linear dependence.
                 self.pos_basis[i] = 0 + zero_vec
                 self.neg_basis[i] = 0 + zero_vec
                 self.pos_basis[i]["+", event_val, group] = 1
