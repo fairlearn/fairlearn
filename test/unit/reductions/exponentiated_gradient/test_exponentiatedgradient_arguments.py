@@ -58,21 +58,20 @@ class TestExponentiatedGradientArguments:
             eps=0.1)
         expgrad.fit(transformX(X), transformY(y), sensitive_features=transformA(A))
 
-        res = expgrad._expgrad_result._as_dict()
-        Q = res["best_classifier"]
-        res["n_classifiers"] = len(res["classifiers"])
+        Q = expgrad._best_classifier
+        n_classifiers = len(expgrad._classifiers)
 
-        disp = DemographicParity()
-        disp.load_data(X, y, sensitive_features=merged_A)
+        disparity_moment = DemographicParity()
+        disparity_moment.load_data(X, y, sensitive_features=merged_A)
         error = ErrorRate()
         error.load_data(X, y, sensitive_features=merged_A)
-        res["disp"] = disp.gamma(Q).max()
-        res["error"] = error.gamma(Q)[0]
+        disparity = disparity_moment.gamma(Q).max()
+        error = error.gamma(Q)[0]
 
-        assert res["best_gap"] == pytest.approx(0.0000, abs=_PRECISION)
-        assert res["last_t"] == 5
-        assert res["best_t"] == 5
-        assert res["disp"] == pytest.approx(0.1, abs=_PRECISION)
-        assert res["error"] == pytest.approx(0.25, abs=_PRECISION)
-        assert res["n_oracle_calls"] == 32
-        assert res["n_classifiers"] == 3
+        assert expgrad._best_gap == pytest.approx(0.0000, abs=_PRECISION)
+        assert expgrad._last_t == 5
+        assert expgrad._best_t == 5
+        assert disparity == pytest.approx(0.1, abs=_PRECISION)
+        assert error == pytest.approx(0.25, abs=_PRECISION)
+        assert expgrad._n_oracle_calls == 32
+        assert n_classifiers == 3
