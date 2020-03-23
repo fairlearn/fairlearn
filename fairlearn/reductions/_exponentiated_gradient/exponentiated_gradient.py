@@ -70,15 +70,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._n_oracle_calls = 0
         self._oracle_calls_execution_time = None
 
-        self._best_classifier = None
-        self._best_gap = None
-        self._classifiers = None
-        self._weights = None
-        self._last_t = None
-        self._best_t = None
-        self._n_oracle_calls = 0
-        self._oracle_calls_execution_time = None
-
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
 
