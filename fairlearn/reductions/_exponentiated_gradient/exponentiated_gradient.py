@@ -60,8 +60,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._T = T
         self._nu = nu
         self._eta_mul = eta_mul
+
         self._best_classifier = None
+        self._best_gap = None
         self._classifiers = None
+        self._weights = None
+        self._last_t = None
+        self._best_t = None
+        self._n_oracle_calls = 0
+        self._oracle_calls_execution_time = None
 
         self._best_classifier = None
         self._best_gap = None
@@ -168,7 +175,28 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             # update theta based on learning rate
             theta += eta * (gamma - self._eps)
 
-        self._format_results(gaps, Qs, lagrangian, B, eta_min)
+        # retain relevant result data
+        gaps_series = pd.Series(gaps)
+        gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
+        self._best_t = gaps_best.index[-1]
+        self._best_gap = gaps[self._best_t]
+        self._weights = Qs[self._best_t]
+        hs = lagrangian.hs
+        for h_idx in hs.index:
+            if h_idx not in self._weights.index:
+                self._weights.at[h_idx] = 0.0
+
+        self._last_t = len(Qs) - 1
+        self._best_classifier = lambda X: _mean_pred(X, hs, self._weights)
+        self._classifiers = lagrangian.classifiers
+        self._n_oracle_calls = lagrangian.n_oracle_calls
+        self._oracle_calls_execution_time = lagrangian.oracle_calls_execution_time
+
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
+                     self._eps, B, self._nu, self._T, eta_min)
+        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
+                     self._last_t, self._best_t, self._best_gap, lagrangian.n_oracle_calls,
+                     len(lagrangian.classifiers))
 
     def predict(self, X):
         """Provide a prediction for the given input data.
@@ -196,26 +224,3 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         positive_probs = self._best_classifier(X)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
-
-    def _format_results(self, gaps, Qs, lagrangian, B, eta_min):
-        gaps_series = pd.Series(gaps)
-        gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
-        self._best_t = gaps_best.index[-1]
-        self._weights = Qs[self._best_t]
-        hs = lagrangian.hs
-        for h_idx in hs.index:
-            if h_idx not in self._weights.index:
-                self._weights.at[h_idx] = 0.0
-
-        self._last_t = len(Qs) - 1
-        self._best_classifier = lambda X: _mean_pred(X, hs, self._weights)
-        self._best_gap = gaps[self._best_t]
-        self._classifiers = lagrangian.classifiers
-        self._n_oracle_calls = lagrangian.n_oracle_calls
-        self._oracle_calls_execution_time = lagrangian.oracle_calls_execution_time
-
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
-                     self._eps, B, self._nu, self._T, eta_min)
-        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
-                     self._last_t, self._best_t, self._best_gap, lagrangian.n_oracle_calls,
-                     len(lagrangian.classifiers))
