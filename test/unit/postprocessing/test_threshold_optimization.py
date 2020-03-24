@@ -4,6 +4,8 @@
 from copy import deepcopy
 import numpy as np
 import pytest
+from sklearn.utils.estimator_checks import parametrize_with_checks
+
 from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
@@ -443,3 +445,8 @@ def create_adjusted_predictor(threshold_optimization_method, sensitive_features,
 
     return lambda sensitive_features_, scores: _vectorized_prediction(
         post_processed_predictor_by_sensitive_feature, sensitive_features_, scores)
+
+
+@parametrize_with_checks([ThresholdOptimizer])
+def test_sklearn_compatibility(estimator, check):
+    check(estimator)
