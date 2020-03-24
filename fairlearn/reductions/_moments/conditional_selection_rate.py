@@ -61,7 +61,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         zero_vec = pd.Series(0.0, self.index)
         i = 0
         for event_val in event_vals:
-            for group in group_vals[:-1]:  # Leave out last group to avoid linear dependence.
+            # Leave out last group to avoid linear dependence of the basis.
+            for group in group_vals[:-1]:
                 self.pos_basis[i] = 0 + zero_vec
                 self.neg_basis[i] = 0 + zero_vec
                 self.pos_basis[i]["+", event_val, group] = 1
