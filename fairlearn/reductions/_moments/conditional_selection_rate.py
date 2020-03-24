@@ -45,8 +45,12 @@ class ConditionalSelectionRate(ClassificationMoment):
         .. math::
         utility_difference = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
 
+<<<<<<< HEAD
         The `utility_difference` defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
         This assumes that binary class of 0/1.
+=======
+        It defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
+>>>>>>> Address Review Comments
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
@@ -163,6 +167,8 @@ class DemographicParity(ConditionalSelectionRate):
 
     def __init__(self, ratio=1.0):
         super(DemographicParity, self).__init__()
+        if ratio <= 0 or ratio > 1:
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
 
     def __init__(self, ratio=1.0):
@@ -205,6 +211,8 @@ class EqualizedOdds(ConditionalSelectionRate):
 
     def __init__(self, ratio=1.0):
         super(EqualizedOdds, self).__init__()
+        if ratio <= 0 or ratio > 1:
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
