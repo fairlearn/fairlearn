@@ -76,26 +76,23 @@ class TestExponentiatedGradientSmoke:
                                         eps=data["eps"])
         expgrad.fit(self.X, self.y, sensitive_features=self.A)
 
-        res = expgrad._expgrad_result._as_dict()
-        Q = res["best_classifier"]
-        res["n_classifiers"] = len(res["classifiers"])
+        Q = expgrad._best_classifier
+        n_classifiers = len(expgrad._classifiers)
 
-        disp = data["cons_class"]()
-        disp.load_data(self.X, self.y, sensitive_features=self.A)
+        disparity_moment = data["cons_class"]()
+        disparity_moment.load_data(self.X, self.y, sensitive_features=self.A)
         error = ErrorRate()
         error.load_data(self.X, self.y, sensitive_features=self.A)
-        res["disp"] = disp.gamma(Q).max()
-        res["error"] = error.gamma(Q)[0]
+        disparity = disparity_moment.gamma(Q).max()
+        error = error.gamma(Q)[0]
 
-        assert res["best_gap"] == pytest.approx(
-            data["best_gap"], abs=self._PRECISION)
-        assert res["last_t"] == data["last_t"]
-        assert res["best_t"] == data["best_t"]
-        assert res["disp"] == pytest.approx(data["disp"], abs=self._PRECISION)
-        assert res["error"] == pytest.approx(
-            data["error"], abs=self._PRECISION)
-        assert res["n_oracle_calls"] == data["n_oracle_calls"]
-        assert res["n_classifiers"] == data["n_classifiers"]
+        assert expgrad._best_gap == pytest.approx(data["best_gap"], abs=self._PRECISION)
+        assert expgrad._last_t == data["last_t"]
+        assert expgrad._best_t == data["best_t"]
+        assert disparity == pytest.approx(data["disp"], abs=self._PRECISION)
+        assert error == pytest.approx(data["error"], abs=self._PRECISION)
+        assert expgrad._n_oracle_calls == data["n_oracle_calls"]
+        assert n_classifiers == data["n_classifiers"]
 
     @pytest.mark.parametrize("testdata", smoke_test_data)
     def test_smoke(self, testdata):

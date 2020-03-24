@@ -9,7 +9,6 @@ learning training.
 """
 
 from ._exponentiated_gradient import ExponentiatedGradient  # noqa: F401
-from ._exponentiated_gradient import ExponentiatedGradientResult  # noqa: F401
 from ._grid_search import GridSearch, GridSearchResult  # noqa: F401
 from ._moments import AbsoluteLoss, Moment, ConditionalSelectionRate  # noqa: F401
 from ._moments import DemographicParity, EqualizedOdds, ErrorRate   # noqa: F401
@@ -18,7 +17,6 @@ from ._moments import ClassificationMoment, LossMoment  # noqa: F401
 
 _exponentiated_gradient = [
     "ExponentiatedGradient",
-    "ExponentiatedGradientResult"
 ]
 
 _grid_search = [
