@@ -4,6 +4,7 @@
 import pandas as pd
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN, _MULTIPLIER
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
 from .error_rate import ErrorRate
 
 _DIFF = "diff"
@@ -44,7 +45,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         .. math::
         multiplier = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
 
-        It defaults to 1 which implies that g(X,A,Y) defaults to h(X).
+        It defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
@@ -156,6 +157,8 @@ class DemographicParity(ConditionalSelectionRate):
 
     def __init__(self, ratio=1.0):
         super(DemographicParity, self).__init__()
+        if ratio <= 0 or ratio > 1:
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
@@ -192,6 +195,8 @@ class EqualizedOdds(ConditionalSelectionRate):
 
     def __init__(self, ratio=1.0):
         super(EqualizedOdds, self).__init__()
+        if ratio <= 0 or ratio > 1:
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
@@ -205,7 +210,7 @@ class ErrorRatio(ConditionalSelectionRate):
     r"""Implementation of Error Ratio as a moment.
 
     Measures the ratio in errors per attribute by overall error.
-    The 2-sided version of error ratio can be written as -
+    The 2-sided version of error ratio can be written as
     ratio <= error(A=a) / total_error <= 1/ratio
     .. math::
     ratio <= E[abs(h(x) - y) = 1 | A = a] / E[abs(h(x) - y) = 1] <= 1/ratio\; \forall a
@@ -238,6 +243,8 @@ class ErrorRatio(ConditionalSelectionRate):
     def __init__(self, ratio=1.0):
         """Intialise with the ratio value."""
         super(ErrorRatio, self).__init__()
+        if ratio <= 0 or ratio > 1:
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
