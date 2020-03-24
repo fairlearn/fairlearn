@@ -107,24 +107,24 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
 
 from sklearn.linear_model import LogisticRegression
 
-unconstrained_predictor = LogisticRegression(solver='liblinear')
-unconstrained_predictor.fit(X_train, y_train)
+estimator = LogisticRegression(solver='liblinear')
+estimator.fit(X_train, y_train)
     
 ###############################################################################
 # print and plot data from training and test set as well as predictions with
 # fairness-unaware classifier on both sets show only test data related plots by
-# default - uncomment the following lines to see training data plots as well
+# default - uncomment the next two lines to see training data plots as well
 
 # show_proportions(X_train, sensitive_features_train, y_train,
-#     description="original training data:", plot_row_index=1)
+#                  description="original training data:", plot_row_index=1)
 # show_proportions(X_train, sensitive_features_train,
-#     unconstrained_predictor.predict(X_train), y_train,
-#     description="fairness-unaware prediction on training data:",
-#     plot_row_index=2)
+#                  estimator.predict(X_train), y_train,
+#                  description="fairness-unaware prediction on training data:",
+#                  plot_row_index=2)
 show_proportions(X_test, sensitive_features_test, y_test,
                  description="original test data:", plot_row_index=3)
-show_proportions(X_test, sensitive_features_test,
-                 unconstrained_predictor.predict(X_test), y_test,
+show_proportions(X_test, sensitive_features_test, estimator.predict(X_test),
+                 y_test,
                  description="fairness-unaware prediction on test data:",
                  plot_row_index=4)
 plt.show()
@@ -185,27 +185,38 @@ plt.show()
 # the predict method to ``predict_proba``` so that we can use real values to get
 # more accurate estimates.
 
-class LogisticRegressionAsRegression:
+from sklearn import clone
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.utils.validation import check_is_fitted
+from sklearn.exceptions import NotFittedError
+
+class LogisticRegressionAsRegression(BaseEstimator, ClassifierMixin):
     def __init__(self, logistic_regression_estimator):
         self.logistic_regression_estimator = logistic_regression_estimator
     
     def fit(self, X, y):
-        self.logistic_regression_estimator.fit(X, y)
+        try:
+            check_is_fitted(self.logistic_regression_estimator)
+            self.logistic_regression_estimator_ = self.logistic_regression_estimator
+        except NotFittedError:
+            self.logistic_regression_estimator_ = clone(
+                self.logistic_regression_estimator).fit(X, y)
+        return self
     
     def predict(self, X):
-        # use predict_proba to get real values instead of 0/1, select only prob
-        # for 1
-        scores = self.logistic_regression_estimator.predict_proba(X)[:,1]
+        # use predict_proba to get real values instead of 0/1, select only prob for 1
+        scores = self.logistic_regression_estimator_.predict_proba(X)[:,1]
         return scores
 
 from fairlearn.postprocessing import ThresholdOptimizer
 from copy import deepcopy
 
-unconstrained_predictor_wrapper = LogisticRegressionAsRegression(
-    unconstrained_predictor)
+estimator_wrapper = LogisticRegressionAsRegression(estimator).fit(X_train,
+                                                                  y_train)
 postprocessed_predictor_EO = ThresholdOptimizer(
-    unconstrained_predictor=unconstrained_predictor_wrapper,
-    constraints="equalized_odds")
+    estimator=estimator_wrapper,
+    constraints="equalized_odds",
+    prefit=True)
 
 postprocessed_predictor_EO.fit(X_train, y_train,
                                sensitive_features=sensitive_features_train)
@@ -218,14 +229,16 @@ fairness_aware_predictions_EO_test = postprocessed_predictor_EO.predict(
 # show only test data related plot by default - uncomment the next line to see
 # training data plot as well
 
-# show_proportions(X_train, sensitive_features_train,
-#     fairness_aware_predictions_EO_train, y_train,
+# show_proportions(
+#     X_train, sensitive_features_train, fairness_aware_predictions_EO_train,
+#     y_train,
 #     description="equalized odds with postprocessed model on training data:",
-# plot_row_index=1)
-show_proportions(X_test, sensitive_features_test,
-                 fairness_aware_predictions_EO_test, y_test,
-                 description="equalized odds with postprocessed model on test data:",
-                 plot_row_index=2)
+#     plot_row_index=1)
+show_proportions(
+    X_test, sensitive_features_test, fairness_aware_predictions_EO_test,
+    y_test,
+    description="equalized odds with postprocessed model on test data:",
+    plot_row_index=2)
 plt.show()
 
 ###############################################################################
@@ -244,7 +257,7 @@ plt.show()
 # that these predictions could be 0/1 (as in this example), or more categories,
 # or even real valued scores. In this case, this looks as follows:
 
-scores = unconstrained_predictor_wrapper.predict(X_train)
+scores = estimator_wrapper.predict(X_train)
 scores
 
 ###############################################################################
