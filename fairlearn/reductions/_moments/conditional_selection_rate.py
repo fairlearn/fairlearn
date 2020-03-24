@@ -44,13 +44,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
         .. math::
         utility_difference = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
-
-<<<<<<< HEAD
-        The `utility_difference` defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
-        This assumes that binary class of 0/1.
-=======
         It defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
->>>>>>> Address Review Comments
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
