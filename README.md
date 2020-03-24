@@ -211,4 +211,4 @@ Maintainers will try to link duplicate issues when possible.
 
 ### Reporting security issues
 
-Please take a look at our guidelines for reporting [security issues](./SECURITY.md).
+Please take a look at our guidelines for reporting [security issues](https://github.com/fairlearn/fairlearn-community/blob/master/SECURITY.md).
