@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 
-from fairlearn.reductions import ExponentiatedGradient
+from fairlearn.reductions import ExponentiatedGradient, EqualOpportunity
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions import ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
@@ -69,7 +69,12 @@ class TestExponentiatedGradientSmoke:
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6}]
+                        "n_classifiers": 6},
+                       {"cons_class": EqualOpportunity, "eps": 0.05,
+                        "best_gap": 0.0, "last_t": 5,
+                        "best_t": 5, "disp": 0.050000,
+                        "error": 0.25, "n_oracle_calls": 29,
+                        "n_classifiers": 3}]
 
     def run_smoke_test(self, data):
         expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
@@ -86,7 +91,6 @@ class TestExponentiatedGradientSmoke:
         error.load_data(self.X, self.y, sensitive_features=self.A)
         res["disp"] = disp.gamma(Q).max()
         res["error"] = error.gamma(Q)[0]
-
         assert res["best_gap"] == pytest.approx(
             data["best_gap"], abs=self._PRECISION)
         assert res["last_t"] == data["last_t"]
