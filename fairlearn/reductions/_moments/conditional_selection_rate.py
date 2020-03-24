@@ -3,7 +3,7 @@
 
 import pandas as pd
 from .moment import ClassificationMoment
-from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN, _MULTIPLIER
+from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
 from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
 from .error_rate import ErrorRate
 
@@ -37,7 +37,7 @@ class ConditionalSelectionRate(ClassificationMoment):
     def load_data(self, X, y, event=None, multiplier=None, **kwargs):
         """Load the specified data into this object.
 
-        This adds a column `event` and `multiplier` to the `tags` field.
+        This adds a column `event` to the `tags` field.
 
         The `multiplier` is the factor with which the signed weights are
         multiplied and correspond to g(X,A,Y,h(X)) mentioned in the paper
@@ -51,7 +51,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         self.tags[_EVENT] = event
         if multiplier is None:
             multiplier = pd.Series(y).apply(lambda y: 1)
-        self.tags[_MULTIPLIER] = multiplier
+        self.multiplier = multiplier
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -60,7 +60,6 @@ class ConditionalSelectionRate(ClassificationMoment):
                            names=[_SIGN, _EVENT, _GROUP_ID])
         self.index = signed.index
         self.default_objective_lambda_vec = None
-        self.multiplier = self.tags.groupby([_EVENT, _GROUP_ID]).mean()
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].unique()
         group_vals = self.tags[_GROUP_ID].unique()
@@ -121,10 +120,11 @@ class ConditionalSelectionRate(ClassificationMoment):
             .sum(level=_EVENT) / self.prob_event
         lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
             self.prob_group_event
-        adjust = self.multiplier[_MULTIPLIER].mul(lambda_event - lambda_group_event)
+        adjust = lambda_event - lambda_group_event
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
+        signed_weights = self.multiplier.mul(signed_weights)
         return signed_weights
 
 
@@ -250,6 +250,6 @@ class ErrorRatio(ConditionalSelectionRate):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y,
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          event=_ALL,
                           multiplier=pd.Series(y).apply(lambda y: 1 - 2*y),
                           **kwargs)
