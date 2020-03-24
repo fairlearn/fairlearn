@@ -40,6 +40,7 @@ X_train.loc[0], y_train[0]
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
+
 # show_proportions is only a helper function for plotting
 def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
                      plot_row_index=1):
@@ -47,7 +48,7 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
     plt.figure(plot_row_index)
     plt.title(description)
     plt.ylabel("P[recidivism predicted | conditions]")
-    
+
     indices = {}
     positive_indices = {}
     negative_indices = {}
@@ -56,7 +57,7 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
     groups = np.unique(sensitive_features.values)
     n_groups = len(groups)
     max_group_length = max([len(group) for group in groups])
-    color = cm.rainbow(np.linspace(0,1,n_groups))
+    color = cm.rainbow(np.linspace(0, 1, n_groups))
     x_tick_labels_basic = []
     x_tick_labels_by_label = []
     for index, group in enumerate(groups):
@@ -65,10 +66,10 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
         recidivism_pct[group] = recidivism_count[group]/len(indices[group])
         print("P[recidivism predicted | {}]                {}= {}".format(
             group, " "*(max_group_length-len(group)), recidivism_pct[group]))
-    
+
         plt.bar(index + 1, recidivism_pct[group], color=color[index])
         x_tick_labels_basic.append(group)
-    
+
         if y is not None:
             positive_indices[group] = sensitive_features.index[
                 (sensitive_features == group) & (y == 1)]
@@ -79,15 +80,15 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
             prob_0 = sum(
                 y_pred[negative_indices[group]])/len(negative_indices[group])
             print("P[recidivism predicted | {}, recidivism]    {}= {}".format(
-                group, " "*(max_group_length-len(group)) , prob_1))
+                group, " " * (max_group_length-len(group)), prob_1))
             print("P[recidivism predicted | {}, no recidivism] {}= {}".format(
-                group, " "*(max_group_length-len(group)), prob_0))
+                group, " " * (max_group_length-len(group)), prob_0))
 
             plt.bar(n_groups + 1 + 2 * index, prob_1, color=color[index])
             plt.bar(n_groups + 2 + 2 * index, prob_0, color=color[index])
             x_tick_labels_by_label.extend(["{} recidivism".format(group),
                                            "{} no recidivism".format(group)])
-    
+
     x_tick_labels = x_tick_labels_basic + x_tick_labels_by_label
     plt.xticks(range(1, len(x_tick_labels)+1), x_tick_labels, rotation=45,
                horizontalalignment="right")
@@ -105,11 +106,12 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
 # to be predicted to reoffend than Caucasians. The test data shows a similar
 # disparity.
 
+
 from sklearn.linear_model import LogisticRegression
 
 estimator = LogisticRegression(solver='liblinear')
 estimator.fit(X_train, y_train)
-    
+
 ###############################################################################
 # print and plot data from training and test set as well as predictions with
 # fairness-unaware classifier on both sets show only test data related plots by
@@ -132,14 +134,14 @@ plt.show()
 ###############################################################################
 # Postprocessing the model to get a fair model
 # --------------------------------------------
-# 
+#
 # The idea behind postprocessing is to alter the output of the fairness-unaware
 # model to achieve fairness. The postprocessing algorithm requires three input
 # arguments:
 # - the matrix of samples X
-# - the vector of predictions y from the fairness-unaware model 
+# - the vector of predictions y from the fairness-unaware model
 # - the vector of group attribute values A (in the code we refer to it as `sensitive_features`)
-# 
+#
 # The goal is to make the output fair with respect to constraints. The
 # postprocessing algorithm uses one of
 #
@@ -147,7 +149,7 @@ plt.show()
 #   :math:`P\ [\ h(X)=\hat{y}\ |\ A=a] = P\ [\ h(X)=\hat{y}\ ] \qquad \forall a, \hat{y}`
 # - Equalized Odds (EO):
 #   :math:`P\ [\ h(X)=\hat{y}\ |\ A=a, Y=y] = P\ [\ h(X)=\hat{y}\ |\ Y=y\ ] \qquad \forall a, \hat{y}`
-# 
+#
 # where $h(X)$ is the prediction based on the input $X$, $\hat{y}$ and $y$ are
 # labels, and $a$ is a sensitive feature value. In this example, we'd expect
 # the postprocessed model with DP to be balanced between races. In this
@@ -161,26 +163,26 @@ plt.show()
 # subgroups of each race without recidivism, but we have no parity between the
 # groups with different training labels. In mathematical terms at the example
 # of African-American and Caucasian:
-# 
+#
 # .. math::
 #   P\ [\ \text{recidivism predicted}\ |\ \text{African-American, recidivism}\ ] = P\ [\ \text{recidivism predicted}\ |\ \text{Caucasian, recidivism}\ ], \text{e.g. } 0.95
-# 
+#
 # .. math::
 #   P\ [\ \text{recidivism predicted}\ |\ \text{African-American, no recidivism}\ ] = P\ [\ \text{recidivism predicted}\ |\ \text{Caucasian, no recidivism}\ ], \text{e.g. } 0.15
-# 
+#
 # but that also means that African-Americans (and Caucasians) of different
 # subgroup based on training labels don't necessarily have parity:
-# 
+#
 # .. math::
 #   P[\text{recidivism predicted} | \text{African-American, recidivism}] = 0.95 \neq 0.15 = P[\text{recidivism predicted} | \text{African-American, no recidivism}]
-# 
+#
 # Assessing which disparity metric is indeed fair varies by application
 # scenario. In this case the evaluation focuses on Equalized Odds, because the
 # recidivism prediction should be accurate for each race, and for each subgroup
 # within. The plot for the training data shows the intended outcome, while the
 # plot for the test data exhibits slight variation which is likely due to
 # randomized predictions as well as a slightly different data distribution.
-# 
+#
 # This wrapper around the unconstrained estimator serves the purpose of mapping
 # the predict method to ``predict_proba``` so that we can use real values to get
 # more accurate estimates.
@@ -190,10 +192,11 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_is_fitted
 from sklearn.exceptions import NotFittedError
 
+
 class LogisticRegressionAsRegression(BaseEstimator, ClassifierMixin):
     def __init__(self, logistic_regression_estimator):
         self.logistic_regression_estimator = logistic_regression_estimator
-    
+
     def fit(self, X, y):
         try:
             check_is_fitted(self.logistic_regression_estimator)
@@ -202,14 +205,14 @@ class LogisticRegressionAsRegression(BaseEstimator, ClassifierMixin):
             self.logistic_regression_estimator_ = clone(
                 self.logistic_regression_estimator).fit(X, y)
         return self
-    
+
     def predict(self, X):
         # use predict_proba to get real values instead of 0/1, select only prob for 1
-        scores = self.logistic_regression_estimator_.predict_proba(X)[:,1]
+        scores = self.logistic_regression_estimator_.predict_proba(X)[:, 1]
         return scores
 
+
 from fairlearn.postprocessing import ThresholdOptimizer
-from copy import deepcopy
 
 estimator_wrapper = LogisticRegressionAsRegression(estimator).fit(X_train,
                                                                   y_train)
@@ -244,11 +247,11 @@ plt.show()
 ###############################################################################
 # Post Processing in Detail
 # -------------------------
-# 
+#
 # While this worked as the numbers show, it's not entirely obvious how it found
 # its solution. The following section will provide a deep dive on post
 # processing for Equalized Odds (EO).
-# 
+#
 # The post processing method (based on work by `Hardt, Price,
 # Srebro <https://arxiv.org/pdf/1610.02413.pdf>`_) takes a fairness-unaware model
 # and disparity constraints (such as EO) in the constructor and features (X),
@@ -263,20 +266,20 @@ scores
 ###############################################################################
 # Finding threshold rules
 # ***********************
-# 
+#
 # The algorithm then tries to find all thresholding rules with which it could
 # divide the data. Any score for which the thresholding rule evaluates to true
 # is predicted to be 1. It does that for each group, so in this case for each
 # race. Depending on the unconstrained predictor's scores you could have lots
 # of thresholding rules, between each set of such values. For each rule we just
 # evaluate the following two probabilities empirically:
-# 
+#
 # .. math::
 #   P[\hat{Y} = 1 | Y = 0] \text{ which is labeled x below to indicate that it'll be plotted on the x-axis}
-# 
+#
 # .. math::
 #   P[\hat{Y} = 1 | Y = 1] \text{ which is labeled y below to indicate that it'll be plotted on the y-axis}
-# 
+#
 # The former is the false negative rate (of that group), while the latter is
 # the true positive rate (of that group). In this example, the threshold rules
 # would be the ones shown below:
