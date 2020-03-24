@@ -22,12 +22,13 @@ import pandas as pd
 import numpy as np
 from tempeh.configurations import datasets
 
-compas_dataset = datasets['compas']()
+compas_dataset = datasets["compas"]()
 X_train, X_test = compas_dataset.get_X(format=pd.DataFrame)
 y_train, y_test = compas_dataset.get_y(format=pd.Series)
-sensitive_features_train, sensitive_features_test = (
-    compas_dataset.get_sensitive_features('race', format=pd.Series)
-)
+(
+    sensitive_features_train,
+    sensitive_features_test,
+) = compas_dataset.get_sensitive_features("race", format=pd.Series)
 X_train.loc[0], y_train[0]
 
 ###############################################################################
@@ -42,8 +43,9 @@ import matplotlib.cm as cm
 
 
 # show_proportions is only a helper function for plotting
-def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
-                     plot_row_index=1):
+def show_proportions(
+    X, sensitive_features, y_pred, y=None, description=None, plot_row_index=1
+):
     print("\n" + description)
     plt.figure(plot_row_index)
     plt.title(description)
@@ -63,35 +65,50 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
     for index, group in enumerate(groups):
         indices[group] = sensitive_features.index[sensitive_features == group]
         recidivism_count[group] = sum(y_pred[indices[group]])
-        recidivism_pct[group] = recidivism_count[group]/len(indices[group])
-        print("P[recidivism predicted | {}]                {}= {}".format(
-            group, " "*(max_group_length-len(group)), recidivism_pct[group]))
+        recidivism_pct[group] = recidivism_count[group] / len(indices[group])
+        print(
+            "P[recidivism predicted | {}]                {}= {}".format(
+                group, " " * (max_group_length - len(group)), recidivism_pct[group]
+            )
+        )
 
         plt.bar(index + 1, recidivism_pct[group], color=color[index])
         x_tick_labels_basic.append(group)
 
         if y is not None:
             positive_indices[group] = sensitive_features.index[
-                (sensitive_features == group) & (y == 1)]
+                (sensitive_features == group) & (y == 1)
+            ]
             negative_indices[group] = sensitive_features.index[
-                (sensitive_features == group) & (y == 0)]
-            prob_1 = sum(
-                y_pred[positive_indices[group]])/len(positive_indices[group])
-            prob_0 = sum(
-                y_pred[negative_indices[group]])/len(negative_indices[group])
-            print("P[recidivism predicted | {}, recidivism]    {}= {}".format(
-                group, " " * (max_group_length-len(group)), prob_1))
-            print("P[recidivism predicted | {}, no recidivism] {}= {}".format(
-                group, " " * (max_group_length-len(group)), prob_0))
+                (sensitive_features == group) & (y == 0)
+            ]
+            prob_1 = sum(y_pred[positive_indices[group]]) / len(positive_indices[group])
+            prob_0 = sum(y_pred[negative_indices[group]]) / len(negative_indices[group])
+            print(
+                "P[recidivism predicted | {}, recidivism]    {}= {}".format(
+                    group, " " * (max_group_length - len(group)), prob_1
+                )
+            )
+            print(
+                "P[recidivism predicted | {}, no recidivism] {}= {}".format(
+                    group, " " * (max_group_length - len(group)), prob_0
+                )
+            )
 
             plt.bar(n_groups + 1 + 2 * index, prob_1, color=color[index])
             plt.bar(n_groups + 2 + 2 * index, prob_0, color=color[index])
-            x_tick_labels_by_label.extend(["{} recidivism".format(group),
-                                           "{} no recidivism".format(group)])
+            x_tick_labels_by_label.extend(
+                ["{} recidivism".format(group), "{} no recidivism".format(group)]
+            )
 
     x_tick_labels = x_tick_labels_basic + x_tick_labels_by_label
-    plt.xticks(range(1, len(x_tick_labels)+1), x_tick_labels, rotation=45,
-               horizontalalignment="right")
+    plt.xticks(
+        range(1, len(x_tick_labels) + 1),
+        x_tick_labels,
+        rotation=45,
+        horizontalalignment="right",
+    )
+
 
 ###############################################################################
 # To get started we look at a very basic Logistic Regression model. We fit it
@@ -109,7 +126,7 @@ def show_proportions(X, sensitive_features, y_pred, y=None, description=None,
 
 from sklearn.linear_model import LogisticRegression
 
-estimator = LogisticRegression(solver='liblinear')
+estimator = LogisticRegression(solver="liblinear")
 estimator.fit(X_train, y_train)
 
 ###############################################################################
@@ -123,12 +140,21 @@ estimator.fit(X_train, y_train)
 #                  estimator.predict(X_train), y_train,
 #                  description="fairness-unaware prediction on training data:",
 #                  plot_row_index=2)
-show_proportions(X_test, sensitive_features_test, y_test,
-                 description="original test data:", plot_row_index=3)
-show_proportions(X_test, sensitive_features_test, estimator.predict(X_test),
-                 y_test,
-                 description="fairness-unaware prediction on test data:",
-                 plot_row_index=4)
+show_proportions(
+    X_test,
+    sensitive_features_test,
+    y_test,
+    description="original test data:",
+    plot_row_index=3,
+)
+show_proportions(
+    X_test,
+    sensitive_features_test,
+    estimator.predict(X_test),
+    y_test,
+    description="fairness-unaware prediction on test data:",
+    plot_row_index=4,
+)
 plt.show()
 
 ###############################################################################
@@ -203,7 +229,8 @@ class LogisticRegressionAsRegression(BaseEstimator, ClassifierMixin):
             self.logistic_regression_estimator_ = self.logistic_regression_estimator
         except NotFittedError:
             self.logistic_regression_estimator_ = clone(
-                self.logistic_regression_estimator).fit(X, y)
+                self.logistic_regression_estimator
+            ).fit(X, y)
         return self
 
     def predict(self, X):
@@ -214,20 +241,21 @@ class LogisticRegressionAsRegression(BaseEstimator, ClassifierMixin):
 
 from fairlearn.postprocessing import ThresholdOptimizer
 
-estimator_wrapper = LogisticRegressionAsRegression(estimator).fit(X_train,
-                                                                  y_train)
+estimator_wrapper = LogisticRegressionAsRegression(estimator).fit(X_train, y_train)
 postprocessed_predictor_EO = ThresholdOptimizer(
-    estimator=estimator_wrapper,
-    constraints="equalized_odds",
-    prefit=True)
+    estimator=estimator_wrapper, constraints="equalized_odds", prefit=True
+)
 
-postprocessed_predictor_EO.fit(X_train, y_train,
-                               sensitive_features=sensitive_features_train)
+postprocessed_predictor_EO.fit(
+    X_train, y_train, sensitive_features=sensitive_features_train
+)
 
 fairness_aware_predictions_EO_train = postprocessed_predictor_EO.predict(
-    X_train, sensitive_features=sensitive_features_train)
+    X_train, sensitive_features=sensitive_features_train
+)
 fairness_aware_predictions_EO_test = postprocessed_predictor_EO.predict(
-    X_test, sensitive_features=sensitive_features_test)
+    X_test, sensitive_features=sensitive_features_test
+)
 
 # show only test data related plot by default - uncomment the next line to see
 # training data plot as well
@@ -238,10 +266,13 @@ fairness_aware_predictions_EO_test = postprocessed_predictor_EO.predict(
 #     description="equalized odds with postprocessed model on training data:",
 #     plot_row_index=1)
 show_proportions(
-    X_test, sensitive_features_test, fairness_aware_predictions_EO_test,
+    X_test,
+    sensitive_features_test,
+    fairness_aware_predictions_EO_test,
     y_test,
     description="equalized odds with postprocessed model on test data:",
-    plot_row_index=2)
+    plot_row_index=2,
+)
 plt.show()
 
 ###############################################################################
@@ -285,8 +316,10 @@ scores
 # would be the ones shown below:
 
 from fairlearn.postprocessing._threshold_optimizer import _reformat_and_group_data
+
 data_grouped_by_sensitive_feature = _reformat_and_group_data(
-    sensitive_features_train, y_train.astype(int), scores)
+    sensitive_features_train, y_train.astype(int), scores
+)
 data_grouped_by_sensitive_feature.describe()
 
 from fairlearn.postprocessing._roc_curve_utilities import _calculate_roc_points
@@ -294,7 +327,8 @@ from fairlearn.postprocessing._roc_curve_utilities import _calculate_roc_points
 roc_points = {}
 for group_name, group in data_grouped_by_sensitive_feature:
     roc_points[group_name] = _calculate_roc_points(
-        data_grouped_by_sensitive_feature.get_group(group_name), 0)
+        data_grouped_by_sensitive_feature.get_group(group_name), 0
+    )
 print("Thresholding rules:")
 roc_points
 
@@ -303,7 +337,7 @@ roc_points
 # essentially just means that we're predicting everything as 0 or everything as
 # 1 regardless of the scores from the fairness-unaware model. Let's look at
 # both cases:
-# 
+#
 # - x=0, y=0, threshold rule ">inf": more than infinity is impossible, which
 #   means every sample is predicted as 0. That means :math:`P[\hat{Y} = 1 | Y = 0] = 0`
 #   (represented as x) because the predictions $\hat{Y}$ are never 1, and
@@ -312,7 +346,7 @@ roc_points
 #   means every sample is predicted as 1. That means :math:`P[\hat{Y} = 1 | Y = 0] = 1`
 #   (represented as x) because the predictions $\hat{Y}$ are always 1, and
 #   similarly :math:`P[\hat{Y} = 1 | Y = 1] = 1` (represented as y).
-# 
+#
 # The more interesting logic happens in between. The x and y values were
 # calculated as follows:
 
@@ -322,16 +356,20 @@ for group_name, group in data_grouped_by_sensitive_feature:
     print("{}:".format(group_name))
     n_group_1[group_name] = sum(group["label"])
     n_group_0[group_name] = len(group) - n_group_1[group_name]
-    
+
     print("    number of samples with label 1: {}".format(n_group_1[group_name]))
     print("    number of samples with label 0: {}".format(n_group_0[group_name]))
 
 threshold = 0.5
 for group_name, group in data_grouped_by_sensitive_feature:
-    x_group_0_5 = sum(
-        (group["score"] > threshold) & (group["label"] == 0)) / n_group_0[group_name]
-    y_group_0_5 = sum(
-        (group["score"] > threshold) & (group["label"] == 1)) / n_group_1[group_name]
+    x_group_0_5 = (
+        sum((group["score"] > threshold) & (group["label"] == 0))
+        / n_group_0[group_name]
+    )
+    y_group_0_5 = (
+        sum((group["score"] > threshold) & (group["label"] == 1))
+        / n_group_1[group_name]
+    )
     print("{}:".format(group_name))
     print("    P[Ŷ = 1 | Y = 0] = {}".format(x_group_0_5))
     print("    P[Ŷ = 1 | Y = 1] = {}".format(y_group_0_5))
@@ -344,7 +382,7 @@ for group_name, group in data_grouped_by_sensitive_feature:
 ###############################################################################
 # Interpolated Predictions and Probabilistic Classifiers
 # ******************************************************
-# 
+#
 # This way you end up with a set of points above the diagonal line connecting
 # (0,0) and (1,1). We calculate the convex hull based on that, because we can
 # reach any point in between two known thresholding points by interpolation. An
@@ -361,14 +399,14 @@ for group_name, group in data_grouped_by_sensitive_feature:
 ###############################################################################
 # Finding the Equalized Odds solution
 # ***********************************
-# 
+#
 # From all the ROC points (see below) we need to extract the convex hull for
 # both groups/curves.
 
 for group_name, group in data_grouped_by_sensitive_feature:
     plt.plot(roc_points[group_name].x, roc_points[group_name].y)
-plt.xlabel("$P\ [\ \\hat{Y}=1\ |\ Y=0\ ]$")
-plt.ylabel("$P\ [\ \\hat{Y}=1\ |\ Y=1\ ]$")
+plt.xlabel("$P [ \\hat{Y}=1 | Y=0 ]$")
+plt.ylabel("$P [ \\hat{Y}=1 | Y=1 ]$")
 plt.show()
 
 ###############################################################################
@@ -384,18 +422,18 @@ plt.show()
 # as well. The result is that we have interpolated solutions for each group,
 # i.e. every prediction is calculated as the weighted result of two threshold
 # rules.
-# 
+#
 # In this particular case the Caucasian curve is always below or matching the
 # African-American curve. That means that the area under the Caucasian curve is
 # also identical to the overlap. That does not always happen, though, and
 # overlaps can be fairly complex with multiple intersecting curves defining its
 # outline.
-# 
+#
 # We can actually even look up the specific interpolations and interpret the
 # results. Keep in mind that these interpolations come up with a floating point
 # number between 0 and 1, and represent the probability of getting 0 or 1 in
 # the predicted outcome.
-# 
+#
 # The result for African-Americans is a combination of two thresholding rules.
 # The first rule checks whether the score is above 0.542, the other whether it
 # is above 0.508. The first rule has a weight of 0.19, which means it
@@ -403,28 +441,28 @@ plt.show()
 # remaining 81%. In the chart the Caucasian curve is below the African-American
 # curve at the EO solution. This means that there is a slight adjustment
 # according to the formula presented below.
-# 
+#
 # The Caucasian rules have somewhat lower thresholds: The first rule's
 # threshold is >0.421 and it is basically the deciding factor with a weight of
 # 99.3%, while the second rule's threshold is >0.404.
-# 
+#
 # Overall, this means that the postprocessing algorithm learned to get
 # probabilities consistent with Equalized Odds and minimal error by setting
 # lower thresholds for Caucasians than for African-Americans. The resulting
 # probability from the formula below is then the probability to get label 1
 # from the probabilistic classifier.
-# 
+#
 # Note that this does not necessarily mean it's fair. It simply enforced the
 # constraints we asked it to enforce, as described by Equalized Odds. The
 # societal context plays a crucial role in determining whether this is fair.
-# 
+#
 # The parameters `p_ignore` and `prediction_constant` are irrelevant for cases
 # where the curves intersect in the minimum error point. When that doesn't
 # happen, and the minimum error point is only part of one curve, then the
 # interpolation is adjusted as follows::
-# 
+#
 #   p_ignore * prediction_constant + (1 - p_ignore) * (p0 * operation0(score) + p1 * operation1(score))
-# 
+#
 # The adjustment should happen to the higher one of the curves and essentially
 # brings it closer to the diagonal as represented by `prediction_constant`. In
 # this case this is not required since the curves intersect, but we are
@@ -433,10 +471,14 @@ plt.show()
 # analytically. By choosing a large `grid_size` this can be alleviated.
 
 postprocessed_predictor_EO._plot = True
-postprocessed_predictor_EO.fit(X_train, y_train, sensitive_features=sensitive_features_train)
+postprocessed_predictor_EO.fit(
+    X_train, y_train, sensitive_features=sensitive_features_train
+)
 
-for group, interpolation in \
-        postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature.items():
+for (
+    group,
+    interpolation,
+) in postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature.items():
     print("{}:".format(group))
-    print("\n ".join(interpolation.__repr__().split(',')))
+    print("\n ".join(interpolation.__repr__().split(",")))
     print("-----------------------------------")
