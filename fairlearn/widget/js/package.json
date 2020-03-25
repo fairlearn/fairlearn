@@ -51,7 +51,7 @@
     "@jupyter-widgets/base": "^1.1.10",
     "css-loader": "^2.1.1",
     "lodash": "^4.17.11",
-    "fairlearn-dashboard": "0.0.16",
+    "fairlearn-dashboard": "0.0.18",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "style-loader": "^0.23.1"
