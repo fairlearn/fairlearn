@@ -33,7 +33,7 @@
         "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are two kinds of disparity metrics: more to come...."
     },
     "Header": {
-        "title": "fairlearn",
+        "title": "Fairlearn",
         "documentation": "Documentation"
     },
     "Footer": {
@@ -42,8 +42,8 @@
     },
     "Intro": {
         "welcome": "Welcome to the",
-        "fairlearnDashboard": "fairlearn dashboard",
-        "introBody": "The fairlearn dashboard enables you to assess tradeoffs between accuracy and fairness of your models",
+        "fairlearnDashboard": "Fairlearn dashboard",
+        "introBody": "The Fairlearn dashboard enables you to assess tradeoffs between accuracy and fairness of your models",
         "explanatoryStep": "To set up the assessment, you need to specify a sensitive feature and an accuracy metric.",
         "getStarted": "Get started",
         "features": "Sensitive features",
