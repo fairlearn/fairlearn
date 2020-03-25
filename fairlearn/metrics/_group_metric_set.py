@@ -93,13 +93,19 @@ REGRESSION_METRICS[GROUP_ROOT_MEAN_SQUARED_ERROR] = group_root_mean_squared_erro
 REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 
 
-def create_group_metric_set(model_type,
-                            y_true,
+def _process_feature_to_integers(feature):
+    """Remap the given feature to integers indexed from 0.
+    """
+    unique_groups = sorted(np.unique(feature))
+    group_names = [str(x) for x in unique_groups]
+    groups = [unique_groups.index(x) for x in feature]
+    return group_names, groups
+
+
+def create_group_metric_set(y_true,
                             y_preds,
                             sensitive_features,
-                            model_titles=None,
-                            sensitive_feature_names=None,
-                            extra_metrics=None):
+                            prediction_type):
     """Create a dictionary matching the Dashboard's cache."""
     if extra_metrics is not None:
         raise NotImplementedError("No support for extra_metrics yet")

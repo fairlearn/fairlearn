@@ -5,10 +5,23 @@ import numpy as np
 import pytest
 
 from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
+from fairlearn.metrics._group_metric_set import _process_feature_to_integers
 from fairlearn.metrics._group_metric_set import create_group_metric_set
 
 from test.unit.input_convertors import conversions_for_1d
 
+
+class TestProcessFeatureToInteger:
+    @pytest.mark.parametrize("transform_feature", conversions_for_1d)
+    def test_smoke(self, transform_feature):
+        f = transform_feature([1, 2, 1, 2])
+
+        names, f_integer = _process_feature_to_integers(f)
+        assert np.array_equal(names, ["1", "2"])
+        assert np.array_equal(f_integer, [0, 1, 0, 1])
+
+
+# ================================================================================================
 
 def test_bad_model_type():
     with pytest.raises(ValueError) as exception_context:
