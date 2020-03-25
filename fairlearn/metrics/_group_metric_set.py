@@ -14,12 +14,6 @@ from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_e
 from . import group_selection_rate, group_specificity_score, group_zero_one_loss
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
-_GROUP_NAMES_MSG = "The sensitive_feature_names property must be a list of strings"
-_METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
-_METRICS_VALUES_MSG = "Values for metrics dictionary must be of type GroupMetricResult"
-
-_ARRAYS_NOT_SAME_LENGTH = "Lengths of y_true, y_pred and sensitive_features must match"
-
 _Y_TRUE = 'trueY'
 _Y_PRED = 'predictedY'
 _PRECOMPUTED_METRICS = 'precomputedMetrics'
@@ -35,8 +29,6 @@ _MODEL_NAMES = 'modelNames'
 _SCHEMA = 'schemaType'
 _DASHBOARD_DICTIONARY = 'dashboardDictionary'
 _VERSION = 'schemaVersion'
-
-_DICT_TOO_MANY_Y_PRED = 'Too many y_pred values in dictionary'
 
 BINARY_CLASSIFICATION = 'binary_classification'
 REGRESSION = 'regression'
@@ -94,8 +86,7 @@ REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 
 
 def _process_feature_to_integers(feature):
-    """Remap the given feature to integers indexed from 0.
-    """
+    """Remap the given feature to integers indexed from 0."""
     np_feature = _convert_to_ndarray_and_squeeze(feature)
     unique_groups = sorted(np.unique(np_feature))
     group_names = [str(x) for x in unique_groups]
