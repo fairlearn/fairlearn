@@ -35,12 +35,11 @@ _SCHEMA = 'schemaType'
 _DASHBOARD_DICTIONARY = 'dashboardDictionary'
 _VERSION = 'schemaVersion'
 
-_UNSUPPORTED_MODEL_TYPE = "The specified model_type of '{0}' is not supported"
 _DICT_TOO_MANY_Y_PRED = 'Too many y_pred values in dictionary'
 
 BINARY_CLASSIFICATION = 'binary_classification'
 REGRESSION = 'regression'
-_allowed_model_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
+_allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
 
 # The following keys need to match those of _metric_methods in
 # _fairlearn_dashboard.py
@@ -96,75 +95,74 @@ REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 def _process_feature_to_integers(feature):
     """Remap the given feature to integers indexed from 0.
     """
-    unique_groups = sorted(np.unique(feature))
+    np_feature = np.asarray(feature)
+    unique_groups = sorted(np.unique(np_feature))
     group_names = [str(x) for x in unique_groups]
-    groups = [unique_groups.index(x) for x in feature]
+    groups = [unique_groups.index(x) for x in np_feature]
     return group_names, groups
 
 
+def _process_sensitive_features(sensitive_features):
+    """Convert the dictionary into the required list."""
+    unsorted_features = []
+    for column_name, column in sensitive_features.items():
+        nxt = dict()
+        nxt[_FEATURE_BIN_NAME] = column_name
+        nxt[_BIN_LABELS], nxt[_BIN_VECTOR] = _process_feature_to_integers(column)
+        unsorted_features.append(nxt)
+    result = sorted(unsorted_features, key=lambda x: x[_FEATURE_BIN_NAME])
+    return result
+
+
 def create_group_metric_set(y_true,
-                            y_preds,
+                            predictions,
                             sensitive_features,
                             prediction_type):
     """Create a dictionary matching the Dashboard's cache."""
-    if extra_metrics is not None:
-        raise NotImplementedError("No support for extra_metrics yet")
-
-    # We could consider checking that the length of y_preds matches model_titles
-    # and that the length of sensitive_features matches sensitive_feature_names
-
     result = dict()
     result[_SCHEMA] = _DASHBOARD_DICTIONARY
     result[_VERSION] = 0
 
-    if model_type not in _allowed_model_types:
+    if prediction_type not in _allowed_prediction_types:
         msg_format = "model_type '{0}' not in {1}"
-        msg = msg_format.format(model_type, sorted(
-            list(_allowed_model_types)))
+        msg = msg_format.format(prediction_type, sorted(
+            list(_allowed_prediction_types)))
         raise ValueError(msg)
 
     function_dict = None
-    if model_type == BINARY_CLASSIFICATION:
+    if prediction_type == BINARY_CLASSIFICATION:
         result[_PREDICTION_TYPE] = _PREDICTION_BINARY_CLASSIFICATION
         function_dict = BINARY_CLASSIFICATION_METRICS
     else:
         raise NotImplementedError("No support yet for regression")
 
+    # Sort out y_true
     _yt = np.asarray(y_true)
     result[_Y_TRUE] = _yt.tolist()
 
-    result[_Y_PRED] = []
-    result[_PRECOMPUTED_METRICS] = []
-    result[_PRECOMPUTED_BINS] = []
+    # Sort out predictions
     result[_MODEL_NAMES] = []
-    for g, group_membership in enumerate(sensitive_features):
-        _gm = np.asarray(group_membership).tolist()
-        _unique_groups = sorted(list(np.unique(_gm)))
-        group_names = [str(x) for x in _unique_groups]
-        groups = [_unique_groups.index(x) for x in _gm]
-        bin_dict = {_BIN_VECTOR: groups, _BIN_LABELS: group_names}
-        if sensitive_feature_names is not None:
-            bin_dict[_FEATURE_BIN_NAME] = sensitive_feature_names[g]
-        result[_PRECOMPUTED_BINS].append(bin_dict)
+    result[_Y_PRED] = []
+    for model_name, y_pred in predictions.items():
+        result[_MODEL_NAMES].append(model_name)
+        _yp = np.assarray(y_pred)
+        result[_Y_PRED].append(_yp.tolist())
 
-        model_list = []
-        for m, model_pred in enumerate(y_preds):
-            _yp = np.asarray(model_pred).tolist()
+    # Sort out the sensitive features
+    result[_PRECOMPUTED_BINS] = _process_sensitive_features(sensitive_features)
 
-            # Only record each y_pred and model name once
-            if g == 0:
-                result[_Y_PRED].append(_yp)
-                if model_titles is not None:
-                    result[_MODEL_NAMES].append(model_titles[m])
-
+    result[_PRECOMPUTED_METRICS] = []
+    for g in result[_PRECOMPUTED_BINS]:
+        by_prediction_list = []
+        for prediction in result[_Y_PRED]:
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
-                gmr = metric_func(_yt, _yp, groups)
+                gmr = metric_func(result[_Y_TRUE], prediction, g[_BIN_VECTOR])
                 curr_dict = dict()
                 curr_dict[_GLOBAL] = gmr.overall
                 curr_dict[_BINS] = list(gmr.by_group.values())
                 metric_dict[metric_key] = curr_dict
-            model_list.append(metric_dict)
-        result[_PRECOMPUTED_METRICS].append(model_list)
+            by_prediction_list.append(metric_dict)
+        result[_PRECOMPUTED_METRICS].append(by_prediction_list)
 
     return result
