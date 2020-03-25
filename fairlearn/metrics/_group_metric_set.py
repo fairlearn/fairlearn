@@ -127,7 +127,7 @@ def create_group_metric_set(y_true,
     result[_VERSION] = 0
 
     if prediction_type not in _allowed_prediction_types:
-        msg_format = "model_type '{0}' not in {1}"
+        msg_format = "prediction_type '{0}' not in {1}"
         msg = msg_format.format(prediction_type, sorted(
             list(_allowed_prediction_types)))
         raise ValueError(msg)
