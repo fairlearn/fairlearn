@@ -69,6 +69,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._best_t = None
         self._n_oracle_calls = 0
         self._oracle_calls_execution_time = None
+        self._lambda_vecs = pd.DataFrame()
+        self._lambda_vecs_LP = pd.DataFrame()
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -91,7 +93,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series()
-        lambdas = pd.DataFrame()
         gaps_EG = []
         gaps = []
         Qs = []
@@ -103,8 +104,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
-            lambdas[t] = lambda_vec
-            lambda_EG = lambdas.mean(axis=1)
+            self._lambda_vecs[t] = lambda_vec
+            lambda_EG = self._lambda_vecs.mean(axis=1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
@@ -132,7 +133,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, _, result_LP = lagrangian.solve_linprog(self._nu)
+                Q_LP, self._lambda_vecs_LP[t], result_LP = lagrangian.solve_linprog(self._nu)
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
