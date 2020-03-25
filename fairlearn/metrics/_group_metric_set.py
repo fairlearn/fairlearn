@@ -12,6 +12,7 @@ from . import group_mean_prediction
 from . import group_miss_rate, group_precision_score, group_r2_score
 from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_error
 from . import group_selection_rate, group_specificity_score, group_zero_one_loss
+from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _GROUP_NAMES_MSG = "The sensitive_feature_names property must be a list of strings"
 _METRICS_KEYS_MSG = "Keys for metrics dictionary must be strings"
@@ -95,7 +96,7 @@ REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 def _process_feature_to_integers(feature):
     """Remap the given feature to integers indexed from 0.
     """
-    np_feature = np.asarray(feature)
+    np_feature = _convert_to_ndarray_and_squeeze(feature)
     unique_groups = sorted(np.unique(np_feature))
     group_names = [str(x) for x in unique_groups]
     groups = [unique_groups.index(x) for x in np_feature]
@@ -112,6 +113,17 @@ def _process_sensitive_features(sensitive_features):
         unsorted_features.append(nxt)
     result = sorted(unsorted_features, key=lambda x: x[_FEATURE_BIN_NAME])
     return result
+
+
+def _process_predictions(predictions):
+    """Convert the dictionary into two lists."""
+    names = []
+    preds = []
+    for model_name in sorted(predictions):
+        names.append(model_name)
+        y_p = _convert_to_ndarray_and_squeeze(predictions[model_name])
+        preds.append(y_p.tolist())
+    return names, preds
 
 
 def create_group_metric_set(y_true,
@@ -137,16 +149,11 @@ def create_group_metric_set(y_true,
         raise NotImplementedError("No support yet for regression")
 
     # Sort out y_true
-    _yt = np.asarray(y_true)
+    _yt = _convert_to_ndarray_and_squeeze(y_true)
     result[_Y_TRUE] = _yt.tolist()
 
     # Sort out predictions
-    result[_MODEL_NAMES] = []
-    result[_Y_PRED] = []
-    for model_name, y_pred in predictions.items():
-        result[_MODEL_NAMES].append(model_name)
-        _yp = np.assarray(y_pred)
-        result[_Y_PRED].append(_yp.tolist())
+    result[_MODEL_NAMES], result[_Y_PRED] = _process_predictions(predictions)
 
     # Sort out the sensitive features
     result[_PRECOMPUTED_BINS] = _process_sensitive_features(sensitive_features)

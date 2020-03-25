@@ -6,6 +6,7 @@ import pytest
 
 from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
 from fairlearn.metrics._group_metric_set import _process_feature_to_integers
+from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
 from fairlearn.metrics._group_metric_set import create_group_metric_set
 
@@ -60,3 +61,40 @@ class TestProcessSensitiveFeatures:
             assert r['binLabels'] == ['1', '2', '3']
         result_names = [r['featureBinName'] for r in result]
         assert result_names == ["a", "b", "c"]
+
+
+class TestProcessPredictions:
+    @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+    def test_smoke(self, transform_y_p):
+        y_pred = transform_y_p([0, 1, 1, 0])
+        name = "my model"
+
+        predictions = {name: y_pred}
+        names, preds = _process_predictions(predictions)
+        assert isinstance(names, list)
+        assert isinstance(preds, list)
+        assert len(names) == 1
+        assert len(preds) == 1
+        assert names[0] == name
+        assert isinstance(preds[0], list)
+        assert preds[0] == [0, 1, 1, 0]
+
+    @pytest.mark.parametrize("transform_y_1", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_2", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_3", conversions_for_1d)
+    def test_results_are_sorted(self,
+                                transform_y_1,
+                                transform_y_2,
+                                transform_y_3):
+        y_p1 = transform_y_1([0, 0, 1, 1])
+        y_p2 = transform_y_2([0, 1, 0, 1])
+        y_p3 = transform_y_3([1, 1, 0, 0])
+        predictions = {"b": y_p1, "a": y_p2, "c": y_p3}
+
+        names, preds = _process_predictions(predictions)
+        assert names == ["a", "b", "c"]
+        for i in range(3):
+            assert isinstance(preds[i], list)
+        assert preds[0] == [0, 1, 0, 1]
+        assert preds[1] == [0, 0, 1, 1]
+        assert preds[2] == [1, 1, 0, 0]
