@@ -9,8 +9,9 @@
   * `ThresholdOptmizer` is now a scikit-learn meta-estimator, and accepts
     an estimator through the `estimator` parameter. To use a pre-fitted
     estimator, pass `prefit=True`.
-* Add `create_dashboard_dictionary()` for creating the Dashboard cache layer
-* Make `create_group_metric_set()` private and change arguments
+* Change the arguments to `create_group_metric_set()`, so that it requires
+  dictionaries for the predictions and sensitive features. This is a
+  breaking change.
 * Remove `Reduction` base class for reductions methods and replace it with
   `sklearn.base.BaseEstimator` and `sklearn.base.MetaEstimatorMixin`.
 * Remove `ExponentiatedGradientResult` in favor of storing the values and
