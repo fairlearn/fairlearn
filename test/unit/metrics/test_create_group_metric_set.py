@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
+# from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
 from fairlearn.metrics._group_metric_set import _process_feature_to_integers
 from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
