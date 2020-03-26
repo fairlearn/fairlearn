@@ -155,19 +155,24 @@ class TestCreateGroupMetricSet:
         validate_dashboard_dictionary(actual)
         assert expected == actual
 
-    def test_round_trip_2p_3f(self):
+    @pytest.mark.parametrize("t_y_t", conversions_for_1d)
+    @pytest.mark.parametrize("t_y_p", conversions_for_1d)
+    @pytest.mark.parametrize("t_sf", conversions_for_1d)
+    def test_round_trip_2p_3f(self, t_y_t, t_y_p, t_sf):
         expected = load_sample_dashboard(_BC_2P_3F)
 
-        y_true = expected['trueY']
+        y_true = t_y_t(expected['trueY'])
 
         y_pred = {}
+        y_p_ts = [t_y_p, lambda x: x]  # Only transform one y_p
         for i, name in enumerate(expected['modelNames']):
-            y_pred[name] = expected['predictedY'][i]
+            y_pred[name] = y_p_ts[i](expected['predictedY'][i])
 
         sensitive_features = {}
-        for sf_file in expected['precomputedFeatureBins']:
+        t_sfs = [lambda x: x, t_sf, lambda x:x]  # Only transform one sf
+        for i, sf_file in enumerate(expected['precomputedFeatureBins']):
             sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
-            sensitive_features[sf_file['featureBinName']] = sf
+            sensitive_features[sf_file['featureBinName']] = t_sfs[i](sf)
 
         actual = create_group_metric_set(y_true,
                                          y_pred,
