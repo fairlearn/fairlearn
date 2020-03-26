@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-# from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
+from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
 from fairlearn.metrics._group_metric_set import _process_feature_to_integers
 from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
@@ -42,9 +42,13 @@ def validate_dashboard_dictionary(dashboard_dict):
         sf_classes = sf['binLabels']
         assert len(sf_classes) == 1 + max(sf_vector)
 
+    expected_keys = sorted(list(dashboard_dict['precomputedMetrics'][0][0].keys()))
     assert len(dashboard_dict['precomputedMetrics']) == num_sf
     for metrics_arr in dashboard_dict['precomputedMetrics']:
         assert len(metrics_arr) == num_y_pred
+        for m in metrics_arr:
+            keys = sorted(list(m.keys()))
+            assert keys == expected_keys
 
 
 class TestProcessFeatureToInteger:
@@ -180,3 +184,36 @@ class TestCreateGroupMetricSet:
                                          'binary_classification')
         validate_dashboard_dictionary(actual)
         assert expected == actual
+
+    def test_specific_metrics(self):
+        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+
+        exp_acc = group_accuracy_score(y_t, y_p, s_f)
+        exp_roc = group_roc_auc_score(y_t, y_p, s_f)
+
+        predictions = {"some model": y_p}
+        sensitive_feature = {"my sf": s_f}
+
+        actual = create_group_metric_set(y_t,
+                                         predictions,
+                                         sensitive_feature,
+                                         'binary_classification')
+
+        # Do some sanity checks
+        validate_dashboard_dictionary(actual)
+        assert actual['trueY'] == y_t
+        assert actual['predictedY'][0] == y_p
+        assert actual['precomputedFeatureBins'][0]['binVector'] == s_f
+        assert len(actual['precomputedMetrics'][0][0]) == 10
+
+        # Cross check the two metrics we computed
+        # Comparisons simplified because s_f was already {0,1}
+        actual_acc = actual['precomputedMetrics'][0][0]['accuracy_score']
+        assert actual_acc['global'] == exp_acc.overall
+        assert actual_acc['bins'] == list(exp_acc.by_group.values())
+
+        actual_roc = actual['precomputedMetrics'][0][0]['balanced_accuracy_score']
+        assert actual_roc['global'] == exp_roc.overall
+        assert actual_roc['bins'] == list(exp_roc.by_group.values())
