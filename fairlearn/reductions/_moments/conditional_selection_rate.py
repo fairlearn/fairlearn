@@ -216,8 +216,8 @@ class EqualizedOdds(ConditionalSelectionRate):
                           **kwargs)
 
 
-class ErrorRatio(ConditionalSelectionRate):
-    r"""Implementation of Error Ratio as a moment.
+class ErrorRateRatio(ConditionalSelectionRate):
+    r"""Implementation of Error Rate Ratio as a moment.
 
     Measures the ratio in errors between unprivileged and privileged attributes, i.e.
     2 sided version of error ratio -
