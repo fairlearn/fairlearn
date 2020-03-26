@@ -10,7 +10,11 @@ from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
 from fairlearn.metrics._group_metric_set import create_group_metric_set
 
+from .sample_loader import load_sample_dashboard
 from test.unit.input_convertors import conversions_for_1d
+
+_BC_1P_1F = "bc-1p-1f.json"
+_BC_2P_3F = "bc-2p-3f.json"
 
 
 class TestProcessFeatureToInteger:
@@ -98,3 +102,21 @@ class TestProcessPredictions:
         assert preds[0] == [0, 1, 0, 1]
         assert preds[1] == [0, 0, 1, 1]
         assert preds[2] == [1, 1, 0, 0]
+
+
+class TestCreateGroupMetricSet:
+    def test_round_trip_1p_1f(self):
+        expected = load_sample_dashboard(_BC_1P_1F)
+
+        y_true = expected['trueY']
+        y_pred = {expected['modelNames'][0]: expected['predictedY'][0]}
+
+        sf_file = expected['precomputedFeatureBins'][0]
+        sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
+        sensitive_feature = {sf_file['featureBinName']: sf}
+
+        actual = create_group_metric_set(y_true,
+                                         y_pred,
+                                         sensitive_feature,
+                                         'binary_classification')
+        assert expected == actual
