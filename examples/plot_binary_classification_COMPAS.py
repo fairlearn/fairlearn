@@ -176,19 +176,19 @@ plt.show()
 # - Equalized Odds (EO):
 #   :math:`P\ [\ h(X)=\hat{y}\ |\ A=a, Y=y] = P\ [\ h(X)=\hat{y}\ |\ Y=y\ ] \qquad \forall a, \hat{y}`
 #
-# where $h(X)$ is the prediction based on the input $X$, $\hat{y}$ and $y$ are
-# labels, and $a$ is a sensitive feature value. In this example, we'd expect
-# the postprocessed model with DP to be balanced between races. In this
-# particular scenario it makes more sense to aim at fairness through accuracy
-# like EO. EO does not make the same guarantees. Instead, it ensures parity
-# between the subgroups of each race with label 1 in the training set, and
-# parity between the subgroups of each race with label 0 in the training set.
-# Applied to this scenario, this means that the subgroups of each race who
-# reoffended in the past are equally likely to be predicted to reoffend (and
-# therefore also equally likely not to). Similarly, there is parity between
-# subgroups of each race without recidivism, but we have no parity between the
-# groups with different training labels. In mathematical terms at the example
-# of African-American and Caucasian:
+# where :math:`h(X)` is the prediction based on the input :math:`X`,
+# :math:`\hat{y}` and :math:`y` are labels, and :math:`a` is a sensitive feature
+# value. In this example, we'd expect the postprocessed model with DP to be
+# balanced between races. In this particular scenario it makes more sense to
+# aim at fairness through accuracy like EO. EO does not make the same
+# guarantees. Instead, it ensures parity between the subgroups of each race
+# with label 1 in the training set, and parity between the subgroups of each
+# race with label 0 in the training set. Applied to this scenario, this means
+# that the subgroups of each race who reoffended in the past are equally likely
+# to be predicted to reoffend (and therefore also equally likely not to).
+# Similarly, there is parity between subgroups of each race without recidivism,
+# but we have no parity between the groups with different training labels. In
+# mathematical terms at the example of African-American and Caucasian:
 #
 # .. math::
 #   P\ [\ \text{recidivism predicted}\ |\ \text{African-American, recidivism}\ ] = P\ [\ \text{recidivism predicted}\ |\ \text{Caucasian, recidivism}\ ], \text{e.g. } 0.95
@@ -339,13 +339,15 @@ roc_points
 # both cases:
 #
 # - x=0, y=0, threshold rule ">inf": more than infinity is impossible, which
-#   means every sample is predicted as 0. That means :math:`P[\hat{Y} = 1 | Y = 0] = 0`
-#   (represented as x) because the predictions $\hat{Y}$ are never 1, and
-#   similarly :math:`P[\hat{Y} = 1 | Y = 1] = 0` (represented as y).
+#   means every sample is predicted as 0. That means :math:`P[\hat{Y} = 1 | Y =
+#   0] = 0` (represented as x) because the predictions :math:`\hat{Y}` are
+#   never 1, and similarly :math:`P[\hat{Y} = 1 | Y = 1] = 0` (represented as
+#   y).
 # - x=1, y=1, threshold rule ">-inf": more than infinity is always true, which
-#   means every sample is predicted as 1. That means :math:`P[\hat{Y} = 1 | Y = 0] = 1`
-#   (represented as x) because the predictions $\hat{Y}$ are always 1, and
-#   similarly :math:`P[\hat{Y} = 1 | Y = 1] = 1` (represented as y).
+#   means every sample is predicted as 1. That means :math:`P[\hat{Y} = 1 | Y =
+#   0] = 1` (represented as x) because the predictions :math:`\hat{Y}` are
+#   always 1, and similarly :math:`P[\hat{Y} = 1 | Y = 1] = 1` (represented as
+#   y).
 #
 # The more interesting logic happens in between. The x and y values were
 # calculated as follows:
@@ -375,7 +377,7 @@ for group_name, group in data_grouped_by_sensitive_feature:
     print("    P[Ŷ = 1 | Y = 1] = {}".format(y_group_0_5))
 
 ###############################################################################
-# Note that it never makes sense to have $x>y$ because in that case you're
+# Note that it never makes sense to have :math:`x>y` because in that case you're
 # better off flipping labels, i.e. completely turning around the meaning of the
 # scores. The method automatically does that unless specified otherwise.
 
@@ -387,14 +389,14 @@ for group_name, group in data_grouped_by_sensitive_feature:
 # (0,0) and (1,1). We calculate the convex hull based on that, because we can
 # reach any point in between two known thresholding points by interpolation. An
 # interpolation could be :math:`p_0 (x_0, y_0) + p_1 (x_1, y_1)`. For the post
-# processing algorithm that would mean that we use the rule defined by $(x_0,
-# y_0, \text{operation}_0)$ $\quad p_0$ percent of the time, and the rule
-# defined by :math:`(x_1, y_1, \text{operation}_1)` :math:`\quad p_1` percent
-# of the time, thus resulting in a probabilistic classifier. Depending on the
-# data certain fairness objectives can only be accomplished with probabilistic
-# classifiers. However, not every use case lends itself to probabilistic
-# classifiers, since it could mean that two people with identical features are
-# classified differently.
+# processing algorithm that would mean that we use the rule defined by
+# :math:`(x_0, y_0, \text{operation}_0)` :math:`\quad p_0` percent of the time,
+# and the rule defined by :math:`(x_1, y_1, \text{operation}_1)` :math:`\quad
+# p_1` percent of the time, thus resulting in a probabilistic classifier.
+# Depending on the data certain fairness objectives can only be accomplished
+# with probabilistic classifiers. However, not every use case lends itself to
+# probabilistic classifiers, since it could mean that two people with identical
+# features are classified differently.
 
 ###############################################################################
 # Finding the Equalized Odds solution
