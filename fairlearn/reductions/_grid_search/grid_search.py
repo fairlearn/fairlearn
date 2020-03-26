@@ -142,23 +142,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self.grid_limit = float(grid_limit)
         self.grid = grid
 
-        self._all_results = []
-        self._best_result = None
-
-    @property
-    def all_results(self):
-        """Return a list of :class:`GridSearchResult` from each point in the grid."""
-        return self._all_results
-
-    @property
-    def best_result(self):
-        """Return the best result found from the grid search.
-
-        The predictor contained in this instance of
-        :class:`GridSearchResult` is used in calls to
-        :code:`predict` and :code:`predict_proba`.
-        """
-        return self._best_result
+        self._best_idx = None
+        self._predictors = []
+        self._lambda_vecs = pd.DataFrame()
+        self._objectives = []
+        self._gammas = []
+        self._oracle_calls_execution_time = []
 
     def fit(self, X, y, **kwargs):
         """Run the grid search.
@@ -216,7 +205,6 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         # Fit the estimates
         logger.debug("Setup complete. Starting grid search")
-        self._all_results = []
         for i in grid.columns:
             lambda_vec = grid[i]
             logger.debug("Obtaining weights")
@@ -239,18 +227,19 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Call to underlying estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
-            nxt = GridSearchResult(current_estimator,
-                                   lambda_vec,
-                                   objective.gamma(predict_fct)[0],
-                                   self.constraints.gamma(predict_fct),
-                                   oracle_call_execution_time)
-            self._all_results.append(nxt)
+            self._predictors.append(current_estimator)
+            self._lambda_vecs[i] = lambda_vec
+            self._objectives.append(objective.gamma(predict_fct)[0])
+            self._gammas.append(self.constraints.gamma(predict_fct))
+            self._oracle_calls_execution_time.append(oracle_call_execution_time)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
-            def loss_fct(x):
-                return self.objective_weight * x.objective + self.constraint_weight * x.gamma.max()
-            self._best_result = min(self._all_results, key=loss_fct)
+            def loss_fct(i):
+                return self.objective_weight * self._objectives[i] + \
+                    self.constraint_weight * self._gammas[i].max()
+            losses = [loss_fct(i) for i in range(len(self._objectives))]
+            self._best_idx = losses.index(min(losses))
         else:
             raise RuntimeError("Unsupported selection rule")
 
@@ -265,9 +254,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self.best_result is None:
+        if self._best_idx is None:
             raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self.best_result.predictor.predict(X)
+        return self._predictors[self._best_idx].predict(X)
 
     def predict_proba(self, X):
         """Provide the result of :code:`predict_proba` from the best model found by the grid search.
@@ -278,6 +267,6 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self.best_result is None:
+        if self._best_idx is None:
             raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self.best_result.predictor.predict_proba(X)
+        return self._predictors[self._best_idx].predict_proba(X)
