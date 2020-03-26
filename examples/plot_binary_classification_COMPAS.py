@@ -114,7 +114,7 @@ def show_proportions(
 # To get started we look at a very basic Logistic Regression model. We fit it
 # to the training data and plot some characteristics of training and test data
 # as well as the predictions of the model on those datasets.
-
+#
 # We notice a stark contrast in the predictions with African-Americans being a
 # lot more likely to be predicted to reoffend, similar to the original training
 # data. However, there's even a disparity between the subgroup of
