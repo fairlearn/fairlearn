@@ -92,9 +92,8 @@ def _process_feature_to_integers(feature):
     """Remap the given feature to integers indexed from 0."""
     np_feature = _convert_to_ndarray_and_squeeze(feature)
     le = preprocessing.LabelEncoder()
-    le.fit(np_feature)
+    groups = list(le.fit_transform(np_feature))
     group_names = [str(x) for x in le.classes_]
-    groups = list(le.transform(np_feature))
     return group_names, groups
 
 
