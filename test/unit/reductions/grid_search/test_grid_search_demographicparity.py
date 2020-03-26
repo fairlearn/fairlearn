@@ -9,6 +9,8 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
+
 
 def _simple_threshold_data(number_a0, number_a1,
                            a0_threshold, a1_threshold,
@@ -53,26 +55,30 @@ def test_demographicparity_fair_uneven_populations(A_two_dim):
     a0_label = 17
     a1_label = 37
 
+    grid_size = 11
+
     X, Y, A = _simple_threshold_data(number_a0, number_a1,
                                      score_threshold, score_threshold,
                                      a0_label, a1_label, A_two_dim)
 
-    target = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
+    grid_search = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
                         constraints=DemographicParity(),
-                        grid_size=11)
+                        grid_size=grid_size)
 
-    target.fit(X, Y, sensitive_features=A)
-    assert len(target.all_results) == 11
+    grid_search.fit(X, Y, sensitive_features=A)
+    assert_n_grid_search_results(grid_size, grid_search)
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
                            "sensitive_features": [a0_label, a1_label],
                            "constant_ones_feature": [1, 1]})
 
-    sample_results = target.predict(test_X)
-    sample_proba = target.predict_proba(test_X)
+    sample_results = grid_search.predict(test_X)
+    assert np.array_equal(sample_results, [0, 1])
+
+    sample_proba = grid_search.predict_proba(test_X)
     assert np.allclose(sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]])
 
-    sample_results = target.all_results[0].predictor.predict(test_X)
+    sample_results = grid_search._predictors[0].predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
 
 
@@ -105,14 +111,14 @@ def test_lambda_vec_zero_unchanged_model(A_two_dim):
     lagrange_zero_series = pd.Series(np.zeros(4), index=midx)
     grid_df = pd.DataFrame(lagrange_zero_series)
 
-    target = GridSearch(estimator,
+    grid_search = GridSearch(estimator,
                         constraints=DemographicParity(),
                         grid=grid_df)
-    target.fit(X, y, sensitive_features=A)
-    assert len(target.all_results) == 1
+    grid_search.fit(X, y, sensitive_features=A)
+    assert_n_grid_search_results(1, grid_search)
 
     # Check coefficients
-    gs_coeff = target.best_result.predictor.coef_
+    gs_coeff = grid_search._predictors[grid_search._best_grid_index].coef_
     um_coeff = unmitigated_estimator.coef_
     assert np.array_equal(gs_coeff, um_coeff)
 
@@ -146,29 +152,29 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
                          lagrange_positive_series],
                         axis=1)
 
-    target1 = GridSearch(copy.deepcopy(estimator),
+    grid_search1 = GridSearch(copy.deepcopy(estimator),
                          constraints=DemographicParity(),
                          grid_size=3)
 
-    target2 = GridSearch(copy.deepcopy(estimator),
+    grid_search2 = GridSearch(copy.deepcopy(estimator),
                          constraints=DemographicParity(),
                          grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
-    target2.fit(X, y, sensitive_features=A)
-    target1.fit(X, y, sensitive_features=A)
+    grid_search2.fit(X, y, sensitive_features=A)
+    grid_search1.fit(X, y, sensitive_features=A)
 
-    assert len(target1.all_results) == 3
-    assert len(target2.all_results) == 3
+    assert_n_grid_search_results(3, grid_search1)
+    assert_n_grid_search_results(3, grid_search2)
 
     # Check we generated the same multipliers
     for i in range(3):
-        lm1 = target1.all_results[i].lambda_vec
-        lm2 = target2.all_results[i].lambda_vec
+        lm1 = grid_search1._lambda_vecs[i]
+        lm2 = grid_search2._lambda_vecs[i]
         assert lm1.equals(lm2)
 
     # Check the models are the same
     for i in range(3):
-        coef1 = target1.all_results[i].predictor.coef_
-        coef2 = target2.all_results[i].predictor.coef_
+        coef1 = grid_search1._predictors[i].coef_
+        coef2 = grid_search2._predictors[i].coef_
         assert np.array_equal(coef1, coef2)

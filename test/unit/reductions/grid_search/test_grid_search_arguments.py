@@ -18,6 +18,7 @@ from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
 
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
 from test.unit.reductions.conftest import is_invalid_transformation
+from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
 
 # ==============================================================
 
@@ -61,7 +62,7 @@ class ArgumentTests:
         gs.fit(transformX(X),
                transformY(Y),
                sensitive_features=transformA(A))
-        assert len(gs.all_results) == 2
+        assert_n_grid_search_results(2, gs)
 
     # ----------------------------
 
