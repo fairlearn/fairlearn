@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import numpy as np
-
 from sklearn import preprocessing
 
 from . import group_accuracy_score, group_balanced_root_mean_squared_error
@@ -88,22 +86,18 @@ REGRESSION_METRICS[GROUP_ROOT_MEAN_SQUARED_ERROR] = group_root_mean_squared_erro
 REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 
 
-def _process_feature_to_integers(feature):
-    """Remap the given feature to integers indexed from 0."""
-    np_feature = _convert_to_ndarray_and_squeeze(feature)
-    le = preprocessing.LabelEncoder()
-    groups = list(le.fit_transform(np_feature))
-    group_names = [str(x) for x in le.classes_]
-    return group_names, groups
-
-
 def _process_sensitive_features(sensitive_features):
     """Convert the dictionary into the required list."""
     unsorted_features = []
     for column_name, column in sensitive_features.items():
         nxt = dict()
         nxt[_FEATURE_BIN_NAME] = column_name
-        nxt[_BIN_LABELS], nxt[_BIN_VECTOR] = _process_feature_to_integers(column)
+
+        np_column = _convert_to_ndarray_and_squeeze(column)
+        le = preprocessing.LabelEncoder()
+        nxt[_BIN_VECTOR] = list(le.fit_transform(np_column))
+        nxt[_BIN_LABELS] = [str(x) for x in le.classes_]
+
         unsorted_features.append(nxt)
     result = sorted(unsorted_features, key=lambda x: x[_FEATURE_BIN_NAME])
     return result
