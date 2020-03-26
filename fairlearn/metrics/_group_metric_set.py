@@ -25,6 +25,7 @@ _BIN_LABELS = 'binLabels'
 _FEATURE_BIN_NAME = 'featureBinName'
 _PREDICTION_TYPE = 'predictionType'
 _PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
+_PREDICTION_REGRESSION = 'regression'
 _MODEL_NAMES = 'modelNames'
 _SCHEMA = 'schemaType'
 _DASHBOARD_DICTIONARY = 'dashboardDictionary'
@@ -117,10 +118,10 @@ def _process_predictions(predictions):
     return names, preds
 
 
-def create_group_metric_set(y_true,
-                            predictions,
-                            sensitive_features,
-                            prediction_type):
+def _create_group_metric_set(y_true,
+                             predictions,
+                             sensitive_features,
+                             prediction_type):
     """Create a dictionary matching the Dashboard's cache."""
     result = dict()
     result[_SCHEMA] = _DASHBOARD_DICTIONARY
@@ -136,6 +137,9 @@ def create_group_metric_set(y_true,
     if prediction_type == BINARY_CLASSIFICATION:
         result[_PREDICTION_TYPE] = _PREDICTION_BINARY_CLASSIFICATION
         function_dict = BINARY_CLASSIFICATION_METRICS
+    elif prediction_type == REGRESSION:
+        result[_PREDICTION_TYPE] == _PREDICTION_REGRESSION
+        function_dict = REGRESSION_METRICS
     else:
         raise NotImplementedError("No support yet for regression")
 

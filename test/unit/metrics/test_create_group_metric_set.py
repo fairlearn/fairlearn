@@ -8,7 +8,7 @@ from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
 from fairlearn.metrics._group_metric_set import _process_feature_to_integers
 from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
-from fairlearn.metrics._group_metric_set import create_group_metric_set
+from fairlearn.metrics._group_metric_set import _create_group_metric_set
 
 from .sample_loader import load_sample_dashboard
 from test.unit.input_convertors import conversions_for_1d
@@ -152,10 +152,10 @@ class TestCreateGroupMetricSet:
         sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
         sensitive_feature = {sf_file['featureBinName']: t_sf(sf)}
 
-        actual = create_group_metric_set(y_true,
-                                         y_pred,
-                                         sensitive_feature,
-                                         'binary_classification')
+        actual = _create_group_metric_set(y_true,
+                                          y_pred,
+                                          sensitive_feature,
+                                          'binary_classification')
         validate_dashboard_dictionary(actual)
         assert expected == actual
 
@@ -178,10 +178,10 @@ class TestCreateGroupMetricSet:
             sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
             sensitive_features[sf_file['featureBinName']] = t_sfs[i](sf)
 
-        actual = create_group_metric_set(y_true,
-                                         y_pred,
-                                         sensitive_features,
-                                         'binary_classification')
+        actual = _create_group_metric_set(y_true,
+                                          y_pred,
+                                          sensitive_features,
+                                          'binary_classification')
         validate_dashboard_dictionary(actual)
         assert expected == actual
 
@@ -196,10 +196,10 @@ class TestCreateGroupMetricSet:
         predictions = {"some model": y_p}
         sensitive_feature = {"my sf": s_f}
 
-        actual = create_group_metric_set(y_t,
-                                         predictions,
-                                         sensitive_feature,
-                                         'binary_classification')
+        actual = _create_group_metric_set(y_t,
+                                          predictions,
+                                          sensitive_feature,
+                                          'binary_classification')
 
         # Do some sanity checks
         validate_dashboard_dictionary(actual)
