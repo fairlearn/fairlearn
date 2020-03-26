@@ -141,7 +141,7 @@ def _create_group_metric_set(y_true,
         result[_PREDICTION_TYPE] == _PREDICTION_REGRESSION
         function_dict = REGRESSION_METRICS
     else:
-        raise NotImplementedError("No support yet for regression")
+        raise NotImplementedError("No support yet for {0}".format(prediction_type))
 
     # Sort out y_true
     _yt = _convert_to_ndarray_and_squeeze(y_true)
