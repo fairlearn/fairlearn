@@ -62,8 +62,8 @@ def test_demographicparity_fair_uneven_populations(A_two_dim):
                                      a0_label, a1_label, A_two_dim)
 
     grid_search = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                        constraints=DemographicParity(),
-                        grid_size=grid_size)
+                             constraints=DemographicParity(),
+                             grid_size=grid_size)
 
     grid_search.fit(X, Y, sensitive_features=A)
     assert_n_grid_search_results(grid_size, grid_search)
@@ -112,8 +112,8 @@ def test_lambda_vec_zero_unchanged_model(A_two_dim):
     grid_df = pd.DataFrame(lagrange_zero_series)
 
     grid_search = GridSearch(estimator,
-                        constraints=DemographicParity(),
-                        grid=grid_df)
+                             constraints=DemographicParity(),
+                             grid=grid_df)
     grid_search.fit(X, y, sensitive_features=A)
     assert_n_grid_search_results(1, grid_search)
 
@@ -153,12 +153,12 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
                         axis=1)
 
     grid_search1 = GridSearch(copy.deepcopy(estimator),
-                         constraints=DemographicParity(),
-                         grid_size=3)
+                              constraints=DemographicParity(),
+                              grid_size=3)
 
     grid_search2 = GridSearch(copy.deepcopy(estimator),
-                         constraints=DemographicParity(),
-                         grid=grid_df)
+                              constraints=DemographicParity(),
+                              grid=grid_df)
 
     # Try both ways of specifying the Lagrange multipliers
     grid_search2.fit(X, y, sensitive_features=A)

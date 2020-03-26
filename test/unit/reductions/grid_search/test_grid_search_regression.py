@@ -63,8 +63,8 @@ def test_bgl_unfair(A_two_dim):
 
     bgl_square_loss = GroupLossMoment(SquareLoss(-np.inf, np.inf))
     grid_search = GridSearch(LinearRegression(),
-                        constraints=bgl_square_loss,
-                        grid_size=grid_size)
+                             constraints=bgl_square_loss,
+                             grid_size=grid_size)
 
     grid_search.fit(X, Y, sensitive_features=A)
 
@@ -167,12 +167,12 @@ def test_bgl_lagrange_specifications(A_two_dim):
                         axis=1)
 
     grid_search1 = GridSearch(copy.deepcopy(estimator),
-                         constraints=GroupLossMoment(ZeroOneLoss()),
-                         grid_size=5)
+                              constraints=GroupLossMoment(ZeroOneLoss()),
+                              grid_size=5)
 
     grid_search2 = GridSearch(copy.deepcopy(estimator),
-                         constraints=GroupLossMoment(ZeroOneLoss()),
-                         grid=grid_df)
+                              constraints=GroupLossMoment(ZeroOneLoss()),
+                              grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
 
