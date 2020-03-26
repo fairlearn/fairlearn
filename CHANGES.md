@@ -9,7 +9,8 @@
   * `ThresholdOptmizer` is now a scikit-learn meta-estimator, and accepts
     an estimator through the `estimator` parameter. To use a pre-fitted
     estimator, pass `prefit=True`.
-* Change the arguments to `create_group_metric_set()`, so that it requires
+* Made `_create_group_metric_set_()` private by prepending with `_`.
+  Also changed the arguments, so that this routine requires
   dictionaries for the predictions and sensitive features. This is a
   breaking change.
 * Remove `Reduction` base class for reductions methods and replace it with
