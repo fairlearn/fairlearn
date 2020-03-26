@@ -45,7 +45,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         .. math::
         multiplier = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
 
-        It defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
+        The `multiplier` defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
+        This assumes that the classes of binary classifier is 0/1.
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
@@ -206,8 +207,8 @@ class EqualizedOdds(ConditionalSelectionRate):
                           **kwargs)
 
 
-class ErrorRatio(ConditionalSelectionRate):
-    r"""Implementation of Error Ratio as a moment.
+class ErrorRateRatio(ConditionalSelectionRate):
+    r"""Implementation of Error Rate Ratio as a moment.
 
     Measures the ratio in errors per attribute by overall error.
     The 2-sided version of error ratio can be written as
@@ -232,17 +233,17 @@ class ErrorRatio(ConditionalSelectionRate):
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     The `ratio` defines the amount of relaxation that is allowed for the
-    constraint. The value varies between 0-1. The ratio of 1 means, the
-    constraint is given no relaxation and thus, the constraint tries to
-    evaluate for -
+    constraint. The value varies between 0 and 1. The ratio of 1 means,
+    the constraint is given no relaxation and thus, the constraint tries to
+    evaluate for
     error(A=a) / total_error = 1
     """
 
-    short_name = "ErrorRatio"
+    short_name = "ErrorRateRatio"
 
     def __init__(self, ratio=1.0):
         """Intialise with the ratio value."""
-        super(ErrorRatio, self).__init__()
+        super(ErrorRateRatio, self).__init__()
         if ratio <= 0 or ratio > 1:
             raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
