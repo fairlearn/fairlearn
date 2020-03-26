@@ -3,6 +3,8 @@
 
 import numpy as np
 
+from sklearn import preprocessing
+
 from . import group_accuracy_score, group_balanced_root_mean_squared_error
 from . import group_fallout_rate, group_max_error
 from . import group_mean_absolute_error, group_mean_overprediction
@@ -89,9 +91,10 @@ REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
 def _process_feature_to_integers(feature):
     """Remap the given feature to integers indexed from 0."""
     np_feature = _convert_to_ndarray_and_squeeze(feature)
-    unique_groups = sorted(np.unique(np_feature))
-    group_names = [str(x) for x in unique_groups]
-    groups = [unique_groups.index(x) for x in np_feature]
+    le = preprocessing.LabelEncoder()
+    le.fit(np_feature)
+    group_names = [str(x) for x in le.classes_]
+    groups = list(le.transform(np_feature))
     return group_names, groups
 
 
