@@ -34,25 +34,25 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, multiplier=None, **kwargs):
+    def load_data(self, X, y, event=None, utility_difference=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
 
-        The `multiplier` is the factor with which the signed weights are
+        The `utility_difference` is the factor with which the signed weights are
         multiplied and correspond to g(X,A,Y,h(X)) mentioned in the paper
         `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
         .. math::
-        multiplier = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
+        utility_difference = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
 
-        The `multiplier` defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
-        This assumes that the classes of binary classifier is 0/1.
+        The `utility_difference` defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
+        This assumes that binary class of 0/1.
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        if multiplier is None:
-            multiplier = pd.Series(y).apply(lambda y: 1)
-        self.multiplier = multiplier
+        if utility_difference is None:
+            utility_difference = pd.Series(y).apply(lambda y: 1)
+        self.utility_difference = utility_difference
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -125,7 +125,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
-        signed_weights = self.multiplier.mul(signed_weights)
+        signed_weights = self.utility_difference.mul(signed_weights)
         return signed_weights
 
 
@@ -252,5 +252,5 @@ class ErrorRateRatio(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=_ALL,
-                          multiplier=pd.Series(y).apply(lambda y: 1 - 2*y),
+                          utility_difference=pd.Series(y).apply(lambda y: 1 - 2*y),
                           **kwargs)
