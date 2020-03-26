@@ -17,6 +17,36 @@ _BC_1P_1F = "bc-1p-1f.json"
 _BC_2P_3F = "bc-2p-3f.json"
 
 
+def validate_dashboard_dictionary(dashboard_dict):
+    """Ensure dictionary is a valid Dashboard."""
+    schema_type = dashboard_dict['schemaType']
+    assert schema_type == 'dashboardDictionary'
+    schema_version = dashboard_dict['schemaVersion']
+    # Will want to update the following prior to release
+    assert schema_version == 0
+
+    pred_type = dashboard_dict['predictionType']
+    assert pred_type in {'binaryClassification', 'regression', 'probability'}
+    len_y_true = len(dashboard_dict['trueY'])
+    num_y_pred = len(dashboard_dict['predictedY'])
+    for y_pred in dashboard_dict['predictedY']:
+        assert len(y_pred) == len_y_true
+
+    len_model_names = len(dashboard_dict['modelNames'])
+    assert len_model_names == num_y_pred
+
+    num_sf = len(dashboard_dict['precomputedFeatureBins'])
+    for sf in dashboard_dict['precomputedFeatureBins']:
+        sf_vector = sf['binVector']
+        assert len(sf_vector) == len_y_true
+        sf_classes = sf['binLabels']
+        assert len(sf_classes) == 1 + max(sf_vector)
+
+    assert len(dashboard_dict['precomputedMetrics']) == num_sf
+    for metrics_arr in dashboard_dict['precomputedMetrics']:
+        assert len(metrics_arr) == num_y_pred
+
+
 class TestProcessFeatureToInteger:
     @pytest.mark.parametrize("transform_feature", conversions_for_1d)
     def test_smoke(self, transform_feature):
@@ -105,18 +135,43 @@ class TestProcessPredictions:
 
 
 class TestCreateGroupMetricSet:
-    def test_round_trip_1p_1f(self):
+    @pytest.mark.parametrize("t_y_t", conversions_for_1d)
+    @pytest.mark.parametrize("t_y_p", conversions_for_1d)
+    @pytest.mark.parametrize("t_sf", conversions_for_1d)
+    def test_round_trip_1p_1f(self, t_y_t, t_y_p, t_sf):
         expected = load_sample_dashboard(_BC_1P_1F)
 
-        y_true = expected['trueY']
-        y_pred = {expected['modelNames'][0]: expected['predictedY'][0]}
+        y_true = t_y_t(expected['trueY'])
+        y_pred = {expected['modelNames'][0]: t_y_p(expected['predictedY'][0])}
 
         sf_file = expected['precomputedFeatureBins'][0]
         sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
-        sensitive_feature = {sf_file['featureBinName']: sf}
+        sensitive_feature = {sf_file['featureBinName']: t_sf(sf)}
 
         actual = create_group_metric_set(y_true,
                                          y_pred,
                                          sensitive_feature,
                                          'binary_classification')
+        validate_dashboard_dictionary(actual)
+        assert expected == actual
+
+    def test_round_trip_2p_3f(self):
+        expected = load_sample_dashboard(_BC_2P_3F)
+
+        y_true = expected['trueY']
+
+        y_pred = {}
+        for i, name in enumerate(expected['modelNames']):
+            y_pred[name] = expected['predictedY'][i]
+
+        sensitive_features = {}
+        for sf_file in expected['precomputedFeatureBins']:
+            sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
+            sensitive_features[sf_file['featureBinName']] = sf
+
+        actual = create_group_metric_set(y_true,
+                                         y_pred,
+                                         sensitive_features,
+                                         'binary_classification')
+        validate_dashboard_dictionary(actual)
         assert expected == actual
