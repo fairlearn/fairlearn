@@ -6,7 +6,7 @@ import pytest
 
 
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import DemographicParity, EqualizedOdds
+from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRateRatio
 from fairlearn.reductions import ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
@@ -69,10 +69,39 @@ class TestExponentiatedGradientSmoke:
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6}]
+                        "n_classifiers": 6},
+                       {"cons_class": ErrorRateRatio, "eps": 0.1,
+                        "best_gap": 1.1102230246251565e-16, "last_t": 5,
+                        "best_t": 5, "disp": 0.09999999999999998,
+                        "error": 0.25, "n_oracle_calls": 23,
+                        "n_classifiers": 6, "ratio": 0.8},
+                       {"cons_class": ErrorRateRatio, "eps": 0.05,
+                        "best_gap": 5.551115123125783e-17, "last_t": 5,
+                        "best_t": 5, "disp": 0.050000000000000155,
+                        "error": 0.29000000000000004, "n_oracle_calls": 19,
+                        "n_classifiers": 4, "ratio": 0.8},
+                       {"cons_class": ErrorRateRatio, "eps": 0.02,
+                        "best_gap": 1.0547118733938987e-15, "last_t": 5,
+                        "best_t": 5, "disp": 0.02000000000000013,
+                        "error": 0.402, "n_oracle_calls": 18,
+                        "n_classifiers": 3, "ratio": 0.8},
+                       {"cons_class": ErrorRateRatio, "eps": 0.01,
+                        "best_gap": 4.440892098500626e-16, "last_t": 5,
+                        "best_t": 5, "disp": 0.01000000000000012,
+                        "error": 0.4510000000000002, "n_oracle_calls": 18,
+                        "n_classifiers": 3, "ratio": 0.8},
+                       {"cons_class": ErrorRateRatio, "eps": 0.005,
+                        "best_gap": 6.6058269965196814e-15, "last_t": 5,
+                        "best_t": 5, "disp": 0.0050000000000001155,
+                        "error": 0.47550000000000014, "n_oracle_calls": 18,
+                        "n_classifiers": 3, "ratio": 0.8},
+                       ]
 
     def run_smoke_test(self, data):
-        expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
+        ratio = 1.0
+        if "ratio" in data.keys():
+            ratio = data["ratio"]
+        expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](ratio=ratio),
                                         eps=data["eps"])
         expgrad.fit(self.X, self.y, sensitive_features=self.A)
 
@@ -80,7 +109,7 @@ class TestExponentiatedGradientSmoke:
         Q = res["best_classifier"]
         res["n_classifiers"] = len(res["classifiers"])
 
-        disp = data["cons_class"]()
+        disp = data["cons_class"](ratio=ratio)
         disp.load_data(self.X, self.y, sensitive_features=self.A)
         error = ErrorRate()
         error.load_data(self.X, self.y, sensitive_features=self.A)
