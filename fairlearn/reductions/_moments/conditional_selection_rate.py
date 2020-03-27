@@ -53,7 +53,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         group_vals = self.tags[_GROUP_ID].unique()
         # The matrices pos_basis and neg_basis contain a lower-dimensional description of
         # constraints, which is achieved by removing some redundant constraints.
-        # Including all constraints would make the vectors linearly dependent.
+        # Considering fewer constraints is not required for correctness, but it can dramatically
+        # speed up GridSearch.
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series()
