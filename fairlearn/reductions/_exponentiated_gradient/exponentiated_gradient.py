@@ -61,7 +61,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._nu = nu
         self._eta_mul = eta_mul
 
-        self._best_predictor = None
         self._best_gap = None
         self._predictors = None
         self._weights = None
@@ -173,13 +172,12 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._best_t = gaps_best.index[-1]
         self._best_gap = gaps[self._best_t]
         self._weights = Qs[self._best_t]
-        hs = lagrangian.hs
-        for h_idx in hs.index:
+        self._hs = lagrangian.hs
+        for h_idx in self._hs.index:
             if h_idx not in self._weights.index:
                 self._weights.at[h_idx] = 0.0
 
         self._last_t = len(Qs) - 1
-        self._best_predictor = lambda X: _mean_pred(X, hs, self._weights)
         self._predictors = lagrangian.classifiers
         self._n_oracle_calls = lagrangian.n_oracle_calls
         self._oracle_calls_execution_time = lagrangian.oracle_calls_execution_time
@@ -203,7 +201,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             the result will be a scalar. Otherwise the result will be a vector
         :rtype: Scalar or vector
         """
-        positive_probs = self._best_predictor(X)
+        positive_probs = _mean_pred(X, self._hs, self._weights)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X):
@@ -214,5 +212,5 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :return: Array of tuples with the probabilities of predicting 0 and 1.
         :rtype: Array
         """
-        positive_probs = self._best_predictor(X)
+        positive_probs = _mean_pred(X, self._hs, self._weights)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
