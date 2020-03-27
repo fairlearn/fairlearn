@@ -52,7 +52,7 @@ class _GridGenerator:
                 # convert the grid of basis coefficients into a grid of lambda vectors
                 self.grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
                 break
-            # if the grid size is not reached yet increase the maximum value
+            # if the grid size is not reached yet increase the scaling parameter
             n_units = n_units + 1
 
     def build_integer_grid(self, n_units):
