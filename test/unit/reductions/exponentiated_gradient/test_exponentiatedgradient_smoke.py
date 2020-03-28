@@ -76,7 +76,7 @@ class TestExponentiatedGradientSmoke:
                                         eps=data["eps"])
         expgrad.fit(self.X, self.y, sensitive_features=self.A)
 
-        Q = lambda X: expgrad._pmf_predict(X)[:, 1]
+        def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
 
         disparity_moment = data["cons_class"]()
