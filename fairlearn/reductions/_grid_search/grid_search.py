@@ -11,7 +11,7 @@ from time import time
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn.reductions._moments import Moment, ClassificationMoment
-from ._grid_generation import _GridGenerator
+from ._grid_generator import _GridGenerator
 
 
 logger = logging.getLogger(__name__)
