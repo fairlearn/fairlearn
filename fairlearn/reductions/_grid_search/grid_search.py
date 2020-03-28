@@ -87,7 +87,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self._lambda_vecs = pd.DataFrame()
         self._objectives = []
         self._gammas = pd.DataFrame()
-        self._oracle_calls_execution_time = []
+        self._oracle_execution_times = []
 
     def fit(self, X, y, **kwargs):
         """Run the grid search.
@@ -171,7 +171,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             self._lambda_vecs[i] = lambda_vec
             self._objectives.append(objective.gamma(predict_fct)[0])
             self._gammas[i] = self.constraints.gamma(predict_fct)
-            self._oracle_calls_execution_time.append(oracle_call_execution_time)
+            self._oracle_execution_times.append(oracle_call_execution_time)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
