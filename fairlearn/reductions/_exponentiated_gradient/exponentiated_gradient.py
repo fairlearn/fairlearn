@@ -13,14 +13,6 @@ from fairlearn._input_validation import _validate_and_reformat_input
 logger = logging.getLogger(__name__)
 
 
-def _mean_pred(X, hs, weights):
-    """Return a weighted average of predictions produced by classifiers in `hs`."""
-    pred = pd.DataFrame()
-    for t in range(len(hs)):
-        pred[t] = hs[t](X)
-    return pred[weights.index].dot(weights)
-
-
 class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """An Estimator which implements the exponentiated gradient approach to reductions.
 
@@ -201,16 +193,19 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             the result will be a scalar. Otherwise the result will be a vector
         :rtype: Scalar or vector
         """
-        positive_probs = _mean_pred(X, self._hs, self._weights)
+        positive_probs = self._pmf_predict(X)[:, 1]
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
 
-        :param X: The data for which predictions are required
-        :type X: Array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
         :return: Array of tuples with the probabilities of predicting 0 and 1.
-        :rtype: Array
+        :rtype: numpy.ndarray
         """
-        positive_probs = _mean_pred(X, self._hs, self._weights)
+        pred = pd.DataFrame()
+        for t in range(len(self._hs)):
+            pred[t] = self._hs[t](X)
+        positive_probs = pred[self._weights.index].dot(self._weights).values.reshape(-1, 1)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)

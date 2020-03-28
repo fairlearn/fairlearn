@@ -58,7 +58,7 @@ class TestExponentiatedGradientArguments:
             eps=0.1)
         expgrad.fit(transformX(X), transformY(y), sensitive_features=transformA(A))
 
-        Q = expgrad._predictors[expgrad._best_t]
+        Q = lambda X: expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
 
         disparity_moment = DemographicParity()
