@@ -12,25 +12,29 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    
+
+    - name: 'Remove fairlearn directory to make sure we do not use the checked out code'
+      run: rm -r ./fairlearn/
+      shell: bash 
+
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
-    
+
     - name: Upgrade pip, setuptools, and wheel before installing other dependencies
       run: python -m pip install --upgrade pip setuptools wheel
 
-    - run: pip install -r requirements.txt
-      name: 'Install required packages'
-      shell: bash
-    
-    - run: pip install fairlearn
-      name: 'Install last released version of Fairlearn'
+    - name: 'Install required packages'
+      run: pip install -r requirements.txt
       shell: bash
 
-    - run: python -m pytest -s ./test/notebooks --junitxml=./TEST.xml
-      name: 'Run notebook tests'
+    - name: 'Install last released version of Fairlearn'
+      run: pip install fairlearn[customplots]
+      shell: bash
+
+    - name: 'Run notebook tests'
+      run: python -m pytest -s ./test/notebooks --junitxml=./TEST.xml
       shell: bash
 
     - name: 'Publish Test Results ./TEST.xml'
