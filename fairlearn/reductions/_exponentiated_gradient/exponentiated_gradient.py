@@ -202,10 +202,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         :return: Array of tuples with the probabilities of predicting 0 and 1.
-        :rtype: numpy.ndarray
+        :rtype: pandas.DataFrame
         """
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
             pred[t] = self._hs[t](X)
-        positive_probs = pred[self._weights.index].dot(self._weights).values.reshape(-1, 1)
+        positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
