@@ -13,6 +13,7 @@ from .error_rate import ErrorRate
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
 
+
 class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness moment for selection rates.
 
@@ -32,6 +33,7 @@ class ConditionalSelectionRate(ClassificationMoment):
       for positive and negative violations of the constraint
 
     """
+
     def __init__(self, ratio=1.0):
         """Intialise with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
@@ -50,7 +52,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
         The `utility` is a matrix which correspond to g(X,A,Y,h(X)) as mentioned
         in the paper `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
-        The `utility` defaults to h(X), ie. [1 \in R^n, 0 \in R^n]
+        The `utility` defaults to h(X), ie. [1 in R^n, 0 in R^n]
         The `_POSITIVE_UTILITY` is G^1 and the `_NEGATIVE_UTILITY` is G^0.
         Assumes that binary class of 0/1.
         .. math::
@@ -104,15 +106,17 @@ class ConditionalSelectionRate(ClassificationMoment):
         expect_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).mean()
         expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * \
-                                                expect_group_event[_PREDICTION]\
-                                                - expect_event[_PREDICTION]
+            expect_group_event[_PREDICTION]\
+            - expect_event[_PREDICTION]
         expect_group_event[_LOWER_BOUND_DIFF] = - expect_group_event[_PREDICTION]\
-                                                + self.ratio * expect_event[_PREDICTION]
+            + self.ratio * expect_event[_PREDICTION]
         g_signed = pd.concat([expect_group_event[_UPPER_BOUND_DIFF],
                               expect_group_event[_LOWER_BOUND_DIFF]],
                              keys=["+", "-"],
                              names=[_SIGN, _EVENT, _GROUP_ID])
-        self._gamma_descr = str(expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF, _LOWER_BOUND_DIFF]])
+        self._gamma_descr = str(expect_group_event[[_PREDICTION,
+                                                    _UPPER_BOUND_DIFF,
+                                                    _LOWER_BOUND_DIFF]])
         return g_signed
 
     # TODO: this can be further improved using the overcompleteness in group membership
