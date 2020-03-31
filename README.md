@@ -4,20 +4,6 @@
 
 Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. Fairlearn contains mitigation algorithms as well as a Jupyter widget for model assessment. Besides the source code, this repository also contains Jupyter notebooks with examples of Fairlearn usage.
 
- #### fairlearn components ####
- * Assessment dashboard: high-level and detailed views, for assessing which groups are negatively impacted. 
- * Mitigation strategies: easy to incorporate into existing machine-learning pipelines.
-
-Together, these components empower data scientists and business leaders to navigate any tradeoffs between fairness and performance, and to select the mitigation strategy that best fits their needs.
-
-<<<<<<< HEAD
-
-=======
-# Fairlearn
-
-Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. Fairlearn contains mitigation algorithms as well as a Jupyter widget for model assessment. Besides the source code, this repository also contains Jupyter notebooks with examples of Fairlearn usage.
->>>>>>> e16927adec392339c3659d958bd3f2ddb9da4554
-
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
 - [Overview of Fairlearn](#overview-of-fairlearn)
