@@ -11,7 +11,8 @@ _LOSS = "loss"
 _PREDICTION = "pred"
 _ALL = "all"
 _SIGN = "sign"
-
+_POSITIVE_UTILITY = "positive_utility"
+_NEGATIVE_UTILITY = "negative_utility"
 
 class Moment:
     """Generic moment.

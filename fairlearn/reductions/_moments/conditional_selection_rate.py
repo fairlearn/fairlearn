@@ -2,13 +2,16 @@
 # Licensed under the MIT License.
 
 import pandas as pd
+import numpy as np
 from .moment import ClassificationMoment
-from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
+from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN, \
+    _POSITIVE_UTILITY, _NEGATIVE_UTILITY
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, \
+    _UTILITY_NOT_SPECIFIED
 from .error_rate import ErrorRate
 
-_DIFF = "diff"
-
+_UPPER_BOUND_DIFF = "upper_bound_diff"
+_LOWER_BOUND_DIFF = "lower_bound_diff"
 
 class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness moment for selection rates.
@@ -29,30 +32,39 @@ class ConditionalSelectionRate(ClassificationMoment):
       for positive and negative violations of the constraint
 
     """
+    def __init__(self, ratio=1.0):
+        """Intialise with the ratio value."""
+        super(ConditionalSelectionRate, self).__init__()
+        if ratio <= 0 or ratio > 1:
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
+        self.ratio = ratio
 
     def default_objective(self):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, utility_difference=None, **kwargs):
+    def load_data(self, X, y, event=None, utility=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
 
-        The `utility_difference` is the factor with which the signed weights are
-        multiplied and correspond to g(X,A,Y,h(X)) mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
+        The `utility` is a matrix which correspond to g(X,A,Y,h(X)) as mentioned
+        in the paper `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
+        The `utility` defaults to h(X), ie. [1 \in R^n, 0 \in R^n]
+        The `_POSITIVE_UTILITY` is G^1 and the `_NEGATIVE_UTILITY` is G^0.
+        Assumes that binary class of 0/1.
         .. math::
-        utility_difference = g(X,A,Y,h(X)=1) - g(X,A,Y,h(X)=0)
+        utility = [g(X,A,Y,h(X)=1), g(X,A,Y,h(X)=0)]
 
-        The `utility_difference` defaults to 1 which implies that g(X,A,Y,h(X)) = h(X).
-        This assumes that binary class of 0/1.
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        if utility_difference is None:
-            utility_difference = pd.Series(y).apply(lambda y: 1)
-        self.utility_difference = utility_difference
+        if utility is None:
+            utility = pd.Series({_POSITIVE_UTILITY: pd.Series(np.ones(y.shape)),
+                                 _NEGATIVE_UTILITY: pd.Series(np.zeros(y.shape))})
+        if not (_POSITIVE_UTILITY in utility and _NEGATIVE_UTILITY in utility):
+            raise ValueError(_UTILITY_NOT_SPECIFIED)
+        self.utility = utility
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -80,24 +92,29 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
-        pred = predictor(self.X)
+        utility_diff = self.utility[_POSITIVE_UTILITY] - self.utility[_NEGATIVE_UTILITY]
+        pred = utility_diff * predictor(self.X) + self.utility[_NEGATIVE_UTILITY]
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
         expect_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).mean()
-        expect_group_event[_DIFF] = expect_group_event[_PREDICTION] - expect_event[_PREDICTION]
-        g_unsigned = expect_group_event[_DIFF]
-        g_signed = pd.concat([g_unsigned, -g_unsigned],
+        expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * \
+                                                expect_group_event[_PREDICTION]\
+                                                - expect_event[_PREDICTION]
+        expect_group_event[_LOWER_BOUND_DIFF] = - expect_group_event[_PREDICTION]\
+                                                + self.ratio * expect_event[_PREDICTION]
+        g_signed = pd.concat([expect_group_event[_UPPER_BOUND_DIFF],
+                              expect_group_event[_LOWER_BOUND_DIFF]],
                              keys=["+", "-"],
                              names=[_SIGN, _EVENT, _GROUP_ID])
-        self._gamma_descr = str(expect_group_event[[_PREDICTION, _DIFF]])
+        self._gamma_descr = str(expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF, _LOWER_BOUND_DIFF]])
         return g_signed
 
     # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec):
         """Return the projected lambda values."""
-        lambda_pos = lambda_vec["+"] - lambda_vec["-"]
-        lambda_neg = -lambda_pos
+        lambda_pos = lambda_vec["+"] - self.ratio * lambda_vec["-"]
+        lambda_neg = - self.ratio * lambda_vec["+"] + lambda_vec["-"]
         lambda_pos[lambda_pos < 0.0] = 0.0
         lambda_neg[lambda_neg < 0.0] = 0.0
         lambda_projected = pd.concat([lambda_pos, lambda_neg],
@@ -125,7 +142,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
-        signed_weights = self.utility_difference.mul(signed_weights)
+        signed_weights = (self.utility[_POSITIVE_UTILITY] -
+                          self.utility[_NEGATIVE_UTILITY]).mul(signed_weights)
         return signed_weights
 
 
@@ -155,12 +173,6 @@ class DemographicParity(ConditionalSelectionRate):
     """
 
     short_name = "DemographicParity"
-
-    def __init__(self, ratio=1.0):
-        super(DemographicParity, self).__init__()
-        if ratio <= 0 or ratio > 1:
-            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-        self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
@@ -193,12 +205,6 @@ class EqualizedOdds(ConditionalSelectionRate):
     """
 
     short_name = "EqualizedOdds"
-
-    def __init__(self, ratio=1.0):
-        super(EqualizedOdds, self).__init__()
-        if ratio <= 0 or ratio > 1:
-            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-        self.ratio = ratio
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
@@ -241,16 +247,9 @@ class ErrorRateRatio(ConditionalSelectionRate):
 
     short_name = "ErrorRateRatio"
 
-    def __init__(self, ratio=1.0):
-        """Intialise with the ratio value."""
-        super(ErrorRateRatio, self).__init__()
-        if ratio <= 0 or ratio > 1:
-            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-        self.ratio = ratio
-
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=_ALL,
-                          utility_difference=pd.Series(y).apply(lambda y: 1 - 2*y),
+                          utility=pd.Series({_POSITIVE_UTILITY: (1-y), _NEGATIVE_UTILITY: y}),
                           **kwargs)

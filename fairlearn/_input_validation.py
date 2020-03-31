@@ -14,6 +14,7 @@ _MESSAGE_SENSITIVE_FEATURES_NONE = "Must specify {0} (for now)".format(_KW_SENSI
 _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
 _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
 _MESSAGE_RATIO_NOT_IN_RANGE = "ratio must lie between (0,1]"
+_UTILITY_NOT_SPECIFIED = "At least one of the utility is not correctly specified."
 _INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats for {} are: {}. " \
                                      "Your provided data was of type {}."
 _EMPTY_INPUT_ERROR_MESSAGE = "At least one of sensitive_features, labels, or scores are empty."
