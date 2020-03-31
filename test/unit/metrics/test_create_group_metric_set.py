@@ -37,6 +37,8 @@ def validate_dashboard_dictionary(dashboard_dict):
     for sf in dashboard_dict['precomputedFeatureBins']:
         sf_vector = sf['binVector']
         assert len(sf_vector) == len_y_true
+        for val in sf_vector:
+            assert isinstance(val, int)
         sf_classes = sf['binLabels']
         assert len(sf_classes) == 1 + max(sf_vector)
 
