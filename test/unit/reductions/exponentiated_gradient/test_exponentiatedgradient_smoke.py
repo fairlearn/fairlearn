@@ -106,7 +106,7 @@ class TestExponentiatedGradientSmoke:
 
     def test_simple_fit_predict(self):
         estimator = LeastSquaresBinaryClassifierLearner()
-        constraints = EqualOpportunity()
+        constraints = DemographicParity()
         expgrad = ExponentiatedGradient(estimator, constraints)
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))
