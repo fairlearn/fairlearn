@@ -50,7 +50,7 @@ def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
                                            sample_weight=sample_weight))
 
     return group_summary(internal_rmse_wrapper,
-                           y_true, y_pred, group_membership, sample_weight=sample_weight)
+                         y_true, y_pred, group_membership, sample_weight=sample_weight)
 
 
 group_r2_score = make_group_metric(skm.r2_score)

@@ -3,7 +3,6 @@
 
 from fairlearn.metrics import group_accuracy_score
 from fairlearn.metrics import group_confusion_matrix
-import numpy as np
 
 Y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
 Y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]

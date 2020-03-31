@@ -61,8 +61,7 @@ def group_summary(metric_function, y_true, y_pred,
 def _check_metric_params(y_true, metric_params, indices=None):
     metric_params_validated = {}
     for param_key, param_value in metric_params.items():
-        if (param_key in _SPLITTABLE_METRIC_PARAMS
-            and param_value is not None):
+        if (param_key in _SPLITTABLE_METRIC_PARAMS and param_value is not None):
             _check_array_sizes(y_true, param_value, 'y_true', param_key)
             p_v = _convert_to_ndarray_and_squeeze(param_value)
             if indices is not None:
@@ -99,10 +98,26 @@ def make_group_metric(metric_function):
 
 
 def difference_from_summary(summary):
+    """The difference between the maximum and minimum metric value across groups.
+
+    :param summary: A group metric summary
+
+    :return: The difference between the maximum and the minimum group-level
+        metrics described in ``summary``.
+    :rtype: float
+    """
     return group_max_from_summary(summary) - group_min_from_summary(summary)
 
 
 def ratio_from_summary(summary):
+    """The ratio between the maximum and minimum metric value across groups.
+
+    :param summary: A group metric summary
+
+    :return: The ratio between the maximum and the minimum group-level
+        metrics described in ``summary``.
+    :rtype: float
+    """
     group_min = group_min_from_summary(summary)
     group_max = group_max_from_summary(summary)
     if group_min < 0.0:
@@ -114,10 +129,24 @@ def ratio_from_summary(summary):
 
 
 def group_min_from_summary(summary):
+    """The minimum group-level metric value across all groups.
+
+    :param summary: A group metric summary
+
+    :return: The minimum group-level metric value across all groups in ``summary``.
+    :rtype: float
+    """
     return min(summary.by_group.values())
 
 
 def group_max_from_summary(summary):
+    """The maximum group-level metric value across all groups.
+
+    :param summary: A group metric summary
+
+    :return: The maximum group-level metric value across all groups in ``summary``.
+    :rtype: float
+    """
     return max(summary.by_group.values())
 
 

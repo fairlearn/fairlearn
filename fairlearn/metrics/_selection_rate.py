@@ -30,5 +30,5 @@ def group_selection_rate(y_true, y_pred, group_membership,
         return selection_rate(y_true, y_pred, pos_label=pos_label, sample_weight=sample_weight)
 
     return group_summary(internal_sel_wrapper,
-                           y_true, y_pred, group_membership,
-                           sample_weight=sample_weight)
+                         y_true, y_pred, group_membership,
+                         sample_weight=sample_weight)
