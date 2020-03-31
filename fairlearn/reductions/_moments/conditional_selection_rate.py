@@ -75,7 +75,6 @@ class ConditionalSelectionRate(ClassificationMoment):
                            names=[_SIGN, _EVENT, _GROUP_ID])
         self.index = signed.index
         self.default_objective_lambda_vec = None
-        # fill in the information about the basis
         event_vals = self.tags[_EVENT].unique()
         group_vals = self.tags[_GROUP_ID].unique()
         # The matrices pos_basis and neg_basis contain a lower-dimensional description of
@@ -220,6 +219,7 @@ class EqualizedOdds(ConditionalSelectionRate):
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
                           **kwargs)
+
 
 class ErrorRateRatio(ConditionalSelectionRate):
     r"""Implementation of Error Rate Ratio as a moment.
