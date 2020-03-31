@@ -98,7 +98,7 @@ def make_group_metric(metric_function):
 
 
 def difference_from_summary(summary):
-    """The difference between the maximum and minimum metric value across groups.
+    """Calculate the difference between the maximum and minimum metric value across groups.
 
     :param summary: A group metric summary
 
@@ -110,7 +110,7 @@ def difference_from_summary(summary):
 
 
 def ratio_from_summary(summary):
-    """The ratio between the maximum and minimum metric value across groups.
+    """Calculate the ratio between the maximum and minimum metric value across groups.
 
     :param summary: A group metric summary
 
@@ -129,7 +129,7 @@ def ratio_from_summary(summary):
 
 
 def group_min_from_summary(summary):
-    """The minimum group-level metric value across all groups.
+    """Retrieve the minimum group-level metric value from group summary.
 
     :param summary: A group metric summary
 
@@ -140,7 +140,7 @@ def group_min_from_summary(summary):
 
 
 def group_max_from_summary(summary):
-    """The maximum group-level metric value across all groups.
+    """Retrieve the minimum group-level metric value from group summary.
 
     :param summary: A group metric summary
 
