@@ -1,18 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# On MacOS we need to use TKAgg before importing matplotlib.pyplot.
-# This used to work on all platforms until matplotlib 3.2.0 broke it on Linux.
-# Consider removing the OS-based if after a future release of matplotlib (issue #320).
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt  # noqa: E402
-import pkg_resources  # noqa: E402
-import pytest  # noqa: E402
-from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer  # noqa: E402
-from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS  # noqa: E402
+import matplotlib.pyplot as plt
+import pkg_resources
+import pytest
+from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
+from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 
-from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3  # noqa: E402
+from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3
 
 
 PYTEST_MPL_NOT_INSTALLED_MSG = "skipping plotting tests because pytest-mpl is not installed"
