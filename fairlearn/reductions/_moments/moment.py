@@ -14,6 +14,7 @@ _SIGN = "sign"
 _POSITIVE_UTILITY = "positive_utility"
 _NEGATIVE_UTILITY = "negative_utility"
 
+
 class Moment:
     """Generic moment.
 
