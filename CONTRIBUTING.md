@@ -57,17 +57,13 @@ a template file with the command.
 
 ## Real-time communication
 
-Most real time discussion and anything that wouldn't fit into the above
-categories happens in [Microsoft Teams](https://teams.microsoft.com/l/team/19%3a441d98d202554f25a4f3030a8c27d3c0%40thread.skype/conversations?groupId=70d3c25a-81db-4a52-85d2-5b56e50fe985&tenantId=b6185859-4461-4dca-b558-0cdcd345d3ac).
-Feel free to join!
+For real time communication please join us on [Gitter](https://gitter.im/fairlearn/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link). All are welcome!
 
 ## Meetings
 
 We are in the process of setting up regular contributor meetings. Stay tuned!
-
-We have a TBD development meeting every TBD at TBD US Pacific Time and all are welcome.
-
-We keep notes from each meeting in a TBD repository.
+<!-- We have a TBD development meeting every TBD at TBD US Pacific Time and all are welcome.
+We keep notes from each meeting in a TBD repository. -->
 
 ## API Design
 
