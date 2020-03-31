@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)
+[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # Fairlearn
 
@@ -212,7 +212,7 @@ For a full list of contributors refer to the [authors page](./AUTHORS.md)
 
 Pose questions and help answer them on [Stack
 Overflow](https://stackoverflow.com/questions/tagged/fairlearn) with the tag
-`fairlearn`.
+`fairlearn` or on [Gitter](https://gitter.im/fairlearn/community#).
 
 ### Regular (non-security) issues
 
