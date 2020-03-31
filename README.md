@@ -10,7 +10,13 @@ Fairlearn is a Python package that empowers developers of artificial intelligenc
 
 Together, these components empower data scientists and business leaders to navigate any tradeoffs between fairness and performance, and to select the mitigation strategy that best fits their needs.
 
+<<<<<<< HEAD
 
+=======
+# Fairlearn
+
+Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. Fairlearn contains mitigation algorithms as well as a Jupyter widget for model assessment. Besides the source code, this repository also contains Jupyter notebooks with examples of Fairlearn usage.
+>>>>>>> e16927adec392339c3659d958bd3f2ddb9da4554
 
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
@@ -46,11 +52,19 @@ To learn more about our definitions of fairness, please visit our [terminology p
 > Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
 
 ## Overview of Fairlearn
+<<<<<<< HEAD
 
 The Fairlearn package has two components:
 
 - A _dashboard_ for assessing which groups are negatively impacted by a model, and for comparing multiple models in terms of various fairness and accuracy metrics.
 
+=======
+
+The Fairlearn package has two components:
+
+- A _dashboard_ for assessing which groups are negatively impacted by a model, and for comparing multiple models in terms of various fairness and accuracy metrics.
+
+>>>>>>> e16927adec392339c3659d958bd3f2ddb9da4554
 - _Algorithms_ for mitigating unfairness in a variety of AI tasks and along a variety of fairness definitions.
 
 ### Fairlearn algorithms
@@ -161,11 +175,15 @@ Onboarding guide for users of version 0.2 or earlier
 </strong>
 </summary>
 
+<<<<<<< HEAD
 Up to version 0.2, fairlearn contained only the exponentiated gradient method.
 The Fairlearn repository now has a more comprehensive scope and aims to
 incorporate other methods as specified above. The same exponentiated gradient
 technique is now the class `fairlearn.reductions.ExponentiatedGradient`. While
 in the past exponentiated gradient was invoked via
+=======
+Up to version 0.2, Fairlearn contained only the exponentiated gradient method. The Fairlearn repository now has a more comprehensive scope and aims to incorporate other methods as specified above. The same exponentiated gradient technique is now the class `fairlearn.reductions.ExponentiatedGradient`. While in the past exponentiated gradient was invoked via
+>>>>>>> e16927adec392339c3659d958bd3f2ddb9da4554
 
 ```python
 import numpy as np
