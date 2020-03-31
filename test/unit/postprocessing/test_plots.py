@@ -5,9 +5,8 @@
 # This used to work on all platforms until matplotlib 3.2.0 broke it on Linux.
 # Consider removing the OS-based if after a future release of matplotlib (issue #320).
 import platform
-if platform.system() == "Darwin":
-    import matplotlib
-    matplotlib.use('TkAgg')
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 import pkg_resources  # noqa: E402
 import pytest  # noqa: E402
