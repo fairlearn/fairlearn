@@ -73,15 +73,19 @@ class ConditionalSelectionRate(ClassificationMoment):
                            names=[_SIGN, _EVENT, _GROUP_ID])
         self.index = signed.index
         self.default_objective_lambda_vec = None
-        # fill in the information about the basis
         event_vals = self.tags[_EVENT].unique()
         group_vals = self.tags[_GROUP_ID].unique()
+        # The matrices pos_basis and neg_basis contain a lower-dimensional description of
+        # constraints, which is achieved by removing some redundant constraints.
+        # Considering fewer constraints is not required for correctness, but it can dramatically
+        # speed up GridSearch.
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series()
         zero_vec = pd.Series(0.0, self.index)
         i = 0
         for event_val in event_vals:
+            # Constraints on the final group are redundant, so they are not included in the basis.
             for group in group_vals[:-1]:
                 self.pos_basis[i] = 0 + zero_vec
                 self.neg_basis[i] = 0 + zero_vec
