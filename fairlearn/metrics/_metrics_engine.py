@@ -3,102 +3,122 @@
 
 import numpy as np
 
-from ._group_metric_result import GroupMetricResult
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
+from sklearn.utils import Bunch
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
+# Parameters to metrics that should be split according to sensitive features
+_SPLITTABLE_METRIC_PARAMS = {"sample_weight"}
 
-def metric_by_group(metric_function,
-                    y_true, y_pred, group_membership,
-                    sample_weight=None,
-                    **kwargs):
+
+def group_summary(metric_function, y_true, y_pred,
+                  sensitive_features, **metric_params):
     r"""Apply a metric to each subgroup of a set of data.
 
-    :param metric_function: Function ``(y_true, y_pred, sample_weight=None, \*\*kwargs)``
+    :param metric_function: Function ``(y_true, y_pred, \*\*metric_params)``
 
     :param y_true: Array of ground-truth values
 
     :param y_pred: Array of predicted values
 
-    :param group_membership: Array Indicating the group to which each input value belongs
+    :param sensitive_features: Array indicating the group to which each input value belongs
 
-    :param sample_weight: Optional weights to apply to each input value
-
-    :param \*\*kwargs: Optional arguments to be passed to the `metric_function`
+    :param \*\*metric_params: Optional arguments to be passed to the `metric_function`
 
     :return: Object containing the result of applying ``metric_function`` to the entire dataset
-        and to each group identified in ``group_membership``.
-        If the ``metric_function`` returns a scalar, then additional fields are populated
-    :rtype: :class:`GroupMetricResult`
+        and to each group identified in ``sensitive_features``
+    :rtype: sklearn.utils.Bunch with the fields ``overall`` and ``by_group``
     """
     _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
-    _check_array_sizes(y_true, group_membership, 'y_true', 'group_membership')
-    if sample_weight is not None:
-        _check_array_sizes(y_true, sample_weight, 'y_true', 'sample_weight')
-
-    result = GroupMetricResult()
+    _check_array_sizes(y_true, sensitive_features, 'y_true', 'sensitive_features')
 
     # Make everything a numpy array
     # This allows for fast slicing of the groups
-    y_a = _convert_to_ndarray_and_squeeze(y_true)
+    y_t = _convert_to_ndarray_and_squeeze(y_true)
     y_p = _convert_to_ndarray_and_squeeze(y_pred)
-    g_d = _convert_to_ndarray_and_squeeze(group_membership)
-
-    s_w = None
-    if sample_weight is not None:
-        s_w = _convert_to_ndarray_and_squeeze(sample_weight)
+    s_f = _convert_to_ndarray_and_squeeze(sensitive_features)
 
     # Evaluate the overall metric with the numpy arrays
     # This ensures consistency in how metric_function is called
-    if s_w is not None:
-        result.overall = metric_function(y_a, y_p, sample_weight=s_w, **kwargs)
-    else:
-        result.overall = metric_function(y_a, y_p, **kwargs)
+    result_overall = metric_function(
+        y_t, y_p,
+        **_check_metric_params(y_t, metric_params))
 
-    groups = np.unique(group_membership)
+    groups = np.unique(s_f)
+    result_by_group = {}
     for group in groups:
-        group_indices = (group == g_d)
-        group_actual = y_a[group_indices]
-        group_predict = y_p[group_indices]
-        group_weight = None
-        if s_w is not None:
-            group_weight = s_w[group_indices]
-            result.by_group[group] = metric_function(group_actual,
-                                                     group_predict,
-                                                     sample_weight=group_weight,
-                                                     **kwargs)
-        else:
-            result.by_group[group] = metric_function(group_actual,
-                                                     group_predict,
-                                                     **kwargs)
+        group_indices = (group == s_f)
+        result_by_group[group] = metric_function(
+            y_t[group_indices], y_p[group_indices],
+            **_check_metric_params(y_t, metric_params, group_indices))
 
-    return result
+    return Bunch(overall=result_overall, by_group=result_by_group)
+
+
+# This loosely follows the pattern of _check_fit_params in
+# sklearn/utils/validation.py
+def _check_metric_params(y_true, metric_params, indices=None):
+    metric_params_validated = {}
+    for param_key, param_value in metric_params.items():
+        if (param_key in _SPLITTABLE_METRIC_PARAMS
+            and param_value is not None):
+            _check_array_sizes(y_true, param_value, 'y_true', param_key)
+            p_v = _convert_to_ndarray_and_squeeze(param_value)
+            if indices is not None:
+                p_v = p_v[indices]
+            metric_params_validated[param_key] = p_v
+        else:
+            metric_params_validated[param_key] = param_value
+
+    return metric_params_validated
 
 
 def make_group_metric(metric_function):
     """Turn a regular metric into a grouped metric.
 
     :param metric_function: The function to be wrapped. This must have signature
-        ``(y_true, y_pred, sample_weight, **kwargs)``
+        ``(y_true, y_pred, **metric_params)``
     :type metric_function: func
 
-    :return: A wrapped version of the supplied metric_function. It will have
-        signature ``(y_true, y_pred, group_membership, sample_weight, **kwargs)``
+    :return: A wrapped version of the supplied ``metric_function``. It will have
+        signature ``(y_true, y_pred, sensitive_features, **metric_params)``
     :rtype: func
     """
-    def wrapper(y_true, y_pred, group_membership, sample_weight=None, **kwargs):
-        return metric_by_group(metric_function,
-                               y_true,
-                               y_pred,
-                               group_membership,
-                               sample_weight,
-                               **kwargs)
+    def wrapper(y_true, y_pred, sensitive_features, **metric_params):
+        return group_summary(metric_function,
+                             y_true,
+                             y_pred,
+                             sensitive_features=sensitive_features,
+                             **metric_params)
 
     # Improve the name of the returned function
     wrapper.__name__ = "group_{0}".format(metric_function.__name__)
 
     return wrapper
+
+
+def difference_from_summary(summary):
+    return group_max_from_summary(summary) - group_min_from_summary(summary)
+
+
+def ratio_from_summary(summary):
+    group_min = group_min_from_summary(summary)
+    group_max = group_max_from_summary(summary)
+    if group_min < 0.0:
+        return np.nan
+    elif group_max == 0.0:
+        return 1.0
+    else:
+        return group_min / group_max
+
+
+def group_min_from_summary(summary):
+    return min(summary.by_group.values())
+
+
+def group_max_from_summary(summary):
+    return max(summary.by_group.values())
 
 
 def _check_array_sizes(a, b, a_name, b_name):

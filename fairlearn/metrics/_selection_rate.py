@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from ._metrics_engine import metric_by_group
+from ._metrics_engine import group_summary
 
 
 def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
@@ -29,6 +29,6 @@ def group_selection_rate(y_true, y_pred, group_membership,
     def internal_sel_wrapper(y_true, y_pred, sample_weight=None):
         return selection_rate(y_true, y_pred, pos_label=pos_label, sample_weight=sample_weight)
 
-    return metric_by_group(internal_sel_wrapper,
+    return group_summary(internal_sel_wrapper,
                            y_true, y_pred, group_membership,
                            sample_weight=sample_weight)
