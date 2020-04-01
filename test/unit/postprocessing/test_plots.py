@@ -51,7 +51,7 @@ def is_py35_on_macos():
 
 @pytest.mark.skipif(is_py35_on_macos(), reason="Python 3.5 on MacOS requires TkAgg.")
 @pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-class PlottingTests:
+class TestPlots:
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex1.png")
     def test_plot_equalized_odds_ex1(self):
         return _fit_and_plot(EQUALIZED_ODDS, _data_ex1)
