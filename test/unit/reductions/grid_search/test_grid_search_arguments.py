@@ -18,6 +18,7 @@ from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
 
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
 from test.unit.reductions.conftest import is_invalid_transformation
+from test.unit.reductions.grid_search import _utilities
 
 # ==============================================================
 
@@ -32,24 +33,6 @@ candidate_A_transforms = conversions_for_1d
 # Tests which must be passed by all calls to the GridSearch
 # go here
 class ArgumentTests:
-    def _quick_data(self, A_two_dim=False):
-        # Data are random and do not matter for these tests
-        feature_1 = [0, 1, 2, 3, 4, 5, 6, 7]
-        feature_2 = [5, 4, 3, 2, 7, 8, 3, 4]
-        feature_3 = [9, 2, 4, 2, 9, 3, 1, 8]
-        X = np.stack((feature_1, feature_2, feature_3), -1)
-        Y = np.array([0, 1, 0, 1, 1, 1, 1, 0])
-        A = np.array([1, 0, 0, 0, 0, 1, 1, 1])
-        if A_two_dim:
-            # Grid Search is still restricted to binary sensitive features.
-            # Even though we provide multiple columns of sensitive features,
-            # the merged feature comprised of these columns can only have
-            # two unique values.
-            A = np.stack((A, A), -1)
-        return X, Y, A
-
-    # ----------------------------
-
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -57,7 +40,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_valid_inputs(self, transformX, transformY, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=2)
-        X, Y, A = self._quick_data(A_two_dim)
+        X, Y, A = _utilities._quick_data(A_two_dim)
         gs.fit(transformX(X),
                transformY(Y),
                sensitive_features=transformA(A))
@@ -71,7 +54,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_X_is_None(self, transformY, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=3)
-        _, Y, A = self._quick_data(A_two_dim)
+        _, Y, A = _utilities._quick_data(A_two_dim)
 
         with pytest.raises(ValueError) as execInfo:
             gs.fit(None,
@@ -86,7 +69,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_is_None(self, transformX, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, _, A = self._quick_data()
+        X, _, A = _utilities._quick_data()
 
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
@@ -104,7 +87,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_X_Y_different_rows(self, transformX, transformY, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, _, A = self._quick_data()
+        X, _, A = _utilities._quick_data()
         Y = np.random.randint(2, size=len(A)+1)
 
         with pytest.raises(ValueError) as execInfo:
@@ -122,7 +105,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_X_A_different_rows(self, transformX, transformY, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, _ = self._quick_data(A_two_dim)
+        X, Y, _ = _utilities._quick_data(A_two_dim)
         A = np.random.randint(2, size=len(Y)+1)
         if A_two_dim:
             A = np.stack((A, A), -1)
@@ -144,7 +127,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_sensitive_feature_non_binary(self, transformX, transformY, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, A = self._quick_data(A_two_dim)
+        X, Y, A = _utilities._quick_data(A_two_dim)
 
         if A_two_dim:
             A[0][0] = 0
@@ -173,7 +156,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_df_bad_columns(self, transformX, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, A = self._quick_data(A_two_dim)
+        X, Y, A = _utilities._quick_data(A_two_dim)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
         with pytest.raises(ValueError) as execInfo:
@@ -189,7 +172,7 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_ndarray_bad_columns(self, transformX, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, A = self._quick_data(A_two_dim)
+        X, Y, A = _utilities._quick_data(A_two_dim)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
         with pytest.raises(ValueError) as execInfo:
@@ -203,7 +186,7 @@ class ArgumentTests:
 
     def test_no_predict_before_fit(self):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, _, _ = self._quick_data()
+        X, _, _ = _utilities._quick_data()
 
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
@@ -212,7 +195,7 @@ class ArgumentTests:
 
     def test_no_predict_proba_before_fit(self):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, _, _ = self._quick_data()
+        X, _, _ = _utilities._quick_data()
 
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
@@ -229,7 +212,7 @@ class ConditionalOpportunityTests(ArgumentTests):
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_ternary(self, transformX, transformY, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, A = self._quick_data(A_two_dim)
+        X, Y, A = _utilities._quick_data(A_two_dim)
         Y[0] = 0
         Y[1] = 1
         Y[2] = 2
@@ -248,7 +231,7 @@ class ConditionalOpportunityTests(ArgumentTests):
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_not_0_1(self, transformX, transformY, transformA, A_two_dim):
         gs = GridSearch(self.estimator, self.disparity_criterion)
-        X, Y, A = self._quick_data(A_two_dim)
+        X, Y, A = _utilities._quick_data(A_two_dim)
         Y = Y + 1
 
         with pytest.raises(ValueError) as execInfo:

@@ -5,12 +5,12 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
+from sklearn.exceptions import NotFittedError
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn import _NO_PREDICT_BEFORE_FIT
-from sklearn.exceptions import NotFittedError
-from fairlearn.reductions import Reduction
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from .grid_search_result import GridSearchResult
 
@@ -52,6 +52,7 @@ class _GridGenerator:
                 # convert the grid of basis coefficients into a grid of lambda vectors
                 self.grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
                 break
+            # if the grid size is not reached yet increase the scaling parameter
             n_units = n_units + 1
 
     def build_integer_grid(self, n_units):
@@ -74,12 +75,13 @@ class _GridGenerator:
             else:
                 min_val = -max_val if self.neg_allowed[index] else 0
                 values = range(min_val, max_val + 1)
+
             for current_value in values:
                 self.entry[index] = current_value
                 self.accumulate_integer_grid(index + 1, max_val - abs(current_value))   # noqa: E501
 
 
-class GridSearch(Reduction):
+class GridSearch(BaseEstimator, MetaEstimatorMixin):
     """Estimator to perform a grid search given a blackbox estimator algorithm.
 
     The approach used is taken from section 3.4 of
