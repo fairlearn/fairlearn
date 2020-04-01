@@ -58,8 +58,8 @@ class TestExponentiatedGradientArguments:
             eps=0.1)
         expgrad.fit(transformX(X), transformY(y), sensitive_features=transformA(A))
 
-        Q = expgrad._best_classifier
-        n_classifiers = len(expgrad._classifiers)
+        def Q(X): return expgrad._pmf_predict(X)[:, 1]
+        n_predictors = len(expgrad._predictors)
 
         disparity_moment = DemographicParity()
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
@@ -74,4 +74,4 @@ class TestExponentiatedGradientArguments:
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad._n_oracle_calls == 32
-        assert n_classifiers == 3
+        assert n_predictors == 3

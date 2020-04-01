@@ -3,7 +3,6 @@
 
 import copy
 import logging
-import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
@@ -12,73 +11,12 @@ from time import time
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn.reductions._moments import Moment, ClassificationMoment
-from .grid_search_result import GridSearchResult
+from ._grid_generator import _GridGenerator
+
 
 logger = logging.getLogger(__name__)
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
-
-
-class _GridGenerator:
-    """A generator of a grid of points with a bounded L1 norm."""
-
-    def __init__(self, grid_size, grid_limit, pos_basis, neg_basis, neg_allowed, force_L1_norm):
-        # grid parameters
-        self.dim = len(pos_basis.columns)
-        self.neg_allowed = neg_allowed
-        self.force_L1_norm = force_L1_norm
-
-        # true dimensionality of the grid
-        if self.force_L1_norm:
-            true_dim = self.dim - 1
-        else:
-            true_dim = self.dim
-
-        # a conservative lower bound on the scaling parameter of the grid
-        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0 / true_dim) - 1   # noqa: E501
-        n_units = int(np.floor(n_units))
-        if n_units < 0:
-            n_units = 0
-
-        # find the grid of size at least "size" and save the first "size" entries
-        while True:
-            int_grid = self.build_integer_grid(n_units)
-            if len(int_grid) >= grid_size:
-                # re-scale the integer grid, separate into positive and negative parts
-                pos_coefs = pd.DataFrame(self.accumulator[:grid_size]).T * (float(grid_limit) / n_units)   # noqa: E501
-                neg_coefs = -pos_coefs.copy()
-                pos_coefs[pos_coefs < 0] = 0.0
-                neg_coefs[neg_coefs < 0] = 0.0
-                # convert the grid of basis coefficients into a grid of lambda vectors
-                self.grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
-                break
-            # if the grid size is not reached yet increase the scaling parameter
-            n_units = n_units + 1
-
-    def build_integer_grid(self, n_units):
-        # initialize working variables for the grid accumulation
-        self.entry = np.zeros(self.dim)
-        self.accumulator = []
-        # recursively create the integer grid
-        self.accumulate_integer_grid(0, n_units)
-        return self.accumulator
-
-    def accumulate_integer_grid(self, index, max_val):
-        if index == self.dim:
-            self.accumulator.append(self.entry.copy())
-        else:
-            if (index == self.dim - 1) and (self.force_L1_norm):
-                if self.neg_allowed[index] and max_val > 0:
-                    values = [-max_val, max_val]
-                else:
-                    values = [max_val]
-            else:
-                min_val = -max_val if self.neg_allowed[index] else 0
-                values = range(min_val, max_val + 1)
-
-            for current_value in values:
-                self.entry[index] = current_value
-                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))   # noqa: E501
 
 
 class GridSearch(BaseEstimator, MetaEstimatorMixin):
@@ -144,23 +82,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self.grid_limit = float(grid_limit)
         self.grid = grid
 
-        self._all_results = []
-        self._best_result = None
-
-    @property
-    def all_results(self):
-        """Return a list of :class:`GridSearchResult` from each point in the grid."""
-        return self._all_results
-
-    @property
-    def best_result(self):
-        """Return the best result found from the grid search.
-
-        The predictor contained in this instance of
-        :class:`GridSearchResult` is used in calls to
-        :code:`predict` and :code:`predict_proba`.
-        """
-        return self._best_result
+        self._best_grid_index = None
+        self._predictors = []
+        self._lambda_vecs = pd.DataFrame()
+        self._objectives = []
+        self._gammas = pd.DataFrame()
+        self._oracle_execution_times = []
 
     def fit(self, X, y, **kwargs):
         """Run the grid search.
@@ -218,7 +145,6 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         # Fit the estimates
         logger.debug("Setup complete. Starting grid search")
-        self._all_results = []
         for i in grid.columns:
             lambda_vec = grid[i]
             logger.debug("Obtaining weights")
@@ -241,18 +167,19 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Call to underlying estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
-            nxt = GridSearchResult(current_estimator,
-                                   lambda_vec,
-                                   objective.gamma(predict_fct)[0],
-                                   self.constraints.gamma(predict_fct),
-                                   oracle_call_execution_time)
-            self._all_results.append(nxt)
+            self._predictors.append(current_estimator)
+            self._lambda_vecs[i] = lambda_vec
+            self._objectives.append(objective.gamma(predict_fct)[0])
+            self._gammas[i] = self.constraints.gamma(predict_fct)
+            self._oracle_execution_times.append(oracle_call_execution_time)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
-            def loss_fct(x):
-                return self.objective_weight * x.objective + self.constraint_weight * x.gamma.max()
-            self._best_result = min(self._all_results, key=loss_fct)
+            def loss_fct(i):
+                return self.objective_weight * self._objectives[i] + \
+                    self.constraint_weight * self._gammas[i].max()
+            losses = [loss_fct(i) for i in range(len(self._objectives))]
+            self._best_grid_index = losses.index(min(losses))
         else:
             raise RuntimeError("Unsupported selection rule")
 
@@ -267,9 +194,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self.best_result is None:
+        if self._best_grid_index is None:
             raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self.best_result.predictor.predict(X)
+        return self._predictors[self._best_grid_index].predict(X)
 
     def predict_proba(self, X):
         """Provide the result of :code:`predict_proba` from the best model found by the grid search.
@@ -280,6 +207,6 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self.best_result is None:
+        if self._best_grid_index is None:
             raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self.best_result.predictor.predict_proba(X)
+        return self._predictors[self._best_grid_index].predict_proba(X)

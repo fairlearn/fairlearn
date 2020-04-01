@@ -19,3 +19,12 @@ def _quick_data(A_two_dim=False):
         # two unique values.
         A = np.stack((A, A), -1)
     return X, Y, A
+
+
+def assert_n_grid_search_results(n, grid_search_obj):
+    assert grid_search_obj._best_grid_index is not None
+    assert len(grid_search_obj._predictors) == n
+    assert len(grid_search_obj._objectives) == n
+    assert len(grid_search_obj._oracle_execution_times) == n
+    assert len(grid_search_obj._lambda_vecs.columns) == n
+    assert len(grid_search_obj._gammas.columns) == n
