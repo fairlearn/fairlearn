@@ -106,24 +106,8 @@ class TestExponentiatedGradientSmoke:
 
     def test_simple_fit_predict(self):
         estimator = LeastSquaresBinaryClassifierLearner()
-        constraints = EqualOpportunity()
-        expgrad = ExponentiatedGradient(estimator, constraints,eps=0.005)
+        constraints = DemographicParity()
+        expgrad = ExponentiatedGradient(estimator, constraints)
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))
-        Q = expgrad._best_classifier
-        n_classifiers = len(expgrad._classifiers)
-
-        disparity_moment = EqualOpportunity()
-        disparity_moment.load_data(pd.DataFrame(X1), pd.Series(labels),
-                        sensitive_features=pd.Series(sensitive_features))
-        error = ErrorRate()
-        error.load_data(pd.DataFrame(X1), pd.Series(labels),
-                        sensitive_features=pd.Series(sensitive_features))
-        print('disparity:',disparity_moment.gamma(Q).max())
-        print('error =', error.gamma(Q)[0])
-        print('best_gap: ', expgrad._best_gap)
-        print('_last_t: ', expgrad._last_t)
-        print('_best_t: ', expgrad._best_t)
-        print('_n_oracle_calls: ', expgrad._n_oracle_calls)
-        print('n_classifiers: ', n_classifiers)
