@@ -2,11 +2,15 @@
 # Licensed under the MIT License.
 
 import pandas as pd
+import numpy as np
 from .moment import ClassificationMoment
-from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
+from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN, _POSITIVE_UTILITY, \
+    _NEGATIVE_UTILITY
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _UTILITY_NOT_SPECIFIED
 from .error_rate import ErrorRate
 
-_DIFF = "diff"
+_UPPER_BOUND_DIFF = "upper_bound_diff"
+_LOWER_BOUND_DIFF = "lower_bound_diff"
 
 
 class ConditionalSelectionRate(ClassificationMoment):
@@ -29,17 +33,38 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     """
 
+    def __init__(self, ratio=1.0):
+        """Intialise with the ratio value."""
+        super(ConditionalSelectionRate, self).__init__()
+        if ratio <= 0 or ratio > 1:
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
+        self.ratio = ratio
+
     def default_objective(self):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, **kwargs):
+    def load_data(self, X, y, event=None, utilities=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
+
+        The `utilities` is a matrix which correspond to g(X,A,Y,h(X)) as mentioned
+        in the paper `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
+        The `utilities` defaults to h(X), i.e. [1, 0] for each X_i
+        The `_POSITIVE_UTILITY` is G^1 and the `_NEGATIVE_UTILITY` is G^0.
+        Assumes binary classification with labels 0/1.
+        .. math::
+        utilities = [g(X,A,Y,h(X)=1), g(X,A,Y,h(X)=0)]
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
+        if utilities is None:
+            utilities = pd.DataFrame({_POSITIVE_UTILITY: pd.Series(np.ones(y.shape)),
+                                      _NEGATIVE_UTILITY: pd.Series(np.zeros(y.shape))})
+        if not (_POSITIVE_UTILITY in utilities and _NEGATIVE_UTILITY in utilities):
+            raise ValueError(_UTILITY_NOT_SPECIFIED)
+        self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -73,24 +98,29 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
-        pred = predictor(self.X)
+        utility_diff = self.utilities[_POSITIVE_UTILITY] - self.utilities[_NEGATIVE_UTILITY]
+        pred = utility_diff * predictor(self.X) + self.utilities[_NEGATIVE_UTILITY]
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
         expect_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).mean()
-        expect_group_event[_DIFF] = expect_group_event[_PREDICTION] - expect_event[_PREDICTION]
-        g_unsigned = expect_group_event[_DIFF]
-        g_signed = pd.concat([g_unsigned, -g_unsigned],
+        expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * expect_group_event[_PREDICTION] - \
+            expect_event[_PREDICTION]
+        expect_group_event[_LOWER_BOUND_DIFF] = - expect_group_event[_PREDICTION] \
+            + self.ratio * expect_event[_PREDICTION]
+        g_signed = pd.concat([expect_group_event[_UPPER_BOUND_DIFF],
+                              expect_group_event[_LOWER_BOUND_DIFF]],
                              keys=["+", "-"],
                              names=[_SIGN, _EVENT, _GROUP_ID])
-        self._gamma_descr = str(expect_group_event[[_PREDICTION, _DIFF]])
+        self._gamma_descr = str(expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF,
+                                                    _LOWER_BOUND_DIFF]])
         return g_signed
 
     # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec):
         """Return the projected lambda values."""
-        lambda_pos = lambda_vec["+"] - lambda_vec["-"]
-        lambda_neg = -lambda_pos
+        lambda_pos = lambda_vec["+"] - self.ratio * lambda_vec["-"]
+        lambda_neg = - self.ratio * lambda_vec["+"] + lambda_vec["-"]
         lambda_pos[lambda_pos < 0.0] = 0.0
         lambda_neg[lambda_neg < 0.0] = 0.0
         lambda_projected = pd.concat([lambda_pos, lambda_neg],
@@ -110,12 +140,16 @@ class ConditionalSelectionRate(ClassificationMoment):
         :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
-        lambda_signed = lambda_vec["+"] - lambda_vec["-"]
-        adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
-            - lambda_signed / self.prob_group_event
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
+            self.prob_event
+        lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
+            self.prob_group_event
+        adjust = lambda_event - lambda_group_event
         signed_weights = self.tags.apply(
             lambda row: 0 if pd.isna(row[_EVENT]) else adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
+        utility_diff = self.utilities[_POSITIVE_UTILITY] - self.utilities[_NEGATIVE_UTILITY]
+        signed_weights = utility_diff.mul(signed_weights)
         return signed_weights
 
 
@@ -216,4 +250,46 @@ class EqualizedOdds(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          **kwargs)
+
+
+class ErrorRateRatio(ConditionalSelectionRate):
+    r"""Implementation of Error Rate Ratio as a moment.
+
+    Measures the ratio in errors per attribute by overall error.
+    The 2-sided version of error ratio can be written as
+    ratio <= error(A=a) / total_error <= 1/ratio
+    .. math::
+    ratio <= E[abs(h(x) - y) = 1 | A = a] / E[abs(h(x) - y) = 1] <= 1/ratio\; \forall a
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    events corresponding to the unique values of the `Y` array.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    fraction of the samples corresponding to each unique value in
+    the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to
+    the number of unique values for the sensitive feature, multiplied by
+    the number of unique values of the `Y` array, multiplied by two (for
+    the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :math:`signed_weights` method
+    will calculate the costs according to Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    The `ratio` defines the amount of relaxation that is allowed for the
+    constraint. The value varies between 0 and 1. The ratio of 1 means,
+    the constraint is given no relaxation and thus, the constraint tries to
+    evaluate for
+    error(A = a) / total_error = 1
+    """
+
+    short_name = "ErrorRateRatio"
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        super().load_data(X, y,
+                          event=_ALL,
+                          utilities=pd.DataFrame({_POSITIVE_UTILITY: (1-y), _NEGATIVE_UTILITY: y}),
                           **kwargs)
