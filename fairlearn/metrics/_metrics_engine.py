@@ -9,11 +9,13 @@ from sklearn.utils import Bunch
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
 # Parameters to metrics that should be split according to sensitive features
-_SPLITTABLE_METRIC_PARAMS = {"sample_weight"}
+_DEFAULT_INDEXED_PARAMS = {"sample_weight"}
 
 
 def group_summary(metric_function, y_true, y_pred,
-                  sensitive_features, **metric_params):
+                  sensitive_features,
+                  indexed_params=None,
+                  **metric_params):
     r"""Apply a metric to each subgroup of a set of data.
 
     :param metric_function: Function ``(y_true, y_pred, \*\*metric_params)``
@@ -24,11 +26,15 @@ def group_summary(metric_function, y_true, y_pred,
 
     :param sensitive_features: Array indicating the group to which each input value belongs
 
-    :param \*\*metric_params: Optional arguments to be passed to the `metric_function`
+    :param indexed_params: Names of ``metric_function`` parameters that
+        should be split according to ``sensitive_features`` in addition to ``y_true``
+        and ``y_pred``. Defaults to ``None`` corresponding to ``{"sample_weight"}``.
+
+    :param \*\*metric_params: Optional arguments to be passed to the ``metric_function``
 
     :return: Object containing the result of applying ``metric_function`` to the entire dataset
         and to each group identified in ``sensitive_features``
-    :rtype: sklearn.utils.Bunch with the fields ``overall`` and ``by_group``
+    :rtype: :py:class:`sklearn.utils.Bunch` with the fields ``overall`` and ``by_group``
     """
     _check_array_sizes(y_true, y_pred, 'y_true', 'y_pred')
     _check_array_sizes(y_true, sensitive_features, 'y_true', 'sensitive_features')
@@ -43,7 +49,7 @@ def group_summary(metric_function, y_true, y_pred,
     # This ensures consistency in how metric_function is called
     result_overall = metric_function(
         y_t, y_p,
-        **_check_metric_params(y_t, metric_params))
+        **_check_metric_params(y_t, metric_params, indexed_params))
 
     groups = np.unique(s_f)
     result_by_group = {}
@@ -51,17 +57,20 @@ def group_summary(metric_function, y_true, y_pred,
         group_indices = (group == s_f)
         result_by_group[group] = metric_function(
             y_t[group_indices], y_p[group_indices],
-            **_check_metric_params(y_t, metric_params, group_indices))
+            **_check_metric_params(y_t, metric_params, indexed_params, group_indices))
 
     return Bunch(overall=result_overall, by_group=result_by_group)
 
 
 # This loosely follows the pattern of _check_fit_params in
 # sklearn/utils/validation.py
-def _check_metric_params(y_true, metric_params, indices=None):
+def _check_metric_params(y_true, metric_params,
+                         indexed_params=None, indices=None):
     metric_params_validated = {}
+    if indexed_params is None:
+        indexed_params = _DEFAULT_INDEXED_PARAMS
     for param_key, param_value in metric_params.items():
-        if (param_key in _SPLITTABLE_METRIC_PARAMS and param_value is not None):
+        if (param_key in indexed_params and param_value is not None):
             _check_array_sizes(y_true, param_value, 'y_true', param_key)
             p_v = _convert_to_ndarray_and_squeeze(param_value)
             if indices is not None:
@@ -73,12 +82,16 @@ def _check_metric_params(y_true, metric_params, indices=None):
     return metric_params_validated
 
 
-def make_group_metric(metric_function):
+def make_group_metric(metric_function, indexed_params=None):
     """Turn a regular metric into a grouped metric.
 
     :param metric_function: The function to be wrapped. This must have signature
         ``(y_true, y_pred, **metric_params)``
     :type metric_function: func
+
+    :param indexed_params: Names of ``metric_function`` parameters that
+        should be split according to ``sensitive_features`` in addition to ``y_true``
+        and ``y_pred``. Defaults to ``None`` corresponding to ``{"sample_weight"}``.
 
     :return: A wrapped version of the supplied ``metric_function``. It will have
         signature ``(y_true, y_pred, sensitive_features, **metric_params)``
@@ -89,6 +102,7 @@ def make_group_metric(metric_function):
                              y_true,
                              y_pred,
                              sensitive_features=sensitive_features,
+                             indexed_params=indexed_params,
                              **metric_params)
 
     # Improve the name of the returned function
