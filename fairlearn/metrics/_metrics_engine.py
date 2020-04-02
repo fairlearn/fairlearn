@@ -94,7 +94,7 @@ def make_group_metric(metric_function, indexed_params=None):
         and ``y_pred``. Defaults to ``None`` corresponding to ``{"sample_weight"}``.
 
     :return: A wrapped version of the supplied ``metric_function``. It will have
-        signature ``(y_true, y_pred, sensitive_features, **metric_params)``
+        signature ``(y_true, y_pred, sensitive_features, **metric_params)``.
     :rtype: func
     """
     def wrapper(y_true, y_pred, sensitive_features, **metric_params):
