@@ -33,21 +33,16 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, filter_value=None, **kwargs):
+    def load_data(self, X, y, event=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        if filter_value is not None:
-            self.dropped_tags = self.tags.where(self.tags['label'] == filter_value).dropna()
-            self.tags = self.tags.where(self.tags['label'] == int(not filter_value)).dropna()
-            self.dropped_X = self.X.drop(self.tags.index)
-            self.X = self.X.drop(self.dropped_tags.index)
-            self.filtered = True
-        else:
-            self.filtered = False
+        self.tags = self.tags.dropna()
+        self.dropped_X = self.X.drop(self.tags[_LABEL].index)
+        self.X = self.X.drop(self.dropped_X.index)
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -120,10 +115,9 @@ class ConditionalSelectionRate(ClassificationMoment):
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
         # this flag is set if a `filter_value` was sent to :meth:`load_data()`
-        if self.filtered:
-            signed_weights = signed_weights.reindex(
-                list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0
-            )
+        signed_weights = signed_weights.reindex(
+            list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0
+        )
         return signed_weights
 
 
@@ -191,7 +185,9 @@ class EqualOpportunity(ConditionalSelectionRate):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y,
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
+                          # the where clause is used to put pd.nan on all values
+                          # where y!=1.
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
                           filter_value=0,
                           **kwargs)
 
