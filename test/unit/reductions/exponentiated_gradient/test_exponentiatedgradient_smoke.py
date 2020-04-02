@@ -24,57 +24,57 @@ class TestExponentiatedGradientSmoke:
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.100000,
                         "error": 0.250000, "n_oracle_calls": 32,
-                        "n_classifiers": 3},
+                        "n_predictors": 3},
                        {"cons_class": DemographicParity, "eps": 0.050,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.050000,
                         "error": 0.266522, "n_oracle_calls": 23,
-                        "n_classifiers": 6},
+                        "n_predictors": 6},
                        {"cons_class": DemographicParity, "eps": 0.020,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.020000,
                         "error": 0.332261, "n_oracle_calls": 22,
-                        "n_classifiers": 5},
+                        "n_predictors": 5},
                        {"cons_class": DemographicParity, "eps": 0.010,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.010000,
                         "error": 0.354174, "n_oracle_calls": 22,
-                        "n_classifiers": 5},
+                        "n_predictors": 5},
                        {"cons_class": DemographicParity, "eps": 0.005,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.365130, "n_oracle_calls": 22,
-                        "n_classifiers": 5},
+                        "n_predictors": 5},
                        {"cons_class": EqualizedOdds, "eps": 0.100,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.100000,
                         "error": 0.309333, "n_oracle_calls": 21,
-                        "n_classifiers": 4},
+                        "n_predictors": 4},
                        {"cons_class": EqualizedOdds, "eps": 0.050,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.050000,
                         "error": 0.378827, "n_oracle_calls": 19,
-                           "n_classifiers": 6},
+                        "n_predictors": 6},
                        {"cons_class": EqualizedOdds, "eps": 0.020,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.020000,
                         "error": 0.421531, "n_oracle_calls": 19,
-                           "n_classifiers": 6},
+                        "n_predictors": 6},
                        {"cons_class": EqualizedOdds, "eps": 0.010,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.010000,
                         "error": 0.435765, "n_oracle_calls": 19,
-                           "n_classifiers": 6},
+                        "n_predictors": 6},
                        {"cons_class": EqualizedOdds, "eps": 0.005,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.442883, "n_oracle_calls": 19,
-                        "n_classifiers": 6},
+                        "n_predictors": 6},
                        {"cons_class": EqualOpportunity, "eps": 0.005,
                         "best_gap": 0.0, "last_t": 5,
                         "best_t": 5, "disp": 0.005000,
                         "error": 0.25, "n_oracle_calls": 16,
-                        "n_classifiers": 2}
+                        "n_predictors": 2}
                        ]
 
     def run_smoke_test(self, data):
@@ -82,8 +82,8 @@ class TestExponentiatedGradientSmoke:
                                         eps=data["eps"])
         expgrad.fit(self.X, self.y, sensitive_features=self.A)
 
-        Q = expgrad._best_classifier
-        n_classifiers = len(expgrad._classifiers)
+        def Q(X): return expgrad._pmf_predict(X)[:, 1]
+        n_predictors = len(expgrad._predictors)
 
         disparity_moment = data["cons_class"]()
         disparity_moment.load_data(self.X, self.y, sensitive_features=self.A)
@@ -98,7 +98,7 @@ class TestExponentiatedGradientSmoke:
         assert disparity == pytest.approx(data["disp"], abs=self._PRECISION)
         assert error == pytest.approx(data["error"], abs=self._PRECISION)
         assert expgrad._n_oracle_calls == data["n_oracle_calls"]
-        assert n_classifiers == data["n_classifiers"]
+        assert n_predictors == data["n_predictors"]
 
     @pytest.mark.parametrize("testdata", smoke_test_data)
     def test_smoke(self, testdata):
