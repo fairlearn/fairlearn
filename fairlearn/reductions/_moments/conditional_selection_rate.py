@@ -45,28 +45,28 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, utility=None, **kwargs):
+    def load_data(self, X, y, event=None, utilities=None, **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
 
-        The `utility` is a matrix which correspond to g(X,A,Y,h(X)) as mentioned
+        The `utilities` is a matrix which correspond to g(X,A,Y,h(X)) as mentioned
         in the paper `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`
-        The `utility` defaults to h(X), ie. [1 in R^n, 0 in R^n]
+        The `utilities` defaults to h(X), i.e. [1, 0] for each X_i
         The `_POSITIVE_UTILITY` is G^1 and the `_NEGATIVE_UTILITY` is G^0.
-        Assumes that binary class of 0/1.
+        Assumes binary classification with labels 0/1.
         .. math::
-        utility = [g(X,A,Y,h(X)=1), g(X,A,Y,h(X)=0)]
+        utilities = [g(X,A,Y,h(X)=1), g(X,A,Y,h(X)=0)]
 
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        if utility is None:
-            utility = pd.Series({_POSITIVE_UTILITY: pd.Series(np.ones(y.shape)),
-                                 _NEGATIVE_UTILITY: pd.Series(np.zeros(y.shape))})
-        if not (_POSITIVE_UTILITY in utility and _NEGATIVE_UTILITY in utility):
+        if utilities is None:
+            utilities = pd.DataFrame({_POSITIVE_UTILITY: pd.Series(np.ones(y.shape)),
+                                      _NEGATIVE_UTILITY: pd.Series(np.zeros(y.shape))})
+        if not (_POSITIVE_UTILITY in utilities and _NEGATIVE_UTILITY in utilities):
             raise ValueError(_UTILITY_NOT_SPECIFIED)
-        self.utility = utility
+        self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -98,15 +98,14 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
-        utility_diff = self.utility[_POSITIVE_UTILITY] - self.utility[_NEGATIVE_UTILITY]
-        pred = utility_diff * predictor(self.X) + self.utility[_NEGATIVE_UTILITY]
+        utility_diff = self.utilities[_POSITIVE_UTILITY] - self.utilities[_NEGATIVE_UTILITY]
+        pred = utility_diff * predictor(self.X) + self.utilities[_NEGATIVE_UTILITY]
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
         expect_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).mean()
-        expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * \
-            expect_group_event[_PREDICTION]\
-            - expect_event[_PREDICTION]
+        expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * expect_group_event[_PREDICTION] - \
+            expect_event[_PREDICTION]
         expect_group_event[_LOWER_BOUND_DIFF] = - expect_group_event[_PREDICTION]\
             + self.ratio * expect_event[_PREDICTION]
         g_signed = pd.concat([expect_group_event[_UPPER_BOUND_DIFF],
@@ -126,8 +125,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         lambda_pos[lambda_pos < 0.0] = 0.0
         lambda_neg[lambda_neg < 0.0] = 0.0
         lambda_projected = pd.concat([lambda_pos, lambda_neg],
-                                     keys=["+", "-"],
-                                     names=[_SIGN, _EVENT, _GROUP_ID])
+                                     keys=["+", "-"], names=[_SIGN, _EVENT, _GROUP_ID])
         return lambda_projected
 
     def signed_weights(self, lambda_vec):
@@ -142,16 +140,16 @@ class ConditionalSelectionRate(ClassificationMoment):
         :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
         :type lambda_vec: :class:`pandas:pandas.Series`
         """
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]) \
-            .sum(level=_EVENT) / self.prob_event
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
+            self.prob_event
         lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
             self.prob_group_event
         adjust = lambda_event - lambda_group_event
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
-        signed_weights = (self.utility[_POSITIVE_UTILITY] -
-                          self.utility[_NEGATIVE_UTILITY]).mul(signed_weights)
+        utility_diff = self.utilities[_POSITIVE_UTILITY] - self.utilities[_NEGATIVE_UTILITY]
+        signed_weights = utility_diff.mul(signed_weights)
         return signed_weights
 
 
@@ -250,7 +248,7 @@ class ErrorRateRatio(ConditionalSelectionRate):
     constraint. The value varies between 0 and 1. The ratio of 1 means,
     the constraint is given no relaxation and thus, the constraint tries to
     evaluate for
-    error(A=a) / total_error = 1
+    error(A = a) / total_error = 1
     """
 
     short_name = "ErrorRateRatio"
@@ -259,5 +257,5 @@ class ErrorRateRatio(ConditionalSelectionRate):
         """Load the specified data into the object."""
         super().load_data(X, y,
                           event=_ALL,
-                          utility=pd.Series({_POSITIVE_UTILITY: (1-y), _NEGATIVE_UTILITY: y}),
+                          utilities=pd.DataFrame({_POSITIVE_UTILITY: (1-y), _NEGATIVE_UTILITY: y}),
                           **kwargs)
