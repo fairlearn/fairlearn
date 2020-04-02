@@ -115,7 +115,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         """
         lambda_signed = lambda_vec["+"] - lambda_vec["-"]
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
-                 - lambda_signed / self.prob_group_event
+            - lambda_signed / self.prob_group_event
         signed_weights = self.tags.apply(
             lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
