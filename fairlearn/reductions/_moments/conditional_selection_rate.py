@@ -40,9 +40,6 @@ class ConditionalSelectionRate(ClassificationMoment):
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
-        self.tags = self.tags.dropna()
-        self.dropped_X = self.X.drop(self.tags[_LABEL].index)
-        self.X = self.X.drop(self.dropped_X.index)
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -112,11 +109,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
             - lambda_signed / self.prob_group_event
         signed_weights = self.tags.apply(
-            lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
-        )
-        # this flag is set if a `filter_value` was sent to :meth:`load_data()`
-        signed_weights = signed_weights.reindex(
-            list(range(self.dropped_X.shape[0] + self.X.shape[0])), fill_value=0
+            lambda row: 0 if pd.isna(row[_EVENT]) else adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
         return signed_weights
 
@@ -188,7 +181,6 @@ class EqualOpportunity(ConditionalSelectionRate):
                           # the where clause is used to put pd.nan on all values
                           # where y!=1.
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
-                          filter_value=0,
                           **kwargs)
 
 
