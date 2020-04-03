@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import numpy as np
-import pandas as pd
 
 
 def _quick_data(A_two_dim=False):
@@ -10,15 +9,15 @@ def _quick_data(A_two_dim=False):
     feature_1 = [0, 1, 2, 3, 4, 5, 6, 7]
     feature_2 = [5, 4, 3, 2, 7, 8, 3, 4]
     feature_3 = [9, 2, 4, 2, 9, 3, 1, 8]
-    X = pd.DataFrame(np.stack((feature_1, feature_2, feature_3), -1))
-    Y = pd.Series(np.array([0, 1, 0, 1, 1, 1, 1, 0]))
-    A = pd.Series(np.array([1, 0, 0, 0, 0, 1, 1, 1]))
+    X = np.stack((feature_1, feature_2, feature_3), -1)
+    Y = np.array([0, 1, 0, 1, 1, 1, 1, 0])
+    A = np.array([1, 0, 0, 0, 0, 1, 1, 1])
     if A_two_dim:
         # Grid Search is still restricted to binary sensitive features.
         # Even though we provide multiple columns of sensitive features,
         # the merged feature comprised of these columns can only have
         # two unique values.
-        A = pd.DataFrame(np.stack((A, A), -1))
+        A = np.stack((A, A), -1)
     return X, Y, A
 
 

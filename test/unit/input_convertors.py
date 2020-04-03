@@ -98,4 +98,4 @@ def _map_into_single_column(matrix):
     if len(np.array(matrix).shape) == 1:
         return np.array(matrix)
 
-    return _compress_multiple_sensitive_features_into_single_column(np.array(matrix))
+    return _compress_multiple_sensitive_features_into_single_column(matrix)

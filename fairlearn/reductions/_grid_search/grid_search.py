@@ -113,7 +113,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        X, y_train, sensitive_features_train = _validate_and_reformat_input(
+        _, y_train, sensitive_features_train = _validate_and_reformat_input(
             X, y, enforce_binary_sensitive_feature=True,
             enforce_binary_labels=is_classification_reduction, **kwargs)
 

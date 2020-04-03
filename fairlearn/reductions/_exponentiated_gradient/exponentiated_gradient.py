@@ -72,7 +72,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        X, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
+        _, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
 
         n = y_train.shape[0]
 

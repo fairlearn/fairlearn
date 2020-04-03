@@ -35,7 +35,7 @@ def _get_data(A_two_dim=False):
     if A_two_dim:
         # Stacking the same column a few times will result in the identical groups
         # compared to using a single column, therefore results should be the same.
-        A = pd.DataFrame(np.stack((sensitive_features, sensitive_features), -1))
+        A = np.stack((sensitive_features, sensitive_features), -1)
     else:
         A = pd.Series(sensitive_features)
     return X, y, A
@@ -56,7 +56,7 @@ class TestExponentiatedGradientArguments:
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(),
             eps=0.1)
-        expgrad.fit(transformX(X), transformY(y), sensitive_features=transformA(merged_A))
+        expgrad.fit(transformX(X), transformY(y), sensitive_features=transformA(A))
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
