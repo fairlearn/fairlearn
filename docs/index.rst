@@ -17,9 +17,9 @@ The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
    fairlearn.reductions
    fairlearn.widget
 
-Example
--------
+Examples
+--------
 .. toctree::
    :maxdepth: 1
 
-   auto_examples/plot_binary_classification_COMPAS
+   auto_examples/index
