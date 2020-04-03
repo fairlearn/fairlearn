@@ -9,12 +9,16 @@
   * `ThresholdOptmizer` is now a scikit-learn meta-estimator, and accepts
     an estimator through the `estimator` parameter. To use a pre-fitted
     estimator, pass `prefit=True`.
-* Rename arguments of `create_group_metric_set()` to match the dashboard
+* Made `_create_group_metric_set_()` private by prepending with `_`.
+  Also changed the arguments, so that this routine requires
+  dictionaries for the predictions and sensitive features. This is a
+  breaking change.
 * Remove `Reduction` base class for reductions methods and replace it with
   `sklearn.base.BaseEstimator` and `sklearn.base.MetaEstimatorMixin`.
-* Remove `ExponentiatedGradientResult` in favor of storing the values and
-  objects resulting from fitting the meta-estimator directly in the
-  `ExponentiatedGradient` object.
+* Remove `ExponentiatedGradientResult` and `GridSearchResult` in favor of
+  storing the values and objects resulting from fitting the meta-estimator
+  directly in the `ExponentiatedGradient` and `GridSearch` objects,
+  respectively.
 * Fix regression in input validation that dropped metadata from `X` if it is
   provided as a `pandas.DataFrame`.
 
