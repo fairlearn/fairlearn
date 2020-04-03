@@ -52,12 +52,17 @@ class ConditionalSelectionRate(ClassificationMoment):
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].dropna().unique()
         group_vals = self.tags[_GROUP_ID].unique()
+        # The matrices pos_basis and neg_basis contain a lower-dimensional description of
+        # constraints, which is achieved by removing some redundant constraints.
+        # Considering fewer constraints is not required for correctness, but it can dramatically
+        # speed up GridSearch.
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series()
         zero_vec = pd.Series(0.0, self.index)
         i = 0
         for event_val in event_vals:
+            # Constraints on the final group are redundant, so they are not included in the basis.
             for group in group_vals[:-1]:
                 self.pos_basis[i] = 0 + zero_vec
                 self.neg_basis[i] = 0 + zero_vec
@@ -146,7 +151,7 @@ class DemographicParity(ConditionalSelectionRate):
         super().load_data(X, y, event=_ALL, **kwargs)
 
 
-class EqualOpportunity(ConditionalSelectionRate):
+class TruePositiveRateDifference(ConditionalSelectionRate):
     r"""Implementation of Equal Opportunity as a moment.
 
     Adds conditioning on `y=1` compared to Demographic parity, i.e.
@@ -173,7 +178,7 @@ class EqualOpportunity(ConditionalSelectionRate):
     all other samples (for all `y=0`).
     """
 
-    short_name = "EqualOpportunity"
+    short_name = "TruePositiveRateDifference"
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
