@@ -154,13 +154,13 @@ class DemographicParity(ConditionalSelectionRate):
 class TruePositiveRateDifference(ConditionalSelectionRate):
     r"""Implementation of Equal Opportunity as a moment.
 
-    Adds conditioning on `y=1` compared to Demographic parity, i.e.
+    Adds conditioning on label `y=1` compared to Demographic parity, i.e.
 
     .. math::
-       P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a, y,
+       P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a
 
     This implementation of :class:`ConditionalSelectionRate` defines
-    events corresponding to the unique values of the `Y` array.
+    the event corresponding to `y=1`.
 
     The `prob_event` :class:`pandas:pandas.DataFrame` will record the
     fraction of the samples corresponding to each unique value of `y = 1` in
@@ -168,8 +168,9 @@ class TruePositiveRateDifference(ConditionalSelectionRate):
 
     The `index` MultiIndex will have a number of entries equal to
     the number of unique values for the sensitive feature, multiplied by
-    the number of unique values of the `Y` array, multiplied by two (for
-    the Lagrange multipliers for positive and negative constraints).
+    the number of unique values of the `Y` array, which is just `label=1`
+    (1 unique value), multiplied by two (for the Lagrange multipliers
+    for positive and negative constraints).
 
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs like how it is calculated in Example 4 of
