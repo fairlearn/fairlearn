@@ -117,7 +117,7 @@ def test_project_lambda_smoke_negatives():
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx)
+    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -140,7 +140,7 @@ def test_project_lambda_smoke_positives():
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx)
+    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 

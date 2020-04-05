@@ -101,7 +101,7 @@ def test_project_lambda_smoke_negatives():
     ls = dp.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 10, 17], index=midx)
+    expected = 0 + pd.Series([0, 0, 10, 17], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -125,7 +125,7 @@ def test_project_lambda_smoke_positives():
     ls = dp.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([18, 12, 0, 0], index=midx)
+    expected = 0 + pd.Series([18, 12, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
