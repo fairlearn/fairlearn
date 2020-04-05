@@ -163,7 +163,7 @@ class TruePositiveRateDifference(ConditionalSelectionRate):
     the event corresponding to `y=1`.
 
     The `prob_event` :class:`pandas:pandas.DataFrame` will record the
-    fraction of the samples corresponding to each unique value of `y = 1` in
+    fraction of the samples corresponding to `y = 1` in
     the `Y` array.
 
     The `index` MultiIndex will have a number of entries equal to
@@ -183,9 +183,8 @@ class TruePositiveRateDifference(ConditionalSelectionRate):
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
+        # The `where` clause is used to put `pd.nan` on all values where `y!=1`.
         super().load_data(X, y,
-                          # the where clause is used to put pd.nan on all values
-                          # where y!=1.
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
                           **kwargs)
 
