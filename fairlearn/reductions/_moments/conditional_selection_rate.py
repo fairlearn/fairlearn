@@ -35,7 +35,7 @@ class ConditionalSelectionRate(ClassificationMoment):
     def __init__(self, ratio=1.0):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
-        if ratio <= 0 or ratio > 1:
+        if not (0 < ratio <= 1):
             raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
 
