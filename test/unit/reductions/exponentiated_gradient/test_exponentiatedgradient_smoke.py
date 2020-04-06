@@ -20,6 +20,7 @@ class TestExponentiatedGradientSmoke:
         self.learner = LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
+    constraints = [TruePositiveRateDifference(), DemographicParity()]
     smoke_test_data = [{"cons_class": DemographicParity, "eps": 0.100,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.100000,
@@ -104,9 +105,9 @@ class TestExponentiatedGradientSmoke:
     def test_smoke(self, testdata):
         self.run_smoke_test(testdata)
 
-    def test_simple_fit_predict(self):
+    @pytest.mark.parametrize("constraints", constraints)
+    def test_simple_fit_predict(self, constraints):
         estimator = LeastSquaresBinaryClassifierLearner()
-        constraints = TruePositiveRateDifference()
         expgrad = ExponentiatedGradient(estimator, constraints)
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))

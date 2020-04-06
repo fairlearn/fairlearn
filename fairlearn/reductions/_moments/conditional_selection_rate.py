@@ -167,10 +167,10 @@ class TruePositiveRateDifference(ConditionalSelectionRate):
     the `Y` array.
 
     The `index` MultiIndex will have a number of entries equal to
-    the number of unique values for the sensitive feature, multiplied by
-    the number of unique values of the `Y` array, which is just `label=1`
-    (1 unique value), multiplied by two (for the Lagrange multipliers
-    for positive and negative constraints).
+    the number of unique values of the sensitive feature, multiplied by
+    the number of unique non-NaN values of the constructed `event` array,
+    whose entries are either NaN or `label=1` (so only one unique non-NaN value), multiplied
+    by two (for the Lagrange multipliers for positive and negative constraints).
 
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs like how it is calculated in Example 4 of
