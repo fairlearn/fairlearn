@@ -1,5 +1,10 @@
 # Changes
 
+### v0.4.6
+* Refactoring of metrics:
+  * Remove `GroupMetricResult` type in favour of a `Bunch`.
+  * Add `group_summary` transformers.
+
 ### v0.4.5
 * Changes to `ThresholdOptimizer`:
   * Separate plotting for `ThresholdOptimizer` into its own plotting function.
