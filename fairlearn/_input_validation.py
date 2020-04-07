@@ -85,7 +85,14 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         if len(np.unique(sensitive_features)) > 2:
             raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
 
-    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
+    # If we don't have a y, then need to fiddle with return type to
+    # avoid a warning from pandas
+    if y is not None:
+        result_y = pd.Series(y)
+    else:
+        result_y = pd.Series(dtype="float64")
+
+    return pd.DataFrame(X), result_y, pd.Series(sensitive_features.squeeze())
 
 
 def _compress_multiple_sensitive_features_into_single_column(sensitive_features):
