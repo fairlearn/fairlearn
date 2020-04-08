@@ -100,11 +100,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
-            pred_h = h(X)
 
             if t == 0:
                 if self._nu is None:
-                    self._nu = _ACCURACY_MUL * (pred_h - y_train).abs().std() / np.sqrt(n)
+                    self._nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
                 eta_min = self._nu / (2 * B)
                 eta = self._eta_mul / B
                 logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
