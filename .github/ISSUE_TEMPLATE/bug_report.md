@@ -70,7 +70,11 @@ Please provide the following information:
 - Browser (if you're reporting a dashboard bug in jupyter): [e.g. Edge, Firefox, Chrome, Safari]
 - Python version: [e.g. 3.7.4]
 - Fairlearn version: [e.g. 0.4.5 or installed from master branch in editable mode]
-- version of Python packages: please run `pip freeze` and paste the output.
+- version of Python packages: please run the following snipped and paste the output:
+  ```python
+  from fairlearn.utils import show_versions
+  show_versions()
+  ```
 -->
 
 <!-- Thanks for contributing! -->
