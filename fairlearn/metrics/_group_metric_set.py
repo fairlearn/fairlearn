@@ -95,7 +95,11 @@ def _process_sensitive_features(sensitive_features):
 
         np_column = _convert_to_ndarray_and_squeeze(column)
         le = preprocessing.LabelEncoder()
-        nxt[_BIN_VECTOR] = list(le.fit_transform(np_column))
+
+        # Since these will likely be JSON serialised we
+        # need to make sure we have Python ints and not
+        # numpy ints
+        nxt[_BIN_VECTOR] = [int(x) for x in list(le.fit_transform(np_column))]
         nxt[_BIN_LABELS] = [str(x) for x in le.classes_]
 
         unsorted_features.append(nxt)
@@ -137,7 +141,8 @@ def _create_group_metric_set(y_true,
         result[_PREDICTION_TYPE] == _PREDICTION_REGRESSION
         function_dict = REGRESSION_METRICS
     else:
-        raise NotImplementedError("No support yet for {0}".format(prediction_type))
+        raise NotImplementedError(
+            "No support yet for {0}".format(prediction_type))
 
     # Sort out y_true
     _yt = _convert_to_ndarray_and_squeeze(y_true)

@@ -45,14 +45,14 @@ class _Lagrangian:
         self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
-        self.hs = pd.Series()
-        self.classifiers = pd.Series()
-        self.errors = pd.Series()
+        self.hs = pd.Series(dtype="float64")
+        self.classifiers = pd.Series(dtype="float64")
+        self.errors = pd.Series(dtype="float64")
         self.gammas = pd.DataFrame()
         self.lambdas = pd.DataFrame()
         self.n = self.X.shape[0]
         self.n_oracle_calls = 0
-        self.oracle_calls_execution_time = []
+        self.oracle_execution_times = []
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
 
@@ -146,7 +146,7 @@ class _Lagrangian:
         classifier = pickle.loads(self.pickled_estimator)
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
-        self.oracle_calls_execution_time.append(time() - oracle_call_start_time)
+        self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
         def h(X): return classifier.predict(X)

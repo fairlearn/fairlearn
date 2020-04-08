@@ -33,7 +33,7 @@ class ConditionalLossMoment(LossMoment):
         attr_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
-        self.neg_basis_present = pd.Series()
+        self.neg_basis_present = pd.Series(dtype='float64')
         zero_vec = pd.Series(0.0, self.index)
         i = 0
         for attr in attr_vals:
