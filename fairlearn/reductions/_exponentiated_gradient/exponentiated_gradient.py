@@ -134,12 +134,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 Qs.append(Q_LP)
                 gaps.append(gap_LP)
 
-            logger.debug("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
-                         ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f",
-                         _INDENTATION, eta, result_EG.L_low,
-                         result_EG.L, result_EG.L_high,
-                         gap_EG, result_EG.gamma.max(),
-                         result_EG.error, gap_LP)
+            logger.debug("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f, gap=%.6f, disp=%.3f, "
+                         "err=%.3f, gap_LP=%.6f",
+                         _INDENTATION, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
+                         gap_EG, result_EG.gamma.max(), result_EG.error, gap_LP)
 
             if (gaps[t] < self._nu) and (t >= _MIN_T):
                 # solution found

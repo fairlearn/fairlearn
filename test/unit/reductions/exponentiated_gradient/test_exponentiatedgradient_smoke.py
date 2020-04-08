@@ -6,8 +6,8 @@ import pytest
 
 
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import DemographicParity, EqualizedOdds
-from fairlearn.reductions import ErrorRate
+from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRate
+from fairlearn.reductions._exponentiated_gradient._constants import _MIN_T
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, X2, X3, labels
 
@@ -89,6 +89,7 @@ class TestExponentiatedGradientSmoke:
         assert expgrad._best_gap == pytest.approx(data["best_gap"], abs=self._PRECISION)
         assert expgrad._last_t == data["last_t"]
         assert expgrad._best_t == data["best_t"]
+        assert expgrad._last_t >= _MIN_T
         assert disparity == pytest.approx(data["disp"], abs=self._PRECISION)
         assert error == pytest.approx(data["error"], abs=self._PRECISION)
         assert expgrad._n_oracle_calls == data["n_oracle_calls"]
