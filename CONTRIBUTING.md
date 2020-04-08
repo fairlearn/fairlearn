@@ -139,6 +139,17 @@ postprocessor.predict(X, sensitive_features=sensitive_features)
 First add a description of the changes introduced in the package version you
 want to release to [CHANGES.md](CHANGES.md).
 
+It is also best to verify that the Dashboard loads correctly. This is slightly
+involved:
+1. Create a wheel by running `python setup.py sdist bdist_wheel` from the
+repository root. This will create a `dist` directory which contains a `.whl`
+file.
+1. Create a new Conda environment for the test
+1. In this new environment, install this wheel by running
+`pip install dist/<FILENAME>.whl`
+1. Install any pip packages required for the notebooks
+1. Check that the dashboard loads in the notebooks
+
 We have a [Azure DevOps
 Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary)
 which takes care of building wheels and pushing to PyPI. Validations are also
