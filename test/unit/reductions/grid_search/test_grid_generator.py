@@ -10,7 +10,7 @@ from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions._moments.conditional_selection_rate import _ALL, _SIGN, _EVENT, \
     _GROUP_ID
 
-from test.unit.reductions.grid_search import _utilities
+from test.unit.reductions.grid_search.utilities import _quick_data
 
 
 @pytest.mark.parametrize("grid_size", [5, 6, 10, 11, 100, 101, 102])
@@ -93,7 +93,7 @@ def test_grid_generator_equalized_odds(grid_limit, grid_size):
 
 
 def calculate_grid(grid_limit, grid_size, disparity_moment, events):
-    X, y, A = _utilities._quick_data()
+    X, y, A = _quick_data()
 
     disparity_moment.load_data(X, y, sensitive_features=A)
 

@@ -40,7 +40,8 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.extlinks"
+    "sphinx.ext.extlinks",
+    "sphinx_gallery.gen_gallery",
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -71,3 +72,8 @@ html_static_path = ['_static']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+
+sphinx_gallery_conf = {
+     'examples_dirs': '../examples',
+     'gallery_dirs': 'auto_examples',
+}
