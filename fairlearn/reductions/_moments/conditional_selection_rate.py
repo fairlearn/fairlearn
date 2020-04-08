@@ -62,8 +62,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
         if utilities is None:
-            utilities = np.vstack([np.zeros(y.shape, dtype=np.int64),
-                                  np.ones(y.shape, dtype=np.int64)]).T
+            utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
+                                  np.ones(y.shape, dtype=np.float64)]).T
         self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(

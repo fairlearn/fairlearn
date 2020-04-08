@@ -112,7 +112,7 @@ def test_project_lambda_smoke_negatives():
 
     df = pd.DataFrame()
     # Note that the '-' labels are larger
-    df = 0 + pd.Series([1, 2, 11, 19, 1001, 1110, 1230, 1350], index=midx)
+    df = 0 + pd.Series([1, 2, 11, 19, 1001, 1110, 1230, 1350], index=midx, dtype=np.float64)
 
     ls = eqo.project_lambda(df)
 
@@ -135,7 +135,7 @@ def test_project_lambda_smoke_positives():
 
     df = pd.DataFrame()
     # Note that the '-' indices are now smaller
-    df = 0 + pd.Series([200, 300, 100, 600, 4, 5, 6, 7], index=midx)
+    df = 0 + pd.Series([200, 300, 100, 600, 4, 5, 6, 7], index=midx, dtype=np.float64)
 
     ls = eqo.project_lambda(df)
 
