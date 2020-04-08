@@ -30,6 +30,10 @@ class ConditionalSelectionRate(ClassificationMoment):
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
+    The `ratio` specifies the multiple at which error(A = a) should be compared with total_error
+    and vice versa. The value of `ratio` has to be in the range (0,1] with smaller values
+    corresponding to weaker constraint. The `ratio` equal to 1 corresponds to the constraint
+    where error(A = a) = total_error
     """
 
     def __init__(self, ratio=1.0):
@@ -50,16 +54,16 @@ class ConditionalSelectionRate(ClassificationMoment):
 
         The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as mentioned in the paper
         `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`. The `utilities` defaults to
-        h(X), i.e. [0, 1] for each X_i. The first row is G^0 and the second is G^1. Assumes binary
-        classification with labels 0/1.
+        h(X), i.e. [0, 1] for each X_i. The first column is G^0 and the second is G^1.
+        Assumes binary classification with labels 0/1.
         .. math::
         utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
         if utilities is None:
-            utilities = np.array([np.zeros(y.shape, dtype=np.int64),
-                                  np.ones(y.shape, dtype=np.int64)])
+            utilities = np.vstack([np.zeros(y.shape, dtype=np.int64),
+                                  np.ones(y.shape, dtype=np.int64)]).T
         self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
@@ -94,8 +98,8 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
-        utility_diff = self.utilities[1] - self.utilities[0]
-        pred = utility_diff * predictor(self.X) + self.utilities[0]
+        utility_diff = self.utilities[:,1] - self.utilities[:,0]
+        pred = utility_diff.T * predictor(self.X) + self.utilities[:,0]
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
         expect_group_event = self.tags.groupby(
@@ -119,13 +123,10 @@ class ConditionalSelectionRate(ClassificationMoment):
         i.e., returns lambda which is guaranteed to lead to the same or higher value of the
         Lagrangian compared with lambda_vec for all possible choices of the classifier, h.
         """
-        lambda_pos = lambda_vec["+"]
-        lambda_neg = lambda_vec["-"]
-        lambda_min = np.minimum(lambda_pos, lambda_neg)
-        lambda_max = np.maximum(lambda_pos, lambda_neg)
-        lambda_subtract = np.minimum(lambda_max, lambda_min / self.ratio)
-        lambda_pos = lambda_pos - lambda_subtract
-        lambda_neg = lambda_neg - lambda_subtract
+        lambda_pos = lambda_vec["+"] - lambda_vec["-"]
+        lambda_neg = -lambda_pos
+        lambda_pos[lambda_pos < 0.0] = 0.0
+        lambda_neg[lambda_neg < 0.0] = 0.0
         lambda_projected = pd.concat([lambda_pos, lambda_neg],
                                      keys=["+", "-"],
                                      names=[_SIGN, _EVENT, _GROUP_ID])
@@ -151,8 +152,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed_weights = self.tags.apply(
             lambda row: 0 if pd.isna(row[_EVENT]) else adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
-        utility_diff = self.utilities[1] - self.utilities[0]
-        signed_weights = utility_diff * signed_weights
+        utility_diff = self.utilities[:,1] - self.utilities[:,0]
+        signed_weights = utility_diff.T * signed_weights
         return signed_weights
 
 
@@ -171,7 +172,7 @@ class DemographicParity(ConditionalSelectionRate):
 
     This implementation of :class:`ConditionalSelectionRate` defines
     a single event, `all`. Consequently, the `prob_event`
-    :class:`pandas:pandas.DataFrame`
+    :class:`pandas:pandas.Series`
     will only have a single entry, which will be equal to 1.
     Similarly, the `index` property will have twice as many entries
     (corresponding to the Lagrange multipliers for positive and negative constraints)
@@ -233,7 +234,7 @@ class EqualizedOdds(ConditionalSelectionRate):
     This implementation of :class:`ConditionalSelectionRate` defines
     events corresponding to the unique values of the `Y` array.
 
-    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
+    The `prob_event` :class:`pandas:pandas.Series` will record the
     fraction of the samples corresponding to each unique value in
     the `Y` array.
 
@@ -266,7 +267,7 @@ class ErrorRateRatio(ConditionalSelectionRate):
     ratio <= E[abs(h(x) - y)| A = a] / E[abs(h(x) - y)] <= 1/ratio\; \forall a
 
     This implementation of :class:`ConditionalSelectionRate` defines a single event, `all`.
-    Consequently, the `prob_event` :class:`pandas:pandas.DataFrame` will only have a single
+    Consequently, the `prob_event` :class:`pandas:pandas.Series` will only have a single
     entry, which will be equal to 1.
 
     The `index` property will have twice as many entries (corresponding to the Lagrange multipliers
@@ -274,15 +275,11 @@ class ErrorRateRatio(ConditionalSelectionRate):
 
     The :meth:`signed_weights` method will compute the costs according to Example 3 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
-
-    The `ratio` defines the amount of relaxation that is allowed for the constraint.
-    The value varies in the range (0,1]. The ratio of 1 means, the constraint is given
-    no relaxation and thus, the constraint tries to evaluate for
-    error(A = a) / total_error = 1
+    However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
     """
 
     short_name = "ErrorRateRatio"
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
-        super().load_data(X, y, event=_ALL, utilities=np.array([y, 1-y]), **kwargs)
+        super().load_data(X, y, event=_ALL, utilities=np.vstack([y, 1-y]).T, **kwargs)
