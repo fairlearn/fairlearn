@@ -72,15 +72,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        _, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
+        _, y_train, sensitive_features = _validate_and_reformat_input(X, y, **kwargs)
 
         n = y_train.shape[0]
 
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self._eps
-        lagrangian = _Lagrangian(X, A, y_train, self._estimator, self._constraints,
-                                 self._eps, B)
+        lagrangian = _Lagrangian(X, sensitive_features, y_train, self._estimator,
+                                 self._constraints, self._eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
