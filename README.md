@@ -184,8 +184,8 @@ encounter any problems.
 
 ## Usage
 
-For common usage refer to the [Jupyter notebooks](./notebooks) and our [API
-guide](./CONTRIBUTING.md#api)
+For common usage refer to the [Jupyter notebooks](./notebooks) and our
+[API guide](./CONTRIBUTING.md#api)
 
 ## Contributing
 
