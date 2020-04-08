@@ -98,8 +98,8 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
-        utility_diff = self.utilities[:,1] - self.utilities[:,0]
-        pred = utility_diff.T * predictor(self.X) + self.utilities[:,0]
+        utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
+        pred = utility_diff.T * predictor(self.X) + self.utilities[:, 0]
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
         expect_group_event = self.tags.groupby(
@@ -152,7 +152,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed_weights = self.tags.apply(
             lambda row: 0 if pd.isna(row[_EVENT]) else adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
-        utility_diff = self.utilities[:,1] - self.utilities[:,0]
+        utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         signed_weights = utility_diff.T * signed_weights
         return signed_weights
 
