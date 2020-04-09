@@ -52,11 +52,15 @@ class TestExponentiatedGradientArguments:
         X, y, A = _get_data(A_two_dim)
         merged_A = _map_into_single_column(A)
 
+        transformed_X = transformX(X)
+        transformed_y = transformY(y)
+        transformed_A = transformA(A)
+
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(),
             eps=0.1)
-        expgrad.fit(transformX(X), transformY(y), sensitive_features=transformA(A))
+        expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
@@ -75,3 +79,8 @@ class TestExponentiatedGradientArguments:
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad._n_oracle_calls == 32
         assert n_predictors == 3
+
+        # ensure that the input data wasn't changed by our mitigator
+        assert type(transformed_X) == type(transformX(X))
+        assert type(transformed_y) == type(transformY(y))
+        assert type(transformed_A) == type(transformA(A))
