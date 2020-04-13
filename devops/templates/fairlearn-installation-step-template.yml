@@ -4,7 +4,7 @@ parameters:
   installationType: "None"
 
 steps:
-- script: echo "Installation type: ${{parameters.installationType}}"
+- script: echo "Step to show installation type"
   displayName: "Fairlearn installation: ${{parameters.installationType}}"
 
 ${{ if eq(parameters.installationType, 'Editable') }}:
