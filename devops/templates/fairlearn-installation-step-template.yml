@@ -7,7 +7,7 @@ steps:
 # Validation of installationType
 - script: exit 1
   displayName: "Bad installationType: ${{parameters.installationType}}"
-  condition: notIn ('${{parameters.installationType}}', 'None', 'Editable')
+  condition: notIn ('${{parameters.installationType}}', 'None', 'Editable', 'PyPI')
 
 # ==============================================================
 # Install editable
@@ -25,6 +25,6 @@ steps:
         devops
         docs
         *.md
-        
+
   - script: ls -p
     displayName: "List after deletion"
