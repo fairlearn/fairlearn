@@ -3,9 +3,6 @@
 parameters:
   installationType: "None"
 
-variables:
-  validTypes: 
-
 steps:
 - script: exit 1
   displayName: "Bad installationType: ${{parameters.installationType}}"
