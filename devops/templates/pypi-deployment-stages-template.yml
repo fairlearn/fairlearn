@@ -101,8 +101,8 @@ stages:
     parameters:
       platform: Linux
       vmImage: 'ubuntu-16.04'
-      freezeArtifactStem: ${{freezeArtifactStem}}
-      freezeFileStem: ${{freezeFileStem}}
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+      freezeFileStem: ${{parameters.freezeFileStem}}
       pyVersions: [3.8] #ONLY FOR TESTING
       testRunType: 'Unit'
       installationType: 'PyPI'
