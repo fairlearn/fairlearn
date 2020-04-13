@@ -47,6 +47,7 @@ jobs:
     platform: Linux
     testRunType: 'Notebooks'
     installationType: 'Editable'
+    vmImage: 'ubuntu-16.04'
     pyVersions: [3.6]
 
 - template: templates/all-tests-job-template.yml
