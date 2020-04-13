@@ -4,13 +4,15 @@
 parameters:
   name: ''
   vmImage: ''
+  testRunType: ''
+  installationType: ''
   pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
   freezeArtifactStem: 
   freezeFileStem:
 
 jobs:
-- job: ${{ parameters.name }}
+- job: ${{ parameters.name }}-${{parameters.testRunType}}
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
@@ -24,6 +26,11 @@ jobs:
           FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
 
   steps:
+
+  - ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
+    - script: exit 1
+      displayName: "Bad testRunType: ${{parameters.testRunType}}"
+
   - task: UsePythonVersion@0
     displayName: 'Use Python $(PyVer)'
     inputs:
@@ -45,13 +52,20 @@ jobs:
 
   - template: fairlearn-installation-step-template.yml
     parameters:
-      installationType: "None"
+      installationType: ${{parameters.installationType}}
     
   - script: flake8 .
     displayName: "Run flake8"
 
-  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
-    displayName: 'Run tests'
+  # =================================================
+  - ${{ if eq(parameters.testRunType, 'Unit')}}:
+    - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+      displayName: 'Run unit tests'
+
+  - ${{ if eq(parameters.testRunType, 'Notebooks')}}:
+    - script: python -m pytest test/ -m notebooks --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
+      displayName: 'Run notebooks as tests'
+  # =================================================
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'

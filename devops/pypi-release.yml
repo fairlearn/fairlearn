@@ -59,13 +59,13 @@ stages:
 
   - template: templates/notebook-job-template.yml
     parameters:
-      name: LinuxNotebooks
+      name: Linux
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.8] #ONLY FOR TESTING
 
   - template: templates/notebook-job-template.yml
     parameters:
-      name: WindowsNotebooks
+      name: Windows
       vmImage: 'vs2017-win2016'
       pyVersions: [3.7] #ONLY FOR TESTING
   

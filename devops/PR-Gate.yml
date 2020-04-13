@@ -16,6 +16,8 @@ jobs:
   parameters:
     name: Linux
     vmImage: 'ubuntu-16.04'
+    testRunType: 'Unit'
+    installationType: 'None'
     pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
@@ -24,6 +26,8 @@ jobs:
   parameters:
     name: Windows
     vmImage:  'vs2017-win2016'
+    testRunType: 'Unit'
+    installationType: 'None'
     pyVersions: [3.6]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
@@ -32,18 +36,24 @@ jobs:
   parameters:
     name: MacOS
     vmImage:  'macos-latest'
+    testRunType: 'Unit'
+    installationType: 'None'
     pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
-- template: templates/notebook-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
-    name: LinuxNotebooks
+    name: Linux
+    testRunType: 'Notebooks'
+    installationType: 'Editable'
     pyVersions: [3.6]
 
-- template: templates/notebook-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
-    name: WindowsNotebooks
+    name: Windows
+    testRunType: 'Notebooks'
+    installationType: 'Editable'
     vmImage: 'vs2017-win2016'
     pyVersions: [3.8]
 
