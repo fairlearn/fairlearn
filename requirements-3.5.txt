@@ -22,6 +22,7 @@ papermill<2.0.0
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
+pytest-mock
 pytest-mpl>=0.11
 nteract-scrapbook
 tempeh==0.1.12

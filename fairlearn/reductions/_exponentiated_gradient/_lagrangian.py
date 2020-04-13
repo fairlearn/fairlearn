@@ -56,39 +56,39 @@ class _Lagrangian:
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
 
-    def _eval_from_error_gamma(self, error, gamma, lambda_vec):
-        """Return the value of the Lagrangian.
-
-        :return: tuple `(L, L_high)` where `L` is the value of the Lagrangian, and
-            `L_high` is the value of the Lagrangian under the best response of the lambda player
-        :rtype: tuple of two floats
-        """
-        lambda_projected = self.constraints.project_lambda(lambda_vec)
-        if self.opt_lambda:
-            L = error + np.sum(lambda_projected * gamma) - self.eps * np.sum(lambda_projected)
-        else:
-            L = error + np.sum(lambda_vec * gamma) - self.eps * np.sum(lambda_vec)
-        max_gamma = gamma.max()
-        if max_gamma < self.eps:
-            L_high = error
-        else:
-            L_high = error + self.B * (max_gamma - self.eps)
-        return L, L_high
-
     def _eval(self, h, lambda_vec):
         """Return the value of the Lagrangian.
+
+        :param h: TODO: should this be Q instead of h? It seems to indicate how much weight each h
+            gets in the randomized classifier, summing up to 1
+        :type h: pandas.Series
+        :param lambda_vec: lambda vector
+        :type h: pandas.Series
 
         :return: tuple `(L, L_high, gamma, error)` where `L` is the value of the Lagrangian,
             `L_high` is the value of the Lagrangian under the best response of the lambda player,
             `gamma` is the vector of constraint violations, and `error` is the empirical error
         """
-        if callable(h):
-            error = self.obj.gamma(h)[0]
-            gamma = self.constraints.gamma(h)
+        error = self.errors[h.index].dot(h)
+        gamma = self.gammas[h.index].dot(h)
+
+        # TODO: some entries in gamma can be negative, presumably because for certain sensitive
+        # feature values the (one-sided) constraint is satisfied and then some. However, below
+        # we multiply the lambda vector with it to calculate the Lagrangian value L, so negative
+        # values should reduce that. Is that intended? Just trying to make sure that's not
+        # unintended.
+
+        if self.opt_lambda:
+            lambda_projected = self.constraints.project_lambda(lambda_vec)
+            L = error + np.sum(lambda_projected * gamma) - self.eps * np.sum(lambda_projected)
         else:
-            error = self.errors[h.index].dot(h)
-            gamma = self.gammas[h.index].dot(h)
-        L, L_high = self._eval_from_error_gamma(error, gamma, lambda_vec)
+            L = error + np.sum(lambda_vec * gamma) - self.eps * np.sum(lambda_vec)
+
+        max_gamma = gamma.max()
+        if max_gamma < self.eps:
+            L_high = error
+        else:
+            L_high = error + self.B * (max_gamma - self.eps)
         return L, L_high, gamma, error
 
     def eval_gap(self, h, lambda_hat, nu):
@@ -98,8 +98,7 @@ class _Lagrangian:
         for mul in [1.0, 2.0, 5.0, 10.0]:
             h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
             logger.debug("%smul=%.0f", _INDENTATION, mul)
-            L_low_mul, _, _, _ = self._eval(
-                pd.Series({h_hat_idx: 1.0}), lambda_hat)
+            L_low_mul, _, _, _ = self._eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
             if L_low_mul < result.L_low:
                 result.L_low = L_low_mul
             if result.gap() > nu + _PRECISION:
@@ -132,12 +131,7 @@ class _Lagrangian:
         self.last_linprog_result = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
         return self.last_linprog_result
 
-    def best_h(self, lambda_vec):
-        """Solve the best-response problem.
-
-        Returns the classifier that solves the best-response problem for
-        the vector of Lagrange multipliers `lambda_vec`.
-        """
+    def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
         redY = 1 * (signed_weights > 0)
         redW = signed_weights.abs()
@@ -149,6 +143,15 @@ class _Lagrangian:
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
+        return classifier
+
+    def best_h(self, lambda_vec):
+        """Solve the best-response problem.
+
+        Returns the classifier that solves the best-response problem for
+        the vector of Lagrange multipliers `lambda_vec`.
+        """
+        classifier = self._call_oracle(lambda_vec)
         def h(X): return classifier.predict(X)
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)

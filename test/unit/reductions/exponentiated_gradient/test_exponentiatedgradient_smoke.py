@@ -9,14 +9,12 @@ from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRate
 from fairlearn.reductions._exponentiated_gradient._constants import _MIN_T
 from .simple_learners import LeastSquaresBinaryClassifierLearner
-from .test_utilities import sensitive_features, X1, X2, X3, labels
+from .test_utilities import sensitive_features, X1, labels, _get_data
 
 
 class TestExponentiatedGradientSmoke:
     def setup_method(self, method):
-        self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
-        self.y = pd.Series(labels)
-        self.A = pd.Series(sensitive_features)
+        self.X, self.y, self.A = _get_data(A_two_dim=False)
         self.learner = LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 

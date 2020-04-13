@@ -10,7 +10,7 @@ from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity
 from fairlearn.reductions import ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
-from .test_utilities import sensitive_features, X1, X2, X3, labels
+from .test_utilities import _get_data
 
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, \
     ensure_dataframe, _map_into_single_column
@@ -26,19 +26,6 @@ candidate_A_transforms = conversions_for_1d
 # ================================================================
 
 _PRECISION = 1e-6
-
-
-def _get_data(A_two_dim=False):
-    X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
-    y = pd.Series(labels)
-
-    if A_two_dim:
-        # Stacking the same column a few times will result in the identical groups
-        # compared to using a single column, therefore results should be the same.
-        A = np.stack((sensitive_features, sensitive_features), -1)
-    else:
-        A = pd.Series(sensitive_features)
-    return X, y, A
 
 
 class TestExponentiatedGradientArguments:
@@ -81,6 +68,6 @@ class TestExponentiatedGradientArguments:
         assert n_predictors == 3
 
         # ensure that the input data wasn't changed by our mitigator
-        assert type(transformed_X) == type(transformX(X))
-        assert type(transformed_y) == type(transformY(y))
-        assert type(transformed_A) == type(transformA(A))
+        assert isinstance(transformed_X, type(transformX(X)))
+        assert isinstance(transformed_y, type(transformY(y)))
+        assert isinstance(transformed_A, type(transformA(A)))
