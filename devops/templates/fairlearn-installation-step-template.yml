@@ -5,6 +5,7 @@ parameters:
 
 steps:
 # Validation of installationType
+# Something is strange with template condition vs task condition
 - ${{ if notIn('${{parameters.installationType}}', 'None', 'Editable', 'PyPI') }}:
   - script: exit 1
     displayName: "Bad installationType: ${{parameters.installationType}}"
@@ -18,7 +19,7 @@ steps:
 
 # ===============================================================
 # Install from PyPI
-- ${{ if eq(parameters.installationType, 'PyPI') }}:
+- ${{ if in(parameters.installationType, 'PyPI', 'WheelArtifact') }}:
   - task: DeleteFiles@1
     inputs:
       contents: |
