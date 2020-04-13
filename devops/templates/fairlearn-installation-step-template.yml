@@ -1,11 +1,11 @@
 # Template to install fairlearn from designated location
 
 parameters:
-  installationType: "None"
+  installationType: 'None'
 
 steps:
 # Validation of installationType
-- ${{ if notIn(${{parameters.installationType}}, 'None', 'Editable', 'PyPI') }}:
+- ${{ if notIn( '${{parameters.installationType}}', 'None', 'Editable', 'PyPI') }}:
   - script: exit 1
     displayName: "Bad installationType: ${{parameters.installationType}}"
 
