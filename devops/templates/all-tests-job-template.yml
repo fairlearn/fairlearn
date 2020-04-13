@@ -66,7 +66,7 @@ jobs:
       pypiUrl: $(pypiUrl)
       versionArtifactName: ${{parameters.verionArtifactName}}
       versionArtifactFile: ${{parameters.versionArtifactFile}}
-      pipVersionVariable: 
+      pipVersionVariable: variableForPipVersion
     
   - script: flake8 .
     displayName: "Run flake8"
