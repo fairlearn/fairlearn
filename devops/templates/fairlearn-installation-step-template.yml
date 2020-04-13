@@ -5,7 +5,7 @@ parameters:
 
 steps:
 # Validation of installationType
-- ${{ if notIn('${{parameters.installationType}}', 'None', 'Editable', 'PyPI') }}:
+- ${{ if notIn(${{parameters.installationType}}, 'None', 'Editable', 'PyPI') }}:
   - script: exit 1
     displayName: "Bad installationType: ${{parameters.installationType}}"
 
