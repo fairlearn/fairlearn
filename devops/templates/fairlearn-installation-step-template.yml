@@ -41,7 +41,11 @@ steps:
     - task: DownloadPipelineArtifact@2
       displayName: "Download version Artifact"
       inputs:
-        artifactName: ${{parameters.versionArtifactName}}
+        artifact: ${{parameters.versionArtifactName}}
+        path: $(Build.SourcesDirectory)
+
+    - script: ls -p
+      displayName: "Show sources directory"
 
     - task: PowerShell@2
       displayName: 'Read version Artifact and set pipeline variable from file contents'
