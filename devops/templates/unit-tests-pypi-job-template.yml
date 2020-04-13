@@ -63,7 +63,7 @@ jobs:
       pypiUrl: $(pypiUrl)
       versionArtifactName: ${{parameters.versionFileArtifact}}
       versionArtifactFile: ${{parameters.versionFileName}}
-      pipVerionVariable: fairlearnVersionForpip
+      pipVersionVariable: fairlearnVersionForpip
 
   # Run the tests
   - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName) targetType=${{parameters.targetType}} pipVersion=$(fairlearnVersionForpip)"

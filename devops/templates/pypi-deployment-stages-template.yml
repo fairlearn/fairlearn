@@ -110,23 +110,27 @@ stages:
       versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: unit-tests-pypi-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
       name: Windows
       vmImage: 'vs2017-win2016'
       pyVersions: [3.5] #ONLY FOR TESTING
+      testRunType: 'Unit'
+      installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: unit-tests-pypi-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
       name: MacOS
       vmImage: 'macos-latest'
       pyVersions: [3.8] #ONLY FOR TESTING
+      testRunType: 'Unit'
+      installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
   - template: notebook-pypi-job-template.yml
     parameters:

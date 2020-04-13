@@ -5,7 +5,7 @@ parameters:
   pypiUrl:
   versionArtifactName:
   versionArtifactFile:
-  pipVersionVariable:
+  pipVersionVariable: 'pipVersionVar'
 
 steps:
 # Validation of installationType
