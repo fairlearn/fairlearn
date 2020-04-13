@@ -2,7 +2,7 @@
 # and running all tests (except for install tests)
 
 parameters:
-  name: ''
+  platform: ''
   vmImage: ''
   testRunType: ''
   installationType: ''
@@ -12,7 +12,7 @@ parameters:
   freezeFileStem:
 
 jobs:
-- job: ${{ parameters.name }}-${{parameters.testRunType}}
+- job: ${{ parameters.platform }}_${{parameters.testRunType}}
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
