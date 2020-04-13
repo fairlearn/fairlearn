@@ -6,7 +6,7 @@ parameters:
 steps:
 - script: exit 1
   displayName: "Bad installationType: ${{parameters.installationType}}"
-  condition: ${{parameters.installationType}} notIn ('None', 'Editable')
+  condition: notIn ('${{parameters.installationType}}', 'None', 'Editable')
 
 - ${{ if eq(parameters.installationType, 'Editable') }}:
   - script: pip install -e .
