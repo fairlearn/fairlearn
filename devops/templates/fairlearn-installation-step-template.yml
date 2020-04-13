@@ -4,10 +4,26 @@ parameters:
   installationType: "None"
 
 steps:
+# Validation of installationType
 - script: exit 1
   displayName: "Bad installationType: ${{parameters.installationType}}"
   condition: notIn ('${{parameters.installationType}}', 'None', 'Editable')
 
+# ==============================================================
+# Install editable
 - ${{ if eq(parameters.installationType, 'Editable') }}:
   - script: pip install -e .
     displayName: "Install fairlearn in editable mode"
+
+# ===============================================================
+# Install from PyPI
+- ${{ if eq(parameters.installationType, 'PyPI') }}:
+  - task: DeleteFiles@1
+      inputs:
+        contents: |
+          fairlearn
+          devops
+          docs
+          *.md
+  - script: ls -p
+    displayName: "List after deletion"

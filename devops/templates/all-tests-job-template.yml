@@ -45,7 +45,7 @@ jobs:
 
   - template: fairlearn-installation-step-template.yml
     parameters:
-      installationType: "None"
+      installationType: "PyPI" # Only for testing
     
   - script: flake8 .
     displayName: "Run flake8"
