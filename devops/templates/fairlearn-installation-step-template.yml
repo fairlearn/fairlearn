@@ -7,6 +7,6 @@ steps:
 - script: echo "Step to show installation type"
   displayName: "Fairlearn installation: ${{parameters.installationType}}"
 
-${{ if eq(parameters.installationType, 'Editable') }}:
+- ${{ if eq(parameters.installationType, 'Editable') }}:
   - script: pip install -e .
     displayName: "Install fairlearn in editable mode"
