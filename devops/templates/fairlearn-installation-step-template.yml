@@ -2,11 +2,15 @@
 
 parameters:
   installationType: 'None'
+  pypiUrl:
+  versionArtifactName:
+  versionArtifactFile:
+  pipVerionVariable:
 
 steps:
 # Validation of installationType
 # Something is strange with template condition vs task condition
-- ${{ if notIn('${{parameters.installationType}}', 'None', 'Editable', 'PyPI') }}:
+- ${{ if notIn(parameters.installationType, 'None', 'Editable', 'PyPI') }}:
   - script: exit 1
     displayName: "Bad installationType: ${{parameters.installationType}}"
     condition: notIn('${{parameters.installationType}}', 'None', 'Editable', 'PyPI')
@@ -18,8 +22,9 @@ steps:
     displayName: "Install fairlearn in editable mode"
 
 # ===============================================================
-# Install from PyPI
+# Install from a wheel package
 - ${{ if in(parameters.installationType, 'PyPI', 'WheelArtifact') }}:
+  # Clear out the checked out code
   - task: DeleteFiles@1
     inputs:
       contents: |
@@ -30,3 +35,21 @@ steps:
 
   - script: ls -p
     displayName: "List after deletion"
+
+  # Install from PyPI
+  - ${{ if eq(parameters.installationType, 'PyPI') }}:
+    - task: DownloadPipelineArtifact@2
+      displayName: "Download version Artifact"
+      inputs:
+        artifactName: ${{parameters.versionArtifactName}}
+
+    - task: PowerShell@2
+      displayName: 'Read version Artifact and set pipeline variable from file contents'
+      inputs:
+        filePath: scripts/set-variable-from-file.ps1
+        arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVerionVariable}}"
+        pwsh: true
+    
+    - script: pip install --index-url ${{parameters.pypiUrl}} fairlearn==$(fairlearnVersionForpip)
+      displayName: "Install fairlearn with pip"
+    
