@@ -10,6 +10,10 @@ parameters:
   pinRequirements: False
   freezeArtifactStem: 
   freezeFileStem:
+  # Following are used if the installationType is PyPI
+  targetType: 'Test'
+  versionArtifactName:
+  versionArtifactFile:
 
 jobs:
 - job: ${{ parameters.platform }}_${{parameters.testRunType}}
@@ -24,6 +28,12 @@ jobs:
           RequirementsFile: requirements-${{pyVer}}.txt
           FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{parameters.testRunType}}${{pyVer}}'
           FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
+
+  variables:
+    ${{ if eq(parameters.targetType, 'Test') }}:
+      pypiUrl: https://test.pypi.org/simple/
+    ${{ if eq(parameters.targetType, 'Prod') }}:
+      pypiUrl: https://pypi.org/simple/
 
   steps:
 
@@ -53,6 +63,10 @@ jobs:
   - template: fairlearn-installation-step-template.yml
     parameters:
       installationType: ${{parameters.installationType}}
+      pypiUrl: $(pypiUrl)
+      versionArtifactName: ${{parameters.verionArtifactName}}
+      versionArtifactFile: ${{parameters.versionArtifactFile}}
+      pipVersionVariable:
     
   - script: flake8 .
     displayName: "Run flake8"

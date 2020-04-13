@@ -97,14 +97,18 @@ stages:
 - stage: 'Validate_Package_from_PyPI_${{parameters.targetType}}'
   
   jobs:
-  - template: unit-tests-pypi-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
-      name: Linux
+      platform: Linux
       vmImage: 'ubuntu-16.04'
+      freezeArtifactStem: ${{freezeArtifactStem}}
+      freezeFileStem: ${{freezeFileStem}}
       pyVersions: [3.8] #ONLY FOR TESTING
+      testRunType: 'Unit'
+      installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
   - template: unit-tests-pypi-job-template.yml
     parameters:
