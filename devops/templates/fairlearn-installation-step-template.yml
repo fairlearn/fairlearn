@@ -3,9 +3,13 @@
 parameters:
   installationType: "None"
 
+variables:
+  validTypes: 
+
 steps:
-- script: echo "Step to show installation type"
-  displayName: "Fairlearn installation: ${{parameters.installationType}}"
+- script: exit 1
+  displayName: "Bad installationType: ${{parameters.installationType}}"
+  condition: ${{parameters. installationType}} not in('None', 'Editable')
 
 - ${{ if eq(parameters.installationType, 'Editable') }}:
   - script: pip install -e .
