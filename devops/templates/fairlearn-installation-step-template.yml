@@ -1,0 +1,12 @@
+# Template to install fairlearn from designated location
+
+parameters:
+  installationType: "None"
+
+steps:
+- script: echo "Installation type: ${{parameters.installationType}}"
+  displayName: "Fairlearn installation: ${{parameters.installationType}}"
+
+${{ if eq(parameters.installationType, 'Editable') }}:
+  - script: pip install -e .
+    displayName: "Install fairlearn in editable mode"

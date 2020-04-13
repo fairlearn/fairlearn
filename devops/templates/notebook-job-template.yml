@@ -31,8 +31,9 @@ jobs:
       requirementsFile: $(RequirementsFile)
       pinRequirements: ${{parameters.pinRequirements}}
 
-  - script: pip install -e .
-    displayName: 'Install fairlearn in edit mode'
+  - template: fairlearn-installation-step-template.yml
+    parameters:
+      installationType: "Editable"
 
   - script: python -m pytest test/ -m notebooks --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run notebooks as tests'
