@@ -173,10 +173,10 @@ class TruePositiveRateDifference(ConditionalSelectionRate):
     by two (for the Lagrange multipliers for positive and negative constraints).
 
     With these definitions, the :meth:`signed_weights` method
-    will calculate the costs like how it is calculated in Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ but for all
-    `y=1' samples and subsequently, add a weight of `0` for
-    all other samples (for all `y=0`).
+    will calculate the costs for `y=1` similar to how it is calculated in Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_  for all
+    `y=1' samples, but will use the weights equal to zero for `y=0`.
     """
 
     short_name = "TruePositiveRateDifference"
