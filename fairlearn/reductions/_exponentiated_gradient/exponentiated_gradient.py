@@ -66,6 +66,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._lambda_vecs = pd.DataFrame()
         self._lambda_vecs_LP = pd.DataFrame()
         self._lambda_vecs_lagrangian = pd.DataFrame()
+        self._is_classification_reduction = None
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -79,13 +80,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         if isinstance(self._constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
-            is_classification_reduction = True
+            self._is_classification_reduction = True
         else:
             logger.debug("Regression problem detected")
-            is_classification_reduction = False
+            self._is_classification_reduction = False
 
         _, y_train, sensitive_features = _validate_and_reformat_input(
-            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
+            X, y, enforce_binary_labels=self._is_classification_reduction, **kwargs)
 
         n = y_train.shape[0]
 
@@ -205,8 +206,11 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             the result will be a scalar. Otherwise the result will be a vector
         :rtype: Scalar or vector
         """
-        positive_probs = self._pmf_predict(X)[:, 1]
-        return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+        if self._is_classification_reduction:
+            positive_probs = self._pmf_predict(X)[:, 1]
+            return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+        else:
+            return self._pmf_predict(X)
 
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
@@ -219,5 +223,12 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
             pred[t] = self._hs[t](X)
-        positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
-        return np.concatenate((1-positive_probs, positive_probs), axis=1)
+        if self._is_classification_reduction:
+            positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
+            return np.concatenate((1-positive_probs, positive_probs), axis=1)
+        else:
+            if 1.0 in self._weights:  # check if we assign all the probability to only one predictor
+                return pred[self._weights.index].dot(self._weights)
+            else:
+                # TODO: implement randomization
+                raise RuntimeError('Randomized prediction still not implemented!')

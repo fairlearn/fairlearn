@@ -6,9 +6,13 @@ import numpy as np
 import pandas as pd
 import pickle
 import scipy.optimize as opt
+from sklearn.dummy import DummyClassifier
 from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
+
+from fairlearn.reductions._moments import ClassificationMoment
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,8 +42,9 @@ class _Lagrangian:
 
     def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
         self.X = X
+        self.y = y
         self.constraints = constraints
-        self.constraints.load_data(X, y, eps=eps, sensitive_features=sensitive_features)
+        self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
         self.pickled_estimator = pickle.dumps(estimator)
@@ -53,6 +58,7 @@ class _Lagrangian:
         self.lambdas = pd.DataFrame()
         self.n = self.X.shape[0]
         self.n_oracle_calls = 0
+        self.n_oracle_calls_dummy_returned = 0
         self.oracle_execution_times = []
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
@@ -133,11 +139,24 @@ class _Lagrangian:
 
     def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
-        redY = 1 * (signed_weights > 0)
+        if isinstance(self.constraints, ClassificationMoment):
+            redY = 1 * (signed_weights > 0)
+        else:
+            redY = self.y
         redW = signed_weights.abs()
         redW = self.n * redW / redW.sum()
 
-        classifier = pickle.loads(self.pickled_estimator)
+        redY_unique = np.unique(redY)
+
+        classifier = None
+        if len(redY_unique) == 1:
+            logger.debug("redY had single value. Using DummyClassifier")
+            classifier = DummyClassifier(strategy='constant',
+                                         constant=redY_unique[0])
+            self.n_oracle_calls_dummy_returned += 1
+        else:
+            classifier = pickle.loads(self.pickled_estimator)
+
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
         self.oracle_execution_times.append(time() - oracle_call_start_time)

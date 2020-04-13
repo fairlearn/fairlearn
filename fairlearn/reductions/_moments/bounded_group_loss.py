@@ -68,13 +68,13 @@ class ConditionalLossMoment(LossMoment):
         """Return the lambda values."""
         return lambda_vec
 
-    def signed_weights(self, lambda_vec):
+    def signed_weights(self, lambda_vec=None):
         """Return the signed weights."""
-        adjust = lambda_vec / self.prob_attr
-        signed_weights = self.tags.apply(
-            lambda row: adjust[row[_GROUP_ID]], axis=1
-        )
-        return signed_weights
+        if lambda_vec is None:
+            adjust = pd.Series(1.0, index=self.index)
+        else:
+            adjust = lambda_vec / self.prob_attr
+        return self.tags.apply(lambda row: adjust[row[_GROUP_ID]], axis=1)
 
 
 # Ensure that ConditionalLossMoment shows up in correct place in documentation
