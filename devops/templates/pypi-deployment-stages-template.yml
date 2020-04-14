@@ -132,20 +132,24 @@ stages:
       versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: notebook-pypi-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
-      name: LinuxNotebooks
+      platform: Linux
       vmImage: 'ubuntu-16.04'
       pyVersions: [3.8] #ONLY FOR TESTING
+      testRunType: 'Notebooks'
+      installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: notebook-pypi-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
-      name: WindowsNotebooks
+      platform: Windows
       vmImage: 'vs2017-win2016'
       pyVersions: [3.8] #ONLY FOR TESTING
+      testRunType: 'Notebooks'
+      installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
       versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
       versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
