@@ -49,7 +49,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         self.index = signed.index
         self.default_objective_lambda_vec = None
 
-        event_vals = self.tags[_EVENT].unique()
+        # fill in the information about the basis
+        event_vals = self.tags[_EVENT].dropna().unique()
         group_vals = self.tags[_GROUP_ID].unique()
         # The matrices pos_basis and neg_basis contain a lower-dimensional description of
         # constraints, which is achieved by removing some redundant constraints.
@@ -113,7 +114,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         adjust = lambda_signed.sum(level=_EVENT) / self.prob_event \
             - lambda_signed / self.prob_group_event
         signed_weights = self.tags.apply(
-            lambda row: adjust[row[_EVENT], row[_GROUP_ID]], axis=1
+            lambda row: 0 if pd.isna(row[_EVENT]) else adjust[row[_EVENT], row[_GROUP_ID]], axis=1
         )
         return signed_weights
 
@@ -148,6 +149,40 @@ class DemographicParity(ConditionalSelectionRate):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, **kwargs)
+
+
+class TruePositiveRateDifference(ConditionalSelectionRate):
+    r"""Implementation of True Positive Rate Difference (Equal Opportunity Difference) as a moment.
+
+    Adds conditioning on label `y=1` compared to Demographic parity, i.e.
+
+    .. math::
+       P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a
+
+    This implementation of :class:`ConditionalSelectionRate` defines
+    the event corresponding to `y=1`.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction of the samples
+    corresponding to `y = 1` in the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to the number of unique values of
+    the sensitive feature, multiplied by the number of unique non-NaN values of the constructed
+    `event` array, whose entries are either NaN or `label=1` (so only one unique non-NaN value),
+    multiplied by two (for the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :meth:`signed_weights` method will calculate the costs for `y=1` as
+    they are calculated in Example 4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
+    but will use the weights equal to zero for `y=0`.
+    """
+
+    short_name = "TruePositiveRateDifference"
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        # The `where` clause is used to put `pd.nan` on all values where `y!=1`.
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
+                          **kwargs)
 
 
 class EqualizedOdds(ConditionalSelectionRate):
