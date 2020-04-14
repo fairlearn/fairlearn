@@ -140,8 +140,8 @@ stages:
       testRunType: 'Notebooks'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
   - template: all-tests-job-template.yml
     parameters:
@@ -151,5 +151,5 @@ stages:
       testRunType: 'Notebooks'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
