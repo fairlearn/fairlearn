@@ -23,33 +23,57 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: Linux
+    platform: Linux
     vmImage: 'ubuntu-16.04'
-    pinRequirements: True
+    testRunType: 'Unit'
+    installationType: 'None'
     pyVersions: [3.5, 3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
+    pinRequirements: True
 
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: Windows
+    platform: Windows
     vmImage:  'vs2017-win2016'
-    pinRequirements: True
+    testRunType: 'Unit'
+    installationType: 'None'
+    pyVersions: [3.5, 3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
-
-- template: templates/notebook-job-template.yml
-  parameters:
-    name: LinuxNotebooks
-    vmImage: 'ubuntu-16.04'
     pinRequirements: True
+    
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platform: MacOS
+    vmImage:  'macos-latest'
+    testRunType: 'Unit'
+    installationType: 'None'
     pyVersions: [3.5, 3.6, 3.7, 3.8]
-
-- template: templates/notebook-job-template.yml
-  parameters:
-    name: WindowsNotebooks
-    vmImage: 'vs2017-win2016'
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
     pinRequirements: True
-    pyVersions: [3.5, 3.6, 3.7, 3.8] 
+
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platform: Linux
+    testRunType: 'Notebooks'
+    installationType: 'Editable'
+    vmImage: 'ubuntu-16.04'
+    pyVersions: [3.5, 3.6, 3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
+    pinRequirements: True
+
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platform: Windows
+    testRunType: 'Notebooks'
+    installationType: 'Editable'
+    vmImage: 'vs2017-win2016'
+    pyVersions: [3.5, 3.6, 3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
+    pinRequirements: True
 
 - template: templates/build-widget-job-template.yml
