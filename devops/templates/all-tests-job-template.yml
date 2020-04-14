@@ -64,7 +64,7 @@ jobs:
     parameters:
       installationType: ${{parameters.installationType}}
       pypiUrl: $(pypiUrl)
-      versionArtifactName: ${{parameters.verionArtifactName}}
+      versionArtifactName: ${{parameters.versionArtifactName}}
       versionArtifactFile: ${{parameters.versionArtifactFile}}
       pipVersionVariable: variableForPipVersion
     
