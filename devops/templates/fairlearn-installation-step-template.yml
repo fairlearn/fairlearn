@@ -1,5 +1,13 @@
 # Template to install fairlearn from designated location
 
+# Valid installation types are (currently):
+# None: Does nothing
+# Editable: Runs `pip install -e`
+# PyPI: Installs from specified PyPI URL, with the version
+#       specified in the versionArtifact
+# Another type of "WheelArtifact" is planned, which will
+# `pip install` a wheel file from a pipeline Artifact
+
 parameters:
   installationType: 'None'
   pypiUrl:

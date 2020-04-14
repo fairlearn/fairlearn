@@ -1,5 +1,21 @@
-# template for setting up the python environment (with optional pinned requirements)
+# Template for setting up the python environment (with optional pinned requirements)
 # and running all tests (except for install tests)
+
+# Some key parameters:
+
+# platform
+# A human-readable string which should be set to match vmImage
+
+# testRunType: {Unit, Notebooks}
+# Specifies the set of tests to be run
+
+# installationType: {None, Editable, PyPI}
+# Specifies how Fairlearn should be made available. Note
+# that the Notebooks tests will not work with 'None'
+# If PyPI is specified, then targetType, versionArtifactName
+# and versionArtifactFile need to be specified, in order to
+# determine which PyPI archive to use, and which version
+# of Fairlearn to fetch from it.
 
 parameters:
   platform: ''
