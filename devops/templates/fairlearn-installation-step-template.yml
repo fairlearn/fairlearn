@@ -51,7 +51,7 @@ steps:
       displayName: 'Read version Artifact and set pipeline variable from file contents'
       inputs:
         filePath: scripts/set-variable-from-file.ps1
-        arguments: "-baseDir $(Pipeline.Workspace) -subDir ${{parameters.versionArtifactName}} -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVersionVariable}}"
+        arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVersionVariable}}"
         pwsh: true
     
     - script: pip install --index-url ${{parameters.pypiUrl}} fairlearn==$(${{parameters.pipVersionVariable}})
