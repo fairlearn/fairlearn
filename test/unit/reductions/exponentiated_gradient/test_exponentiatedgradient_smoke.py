@@ -16,11 +16,11 @@ class TestExponentiatedGradientSmoke:
     def setup_method(self, method):
         self.X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
         self.y = pd.Series(labels)
+        self.flipped_y = pd.Series([int(not i) for i in labels])
         self.A = pd.Series(sensitive_features)
         self.learner = LeastSquaresBinaryClassifierLearner()
         self._PRECISION = 1e-6
 
-    constraints = [TruePositiveRateDifference(), DemographicParity()]
     smoke_test_data = [{"cons_class": DemographicParity, "eps": 0.100,
                         "best_gap": 0.000000, "last_t": 5,
                         "best_t": 5, "disp": 0.100000,
@@ -77,19 +77,32 @@ class TestExponentiatedGradientSmoke:
                         "error": 0.25, "n_oracle_calls": 16,
                         "n_predictors": 2}
                        ]
+    smoke_test_data_flipped = [
+        {"cons_class": TruePositiveRateDifference, "eps": 0.005,
+         "best_gap": 0.0, "last_t": 5,
+         "best_t": 5, "disp": 0.005000,
+         "error": 0.427133, "n_oracle_calls": 17,
+         "n_predictors": 3},
+        {"cons_class": EqualizedOdds, "eps": 0.005,
+         "best_gap": 0.000000, "last_t": 5,
+         "best_t": 5, "disp": 0.005000,
+         "error": 0.442883, "n_oracle_calls": 19,
+         "n_predictors": 6}
+    ]
 
-    def run_smoke_test(self, data):
+    def run_smoke_test(self, data, flipped=False):
         expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](),
                                         eps=data["eps"])
-        expgrad.fit(self.X, self.y, sensitive_features=self.A)
+        expgrad.fit(self.X, (self.flipped_y if flipped else self.y), sensitive_features=self.A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
 
         disparity_moment = data["cons_class"]()
-        disparity_moment.load_data(self.X, self.y, sensitive_features=self.A)
+        disparity_moment.load_data(self.X, (self.flipped_y if flipped else self.y),
+                                   sensitive_features=self.A)
         error = ErrorRate()
-        error.load_data(self.X, self.y, sensitive_features=self.A)
+        error.load_data(self.X, (self.flipped_y if flipped else self.y), sensitive_features=self.A)
         disparity = disparity_moment.gamma(Q).max()
         error = error.gamma(Q)[0]
 
@@ -105,10 +118,14 @@ class TestExponentiatedGradientSmoke:
     def test_smoke(self, testdata):
         self.run_smoke_test(testdata)
 
-    @pytest.mark.parametrize("constraints", constraints)
-    def test_simple_fit_predict(self, constraints):
+    @pytest.mark.parametrize("testdata", smoke_test_data_flipped)
+    def test_smoke_flipped(self, testdata):
+        self.run_smoke_test(testdata, flipped=True)
+
+    @pytest.mark.parametrize("constraint", [TruePositiveRateDifference, DemographicParity])
+    def test_simple_fit_predict(self, constraint):
         estimator = LeastSquaresBinaryClassifierLearner()
-        expgrad = ExponentiatedGradient(estimator, constraints)
+        expgrad = ExponentiatedGradient(estimator, constraint())
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))

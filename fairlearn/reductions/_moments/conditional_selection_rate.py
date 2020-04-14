@@ -162,21 +162,17 @@ class TruePositiveRateDifference(ConditionalSelectionRate):
     This implementation of :class:`ConditionalSelectionRate` defines
     the event corresponding to `y=1`.
 
-    The `prob_event` :class:`pandas:pandas.DataFrame` will record the
-    fraction of the samples corresponding to `y = 1` in
-    the `Y` array.
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction of the samples
+    corresponding to `y = 1` in the `Y` array.
 
-    The `index` MultiIndex will have a number of entries equal to
-    the number of unique values of the sensitive feature, multiplied by
-    the number of unique non-NaN values of the constructed `event` array,
-    whose entries are either NaN or `label=1` (so only one unique non-NaN value), multiplied
-    by two (for the Lagrange multipliers for positive and negative constraints).
+    The `index` MultiIndex will have a number of entries equal to the number of unique values of
+    the sensitive feature, multiplied by the number of unique non-NaN values of the constructed
+    `event` array, whose entries are either NaN or `label=1` (so only one unique non-NaN value),
+    multiplied by two (for the Lagrange multipliers for positive and negative constraints).
 
-    With these definitions, the :meth:`signed_weights` method
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ but for all
-    will calculate the costs for `y=1` similar to how it is calculated in Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_  for all
-    `y=1' samples, but will use the weights equal to zero for `y=0`.
+    With these definitions, the :meth:`signed_weights` method will calculate the costs for `y=1` as
+    they are calculated in Example 4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
+    but will use the weights equal to zero for `y=0`.
     """
 
     short_name = "TruePositiveRateDifference"
