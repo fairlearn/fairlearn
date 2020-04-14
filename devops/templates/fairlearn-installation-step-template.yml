@@ -44,14 +44,14 @@ steps:
         artifact: ${{parameters.versionArtifactName}}
         path: $(Build.SourcesDirectory)
 
-    - script: ls -p
+    - script: ls -p $(Build.SourcesDirectory)
       displayName: "Show sources directory"
 
     - task: PowerShell@2
       displayName: 'Read version Artifact and set pipeline variable from file contents'
       inputs:
         filePath: scripts/set-variable-from-file.ps1
-        arguments: "-baseDir $(Pipeline.Workspace) -subDir . -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVersionVariable}}"
+        arguments: "-baseDir $(Build.SourcesDirectory) -subDir . -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVersionVariable}}"
         pwsh: true
     
     - script: pip install --index-url ${{parameters.pypiUrl}} fairlearn==$(${{parameters.pipVersionVariable}})
