@@ -103,7 +103,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       freezeArtifactStem: ${{parameters.freezeArtifactStem}}
       freezeFileStem: ${{parameters.freezeFileStem}}
-      pyVersions: [3.8] #ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       testRunType: 'Unit'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
@@ -114,7 +114,7 @@ stages:
     parameters:
       platform: Windows
       vmImage: 'vs2017-win2016'
-      pyVersions: [3.5] #ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       testRunType: 'Unit'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
@@ -125,7 +125,7 @@ stages:
     parameters:
       platform: MacOS
       vmImage: 'macos-latest'
-      pyVersions: [3.8] #ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       testRunType: 'Unit'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
@@ -136,7 +136,7 @@ stages:
     parameters:
       platform: Linux
       vmImage: 'ubuntu-16.04'
-      pyVersions: [3.8] #ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       testRunType: 'Notebooks'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
@@ -147,7 +147,7 @@ stages:
     parameters:
       platform: Windows
       vmImage: 'vs2017-win2016'
-      pyVersions: [3.8] #ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       testRunType: 'Notebooks'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}

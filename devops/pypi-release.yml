@@ -39,7 +39,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       testRunType: 'Unit'
       installationType: 'None'
-      pyVersions: [3.5] # ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
@@ -49,7 +49,7 @@ stages:
       vmImage:  'vs2017-win2016'
       testRunType: 'Unit'
       installationType: 'None'
-      pyVersions: [3.6, 3.7] #ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
       
@@ -59,7 +59,7 @@ stages:
       vmImage:  'macos-latest'
       testRunType: 'Unit'
       installationType: 'None'
-      pyVersions: [ 3.8] # ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
@@ -69,7 +69,7 @@ stages:
       vmImage: 'ubuntu-16.04'
       testRunType: 'Notebooks'
       installationType: 'Editable'
-      pyVersions: [3.8] #ONLY FOR TESTING
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
 
@@ -79,7 +79,7 @@ stages:
       vmImage: 'vs2017-win2016'
       testRunType: 'Notebooks'
       installationType: 'Editable'
-      pyVersions: [3.7] #ONLY FOR TESTING
+      pyVersions: [[3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
   
