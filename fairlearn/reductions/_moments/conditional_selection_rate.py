@@ -152,8 +152,7 @@ class DemographicParity(ConditionalSelectionRate):
 
 
 class TruePositiveRateDifference(ConditionalSelectionRate):
-    r"""Implementation of True Positive Rate Difference (also called Equal Opportunity Difference)
-    as a moment.
+    r"""Implementation of True Positive Rate Difference (Equal Opportunity Difference) as a moment.
 
     Adds conditioning on label `y=1` compared to Demographic parity, i.e.
 
