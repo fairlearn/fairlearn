@@ -123,14 +123,16 @@ class ConditionalSelectionRate(ClassificationMoment):
         i.e., returns lambda which is guaranteed to lead to the same or higher value of the
         Lagrangian compared with lambda_vec for all possible choices of the classifier, h.
         """
-        lambda_pos = lambda_vec["+"] - lambda_vec["-"]
-        lambda_neg = -lambda_pos
-        lambda_pos[lambda_pos < 0.0] = 0.0
-        lambda_neg[lambda_neg < 0.0] = 0.0
-        lambda_projected = pd.concat([lambda_pos, lambda_neg],
-                                     keys=["+", "-"],
-                                     names=[_SIGN, _EVENT, _GROUP_ID])
-        return lambda_projected
+        if self.ratio == 1.0:
+            lambda_pos = lambda_vec["+"] - lambda_vec["-"]
+            lambda_neg = -lambda_pos
+            lambda_pos[lambda_pos < 0.0] = 0.0
+            lambda_neg[lambda_neg < 0.0] = 0.0
+            lambda_projected = pd.concat([lambda_pos, lambda_neg],
+                                         keys=["+", "-"],
+                                         names=[_SIGN, _EVENT, _GROUP_ID])
+            return lambda_projected
+        return lambda_vec
 
     def signed_weights(self, lambda_vec):
         """Compute the signed weights.
