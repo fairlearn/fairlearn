@@ -5,7 +5,7 @@
 
 import os
 import sys
-from .show_versions import show_versions
+from .show_versions import show_versions  # noqa: F401
 
 
 # Finesse the version
