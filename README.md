@@ -217,9 +217,7 @@ Issues are meant for bugs & feature requests. Please submit a report through
 will respond promptly as follows:
 - **bug**: triage as `bug` and provide estimated timeline based on severity
 - **feature request**: triage as `feature request` and provide estimated
-  timeline
-- **question** or **discussion**: triage as `question` and either respond or
-  notify/identify a suitable expert to respond
+  timeline.
 
 Maintainers will try to link duplicate issues when possible.
 

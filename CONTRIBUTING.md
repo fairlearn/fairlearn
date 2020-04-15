@@ -25,9 +25,10 @@ guidelines](https://help.github.com/en/github/site-policy/github-community-guide
 
 Development happens against the `master` branch following the
 [GitHub flow model](https://guides.github.com/introduction/flow/).
-Contributors create feature branches off of `master`, and their pull requests
-should target the `master` branch. Maintainers are responsible for prompt
-review of pull requests.
+Contributors should use their own forks of the repository. In their fork, they
+create feature branches off of `master`, and their pull requests should target
+the `master` branch. Maintainers are responsible for prompt review of pull
+requests.
 
 Pull requests against `master` trigger automated tests that are run through
 Azure DevOps or GitHub Actions. Additional test suites are run periodically.
