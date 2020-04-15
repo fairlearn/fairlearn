@@ -5,6 +5,8 @@
 
 import os
 import sys
+from .show_versions import show_versions
+
 
 # Finesse the version
 _FAIRLEARN_DEV_VERSION_ENV_VAR = "FAIRLEARN_DEV_VERSION"

@@ -71,8 +71,8 @@ Please provide the following information:
 - Fairlearn version: [e.g. 0.4.5 or installed from master branch in editable mode]
 - version of Python packages: please run the following snippet and paste the output:
   ```python
-  from fairlearn.utils import show_versions
-  show_versions()
+  import fairlearn
+  fairlearn.show_versions()
   ```
 -->
 
