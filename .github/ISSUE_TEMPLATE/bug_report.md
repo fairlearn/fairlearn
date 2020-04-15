@@ -28,10 +28,9 @@ A clear and concise description of what the bug is.
 
 #### Steps/Code to Reproduce
 <!--
-Please add a minimal example that we can reproduce the error by running the
-code. Be as succinct as possible, do not depend on external data. In short, we
-are going to copy-paste your code and we expect to get the same
-result as you.
+Please add a minimal example (in the form of code) that reproduces the error.
+Be as succinct as possible, do not depend on external data. In short, we are
+going to copy-paste your code and we expect to get the same result as you.
 
 Example:
 ```python
@@ -70,7 +69,7 @@ Please provide the following information:
 - Browser (if you're reporting a dashboard bug in jupyter): [e.g. Edge, Firefox, Chrome, Safari]
 - Python version: [e.g. 3.7.4]
 - Fairlearn version: [e.g. 0.4.5 or installed from master branch in editable mode]
-- version of Python packages: please run the following snipped and paste the output:
+- version of Python packages: please run the following snippet and paste the output:
   ```python
   from fairlearn.utils import show_versions
   show_versions()
