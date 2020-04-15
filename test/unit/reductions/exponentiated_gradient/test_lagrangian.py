@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+import pickle
 import pytest
 
 from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
@@ -75,7 +76,6 @@ def test_call_oracle(Constraints, eps, mocker):
 
     # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the mock
     # object, so we mock that process as well.
-    import pickle
     mocker.patch('pickle.dumps')
     pickle.loads = mocker.MagicMock(return_value=estimator)
 
