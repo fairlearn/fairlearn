@@ -112,3 +112,6 @@ venv.bak/
 
 # Documentation
 docbuild/
+
+# IntelliJ
+/.idea

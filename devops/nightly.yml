@@ -22,38 +22,53 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: Linux
+    platform: Linux
     vmImage: 'ubuntu-16.04'
+    testRunType: 'Unit'
+    installationType: 'None'
     pyVersions: [3.5, 3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: Windows
+    platform: Windows
     vmImage:  'vs2017-win2016'
+    testRunType: 'Unit'
+    installationType: 'None'
+    pyVersions: [3.5, 3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: MacOS
+    platform: MacOS
     vmImage:  'macos-latest'
+    testRunType: 'Unit'
+    installationType: 'None'
     pyVersions: [3.5, 3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
-- template: templates/notebook-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
-    name: LinuxNotebooks
+    platform: Linux
+    testRunType: 'Notebooks'
+    installationType: 'PipLocal'
     vmImage: 'ubuntu-16.04'
     pyVersions: [3.5, 3.6, 3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
 
-- template: templates/notebook-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
-    name: WindowsNotebooks
+    platform: Windows
+    testRunType: 'Notebooks'
+    installationType: 'PipLocal'
     vmImage: 'vs2017-win2016'
-    pyVersions: [3.5, 3.6, 3.7, 3.8] 
+    pyVersions: [3.5, 3.6, 3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
 
 - template: templates/build-widget-job-template.yml
 
