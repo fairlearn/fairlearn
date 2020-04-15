@@ -9,7 +9,7 @@
 # testRunType: {Unit, Notebooks}
 # Specifies the set of tests to be run
 
-# installationType: {None, Editable, PyPI}
+# installationType: {None, PipLocal, PyPI}
 # Specifies how Fairlearn should be made available. Note
 # that the Notebooks tests will not work with 'None'
 # If PyPI is specified, then targetType, versionArtifactName

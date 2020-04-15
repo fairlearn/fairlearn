@@ -2,7 +2,7 @@
 
 # Valid installation types are (currently):
 # None: Does nothing
-# Editable: Runs `pip install -e`
+# PipLocal: Runs `pip install .`
 # PyPI: Installs from specified PyPI URL, with the version
 #       specified in the versionArtifact
 # Another type of "WheelArtifact" is planned, which will
@@ -18,16 +18,16 @@ parameters:
 steps:
 # Validation of installationType
 # Something is strange with template condition vs task condition
-- ${{ if notIn(parameters.installationType, 'None', 'Editable', 'PyPI') }}:
+- ${{ if notIn(parameters.installationType, 'None', 'PipLocal', 'PyPI') }}:
   - script: exit 1
     displayName: "Bad installationType: ${{parameters.installationType}}"
-    condition: notIn('${{parameters.installationType}}', 'None', 'Editable', 'PyPI')
+    condition: notIn('${{parameters.installationType}}', 'None', 'PipLocal', 'PyPI')
 
 # ==============================================================
-# Install editable
-- ${{ if eq(parameters.installationType, 'Editable') }}:
-  - script: pip install -e .
-    displayName: "Install fairlearn in editable mode"
+# Install PipLocal
+- ${{ if eq(parameters.installationType, 'PipLocal') }}:
+  - script: pip install .
+    displayName: "Local install of fairlearn with pip"
 
 # ===============================================================
 # Install from a wheel package

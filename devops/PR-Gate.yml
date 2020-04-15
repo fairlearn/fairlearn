@@ -46,7 +46,7 @@ jobs:
   parameters:
     platform: Linux
     testRunType: 'Notebooks'
-    installationType: 'Editable'
+    installationType: 'PipLocal'
     vmImage: 'ubuntu-16.04'
     pyVersions: [3.6]
 
@@ -54,7 +54,7 @@ jobs:
   parameters:
     platform: Windows
     testRunType: 'Notebooks'
-    installationType: 'Editable'
+    installationType: 'PipLocal'
     vmImage: 'vs2017-win2016'
     pyVersions: [3.8]
 

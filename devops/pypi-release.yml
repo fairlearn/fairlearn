@@ -65,7 +65,7 @@ stages:
       platform: Linux
       vmImage: 'ubuntu-16.04'
       testRunType: 'Notebooks'
-      installationType: 'Editable'
+      installationType: 'PipLocal'
       pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
@@ -75,7 +75,7 @@ stages:
       platform: Windows
       vmImage: 'vs2017-win2016'
       testRunType: 'Notebooks'
-      installationType: 'Editable'
+      installationType: 'PipLocal'
       pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
