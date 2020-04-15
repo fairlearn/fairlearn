@@ -1,16 +1,38 @@
-# template for setting up the python environment (with optional pinned requirements)
+# Template for setting up the python environment (with optional pinned requirements)
 # and running all tests (except for install tests)
 
+# Some key parameters:
+
+# platform
+# A human-readable string which should be set to match vmImage
+
+# testRunType: {Unit, Notebooks}
+# Specifies the set of tests to be run
+
+# installationType: {None, PipLocal, PyPI}
+# Specifies how Fairlearn should be made available. Note
+# that the Notebooks tests will not work with 'None'
+# If PyPI is specified, then targetType, versionArtifactName
+# and versionArtifactFile need to be specified, in order to
+# determine which PyPI archive to use, and which version
+# of Fairlearn to fetch from it.
+
 parameters:
-  name: ''
+  platform: ''
   vmImage: ''
+  testRunType: ''
+  installationType: ''
   pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
   freezeArtifactStem: 
   freezeFileStem:
+  # Following are used if the installationType is PyPI
+  targetType: 'Test'
+  versionArtifactName:
+  versionArtifactFile:
 
 jobs:
-- job: ${{ parameters.name }}
+- job: ${{ parameters.platform }}_${{parameters.testRunType}}
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
@@ -20,10 +42,21 @@ jobs:
         ${{ pyVer }}:
           PyVer: ${{ pyVer }}
           RequirementsFile: requirements-${{pyVer}}.txt
-          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{parameters.testRunType}}${{pyVer}}'
           FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
 
+  variables:
+    ${{ if eq(parameters.targetType, 'Test') }}:
+      pypiUrl: https://test.pypi.org/simple/
+    ${{ if eq(parameters.targetType, 'Prod') }}:
+      pypiUrl: https://pypi.org/simple/
+
   steps:
+
+  - ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
+    - script: exit 1
+      displayName: "Bad testRunType: ${{parameters.testRunType}}"
+
   - task: UsePythonVersion@0
     displayName: 'Use Python $(PyVer)'
     inputs:
@@ -42,12 +75,27 @@ jobs:
     parameters:
       freezeArtifact: $(FreezeArtifact)
       freezeFile: $(FreezeFile)
+
+  - template: fairlearn-installation-step-template.yml
+    parameters:
+      installationType: ${{parameters.installationType}}
+      pypiUrl: $(pypiUrl)
+      versionArtifactName: ${{parameters.versionArtifactName}}
+      versionArtifactFile: ${{parameters.versionArtifactFile}}
+      pipVersionVariable: variableForPipVersion
     
   - script: flake8 .
     displayName: "Run flake8"
 
-  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
-    displayName: 'Run tests'
+  # =================================================
+  - ${{ if eq(parameters.testRunType, 'Unit')}}:
+    - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+      displayName: 'Run unit tests'
+
+  - ${{ if eq(parameters.testRunType, 'Notebooks')}}:
+    - script: python -m pytest test/ -m notebooks --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
+      displayName: 'Run notebooks as tests'
+  # =================================================
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
