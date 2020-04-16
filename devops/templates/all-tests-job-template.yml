@@ -56,7 +56,7 @@ jobs:
   steps:
   - template: test-run-step-template.yml
     parameters:
-      testRunType: $(TestRunType)
+      testRunType: ${{testRunType}}
       installationType: ${{parameters.installationType}}
       pythonVersion: $(PyVer)
       pinRequirements: ${{parameters.pinRequirements}}
