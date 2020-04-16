@@ -12,7 +12,7 @@ parameters:
 - name: pinRequirements
   type: boolean
   default: False
-- name: requirementsFile:
+- name: requirementsFile
   type: string
 - name: freezeArtifact
   type: string
