@@ -1,3 +1,12 @@
+# Template to run a single set of tests
+# - Specifies Python version
+# - Installs requirements
+# - Saves 'pip freeze' to Artifact
+# - Installs fairlearn via specified means
+# - Runs flake8
+# - Runs specified test suite
+# - Saves test results
+
 parameters:
 - name: testRunType
   type: string
