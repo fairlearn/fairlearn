@@ -54,51 +54,16 @@ jobs:
       pypiUrl: https://pypi.org/simple/
 
   steps:
-
-  - ${{ if notIn($(TestRunType), 'Unit', 'Notebooks') }}:
-    - script: exit 1
-      displayName: "Bad testRunType: $(TestRunType)"
-
-  - task: UsePythonVersion@0
-    displayName: 'Use Python $(PyVer)'
-    inputs:
-      versionSpec: '$(PyVer)' 
-      addToPath: true
-
-  - template: python-infra-upgrade-steps-template.yml
-
-  - template: requirements-installation-steps-template.yml
+  - template: test-run-step-template.yml
     parameters:
-      pyVer: '$(PyVer)'
-      requirementsFile: $(RequirementsFile)
+      testRunType: $(TestRunType)
+      installationType: ${{parameters.installationType}}
+      pythonVersion: $(PyVer)
       pinRequirements: ${{parameters.pinRequirements}}
-
-  - template: pip-freeze-to-artifact-steps-template.yml
-    parameters:
+      requirementsFile: $(RequirementsFile)
       freezeArtifact: $(FreezeArtifact)
       freezeFile: $(FreezeFile)
-
-  - template: fairlearn-installation-step-template.yml
-    parameters:
-      installationType: ${{parameters.installationType}}
+      # Following are used if the installationType is PyPI
       pypiUrl: $(pypiUrl)
       versionArtifactName: ${{parameters.versionArtifactName}}
       versionArtifactFile: ${{parameters.versionArtifactFile}}
-      pipVersionVariable: variableForPipVersion
-    
-  - script: flake8 .
-    displayName: "Run flake8"
-
-  # =================================================
-  - ${{ if eq($(TestRunType), 'Unit')}}:
-    - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
-      displayName: 'Run unit tests'
-
-  - ${{ if eq($(TestRunType), 'Notebooks')}}:
-    - script: python -m pytest test/ -m notebooks --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
-      displayName: 'Run notebooks as tests'
-  # =================================================
-
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results **/TEST-*.xml'
-    condition: succeededOrFailed()
