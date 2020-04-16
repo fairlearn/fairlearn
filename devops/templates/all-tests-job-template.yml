@@ -32,11 +32,11 @@ parameters:
   versionArtifactFile:
 
 jobs:
-- job: ${{ parameters.platform }}_${{parameters.testRunType}}
+- job: ${{ parameters.platform }}
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
-    maxParallel: 2
+    maxParallel: 4
     matrix:
       ${{ each pyVer in parameters.pyVersions }}:
         ${{ each testRunType in parameters.testRunTypes }}:
