@@ -1,10 +1,13 @@
 parameters:
 - name: testRunType
   type: string
+  values:
+  - Unit
+  - Notebooks
 - name: installationType
   type: string
 - name: pythonVersion
-  type: string
+  type: number
   default: 3.7
 - name: pinRequirements
   type: boolean
@@ -28,7 +31,6 @@ steps:
 - ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
   - script: exit 1
     displayName: "Validate testRunType: ${{parameters.testRunType}}"
-    condition: notIn(${{parameters.testRunType}}, 'Unit', 'Notebooks')
 
 - task: UsePythonVersion@0
   displayName: 'Use Python ${{parameters.pythonVersion}}'
