@@ -20,7 +20,7 @@
 parameters:
   platform: ''
   vmImage: ''
-  testRunTypes: ['Unit', 'Notebooks']
+  testRunTypes: ['Units', 'Notebooks']
   installationType: ''
   pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
