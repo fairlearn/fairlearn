@@ -15,7 +15,7 @@ steps:
 
 - ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
   - script: exit 1
-    displayName: "Bad testRunType: ${{parameters.testRunType}}"
+    displayName: "Bad testRunType: -${{parameters.testRunType}}-"
 
 - task: UsePythonVersion@0
   displayName: 'Use Python ${{parameters.pythonVersion}}'
