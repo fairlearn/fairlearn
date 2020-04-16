@@ -99,12 +99,10 @@ stages:
   jobs:
   - template: all-tests-job-template.yml
     parameters:
-      platform: Linux
-      vmImage: 'ubuntu-16.04'
+      platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: ${{parameters.freezeArtifactStem}}
       freezeFileStem: ${{parameters.freezeFileStem}}
-      pyVersions: [3.5, 3.6, 3.7, 3.8]
-      testRunType: 'Unit'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
       versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
@@ -112,43 +110,9 @@ stages:
 
   - template: all-tests-job-template.yml
     parameters:
-      platform: Windows
-      vmImage: 'vs2017-win2016'
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
       pyVersions: [3.5, 3.6, 3.7, 3.8]
-      testRunType: 'Unit'
-      installationType: 'PyPI'
-      targetType: ${{parameters.targetType}}
-      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-
-  - template: all-tests-job-template.yml
-    parameters:
-      platform: MacOS
-      vmImage: 'macos-latest'
-      pyVersions: [3.5, 3.6, 3.7, 3.8]
-      testRunType: 'Unit'
-      installationType: 'PyPI'
-      targetType: ${{parameters.targetType}}
-      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-
-  - template: all-tests-job-template.yml
-    parameters:
-      platform: Linux
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7, 3.8]
-      testRunType: 'Notebooks'
-      installationType: 'PyPI'
-      targetType: ${{parameters.targetType}}
-      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-
-  - template: all-tests-job-template.yml
-    parameters:
-      platform: Windows
-      vmImage: 'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7, 3.8]
-      testRunType: 'Notebooks'
       installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
       versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
