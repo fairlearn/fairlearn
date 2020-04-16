@@ -53,7 +53,7 @@ jobs:
           parameters:
             testRunType: ${{trt}}
             installationType: ${{parameters.installationType}}
-            pythonVersion: $(PyVer)
+            pythonVersion: ${{pyVer}}
             pinRequirements: ${{parameters.pinRequirements}}
             requirementsFile: $(RequirementsFile)
             freezeArtifact: $(FreezeArtifact)
