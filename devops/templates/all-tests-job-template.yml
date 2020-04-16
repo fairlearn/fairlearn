@@ -20,6 +20,7 @@
 parameters:
   platform: ''
   vmImage: ''
+  platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016}
   testRunTypes: ['Unit', 'Notebooks']
   installationType: ''
   pyVersions: [3.5, 3.6, 3.7, 3.8]
@@ -34,31 +35,32 @@ parameters:
 jobs:
   - ${{ each pyVer in parameters.pyVersions }}:
     - ${{ each trt in parameters.testRunTypes }}:
-      - job:
-        displayName: ${{ format('{0} {1} {2}', parameters.platform , trt, pyVer) }}
-        pool:
-          vmImage: ${{ parameters.vmImage }}
+      - ${{ each p in platforms }}:
+        - job:
+          displayName: ${{ format('{0} {1} {2}', p.Key , trt, pyVer) }}
+          pool:
+            vmImage: ${{ p.value }}
 
-        variables:
-            ${{ if eq(parameters.targetType, 'Test') }}:
-              pypiUrl: https://test.pypi.org/simple/
-            ${{ if eq(parameters.targetType, 'Prod') }}:
-              pypiUrl: https://pypi.org/simple/
-            RequirementsFile: requirements-${{pyVer}}.txt
-            FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{trt}}${{pyVer}}'
-            FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
+          variables:
+              ${{ if eq(parameters.targetType, 'Test') }}:
+                pypiUrl: https://test.pypi.org/simple/
+              ${{ if eq(parameters.targetType, 'Prod') }}:
+                pypiUrl: https://pypi.org/simple/
+              RequirementsFile: requirements-${{pyVer}}.txt
+              FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{trt}}${{pyVer}}'
+              FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
 
-        steps:
-        - template: test-run-step-template.yml
-          parameters:
-            testRunType: ${{trt}}
-            installationType: ${{parameters.installationType}}
-            pythonVersion: ${{pyVer}}
-            pinRequirements: ${{parameters.pinRequirements}}
-            requirementsFile: $(RequirementsFile)
-            freezeArtifact: $(FreezeArtifact)
-            freezeFile: $(FreezeFile)
-            # Following are used if the installationType is PyPI
-            pypiUrl: $(pypiUrl)
-            versionArtifactName: ${{parameters.versionArtifactName}}
-            versionArtifactFile: ${{parameters.versionArtifactFile}}
+          steps:
+          - template: test-run-step-template.yml
+            parameters:
+              testRunType: ${{trt}}
+              installationType: ${{parameters.installationType}}
+              pythonVersion: ${{pyVer}}
+              pinRequirements: ${{parameters.pinRequirements}}
+              requirementsFile: $(RequirementsFile)
+              freezeArtifact: $(FreezeArtifact)
+              freezeFile: $(FreezeFile)
+              # Following are used if the installationType is PyPI
+              pypiUrl: $(pypiUrl)
+              versionArtifactName: ${{parameters.versionArtifactName}}
+              versionArtifactFile: ${{parameters.versionArtifactFile}}
