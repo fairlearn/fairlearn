@@ -27,11 +27,6 @@ parameters:
   type: string
 
 steps:
-
-- ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
-  - script: exit 1
-    displayName: "Validate testRunType: ${{parameters.testRunType}}"
-
 - task: UsePythonVersion@0
   displayName: 'Use Python ${{parameters.pythonVersion}}'
   inputs:
