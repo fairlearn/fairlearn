@@ -13,6 +13,7 @@ _MESSAGE_Y_NONE = "Must supply y"
 _MESSAGE_SENSITIVE_FEATURES_NONE = "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES)
 _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
 _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
+_MESSAGE_RATIO_NOT_IN_RANGE = "ratio must lie between (0,1]"
 _INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats for {} are: {}. " \
                                      "Your provided data was of type {}."
 _EMPTY_INPUT_ERROR_MESSAGE = "At least one of sensitive_features, labels, or scores are empty."
@@ -85,7 +86,14 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         if len(np.unique(sensitive_features)) > 2:
             raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
 
-    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
+    # If we don't have a y, then need to fiddle with return type to
+    # avoid a warning from pandas
+    if y is not None:
+        result_y = pd.Series(y)
+    else:
+        result_y = pd.Series(dtype="float64")
+
+    return pd.DataFrame(X), result_y, pd.Series(sensitive_features.squeeze())
 
 
 def _compress_multiple_sensitive_features_into_single_column(sensitive_features):

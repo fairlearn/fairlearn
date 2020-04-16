@@ -57,7 +57,7 @@ def fallout_rate(y_true, y_pred, sample_weight=None):
     """
     # aka False Positive Rate
     # Since we use specificity, also restricted to binary classification
-    return 1 - specificity_score(y_true, y_pred, sample_weight)
+    return 1 - specificity_score(y_true, y_pred, sample_weight=sample_weight)
 
 # =============================================================
 # Group metrics
