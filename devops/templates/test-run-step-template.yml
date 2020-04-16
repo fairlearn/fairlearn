@@ -1,15 +1,30 @@
 parameters:
-  testRunType: 'Unit'
-  installationType: 'None'
-  pythonVersion: 3.7
-  pinRequirements: False
-  requirementsFile:
-  freezeArtifact: 
-  freezeFile:
+- name: testRunType
+  type: string
+  values:
+  - Unit
+  - Notebooks
+- name: installationType
+  type: string
+- name: pythonVersion
+  type: number
+  default: 3.7
+- name: pinRequirements
+  type: boolean
+  default: False
+- name: requirementsFile:
+  type: string
+- name: freezeArtifact
+  type: string
+- name: freezeFile
+  type: string
   # Following are used if the installationType is PyPI
-  pypiUrl: 
-  versionArtifactName:
-  versionArtifactFile:
+- name: pypiUrl
+  type: string
+- name: versionArtifactName
+  type: string
+- name: versionArtifactFile
+  type: string
 
 steps:
 
