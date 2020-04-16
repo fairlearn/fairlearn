@@ -7,7 +7,7 @@ parameters:
 - name: installationType
   type: string
 - name: pythonVersion
-  type: number
+  type: string
   default: 3.7
 - name: pinRequirements
   type: boolean
