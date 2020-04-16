@@ -20,7 +20,7 @@
 parameters:
   platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
   testRunTypes: ['Unit', 'Notebooks']
-  installationType: ''
+  installationType:
   pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
   freezeArtifactStem: 
