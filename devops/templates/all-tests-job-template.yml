@@ -39,12 +39,12 @@ jobs:
     maxParallel: 4
     matrix:
       ${{ each pyVer in parameters.pyVersions }}:
-        ${{ each testRunType in parameters.testRunTypes }}:
-          ${{testRunType}}_${{ pyVer }}:
+        ${{ each trt in parameters.testRunTypes }}:
+          ${{trt}}_${{ pyVer }}:
             PyVer: ${{ pyVer }}
-            TestRunType: ${{testRunType}}
+            TestRunType: ${{trt}}
             RequirementsFile: requirements-${{pyVer}}.txt
-            FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{parameters.testRunType}}${{pyVer}}'
+            FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{trt}}${{pyVer}}'
             FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
 
   variables:
@@ -56,7 +56,7 @@ jobs:
   steps:
   - template: test-run-step-template.yml
     parameters:
-      testRunType: ${{testRunType}}
+      testRunType: ${{trt}}
       installationType: ${{parameters.installationType}}
       pythonVersion: $(PyVer)
       pinRequirements: ${{parameters.pinRequirements}}
