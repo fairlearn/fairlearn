@@ -1,9 +1,6 @@
 parameters:
 - name: testRunType
   type: string
-  values:
-  - Unit
-  - Notebooks
 - name: installationType
   type: string
 - name: pythonVersion
@@ -30,7 +27,8 @@ steps:
 
 - ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
   - script: exit 1
-    displayName: "Bad testRunType: -${{parameters.testRunType}}-"
+    displayName: "Validate testRunType: ${{parameters.testRunType}}"
+    condition: notIn(${{parameters.testRunType, 'Unit', 'Notebooks'}})
 
 - task: UsePythonVersion@0
   displayName: 'Use Python ${{parameters.pythonVersion}}'
