@@ -35,7 +35,7 @@ jobs:
   - ${{ each pyVer in parameters.pyVersions }}:
     - ${{ each trt in parameters.testRunTypes }}:
       - job:
-        displayName: ${{ format('{0} {1} {2}', parameters.platform , trt, pyVer }}
+        displayName: ${{ format('{0} {1} {2}', parameters.platform , trt, pyVer) }}
         pool:
           vmImage: ${{ parameters.vmImage }}
 
