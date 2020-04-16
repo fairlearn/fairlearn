@@ -20,7 +20,7 @@
 parameters:
   platform: ''
   vmImage: ''
-  testRunType: ''
+  testRunTypes: ['Unit', 'Notebooks']
   installationType: ''
   pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
@@ -39,11 +39,13 @@ jobs:
     maxParallel: 2
     matrix:
       ${{ each pyVer in parameters.pyVersions }}:
-        ${{ pyVer }}:
-          PyVer: ${{ pyVer }}
-          RequirementsFile: requirements-${{pyVer}}.txt
-          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{parameters.testRunType}}${{pyVer}}'
-          FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
+        ${{ each testRunType in parameters.testRunTypes }}:
+          ${{testRunType}}_${{ pyVer }}:
+            PyVer: ${{ pyVer }}
+            TestRunType: ${{testRunType}}
+            RequirementsFile: requirements-${{pyVer}}.txt
+            FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{parameters.testRunType}}${{pyVer}}'
+            FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
 
   variables:
     ${{ if eq(parameters.targetType, 'Test') }}:
@@ -53,9 +55,9 @@ jobs:
 
   steps:
 
-  - ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
+  - ${{ if notIn($(TestRunType), 'Unit', 'Notebooks') }}:
     - script: exit 1
-      displayName: "Bad testRunType: ${{parameters.testRunType}}"
+      displayName: "Bad testRunType: $(TestRunType)"
 
   - task: UsePythonVersion@0
     displayName: 'Use Python $(PyVer)'
@@ -88,11 +90,11 @@ jobs:
     displayName: "Run flake8"
 
   # =================================================
-  - ${{ if eq(parameters.testRunType, 'Unit')}}:
+  - ${{ if eq($(TestRunType), 'Unit')}}:
     - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
       displayName: 'Run unit tests'
 
-  - ${{ if eq(parameters.testRunType, 'Notebooks')}}:
+  - ${{ if eq($(TestRunType), 'Notebooks')}}:
     - script: python -m pytest test/ -m notebooks --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
       displayName: 'Run notebooks as tests'
   # =================================================
