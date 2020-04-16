@@ -71,11 +71,14 @@ def test_lagrangian_eval(eps, Constraints, h_vec, opt_lambda):
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
 def test_call_oracle(Constraints, eps, mocker):
     X, y, A = _get_data(A_two_dim=False)
+    # Using a mocked estimator here since we don't actually want to fit one, but rather care about
+    # having that object's fit method called exactly once.
     estimator = mocker.MagicMock()
     constraints = Constraints()
 
     # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the mock
-    # object, so we mock that process as well.
+    # object, so we mock that process as well. It sets the result from pickle.loads as the
+    # estimator, so we can simply overwrite the return value to be our mocked estimator object.
     mocker.patch('pickle.dumps')
     pickle.loads = mocker.MagicMock(return_value=estimator)
 
