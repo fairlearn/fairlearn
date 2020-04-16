@@ -45,8 +45,8 @@ jobs:
               ${{ if eq(parameters.targetType, 'Prod') }}:
                 pypiUrl: https://pypi.org/simple/
               RequirementsFile: requirements-${{pyVer}}.txt
-              FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{trt}}${{pyVer}}'
-              FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
+              FreezeArtifact: '${{parameters.freezeArtifactStem}}${{p.Key}}${{trt}}${{pyVer}}'
+              FreezeFile: '${{parameters.freezeFileStem}}-${{p.Key}}${{trt}}${{pyVer}}.txt'
 
           steps:
           - template: test-run-step-template.yml
