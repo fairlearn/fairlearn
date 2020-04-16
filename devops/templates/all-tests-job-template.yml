@@ -18,9 +18,7 @@
 # of Fairlearn to fetch from it.
 
 parameters:
-  platform: ''
-  vmImage: ''
-  platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016}
+  platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
   testRunTypes: ['Unit', 'Notebooks']
   installationType: ''
   pyVersions: [3.5, 3.6, 3.7, 3.8]
@@ -33,9 +31,9 @@ parameters:
   versionArtifactFile:
 
 jobs:
-  - ${{ each pyVer in parameters.pyVersions }}:
+  - ${{ each p in parameters.platforms }}:
     - ${{ each trt in parameters.testRunTypes }}:
-      - ${{ each p in parameters.platforms }}:
+      - ${{ each pyVer in parameters.pyVersions }}:
         - job:
           displayName: ${{ format('{0} {1} {2}', p.Key , trt, pyVer) }}
           pool:
