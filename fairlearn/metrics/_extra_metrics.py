@@ -59,6 +59,5 @@ def fallout_rate(y_true, y_pred, sample_weight=None):
 
 
 def root_mean_squared_error(y_true, y_pred, **kwargs):
-    r"""Calculate the root mean squared error.
-    """
+    r"""Calculate the root mean squared error."""
     return skm.mean_squared_error(y_true, y_pred, squared=False, **kwargs)

@@ -114,7 +114,8 @@ class TestMetricByGroup:
         gid = transform_gid([0, 0, 0, 0, 1, 1, 2, 2])
         s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3, 3])
 
-        result = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
+        result = metrics.group_summary(
+            mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         assert result.overall == 10
         assert len(result.by_group) == 3
@@ -135,7 +136,8 @@ class TestMetricByGroup:
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
+            _ = metrics.group_summary(
+                mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         expected = "Array y_pred is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -149,7 +151,8 @@ class TestMetricByGroup:
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
+            _ = metrics.group_summary(
+                mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         expected = "Array sensitive_features is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -163,7 +166,8 @@ class TestMetricByGroup:
         s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3])
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
+            _ = metrics.group_summary(
+                mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         expected = "Array sample_weight is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -215,7 +219,8 @@ class TestMetricByGroup:
         def sum_lengths(y_true, y_pred, sample_weight):
             return len(y_true) + len(y_pred) + len(sample_weight)
 
-        result = metrics.group_summary(sum_lengths, y_t, y_p, sensitive_features=gid, sample_weight=s_w)
+        result = metrics.group_summary(
+            sum_lengths, y_t, y_p, sensitive_features=gid, sample_weight=s_w)
         assert result.overall == 3
         assert result.by_group[0] == 3
         assert metrics.group_min_from_summary(result) == 3

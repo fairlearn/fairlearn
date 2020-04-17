@@ -47,7 +47,8 @@ def test_selection_rate_group_summary():
     weight = [1, 2, 3, 4, 1, 2, 4, 8]
     groups = [r, r, r, r, q, q, q, q]
 
-    result = metrics.selection_rate_group_summary(y_true, y_pred,
+    result = metrics.selection_rate_group_summary(
+        y_true, y_pred,
         sensitive_features=groups,
         pos_label=b,
         sample_weight=weight)

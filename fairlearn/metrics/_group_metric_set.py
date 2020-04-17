@@ -10,8 +10,8 @@ from . import mean_squared_error_group_summary, mean_squared_log_error_group_sum
 from . import mean_underprediction_group_summary, median_absolute_error_group_summary
 from . import mean_prediction_group_summary
 from . import miss_rate_group_summary, precision_score_group_summary, r2_score_group_summary
-from . import recall_score_group_summary, roc_auc_score_group_summary, root_mean_squared_error_group_summary
-from . import selection_rate_group_summary, specificity_score_group_summary, zero_one_loss_group_summary
+from . import recall_score_group_summary, roc_auc_score_group_summary, root_mean_squared_error_group_summary  # noqa:E501
+from . import selection_rate_group_summary, specificity_score_group_summary, zero_one_loss_group_summary  # noqa:E501
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _Y_TRUE = 'trueY'
@@ -62,8 +62,8 @@ ZERO_ONE_LOSS_GROUP_SUMMARY = "zero_one_loss"
 BINARY_CLASSIFICATION_METRICS = {}
 BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE_GROUP_SUMMARY] = accuracy_score_group_summary
 BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE_GROUP_SUMMARY] = fallout_rate_group_summary
-BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = mean_overprediction_group_summary
-BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = mean_underprediction_group_summary
+BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = mean_overprediction_group_summary  # noqa:E501
+BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = mean_underprediction_group_summary  # noqa:E501
 BINARY_CLASSIFICATION_METRICS[MISS_RATE_GROUP_SUMMARY] = miss_rate_group_summary
 BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE_GROUP_SUMMARY] = precision_score_group_summary
 BINARY_CLASSIFICATION_METRICS[RECALL_SCORE_GROUP_SUMMARY] = recall_score_group_summary
