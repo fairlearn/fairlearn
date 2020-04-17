@@ -136,7 +136,7 @@ def test_mitigating_disparities_in_ranking_from_binary_data():
 
 
 @pytest.mark.notebooks
-def test_binary_classification_with_the_uci_credit_card_payment_default_dataset():
-    nb_name = "Binary Classification with the UCI Credit Card Payment Default Dataset"
+def test_binary_classification_with_the_uci_credit_card_default_dataset():
+    nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
     test_values = {}
     assay_one_notebook(nb_name, test_values)
