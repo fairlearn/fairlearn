@@ -23,43 +23,8 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    platform: Linux
-    vmImage: 'ubuntu-16.04'
-    testRunType: 'Unit'
-    installationType: 'None'
-    pyVersions: [3.5, 3.6, 3.7, 3.8]
-    freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFileStem: $(FreezeFileStem)
-    pinRequirements: True
-
-- template: templates/all-tests-job-template.yml
-  parameters:
-    platform: Windows
-    vmImage:  'vs2017-win2016'
-    testRunType: 'Unit'
-    installationType: 'None'
-    pyVersions: [3.5, 3.6, 3.7, 3.8]
-    freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFileStem: $(FreezeFileStem)
-    pinRequirements: True
-
-- template: templates/all-tests-job-template.yml
-  parameters:
-    platform: Linux
-    testRunType: 'Notebooks'
+    platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
     installationType: 'PipLocal'
-    vmImage: 'ubuntu-16.04'
-    pyVersions: [3.5, 3.6, 3.7, 3.8]
-    freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFileStem: $(FreezeFileStem)
-    pinRequirements: True
-
-- template: templates/all-tests-job-template.yml
-  parameters:
-    platform: Windows
-    testRunType: 'Notebooks'
-    installationType: 'PipLocal'
-    vmImage: 'vs2017-win2016'
     pyVersions: [3.5, 3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)

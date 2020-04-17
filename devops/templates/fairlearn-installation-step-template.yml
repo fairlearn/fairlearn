@@ -9,20 +9,23 @@
 # `pip install` a wheel file from a pipeline Artifact
 
 parameters:
-  installationType: 'None'
-  pypiUrl:
-  versionArtifactName:
-  versionArtifactFile:
-  pipVersionVariable: 'pipVersionVar'
+- name: installationType
+  type: string
+  values:
+  - None
+  - PipLocal
+  - PyPI
+- name: pypiUrl
+  type: string
+- name: versionArtifactName
+  type: string
+- name: versionArtifactFile
+  type: string
+- name: pipVersionVariable
+  type: string
+  default: pipVersionVar
 
 steps:
-# Validation of installationType
-# Something is strange with template condition vs task condition
-- ${{ if notIn(parameters.installationType, 'None', 'PipLocal', 'PyPI') }}:
-  - script: exit 1
-    displayName: "Bad installationType: ${{parameters.installationType}}"
-    condition: notIn('${{parameters.installationType}}', 'None', 'PipLocal', 'PyPI')
-
 # ==============================================================
 # Install PipLocal
 - ${{ if eq(parameters.installationType, 'PipLocal') }}:
