@@ -32,7 +32,7 @@ class TestMetricByGroup:
         y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
         gid = transform_gid([0, 0, 0, 0, 1, 1, 1, 1])
 
-        result = metrics.group_summary(mock_func, y_a, y_p, gid)
+        result = metrics.group_summary(mock_func, y_a, y_p, sensitive_features=gid)
 
         assert result.overall == 5
         assert len(result.by_group) == 2
@@ -54,7 +54,7 @@ class TestMetricByGroup:
         y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
         gid = transform_gid([a, a, a, b, b, c, c, c])
 
-        result = metrics.group_summary(mock_func, y_a, y_p, gid)
+        result = metrics.group_summary(mock_func, y_a, y_p, sensitive_features=gid)
 
         assert result.overall == 5
         assert len(result.by_group) == 3
@@ -77,7 +77,7 @@ class TestMetricByGroup:
         y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
         gid = transform_gid([a, a, a, b, b, c, c, c])
 
-        result = metrics.group_summary(mock_func_matrix_return, y_a, y_p, gid)
+        result = metrics.group_summary(mock_func_matrix_return, y_a, y_p, sensitive_features=gid)
 
         assert np.array_equal(result.overall, np.ones([8, 5]))
         assert np.array_equal(result.by_group[a], np.ones([3, 2]))
@@ -92,7 +92,7 @@ class TestMetricByGroup:
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [a, a, a, b, b, c, c, c]
 
-        result = metrics.group_summary(mock_func_matrix_return, y_a, y_p, gid)
+        result = metrics.group_summary(mock_func_matrix_return, y_a, y_p, sensitive_features=gid)
 
         # Other fields should fail
         with pytest.raises(ValueError):
@@ -114,7 +114,7 @@ class TestMetricByGroup:
         gid = transform_gid([0, 0, 0, 0, 1, 1, 2, 2])
         s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3, 3])
 
-        result = metrics.group_summary(mock_func_weight, y_a, y_p, gid, sample_weight=s_w)
+        result = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         assert result.overall == 10
         assert len(result.by_group) == 3
@@ -135,7 +135,7 @@ class TestMetricByGroup:
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.group_summary(mock_func_weight, y_a, y_p, gid, sample_weight=s_w)
+            _ = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         expected = "Array y_pred is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -149,7 +149,7 @@ class TestMetricByGroup:
         s_w = [1, 1, 1, 1, 2, 2, 3, 3]
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.group_summary(mock_func_weight, y_a, y_p, gid, sample_weight=s_w)
+            _ = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         expected = "Array sensitive_features is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -163,7 +163,7 @@ class TestMetricByGroup:
         s_w = transform_s_w([1, 1, 1, 1, 2, 2, 3])
 
         with pytest.raises(ValueError) as exception_context:
-            _ = metrics.group_summary(mock_func_weight, y_a, y_p, gid, sample_weight=s_w)
+            _ = metrics.group_summary(mock_func_weight, y_a, y_p, sensitive_features=gid, sample_weight=s_w)
 
         expected = "Array sample_weight is not the same size as y_true"
         assert exception_context.value.args[0] == expected
@@ -176,7 +176,7 @@ class TestMetricByGroup:
         def negative_results(y_true, y_pred):
             return -(len(y_true) + len(y_pred))
 
-        result = metrics.group_summary(negative_results, y_a, y_p, gid)
+        result = metrics.group_summary(negative_results, y_a, y_p, sensitive_features=gid)
 
         assert result.overall == -16
         assert result.by_group[0] == -10
@@ -195,7 +195,7 @@ class TestMetricByGroup:
             # Arrays will always be same length
             return len(y_true)-len(y_pred)
 
-        result = metrics.group_summary(zero_results, y_a, y_p, gid)
+        result = metrics.group_summary(zero_results, y_a, y_p, sensitive_features=gid)
 
         assert result.overall == 0
         assert result.by_group[0] == 0
@@ -215,7 +215,7 @@ class TestMetricByGroup:
         def sum_lengths(y_true, y_pred, sample_weight):
             return len(y_true) + len(y_pred) + len(sample_weight)
 
-        result = metrics.group_summary(sum_lengths, y_t, y_p, gid, sample_weight=s_w)
+        result = metrics.group_summary(sum_lengths, y_t, y_p, sensitive_features=gid, sample_weight=s_w)
         assert result.overall == 3
         assert result.by_group[0] == 3
         assert metrics.group_min_from_summary(result) == 3
@@ -231,7 +231,7 @@ class TestMetricByGroup:
         def sum_lengths(y_true, y_pred):
             return len(y_true) + len(y_pred)
 
-        result = metrics.group_summary(sum_lengths, y_t, y_p, gid)
+        result = metrics.group_summary(sum_lengths, y_t, y_p, sensitive_features=gid)
         assert result.overall == 4
         assert result.by_group[0] == 2
         assert result.by_group[1] == 2
@@ -247,8 +247,8 @@ class TestMakeGroupMetric:
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
         gid = [0, 0, 0, 0, 1, 1, 1, 1]
 
-        grouped_metric_func = metrics.make_group_metric(mock_func)
-        result = grouped_metric_func(y_a, y_p, gid)
+        grouped_metric_func = metrics.make_metric_group_summary(mock_func)
+        result = grouped_metric_func(y_a, y_p, sensitive_features=gid)
         assert result.overall == 5
         assert len(result.by_group) == 2
         assert result.by_group[0] == 2
@@ -272,8 +272,8 @@ class TestMakeGroupMetric:
         gid = transform_gid([a, z, a, b, b, c, c, c])
         s_w = transform_s_w([1, 1, 1, 5, 5, 7, 7, 7])
 
-        grouped_metric_func = metrics.make_group_metric(mock_func_weight)
-        result = grouped_metric_func(y_a, y_p, gid, sample_weight=s_w)
+        grouped_metric_func = metrics.make_metric_group_summary(mock_func_weight)
+        result = grouped_metric_func(y_a, y_p, sensitive_features=gid, sample_weight=s_w)
         assert result.overall == 28
         assert len(result.by_group) == 4
         assert result.by_group[a] == 1

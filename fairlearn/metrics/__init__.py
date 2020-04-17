@@ -18,34 +18,48 @@ The metric is evaluated for the entire set of data, and also
 for each subgroup identified in ``group_membership``.
 """
 
+import sklearn.metrics as skm
+
 from ._extra_metrics import balanced_root_mean_squared_error, fallout_rate  # noqa: F401
+from ._extra_metrics import root_mean_squared_error  # noqa: F401
 from ._extra_metrics import mean_overprediction, mean_prediction  # noqa: F401
 from ._extra_metrics import mean_underprediction, miss_rate  # noqa: F401
 from ._extra_metrics import selection_rate, specificity_score  # noqa: F401
-from ._extra_metrics import group_fallout_rate  # noqa: F401
-from ._extra_metrics import group_miss_rate  # noqa: F401
-from ._extra_metrics import group_specificity_score  # noqa: F401
-from ._extra_metrics import group_balanced_root_mean_squared_error  # noqa: F401
-from ._extra_metrics import group_mean_overprediction  # noqa: F401
-from ._extra_metrics import group_mean_prediction  # noqa: F401
-from ._extra_metrics import group_mean_underprediction  # noqa: F401
 
-from ._selection_rate import group_selection_rate  # noqa: F401
-
-from ._skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
-from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
-from ._skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
-from ._skm_wrappers import group_max_error  # noqa: F401
-from ._skm_wrappers import group_mean_absolute_error  # noqa: F401
-from ._skm_wrappers import group_mean_squared_error  # noqa: F401
-from ._skm_wrappers import group_mean_squared_log_error  # noqa: F401
-from ._skm_wrappers import group_median_absolute_error  # noqa: F401
-from ._skm_wrappers import group_root_mean_squared_error  # noqa: F401
-from ._skm_wrappers import group_r2_score  # noqa: F401
-
-from ._metrics_engine import make_group_metric, group_summary  # noqa: F401
+from ._metrics_engine import make_metric_group_summary, group_summary  # noqa: F401
 from ._metrics_engine import group_min_from_summary, group_max_from_summary  # noqa: F401
 from ._metrics_engine import difference_from_summary, ratio_from_summary  # noqa: F401
+
+BASE_METRICS = [
+    # _extra_metrics
+    fallout_rate,
+    miss_rate,
+    specificity_score,
+    root_mean_squared_error,
+    balanced_root_mean_squared_error,
+    mean_overprediction,
+    mean_prediction,
+    mean_underprediction,
+    selection_rate,
+
+    # sklearn metrics
+    skm.accuracy_score,
+    skm.confusion_matrix,
+    skm.precision_score,
+    skm.recall_score,
+    skm.roc_auc_score,
+    skm.zero_one_loss,
+    skm.mean_squared_error,
+    skm.r2_score,
+    skm.max_error,
+    skm.mean_absolute_error,
+    skm.mean_squared_log_error,
+    skm.median_absolute_error,
+]
+
+for metric in BASE_METRICS:
+    metric_group_summary_name = "{0}_group_summary".format(metric.__name__)
+    globals()[metric_group_summary_name] = make_metric_group_summary(metric)
 
 # -------------------------------------------
 
@@ -61,32 +75,31 @@ _extra_metrics = [
 ]
 
 _group_metrics = [
-    "group_accuracy_score",
-    "group_balanced_root_mean_squared_error",
-    "group_confusion_matrix",
-    "group_fallout_rate",
-    "group_max_error",
-    "group_mean_absolute_error",
-    "group_mean_prediction",
-    "group_mean_overprediction",
-    "group_mean_squared_error",
-    "group_mean_squared_log_error",
-    "group_mean_underprediction",
-    "group_median_absolute_error",
-    "group_miss_rate",
-    "group_precision_score",
-    "group_r2_score",
-    "group_recall_score",
-    "group_roc_auc_score",
-    "group_root_mean_squared_error",
-    "group_selection_rate",
-    "group_specificity_score",
-    "group_zero_one_loss"
+    "accuracy_score_group_summary",
+    "balanced_root_mean_squared_error_group_summary",
+    "confusion_matrix_group_summary",
+    "fallout_rate_group_summary",
+    "max_error_group_summary",
+    "mean_absolute_error_group_summary",
+    "mean_prediction_group_summary",
+    "mean_overprediction_group_summary",
+    "mean_squared_error_group_summary",
+    "mean_squared_log_error_group_summary",
+    "mean_underprediction_group_summary",
+    "median_absolute_error_group_summary",
+    "miss_rate_group_summary",
+    "precision_score_group_summary",
+    "r2_score_group_summary",
+    "recall_score_group_summary",
+    "roc_auc_score_group_summary",
+    "root_mean_squared_error_group_summary",
+    "selection_rate_group_summary",
+    "specificity_score_group_summary",
+    "zero_one_loss_group_summary"
 ]
 
 _engine = [
-    "GroupMetricResult",
-    "make_group_metric",
+    "make_metric_group_summary",
     "group_summary",
     "group_min_from_summary",
     "group_max_from_summary",

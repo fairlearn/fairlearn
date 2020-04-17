@@ -5,6 +5,7 @@ import numpy as np
 
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 from sklearn.utils import Bunch
+from functools import partial
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
@@ -12,13 +13,14 @@ _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 _DEFAULT_INDEXED_PARAMS = {"sample_weight"}
 
 
-def group_summary(metric_function, y_true, y_pred,
+def group_summary(metric_function, y_true, y_pred, *,
                   sensitive_features,
                   indexed_params=None,
                   **metric_params):
     r"""Apply a metric to each subgroup of a set of data.
 
-    :param metric_function: Function ``(y_true, y_pred, \*\*metric_params)``
+    :param metric_function: Function with signature
+        ``metric_function(y_true, y_pred, \*\*metric_params)``
 
     :param y_true: Array of ground-truth values
 
@@ -82,11 +84,11 @@ def _check_metric_params(y_true, metric_params,
     return metric_params_validated
 
 
-def make_group_metric(metric_function, indexed_params=None):
-    """Turn a regular metric into a grouped metric.
+def make_metric_group_summary(metric_function, indexed_params=None):
+    """Create a callable object that calculates a group summary of a given standard metric.
 
     :param metric_function: The function to be wrapped. This must have signature
-        ``(y_true, y_pred, **metric_params)``
+        ``metric_function(y_true, y_pred, **metric_params)``
     :type metric_function: func
 
     :param indexed_params: Names of ``metric_function`` parameters that
@@ -94,21 +96,10 @@ def make_group_metric(metric_function, indexed_params=None):
         and ``y_pred``. Defaults to ``None`` corresponding to ``{"sample_weight"}``.
 
     :return: A wrapped version of the supplied ``metric_function``. It will have
-        signature ``(y_true, y_pred, sensitive_features, **metric_params)``.
+        signature ``(y_true, y_pred, sensitive_features, **metric_params)``
     :rtype: func
     """
-    def wrapper(y_true, y_pred, sensitive_features, **metric_params):
-        return group_summary(metric_function,
-                             y_true,
-                             y_pred,
-                             sensitive_features=sensitive_features,
-                             indexed_params=indexed_params,
-                             **metric_params)
-
-    # Improve the name of the returned function
-    wrapper.__name__ = "group_{0}".format(metric_function.__name__)
-
-    return wrapper
+    return partial(group_summary, metric_function, indexed_params=indexed_params)
 
 
 def difference_from_summary(summary):
