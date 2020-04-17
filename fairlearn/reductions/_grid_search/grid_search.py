@@ -17,6 +17,7 @@ from ._grid_generator import _GridGenerator
 logger = logging.getLogger(__name__)
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
+GROUP_WARN_THRESHOLD = 4
 
 
 class GridSearch(BaseEstimator, MetaEstimatorMixin):
@@ -114,8 +115,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             is_classification_reduction = False
 
         _, y_train, sensitive_features_train = _validate_and_reformat_input(
-            X, y, enforce_binary_sensitive_feature=True,
-            enforce_binary_labels=is_classification_reduction, **kwargs)
+            X, y, enforce_binary_labels=is_classification_reduction,
+            group_warn_threshold=GROUP_WARN_THRESHOLD, **kwargs)
 
         kwargs[_KW_SENSITIVE_FEATURES] = sensitive_features_train
 

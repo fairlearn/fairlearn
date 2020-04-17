@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import logging
 import numpy as np
 import pandas as pd
 import pytest
@@ -10,11 +11,11 @@ from sklearn.exceptions import NotFittedError
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
-     _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE,
+     _SENSITIVE_FEATURES_THRESHOLD_ERROR_TEMPLATE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
-from fairlearn.reductions import GridSearch
-from fairlearn.reductions import DemographicParity, EqualizedOdds
-from fairlearn.reductions import GroupLossMoment, ZeroOneLoss
+from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, GroupLossMoment, \
+    ZeroOneLoss
+from fairlearn.reductions._grid_search.grid_search import GROUP_WARN_THRESHOLD
 
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
 from test.unit.reductions.conftest import is_invalid_transformation
@@ -27,6 +28,9 @@ from test.unit.reductions.grid_search.utilities import assert_n_grid_search_resu
 candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
 candidate_Y_transforms = conversions_for_1d
 candidate_A_transforms = conversions_for_1d
+
+
+SF_THRESHOLD_ERROR_MSG = _SENSITIVE_FEATURES_THRESHOLD_ERROR_TEMPLATE.format(GROUP_WARN_THRESHOLD)
 
 
 # Base class for tests
@@ -125,7 +129,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_sensitive_feature_non_binary(self, transformX, transformY, transformA, A_two_dim):
+    def test_many_sensitive_feature_groups_warning(self, transformX, transformY, transformA,
+                                                   A_two_dim, caplog):
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, Y, A = _quick_data(A_two_dim)
 
@@ -136,17 +141,42 @@ class ArgumentTests:
             A[1][1] = 1
             A[2][0] = 2
             A[2][1] = 2
+            A[3][0] = 3
+            A[3][1] = 3
+            A[4][0] = 4
+            A[4][1] = 4
         else:
             A[0] = 0
             A[1] = 1
             A[2] = 2
+            A[3] = 3
+            A[4] = 4
 
-        with pytest.raises(ValueError) as execInfo:
-            gs.fit(transformX(X),
-                   transformY(Y),
-                   sensitive_features=transformA(A))
+        caplog.set_level(logging.WARNING)
+        gs.fit(transformX(X),
+               transformY(Y),
+               sensitive_features=transformA(A))
 
-        assert _SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE == execInfo.value.args[0]
+        assert SF_THRESHOLD_ERROR_MSG in caplog.text
+
+    
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.parametrize("n_groups", [2, 3, 4])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_no_warning_below_4_sensitive_feature_group(self, transformX, transformY, transformA,
+                                                        A_two_dim, n_groups, caplog):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, Y, A = _quick_data(A_two_dim, n_groups=n_groups)
+
+        caplog.set_level(logging.WARNING)
+        gs.fit(transformX(X),
+               transformY(Y),
+               sensitive_features=transformA(A))
+
+        assert SF_THRESHOLD_ERROR_MSG not in caplog.text
 
     # ----------------------------
 
