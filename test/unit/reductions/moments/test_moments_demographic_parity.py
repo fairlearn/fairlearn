@@ -96,12 +96,12 @@ def test_project_lambda_smoke_negatives():
     df = pd.DataFrame()
     # Note that the '-' indices (11 and 19) are larger
     # than the '+' indices (1 and 2)
-    df = 0 + pd.Series([1, 2, 11, 19], index=midx)
+    df = 0 + pd.Series([1, 2, 11, 19], index=midx, dtype=np.float64)
 
     ls = dp.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 10, 17], index=midx)
+    expected = 0 + pd.Series([0, 0, 10, 17], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -120,12 +120,12 @@ def test_project_lambda_smoke_positives():
     df = pd.DataFrame()
     # Note that the '-' indices are smaller than
     # the '+' ones
-    df = 0 + pd.Series([23, 19, 5, 7], index=midx)
+    df = 0 + pd.Series([23, 19, 5, 7], index=midx, dtype=np.float64)
 
     ls = dp.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([18, 12, 0, 0], index=midx)
+    expected = 0 + pd.Series([18, 12, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 

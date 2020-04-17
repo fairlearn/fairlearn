@@ -83,7 +83,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                                  self._eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
-        Qsum = pd.Series()
+        Qsum = pd.Series(dtype="float64")
         gaps_EG = []
         gaps = []
         Qs = []

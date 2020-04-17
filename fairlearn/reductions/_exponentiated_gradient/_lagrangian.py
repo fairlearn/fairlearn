@@ -45,9 +45,9 @@ class _Lagrangian:
         self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
-        self.hs = pd.Series()
-        self.classifiers = pd.Series()
-        self.errors = pd.Series()
+        self.hs = pd.Series(dtype="float64")
+        self.classifiers = pd.Series(dtype="float64")
+        self.errors = pd.Series(dtype="float64")
         self.gammas = pd.DataFrame()
         self.lambdas = pd.DataFrame()
         self.n = self.X.shape[0]

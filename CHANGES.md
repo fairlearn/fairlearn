@@ -4,6 +4,8 @@
 * Refactoring of metrics:
   * Remove `GroupMetricResult` type in favour of a `Bunch`.
   * Add `group_summary` transformers.
+* Fix warning due to changing default `dtype` when creating an empty
+  `pandas.Series`.
 
 ### v0.4.5
 * Changes to `ThresholdOptimizer`:

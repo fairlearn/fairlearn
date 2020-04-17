@@ -23,33 +23,11 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: Linux
-    vmImage: 'ubuntu-16.04'
-    pinRequirements: True
+    platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+    installationType: 'PipLocal'
     pyVersions: [3.5, 3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
-
-- template: templates/all-tests-job-template.yml
-  parameters:
-    name: Windows
-    vmImage:  'vs2017-win2016'
     pinRequirements: True
-    freezeArtifactStem: $(FreezeArtifactStem)
-    freezeFileStem: $(FreezeFileStem)
-
-- template: templates/notebook-job-template.yml
-  parameters:
-    name: LinuxNotebooks
-    vmImage: 'ubuntu-16.04'
-    pinRequirements: True
-    pyVersions: [3.5, 3.6, 3.7, 3.8]
-
-- template: templates/notebook-job-template.yml
-  parameters:
-    name: WindowsNotebooks
-    vmImage: 'vs2017-win2016'
-    pinRequirements: True
-    pyVersions: [3.5, 3.6, 3.7, 3.8] 
 
 - template: templates/build-widget-job-template.yml
