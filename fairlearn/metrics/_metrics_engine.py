@@ -83,23 +83,110 @@ def _check_metric_params(y_true, metric_params,
 
     return metric_params_validated
 
+def _function_name(func):
+    if hasattr(func, '__name__'):
+        return func.__name__
+    else:
+        return str(func)
 
-def make_metric_group_summary(metric_function, indexed_params=None):
-    """Create a callable object that calculates a group summary of a given standard metric.
 
-    :param metric_function: The function to be wrapped. This must have signature
+class _MetricGroupSummaryCallable:
+    r"""Callable that calculates the group summary of a metric.
+
+    :param metric_function: A metric function with the signature
         ``metric_function(y_true, y_pred, **metric_params)``
     :type metric_function: func
 
-    :param indexed_params: Names of ``metric_function`` parameters that
+    :param indexed_params: The names of parameters of ``metric_function`` that
         should be split according to ``sensitive_features`` in addition to ``y_true``
-        and ``y_pred``. Defaults to ``None`` corresponding to ``{"sample_weight"}``.
+        and ``y_pred``. Defaults to ``None`` corresponding to ``['sample_weight']``.
+    """
+    def __init__(self, metric_function, indexed_params=None, name=None):
+        self._metric_function = metric_function
+        self._indexed_params = indexed_params
+        if name is not None:
+            self.__name__ = name
+        
+    def __repr__(self):
+        if self._indexed_params is None:
+            args_string = ""
+        else:
+            args_string = ", indexed_params={0}".format(self._indexed_params)
+        return "make_metric_group_summary({0}{1})".format(
+            _function_name(self._metric_function),
+            args_string)
 
-    :return: A wrapped version of the supplied ``metric_function``. It will have
-        signature ``(y_true, y_pred, sensitive_features, **metric_params)``
+    def __call__(self, y_true, y_pred, *, sensitive_features, **metric_params):
+        return group_summary(self._metric_function,
+                             y_true, y_pred,
+                             sensitive_features=sensitive_features,
+                             indexed_params=self._indexed_params,
+                             **metric_params)
+
+class _DerivedMetricCallable:
+    """Callable that calculates a derived metric.
+
+    :param transformation_function: A transformation function with the signature
+        ``transformation_function(summary)``
+    :type transformation_function: func
+
+    :param summary_function: A metric group summary function with the signature
+        ``summary_function(y_true, y_pred, *, sensitive_features, **metric_params)``
+    :type summary_function: func
+    """
+    def __init__(self, transformation_function, summary_function, name=None):
+        self._transformation_function = transformation_function
+        self._summary_function = summary_function
+        if name is not None:
+            self.__name__ = name
+
+    def __repr__(self):
+        return "make_derived_metric({0}, {1})".format(
+                _function_name(self._transformation_function),
+                _function_name(self._summary_function))
+    
+    def __call__(self, y_true, y_pred, *, sensitive_features, **metric_params):
+        return self._transformation_function(self._summary_function(
+                y_true, y_pred,
+                sensitive_features=sensitive_features,
+                **metric_params))
+
+def make_metric_group_summary(metric_function, indexed_params=None, name=None):
+    """Make a callable that calculates the group summary of a metric.
+
+    :param metric_function: A metric function with the signature
+        ``metric_function(y_true, y_pred, **metric_params)``
+    :type metric_function: func
+
+    :param indexed_params: The names of parameters of ``metric_function`` that
+        should be split according to ``sensitive_features`` in addition to ``y_true``
+        and ``y_pred``. Defaults to ``None`` corresponding to ``['sample_weight']``.
+
+    :return: A callable object with the signature
+        ``metric_group_summary(y_true, y_pred, *, sensitive_features, **metric_params)``
     :rtype: func
     """
-    return partial(group_summary, metric_function, indexed_params=indexed_params)
+    return _MetricGroupSummaryCallable(
+        metric_function, indexed_params=indexed_params, name=name)
+
+
+def make_derived_metric(transformation_function, summary_function, name=None):
+    """Make a callable that calculates a derived metric from the group summary.
+
+    :param transformation_function: A transformation function with the signature
+        ``transformation_function(summary)``
+    :type transformation_function: func
+
+    :param summary_function: A metric group summary function with the signature
+        ``summary_function(y_true, y_pred, *, sensitive_features, **metric_params)``
+    :type summary_function: func
+
+    :return: A callable object with the signature
+        ``derived_metric(y_true, y_pred, *, sensitive_features, **metric_params)``
+    :rtype: func
+    """
+    return _DerivedMetricCallable(
+        transformation_function, summary_function, name=name)
 
 
 def difference_from_summary(summary):

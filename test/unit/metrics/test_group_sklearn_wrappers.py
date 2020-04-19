@@ -44,10 +44,7 @@ supported_metrics_weighted_binary = supported_metrics_weighted_binary + supporte
 
 
 metrics_no_sample_weights = [
-    (skm.max_error, metrics.max_error_group_summary),
-    (skm.mean_absolute_error, metrics.mean_absolute_error_group_summary),
-    (skm.mean_squared_log_error, metrics.mean_squared_log_error_group_summary),
-    (skm.median_absolute_error, metrics.median_absolute_error_group_summary)]
+    (skm.mean_absolute_error, metrics.mean_absolute_error_group_summary)]
 
 supported_metrics_unweighted = metrics_no_sample_weights + supported_metrics_weighted_binary
 
