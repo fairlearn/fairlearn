@@ -113,6 +113,14 @@ class ExamplePredictor(BaseEstimator, ClassifierMixin):
         return self.scores
 
 
+class PassThroughPredictor(BaseEstimator, ClassifierMixin):
+    def fit(self, X, y=None, **kwargs):
+        return self
+
+    def predict(self, X):
+        return X[0]
+
+
 class ExampleNotPredictor():
     pass
 

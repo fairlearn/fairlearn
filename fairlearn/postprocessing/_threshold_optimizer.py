@@ -18,12 +18,12 @@ from sklearn import clone
 from sklearn.base import BaseEstimator, ClassifierMixin, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
+from sklearn.utils import Bunch
 
 from fairlearn._input_validation import _validate_and_reformat_input
 from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
                          DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
-from ._interpolated_prediction import InterpolatedPredictor
 
 # various error messages
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
@@ -43,7 +43,98 @@ _SUPPORTED_CONSTRAINTS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
 logger = logging.getLogger(__name__)
 
 
-class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
+class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
+    """Predictor for computing predictions between two actual predictions.
+
+    The predictions are represented through the threshold rules operation0 and operation1.
+
+    :param p_ignore: p_ignore changes the interpolated prediction P to the desired
+        solution using the transformation p_ignore * prediction_constant + (1 - p_ignore) * P
+    :param prediction_constant: 0 if not required, otherwise the x value of the best
+        solution should be passed
+    :param p0: interpolation multiplier for prediction from the first predictor
+    :param operation0: threshold rule for the first predictor
+    :param p1: interpolation multiplier for prediction from the second predictor
+    :param operation1: threshold rule for the second predictor
+    :return: an anonymous function that scales the original prediction to the desired one
+    :rtype: lambda
+    """
+
+    def __init__(self, estimator, interpolation_dict, prefit=False):
+        self.estimator = estimator
+        self.interpolation_dict = interpolation_dict
+        self.prefit = prefit
+
+    def fit(self, X, y, **kwargs):
+        """Fit the estimator.
+
+        If `prefit` is set to `False` or the base estimator is not fitted then
+        the base estimator is fitted from the provided arguments. Otherwise the base
+        estimator is kept as is.
+        """
+        if self.estimator is None:
+            raise ValueError(ESTIMATOR_ERROR_MESSAGE)
+        
+        if not self.prefit:
+            self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
+        else:
+            self.estimator_ = self.estimator
+        return self
+
+    def _pmf_predict(self, X, *, sensitive_features):
+        """Probabilistic mass function.
+
+        :param X: Feature matrix
+        :type X: numpy.ndarray or pandas.DataFrame
+        :param sensitive_features: Sensitive features to identify groups by, currently allows
+            only a single column
+        :type sensitive_features: Currently 1D array as numpy.ndarray, list, pandas.DataFrame,
+            or pandas.Series
+        :return: array of tuples with probabilities for predicting 0 or 1, respectively. The sum
+            of the two numbers in each tuple needs to add up to 1.
+        :rtype: numpy.ndarray
+        """
+        check_is_fitted(self)
+        _, _, sensitive_feature_vector = _validate_and_reformat_input(
+            X, y=None, sensitive_features=sensitive_features, expect_y=False,
+            enforce_binary_labels=True)
+        base_predictions = np.array(self.estimator_.predict(X))
+        
+        positive_probs = 0.0*base_predictions
+        for a, interpolation in self.interpolation_dict.items():
+            interpolated_predictions = \
+                interpolation.p0 * interpolation.operation0(base_predictions) + \
+                interpolation.p1 * interpolation.operation1(base_predictions)
+            if 'p_ignore' in interpolation:
+                interpolated_predictions = \
+                    interpolation.p_ignore * interpolation.prediction_constant + \
+                    (1 - interpolation.p_ignore) * interpolated_predictions
+            positive_probs[sensitive_feature_vector == a] = \
+                interpolated_predictions[sensitive_feature_vector == a]
+        return np.array([1.0 - positive_probs, positive_probs]).transpose()
+        
+    def predict(self, X, *, sensitive_features, random_state=None):
+        """Provide a prediction for the given input data.
+
+        Note that this is non-deterministic, due to the nature of the
+        interpolation.
+
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
+
+        :return: The prediction. If `X` represents the data for a single example
+            the result will be a scalar. Otherwise the result will be a vector
+        :rtype: Scalar or vector
+        """
+        check_is_fitted(self)
+        if random_state:
+            random.seed(random_state)
+        positive_probs = self._pmf_predict(
+            X, sensitive_features=sensitive_features)[:, 1]
+        return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+
+
+class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     """An Estimator based on the threshold optimization approach.
 
     The procedure followed is described in detail in
@@ -125,7 +216,7 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        self._post_processed_predictor_by_sensitive_feature = threshold_optimization_method(
+        self.interpolated_thresholder_ = threshold_optimization_method(
             sensitive_feature_vector, y, scores, self.grid_size, self.flip)
 
     def predict(self, X, *, sensitive_features, random_state=None):
@@ -141,21 +232,10 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
         :type random_state: int
         :return: predictions in numpy.ndarray
         """
-        if random_state:
-            random.seed(random_state)
-
         check_is_fitted(self)
-        _, _, sensitive_feature_vector = _validate_and_reformat_input(
-            X, y=None, sensitive_features=sensitive_features, expect_y=False,
-            enforce_binary_labels=True)
-        unconstrained_predictions = self.estimator_.predict(X)
-
-        positive_probs = _vectorized_prediction(
-            self._post_processed_predictor_by_sensitive_feature,
-            sensitive_feature_vector,
-            unconstrained_predictions)
-        return (positive_probs >= np.random.rand(len(positive_probs))) * 1
-
+        return self.interpolated_thresholder_.predict(
+            X, sensitive_features=sensitive_features, random_state=random_state)
+        
     def _pmf_predict(self, X, *, sensitive_features):
         """Probabilistic mass function.
 
@@ -170,14 +250,9 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
         :rtype: numpy.ndarray
         """
         check_is_fitted(self)
-        _, _, sensitive_feature_vector = _validate_and_reformat_input(
-            X, y=None, sensitive_features=sensitive_features, expect_y=False,
-            enforce_binary_labels=True)
-        positive_probs = _vectorized_prediction(
-            self._post_processed_predictor_by_sensitive_feature, sensitive_feature_vector,
-            self.estimator_.predict(X))
-        return np.array([[1.0 - p, p] for p in positive_probs])
-
+        return self.interpolated_thresholder_._pmf_predict(
+            X, sensitive_features=sensitive_features)
+        
     def _threshold_optimization_demographic_parity(self, sensitive_features, labels, scores,
                                                    grid_size=1000, flip=True):
         """Calculate the selection and error rates for every sensitive feature value.
@@ -260,19 +335,18 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
         i_best_DP = error_given_selection.idxmin()
         self._x_best = self._x_grid[i_best_DP]
 
-        # create the solution as interpolation of multiple points with a separate predictor per
-        # sensitive feature value
-        predicted_DP_by_sensitive_feature = {}
+        # create the solution as interpolation of multiple points with a separate
+        # interpolation per sensitive feature value
+        interpolation_dict = {}
         for sensitive_feature_value in self._selection_error_curve.keys():
             # For DP we already have the predictor directly without complex interpolation.
             selection_error_curve_result = self._selection_error_curve[sensitive_feature_value] \
                 .transpose()[i_best_DP]
-            predicted_DP_by_sensitive_feature[sensitive_feature_value] = \
-                InterpolatedPredictor(0, 0,
-                                      selection_error_curve_result.p0,
-                                      selection_error_curve_result.operation0,
-                                      selection_error_curve_result.p1,
-                                      selection_error_curve_result.operation1)
+            interpolation_dict[sensitive_feature_value] = \
+                Bunch(p0 = selection_error_curve_result.p0,
+                      operation0 = selection_error_curve_result.operation0,
+                      p1 = selection_error_curve_result.p1,
+                      operation1 = selection_error_curve_result.operation1)
 
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("From ROC curves")
@@ -280,8 +354,9 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
                      error_given_selection[i_best_DP], self._x_best)
         logger.debug(OUTPUT_SEPARATOR)
 
-        return predicted_DP_by_sensitive_feature
-
+        return InterpolatedThresholder(
+            self.estimator_, interpolation_dict, prefit=True).fit(None, None)
+        
     def _threshold_optimization_equalized_odds(self, sensitive_features, labels, scores,
                                                grid_size=1000, flip=True):
         """Calculate the ROC curve of every sensitive feature value at different thresholds.
@@ -352,9 +427,9 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
         self._x_best = self._x_grid[i_best_EO]
         self._y_best = self._y_min[i_best_EO]
 
-        # create the solution as interpolation of multiple points with a separate predictor
-        # per sensitive feature
-        predicted_EO_by_sensitive_feature = {}
+        # create the solution as interpolation of multiple points with a separate
+        # interpolation per sensitive feature
+        interpolation_dict = {}
         for sensitive_feature_value in self._roc_curve.keys():
             roc_result = self._roc_curve[sensitive_feature_value].transpose()[i_best_EO]
             # p_ignore * x_best represent the diagonal of the ROC plot.
@@ -369,10 +444,13 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
                 p_ignore = difference_from_best_predictor_for_sensitive_feature / \
                     vertical_distance_from_diagonal
 
-            predicted_EO_by_sensitive_feature[sensitive_feature_value] = \
-                InterpolatedPredictor(p_ignore, self._x_best,
-                                      roc_result.p0, roc_result.operation0,
-                                      roc_result.p1, roc_result.operation1)
+            interpolation_dict[sensitive_feature_value] = \
+                Bunch(p_ignore=p_ignore,
+                      prediction_constant=self._x_best,
+                      p0=roc_result.p0,
+                      operation0=roc_result.operation0,
+                      p1=roc_result.p1,
+                      operation1=roc_result.operation1)
 
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("From ROC curves")
@@ -380,30 +458,8 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
                      error_given_x[i_best_EO], self._x_best, self._y_best)
         logger.debug(OUTPUT_SEPARATOR)
 
-        return predicted_EO_by_sensitive_feature
-
-
-def _vectorized_prediction(function_dict, sensitive_features, scores):
-    """Make predictions for all samples with all provided functions.
-
-    However, only use the results from the function that corresponds to the
-    sensitive feature value of the sample.
-
-    This method assumes that sensitive_features and scores are of equal length.
-
-    :param function_dict: the functions that apply to various sensitive feature values
-    :type function_dict: dictionary of functions
-    :param sensitive_features: the feature data that determines the grouping
-    :type sensitive_features: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    :param scores: vector of predicted values
-    :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-    """
-    # handle type conversion to ndarray for other types
-    sensitive_features_vector = np.array(sensitive_features)
-    scores_vector = np.array(scores)
-
-    return sum([(sensitive_features_vector == a) * function_dict[a].predict(scores_vector)
-                for a in function_dict])
+        return InterpolatedThresholder(
+            self.estimator_, interpolation_dict, prefit=True).fit(None, None)
 
 
 def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_feature_names=None):

@@ -11,8 +11,7 @@ from fairlearn._input_validation import \
      _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import \
-    (_vectorized_prediction,
-     NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
+    (NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
      ESTIMATOR_ERROR_MESSAGE,
      )
 from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
@@ -20,11 +19,12 @@ from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
                        _get_predictions_by_sensitive_feature,
                        ExamplePredictor,
+                       PassThroughPredictor,
                        is_invalid_transformation,
                        candidate_A_transforms, candidate_X_transforms,
                        candidate_Y_transforms)
 from test.unit.input_convertors import _map_into_single_column
-
+import pandas as pd
 
 @pytest.mark.parametrize("X_transform", candidate_X_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
@@ -150,24 +150,19 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
                                    sensitive_features=data_X_y_sf.sensitive_features)
 
 
-@pytest.mark.parametrize("score_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
-def test_threshold_optimization_demographic_parity(score_transform, y_transform,
+def test_threshold_optimization_demographic_parity(y_transform,
                                                    sensitive_features_transform):
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(estimator=ExamplePredictor(scores),
+    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(),
                                    constraints=DEMOGRAPHIC_PARITY)
-    estimator.fit(X_ex, y, sensitive_features=sensitive_features)
-
+    estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
+    
     def prob_pred(sensitive_features, scores):
-        return _vectorized_prediction(
-            estimator._post_processed_predictor_by_sensitive_feature,
-            sensitive_features,
-            scores)
-
+        return estimator._pmf_predict(pd.DataFrame(scores), sensitive_features=sensitive_features)[0,1]
+        
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
     # sensitive feature value A
@@ -219,23 +214,18 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
     assert np.isclose(average_probabilities_by_sensitive_feature, [0.572] * 3).all()
 
 
-@pytest.mark.parametrize("score_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
-def test_threshold_optimization_equalized_odds(score_transform, y_transform,
+def test_threshold_optimization_equalized_odds(y_transform,
                                                sensitive_features_transform):
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(estimator=ExamplePredictor(scores),
+    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(),
                                    constraints=EQUALIZED_ODDS)
-    estimator.fit(X_ex, y, sensitive_features=sensitive_features)
-
+    estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
+    
     def prob_pred(sensitive_features, scores):
-        return _vectorized_prediction(
-            estimator._post_processed_predictor_by_sensitive_feature,
-            sensitive_features,
-            scores)
+        return estimator._pmf_predict(pd.DataFrame(scores), sensitive_features=sensitive_features)[0,1]
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
@@ -435,11 +425,3 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
                        match="Found input variables with inconsistent numbers of samples"):
         adjusted_predictor.predict(data_X_y_sf.X[:-1],
                                    sensitive_features=data_X_y_sf.sensitive_features)
-
-
-def create_adjusted_predictor(threshold_optimization_method, sensitive_features, labels, scores):
-    post_processed_predictor_by_sensitive_feature = threshold_optimization_method(
-        sensitive_features, labels, scores)
-
-    return lambda sensitive_features_, scores: _vectorized_prediction(
-        post_processed_predictor_by_sensitive_feature, sensitive_features_, scores)
