@@ -194,6 +194,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :rtype: Scalar or vector
         """
         positive_probs = self._pmf_predict(X)[:, 1]
+        print(positive_probs)
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X):
@@ -207,5 +208,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
             pred[t] = self._hs[t](X)
+        print(pred)
         positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
+        print(positive_probs)
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
