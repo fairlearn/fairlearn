@@ -4,7 +4,6 @@
 from sklearn import preprocessing
 
 from . import (
-    true_positive_rate_group_summary,
     true_negative_rate_group_summary,
     false_positive_rate_group_summary,
     false_negative_rate_group_summary,
@@ -16,7 +15,6 @@ from . import (
     selection_rate_group_summary,
 
     accuracy_score_group_summary,
-    confusion_matrix_group_summary,
     precision_score_group_summary,
     recall_score_group_summary,
     roc_auc_score_group_summary,
@@ -24,7 +22,7 @@ from . import (
     mean_absolute_error_group_summary,
     mean_squared_error_group_summary,
     r2_score_group_summary,
-    ) 
+    )
 
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 

@@ -2,10 +2,18 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import sklearn.metrics as skm
+from sklearn.utils import Bunch
+
+from ._extra_metrics import (
+    true_positive_rate, true_negative_rate,
+    false_positive_rate, false_negative_rate,
+    root_mean_squared_error, balanced_root_mean_squared_error,
+    mean_overprediction, mean_prediction, mean_underprediction,
+    selection_rate)
 
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
-from sklearn.utils import Bunch
-from functools import partial
+
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
@@ -245,3 +253,65 @@ def group_max_from_summary(summary):
 def _check_array_sizes(a, b, a_name, b_name):
     if len(a) != len(b):
         raise ValueError(_MESSAGE_SIZE_MISMATCH.format(b_name, a_name))
+
+
+TRANSFORMATIONS = {
+    "difference": difference_from_summary,
+    "ratio": ratio_from_summary,
+    "group_min": group_min_from_summary,
+    "group_max": group_max_from_summary,
+}
+
+# Base metrics and the variants that are implemented by the metrics engine
+METRICS_SPEC = [
+    # base metrics from _extra_metrics
+    (true_positive_rate, ["difference", "ratio"]),
+    (true_negative_rate, []),
+    (false_positive_rate, ["difference", "ratio"]),
+    (false_negative_rate, []),
+    (root_mean_squared_error, []),
+    (balanced_root_mean_squared_error, []),
+    (mean_overprediction, []),
+    (mean_prediction, []),
+    (mean_underprediction, []),
+    (selection_rate, ["difference", "ratio", "group_min", "group_max"]),
+
+    # base metrics from sklearn.metrics
+    (skm.accuracy_score, ["difference", "ratio", "group_min", "group_max"]),
+    (skm.confusion_matrix, []),
+    (skm.precision_score, []),
+    (skm.recall_score, []),
+    (skm.roc_auc_score, []),
+    (skm.zero_one_loss, []),
+    (skm.mean_absolute_error, ["difference", "ratio", "group_min", "group_max"]),
+    (skm.mean_squared_error, []),
+    (skm.r2_score, []),
+]
+
+
+def _derive_metrics(metrics_spec):
+    metric_group_summary_dict = {}
+    derived_metric_dict = {}
+
+    for base_metric, variants in metrics_spec:
+        metric_group_summary_name = "{0}_group_summary".format(base_metric.__name__)
+        metric_group_summary = make_metric_group_summary(
+            base_metric,
+            name=metric_group_summary_name)
+        metric_group_summary_dict[metric_group_summary_name] = metric_group_summary
+
+        for variant in variants:
+            derived_metric_name = "{0}_{1}".format(base_metric.__name__, variant)
+            derived_metric = make_derived_metric(
+                TRANSFORMATIONS[variant],
+                metric_group_summary,
+                name=derived_metric_name)
+            derived_metric_dict[derived_metric_name] = derived_metric
+
+    return metric_group_summary_dict, derived_metric_dict
+
+
+_metric_group_summary_dict, _derived_metric_dict = _derive_metrics(METRICS_SPEC)
+
+globals().update(_metric_group_summary_dict)
+globals().update(_derived_metric_dict)
