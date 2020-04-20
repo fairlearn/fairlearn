@@ -283,10 +283,11 @@ METRICS_SPEC = [
 
     # base metrics from sklearn.metrics
     (skm.accuracy_score, ["difference", "ratio", "group_min", "group_max"]),
+    (skm.balanced_accuracy_score, []),
     (skm.confusion_matrix, []),
     (skm.precision_score, []),
     (skm.recall_score, []),
-    (skm.roc_auc_score, []),
+    (skm.roc_auc_score, ["group_min"]),
     (skm.zero_one_loss, []),
     (skm.mean_absolute_error, ["difference", "ratio", "group_min", "group_max"]),
     (skm.mean_squared_error, []),
