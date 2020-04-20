@@ -4,7 +4,7 @@
 """Utilities for plotting curves."""
 
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE, DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
-from ._threshold_optimizer import ThresholdOptimizer, _SUPPORTED_CONSTRAINTS
+from ._threshold_optimizer import ThresholdOptimizer, SUPPORTED_CONSTRAINTS
 
 
 def _get_debug_color(key):
@@ -101,8 +101,8 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
                        'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
     else:
         raise ValueError("The plot can only be generated for a ThresholdOptimizer "
-                         "object with constraints {}."
-                         .format(" or ".join(_SUPPORTED_CONSTRAINTS)))
+                         "object with constraints from: {}."
+                         .format(", ".join(SUPPORTED_CONSTRAINTS)))
 
     if show_plot:
         plt.show()

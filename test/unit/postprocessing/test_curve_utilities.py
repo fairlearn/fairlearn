@@ -89,24 +89,37 @@ def test_calculate_roc_points():
     grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group("A") \
         .sort_values(by=SCORE_KEY, ascending=False)
 
-    roc_points = _calculate_roc_points(grouped_data, "A")
+    roc_points = _calculate_roc_points(grouped_data, "A", flip=True)
     expected_roc_points = pd.DataFrame({
-        "x": [0, 0.25, 0.5, 0.5, 1],
-        "y": [0, 1/3,  2/3, 1,   1],
+        "x": [0, 1, 0.75, 0.25, 0.5, 0.5, 0.5, 0.5, 1, 0],
+        "y": [0, 1, 2/3,  1/3,  1/3, 2/3, 0,   1,   1, 0],
         "operation": [ThresholdOperation('>', np.inf),
+                      ThresholdOperation('<', np.inf),
+                      ThresholdOperation('>', 0.5),
                       ThresholdOperation('<', 0.5),
+                      ThresholdOperation('>', 1.5),
                       ThresholdOperation('<', 1.5),
+                      ThresholdOperation('>', 2.5),
                       ThresholdOperation('<', 2.5),
-                      ThresholdOperation('>', -np.inf)]
-    })
+                      ThresholdOperation('>', -np.inf),
+                      ThresholdOperation('<', -np.inf),
+                      ]
+    }).sort_values(['x', 'y'], ignore_index=True)
 
     _assert_equal_points(expected_roc_points, roc_points)
 
+    expected_roc_curve = pd.DataFrame({
+        "x": [0, 0.5, 1],
+        "y": [0, 1,   1],
+        "operation": [ThresholdOperation('>', np.inf),
+                      ThresholdOperation('<', 2.5),
+                      ThresholdOperation('>', -np.inf),
+                      ]
+    })
     # Try filtering to get the convex hull of the ROC points.
-    # This should drop the second and third point.
     selected_points = \
         pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[['x', 'y', 'operation']]
-    _assert_equal_points(expected_roc_points, selected_points, ignore_indices=[1, 2])
+    _assert_equal_points(expected_roc_curve, selected_points)
 
 
 def test_get_roc():
@@ -177,28 +190,13 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve,
                           (next_base_point_y - y) / (next_base_point_x - x))
 
 
-def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
-    if ignore_indices is None:
-        ignore_indices = []
-    assert len(expected_points) - len(ignore_indices) == len(actual_points)
+def _assert_equal_points(expected_points, actual_points):
+    assert len(expected_points) == len(actual_points)
 
-    # order by x to be able to iterate through
-    actual_points = actual_points.sort_values(by="x")
-    actual_points.index = range(len(actual_points))
-
-    index_offset = 0
     for i in range(len(expected_points)):
-        if i in ignore_indices:
-            index_offset += 1
-
-            if i > len(expected_points):
-                break
-
-            continue
-
-        assert np.isclose(actual_points.x[i - index_offset], expected_points.x[i])
-        assert np.isclose(actual_points.y[i - index_offset], expected_points.y[i])
-        assert actual_points.operation[i - index_offset].operator == \
+        assert np.isclose(actual_points.x[i], expected_points.x[i])
+        assert np.isclose(actual_points.y[i], expected_points.y[i])
+        assert actual_points.operation[i].operator == \
             expected_points.operation[i].operator
-        assert np.isclose(actual_points.operation[i - index_offset].threshold,
+        assert np.isclose(actual_points.operation[i].threshold,
                           expected_points.operation[i].threshold)

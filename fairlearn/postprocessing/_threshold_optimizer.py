@@ -21,15 +21,16 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import Bunch
 
 from fairlearn._input_validation import _validate_and_reformat_input
-from ._constants import (LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY, OUTPUT_SEPARATOR,
-                         DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
+from ._constants import (
+    LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY,
+    OUTPUT_SEPARATOR,
+    DEMOGRAPHIC_PARITY, EQUALIZED_ODDS, ACCURACY_SCORE,
+    METRIC_DICT)
 from ._roc_curve_utilities import _interpolate_curve, _get_roc
 
 # various error messages
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
-NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = "Currently only {} and {} are supported " \
-    "constraints.".format(DEMOGRAPHIC_PARITY, EQUALIZED_ODDS)
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = "Post processing currently only supports a single " \
     "column in {}."
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = "A sensitive feature named {} or {} " \
@@ -38,26 +39,55 @@ SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains 
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 ESTIMATOR_ERROR_MESSAGE = "'estimator' cannot be `None`."
 
-_SUPPORTED_CONSTRAINTS = [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS]
-
 logger = logging.getLogger(__name__)
 
+# All allowed utilities must have values between 0 and 1 and attain both extremes as
+# the threshold goes from -Inf to Inf.
+SUPPORTED_UTILITIES = {
+    'selection_rate',
+    'demographic_parity',
+    'false_positive_rate',
+    'false_negative_rate',
+    'true_positive_rate',
+    'true_negative_rate',
+}
+
+# For equalized odds, we only allow objectives that are non-decreasing in true_positives,
+# holding n, positives, negatives, true_negatives, and false_positives fixed.
+SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS = {
+    'accuracy_score',
+}
+
+SUPPORTED_CONSTRAINTS = [*SUPPORTED_UTILITIES, EQUALIZED_ODDS]
+NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = (
+    "Currently only the following constraints are supported: {}.".format(
+        ", ".join(SUPPORTED_CONSTRAINTS)))
+NOT_SUPPORTED_OBJECTIVES_ERROR_MESSAGE = (
+    "Currently only the following objectives are supported: {}.".format(
+    ", ".join(METRIC_DICT.keys())))
+NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
+    "Currently only the following objectives are supported: {}.".format(
+    ", ".join(SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS)))
 
 class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
-    """Predictor for computing predictions between two actual predictions.
+    """Binary predictor that thresholds continuous predictions of a base estimator.
 
-    The predictions are represented through the threshold rules operation0 and operation1.
-
-    :param p_ignore: p_ignore changes the interpolated prediction P to the desired
-        solution using the transformation p_ignore * prediction_constant + (1 - p_ignore) * P
-    :param prediction_constant: 0 if not required, otherwise the x value of the best
-        solution should be passed
-    :param p0: interpolation multiplier for prediction from the first predictor
-    :param operation0: threshold rule for the first predictor
-    :param p1: interpolation multiplier for prediction from the second predictor
-    :param operation1: threshold rule for the second predictor
-    :return: an anonymous function that scales the original prediction to the desired one
-    :rtype: lambda
+    At prediction time, the predictor takes as input both standard and sensitive features.
+    Based on the values of sensitive features, it then applies a randomized thresholding
+    transformation according to the provided `interpolation_dict`.
+    
+    :param estimator: base estimator
+    :param dict interpolation_dict: maps sensitive feature values to `Bunch` that describes the
+        interpolation transformation via the following fields:
+        - p0, operation0: with probability p0, operation0 is executed
+        - p1, operation1: with probability p1, operation1 is executed
+        - p_ignore, prediction_constant: two optional fields; if present then the result of
+          the draw of operation0 or operation1 is kept with probability 1 - p_ignore, and gets
+          replaced by prediction_constant with probability p_ignore.
+        The numbers p0 and p1 must be non-negative and add up to 1, operation0 and
+        operation1 must be instances of :class:`ThresholdOperation`, and p_ignore must be
+        between 0 and 1.
+    :param bool prefit: if `True` then the base estimator is not fitted in :meth:`fit`.
     """
 
     def __init__(self, estimator, interpolation_dict, prefit=False):
@@ -68,9 +98,8 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
     def fit(self, X, y, **kwargs):
         """Fit the estimator.
 
-        If `prefit` is set to `False` or the base estimator is not fitted then
-        the base estimator is fitted from the provided arguments. Otherwise the base
-        estimator is kept as is.
+        If `prefit` is set to `True` then the base estimator is kept as is.
+        Otherwise it is fitted from the provided arguments.
         """
         if self.estimator is None:
             raise ValueError(ESTIMATOR_ERROR_MESSAGE)
@@ -156,12 +185,13 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     """
 
     def __init__(self, *, estimator=None,
-                 constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True,
+                 constraints=DEMOGRAPHIC_PARITY, objective=ACCURACY_SCORE, grid_size=1000, flip=True,
                  prefit=False):
         self.grid_size = grid_size
         self.flip = flip
         self.post_processed_predictor_by_sensitive_feature = None
         self.constraints = constraints
+        self.objective = objective
         self.estimator = estimator
         self.prefit = prefit
 
@@ -184,8 +214,15 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         if self.estimator is None:
             raise ValueError(ESTIMATOR_ERROR_MESSAGE)
 
-        if self.constraints not in _SUPPORTED_CONSTRAINTS:
+        if self.constraints not in SUPPORTED_CONSTRAINTS:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
+
+        if self.constraints == EQUALIZED_ODDS:
+            if self.objective not in SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS:
+                raise ValueError(NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE)
+        else:
+            if self.objective not in METRIC_DICT:
+                raise ValueError(NOT_SUPPORTED_OBJECTIVES_ERROR_MESSAGE)
 
         _, _, sensitive_feature_vector = _validate_and_reformat_input(
             X, y, sensitive_features=sensitive_features, enforce_binary_labels=True)
@@ -206,15 +243,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
 
         scores = self.estimator_.predict(X)
-        threshold_optimization_method = None
-        if self.constraints == DEMOGRAPHIC_PARITY:
-            threshold_optimization_method = \
-                self._threshold_optimization_demographic_parity
-        elif self.constraints == EQUALIZED_ODDS:
-            threshold_optimization_method = \
-                self._threshold_optimization_equalized_odds
+        if self.constraints == EQUALIZED_ODDS:
+            threshold_optimization_method = self._threshold_optimization_for_equalized_odds
         else:
-            raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
+            threshold_optimization_method = self._threshold_optimization_for_utility
 
         self.interpolated_thresholder_ = threshold_optimization_method(
             sensitive_feature_vector, y, scores, self.grid_size, self.flip)
@@ -253,8 +285,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         return self.interpolated_thresholder_._pmf_predict(
             X, sensitive_features=sensitive_features)
         
-    def _threshold_optimization_demographic_parity(self, sensitive_features, labels, scores,
-                                                   grid_size=1000, flip=True):
+    def _threshold_optimization_for_utility(
+        self, sensitive_features, labels, scores, grid_size=1000, flip=True):
         """Calculate the selection and error rates for every sensitive feature value.
 
         These calculations are made at different
@@ -357,8 +389,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         return InterpolatedThresholder(
             self.estimator_, interpolation_dict, prefit=True).fit(None, None)
         
-    def _threshold_optimization_equalized_odds(self, sensitive_features, labels, scores,
-                                               grid_size=1000, flip=True):
+    def _threshold_optimization_for_equalized_odds(
+        self, sensitive_features, labels, scores, grid_size=1000, flip=True):
         """Calculate the ROC curve of every sensitive feature value at different thresholds.
 
         Subsequently takes the overlapping region of the ROC curves, and finds the best

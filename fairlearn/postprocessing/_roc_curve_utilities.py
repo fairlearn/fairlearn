@@ -4,13 +4,17 @@
 import numpy as np
 import pandas as pd
 
-from ._constants import LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY
+from ._constants import (
+    LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY,
+    METRIC_DICT,
+    confusion_matrix_summary)
 from ._threshold_operation import ThresholdOperation
 
 DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
 
 
-def _get_roc(data, sensitive_feature_value, flip=True):
+def _get_roc(data, sensitive_feature_value, flip=False,
+             x_metric="false_positive_rate", y_metric="true_positive_rate"):
     """Get ROC curve's convex hull based on data columns 'score' and 'label'.
 
     Scores represent output values from the predictor.
@@ -25,7 +29,8 @@ def _get_roc(data, sensitive_feature_value, flip=True):
     :return: the convex hull over the ROC curve points
     :rtype: pandas.DataFrame
     """
-    roc_sorted = _calculate_roc_points(data, sensitive_feature_value, flip)
+    roc_sorted = _calculate_roc_points(
+        data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric)
     roc_selected = _filter_points_to_get_convex_hull(roc_sorted)
     roc_convex_hull = pd.DataFrame(roc_selected)[['x', 'y', 'operation']]
     return roc_convex_hull
@@ -123,7 +128,8 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
 
 
-def _calculate_roc_points(data, sensitive_feature_value, flip=True):
+def _calculate_roc_points(data, sensitive_feature_value, flip=False,
+                          x_metric="false_positive_rate", y_metric="true_positive_rate"):
     """Calculate the ROC points from the scores and labels.
 
     This is done by iterating through all possible
@@ -147,8 +153,6 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
     scores.append(-np.inf)
     labels.append(np.nan)
 
-    x_list, y_list, operation_list = [0], [0], [ThresholdOperation('>', np.inf)]
-
     # Iterate through all samples which are sorted by increasing scores.
     # Setting the threshold between two scores means that everything smaller
     # than the threshold gets a label of 0 while everything larger than the
@@ -156,29 +160,48 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
     # labels provides better accuracy.
     i = 0
     count = [0, 0]
+    x_list, y_list, operation_list = [], [], []
     while i < n:
-        threshold = scores[i]
-        while scores[i] == threshold:
-            count[labels[i]] += 1
-            i += 1
+        # special handling of the initial point
+        if x_list == []:
+            threshold = np.inf
+        else:
+            threshold = scores[i]
+            while scores[i] == threshold:
+                count[labels[i]] += 1
+                i += 1
+            threshold = (threshold + scores[i]) / 2
+        
         # For the ROC curve we calculate points (x, y), where x represents
         # the conditional probability P[Y_hat=1 | Y=0] and y represents
         # the conditional probability P[Y_hat=1 | Y=1]. The conditional
         # probability is achieved by dividing by only the number of
         # negative/positive samples.
-        x, y = count[0] / n_negative, count[1] / n_positive
-        threshold = (threshold + scores[i]) / 2
-        operation = ThresholdOperation('>', threshold)
+        actual_counts = confusion_matrix_summary(
+            false_positives = count[0],
+            true_positives = count[1],
+            true_negatives = n_negative - count[0],
+            false_negatives = n_positive - count[1]) 
+        flipped_counts = confusion_matrix_summary(
+            false_positives = n_negative - count[0],
+            true_positives = n_positive - count[1],
+            true_negatives = count[0],
+            false_negatives = count[1])
+        if flip:
+            operations = [('>', actual_counts), ('<', flipped_counts)]
+        else:
+            operations = [('>', actual_counts)]
 
-        if flip and x > y:
-            x, y = 1 - x, 1 - y
-            operation = ThresholdOperation('<', threshold)
-        x_list.append(x)
-        y_list.append(y)
-        operation_list.append(operation)
-
+        for operation_string, counts in operations:
+            x = METRIC_DICT[x_metric](counts)
+            y = METRIC_DICT[y_metric](counts)
+            operation = ThresholdOperation(operation_string, threshold)
+            x_list.append(x)
+            y_list.append(y)
+            operation_list.append(operation)
+        
     return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}) \
-        .sort_values(by=['x', 'y'])
+        .sort_values(by=['x', 'y'], ignore_index=True)
 
 
 def _get_scores_labels_and_counts(data):
