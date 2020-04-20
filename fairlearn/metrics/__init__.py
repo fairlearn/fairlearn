@@ -18,8 +18,6 @@ The metric is evaluated for the entire set of data, and also
 for each subgroup identified in ``group_membership``.
 """
 
-import sklearn.metrics as skm
-
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
     true_negative_rate,

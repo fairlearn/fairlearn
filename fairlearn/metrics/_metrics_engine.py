@@ -116,7 +116,7 @@ class _MetricGroupSummaryCallable:
         self._indexed_params = indexed_params
         if name is not None:
             self.__name__ = name
-        
+
     def __repr__(self):
         if self._indexed_params is None:
             args_string = ""
