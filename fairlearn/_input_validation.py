@@ -20,8 +20,6 @@ _MESSAGE_RATIO_NOT_IN_RANGE = "ratio must lie between (0,1]"
 _INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats for {} are: {}. " \
                                      "Your provided data was of type {}."
 _EMPTY_INPUT_ERROR_MESSAGE = "At least one of sensitive_features, labels, or scores are empty."
-_SENSITIVE_FEATURES_THRESHOLD_ERROR_TEMPLATE = "Sensitive features contain more than {} unique" \
-                                               " values"
 _LABELS_NOT_0_1_ERROR_MESSAGE = "Supplied y labels are not 0 or 1"
 _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE = "{} is a {} with more than one column"
 _NOT_ALLOWED_TYPE_ERROR_MESSAGE = "{} is not an ndarray, Series or DataFrame"
@@ -35,8 +33,7 @@ _ALLOWED_INPUT_TYPES_Y = [np.ndarray, pd.DataFrame, pd.Series, list]
 _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR = ","
 
 
-def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels=False, 
-                                 group_warn_threshold=None, **kwargs):
+def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels=False, **kwargs):
     """Validate input data and return the data in an appropriate format.
 
     :param X: The feature matrix
@@ -48,9 +45,6 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     :param enforce_binary_labels: if True raise exception if there are more than two distinct
         values in the `y` data; default False
     :type enforce_binary_labels: bool
-    :param group_warn_threshold: threshold on the number of groups as defined by sensitive
-        features above which a warning is displayed; default None
-    :type group_warn_threshold: int
     :return: the validated and reformatted X, y, and sensitive_features; note that certain
         estimators rely on metadata encoded in X which may be stripped during the reformatting
         process, so mitigation methods should ideally use the input X instead of the returned X
@@ -84,11 +78,6 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
         sensitive_features = \
             _compress_multiple_sensitive_features_into_single_column(sensitive_features)
-
-    if group_warn_threshold is not None:
-        if len(np.unique(sensitive_features)) > group_warn_threshold:
-            logger.warning(_SENSITIVE_FEATURES_THRESHOLD_ERROR_TEMPLATE
-                           .format(group_warn_threshold))
 
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas

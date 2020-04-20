@@ -18,6 +18,8 @@ def _quick_data(A_two_dim=False, n_groups=2):
         A = np.array([1, 0, 2, 0, 0, 1, 2, 1])
     elif n_groups == 4:
         A = np.array([3, 0, 2, 0, 3, 1, 2, 1])
+    elif n_groups == 5:
+        A = np.array([3, 0, 2, 0, 3, 4, 2, 1])
     else:
         raise ValueError("_quick_data only supports 2, 3, or 4 sensitive feature values.")
 

@@ -11,11 +11,11 @@ from sklearn.exceptions import NotFittedError
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
-     _SENSITIVE_FEATURES_THRESHOLD_ERROR_TEMPLATE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, GroupLossMoment, \
     ZeroOneLoss
-from fairlearn.reductions._grid_search.grid_search import GROUP_WARN_THRESHOLD
+from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
+    GRID_DIMENSION_WARN_TEMPLATE
 
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
 from test.unit.reductions.conftest import is_invalid_transformation
@@ -28,9 +28,6 @@ from test.unit.reductions.grid_search.utilities import assert_n_grid_search_resu
 candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
 candidate_Y_transforms = conversions_for_1d
 candidate_A_transforms = conversions_for_1d
-
-
-SF_THRESHOLD_ERROR_MSG = _SENSITIVE_FEATURES_THRESHOLD_ERROR_TEMPLATE.format(GROUP_WARN_THRESHOLD)
 
 
 # Base class for tests
@@ -145,28 +142,39 @@ class ArgumentTests:
             A[3][1] = 3
             A[4][0] = 4
             A[4][1] = 4
+            A[5][0] = 5
+            A[5][1] = 5
         else:
             A[0] = 0
             A[1] = 1
             A[2] = 2
             A[3] = 3
             A[4] = 4
+            A[5] = 5
 
         caplog.set_level(logging.WARNING)
         gs.fit(transformX(X),
                transformY(Y),
                sensitive_features=transformA(A))
 
-        assert SF_THRESHOLD_ERROR_MSG in caplog.text
+        log_record = caplog.get_records('call')[0]
+        if isinstance(self.disparity_criterion, EqualizedOdds):
+            # not every label occurs with every group
+            grid_dimensions = 10
+        else:
+            # 6 groups total, but one is not part of the basis, so 5 dimensions
+            grid_dimensions = 5
+        assert GRID_DIMENSION_WARN_TEMPLATE \
+            .format(grid_dimensions, GRID_DIMENSION_WARN_THRESHOLD) \
+            in log_record.msg.format(*log_record.args)
 
-    
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
-    @pytest.mark.parametrize("n_groups", [2, 3, 4])
+    @pytest.mark.parametrize("n_groups", [2, 3, 4, 5])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_no_warning_below_4_sensitive_feature_group(self, transformX, transformY, transformA,
+    def test_no_warning_below_5_sensitive_feature_group(self, transformX, transformY, transformA,
                                                         A_two_dim, n_groups, caplog):
         gs = GridSearch(self.estimator, self.disparity_criterion)
         X, Y, A = _quick_data(A_two_dim, n_groups=n_groups)
@@ -176,7 +184,7 @@ class ArgumentTests:
                transformY(Y),
                sensitive_features=transformA(A))
 
-        assert SF_THRESHOLD_ERROR_MSG not in caplog.text
+        assert GRID_DIMENSION_WARN_TEMPLATE.format(n_groups-1, GRID_DIMENSION_WARN_THRESHOLD)
 
     # ----------------------------
 
