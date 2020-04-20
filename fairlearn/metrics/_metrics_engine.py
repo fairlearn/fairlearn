@@ -91,6 +91,7 @@ def _check_metric_params(y_true, metric_params,
 
     return metric_params_validated
 
+
 def _function_name(func):
     if hasattr(func, '__name__'):
         return func.__name__
@@ -109,6 +110,7 @@ class _MetricGroupSummaryCallable:
         should be split according to ``sensitive_features`` in addition to ``y_true``
         and ``y_pred``. Defaults to ``None`` corresponding to ``['sample_weight']``.
     """
+
     def __init__(self, metric_function, indexed_params=None, name=None):
         self._metric_function = metric_function
         self._indexed_params = indexed_params
@@ -131,6 +133,7 @@ class _MetricGroupSummaryCallable:
                              indexed_params=self._indexed_params,
                              **metric_params)
 
+
 class _DerivedMetricCallable:
     """Callable that calculates a derived metric.
 
@@ -142,6 +145,7 @@ class _DerivedMetricCallable:
         ``summary_function(y_true, y_pred, *, sensitive_features, **metric_params)``
     :type summary_function: func
     """
+
     def __init__(self, transformation_function, summary_function, name=None):
         self._transformation_function = transformation_function
         self._summary_function = summary_function
@@ -152,12 +156,13 @@ class _DerivedMetricCallable:
         return "make_derived_metric({0}, {1})".format(
                 _function_name(self._transformation_function),
                 _function_name(self._summary_function))
-    
+
     def __call__(self, y_true, y_pred, *, sensitive_features, **metric_params):
         return self._transformation_function(self._summary_function(
                 y_true, y_pred,
                 sensitive_features=sensitive_features,
                 **metric_params))
+
 
 def make_metric_group_summary(metric_function, indexed_params=None, name=None):
     """Make a callable that calculates the group summary of a metric.

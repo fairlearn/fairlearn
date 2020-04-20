@@ -30,7 +30,7 @@ def equalized_odds_difference(y_true, y_pred, *, sensitive_features, sample_weig
         true_positive_rate_difference(
             y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight),
         false_positive_rate_difference(
-            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight))    
+            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight))
 
 
 def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=None):
@@ -39,4 +39,4 @@ def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=No
         true_positive_rate_ratio(
             y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight),
         false_positive_rate_ratio(
-            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight))    
+            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight))

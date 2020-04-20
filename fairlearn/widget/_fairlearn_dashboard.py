@@ -5,7 +5,6 @@
 
 from ._fairlearn_widget import FairlearnWidget
 from fairlearn.metrics import (
-    true_positive_rate_group_summary,
     true_negative_rate_group_summary,
     false_positive_rate_group_summary,
     false_negative_rate_group_summary,
@@ -17,7 +16,6 @@ from fairlearn.metrics import (
     selection_rate_group_summary,
 
     accuracy_score_group_summary,
-    confusion_matrix_group_summary,
     precision_score_group_summary,
     recall_score_group_summary,
     roc_auc_score_group_summary,
@@ -206,7 +204,7 @@ class FairlearnDashboard(object):
                         prediction = method(
                             self._y_true,
                             self._y_pred[data["modelIndex"]],
-                            sensitive_features = binVector)
+                            sensitive_features=binVector)
                         response[id] = {
                                 "global": prediction.overall,
                                 "bins": prediction.by_group

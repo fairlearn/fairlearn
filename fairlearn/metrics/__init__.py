@@ -20,7 +20,7 @@ for each subgroup identified in ``group_membership``.
 
 import sklearn.metrics as skm
 
-from ._extra_metrics import (
+from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
     true_negative_rate,
     false_positive_rate,
@@ -31,14 +31,14 @@ from ._extra_metrics import (
     mean_underprediction,
     selection_rate)
 
-from ._metrics_engine import (
+from ._metrics_engine import (  # noqa: F401
     make_metric_group_summary, group_summary,
     make_derived_metric,
     group_min_from_summary, group_max_from_summary,
     difference_from_summary, ratio_from_summary,
     _metric_group_summary_dict, _derived_metric_dict)
 
-from ._disparities import (
+from ._disparities import (  # noqa: F401
     demographic_parity_difference,
     demographic_parity_ratio,
     equalized_odds_difference,
