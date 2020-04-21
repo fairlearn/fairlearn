@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 GRID_DIMENSION_WARN_THRESHOLD = 4
 GRID_DIMENSION_WARN_TEMPLATE = "The grid has {} dimensions. It is not recommended to use more " \
                                "than {}, otherwise a prohibitively large grid size is required " \
-                               "to explore the grid thoroughly. For such cases consider using " \
+                               "to explore the space thoroughly. For such cases consider using " \
                                "ExponentiatedGradient from the fairlearn.reductions module."
 GRID_SIZE_WARN_TEMPLATE = "Generating a grid with {} grid points. It is recommended to use at " \
                           "least {} grid points. Please consider increasing grid_size."
