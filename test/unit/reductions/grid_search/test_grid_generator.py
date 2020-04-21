@@ -34,6 +34,31 @@ def test_grid_generator_demographic_parity(grid_size, grid_limit):
     assert np.isclose(expected_grid.values, grid.values).all()
 
 
+@pytest.mark.parametrize("grid_size", [5, 6, 10, 11, 100, 101, 102])
+@pytest.mark.parametrize("grid_limit", [1.0, 2.0, 4.0, 10.0])
+def test_grid_generator_demographic_parity_with_center(grid_size, grid_limit):
+    disparity_moment = DemographicParity()
+    events = [_ALL]
+
+    _index = pd.MultiIndex.from_product([['+', '-'], events, [0, 1]],
+                                        names=[_SIGN, _EVENT, _GROUP_ID])
+    add_val = 0.02
+    grid_center = pd.Series([0, 0, 0, add_val], index=_index)
+    grid = calculate_grid(grid_limit, grid_size, disparity_moment, events, grid_center)
+
+    expected_index = pd.MultiIndex.from_product([['+', '-'], events, [0, 1]],
+                                                names=[_SIGN, _EVENT, _GROUP_ID])
+    assert (expected_index == grid.index).all()
+    expected_grid = pd.DataFrame()
+    grid_size_or_next_smaller_even_number = int(grid_size / 2) * 2
+    step_size = 2 * grid_limit / grid_size_or_next_smaller_even_number
+    for i in range(grid_size):
+        expected_grid[i] = pd.Series(0.0, index=expected_index)
+        expected_grid[i]['-', _ALL, 1] = max(grid_limit - step_size * i, 0) + add_val
+        expected_grid[i]['+', _ALL, 1] = max(-grid_limit + step_size * i, 0)
+    assert np.isclose(expected_grid.values, grid.values).all()
+
+
 @pytest.mark.parametrize("grid_limit", [0.1, 0.5, 1, 2, 3, 10, 99, 100, 101])
 def test_grid_generator_equalized_odds_basic(grid_limit):
     # Equalized odds has four rows with potential non-zero values in the grid.
@@ -92,11 +117,47 @@ def test_grid_generator_equalized_odds(grid_limit, grid_size):
     assert np.isclose(expected_grid.values, grid.values).all()
 
 
-def calculate_grid(grid_limit, grid_size, disparity_moment, events):
+@pytest.mark.parametrize("grid_limit", [0.1, 0.5, 1, 2, 5, 10, 99, 100])
+@pytest.mark.parametrize("grid_size", [13])
+def test_grid_generator_equalized_odds_with_center(grid_limit, grid_size):
+    # Equalized odds has four rows with potential non-zero values in the grid.
+    # With grid_size = 13 we get exactly one column with the grid_limit value per row,
+    # one column with half the grid_limit value per row, and combinations of rows
+
+    disparity_moment = EqualizedOdds()
+    label0 = 'label=0'
+    label1 = 'label=1'
+    events = [label0, label1]
+
+    _index = pd.MultiIndex.from_product([['+', '-'], events, [0, 1]],
+                                        names=[_SIGN, _EVENT, _GROUP_ID])
+    add_val = 0.02
+    grid_center = pd.Series([0, 0, 0, 0, 0, 0, 0, add_val], index=_index)
+    grid = calculate_grid(grid_limit, grid_size, disparity_moment, events, grid_center)
+
+    expected_index = pd.MultiIndex.from_product([['+', '-'], events, [0, 1]],
+                                                names=[_SIGN, _EVENT, _GROUP_ID])
+    assert (expected_index == grid.index).all()
+    expected_grid = pd.DataFrame()
+    for i in range(grid_size):
+        expected_grid[i] = pd.Series(0.0, index=expected_index)
+
+    gl = grid_limit  # abbreviation for readibility
+    expected_grid.loc['+', label0, 1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, gl/2, gl/2, gl/2, gl]
+    expected_grid.loc['+', label1, 1] = [0, 0, 0, gl/2, 0, 0, 0, gl/2, gl, 0, 0, gl/2, 0]
+    expected_grid.loc['-', label0, 1] = [gl, gl/2, gl/2, gl/2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    expected_grid.loc['-', label1, 1] = [add_val, gl/2 + add_val, add_val, add_val, gl + add_val,
+                                         gl/2 + add_val, add_val, add_val, add_val,
+                                         gl/2 + add_val, add_val, add_val, add_val]
+
+    assert np.isclose(expected_grid.values, grid.values).all()
+
+
+def calculate_grid(grid_limit, grid_size, disparity_moment, events, grid_center=None):
     X, y, A = _quick_data()
 
     disparity_moment.load_data(X, y, sensitive_features=A)
 
     return _GridGenerator(grid_size, grid_limit,
                           disparity_moment.pos_basis, disparity_moment.neg_basis,
-                          disparity_moment.neg_basis_present, False).grid
+                          disparity_moment.neg_basis_present, False, grid_center).grid

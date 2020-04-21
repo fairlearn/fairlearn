@@ -20,11 +20,17 @@ GRID_SIZE_WARN_TEMPLATE = "Generating a grid with {} grid points. It is recommen
 class _GridGenerator:
     """A generator of a grid of points with a bounded L1 norm."""
 
-    def __init__(self, grid_size, grid_limit, pos_basis, neg_basis, neg_allowed, force_L1_norm):
+    def __init__(self, grid_size, grid_limit, pos_basis, neg_basis, neg_allowed, force_L1_norm,
+                 grid_center=None):
         # grid parameters
         self.dim = len(pos_basis.columns)
         self.neg_allowed = neg_allowed
         self.force_L1_norm = force_L1_norm
+        if grid_center is None:
+            self.grid_center = pd.Series(np.zeros(pos_basis.shape[0], dtype=np.float64),
+                                         index=pos_basis.index)
+        else:
+            self.grid_center = grid_center
 
         # true dimensionality of the grid
         if self.force_L1_norm:
@@ -55,7 +61,8 @@ class _GridGenerator:
                 pos_coefs[pos_coefs < 0] = 0.0
                 neg_coefs[neg_coefs < 0] = 0.0
                 # convert the grid of basis coefficients into a grid of lambda vectors
-                self.grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
+                _grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
+                self.grid = _grid.add(self.grid_center, axis='index')
                 break
             # if the grid size is not reached yet increase the scaling parameter
             n_units = n_units + 1
