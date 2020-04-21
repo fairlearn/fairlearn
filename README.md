@@ -212,12 +212,10 @@ Overflow](https://stackoverflow.com/questions/tagged/fairlearn) with the tag
 
 ### Regular (non-security) issues
 
-Issues are meant for bugs & feature requests. Please submit a report through
+Issues are meant for bugs, feature requests, and documentation improvements.
+Please submit a report through
 [GitHub issues](https://github.com/fairlearn/fairlearn/issues). A maintainer
-will respond promptly as follows:
-- **bug**: triage as `bug` and provide estimated timeline based on severity
-- **feature request**: triage as `feature request` and provide estimated
-  timeline.
+will respond promptly as appropriate.
 
 Maintainers will try to link duplicate issues when possible.
 
