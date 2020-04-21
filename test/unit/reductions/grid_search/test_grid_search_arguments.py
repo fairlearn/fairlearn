@@ -15,7 +15,7 @@ from fairlearn._input_validation import \
 from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, GroupLossMoment, \
     ZeroOneLoss
 from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
-    GRID_DIMENSION_WARN_TEMPLATE
+    GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
 
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
 from test.unit.reductions.conftest import is_invalid_transformation
@@ -128,7 +128,10 @@ class ArgumentTests:
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_many_sensitive_feature_groups_warning(self, transformX, transformY, transformA,
                                                    A_two_dim, caplog):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        # The purpose of this test case is to create enough groups to trigger certain expected
+        # warnings. The scenario should still work and succeed.
+        grid_size = 10
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size)
         X, Y, A = _quick_data(A_two_dim)
 
         if A_two_dim:
@@ -157,16 +160,23 @@ class ArgumentTests:
                transformY(Y),
                sensitive_features=transformA(A))
 
-        log_record = caplog.get_records('call')[0]
+        log_records = caplog.get_records('call')
+        dimension_log_record = log_records[0]
+        size_log_record = log_records[1]
         if isinstance(self.disparity_criterion, EqualizedOdds):
             # not every label occurs with every group
             grid_dimensions = 10
         else:
             # 6 groups total, but one is not part of the basis, so 5 dimensions
             grid_dimensions = 5
+
+        # expect both the dimension warning and the grid size warning
+        assert len(log_records) == 2
         assert GRID_DIMENSION_WARN_TEMPLATE \
             .format(grid_dimensions, GRID_DIMENSION_WARN_THRESHOLD) \
-            in log_record.msg.format(*log_record.args)
+            in dimension_log_record.msg.format(*dimension_log_record.args)
+        assert GRID_SIZE_WARN_TEMPLATE.format(grid_size, 2**grid_dimensions) \
+            in size_log_record.msg.format(*size_log_record.args)
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -174,9 +184,15 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.parametrize("n_groups", [2, 3, 4, 5])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_no_warning_below_5_sensitive_feature_group(self, transformX, transformY, transformA,
-                                                        A_two_dim, n_groups, caplog):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+    def test_grid_size_warning_up_to_5_sensitive_feature_group(self, transformX, transformY,
+                                                               transformA, A_two_dim, n_groups,
+                                                               caplog):
+        if isinstance(self.disparity_criterion, EqualizedOdds):
+            pytest.skip('With EqualizedOdds there would be multiple warnings due to higher grid '
+                        'dimensionality.')
+
+        grid_size = 10
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size)
         X, Y, A = _quick_data(A_two_dim, n_groups=n_groups)
 
         caplog.set_level(logging.WARNING)
@@ -184,7 +200,21 @@ class ArgumentTests:
                transformY(Y),
                sensitive_features=transformA(A))
 
-        assert GRID_DIMENSION_WARN_TEMPLATE.format(n_groups-1, GRID_DIMENSION_WARN_THRESHOLD)
+        # don't expect the dimension warning;
+        # but expect the grid size warning for large numbers of groups
+        log_records = caplog.get_records('call')
+
+        # 6 groups total, but one is not part of the basis, so 5 dimensions
+        grid_dimensions = n_groups - 1
+
+        if 2**(n_groups-1) > grid_size:
+            print(log_records)
+            assert len(log_records) == 1
+            size_log_record = log_records[0]
+            assert GRID_SIZE_WARN_TEMPLATE.format(grid_size, 2**grid_dimensions) \
+                in size_log_record.msg.format(*size_log_record.args)
+        else:
+            assert len(log_records) == 0
 
     # ----------------------------
 
