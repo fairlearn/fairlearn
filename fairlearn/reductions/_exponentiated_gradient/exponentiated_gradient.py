@@ -183,8 +183,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     def predict(self, X):
         """Provide a prediction for the given input data.
 
-        Note that this is non-deterministic, due to the nature of the
-        exponentiated gradient algorithm.
+        Chooses the prediction label randomly based on the probabilities from `_pmf_predict`,
+        i.e., based on the aggregate of the weighted predictions of all underlying classifiers.
+        This is equivalent to randomly choosing an individual classifier based on the weights and
+        returning its prediction.
+        Repeatedly calling `predict` with the same feature data may yield different output. This
+        non-deterministic behavior is intended and stems from the nature of exponentiated gradient
+        algorithm, which produces probabilistic classifiers.
 
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
@@ -199,13 +204,21 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
 
+        Calculates predictions for each of the underlying classifiers. The predictions are
+        subsequently multiplied by the classifiers' weights and aggregated into the returned
+        probabilities.
+
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         :return: Array of tuples with the probabilities of predicting 0 and 1.
         :rtype: pandas.DataFrame
         """
-        pred = pd.DataFrame()
-        for t in range(len(self._hs)):
-            pred[t] = self._hs[t](X)
+        n_samples = len(X)
+
+        # ignore classifiers with weight 0 since they can only contribute 0 to the result
+        pred = pd.DataFrame(0, index=range(n_samples), columns=range(len(self._hs))) \
+            .apply(lambda row: np.zeros(n_samples) if self._weights[int(row.name)] == 0
+                   else self._hs[int(row.name)](X))
+
         positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
