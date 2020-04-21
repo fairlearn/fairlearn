@@ -62,6 +62,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._oracle_execution_times = None
         self._lambda_vecs = pd.DataFrame()
         self._lambda_vecs_LP = pd.DataFrame()
+        self._lagrangian_lambdas = pd.DataFrame()
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -173,6 +174,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._predictors = lagrangian.classifiers
         self._n_oracle_calls = lagrangian.n_oracle_calls
         self._oracle_execution_times = lagrangian.oracle_execution_times
+        self._lagrangian_lambdas = lagrangian.lambdas
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
                      self._eps, B, self._nu, self._T, eta_min)
