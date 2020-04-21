@@ -208,7 +208,6 @@ class ArgumentTests:
         grid_dimensions = n_groups - 1
 
         if 2**(n_groups-1) > grid_size:
-            print(log_records)
             assert len(log_records) == 1
             size_log_record = log_records[0]
             assert GRID_SIZE_WARN_TEMPLATE.format(grid_size, 2**grid_dimensions) \
