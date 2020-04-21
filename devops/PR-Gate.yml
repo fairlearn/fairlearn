@@ -14,49 +14,28 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    platform: Linux
-    vmImage: 'ubuntu-16.04'
-    testRunType: 'Unit'
-    installationType: 'None'
-    pyVersions: [3.7]
+    platforms:  { Linux: ubuntu-latest }
+    installationType: 'PipLocal'
+    pyVersions: [3.5]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
 - template: templates/all-tests-job-template.yml
   parameters:
-    platform: Windows
-    vmImage:  'vs2017-win2016'
-    testRunType: 'Unit'
-    installationType: 'None'
+    platforms:  { Windows: vs2017-win2016 }
+    installationType: 'PipLocal'
     pyVersions: [3.6]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     
 - template: templates/all-tests-job-template.yml
   parameters:
-    platform: MacOS
-    vmImage:  'macos-latest'
-    testRunType: 'Unit'
+    platforms: { MacOS: macos-latest }
+    testRunTypes: ['Unit']
     installationType: 'None'
-    pyVersions: [3.7]
+    pyVersions: [3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
-
-- template: templates/all-tests-job-template.yml
-  parameters:
-    platform: Linux
-    testRunType: 'Notebooks'
-    installationType: 'PipLocal'
-    vmImage: 'ubuntu-16.04'
-    pyVersions: [3.6]
-
-- template: templates/all-tests-job-template.yml
-  parameters:
-    platform: Windows
-    testRunType: 'Notebooks'
-    installationType: 'PipLocal'
-    vmImage: 'vs2017-win2016'
-    pyVersions: [3.8]
 
 - template: templates/build-widget-job-template.yml
 

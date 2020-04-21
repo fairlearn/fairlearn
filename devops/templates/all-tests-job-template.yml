@@ -1,27 +1,22 @@
-# Template for setting up the python environment (with optional pinned requirements)
-# and running all tests (except for install tests)
-
-# Some key parameters:
-
-# platform
-# A human-readable string which should be set to match vmImage
-
-# testRunType: {Unit, Notebooks}
-# Specifies the set of tests to be run
-
-# installationType: {None, PipLocal, PyPI}
-# Specifies how Fairlearn should be made available. Note
-# that the Notebooks tests will not work with 'None'
-# If PyPI is specified, then targetType, versionArtifactName
-# and versionArtifactFile need to be specified, in order to
-# determine which PyPI archive to use, and which version
-# of Fairlearn to fetch from it.
+# Template for running tests on multiple Python versions and platforms
+#
+# This is a driver for test-run-step-template.yml
+#
+# platforms is a dictionary to specify the VM images to use
+# for the runs. The keys are human-readable titles, the values
+# are vmImage names
+#
+# testRunTypes specifies the different test suites to run
+#
+# pyVersions lists the Python versions to use
+#
+# The set of jobs submitted is the Cartesian product of these
+# three parameters
 
 parameters:
-  platform: ''
-  vmImage: ''
-  testRunType: ''
-  installationType: ''
+  platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+  testRunTypes: ['Unit', 'Notebooks']
+  installationType:
   pyVersions: [3.5, 3.6, 3.7, 3.8]
   pinRequirements: False
   freezeArtifactStem: 
@@ -32,71 +27,34 @@ parameters:
   versionArtifactFile:
 
 jobs:
-- job: ${{ parameters.platform }}_${{parameters.testRunType}}
-  pool:
-    vmImage: ${{ parameters.vmImage }}
-  strategy:
-    maxParallel: 2
-    matrix:
-      ${{ each pyVer in parameters.pyVersions }}:
-        ${{ pyVer }}:
-          PyVer: ${{ pyVer }}
-          RequirementsFile: requirements-${{pyVer}}.txt
-          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.platform}}${{parameters.testRunType}}${{pyVer}}'
-          FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
+  - ${{ each plat in parameters.platforms }}:
+    - ${{ each testRunType in parameters.testRunTypes }}:
+      - ${{ each pyVer in parameters.pyVersions }}:
+        - job:
+          displayName: ${{ format('{0} {1} {2}', plat.Key , testRunType, pyVer) }}
+          pool:
+            vmImage: ${{ plat.value }}
 
-  variables:
-    ${{ if eq(parameters.targetType, 'Test') }}:
-      pypiUrl: https://test.pypi.org/simple/
-    ${{ if eq(parameters.targetType, 'Prod') }}:
-      pypiUrl: https://pypi.org/simple/
+          variables:
+              ${{ if eq(parameters.targetType, 'Test') }}:
+                pypiUrl: https://test.pypi.org/simple/
+              ${{ if eq(parameters.targetType, 'Prod') }}:
+                pypiUrl: https://pypi.org/simple/
+              RequirementsFile: requirements-${{pyVer}}.txt
+              FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
+              FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
 
-  steps:
-
-  - ${{ if notIn(parameters.testRunType, 'Unit', 'Notebooks') }}:
-    - script: exit 1
-      displayName: "Bad testRunType: ${{parameters.testRunType}}"
-
-  - task: UsePythonVersion@0
-    displayName: 'Use Python $(PyVer)'
-    inputs:
-      versionSpec: '$(PyVer)' 
-      addToPath: true
-
-  - template: python-infra-upgrade-steps-template.yml
-
-  - template: requirements-installation-steps-template.yml
-    parameters:
-      pyVer: '$(PyVer)'
-      requirementsFile: $(RequirementsFile)
-      pinRequirements: ${{parameters.pinRequirements}}
-
-  - template: pip-freeze-to-artifact-steps-template.yml
-    parameters:
-      freezeArtifact: $(FreezeArtifact)
-      freezeFile: $(FreezeFile)
-
-  - template: fairlearn-installation-step-template.yml
-    parameters:
-      installationType: ${{parameters.installationType}}
-      pypiUrl: $(pypiUrl)
-      versionArtifactName: ${{parameters.versionArtifactName}}
-      versionArtifactFile: ${{parameters.versionArtifactFile}}
-      pipVersionVariable: variableForPipVersion
-    
-  - script: flake8 .
-    displayName: "Run flake8"
-
-  # =================================================
-  - ${{ if eq(parameters.testRunType, 'Unit')}}:
-    - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
-      displayName: 'Run unit tests'
-
-  - ${{ if eq(parameters.testRunType, 'Notebooks')}}:
-    - script: python -m pytest test/ -m notebooks --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
-      displayName: 'Run notebooks as tests'
-  # =================================================
-
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results **/TEST-*.xml'
-    condition: succeededOrFailed()
+          steps:
+          - template: test-run-step-template.yml
+            parameters:
+              testRunType: ${{testRunType}}
+              installationType: ${{parameters.installationType}}
+              pythonVersion: ${{pyVer}}
+              pinRequirements: ${{parameters.pinRequirements}}
+              requirementsFile: $(RequirementsFile)
+              freezeArtifact: $(FreezeArtifact)
+              freezeFile: $(FreezeFile)
+              # Following are used if the installationType is PyPI
+              pypiUrl: $(pypiUrl)
+              versionArtifactName: ${{parameters.versionArtifactName}}
+              versionArtifactFile: ${{parameters.versionArtifactFile}}
