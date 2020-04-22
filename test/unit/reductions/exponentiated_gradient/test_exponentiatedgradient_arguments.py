@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import pandas as pd
+import pickle
 import pytest
 
 from fairlearn.reductions import ExponentiatedGradient
@@ -64,7 +66,41 @@ class TestExponentiatedGradientArguments:
         assert expgrad._n_oracle_calls == 32
         assert n_predictors == 3
 
-        # ensure that the input data wasn't changed by our mitigator
-        assert isinstance(transformed_X, type(transformX(X)))
-        assert isinstance(transformed_y, type(transformY(y)))
-        assert isinstance(transformed_A, type(transformA(A)))
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    def test_input_X_unchanged(self, transformA, transformY, transformX, mocker):
+        # The purpose of this test is to ensure that X is passed to the underlying estimator
+        # unchanged. For y and sample_weight ExponentiatedGradient makes certain transformations
+        # which are required. They are expected as pandas.Series.
+        X, y, A = _get_data()
+
+        transformed_X = transformX(X)
+        transformed_y = transformY(y)
+        transformed_A = transformA(A)
+
+        # Using a mocked estimator here since we don't actually want to fit one, but rather care
+        # about having that object's fit method called exactly twice through the best_h calls.
+        estimator = mocker.MagicMock()
+        estimator.predict = mocker.MagicMock(return_value=y)
+        # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the
+        # mock object, so we mock that process as well. It sets the result from pickle.loads as
+        # the estimator, so we can simply overwrite the return value to be our mocked estimator
+        # object.
+        mocker.patch('pickle.dumps')
+        pickle.loads = mocker.MagicMock(return_value=estimator)
+
+        # restrict ExponentiatedGradient to a single iteration
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), T=1)
+        expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
+
+        # ensure that the input data wasn't changed by our mitigator before being passed to the
+        # underlying estimator
+        assert estimator.fit.call_count == 2
+        for name, args, kwargs in estimator.method_calls:
+            if name == 'fit':
+                assert len(args) == 2  # X and y
+                assert len(kwargs) == 1  # sample_weight
+                assert isinstance(args[0], type(transformed_X))
+                assert isinstance(args[1], pd.Series)
+                assert isinstance(kwargs['sample_weight'], pd.Series)
