@@ -37,6 +37,7 @@ class _Lagrangian:
 
     def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
         self.X = X
+        self.n = self.X.shape[0]
         self.constraints = constraints
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
@@ -45,16 +46,15 @@ class _Lagrangian:
         self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
-        self.hs = pd.Series(dtype="float64")
-        self.classifiers = pd.Series(dtype="float64")
-        self.errors = pd.Series(dtype="float64")
-        self.gammas = pd.DataFrame()
-        self.lambdas = pd.DataFrame()
-        self.n = self.X.shape[0]
-        self.n_oracle_calls = 0
-        self.oracle_execution_times = []
-        self.last_linprog_n_hs = 0
-        self.last_linprog_result = None
+        self.hs_ = pd.Series(dtype="float64")
+        self.predictors_ = pd.Series(dtype="float64")
+        self.errors_ = pd.Series(dtype="float64")
+        self.gammas_ = pd.DataFrame()
+        self.lambdas_ = pd.DataFrame()
+        self.n_oracle_calls_ = 0
+        self.oracle_execution_times_ = []
+        self.last_linprog_n_hs_ = 0
+        self.last_linprog_result_ = None
 
     def _eval_from_error_gamma(self, error, gamma, lambda_vec):
         """Return the value of the Lagrangian.
@@ -86,8 +86,8 @@ class _Lagrangian:
             error = self.obj.gamma(h)[0]
             gamma = self.constraints.gamma(h)
         else:
-            error = self.errors[h.index].dot(h)
-            gamma = self.gammas[h.index].dot(h)
+            error = self.errors_[h.index].dot(h)
+            gamma = self.gammas_[h.index].dot(h)
         L, L_high = self._eval_from_error_gamma(error, gamma, lambda_vec)
         return L, L_high, gamma, error
 
@@ -107,17 +107,17 @@ class _Lagrangian:
         return result
 
     def solve_linprog(self, nu):
-        n_hs = len(self.hs)
+        n_hs = len(self.hs_)
         n_constraints = len(self.constraints.index)
-        if self.last_linprog_n_hs == n_hs:
-            return self.last_linprog_result
-        c = np.concatenate((self.errors, [self.B]))
-        A_ub = np.concatenate((self.gammas - self.eps, -np.ones((n_constraints, 1))), axis=1)
+        if self.last_linprog_n_hs_ == n_hs:
+            return self.last_linprog_result_
+        c = np.concatenate((self.errors_, [self.B]))
+        A_ub = np.concatenate((self.gammas_ - self.eps, -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
         result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
-        h = pd.Series(result.x[:-1], self.hs.index)
+        h = pd.Series(result.x[:-1], self.hs_.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
@@ -128,9 +128,9 @@ class _Lagrangian:
                                   bounds=dual_bounds,
                                   method='simplex')
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
-        self.last_linprog_n_hs = n_hs
-        self.last_linprog_result = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
-        return self.last_linprog_result
+        self.last_linprog_n_hs_ = n_hs
+        self.last_linprog_result_ = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
+        return self.last_linprog_result_
 
     def best_h(self, lambda_vec):
         """Solve the best-response problem.
@@ -146,16 +146,16 @@ class _Lagrangian:
         classifier = pickle.loads(self.pickled_estimator)
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
-        self.oracle_execution_times.append(time() - oracle_call_start_time)
-        self.n_oracle_calls += 1
+        self.oracle_execution_times_.append(time() - oracle_call_start_time)
+        self.n_oracle_calls_ += 1
 
         def h(X): return classifier.predict(X)
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
 
-        if not self.hs.empty:
-            values = self.errors + self.gammas.transpose().dot(lambda_vec)
+        if not self.hs_.empty:
+            values = self.errors_ + self.gammas_.transpose().dot(lambda_vec)
             best_idx = values.idxmin()
             best_value = values[best_idx]
         else:
@@ -164,15 +164,15 @@ class _Lagrangian:
 
         if h_value < best_value - _PRECISION:
             logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
-            h_idx = len(self.hs)
-            self.hs.at[h_idx] = h
-            self.classifiers.at[h_idx] = classifier
-            self.errors.at[h_idx] = h_error
-            self.gammas[h_idx] = h_gamma
-            self.lambdas[h_idx] = lambda_vec.copy()
+            h_idx = len(self.hs_)
+            self.hs_.at[h_idx] = h
+            self.predictors_.at[h_idx] = classifier
+            self.errors_.at[h_idx] = h_error
+            self.gammas_[h_idx] = h_gamma
+            self.lambdas_[h_idx] = lambda_vec.copy()
             best_idx = h_idx
 
-        return self.hs[best_idx], best_idx
+        return self.hs_[best_idx], best_idx
 
 
 class _GapResult:

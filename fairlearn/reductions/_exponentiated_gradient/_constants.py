@@ -19,8 +19,3 @@ _SHRINK_ETA = 0.8
 
 # The smallest number of iterations after which ExponentiatedGradient terminates.
 _MIN_T = 5
-
-# If _RUN_LP_STEP is set to True, then each step of exponentiated
-# gradient is followed by the saddle point optimization over the convex
-# hull of classifiers returned so far.
-_RUN_LP_STEP = True
