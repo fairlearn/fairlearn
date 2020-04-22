@@ -135,7 +135,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`
         },
         thinHeader: {
-            height: "36px",
+            // height: "36px",
             backgroundColor: "#333333",
             color: "#FFFFFF"
         },
@@ -236,7 +236,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         if (this.state.featureBins.length === 0) {
             return (<Stack className={FairnessWizard.classNames.frame}>
                 <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
-                    <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
+                    {/* <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div> */}
                     {/* <div className={FairnessWizard.classNames.headerRight}>{localization.Header.documentation}</div> */}
                 </Stack>
                 <Stack.Item grow={2} className={FairnessWizard.classNames.body}>
@@ -247,7 +247,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         return (
              <Stack className={FairnessWizard.classNames.frame}>
                 <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
-                    <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
+                    {/* <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div> */}
                     {/* <div className={FairnessWizard.classNames.headerRight}>{localization.Header.documentation}</div> */}
                 </Stack>
                 {(this.state.activeTabKey === introTabKey) &&
