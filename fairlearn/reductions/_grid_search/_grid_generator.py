@@ -40,7 +40,7 @@ class _GridGenerator:
         :type force_L1_norm: boolean
 
         The `grid_offset` shifts the whole grid by that value.
-        :type grid_offset: float
+        :type grid_offset: :class:`pandas:pandas.DataFrame`
         """
         # grid parameters
         self.dim = len(pos_basis.columns)

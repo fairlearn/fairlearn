@@ -53,7 +53,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
     :param grid_offset: shifts the grid of Lagrangian multiplier by that value
          It is '0' by default
-    :type grid_offset: float
+    :type grid_offset: :class:`pandas:pandas.DataFrame`
 
     :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
         set of Lagrange multipliers they desire using this argument.

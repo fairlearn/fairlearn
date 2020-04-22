@@ -36,8 +36,8 @@ def test_grid_generator_demographic_parity(grid_size, grid_limit):
 
 @pytest.mark.parametrize("grid_size", [5, 6])
 @pytest.mark.parametrize("grid_limit", [1.0, 2.0])
-@pytest.mark.parametrize("grid_offset", [[0, 0, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0],
-                                         [0, 0, 0, 0.2], [0, 0.2, 0, 0]])
+@pytest.mark.parametrize("grid_offset", [[0, 0.2, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0],
+                                         [0, 0, 0, 0.2]])
 def test_grid_generator_demographic_parity_with_center(grid_size, grid_limit, grid_offset):
     disparity_moment = DemographicParity()
     events = [_ALL]
@@ -122,9 +122,8 @@ def test_grid_generator_equalized_odds(grid_limit, grid_size):
 
 @pytest.mark.parametrize("grid_limit", [0.1, 2])
 @pytest.mark.parametrize("grid_size", [13])
-@pytest.mark.parametrize("grid_offset", [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0],
-                                         [0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0.2, 0, 0],
-                                         [0, 0, 0, 0, 0, 0, 0, 0.2]])
+@pytest.mark.parametrize("grid_offset", [[0, 0, 0, 0, 0, 0, 0, 0.2], [0, 0, 0, 1, 0, 0, 0, 0],
+                                         [0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0.2, 0, 0]])
 def test_grid_generator_equalized_odds_with_center(grid_limit, grid_size, grid_offset):
     # Equalized odds has four rows with potential non-zero values in the grid.
     # With grid_size = 13 we get exactly one column with the grid_limit value per row,
