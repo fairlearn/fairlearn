@@ -1,8 +1,20 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import logging
 import numpy as np
 import pandas as pd
+
+
+logger = logging.getLogger(__name__)
+
+GRID_DIMENSION_WARN_THRESHOLD = 4
+GRID_DIMENSION_WARN_TEMPLATE = "The grid has {} dimensions. It is not recommended to use more " \
+                               "than {}, otherwise a prohibitively large grid size is required " \
+                               "to explore the space thoroughly. For such cases consider using " \
+                               "ExponentiatedGradient from the fairlearn.reductions module."
+GRID_SIZE_WARN_TEMPLATE = "Generating a grid with {} grid points. It is recommended to use at " \
+                          "least {} grid points. Please consider increasing grid_size."
 
 
 class _GridGenerator:
@@ -20,8 +32,15 @@ class _GridGenerator:
         else:
             true_dim = self.dim
 
+        if true_dim > GRID_DIMENSION_WARN_THRESHOLD:
+            logger.warning(GRID_DIMENSION_WARN_TEMPLATE, true_dim, GRID_DIMENSION_WARN_THRESHOLD)
+
+        recommended_min_grid_size = 2**true_dim
+        if grid_size < recommended_min_grid_size:
+            logger.warning(GRID_SIZE_WARN_TEMPLATE, grid_size, recommended_min_grid_size)
+
         # a conservative lower bound on the scaling parameter of the grid
-        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0 / true_dim) - 1   # noqa: E501
+        n_units = (float(grid_size) / (2.0**neg_allowed.sum())) ** (1.0 / true_dim) - 1
         n_units = int(np.floor(n_units))
         if n_units < 0:
             n_units = 0

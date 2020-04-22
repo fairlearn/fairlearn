@@ -28,6 +28,7 @@ nteract-scrapbook
 tempeh==0.1.12
 wheel
 lightgbm
+xlrd
 
 # Required for notebooks
 jupyter
