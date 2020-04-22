@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from copy import deepcopy
 import numpy as np
 import pandas as pd
 import pickle
@@ -25,10 +26,14 @@ def test_lagrangian_eval(eps, Constraints, h_vec, opt_lambda):
     # epsilon (and thereby also B) only affects L_high and L
     B = 1 / eps
 
-    lagrangian = _Lagrangian(X, A, y, estimator, constraints, eps, B, opt_lambda=opt_lambda)
+    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, B,
+                             opt_lambda=opt_lambda)
 
     # set up initial lambda vector based on a 0-initialized theta
-    theta = pd.Series(0, lagrangian.constraints.index)
+    constraints.load_data(X, y, sensitive_features=A)
+    objective = constraints.default_objective()
+    objective.load_data(X, y, sensitive_features=A)
+    theta = pd.Series(0, constraints.index)
     lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
 
     # call oracle to determine error and gamma and calculate exp
@@ -39,7 +44,7 @@ def test_lagrangian_eval(eps, Constraints, h_vec, opt_lambda):
 
     # opt_lambda affects only the calculation of L
     if opt_lambda:
-        projected_lambda = lagrangian.constraints.project_lambda(lambda_vec)
+        projected_lambda = constraints.project_lambda(lambda_vec)
         L_expected = best_h_error + np.sum(projected_lambda * best_h_gamma) - \
             eps * np.sum(projected_lambda)
     else:
@@ -54,17 +59,17 @@ def test_lagrangian_eval(eps, Constraints, h_vec, opt_lambda):
     # call _eval to get the desired results L, L_high, gamma, error
     L, L_high, gamma, error = lagrangian._eval(h_vec, lambda_vec)
 
-    assert L == L_expected
-    assert L_high == L_high_expected
-    assert error == 0.25
-    assert (gamma == best_h_gamma).all()
-
     # in this particular example the estimator is always the same
     expected_estimator_weights = pd.Series({
         'X1': 0.538136,
         'X2': 0.457627,
         'X3': 0.021186})
     assert (np.isclose(fitted_estimator.weights, expected_estimator_weights, atol=1.e-6)).all()
+
+    assert L == L_expected
+    assert L_high == L_high_expected
+    assert error == 0.25
+    assert (gamma == best_h_gamma).all()
 
 
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
@@ -82,14 +87,18 @@ def test_call_oracle(Constraints, eps, mocker):
     mocker.patch('pickle.dumps')
     pickle.loads = mocker.MagicMock(return_value=estimator)
 
-    lagrangian = _Lagrangian(X, A, y, estimator, constraints, eps, 1/eps)
+    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, 1/eps)
 
-    # set up initial lambda vector based on a 0-initialized theta
-    theta = pd.Series(0, lagrangian.constraints.index)
+    # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
+    # object for it to avoid the dependence on the lagrangian object.
+    constraints.load_data(X, y, sensitive_features=A)
+    objective = constraints.default_objective()
+    objective.load_data(X, y, sensitive_features=A)
+    theta = pd.Series(0, constraints.index)
     lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
 
-    signed_weights = lagrangian.obj.signed_weights() + \
-        lagrangian.constraints.signed_weights(lambda_vec)
+    signed_weights = objective.signed_weights() + \
+        constraints.signed_weights(lambda_vec)
     redY = 1 * (signed_weights > 0)
     redW = signed_weights.abs()
     redW = y.shape[0] * redW / redW.sum()
