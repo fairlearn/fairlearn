@@ -51,6 +51,10 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         distributed between :code:`-grid_limit` and :code:`grid_limit` by default
     :type grid_limit: float
 
+    :param grid_offset: shifts the grid of Lagrangian multiplier by that value
+         It is '0' by default
+    :type grid_offset: float
+
     :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
         set of Lagrange multipliers they desire using this argument.
     """
@@ -62,6 +66,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                  constraint_weight=0.5,
                  grid_size=10,
                  grid_limit=2.0,
+                 grid_offset=0,
                  grid=None):
         """Construct a GridSearch object."""
         self.estimator = estimator
@@ -80,6 +85,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         self.grid_size = grid_size
         self.grid_limit = float(grid_limit)
+        self.grid_offset = float(grid_offset)
         self.grid = grid
 
         self._best_grid_index = None
@@ -137,7 +143,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                                   pos_basis,
                                   neg_basis,
                                   neg_allowed,
-                                  objective_in_the_span).grid
+                                  objective_in_the_span,
+                                  self.grid_offset).grid
         else:
             logger.debug("Using supplied grid")
             grid = self.grid

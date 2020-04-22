@@ -82,6 +82,50 @@ def test_demographicparity_fair_uneven_populations(A_two_dim):
     assert np.array_equal(sample_results, [1, 0])
 
 
+@pytest.mark.parametrize("A_two_dim", [False, True])
+def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim):
+    # Variant of test_demographicparity_already_fair, which has unequal
+    # populations in the two classes
+    # Also allow the threshold to be adjustable
+    # Grid of Lagrangian multipliers has some initial offset
+
+    score_threshold = 0.625
+
+    number_a0 = 4
+    number_a1 = 4
+
+    a0_label = 17
+    a1_label = 37
+
+    grid_size = 11
+    grid_offset = 0.25
+
+    X, Y, A = _simple_threshold_data(number_a0, number_a1,
+                                     score_threshold, score_threshold,
+                                     a0_label, a1_label, A_two_dim)
+
+    grid_search = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
+                             constraints=DemographicParity(),
+                             grid_size=grid_size,
+                             grid_offset=grid_offset)
+
+    grid_search.fit(X, Y, sensitive_features=A)
+    assert_n_grid_search_results(grid_size, grid_search)
+
+    test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
+                           "sensitive_features": [a0_label, a1_label],
+                           "constant_ones_feature": [1, 1]})
+
+    sample_results = grid_search.predict(test_X)
+    assert np.array_equal(sample_results, [0, 1])
+
+    sample_proba = grid_search.predict_proba(test_X)
+    assert np.allclose(sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]])
+
+    sample_results = grid_search._predictors[0].predict(test_X)
+    assert np.array_equal(sample_results, [1, 0])
+
+
 # TODO: try with two-dimensional A, but liblinear solver has issues.
 @pytest.mark.parametrize("A_two_dim", [False])
 def test_lambda_vec_zero_unchanged_model(A_two_dim):
