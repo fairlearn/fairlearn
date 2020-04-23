@@ -75,7 +75,7 @@ stages:
 # ==============================================
 
 - stage: TestFromPyPI
-  dependsOn: DeployToPyPI
+  dependsOn: UploadWheel
 
   jobs:
   - job: Placeholder
