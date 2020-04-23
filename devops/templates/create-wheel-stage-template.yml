@@ -27,7 +27,8 @@ stages:
     vmImage: ${{parameters.poolImage}}
 
   jobs:
-  - job: Placeholder
+  - job: CreateWheel
+    displayName: Build and publish wheel
     pool:
       vmImage: ${{parameters.poolImage}}
     
