@@ -56,31 +56,26 @@ class _Lagrangian:
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
 
-    def _eval(self, h, lambda_vec):
+    def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
 
-        :param h: TODO: should this be Q instead of h? It seems to indicate how much weight each h
-            gets in the randomized classifier, summing up to 1
-        :type h: pandas.Series
+        :param Q: `Q` is either a series of weights summing up to 1 that indicate the weight of
+            each `h` in contributing to the randomized classifier, or a callable corresponding to
+            a deterministic predict function.
+        :type Q: pandas.Series or callable
         :param lambda_vec: lambda vector
-        :type h: pandas.Series
+        :type lambda_vec: pandas.Series
 
         :return: tuple `(L, L_high, gamma, error)` where `L` is the value of the Lagrangian,
             `L_high` is the value of the Lagrangian under the best response of the lambda player,
             `gamma` is the vector of constraint violations, and `error` is the empirical error
         """
-        if callable(h):
-            error = self.obj.gamma(h)[0]
-            gamma = self.constraints.gamma(h)
+        if callable(Q):
+            error = self.obj.gamma(Q)[0]
+            gamma = self.constraints.gamma(Q)
         else:
-            error = self.errors[h.index].dot(h)
-            gamma = self.gammas[h.index].dot(h)
-
-        # TODO: some entries in gamma can be negative, presumably because for certain sensitive
-        # feature values the (one-sided) constraint is satisfied and then some. However, below
-        # we multiply the lambda vector with it to calculate the Lagrangian value L, so negative
-        # values should reduce that. Is that intended? Just trying to make sure that's not
-        # unintended.
+            error = self.errors[Q.index].dot(Q)
+            gamma = self.gammas[Q.index].dot(Q)
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
@@ -95,9 +90,9 @@ class _Lagrangian:
             L_high = error + self.B * (max_gamma - self.eps)
         return L, L_high, gamma, error
 
-    def eval_gap(self, h, lambda_hat, nu):
-        r"""Return the duality gap object for the given :math:`h` and :math:`\hat{\lambda}`."""
-        L, L_high, gamma, error = self._eval(h, lambda_hat)
+    def eval_gap(self, Q, lambda_hat, nu):
+        r"""Return the duality gap object for the given :math:`Q` and :math:`\hat{\lambda}`."""
+        L, L_high, gamma, error = self._eval(Q, lambda_hat)
         result = _GapResult(L, L, L_high, gamma, error)
         for mul in [1.0, 2.0, 5.0, 10.0]:
             h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
@@ -120,7 +115,7 @@ class _Lagrangian:
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
         result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
-        h = pd.Series(result.x[:-1], self.hs.index)
+        Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
@@ -132,7 +127,7 @@ class _Lagrangian:
                                   method='simplex')
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
-        self.last_linprog_result = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
+        self.last_linprog_result = (Q, lambda_vec, self.eval_gap(Q, lambda_vec, nu))
         return self.last_linprog_result
 
     def _call_oracle(self, lambda_vec):
