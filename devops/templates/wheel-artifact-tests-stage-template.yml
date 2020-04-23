@@ -16,7 +16,7 @@ parameters:
   type: string
 
 stages:
-- stage: {{parameters.stageName}}
+- stage: ${{parameters.stageName}}
   displayName: Test Wheel from Artifact
   dependsOn: ${{parameters.previousStages}}
   pool:
