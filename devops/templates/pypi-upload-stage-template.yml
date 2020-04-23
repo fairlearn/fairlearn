@@ -60,7 +60,7 @@ stages:
             - task: AzureKeyVault@1
               displayName: "Fetch deployment secrets from KeyVault"
               inputs:
-                azureSubscription: $(kvSubscription)
+                azureSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)" 
                 keyVaultName:  $(kvVaultName)
                 secretsFilter: '$(kvUsername),$(kvPassword)'
 
