@@ -46,7 +46,6 @@ jobs:
             FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
             FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
 
-
           steps:
           - template: test-run-step-template.yml
             parameters:
