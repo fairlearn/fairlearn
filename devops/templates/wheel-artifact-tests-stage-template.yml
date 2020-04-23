@@ -1,0 +1,30 @@
+parameters:
+- name: previousStages
+  type: string
+  default: PredeploymentValidation
+- name:  poolImage
+  type: string
+  default: 'ubuntu-latest'
+- name: poolPythonVersion
+  type: number
+  default: 3.6
+- name: packageArtifactName
+  type: string
+- name: freezeArtifactStem
+  type: string
+
+- stage: TestWheel
+  displayName: Test Wheel from Artifact
+  dependsOn: ${{parameters.previousStages}}
+  pool:
+    vmImage: ${{parameters.poolImage}}
+
+  jobs:
+    - template: templates/all-tests-job-template.yml
+      parameters:
+        platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+        installationType: 'WheelArtifact'
+        pyVersions: [3.8]
+        freezeArtifactStem: ${{freezeArtifactStem}}
+        freezeFileStem: requirements-wheel-test
+        wheelArtifactName: ${{packageArtifactName}}

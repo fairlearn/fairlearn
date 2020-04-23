@@ -15,6 +15,7 @@ parameters:
   - None
   - PipLocal
   - PyPI
+  - WheelArtifact
 - name: pypiUrl
   type: string
 - name: versionArtifactName
@@ -24,6 +25,8 @@ parameters:
 - name: pipVersionVariable
   type: string
   default: pipVersionVar
+- name: wheelArtifactName
+  type: string
 
 steps:
 # ==============================================================
@@ -67,4 +70,20 @@ steps:
     
     - script: pip install --index-url ${{parameters.pypiUrl}} fairlearn==$(${{parameters.pipVersionVariable}})
       displayName: "Install fairlearn with pip"
+
+  # Install from Wheel Artifact
+  - ${{ if eq(parameters.InstallationType, 'WheelArtifact') }}:
+    - task: DownloadPipelineArtifact@2
+      displayName: "Download wheel Artifact ${{parameters.wheelArtifactName}}"
+      inputs:
+        artifact: ${{parameters.wheelArtifactName}}
+        path: $(Build.SourcesDirectory)
+
+    - script: ls -p $(Build.SourcesDirectory)
+      displayName: "Show sources directory"
+
+    - script: pip install fairlearn*.whl
+      displayName: "Install fairlearn with pip from local file"
+
+      
     

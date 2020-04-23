@@ -25,6 +25,8 @@ parameters:
   targetType: 'Test'
   versionArtifactName:
   versionArtifactFile:
+  # Following used if installationType is WheelArtifact
+  wheelArtifactName:
 
 jobs:
   - ${{ each plat in parameters.platforms }}:
@@ -58,3 +60,5 @@ jobs:
               pypiUrl: $(pypiUrl)
               versionArtifactName: ${{parameters.versionArtifactName}}
               versionArtifactFile: ${{parameters.versionArtifactFile}}
+              # Following used if installationType is WheelArtifact
+              wheelArtifactName: ${{parameters.wheelArtifactName}}

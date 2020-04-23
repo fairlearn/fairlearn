@@ -45,23 +45,18 @@ stages:
     packageArtifactName: Wheels
     versionArtifactName: Version
     versionFileName: versionInfo.txt
-    freezeArtifactStem: Freeze
+    freezeArtifactStem: CreateWheelFreeze
     freezeFile: requirements-freeze.txt
 
 # ==============================================
 
-- stage: TestWheel
-  dependsOn: CreateWheel
-  
-  jobs:
-  - job: Placeholder
-    pool: server
-    
-    steps:
-    - task: Delay@1
-      displayName: "Placeholder Pause"
-      inputs:
-        delayForMinutes: "0"
+- template: tempates/wheel-artifact-tests-stage-template.yml
+  parameters:
+    previousStages: CreateWheel
+    poolImage: $(PoolImage)
+    poolPythonVersion: 3.7
+    packageArtifactName: Wheels
+    freezeArtifactStem: CreateWheelFreeze
 
 # ==============================================
 
