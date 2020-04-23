@@ -62,13 +62,13 @@ stages:
               inputs:
                 azureSubscription: $(kvSubscription)
                 keyVaultName:  $(kvVaultName)
-                secretsFilter: '$(parameters.kvUsername),$(parameters.kvPassword)'
+                secretsFilter: '$(kvUsername),$(kvPassword)'
 
             - script: pip install twine
               displayName: 'Install twine'
 
             # Quote the password argument in case it contains characters the shell might try to parse
-            - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p "$(${{parameters.kvPassword}})" $(Pipeline.Workspace)/$(PackageDirectory)/*'
+            - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $($(kvUsername)) -p "$($(kvPassword))" $(Pipeline.Workspace)/$(PackageDirectory)/*'
               displayName: "Run twine for upload"
   
   - job: PyPI_Pause
