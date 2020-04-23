@@ -28,7 +28,7 @@ parameters:
 - name: freezeFile
   type: string
 # Following are used if the installationType is PyPI
-- pypiSource: pypiUrl
+- name: pypiSource
   type: string
 - name: versionArtifactName
   type: string
