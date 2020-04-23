@@ -6,13 +6,9 @@ import numpy as np
 import pandas as pd
 import pickle
 import scipy.optimize as opt
-from sklearn.dummy import DummyClassifier
 from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
-
-from fairlearn.reductions._moments import ClassificationMoment
-
 
 logger = logging.getLogger(__name__)
 
@@ -35,14 +31,12 @@ class _Lagrangian:
     :type eps: float
     :param B:
     :type B:
-    :param opt_lambda: indicates whether to optimize lambda during the calculation of the
-        Lagrangian; optional with default value True
+    :param opt_lambda: optional with default value True
     :type opt_lambda: bool
     """
 
     def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
         self.X = X
-        self.y = y
         self.constraints = constraints
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
@@ -58,31 +52,35 @@ class _Lagrangian:
         self.lambdas = pd.DataFrame()
         self.n = self.X.shape[0]
         self.n_oracle_calls = 0
-        self.n_oracle_calls_dummy_returned = 0
         self.oracle_execution_times = []
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
 
-    def _eval(self, Q, lambda_vec):
+    def _eval(self, h, lambda_vec):
         """Return the value of the Lagrangian.
 
-        :param Q: `Q` is either a series of weights summing up to 1 that indicate the weight of
-            each `h` in contributing to the randomized classifier, or a callable corresponding to
-            a deterministic predict function.
-        :type Q: pandas.Series or callable
+        :param h: TODO: should this be Q instead of h? It seems to indicate how much weight each h
+            gets in the randomized classifier, summing up to 1
+        :type h: pandas.Series
         :param lambda_vec: lambda vector
-        :type lambda_vec: pandas.Series
+        :type h: pandas.Series
 
         :return: tuple `(L, L_high, gamma, error)` where `L` is the value of the Lagrangian,
             `L_high` is the value of the Lagrangian under the best response of the lambda player,
             `gamma` is the vector of constraint violations, and `error` is the empirical error
         """
-        if callable(Q):
-            error = self.obj.gamma(Q)[0]
-            gamma = self.constraints.gamma(Q)
+        if callable(h):
+            error = self.obj.gamma(h)[0]
+            gamma = self.constraints.gamma(h)
         else:
-            error = self.errors[Q.index].dot(Q)
-            gamma = self.gammas[Q.index].dot(Q)
+            error = self.errors[h.index].dot(h)
+            gamma = self.gammas[h.index].dot(h)
+
+        # TODO: some entries in gamma can be negative, presumably because for certain sensitive
+        # feature values the (one-sided) constraint is satisfied and then some. However, below
+        # we multiply the lambda vector with it to calculate the Lagrangian value L, so negative
+        # values should reduce that. Is that intended? Just trying to make sure that's not
+        # unintended.
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
@@ -97,9 +95,9 @@ class _Lagrangian:
             L_high = error + self.B * (max_gamma - self.eps)
         return L, L_high, gamma, error
 
-    def eval_gap(self, Q, lambda_hat, nu):
-        r"""Return the duality gap object for the given :math:`Q` and :math:`\hat{\lambda}`."""
-        L, L_high, gamma, error = self._eval(Q, lambda_hat)
+    def eval_gap(self, h, lambda_hat, nu):
+        r"""Return the duality gap object for the given :math:`h` and :math:`\hat{\lambda}`."""
+        L, L_high, gamma, error = self._eval(h, lambda_hat)
         result = _GapResult(L, L, L_high, gamma, error)
         for mul in [1.0, 2.0, 5.0, 10.0]:
             h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
@@ -122,7 +120,7 @@ class _Lagrangian:
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
         result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
-        Q = pd.Series(result.x[:-1], self.hs.index)
+        h = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
@@ -134,29 +132,16 @@ class _Lagrangian:
                                   method='simplex')
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
-        self.last_linprog_result = (Q, lambda_vec, self.eval_gap(Q, lambda_vec, nu))
+        self.last_linprog_result = (h, lambda_vec, self.eval_gap(h, lambda_vec, nu))
         return self.last_linprog_result
 
     def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
-        if isinstance(self.constraints, ClassificationMoment):
-            redY = 1 * (signed_weights > 0)
-        else:
-            redY = self.y
+        redY = 1 * (signed_weights > 0)
         redW = signed_weights.abs()
         redW = self.n * redW / redW.sum()
 
-        redY_unique = np.unique(redY)
-
-        classifier = None
-        if len(redY_unique) == 1:
-            logger.debug("redY had single value. Using DummyClassifier")
-            classifier = DummyClassifier(strategy='constant',
-                                         constant=redY_unique[0])
-            self.n_oracle_calls_dummy_returned += 1
-        else:
-            classifier = pickle.loads(self.pickled_estimator)
-
+        classifier = pickle.loads(self.pickled_estimator)
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
         self.oracle_execution_times.append(time() - oracle_call_start_time)
