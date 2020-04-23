@@ -200,7 +200,7 @@ class TestExponentiatedGradientSmoke:
         expgrad.fit(self.X, (self.flipped_y if flipped else self.y), sensitive_features=self.A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
-        n_predictors = len(expgrad._predictors)
+        n_predictors = len(expgrad.predictors_)
 
         disparity_moment = data["cons_class"](ratio=ratio)
         disparity_moment.load_data(self.X, (self.flipped_y if flipped else self.y),
@@ -210,12 +210,12 @@ class TestExponentiatedGradientSmoke:
         disparity = disparity_moment.gamma(Q).max()
         error = error.gamma(Q)[0]
 
-        assert expgrad._best_gap == pytest.approx(data["best_gap"], abs=self._PRECISION)
-        assert expgrad._last_t == data["last_t"]
-        assert expgrad._best_t == data["best_t"]
+        assert expgrad.best_gap_ == pytest.approx(data["best_gap"], abs=self._PRECISION)
+        assert expgrad.last_t_ == data["last_t"]
+        assert expgrad.best_t_ == data["best_t"]
         assert disparity == pytest.approx(data["disp"], abs=self._PRECISION)
         assert error == pytest.approx(data["error"], abs=self._PRECISION)
-        assert expgrad._n_oracle_calls == data["n_oracle_calls"]
+        assert expgrad.n_oracle_calls_ == data["n_oracle_calls"]
         assert n_predictors == data["n_predictors"]
 
     @pytest.mark.parametrize("testdata", smoke_test_data)

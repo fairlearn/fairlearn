@@ -97,7 +97,7 @@ def test_grid_search_for_binary_classification():
     test_values["best_lambda_second_grid"] = ScrapSpec(
         "lambda_best_second", pytest.approx(0.8333333333))
     test_values["best_coeff_second0"] = ScrapSpec(
-        "second_sweep._predictors[second_sweep._best_grid_index].coef_[0][0]",
+        "second_sweep.predictors_[second_sweep._best_grid_index].coef_[0][0]",
         pytest.approx(2.53725364))
 
     assay_one_notebook(nb_name, test_values)

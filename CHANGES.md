@@ -7,6 +7,7 @@
 * Fix warning due to changing default `dtype` when creating an empty
   `pandas.Series`.
 * Enable `GridSearch` for more than two sensitive features values.
+* Adjust classes to abide by naming conventions for attributes.
 
 ### v0.4.5
 * Changes to `ThresholdOptimizer`:

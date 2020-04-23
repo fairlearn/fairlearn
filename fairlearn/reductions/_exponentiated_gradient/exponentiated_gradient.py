@@ -59,15 +59,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.learning_rate = learning_rate
         self.run_lp_step = run_lp_step
 
-        self._best_gap = None
-        self._predictors = None
-        self._weights = None
-        self._last_t = None
-        self._best_t = None
-        self._n_oracle_calls = 0
-        self._oracle_execution_times = None
-        self._lambda_vecs = pd.DataFrame()
-        self._lambda_vecs_LP = pd.DataFrame()
+        self.best_gap_ = None
+        self.predictors_ = None
+        self.weights_ = None
+        self.last_t_ = None
+        self.best_t_ = None
+        self.n_oracle_calls_ = 0
+        self.oracle_execution_times_ = None
+        self.lambda_vecs_ = pd.DataFrame()
+        self.lambda_vecs_LP_ = pd.DataFrame()
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -101,8 +101,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
-            self._lambda_vecs[t] = lambda_vec
-            lambda_EG = self._lambda_vecs.mean(axis=1)
+            self.lambda_vecs_[t] = lambda_vec
+            lambda_EG = self.lambda_vecs_.mean(axis=1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
@@ -130,7 +130,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, self._lambda_vecs_LP[t], result_LP = lagrangian.solve_linprog(self.nu)
+                Q_LP, self.lambda_vecs_LP_[t], result_LP = lagrangian.solve_linprog(self.nu)
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
@@ -167,23 +167,23 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         # retain relevant result data
         gaps_series = pd.Series(gaps)
         gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
-        self._best_t = gaps_best.index[-1]
-        self._best_gap = gaps[self._best_t]
-        self._weights = Qs[self._best_t]
+        self.best_t_ = gaps_best.index[-1]
+        self.best_gap_ = gaps[self.best_t_]
+        self.weights_ = Qs[self.best_t_]
         self._hs = lagrangian.hs_
         for h_idx in self._hs.index:
-            if h_idx not in self._weights.index:
-                self._weights.at[h_idx] = 0.0
+            if h_idx not in self.weights_.index:
+                self.weights_.at[h_idx] = 0.0
 
-        self._last_t = len(Qs) - 1
-        self._predictors = lagrangian.predictors_
-        self._n_oracle_calls = lagrangian.n_oracle_calls_
-        self._oracle_execution_times = lagrangian.oracle_execution_times_
+        self.last_t_ = len(Qs) - 1
+        self.predictors_ = lagrangian.predictors_
+        self.n_oracle_calls_ = lagrangian.n_oracle_calls_
+        self.oracle_execution_times_ = lagrangian.oracle_execution_times_
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
                      self.eps, B, self.nu, self.max_iterations, eta_min)
         logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
-                     self._last_t, self._best_t, self._best_gap, lagrangian.n_oracle_calls_,
+                     self.last_t_, self.best_t_, self.best_gap_, lagrangian.n_oracle_calls_,
                      len(lagrangian.predictors_))
 
     def predict(self, X):
@@ -213,5 +213,5 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
             pred[t] = self._hs[t](X)
-        positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
+        positive_probs = pred[self.weights_.index].dot(self.weights_).to_frame()
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
