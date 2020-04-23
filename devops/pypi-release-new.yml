@@ -62,7 +62,7 @@ stages:
 
 # ==============================================
 
-- template: templates/pypi-upload_stage-template.yml
+- template: templates/pypi-upload-stage-template.yml
   parameters:
     stageName: UploadWheel
     previousStages: TestWheel
