@@ -28,6 +28,10 @@ parameters:
   # Following used if installationType is WheelArtifact
   wheelArtifactName:
 
+variables:
+- template: pypi-variables.yml
+  releaseType: ${{parameters.targetType}}
+
 jobs:
   - ${{ each plat in parameters.platforms }}:
     - ${{ each testRunType in parameters.testRunTypes }}:
@@ -53,7 +57,7 @@ jobs:
               freezeArtifact: $(FreezeArtifact)
               freezeFile: $(FreezeFile)
               # Following are used if the installationType is PyPI
-              pypiSource: ${{parameters.targetType}}
+              pypiUrl: ${{variables.pypiUrl}}
               versionArtifactName: ${{parameters.versionArtifactName}}
               versionArtifactFile: ${{parameters.versionArtifactFile}}
               # Following used if installationType is WheelArtifact
