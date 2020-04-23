@@ -21,7 +21,7 @@ stages:
     vmImage: ${{parameters.poolImage}}
 
   jobs:
-    - template: templates/all-tests-job-template.yml
+    - template: all-tests-job-template.yml
       parameters:
         platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
         installationType: 'WheelArtifact'
