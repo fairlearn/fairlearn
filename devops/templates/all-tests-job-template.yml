@@ -38,14 +38,14 @@ jobs:
             vmImage: ${{ plat.value }}
 
           variables:
+            ${{ if eq(parameters.targetType, 'Test') }}:
+              pypiUrl: https://test.pypi.org/simple/
+            ${{ if eq(parameters.targetType, 'Prod') }}:
+              pypiUrl: https://pypi.org/simple/
             RequirementsFile: requirements-${{pyVer}}.txt
             FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
             FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
 
-          variables:
-          - template: pypi-variables.yml
-            parameters:
-              releaseType: ${{parameters.targetType}}
 
           steps:
           - template: test-run-step-template.yml
