@@ -38,10 +38,6 @@ jobs:
             vmImage: ${{ plat.value }}
 
           variables:
-              ${{ if eq(parameters.targetType, 'Test') }}:
-                pypiUrl: https://test.pypi.org/simple/
-              ${{ if eq(parameters.targetType, 'Prod') }}:
-                pypiUrl: https://pypi.org/simple/
               RequirementsFile: requirements-${{pyVer}}.txt
               FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
               FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
@@ -57,7 +53,7 @@ jobs:
               freezeArtifact: $(FreezeArtifact)
               freezeFile: $(FreezeFile)
               # Following are used if the installationType is PyPI
-              pypiUrl: $(pypiUrl)
+              pypiSource: ${{parameters.targetType}}
               versionArtifactName: ${{parameters.versionArtifactName}}
               versionArtifactFile: ${{parameters.versionArtifactFile}}
               # Following used if installationType is WheelArtifact
