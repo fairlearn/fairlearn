@@ -62,18 +62,15 @@ stages:
 
 # ==============================================
 
-- stage: DeployToPyPI
-  dependsOn: TestWheel
-  
-  jobs:
-  - job: Placeholder
-    pool: server
-    
-    steps:
-    - task: Delay@1
-      displayName: "Placeholder Pause"
-      inputs:
-        delayForMinutes: "0"
+- template: templates/pypi-upload_stage-template.yml
+  parameters:
+    stageName: UploadWheel
+    previousStages: TestWheel
+    poolImage: $(PoolImage)
+    poolPythonVersion: 3.7
+    releaseType: ${{parameters.releaseType}}
+    packageArtifactName: Wheels
+
 
 # ==============================================
 

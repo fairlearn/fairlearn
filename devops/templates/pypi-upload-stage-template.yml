@@ -1,0 +1,75 @@
+parameters:
+- name: stageName
+  type: string
+- name: previousStages
+  type: string
+  default: PredeploymentValidation
+- name:  poolImage
+  type: string
+  default: 'ubuntu-latest'
+- name: poolPythonVersion
+  type: number
+  default: 3.6
+- name: releaseType
+  type: string
+  default: Test
+  values:
+  - Test
+  - Prod
+  - Production
+- name: packageArtifactName
+  type: string
+
+variables:
+  packageDirectory: '${{parameters.packageArtifactName}}'
+  kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)" # This is actually the name of the service connection from the Project Settings page
+  kvVaultName: fairlearndeploy
+  - ${{ if eq(parameters.releaseType, 'Test')}}:
+    kvUsername: 'usernametest'
+    kvPassword: 'passwordtest'
+    pypiUrl: https://test.pypi.org/legacy/
+  - ${{ if in(parameters.releaseType, 'Prod', 'Production')}}:
+    kvUsername: 'usernameprod'
+    kvPassword: 'passwordprod'
+    pypiUrl: https://upload.pypi.org/legacy/
+
+stages:
+- stage: ${{parameters.stageName}}
+  displayName: Upload Wheel to PyPI (${{parameters.releaseType}})
+  dependsOn: ${{parameters.previousStages}}
+  pool:
+    vmImage: ${{parameters.poolImage}}
+
+  jobs:
+  - deployment: 'PyPI_${{parameters.releaseType}}_Upload'
+    environment: ${{parameters.releaseType}}
+    pool:
+      vmImage: ${{parameters.poolImage}}
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: UsePythonVersion@0
+              displayName: 'Use Python ${{parameters.poolPythonVersion}}'
+              inputs:
+                versionSpec: ${{parameters.poolPythonVersion}}
+                addToPath: true
+
+            - task: AzureKeyVault@1
+              displayName: "Fetch deployment secrets from KeyVault"
+              inputs:
+                azureSubscription: $(kvSubscription)
+                keyVaultName:  $(kvVaultName)
+                secretsFilter: '$(parameters.kvUsername),$(parameters.kvPassword)'
+
+            - script: pip install twine
+              displayName: 'Install twine'
+
+            # Quote the password argument in case it contains characters the shell might try to parse
+            - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{parameters.kvUsername}}) -p "$(${{parameters.kvPassword}})" $(Pipeline.Workspace)/$(PackageDirectory)/*'
+              displayName: "Run twine for upload"
+  
+  - job: PyPI_Pause
+    pool: server
+    dependsOn: 'PyPI_${{parameters.releaseType}}_Upload'
