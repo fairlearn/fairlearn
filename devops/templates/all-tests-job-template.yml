@@ -28,6 +28,11 @@ parameters:
   # Following used if installationType is WheelArtifact
   wheelArtifactName:
 
+variables:
+- template: pypi-variables.yml
+  parameters:
+    releaseType: ${{parameters.targetType}}
+
 jobs:
   - ${{ each plat in parameters.platforms }}:
     - ${{ each testRunType in parameters.testRunTypes }}:
