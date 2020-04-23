@@ -41,9 +41,9 @@ jobs:
             RequirementsFile: requirements-${{pyVer}}.txt
             FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
             FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
-            - template: pypi-variables.yml
-              parameters:
-                releaseType: ${{parameters.targetType}}
+          - template: pypi-variables.yml
+            parameters:
+              releaseType: ${{parameters.targetType}}
 
           steps:
           - template: test-run-step-template.yml
