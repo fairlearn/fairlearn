@@ -1,5 +1,14 @@
 # Simplified PyPI release pipeline
 
+parameters:
+- name: releaseType
+  displayName: Release Type
+  type: string
+  default: Test
+  values:
+  - Test
+  - Production
+
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
@@ -72,7 +81,7 @@ stages:
 
 # ==============================================
 
-- stage: TestFrom PyPI
+- stage: TestFromPyPI
   dependsOn: DeployToPyPI
 
   jobs:
