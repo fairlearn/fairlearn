@@ -16,8 +16,12 @@ parameters:
   - PipLocal
   - PyPI
   - WheelArtifact
-- name: pypiUrl
+- name: pypiSource
   type: string
+  default: Prod
+  values:
+  - Test
+  - Prod
 - name: versionArtifactName
   type: string
 - name: versionArtifactFile
@@ -27,6 +31,11 @@ parameters:
   default: pipVersionVar
 - name: wheelArtifactName
   type: string
+
+variables:
+- template: pypi-variables.yml
+  parameters:
+    releaseType: ${{parameters.pypiSource}}
 
 steps:
 # ==============================================================
@@ -68,7 +77,7 @@ steps:
         arguments: "-baseDir $(Build.SourcesDirectory) -subDir . -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVersionVariable}}"
         pwsh: true
     
-    - script: pip install --index-url ${{parameters.pypiUrl}} fairlearn==$(${{parameters.pipVersionVariable}})
+    - script: pip install --index-url $(pypiUrl) fairlearn==$(${{parameters.pipVersionVariable}})
       displayName: "Install fairlearn with pip"
 
   # Install from Wheel Artifact
