@@ -19,7 +19,7 @@ variables:
     kvUsername: 'usernametest'
     kvPassword: 'passwordtest'
     pypiUrl: https://test.pypi.org/legacy/
-  ${{ if eq(parameters.releaseType, Production')}}:
+  ${{ if eq(parameters.releaseType, 'Production')}}:
     kvUsername: 'usernameprod'
     kvPassword: 'passwordprod'
     pypiUrl: https://upload.pypi.org/legacy/
