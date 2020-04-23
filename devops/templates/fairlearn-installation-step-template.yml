@@ -77,7 +77,7 @@ steps:
         arguments: "-baseDir $(Build.SourcesDirectory) -subDir . -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVersionVariable}}"
         pwsh: true
     
-    - script: pip install --index-url $(pypiUrl) fairlearn==$(${{parameters.pipVersionVariable}})
+    - script: pip install --index-url ${{variables.pypiUrl}} fairlearn==$(${{parameters.pipVersionVariable}})
       displayName: "Install fairlearn with pip"
 
   # Install from Wheel Artifact
