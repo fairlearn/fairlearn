@@ -41,7 +41,7 @@ stages:
   - deployment: 'PyPI_${{parameters.releaseType}}_Upload'
     ${{ if eq(parameters.releaseType, 'Test')}}:
       environment: 'PyPI-Test Deployment'
-    ${{ if eq(parameters.releaseType, 'Test')}}:
+    ${{ if eq(parameters.releaseType, 'Production')}}:
       environment: 'PyPI Deployment'
     pool:
       vmImage: ${{parameters.poolImage}}
