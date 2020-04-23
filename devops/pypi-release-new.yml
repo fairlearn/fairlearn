@@ -1,0 +1,86 @@
+# Simplified PyPI release pipeline
+
+variables:
+  poolImage: "ubuntu-latest"
+  poolPythonVersion: 3.6
+
+trigger: none # No CI build
+
+pr: none # Not for pull requests
+
+# ==============================================
+
+stages:
+- stage: PredeploymentValidation
+  pool:
+    vmImage: $(PoolImage)
+    
+  jobs:
+  - job: Placeholder
+    pool: server
+
+    steps:
+    - task: Delay@1
+      displayName: "Placeholder Pause"
+      inputs:
+        delayForMinutes: "0"
+
+# ==============================================
+
+- stage: CreateWheel
+  dependsOn: PredeploymentValidation
+
+  jobs:
+  - job: Placeholder
+    pool: server
+    
+    steps:
+    - task: Delay@1
+      displayName: "Placeholder Pause"
+      inputs:
+        delayForMinutes: "0"
+
+# ==============================================
+
+- stage: TestWheel
+  dependsOn: CreateWheel
+  
+  jobs:
+  - job: Placeholder
+    pool: server
+    
+    steps:
+    - task: Delay@1
+      displayName: "Placeholder Pause"
+      inputs:
+        delayForMinutes: "0"
+
+# ==============================================
+
+- stage: DeployToPyPI
+  dependsOn: TestWheel
+  
+  jobs:
+  - job: Placeholder
+    pool: server
+    
+    steps:
+    - task: Delay@1
+      displayName: "Placeholder Pause"
+      inputs:
+        delayForMinutes: "0"
+
+# ==============================================
+
+- stage: TestFrom PyPI
+  dependsOn: DeployToPyPI
+
+  jobs:
+  - job: Placeholder
+    pool: server
+    
+    steps:
+    - task: Delay@1
+      displayName: "Placeholder Pause"
+      inputs:
+        delayForMinutes: "0"
