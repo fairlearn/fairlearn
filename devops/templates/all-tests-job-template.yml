@@ -28,10 +28,6 @@ parameters:
   # Following used if installationType is WheelArtifact
   wheelArtifactName:
 
-variables:
-- template: pypi-variables.yml
-  releaseType: ${{parameters.targetType}}
-
 jobs:
   - ${{ each plat in parameters.platforms }}:
     - ${{ each testRunType in parameters.testRunTypes }}:
@@ -42,9 +38,11 @@ jobs:
             vmImage: ${{ plat.value }}
 
           variables:
-              RequirementsFile: requirements-${{pyVer}}.txt
-              FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
-              FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
+            RequirementsFile: requirements-${{pyVer}}.txt
+            FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
+            FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
+          - template: pypi-variables.yml
+            releaseType: ${{parameters.targetType}}
 
           steps:
           - template: test-run-step-template.yml
