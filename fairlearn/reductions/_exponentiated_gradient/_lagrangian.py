@@ -69,8 +69,12 @@ class _Lagrangian:
             `L_high` is the value of the Lagrangian under the best response of the lambda player,
             `gamma` is the vector of constraint violations, and `error` is the empirical error
         """
-        error = self.errors[h.index].dot(h)
-        gamma = self.gammas[h.index].dot(h)
+        if callable(h):
+            error = self.obj.gamma(h)[0]
+            gamma = self.constraints.gamma(h)
+        else:
+            error = self.errors[h.index].dot(h)
+            gamma = self.gammas[h.index].dot(h)
 
         # TODO: some entries in gamma can be negative, presumably because for certain sensitive
         # feature values the (one-sided) constraint is satisfied and then some. However, below

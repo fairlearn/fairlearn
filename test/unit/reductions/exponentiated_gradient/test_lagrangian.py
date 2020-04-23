@@ -16,9 +16,9 @@ from .simple_learners import LeastSquaresBinaryClassifierLearner
 
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
-@pytest.mark.parametrize("h_vec", [pd.Series([1.0])])
+@pytest.mark.parametrize("use_h_callable", [True, False])
 @pytest.mark.parametrize("opt_lambda", [True, False])
-def test_lagrangian_eval(eps, Constraints, h_vec, opt_lambda):
+def test_lagrangian_eval(eps, Constraints, use_h_callable, opt_lambda):
     X, y, A = _get_data(A_two_dim=False)
     estimator = LeastSquaresBinaryClassifierLearner()
     constraints = Constraints()
@@ -56,8 +56,10 @@ def test_lagrangian_eval(eps, Constraints, h_vec, opt_lambda):
     lagrangian.errors = pd.Series([best_h_error])
     lagrangian.gammas = pd.Series([best_h_gamma])
 
-    # call _eval to get the desired results L, L_high, gamma, error
-    L, L_high, gamma, error = lagrangian._eval(h_vec, lambda_vec)
+    # call _eval to get the desired results L, L_high, gamma, error;
+    # _eval is compatible with a callable h or a vector h
+    h_vec = pd.Series([1.0])
+    L, L_high, gamma, error = lagrangian._eval(h if use_h_callable else h_vec, lambda_vec)
 
     # in this particular example the estimator is always the same
     expected_estimator_weights = pd.Series({
