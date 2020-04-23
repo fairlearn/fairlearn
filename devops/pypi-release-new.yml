@@ -38,6 +38,15 @@ stages:
 # ==============================================
 
 - template: templates/create-wheel-stage-template.yml
+  parameters:
+    previousStages: PredeploymentValidation
+    poolImage: $(PoolImage)
+    poolPythonVersion: 3.7
+    packageArtifactName: Wheels
+    versionArtifactName: Version
+    versionFileName: versionInfo.txt
+    freezeArtifactStem: Freeze
+    freezeFile: requirements-freeze.txt
 
 # ==============================================
 

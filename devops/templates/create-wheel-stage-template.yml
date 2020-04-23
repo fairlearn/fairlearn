@@ -8,15 +8,16 @@ parameters:
 - name: poolPythonVersion
   type: number
   default: 3.6
-- name: packageArtifactStem
+- name: packageArtifactName
   type: string
-  default: Packages
-- name: versionArtifactStem
+- name: versionArtifactName
   type: string
-  default: Version
-- name: versionInfo
+- name: versionFileName
   type: string
-  default: versionInfo
+- name: freezeArtifactStem
+  type: string
+- name: freezeFile
+  type: string
 
 stages:
 - stage: CreateWheel
@@ -27,10 +28,45 @@ stages:
 
   jobs:
   - job: Placeholder
-    pool: server
+    pool:
+      vmImage: ${{parameters.poolImage}}
     
     steps:
-    - task: Delay@1
-      displayName: "Placeholder Pause"
+    - task: UsePythonVersion@0
+      displayName: 'Use Python ${{parameters.poolPythonVersion}}'
       inputs:
-        delayForMinutes: "0"
+        versionSpec: ${{parameters.poolPythonVersion}}
+        addToPath: true
+
+    - template: python-infra-upgrade-steps-template.yml
+
+    - script: pip install setuptools wheel 
+      displayName: 'Install setuptools'
+
+    - script: pip install -r requirements.txt
+      displayName: "Install fairlearn requirements"
+
+    - template: pip-freeze-to-artifact-steps-template.yml
+      parameters:
+        freezeArtifact: '${{parameters.freezeArtifactStem}}CreateWheel'
+        freezeFile: ${{parameters.FreezeFile}}
+
+    # TODO: add --assert-no-changes to validate that no changes happened to widget files (Issue #270)
+    - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+      displayName: 'Build widget'
+
+    # TODO: Simplify the build_wheels script to remove target type and dev version
+    - script: python ./scripts/build_wheels.py --target-type Prod --version-filename ${{parameters.versionFilename}} --dev-version 0
+      displayName: 'Build wheels'
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish wheels"
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/dist
+        artifact: '${{parameters.packageArtifactName}}'
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish version information file"
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)/${{parameters.versionFilename}}'
+        artifact: '${{parameters.versionArtifactName}}'
