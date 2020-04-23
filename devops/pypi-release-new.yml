@@ -39,6 +39,7 @@ stages:
 
 - template: templates/create-wheel-stage-template.yml
   parameters:
+    stageName: CreateWheel
     previousStages: PredeploymentValidation
     poolImage: $(PoolImage)
     poolPythonVersion: 3.7
