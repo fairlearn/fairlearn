@@ -52,6 +52,7 @@ stages:
 
 - template: templates/wheel-artifact-tests-stage-template.yml
   parameters:
+    stageName: TestWheel
     previousStages: CreateWheel
     poolImage: $(PoolImage)
     poolPythonVersion: 3.7

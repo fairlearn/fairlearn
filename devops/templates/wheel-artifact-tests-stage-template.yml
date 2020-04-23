@@ -1,4 +1,6 @@
 parameters:
+- name: stageName
+  type: string
 - name: previousStages
   type: string
   default: PredeploymentValidation
@@ -14,7 +16,7 @@ parameters:
   type: string
 
 stages:
-- stage: TestWheel
+- stage: {{parameters.stageName}}
   displayName: Test Wheel from Artifact
   dependsOn: ${{parameters.previousStages}}
   pool:

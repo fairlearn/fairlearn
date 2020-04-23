@@ -82,7 +82,10 @@ steps:
     - script: ls -p $(Build.SourcesDirectory)
       displayName: "Show sources directory"
 
-    - script: pip install fairlearn*.whl
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: pip install fairlearn*.whl
       displayName: "Install fairlearn with pip from local file"
 
       
