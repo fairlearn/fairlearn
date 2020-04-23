@@ -39,7 +39,10 @@ stages:
 
   jobs:
   - deployment: 'PyPI_${{parameters.releaseType}}_Upload'
-    environment: ${{parameters.releaseType}}
+    ${{ if eq(parameters.releaseType, 'Test')}}:
+      environment: 'PyPI-Test Deployment'
+    ${{ if eq(parameters.releaseType, 'Test')}}:
+      environment: 'PyPI Deployment'
     pool:
       vmImage: ${{parameters.poolImage}}
 
