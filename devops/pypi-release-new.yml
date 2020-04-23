@@ -58,7 +58,7 @@ stages:
     poolImage: $(PoolImage)
     poolPythonVersion: 3.7
     packageArtifactName: Wheels
-    freezeArtifactStem: CreateWheelFreeze
+    freezeArtifactStem: TestWheelFreeze
 
 # ==============================================
 
