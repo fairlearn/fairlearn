@@ -12,6 +12,17 @@ parameters:
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
+  # Following is actually the name of the service connection from the Project Settings page
+  kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)"
+  kvVaultName: fairlearndeploy
+  ${{ if eq(parameters.releaseType, 'Test')}}:
+    kvUsername: 'usernametest'
+    kvPassword: 'passwordtest'
+    pypiUrl: https://test.pypi.org/legacy/
+  ${{ if eq(parameters.releaseType, Production')}}:
+    kvUsername: 'usernameprod'
+    kvPassword: 'passwordprod'
+    pypiUrl: https://upload.pypi.org/legacy/
 
 trigger: none # No CI build
 
@@ -70,6 +81,11 @@ stages:
     poolPythonVersion: 3.7
     releaseType: ${{parameters.releaseType}}
     packageArtifactName: Wheels
+    kvSubscription: $(kvSubscription)
+    kvVaultName: $(kvVaultName)
+    kvUsername: $(kvUsername)
+    kvPassword: $(kvPassword)
+    pypiUrl: $(pypiUrl)
 
 
 # ==============================================

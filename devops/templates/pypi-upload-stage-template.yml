@@ -19,6 +19,16 @@ parameters:
   - Production
 - name: packageArtifactName
   type: string
+- name: kvSubscription
+  type: string
+- name: kvVaultName
+  type: string
+- name: kvUsername
+  type: string
+- name: kvPassword
+  type: string
+- name: pypiUrl
+  type: string
 
 stages:
 - stage: ${{parameters.stageName}}
@@ -33,20 +43,6 @@ stages:
     pool:
       vmImage: ${{parameters.poolImage}}
 
-    variables:
-      packageDirectory: '${{parameters.packageArtifactName}}'
-      # Following is actually the name of the service connection from the Project Settings page
-      kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)"
-      kvVaultName: fairlearndeploy
-      ${{ if eq(parameters.releaseType, 'Test')}}:
-        kvUsername: 'usernametest'
-        kvPassword: 'passwordtest'
-        pypiUrl: https://test.pypi.org/legacy/
-      ${{ if in(parameters.releaseType, 'Prod', 'Production')}}:
-        kvUsername: 'usernameprod'
-        kvPassword: 'passwordprod'
-        pypiUrl: https://upload.pypi.org/legacy/
-
     strategy:
       runOnce:
         deploy:
@@ -60,17 +56,23 @@ stages:
             - task: AzureKeyVault@1
               displayName: "Fetch deployment secrets from KeyVault"
               inputs:
-                azureSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)" 
-                keyVaultName:  $(kvVaultName)
-                secretsFilter: '$(kvUsername),$(kvPassword)'
+                azureSubscription: ${{parameters.kvSubscription}}
+                keyVaultName:  ${{parameters.kvVaultName}}
+                secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
 
             - script: pip install twine
               displayName: 'Install twine'
 
             # Quote the password argument in case it contains characters the shell might try to parse
-            - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $($(kvUsername)) -p "$($(kvPassword))" $(Pipeline.Workspace)/$(PackageDirectory)/*'
+            - script: 'twine upload --verbose --repository-url ${{parameters.pypiUrl}} -u $(${{parameters.kvUsername}}) -p "$(${{parameters.kvPassword}})" $(Pipeline.Workspace)/${{parameters.packageArtifactName}}/*'
               displayName: "Run twine for upload"
   
   - job: PyPI_Pause
     pool: server
     dependsOn: 'PyPI_${{parameters.releaseType}}_Upload'
+
+    steps:
+    - task: Delay@1
+      displayName: "Pause to allow PyPI updates to complete"
+      inputs:
+        delayForMinutes: "5"
