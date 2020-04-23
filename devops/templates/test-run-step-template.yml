@@ -28,7 +28,7 @@ parameters:
 - name: freezeFile
   type: string
 # Following are used if the installationType is PyPI
-- name: pypiSource
+- name: pypiUrl
   type: string
 - name: versionArtifactName
   type: string
@@ -61,7 +61,7 @@ steps:
 - template: fairlearn-installation-step-template.yml
   parameters:
     installationType: ${{parameters.installationType}}
-    pypiSource: ${{parameters.pypiSource}}
+    pypiUrl: ${{parameters.pypiUrl}}
     versionArtifactName: ${{parameters.versionArtifactName}}
     versionArtifactFile: ${{parameters.versionArtifactFile}}
     pipVersionVariable: variableForPipVersion
