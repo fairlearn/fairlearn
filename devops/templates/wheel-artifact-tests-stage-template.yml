@@ -26,6 +26,6 @@ stages:
         platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
         installationType: 'WheelArtifact'
         pyVersions: [3.8]
-        freezeArtifactStem: ${{freezeArtifactStem}}
+        freezeArtifactStem: ${{parameters.freezeArtifactStem}}
         freezeFileStem: requirements-wheel-test
-        wheelArtifactName: ${{packageArtifactName}}
+        wheelArtifactName: ${{parameters.packageArtifactName}}
