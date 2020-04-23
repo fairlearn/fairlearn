@@ -8,6 +8,8 @@
   `pandas.Series`.
 * Enable `GridSearch` for more than two sensitive features values.
 * Adjust classes to abide by naming conventions for attributes.
+* Change `ExponentiatedGradient` signature by renaming argument `T` to
+  `max_iterations`, `eta_mul` to `learning_rate`, and by adding `run_lp_step`.
 
 ### v0.4.5
 * Changes to `ThresholdOptimizer`:
