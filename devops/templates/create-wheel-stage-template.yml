@@ -1,0 +1,36 @@
+parameters:
+- name: previousStages
+  type: string
+  default: PredeploymentValidation
+- name:  poolImage
+  type: string
+  default: 'ubuntu-latest'
+- name: poolPythonVersion
+  type: number
+  default: 3.6
+- name: packageArtifactStem
+  type: string
+  default: Packages
+- name: versionArtifactStem
+  type: string
+  default: Version
+- name: versionInfo
+  type: string
+  default: versionInfo
+
+stages:
+- stage: CreateWheel
+  displayName: Create Wheel Artifact
+  dependsOn: ${{parameters.previousStages}}
+  pool:
+    vmImage: ${{parameters.poolImage}}
+
+  jobs:
+  - job: Placeholder
+    pool: server
+    
+    steps:
+    - task: Delay@1
+      displayName: "Placeholder Pause"
+      inputs:
+        delayForMinutes: "0"
