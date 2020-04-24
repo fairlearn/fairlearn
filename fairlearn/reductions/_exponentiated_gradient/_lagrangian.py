@@ -31,7 +31,8 @@ class _Lagrangian:
     :type eps: float
     :param B:
     :type B:
-    :param opt_lambda: optional with default value True
+    :param opt_lambda: indicates whether to optimize lambda during the calculation of the
+        Lagrangian; optional with default value True
     :type opt_lambda: bool
     """
 
