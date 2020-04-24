@@ -76,7 +76,7 @@ stages:
               displayName: 'Install twine'
 
             # Some ugliness until I can figure out why "Check two" isn't working in this pipeline (but works in the old release)
-            - ${{ if ne(parameters.kvUsername, 'usernametest') }}:
+            - ${{ if ne(parameters.kvUsername, "usernametest") }}:
               # Quote the password argument in case it contains characters the shell might try to parse
               - script: 'twine upload --verbose --repository-url ${{parameters.pypiUrl}} -u $(usernametest) -p "$(passwordtest)" $(Pipeline.Workspace)/${{parameters.packageArtifactName}}/*'
                 displayName: "Run twine for upload"
