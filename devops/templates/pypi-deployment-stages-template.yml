@@ -75,6 +75,12 @@ stages:
                 keyVaultName:  ${{parameters.kvVaultName}}
                 secretsFilter: '${{parameters.kvUsername}},${{parameters.kvPassword}}'
 
+            - script: echo $(usernametest)
+              displayName: "Check one"
+
+            - script: echo $(${{parameters.kvUsername}})
+              displayName: "Check two"
+
             - script: pip install twine
               displayName: 'Install twine'
 
