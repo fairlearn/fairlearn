@@ -72,8 +72,8 @@ stages:
             - script: pip install twine
               displayName: 'Install twine'
 
-            # Some ugliness until I can figure out why "Check two" isn't working in this build
-            ${{ if and(eq(parameters.kvUsername, usernametest), eq(parameters.kvPassword, passwordtest))}}:
+            # Some ugliness until I can figure out why "Check two" isn't working in this pipeline (but works in the old release)
+            - ${{ if and(eq(parameters.kvUsername, usernametest), eq(parameters.kvPassword, passwordtest))}}:
               # Quote the password argument in case it contains characters the shell might try to parse
               - script: 'twine upload --verbose --repository-url ${{parameters.pypiUrl}} -u $(usernametest) -p "$(passwordtest)" $(Pipeline.Workspace)/${{parameters.packageArtifactName}}/*'
                 displayName: "Run twine for upload"
