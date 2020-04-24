@@ -16,8 +16,8 @@ variables:
   kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)"
   kvVaultName: fairlearndeploy
   ${{ if eq(parameters.releaseType, 'Test')}}:
-    kvUsername: 'usernametest'
-    kvPassword: 'passwordtest'
+    kvUsername: usernametest
+    kvPassword: passwordtest
     pypiUrl: https://test.pypi.org/legacy/
   ${{ if eq(parameters.releaseType, 'Production')}}:
     kvUsername: 'usernameprod'
