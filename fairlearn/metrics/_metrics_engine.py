@@ -9,8 +9,11 @@ from ._extra_metrics import (
     true_positive_rate, true_negative_rate,
     false_positive_rate, false_negative_rate,
     root_mean_squared_error, balanced_root_mean_squared_error,
-    mean_overprediction, mean_prediction, mean_underprediction,
-    selection_rate)
+    mean_prediction,
+    selection_rate,
+    _mean_overprediction,
+    _mean_underprediction,
+    )
 
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
@@ -276,10 +279,10 @@ METRICS_SPEC = [
     (false_negative_rate, []),
     (root_mean_squared_error, []),
     (balanced_root_mean_squared_error, []),
-    (mean_overprediction, []),
     (mean_prediction, []),
-    (mean_underprediction, []),
     (selection_rate, ["difference", "ratio", "group_min", "group_max"]),
+    (_mean_overprediction, []),
+    (_mean_underprediction, []),
 
     # base metrics from sklearn.metrics
     (skm.accuracy_score, ["difference", "ratio", "group_min", "group_max"]),

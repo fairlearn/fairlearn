@@ -24,10 +24,11 @@ from ._extra_metrics import (  # noqa: F401
     false_positive_rate,
     false_negative_rate,
     balanced_root_mean_squared_error,
-    mean_overprediction,
     mean_prediction,
-    mean_underprediction,
-    selection_rate)
+    selection_rate,
+    _mean_overprediction,
+    _mean_underprediction,
+    )
 
 from ._metrics_engine import (  # noqa: F401
     make_metric_group_summary, group_summary,
@@ -51,9 +52,9 @@ _extra_metrics = [
     "false_negative_rate",
     "balanced_root_mean_squared_error",
     "mean_prediction",
-    "mean_overprediction",
-    "mean_underprediction",
     "selection_rate",
+    "_mean_overprediction",
+    "_mean_underprediction",
 ]
 
 
@@ -68,6 +69,8 @@ _metrics_engine = [
 ]
 
 
+# Add the generated metrics of the form `<metric>_group summary` and
+# `<metric>_{difference,ratio,group_min,group_max`
 globals().update(_metric_group_summary_dict)
 globals().update(_derived_metric_dict)
 

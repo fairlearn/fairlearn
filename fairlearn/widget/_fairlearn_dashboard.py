@@ -10,10 +10,10 @@ from fairlearn.metrics import (
     false_negative_rate_group_summary,
     root_mean_squared_error_group_summary,
     balanced_root_mean_squared_error_group_summary,
-    mean_overprediction_group_summary,
     mean_prediction_group_summary,
-    mean_underprediction_group_summary,
     selection_rate_group_summary,
+    _mean_overprediction_group_summary,
+    _mean_underprediction_group_summary,
 
     accuracy_score_group_summary,
     precision_score_group_summary,
@@ -131,11 +131,11 @@ class FairlearnDashboard(object):
             },
             "overprediction": {
                 "model_type": [],
-                "function": mean_overprediction_group_summary
+                "function": _mean_overprediction_group_summary
             },
             "underprediction": {
                 "model_type": [],
-                "function": mean_underprediction_group_summary
+                "function": _mean_underprediction_group_summary
             },
             "average": {
                 "model_type": [],
