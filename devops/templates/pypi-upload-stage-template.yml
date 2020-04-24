@@ -24,7 +24,9 @@ parameters:
 - name: kvVaultName
   type: string
 - name: kvUsername
+  type: string
 - name: kvPassword
+  type: string
 - name: pypiUrl
   type: string
 
