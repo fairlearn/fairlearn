@@ -65,7 +65,7 @@ def equalized_odds_difference(y_true, y_pred, *, sensitive_features, sample_weig
 
 
 def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=None):
-    """Calculate the equalized odds ratio.""
+    """Calculate the equalized odds ratio.
 
     :param 1D-array y_true: Ground truth (correct) labels :math:`Y`.
     :param 1D-array y_pred: Predicted labels :math:`h(X)` returned by the classifier.
