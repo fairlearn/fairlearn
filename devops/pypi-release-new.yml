@@ -78,7 +78,7 @@ stages:
     stageName: UploadWheel
     previousStages: TestWheel
     poolImage: $(PoolImage)
-    poolPythonVersion: 3.7
+    poolPythonVersion: 3.6
     releaseType: ${{parameters.releaseType}}
     packageArtifactName: Wheels
     kvSubscription: $(kvSubscription)
