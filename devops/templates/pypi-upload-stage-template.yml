@@ -69,6 +69,9 @@ stages:
             - script: echo $(${{parameters.kvUsername}})
               displayName: "Check two"
 
+            - script: echo ${{parameters.kvUsername}}
+              displayName: "Insanity check"
+
             - script: pip install twine
               displayName: 'Install twine'
 
