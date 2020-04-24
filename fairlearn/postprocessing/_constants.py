@@ -55,3 +55,4 @@ METRIC_DICT = {
 
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install fairlearn[customplots] to use " \
                                    "the postprocessing plots."
+ESTIMATOR_ERROR_MESSAGE = "'estimator' cannot be `None`."
