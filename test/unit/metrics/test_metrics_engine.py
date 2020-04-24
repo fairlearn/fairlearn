@@ -23,7 +23,7 @@ def mock_func_matrix_return(y_true, y_pred):
     return np.ones([len(y_true), sum(y_pred)])
 
 
-class TestMetricByGroup:
+class TestGroupSummary:
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_a", conversions_for_1d)
@@ -246,7 +246,7 @@ class TestMetricByGroup:
         assert metrics.ratio_from_summary(result) == 1
 
 
-class TestMakeGroupMetric:
+class TestMakeMetricGroupSummary:
     def test_smoke(self):
         y_a = [0, 0, 1, 1, 0, 1, 1, 1]
         y_p = [0, 1, 1, 1, 1, 0, 0, 1]
@@ -289,3 +289,55 @@ class TestMakeGroupMetric:
         assert metrics.group_max_from_summary(result) == 21
         assert metrics.difference_from_summary(result) == 20
         assert metrics.ratio_from_summary(result) == pytest.approx(1.0/21.0)
+
+
+class TestMakeDerivedMetric:
+    def test_smoke(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
+
+        metric_group_summary = metrics.make_metric_group_summary(mock_func)
+        metric_group_min = metrics.make_derived_metric(
+            metrics.group_min_from_summary, metric_group_summary)
+        metric_group_max = metrics.make_derived_metric(
+            metrics.group_max_from_summary, metric_group_summary)
+        metric_difference = metrics.make_derived_metric(
+            metrics.difference_from_summary, metric_group_summary)
+        metric_ratio = metrics.make_derived_metric(
+            metrics.ratio_from_summary, metric_group_summary)
+
+        assert metric_group_min(y_a, y_p, sensitive_features=gid) == 2
+        assert metric_group_max(y_a, y_p, sensitive_features=gid) == 3
+        assert metric_difference(y_a, y_p, sensitive_features=gid) == 1
+        assert metric_ratio(y_a, y_p, sensitive_features=gid) == pytest.approx(0.66666666667)
+
+    @pytest.mark.parametrize("transform_s_w", conversions_for_1d)
+    @pytest.mark.parametrize("transform_gid", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_a", conversions_for_1d)
+    def test_keys_and_weights(self, transform_y_a, transform_y_p, transform_gid, transform_s_w):
+        a = "ABC"
+        b = "DEF"
+        c = "GHI"
+        z = "something_longer"
+        y_a = transform_y_a([0, 1, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
+        gid = transform_gid([a, z, a, b, b, c, c, c])
+        s_w = transform_s_w([1, 1, 1, 5, 5, 7, 7, 7])
+
+        metric_group_summary = metrics.make_metric_group_summary(mock_func_weight)
+        metric_group_min = metrics.make_derived_metric(
+            metrics.group_min_from_summary, metric_group_summary)
+        metric_group_max = metrics.make_derived_metric(
+            metrics.group_max_from_summary, metric_group_summary)
+        metric_difference = metrics.make_derived_metric(
+            metrics.difference_from_summary, metric_group_summary)
+        metric_ratio = metrics.make_derived_metric(
+            metrics.ratio_from_summary, metric_group_summary)
+
+        assert metric_group_min(y_a, y_p, sensitive_features=gid, sample_weight=s_w) == 1
+        assert metric_group_max(y_a, y_p, sensitive_features=gid, sample_weight=s_w) == 21
+        assert metric_difference(y_a, y_p, sensitive_features=gid, sample_weight=s_w) == 20
+        assert metric_ratio(y_a, y_p,
+                            sensitive_features=gid, sample_weight=s_w) == pytest.approx(1.0/21.0)
