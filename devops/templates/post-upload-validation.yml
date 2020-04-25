@@ -42,6 +42,6 @@ stages:
       freezeArtifactStem: ${{parameters.freezeArtifactStem}}
       freezeFileStem: ${{parameters.freezeFileStem}}
       installationType: 'PyPI'
-      targetType: ${{parameters.targetType}}
+      targetType: ${{parameters.releaseType}}
       versionArtifactName: '${{parameters.versionArtifactName}}'
       versionArtifactFile: '${{parameters.versionFileName}}'
