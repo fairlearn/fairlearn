@@ -23,21 +23,23 @@ guidelines](https://help.github.com/en/github/site-policy/github-community-guide
 
 ## Development process
 
-Development happens against the `master` branch following the [GitHub flow
-model](https://guides.github.com/introduction/flow/). Contributors create
-feature branches off of `master`, and their pull requests should target the
-`master` branch. Maintainers are responsible for prompt review of pull
+Development happens against the `master` branch following the
+[GitHub flow model](https://guides.github.com/introduction/flow/).
+Contributors should use their own forks of the repository. In their fork, they
+create feature branches off of `master`, and their pull requests should target
+the `master` branch. Maintainers are responsible for prompt review of pull
 requests.
 
 Pull requests against `master` trigger automated tests that are run through
-Azure DevOps. Additional test suites are run periodically. When adding new code
-paths or features, tests are a requirement to complete a pull request. They
-should be added in the `test` directory.
+Azure DevOps or GitHub Actions. Additional test suites are run periodically.
+When adding new code paths or features, tests are a requirement to complete a
+pull request. They should be added in the `test` directory.
 
-To build the fairlearn dashboard after making changes to it, [install
-Yarn](https://yarnpkg.com/lang/en/docs/install), and then run the [widget build
-script](scripts/build_widget.py). To validate that you did not make changes
-that affect the generated files simply add the `--assert-no-changes` option.
+To build the fairlearn dashboard after making changes to it,
+[install Yarn](https://yarnpkg.com/lang/en/docs/install), and then run the
+[widget build script](scripts/build_widget.py). To validate that you did not
+make changes that affect the generated files simply add the
+`--assert-no-changes` option.
 
 ### Investigating automated test failures
 
@@ -47,13 +49,32 @@ through Azure Pipelines with steps for setup, testing, and teardown. The
 `Checks` tab of a pull request contains a link to the [Azure Pipelines
 page](dev.azure.com/responsibleai/fairlearn/_build/results), where you can
 review the logs by clicking on a specific step in the automated test sequence.
-If you encounter problems with this workflow, please reach out through [GitHub
-issues](https://github.com/fairlearn/fairlearn/issues).
+If you encounter problems with this workflow, please reach out through
+[GitHub issues](https://github.com/fairlearn/fairlearn/issues).
 
 To run the same tests locally, find the corresponding pipeline definition (a
 `yml` file) in the `devops` directory. It either directly contains the command
 to execute the tests (usually starting with `python -m pytest`) or it refers to
 a template file with the command.
+
+## Real-time communication
+
+For real time communication please join us on
+[Gitter](https://gitter.im/fairlearn/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link).
+All are welcome!
+
+## Meetings
+
+We are in the process of setting up regular contributor meetings. Stay tuned!
+<!-- We have a TBD development meeting every TBD at TBD US Pacific Time and all are welcome.
+We keep notes from each meeting in a TBD repository. -->
+
+## API Design
+
+Design proposals for larger changes go into the
+[fairlearn-proposals repository](https://github.com/fairlearn/fairlearn-proposals).
+If you want to submit a proposal, just create a pull request there and
+maintainers will review it.
 
 ## API conventions
 
@@ -133,8 +154,8 @@ file.
 1. Install any pip packages required for the notebooks
 1. Check that the dashboard loads in the notebooks
 
-We have a [Azure DevOps
-Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary)
+We have a
+[Azure DevOps Pipeline](https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=48&_a=summary)
 which takes care of building wheels and pushing to PyPI. Validations are also
 performed prior to any deployments, and also following the uploads to Test-PyPI
 and PyPI. To use it:
