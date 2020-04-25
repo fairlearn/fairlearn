@@ -87,18 +87,16 @@ stages:
     kvPassword: $(kvPassword)
     pypiUrl: $(pypiUrl)
 
-
 # ==============================================
 
-- stage: TestFromPyPI
-  dependsOn: UploadWheel
-
-  jobs:
-  - job: Placeholder
-    pool: server
-    
-    steps:
-    - task: Delay@1
-      displayName: "Placeholder Pause"
-      inputs:
-        delayForMinutes: "0"
+- template: templates/post-upload-validation.yml
+  parameters:
+    stageName: TestFromPyPI
+    previousStages: UploadWheel
+    poolImage: $(PoolImage)
+    poolPythonVersion: 3.6
+    releaseType: ${{parameters.releaseType}}
+    versionArtifactName: Version
+    versionFileName: versionInfo.txt
+    freezeArtifactStem: TestPyPIFreeze
+    freezeFileStem: requirements-freeze
