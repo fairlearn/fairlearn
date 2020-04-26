@@ -72,15 +72,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        _, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
+        _, y_train, sensitive_features = _validate_and_reformat_input(X, y, **kwargs)
 
         n = y_train.shape[0]
 
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self._eps
-        lagrangian = _Lagrangian(X, A, y_train, self._estimator, self._constraints,
-                                 self._eps, B)
+        lagrangian = _Lagrangian(X, sensitive_features, y_train, self._estimator,
+                                 self._constraints, self._eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
@@ -100,11 +100,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
-            pred_h = h(X)
 
             if t == 0:
                 if self._nu is None:
-                    self._nu = _ACCURACY_MUL * (pred_h - y_train).abs().std() / np.sqrt(n)
+                    self._nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
                 eta_min = self._nu / (2 * B)
                 eta = self._eta_mul / B
                 logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
@@ -135,12 +134,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 Qs.append(Q_LP)
                 gaps.append(gap_LP)
 
-            logger.debug("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
-                         ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f",
-                         _INDENTATION, eta, result_EG.L_low,
-                         result_EG.L, result_EG.L_high,
-                         gap_EG, result_EG.gamma.max(),
-                         result_EG.error, gap_LP)
+            logger.debug("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f, gap=%.6f, disp=%.3f, "
+                         "err=%.3f, gap_LP=%.6f",
+                         _INDENTATION, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
+                         gap_EG, result_EG.gamma.max(), result_EG.error, gap_LP)
 
             if (gaps[t] < self._nu) and (t >= _MIN_T):
                 # solution found
