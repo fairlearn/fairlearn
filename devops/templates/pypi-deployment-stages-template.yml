@@ -97,47 +97,23 @@ stages:
 - stage: 'Validate_Package_from_PyPI_${{parameters.targetType}}'
   
   jobs:
-  - template: unit-tests-pypi-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
-      name: Linux
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
+      platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+      freezeFileStem: ${{parameters.freezeFileStem}}
+      installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'
 
-  - template: unit-tests-pypi-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
-      name: Windows
-      vmImage: 'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7]
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      installationType: 'PyPI'
       targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-
-  - template: unit-tests-pypi-job-template.yml
-    parameters:
-      name: MacOS
-      vmImage: 'macos-latest'
-      pyVersions: [3.6, 3.7]
-      targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-
-  - template: notebook-pypi-job-template.yml
-    parameters:
-      name: LinuxNotebooks
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
-      targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
-
-  - template: notebook-pypi-job-template.yml
-    parameters:
-      name: WindowsNotebooks
-      vmImage: 'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7]
-      targetType: ${{parameters.targetType}}
-      versionFileArtifact: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
-      versionFileName: '${{parameters.versionFileStem}}${{parameters.targetType}}'
+      versionArtifactName: '${{parameters.versionArtifactStem}}${{parameters.targetType}}'
+      versionArtifactFile: '${{parameters.versionFileStem}}${{parameters.targetType}}'

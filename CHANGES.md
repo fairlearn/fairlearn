@@ -1,16 +1,40 @@
 # Changes
 
+### v0.4.6
+* Refactoring of metrics:
+  * Remove `GroupMetricResult` type in favour of a `Bunch`.
+  * Add `group_summary` transformers.
+* Fix warning due to changing default `dtype` when creating an empty
+  `pandas.Series`.
+* Enable `GridSearch` for more than two sensitive features values.
+
 ### v0.4.5
-* Separate plotting for `ThresholdOptimizer` into its own plotting function.
-* `ThresholdOptimizer` now performs validations during `fit`, and not during
-  `__init__`. It also stores the fitted given estimator in the `estimator_`
-  attribute.
-* Rename arguments of `create_group_metric_set()` to match the dashboard
+* Changes to `ThresholdOptimizer`:
+  * Separate plotting for `ThresholdOptimizer` into its own plotting function.
+  * `ThresholdOptimizer` now performs validations during `fit`, and not during
+    `__init__`. It also stores the fitted given estimator in the `estimator_`
+    attribute.
+  * `ThresholdOptmizer` is now a scikit-learn meta-estimator, and accepts
+    an estimator through the `estimator` parameter. To use a pre-fitted
+    estimator, pass `prefit=True`.
+* Made `_create_group_metric_set_()` private by prepending with `_`.
+  Also changed the arguments, so that this routine requires
+  dictionaries for the predictions and sensitive features. This is a
+  breaking change.
+* Remove `Reduction` base class for reductions methods and replace it with
+  `sklearn.base.BaseEstimator` and `sklearn.base.MetaEstimatorMixin`.
+* Remove `ExponentiatedGradientResult` and `GridSearchResult` in favor of
+  storing the values and objects resulting from fitting the meta-estimator
+  directly in the `ExponentiatedGradient` and `GridSearch` objects,
+  respectively.
+* Fix regression in input validation that dropped metadata from `X` if it is
+  provided as a `pandas.DataFrame`.
 
 ### v0.4.4
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
 * Add basic support for multiple sensitive features
 * Refactor `ThresholdOptimizer` to use mixins from scikit-learn
+* Adjust `scipy`, `scikit-learn`, and `matplotlib` requirements to support python 3.8
 
 ### v0.4.3
 

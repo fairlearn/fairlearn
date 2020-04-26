@@ -4,25 +4,16 @@
 import logging
 import numpy as np
 import pandas as pd
-from fairlearn.reductions import Reduction
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
-from ._exponentiated_gradient_result import ExponentiatedGradientResult
 from fairlearn._input_validation import _validate_and_reformat_input
 
 logger = logging.getLogger(__name__)
 
 
-def _mean_pred(X, hs, weights):
-    """Return a weighted average of predictions produced by classifiers in `hs`."""
-    pred = pd.DataFrame()
-    for t in range(len(hs)):
-        pred[t] = hs[t](X)
-    return pred[weights.index].dot(weights)
-
-
-class ExponentiatedGradient(Reduction):
+class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """An Estimator which implements the exponentiated gradient approach to reductions.
 
     The exponentiated gradient algorithm is described in detail by
@@ -37,9 +28,9 @@ class ExponentiatedGradient(Reduction):
     :param constraints: The disparity constraints expressed as moments
     :type constraints: fairlearn.reductions.Moment
 
-    :param eps: Allowed fairness constraint violation; the solution best_classifier is
-        guaranteed to have the classification error within :code:`2*best_gap` of the best error
-        under constraint eps; the constraint violation is at most :code:`2*(eps+best_gap)`
+    :param eps: Allowed fairness constraint violation; the solution is guaranteed to have the
+        error within :code:`2*best_gap` of the best error under constraint eps; the constraint
+        violation is at most :code:`2*(eps+best_gap)`
     :type eps: float
 
     :param T: Maximum number of iterations
@@ -61,8 +52,16 @@ class ExponentiatedGradient(Reduction):
         self._T = T
         self._nu = nu
         self._eta_mul = eta_mul
-        self._best_classifier = None
-        self._classifiers = None
+
+        self._best_gap = None
+        self._predictors = None
+        self._weights = None
+        self._last_t = None
+        self._best_t = None
+        self._n_oracle_calls = 0
+        self._oracle_execution_times = None
+        self._lambda_vecs = pd.DataFrame()
+        self._lambda_vecs_LP = pd.DataFrame()
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -73,19 +72,18 @@ class ExponentiatedGradient(Reduction):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        X_train, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
+        _, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
 
-        n = X_train.shape[0]
+        n = y_train.shape[0]
 
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self._eps
-        lagrangian = _Lagrangian(X_train, A, y_train, self._estimator, self._constraints,
+        lagrangian = _Lagrangian(X, A, y_train, self._estimator, self._constraints,
                                  self._eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
-        Qsum = pd.Series()
-        lambdas = pd.DataFrame()
+        Qsum = pd.Series(dtype="float64")
         gaps_EG = []
         gaps = []
         Qs = []
@@ -97,12 +95,12 @@ class ExponentiatedGradient(Reduction):
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
-            lambdas[t] = lambda_vec
-            lambda_EG = lambdas.mean(axis=1)
+            self._lambda_vecs[t] = lambda_vec
+            lambda_EG = self._lambda_vecs.mean(axis=1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
-            pred_h = h(X_train)
+            pred_h = h(X)
 
             if t == 0:
                 if self._nu is None:
@@ -126,7 +124,7 @@ class ExponentiatedGradient(Reduction):
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, _, result_LP = lagrangian.solve_linprog(self._nu)
+                Q_LP, self._lambda_vecs_LP[t], result_LP = lagrangian.solve_linprog(self._nu)
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
@@ -160,10 +158,27 @@ class ExponentiatedGradient(Reduction):
             # update theta based on learning rate
             theta += eta * (gamma - self._eps)
 
-        self._expgrad_result = self._format_results(gaps, Qs, lagrangian, B, eta_min)
+        # retain relevant result data
+        gaps_series = pd.Series(gaps)
+        gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
+        self._best_t = gaps_best.index[-1]
+        self._best_gap = gaps[self._best_t]
+        self._weights = Qs[self._best_t]
+        self._hs = lagrangian.hs
+        for h_idx in self._hs.index:
+            if h_idx not in self._weights.index:
+                self._weights.at[h_idx] = 0.0
 
-        self._best_classifier = self._expgrad_result._best_classifier
-        self._classifiers = self._expgrad_result._classifiers
+        self._last_t = len(Qs) - 1
+        self._predictors = lagrangian.classifiers
+        self._n_oracle_calls = lagrangian.n_oracle_calls
+        self._oracle_execution_times = lagrangian.oracle_execution_times
+
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
+                     self._eps, B, self._nu, self._T, eta_min)
+        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
+                     self._last_t, self._best_t, self._best_gap, lagrangian.n_oracle_calls,
+                     len(lagrangian.classifiers))
 
     def predict(self, X):
         """Provide a prediction for the given input data.
@@ -178,47 +193,19 @@ class ExponentiatedGradient(Reduction):
             the result will be a scalar. Otherwise the result will be a vector
         :rtype: Scalar or vector
         """
-        positive_probs = self._best_classifier(X)
+        positive_probs = self._pmf_predict(X)[:, 1]
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
 
-        :param X: The data for which predictions are required
-        :type X: Array
+        :param X: Feature data
+        :type X: numpy.ndarray or pandas.DataFrame
         :return: Array of tuples with the probabilities of predicting 0 and 1.
-        :rtype: Array
+        :rtype: pandas.DataFrame
         """
-        positive_probs = self._best_classifier(X)
+        pred = pd.DataFrame()
+        for t in range(len(self._hs)):
+            pred[t] = self._hs[t](X)
+        positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
-
-    def _format_results(self, gaps, Qs, lagrangian, B, eta_min):
-        gaps_series = pd.Series(gaps)
-        gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
-        best_t = gaps_best.index[-1]
-        weights = Qs[best_t]
-        hs = lagrangian.hs
-        for h_idx in hs.index:
-            if h_idx not in weights.index:
-                weights.at[h_idx] = 0.0
-
-        def best_classifier(X): return _mean_pred(X, hs, weights)
-        best_gap = gaps[best_t]
-
-        last_t = len(Qs) - 1
-
-        result = ExponentiatedGradientResult(
-            best_classifier,
-            best_gap,
-            lagrangian,
-            weights,
-            last_t,
-            best_t)
-
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
-                     self._eps, B, self._nu, self._T, eta_min)
-        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
-                     last_t, best_t, best_gap, lagrangian.n_oracle_calls,
-                     len(lagrangian.classifiers))
-
-        return result

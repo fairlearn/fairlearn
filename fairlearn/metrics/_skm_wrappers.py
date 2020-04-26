@@ -3,7 +3,7 @@
 
 import sklearn.metrics as skm
 from math import sqrt
-from ._metrics_engine import make_group_metric, metric_by_group
+from ._metrics_engine import make_group_metric, group_summary
 
 
 group_accuracy_score = make_group_metric(skm.accuracy_score)
@@ -49,8 +49,8 @@ def group_root_mean_squared_error(y_true, y_pred, group_membership, *,
                                            multioutput=multioutput,
                                            sample_weight=sample_weight))
 
-    return metric_by_group(internal_rmse_wrapper,
-                           y_true, y_pred, group_membership, sample_weight=sample_weight)
+    return group_summary(internal_rmse_wrapper,
+                         y_true, y_pred, group_membership, sample_weight=sample_weight)
 
 
 group_r2_score = make_group_metric(skm.r2_score)

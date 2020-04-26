@@ -60,6 +60,7 @@ export class FairlearnView extends DOMWidgetView {
             predictedY={data.predicted_ys}
             trueY={data.true_y}
             modelNames={data.model_names}
+            customMetrics={[]}
             supportedBinaryClassificationAccuracyKeys={data.classification_methods}
             supportedRegressionAccuracyKeys={data.regression_methods}
             supportedProbabilityAccuracyKeys={data.probability_methods}

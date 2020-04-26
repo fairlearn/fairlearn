@@ -14,9 +14,6 @@
 # candidates' so that minor fixes can be made without requiring a separate checkin
 # to release to PyPI itself. See the logic in __init__.py
 
-# TODO:
-# Use Azure KeyVault so that uploads to PyPI actually occur
-
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
@@ -35,39 +32,20 @@ stages:
   jobs:
   - template: templates/all-tests-job-template.yml
     parameters:
-      name: Linux
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
-      freezeArtifactStem: "PreDeployment"
-      freezeFileStem: $(FreezeFileStem)
-
-  - template: templates/all-tests-job-template.yml
-    parameters:
-      name: Windows
-      vmImage:  'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7]
+      platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      installationType: 'PipLocal'
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
       
   - template: templates/all-tests-job-template.yml
     parameters:
-      name: MacOS
-      vmImage:  'macos-latest'
-      pyVersions: [3.5, 3.6, 3.7] 
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      installationType: 'None'
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
       freezeArtifactStem: "PreDeployment"
       freezeFileStem: $(FreezeFileStem)
-
-  - template: templates/notebook-job-template.yml
-    parameters:
-      name: LinuxNotebooks
-      vmImage: 'ubuntu-16.04'
-      pyVersions: [3.5, 3.6, 3.7]
-
-  - template: templates/notebook-job-template.yml
-    parameters:
-      name: WindowsNotebooks
-      vmImage: 'vs2017-win2016'
-      pyVersions: [3.5, 3.6, 3.7] 
   
   - template: templates/limited-installation-job-template.yml
 

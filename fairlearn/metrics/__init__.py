@@ -43,9 +43,9 @@ from ._skm_wrappers import group_median_absolute_error  # noqa: F401
 from ._skm_wrappers import group_root_mean_squared_error  # noqa: F401
 from ._skm_wrappers import group_r2_score  # noqa: F401
 
-from ._group_metric_result import GroupMetricResult  # noqa: F401
-from ._group_metric_set import create_group_metric_set  # noqa: F401
-from ._metrics_engine import make_group_metric, metric_by_group  # noqa: F401
+from ._metrics_engine import make_group_metric, group_summary  # noqa: F401
+from ._metrics_engine import group_min_from_summary, group_max_from_summary  # noqa: F401
+from ._metrics_engine import difference_from_summary, ratio_from_summary  # noqa: F401
 
 # -------------------------------------------
 
@@ -87,7 +87,11 @@ _group_metrics = [
 _engine = [
     "GroupMetricResult",
     "make_group_metric",
-    "metric_by_group"
+    "group_summary",
+    "group_min_from_summary",
+    "group_max_from_summary",
+    "difference_from_summary",
+    "ratio_from_summary"
 ]
 
 
