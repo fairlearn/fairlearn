@@ -32,13 +32,14 @@ parameters:
 
 stages:
 - stage: ${{parameters.stageName}}
-  displayName: Upload Wheel to PyPI (${{parameters.releaseType}})
+  displayName: Upload Wheel to PyPI (${{parameters.releaseType}}) and test
   dependsOn: ${{parameters.previousStages}}
   pool:
     vmImage: ${{parameters.poolImage}}
 
   jobs:
   - deployment: 'PyPI_${{parameters.releaseType}}_Upload'
+    displayName: PyPI ${{parameters.releaseType}} Upload
     ${{ if eq(parameters.releaseType, 'Test')}}:
       environment: 'PyPI-Test Deployment'
     ${{ if eq(parameters.releaseType, 'Production')}}:
@@ -80,10 +81,16 @@ stages:
               # Quote the password argument in case it contains characters the shell might try to parse
               - script: 'twine upload --verbose --repository-url ${{parameters.pypiUrl}} -u $(usernametest) -p "$(passwordtest)" $(Pipeline.Workspace)/${{parameters.packageArtifactName}}/*'
                 displayName: "Run twine for upload"
+
+            - ${{ if in(parameters.releaseType, 'Prod', 'Production')}}:
+              # Quote the password argument in case it contains characters the shell might try to parse
+              - script: 'twine upload --verbose --repository-url ${{parameters.pypiUrl}} -u $(usernameprod) -p "$(passwordprod)" $(Pipeline.Workspace)/${{parameters.packageArtifactName}}/*'
+                displayName: "Run twine for upload"
   
   - job: PyPI_Pause
     pool: server
     dependsOn: 'PyPI_${{parameters.releaseType}}_Upload'
+    displayName: PyPI Pause
 
     steps:
     - task: Delay@1
