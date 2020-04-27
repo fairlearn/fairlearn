@@ -95,6 +95,8 @@ stages:
               # Quote the password argument in case it contains characters the shell might try to parse
               - script: 'twine upload --verbose --repository-url ${{parameters.pypiUrl}} -u $(usernameprod) -p "$(passwordprod)" $(Pipeline.Workspace)/${{parameters.packageArtifactName}}/*'
                 displayName: "Run twine for upload"
+
+          # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention
   
   - job: PyPI_Pause
     pool: server
