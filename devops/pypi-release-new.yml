@@ -31,20 +31,12 @@ pr: none # Not for pull requests
 # ==============================================
 
 stages:
-- stage: PredeploymentValidation
-  displayName: Predeployment Validation
-  pool:
-    vmImage: $(PoolImage)
-    
-  jobs:
-  - job: Placeholder
-    pool: server
-
-    steps:
-    - task: Delay@1
-      displayName: "Placeholder Pause"
-      inputs:
-        delayForMinutes: "0"
+- template: templates/predeployment-validation-stage-template.yml
+  parameters:
+    stageName: PredeploymentValidation
+    poolImage: $(PoolImage)
+    freezeArtifactStem: PredeploymentValidationFreeze
+    freezeFileStem: predeploy-requirements-freeze
 
 # ==============================================
 
