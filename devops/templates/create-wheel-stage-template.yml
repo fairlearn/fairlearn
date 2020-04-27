@@ -1,3 +1,9 @@
+# Stage template to create a Wheel file
+
+# Creates a Wheel and stores it in a specified Artifact. At the
+# same time, it also extracts the version information, and places
+# that in a separate Artifact (used later to download from PyPI)
+
 parameters:
 - name: stageName
   type: string

@@ -1,3 +1,7 @@
+# Predeployment Validation Template
+
+# Runs tests against the checked out repository
+
 parameters:
 - name: stageName
   type: string

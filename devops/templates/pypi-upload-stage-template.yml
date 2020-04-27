@@ -1,3 +1,12 @@
+# Stage template for uploading to PyPI
+
+# This requires that a wheel is available in an Artifact, and uploads
+# it to Test or Prod PyPI as required. Secrets are retrieved from KeyVault
+# using a service connection
+
+# After the upload, there is a pause enforced, to allow the uploaded package
+# to propagate across the PyPI mirrors.
+
 parameters:
 - name: stageName
   type: string

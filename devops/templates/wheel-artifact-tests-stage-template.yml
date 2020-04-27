@@ -1,3 +1,9 @@
+# Template to test a Wheel from an Artifact
+
+# This looks downloads a specified Artifact which is assumed to
+# contain a single `.whl`. This is installed using pip, and then
+# tests run against this installation.
+
 parameters:
 - name: stageName
   type: string
