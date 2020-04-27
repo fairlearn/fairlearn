@@ -3,7 +3,7 @@ jobs:
     docker:
       - image: circleci/python:3.7.3-stretch
 
-    working_directory: /tmp
+    working_directory: /tmp-fairlearn
     steps:
       - checkout
 
