@@ -3,8 +3,8 @@
 
 """Utilities for plotting curves."""
 
-from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE, DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
-from ._threshold_optimizer import ThresholdOptimizer, SUPPORTED_CONSTRAINTS
+from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+from ._threshold_optimizer import ThresholdOptimizer, SIMPLE_CONSTRAINTS
 
 
 def _get_debug_color(key):
@@ -80,16 +80,16 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
 
     _raise_if_not_threshold_optimizer(threshold_optimizer)
 
-    if threshold_optimizer.constraints == DEMOGRAPHIC_PARITY:
-        for sensitive_feature_value in threshold_optimizer._selection_error_curve.keys():
-            _plot_curve(ax, sensitive_feature_value, 'selection', 'error',
-                        threshold_optimizer._selection_error_curve[sensitive_feature_value])
+    if threshold_optimizer.constraints in SIMPLE_CONSTRAINTS:
+        for sensitive_feature_value in threshold_optimizer._tradeoff_curve.keys():
+            _plot_curve(ax, sensitive_feature_value, 'x', 'y',
+                        threshold_optimizer._tradeoff_curve[sensitive_feature_value])
 
         if ax is None:
             ax = plt.figure()
-        _plot_solution(ax, threshold_optimizer._x_best, None, "DP solution",
-                       "selection rate", "error")
-    elif threshold_optimizer.constraints == EQUALIZED_ODDS:
+        _plot_solution(ax, threshold_optimizer._x_best, None, "Solution",
+                       threshold_optimizer.constraints, threshold_optimizer.objective)
+    elif threshold_optimizer.constraints == "equalized_odds":
         for sensitive_feature_value in threshold_optimizer._roc_curve.keys():
             _plot_curve(ax, sensitive_feature_value, 'x', 'y',
                         threshold_optimizer._roc_curve[sensitive_feature_value])
@@ -98,11 +98,11 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
             ax = plt.figure()
         _plot_overlap(ax, threshold_optimizer._x_grid, threshold_optimizer._y_min)
         _plot_solution(ax, threshold_optimizer._x_best, threshold_optimizer._y_best,
-                       'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
+                       'Solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
     else:
         raise ValueError("The plot can only be generated for a ThresholdOptimizer "
-                         "object with constraints from: {}."
-                         .format(", ".join(SUPPORTED_CONSTRAINTS)))
+                         "object with constraints from: {}, equalized_odds."
+                         .format(", ".join(SIMPLE_CONSTRAINTS)))
 
     if show_plot:
         plt.show()

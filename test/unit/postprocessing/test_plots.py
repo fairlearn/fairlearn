@@ -6,7 +6,6 @@ import platform
 import pytest
 import sys
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
-from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 
 from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3
 
@@ -54,24 +53,24 @@ def is_py35_on_macos():
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex1.png")
     def test_plot_equalized_odds_ex1(self):
-        return _fit_and_plot(EQUALIZED_ODDS, _data_ex1)
+        return _fit_and_plot('equalized_odds', _data_ex1)
 
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex2.png")
     def test_plot_equalized_odds_ex2(self):
-        return _fit_and_plot(EQUALIZED_ODDS, _data_ex2)
+        return _fit_and_plot('equalized_odds', _data_ex2)
 
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex3.png")
     def test_plot_equalized_odds_ex3(self):
-        return _fit_and_plot(EQUALIZED_ODDS, _data_ex3)
+        return _fit_and_plot('equalized_odds', _data_ex3)
 
     @pytest.mark.mpl_image_compare(filename="demographic_parity_ex1.png")
     def test_plot_demographic_parity_ex1(self):
-        return _fit_and_plot(DEMOGRAPHIC_PARITY, _data_ex1)
+        return _fit_and_plot('demographic_parity', _data_ex1)
 
     @pytest.mark.mpl_image_compare(filename="demographic_parity_ex2.png")
     def test_plot_demographic_parity_ex2(self):
-        return _fit_and_plot(DEMOGRAPHIC_PARITY, _data_ex2)
+        return _fit_and_plot('demographic_parity', _data_ex2)
 
     @pytest.mark.mpl_image_compare(filename="demographic_parity_ex3.png")
     def test_plot_demographic_parity_ex3(self):
-        return _fit_and_plot(DEMOGRAPHIC_PARITY, _data_ex3)
+        return _fit_and_plot('demographic_parity', _data_ex3)

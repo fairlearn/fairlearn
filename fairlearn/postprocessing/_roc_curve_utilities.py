@@ -4,13 +4,52 @@
 import numpy as np
 import pandas as pd
 
+from sklearn.utils import Bunch
+
 from ._constants import (
-    LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY,
-    METRIC_DICT,
-    confusion_matrix_summary)
+    LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY)
 from ._threshold_operation import ThresholdOperation
 
 DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
+
+# Dictionary of metrics based on confusion matrix. Their input must be a Bunch with the fields
+# named n, positives, negatives, predicted_positives, predicted_negatives, true_positives,
+# true_negatives, false_positives, false_negatives. The fields indicate the counts. They can all
+# be numpy arrays of the same length. Metrics are expected to return NaN where undefined.
+METRIC_DICT = {
+    'selection_rate': (
+        lambda x: x.predicted_positives / x.n),
+    'demographic_parity': (
+        lambda x: x.predicted_positives / x.n),
+    'false_positive_rate': (
+        lambda x: x.false_positives / x.negatives),
+    'false_negative_rate': (
+        lambda x: x.false_negatives / x.positives),
+    'true_positive_rate': (
+        lambda x: x.true_positives / x.positives),
+    'true_negative_rate': (
+        lambda x: x.true_negatives / x.negatives),
+    'accuracy_score': (
+        lambda x: (x.true_positives + x.true_negatives) / x.n),
+    'balanced_accuracy_score': (
+        lambda x: x.true_positives / x.positives + x.true_negatives / x.negatives),
+}
+
+
+def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives, false_negatives):
+    """Return the Bunch with the fields required for confusion-matrix metrics."""
+
+    return Bunch(
+        true_positives = true_positives,
+        false_positives = false_positives,
+        true_negatives = true_negatives,
+        false_negatives = false_negatives,
+        predicted_positives = true_positives + false_positives,
+        predicted_negatives = true_negatives + false_negatives,
+        positives = true_positives + false_negatives,
+        negatives = true_negatives + false_positives,
+        n = true_positives + true_negatives + false_positives + false_negatives,
+    )
 
 
 def _get_roc(data, sensitive_feature_value, flip=False,
@@ -177,12 +216,12 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=False,
         # the conditional probability P[Y_hat=1 | Y=1]. The conditional
         # probability is achieved by dividing by only the number of
         # negative/positive samples.
-        actual_counts = confusion_matrix_summary(
+        actual_counts = _extend_confusion_matrix(
             false_positives = count[0],
             true_positives = count[1],
             true_negatives = n_negative - count[0],
             false_negatives = n_positive - count[1]) 
-        flipped_counts = confusion_matrix_summary(
+        flipped_counts = _extend_confusion_matrix(
             false_positives = n_negative - count[0],
             true_positives = n_positive - count[1],
             true_negatives = count[0],
