@@ -7,11 +7,11 @@ jobs:
     steps:
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: python -m pip install --upgrade pip setuptools wheel
+          command: sudo python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
-          command: pip install -r requirements.txt
+          command: sudo pip install -r requirements.txt
       
       - run:
           name: 'Build'
@@ -19,4 +19,3 @@ jobs:
 
       - store_artifacts:
           path: /docs/_build/html
-          
