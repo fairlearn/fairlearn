@@ -1,7 +1,12 @@
 name: build website
 
-# TODO modify trigger
-on: push
+on:
+  pull_request:
+    branches:
+    - master
+  push:
+    branches:
+    - master
 
 jobs:
   publish:
@@ -25,8 +30,18 @@ jobs:
     - name: Build
       run: python -m sphinx -b html -j auto docs docs/_build/html
 
+    - name: Upload build files as artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: build
+        path: docs/_build
+
     - name: Deploy
-      if: success()
+      # Only deploy webpage if previous steps succeeded and this is a push
+      # event as opposed to a pull_request event. We filter for the master
+      # branch through triggers in this file, so only push events to the
+      # master branch are relevant. 
+      if: success() && ${{ github.event_name }} == 'push'
       # for more information refer to GitHub Action's documentation at:
       # https://github.com/marketplace/actions/github-pages
       uses: crazy-max/ghaction-github-pages@v1
