@@ -9,30 +9,30 @@ parameters:
 - name: freezeFileStem
   type: string
 
-  stages:
-  - stage: ${{parameters.stageName}}
-    displayName: Predeployment Validation
-    pool:
-      vmImage: ${{parameters.poolImage}}
+stages:
+- stage: ${{parameters.stageName}}
+  displayName: Predeployment Validation
+  pool:
+    vmImage: ${{parameters.poolImage}}
 
-    jobs:
-    - template: templates/all-tests-job-template.yml
-      parameters:
-        platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
-        installationType: 'PipLocal'
-        pyVersions: [3.5, 3.6, 3.7, 3.8]
-        freezeArtifactStem: ${{parameters.freezeArtifactStem}}
-        freezeFileStem: ${{parameters.freezeFileStem}}
-        
-    - template: templates/all-tests-job-template.yml
-      parameters:
-        platforms: { MacOS: macos-latest }
-        testRunTypes: ['Unit']
-        installationType: 'None'
-        pyVersions: [3.5, 3.6, 3.7, 3.8]
-        freezeArtifactStem: ${{parameters.freezeArtifactStem}}
-        freezeFileStem: ${{parameters.freezeFileStem}}
+  jobs:
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      installationType: 'PipLocal'
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+      freezeFileStem: ${{parameters.freezeFileStem}}
+      
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      installationType: 'None'
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+      freezeFileStem: ${{parameters.freezeFileStem}}
 
-    - template: templates/build-widget-job-template.yml
+  - template: templates/build-widget-job-template.yml
 
-    - template: templates/limited-installation-job-template.yml
+  - template: templates/limited-installation-job-template.yml
