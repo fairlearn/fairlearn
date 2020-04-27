@@ -1,7 +1,8 @@
 # This CircleCI workflow builds our documentation into HTML pages.
 # The generated pages are viewable as artifacts in CircleCI.
 # CircleCI can be run on PRs from forks & allows viewing stored artifacts
-# without download.
+# without download. Azure Pipelines and GitHub Actions currently don't
+# support certain actions on PRs from forks so we can't use them for this.
 
 version: 2.0
 
