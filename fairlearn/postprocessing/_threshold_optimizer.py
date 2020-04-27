@@ -16,7 +16,7 @@ import pandas as pd
 from warnings import warn
 
 from sklearn import clone
-from sklearn.base import BaseEstimator, ClassifierMixin, MetaEstimatorMixin
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import Bunch
@@ -172,7 +172,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             threshold_optimization_method = self._threshold_optimization_for_simple_constraints
 
         self.interpolated_thresholder_ = threshold_optimization_method(
-            sensitive_feature_vector, y, scores, self.constraints, self.objective, self.grid_size, self.flip)
+            sensitive_feature_vector, y, scores,
+            self.constraints, self.objective, self.grid_size, self.flip)
         return self
 
     def predict(self, X, *, sensitive_features, random_state=None):
@@ -191,7 +192,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         check_is_fitted(self)
         return self.interpolated_thresholder_.predict(
             X, sensitive_features=sensitive_features, random_state=random_state)
-        
+
     def _pmf_predict(self, X, *, sensitive_features):
         """Probabilistic mass function.
 
@@ -208,14 +209,14 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         check_is_fitted(self)
         return self.interpolated_thresholder_._pmf_predict(
             X, sensitive_features=sensitive_features)
-        
-    def _threshold_optimization_for_simple_constraints(
-        self, sensitive_features, labels, scores,
-        constraints, objective, grid_size=1000, flip=False):
+
+    def _threshold_optimization_for_simple_constraints(self, sensitive_features, labels, scores,
+                                                       constraints, objective,
+                                                       grid_size=1000, flip=False):
         """Calculate the objective value across all values of constraints.
 
-        These calculations are made at different
-        thresholds over the scores. Subsequently weighs each sensitive feature value's objective by the
+        These calculations are made at different thresholds over the scores. Subsequently weighs
+        each sensitive feature value's objective by the
         frequency of the sensitive feature value in the data. The maximum objective point is the
         selected solution, which is recreated by interpolating between two points on the convex
         hull of all solutions. Each sensitive feature value has its own predictor in the resulting
@@ -224,8 +225,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         This method assumes that sensitive_features, labels, and scores are non-empty data
         structures of equal length, and labels contains only binary labels 0 and 1.
 
-        :param sensitive_features: the feature data that determines the groups for which the parity
-            constraints are enforced
+        :param sensitive_features: the feature data that determines the groups for which
+            the parity constraints are enforced
         :type sensitive_features: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
         :param labels: the labels of the dataset
         :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
@@ -298,9 +299,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         return InterpolatedThresholder(
             self.estimator_, interpolation_dict, prefit=True).fit(None, None)
         
-    def _threshold_optimization_for_equalized_odds(
-        self, sensitive_features, labels, scores,
-        constraints, objective, grid_size=1000, flip=False):
+    def _threshold_optimization_for_equalized_odds(self, sensitive_features, labels, scores,
+                                                   constraints, objective,
+                                                   grid_size=1000, flip=False):
         """Calculate the ROC curve of every sensitive feature value at different thresholds.
 
         Subsequently takes the overlapping region of the ROC curves, and finds the best
@@ -358,10 +359,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         # Calculate the confusion matrix counts based on the false positive rate
         # (along the x axis) and the true positive rate (along the y axis).
         counts = _extend_confusion_matrix(
-            false_positives = n_negative * self._x_grid,
-            true_negatives = n_negative * (1.0 - self._x_grid),
-            true_positives = n_positive * self._y_min,
-            false_negatives = n_positive * (1.0 - self._y_min)
+            false_positives=(n_negative * self._x_grid),
+            true_negatives=(n_negative * (1.0 - self._x_grid)),
+            true_positives=(n_positive * self._y_min),
+            false_negatives=(n_positive * (1.0 - self._y_min))
         )
         objective_values = np.around(METRIC_DICT[objective](counts), 15)
         # Calculate the error at any given x as the sum of

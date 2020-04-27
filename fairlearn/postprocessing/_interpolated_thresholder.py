@@ -7,7 +7,7 @@ import random
 from warnings import warn
 
 from sklearn import clone
-from sklearn.base import BaseEstimator, ClassifierMixin, MetaEstimatorMixin
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 from fairlearn._input_validation import _validate_and_reformat_input
@@ -22,15 +22,17 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
     At prediction time, the predictor takes as input both standard and sensitive features.
     Based on the values of sensitive features, it then applies a randomized thresholding
     transformation according to the provided `interpolation_dict`.
-    
+
     :param estimator: base estimator
     :param dict interpolation_dict: maps sensitive feature values to `Bunch` that describes the
         interpolation transformation via the following fields:
+
         - p0, operation0: with probability p0, operation0 is executed
         - p1, operation1: with probability p1, operation1 is executed
         - p_ignore, prediction_constant: two optional fields; if present then the result of
           the draw of operation0 or operation1 is kept with probability 1 - p_ignore, and gets
           replaced by prediction_constant with probability p_ignore.
+
         The numbers p0 and p1 must be non-negative and add up to 1, operation0 and
         operation1 must be instances of :class:`ThresholdOperation`, and p_ignore must be
         between 0 and 1.
@@ -50,7 +52,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         """
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
-        
+
         if not self.prefit:
             self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
         else:
@@ -79,7 +81,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             X, y=None, sensitive_features=sensitive_features, expect_y=False,
             enforce_binary_labels=True)
         base_predictions = np.array(self.estimator_.predict(X))
-        
+
         positive_probs = 0.0*base_predictions
         for a, interpolation in self.interpolation_dict.items():
             interpolated_predictions = \
@@ -92,7 +94,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             positive_probs[sensitive_feature_vector == a] = \
                 interpolated_predictions[sensitive_feature_vector == a]
         return np.array([1.0 - positive_probs, positive_probs]).transpose()
-        
+
     def predict(self, X, *, sensitive_features, random_state=None):
         """Provide a prediction for the given input data.
 

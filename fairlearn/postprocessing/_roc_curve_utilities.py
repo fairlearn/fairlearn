@@ -38,17 +38,16 @@ METRIC_DICT = {
 
 def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives, false_negatives):
     """Return the Bunch with the fields required for confusion-matrix metrics."""
-
     return Bunch(
-        true_positives = true_positives,
-        false_positives = false_positives,
-        true_negatives = true_negatives,
-        false_negatives = false_negatives,
-        predicted_positives = true_positives + false_positives,
-        predicted_negatives = true_negatives + false_negatives,
-        positives = true_positives + false_negatives,
-        negatives = true_negatives + false_positives,
-        n = true_positives + true_negatives + false_positives + false_negatives,
+        true_positives=true_positives,
+        false_positives=false_positives,
+        true_negatives=true_negatives,
+        false_negatives=false_negatives,
+        predicted_positives=(true_positives + false_positives),
+        predicted_negatives=(true_negatives + false_negatives),
+        positives=(true_positives + false_negatives),
+        negatives=(true_negatives + false_positives),
+        n=(true_positives + true_negatives + false_positives + false_negatives),
     )
 
 
@@ -210,22 +209,22 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=False,
                 count[labels[i]] += 1
                 i += 1
             threshold = (threshold + scores[i]) / 2
-        
+
         # For the ROC curve we calculate points (x, y), where x represents
         # the conditional probability P[Y_hat=1 | Y=0] and y represents
         # the conditional probability P[Y_hat=1 | Y=1]. The conditional
         # probability is achieved by dividing by only the number of
         # negative/positive samples.
         actual_counts = _extend_confusion_matrix(
-            false_positives = count[0],
-            true_positives = count[1],
-            true_negatives = n_negative - count[0],
-            false_negatives = n_positive - count[1]) 
+            false_positives=count[0],
+            true_positives=count[1],
+            true_negatives=(n_negative - count[0]),
+            false_negatives=(n_positive - count[1]))
         flipped_counts = _extend_confusion_matrix(
-            false_positives = n_negative - count[0],
-            true_positives = n_positive - count[1],
-            true_negatives = count[0],
-            false_negatives = count[1])
+            false_positives=(n_negative - count[0]),
+            true_positives=(n_positive - count[1]),
+            true_negatives=count[0],
+            false_negatives=count[1])
         if flip:
             operations = [('>', actual_counts), ('<', flipped_counts)]
         else:
@@ -238,7 +237,7 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=False,
             x_list.append(x)
             y_list.append(y)
             operation_list.append(operation)
-        
+
     return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}) \
         .sort_values(by=['x', 'y'], ignore_index=True)
 
