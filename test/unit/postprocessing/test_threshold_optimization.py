@@ -25,6 +25,7 @@ from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
 from test.unit.input_convertors import _map_into_single_column
 import pandas as pd
 
+
 @pytest.mark.parametrize("X_transform", candidate_X_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
 @pytest.mark.parametrize("predict_method_name", ['predict', '_pmf_predict'])
@@ -158,10 +159,11 @@ def test_threshold_optimization_demographic_parity(y_transform,
                                    constraints='demographic_parity',
                                    flip=True)
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
-    
+
     def prob_pred(sensitive_features, scores):
-        return estimator._pmf_predict(pd.DataFrame(scores), sensitive_features=sensitive_features)[0,1]
-        
+        return estimator._pmf_predict(
+            pd.DataFrame(scores), sensitive_features=sensitive_features)[0, 1]
+
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
     # sensitive feature value A
@@ -223,9 +225,10 @@ def test_threshold_optimization_equalized_odds(y_transform,
                                    constraints='equalized_odds',
                                    flip=True)
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
-    
+
     def prob_pred(sensitive_features, scores):
-        return estimator._pmf_predict(pd.DataFrame(scores), sensitive_features=sensitive_features)[0,1]
+        return estimator._pmf_predict(
+            pd.DataFrame(scores), sensitive_features=sensitive_features)[0, 1]
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))

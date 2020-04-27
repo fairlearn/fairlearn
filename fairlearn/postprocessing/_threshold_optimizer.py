@@ -285,10 +285,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             best_interpolation = self._tradeoff_curve[sensitive_feature_value] \
                 .transpose()[i_best]
             interpolation_dict[sensitive_feature_value] = \
-                Bunch(p0 = best_interpolation.p0,
-                      operation0 = best_interpolation.operation0,
-                      p1 = best_interpolation.p1,
-                      operation1 = best_interpolation.operation1)
+                Bunch(p0=best_interpolation.p0,
+                      operation0=best_interpolation.operation0,
+                      p1=best_interpolation.p1,
+                      operation1=best_interpolation.operation1)
 
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("From ROC curves")
@@ -298,7 +298,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         return InterpolatedThresholder(
             self.estimator_, interpolation_dict, prefit=True).fit(None, None)
-        
+
     def _threshold_optimization_for_equalized_odds(self, sensitive_features, labels, scores,
                                                    constraints, objective,
                                                    grid_size=1000, flip=False):
