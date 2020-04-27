@@ -1,10 +1,18 @@
+# This CircleCI workflow builds our documentation into HTML pages.
+# The generated pages are viewable as artifacts in CircleCI.
+# CircleCI can be run on PRs from forks & allows viewing stored artifacts
+# without download.
+
+version: 2.0
+
 jobs:
-  build:
+  build-doc:
     docker:
       - image: circleci/python:3.7.3-stretch
 
     working_directory: ~/tmp-fairlearn
     steps:
+      # check out PR branch
       - checkout
 
       - run:
@@ -21,3 +29,11 @@ jobs:
 
       - store_artifacts:
           path: docs/_build/html
+
+# Adding this workflow specification only to have the check in GitHub show up
+# as "build-webpage" as opposed to "workflow" (default).
+workflows:
+  version: 2
+  build-webpage:
+    jobs:
+      - build-doc
