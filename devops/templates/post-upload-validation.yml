@@ -45,3 +45,14 @@ stages:
       targetType: ${{parameters.releaseType}}
       versionArtifactName: '${{parameters.versionArtifactName}}'
       versionArtifactFile: '${{parameters.versionFileName}}'
+
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+      freezeFileStem: ${{parameters.freezeFileStem}}
+      installationType: 'PyPI'
+      targetType: ${{parameters.releaseType}}
+      versionArtifactName: '${{parameters.versionArtifactName}}'
+      versionArtifactFile: '${{parameters.versionFileName}}'

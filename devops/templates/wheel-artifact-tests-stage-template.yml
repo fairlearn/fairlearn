@@ -27,7 +27,16 @@ stages:
       parameters:
         platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
         installationType: 'WheelArtifact'
-        pyVersions: [3.8]
+        pyVersions: [3.5, 3.6, 3.7, 3.8]
         freezeArtifactStem: ${{parameters.freezeArtifactStem}}
         freezeFileStem: requirements-wheel-test
         wheelArtifactName: ${{parameters.packageArtifactName}}
+    - template: templates/all-tests-job-template.yml
+        parameters:
+          platforms: { MacOS: macos-latest }
+          testRunTypes: ['Unit']
+          installationType: 'WheelArtifact'
+          pyVersions: [3.5, 3.6, 3.7, 3.8]
+          freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+          freezeFileStem: requirements-wheel-test
+          wheelArtifactName: ${{parameters.packageArtifactName}}
