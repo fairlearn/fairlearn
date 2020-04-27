@@ -5,6 +5,8 @@ jobs:
 
     working_directory: /tmp
     steps:
+      - checkout
+
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
           command: sudo python -m pip install --upgrade pip setuptools wheel
