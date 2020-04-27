@@ -40,7 +40,7 @@ jobs:
       uses: pavi2410/html-preview-action@master
       with:
         msg: 'Click here to preview HTML page in browser'
-        html_file: 'index.html'
+        html_file: 'docs/_build/index.html'
         gh_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Deploy
