@@ -35,6 +35,13 @@ jobs:
       with:
         name: build
         path: docs/_build
+    
+    - name: HTML Preview
+      uses: pavi2410/html-preview-action@master
+      with:
+        msg: 'Click here to preview HTML page in browser'
+        html_file: 'index.html'
+        gh_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Deploy
       # Only deploy webpage if previous steps succeeded and this is a push
