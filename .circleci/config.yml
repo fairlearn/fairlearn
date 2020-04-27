@@ -20,4 +20,4 @@ jobs:
           command: python -m sphinx -b html -j auto docs docs/_build/html
 
       - store_artifacts:
-          path: /docs/_build/html
+          path: docs/_build/html
