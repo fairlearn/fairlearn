@@ -1,3 +1,8 @@
+# Stage template to validate uploaded packag from PyPI
+
+# Downloads fairlearn from the specified PyPI (Test or Prod) at the version
+# specified in the Version Artifact. Then runs tests against that install
+
 parameters:
 - name: stageName
   type: string
