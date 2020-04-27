@@ -1,0 +1,21 @@
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7.3-stretch
+
+    working_directory: /tmp
+    steps:
+      - run:
+          name: Upgrade pip, setuptools, and wheel before installing other dependencies
+          command: python -m pip install --upgrade pip setuptools wheel
+      
+      - run:
+          name: 'Install required packages'
+          command: pip install -r requirements.txt
+      
+      - run:
+          name: 'Build'
+          command: python -m sphinx -b html -j auto docs docs/_build/html
+
+      - store_artifacts:
+          path: /docs/_build/html
