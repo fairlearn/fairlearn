@@ -46,7 +46,7 @@ stages:
       versionArtifactName: '${{parameters.versionArtifactName}}'
       versionArtifactFile: '${{parameters.versionFileName}}'
 
-  - template: templates/all-tests-job-template.yml
+  - template: all-tests-job-template.yml
     parameters:
       platforms: { MacOS: macos-latest }
       testRunTypes: ['Unit']

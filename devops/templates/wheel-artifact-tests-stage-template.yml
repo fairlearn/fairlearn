@@ -31,7 +31,8 @@ stages:
         freezeArtifactStem: ${{parameters.freezeArtifactStem}}
         freezeFileStem: requirements-wheel-test
         wheelArtifactName: ${{parameters.packageArtifactName}}
-    - template: templates/all-tests-job-template.yml
+
+    - template: all-tests-job-template.yml
         parameters:
           platforms: { MacOS: macos-latest }
           testRunTypes: ['Unit']
