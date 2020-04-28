@@ -77,16 +77,16 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         :rtype: numpy.ndarray
         """
         check_is_fitted(self)
-        _, _, sensitive_feature_vector = _validate_and_reformat_input(
-            X, y=None, sensitive_features=sensitive_features, expect_y=False,
-            enforce_binary_labels=True)
         base_predictions = np.array(self.estimator_.predict(X))
+        _, base_predictions_vector, sensitive_feature_vector = _validate_and_reformat_input(
+            X, y=base_predictions, sensitive_features=sensitive_features, expect_y=True,
+            enforce_binary_labels=False)
 
-        positive_probs = 0.0*base_predictions
+        positive_probs = 0.0*base_predictions_vector
         for a, interpolation in self.interpolation_dict.items():
             interpolated_predictions = \
-                interpolation.p0 * interpolation.operation0(base_predictions) + \
-                interpolation.p1 * interpolation.operation1(base_predictions)
+                interpolation.p0 * interpolation.operation0(base_predictions_vector) + \
+                interpolation.p1 * interpolation.operation1(base_predictions_vector)
             if 'p_ignore' in interpolation:
                 interpolated_predictions = \
                     interpolation.p_ignore * interpolation.prediction_constant + \

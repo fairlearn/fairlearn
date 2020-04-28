@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from sklearn.base import BaseEstimator
+
 from copy import deepcopy
 import numpy as np
 import pytest
@@ -18,7 +20,6 @@ from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
                        _get_predictions_by_sensitive_feature,
                        ExamplePredictor,
-                       PassThroughPredictor,
                        is_invalid_transformation,
                        candidate_A_transforms, candidate_X_transforms,
                        candidate_Y_transforms)
@@ -149,13 +150,28 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
                                    sensitive_features=data_X_y_sf.sensitive_features)
 
 
+class PassThroughPredictor(BaseEstimator):
+    def __init__(self, transform):
+        self.transform = transform
+
+    def fit(self, X, y=None, **kwargs):
+        self.transform_ = self.transform
+        return self
+
+    def predict(self, X):
+        return self.transform_(X[0])
+
+
+@pytest.mark.parametrize("score_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
-def test_threshold_optimization_demographic_parity(y_transform,
+def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                                    sensitive_features_transform):
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(),
+    # PassThroughPredictor takes scores_ex as input in predict and
+    # returns score_transform(scores_ex) as output
+    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
                                    constraints='demographic_parity',
                                    flip=True)
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
@@ -215,13 +231,16 @@ def test_threshold_optimization_demographic_parity(y_transform,
     assert np.isclose(average_probabilities_by_sensitive_feature, [0.572] * 3).all()
 
 
+@pytest.mark.parametrize("score_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
-def test_threshold_optimization_equalized_odds(y_transform,
+def test_threshold_optimization_equalized_odds(score_transform, y_transform,
                                                sensitive_features_transform):
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(),
+    # PassThroughPredictor takes scores_ex as input in predict and
+    # returns score_transform(scores_ex) as output
+    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
                                    constraints='equalized_odds',
                                    flip=True)
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)

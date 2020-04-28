@@ -107,30 +107,15 @@ class ExamplePredictor(BaseEstimator, ClassifierMixin):
         self.scores = scores
 
     def fit(self, X, y=None, **kwargs):
+        self.scores_ = self.scores
         return self
 
     def predict(self, X):
-        return self.scores
-
-
-class PassThroughPredictor(BaseEstimator, ClassifierMixin):
-    def fit(self, X, y=None, **kwargs):
-        return self
-
-    def predict(self, X):
-        return X[0]
+        return self.scores_
 
 
 class ExampleNotPredictor():
     pass
-
-
-class ExampleEstimator(BaseEstimator, ClassifierMixin):
-    def fit(self, X, Y):
-        pass
-
-    def predict(self, X):
-        return scores_ex
 
 
 class ExampleNotEstimator1():

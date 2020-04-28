@@ -91,8 +91,8 @@ def test_calculate_roc_points():
 
     roc_points = _calculate_roc_points(grouped_data, "A", flip=True)
     expected_roc_points = pd.DataFrame({
-        "x": [0, 0, 0.25, 0.5, 0.5, 0.5, 0.5, 0.75, 1, 1],
-        "y": [0, 0, 1/3,  0,   1/3, 2/3, 1,   2/3,  1, 1],
+        "x": [0, .0, 0.25, .5, .5,    0.5, 0.5, .75,    1.0, 1],
+        "y": [0, .0, 1/3,  .0, .1/.3, 2/3, 1,   .2/.3,  1.0, 1],
         "operation": [ThresholdOperation('>', np.inf),
                       ThresholdOperation('<', -np.inf),
                       ThresholdOperation('<', 0.5),
@@ -102,8 +102,7 @@ def test_calculate_roc_points():
                       ThresholdOperation('<', 2.5),
                       ThresholdOperation('>', 0.5),
                       ThresholdOperation('<', np.inf),
-                      ThresholdOperation('>', -np.inf),
-                      ]
+                      ThresholdOperation('>', -np.inf)]
     })
 
     _assert_equal_points(expected_roc_points, roc_points)
