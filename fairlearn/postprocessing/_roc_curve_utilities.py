@@ -239,7 +239,7 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=False,
             operation_list.append(operation)
 
     return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}) \
-        .sort_values(by=['x', 'y'], ignore_index=True)
+        .sort_values(by=['x', 'y']).reset_index(drop=True)
 
 
 def _get_scores_labels_and_counts(data):
