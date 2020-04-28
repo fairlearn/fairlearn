@@ -1,7 +1,7 @@
 # Simplified PyPI release pipeline
 
 # At queue time, the user selects a Test or Production deployment. The following stages
-# then Run
+# then run:
 # - Predeployment validation (run a set of tests against the repository)
 # - Creates a wheel and stores in Pipeline Artifact
 # - Download wheel file from Artifact, pip install, and run tests
