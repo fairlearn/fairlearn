@@ -36,17 +36,43 @@ trigger: none # No CI build
 
 pr: none # Not for pull requests
 
-# ==============================================
+# ==================================================================================================
+
 
 stages:
-- template: templates/predeployment-validation-stage-template.yml
-  parameters:
-    stageName: PredeploymentValidation
-    poolImage: $(PoolImage)
-    freezeArtifactStem: PredeploymentValidationFreeze
-    freezeFileStem: predeploy-requirements-freeze
+- stage: PredeploymentValidation
+  displayName: Predeployment Validation
+    pool:
+    vmImage: $(poolImage)
 
-# ==============================================
+  variables:
+    freezeArtifactStem: PredeployFreeze
+    freezeFileStem: predeploy-requirements
+
+  jobs:
+  - template: all-tests-job-template.yml
+    parameters:
+      platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      installationType: 'PipLocal'
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+      freezeFileStem: ${{parameters.freezeFileStem}}
+      
+  - template: all-tests-job-template.yml
+    parameters:
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      installationType: 'None'
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      freezeArtifactStem: ${{parameters.freezeArtifactStem}}
+      freezeFileStem: ${{parameters.freezeFileStem}}
+
+  - template: build-widget-job-template.yml
+
+  - template: limited-installation-job-template.yml
+
+# ==================================================================================================
+
 
 - template: templates/create-wheel-stage-template.yml
   parameters:
@@ -60,7 +86,7 @@ stages:
     freezeArtifactStem: CreateWheelFreeze
     freezeFile: requirements-freeze.txt
 
-# ==============================================
+# ==================================================================================================
 
 - template: templates/wheel-artifact-tests-stage-template.yml
   parameters:
@@ -71,7 +97,8 @@ stages:
     packageArtifactName: Wheels
     freezeArtifactStem: TestWheelFreeze
 
-# ==============================================
+# ==================================================================================================
+
 
 - template: templates/pypi-upload-stage-template.yml
   parameters:
@@ -87,7 +114,8 @@ stages:
     kvPassword: $(kvPassword)
     pypiUrl: $(pypiUrl)
 
-# ==============================================
+# # ==================================================================================================
+
 
 - template: templates/post-upload-validation.yml
   parameters:
