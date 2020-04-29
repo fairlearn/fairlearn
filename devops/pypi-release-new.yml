@@ -207,7 +207,7 @@ stages:
                 secretsFilter: 'usernametest,passwordtest'
 
             # Quote the password argument in case it contains characters the shell might try to parse
-            - script: 'twine upload --verbose --repository-url https://test.pypi.org/legacy/ -u $(usernametest) -p "$(passwordtest)" $(Pipeline.Workspace)/$(packageArtifactName)/*'
+            - script: 'twine upload --verbose --repository-url https://test.pypi.org/legacy/ -u $(${{variables.kvUsername}}) -p "$(passwordtest)" $(Pipeline.Workspace)/$(packageArtifactName)/*'
               displayName: Upload to ${{parameters.releaseType}} PyPI
           # ----------------
           - ${{ if in(parameters.releaseType, 'Prod', 'Production')}}:
