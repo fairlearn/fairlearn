@@ -42,7 +42,7 @@ pr: none # Not for pull requests
 stages:
 - stage: PredeploymentValidation
   displayName: Predeployment Validation
-    pool:
+  pool:
     vmImage: $(poolImage)
 
   variables:
