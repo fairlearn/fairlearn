@@ -2,7 +2,7 @@
 
 ### v0.4.6
 * Refactor metrics:
-  * Remove `GroupMetricResult` type in favour of a `Bunch`.
+  * Remove `GroupMetricResult` type in favor of a `Bunch`.
   * Rename and slightly update signatures:
     * `metric_by_group` changed to `group_summary`
     * `make_group_metric` changed to `make_metric_group_summary`

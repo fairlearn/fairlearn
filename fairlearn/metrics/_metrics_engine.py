@@ -141,7 +141,9 @@ class _DerivedMetricCallable:
     """Callable that calculates a derived metric.
 
     :param transformation_function: A transformation function with the signature
-        ``transformation_function(summary)``
+        ``transformation_function(summary)`` which can consume the result
+        produced by ``summary_function`` (typically a ``Bunch`` with fields including
+        ``overall`` and ``by_group``)
     :type transformation_function: func
 
     :param summary_function: A metric group summary function with the signature
