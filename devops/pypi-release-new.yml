@@ -67,9 +67,9 @@ stages:
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
 
-  - template: build-widget-job-template.yml
+  - template: templates/build-widget-job-template.yml
 
-  - template: limited-installation-job-template.yml
+  - template: templates/limited-installation-job-template.yml
 
 # ==================================================================================================
 
