@@ -188,42 +188,42 @@ stages:
       runOnce:
         deploy:
           steps:
-            - task: UsePythonVersion@0
-              displayName: Use Python $(poolPythonVersion)
+          - task: UsePythonVersion@0
+            displayName: 'Use Python $(poolPythonVersion)'
+            inputs:
+              versionSpec: $(poolPythonVersion)
+              addToPath: true
+          
+          - script: pip install twine
+            displayName: 'Install twine'
+
+          # ----------------
+          - ${{ if eq(parameters.releaseType, 'Test') }}:
+            - task: AzureKeyVault@1
+              displayName: "Fetch deployment secrets from KeyVault"
               inputs:
-                versionSpec: Use Python $(poolPythonVersion)
-                addToPath: true
-            
-            - script: pip install twine
-              displayName: 'Install twine'
+                azureSubscription: ${{variables.kvSubscription}}
+                keyVaultName:  ${{variables.kvName}}
+                secretsFilter: 'usernametest,passwordtest'
 
-            # ----------------
-            - ${{ if eq(parameters.releaseType, 'Test') }}:
-              - task: AzureKeyVault@1
-                displayName: "Fetch deployment secrets from KeyVault"
-                inputs:
-                  azureSubscription: ${{variables.kvSubscription}}
-                  keyVaultName:  ${{variables.kvName}}
-                  secretsFilter: 'usernametest,passwordtest'
+            # Quote the password argument in case it contains characters the shell might try to parse
+            - script: 'twine upload --verbose --repository-url https://test.pypi.org/legacy/ -u $(usernametest) -p "$(passwordtest)" $(Pipeline.Workspace)/$(packageArtifactName)/*'
+              displayName: Upload to ${{parameters.releaseType}} PyPI
+          # ----------------
+          - ${{ if in(parameters.releaseType, 'Prod', 'Production')}}:
+            - task: AzureKeyVault@1
+              displayName: "Fetch deployment secrets from KeyVault"
+              inputs:
+                azureSubscription: $(kvSubscription)
+                keyVaultName:  $(kvVaultName)
+                secretsFilter: 'usernameprod,passwordprod'
 
-              # Quote the password argument in case it contains characters the shell might try to parse
-              - script: 'twine upload --verbose --repository-url https://test.pypi.org/legacy/ -u $(usernametest) -p "$(passwordtest)" $(Pipeline.Workspace)/$(packageArtifactName)/*'
-                displayName: Upload to ${{parameters.releaseType}} PyPI
-            # ----------------
-            - ${{ if in(parameters.releaseType, 'Prod', 'Production')}}:
-              - task: AzureKeyVault@1
-                displayName: "Fetch deployment secrets from KeyVault"
-                inputs:
-                  azureSubscription: $(kvSubscription)
-                  keyVaultName:  $(kvVaultName)
-                  secretsFilter: 'usernameprod,passwordprod'
+            # Quote the password argument in case it contains characters the shell might try to parse
+            - script: 'twine upload --verbose --repository-url https://upload.pypi.org/legacy/ -u $(usernameprod) -p "$(passwordprod)" $(Pipeline.Workspace)/$(packageArtifactName)/*'
+              displayName: Upload to ${{parameters.releaseType}} PyPI
+          # ----------------
 
-              # Quote the password argument in case it contains characters the shell might try to parse
-              - script: 'twine upload --verbose --repository-url https://upload.pypi.org/legacy/ -u $(usernameprod) -p "$(passwordprod)" $(Pipeline.Workspace)/$(packageArtifactName)/*'
-                displayName: Upload to ${{parameters.releaseType}} PyPI
-            # ----------------
-
-          # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention
+        # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention
   
   - job: PyPI_Pause
     pool: server
