@@ -53,4 +53,4 @@ jobs:
         target_branch: master
         build_dir: docs/_build/html
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ROMANLUTZ_FAIRLEARN_GITHUB_PAGES_REPO_TOKEN }}
