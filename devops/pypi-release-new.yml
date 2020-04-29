@@ -202,7 +202,7 @@ stages:
               - task: AzureKeyVault@1
                 displayName: "Fetch deployment secrets from KeyVault"
                 inputs:
-                  azureSubscription: $(kvSubscription)
+                  azureSubscription: ${{kvSubscription}}
                   keyVaultName:  $(kvVaultName)
                   secretsFilter: 'usernametest,passwordtest'
 
