@@ -20,6 +20,9 @@ parameters:
 variables:
   poolImage: "ubuntu-latest"
   poolPythonVersion: 3.6
+  packageArtifactName: Wheels
+  versionArtifactName: Version
+  versionFileName: versionInfo.txt
   # Following is actually the name of the service connection from the Project Settings page
   kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)"
   kvVaultName: fairlearndeploy
@@ -73,18 +76,61 @@ stages:
 
 # ==================================================================================================
 
+- stage: CreateWheel
+  displayName: Create Wheel Artifact
+  dependsOn: PredeploymentValidation
+  pool:
+    vmImage: $(poolImage)
 
-- template: templates/create-wheel-stage-template.yml
-  parameters:
-    stageName: CreateWheel
-    previousStages: PredeploymentValidation
-    poolImage: $(PoolImage)
-    poolPythonVersion: 3.7
-    packageArtifactName: Wheels
-    versionArtifactName: Version
-    versionFileName: versionInfo.txt
-    freezeArtifactStem: CreateWheelFreeze
-    freezeFile: requirements-freeze.txt
+  variables:
+    freezeArtifactName: CreateWheelFreeze
+    freezeFile: createwheel-freeze.txt
+
+  jobs:
+  - job: CreateWheel
+    displayName: Build and publish wheel
+    pool:
+      vmImage: $(poolImage)
+    
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(poolPythonVersion)'
+      inputs:
+        versionSpec: $(poolPythonVersion)
+        addToPath: true
+
+    - template: python-infra-upgrade-steps-template.yml
+
+    - script: pip install setuptools wheel 
+      displayName: 'Install setuptools'
+
+    - script: pip install -r requirements.txt
+      displayName: "Install fairlearn requirements"
+
+    - template: pip-freeze-to-artifact-steps-template.yml
+      parameters:
+        freezeArtifact: $(freezeArtifactName)
+        freezeFile: $(freezeFile)
+
+    # TODO: add --assert-no-changes to validate that no changes happened to widget files (Issue #270)
+    - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+      displayName: 'Build widget'
+
+    # TODO: Simplify the build_wheels script to remove target type and dev version
+    - script: python ./scripts/build_wheels.py --target-type Prod --version-filename $(versionFilename) --dev-version 0
+      displayName: 'Build wheels'
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish wheels"
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/dist
+        artifact: $(packageArtifactName)
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish version information file"
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)/$(versionFilename)'
+        artifact: $(versionArtifactName)
 
 # ==================================================================================================
 
