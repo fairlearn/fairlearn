@@ -182,7 +182,7 @@ stages:
     ${{ if eq(parameters.releaseType, 'Production')}}:
       environment: 'PyPI Deployment'
     pool:
-      vmImage: $$(poolImage)
+      vmImage: $(poolImage)
 
     strategy:
       runOnce:
