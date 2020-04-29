@@ -223,15 +223,35 @@ stages:
 
 # # ==================================================================================================
 
-
-- template: templates/post-upload-validation.yml
-  parameters:
-    stageName: TestFromPyPI
-    previousStages: UploadWheel
-    poolImage: $(PoolImage)
-    poolPythonVersion: 3.6
-    releaseType: ${{parameters.releaseType}}
-    versionArtifactName: Version
-    versionFileName: versionInfo.txt
+- stage: TestFromPyPI
+  displayName: Test package from ${{parameters.releaseType}} PyPI
+  dependsOn: UploadWheel
+  pool:
+    vmImage: $(poolImage)
+  
+  variables:
     freezeArtifactStem: TestPyPIFreeze
-    freezeFileStem: requirements-freeze
+    freezeFileStem: requirements-pypi-test
+
+  jobs:
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      freezeArtifactStem: $(freezeArtifactStem)
+      freezeFileStem: $(freezeFileStem)
+      installationType: 'PyPI'
+      targetType: ${{parameters.releaseType}}
+      versionArtifactName: $(versionArtifactName)
+      versionArtifactFile: $(versionFileName)
+
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      freezeArtifactStem: $(freezeArtifactStem)
+      freezeFileStem: $(freezeFileStem)
+      installationType: 'PyPI'
+      targetType: ${{parameters.releaseType}}
+      versionArtifactName: $(versionArtifactName)
+      versionArtifactFile: $(versionFileName)
