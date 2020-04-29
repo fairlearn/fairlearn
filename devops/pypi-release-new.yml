@@ -99,7 +99,7 @@ stages:
         versionSpec: $(poolPythonVersion)
         addToPath: true
 
-    - template: python-infra-upgrade-steps-template.yml
+    - template: templates/python-infra-upgrade-steps-template.yml
 
     - script: pip install setuptools wheel 
       displayName: 'Install setuptools'
@@ -107,7 +107,7 @@ stages:
     - script: pip install -r requirements.txt
       displayName: "Install fairlearn requirements"
 
-    - template: pip-freeze-to-artifact-steps-template.yml
+    - template: templates/pip-freeze-to-artifact-steps-template.yml
       parameters:
         freezeArtifact: $(freezeArtifactName)
         freezeFile: $(freezeFile)
