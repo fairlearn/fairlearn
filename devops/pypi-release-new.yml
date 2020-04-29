@@ -236,23 +236,6 @@ stages:
       inputs:
         delayForMinutes: "5"
 
-
-
-
-- template: templates/pypi-upload-stage-template.yml
-  parameters:
-    stageName: UploadWheel
-    previousStages: TestWheel
-    poolImage: $(PoolImage)
-    poolPythonVersion: 3.6
-    releaseType: ${{parameters.releaseType}}
-    packageArtifactName: Wheels
-    kvSubscription: $(kvSubscription)
-    kvVaultName: $(kvVaultName)
-    kvUsername: $(kvUsername)
-    kvPassword: $(kvPassword)
-    pypiUrl: $(pypiUrl)
-
 # # ==================================================================================================
 
 
