@@ -11,7 +11,7 @@ from .show_versions import show_versions  # noqa: F401
 # Finesse the version
 _FAIRLEARN_DEV_VERSION_ENV_VAR = "FAIRLEARN_DEV_VERSION"
 
-_base_version = "0.4.5.dev4102"
+_base_version = "0.4.5.dev4103"
 _dev_version = ""
 
 if _FAIRLEARN_DEV_VERSION_ENV_VAR in os.environ.keys():
