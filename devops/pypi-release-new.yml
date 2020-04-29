@@ -161,10 +161,12 @@ stages:
   pool:
     vmImage: $(poolImage)
 
-  variables:
+  parameters:
     # Following is actually the name of the service connection from the Project Settings page
     kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)"
     kvVaultName: fairlearndeploy
+
+  variables:
     ${{ if eq(parameters.releaseType, 'Test')}}:
       kvUsername: usernametest
       kvPassword: passwordtest
@@ -202,8 +204,8 @@ stages:
               - task: AzureKeyVault@1
                 displayName: "Fetch deployment secrets from KeyVault"
                 inputs:
-                  azureSubscription: ${{kvSubscription}}
-                  keyVaultName:  $(kvVaultName)
+                  azureSubscription: ${{parameters.kvSubscription}}
+                  keyVaultName:  ${parameters.kvName}
                   secretsFilter: 'usernametest,passwordtest'
 
               # Quote the password argument in case it contains characters the shell might try to parse
