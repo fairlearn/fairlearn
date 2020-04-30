@@ -47,7 +47,7 @@ jobs:
           # Upload private key to CircleCI as an SSH key at
           # https://app.circleci.com/settings/project/github/romanlutz/fairlearn#ssh.
           fingerprints:  # fingerprint of deploy (public) key
-            - "6b:63:88:68:8e:cf:26:37:7f:ae:85:1a:a3:60:cc:01"
+            - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
 
       - attach_workspace:
           at: docs/_build
