@@ -68,7 +68,7 @@ workflows:
   build-webpage:
     jobs:
       - build-doc
-      - deploy-doc
+      - deploy-doc:
           requires:
             - build-doc
           filters:
