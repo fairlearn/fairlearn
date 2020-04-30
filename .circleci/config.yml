@@ -51,6 +51,12 @@ jobs:
 
       - attach_workspace:
           at: docs/_build
+      
+      - run:
+          # By default GitHub attempts jekyll builds.
+          # Instead, we want the webpage to just point at index.html
+          name: Disable jekyll builds
+          command: touch docs/_build/html/.nojekyll
 
       - run:
           name: 'Install gh-pages and configure dependencies'
