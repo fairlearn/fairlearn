@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - checkout
-
+ 
       - add_ssh_keys:
           # To generate a key run the following in git bash (on Windows):
           # ssh-keygen -t rsa -m pem -C "ci-build@fairlearn.org"
