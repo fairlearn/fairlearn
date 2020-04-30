@@ -34,9 +34,11 @@ jobs:
       
   deploy-doc:
     docker:
-      - image: node:14.0.0-stretch
+      - image: node:14.0.0-stretch  # npm required for gh-pages
 
     steps:
+      - checkout
+
       - add_ssh_keys:
           # To generate a key run the following in git bash (on Windows):
           # ssh-keygen -t rsa -m pem -C "ci-build@fairlearn.org"
@@ -61,8 +63,8 @@ jobs:
           name: 'Push to GitHub Pages repository'
           command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/romanlutz/fairlearn.github.io.git --branch master
 
-# Adding this workflow specification only to have the check in GitHub show up
-# as "build-webpage" as opposed to "workflow" (default).
+# This workflow defines the ordering, in this case build-doc needs to happen
+# before deploy-doc.
 workflows:
   version: 2
   build-webpage:
@@ -73,4 +75,4 @@ workflows:
             - build-doc
           filters:
             branches:
-              only: master
+              only: master  # don't deploy to GitHub pages from other branches
