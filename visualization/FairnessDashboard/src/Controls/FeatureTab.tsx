@@ -59,22 +59,23 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             height: "100%",
         },
         main: {
+            width: "600px",
             height: "100%",
-            maxWidth: "700px",
             flex: 1
         },
         header: {
             color: "#333333",
             fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100"
+            lineHeight: "40px",
+            fontWeight: "300"
         },
         textBody: {
+            color: "#333333",
             paddingTop: "12px",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "300",
-            marginBottom: "15px"
+            fontSize: "15px",
+            lineHeight: "20px",
+            fontWeight: "normal",
+            marginBottom: "50px"
         },
         tableHeader: {
             display: "flex",
@@ -82,24 +83,25 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             justifyContent: "space-between",
             paddingBottom: "15px",
             color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "500",
+            fontSize: "12px",
+            lineHeight: "15px",
+            fontWeight: "600",
+            textTransform: "uppercase",
             borderBottom: "1px solid #CCCCCC"
         },
         itemTitle: {
             margin: 0,
             color: "#333333",
-            fontSize: "22px",
-            lineHeight: "26px",
-            fontWeight: "300"
+            fontSize: "18px",
+            lineHeight: "22px",
+            fontWeight: "normal"
         },
         valueCount: {
             paddingTop: "15px",
             color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "500"
+            fontSize: "12px",
+            lineHeight: "15px",
+            fontWeight: "normal"
         },
         iconWrapper: {
             paddingTop: "4px",
@@ -124,6 +126,9 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             }
         },
         category: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "15px",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             overflow: "hidden"
@@ -162,7 +167,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                     </h2>
                     <p className={FeatureTab.classNames.textBody}>{localization.Feature.body}</p>
                     <div className={FeatureTab.classNames.tableHeader}>
-                        <div>{localization.Intro.features}</div>
+                    <div>{localization.Intro.features}</div>
                         <div className={FeatureTab.classNames.subgroupHeader}>{localization.Feature.subgroups}</div>
                     </div>
                     <StackItem grow={2} className={FeatureTab.classNames.itemsList}>

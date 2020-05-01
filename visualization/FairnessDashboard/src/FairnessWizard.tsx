@@ -268,7 +268,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                             }}
                             selectedKey={this.state.activeTabKey}
                             onLinkClick={this.handleTabClick}>
-                            <PivotItem headerText={localization.Intro.features} itemKey={featureBinTabKey} style={{height: "100%", paddingLeft:"8px"}}>
+                            <PivotItem headerText={localization.sensitiveFeatures} itemKey={featureBinTabKey} style={{height: "100%", paddingLeft:"8px"}}>
                                 <FeatureTab
                                     dashboardContext={this.state.dashboardContext}
                                     selectedFeatureChange={this.setBinIndex}
@@ -286,7 +286,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                     onPrevious={this.setTab.bind(this, featureBinTabKey)}
                                 />
                             </PivotItem>
-                            {(flights.skipDisparity === false) && (<PivotItem headerText={"Parity"} itemKey={disparityTabKey}>
+                            {(flights.skipDisparity === false) && (<PivotItem headerText={localization.disparityMetric} itemKey={disparityTabKey} style={{height: "100%", paddingLeft:"8px"}}>
                                 <ParityTab
                                     dashboardContext={this.state.dashboardContext}
                                     parityPickerProps={parityPickerProps}

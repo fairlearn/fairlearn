@@ -17,23 +17,27 @@ export class WizardFooter extends React.PureComponent<IWizardFooterProps> {
             paddingBottom: "10px"
         },
         next: {
-            height: "44px",
+            height: "40px",
             padding: "12px",
             color: "#FFFFFF",
-            fontSize: "18px",
-            lineHeight: "24px",
-            backgroundColor: "#666666",
-            fontWeight: "400",
-            marginLeft: "10px"
+            fontSize: "12px",
+            lineHeight: "16px",
+            background: "linear-gradient(338.45deg, #5A53FF -73.33%, #5A53FF 84.28%)",
+            fontWeight: "600",
+            fontStyle: "normal",
+            marginLeft: "10px",
+            borderRadius: "5px"
         },
         back: {
-            height: "44px",
+            height: "40px",
             padding: "12px",
             color: "#333333",
-            fontSize: "18px",
-            lineHeight: "24px",
+            fontSize: "12px",
+            lineHeight: "16px",
             backgroundColor: "#FFFFFF",
-            fontWeight: "400"
+            fontWeight: "600",
+            fontStyle: "normal",
+            borderRadius: "5px"
         }
     });
     

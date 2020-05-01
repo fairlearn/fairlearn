@@ -17,17 +17,19 @@ export class DataSpecificationBlade extends React.PureComponent<IDataSpecProps> 
             lineHeight: "15px",
             fontWeight: "500",
             height: "20px",
+            textTransform: "uppercase",
             paddingBottom: "10px"
         },
         frame: {
             paddingTop:"35px",
             paddingLeft:"60px",
-            width: "120px",
+            minWidth: "120px",
             boxSizing: "content-box"
         },
         text: {
+            color: "#333333",
             fontSize: "12px",
-            lineHeight: "15px",
+            lineHeight: "28px",
         }
     });
     render(): React.ReactNode {

@@ -24,18 +24,19 @@ export class TileList extends React.PureComponent<ITileListProps> {
             flexDirection: "row",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            borderBottom: "1px solid #CCCCCC",
         },
         itemCell: {
             padding: "15px",
-            width: "235px",
+            width: "48%",
             position: "relative",
             float: "left",
             cursor: "pointer",
             boxSizing: "border-box",
             backgroundColor: "#FFFFFF",
-            marginBottom: "10px",
-            marginRight: "10px",
+            marginBottom: "20px",
+            marginRight: "0px",
+            border: "1px solid #CCCCCC",
+            borderRadius: "5px",
             selectors: {
               '&:hover': { background: "lightgray" }
             }
@@ -43,23 +44,26 @@ export class TileList extends React.PureComponent<ITileListProps> {
         iconClass: {
             fontSize: "20px",
             position: "absolute",
-            right: "10px",
-            top: "10px"
+            left: "15px",
+            top: "18px"
         },
         title: {
             color: "#333333",
             fontSize: "18px",
             lineHeight: "22px",
-            fontWeight: "500",
-            paddingRight: "16px",
+            fontWeight: "normal",
+            paddingLeft: "30px",
             margin: 0
         },
         description: {
             paddingTop: "10px",
-            color: "#666666",
-            fontSize: "15px",
-            lineHeight: "20px",
-            fontWeight: "400"
+            paddingLeft: "30px",
+            paddingRight: "10px",
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "15px",
+            fontWeight: "normal",
+            textAlign: "justify"
         }
     });
     render(): React.ReactNode {

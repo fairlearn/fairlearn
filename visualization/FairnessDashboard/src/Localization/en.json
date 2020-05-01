@@ -14,7 +14,9 @@
     "instanceCount": "{0} instances",
     "close": "Close",
     "calculating": "Calculating...",
-    "accuracyMetric": "Accuracy metric",
+    "sensitiveFeatures": "01 Sensitive features",
+    "accuracyMetric": "02 Accuracy metrics",
+    "disparityMetric": "03 Disparity metrics",
     "errorOnInputs": "Error with input. Sensitive features must be categorical values at this time. Please map values to binned categories and retry.",
     "Accuracy": {
         "header": "How do you want to measure accuracy?",

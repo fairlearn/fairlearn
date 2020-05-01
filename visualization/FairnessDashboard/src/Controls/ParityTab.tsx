@@ -39,25 +39,27 @@ export class ParityTab extends React.PureComponent<IParityTabProps> {
             overflowY: "auto"
         },
         frame: {
+            width: "750px",
             height: "100%",
         },
         main: {
             height: "100%",
-            maxWidth: "750px",
+            minWidth: "550px",
             flex: 1
         },
         header: {
             color: "#333333",
             fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100",
+            lineHeight: "40px",
+            fontWeight: "300",
             margin: "26px 0"
         },
         textBody: {
+            color: "#333333",
             paddingTop: "12px",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "300",
+            fontSize: "15px",
+            lineHeight: "20px",
+            fontWeight: "normal",
             paddingBottom: "12px"
         }
     });
