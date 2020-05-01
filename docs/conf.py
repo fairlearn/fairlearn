@@ -23,7 +23,7 @@ print("================================")
 
 # -- Project information -----------------------------------------------------
 
-project = 'fairlearn'
+project = 'Fairlearn'
 copyright = '2019, Microsoft Corporation.'
 author = 'Microsoft'
 
@@ -63,7 +63,25 @@ master_doc = 'index'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-# html_theme = 'sphinx_docfx_theme'
+html_theme = 'pydata_sphinx_theme'
+
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+html_theme_options = {
+    # TODO: fork the pydata-sphinx-theme to integrate these with logo
+    "external_links": [
+        {"name": "Gitter", "url": "https://gitter.im/fairlearn/community"},
+        {"name": "StackOverflow", "url": "https://stackoverflow.com/questions/tagged/fairlearn"}
+    ],
+    "github_url": "https://github.com/fairlearn/fairlearn",
+    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this,
+    "show_prev_next": False
+}
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+# html_logo = "path/to/some/file.png" TODO: add logo
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
