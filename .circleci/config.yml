@@ -45,7 +45,7 @@ jobs:
           # Do not add a passphrase.
           # Upload public key as a deploy key to the website repository.
           # Upload private key to CircleCI as an SSH key at
-          # https://app.circleci.com/settings/project/github/romanlutz/fairlearn#ssh.
+          # https://app.circleci.com/settings/project/github/fairlearn/fairlearn#ssh.
           fingerprints:  # fingerprint of deploy (public) key
             - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
 
@@ -67,7 +67,7 @@ jobs:
 
       - run:
           name: 'Push to GitHub Pages repository'
-          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/romanlutz/fairlearn.github.io.git --branch master
+          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
 
 # This workflow defines the ordering, in this case build-doc needs to happen
 # before deploy-doc.
