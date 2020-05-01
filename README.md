@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)
+[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![StackOverflow](https://img.shields.io/badge/StackOverflow-questions-blueviolet)](https://stackoverflow.com/questions/tagged/fairlearn)
 
 # Fairlearn
 
@@ -17,7 +17,7 @@ Fairlearn is a Python package that empowers developers of artificial intelligenc
 
 ## Current release
 
-- The current stable release is available at [Fairlearn v0.4.4](https://github.com/fairlearn/fairlearn/tree/v0.4.4).
+- The current stable release is available at [Fairlearn v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5).
 
 - Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
@@ -126,7 +126,8 @@ The package can be installed via
 pip install fairlearn
 ```
 
-or optionally with a full feature set by adding extras, e.g. `pip install fairlearn[customplots]`.
+or optionally with a full feature set by adding extras, e.g.
+`pip install fairlearn[customplots]`.
 
 or you can clone the repository locally via
 
@@ -134,7 +135,8 @@ or you can clone the repository locally via
 git clone git@github.com:fairlearn/fairlearn.git
 ```
 
-To verify that the cloned repository works (the pip package does not include the tests), run
+To verify that the cloned repository works (the pip package does not include
+the tests), run
 
 ```python
 pip install -r requirements.txt
@@ -175,13 +177,15 @@ exponentiated_gradient.fit(X, y, sensitive_features=sensitive_features)
 randomized_predictions = exponentiated_gradient.predict(X)
 ```
 
-Please open a [new issue](https://github.com/fairlearn/fairlearn/issues) if you encounter any problems.
+Please open a [new issue](https://github.com/fairlearn/fairlearn/issues) if you
+encounter any problems.
 
 </details>
 
 ## Usage
 
-For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](./CONTRIBUTING.md#api)
+For common usage refer to the [Jupyter notebooks](./notebooks) and our
+[API guide](./CONTRIBUTING.md#api)
 
 ## Contributing
 
@@ -200,12 +204,18 @@ For a full list of contributors refer to the [authors page](./AUTHORS.md)
 
 ## Issues
 
+### Usage Questions
+
+Pose questions and help answer them on [Stack
+Overflow](https://stackoverflow.com/questions/tagged/fairlearn) with the tag
+`fairlearn` or on [Gitter](https://gitter.im/fairlearn/community#).
+
 ### Regular (non-security) issues
 
-Please submit a report through [GitHub issues](https://github.com/fairlearn/fairlearn/issues). A maintainer will respond promptly as follows:
-- **bug**: triage as `bug` and provide estimated timeline based on severity
-- **feature request**: triage as `feature request` and provide estimated timeline
-- **question** or **discussion**: triage as `question` and either respond or notify/identify a suitable expert to respond
+Issues are meant for bugs, feature requests, and documentation improvements.
+Please submit a report through
+[GitHub issues](https://github.com/fairlearn/fairlearn/issues). A maintainer
+will respond promptly as appropriate.
 
 Maintainers will try to link duplicate issues when possible.
 

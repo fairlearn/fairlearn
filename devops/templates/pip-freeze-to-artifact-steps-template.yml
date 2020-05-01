@@ -7,7 +7,7 @@ parameters:
 
   
 steps:
-  - script: pip freeze > ${{parameters.freezeFile}}
+  - script: pip freeze --all > ${{parameters.freezeFile}}
     displayName: "Run pip freeze"
 
   - task: PublishPipelineArtifact@1

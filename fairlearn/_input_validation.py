@@ -1,10 +1,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import logging
 import numpy as np
 import pandas as pd
 from sklearn.utils.validation import check_X_y, check_consistent_length, check_array
 
+
+logger = logging.getLogger(__file__)
 
 _KW_SENSITIVE_FEATURES = "sensitive_features"
 
@@ -13,11 +16,10 @@ _MESSAGE_Y_NONE = "Must supply y"
 _MESSAGE_SENSITIVE_FEATURES_NONE = "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES)
 _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
 _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
+_MESSAGE_RATIO_NOT_IN_RANGE = "ratio must lie between (0,1]"
 _INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats for {} are: {}. " \
                                      "Your provided data was of type {}."
 _EMPTY_INPUT_ERROR_MESSAGE = "At least one of sensitive_features, labels, or scores are empty."
-_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE = "Sensitive features contain more than two unique" \
-                                               " values"
 _LABELS_NOT_0_1_ERROR_MESSAGE = "Supplied y labels are not 0 or 1"
 _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE = "{} is a {} with more than one column"
 _NOT_ALLOWED_TYPE_ERROR_MESSAGE = "{} is not an ndarray, Series or DataFrame"
@@ -31,8 +33,7 @@ _ALLOWED_INPUT_TYPES_Y = [np.ndarray, pd.DataFrame, pd.Series, list]
 _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR = ","
 
 
-def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensitive_feature=False,
-                                 enforce_binary_labels=False, **kwargs):
+def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels=False, **kwargs):
     """Validate input data and return the data in an appropriate format.
 
     :param X: The feature matrix
@@ -41,9 +42,6 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
     :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
     :param expect_y: if True y needs to be provided, otherwise ignores the argument; default True
     :type expect_y: bool
-    :param enforce_binary_sensitive_feature: if True raise exception if there are more than two
-        distinct values in the `sensitive_features` data from `kwargs`; default False
-    :type enforce_binary_sensitive_feature: bool
     :param enforce_binary_labels: if True raise exception if there are more than two distinct
         values in the `y` data; default False
     :type enforce_binary_labels: bool
@@ -81,11 +79,14 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_sensit
         sensitive_features = \
             _compress_multiple_sensitive_features_into_single_column(sensitive_features)
 
-    if enforce_binary_sensitive_feature:
-        if len(np.unique(sensitive_features)) > 2:
-            raise ValueError(_SENSITIVE_FEATURES_NON_BINARY_ERROR_MESSAGE)
+    # If we don't have a y, then need to fiddle with return type to
+    # avoid a warning from pandas
+    if y is not None:
+        result_y = pd.Series(y)
+    else:
+        result_y = pd.Series(dtype="float64")
 
-    return pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features.squeeze())
+    return pd.DataFrame(X), result_y, pd.Series(sensitive_features.squeeze())
 
 
 def _compress_multiple_sensitive_features_into_single_column(sensitive_features):

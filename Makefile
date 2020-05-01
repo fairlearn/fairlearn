@@ -2,6 +2,7 @@
 
 PYTHON ?= python
 PYTEST ?= pytest
+SPHINX ?= python -m sphinx
 
 all: clean inplace test-unit
 
@@ -17,3 +18,6 @@ test-coverage:
 
 test-unit:
 	$(PYTEST) ./test/unit
+
+doc:
+	$(SPHINX) -b html -j auto docs docs/_build/html
