@@ -66,7 +66,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                  constraint_weight=0.5,
                  grid_size=10,
                  grid_limit=2.0,
-                 grid_offset=0,
+                 grid_offset=None,
                  grid=None):
         """Construct a GridSearch object."""
         self.estimator = estimator
@@ -85,7 +85,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         self.grid_size = grid_size
         self.grid_limit = float(grid_limit)
-        self.grid_offset = float(grid_offset)
+        self.grid_offset = grid_offset
         self.grid = grid
 
         self._best_grid_index = None

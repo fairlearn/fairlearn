@@ -82,11 +82,9 @@ def test_demographicparity_fair_uneven_populations(A_two_dim):
     assert np.array_equal(sample_results, [1, 0])
 
 
-@pytest.mark.parametrize("A_two_dim", [False, True])
-def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim):
-    # Variant of test_demographicparity_already_fair, which has unequal
-    # populations in the two classes
-    # Also allow the threshold to be adjustable
+@pytest.mark.parametrize("A_two_dim", [False])
+@pytest.mark.parametrize("offset", [[0, 0.2, 0, 0]])
+def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim, offset):
     # Grid of Lagrangian multipliers has some initial offset
 
     score_threshold = 0.625
@@ -98,7 +96,9 @@ def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim):
     a1_label = 37
 
     grid_size = 11
-    grid_offset = 0.25
+    iterables = [['+', '-'], ['all'], [a0_label, a1_label]]
+    midx = pd.MultiIndex.from_product(iterables, names=['sign', 'event', 'group_id'])
+    grid_offset = pd.Series(offset, index=midx)
 
     X, Y, A = _simple_threshold_data(number_a0, number_a1,
                                      score_threshold, score_threshold,
@@ -120,7 +120,7 @@ def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim):
     assert np.array_equal(sample_results, [0, 1])
 
     sample_proba = grid_search.predict_proba(test_X)
-    assert np.allclose(sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]])
+    assert np.allclose(sample_proba, [[0.55069845, 0.44930155], [0.41546008, 0.58453992]])
 
     sample_results = grid_search._predictors[0].predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
