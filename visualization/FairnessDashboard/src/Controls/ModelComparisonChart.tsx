@@ -346,8 +346,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const accuracyOptions: IDropdownOption[] = this.props.accuracyPickerProps.accuracyOptions.map(x => { return {key: x.key, text: x.title}});
         const parityOptions: IDropdownOption[] = this.props.parityPickerProps.parityOptions.map(x => { return {key: x.key, text: x.title}});
         const dropdownStyles: Partial<IDropdownStyles> = {
-            dropdown: { width: 180 },
             label: { color: "#ffffff" },
+            dropdown: { width: 180, selectors: {
+                ':focus .ms-Dropdown-title': {
+                    color: "#333333",
+                    backgroundColor: "#f3f2f1",
+                },
+            }},
             title: { color: "#ffffff", backgroundColor: "#333333", selectors: {
                 ':hover': {
                     color: "#333333",
