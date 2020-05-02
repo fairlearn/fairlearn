@@ -32,7 +32,8 @@ An AI system can behave unfairly for a variety of reasons. In Fairlearn, we defi
 We follow the approach known as **group fairness**, which asks: _Which groups of individuals are at risk for experiencing harms?_ The relevant groups need to be specified by the data scientist and are application specific.
 
 Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The Fairlearn package enables assessment and mitigation of unfairness under several common definitions.
-To learn more about our definitions of fairness, please visit our [terminology page](./TERMINOLOGY.md#fairness-of-ai-systems).
+To learn more about our definitions of fairness, please visit our
+[terminology page](https://fairlearn.github.io/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems).
 
 >_Note_:
 > Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
@@ -57,8 +58,7 @@ Fairlearn contains the following algorithms for mitigating unfairness in binary 
 | `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/abs/1610.02413). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier's prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
 > _Note_:
-> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](./TERMINOLOGY.md). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
-
+> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](https://fairlearn.github.io/user_guide/fairness_in_machine_learning.html). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
 
 ### Fairlearn dashboard
 
@@ -185,11 +185,12 @@ encounter any problems.
 ## Usage
 
 For common usage refer to the [Jupyter notebooks](./notebooks) and our
-[API guide](./CONTRIBUTING.md#api)
+[API guide](https://fairlearn.github.io/contribution_guide.html#api-design)
 
 ## Contributing
 
-To contribute please check our [contributing guide](./CONTRIBUTING.md).
+To contribute please check our
+[contributing guide](https://fairlearn.github.io/contribution_guide.html).
 
 ## Maintainers
 

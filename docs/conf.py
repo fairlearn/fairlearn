@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
+    "sphinx.ext.mathjax",
     "sphinx_gallery.gen_gallery",
 ]
 
@@ -95,3 +96,15 @@ sphinx_gallery_conf = {
      'examples_dirs': '../examples',
      'gallery_dirs': 'auto_examples',
 }
+
+# -- LaTeX macros ------------------------------------------------------------
+
+mathjax_config = {                  
+    "TeX": {                        
+        "Macros": {                 
+            "E": '{\\mathbb{E}}',
+            "P": '{\\mathbb{P}}',
+            "given": '\\mathbin{\\vert}'
+            }                       
+        }                           
+    }
