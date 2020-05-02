@@ -25,7 +25,7 @@ jobs:
   parameters:
     platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
     installationType: 'PipLocal'
-    pyVersions: [3.5, 3.6, 3.7, 3.8]
+    pyVersions: [3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     pinRequirements: True
