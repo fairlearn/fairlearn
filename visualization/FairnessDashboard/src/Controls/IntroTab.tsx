@@ -105,7 +105,10 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
             fontWeight: "600",
             fontStyle: "normal",
             borderRadius: "5px",
-            background: "linear-gradient(348.1deg, #5A53FF -73.33%, #5A53FF 84.28%)"
+            background: "linear-gradient(348.1deg, #5A53FF -73.33%, #5A53FF 84.28%)",
+            selectors: {
+                '&:hover': { color: "#ffffff" }
+            }
         }
     });
 

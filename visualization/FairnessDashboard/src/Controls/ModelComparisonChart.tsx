@@ -352,6 +352,10 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     color: "#333333",
                     backgroundColor: "#f3f2f1",
                 },
+                ':hover .ms-Dropdown-title': {
+                    color: "#333333",
+                    backgroundColor: "#f3f2f1",
+                },
             }},
             title: { color: "#ffffff", backgroundColor: "#333333", selectors: {
                 ':hover': {
