@@ -1,11 +1,28 @@
 # Changes
 
 ### v0.4.6
-* Refactoring of metrics:
-  * Remove `GroupMetricResult` type in favour of a `Bunch`.
-  * Add `group_summary` transformers.
+* Refactor metrics:
+  * Remove `GroupMetricResult` type in favor of a `Bunch`.
+  * Rename and slightly update signatures:
+    * `metric_by_group` changed to `group_summary`
+    * `make_group_metric` changed to `make_metric_group_summary`
+  * Add group summary transformers
+    `{difference,ratio,group_min,group_max}_from_group_summary`.
+  * Add factory `make_derived_metric`.
+* Add new metrics:
+  * base metrics `{true,false}_{positive,negative}_rate`
+  * group summary metrics `<metric>_group_summary`
+  * derived metrics `<metric>_{difference,ratio,group_min,group_max}`
+  * disparity metrics `{demographic_parity,equalized_odds}_{difference,ratio}`
+* Remove metrics:
+  * `fallout_rate` in favor of `false_positive_rate`
+  * `miss_rate` in favor of `false_negative_rate`
+  * `specificity_score` in favor of `true_negative_rate`
+* Change from public to private:
+  * `mean_{over,under}prediction` changed to `_mean_{over,under}prediction`
 * Fix warning due to changing default `dtype` when creating an empty
   `pandas.Series`.
+* Enable `GridSearch` for more than two sensitive features values.
 
 ### v0.4.5
 * Changes to `ThresholdOptimizer`:
