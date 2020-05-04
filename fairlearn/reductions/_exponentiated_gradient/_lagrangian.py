@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 import pickle
 import scipy.optimize as opt
+from sklearn.dummy import DummyClassifier
 from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
-from fairlearn.reductions._constant_predictor import ConstantPredictor
 
 logger = logging.getLogger(__name__)
 
@@ -141,8 +141,10 @@ class _Lagrangian:
 
         redY_unique = np.unique(redY)
         if len(redY_unique == 1):
-            logger.debug("redY had single value. Using ConstantPredictor")
-            classifier = ConstantPredictor(redY_unique[0])
+            logger.debug("redY had single value. Using DummyClassifier")
+            classifier = DummyClassifier(strategy='constant',
+                                         constant=redY_unique[0])
+            classifier.fit(self.X, redY, sample_weight=redW)
         else:
             classifier = pickle.loads(self.pickled_estimator)
             oracle_call_start_time = time()
