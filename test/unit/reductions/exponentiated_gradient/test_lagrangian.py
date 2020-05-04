@@ -131,11 +131,13 @@ def test_call_oracle_single_y_value(Constraints, eps, mocker):
     }
     X = pd.DataFrame(X_dict)
 
-    y = np.ndarray([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
-    A = np.ndarray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+    y = pd.Series([1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    A = pd.Series([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
 
-    # We mock the estimator, but we don't set anything on it, since it should not be called
+    # We mock the estimator, but we only patch it for pickling
     estimator = mocker.MagicMock()
+    mocker.patch('pickle.dumps')
+
     constraints = Constraints()
 
     lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, 1/eps)

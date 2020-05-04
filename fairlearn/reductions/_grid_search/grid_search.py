@@ -169,7 +169,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
             y_reduction_unique = np.unique(y_reduction)
             if len(y_reduction_unique) == 1:
-                logger.debug("y_reduction had single value. Using ConstantPredictor")
+                logger.debug("y_reduction had single value. Using DummyClassifier")
                 current_estimator = DummyClassifier(strategy='constant',
                                                     constant=y_reduction_unique[0])
                 current_estimator.fit(X, y_reduction, sample_weight=weights)
