@@ -222,3 +222,26 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
         coef1 = grid_search1._predictors[i].coef_
         coef2 = grid_search2._predictors[i].coef_
         assert np.array_equal(coef1, coef2)
+
+    def test_constant_predictor(self):
+        # Setup with data designed to result in "all single class"
+        # at some point in the grid
+        score_threshold = 0.1
+
+        number_a0 = 1
+        number_a1 = 24
+
+        a0_label = 11
+        a1_label = 3
+
+        X, y, A = _simple_threshold_data(number_a0, number_a1,
+                                         score_threshold, 1-score_threshold,
+                                         a0_label, a1_label)
+
+        estimator = LogisticRegression(solver='liblinear',
+                                       fit_intercept=True,
+                                       random_state=97)
+
+        grid_search1 = GridSearch(copy.deepcopy(estimator),
+                                  constraints=DemographicParity(),
+                                  grid_size=3)
