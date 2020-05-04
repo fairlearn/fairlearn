@@ -328,3 +328,19 @@ class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         self.estimator = LinearRegression()
         self.disparity_criterion = GroupLossMoment(ZeroOneLoss())
+
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    def setup_eps(self, A_two_dim):
+        X, Y, A = _quick_data(A_two_dim)
+        eps = 0.01
+        self.estimator = LinearRegression()
+        self.disparity_criterion = GroupLossMoment(ZeroOneLoss())
+        self.disparity_criterion.load_data(X, Y, eps=eps)
+
+        loss_eps = self.disparity_criterion.gamma(with_RHS=True)
+        loss = self.disparity_criterion.gamma(with_RHS=False)
+        assert (loss - loss_eps == eps)
+

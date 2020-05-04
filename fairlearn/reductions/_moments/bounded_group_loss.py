@@ -22,8 +22,8 @@ class ConditionalLossMoment(LossMoment):
     def load_data(self, X, y, **kwargs):
         """Load data into the moment object."""
         kwargs_mod = kwargs.copy()
-        if kwargs_mod.get(eps):
-            self.eps = kwargs_mod[eps]
+        if kwargs_mod.get("eps"):
+            self.eps = kwargs_mod.get("eps")
         if self.no_groups:
             kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
         super().load_data(X, y, **kwargs_mod)
