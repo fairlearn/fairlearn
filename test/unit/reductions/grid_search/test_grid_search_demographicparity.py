@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch, DemographicParity
+from fairlearn.reductions._constant_predictor import ConstantPredictor
 
 import copy
 import numpy as np
@@ -250,3 +251,8 @@ def test_constant_predictor():
     grid_search.fit(X, y, sensitive_features=A)
 
     # Check the predictors for a ConstantPredictor
+    have_constant_predictor = False
+    for p in grid_search._predictors:
+        if isinstance(p, ConstantPredictor):
+            have_constant_predictor = True
+    assert have_constant_predictor

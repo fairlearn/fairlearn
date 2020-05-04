@@ -3,6 +3,7 @@
 
 import copy
 import logging
+import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
@@ -11,6 +12,7 @@ from time import time
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn.reductions._moments import Moment, ClassificationMoment
+from fairlearn.reductions._constant_predictor import ConstantPredictor
 from ._grid_generator import _GridGenerator
 
 
@@ -165,12 +167,18 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             else:
                 y_reduction = y_train
 
-            current_estimator = copy.deepcopy(self.estimator)
-            logger.debug("Calling underlying estimator")
-            oracle_call_start_time = time()
-            current_estimator.fit(X, y_reduction, sample_weight=weights)
-            oracle_call_execution_time = time() - oracle_call_start_time
-            logger.debug("Call to underlying estimator complete")
+            y_reduction_unique = np.unique(y_reduction)
+            if len(y_reduction_unique) == 1:
+                logger.debug("y_reduction had single value. Using ConstantPredictor")
+                current_estimator = ConstantPredictor(y_reduction_unique[0])
+                oracle_call_execution_time = 0
+            else:
+                current_estimator = copy.deepcopy(self.estimator)
+                logger.debug("Calling underlying estimator")
+                oracle_call_start_time = time()
+                current_estimator.fit(X, y_reduction, sample_weight=weights)
+                oracle_call_execution_time = time() - oracle_call_start_time
+                logger.debug("Call to underlying estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
             self._predictors.append(current_estimator)
