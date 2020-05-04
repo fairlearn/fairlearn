@@ -39,7 +39,7 @@ class _Lagrangian:
     def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
         self.X = X
         self.constraints = constraints
-        self.constraints.load_data(X, y, sensitive_features=sensitive_features)
+        self.constraints.load_data(X, y, eps=eps, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
         self.pickled_estimator = pickle.dumps(estimator)

@@ -26,6 +26,8 @@ class ConditionalLossMoment(LossMoment):
     def load_data(self, X, y, **kwargs):
         """Load data into the moment object."""
         kwargs_mod = kwargs.copy()
+        if kwargs_mod.get(eps):
+            self.eps = kwargs_mod[eps]
         if self.no_groups:
             kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
         super().load_data(X, y, **kwargs_mod)
@@ -47,12 +49,14 @@ class ConditionalLossMoment(LossMoment):
             self.neg_basis_present.at[i] = False
             i += 1
 
-    def gamma(self, predictor):
+    def gamma(self, predictor, with_RHS=False):
         """Calculate the degree to which constraints are currently violated by the predictor."""
         self.tags[_PREDICTION] = predictor(self.X)
         self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
         self._gamma_descr = str(expect_attr[[_LOSS]])
+        if with_RHS:
+            return expect_attr[_LOSS] - self.eps
         return expect_attr[_LOSS]
 
     # add new method bound() that returns vector for RHS
