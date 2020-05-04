@@ -250,101 +250,10 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     }
 
     public render(): React.ReactNode {
-        if (!this.state || this.state.accuracyArray === undefined || this.state.disparityArray === undefined) {
-            this.loadData();
-            return (
-                <Spinner className={ModelComparisonChart.classNames.spinner} size={SpinnerSize.large} label={localization.calculating}/>
-            );
-        }
-        const data = this.state.accuracyArray.map((accuracy, index) => {
-
-            return {
-                Parity: this.state.disparityArray[index],
-                Accuracy: accuracy,
-                index: index
-            };
-        });
-
-        let minAccuracy: number = Number.MAX_SAFE_INTEGER;
-        let maxAccuracy: number = Number.MIN_SAFE_INTEGER;
-        let maxDisparity: number = Number.MIN_SAFE_INTEGER;
-        let minDisparity: number = Number.MAX_SAFE_INTEGER;
-        let minAccuracyIndex: number;
-        let maxAccuracyIndex: number;
-        let minDisparityIndex: number;
-        let maxDisparityIndex: number;
-        this.state.accuracyArray.forEach((value, index) => {
-            if (value >= maxAccuracy) {
-                maxAccuracyIndex = index;
-                maxAccuracy = value;
-            }
-            if (value <= minAccuracy) {
-                minAccuracyIndex = index;
-                minAccuracy = value;
-            }
-        });
-        this.state.disparityArray.forEach((value, index) => {
-            if (value >= maxDisparity) {
-                maxDisparityIndex = index;
-                maxDisparity = value;
-            }
-            if (value <= minDisparity) {
-                minDisparityIndex = index;
-                minDisparity = value;
-            }
-        });
-        const formattedMinAccuracy = FormatMetrics.formatNumbers(minAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
-        const formattedMaxAccuracy = FormatMetrics.formatNumbers(maxAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
-        const formattedMinDisparity = FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
-        const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
-        const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
-        
-        // const insights2 = [selectedMetric.title,
-        //     localization.ModelComparison.rangesFrom,
-        //     <strong>{formattedMinAccuracy}</strong>,
-        //     localization.ModelComparison.to,
-        //     <strong>{formattedMaxAccuracy}</strong>,
-        //     localization.ModelComparison.period,
-        //     localization.ModelComparison.disparity,
-        //     localization.ModelComparison.rangesFrom,
-        //     <strong>{formattedMinDisparity}</strong>,
-        //     localization.ModelComparison.to,
-        //     <strong>{formattedMaxDisparity}</strong>,
-        //     localization.ModelComparison.period
-        // ];
-
-        const insights2 = localization.formatString(
-            localization.ModelComparison.insightsText2, 
-            selectedMetric.title,
-            formattedMinAccuracy,
-            formattedMaxAccuracy,
-            formattedMinDisparity,
-            formattedMaxDisparity,
-        );
-
-        const insights3 = localization.formatString(
-            localization.ModelComparison.insightsText3,
-            selectedMetric.title.toLowerCase(),
-            selectedMetric.isMinimization ? formattedMinAccuracy : formattedMaxAccuracy, 
-            FormatMetrics.formatNumbers(this.state.disparityArray[selectedMetric.isMinimization ? minAccuracyIndex : maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
-        );
-
-        const insights4 = localization.formatString(
-            localization.ModelComparison.insightsText4,
-            selectedMetric.title.toLowerCase(),
-            FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
-            formattedMinDisparity
-        );
-
-        const howToReadText = localization.formatString(
-            localization.ModelComparison.howToReadText,
-            this.props.modelCount.toString(),
-            selectedMetric.title.toLowerCase(),
-            selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
-        );
         const featureOptions: IDropdownOption[] = this.props.dashboardContext.modelMetadata.featureNames.map(x => { return {key: x, text: x}});
         const accuracyOptions: IDropdownOption[] = this.props.accuracyPickerProps.accuracyOptions.map(x => { return {key: x.key, text: x.title}});
         const parityOptions: IDropdownOption[] = this.props.parityPickerProps.parityOptions.map(x => { return {key: x.key, text: x.title}});
+         
         const dropdownStyles: Partial<IDropdownStyles> = {
             label: { color: "#ffffff" },
             dropdown: { width: 180, selectors: {
@@ -365,6 +274,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             }},
             dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
         };
+        
         const modalStyles = {
             content : {
                 top                   : '50%',
@@ -381,18 +291,130 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 backgroundColor: "#333333"
             },
             overlay: {zIndex: 1000}
-        };          
-        const props = _.cloneDeep(this.plotlyProps);
-        props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
-            series.name = this.props.dashboardContext.modelNames[series.name];
-            series.text = this.props.dashboardContext.modelNames;
-            return series;
-        });
-        const accuracyMetricTitle = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title 
-        const parityMetricTitle = ParityOptions[this.props.parityPickerProps.selectedParityKey].title;
-        props.layout.xaxis.title = accuracyMetricTitle;
-        props.layout.yaxis.title = parityMetricTitle;
-        
+        };        
+         
+        var mainChart;
+        if (!this.state || this.state.accuracyArray === undefined || this.state.disparityArray === undefined) {
+            this.loadData();
+            mainChart = <Spinner className={ModelComparisonChart.classNames.spinner} size={SpinnerSize.large} label={localization.calculating}/>;
+        }
+        else {
+            const data = this.state.accuracyArray.map((accuracy, index) => {
+
+                return {
+                    Parity: this.state.disparityArray[index],
+                    Accuracy: accuracy,
+                    index: index
+                };
+            });
+    
+            let minAccuracy: number = Number.MAX_SAFE_INTEGER;
+            let maxAccuracy: number = Number.MIN_SAFE_INTEGER;
+            let maxDisparity: number = Number.MIN_SAFE_INTEGER;
+            let minDisparity: number = Number.MAX_SAFE_INTEGER;
+            let minAccuracyIndex: number;
+            let maxAccuracyIndex: number;
+            let minDisparityIndex: number;
+            let maxDisparityIndex: number;
+            this.state.accuracyArray.forEach((value, index) => {
+                if (value >= maxAccuracy) {
+                    maxAccuracyIndex = index;
+                    maxAccuracy = value;
+                }
+                if (value <= minAccuracy) {
+                    minAccuracyIndex = index;
+                    minAccuracy = value;
+                }
+            });
+            this.state.disparityArray.forEach((value, index) => {
+                if (value >= maxDisparity) {
+                    maxDisparityIndex = index;
+                    maxDisparity = value;
+                }
+                if (value <= minDisparity) {
+                    minDisparityIndex = index;
+                    minDisparity = value;
+                }
+            });
+            const formattedMinAccuracy = FormatMetrics.formatNumbers(minAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
+            const formattedMaxAccuracy = FormatMetrics.formatNumbers(maxAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
+            const formattedMinDisparity = FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
+            const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
+            const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
+            
+            // const insights2 = [selectedMetric.title,
+            //     localization.ModelComparison.rangesFrom,
+            //     <strong>{formattedMinAccuracy}</strong>,
+            //     localization.ModelComparison.to,
+            //     <strong>{formattedMaxAccuracy}</strong>,
+            //     localization.ModelComparison.period,
+            //     localization.ModelComparison.disparity,
+            //     localization.ModelComparison.rangesFrom,
+            //     <strong>{formattedMinDisparity}</strong>,
+            //     localization.ModelComparison.to,
+            //     <strong>{formattedMaxDisparity}</strong>,
+            //     localization.ModelComparison.period
+            // ];
+    
+            const insights2 = localization.formatString(
+                localization.ModelComparison.insightsText2, 
+                selectedMetric.title,
+                formattedMinAccuracy,
+                formattedMaxAccuracy,
+                formattedMinDisparity,
+                formattedMaxDisparity,
+            );
+    
+            const insights3 = localization.formatString(
+                localization.ModelComparison.insightsText3,
+                selectedMetric.title.toLowerCase(),
+                selectedMetric.isMinimization ? formattedMinAccuracy : formattedMaxAccuracy, 
+                FormatMetrics.formatNumbers(this.state.disparityArray[selectedMetric.isMinimization ? minAccuracyIndex : maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
+            );
+    
+            const insights4 = localization.formatString(
+                localization.ModelComparison.insightsText4,
+                selectedMetric.title.toLowerCase(),
+                FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
+                formattedMinDisparity
+            );
+    
+            const howToReadText = localization.formatString(
+                localization.ModelComparison.howToReadText,
+                this.props.modelCount.toString(),
+                selectedMetric.title.toLowerCase(),
+                selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
+            );
+            const props = _.cloneDeep(this.plotlyProps);
+            props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
+                series.name = this.props.dashboardContext.modelNames[series.name];
+                series.text = this.props.dashboardContext.modelNames;
+                return series;
+            });
+            const accuracyMetricTitle = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title 
+            const parityMetricTitle = ParityOptions[this.props.parityPickerProps.selectedParityKey].title;
+            props.layout.xaxis.title = accuracyMetricTitle;
+            props.layout.yaxis.title = parityMetricTitle;
+            
+            mainChart = <div className={ModelComparisonChart.classNames.main}>
+                            <div className={ModelComparisonChart.classNames.chart}>
+                                <AccessibleChart
+                                    plotlyProps={props}
+                                    sharedSelectionContext={this.props.selections}
+                                    theme={undefined}
+                                />
+                            </div>
+                            <div className={ModelComparisonChart.classNames.mainRight}>
+                                <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
+                                <div className={ModelComparisonChart.classNames.insightsText}>
+                                    <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
+                                    <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
+                                    <div className={ModelComparisonChart.classNames.textSectionLast}>{insights4}</div>
+                                </div>
+                                <div className={ModelComparisonChart.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
+                            </div>
+                        </div>;
+        }
         return (
             <Stack className={ModelComparisonChart.classNames.frame}>
                 <div className={ModelComparisonChart.classNames.header}>
@@ -449,24 +471,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         <p className={ModelComparisonChart.classNames.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.</p>
                     </ReactModal>
                 </div>
-                <div className={ModelComparisonChart.classNames.main}>
-                    <div className={ModelComparisonChart.classNames.chart}>
-                        <AccessibleChart
-                            plotlyProps={props}
-                            sharedSelectionContext={this.props.selections}
-                            theme={undefined}
-                        />
-                    </div>
-                    <div className={ModelComparisonChart.classNames.mainRight}>
-                        <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={ModelComparisonChart.classNames.insightsText}>
-                            <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
-                            <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
-                            <div className={ModelComparisonChart.classNames.textSectionLast}>{insights4}</div>
-                        </div>
-                        <div className={ModelComparisonChart.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
-                    </div>
-                </div>
+                {mainChart}
                 {/* <div>
                     <ChoiceGroup
                         className={ModelComparisonChart.classNames.radio}
