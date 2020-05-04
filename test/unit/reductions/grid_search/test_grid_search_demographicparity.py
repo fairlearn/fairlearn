@@ -243,7 +243,7 @@ def test_constant_predictor():
 
     grid_search = GridSearch(copy.deepcopy(estimator),
                              constraints=DemographicParity(),
-                             grid_size=11,
+                             grid_size=3,
                              grid_limit=1,
                              grid_offset=10)
 
@@ -251,8 +251,8 @@ def test_constant_predictor():
     grid_search.fit(X, y, sensitive_features=A)
 
     # Check the predictors for a ConstantPredictor
-    have_constant_predictor = False
-    for p in grid_search._predictors:
-        if isinstance(p, ConstantPredictor):
-            have_constant_predictor = True
-    assert have_constant_predictor
+    assert len(grid_search._predictors) == 3
+    assert isinstance(grid_search._predictors[0], ConstantPredictor)
+    assert grid_search._predictors[0].predict([0, 10]) == 0
+    assert isinstance(grid_search._predictors[1], LogisticRegression)
+    assert isinstance(grid_search._predictors[2], LogisticRegression)
