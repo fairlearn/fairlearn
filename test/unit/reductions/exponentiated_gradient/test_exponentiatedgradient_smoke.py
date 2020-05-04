@@ -1,11 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import numpy as np
 import pandas as pd
 import pytest
+from sklearn.linear_model import LogisticRegression
 
 
 from fairlearn.reductions import ExponentiatedGradient
+from fairlearn.reductions._constant_predictor import ConstantPredictor
 from fairlearn.reductions._exponentiated_gradient._constants import _MIN_T
 from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRateRatio,\
     TruePositiveRateDifference, ErrorRate
@@ -238,3 +241,36 @@ class TestExponentiatedGradientSmoke:
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))
+
+    def test_constant_predictor(self):
+        # Setup with data designed to result in "all single class"
+        # at some point in the grid
+        array_size = 1000
+        X_dict = {
+            "c": np.random.random(array_size),
+            "d": np.random.random(array_size)
+        }
+        X = pd.DataFrame(X_dict)
+
+        y = np.zeros(array_size)
+        y[0] = 1
+        A = np.zeros(array_size)
+        A = A + 11
+        A[0] = 10
+
+        estimator = LogisticRegression(solver='liblinear',
+                                       fit_intercept=True,
+                                       random_state=97)
+        expgrad = ExponentiatedGradient(estimator, DemographicParity())
+
+        # Following line should not throw an exception
+        expgrad.fit(X, y, sensitive_features=A)
+
+        # Check the predictors for a ConstantPredictor
+        have_constant_predictor = False
+        for p in expgrad._predictors:
+            if isinstance(p, ConstantPredictor):
+                have_constant_predictor = True
+        assert have_constant_predictor
+
+        
