@@ -214,10 +214,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         n_samples = len(X)
 
+        def get_weighted_predictions(row):
+            if self._weights[int(row.name)] == 0:
+                return np.zeros(n_samples)
+            else:
+                return self._hs[int(row.name)](X)
+
         # ignore classifiers with weight 0 since they can only contribute 0 to the result
         pred = pd.DataFrame(0, index=range(n_samples), columns=range(len(self._hs))) \
-            .apply(lambda row: np.zeros(n_samples) if self._weights[int(row.name)] == 0
-                   else self._hs[int(row.name)](X))
+            .apply(get_weighted_predictions)
 
         positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
