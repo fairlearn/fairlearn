@@ -23,6 +23,11 @@
 * Fix warning due to changing default `dtype` when creating an empty
   `pandas.Series`.
 * Enable `GridSearch` for more than two sensitive features values.
+* Add new disparity constraints for reductions methods as moments in
+  `fairlearn.reductions` including:
+  * `TruePositiveRateDifference`
+  * ratio options for all existing constraints in addition to the default,
+    i.e., difference between groups w.r.t. the relevant metric.
 
 ### v0.4.5
 * Changes to `ThresholdOptimizer`:
