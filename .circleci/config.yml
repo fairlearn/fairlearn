@@ -32,6 +32,10 @@ jobs:
           root: docs/_build
           paths: html
       
+      # additionally store artifacts to make them viewable in the CircleCI UX
+      - store_artifacts:
+          path: docs/_build/html
+      
   deploy-doc:
     docker:
       - image: node:14.0.0-stretch  # npm required for gh-pages
