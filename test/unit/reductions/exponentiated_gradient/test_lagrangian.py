@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import pickle
 import pytest
+from sklearn.dummy import DummyClassifier
 
-from fairlearn.reductions._constant_predictor import ConstantPredictor
 from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 
@@ -124,7 +124,7 @@ def test_call_oracle(Constraints, eps, mocker):
 
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
-def test_call_oracle_single_value_redY(Constraints, eps, mocker):
+def test_call_oracle_single_y_value(Constraints, eps, mocker):
     X_dict = {
         "c": [0, 1, 4, 1, 5, 1, 6, 0, 2, 4],
         "d": [1, 5, 1, 6, 2, 3, 5, 1, 5, 2]
@@ -149,7 +149,7 @@ def test_call_oracle_single_value_redY(Constraints, eps, mocker):
     lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
 
     result_estimator = lagrangian._call_oracle(lambda_vec)
-    assert isinstance(result_estimator, ConstantPredictor)
+    assert isinstance(result_estimator, DummyClassifier)
     assert result_estimator.predict([1]) == 1
 
     # Make sure the mocked estimator wasn't called

@@ -1,13 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
 
 
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions._constant_predictor import ConstantPredictor
 from fairlearn.reductions._exponentiated_gradient._constants import _MIN_T
 from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRateRatio,\
     TruePositiveRateDifference, ErrorRate
@@ -241,7 +242,7 @@ class TestExponentiatedGradientSmoke:
                     sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))
 
-    def test_constant_predictor(self):
+    def test_single_y_value(self):
         # Setup with data designed to result in "all single class"
         # at some point in the grid
         X_dict = {
@@ -262,5 +263,5 @@ class TestExponentiatedGradientSmoke:
 
         # Check the predictors for a ConstantPredictor
         for p in expgrad._predictors:
-            assert isinstance(p, ConstantPredictor)
-            assert p.predict([1,2,3,4]) == 1
+            assert isinstance(p, DummyClassifier)
+            assert np.array_equal(p.predict([1, 2, 3, 4]), [1, 1, 1, 1])

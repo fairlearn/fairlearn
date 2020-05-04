@@ -2,13 +2,13 @@
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch, DemographicParity
-from fairlearn.reductions._constant_predictor import ConstantPredictor
 
 import copy
 import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
 
 from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
 
@@ -225,7 +225,7 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
         assert np.array_equal(coef1, coef2)
 
 
-def test_constant_predictor():
+def test_single_y_class():
     # Setup with data designed to result in "all single class"
     # at some point in the grid
     X_dict = {
@@ -234,7 +234,9 @@ def test_constant_predictor():
     }
     X = pd.DataFrame(X_dict)
 
-    y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    # Set y to a constant
+    y_val = 1
+    y = np.full(10, y_val)
     A = ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b']
 
     estimator = LogisticRegression(solver='liblinear',
@@ -244,13 +246,13 @@ def test_constant_predictor():
     grid_search = GridSearch(copy.deepcopy(estimator),
                              constraints=DemographicParity(),
                              grid_size=3,
-                             grid_limit=1,
-                             grid_offset=10)
+                             grid_limit=0.1,
+                             grid_offset=5)
 
     # We want to avoid an exception on the following line
     grid_search.fit(X, y, sensitive_features=A)
 
-    # Check all predictors are a ConstantPredictor
+    # Check all predictors are DummyClassifiers
     for p in grid_search._predictors:
-        assert isinstance(p, ConstantPredictor)
-        assert p.predict([1, 2]) == 0
+        assert isinstance(p, DummyClassifier)
+        assert np.array_equal(p.predict([1, 2]), [y_val, y_val])
