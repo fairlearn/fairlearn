@@ -7,6 +7,7 @@ import pandas as pd
 import pickle
 import pytest
 
+from fairlearn.reductions._constant_predictor import ConstantPredictor
 from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 
@@ -119,3 +120,37 @@ def test_call_oracle(Constraints, eps, mocker):
     assert (kwargs['sample_weight'] == redW).all()
     assert lagrangian.n_oracle_calls == 1
     assert len(lagrangian.oracle_execution_times) == 1
+
+
+@pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
+def test_call_oracle_single_value_redY(Constraints, eps, mocker):
+    X_dict = {
+        "c": [0, 1, 4, 1, 5, 1, 6, 0, 2, 4],
+        "d": [1, 5, 1, 6, 2, 3, 5, 1, 5, 2]
+    }
+    X = pd.DataFrame(X_dict)
+
+    y = np.ndarray([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    A = np.ndarray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+
+    # We mock the estimator, but we don't set anything on it, since it should not be called
+    estimator = mocker.MagicMock()
+    constraints = Constraints()
+
+    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, 1/eps)
+
+    # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
+    # object for it to avoid the dependence on the lagrangian object.
+    constraints.load_data(X, y, sensitive_features=A)
+    objective = constraints.default_objective()
+    objective.load_data(X, y, sensitive_features=A)
+    theta = pd.Series(0, constraints.index)
+    lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
+
+    result_estimator = lagrangian._call_oracle(lambda_vec)
+    assert isinstance(result_estimator, ConstantPredictor)
+    assert result_estimator.predict([1]) == 1
+
+    # Make sure the mocked estimator wasn't called
+    assert len(estimator.method_calls) == 0

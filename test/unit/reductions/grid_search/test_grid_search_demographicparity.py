@@ -234,8 +234,8 @@ def test_constant_predictor():
     }
     X = pd.DataFrame(X_dict)
 
-    y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-    A = [3, 3, 3, 3, 3, 3, 3, 3, 3, 11]
+    y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    A = ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b']
 
     estimator = LogisticRegression(solver='liblinear',
                                    fit_intercept=True,
@@ -250,9 +250,7 @@ def test_constant_predictor():
     # We want to avoid an exception on the following line
     grid_search.fit(X, y, sensitive_features=A)
 
-    # Check the predictors for a ConstantPredictor
-    assert len(grid_search._predictors) == 3
-    assert isinstance(grid_search._predictors[0], ConstantPredictor)
-    assert grid_search._predictors[0].predict([0, 10]) == 0
-    assert isinstance(grid_search._predictors[1], LogisticRegression)
-    assert isinstance(grid_search._predictors[2], LogisticRegression)
+    # Check all predictors are a ConstantPredictor
+    for p in grid_search._predictors:
+        assert isinstance(p, ConstantPredictor)
+        assert p.predict([1, 2]) == 0

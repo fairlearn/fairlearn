@@ -10,6 +10,8 @@ from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
+from fairlearn.reductions._constant_predictor import ConstantPredictor
+
 logger = logging.getLogger(__name__)
 
 
@@ -137,11 +139,16 @@ class _Lagrangian:
         redW = signed_weights.abs()
         redW = self.n * redW / redW.sum()
 
-        classifier = pickle.loads(self.pickled_estimator)
-        oracle_call_start_time = time()
-        classifier.fit(self.X, redY, sample_weight=redW)
-        self.oracle_execution_times.append(time() - oracle_call_start_time)
-        self.n_oracle_calls += 1
+        redY_unique = np.unique(redY)
+        if len(redY_unique == 1):
+            logger.debug("redY had single value. Using ConstantPredictor")
+            classifier = ConstantPredictor(redY_unique[0])
+        else:
+            classifier = pickle.loads(self.pickled_estimator)
+            oracle_call_start_time = time()
+            classifier.fit(self.X, redY, sample_weight=redW)
+            self.oracle_execution_times.append(time() - oracle_call_start_time)
+            self.n_oracle_calls += 1
 
         return classifier
 
