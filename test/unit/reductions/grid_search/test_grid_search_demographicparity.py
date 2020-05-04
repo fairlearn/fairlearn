@@ -223,25 +223,30 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
         coef2 = grid_search2._predictors[i].coef_
         assert np.array_equal(coef1, coef2)
 
-    def test_constant_predictor(self):
-        # Setup with data designed to result in "all single class"
-        # at some point in the grid
-        score_threshold = 0.1
 
-        number_a0 = 1
-        number_a1 = 24
+def test_constant_predictor():
+    # Setup with data designed to result in "all single class"
+    # at some point in the grid
+    X_dict = {
+        "c": [0, 1, 4, 1, 5, 1, 6, 0, 2, 4],
+        "d": [1, 5, 1, 6, 2, 3, 5, 1, 5, 2]
+    }
+    X = pd.DataFrame(X_dict)
 
-        a0_label = 11
-        a1_label = 3
+    y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    A = [3, 3, 3, 3, 3, 3, 3, 3, 3, 11]
 
-        X, y, A = _simple_threshold_data(number_a0, number_a1,
-                                         score_threshold, 1-score_threshold,
-                                         a0_label, a1_label)
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
 
-        estimator = LogisticRegression(solver='liblinear',
-                                       fit_intercept=True,
-                                       random_state=97)
+    grid_search = GridSearch(copy.deepcopy(estimator),
+                             constraints=DemographicParity(),
+                             grid_size=11,
+                             grid_limit=1,
+                             grid_offset=10)
 
-        grid_search1 = GridSearch(copy.deepcopy(estimator),
-                                  constraints=DemographicParity(),
-                                  grid_size=3)
+    # We want to avoid an exception on the following line
+    grid_search.fit(X, y, sensitive_features=A)
+
+    # Check the predictors for a ConstantPredictor
