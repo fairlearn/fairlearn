@@ -53,8 +53,8 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     L_high_expected = best_h_error + B * (best_h_gamma.max() - eps)
 
     # manually set errors and gammas which would otherwise be done in the best_h step
-    lagrangian.errors = pd.Series([best_h_error])
-    lagrangian.gammas = pd.Series([best_h_gamma])
+    lagrangian.errors_ = pd.Series([best_h_error])
+    lagrangian.gammas_ = pd.Series([best_h_gamma])
 
     # call _eval to get the desired results L, L_high, gamma, error;
     # _eval is compatible with a callable h or a vector Q
@@ -117,5 +117,5 @@ def test_call_oracle(Constraints, eps, mocker):
     assert (args[0] == X).all().all()
     assert (args[1] == redY).all()
     assert (kwargs['sample_weight'] == redW).all()
-    assert lagrangian.n_oracle_calls == 1
-    assert len(lagrangian.oracle_execution_times) == 1
+    assert lagrangian.n_oracle_calls_ == 1
+    assert len(lagrangian.oracle_execution_times_) == 1

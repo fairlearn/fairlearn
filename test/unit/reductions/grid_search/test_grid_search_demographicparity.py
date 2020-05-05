@@ -122,7 +122,7 @@ def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim, o
     sample_proba = grid_search.predict_proba(test_X)
     assert np.allclose(sample_proba, [[0.55069845, 0.44930155], [0.41546008, 0.58453992]])
 
-    sample_results = grid_search._predictors[0].predict(test_X)
+    sample_results = grid_search.predictors_[0].predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
 
 

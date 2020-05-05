@@ -214,10 +214,10 @@ class TestExponentiatedGradientSmoke:
         disparity = disparity_moment.gamma(Q).max()
         error = error.gamma(Q)[0]
 
-        assert expgrad.best_gap == pytest.approx(data["best_gap"], abs=self._PRECISION)
-        assert expgrad.last_t == data["last_t"]
-        assert expgrad.best_t == data["best_t"]
-        assert expgrad.last_t >= _MIN_T
+        assert expgrad.best_gap_ == pytest.approx(data["best_gap"], abs=self._PRECISION)
+        assert expgrad.last_t_ == data["last_t"]
+        assert expgrad.best_t_ == data["best_t"]
+        assert expgrad.last_t_ >= _MIN_T
         assert disparity == pytest.approx(data["disp"], abs=self._PRECISION)
         assert error == pytest.approx(data["error"], abs=self._PRECISION)
         assert expgrad.n_oracle_calls_ == data["n_oracle_calls"]

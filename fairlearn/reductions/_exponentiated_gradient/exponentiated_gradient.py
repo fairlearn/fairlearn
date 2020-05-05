@@ -174,10 +174,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 self.weights_.at[h_idx] = 0.0
 
         self.last_t_ = len(Qs) - 1
-        self.predictors_ = lagrangian.classifiers
-        self.n_oracle_calls_ = lagrangian.n_oracle_calls
-        self.oracle_execution_times_ = lagrangian.oracle_execution_times
-        self.lambda_vecs_lagrangian_ = lagrangian.lambdas
+        self.predictors_ = lagrangian.predictors_
+        self.n_oracle_calls_ = lagrangian.n_oracle_calls_
+        self.oracle_execution_times_ = lagrangian.oracle_execution_times_
+        self.lambda_vecs_lagrangian_ = lagrangian.lambdas_
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
                      self.eps, B, self.nu, self.max_iterations, eta_min)

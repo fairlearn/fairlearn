@@ -75,8 +75,8 @@ class _Lagrangian:
             error = self.obj.gamma(Q)[0]
             gamma = self.constraints.gamma(Q)
         else:
-            error = self.errors[Q.index].dot(Q)
-            gamma = self.gammas[Q.index].dot(Q)
+            error = self.errors_[Q.index].dot(Q)
+            gamma = self.gammas_[Q.index].dot(Q)
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
@@ -116,7 +116,7 @@ class _Lagrangian:
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
         result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
-        Q = pd.Series(result.x[:-1], self.hs.index)
+        Q = pd.Series(result.x[:-1], self.hs_.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
