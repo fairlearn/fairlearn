@@ -153,6 +153,7 @@ def test_call_oracle_single_y_value(Constraints, eps, mocker):
     result_estimator = lagrangian._call_oracle(lambda_vec)
     assert isinstance(result_estimator, DummyClassifier)
     assert result_estimator.predict([1]) == 1
+    assert lagrangian.n_dummy_classifiers == 1
 
     # Make sure the mocked estimator wasn't called
     assert len(estimator.method_calls) == 0
