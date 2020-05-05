@@ -55,6 +55,7 @@ class _Lagrangian:
         self.lambdas = pd.DataFrame()
         self.n = self.X.shape[0]
         self.n_oracle_calls = 0
+        self.n_dummy_classifiers = 0
         self.oracle_execution_times = []
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
@@ -145,6 +146,7 @@ class _Lagrangian:
             classifier = DummyClassifier(strategy='constant',
                                          constant=redY_unique[0])
             classifier.fit(self.X, redY, sample_weight=redW)
+            self.n_dummy_classifiers += 1
         else:
             classifier = pickle.loads(self.pickled_estimator)
             oracle_call_start_time = time()
