@@ -140,7 +140,7 @@ class _Lagrangian:
         redW = self.n * redW / redW.sum()
 
         redY_unique = np.unique(redY)
-        if len(redY_unique == 1):
+        if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
             classifier = DummyClassifier(strategy='constant',
                                          constant=redY_unique[0])
