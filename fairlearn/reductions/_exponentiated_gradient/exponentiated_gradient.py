@@ -68,6 +68,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.oracle_execution_times_ = None
         self.lambda_vecs_ = pd.DataFrame()
         self.lambda_vecs_LP_ = pd.DataFrame()
+        self.lambda_vecs_lagrangian_ = pd.DataFrame()
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -78,15 +79,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        _, y_train, A = _validate_and_reformat_input(X, y, **kwargs)
+        _, y_train, sensitive_features = _validate_and_reformat_input(X, y, **kwargs)
 
         n = y_train.shape[0]
 
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self.eps
-        lagrangian = _Lagrangian(X, A, y_train, self.estimator, self.constraints,
-                                 self.eps, B)
+        lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
+                                 self.constraints, self.eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
@@ -106,11 +107,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
-            pred_h = h(X)
 
             if t == 0:
                 if self.nu is None:
-                    self.nu = _ACCURACY_MUL * (pred_h - y_train).abs().std() / np.sqrt(n)
+                    self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
                 eta_min = self.nu / (2 * B)
                 eta = self.learning_rate / B
                 logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
@@ -141,12 +141,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 Qs.append(Q_LP)
                 gaps.append(gap_LP)
 
-            logger.debug("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f"
-                         ", gap=%.6f, disp=%.3f, err=%.3f, gap_LP=%.6f",
-                         _INDENTATION, eta, result_EG.L_low,
-                         result_EG.L, result_EG.L_high,
-                         gap_EG, result_EG.gamma.max(),
-                         result_EG.error, gap_LP)
+            logger.debug("%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f, gap=%.6f, disp=%.3f, "
+                         "err=%.3f, gap_LP=%.6f",
+                         _INDENTATION, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
+                         gap_EG, result_EG.gamma.max(), result_EG.error, gap_LP)
 
             if (gaps[t] < self.nu) and (t >= _MIN_T):
                 # solution found
@@ -176,9 +174,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 self.weights_.at[h_idx] = 0.0
 
         self.last_t_ = len(Qs) - 1
-        self.predictors_ = lagrangian.predictors_
-        self.n_oracle_calls_ = lagrangian.n_oracle_calls_
-        self.oracle_execution_times_ = lagrangian.oracle_execution_times_
+        self.predictors_ = lagrangian.classifiers
+        self.n_oracle_calls_ = lagrangian.n_oracle_calls
+        self.oracle_execution_times_ = lagrangian.oracle_execution_times
+        self.lambda_vecs_lagrangian_ = lagrangian.lambdas
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
                      self.eps, B, self.nu, self.max_iterations, eta_min)
