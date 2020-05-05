@@ -99,12 +99,12 @@ sphinx_gallery_conf = {
 
 # -- LaTeX macros ------------------------------------------------------------
 
-mathjax_config = {                  
-    "TeX": {                        
-        "Macros": {                 
+mathjax_config = {
+    "TeX": {
+        "Macros": {
             "E": '{\\mathbb{E}}',
             "P": '{\\mathbb{P}}',
             "given": '\\mathbin{\\vert}'
-            }                       
-        }                           
+            }
+        }
     }
