@@ -53,6 +53,8 @@ class Moment:
     def gamma(self, predictor):  # noqa: D102
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
+        
+    # add bound method that takes only self as argument 
 
     # add bound method that takes only self as argument
     def bound(self):  # noqa: D102
