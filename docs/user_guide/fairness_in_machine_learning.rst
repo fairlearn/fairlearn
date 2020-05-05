@@ -90,19 +90,18 @@ For example, in Fairlearn, we consider the following types of parity constraints
   :math:`h` satisfies demographic parity under a distribution over
   :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
   independent of the sensitive feature :math:`A`. This is equivalent to
-  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`.
-  `[Agarwal, Beygelzimer, Dudik, Langford, Wallach] <https://arxiv.org/pdf/1803.02453.pdf>`__
+  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#3]_
 
 * *Equalized odds*: A classifier :math:`h` satisfies equalized odds under a
   distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
   conditionally independent of the sensitive feature :math:`A` given the label
   :math:`Y`. This is equivalent to
   :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-  `[Agarwal, Beygelzimer, Dudik, Langford, Wallach] <https://arxiv.org/pdf/1803.02453.pdf>`__
+  [#3]_
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-  `[Hardt, Price, Srebro] <https://ttic.uchicago.edu/~nati/Publications/HardtPriceSrebro2016.pdf>`_
+  [#2]_
 
 *Regression*:
 
@@ -110,12 +109,11 @@ For example, in Fairlearn, we consider the following types of parity constraints
   under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
   of the sensitive feature :math:`A`. This is equivalent to
   :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-  `[Agarwal, Dudik, Wu] <https://arxiv.org/pdf/1905.12843.pdf>`__
+  [#1]_
 
 * *Bounded group loss*: A predictor :math:`f` satisfies bounded group loss at
   level :math:`\zeta` under a distribution over :math:`(X, A, Y)` if
-  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`.
-  `[Agarwal, Dudik, Wu] <https://arxiv.org/pdf/1905.12843.pdf>`__
+  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#1]_
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded
 group loss primarily seeks to mitigate quality-of-service harms. Equalized
@@ -142,3 +140,19 @@ Additionally, group metrics yield the minimum and maximum metric value and for
 which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
 subpackage :code:`fairlearn.metrics`.
+
+
+.. topic:: References:
+
+   .. [#1] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
+      Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
+      ICML, 2019.
+   
+   .. [#2] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
+      Learning"
+      <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
+      NIPS, 2016.
+   
+   .. [#3] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
+      Approach to Fair Classification"
+      <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.

@@ -33,7 +33,7 @@ We follow the approach known as **group fairness**, which asks: _Which groups of
 
 Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The Fairlearn package enables assessment and mitigation of unfairness under several common definitions.
 To learn more about our definitions of fairness, please visit our
-[terminology page](https://fairlearn.github.io/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems).
+[user guide on Fairness of AI Systems](https://fairlearn.github.io/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems).
 
 >_Note_:
 > Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
