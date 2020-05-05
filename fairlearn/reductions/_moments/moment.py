@@ -53,6 +53,8 @@ class Moment:
     def gamma(self, predictor):  # noqa: D102
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
+        
+    # add bound method that takes only self as argument 
 
     def project_lambda(self, lambda_vec):  # noqa: D102
         """Return the projected lambda values."""
