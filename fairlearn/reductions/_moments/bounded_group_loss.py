@@ -12,6 +12,7 @@ class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group."""
 
     def __init__(self, loss, no_groups=False):
+        # TODO: add (upper_)bound provided to init -- specific to conditional loss 
         super().__init__(loss)
         self.no_groups = no_groups
 
@@ -22,6 +23,7 @@ class ConditionalLossMoment(LossMoment):
     def load_data(self, X, y, **kwargs):
         """Load data into the moment object."""
         kwargs_mod = kwargs.copy()
+        # TODO: remove .get("eps")
         if kwargs_mod.get("eps"):
             self.eps = kwargs_mod.get("eps")
         if self.no_groups:
@@ -44,16 +46,20 @@ class ConditionalLossMoment(LossMoment):
             self.pos_basis[i][attr] = 1
             self.neg_basis_present.at[i] = False
             i += 1
-
+     
     def gamma(self, predictor, with_RHS=False):
         """Calculate the degree to which constraints are currently violated by the predictor."""
         self.tags[_PREDICTION] = predictor(self.X)
         self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
         self._gamma_descr = str(expect_attr[[_LOSS]])
+        
+        # TODO: revert gamma to original
         if with_RHS:
             return expect_attr[_LOSS] - self.eps
         return expect_attr[_LOSS]
+    
+    # add new method bound() that returns vector for RHS 
 
     def project_lambda(self, lambda_vec):
         """Return the lambda values."""
