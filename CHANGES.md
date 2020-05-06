@@ -29,6 +29,8 @@
   * `TruePositiveRateDifference`
   * ratio options for all existing constraints in addition to the default,
     i.e., difference between groups w.r.t. the relevant metric.
+* Make `ExponentiatedGradient` require 0-1 labels for classification problems,
+  pending a better solution for Issue 339.
 
 ### v0.4.5
 
