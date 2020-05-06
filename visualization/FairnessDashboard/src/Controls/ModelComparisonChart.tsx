@@ -65,6 +65,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         ],
         layout: {
             autosize: true,
+            plot_bgcolor:"#F2F2F2",
             font: {
                 size: 10
             },
@@ -74,16 +75,16 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             },
             hovermode: 'closest',
             xaxis: {
+                showgrid: false,
                 automargin: true,
                 fixedrange: true,
                 mirror: true,
-                linecolor: '#CCCCCC',
-                linewidth: 1,
                 title:{
                     text: 'Error'
                 }
             },
             yaxis: {
+                showgrid: false,
                 automargin: true,
                 fixedrange: true,
                 title:{
