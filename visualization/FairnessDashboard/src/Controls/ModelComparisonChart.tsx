@@ -104,7 +104,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             padding: "40px"
         },
         header: {
-            backgroundColor: "#333333",
+            backgroundColor: "#222222",
             padding: "0 50px",
             height: "90px",
             display: "inline-flex",
@@ -114,12 +114,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         },
         headerTitle: {
             color: "#FFFFFF",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100"
+            fontSize: "30px",
+            lineHeight: "43px",
+            fontWeight: "300"
         },
         headerOptions: {
-            backgroundColor: "#333333",
+            backgroundColor: "#222222",
             padding: "0 40px"
         },
         dropDown: {
@@ -266,13 +266,14 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     backgroundColor: "#f3f2f1",
                 },
             }},
-            title: { color: "#ffffff", backgroundColor: "#333333", selectors: {
+            title: { color: "#ffffff", backgroundColor: "#353535", borderWidth: "0px", borderRadius: "5px", selectors: {
                 ':hover': {
                     color: "#333333",
                     backgroundColor: "#f3f2f1"
                 }
             }},
-            dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
+            caretDown: { color: "#ffffff" },
+            dropdownItem: { color: "#ffffff", backgroundColor: "#353535" }
         };
         
         const modalStyles = {
@@ -418,13 +419,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         return (
             <Stack className={ModelComparisonChart.classNames.frame}>
                 <div className={ModelComparisonChart.classNames.header}>
-                    <h2 className={ModelComparisonChart.classNames.headerTitle}>{localization.ModelComparison.title}</h2>
+                    <h2 className={ModelComparisonChart.classNames.headerTitle}>{localization.ModelComparison.title} <b>assessment</b></h2>
                     {/* <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={ModelComparisonChart.classNames.editButton}>{localization.Report.editConfiguration}</ActionButton> */}
                 </div>
                 <div className={ModelComparisonChart.classNames.headerOptions}>
                     <Dropdown
                         className={ModelComparisonChart.classNames.dropDown}
-                        label="Feature"
+                        // label="Feature"
                         defaultSelectedKey={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         options={featureOptions}
                         disabled={false}
@@ -433,7 +434,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     />
                     <Dropdown
                         className={ModelComparisonChart.classNames.dropDown}
-                        label="Accuracy"
+                        // label="Accuracy"
                         defaultSelectedKey={this.props.accuracyPickerProps.selectedAccuracyKey}
                         options={accuracyOptions}
                         disabled={false}
@@ -442,7 +443,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     />
                     <Dropdown
                         className={ModelComparisonChart.classNames.dropDown}
-                        label="Parity"
+                        // label="Parity"
                         defaultSelectedKey={this.props.parityPickerProps.selectedParityKey}
                         options={parityOptions}
                         disabled={false}

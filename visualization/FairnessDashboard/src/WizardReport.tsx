@@ -63,7 +63,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         },
         header: {
             padding: "0px 90px 20px 90px",
-            backgroundColor: "#333333"
+            backgroundColor: "#222222"
         },
         multimodelButton: {
             marginTop: "20px",
@@ -75,15 +75,15 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         headerTitle: {
             paddingTop: "10px",
             color: "#ffffff",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100"
+            fontSize: "30px",
+            lineHeight: "43px",
+            fontWeight: "300"
         },
         headerBanner: {
             display: "flex"
         },
         headerOptions: {
-            backgroundColor: "#333333",
+            backgroundColor: "#222222",
         },
         bannerWrapper: {
             width: "100%",
@@ -341,13 +341,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 }
             }},
             label: { color: "#ffffff" },
-            title: { color: "#ffffff", backgroundColor: "#333333", selectors: {
+            title: { color: "#ffffff", backgroundColor: "#353535", borderWidth: "0px", borderRadius: "5px", selectors: {
                 ':hover': {
                     color: "#333333",
                     backgroundColor: "#f3f2f1"
                 }
             }},
-            dropdownItem: { color: "#ffffff", backgroundColor: "#333333" }
+            caretDown: { color: "#ffffff" },
+            dropdownItem: { color: "#ffffff", backgroundColor: "#353535" }
         };
         const modalStyles = {
             content : {

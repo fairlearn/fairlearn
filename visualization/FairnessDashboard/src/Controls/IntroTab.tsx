@@ -14,7 +14,7 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
         firstSection: {
             padding: "60px 60px",
             fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
-            backgroundColor: "#333333",
+            backgroundColor: "#222222",
             color: "#FFFFFF",
         },
         firstSectionTitle: {
