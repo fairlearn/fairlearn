@@ -74,6 +74,6 @@ html_static_path = ['_static']
 pygments_style = 'sphinx'
 
 sphinx_gallery_conf = {
-    'examples_dirs': '../examples',
-    'gallery_dirs': 'auto_examples',
+     'examples_dirs': '../examples',
+     'gallery_dirs': 'auto_examples',
 }
