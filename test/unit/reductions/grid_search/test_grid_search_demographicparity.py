@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
 
 from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
 
@@ -222,3 +223,38 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
         coef1 = grid_search1._predictors[i].coef_
         coef2 = grid_search2._predictors[i].coef_
         assert np.array_equal(coef1, coef2)
+
+
+def test_single_y_class():
+    # Setup with data designed to result in "all single class"
+    # at some point in the grid
+    X_dict = {
+        "c": [0, 1, 4, 1, 5, 1, 6, 0, 2, 4],
+        "d": [1, 5, 1, 6, 2, 3, 5, 1, 5, 2]
+    }
+    X = pd.DataFrame(X_dict)
+
+    # Set y to a constant
+    y_val = 1
+    y = np.full(10, y_val)
+    A = ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b']
+
+    estimator = LogisticRegression(solver='liblinear',
+                                   fit_intercept=True,
+                                   random_state=97)
+
+    grid_search = GridSearch(copy.deepcopy(estimator),
+                             constraints=DemographicParity(),
+                             grid_size=3,
+                             grid_limit=0.1,
+                             grid_offset=5)
+
+    # We want to avoid an exception on the following line
+    grid_search.fit(X, y, sensitive_features=A)
+
+    # Check all predictors are DummyClassifiers
+    test_X_dict = {"c": [134534, 27381], "d": [1923, 14123]}
+    test_X = pd.DataFrame(test_X_dict)
+    for p in grid_search._predictors:
+        assert isinstance(p, DummyClassifier)
+        assert np.array_equal(p.predict(test_X), [y_val, y_val])

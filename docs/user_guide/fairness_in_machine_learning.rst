@@ -1,4 +1,5 @@
 .. _fairness_in_machine_learning:
+.. _terminology:
 
 Fairness in Machine Learning
 ============================
