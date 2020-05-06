@@ -270,8 +270,10 @@ class TestExponentiatedGradientSmoke:
         expgrad.fit(X, y, sensitive_features=A)
 
         # Check the predictors for a ConstantPredictor
+        test_X_dict = {"c": [1, 2, 3, 4, 5, 6]}
+        test_X = pd.DataFrame(test_X_dict)
         assert expgrad._n_oracle_calls_dummy_returned > 0
         assert len(expgrad._oracle_execution_times) == expgrad._n_oracle_calls
         for p in expgrad._predictors:
             assert isinstance(p, DummyClassifier)
-            assert np.array_equal(p.predict([1, 2, 3, 4]), [1, 1, 1, 1])
+            assert np.array_equal(p.predict(test_X), [1, 1, 1, 1, 1, 1])

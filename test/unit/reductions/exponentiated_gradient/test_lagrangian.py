@@ -150,9 +150,12 @@ def test_call_oracle_single_y_value(Constraints, eps, mocker):
     theta = pd.Series(0, constraints.index)
     lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
 
+    test_X_dict = {"c": [10000], "d": [2000000]}
+    test_X = pd.DataFrame(test_X_dict)
+
     result_estimator = lagrangian._call_oracle(lambda_vec)
     assert isinstance(result_estimator, DummyClassifier)
-    assert result_estimator.predict([1]) == 1
+    assert result_estimator.predict(test_X) == 1
     assert lagrangian.n_oracle_calls_dummy_returned == 1
 
     # Make sure the mocked estimator wasn't called
