@@ -18,6 +18,7 @@ import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
 import { AccuracyOptions } from "./AccuracyMetrics";
 import { NONAME } from "dns";
 import { ChartColors } from "./ChartColors";
+import { withSlots } from "office-ui-fabric-react/lib/Foundation";
 
 interface IMetrics {
     globalAccuracy: number;
@@ -250,6 +251,15 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             fontWeight: "400",
             paddingLeft: "20px"
         },
+        doneButton: {
+            color: "#FFFFFF",
+            borderRadius: "5px",
+            background: "#5A53FF",
+            padding: "5px 15px",
+            selectors: {
+                '&:hover': { color: "#ffffff" }
+            }
+        },
         equalizedOdds: {
             float: "left",
             fontWeight: "600",
@@ -268,8 +278,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         modalContentHelp: {
             float: 'left',
             paddingTop: '10px',
+            paddingRight: '20px',
             wordWrap: "break-word",
-            width: "300px"
+            width: "300px",
+            textAlign: "center"
         },
         multimodelSection: {
             display: "flex",
@@ -363,7 +375,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 transform             : 'translate(-50%, -50%)',
                 fontFamily: "Segoe UI",
                 color: "#FFFFFF",
-                backgroundColor: "#333333"
+                borderRadius: "5px",
+                backgroundColor: "#222222",
+                boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.1)"
             },
             overlay: {zIndex: 1000}
         };
@@ -639,8 +653,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                                     isOpen={this.state.showModalHelp}
                                     contentLabel="Minimal Modal Example"
                                     >
-                                    <ActionButton className={WizardReport.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton>
-                                    <p className={WizardReport.classNames.modalContentHelp}>{localization.Report.classificationAccuracyHowToRead1}<br/><br/>{localization.Report.classificationAccuracyHowToRead2}<br/><br/>{localization.Report.classificationAccuracyHowToRead3}</p>
+                                    {/* <ActionButton className={WizardReport.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
+                                    <p className={WizardReport.classNames.modalContentHelp}>{localization.Report.classificationAccuracyHowToRead1}<br/><br/>{localization.Report.classificationAccuracyHowToRead2}<br/><br/>{localization.Report.classificationAccuracyHowToRead3}<br /><br /><ActionButton className={WizardReport.classNames.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
                                 </ReactModal>
                         </div>
                         <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>

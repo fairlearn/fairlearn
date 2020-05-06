@@ -150,16 +150,25 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             paddingLeft: "20px"
         },
         doneButton: {
-            color: "#FFFFFF"
+            color: "#FFFFFF",
+            borderRadius: "5px",
+            background: "#5A53FF",
+            padding: "5px 15px",
+            selectors: {
+                '&:hover': { color: "#ffffff" }
+            }
         },
         modalContentIntro: {
             float: 'left',
             textAlign: 'center',
-            paddingTop: '10px'
+            paddingTop: '10px',
+            paddingRight: '20px'
         },
         modalContentHelp: {
             float: 'left',
-            paddingTop: '10px'
+            textAlign: 'center',
+            paddingTop: '10px',
+            paddingRight: '20px',
         },
         editButton: {
             color: "#333333",
@@ -289,7 +298,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 transform             : 'translate(-50%, -50%)',
                 fontFamily: "Segoe UI",
                 color: "#FFFFFF",
-                backgroundColor: "#333333"
+                borderRadius: "5px",
+                backgroundColor: "#222222",
+                boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.1)"
             },
             overlay: {zIndex: 1000}
         };        
@@ -458,8 +469,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         isOpen={this.state.showModalIntro}
                         contentLabel="Intro Modal Example"
                         >
-                        <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton>
-                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalIntro}><u>Done</u></ActionButton></p>
+                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton> */}
+                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalIntro}>Done</ActionButton></p>
                     </ReactModal>
                     <ActionButton onClick={this.handleOpenModalHelp}><div className={ModelComparisonChart.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
                     <ReactModal
@@ -468,8 +479,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         isOpen={this.state.showModalHelp}
                         contentLabel="Minimal Modal Example"
                         >
-                        <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton>
-                        <p className={ModelComparisonChart.classNames.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.</p>
+                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
+                        <p className={ModelComparisonChart.classNames.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.<br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
                     </ReactModal>
                 </div>
                 {mainChart}
