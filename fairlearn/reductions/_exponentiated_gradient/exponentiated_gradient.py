@@ -75,7 +75,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-
         if isinstance(self._constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
             is_classification_reduction = True
