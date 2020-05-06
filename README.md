@@ -58,7 +58,7 @@ Fairlearn contains the following algorithms for mitigating unfairness in binary 
 | `fairlearn.` `postprocessing.` `ThresholdOptimizer` | Postprocessing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/abs/1610.02413). This technique takes as input an existing classifier and the sensitive feature, and derives a monotone transformation of the classifier's prediction to enforce the specified parity constraints. | binary classification | categorical | DP, EO |
 
 > _Note_:
-> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [terminology page](https://fairlearn.github.io/user_guide/fairness_in_machine_learning.html). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
+> DP refers to demographic parity, EO to equalized odds, and BGL to bounded group loss. For more information on these and other terms we use in this repository please refer to the [documentation](https://fairlearn.github.io/user_guide/fairness_in_machine_learning.html). To request additional algorithms or fairness definitions, please open a [new issue](https://github.com/fairlearn/fairlearn/issues).
 
 ### Fairlearn dashboard
 
@@ -81,7 +81,6 @@ FairlearnDashboard(sensitive_features=A_test,
                    y_true=Y_test.tolist(),
                    y_pred=[y_pred.tolist()])
 ```
-
 
 After the launch, the widget walks the user through the assessment set-up, where the user is asked to select (1) the sensitive feature of interest (e.g., binary gender or age), and (2) the accuracy metric (e.g., model precision) along which to evaluate the overall model performance as well as any disparities across groups. These selections are then used to obtain the visualization of the model's impact on the subgroups (e.g., model precision for females and model precision for males).
 

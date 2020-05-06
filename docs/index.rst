@@ -14,12 +14,12 @@ The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
    
    quickstart
 
-   user_guide/main
+   user_guide/index
 
-   api_reference/main
+   api_reference/index
    
    auto_examples/index
 
-   contribution_guide
+   contribution_guide/index
 
    community
