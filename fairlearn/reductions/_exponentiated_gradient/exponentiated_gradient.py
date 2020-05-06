@@ -61,6 +61,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._last_t = None
         self._best_t = None
         self._n_oracle_calls = 0
+        self._n_oracle_calls_dummy_returned = 0
         self._oracle_execution_times = None
         self._lambda_vecs = pd.DataFrame()
         self._lambda_vecs_LP = pd.DataFrame()
@@ -180,6 +181,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._last_t = len(Qs) - 1
         self._predictors = lagrangian.classifiers
         self._n_oracle_calls = lagrangian.n_oracle_calls
+        self._n_oracle_calls_dummy_returned = lagrangian.n_oracle_calls_dummy_returned
         self._oracle_execution_times = lagrangian.oracle_execution_times
         self._lambda_vecs_lagrangian = lagrangian.lambdas
 
