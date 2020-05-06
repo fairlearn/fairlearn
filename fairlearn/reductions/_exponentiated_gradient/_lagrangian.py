@@ -142,7 +142,6 @@ class _Lagrangian:
 
         redY_unique = np.unique(redY)
 
-        
         oracle_call_start_time = time()
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
@@ -153,7 +152,7 @@ class _Lagrangian:
         else:
             classifier = pickle.loads(self.pickled_estimator)
             classifier.fit(self.X, redY, sample_weight=redW)
-        
+
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
