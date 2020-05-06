@@ -1,6 +1,7 @@
 # Changes
 
 ### v0.4.6
+* Handle case where reductions relabelling results in a single class
 * Refactor metrics:
   * Remove `GroupMetricResult` type in favor of a `Bunch`.
   * Rename and slightly update signatures:
