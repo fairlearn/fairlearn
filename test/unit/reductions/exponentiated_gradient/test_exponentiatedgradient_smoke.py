@@ -32,7 +32,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": DemographicParity, "eps": 0.100,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": -0.020000,
-         "error": 0.250000, "n_oracle_calls": 5, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.250000, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 2, "ratio": 0.8},
         {"cons_class": DemographicParity, "eps": 0.050,
          "best_gap": 0.000000, "last_t": 5,
@@ -42,7 +42,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": DemographicParity, "eps": 0.050,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": -0.020000,
-         "error": 0.25, "n_oracle_calls": 5, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.25, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 2, "ratio": 0.8},
         {"cons_class": DemographicParity, "eps": 0.020,
          "best_gap": 0.000000, "last_t": 5,
@@ -53,7 +53,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": DemographicParity, "eps": 0.020,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": -0.020000,
-         "error": 0.25, "n_oracle_calls": 5, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.25, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 2, "ratio": 0.8},
         {"cons_class": DemographicParity, "eps": 0.010,
          "best_gap": 0.000000, "last_t": 5,
@@ -63,7 +63,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": DemographicParity, "eps": 0.010,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": -0.020000,
-         "error": 0.25, "n_oracle_calls": 5, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.25, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 2, "ratio": 0.8},
         {"cons_class": DemographicParity, "eps": 0.005,
          "best_gap": 0.000000, "last_t": 5,
@@ -73,7 +73,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": DemographicParity, "eps": 0.005,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": -0.020000,
-         "error": 0.25, "n_oracle_calls": 5, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.25, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 2, "ratio": 0.8},
         # ================================================
         {"cons_class": EqualizedOdds, "eps": 0.100,
@@ -84,7 +84,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": EqualizedOdds, "eps": 0.100,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": 0.100000,
-         "error": 0.25, "n_oracle_calls": 10, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.25, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 4, "ratio": 0.8},
         {"cons_class": EqualizedOdds, "eps": 0.050,
          "best_gap": 0.000000, "last_t": 5,
@@ -94,7 +94,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": EqualizedOdds, "eps": 0.050,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": 0.050000,
-         "error": 0.277016, "n_oracle_calls": 10, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.277016, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 4, "ratio": 0.8},
         {"cons_class": EqualizedOdds, "eps": 0.020,
          "best_gap": 0.000000, "last_t": 5,
@@ -105,7 +105,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": EqualizedOdds, "eps": 0.020,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": 0.020000,
-         "error": 0.296612, "n_oracle_calls": 10, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.296612, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 4, "ratio": 0.8},
         {"cons_class": EqualizedOdds, "eps": 0.010,
          "best_gap": 0.000000, "last_t": 5,
@@ -115,7 +115,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": EqualizedOdds, "eps": 0.010,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": 0.010000,
-         "error": 0.303145, "n_oracle_calls": 10, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.303145, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 4, "ratio": 0.8},
         {"cons_class": EqualizedOdds, "eps": 0.005,
          "best_gap": 0.000000, "last_t": 5,
@@ -125,7 +125,7 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": EqualizedOdds, "eps": 0.005,
          "best_gap": 0.000000, "last_t": 5,
          "best_t": 5, "disp": 0.005000,
-         "error": 0.306411, "n_oracle_calls": 10, "n_oracle_calls_dummy_returned": 12,
+         "error": 0.306411, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 4, "ratio": 0.8},
         # ================================================
         {"cons_class": ErrorRateRatio, "eps": 0.1,
@@ -232,6 +232,7 @@ class TestExponentiatedGradientSmoke:
         assert expgrad._n_oracle_calls == data["n_oracle_calls"]
         assert expgrad._n_oracle_calls_dummy_returned == data["n_oracle_calls_dummy_returned"]
         assert n_predictors == data["n_predictors"]
+        assert len(expgrad._oracle_execution_times) == expgrad._n_oracle_calls
 
     @pytest.mark.parametrize("testdata", smoke_test_data)
     def test_smoke(self, testdata):
