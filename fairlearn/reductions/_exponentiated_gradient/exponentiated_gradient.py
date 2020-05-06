@@ -8,6 +8,8 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
+
+from fairlearn.reductions._moments import ClassificationMoment
 from fairlearn._input_validation import _validate_and_reformat_input
 
 logger = logging.getLogger(__name__)
@@ -73,7 +75,16 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        _, y_train, sensitive_features = _validate_and_reformat_input(X, y, **kwargs)
+
+        if isinstance(self._constraints, ClassificationMoment):
+            logger.debug("Classification problem detected")
+            is_classification_reduction = True
+        else:
+            logger.debug("Regression problem detected")
+            is_classification_reduction = False
+
+        _, y_train, sensitive_features = _validate_and_reformat_input(
+            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
 
         n = y_train.shape[0]
 
