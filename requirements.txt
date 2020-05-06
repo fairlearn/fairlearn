@@ -38,3 +38,4 @@ shap
 # Required for documentation
 sphinx
 sphinx-gallery
+pydata-sphinx-theme
