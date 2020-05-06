@@ -168,18 +168,18 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 y_reduction = y_train
 
             y_reduction_unique = np.unique(y_reduction)
-            oracle_call_start_time = time()
             if len(y_reduction_unique) == 1:
                 logger.debug("y_reduction had single value. Using DummyClassifier")
                 current_estimator = DummyClassifier(strategy='constant',
                                                     constant=y_reduction_unique[0])
-                current_estimator.fit(X, y_reduction, sample_weight=weights)
             else:
+                logger.debug("Using underlying estimator")
                 current_estimator = copy.deepcopy(self.estimator)
-                logger.debug("Calling underlying estimator")
-                current_estimator.fit(X, y_reduction, sample_weight=weights)
-                logger.debug("Call to underlying estimator complete")
+
+            oracle_call_start_time = time()
+            current_estimator.fit(X, y_reduction, sample_weight=weights)
             oracle_call_execution_time = time() - oracle_call_start_time
+            logger.debug("Call to estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
             self._predictors.append(current_estimator)
