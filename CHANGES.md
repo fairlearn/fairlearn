@@ -1,7 +1,12 @@
 # Changes
 
+### v0.5.0
+
+* Adjust classes to abide by naming conventions for attributes.
+
 ### v0.4.6
 
+* Handle case where reductions relabelling results in a single class
 * Refactor metrics:
   * Remove `GroupMetricResult` type in favor of a `Bunch`.
   * Rename and slightly update signatures:
@@ -24,7 +29,6 @@
 * Fix warning due to changing default `dtype` when creating an empty
   `pandas.Series`.
 * Enable `GridSearch` for more than two sensitive features values.
-* Adjust classes to abide by naming conventions for attributes.
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
   `max_iterations`, `eta_mul` to `learning_rate`, and by adding `run_lp_step`.
 * Add new disparity constraints for reductions methods as moments in
@@ -32,6 +36,8 @@
   * `TruePositiveRateDifference`
   * ratio options for all existing constraints in addition to the default,
     i.e., difference between groups w.r.t. the relevant metric.
+* Make `ExponentiatedGradient` require 0-1 labels for classification problems,
+  pending a better solution for Issue 339.
 
 ### v0.4.5
 

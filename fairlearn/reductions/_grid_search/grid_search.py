@@ -3,9 +3,11 @@
 
 import copy
 import logging
+import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from sklearn.dummy import DummyClassifier
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
@@ -165,12 +167,19 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             else:
                 y_reduction = y_train
 
-            current_estimator = copy.deepcopy(self.estimator)
-            logger.debug("Calling underlying estimator")
+            y_reduction_unique = np.unique(y_reduction)
+            if len(y_reduction_unique) == 1:
+                logger.debug("y_reduction had single value. Using DummyClassifier")
+                current_estimator = DummyClassifier(strategy='constant',
+                                                    constant=y_reduction_unique[0])
+            else:
+                logger.debug("Using underlying estimator")
+                current_estimator = copy.deepcopy(self.estimator)
+
             oracle_call_start_time = time()
             current_estimator.fit(X, y_reduction, sample_weight=weights)
             oracle_call_execution_time = time() - oracle_call_start_time
-            logger.debug("Call to underlying estimator complete")
+            logger.debug("Call to estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
             self.predictors_.append(current_estimator)

@@ -8,6 +8,8 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
+
+from fairlearn.reductions._moments import ClassificationMoment
 from fairlearn._input_validation import _validate_and_reformat_input
 
 logger = logging.getLogger(__name__)
@@ -65,6 +67,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.last_t_ = None
         self.best_t_ = None
         self.n_oracle_calls_ = 0
+        self.n_oracle_calls_dummy_returned_ = 0
         self.oracle_execution_times_ = None
         self.lambda_vecs_ = pd.DataFrame()
         self.lambda_vecs_LP_ = pd.DataFrame()
@@ -79,7 +82,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        _, y_train, sensitive_features = _validate_and_reformat_input(X, y, **kwargs)
+        if isinstance(self._constraints, ClassificationMoment):
+            logger.debug("Classification problem detected")
+            is_classification_reduction = True
+        else:
+            logger.debug("Regression problem detected")
+            is_classification_reduction = False
+
+        _, y_train, sensitive_features = _validate_and_reformat_input(
+            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
 
         n = y_train.shape[0]
 
@@ -176,6 +187,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.last_t_ = len(Qs) - 1
         self.predictors_ = lagrangian.predictors_
         self.n_oracle_calls_ = lagrangian.n_oracle_calls_
+        self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned_
         self.oracle_execution_times_ = lagrangian.oracle_execution_times_
         self.lambda_vecs_lagrangian_ = lagrangian.lambdas_
 
