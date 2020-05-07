@@ -4,13 +4,27 @@
 """Defines the fairlearn dashboard class."""
 
 from ._fairlearn_widget import FairlearnWidget
-from fairlearn.metrics import group_accuracy_score, group_precision_score,\
-    group_recall_score, group_zero_one_loss, group_max_error, group_mean_absolute_error,\
-    group_mean_squared_error, group_median_absolute_error,\
-    group_specificity_score, group_miss_rate, group_fallout_rate, group_selection_rate,\
-    group_balanced_root_mean_squared_error, group_mean_overprediction, group_r2_score, \
-    group_mean_underprediction, group_mean_prediction, group_roc_auc_score,\
-    group_root_mean_squared_error
+from fairlearn.metrics import (
+    true_negative_rate_group_summary,
+    false_positive_rate_group_summary,
+    false_negative_rate_group_summary,
+    root_mean_squared_error_group_summary,
+    balanced_root_mean_squared_error_group_summary,
+    mean_prediction_group_summary,
+    selection_rate_group_summary,
+    _mean_overprediction_group_summary,
+    _mean_underprediction_group_summary,
+
+    accuracy_score_group_summary,
+    precision_score_group_summary,
+    recall_score_group_summary,
+    roc_auc_score_group_summary,
+    zero_one_loss_group_summary,
+    mean_absolute_error_group_summary,
+    mean_squared_error_group_summary,
+    r2_score_group_summary,
+    )
+
 from IPython.display import display
 from scipy.sparse import issparse
 import copy
@@ -49,47 +63,47 @@ class FairlearnDashboard(object):
         self._metric_methods = {
             "accuracy_score": {
                 "model_type": ["classification"],
-                "function": group_accuracy_score
+                "function": accuracy_score_group_summary
             },
             "balanced_accuracy_score": {
                 "model_type": ["classification"],
-                "function": group_roc_auc_score
+                "function": roc_auc_score_group_summary
             },
             "precision_score": {
                 "model_type": ["classification"],
-                "function": group_precision_score
+                "function": precision_score_group_summary
             },
             "recall_score": {
                 "model_type": ["classification"],
-                "function": group_recall_score
+                "function": recall_score_group_summary
             },
             "zero_one_loss": {
                 "model_type": [],
-                "function": group_zero_one_loss
+                "function": zero_one_loss_group_summary
             },
             "specificity_score": {
                 "model_type": [],
-                "function": group_specificity_score
+                "function": true_negative_rate_group_summary
             },
             "miss_rate": {
                 "model_type": [],
-                "function": group_miss_rate
+                "function": false_negative_rate_group_summary
             },
             "fallout_rate": {
                 "model_type": [],
-                "function": group_fallout_rate
+                "function": false_positive_rate_group_summary
             },
             "false_positive_over_total": {
                 "model_type": [],
-                "function": group_fallout_rate
+                "function": false_positive_rate_group_summary
             },
             "false_negative_over_total": {
                 "model_type": [],
-                "function": group_miss_rate
+                "function": false_negative_rate_group_summary
             },
             "selection_rate": {
                 "model_type": [],
-                "function": group_selection_rate
+                "function": selection_rate_group_summary
             },
             "selection_rate_ratio": {
                 "model_type": [],
@@ -97,47 +111,39 @@ class FairlearnDashboard(object):
             },
             "auc": {
                 "model_type": ["probability"],
-                "function": group_roc_auc_score
+                "function": roc_auc_score_group_summary
             },
             "root_mean_squared_error": {
                 "model_type": ["regression", "probability"],
-                "function": group_root_mean_squared_error
+                "function": root_mean_squared_error_group_summary
             },
             "balanced_root_mean_squared_error": {
                 "model_type": ["probability"],
-                "function": group_balanced_root_mean_squared_error
+                "function": balanced_root_mean_squared_error_group_summary
             },
             "mean_squared_error": {
                 "model_type": ["regression", "probability"],
-                "function": group_mean_squared_error
+                "function": mean_squared_error_group_summary
             },
             "mean_absolute_error": {
                 "model_type": ["regression", "probability"],
-                "function": group_mean_absolute_error
+                "function": mean_absolute_error_group_summary
             },
             "r2_score": {
                 "model_type": ["regression"],
-                "function": group_r2_score
-            },
-            "max_error": {
-                "model_type": [],
-                "function": group_max_error
-            },
-            "median_absolute_error": {
-                "model_type": [],
-                "function": group_median_absolute_error
+                "function": r2_score_group_summary
             },
             "overprediction": {
                 "model_type": [],
-                "function": group_mean_overprediction
+                "function": _mean_overprediction_group_summary
             },
             "underprediction": {
                 "model_type": [],
-                "function": group_mean_underprediction
+                "function": _mean_underprediction_group_summary
             },
             "average": {
                 "model_type": [],
-                "function": group_mean_prediction
+                "function": mean_prediction_group_summary
             }
         }
 
@@ -202,7 +208,7 @@ class FairlearnDashboard(object):
                         prediction = method(
                             self._y_true,
                             self._y_pred[data["modelIndex"]],
-                            binVector)
+                            sensitive_features=binVector)
                         response[id] = {
                                 "global": prediction.overall,
                                 "bins": prediction.by_group

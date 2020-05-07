@@ -2,12 +2,14 @@ import React from 'react';
 import { FairnessWizard } from 'fairlearn-dashboard';
 import { binaryClassifier } from '../__mock-data/binaryClassifier';
 import {regression} from "../__mock-data/regression";
+import { precomputedBinary } from "../__mock-data/precomputedBinary";
+import { precomputedBinary2 } from "../__mock-data/precomputedBinary2"
 import { probit } from "../__mock-data/probit";
 
     class App extends React.Component {
       constructor(props) {
         super(props);
-        this.state = {value: 0};
+        this.state = {value: 4};
         this.handleChange = this.handleChange.bind(this);
         this.generateRandomScore = this.generateRandomScore.bind(this);
       }
@@ -15,7 +17,9 @@ import { probit } from "../__mock-data/probit";
       static choices = [
         {label: 'binaryClassifier', data: binaryClassifier},
         {label: 'regression', data: regression},
-        {label: "probit", data: probit}
+        {label: "probit", data: probit},
+        {label: "precomputed binary", data: precomputedBinary},
+        {label: "precomputed binary2", data: precomputedBinary2}
       ]
 
       messages = {
@@ -84,6 +88,10 @@ import { probit } from "../__mock-data/probit";
                         predictedY={data.predictedYs}
                         trueY={data.trueY}
                         showIntro={true}
+                        precomputedMetrics={data.precomputedMetrics}
+                        precomputedFeatureBins={data.precomputedBins}
+                        customMetrics={data.customMetrics}
+                        predictionType={data.predictionType}
                         supportedBinaryClassificationAccuracyKeys={["accuracy_score", "balanced_accuracy_score","precision_score", "recall_score"]}
                         supportedBinaryClassificationParityKeys={["selection_rate", "selection_rate_ratio", "zero_one_loss", "recall_score"]}
                         supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}

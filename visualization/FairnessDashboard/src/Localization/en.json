@@ -3,7 +3,8 @@
     "defaultClassNames": "Class {0}",
     "defaultFeatureNames": "Sensitive feature {0}",
     "defaultSingleFeatureName": "Sensitive feature",
-    "accuracyTab": "Fairness in Accuracy",
+    "defaultCustomMetricName": "Custom metric {0}",
+    "accuracyTab": "Fairness in Performance",
     "opportunityTab": "Fairness in Opportunity",
     "modelComparisonTab": "Model comparison",
     "tableTab": "Detail View",
@@ -15,11 +16,11 @@
     "close": "Close",
     "calculating": "Calculating...",
     "sensitiveFeatures": "01 Sensitive features",
-    "accuracyMetric": "02 Accuracy metrics",
+    "accuracyMetric": "02 Performance metrics",
     "disparityMetric": "03 Disparity metrics",
     "errorOnInputs": "Error with input. Sensitive features must be categorical values at this time. Please map values to binned categories and retry.",
     "Accuracy": {
-        "header": "How do you want to measure accuracy?",
+        "header": "How do you want to measure performance?",
         "modelMakes": "model makes",
         "modelsMake": "models make",
         "body": "Your data contains {0} labels and your {2} {1} predictions. Based on that information, we recommend the following metrics. Please select one metric from the list.",
@@ -34,7 +35,7 @@
         "body": "Disparity metrics quantify variation of your model's behavior across selected features. There are four kinds of disparity metrics: more to come...."
     },
     "Header": {
-        "title": "fairlearn",
+        "title": "Fairlearn",
         "documentation": "Documentation"
     },
     "Footer": {
@@ -44,13 +45,13 @@
     "Intro": {
         "welcome": "Welcome to the",
         "fairlearnDashboard": "Fairlearn dashboard",
-        "introBody": "The fairlearn dashboard enables you to assess tradeoffs between accuracy and fairness of your models",
-        "explanatoryStep": "To set up the assessment, you need to specify a sensitive feature, accuracy metric and disparity metric.",
+        "introBody": "The Fairlearn dashboard enables you to assess tradeoffs between performance and fairness of your models",
+        "explanatoryStep": "To set up the assessment, you need to specify a sensitive feature and a performance metric.",
         "getStarted": "Get started",
         "features": "Sensitive features",
         "featuresInfo": "Sensitive features are used to split your data into groups. Fairness of your model across these groups is measured by disparity metrics. Disparity metrics quantify how much your model's behavior varies across these groups.",
-        "accuracy": "Accuracy metrics",
-        "accuracyInfo": "Accuracy metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy.",
+        "accuracy": "Performance metric",
+        "accuracyInfo": "Performance metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of the performance metric across the groups is reported as the disparity in performance.",
         "parity": "Disparity metrics",
         "parityInfo": "Parity metrics are used to evaluate the overall quality of your model as well as the quality of your model in each group. The difference between the extreme values of accuracy is reported as the disparity in accuracy."
     },
@@ -76,7 +77,7 @@
     },
     "Report": {
         "modelName": "Model {0}",
-        "title": "Disparity in accuracy",
+        "title": "Disparity in performance",
         "globalAccuracyText": "Is the overall {0}",
         "accuracyDisparityText": "Is the disparity in {0}",
         "editConfiguration": "Edit configuration",
@@ -110,7 +111,7 @@
     },
     "Feature": {
         "header": "Along which features would you like to evaluate your model's fairness?",
-        "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's accuracy and predictions differ across these splits.",
+        "body": "Fairness is evaluated in terms of disparities in your model's behavior. We will split your data according to values of each selected feature, and evaluate how your model's performance metric and predictions differ across these splits.",
         "learnMore": "Learn more",
         "summaryCategoricalCount": "This feature has {0} unique values",
         "summaryNumericCount": "This numeric feature ranges from {0} to {1}, and is grouped into {2} bins.",

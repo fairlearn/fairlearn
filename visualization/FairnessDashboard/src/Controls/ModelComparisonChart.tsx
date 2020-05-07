@@ -313,7 +313,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         }
         else {
             const data = this.state.accuracyArray.map((accuracy, index) => {
-
+                
                 return {
                     Parity: this.state.disparityArray[index],
                     Accuracy: accuracy,
@@ -353,8 +353,15 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             const formattedMaxAccuracy = FormatMetrics.formatNumbers(maxAccuracy, this.props.accuracyPickerProps.selectedAccuracyKey);
             const formattedMinDisparity = FormatMetrics.formatNumbers(minDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
             const formattedMaxDisparity = FormatMetrics.formatNumbers(maxDisparity, this.props.accuracyPickerProps.selectedAccuracyKey);
-            const selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
+           
+            let selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
             
+             // handle custom metric case
+            if (selectedMetric === undefined) {
+                selectedMetric = this.props.accuracyPickerProps.accuracyOptions.find(metric => metric.key === this.props.accuracyPickerProps.selectedAccuracyKey)
+            }
+
+
             // const insights2 = [selectedMetric.title,
             //     localization.ModelComparison.rangesFrom,
             //     <strong>{formattedMinAccuracy}</strong>,
@@ -370,12 +377,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             // ];
     
             const insights2 = localization.formatString(
-                localization.ModelComparison.insightsText2, 
+                localization.ModelComparison.insightsText2,
                 selectedMetric.title,
                 formattedMinAccuracy,
                 formattedMaxAccuracy,
                 formattedMinDisparity,
-                formattedMaxDisparity,
+                formattedMaxDisparity
             );
     
             const insights3 = localization.formatString(
@@ -398,13 +405,15 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 selectedMetric.title.toLowerCase(),
                 selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
             );
+     
             const props = _.cloneDeep(this.plotlyProps);
             props.data = ChartBuilder.buildPlotlySeries(props.data[0], data).map(series => {
                 series.name = this.props.dashboardContext.modelNames[series.name];
                 series.text = this.props.dashboardContext.modelNames;
                 return series;
             });
-            const accuracyMetricTitle = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title 
+            
+            const accuracyMetricTitle = selectedMetric.title 
             const parityMetricTitle = ParityOptions[this.props.parityPickerProps.selectedParityKey].title;
             props.layout.xaxis.title = accuracyMetricTitle;
             props.layout.yaxis.title = parityMetricTitle;
@@ -428,6 +437,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                             </div>
                         </div>;
         }
+
         return (
             <Stack className={ModelComparisonChart.classNames.frame}>
                 <div className={ModelComparisonChart.classNames.header}>
@@ -493,7 +503,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                             {
                             key: 'accuracy',
                             text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
-                                AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey].title.toLowerCase()) as string
+                                accuracyMetricTitle.toLowerCase()) as string
                             },
                             {
                             key: 'outcomes',

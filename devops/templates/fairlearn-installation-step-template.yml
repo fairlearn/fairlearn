@@ -1,0 +1,92 @@
+# Template to install fairlearn from designated location
+
+# Valid installation types are (currently):
+# None: Does nothing
+# PipLocal: Runs `pip install .`
+# PyPI: Installs from specified PyPI URL, with the version
+#       specified in the versionArtifact
+# Another type of "WheelArtifact" is planned, which will
+# `pip install` a wheel file from a pipeline Artifact
+
+parameters:
+- name: installationType
+  type: string
+  values:
+  - None
+  - PipLocal
+  - PyPI
+  - WheelArtifact
+- name: pypiUrl
+  type: string
+- name: versionArtifactName
+  type: string
+- name: versionArtifactFile
+  type: string
+- name: pipVersionVariable
+  type: string
+  default: pipVersionVar
+- name: wheelArtifactName
+  type: string
+
+steps:
+# ==============================================================
+# Install PipLocal
+- ${{ if eq(parameters.installationType, 'PipLocal') }}:
+  - script: pip install .
+    displayName: "Local install of fairlearn with pip"
+
+# ===============================================================
+# Install from a wheel package
+- ${{ if in(parameters.installationType, 'PyPI', 'WheelArtifact') }}:
+  # Clear out the checked out code
+  - task: DeleteFiles@1
+    inputs:
+      contents: |
+        fairlearn
+        devops
+        docs
+        *.md
+
+  - script: ls -p
+    displayName: "List after deletion"
+
+  # Install from PyPI
+  - ${{ if eq(parameters.installationType, 'PyPI') }}:
+    - task: DownloadPipelineArtifact@2
+      displayName: "Download version Artifact ${{parameters.versionArtifactName}}"
+      inputs:
+        artifact: ${{parameters.versionArtifactName}}
+        path: $(Build.SourcesDirectory)
+
+    - script: ls -p $(Build.SourcesDirectory)
+      displayName: "Show sources directory"
+
+    - task: PowerShell@2
+      displayName: 'Read version Artifact and set pipeline variable from file contents'
+      inputs:
+        filePath: scripts/set-variable-from-file.ps1
+        arguments: "-baseDir $(Build.SourcesDirectory) -subDir . -fileName ${{parameters.versionArtifactFile}} -targetVariable ${{parameters.pipVersionVariable}}"
+        pwsh: true
+    
+    - script: pip install --index-url ${{parameters.pypiUrl}} fairlearn==$(${{parameters.pipVersionVariable}})
+      displayName: "Install fairlearn with pip"
+
+  # Install from Wheel Artifact
+  - ${{ if eq(parameters.InstallationType, 'WheelArtifact') }}:
+    - task: DownloadPipelineArtifact@2
+      displayName: "Download wheel Artifact ${{parameters.wheelArtifactName}}"
+      inputs:
+        artifact: ${{parameters.wheelArtifactName}}
+        path: $(Build.SourcesDirectory)
+
+    - script: ls -p $(Build.SourcesDirectory)
+      displayName: "Show sources directory"
+
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: pip install fairlearn*.whl
+      displayName: "Install fairlearn with pip from local file"
+
+      
+    

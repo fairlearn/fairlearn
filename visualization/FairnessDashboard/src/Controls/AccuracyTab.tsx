@@ -96,7 +96,7 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
                     <WizardFooter onNext={this.props.onNext} onPrevious={this.props.onPrevious}/>
                 </Stack>
                 <DataSpecificationBlade
-                        numberRows={this.props.dashboardContext.dataset.length}
+                        numberRows={this.props.dashboardContext.trueY.length}
                         featureNames={this.props.dashboardContext.modelMetadata.featureNames}/>
             </Stack>
         );

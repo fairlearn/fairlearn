@@ -8,24 +8,19 @@ reweighting and relabelling of the input data. This *reduces* the problem back t
 learning training.
 """
 
-from ._reduction import Reduction  # noqa: F401
-
 from ._exponentiated_gradient import ExponentiatedGradient  # noqa: F401
-from ._exponentiated_gradient import ExponentiatedGradientResult  # noqa: F401
-from ._grid_search import GridSearch, GridSearchResult  # noqa: F401
+from ._grid_search import GridSearch  # noqa: F401
 from ._moments import AbsoluteLoss, Moment, ConditionalSelectionRate  # noqa: F401
-from ._moments import DemographicParity, EqualizedOdds, ErrorRate   # noqa: F401
+from ._moments import DemographicParity, EqualizedOdds, ErrorRateRatio, ErrorRate, TruePositiveRateDifference   # noqa: F401,E501
 from ._moments import GroupLossMoment, SquareLoss, ZeroOneLoss  # noqa: F401
 from ._moments import ClassificationMoment, LossMoment  # noqa: F401
 
 _exponentiated_gradient = [
     "ExponentiatedGradient",
-    "ExponentiatedGradientResult"
 ]
 
 _grid_search = [
     "GridSearch",
-    "GridSearchResult"
 ]
 
 _moments = [
@@ -35,6 +30,8 @@ _moments = [
     "ConditionalSelectionRate",
     "DemographicParity",
     "EqualizedOdds",
+    "TruePositiveRateDifference",
+    "ErrorRateRatio",
     "ErrorRate",
     "GroupLossMoment",
     "LossMoment",
@@ -42,4 +39,4 @@ _moments = [
     "ZeroOneLoss"
 ]
 
-__all__ = ["Reduction"] + _exponentiated_gradient + _grid_search + _moments
+__all__ = [] + _exponentiated_gradient + _grid_search + _moments

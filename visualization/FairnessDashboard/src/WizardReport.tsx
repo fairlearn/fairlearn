@@ -614,7 +614,13 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             
             const globalAccuracyString = this.formatNumbers(this.state.metrics.globalAccuracy, accuracyKey);
             const disparityAccuracyString = this.formatNumbers(this.state.metrics.accuracyDisparity, accuracyKey);
+            let selectedMetric = AccuracyOptions[this.props.accuracyPickerProps.selectedAccuracyKey];
             
+            // handle custom metric case
+            if (selectedMetric === undefined) {
+                selectedMetric = this.props.accuracyPickerProps.accuracyOptions.find(metric => metric.key === this.props.accuracyPickerProps.selectedAccuracyKey)
+            }
+                        
             const globalOutcomeString = this.formatNumbers(this.state.metrics.globalOutcome, outcomeKey);
             const disparityOutcomeString = this.formatNumbers(this.state.metrics.outcomeDisparity, outcomeKey);
 
@@ -662,7 +668,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                                 binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                                 binLabels={this.props.dashboardContext.groupNames}
                                 formattedBinValues={formattedBinAccuracyValues}
-                                metricLabel={AccuracyOptions[accuracyKey].title}
+                                metricLabel={selectedMetric.title}
                                 binValues={this.state.metrics.binnedAccuracy}/>
                             <div className={WizardReport.classNames.chartWrapper}>
                                 <div className={WizardReport.classNames.chartHeader}>{accuracyChartHeader}</div>
@@ -734,7 +740,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             return NaN.toString();
         }
         const styleObject = {maximumSignificantDigits: sigDigits};
-        if (AccuracyOptions[key].isPercentage && !isRatio) {
+        if (AccuracyOptions[key] && AccuracyOptions[key].isPercentage && !isRatio) {
             (styleObject as any).style = "percent";
         }
         return value.toLocaleString(undefined, styleObject);
