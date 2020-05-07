@@ -20,11 +20,36 @@ GRID_SIZE_WARN_TEMPLATE = "Generating a grid with {} grid points. It is recommen
 class _GridGenerator:
     """A generator of a grid of points with a bounded L1 norm."""
 
-    def __init__(self, grid_size, grid_limit, pos_basis, neg_basis, neg_allowed, force_L1_norm):
+    def __init__(self, grid_size, grid_limit, pos_basis, neg_basis, neg_allowed, force_L1_norm,
+                 grid_offset=None):
+        """Initialize with grid generator utility.
+
+        The `grid_size` is the number of columns to be generated in the grid.
+        :type grid_size: int
+
+        The `grid_limit` is the range of the values in the grid generated.
+        :type grid_limit: float
+
+        The `neg_allowed` ensures if we want to include negative values in the grid or not.
+        If True, the range is doubled.
+        :type neg_allowed: boolean
+
+        The `force_L1_norm`, if True, ensures that all points of the grid have the L1 norm equal
+        to grid_limit. If False, then grid consists of points whose L1 norm is less than equal to
+        grid_limit.
+        :type force_L1_norm: boolean
+
+        The `grid_offset` shifts the whole grid by that value.
+        :type grid_offset: :class:`pandas:pandas.DataFrame`
+        """
         # grid parameters
         self.dim = len(pos_basis.columns)
         self.neg_allowed = neg_allowed
         self.force_L1_norm = force_L1_norm
+        if grid_offset is None:
+            self.grid_offset = pd.Series(0, index=pos_basis.index)
+        else:
+            self.grid_offset = grid_offset
 
         # true dimensionality of the grid
         if self.force_L1_norm:
@@ -55,7 +80,8 @@ class _GridGenerator:
                 pos_coefs[pos_coefs < 0] = 0.0
                 neg_coefs[neg_coefs < 0] = 0.0
                 # convert the grid of basis coefficients into a grid of lambda vectors
-                self.grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
+                _grid = pos_basis.dot(pos_coefs) + neg_basis.dot(neg_coefs)
+                self.grid = _grid.add(self.grid_offset, axis='index')
                 break
             # if the grid size is not reached yet increase the scaling parameter
             n_units = n_units + 1
