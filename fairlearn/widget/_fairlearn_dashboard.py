@@ -105,10 +105,6 @@ class FairlearnDashboard(object):
                 "model_type": [],
                 "function": selection_rate_group_summary
             },
-            "selection_rate_ratio": {
-                "model_type": [],
-                "function": group_selection_rate
-            },
             "auc": {
                 "model_type": ["probability"],
                 "function": roc_auc_score_group_summary
