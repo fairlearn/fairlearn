@@ -1,0 +1,88 @@
+# This CircleCI workflow builds our documentation into HTML pages.
+# The generated pages are viewable as artifacts in CircleCI.
+# CircleCI can be run on PRs from forks & allows viewing stored artifacts
+# without download. Azure Pipelines and GitHub Actions currently don't
+# support certain actions on PRs from forks so we can't use them for this.
+
+version: 2.0
+
+jobs:
+  build-doc:
+    docker:
+      - image: circleci/python:3.7.3-stretch
+
+    working_directory: ~/tmp-fairlearn
+    steps:
+      # check out PR branch
+      - checkout
+
+      - run:
+          name: Upgrade pip, setuptools, and wheel before installing other dependencies
+          command: sudo python -m pip install --upgrade pip setuptools wheel
+      
+      - run:
+          name: 'Install required packages'
+          command: sudo pip install -r requirements.txt
+      
+      - run:
+          name: 'Build'
+          command: python -m sphinx -b html -j auto docs docs/_build/html
+
+      - persist_to_workspace:
+          root: docs/_build
+          paths: html
+      
+      # additionally store artifacts to make them viewable in the CircleCI UX
+      - store_artifacts:
+          path: docs/_build/html
+      
+  deploy-doc:
+    docker:
+      - image: node:14.0.0-stretch  # npm required for gh-pages
+
+    steps:
+      - checkout
+ 
+      - add_ssh_keys:
+          # To generate a key run the following in git bash (on Windows):
+          # ssh-keygen -t rsa -m pem -C "ci-build@fairlearn.org"
+          # Do not add a passphrase.
+          # Upload public key as a deploy key to the website repository.
+          # Upload private key to CircleCI as an SSH key at
+          # https://app.circleci.com/settings/project/github/fairlearn/fairlearn#ssh.
+          fingerprints:  # fingerprint of deploy (public) key
+            - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
+
+      - attach_workspace:
+          at: docs/_build
+      
+      - run:
+          # By default GitHub attempts jekyll builds.
+          # Instead, we want the webpage to just point at index.html
+          name: Disable jekyll builds
+          command: touch docs/_build/html/.nojekyll
+
+      - run:
+          name: 'Install gh-pages and configure dependencies'
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@fairlearn.org"
+            git config user.name "ci-build"
+
+      - run:
+          name: 'Push to GitHub Pages repository'
+          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+
+# This workflow defines the ordering, in this case build-doc needs to happen
+# before deploy-doc.
+workflows:
+  version: 2
+  build-webpage:
+    jobs:
+      - build-doc
+      - deploy-doc:
+          requires:
+            - build-doc
+          filters:
+            branches:
+              only: master  # don't deploy to GitHub pages from other branches

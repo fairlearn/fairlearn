@@ -7,6 +7,7 @@ export interface IAccuracyOption {
     isPercentage: boolean;
     description?: string;
     tags?: string[];
+    userVisible?: boolean;
 }
 
 export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
@@ -15,21 +16,24 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         title: localization.Metrics.accuracyScore,
         description: localization.Metrics.accuracyDescription,
         isMinimization: false,
-        isPercentage: true
+        isPercentage: true,
+        userVisible: true
     },
     "precision_score": {
         key: "precision_score",
         title: localization.Metrics.precisionScore,
         description: localization.Metrics.precisionDescription,
         isMinimization: false,
-        isPercentage: true
+        isPercentage: true,
+        userVisible: true
     },
     "recall_score": {
         key: "recall_score",
         title: localization.Metrics.recallScore,
         description: localization.Metrics.recallDescription,
         isMinimization: false,
-        isPercentage: true
+        isPercentage: true,
+        userVisible: true
     },
     "zero_one_loss": {
         key: "zero_one_loss",
@@ -85,14 +89,16 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         title: localization.Metrics.meanAbsoluteError,
         description: localization.Metrics.meanAbsoluteErrorDescription,
         isMinimization: true,
-        isPercentage: false
+        isPercentage: false,
+        userVisible: true
     },
     "mean_squared_error": {
         key: "mean_squared_error",
         title: localization.Metrics.meanSquaredError,
         description: localization.Metrics.mseDescription,
         isMinimization: true,
-        isPercentage: false
+        isPercentage: false,
+        userVisible: true
     },
     "mean_squared_log_error": {
         key: "mean_squared_log_error",
@@ -113,7 +119,8 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         title: localization.Metrics.balancedRootMeanSquaredError,
         description: localization.Metrics.balancedRMSEDescription,
         isMinimization: true,
-        isPercentage: false
+        isPercentage: false,
+        userVisible: true
     },
     "average": {
         key: "average",
@@ -148,27 +155,31 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         title: localization.Metrics.r2_score,
         description: localization.Metrics.r2Description,
         isMinimization: false,
-        isPercentage: false
+        isPercentage: false,
+        userVisible: true
     },
     "root_mean_squared_error": {
         key: "root_mean_squared_error",
         title: localization.Metrics.rms_error,
         description: localization.Metrics.rmseDescription,
         isMinimization: true,
-        isPercentage: false
+        isPercentage: false,
+        userVisible: true
     },
     "auc": {
         key: "auc",
         title: localization.Metrics.auc,
         description: localization.Metrics.aucDescription,
         isMinimization: false,
-        isPercentage: false
+        isPercentage: false,
+        userVisible: true
     },
     "balanced_accuracy_score": {
         key: "balanced_accuracy_score",
         title: localization.Metrics.balancedAccuracy,
         description: localization.Metrics.balancedAccuracyDescription,
         isMinimization: false,
-        isPercentage: true
+        isPercentage: true,
+        userVisible: true
     }
 };

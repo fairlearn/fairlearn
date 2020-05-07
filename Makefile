@@ -2,6 +2,7 @@
 
 PYTHON ?= python
 PYTEST ?= pytest
+SPHINX ?= python -m sphinx
 
 all: clean inplace test-unit
 
@@ -13,10 +14,10 @@ inplace:
 	$(PYTHON) setup.py build_ext -i
 
 test-coverage:
-	$(PYTEST) test -m "not notebooks" --ignore=test/perf --ignore=test/install --cov=fairlearn --cov-report=xml --cov-report=html
+	$(PYTEST) test -m "not notebooks" --ignore=test/install --cov=fairlearn --cov-report=xml --cov-report=html
 
 test-unit:
 	$(PYTEST) ./test/unit
 
-test-perf:
-	$(PYTEST) ./test/perf
+doc:
+	$(SPHINX) -b html -j auto docs docs/_build/html

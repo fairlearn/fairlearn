@@ -1,467 +1,210 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import numpy as np
 import pytest
 
-from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
-from fairlearn.metrics import create_group_metric_set
+from fairlearn.metrics import accuracy_score_group_summary, roc_auc_score_group_summary
+from fairlearn.metrics._group_metric_set import _process_predictions
+from fairlearn.metrics._group_metric_set import _process_sensitive_features
+from fairlearn.metrics._group_metric_set import _create_group_metric_set
 
+from .sample_loader import load_sample_dashboard
 from test.unit.input_convertors import conversions_for_1d
 
-
-def test_bad_model_type():
-    with pytest.raises(ValueError) as exception_context:
-        create_group_metric_set("Something Random", None, None, None)
-    expected = "model_type 'Something Random' not in ['binary_classification', 'regression']"
-    assert exception_context.value.args[0] == expected
+_BC_1P_1F = "bc-1p-1f.json"
+_BC_2P_3F = "bc-2p-3f.json"
 
 
-def test_smoke():
-    # Single model, single sensitive feature vector, no names
-    Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
-    Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
-    sensitive_feature = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b']]
-    sf_int = [int(x == 'b') for x in sensitive_feature[0]]
+def validate_dashboard_dictionary(dashboard_dict):
+    """Ensure dictionary is a valid Dashboard."""
+    schema_type = dashboard_dict['schemaType']
+    assert schema_type == 'dashboardDictionary'
+    schema_version = dashboard_dict['schemaVersion']
+    # Will want to update the following prior to release
+    assert schema_version == 0
 
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_feature)
-    assert result['predictionType'] == 'binaryClassification'
-    assert result['schemaType'] == 'groupMetricSet'
-    assert result['schemaVersion'] == 0
+    pred_type = dashboard_dict['predictionType']
+    assert pred_type in {'binaryClassification', 'regression', 'probability'}
+    len_y_true = len(dashboard_dict['trueY'])
+    num_y_pred = len(dashboard_dict['predictedY'])
+    for y_pred in dashboard_dict['predictedY']:
+        assert len(y_pred) == len_y_true
 
-    assert isinstance(result['trueY'], list)
-    assert np.array_equal(result['trueY'], Y_true)
+    len_model_names = len(dashboard_dict['modelNames'])
+    assert len_model_names == num_y_pred
 
-    assert isinstance(result['precomputedFeatureBins'], list)
-    assert len(result['precomputedFeatureBins']) == 1
-    bin_dict = result['precomputedFeatureBins'][0]
-    assert isinstance(bin_dict, dict)
-    assert np.array_equal(bin_dict['binVector'], sf_int)
-    assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
+    num_sf = len(dashboard_dict['precomputedFeatureBins'])
+    for sf in dashboard_dict['precomputedFeatureBins']:
+        sf_vector = sf['binVector']
+        assert len(sf_vector) == len_y_true
+        for val in sf_vector:
+            assert isinstance(val, int)
+        sf_classes = sf['binLabels']
+        assert len(sf_classes) == 1 + max(sf_vector)
 
-    assert isinstance(result['predictedY'], list)
-    assert len(result['predictedY']) == 1
-    y_p = result['predictedY'][0]
-    assert isinstance(y_p, list)
-    assert np.array_equal(y_p, Y_pred[0])
-
-    assert isinstance(result['precomputedMetrics'], list)
-    assert len(result['precomputedMetrics']) == 1
-    metrics_group_0 = result['precomputedMetrics'][0]
-    assert isinstance(metrics_group_0, list)
-    assert len(metrics_group_0) == 1
-    metrics_g0_m0 = metrics_group_0[0]
-    assert isinstance(metrics_g0_m0, dict)
-    assert len(metrics_g0_m0) == 10
-
-    accuracy = metrics_g0_m0['accuracy_score']
-    assert isinstance(accuracy, dict)
-    gmr = group_accuracy_score(Y_true, Y_pred[0], sensitive_feature[0])
-    assert gmr.overall == pytest.approx(accuracy['global'])
-    assert isinstance(accuracy['bins'], list)
-    assert len(accuracy['bins']) == 2
-    assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
-    assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
-
-    roc_auc = metrics_g0_m0['balanced_accuracy_score']
-    assert isinstance(roc_auc, dict)
-    gmr = group_roc_auc_score(Y_true, Y_pred[0], sensitive_feature[0])
-    assert gmr.overall == pytest.approx(roc_auc['global'])
-    assert isinstance(roc_auc['bins'], list)
-    assert len(roc_auc['bins']) == 2
-    assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
-    assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
+    expected_keys = sorted(list(dashboard_dict['precomputedMetrics'][0][0].keys()))
+    assert len(dashboard_dict['precomputedMetrics']) == num_sf
+    for metrics_arr in dashboard_dict['precomputedMetrics']:
+        assert len(metrics_arr) == num_y_pred
+        for m in metrics_arr:
+            keys = sorted(list(m.keys()))
+            assert keys == expected_keys
 
 
-def test_two_models():
-    # Two models, single sensitive feature vector, no names
-    Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1]
-    Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1],
-              [1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0]]
-    a, b = 'a', 'b'
-    sensitive_features = [[b, a, a, b, b, a, a, b, b, a, b, a, b, a, b]]
-    sf_int = [int(x == 'b') for x in sensitive_features[0]]
+class TestProcessSensitiveFeatures:
+    @pytest.mark.parametrize("transform_feature", conversions_for_1d)
+    def test_smoke(self, transform_feature):
+        sf_name = "My SF"
+        sf_vals = transform_feature([1, 3, 3, 1])
 
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
-    assert result['predictionType'] == 'binaryClassification'
-    assert result['schemaType'] == 'groupMetricSet'
-    assert result['schemaVersion'] == 0
+        sf = {sf_name: sf_vals}
+        result = _process_sensitive_features(sf)
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert result[0]['featureBinName'] == sf_name
+        assert result[0]['binVector'] == [0, 1, 1, 0]
+        assert result[0]['binLabels'] == ["1", "3"]
 
-    assert isinstance(result['trueY'], list)
-    assert np.array_equal(result['trueY'], Y_true)
+    @pytest.mark.parametrize("transform_feature", conversions_for_1d)
+    def test_smoke_string_groups(self, transform_feature):
+        sf_name = "My SF"
+        sf_vals = transform_feature(['b', 'a', 'c', 'a', 'b'])
 
-    assert isinstance(result['precomputedFeatureBins'], list)
-    assert len(result['precomputedFeatureBins']) == 1
-    bin_dict = result['precomputedFeatureBins'][0]
-    assert isinstance(bin_dict, dict)
-    assert np.array_equal(bin_dict['binVector'], sf_int)
-    assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
+        sf = {sf_name: sf_vals}
+        result = _process_sensitive_features(sf)
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert result[0]['featureBinName'] == sf_name
+        assert result[0]['binVector'] == [1, 0, 2, 0, 1]
+        assert result[0]['binLabels'] == ["a", "b", "c"]
 
-    assert isinstance(result['predictedY'], list)
-    assert len(result['predictedY']) == 2
-    for i in range(2):
-        y_p = result['predictedY'][i]
-        assert isinstance(y_p, list)
-        assert np.array_equal(y_p, Y_pred[i])
+    def test_result_is_sorted(self):
+        sf_vals = [1, 2, 3, 1]
 
-    assert isinstance(result['precomputedMetrics'], list)
-    assert len(result['precomputedMetrics']) == 1
-    metrics_group_0 = result['precomputedMetrics'][0]
-    assert isinstance(metrics_group_0, list)
-    assert len(metrics_group_0) == 2
-    for i in range(2):
-        metrics_g0_m0 = metrics_group_0[i]
-        assert isinstance(metrics_g0_m0, dict)
-        assert len(metrics_g0_m0) == 10
-
-        accuracy = metrics_g0_m0['accuracy_score']
-        assert isinstance(accuracy, dict)
-        gmr = group_accuracy_score(Y_true, Y_pred[i], sensitive_features[0])
-        assert gmr.overall == pytest.approx(accuracy['global'])
-        assert isinstance(accuracy['bins'], list)
-        assert len(accuracy['bins']) == 2
-        assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
-        assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
-
-        roc_auc = metrics_g0_m0['balanced_accuracy_score']
-        assert isinstance(roc_auc, dict)
-        gmr = group_roc_auc_score(Y_true, Y_pred[i], sensitive_features[0])
-        assert gmr.overall == pytest.approx(roc_auc['global'])
-        assert isinstance(roc_auc['bins'], list)
-        assert len(roc_auc['bins']) == 2
-        assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
-        assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
+        sf = {"b": sf_vals, "a": sf_vals, "c": sf_vals}
+        result = _process_sensitive_features(sf)
+        assert isinstance(result, list)
+        assert len(result) == 3
+        for r in result:
+            assert r['binVector'] == [0, 1, 2, 0]
+            assert r['binLabels'] == ['1', '2', '3']
+        result_names = [r['featureBinName'] for r in result]
+        assert result_names == ["a", "b", "c"]
 
 
-def test_two_sensitive_features():
-    # Single model, two sensitive feature vectors, no names
-    Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
-    Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
-    # First sensitive feature is just 'a' and 'b'. Second is 4, 5 and 6
-    sensitive_features = [['b', 'a', 'a', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
-                          [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
-    sf_int = [int(x == 'b') for x in sensitive_features[0]]
+class TestProcessPredictions:
+    @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+    def test_smoke(self, transform_y_p):
+        y_pred = transform_y_p([0, 1, 1, 0])
+        name = "my model"
 
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
-    assert result['predictionType'] == 'binaryClassification'
-    assert result['schemaType'] == 'groupMetricSet'
-    assert result['schemaVersion'] == 0
+        predictions = {name: y_pred}
+        names, preds = _process_predictions(predictions)
+        assert isinstance(names, list)
+        assert isinstance(preds, list)
+        assert len(names) == 1
+        assert len(preds) == 1
+        assert names[0] == name
+        assert isinstance(preds[0], list)
+        assert preds[0] == [0, 1, 1, 0]
 
-    assert isinstance(result['trueY'], list)
-    assert np.array_equal(result['trueY'], Y_true)
+    @pytest.mark.parametrize("transform_y_1", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_2", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_3", conversions_for_1d)
+    def test_results_are_sorted(self,
+                                transform_y_1,
+                                transform_y_2,
+                                transform_y_3):
+        y_p1 = transform_y_1([0, 0, 1, 1])
+        y_p2 = transform_y_2([0, 1, 0, 1])
+        y_p3 = transform_y_3([1, 1, 0, 0])
+        predictions = {"b": y_p1, "a": y_p2, "c": y_p3}
 
-    assert isinstance(result['precomputedFeatureBins'], list)
-    assert len(result['precomputedFeatureBins']) == 2
-    bin_dict0 = result['precomputedFeatureBins'][0]
-    assert isinstance(bin_dict0, dict)
-    assert np.array_equal(bin_dict0['binVector'], sf_int)
-    assert np.array_equal(bin_dict0['binLabels'], ['a', 'b'])
-    bin_dict1 = result['precomputedFeatureBins'][1]
-    assert isinstance(bin_dict1, dict)
-    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in sensitive_features[1]])
-    assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
-
-    assert isinstance(result['predictedY'], list)
-    assert len(result['predictedY']) == 1
-    y_p = result['predictedY'][0]
-    assert isinstance(y_p, list)
-    assert np.array_equal(y_p, Y_pred[0])
-
-    assert isinstance(result['precomputedMetrics'], list)
-    assert len(result['precomputedMetrics']) == 2
-
-    # Check the first grouping (with alphabetical labels)
-    metrics_group_0 = result['precomputedMetrics'][0]
-    assert isinstance(metrics_group_0, list)
-    assert len(metrics_group_0) == 1
-    metrics_g0_m0 = metrics_group_0[0]
-    assert isinstance(metrics_g0_m0, dict)
-    assert len(metrics_g0_m0) == 10
-
-    accuracy = metrics_g0_m0['accuracy_score']
-    assert isinstance(accuracy, dict)
-    gmr = group_accuracy_score(Y_true, Y_pred[0], sensitive_features[0])
-    assert gmr.overall == pytest.approx(accuracy['global'])
-    assert isinstance(accuracy['bins'], list)
-    assert len(accuracy['bins']) == 2
-    assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
-    assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
-
-    roc_auc = metrics_g0_m0['balanced_accuracy_score']
-    assert isinstance(roc_auc, dict)
-    gmr = group_roc_auc_score(Y_true, Y_pred[0], sensitive_features[0])
-    assert gmr.overall == pytest.approx(roc_auc['global'])
-    assert isinstance(roc_auc['bins'], list)
-    assert len(roc_auc['bins']) == 2
-    assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
-    assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
-
-    # Check the second grouping (three unique numeric labels)
-    metrics_group_1 = result['precomputedMetrics'][1]
-    assert isinstance(metrics_group_1, list)
-    assert len(metrics_group_1) == 1
-    metrics_g1_m0 = metrics_group_1[0]
-    assert isinstance(metrics_g1_m0, dict)
-    assert len(metrics_g1_m0) == 10
-
-    accuracy = metrics_g1_m0['accuracy_score']
-    assert isinstance(accuracy, dict)
-    gmr = group_accuracy_score(Y_true, Y_pred[0], sensitive_features[1])
-    assert gmr.overall == pytest.approx(accuracy['global'])
-    assert isinstance(accuracy['bins'], list)
-    assert len(accuracy['bins']) == 3
-    for i in range(3):
-        assert gmr.by_group[i+4] == pytest.approx(accuracy['bins'][i])
-
-    roc_auc = metrics_g1_m0['balanced_accuracy_score']
-    assert isinstance(roc_auc, dict)
-    gmr = group_roc_auc_score(Y_true, Y_pred[0], sensitive_features[1])
-    assert gmr.overall == pytest.approx(roc_auc['global'])
-    assert isinstance(roc_auc['bins'], list)
-    assert len(roc_auc['bins']) == 3
-    for i in range(3):
-        assert gmr.by_group[i+4] == pytest.approx(roc_auc['bins'][i])
-
-
-def test_two_named_sensitive_features():
-    # Single model, two sensitive feature vectors, no names
-    Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
-    Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]]
-    # First sensitive feature is just 'a' and 'b'. Second is 4, 5 and 6
-    sensitive_features = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
-                          [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
-    sf_int = [int(x == 'b') for x in sensitive_features[0]]
-    sensitive_feature_titles = ['alpha', 'num']
-
-    result = create_group_metric_set('binary_classification',
-                                     Y_true, Y_pred, sensitive_features,
-                                     sensitive_feature_names=sensitive_feature_titles)
-    assert result['predictionType'] == 'binaryClassification'
-    assert result['schemaType'] == 'groupMetricSet'
-    assert result['schemaVersion'] == 0
-
-    assert isinstance(result['trueY'], list)
-    assert np.array_equal(result['trueY'], Y_true)
-
-    assert isinstance(result['precomputedFeatureBins'], list)
-    assert len(result['precomputedFeatureBins']) == 2
-    bin_dict0 = result['precomputedFeatureBins'][0]
-    assert isinstance(bin_dict0, dict)
-    assert np.array_equal(bin_dict0['binVector'], sf_int)
-    assert np.array_equal(bin_dict0['binLabels'], ['a', 'b'])
-    assert sensitive_feature_titles[0] == bin_dict0['featureBinName']
-    bin_dict1 = result['precomputedFeatureBins'][1]
-    assert isinstance(bin_dict1, dict)
-    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in sensitive_features[1]])
-    assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
-    assert sensitive_feature_titles[1] == bin_dict1['featureBinName']
-
-
-def test_two_named_models():
-    # Two models, single sensitive feature vector, no names
-    Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
-    Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-              [1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0]]
-    sensitive_features = [['b', 'a', 'a', 'b', 'b', 'b', 'b', 'a', 'b', 'b', 'b']]
-    sf_int = [int(x == 'b') for x in sensitive_features[0]]
-    model_names = ['firstModel', 'secondModel']
-
-    result = create_group_metric_set('binary_classification',
-                                     Y_true, Y_pred, sensitive_features,
-                                     model_titles=model_names)
-    assert result['predictionType'] == 'binaryClassification'
-    assert result['schemaType'] == 'groupMetricSet'
-    assert result['schemaVersion'] == 0
-
-    assert isinstance(result['trueY'], list)
-    assert np.array_equal(result['trueY'], Y_true)
-
-    assert isinstance(result['precomputedFeatureBins'], list)
-    assert len(result['precomputedFeatureBins']) == 1
-    bin_dict = result['precomputedFeatureBins'][0]
-    assert isinstance(bin_dict, dict)
-    assert np.array_equal(bin_dict['binVector'], sf_int)
-    assert np.array_equal(bin_dict['binLabels'], ['a', 'b'])
-
-    assert isinstance(result['modelNames'], list)
-    assert np.array_equal(result['modelNames'], model_names)
-
-
-def test_multiple_models_multiple_sensitive_features():
-    # Three models, two sensitive feature vectors, no names
-    Y_true = [0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0]
-    Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-              [1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-              [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0]]
-    # First group is just 'a' and 'b'. Second is 4, 5 and 6
-    sensitive_features = [['a', 'b', 'b', 'a', 'b', 'b', 'b', 'a', 'b', 'b', 'b'],
-                          [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
-    sf_int = [int(x == 'b') for x in sensitive_features[0]]
-
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, sensitive_features)
-    assert result['predictionType'] == 'binaryClassification'
-    assert result['schemaType'] == 'groupMetricSet'
-    assert result['schemaVersion'] == 0
-
-    assert isinstance(result['trueY'], list)
-    assert np.array_equal(result['trueY'], Y_true)
-
-    assert isinstance(result['precomputedFeatureBins'], list)
-    assert len(result['precomputedFeatureBins']) == 2
-    bin_dict0 = result['precomputedFeatureBins'][0]
-    assert isinstance(bin_dict0, dict)
-    assert np.array_equal(bin_dict0['binVector'], sf_int)
-    assert np.array_equal(bin_dict0['binLabels'], ['a', 'b'])
-    bin_dict1 = result['precomputedFeatureBins'][1]
-    assert isinstance(bin_dict1, dict)
-    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in sensitive_features[1]])
-    assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
-
-    assert isinstance(result['predictedY'], list)
-    assert len(result['predictedY']) == 3
-    for i in range(3):
-        y_p = result['predictedY'][i]
-        assert isinstance(y_p, list)
-        assert np.array_equal(y_p, Y_pred[i])
-
-    assert isinstance(result['precomputedMetrics'], list)
-    assert len(result['precomputedMetrics']) == 2
-
-    # Check the first grouping (with alphabetical labels)
-    metrics_group_0 = result['precomputedMetrics'][0]
-    assert isinstance(metrics_group_0, list)
-    assert len(metrics_group_0) == 3
-    # Loop over the models
-    for i in range(3):
-        m_g0 = metrics_group_0[i]
-        assert isinstance(m_g0, dict)
-        assert len(m_g0) == 10
-
-        accuracy = m_g0['accuracy_score']
-        assert isinstance(accuracy, dict)
-        gmr = group_accuracy_score(Y_true, Y_pred[i], sensitive_features[0])
-        assert gmr.overall == pytest.approx(accuracy['global'])
-        assert isinstance(accuracy['bins'], list)
-        assert len(accuracy['bins']) == 2
-        assert gmr.by_group['a'] == pytest.approx(accuracy['bins'][0])
-        assert gmr.by_group['b'] == pytest.approx(accuracy['bins'][1])
-
-        roc_auc = m_g0['balanced_accuracy_score']
-        assert isinstance(roc_auc, dict)
-        gmr = group_roc_auc_score(Y_true, Y_pred[i], sensitive_features[0])
-        assert gmr.overall == pytest.approx(roc_auc['global'])
-        assert isinstance(roc_auc['bins'], list)
-        assert len(roc_auc['bins']) == 2
-        assert gmr.by_group['a'] == pytest.approx(roc_auc['bins'][0])
-        assert gmr.by_group['b'] == pytest.approx(roc_auc['bins'][1])
-
-    # Check the second grouping (three unique numeric labels)
-    metrics_group_1 = result['precomputedMetrics'][1]
-    assert isinstance(metrics_group_1, list)
-    assert len(metrics_group_1) == 3
-    # Loop over the models
-    for i in range(3):
-        m_g1 = metrics_group_1[i]
-        assert isinstance(m_g1, dict)
-        assert len(m_g1) == 10
-        accuracy = m_g1['accuracy_score']
-        assert isinstance(accuracy, dict)
-        gmr = group_accuracy_score(Y_true, Y_pred[i], sensitive_features[1])
-        assert gmr.overall == pytest.approx(accuracy['global'])
-        assert isinstance(accuracy['bins'], list)
-        assert len(accuracy['bins']) == 3
-        # Use the fact that the groups are integers
-        for j in range(3):
-            assert gmr.by_group[j+4] == pytest.approx(accuracy['bins'][j])
-
-        roc_auc = m_g1['balanced_accuracy_score']
-        assert isinstance(roc_auc, dict)
-        gmr = group_roc_auc_score(Y_true, Y_pred[i], sensitive_features[1])
-        assert gmr.overall == pytest.approx(roc_auc['global'])
-        assert isinstance(roc_auc['bins'], list)
-        assert len(roc_auc['bins']) == 3
+        names, preds = _process_predictions(predictions)
+        assert names == ["a", "b", "c"]
         for i in range(3):
-            assert gmr.by_group[i+4] == pytest.approx(roc_auc['bins'][i])
+            assert isinstance(preds[i], list)
+        assert preds[0] == [0, 1, 0, 1]
+        assert preds[1] == [0, 0, 1, 1]
+        assert preds[2] == [1, 1, 0, 0]
 
 
-@pytest.mark.parametrize("transform_y_true", conversions_for_1d)
-@pytest.mark.parametrize("transform_y_pred1", conversions_for_1d)
-@pytest.mark.parametrize("transform_group_1", conversions_for_1d)
-def test_argument_types(transform_y_true,
-                        transform_y_pred1,
-                        transform_group_1):
-    # Three models, two groups, no names
-    Y_true = transform_y_true([0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0])
-    Y_pred = [[0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-              transform_y_pred1([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1]),
-              [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0]]
-    g = [[0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
-         [4, 5, 6, 6, 5, 4, 4, 5, 5, 6, 6]]
-    Groups = [g[0],
-              transform_group_1(g[1])]
+class TestCreateGroupMetricSet:
+    @pytest.mark.parametrize("t_y_t", conversions_for_1d)
+    @pytest.mark.parametrize("t_y_p", conversions_for_1d)
+    @pytest.mark.parametrize("t_sf", conversions_for_1d)
+    def test_round_trip_1p_1f(self, t_y_t, t_y_p, t_sf):
+        expected = load_sample_dashboard(_BC_1P_1F)
 
-    result = create_group_metric_set('binary_classification', Y_true, Y_pred, Groups)
-    assert result['predictionType'] == 'binaryClassification'
-    assert result['schemaType'] == 'groupMetricSet'
-    assert result['schemaVersion'] == 0
+        y_true = t_y_t(expected['trueY'])
+        y_pred = {expected['modelNames'][0]: t_y_p(expected['predictedY'][0])}
 
-    assert isinstance(result['trueY'], list)
-    assert np.array_equal(result['trueY'], Y_true)
+        sf_file = expected['precomputedFeatureBins'][0]
+        sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
+        sensitive_feature = {sf_file['featureBinName']: t_sf(sf)}
 
-    assert isinstance(result['precomputedFeatureBins'], list)
-    assert len(result['precomputedFeatureBins']) == 2
-    bin_dict0 = result['precomputedFeatureBins'][0]
-    assert isinstance(bin_dict0, dict)
-    assert np.array_equal(bin_dict0['binVector'], g[0])
-    assert np.array_equal(bin_dict0['binLabels'], ['0', '1'])
-    bin_dict1 = result['precomputedFeatureBins'][1]
-    assert isinstance(bin_dict1, dict)
-    assert np.array_equal(bin_dict1['binVector'], [x-4 for x in g[1]])
-    assert np.array_equal(bin_dict1['binLabels'], ['4', '5', '6'])
+        actual = _create_group_metric_set(y_true,
+                                          y_pred,
+                                          sensitive_feature,
+                                          'binary_classification')
+        validate_dashboard_dictionary(actual)
+        assert expected == actual
 
-    assert isinstance(result['predictedY'], list)
-    assert len(result['predictedY']) == 3
-    for i in range(3):
-        y_p = result['predictedY'][i]
-        assert isinstance(y_p, list)
-        assert np.array_equal(y_p, Y_pred[i])
+    @pytest.mark.parametrize("t_y_t", conversions_for_1d)
+    @pytest.mark.parametrize("t_y_p", conversions_for_1d)
+    @pytest.mark.parametrize("t_sf", conversions_for_1d)
+    def test_round_trip_2p_3f(self, t_y_t, t_y_p, t_sf):
+        expected = load_sample_dashboard(_BC_2P_3F)
 
-    assert isinstance(result['precomputedMetrics'], list)
-    assert len(result['precomputedMetrics']) == 2
+        y_true = t_y_t(expected['trueY'])
 
-    # Check the first grouping (with alphabetical labels)
-    metrics_group_0 = result['precomputedMetrics'][0]
-    assert isinstance(metrics_group_0, list)
-    assert len(metrics_group_0) == 3
-    # Loop over the models
-    for i in range(3):
-        m_g0 = metrics_group_0[i]
-        assert isinstance(m_g0, dict)
-        assert len(m_g0) == 10
-        accuracy = m_g0['accuracy_score']
-        assert isinstance(accuracy, dict)
-        gmr = group_accuracy_score(Y_true, Y_pred[i], Groups[0])
-        assert gmr.overall == pytest.approx(accuracy['global'])
-        assert isinstance(accuracy['bins'], list)
-        assert len(accuracy['bins']) == 2
-        assert gmr.by_group[0] == pytest.approx(accuracy['bins'][0])
-        assert gmr.by_group[1] == pytest.approx(accuracy['bins'][1])
+        y_pred = {}
+        y_p_ts = [t_y_p, lambda x: x]  # Only transform one y_p
+        for i, name in enumerate(expected['modelNames']):
+            y_pred[name] = y_p_ts[i](expected['predictedY'][i])
 
-    # Check the second grouping (three unique numeric labels)
-    metrics_group_1 = result['precomputedMetrics'][1]
-    assert isinstance(metrics_group_1, list)
-    assert len(metrics_group_1) == 3
-    # Loop over the models
-    for i in range(3):
-        m_g1 = metrics_group_1[i]
-        assert isinstance(m_g1, dict)
-        assert len(m_g1) == 10
-        accuracy = m_g1['accuracy_score']
-        assert isinstance(accuracy, dict)
-        gmr = group_accuracy_score(Y_true, Y_pred[i], Groups[1])
-        assert gmr.overall == pytest.approx(accuracy['global'])
-        assert isinstance(accuracy['bins'], list)
-        assert len(accuracy['bins']) == 3
-        # Use the fact that the groups are integers
-        for j in range(3):
-            assert gmr.by_group[j+4] == pytest.approx(accuracy['bins'][j])
+        sensitive_features = {}
+        t_sfs = [lambda x: x, t_sf, lambda x:x]  # Only transform one sf
+        for i, sf_file in enumerate(expected['precomputedFeatureBins']):
+            sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
+            sensitive_features[sf_file['featureBinName']] = t_sfs[i](sf)
+
+        actual = _create_group_metric_set(y_true,
+                                          y_pred,
+                                          sensitive_features,
+                                          'binary_classification')
+        validate_dashboard_dictionary(actual)
+        assert expected == actual
+
+    def test_specific_metrics(self):
+        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+
+        exp_acc = accuracy_score_group_summary(y_t, y_p, sensitive_features=s_f)
+        exp_roc = roc_auc_score_group_summary(y_t, y_p, sensitive_features=s_f)
+
+        predictions = {"some model": y_p}
+        sensitive_feature = {"my sf": s_f}
+
+        actual = _create_group_metric_set(y_t,
+                                          predictions,
+                                          sensitive_feature,
+                                          'binary_classification')
+
+        # Do some sanity checks
+        validate_dashboard_dictionary(actual)
+        assert actual['trueY'] == y_t
+        assert actual['predictedY'][0] == y_p
+        assert actual['precomputedFeatureBins'][0]['binVector'] == s_f
+        assert len(actual['precomputedMetrics'][0][0]) == 10
+
+        # Cross check the two metrics we computed
+        # Comparisons simplified because s_f was already {0,1}
+        actual_acc = actual['precomputedMetrics'][0][0]['accuracy_score']
+        assert actual_acc['global'] == exp_acc.overall
+        assert actual_acc['bins'] == list(exp_acc.by_group.values())
+
+        actual_roc = actual['precomputedMetrics'][0][0]['balanced_accuracy_score']
+        assert actual_roc['global'] == exp_roc.overall
+        assert actual_roc['bins'] == list(exp_roc.by_group.values())

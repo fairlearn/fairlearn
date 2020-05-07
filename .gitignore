@@ -65,6 +65,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/auto_examples/
 
 # PyBuilder
 target/
@@ -112,5 +113,5 @@ venv.bak/
 # Documentation
 docbuild/
 
-# generated perf test scripts
-test/perf/scripts/**
+# IntelliJ
+/.idea
