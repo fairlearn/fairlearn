@@ -90,7 +90,7 @@ export class ParityTab extends React.PureComponent<IParityTabProps> {
                     </Stack>
                 </StackItem>
                 <DataSpecificationBlade
-                        numberRows={this.props.dashboardContext.dataset.length}
+                        numberRows={this.props.dashboardContext.trueY.length}
                         featureNames={this.props.dashboardContext.modelMetadata.featureNames}/>
             </Stack>
         );

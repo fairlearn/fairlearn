@@ -254,7 +254,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 accuracyMetrics,
                 selectedAccuracyKey: accuracyMetrics[0].key,
                 parityMetrics: parityMetrics,
-                selectedParityKey: accuracyMetrics[0].key,
+                selectedParityKey: parityMetrics[0].key,
                 dashboardContext: FairnessWizard.buildPrecomputedFairnessContext(props),
                 activeTabKey: featureBinTabKey,
                 featureBins: readonlyFeatureBins,
