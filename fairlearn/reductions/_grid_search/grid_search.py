@@ -3,9 +3,11 @@
 
 import copy
 import logging
+import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from sklearn.dummy import DummyClassifier
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
@@ -51,6 +53,10 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         distributed between :code:`-grid_limit` and :code:`grid_limit` by default
     :type grid_limit: float
 
+    :param grid_offset: shifts the grid of Lagrangian multiplier by that value
+         It is '0' by default
+    :type grid_offset: :class:`pandas:pandas.DataFrame`
+
     :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
         set of Lagrange multipliers they desire using this argument.
     """
@@ -62,6 +68,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                  constraint_weight=0.5,
                  grid_size=10,
                  grid_limit=2.0,
+                 grid_offset=None,
                  grid=None):
         """Construct a GridSearch object."""
         self.estimator = estimator
@@ -80,6 +87,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         self.grid_size = grid_size
         self.grid_limit = float(grid_limit)
+        self.grid_offset = grid_offset
         self.grid = grid
 
         self._best_grid_index = None
@@ -137,7 +145,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                                   pos_basis,
                                   neg_basis,
                                   neg_allowed,
-                                  objective_in_the_span).grid
+                                  objective_in_the_span,
+                                  self.grid_offset).grid
         else:
             logger.debug("Using supplied grid")
             grid = self.grid
@@ -158,12 +167,19 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             else:
                 y_reduction = y_train
 
-            current_estimator = copy.deepcopy(self.estimator)
-            logger.debug("Calling underlying estimator")
+            y_reduction_unique = np.unique(y_reduction)
+            if len(y_reduction_unique) == 1:
+                logger.debug("y_reduction had single value. Using DummyClassifier")
+                current_estimator = DummyClassifier(strategy='constant',
+                                                    constant=y_reduction_unique[0])
+            else:
+                logger.debug("Using underlying estimator")
+                current_estimator = copy.deepcopy(self.estimator)
+
             oracle_call_start_time = time()
             current_estimator.fit(X, y_reduction, sample_weight=weights)
             oracle_call_execution_time = time() - oracle_call_start_time
-            logger.debug("Call to underlying estimator complete")
+            logger.debug("Call to estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
             self._predictors.append(current_estimator)

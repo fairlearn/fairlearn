@@ -1,4 +1,4 @@
-Examples Gallery
+Example Notebooks
 =================
 
 Here's a list of examples on how to use the library. We will be adding more
