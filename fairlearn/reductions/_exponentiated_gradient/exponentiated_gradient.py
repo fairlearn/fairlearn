@@ -82,7 +82,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        if isinstance(self._constraints, ClassificationMoment):
+        if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
             is_classification_reduction = True
         else:
@@ -124,7 +124,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                     self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
                 eta_min = self.nu / (2 * B)
                 eta = self.learning_rate / B
-                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
+                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iterations=%d, eta_min=%.6f",
                              self.eps, B, self.nu, self.max_iterations, eta_min)
 
             if h_idx not in Qsum.index:
@@ -191,7 +191,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.oracle_execution_times_ = lagrangian.oracle_execution_times_
         self.lambda_vecs_lagrangian_ = lagrangian.lambdas_
 
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iterations=%d, eta_min=%.6f",
                      self.eps, B, self.nu, self.max_iterations, eta_min)
         logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
                      self.last_t_, self.best_t_, self.best_gap_, lagrangian.n_oracle_calls_,

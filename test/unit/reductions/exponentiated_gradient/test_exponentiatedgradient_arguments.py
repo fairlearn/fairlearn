@@ -114,7 +114,7 @@ class TestExponentiatedGradientArguments:
 
         expgrad = ExponentiatedGradient(LogisticRegression(),
                                         constraints=DemographicParity(),
-                                        T=1)
+                                        max_iterations=1)
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
         assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]

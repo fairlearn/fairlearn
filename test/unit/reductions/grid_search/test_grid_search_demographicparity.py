@@ -255,6 +255,6 @@ def test_single_y_class():
     # Check all predictors are DummyClassifiers
     test_X_dict = {"c": [134534, 27381], "d": [1923, 14123]}
     test_X = pd.DataFrame(test_X_dict)
-    for p in grid_search._predictors:
+    for p in grid_search.predictors_:
         assert isinstance(p, DummyClassifier)
         assert np.array_equal(p.predict(test_X), [y_val, y_val])
