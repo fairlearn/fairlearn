@@ -8,7 +8,7 @@ These are metrics which are not part of `scikit-learn`.
 
 import sklearn.metrics as skm
 
-from ._balanced_root_mean_squared_error import balanced_root_mean_squared_error  # noqa: F401
+from ._balanced_root_mean_squared_error import _balanced_root_mean_squared_error  # noqa: F401
 from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_underprediction  # noqa: F401,E501
 from ._selection_rate import selection_rate  # noqa: F401,E501
 
@@ -41,6 +41,6 @@ def false_negative_rate(y_true, y_pred, sample_weight=None):
     return fnr
 
 
-def root_mean_squared_error(y_true, y_pred, **kwargs):
+def _root_mean_squared_error(y_true, y_pred, **kwargs):
     r"""Calculate the root mean squared error."""
     return skm.mean_squared_error(y_true, y_pred, squared=False, **kwargs)

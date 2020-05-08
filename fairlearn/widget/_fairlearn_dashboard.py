@@ -8,8 +8,8 @@ from fairlearn.metrics import (
     true_negative_rate_group_summary,
     false_positive_rate_group_summary,
     false_negative_rate_group_summary,
-    root_mean_squared_error_group_summary,
-    balanced_root_mean_squared_error_group_summary,
+    _root_mean_squared_error_group_summary,
+    _balanced_root_mean_squared_error_group_summary,
     mean_prediction_group_summary,
     selection_rate_group_summary,
     _mean_overprediction_group_summary,
@@ -111,11 +111,11 @@ class FairlearnDashboard(object):
             },
             "root_mean_squared_error": {
                 "model_type": ["regression", "probability"],
-                "function": root_mean_squared_error_group_summary
+                "function": _root_mean_squared_error_group_summary
             },
             "balanced_root_mean_squared_error": {
                 "model_type": ["probability"],
-                "function": balanced_root_mean_squared_error_group_summary
+                "function": _balanced_root_mean_squared_error_group_summary
             },
             "mean_squared_error": {
                 "model_type": ["regression", "probability"],
