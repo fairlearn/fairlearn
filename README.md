@@ -17,7 +17,7 @@ Fairlearn is a Python package that empowers developers of artificial intelligenc
 
 ## Current release
 
-- The current stable release is available at [Fairlearn v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5).
+- The current stable release is available at [Fairlearn v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6).
 
 - Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](#onboarding-guide).
 
