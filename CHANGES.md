@@ -1,7 +1,7 @@
 # Changes
 
 ### v0.4.6
-* Handle case where reductions relabelling results in a single class
+* Handle case where reductions relabeling results in a single class
 * Refactor metrics:
   * Remove `GroupMetricResult` type in favor of a `Bunch`.
   * Rename and slightly update signatures:
@@ -20,7 +20,8 @@
   * `miss_rate` in favor of `false_negative_rate`
   * `specificity_score` in favor of `true_negative_rate`
 * Change from public to private:
-  * `mean_{over,under}prediction` changed to `_mean_{over,under}prediction`
+  * `mean_{over,under}prediction` and `{balanced_,}root_mean_squared_error`
+    changed to the versions with a leading underscore
 * Fix warning due to changing default `dtype` when creating an empty
   `pandas.Series`.
 * Enable `GridSearch` for more than two sensitive features values.
