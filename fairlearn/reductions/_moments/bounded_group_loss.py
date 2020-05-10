@@ -11,11 +11,13 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group."""
 
-    def __init__(self, loss, upper_bound, no_groups=False):
+    def __init__(self, loss, upper_bound=None, no_groups=False):
         # TODO: add (upper_)bound provided to init -- specific to conditional loss
         super().__init__(loss)
+        self.upper_bound = upper_bound
         self.no_groups = no_groups
-        self.upper_bound = upper_bound #If not provided does it default?
+         #If not provided does it defaul?
+
 
     def default_objective(self):
         """Return a default objective."""
@@ -56,9 +58,9 @@ class ConditionalLossMoment(LossMoment):
     # add new method bound() that returns vector for RHS
     def bound(self):
         """Return bound vector"""
-        n_groups = len(self.tags.groupby(_GROUP_ID))
-        return pd.Series(self.uppper_bound, index = range(n_groups))
-
+        if upper_bound is None:
+            raise TypeError
+        return pd.Series(self.uppper_bound, index=self.index)
 
 
 
