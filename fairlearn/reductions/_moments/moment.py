@@ -85,7 +85,7 @@ ClassificationMoment.__module__ = "fairlearn.reductions"
 class LossMoment(Moment):
     """Moment that can be expressed as weighted loss."""
 
-    def __init__(self, loss):
+    def __init__(self, loss, upper_bound=None):
         super().__init__()
         self.reduction_loss = loss
 

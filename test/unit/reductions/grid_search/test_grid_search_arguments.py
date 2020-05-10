@@ -339,7 +339,8 @@ class TestBoundedGroupLoss(ArgumentTests):
         self.estimator = LinearRegression()
         self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), eps)
         self.disparity_criterion.load_data(X, Y)
-
-        loss_eps = self.disparity_criterion.gamma() - self.disparity_criterion.bound()
+        bnd = self.disparity_criterion.bound()
+        loss_eps = self.disparity_criterion.gamma() - bnd
         loss = self.disparity_criterion.gamma()
-        assert (loss - loss_eps == eps)
+        assert (np.isclose(loss - loss_eps, eps))
+        assert(bnd.shape == loss.shape)
