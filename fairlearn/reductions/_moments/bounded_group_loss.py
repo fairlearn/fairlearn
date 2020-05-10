@@ -58,9 +58,9 @@ class ConditionalLossMoment(LossMoment):
     # add new method bound() that returns vector for RHS
     def bound(self):
         """Return bound vector"""
-        if upper_bound is None:
+        if self.upper_bound is None:
             raise TypeError
-        return pd.Series(self.uppper_bound, index=self.index)
+        return pd.Series(self.upper_bound, index=self.index)
 
 
 
@@ -85,14 +85,14 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 class AverageLossMoment(ConditionalLossMoment):
     """Moment for Average Loss."""
 
-    def __init__(self, loss):
+    def __init__(self, loss, upper_bound=None):
         super().__init__(loss, no_groups=True)
 
 
 class GroupLossMoment(ConditionalLossMoment):
     """Moment for Group Loss."""
 
-    def __init__(self, loss):
+    def __init__(self, loss, upper_bound=None):
         super().__init__(loss, no_groups=False)
 
 
