@@ -11,10 +11,13 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group."""
 
-    def __init__(self, loss, no_groups=False):
-        # TODO: add (upper_)bound provided to init -- specific to conditional loss 
+    def __init__(self, loss, upper_bound=None, no_groups=False):
+        # TODO: add (upper_)bound provided to init -- specific to conditional loss
         super().__init__(loss)
+        self.upper_bound = upper_bound
         self.no_groups = no_groups
+         #If not provided does it defaul?
+
 
     def default_objective(self):
         """Return a default objective."""
@@ -23,9 +26,6 @@ class ConditionalLossMoment(LossMoment):
     def load_data(self, X, y, **kwargs):
         """Load data into the moment object."""
         kwargs_mod = kwargs.copy()
-        # TODO: remove .get("eps")
-        if kwargs_mod.get("eps"):
-            self.eps = kwargs_mod.get("eps")
         if self.no_groups:
             kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
         super().load_data(X, y, **kwargs_mod)
@@ -46,20 +46,23 @@ class ConditionalLossMoment(LossMoment):
             self.pos_basis[i][attr] = 1
             self.neg_basis_present.at[i] = False
             i += 1
-     
-    def gamma(self, predictor, with_RHS=False):
+
+    def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
         self.tags[_PREDICTION] = predictor(self.X)
         self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
         self._gamma_descr = str(expect_attr[[_LOSS]])
-        
-        # TODO: revert gamma to original
-        if with_RHS:
-            return expect_attr[_LOSS] - self.eps
         return expect_attr[_LOSS]
-    
-    # add new method bound() that returns vector for RHS 
+
+    # add new method bound() that returns vector for RHS
+    def bound(self):
+        """Return bound vector"""
+        if self.upper_bound is None:
+            raise TypeError
+        return pd.Series(self.upper_bound, index=self.index)
+
+
 
     def project_lambda(self, lambda_vec):
         """Return the lambda values."""
@@ -82,14 +85,14 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 class AverageLossMoment(ConditionalLossMoment):
     """Moment for Average Loss."""
 
-    def __init__(self, loss):
+    def __init__(self, loss, upper_bound=None):
         super().__init__(loss, no_groups=True)
 
 
 class GroupLossMoment(ConditionalLossMoment):
     """Moment for Group Loss."""
 
-    def __init__(self, loss):
+    def __init__(self, loss, upper_bound=None):
         super().__init__(loss, no_groups=False)
 
 
