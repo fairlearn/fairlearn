@@ -188,8 +188,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             flexDirection: "row"
         },
         mainRight: {
+            width: "240px",
+            marginLeft: "20px",
             padding: "30px 0 0 35px",
-            width: "300px"
+            backgroundColor: "#f2f2f2",
+            boxShadow: "-1px 0px 0px #D2D2D2"
         },
         rightTitle: {
             color: "#333333",
@@ -210,28 +213,27 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         insights: {
             // textTransform: "uppercase",
             color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "600",
+            fontSize: "18px",
+            lineHeight: "22px",
+            fontWeight: "normal",
             padding: "18px 0",
         },
         insightsText: {
             color: "#333333",
-            fontSize: "15px",
+            fontSize: "12px",
             lineHeight: "16px",
-            fontWeight: "400",
+            fontWeight: "normal",
             paddingBottom: "18px",
             paddingRight: "15px",
         },
         downloadReport: {
             color: "#333333",
-            fontSize: "15px",
+            fontSize: "12px",
             lineHeight: "16px",
-            fontWeight: "400",
+            fontWeight: "normal",
             paddingTop: "20px",
             paddingBottom: "20px",
-            paddingLeft: "80px",
-            border: "1px solid #CCCCCC"
+            paddingLeft: "30px",
         },
         chart: {
             padding: "0px 0 0 0",

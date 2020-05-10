@@ -166,11 +166,21 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             margin: "10px 0px",
             display: "inline-block"
         },
+        main: {
+            display: "flex",
+            flexDirection: "row"
+        },
+        mainLeft: {
+            maxWidth: "700px",
+        },
         mainRight: {
-            minWidth: "200px",
+            marginLeft: "20px",
+            width: "240px",
             paddingLeft: "35px",
             flexBasis: "300px",
-            flexShrink: 1
+            flexShrink: 1,
+            backgroundColor: "#f2f2f2",
+            boxShadow: "-1px 0px 0px #D2D2D2"
         },
         rightTitle: {
             color: "#333333",
@@ -191,29 +201,29 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         insights: {
             // textTransform: "uppercase",
             color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "600",
+            fontSize: "18px",
+            lineHeight: "22px",
+            fontWeight: "normal",
             padding: "18px 0",
         },
         insightsText: {
             color: "#333333",
-            fontSize: "15px",
+            fontSize: "12px",
             lineHeight: "16px",
-            fontWeight: "400",
+            fontWeight: "normal",
             paddingBottom: "18px",
             paddingRight: "15px"
             // borderBottom: "1px solid #CCCCCC"
         },
         downloadReport: {
             color: "#333333",
-            fontSize: "15px",
+            fontSize: "12px",
             lineHeight: "16px",
-            fontWeight: "400",
+            fontWeight: "normal",
             paddingTop: "20px",
             paddingBottom: "20px",
-            paddingLeft: "60px",
-            border: "1px solid #CCCCCC"
+            paddingLeft: "30px",
+            // border: "1px solid #CCCCCC"
         },
         tableWrapper: {
             paddingBottom: "20px"
@@ -638,71 +648,71 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             const metricLabels = [AccuracyOptions[accuracyKey].title, AccuracyOptions[outcomeKey].title, AccuracyOptions[overpredicitonKey].title, AccuracyOptions[underpredictionKey].title];
 
             mainChart = 
-                    <div>
-                        <div className={WizardReport.classNames.overallArea} style={{height: !this.state.expandAttributes && "150px" || this.state.expandAttributes && `${areaHeights/2}px` }}>
-                            <OverallTable
-                                binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
-                                binLabels={this.props.dashboardContext.groupNames}
-                                formattedBinValues={formattedBinValues}
-                                metricLabels={metricLabels}
-                                overallMetrics={overallMetrics}
-                                expandAttributes={this.state.expandAttributes}
-                                binValues={this.state.metrics.binnedAccuracy}/>
-                        </div>
-                        <div className={WizardReport.classNames.expandAttributes} onClick={this.expandAttributes}>{this.state.expandAttributes && localization.Report.collapseSensitiveAttributes || !this.state.expandAttributes && localization.Report.expandSensitiveAttributes}</div>
-                        <div className={WizardReport.classNames.equalizedOdds}>{localization.Report.equalizedOddsDisparity}</div>
-                        <div className={WizardReport.classNames.howTo}>
-                                <ActionButton onClick={this.handleOpenModalHelp}><div className={WizardReport.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
-                                <ReactModal
-                                    style={modalStyles}
-                                    appElement={document.getElementById('app') as HTMLElement}
-                                    isOpen={this.state.showModalHelp}
-                                    contentLabel="Minimal Modal Example"
-                                    >
-                                    {/* <ActionButton className={WizardReport.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
-                                    <p className={WizardReport.classNames.modalContentHelp}>{localization.Report.classificationAccuracyHowToRead1}<br/><br/>{localization.Report.classificationAccuracyHowToRead2}<br/><br/>{localization.Report.classificationAccuracyHowToRead3}<br /><br /><ActionButton className={WizardReport.classNames.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
-                                </ReactModal>
-                        </div>
-                        <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
-                            <SummaryTable 
-                                binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
-                                binLabels={this.props.dashboardContext.groupNames}
-                                formattedBinValues={formattedBinAccuracyValues}
-                                metricLabel={selectedMetric.title}
-                                binValues={this.state.metrics.binnedAccuracy}/>
-                            <div className={WizardReport.classNames.chartWrapper}>
-                                <div className={WizardReport.classNames.chartHeader}>{accuracyChartHeader}</div>
-                                <div className={WizardReport.classNames.chartBody}>
-                                    <AccessibleChart
-                                        plotlyProps={accuracyPlot}
-                                        sharedSelectionContext={undefined}
-                                        theme={undefined}
-                                    />
+                    <div className={WizardReport.classNames.main}>
+                        <div className={WizardReport.classNames.mainLeft}>
+                            <div className={WizardReport.classNames.overallArea} style={{height: !this.state.expandAttributes && "150px" || this.state.expandAttributes && `${areaHeights/2}px` }}>
+                                <OverallTable
+                                    binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
+                                    binLabels={this.props.dashboardContext.groupNames}
+                                    formattedBinValues={formattedBinValues}
+                                    metricLabels={metricLabels}
+                                    overallMetrics={overallMetrics}
+                                    expandAttributes={this.state.expandAttributes}
+                                    binValues={this.state.metrics.binnedAccuracy}/>
+                            </div>
+                            <div className={WizardReport.classNames.expandAttributes} onClick={this.expandAttributes}>{this.state.expandAttributes && localization.Report.collapseSensitiveAttributes || !this.state.expandAttributes && localization.Report.expandSensitiveAttributes}</div>
+                            <div className={WizardReport.classNames.equalizedOdds}>{localization.Report.equalizedOddsDisparity}</div>
+                            <div className={WizardReport.classNames.howTo}>
+                                    <ActionButton onClick={this.handleOpenModalHelp}><div className={WizardReport.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
+                                    <ReactModal
+                                        style={modalStyles}
+                                        appElement={document.getElementById('app') as HTMLElement}
+                                        isOpen={this.state.showModalHelp}
+                                        contentLabel="Minimal Modal Example"
+                                        >
+                                        {/* <ActionButton className={WizardReport.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
+                                        <p className={WizardReport.classNames.modalContentHelp}>{localization.Report.classificationAccuracyHowToRead1}<br/><br/>{localization.Report.classificationAccuracyHowToRead2}<br/><br/>{localization.Report.classificationAccuracyHowToRead3}<br /><br /><ActionButton className={WizardReport.classNames.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
+                                    </ReactModal>
+                            </div>
+                            <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
+                                <SummaryTable 
+                                    binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
+                                    binLabels={this.props.dashboardContext.groupNames}
+                                    formattedBinValues={formattedBinAccuracyValues}
+                                    metricLabel={selectedMetric.title}
+                                    binValues={this.state.metrics.binnedAccuracy}/>
+                                <div className={WizardReport.classNames.chartWrapper}>
+                                    <div className={WizardReport.classNames.chartHeader}>{accuracyChartHeader}</div>
+                                    <div className={WizardReport.classNames.chartBody}>
+                                        <AccessibleChart
+                                            plotlyProps={accuracyPlot}
+                                            sharedSelectionContext={undefined}
+                                            theme={undefined}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div className={WizardReport.classNames.mainRight}>
-                                {/* <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div> */}
-                                {/* <div className={WizardReport.classNames.rightText}>{howToReadAccuracySection}</div> */}
-                                <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
-                                <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
-                                <div className={WizardReport.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
+                            <div className={WizardReport.classNames.textRow}>
+                                <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                                <div>
+                                    <div>{localization.Report.underestimationError}</div>
+                                    <div>{localization.Report.underpredictionExplanation}</div>
+                                </div>
                             </div>
-                     </div>
-                    <div className={WizardReport.classNames.textRow}>
-                        <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
-                        <div>
-                            <div>{localization.Report.underestimationError}</div>
-                            <div>{localization.Report.underpredictionExplanation}</div>
+                            <div className={WizardReport.classNames.textRow}>
+                                <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                                <div>
+                                    <div>{localization.Report.overestimationError}</div>
+                                    <div>{localization.Report.overpredictionExplanation}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={WizardReport.classNames.mainRight}>
+                            <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
+                            <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div>
+                            <div className={WizardReport.classNames.downloadReport}>{localization.ModelComparison.downloadReport}</div>
                         </div>
                     </div>
-                    <div className={WizardReport.classNames.textRow}>
-                        <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
-                        <div>
-                            <div>{localization.Report.overestimationError}</div>
-                            <div>{localization.Report.overpredictionExplanation}</div>
-                        </div>
-                    </div>
-                </div>
         }
 
         return (<div style={{height: "100%", overflowY:"auto"}}>
