@@ -116,7 +116,7 @@ class ConditionalSelectionRate(ClassificationMoment):
                                                     _LOWER_BOUND_DIFF]])
         return g_signed
     
-    # implement bound() method ratio bound or difference bound 
+    # implement bound() method ratio bound or difference bound
 
     # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec):
