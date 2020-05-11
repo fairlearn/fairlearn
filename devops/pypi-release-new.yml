@@ -207,7 +207,7 @@ stages:
           - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{variables.kvUsername}}) -p "$(${{variables.kvPassword}})" $(Pipeline.Workspace)/$(packageArtifactName)/*'
             displayName: Upload to ${{parameters.releaseType}} PyPI
 
-        # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention
+        # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention (Prod only)
   
   - job: PyPI_Pause
     pool: server
