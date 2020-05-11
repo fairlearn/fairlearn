@@ -40,7 +40,7 @@ jobs:
           variables:
             ${{ if eq(parameters.targetType, 'Test') }}:
               pypiUrl: https://test.pypi.org/simple/
-            ${{ if eq(parameters.targetType, 'Prod') }}:
+            ${{ if eq(parameters.targetType, 'Production') }}:
               pypiUrl: https://pypi.org/simple/
             RequirementsFile: requirements-${{pyVer}}.txt
             FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
