@@ -131,8 +131,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             lineHeight: "16px",
             fontWeight: "normal",
             height: "26px",
-            paddingLeft: "10px",
-            marginLeft: "80px"
+            marginLeft: "50px"
         },
         overallArea: {
             display: "flex",
@@ -171,14 +170,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             flexDirection: "row"
         },
         mainLeft: {
-            maxWidth: "75%",
+            width: "75%",
         },
         mainRight: {
             marginLeft: "20px",
             width: "240px",
             paddingLeft: "35px",
-            flexBasis: "300px",
-            flexShrink: 1,
+            // flexBasis: "300px",
+            // flexShrink: 1,
             backgroundColor: "#f2f2f2",
             boxShadow: "-1px 0px 0px #D2D2D2"
         },
@@ -242,10 +241,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             width: "15px",
             height: "15px",
             textAlign: "center",
-            fontFamily: "Arial",
             fontSize: "12px",
-            lineHeight: "15px",
-            fontWeight: "400",
+            lineHeight: "16px",
+            fontWeight: "600",
             borderRadius: "50%",
             border: "1px solid",
             marginTop: "3px",
