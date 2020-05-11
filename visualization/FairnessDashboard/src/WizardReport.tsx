@@ -63,7 +63,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             padding: "40px"
         },
         header: {
-            padding: "0px 90px 20px 90px",
+            padding: "0px 50px 20px 50px",
             backgroundColor: "#222222"
         },
         multimodelButton: {
@@ -128,8 +128,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         expandAttributes: {
             color: "#333333",
             fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500",
+            lineHeight: "16px",
+            fontWeight: "normal",
             height: "26px",
             paddingLeft: "10px",
             marginLeft: "80px"
@@ -137,13 +137,13 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         overallArea: {
             display: "flex",
             flexDirection: "row",
-            padding: "20px 0 30px 90px",
+            padding: "20px 0 30px 50px",
             backgroundColor: 'white'
         },
         presentationArea: {
             display: "flex",
             flexDirection: "row",
-            padding: "20px 0 30px 90px",
+            padding: "20px 0 30px 50px",
             backgroundColor: 'white'
         },
         chartWrapper: {
@@ -171,7 +171,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             flexDirection: "row"
         },
         mainLeft: {
-            maxWidth: "700px",
+            maxWidth: "75%",
         },
         mainRight: {
             marginLeft: "20px",
@@ -272,9 +272,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         },
         equalizedOdds: {
             float: "left",
-            fontWeight: "600",
+            fontSize: "18px",
+            lineHeight: "22px",
+            fontWeight: "normal",
             paddingTop: "30px",
-            paddingLeft: "90px"
+            paddingLeft: "50px"
         },
         howTo: {
             paddingTop: "20px",

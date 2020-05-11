@@ -67,15 +67,15 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
         },
         binTitle: {
             color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "400"
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "600"
         },
         sensitiveAttributes: {
             color: "#333333",
             fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500",
+            lineHeight: "16px",
+            fontWeight: "normal",
             height: "26px",
             paddingLeft: "10px"
         },
@@ -87,9 +87,9 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
         },
         metricLabel: {
             color: "#333333",
-            fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500",
+            fontSize: "11px",
+            lineHeight: "16px",
+            fontWeight: "600",
             height: "26px",
             paddingLeft: "10px"
         },
@@ -97,9 +97,9 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             flex: 1,
             paddingLeft: "10px",
             color: "#333333",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "normal",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",

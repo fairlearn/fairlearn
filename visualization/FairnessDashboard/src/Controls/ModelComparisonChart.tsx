@@ -182,10 +182,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             paddingLeft: "100px"
         },
         main: {
-            height: "100%",
-            flex: 1,
-            display: "inline-flex",
-            flexDirection: "row"
+            display: "flex",
+            flexDirection: "row",
+        },
+        mainLeft: {
+            width: "75%",
         },
         mainRight: {
             width: "240px",
@@ -421,12 +422,35 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             props.layout.yaxis.title = parityMetricTitle;
             
             mainChart = <div className={ModelComparisonChart.classNames.main}>
-                            <div className={ModelComparisonChart.classNames.chart}>
-                                <AccessibleChart
-                                    plotlyProps={props}
-                                    sharedSelectionContext={this.props.selections}
-                                    theme={undefined}
-                                />
+                            <div className={ModelComparisonChart.classNames.mainLeft}>
+                                <div className={ModelComparisonChart.classNames.howTo}>
+                                    <ReactModal
+                                        style={modalStyles}
+                                        appElement={document.getElementById('app') as HTMLElement}
+                                        isOpen={this.state.showModalIntro}
+                                        contentLabel="Intro Modal Example"
+                                        >
+                                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton> */}
+                                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalIntro}>Done</ActionButton></p>
+                                    </ReactModal>
+                                    <ActionButton onClick={this.handleOpenModalHelp}><div className={ModelComparisonChart.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
+                                    <ReactModal
+                                        style={modalStyles}
+                                        appElement={document.getElementById('app') as HTMLElement}
+                                        isOpen={this.state.showModalHelp}
+                                        contentLabel="Minimal Modal Example"
+                                        >
+                                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
+                                        <p className={ModelComparisonChart.classNames.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.<br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
+                                    </ReactModal>
+                                </div>
+                                <div className={ModelComparisonChart.classNames.chart}>
+                                    <AccessibleChart
+                                        plotlyProps={props}
+                                        sharedSelectionContext={this.props.selections}
+                                        theme={undefined}
+                                    />
+                                </div>
                             </div>
                             <div className={ModelComparisonChart.classNames.mainRight}>
                                 <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
@@ -474,27 +498,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         onChange={this.parityChanged}
                         styles={dropdownStyles}
                     />
-                </div>
-                <div className={ModelComparisonChart.classNames.howTo}>
-                    <ReactModal
-                        style={modalStyles}
-                        appElement={document.getElementById('app') as HTMLElement}
-                        isOpen={this.state.showModalIntro}
-                        contentLabel="Intro Modal Example"
-                        >
-                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton> */}
-                        <p className={ModelComparisonChart.classNames.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalIntro}>Done</ActionButton></p>
-                    </ReactModal>
-                    <ActionButton onClick={this.handleOpenModalHelp}><div className={ModelComparisonChart.classNames.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
-                    <ReactModal
-                        style={modalStyles}
-                        appElement={document.getElementById('app') as HTMLElement}
-                        isOpen={this.state.showModalHelp}
-                        contentLabel="Minimal Modal Example"
-                        >
-                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
-                        <p className={ModelComparisonChart.classNames.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.<br /><br /><ActionButton className={ModelComparisonChart.classNames.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
-                    </ReactModal>
                 </div>
                 {mainChart}
                 {/* <div>
