@@ -174,7 +174,7 @@ performed prior to any deployments, and also following the uploads to Test-PyPI
 and PyPI. To use it:
 
 #. Ensure that `fairlearn/__init__.py` has the correct version set.
-#. Put down a tag corresponding to this `_base_version` but preprended with
+#. Put down a tag corresponding to this version but preprended with
    `v`. For example, version `0.5.0` should be tagged wtih `v0.5.0`
 
 At queue time, select Test or Production PyPI as appropriate.
@@ -182,6 +182,6 @@ At queue time, select Test or Production PyPI as appropriate.
 As part of the release process, the `build_wheels.py` script uses
 `process_readme.py` to turn all the relative links in the ReadMe file into
 absolute ones (this is the reason why the applied tag has be of the form
-`v[_base_version]`). The `process_readme.py` script is slightly fragile with
+`v[__version__]`). The `process_readme.py` script is slightly fragile with
 respect to the contents of the ReadMe, so after significant changes its output
 should be verified.
