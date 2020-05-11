@@ -77,7 +77,7 @@ html_theme_options = {
         {"name": "StackOverflow", "url": "https://stackoverflow.com/questions/tagged/fairlearn"}
     ],
     "github_url": "https://github.com/fairlearn/fairlearn",
-    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this,
+    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this
     "show_prev_next": False
 }
 
@@ -98,8 +98,8 @@ html_css_files = [
 pygments_style = 'sphinx'
 
 sphinx_gallery_conf = {
-     'examples_dirs': '../examples',
-     'gallery_dirs': 'auto_examples',
+     'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
+     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
 # -- LaTeX macros ------------------------------------------------------------

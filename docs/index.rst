@@ -3,11 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Fairlearn's documentation!
-=====================================
+Welcome to Fairlearn!
+=====================
 
-The fairlearn project seeks to enable anyone involved in the development of artificial intelligence (AI) systems to assess their system's fairness and mitigate the observed unfairness.
-The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
+Fairlearn is and open source project that seeks to enable anyone involved in
+the development of artificial intelligence (AI) systems to assess their
+system's fairness and mitigate the observed unfairness.
+The source code and documentation are hosted on
+`GitHub <https://github.com/fairlearn/fairlearn>`_. 
 
 .. toctree::
    :maxdepth: 1
@@ -18,7 +21,7 @@ The code is `available from GitHub <https://github.com/fairlearn/fairlearn>`_.
 
    api_reference/index
    
-   auto_examples/index
+   auto_examples/notebooks/index
 
    contribution_guide/index
 
