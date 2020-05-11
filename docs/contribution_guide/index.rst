@@ -3,9 +3,11 @@
 Contribution Guide
 ==================
 
-This project welcomes contributions and suggestions. For information on our
-community, such as our :ref:`code_of_conduct`, :ref:`communication`, and
-regular :ref:`developer_calls`, refer to the :ref:`community` pages.
+This project welcomes contributions and suggestions. To find out how to
+connect to our community of users and developers, read our
+:ref:`community pages <community>` including our :ref:`code_of_conduct`.
+The contribution guide explains how to structure your contributions. Please
+:ref:`reach out <communication>` if you encouter any issues.
 
 .. toctree::
    :maxdepth: 3

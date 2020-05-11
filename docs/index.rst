@@ -25,4 +25,4 @@ The source code and documentation are hosted on
 
    contribution_guide/index
 
-   community
+   community/index

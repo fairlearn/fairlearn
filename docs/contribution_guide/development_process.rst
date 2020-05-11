@@ -27,7 +27,7 @@ comment).
 
 Signing off means you need to have your name and email address attached as a
 commit comment, which you can automate using git hooks as shown
-`here <https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#46536244>`_.s
+`here <https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#46536244>`_.
 
 .. _advanced_install:
 
@@ -36,7 +36,13 @@ Advanced installation instructions
 
 While working on Fairlearn itself you may want to install it in editable mode.
 This allows you to test the changed functionality. To install in editable mode
-using :code:`pip` run :code:`pip install -e .` from the repository root path.
+using :code:`pip` run 
+
+.. code-block::
+
+    pip install -e .
+
+from the repository root path.
 Note that the dashboard is built using nodejs and requires additional steps.
 To build the Fairlearn dashboard after making changes to it,
 `install Yarn <https://yarnpkg.com/lang/en/docs/install>`_, and then run the

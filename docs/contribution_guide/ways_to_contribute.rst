@@ -1,8 +1,7 @@
 Ways to contribute
 ==================
 
-There are many different ways to contribute to the Fairlearn community, for
-example:
+There are many different ways to contribute to Fairlearn, for example:
 
 * contributing code to add/enhance
     * unfairness mitigation techniques

@@ -1,4 +1,4 @@
-Contributing Example Notebooks
+Contributing example notebooks
 ------------------------------
 
 To contribute new example notebooks please submit a pull request. We have

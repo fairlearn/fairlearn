@@ -4,16 +4,18 @@ Creating new releases
 First add a description of the changes introduced in the package version you
 want to release to `CHANGES.md <https://github.com/fairlearn/fairlearn/CHANGES.md>`_.
 
-It is also best to verify that the Dashboard loads correctly. This is slightly
-involved:
+It is also best to verify that the Fairlearn dashboard loads correctly. This
+is slightly involved:
 
+#. Install the :code:`wheel` package by running :code:`pip install wheel`
 #. Create a wheel by running :code:`python setup.py sdist bdist_wheel` from
    the repository root. This will create a :code:`dist` directory which
    contains a :code:`.whl` file.
 #. Create a new conda environment for the test
 #. In this new environment, install this wheel by running
    :code:`pip install dist/<FILENAME>.whl`
-#. Install any pip packages required for the notebooks
+#. Install any pip packages required for the notebooks using
+   :code:`pip install -r requirements.txt`
 #. Check that the dashboard loads in the notebooks
 
 We have an

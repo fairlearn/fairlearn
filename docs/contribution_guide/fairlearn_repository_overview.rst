@@ -1,5 +1,5 @@
-Overview of the Fairlearn repository
-====================================
+Fairlearn repository overview
+=============================
 
 .. toctree::
    :maxdepth: 3
