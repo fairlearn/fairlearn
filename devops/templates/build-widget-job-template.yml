@@ -1,0 +1,16 @@
+# template for building the widget/fairlearn dashboard
+
+parameters:
+  name: 'BuildWidget'
+  vmImage: 'ubuntu-latest'
+  pyVersion: 3.6
+
+jobs:
+- job:  ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  steps:
+  # TODO: add --assert-no-changes to validate that no changes happened to widget files (Issue #270)
+  - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+    displayName: 'Build widget'
