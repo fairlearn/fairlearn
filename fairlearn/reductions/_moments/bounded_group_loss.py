@@ -59,7 +59,7 @@ class ConditionalLossMoment(LossMoment):
     def bound(self):
         """Return bound vector"""
         if self.upper_bound is None:
-            raise TypeError
+            raise ValueError("No Upper Bound")
         return pd.Series(self.upper_bound, index=self.index)
 
 
@@ -86,14 +86,14 @@ class AverageLossMoment(ConditionalLossMoment):
     """Moment for Average Loss."""
 
     def __init__(self, loss, upper_bound=None):
-        super().__init__(loss, no_groups=True)
+        super().__init__(loss, upper_bound=None, no_groups=True)
 
 
 class GroupLossMoment(ConditionalLossMoment):
     """Moment for Group Loss."""
 
-    def __init__(self, loss, upper_bound=None):
-        super().__init__(loss, no_groups=False)
+    def __init__(self, loss, upper_bound):
+        super().__init__(loss, upper_bound, no_groups=False)
 
 
 class SquareLoss:
