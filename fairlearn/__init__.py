@@ -9,7 +9,7 @@ import os
 from .show_versions import show_versions  # noqa: F401
 
 __name__ = "fairlearn"
-__version__ = "0.4.6"
+__version__ = "0.4.6.post0.dev0"
 
 # Common strings
 _NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
