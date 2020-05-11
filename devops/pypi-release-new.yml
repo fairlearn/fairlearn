@@ -105,8 +105,7 @@ stages:
     - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
       displayName: 'Build widget'
 
-    # TODO: Simplify the build_wheels script to remove target type and dev version
-    - script: python ./scripts/build_wheels.py --target-type Prod --version-filename $(versionFilename) --dev-version 0
+    - script: python ./scripts/build_wheels.py --version-filename $(versionFilename) 
       displayName: 'Build wheels'
 
     - task: PublishPipelineArtifact@1
