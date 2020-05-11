@@ -344,5 +344,4 @@ class TestBoundedGroupLoss(ArgumentTests):
         bnd = self.disparity_criterion.bound()
         loss_eps = self.disparity_criterion.gamma(predictor) - bnd
         loss = self.disparity_criterion.gamma(predictor)
-        #assert (np.isclose(loss - loss_eps, eps))
-        assert(not np.any(np.array(loss) - np.array(loss)))
+        assert(np.all(np.isclose(loss - eps, loss_eps)))
