@@ -5,6 +5,7 @@ import logging
 import numpy as np
 import pandas as pd
 import pytest
+import sklearn
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from sklearn.exceptions import NotFittedError
@@ -231,7 +232,12 @@ class ArgumentTests:
                    Y_two_col_df,
                    sensitive_features=transformA(A))
 
-        assert "bad input shape" in execInfo.value.args[0]
+        if sklearn.__version__ < "0.23.0":
+            expected_message = "bad input shape"
+        else:
+            expected_message = "y should be a 1d array"
+
+        assert expected_message in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -247,7 +253,12 @@ class ArgumentTests:
                    Y_two_col_ndarray,
                    sensitive_features=transformA(A))
 
-        assert "bad input shape" in execInfo.value.args[0]
+        if sklearn.__version__ < "0.23.0":
+            expected_message = "bad input shape"
+        else:
+            expected_message = "y should be a 1d array"
+
+        assert expected_message in execInfo.value.args[0]
 
     # ----------------------------
 
