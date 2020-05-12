@@ -48,7 +48,7 @@ The Fairlearn Python package has two components:
 
 ### Fairlearn algorithms
 
-For an overview of our algorithms please refer to our [website](https://fairlearn.github.io/user_guide/mitigation.html#id10).
+For an overview of our algorithms please refer to our [website](https://fairlearn.github.io/user_guide/mitigation.html).
 
 ### Fairlearn dashboard
 
