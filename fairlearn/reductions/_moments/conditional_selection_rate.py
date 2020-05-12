@@ -36,12 +36,13 @@ class ConditionalSelectionRate(ClassificationMoment):
     where error(A = a) = total_error
     """
 
-    def __init__(self, ratio=1.0):
+    def __init__(self, ratio=1.0, eps=0.1):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
         if not (0 < ratio <= 1):
             raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
         self.ratio = ratio
+        self.eps = eps
 
     def default_objective(self):
         """Return the default objective for moments of this kind."""
@@ -117,7 +118,8 @@ class ConditionalSelectionRate(ClassificationMoment):
         return g_signed
     
     # implement bound() method ratio bound or difference bound
-
+    def bound(self):
+        return pd.Series(self.eps, index=self.index)
     # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec):
         """Return the projected lambda values.

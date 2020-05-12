@@ -11,10 +11,10 @@ class ErrorRate(ClassificationMoment):
 
     short_name = "Err"
 
-    def __init__(self, epsilon=None):
+    def __init__(self, eps=None):
         """Initialize with the ratio value."""
-        super(ConditionalSelectionRate, self).__init__()
-        self.epsilon = epsilon
+        super().__init__()
+        self.eps = eps
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
@@ -30,7 +30,7 @@ class ErrorRate(ClassificationMoment):
         return error
 
     def bound(self):
-        return pd.Series(self.epsilon, index=self.index)
+        return pd.Series(self.eps, index=self.index)
 
     def project_lambda(self, lambda_vec):
         """Return the lambda values."""
