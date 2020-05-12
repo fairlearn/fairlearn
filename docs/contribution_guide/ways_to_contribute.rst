@@ -3,14 +3,22 @@ Ways to contribute
 
 There are many different ways to contribute to Fairlearn, for example:
 
-* contributing code to add/enhance
-    * unfairness mitigation techniques
-    * fairness metrics
-    * visualizations 
-* writing example notebooks
-* improving documentation
-    * in the code through docstrings
-    * for the website through user guides, etc.
-* reporting bugs
-* requesting new features
-* writing proposals for larger changes
+* Contribute code in the following areas:
+
+  * unfairness mitigation algorithms
+  * fairness metrics
+  * visualizations
+
+* Write example notebooks showcasing
+
+  * case studies in new application domains
+  * usage of Fairlearn components
+
+* Improve documentation, including:
+
+    * docstrings
+    * website content
+
+* Report bugs.
+* Request new features.
+* Write proposals for larger changes.
