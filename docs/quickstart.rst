@@ -23,6 +23,18 @@ Fairlearn is also available on
 For checking out the latest version in our repository check out our
 :ref:`advanced_install`.
 
+Overview of Fairlearn
+---------------------
+
+The Fairlearn package has two components:
+
+- A *dashboard* for assessing which groups are negatively impacted by a model,
+  and for comparing multiple models in terms of various fairness and accuracy
+  metrics.
+
+- *Algorithms* for mitigating unfairness in a variety of AI tasks and along a
+  variety of fairness definitions.
+
 Fairlearn in 10 minutes
 -----------------------
 

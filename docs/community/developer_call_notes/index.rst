@@ -1,3 +1,5 @@
+:orphan:
+
 .. _developer_call_notes:
 
 Developer call notes
