@@ -6,7 +6,18 @@ Plotting the UCI Adult Dataset
 print(__doc__)
 
 import matplotlib.pyplot as plt
-from shap.datasets import adult  # shap is only used its dataset utility
+from shap.datasets import adult, cache  # shap is only used its dataset utility
+
+
+# shap tries to cache the dataset locally which results in a permissions error
+# in CircleCI, so we rewrite the cache functionality
+def do_not_cache(url, filename=None):
+    return url
+
+
+# overwrite cache function
+cache = do_not_cache  # noqa: F811
+
 X, y_true = adult()
 y_true = y_true * 1
 sex = X['Sex'].apply(lambda sex: "female" if sex == 0 else "male")
