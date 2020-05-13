@@ -19,7 +19,7 @@ Fairlearn is a Python package that empowers developers of artificial intelligenc
 
 - The current stable release is available at [Fairlearn v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6).
 
-- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://fairlearn.github.io/contribution_guide/development_process.html#onboarding-guide).
+- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://fairlearn.github.io/contributor_guide/development_process.html#onboarding-guide).
 
 ## What we mean by _fairness_
 
@@ -61,12 +61,12 @@ For instructions on how to install Fairlearn check out our [Quickstart guide](ht
 ## Usage
 
 For common usage refer to the [Jupyter notebooks](./notebooks) and our
-[API guide](https://fairlearn.github.io/contribution_guide.html#api-design)
+[API guide](https://fairlearn.github.io/contributor_guide.html#api-design)
 
 ## Contributing
 
 To contribute please check our
-[contributing guide](https://fairlearn.github.io/contribution_guide.html).
+[contributor guide](https://fairlearn.github.io/contributor_guide.html).
 
 ## Maintainers
 

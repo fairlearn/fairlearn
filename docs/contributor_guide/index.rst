@@ -1,4 +1,4 @@
-.. _contribution_guide:
+.. _contributor_guide:
 
 Contribution Guide
 ==================

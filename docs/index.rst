@@ -23,6 +23,6 @@ The source code and documentation are hosted on
    
    auto_examples/notebooks/index
 
-   contribution_guide/index
+   contributor_guide/index
 
    community/index
