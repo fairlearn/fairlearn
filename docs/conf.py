@@ -28,7 +28,7 @@ copyright = '2019, Microsoft Corporation.'
 author = 'Microsoft'
 
 # The full version, including alpha/beta/rc tags
-release = fairlearn._base_version
+release = fairlearn.__version__
 
 
 # -- General configuration ---------------------------------------------------

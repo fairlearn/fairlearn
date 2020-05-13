@@ -3,10 +3,13 @@
 
 import pandas as pd
 import pytest
+from sklearn.linear_model import LogisticRegression
 
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity
 from fairlearn.reductions import ErrorRate
+from fairlearn._input_validation import \
+    (_LABELS_NOT_0_1_ERROR_MESSAGE)
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data
 
@@ -103,3 +106,14 @@ class TestExponentiatedGradientArguments:
                 assert isinstance(args[0], type(transformed_X))
                 assert isinstance(args[1], pd.Series)
                 assert isinstance(kwargs['sample_weight'], pd.Series)
+
+    def test_binary_classifier_0_1_required(self):
+        X, y, A = _get_data()
+        y = 2 * y
+
+        expgrad = ExponentiatedGradient(LogisticRegression(),
+                                        constraints=DemographicParity(),
+                                        T=1)
+        with pytest.raises(ValueError) as execInfo:
+            expgrad.fit(X, y, sensitive_features=(A))
+        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]

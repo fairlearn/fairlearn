@@ -21,9 +21,9 @@ metric_group_summary_results = {
         "overall": 0.3, "by_group": {0: 0.33333333, 1: 0.25}},
     metrics.false_negative_rate_group_summary: {
         "overall": 0.25, "by_group": {0: 0, 1: 0.4}},
-    metrics.root_mean_squared_error_group_summary: {
+    metrics._root_mean_squared_error_group_summary: {
         "overall": 0.52704628, "by_group": {0: 0.47140452, 1: 0.57735027}},
-    metrics.balanced_root_mean_squared_error_group_summary: {
+    metrics._balanced_root_mean_squared_error_group_summary: {
         "overall": 0.52386128, "by_group": {0: 0.28867513, 1: 0.56622777}},
     metrics.mean_prediction_group_summary: {
         "overall": 0.5, "by_group": {0: 0.55555556, 1: 0.44444444}},
@@ -59,21 +59,27 @@ metric_group_summary_results = {
 derived_metric_results = {
     metrics.true_positive_rate_difference: 0.4,
     metrics.true_positive_rate_ratio: 0.6,
+    metrics.true_negative_rate_difference: 0.083333333,
+    metrics.true_negative_rate_ratio: 0.88888889,
     metrics.false_positive_rate_difference: 0.083333333,
     metrics.false_positive_rate_ratio: 0.75,
+    metrics.false_negative_rate_difference: 0.4,
+    metrics.false_negative_rate_ratio: 0,
     metrics.selection_rate_difference: 0.11111111,
     metrics.selection_rate_ratio: 0.8,
-    metrics.selection_rate_group_min: 0.44444444,
-    metrics.selection_rate_group_max: 0.55555556,
     metrics.accuracy_score_difference: 0.11111111,
     metrics.accuracy_score_ratio: 0.85714286,
     metrics.accuracy_score_group_min: 0.66666667,
-    metrics.accuracy_score_group_max: 0.77777778,
+    metrics.zero_one_loss_difference: 0.11111111,
+    metrics.zero_one_loss_ratio: 0.66666667,
+    metrics.zero_one_loss_group_max: 0.33333333,
+    metrics.balanced_accuracy_score_group_min: 0.675,
+    metrics.precision_score_group_min: 0.6,
+    metrics.recall_score_group_min: 0.6,
     metrics.roc_auc_score_group_min: 0.675,
-    metrics.mean_absolute_error_difference: 0.11111111,
-    metrics.mean_absolute_error_ratio: 0.66666667,
-    metrics.mean_absolute_error_group_min: 0.22222222,
     metrics.mean_absolute_error_group_max: 0.33333333,
+    metrics.mean_squared_error_group_max: 0.33333333,
+    metrics.r2_score_group_min: -0.35,
 }
 
 

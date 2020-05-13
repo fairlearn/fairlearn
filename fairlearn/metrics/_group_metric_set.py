@@ -7,8 +7,8 @@ from . import (
     true_negative_rate_group_summary,
     false_positive_rate_group_summary,
     false_negative_rate_group_summary,
-    root_mean_squared_error_group_summary,
-    balanced_root_mean_squared_error_group_summary,
+    _root_mean_squared_error_group_summary,
+    _balanced_root_mean_squared_error_group_summary,
     mean_prediction_group_summary,
     selection_rate_group_summary,
     _mean_overprediction_group_summary,
@@ -81,14 +81,14 @@ BINARY_CLASSIFICATION_METRICS[SELECTION_RATE_GROUP_SUMMARY] = selection_rate_gro
 BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE_GROUP_SUMMARY] = true_negative_rate_group_summary
 
 REGRESSION_METRICS = {}
-REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = balanced_root_mean_squared_error_group_summary  # noqa:E501
+REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _balanced_root_mean_squared_error_group_summary  # noqa:E501
 REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY] = mean_absolute_error_group_summary
 REGRESSION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction_group_summary
 REGRESSION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction_group_summary
 REGRESSION_METRICS[MEAN_PREDICTION_GROUP_SUMMARY] = mean_prediction_group_summary
 REGRESSION_METRICS[MEAN_SQUARED_ERROR_GROUP_SUMMARY] = mean_squared_error_group_summary
 REGRESSION_METRICS[R2_SCORE_GROUP_SUMMARY] = r2_score_group_summary
-REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = root_mean_squared_error_group_summary
+REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _root_mean_squared_error_group_summary
 REGRESSION_METRICS[ZERO_ONE_LOSS_GROUP_SUMMARY] = zero_one_loss_group_summary
 
 
