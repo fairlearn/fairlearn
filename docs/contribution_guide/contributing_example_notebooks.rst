@@ -5,10 +5,10 @@ To contribute new example notebooks please submit a pull request. We have
 certain requirements that need to be satisfied to contribute a notebook. Those
 include:
 
-* clear structure
-* appropriate framing of the problem while respecting that fairness is a
+* Clear structure
+* Appropriate framing of the problem while respecting that fairness is a
   fundamentally sociotechnical challenge
-* usage of at least some part of Fairlearn
+* Usage of at least some part of Fairlearn
 
 Good examples of existing notebooks that abide by these requirements are:
 
