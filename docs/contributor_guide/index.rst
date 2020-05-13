@@ -1,6 +1,6 @@
 .. _contributor_guide:
 
-Contribution Guide
+Contributor Guide
 ==================
 
 This project welcomes contributions and suggestions. To find out how to
