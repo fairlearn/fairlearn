@@ -16,12 +16,11 @@ class ConditionalLossMoment(LossMoment):
         super().__init__(loss)
         self.upper_bound = upper_bound
         self.no_groups = no_groups
-         #If not provided does it defaul?
 
 
     def default_objective(self):
         """Return a default objective."""
-        return AverageLossMoment(self.reduction_loss, self.upper_bound)
+        return AverageLossMoment(self.reduction_loss)
 
     def load_data(self, X, y, **kwargs):
         """Load data into the moment object."""
@@ -85,14 +84,14 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 class AverageLossMoment(ConditionalLossMoment):
     """Moment for Average Loss."""
 
-    def __init__(self, loss, upper_bound):
-        super().__init__(loss, upper_bound, no_groups=True)
+    def __init__(self, loss):
+        super().__init__(loss, upper_bound=None, no_groups=True)
 
 
 class GroupLossMoment(ConditionalLossMoment):
     """Moment for Group Loss."""
 
-    def __init__(self, loss, upper_bound):
+    def __init__(self, loss, upper_bound=None):
         super().__init__(loss, upper_bound, no_groups=False)
 
 

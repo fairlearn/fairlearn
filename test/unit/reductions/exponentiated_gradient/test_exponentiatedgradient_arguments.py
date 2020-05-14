@@ -42,21 +42,24 @@ class TestExponentiatedGradientArguments:
         transformed_y = transformY(y)
         transformed_A = transformA(A)
         eps = 0.1
+        ratio = 1.0
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
-            constraints=DemographicParity(eps=eps),
+            # constraints=DemographicParity(ratio_bound=ratio, ratio_bound_slack=eps),
+            constraints=DemographicParity(ratio_bound=ratio, ratio_bound_slack=eps),
             eps=0.1)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
 
-        disparity_moment = DemographicParity(eps=eps)
+        # disparity_moment = DemographicParity(ratio_bound=ratio, ratio_bound_slack=eps)
+        disparity_moment = DemographicParity(ratio_bound=ratio, ratio_bound_slack=eps)
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
-        error = ErrorRate(eps)
+        error = ErrorRate()
         error.load_data(X, y, sensitive_features=merged_A)
         disparity = disparity_moment.gamma(Q).max()
-        disp =disparity_moment.gamma(Q)
+        disp = disparity_moment.gamma(Q)
         disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
         error = error.gamma(Q)[0]
 
@@ -64,7 +67,7 @@ class TestExponentiatedGradientArguments:
         assert expgrad._last_t == 5
         assert expgrad._best_t == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
-        assert (disparity - disparity_moment.bound().max()) == pytest.approx(disparity - eps, abs = _PRECISION)
+        #assert (disparity - disparity_moment.bound().max()) == pytest.approx(disparity - eps, abs = _PRECISION)
         assert (np.all(np.isclose(disp - eps, disp_eps)))
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad._n_oracle_calls == 32
