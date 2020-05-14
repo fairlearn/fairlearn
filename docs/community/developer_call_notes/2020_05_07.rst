@@ -5,19 +5,19 @@ Scribe: `Roman Lutz <https://github.com/romanlutz>`_
 
 Attendees:
 
-- Andrew Anderson
-- Matthijs Brouns
-- Miro Dudik
-- Richard Edgar
-- Parul Gupta
-- Ken Holstein
-- Adrin Jalali
-- Abdul Hannan Kanji
+- `Andrew Anderson <https://www.linkedin.com/in/andrewanderson05/>`_
+- `Matthijs Brouns <https://github.com/mbrouns>`_
+- `Miro Dudik <https://github.com/MiroDudik>`_
+- `Richard Edgar <https://github.com/riedgar-ms>`_
+- `Parul Gupta <https://github.com/parul100495>`_
+- `Ken Holstein <https://kenholstein.myportfolio.com/>`_
+- `Adrin Jalali <https://github.com/adrinjalali>`_
+- `Abdul Hannan Kanji <https://github.com/hannanabdul55>`_
 - `Roman Lutz <https://github.com/romanlutz>`_
-- Vanessa Milan
-- Kevin Robinson
-- Mehrnoosh Sameki
-- Hanna Wallach
+- `Vanessa Milan <https://www.microsoft.com/en-us/research/people/vmilan/>`_
+- `Kevin Robinson <https://github.com/kevinrobinson>`_
+- `Mehrnoosh Sameki <https://github.com/mesameki>`_
+- `Hanna Wallach <https://www.microsoft.com/en-us/research/people/wallach/>`_
 
 Organizational updates
 ^^^^^^^^^^^^^^^^^^^^^^
