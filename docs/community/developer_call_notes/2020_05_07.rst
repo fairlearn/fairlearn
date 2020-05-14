@@ -28,10 +28,11 @@ Organizational updates
     - sociotechnical framing is central to the project, careful and precise
       wording matter
     - more focus on governance when the project matures
-    - The Azure ML team will try to make Fairlearn easily usable in Azure. Any
-      functionality that can exist in the Fairlearn repository should live there.
-      Company-specific goals should not affect Fairlearn project decisions, just
-      like with any other open source project.
+    - The Azure ML team will try to make Fairlearn easily usable in Azure, but
+      Fairlearn is a standalone and independent project. Any functionality
+      that can exist in the Fairlearn repository should live there. The Azure
+      ML goals do not affect Fairlearn project decisions, just like with any
+      other open source projects.
 	
 #. regular occurrence of developer call (2nd Thursday each month)
 #. new newsletter through python.org, used to keep community in the loop about major news/updates
