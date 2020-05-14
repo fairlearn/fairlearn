@@ -105,8 +105,7 @@ stages:
     - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
       displayName: 'Build widget'
 
-    # TODO: Simplify the build_wheels script to remove target type and dev version
-    - script: python ./scripts/build_wheels.py --target-type Prod --version-filename $(versionFilename) --dev-version 0
+    - script: python ./scripts/build_wheels.py --version-filename $(versionFilename) 
       displayName: 'Build wheels'
 
     - task: PublishPipelineArtifact@1
@@ -208,7 +207,7 @@ stages:
           - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{variables.kvUsername}}) -p "$(${{variables.kvPassword}})" $(Pipeline.Workspace)/$(packageArtifactName)/*'
             displayName: Upload to ${{parameters.releaseType}} PyPI
 
-        # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention
+        # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention (Prod only)
   
   - job: PyPI_Pause
     pool: server
