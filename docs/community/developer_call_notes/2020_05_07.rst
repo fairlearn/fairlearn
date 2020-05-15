@@ -73,7 +73,7 @@ same obstacles including changing the way people talk about the topic.
 
 UX-specific points made throughout the conversation:
 
-* A lof things depend on the specific context. To create domain-specific UX
+* A lot of things depend on the specific context. To create domain-specific UX
   flows we'll need to work with partners in those domains.
 
 * For data scientists the job doesn't end with metrics. They need to interpret
