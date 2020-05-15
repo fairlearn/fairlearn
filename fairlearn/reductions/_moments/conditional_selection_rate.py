@@ -54,12 +54,14 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
         self.ratio = kwargs.get('ratio_bound', 1.0)
-        # if not (0 < kwargs.get('ratio_bound', 1.0) <= 1):
-        #     raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-        # if kwargs.get('ratio_bound_slack', None) is not None:
-        self.eps = kwargs.get('ratio_bound_slack', 0.1)
-        # if kwargs.get('difference_bound', None) is not None:
-        #     self.eps = kwargs.get('difference_bound', None)
+        if not (0 < kwargs.get('ratio_bound', 1.0) <= 1):
+            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
+        if 'ratio_bound_slack' in kwargs:
+            self.eps = kwargs.get('ratio_bound_slack', None)
+        elif 'difference_bound' in kwargs:
+            self.eps = kwargs.get('difference_bound', None)
+        else:
+            self.eps = None
 
     # def __init__(self, ratio_bound=1.0, ratio_bound_slack=None, difference_bound=None):
     #     """Initialize with the ratio value."""
@@ -221,18 +223,20 @@ class DemographicParity(ConditionalSelectionRate):
     """
 
     short_name = "DemographicParity"
-
-    def __init__(self, ratio_bound=1.0, ratio_bound_slack=None, difference_bound=None):
-        super().__init__(ratio_bound=ratio_bound,
-                         ratio_bound_slack=ratio_bound_slack)
+    #
+    # def __init__(self, ratio_bound=1.0, ratio_bound_slack=None, difference_bound=None):
+    #     super().__init__(ratio_bound=ratio_bound,
+    #                      ratio_bound_slack=ratio_bound_slack)
 
     # def __init__(self, ratio_bound=1.0, difference_bound=None):
     #     super().__init__(ratio_bound=ratio_bound, difference_bound=difference_bound)
 
-    # def __init__(self, **kwargs):
-    # #     if 'ratio_bound_slack' in kwargs:
-    #     super().__init__(ratio_bound=kwargs.get('ratio_bound'), ratio_bound_slack=kwargs.get('ratio_bound_slack'))
-    #     # super().__init__(difference_bound= kwargs.get('difference_bound', None))
+    def __init__(self, **kwargs):
+        if 'ratio_bound_slack' in kwargs:
+            super().__init__(ratio_bound=kwargs.get('ratio_bound', 1.0),
+                             ratio_bound_slack=kwargs.get('ratio_bound_slack', None))
+        else:
+            super().__init__(difference_bound= kwargs.get('difference_bound', None))
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
