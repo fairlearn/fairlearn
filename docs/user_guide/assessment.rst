@@ -52,7 +52,11 @@ The following figures illustrate the setup steps, where *binary gender* is
 selected as a sensitive feature and *accuracy rate* is selected as the
 performance metric.
 
-.. image:: ../../img/fairlearn-dashboard-config.png
+.. image:: ../../img/fairlearn-dashboard-start.png
+
+.. image:: ../../img/fairlearn-dashboard-multiple-sensitive-features.png
+
+.. image:: ../../img/fairlearn-dashboard-performance-multiple-sensitive-features.png
 
 After the setup, the dashboard presents the model assessment in two panels:
 
@@ -77,7 +81,9 @@ After the setup, the dashboard presents the model assessment in two panels:
         group, meaning the fraction of data classified as 1 (in binary
         classification) or distribution of prediction values (in regression).
 
-.. image:: ../../img/fairlearn-dashboard-results.png
+.. image:: ../../img/fairlearn-dashboard-disparity-performance-multiple-sensitive-features.png
+
+.. image:: ../../img/fairlearn-dashboard-disparity-predictions-multiple-sensitive-features.png
 
 Comparing multiple models
 ^^^^^^^^^^^^^^^^^^^^^^^^^
