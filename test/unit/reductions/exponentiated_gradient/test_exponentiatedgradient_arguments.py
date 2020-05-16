@@ -42,11 +42,11 @@ class TestExponentiatedGradientArguments:
         transformed_y = transformY(y)
         transformed_A = transformA(A)
         eps = 0.1
-        ratio = 0.7
+        ratio = 1.0
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(difference_bound=eps),
-            # constraints=DemographicParity(ratio_bound=ratio, ratio_bound_slack=eps),
+            # constraints=DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio),
             eps=0.1)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
@@ -54,7 +54,7 @@ class TestExponentiatedGradientArguments:
         n_predictors = len(expgrad._predictors)
 
         disparity_moment = DemographicParity(difference_bound=eps)
-        # disparity_moment = DemographicParity(ratio_bound=ratio, ratio_bound_slack=eps)
+        # disparity_moment = DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio)
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
         error = ErrorRate()
         error.load_data(X, y, sensitive_features=merged_A)

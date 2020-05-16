@@ -36,45 +36,24 @@ class ConditionalSelectionRate(ClassificationMoment):
     where error(A = a) = total_error
     """
 
-    # def __init__(self, difference_bound=None):
-    #     """Initialize with the ratio value."""
-    #     super(ConditionalSelectionRate, self).__init__()
-    #     self.ratio = 1.0
-    #     self.eps = difference_bound
-
-    # def __init__(self, ratio_bound=1.0, ratio_bound_slack=None):
-    #     """Initialize with the ratio value."""
-    #     super(ConditionalSelectionRate, self).__init__()
-    #     if not (0 < ratio_bound <= 1):
-    #         raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-    #     self.ratio = ratio_bound
-    #     self.eps = ratio_bound_slack
-
-    def __init__(self, **kwargs):
+    def __init__(self, difference_bound=None, ratio_bound_slack=None, ratio_bound=None):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
-        self.ratio = kwargs.get('ratio_bound', 1.0)
-        if not (0 < kwargs.get('ratio_bound', 1.0) <= 1):
-            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-        if 'ratio_bound_slack' in kwargs:
-            self.eps = kwargs.get('ratio_bound_slack', None)
-        elif 'difference_bound' in kwargs:
-            self.eps = kwargs.get('difference_bound', None)
-        else:
-            self.eps = None
+        if (difference_bound is None) and (ratio_bound_slack is None):
+            raise ValueError("One of difference_bound and ratio_bound_slack is required.")
+        if difference_bound is not None and ratio_bound_slack is not None:
+            raise ValueError("Only one of difference_bound and ratio_bound_slack can be used.")
+        if difference_bound is not None:
+            self.eps = difference_bound
+            self.ratio = 1.0
+        if ratio_bound_slack is not None:
+            self.eps = ratio_bound_slack
+            if ratio_bound is None:
+                raise ValueError("Ratio Bound Required")
+            if not (0 < ratio_bound <= 1):
+                raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
+            self.ratio = ratio_bound
 
-    # def __init__(self, ratio_bound=1.0, ratio_bound_slack=None, difference_bound=None):
-    #     """Initialize with the ratio value."""
-    #     super(ConditionalSelectionRate, self).__init__()
-    #     if not (0 < ratio_bound <= 1):
-    #         raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-    #     self.ratio = ratio_bound
-    #     if ratio_bound_slack is not None:
-    #         self.eps = ratio_bound_slack
-    #     elif difference_bound is not None:
-    #         self.eps = difference_bound
-    #     else:
-    #         self.eps=None
 
     def default_objective(self):
         """Return the default objective for moments of this kind."""
@@ -223,20 +202,6 @@ class DemographicParity(ConditionalSelectionRate):
     """
 
     short_name = "DemographicParity"
-    #
-    # def __init__(self, ratio_bound=1.0, ratio_bound_slack=None, difference_bound=None):
-    #     super().__init__(ratio_bound=ratio_bound,
-    #                      ratio_bound_slack=ratio_bound_slack)
-
-    # def __init__(self, ratio_bound=1.0, difference_bound=None):
-    #     super().__init__(ratio_bound=ratio_bound, difference_bound=difference_bound)
-
-    def __init__(self, **kwargs):
-        if 'ratio_bound_slack' in kwargs:
-            super().__init__(ratio_bound=kwargs.get('ratio_bound', 1.0),
-                             ratio_bound_slack=kwargs.get('ratio_bound_slack', None))
-        else:
-            super().__init__(difference_bound= kwargs.get('difference_bound', None))
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
