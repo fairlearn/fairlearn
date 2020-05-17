@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
+import numpy as np
 import pandas as pd
 import pickle
 import pytest
@@ -41,27 +41,33 @@ class TestExponentiatedGradientArguments:
         transformed_X = transformX(X)
         transformed_y = transformY(y)
         transformed_A = transformA(A)
-
+        eps = 0.1
+        ratio = 1.0
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
-            constraints=DemographicParity(),
+            constraints=DemographicParity(difference_bound=eps),
             eps=0.1)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
 
-        disparity_moment = DemographicParity()
+        disparity_moment = DemographicParity(difference_bound=eps)
+        disparity_moment_ratio = DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio)
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
+        disparity_moment_ratio.load_data(X, y, sensitive_features=merged_A)
         error = ErrorRate()
         error.load_data(X, y, sensitive_features=merged_A)
         disparity = disparity_moment.gamma(Q).max()
+        disp = disparity_moment.gamma(Q)
+        disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
         error = error.gamma(Q)[0]
 
         assert expgrad._best_gap == pytest.approx(0.0000, abs=_PRECISION)
         assert expgrad._last_t == 5
         assert expgrad._best_t == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
+        assert (np.all(np.isclose(disp - eps, disp_eps)))
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad._n_oracle_calls == 32
         assert n_predictors == 3

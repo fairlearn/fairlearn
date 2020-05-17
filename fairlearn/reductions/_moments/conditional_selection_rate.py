@@ -36,12 +36,24 @@ class ConditionalSelectionRate(ClassificationMoment):
     where error(A = a) = total_error
     """
 
-    def __init__(self, ratio=1.0):
+    def __init__(self, difference_bound=None, ratio_bound_slack=None, ratio_bound=None):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
-        if not (0 < ratio <= 1):
-            raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
-        self.ratio = ratio
+        if (difference_bound is None) and (ratio_bound_slack is None):
+            raise ValueError("One of difference_bound and ratio_bound_slack is required.")
+        if difference_bound is not None and ratio_bound_slack is not None:
+            raise ValueError("Only one of difference_bound and ratio_bound_slack can be used.")
+        if difference_bound is not None:
+            self.eps = difference_bound
+            self.ratio = 1.0
+        if ratio_bound_slack is not None:
+            self.eps = ratio_bound_slack
+            if ratio_bound is None:
+                raise ValueError("Ratio Bound Required")
+            if not (0 < ratio_bound <= 1):
+                raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
+            self.ratio = ratio_bound
+
 
     def default_objective(self):
         """Return the default objective for moments of this kind."""
@@ -115,8 +127,11 @@ class ConditionalSelectionRate(ClassificationMoment):
         self._gamma_descr = str(expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF,
                                                     _LOWER_BOUND_DIFF]])
         return g_signed
-    
-    # implement bound() method ratio bound or difference bound 
+
+    def bound(self):
+        if self.eps is None:
+            raise ValueError("No Bound")
+        return pd.Series(self.eps, index=self.index)
 
     # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec):
@@ -253,6 +268,12 @@ class EqualizedOdds(ConditionalSelectionRate):
     """
 
     short_name = "EqualizedOdds"
+
+    # def __init__(self, ratio_bound=1.0, ratio_bound_slack=None):
+    #     super().__init__(ratio_bound, ratio_bound_slack)
+
+    # def __init__(self, difference_bound=None):
+    #     super().__init__(difference_bound)
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
