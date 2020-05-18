@@ -22,7 +22,6 @@ from .simple_learners import LeastSquaresBinaryClassifierLearner
 def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     X, y, A = _get_data(A_two_dim=False)
     estimator = LeastSquaresBinaryClassifierLearner()
-
     constraints = Constraints(difference_bound=0.0) #added diff bound; o.w. test fails without bound specified
 
     # epsilon (and thereby also B) only affects L_high and L
@@ -83,7 +82,6 @@ def test_call_oracle(Constraints, eps, mocker):
     # Using a mocked estimator here since we don't actually want to fit one, but rather care about
     # having that object's fit method called exactly once.
     estimator = mocker.MagicMock()
-
     constraints = Constraints(difference_bound=0.0) #added diff bound; o.w. test fails without bound specified
 
     # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the mock
@@ -139,7 +137,6 @@ def test_call_oracle_single_y_value(Constraints, eps, mocker):
     # We mock the estimator, but we only patch it for pickling
     estimator = mocker.MagicMock()
     mocker.patch('pickle.dumps')
-
     constraints = Constraints(difference_bound=0.0) #added diff bound; o.w. test fails without bound specified
 
     lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, 1/eps)

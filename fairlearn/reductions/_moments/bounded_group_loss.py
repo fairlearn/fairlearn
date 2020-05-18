@@ -12,7 +12,6 @@ class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group."""
 
     def __init__(self, loss, upper_bound=None, no_groups=False):
-        # TODO: add (upper_)bound provided to init -- specific to conditional loss
         super().__init__(loss)
         self.upper_bound = upper_bound
         self.no_groups = no_groups
@@ -60,8 +59,6 @@ class ConditionalLossMoment(LossMoment):
         if self.upper_bound is None:
             raise ValueError("No Upper Bound")
         return pd.Series(self.upper_bound, index=self.index)
-
-
 
     def project_lambda(self, lambda_vec):
         """Return the lambda values."""

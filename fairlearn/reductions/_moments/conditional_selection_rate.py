@@ -54,7 +54,6 @@ class ConditionalSelectionRate(ClassificationMoment):
                 raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
             self.ratio = ratio_bound
 
-
     def default_objective(self):
         """Return the default objective for moments of this kind."""
         return ErrorRate()

@@ -102,7 +102,7 @@ class TestExponentiatedGradientArguments:
         mocker.patch('pickle.loads', return_value=estimator)
 
         # restrict ExponentiatedGradient to a single iteration
-        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), T=1)
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(difference_bound=0.0), T=1) # added required DP bound
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
