@@ -329,10 +329,6 @@ class TestBoundedGroupLoss(ArgumentTests):
         eps = 0.01
         self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), eps)
 
-    # @pytest.mark.parametrize("transformA", candidate_A_transforms)
-    # @pytest.mark.parametrize("transformY", candidate_Y_transforms)
-    # @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    #@pytest.mark.parametrize("A_two_dim", [False, True])
     def test_eps(self):
         X, Y, A = _quick_data()
         eps = 0.01
