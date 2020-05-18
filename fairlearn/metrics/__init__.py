@@ -18,76 +18,50 @@ The metric is evaluated for the entire set of data, and also
 for each subgroup identified in ``group_membership``.
 """
 
-from ._extra_metrics import balanced_root_mean_squared_error, fallout_rate  # noqa: F401
-from ._extra_metrics import mean_overprediction, mean_prediction  # noqa: F401
-from ._extra_metrics import mean_underprediction, miss_rate  # noqa: F401
-from ._extra_metrics import selection_rate, specificity_score  # noqa: F401
-from ._extra_metrics import group_fallout_rate  # noqa: F401
-from ._extra_metrics import group_miss_rate  # noqa: F401
-from ._extra_metrics import group_specificity_score  # noqa: F401
-from ._extra_metrics import group_balanced_root_mean_squared_error  # noqa: F401
-from ._extra_metrics import group_mean_overprediction  # noqa: F401
-from ._extra_metrics import group_mean_prediction  # noqa: F401
-from ._extra_metrics import group_mean_underprediction  # noqa: F401
+from ._extra_metrics import (  # noqa: F401
+    true_positive_rate,
+    true_negative_rate,
+    false_positive_rate,
+    false_negative_rate,
+    _balanced_root_mean_squared_error,
+    mean_prediction,
+    selection_rate,
+    _mean_overprediction,
+    _mean_underprediction,
+    )
 
-from ._selection_rate import group_selection_rate  # noqa: F401
+from ._metrics_engine import (  # noqa: F401
+    make_metric_group_summary, group_summary,
+    make_derived_metric,
+    group_min_from_summary, group_max_from_summary,
+    difference_from_summary, ratio_from_summary,
+    _metric_group_summary_dict, _derived_metric_dict)
 
-from ._skm_wrappers import group_accuracy_score, group_confusion_matrix  # noqa: F401
-from ._skm_wrappers import group_precision_score, group_recall_score  # noqa: F401
-from ._skm_wrappers import group_roc_auc_score, group_zero_one_loss  # noqa: F401
-from ._skm_wrappers import group_max_error  # noqa: F401
-from ._skm_wrappers import group_mean_absolute_error  # noqa: F401
-from ._skm_wrappers import group_mean_squared_error  # noqa: F401
-from ._skm_wrappers import group_mean_squared_log_error  # noqa: F401
-from ._skm_wrappers import group_median_absolute_error  # noqa: F401
-from ._skm_wrappers import group_root_mean_squared_error  # noqa: F401
-from ._skm_wrappers import group_r2_score  # noqa: F401
+from ._disparities import (  # noqa: F401
+    demographic_parity_difference,
+    demographic_parity_ratio,
+    equalized_odds_difference,
+    equalized_odds_ratio,
+)
 
-from ._metrics_engine import make_group_metric, group_summary  # noqa: F401
-from ._metrics_engine import group_min_from_summary, group_max_from_summary  # noqa: F401
-from ._metrics_engine import difference_from_summary, ratio_from_summary  # noqa: F401
-
-# -------------------------------------------
 
 _extra_metrics = [
+    "true_positive_rate",
+    "true_negative_rate",
+    "false_positive_rate",
+    "false_negative_rate",
     "balanced_root_mean_squared_error",
-    "fallout_rate",
     "mean_prediction",
-    "mean_overprediction",
-    "mean_underprediction",
-    "miss_rate",
     "selection_rate",
-    "specificity_score"
+    "_mean_overprediction",
+    "_mean_underprediction",
 ]
 
-_group_metrics = [
-    "group_accuracy_score",
-    "group_balanced_root_mean_squared_error",
-    "group_confusion_matrix",
-    "group_fallout_rate",
-    "group_max_error",
-    "group_mean_absolute_error",
-    "group_mean_prediction",
-    "group_mean_overprediction",
-    "group_mean_squared_error",
-    "group_mean_squared_log_error",
-    "group_mean_underprediction",
-    "group_median_absolute_error",
-    "group_miss_rate",
-    "group_precision_score",
-    "group_r2_score",
-    "group_recall_score",
-    "group_roc_auc_score",
-    "group_root_mean_squared_error",
-    "group_selection_rate",
-    "group_specificity_score",
-    "group_zero_one_loss"
-]
 
-_engine = [
-    "GroupMetricResult",
-    "make_group_metric",
+_metrics_engine = [
+    "make_metric_group_summary",
     "group_summary",
+    "make_derived_metric",
     "group_min_from_summary",
     "group_max_from_summary",
     "difference_from_summary",
@@ -95,4 +69,23 @@ _engine = [
 ]
 
 
-__all__ = _engine + _extra_metrics + _group_metrics
+# Add the generated metrics of the form `<metric>_group summary` and
+# `<metric>_{difference,ratio,group_min,group_max`
+globals().update(_metric_group_summary_dict)
+globals().update(_derived_metric_dict)
+
+
+_disparities = [
+    "demographic_parity_difference",
+    "demographic_parity_ratio",
+    "equalized_odds_difference",
+    "equalized_odds_ratio",
+]
+
+
+__all__ = (
+    _extra_metrics +
+    _metrics_engine +
+    list(_metric_group_summary_dict.keys()) +
+    list(_derived_metric_dict.keys()) +
+    _disparities)

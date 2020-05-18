@@ -39,7 +39,7 @@ def main(argv):
     with open(args.input, 'r') as f:
         text_lines = f.readlines()
 
-    result_lines = [process_line(l) for l in text_lines]
+    result_lines = [process_line(current_line) for current_line in text_lines]
 
     logger.debug("Writing file %s", args.output)
     with open(args.output, 'w') as f:

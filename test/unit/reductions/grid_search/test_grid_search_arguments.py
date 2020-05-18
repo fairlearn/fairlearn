@@ -17,6 +17,7 @@ from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, G
 from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
     GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
 
+from test.unit.fixes import get_sklearn_expected_1d_message
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
 from test.unit.reductions.conftest import is_invalid_transformation
 from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results, _quick_data
@@ -230,8 +231,7 @@ class ArgumentTests:
             gs.fit(transformX(X),
                    Y_two_col_df,
                    sensitive_features=transformA(A))
-
-        assert "bad input shape" in execInfo.value.args[0]
+        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -246,8 +246,7 @@ class ArgumentTests:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
                    sensitive_features=transformA(A))
-
-        assert "bad input shape" in execInfo.value.args[0]
+        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     # ----------------------------
 

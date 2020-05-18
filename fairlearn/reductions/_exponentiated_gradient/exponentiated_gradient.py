@@ -8,6 +8,8 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
+
+from fairlearn.reductions._moments import ClassificationMoment
 from fairlearn._input_validation import _validate_and_reformat_input
 
 logger = logging.getLogger(__name__)
@@ -59,9 +61,11 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._last_t = None
         self._best_t = None
         self._n_oracle_calls = 0
+        self._n_oracle_calls_dummy_returned = 0
         self._oracle_execution_times = None
         self._lambda_vecs = pd.DataFrame()
         self._lambda_vecs_LP = pd.DataFrame()
+        self._lambda_vecs_lagrangian = pd.DataFrame()
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -72,7 +76,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        _, y_train, sensitive_features = _validate_and_reformat_input(X, y, **kwargs)
+        if isinstance(self._constraints, ClassificationMoment):
+            logger.debug("Classification problem detected")
+            is_classification_reduction = True
+        else:
+            logger.debug("Regression problem detected")
+            is_classification_reduction = False
+
+        _, y_train, sensitive_features = _validate_and_reformat_input(
+            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
 
         n = y_train.shape[0]
 
@@ -169,7 +181,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._last_t = len(Qs) - 1
         self._predictors = lagrangian.classifiers
         self._n_oracle_calls = lagrangian.n_oracle_calls
+        self._n_oracle_calls_dummy_returned = lagrangian.n_oracle_calls_dummy_returned
         self._oracle_execution_times = lagrangian.oracle_execution_times
+        self._lambda_vecs_lagrangian = lagrangian.lambdas
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
                      self._eps, B, self._nu, self._T, eta_min)
