@@ -222,6 +222,7 @@ class TestExponentiatedGradientSmoke:
 
         # disparity_moment = data["cons_class"](ratio=ratio)
         disparity_moment = data["cons_class"](ratio_bound_slack=eps, ratio_bound=ratio)
+
         disparity_moment.load_data(self.X, y,
                                    sensitive_features=self.A)
         error = ErrorRate()
@@ -251,6 +252,7 @@ class TestExponentiatedGradientSmoke:
     @pytest.mark.parametrize("Constraints", [TruePositiveRateDifference, DemographicParity])
     def test_simple_fit_predict(self, Constraints):
         estimator = LeastSquaresBinaryClassifierLearner()
+
         expgrad = ExponentiatedGradient(estimator, Constraints(difference_bound=0.01)) # added diff bound; o.w. test fails without bound specified
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))

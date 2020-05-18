@@ -95,14 +95,14 @@ class TestExponentiatedGradientArguments:
         estimator = mocker.MagicMock()
         estimator.predict = mocker.MagicMock(return_value=y)
         # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the
-        # mock object, so we mock that process as well. It sets the result from pickle.loads as
-        # the estimator, so we can simply overwrite the return value to be our mocked estimator
+        # mock object, so we patch import of pickle as well. It sets the result from pickle.loads
+        # as the estimator, so we can simply overwrite the return value to be our mocked estimator
         # object.
         mocker.patch('pickle.dumps')
-        pickle.loads = mocker.MagicMock(return_value=estimator)
+        mocker.patch('pickle.loads', return_value=estimator)
 
         # restrict ExponentiatedGradient to a single iteration
-        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(difference_bound=0.0), T=1) # added required DP bound
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), T=1)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
