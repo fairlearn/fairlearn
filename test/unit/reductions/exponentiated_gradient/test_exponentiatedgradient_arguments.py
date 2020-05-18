@@ -1,13 +1,17 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import numpy as np
+
 import pandas as pd
 import pickle
 import pytest
+from sklearn.linear_model import LogisticRegression
 
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity
 from fairlearn.reductions import ErrorRate
+from fairlearn._input_validation import \
+    (_LABELS_NOT_0_1_ERROR_MESSAGE)
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data
 
@@ -43,6 +47,7 @@ class TestExponentiatedGradientArguments:
         transformed_A = transformA(A)
         eps = 0.1
         ratio = 1.0
+
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(difference_bound=eps),
@@ -97,7 +102,7 @@ class TestExponentiatedGradientArguments:
         pickle.loads = mocker.MagicMock(return_value=estimator)
 
         # restrict ExponentiatedGradient to a single iteration
-        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), T=1)
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(difference_bound=0.0), T=1) # added required DP bound
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
@@ -110,3 +115,15 @@ class TestExponentiatedGradientArguments:
                 assert isinstance(args[0], type(transformed_X))
                 assert isinstance(args[1], pd.Series)
                 assert isinstance(kwargs['sample_weight'], pd.Series)
+
+
+    def test_binary_classifier_0_1_required(self):
+        X, y, A = _get_data()
+        y = 2 * y
+
+        expgrad = ExponentiatedGradient(LogisticRegression(),
+                                        constraints=DemographicParity(difference_bound=0.0),
+                                        T=1) # added required DP bound
+        with pytest.raises(ValueError) as execInfo:
+            expgrad.fit(X, y, sensitive_features=(A))
+        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
