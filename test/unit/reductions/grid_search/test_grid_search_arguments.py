@@ -312,14 +312,14 @@ class ConditionalOpportunityTests(ArgumentTests):
 class TestDemographicParity(ConditionalOpportunityTests):
     def setup_method(self, method):
         self.estimator = LogisticRegression(solver='liblinear')
-        self.disparity_criterion = DemographicParity()
+        self.disparity_criterion = DemographicParity(difference_bound=0.0) # added DP required bound
 
 
 # Test EqualizedOdds
 class TestEqualizedOdds(ConditionalOpportunityTests):
     def setup_method(self, method):
         self.estimator = LogisticRegression(solver='liblinear')
-        self.disparity_criterion = EqualizedOdds()
+        self.disparity_criterion = EqualizedOdds(difference_bound=0.0) # added EO required bound
 
 
 # Tests specific to BoundedGroupLoss
