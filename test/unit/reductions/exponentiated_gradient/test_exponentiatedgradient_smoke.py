@@ -253,7 +253,7 @@ class TestExponentiatedGradientSmoke:
     def test_simple_fit_predict(self, Constraints):
         estimator = LeastSquaresBinaryClassifierLearner()
 
-        expgrad = ExponentiatedGradient(estimator, Constraints(difference_bound=0.01)) # added diff bound; o.w. test fails without bound specified
+        expgrad = ExponentiatedGradient(estimator, Constraints())
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))
         expgrad.predict(pd.DataFrame(X1))
@@ -272,7 +272,7 @@ class TestExponentiatedGradientSmoke:
         estimator = LogisticRegression(solver='liblinear',
                                        fit_intercept=True,
                                        random_state=97)
-        expgrad = ExponentiatedGradient(estimator, DemographicParity(difference_bound=0.01)) # added diff bound; o.w. test fails without bound specified
+        expgrad = ExponentiatedGradient(estimator, DemographicParity())
 
         # Following line should not throw an exception
         expgrad.fit(X, y, sensitive_features=A)
