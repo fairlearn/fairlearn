@@ -129,8 +129,13 @@ class ConditionalSelectionRate(ClassificationMoment):
         return g_signed
 
     def bound(self):
+        ''' Return pandas Series of length of gamma
+
+        i.e., returns vector of fairness bound constraint the length of gamma.
+        '''
+        # TODO: understand if NotImplementedError is appropriate here
         if self.eps is None:
-            raise ValueError("No Bound")
+            raise NotImplementedError("Bound Cannot be Handled!")
         return pd.Series(self.eps, index=self.index)
 
     # TODO: this can be further improved using the overcompleteness in group membership
@@ -268,12 +273,6 @@ class EqualizedOdds(ConditionalSelectionRate):
     """
 
     short_name = "EqualizedOdds"
-
-    # def __init__(self, ratio_bound=1.0, ratio_bound_slack=None):
-    #     super().__init__(ratio_bound, ratio_bound_slack)
-
-    # def __init__(self, difference_bound=None):
-    #     super().__init__(difference_bound)
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
