@@ -10,6 +10,8 @@ from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
+from fairlearn.reductions._moments import ClassificationMoment
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,6 +40,7 @@ class _Lagrangian:
 
     def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
         self.X = X
+        self.y = y
         self.constraints = constraints
         self.constraints.load_data(X, y, eps=eps, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
@@ -133,7 +136,10 @@ class _Lagrangian:
 
     def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
-        redY = 1 * (signed_weights > 0)
+        if isinstance(self._constraints, ClassificationMoment):
+            redY = 1 * (signed_weights > 0)
+        else:
+            redY = self.y
         redW = signed_weights.abs()
         redW = self.n * redW / redW.sum()
 
