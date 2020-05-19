@@ -36,20 +36,18 @@ class ConditionalSelectionRate(ClassificationMoment):
     where error(A = a) = total_error
     """
 
-    def __init__(self, difference_bound=None, ratio_bound_slack=None, ratio_bound=None):
+    def __init__(self, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
-        if (difference_bound is None) and (ratio_bound_slack is None):
-            raise ValueError("One of difference_bound and ratio_bound_slack is required.")
-        if difference_bound is not None and ratio_bound_slack is not None:
-            raise ValueError("Only one of difference_bound and ratio_bound_slack can be used.")
-        if difference_bound is not None:
+        if (difference_bound is None) and (ratio_bound is None):
+            raise ValueError("One of difference_bound and ratio_bound is required.")
+        if difference_bound and ratio_bound:
+            raise ValueError("Only one of difference_bound and ratio_bound can be used.")
+        if difference_bound:
             self.eps = difference_bound
             self.ratio = 1.0
-        if ratio_bound_slack is not None:
+        if ratio_bound:
             self.eps = ratio_bound_slack
-            if ratio_bound is None:
-                raise ValueError("Ratio Bound Required")
             if not (0 < ratio_bound <= 1):
                 raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
             self.ratio = ratio_bound
