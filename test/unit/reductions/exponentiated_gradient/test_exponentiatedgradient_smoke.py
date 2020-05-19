@@ -207,6 +207,7 @@ class TestExponentiatedGradientSmoke:
 
         ratio = 1.0
         if "ratio" in data.keys():
+            # use ratio_bound
             ratio = data["ratio"]
 
         eps = 0.01
@@ -220,7 +221,6 @@ class TestExponentiatedGradientSmoke:
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad._predictors)
 
-        # disparity_moment = data["cons_class"](ratio=ratio)
         disparity_moment = data["cons_class"](ratio_bound_slack=eps, ratio_bound=ratio)
 
         disparity_moment.load_data(self.X, y,
