@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _MESSAGE_INVALID_BOUNDS
 from .error_rate import ErrorRate
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
@@ -45,7 +45,7 @@ class ConditionalSelectionRate(ClassificationMoment):
             # TODO: figure out if this initialization of ratio is correct
             self.ratio = 1.0
         if difference_bound and ratio_bound:
-            raise ValueError("Only one of difference_bound and ratio_bound can be used.")
+            raise ValueError(_MESSAGE_INVALID_BOUNDS)
         if difference_bound:
             self.eps = difference_bound
             self.ratio = 1.0
