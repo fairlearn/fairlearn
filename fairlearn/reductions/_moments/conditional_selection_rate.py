@@ -10,6 +10,7 @@ from .error_rate import ErrorRate
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
+_DEFAULT_DIFFERENCE_BOUND = 0.01
 
 
 class ConditionalSelectionRate(ClassificationMoment):
@@ -40,7 +41,9 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
-            raise ValueError("One of difference_bound and ratio_bound is required.")
+            self.eps = _DEFAULT_DIFFERENCE_BOUND
+            # TODO: figure out if this initialization of ratio is correct
+            self.ratio = 1.0
         if difference_bound and ratio_bound:
             raise ValueError("Only one of difference_bound and ratio_bound can be used.")
         if difference_bound:
