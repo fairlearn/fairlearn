@@ -7,7 +7,7 @@ import React from "react";
 import { AccuracyOptions, IAccuracyOption } from "./AccuracyMetrics";
 import { BinnedResponseBuilder } from "./BinnedResponseBuilder";
 import { AccuracyTab } from "./Controls/AccuracyTab";
-import { FeatureTab } from "./Controls/FeatureTab";
+import { FeatureTab } from "./Controls/FeatureTab/FeatureTab";
 import { IntroTab } from "./Controls/IntroTab";
 import { ModelComparisonChart } from "./Controls/ModelComparisonChart";
 import { ParityTab } from "./Controls/ParityTab";

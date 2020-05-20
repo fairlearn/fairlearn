@@ -1,4 +1,4 @@
-import { IStyle, mergeStyleSets, IProcessedStyleSet, ITheme, getTheme } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets } from "office-ui-fabric-react";
 
 export interface IFairnessWizardStyles {
     frame: IStyle;
@@ -16,12 +16,13 @@ export const FairnessWizardStyles: () => IProcessedStyleSet<IFairnessWizardStyle
         frame: {
             minHeight: "800px",
             minWidth: "800px",
-            //fontFamily: theme.fonts
+            //TODO
             fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`
         },
         thinHeader: {
             height: "36px",
-            backgroundColor: theme.palette.neutralPrimaryAlt,
+            // #333333
+            backgroundColor: theme.palette.neutralPrimary,
             color: theme.palette.white
         },
         headerLeft: {
