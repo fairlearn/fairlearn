@@ -63,7 +63,6 @@ class GPA:
                                         eps=eps,
                                         nu=nu)
         expgrad.fit(self.X_train, self.y_train, sensitive_features=self.A_train)
-        expgrad.predict(self.X_test)
         return pd.Series(expgrad.predict(self.X_test), name='scores_expgrad')
 
     def get_mse(self, algorithm, eps=0.01, grid_size=10, constraint_weight=0.5):
@@ -120,13 +119,13 @@ def main():
     print('Grid search:', gpa.summary('grid_search'))
     print('Exponentiated gradient:', gpa.summary('exp_grad', eps=0.6))
 
-    # # Plot MSE vs Fairness trade-off
-    # mse = []
-    # eps_values = np.arange(0.1, 1.1, 0.1)
-    # for eps in eps_values:
-    #     mse_result = gpa.summary('exp_grad', eps=eps)
-    #     mse.append(mse_result)
-    # gpa.plot_mse_vs_eps(eps_values, mse)
+    # Plot MSE vs Fairness trade-off
+    mse = []
+    eps_values = np.arange(0.1, 1.1, 0.1)
+    for eps in eps_values:
+        mse_result = gpa.summary('exp_grad', eps=eps)
+        mse.append(mse_result)
+    gpa.plot_mse_vs_eps(eps_values, mse)
 
 
 if __name__ == '__main__':
