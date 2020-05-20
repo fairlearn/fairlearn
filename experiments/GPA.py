@@ -76,6 +76,7 @@ class GPA:
         return round(skm.mean_squared_error(self.y_test, y_pred), 4)
 
     def summary(self, algorithm, eps=0.01, grid_size=10, constraint_weight=0.5):
+        """Provides MSE by group for a given algorithm"""
         if algorithm == 'grid_search':
             y_pred = self.run_grid_search(grid_size, constraint_weight)
         elif algorithm == 'exp_grad':
@@ -86,8 +87,10 @@ class GPA:
             raise ValueError('Please provide valid algorithm name')
         # mse = round(skm.mean_squared_error(self.y_test, y_pred), 4)
         mse = flm.group_mean_squared_error(self.y_test, y_pred, self.A_test)
-        return mse['overall'], mse['by_group'][0.0], mse['by_group'][1.0]
+        R = lambda x: round(x, 4)
+        return R(mse['overall']), R(mse['by_group'][0.0]), R(mse['by_group'][1.0])
 
+    @staticmethod
     def group_metric_as_df(self, name, group_metric_result):
         a = pd.Series(group_metric_result.by_group)
         a['overall'] = group_metric_result.overall
@@ -95,6 +98,7 @@ class GPA:
         a.rename({0: 'female', 1: 'male'}, inplace=True)
         return pd.DataFrame({name: a})
 
+    @staticmethod
     def plot_mse_vs_eps(self, eps_values, mse):
         overall, female, male = zip(*mse)
         plt.plot(eps_values, overall, label='overall')
@@ -111,16 +115,18 @@ def main():
     filename = '~/fairlearn/experiments/data.csv'
     bgl_square_loss = GroupLossMoment(SquareLoss(-np.inf, np.inf))
     gpa = GPA(filename, LinearRegression(), bgl_square_loss)
-    # gpa.summary('lin_reg')
-    # gpa.summary('grid_search')
-    # gpa.summary('exp_grad', eps=1)
+    print('MSE by group: overall - female - male')
+    print('Linear regression:', gpa.summary('lin_reg'))
+    print('Grid search:', gpa.summary('grid_search'))
+    print('Exponentiated gradient:', gpa.summary('exp_grad', eps=0.6))
 
-    mse = []
-    eps_values = np.arange(0.1, 1.1, 0.1)
-    for eps in eps_values:
-        mse_result = gpa.summary('exp_grad', eps=eps)
-        mse.append(mse_result)
-    gpa.plot_mse_vs_eps(eps_values, mse)
+    # # Plot MSE vs Fairness trade-off
+    # mse = []
+    # eps_values = np.arange(0.1, 1.1, 0.1)
+    # for eps in eps_values:
+    #     mse_result = gpa.summary('exp_grad', eps=eps)
+    #     mse.append(mse_result)
+    # gpa.plot_mse_vs_eps(eps_values, mse)
 
 
 if __name__ == '__main__':

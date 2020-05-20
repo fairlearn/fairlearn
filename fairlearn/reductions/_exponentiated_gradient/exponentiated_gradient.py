@@ -230,5 +230,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             if 1.0 in self._weights:  # check if we assign all the probability to only one predictor
                 return pred[self._weights.index].dot(self._weights)
             else:
-                # TODO: implement randomization
-                raise RuntimeError('Randomized prediction still not implemented!')
+                pred = pred[self._weights.index]
+                randomized_pred = np.zeros(pred.shape[0])
+                for i in range(pred.shape[0]):
+                    randomized_pred[i] = np.random.choice(pred.iloc[i,:], p=self._weights)  # sample the prediction
+                return randomized_pred
