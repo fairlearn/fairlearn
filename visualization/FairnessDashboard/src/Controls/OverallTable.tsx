@@ -52,7 +52,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             flex: 1,
             flexDirection: "column",
             borderTop: "0.5px solid #CCCCCC",
-            borderBottom: "0.5px solid #CCCCCC"
+            // borderBottom: "0.5px solid #CCCCCC"
         },
         binBox: {
             flex: 1,
@@ -63,13 +63,19 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            borderBottom: "0.5px dashed #CCCCCC"
+            borderBottom: "0.5px solid #CCCCCC"
         },
         binTitle: {
             color: "#333333",
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "600"
+        },
+        binLabel: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "normal"
         },
         sensitiveAttributes: {
             color: "#333333",
@@ -104,7 +110,7 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             flexDirection: "column",
             justifyContent: "center",
             // borderLeft: "0.5px dashed #CCCCCC",
-            borderBottom: "0.5px dashed #CCCCCC"
+            borderBottom: "0.5px solid #CCCCCC"
         },
         frame: {
             paddingBottom: "19px",
@@ -141,11 +147,11 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                     <div className={OverallTable.classNames.groupLabel}>{/*this.props.binGroup*/}</div>
                     <div className={OverallTable.classNames.flexCol}>
                         <div className={OverallTable.classNames.binBox}>
-                                <div className={OverallTable.classNames.binTitle}><b>{localization.Report.overallLabel}</b></div>
+                                <div className={OverallTable.classNames.binTitle}>{localization.Report.overallLabel}</div>
                         </div>
                         {this.props.binLabels.map((label, index) => {
                             if (this.props.expandAttributes) return (<div className={OverallTable.classNames.binBox} key={index}>
-                                <div className={OverallTable.classNames.binTitle}>{label}</div>
+                                <div className={OverallTable.classNames.binLabel}>{label}</div>
                                 {/* <Stack horizontal>
                                     {minIndexes.includes(index) && <div className={OverallTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
                                     {maxIndexes.includes(index) && <div className={OverallTable.classNames.minMaxLabel}>{localization.Report.maxTag}</div>}

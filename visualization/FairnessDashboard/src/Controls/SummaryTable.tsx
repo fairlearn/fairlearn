@@ -41,8 +41,8 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         groupLabel: {
             color: "#333333",
             fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500",
+            lineHeight: "15px",
+            fontWeight: "600",
             height: "26px"
         },
         flexCol: {
@@ -65,9 +65,9 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         },
         binTitle: {
             color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "400"
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "normal"
         },
         metricCol: {
             display: "inline-flex",
