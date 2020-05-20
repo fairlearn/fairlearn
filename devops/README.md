@@ -32,9 +32,3 @@ The pipeline then:
 1. Uploads to PyPI (requires user approval)
 1. Runs tests against the upload
 
-`pypi-release.yml` is our original Pipeline for doing PyPI releases.
-Rather than testing against the Wheel file, it first uploads to Test-PyPI, and then to Production PyPI.
-In order to avoid 'burning' a version in Test PyPI (at the time the pipeline was created, PyPI automatically published
-a package immediately on upload), the user must set a variable
-`DEV_VERSION` at queue time to a unique integer.
-The package uploaded to Test-PyPI then gets a `.dev[n]` suffix.

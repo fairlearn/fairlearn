@@ -28,7 +28,7 @@ copyright = '2019, Microsoft Corporation.'
 author = 'Microsoft'
 
 # The full version, including alpha/beta/rc tags
-release = fairlearn._base_version
+release = fairlearn.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -42,7 +42,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
     "sphinx.ext.mathjax",
-    "sphinx_gallery.gen_gallery",
+    "sphinx_gallery.gen_gallery"
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -76,7 +76,7 @@ html_theme_options = {
         {"name": "StackOverflow", "url": "https://stackoverflow.com/questions/tagged/fairlearn"}
     ],
     "github_url": "https://github.com/fairlearn/fairlearn",
-    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this,
+    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this
     "show_prev_next": False
 }
 
@@ -89,12 +89,16 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_css_files = [
+    "css/cards.css"
+]
+
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
 sphinx_gallery_conf = {
-     'examples_dirs': '../examples',
-     'gallery_dirs': 'auto_examples',
+     'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
+     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
 # -- LaTeX macros ------------------------------------------------------------
