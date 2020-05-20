@@ -1,6 +1,0 @@
-...Exponentiated Gradient STARTING
-...iter=000
-_________best_h: val improvement inf
-_________MSE: 0
-_________lambda: 33, 33
-...eps=0.010, B=100.0, nu=0.000001, T=50, eta_min=0.000000
