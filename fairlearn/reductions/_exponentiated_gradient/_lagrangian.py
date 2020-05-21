@@ -52,13 +52,13 @@ class _Lagrangian:
         self.hs_ = pd.Series(dtype="float64")
         self.predictors_ = pd.Series(dtype="float64")
         self.errors_ = pd.Series(dtype="float64")
-        self.gammas_ = pd.DataFrame()
-        self.lambdas_ = pd.DataFrame()
-        self.n_oracle_calls_ = 0
-        self.oracle_execution_times_ = []
-        self.n_oracle_calls_dummy_returned_ = 0
-        self.last_linprog_n_hs_ = 0
-        self.last_linprog_result_ = None
+        self.gammas = pd.DataFrame()
+        self.lambdas = pd.DataFrame()
+        self.n_oracle_calls = 0
+        self.oracle_execution_times = []
+        self.n_oracle_calls_dummy_returned = 0
+        self.last_linprog_n_hs = 0
+        self.last_linprog_result = None
 
     def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
@@ -79,7 +79,7 @@ class _Lagrangian:
             gamma = self.constraints.gamma(Q)
         else:
             error = self.errors_[Q.index].dot(Q)
-            gamma = self.gammas_[Q.index].dot(Q)
+            gamma = self.gammas[Q.index].dot(Q)
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
@@ -111,10 +111,10 @@ class _Lagrangian:
     def solve_linprog(self, nu):
         n_hs = len(self.hs_)
         n_constraints = len(self.constraints.index)
-        if self.last_linprog_n_hs_ == n_hs:
-            return self.last_linprog_result_
+        if self.last_linprog_n_hs == n_hs:
+            return self.last_linprog_result
         c = np.concatenate((self.errors_, [self.B]))
-        A_ub = np.concatenate((self.gammas_ - self.eps, -np.ones((n_constraints, 1))), axis=1)
+        A_ub = np.concatenate((self.gammas - self.eps, -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
@@ -130,9 +130,9 @@ class _Lagrangian:
                                   bounds=dual_bounds,
                                   method='simplex')
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
-        self.last_linprog_n_hs_ = n_hs
-        self.last_linprog_result_ = (Q, lambda_vec, self.eval_gap(Q, lambda_vec, nu))
-        return self.last_linprog_result_
+        self.last_linprog_n_hs = n_hs
+        self.last_linprog_result = (Q, lambda_vec, self.eval_gap(Q, lambda_vec, nu))
+        return self.last_linprog_result
 
     def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
@@ -147,14 +147,14 @@ class _Lagrangian:
             logger.debug("redY had single value. Using DummyClassifier")
             classifier = DummyClassifier(strategy='constant',
                                          constant=redY_unique[0])
-            self.n_oracle_calls_dummy_returned_ += 1
+            self.n_oracle_calls_dummy_returned += 1
         else:
             classifier = pickle.loads(self.pickled_estimator)
 
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
-        self.oracle_execution_times_.append(time() - oracle_call_start_time)
-        self.n_oracle_calls_ += 1
+        self.oracle_execution_times.append(time() - oracle_call_start_time)
+        self.n_oracle_calls += 1
 
         return classifier
 
@@ -171,7 +171,7 @@ class _Lagrangian:
         h_value = h_error + h_gamma.dot(lambda_vec)
 
         if not self.hs_.empty:
-            values = self.errors_ + self.gammas_.transpose().dot(lambda_vec)
+            values = self.errors_ + self.gammas.transpose().dot(lambda_vec)
             best_idx = values.idxmin()
             best_value = values[best_idx]
         else:
@@ -184,8 +184,8 @@ class _Lagrangian:
             self.hs_.at[h_idx] = h
             self.predictors_.at[h_idx] = classifier
             self.errors_.at[h_idx] = h_error
-            self.gammas_[h_idx] = h_gamma
-            self.lambdas_[h_idx] = lambda_vec.copy()
+            self.gammas[h_idx] = h_gamma
+            self.lambdas[h_idx] = lambda_vec.copy()
             best_idx = h_idx
 
         return self.hs_[best_idx], best_idx

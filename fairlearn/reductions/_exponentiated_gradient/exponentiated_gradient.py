@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
-    _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _PRECISION, _INDENTATION
+    _SHRINK_REGRET, _SHRINK_ETA, _MIN_ITER, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
 
 from fairlearn.reductions._moments import ClassificationMoment
@@ -35,8 +35,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         violation is at most :code:`2*(eps+best_gap)`
     :type eps: float
 
-    :param max_iterations: Maximum number of iterations
-    :type max_iterations: int
+    :param max_iter: Maximum number of iterations
+    :type max_iter: int
 
     :param nu: Convergence threshold for the duality gap, corresponding to a
         conservative automatic setting based on the statistical uncertainty in measuring
@@ -46,26 +46,26 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     :param learning_rate: Initial setting of the learning rate
     :type learning_rate: float
 
-    :param run_lp_step: if True each step of exponentiated gradient is followed by the saddle
+    :param run_linprog_step: if True each step of exponentiated gradient is followed by the saddle
         point optimization over the convex hull of classifiers returned so far; default True
-    :type run_lp_step: bool
+    :type run_linprog_step: bool
     """
 
-    def __init__(self, estimator, constraints, eps=0.01, max_iterations=50, nu=None,
-                 learning_rate=2.0, run_lp_step=True):  # noqa: D103
+    def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
+                 learning_rate=2.0, run_linprog_step=True):  # noqa: D103
         self.estimator = estimator
         self.constraints = constraints
         self.eps = eps
-        self.max_iterations = max_iterations
+        self.max_iter = max_iter
         self.nu = nu
         self.learning_rate = learning_rate
-        self.run_lp_step = run_lp_step
+        self.run_linprog_step = run_linprog_step
 
         self.best_gap_ = None
         self.predictors_ = None
         self.weights_ = None
-        self.last_t_ = None
-        self.best_t_ = None
+        self.last_iter_ = None
+        self.best_iter_ = None
         self.n_oracle_calls_ = 0
         self.n_oracle_calls_dummy_returned_ = 0
         self.oracle_execution_times_ = None
@@ -108,7 +108,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         last_regret_checked = _REGRET_CHECK_START_T
         last_gap = np.PINF
-        for t in range(0, self.max_iterations):
+        for t in range(0, self.max_iter):
             logger.debug("...iter=%03d", t)
 
             # set lambdas for every constraint
@@ -124,19 +124,19 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                     self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
                 eta_min = self.nu / (2 * B)
                 eta = self.learning_rate / B
-                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iterations=%d, eta_min=%.6f",
-                             self.eps, B, self.nu, self.max_iterations, eta_min)
+                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
+                             self.eps, B, self.nu, self.max_iter, eta_min)
 
             if h_idx not in Qsum.index:
                 Qsum.at[h_idx] = 0.0
             Qsum[h_idx] += 1.0
-            gamma = lagrangian.gammas_[h_idx]
+            gamma = lagrangian.gammas[h_idx]
             Q_EG = Qsum / Qsum.sum()
             result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, self.nu)
             gap_EG = result_EG.gap()
             gaps_EG.append(gap_EG)
 
-            if t == 0 or not self.run_lp_step:
+            if t == 0 or not self.run_linprog_step:
                 gap_LP = np.PINF
             else:
                 # saddle point optimization over the convex hull of
@@ -157,7 +157,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                          _INDENTATION, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
                          gap_EG, result_EG.gamma.max(), result_EG.error, gap_LP)
 
-            if (gaps[t] < self.nu) and (t >= _MIN_T):
+            if (gaps[t] < self.nu) and (t >= _MIN_ITER):
                 # solution found
                 break
 
@@ -176,25 +176,25 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         # retain relevant result data
         gaps_series = pd.Series(gaps)
         gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
-        self.best_t_ = gaps_best.index[-1]
-        self.best_gap_ = gaps[self.best_t_]
-        self.weights_ = Qs[self.best_t_]
+        self.best_iter_ = gaps_best.index[-1]
+        self.best_gap_ = gaps[self.best_iter_]
+        self.weights_ = Qs[self.best_iter_]
         self._hs = lagrangian.hs_
         for h_idx in self._hs.index:
             if h_idx not in self.weights_.index:
                 self.weights_.at[h_idx] = 0.0
 
-        self.last_t_ = len(Qs) - 1
+        self.last_iter_ = len(Qs) - 1
         self.predictors_ = lagrangian.predictors_
-        self.n_oracle_calls_ = lagrangian.n_oracle_calls_
-        self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned_
-        self.oracle_execution_times_ = lagrangian.oracle_execution_times_
-        self.lambda_vecs_lagrangian_ = lagrangian.lambdas_
+        self.n_oracle_calls_ = lagrangian.n_oracle_calls
+        self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned
+        self.oracle_execution_times_ = lagrangian.oracle_execution_times
+        self.lambda_vecs_lagrangian_ = lagrangian.lambdas
 
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iterations=%d, eta_min=%.6f",
-                     self.eps, B, self.nu, self.max_iterations, eta_min)
-        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
-                     self.last_t_, self.best_t_, self.best_gap_, lagrangian.n_oracle_calls_,
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
+                     self.eps, B, self.nu, self.max_iter, eta_min)
+        logger.debug("...last_iter=%d, best_iter=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
+                     self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
                      len(lagrangian.predictors_))
 
     def predict(self, X):

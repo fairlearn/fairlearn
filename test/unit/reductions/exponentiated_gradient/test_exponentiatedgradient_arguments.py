@@ -61,8 +61,8 @@ class TestExponentiatedGradientArguments:
         error = error.gamma(Q)[0]
 
         assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
-        assert expgrad.last_t_ == 5
-        assert expgrad.best_t_ == 5
+        assert expgrad.last_iter_ == 5
+        assert expgrad.best_iter_ == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad.n_oracle_calls_ == 32
@@ -94,7 +94,7 @@ class TestExponentiatedGradientArguments:
 
         # restrict ExponentiatedGradient to a single iteration
         expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(),
-                                        max_iterations=1)
+                                        max_iter=1)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
@@ -114,7 +114,7 @@ class TestExponentiatedGradientArguments:
 
         expgrad = ExponentiatedGradient(LogisticRegression(),
                                         constraints=DemographicParity(),
-                                        max_iterations=1)
+                                        max_iter=1)
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
         assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]

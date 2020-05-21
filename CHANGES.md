@@ -3,6 +3,8 @@
 ### v0.5.0
 
 * Adjust classes to abide by naming conventions for attributes.
+* Change `ExponentiatedGradient` signature by renaming argument `T` to
+  `max_iter`, `eta_mul` to `learning_rate`, and by adding `run_linprog_step`.
 
 ### v0.4.6
 * Handle case where reductions relabeling results in a single class
@@ -29,8 +31,6 @@
 * Fix warning due to changing default `dtype` when creating an empty
   `pandas.Series`.
 * Enable `GridSearch` for more than two sensitive features values.
-* Change `ExponentiatedGradient` signature by renaming argument `T` to
-  `max_iterations`, `eta_mul` to `learning_rate`, and by adding `run_lp_step`.
 * Add new disparity constraints for reductions methods as moments in
   `fairlearn.reductions` including:
   * `TruePositiveRateDifference`

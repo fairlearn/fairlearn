@@ -18,4 +18,4 @@ _SHRINK_REGRET = 0.8
 _SHRINK_ETA = 0.8
 
 # The smallest number of iterations after which ExponentiatedGradient terminates.
-_MIN_T = 5
+_MIN_ITER = 5

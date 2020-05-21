@@ -128,7 +128,7 @@ def test_bgl_unmitigated_same(A_two_dim):
     grid_search.fit(X, y, sensitive_features=A)
 
     raw_coef = unmitigated_estimator.coef_
-    gs_coef = grid_search.predictors_[grid_search._best_grid_index].coef_
+    gs_coef = grid_search.predictors_[grid_search.best_grid_index_].coef_
     # Can't quite get exact match, but this should be very close
     assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
