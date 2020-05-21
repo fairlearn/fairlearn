@@ -49,9 +49,9 @@ class _Lagrangian:
         self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
-        self.hs_ = pd.Series(dtype="float64")
-        self.predictors_ = pd.Series(dtype="float64")
-        self.errors_ = pd.Series(dtype="float64")
+        self.hs = pd.Series(dtype="float64")
+        self.predictors = pd.Series(dtype="float64")
+        self.errors = pd.Series(dtype="float64")
         self.gammas = pd.DataFrame()
         self.lambdas = pd.DataFrame()
         self.n_oracle_calls = 0
@@ -78,7 +78,7 @@ class _Lagrangian:
             error = self.obj.gamma(Q)[0]
             gamma = self.constraints.gamma(Q)
         else:
-            error = self.errors_[Q.index].dot(Q)
+            error = self.errors[Q.index].dot(Q)
             gamma = self.gammas[Q.index].dot(Q)
 
         if self.opt_lambda:
@@ -109,17 +109,17 @@ class _Lagrangian:
         return result
 
     def solve_linprog(self, nu):
-        n_hs = len(self.hs_)
+        n_hs = len(self.hs)
         n_constraints = len(self.constraints.index)
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_result
-        c = np.concatenate((self.errors_, [self.B]))
+        c = np.concatenate((self.errors, [self.B]))
         A_ub = np.concatenate((self.gammas - self.eps, -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
         result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
-        Q = pd.Series(result.x[:-1], self.hs_.index)
+        Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
@@ -170,8 +170,8 @@ class _Lagrangian:
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
 
-        if not self.hs_.empty:
-            values = self.errors_ + self.gammas.transpose().dot(lambda_vec)
+        if not self.hs.empty:
+            values = self.errors + self.gammas.transpose().dot(lambda_vec)
             best_idx = values.idxmin()
             best_value = values[best_idx]
         else:
@@ -180,15 +180,15 @@ class _Lagrangian:
 
         if h_value < best_value - _PRECISION:
             logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
-            h_idx = len(self.hs_)
-            self.hs_.at[h_idx] = h
-            self.predictors_.at[h_idx] = classifier
-            self.errors_.at[h_idx] = h_error
+            h_idx = len(self.hs)
+            self.hs.at[h_idx] = h
+            self.predictors.at[h_idx] = classifier
+            self.errors.at[h_idx] = h_error
             self.gammas[h_idx] = h_gamma
             self.lambdas[h_idx] = lambda_vec.copy()
             best_idx = h_idx
 
-        return self.hs_[best_idx], best_idx
+        return self.hs[best_idx], best_idx
 
 
 class _GapResult:

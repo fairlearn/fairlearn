@@ -43,8 +43,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         classification error
     :type nu: float
 
-    :param learning_rate: Initial setting of the learning rate
-    :type learning_rate: float
+    :param eta0: Initial setting of the learning rate
+    :type eta0: float
 
     :param run_linprog_step: if True each step of exponentiated gradient is followed by the saddle
         point optimization over the convex hull of classifiers returned so far; default True
@@ -52,13 +52,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """
 
     def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
-                 learning_rate=2.0, run_linprog_step=True):  # noqa: D103
+                 eta0=2.0, run_linprog_step=True):  # noqa: D103
         self.estimator = estimator
         self.constraints = constraints
         self.eps = eps
         self.max_iter = max_iter
         self.nu = nu
-        self.learning_rate = learning_rate
+        self.eta0 = eta0
         self.run_linprog_step = run_linprog_step
 
         self.best_gap_ = None
@@ -69,9 +69,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.n_oracle_calls_ = 0
         self.n_oracle_calls_dummy_returned_ = 0
         self.oracle_execution_times_ = None
-        self.lambda_vecs_ = pd.DataFrame()
+        self.lambda_vecs_EG_ = pd.DataFrame()
         self.lambda_vecs_LP_ = pd.DataFrame()
-        self.lambda_vecs_lagrangian_ = pd.DataFrame()
+        self.lambda_vecs_ = pd.DataFrame()
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -113,8 +113,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
-            self.lambda_vecs_[t] = lambda_vec
-            lambda_EG = self.lambda_vecs_.mean(axis=1)
+            self.lambda_vecs_EG_[t] = lambda_vec
+            lambda_EG = self.lambda_vecs_EG_.mean(axis=1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
@@ -123,7 +123,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 if self.nu is None:
                     self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
                 eta_min = self.nu / (2 * B)
-                eta = self.learning_rate / B
+                eta = self.eta0 / B
                 logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
                              self.eps, B, self.nu, self.max_iter, eta_min)
 
@@ -179,23 +179,23 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.best_iter_ = gaps_best.index[-1]
         self.best_gap_ = gaps[self.best_iter_]
         self.weights_ = Qs[self.best_iter_]
-        self._hs = lagrangian.hs_
+        self._hs = lagrangian.hs
         for h_idx in self._hs.index:
             if h_idx not in self.weights_.index:
                 self.weights_.at[h_idx] = 0.0
 
         self.last_iter_ = len(Qs) - 1
-        self.predictors_ = lagrangian.predictors_
+        self.predictors_ = lagrangian.predictors
         self.n_oracle_calls_ = lagrangian.n_oracle_calls
         self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned
         self.oracle_execution_times_ = lagrangian.oracle_execution_times
-        self.lambda_vecs_lagrangian_ = lagrangian.lambdas
+        self.lambda_vecs_ = lagrangian.lambdas
 
         logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
                      self.eps, B, self.nu, self.max_iter, eta_min)
         logger.debug("...last_iter=%d, best_iter=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
                      self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
-                     len(lagrangian.predictors_))
+                     len(lagrangian.predictors))
 
     def predict(self, X):
         """Provide a prediction for the given input data.

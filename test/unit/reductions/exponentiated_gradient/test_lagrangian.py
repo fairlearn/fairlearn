@@ -54,7 +54,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     L_high_expected = best_h_error + B * (best_h_gamma.max() - eps)
 
     # manually set errors and gammas which would otherwise be done in the best_h step
-    lagrangian.errors_ = pd.Series([best_h_error])
+    lagrangian.errors = pd.Series([best_h_error])
     lagrangian.gammas = pd.Series([best_h_gamma])
 
     # call _eval to get the desired results L, L_high, gamma, error;
