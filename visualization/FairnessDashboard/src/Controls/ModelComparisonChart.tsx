@@ -38,7 +38,6 @@ export interface IState {
     parityKey?: string;
     accuracyArray?: number[];
     disparityArray?: number[];
-    disparityInOutcomes: boolean;
 }
 
 export class ModelComparisonChart extends React.PureComponent<IModelComparisonProps, IState> {
@@ -256,9 +255,9 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     constructor(props: IModelComparisonProps) {
         super(props);
         this.state = {
-            disparityInOutcomes: true,
             showModalIntro: this.props.showIntro,
-            accuracyKey: this.props.accuracyPickerProps.selectedAccuracyKey
+            accuracyKey: this.props.accuracyPickerProps.selectedAccuracyKey,
+            parityKey: this.props.parityPickerProps.selectedParityKey
         };
     }
 
@@ -552,10 +551,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     modelIndex,
                     this.props.accuracyPickerProps.selectedAccuracyKey);
             });
-            const disparityMetric = this.state.disparityInOutcomes ?
-            (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
-                this.props.parityPickerProps.selectedParityKey : "average") :
-                this.props.accuracyPickerProps.selectedAccuracyKey;
+            const disparityMetric = this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
+                this.props.parityPickerProps.selectedParityKey : "average";
             const parityMode = this.props.parityPickerProps.parityOptions.filter(option => option.key == this.props.parityPickerProps.selectedParityKey)[0].parityModes[0];
             const disparityPromises = new Array(this.props.modelCount).fill(0).map((unused, modelIndex) => {
                 return this.props.metricsCache.getDisparityMetric(
@@ -578,7 +575,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const featureKey = option.key.toString();
         if (this.state.featureKey !== featureKey) {
             this.props.featureBinPickerProps.selectedBinIndex = this.props.dashboardContext.modelMetadata.featureNames.indexOf(featureKey);
-            this.setState({featureKey: featureKey, disparityArray: undefined});
+            this.setState({featureKey: featureKey, accuracyArray: undefined, disparityArray: undefined});
         }
     }
 
@@ -586,7 +583,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const accuracyKey = option.key.toString();
         if (this.state.accuracyKey !== accuracyKey) {
             this.props.accuracyPickerProps.selectedAccuracyKey = accuracyKey;
-            this.setState({accuracyKey: accuracyKey, disparityArray: undefined});
+            this.setState({accuracyKey: accuracyKey, accuracyArray: undefined});
         }
     }
 
@@ -595,13 +592,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         if (this.state.parityKey !== parityKey) {
             this.props.parityPickerProps.selectedParityKey = parityKey;
             this.setState({parityKey: parityKey, disparityArray: undefined});
-        }
-    }
-
-    private readonly disparityChanged = (ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): void => {
-        const disparityInOutcomes = option.key !== "accuracy";
-        if (this.state.disparityInOutcomes !== disparityInOutcomes) {
-            this.setState({disparityInOutcomes, disparityArray: undefined});
         }
     }
 
