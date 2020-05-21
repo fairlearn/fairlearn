@@ -152,7 +152,15 @@
         "aucDescription": "The quality of the predictions, viewed as scores, in separating positive examples from negative examples.",
         "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced.",
         "balancedAccuracy": "Balanced accuracy",
-        "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced."
+        "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced.",
+        "parityDifference": "Parity difference",
+        "parityDifferenceDescription": "Parity difference",
+        "parityRatio": "Parity ratio",
+        "parityRatioDescription": "Parity ratio",
+        "errorRateDifference": "Error rate difference",
+        "errorRateDifferenceDescription": "Error rate difference",
+        "equalOpportunityDifference": "Equal opportunity difference",
+        "equalOpportunityDifferenceDescription": "Equal opportunity difference"
     },
     "BinDialog": {
         "header": "Configure bins",
