@@ -61,18 +61,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.eta0 = eta0
         self.run_linprog_step = run_linprog_step
 
-        self.best_gap_ = None
-        self.predictors_ = None
-        self.weights_ = None
-        self.last_iter_ = None
-        self.best_iter_ = None
-        self.n_oracle_calls_ = 0
-        self.n_oracle_calls_dummy_returned_ = 0
-        self.oracle_execution_times_ = None
-        self.lambda_vecs_EG_ = pd.DataFrame()
-        self.lambda_vecs_LP_ = pd.DataFrame()
-        self.lambda_vecs_ = pd.DataFrame()
-
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
 
@@ -82,6 +70,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
+        self.lambda_vecs_EG_ = pd.DataFrame()
+        self.lambda_vecs_LP_ = pd.DataFrame()
+        self.lambda_vecs_ = pd.DataFrame()
+
         if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
             is_classification_reduction = True

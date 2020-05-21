@@ -90,13 +90,6 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self.grid_offset = grid_offset
         self.grid = grid
 
-        self.best_grid_index_ = None
-        self.predictors_ = []
-        self.lambda_vecs_ = pd.DataFrame()
-        self.objectives_ = []
-        self.gammas_ = pd.DataFrame()
-        self.oracle_execution_times_ = []
-
     def fit(self, X, y, **kwargs):
         """Run the grid search.
 
@@ -114,6 +107,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             feature used by the constraints object
         :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
         """
+        self.predictors_ = []
+        self.lambda_vecs_ = pd.DataFrame()
+        self.objectives_ = []
+        self.gammas_ = pd.DataFrame()
+        self.oracle_execution_times_ = []
+
         if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
             is_classification_reduction = True
