@@ -7,7 +7,7 @@ import React from "react";
 import { AccuracyOptions, IAccuracyOption } from "./AccuracyMetrics";
 import { BinnedResponseBuilder } from "./BinnedResponseBuilder";
 import { AccuracyTab } from "./Controls/AccuracyTab";
-import { FeatureTab } from "./Controls/FeatureTab/FeatureTab";
+import { FeatureTab } from "./Controls/FeatureTab";
 import { IntroTab } from "./Controls/IntroTab";
 import { ModelComparisonChart } from "./Controls/ModelComparisonChart";
 import { ParityTab } from "./Controls/ParityTab";
@@ -180,45 +180,6 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         }
         return PredictionTypes.regression;
     }
-
-    // private static readonly classNames = mergeStyleSets({
-    //     frame: {
-    //         minHeight: "800px",
-    //         minWidth: "800px",
-    //         fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`
-    //     },
-    //     thinHeader: {
-    //         height: "36px",
-    //         backgroundColor: "#333333",
-    //         color: "#FFFFFF"
-    //     },
-    //     headerLeft: {
-    //         fontSize: "15px",
-    //         lineHeight: "24px",
-    //         fontWeight: "500",
-    //         padding: "20px"
-    //     },
-    //     headerRight: {
-    //         fontSize: "12px",
-    //         padding: "20px"
-    //     },
-    //     pivot: {
-    //         flex: 1,
-    //         display: "flex",
-    //         flexDirection: "column",
-    //         backgroundColor: "#F2F2F2",
-    //         padding: "30px 90px 0 82px"
-    //     },
-    //     body: {
-    //         flex: 1,
-    //         display: "flex",
-    //         flexDirection: "column"
-    //     },
-    //     errorMessage: {
-    //         padding: "50px",
-    //         fontSize: "18px"
-    //     }
-    // });
 
     private selections: SelectionContext;
 

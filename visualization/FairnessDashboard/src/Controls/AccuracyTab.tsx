@@ -8,67 +8,69 @@ import { TileList } from "./TileList";
 import { IAccuracyPickerProps } from "../FairnessWizard";
 import { mergeStyleSets } from "@uifabric/styling";
 import { PredictionTypes } from "../IFairnessProps";
+import { AccuracyTabStyles } from "./AccuracyTab.styles";
 
 export interface IAccuracyPickingTabProps extends IWizardTabProps {
     accuracyPickerProps: IAccuracyPickerProps
 }
 
 export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
-    private static readonly classNames = mergeStyleSets({
-        itemCell: [
-          {
-            padding: "30px 36px 20px 0",
-            width: "100%",
-            position: "relative",
-            float: "left",
-            cursor: "pointer",
-            boxSizing: "border-box",
-            borderBottom: "1px solid #CCCCCC",
-            selectors: {
-              '&:hover': { background: "lightgray" }
-            }
-          }
-        ],
-        iconClass: {
-            fontSize: "20px",
-            position: "absolute",
-            right: "10px",
-            top: "10px"
-        },
-        itemsList: {
-            overflowY: "auto"
-        },
-        frame: {
-            height: "100%",
-        },
-        main: {
-            height: "100%",
-            maxWidth: "750px",
-            flex: 1
-        },
-        header: {
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100",
-            margin: "26px 0"
-        },
-        textBody: {
-            paddingTop: "12px",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "300",
-            paddingBottom: "12px"
-        }
-    });
+    // private static readonly classNames = mergeStyleSets({
+    //     itemCell: [
+    //       {
+    //         padding: "30px 36px 20px 0",
+    //         width: "100%",
+    //         position: "relative",
+    //         float: "left",
+    //         cursor: "pointer",
+    //         boxSizing: "border-box",
+    //         borderBottom: "1px solid #CCCCCC",
+    //         selectors: {
+    //           '&:hover': { background: "lightgray" }
+    //         }
+    //       }
+    //     ],
+    //     iconClass: {
+    //         fontSize: "20px",
+    //         position: "absolute",
+    //         right: "10px",
+    //         top: "10px"
+    //     },
+    //     itemsList: {
+    //         overflowY: "auto"
+    //     },
+    //     frame: {
+    //         height: "100%",
+    //     },
+    //     main: {
+    //         height: "100%",
+    //         maxWidth: "750px",
+    //         flex: 1
+    //     },
+    //     header: {
+    //         color: "#333333",
+    //         fontSize: "32px",
+    //         lineHeight: "39px",
+    //         fontWeight: "100",
+    //         margin: "26px 0"
+    //     },
+    //     textBody: {
+    //         paddingTop: "12px",
+    //         fontSize: "18px",
+    //         lineHeight: "24px",
+    //         fontWeight: "300",
+    //         paddingBottom: "12px"
+    //     }
+    // });
     render(): React.ReactNode {
+        const styles = AccuracyTabStyles();
         return(
-            <Stack horizontal horizontalAlign="space-between" className={AccuracyTab.classNames.frame}>
-                <Stack className={AccuracyTab.classNames.main}>
-                    <h2 className={AccuracyTab.classNames.header}>
+            <Stack horizontal horizontalAlign="space-between" className={styles.frame}>
+                <Stack className={styles.main}>
+                    <h2 className={styles.header}>
                         {localization.Accuracy.header}
                     </h2>
-                    <p className={AccuracyTab.classNames.textBody}>{localization.formatString(localization.Accuracy.body,
+                    <p className={styles.textBody}>{localization.formatString(localization.Accuracy.body,
                         this.props.dashboardContext.modelMetadata.predictionType !== PredictionTypes.regression ?
                             localization.Accuracy.binary :
                             localization.Accuracy.continuous,
@@ -79,7 +81,7 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
                             localization.Accuracy.modelMakes :
                             localization.Accuracy.modelsMake
                         )}</p>
-                    <StackItem grow={2} className={AccuracyTab.classNames.itemsList}>
+                    <StackItem grow={2} className={styles.itemsList}>
                         <TileList
                             items={this.props.accuracyPickerProps.accuracyOptions.map((accuracy, index) => {
                                 return {

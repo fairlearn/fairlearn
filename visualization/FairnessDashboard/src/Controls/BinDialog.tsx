@@ -8,6 +8,7 @@ import { localization } from "../Localization/localization";
 import { PrimaryButton, DefaultButton } from "office-ui-fabric-react/lib/Button";
 import { IBinnedResponse } from "../IBinnedResponse";
 import { BinnedResponseBuilder } from "../BinnedResponseBuilder";
+import { BinDialogStyles } from "./BinDialog.styles";
 
 export interface IBinDialogProps {
     range: INumericRange;
@@ -19,102 +20,102 @@ export interface IBinDialogProps {
 }
 
 export default class BinDialog extends React.PureComponent<IBinDialogProps, IBinnedResponse> {
-    private static readonly classNames = mergeStyleSets({
-        frame: {
-            height: "400px",
-            width: "500px",
-            display: "flex",
-            flexDirection: "column",
-            backgroundColor: "#F2F2F2"
-        },
-        header: {
-            padding: "12px",
-            textAlign: "center",
-            backgroundColor: "#333333",
-            color: "#FFFFFF",
-            fontSize: "24px",
-            lineHeight: "30px",
-            fontWeight: "100"
-        },
-        buttons: {
-            display: "inline-flex",
-            flexDirection: "row-reverse",
-            padding: "10px"
-        },
-        saveButton: {
-            height: "44px",
-            padding: "12px",
-            color: "#FFFFFF",
-            fontSize: "18px",
-            lineHeight: "24px",
-            backgroundColor: "#666666",
-            fontWeight: "400",
-            marginLeft: "10px"
-        },
-        cancelButton: {
-            height: "44px",
-            padding: "12px",
-            color: "#333333",
-            fontSize: "18px",
-            lineHeight: "24px",
-            backgroundColor: "#FFFFFF",
-            fontWeight: "400"
-        },
-        binCounter: {
-            selectors: {
-                "& label": {
-                    color: "#333333",
-                    fontSize: "15px",
-                    lineHeight: "20px",
-                    fontWeight: "500"
-                }
-            }
-        },
-        main: {
-            flexGrow: 1,
-            padding: "20px 40px",
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column"
-        },
-        categoryHeader: {
+    // private static readonly classNames = mergeStyleSets({
+    //     frame: {
+    //         height: "400px",
+    //         width: "500px",
+    //         display: "flex",
+    //         flexDirection: "column",
+    //         backgroundColor: "#F2F2F2"
+    //     },
+    //     header: {
+    //         padding: "12px",
+    //         textAlign: "center",
+    //         backgroundColor: "#333333",
+    //         color: "#FFFFFF",
+    //         fontSize: "24px",
+    //         lineHeight: "30px",
+    //         fontWeight: "100"
+    //     },
+    //     buttons: {
+    //         display: "inline-flex",
+    //         flexDirection: "row-reverse",
+    //         padding: "10px"
+    //     },
+    //     saveButton: {
+    //         height: "44px",
+    //         padding: "12px",
+    //         color: "#FFFFFF",
+    //         fontSize: "18px",
+    //         lineHeight: "24px",
+    //         backgroundColor: "#666666",
+    //         fontWeight: "400",
+    //         marginLeft: "10px"
+    //     },
+    //     cancelButton: {
+    //         height: "44px",
+    //         padding: "12px",
+    //         color: "#333333",
+    //         fontSize: "18px",
+    //         lineHeight: "24px",
+    //         backgroundColor: "#FFFFFF",
+    //         fontWeight: "400"
+    //     },
+    //     binCounter: {
+    //         selectors: {
+    //             "& label": {
+    //                 color: "#333333",
+    //                 fontSize: "15px",
+    //                 lineHeight: "20px",
+    //                 fontWeight: "500"
+    //             }
+    //         }
+    //     },
+    //     main: {
+    //         flexGrow: 1,
+    //         padding: "20px 40px",
+    //         overflow: "hidden",
+    //         display: "flex",
+    //         flexDirection: "column"
+    //     },
+    //     categoryHeader: {
 
-        },
-        checkbox: {
-            selectors: {
-                "& span": {
-                    color: "#333333",
-                    fontSize: "15px",
-                    lineHeight: "20px",
-                    fontWeight: "500"
-                }
-            }
-        },
-        controls: {
-            display: "inline-flex",
-            width: "100%",
-            justifyContent: "space-between",
-            height: "30px",
-            alignItems: "center",
-            paddingBottom: "10px",
-            borderBottom: "1px solid #CCCCCC",
-            marginBottom: "10px"
-        },
-        scrollArea: {
-            overflowY: "auto",
-            overflowX: "hidden",
-            flexGrow:"2"
-        },
-        groupLabel: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "20px",
-            fontWeight: "400",
-            height: "25px",
-            borderBottom: "1px solid #CCCCCC",
-            paddingLeft: "12px"
-        }
-    });
+    //     },
+    //     checkbox: {
+    //         selectors: {
+    //             "& span": {
+    //                 color: "#333333",
+    //                 fontSize: "15px",
+    //                 lineHeight: "20px",
+    //                 fontWeight: "500"
+    //             }
+    //         }
+    //     },
+    //     controls: {
+    //         display: "inline-flex",
+    //         width: "100%",
+    //         justifyContent: "space-between",
+    //         height: "30px",
+    //         alignItems: "center",
+    //         paddingBottom: "10px",
+    //         borderBottom: "1px solid #CCCCCC",
+    //         marginBottom: "10px"
+    //     },
+    //     scrollArea: {
+    //         overflowY: "auto",
+    //         overflowX: "hidden",
+    //         flexGrow:"2"
+    //     },
+    //     groupLabel: {
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "20px",
+    //         fontWeight: "400",
+    //         height: "25px",
+    //         borderBottom: "1px solid #CCCCCC",
+    //         paddingLeft: "12px"
+    //     }
+    // });
 
     private static minBins = 1;
     private static maxBins = 30;
@@ -125,20 +126,21 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
     }
 
     public render(): React.ReactNode {
+        const styles = BinDialogStyles();
         return (
-            <div className={BinDialog.classNames.frame}>
-                <div className={BinDialog.classNames.header}>{localization.BinDialog.header}</div>
-                <div className={BinDialog.classNames.main}>
-                    <div className={BinDialog.classNames.controls}>
+            <div className={styles.frame}>
+                <div className={styles.header}>{localization.BinDialog.header}</div>
+                <div className={styles.main}>
+                    <div className={styles.controls}>
                         {this.props.range.rangeType === RangeTypes.integer &&
                             <Checkbox
-                                className={BinDialog.classNames.checkbox}
+                                className={styles.checkbox}
                                 label={localization.BinDialog.makeCategorical}
                                 checked={this.state.rangeType === RangeTypes.categorical}
                                 onChange={this.toggleCategorical}/>
                         }
                         {this.state.rangeType !== RangeTypes.categorical &&
-                            <div className={BinDialog.classNames.binCounter}>
+                            <div className={styles.binCounter}>
                                 <SpinButton
                                     styles={{
                                         spinButtonWrapper: {maxWidth: "98px"},
@@ -164,17 +166,17 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
                             </div>
                         }
                     </div>
-                    <div className={BinDialog.classNames.categoryHeader}>{localization.BinDialog.categoryHeader}</div>
-                    <div className={BinDialog.classNames.scrollArea}>
+                    <div className={styles.categoryHeader}>{localization.BinDialog.categoryHeader}</div>
+                    <div className={styles.scrollArea}>
                         {this.state.labelArray.map((val, i) => {
-                            return <div className={BinDialog.classNames.groupLabel} key={i}>{val}</div>;
+                            return <div className={styles.groupLabel} key={i}>{val}</div>;
                         })}
                     </div>
                 </div>
-                <div className={BinDialog.classNames.buttons}>
-                    <PrimaryButton className={BinDialog.classNames.saveButton} text={localization.BinDialog.save} onClick={this.onSave}/>
+                <div className={styles.buttons}>
+                    <PrimaryButton className={styles.saveButton} text={localization.BinDialog.save} onClick={this.onSave}/>
                     <DefaultButton
-                        className={BinDialog.classNames.cancelButton}
+                        className={styles.cancelButton}
                         text={localization.BinDialog.cancel}
                         onClick={this.props.onCancel}/>
                 </div>

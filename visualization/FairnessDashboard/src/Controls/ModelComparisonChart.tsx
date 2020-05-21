@@ -14,6 +14,7 @@ import { ActionButton } from "office-ui-fabric-react/lib/Button";
 import { AccuracyOptions } from "../AccuracyMetrics";
 import { FormatMetrics } from "../FormatMetrics";
 import { PredictionTypes } from "../IFairnessProps";
+import { ModelComparisionChartStyles } from "./ModelComparisionChart.styles";
 
 export interface IModelComparisonProps {
     dashboardContext: IFairnessContext;
@@ -83,92 +84,92 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         } as any
     };
 
-    private static readonly classNames = mergeStyleSets({
-        frame: {
-            flex: 1,
-            display: "flex",
-            flexDirection: "column"
-        },
-        spinner: {
-            margin: "auto",
-            padding: "40px"
-        },
-        header: {
-            backgroundColor: "#EBEBEB",
-            padding: "0 90px",
-            height: "90px",
-            display: "inline-flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center"
-        },
-        headerTitle: {
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100"
-        },
-        editButton: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "20px",
-            fontWeight: "400"
-        },
-        main: {
-            height: "100%",
-            flex: 1,
-            display: "inline-flex",
-            flexDirection: "row"
-        },
-        mainRight: {
-            padding: "30px 0 0 35px",
-            width: "300px"
-        },
-        rightTitle: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "500",
-            paddingBottom: "18px",
-            borderBottom: "1px solid #CCCCCC"
-        },
-        rightText: {
-            padding: "16px 15px 30px 0",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "400",
-            borderBottom: "0.5px dashed #CCCCCC"
-        },
-        insights: {
-            textTransform: "uppercase",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "500",
-            padding: "18px 0",
-        },
-        insightsText: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "400",
-            paddingBottom: "18px",
-            paddingRight: "15px",
-            borderBottom: "1px solid #CCCCCC"
-        },
-        chart: {
-            padding: "60px 0 0 0",
-            flex: 1
-        },
-        textSection: {
-            paddingBottom: "5px"
-        },
-        radio: {
-            paddingBottom: "30px",
-            paddingLeft: "75px"
-        }
-    });
+    // private static readonly classNames = mergeStyleSets({
+    //     frame: {
+    //         flex: 1,
+    //         display: "flex",
+    //         flexDirection: "column"
+    //     },
+    //     spinner: {
+    //         margin: "auto",
+    //         padding: "40px"
+    //     },
+    //     header: {
+    //         backgroundColor: "#EBEBEB",
+    //         padding: "0 90px",
+    //         height: "90px",
+    //         display: "inline-flex",
+    //         flexDirection: "row",
+    //         justifyContent: "space-between",
+    //         alignItems: "center"
+    //     },
+    //     headerTitle: {
+    //         color: "#333333",
+    //         fontSize: "32px",
+    //         lineHeight: "39px",
+    //         fontWeight: "100"
+    //     },
+    //     editButton: {
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "20px",
+    //         fontWeight: "400"
+    //     },
+    //     main: {
+    //         height: "100%",
+    //         flex: 1,
+    //         display: "inline-flex",
+    //         flexDirection: "row"
+    //     },
+    //     mainRight: {
+    //         padding: "30px 0 0 35px",
+    //         width: "300px"
+    //     },
+    //     rightTitle: {
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "16px",
+    //         fontWeight: "500",
+    //         paddingBottom: "18px",
+    //         borderBottom: "1px solid #CCCCCC"
+    //     },
+    //     rightText: {
+    //         padding: "16px 15px 30px 0",
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "18px",
+    //         fontWeight: "400",
+    //         borderBottom: "0.5px dashed #CCCCCC"
+    //     },
+    //     insights: {
+    //         textTransform: "uppercase",
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "16px",
+    //         fontWeight: "500",
+    //         padding: "18px 0",
+    //     },
+    //     insightsText: {
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "16px",
+    //         fontWeight: "400",
+    //         paddingBottom: "18px",
+    //         paddingRight: "15px",
+    //         borderBottom: "1px solid #CCCCCC"
+    //     },
+    //     chart: {
+    //         padding: "60px 0 0 0",
+    //         flex: 1
+    //     },
+    //     textSection: {
+    //         paddingBottom: "5px"
+    //     },
+    //     radio: {
+    //         paddingBottom: "30px",
+    //         paddingLeft: "75px"
+    //     }
+    // });
 
     constructor(props: IModelComparisonProps) {
         super(props);
@@ -178,10 +179,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     }
 
     public render(): React.ReactNode {
+        const styles = ModelComparisionChartStyles(); 
         if (!this.state || this.state.accuracyArray === undefined || this.state.disparityArray === undefined) {
             this.loadData();
             return (
-                <Spinner className={ModelComparisonChart.classNames.spinner} size={SpinnerSize.large} label={localization.calculating}/>
+                <Spinner className={styles.spinner} size={SpinnerSize.large} label={localization.calculating}/>
             );
         }
         const data = this.state.accuracyArray.map((accuracy, index) => {
@@ -270,33 +272,33 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         props.layout.yaxis.title = this.state.disparityInOutcomes ? localization.ModelComparison.disparityInOutcomes :
             localization.formatString(localization.ModelComparison.disparityInAccuracy, accuracyMetricTitle.toLowerCase()) as string
         return (
-            <Stack className={ModelComparisonChart.classNames.frame}>
-                <div className={ModelComparisonChart.classNames.header}>
-                    <h2 className={ModelComparisonChart.classNames.headerTitle}>{localization.ModelComparison.title}</h2>
-                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={ModelComparisonChart.classNames.editButton}>{localization.Report.editConfiguration}</ActionButton>
+            <Stack className={styles.frame}>
+                <div className={styles.header}>
+                    <h2 className={styles.headerTitle}>{localization.ModelComparison.title}</h2>
+                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
-                <div className={ModelComparisonChart.classNames.main}>
-                    <div className={ModelComparisonChart.classNames.chart}>
+                <div className={styles.main}>
+                    <div className={styles.chart}>
                         <AccessibleChart
                             plotlyProps={props}
                             sharedSelectionContext={this.props.selections}
                             theme={undefined}
                         />
                     </div>
-                    <div className={ModelComparisonChart.classNames.mainRight}>
-                        <div className={ModelComparisonChart.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={ModelComparisonChart.classNames.rightText}>{howToReadText}</div>
-                        <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={ModelComparisonChart.classNames.insightsText}>
-                            <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
-                            <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
+                    <div className={styles.mainRight}>
+                        <div className={styles.rightTitle}>{localization.ModelComparison.howToRead}</div>
+                        <div className={styles.rightText}>{howToReadText}</div>
+                        <div className={styles.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={styles.insightsText}>
+                            <div className={styles.textSection}>{insights2}</div>
+                            <div className={styles.textSection}>{insights3}</div>
                             <div>{insights4}</div>
                         </div>
                     </div>
                 </div>
                 <div>
                     <ChoiceGroup
-                        className={ModelComparisonChart.classNames.radio}
+                        className={styles.radio}
                         selectedKey={this.state.disparityInOutcomes ? "outcomes" : "accuracy"}
                         options={[
                             {
