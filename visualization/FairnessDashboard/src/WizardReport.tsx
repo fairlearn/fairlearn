@@ -28,6 +28,8 @@ interface IMetrics {
     outcomeDisparity: number;
     binnedOutcome: number[];
     // Optional, based on model type
+    globalOverprediction?: number;
+    globalUnderprediction?: number;
     binnedOverprediction?: number[];
     binnedUnderprediction?: number[];
     // different length, raw unbinned errors and predictions
@@ -655,7 +657,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             const formattedBinUnderPredictionValues = this.state.metrics.binnedUnderprediction.map(value => 
                 this.formatNumbers(value, underpredictionKey));
 
-            const overallMetrics = [globalAccuracyString, globalOutcomeString, disparityAccuracyString, disparityOutcomeString];
+            const globalOverpredictionString = this.formatNumbers(this.state.metrics.globalOverprediction, outcomeKey);
+            const globalUnderpredictionString = this.formatNumbers(this.state.metrics.globalUnderprediction, outcomeKey);
+
+            const overallMetrics = [globalAccuracyString, globalOutcomeString, globalOverpredictionString, globalUnderpredictionString];
             const formattedBinValues = [formattedBinAccuracyValues, formattedBinOutcomeValues, formattedBinOverPredictionValues, formattedBinUnderPredictionValues];
             const metricLabels = [AccuracyOptions[accuracyKey].title, AccuracyOptions[outcomeKey].title, AccuracyOptions[overpredicitonKey].title, AccuracyOptions[underpredictionKey].title];
 
@@ -828,6 +833,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         try {
             let binnedFNR: number[];
             let binnedFPR: number[];
+            let overallOverprediction: number;
+            let overallUnderprediction: number;
             let binnedOverprediction: number[];
             let binnedUnderprediction: number[];
             let predictions: number[];
@@ -851,11 +858,21 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     this.props.featureBinPickerProps.selectedBinIndex, 
                     this.props.selectedModelIndex,
                     "underprediction")).bins;
+                overallUnderprediction = (await this.props.metricsCache.getMetric(
+                        this.props.dashboardContext.binVector,
+                        this.props.featureBinPickerProps.selectedBinIndex, 
+                        this.props.selectedModelIndex,
+                        "underprediction")).global;
                 binnedOverprediction = (await this.props.metricsCache.getMetric(
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex, 
                     this.props.selectedModelIndex,
                     "overprediction")).bins;
+                overallOverprediction = (await this.props.metricsCache.getMetric(
+                    this.props.dashboardContext.binVector,
+                    this.props.featureBinPickerProps.selectedBinIndex, 
+                    this.props.selectedModelIndex,
+                    "overprediction")).global;    
                 outcomes = await this.props.metricsCache.getMetric(
                     this.props.dashboardContext.binVector,
                     this.props.featureBinPickerProps.selectedBinIndex, 
@@ -911,14 +928,16 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 metrics: {
                     globalAccuracy: accuracy.global,
                     binnedAccuracy: accuracy.bins,
-                    accuracyDisparity,
+                    accuracyDisparity: accuracyDisparity,
                     globalOutcome: outcomes.global,
                     binnedOutcome: outcomes.bins,
-                    outcomeDisparity,
-                    predictions,
-                    errors,
-                    binnedOverprediction,
-                    binnedUnderprediction
+                    outcomeDisparity: outcomeDisparity,
+                    predictions: predictions,
+                    errors: errors,
+                    globalOverprediction: overallOverprediction,
+                    globalUnderprediction: overallUnderprediction,
+                    binnedOverprediction: binnedOverprediction,
+                    binnedUnderprediction: binnedUnderprediction
                 }
             });
         } catch {
