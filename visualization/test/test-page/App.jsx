@@ -96,8 +96,8 @@ import { probit } from "../__mock-data/probit";
                         supportedBinaryClassificationParityKeys={["selection_rate", "selection_rate_ratio", "zero_one_loss", "recall_score"]}
                         supportedRegressionAccuracyKeys={["mean_absolute_error", "r2_score", "mean_squared_error", "root_mean_squared_error"]}
                         supportedProbabilityAccuracyKeys={["auc", "root_mean_squared_error", "balanced_root_mean_squared_error", "r2_score", "mean_squared_error", "mean_absolute_error"]}
-                        supportedRegressionParityKeys={["selection_rate", "selection_rate_ratio", "zero_one_loss", "recall_score"]}
-                        supportedProbabilityParityKeys={["selection_rate", "selection_rate_ratio", "zero_one_loss", "recall_score"]}
+                        supportedRegressionParityKeys={[]}
+                        supportedProbabilityParityKeys={[]}
                         stringParams={{contextualHelp: this.messages}}
                         requestMetrics={this.generateRandomMetrics.bind(this)}
                         key={new Date()}
