@@ -332,6 +332,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         layout: {
             autosize: true,
             barmode: 'relative',
+            colorway: ChartColors,
             font: {
                 size: 10
             },
