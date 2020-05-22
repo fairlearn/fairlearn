@@ -4,15 +4,8 @@ from ._common import FairnessWarning
 from sklearn.datasets import fetch_openml
 
 
-def fetch_boston(
-    *,
-    version='1',
-    cache=True,
-    data_home=None,
-    as_frame=False,
-    return_X_y=False,
-    warn=True,
-):
+def fetch_boston(*, version='1', cache=True, data_home=None,
+                 as_frame=False, return_X_y=False, warn=True):
     """Load the boston housing dataset (regression).
 
     Download it if necessary.
