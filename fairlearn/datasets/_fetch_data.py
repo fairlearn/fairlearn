@@ -6,7 +6,7 @@ from sklearn.datasets import fetch_openml
 
 def fetch_boston(
     *,
-    version='active',
+    version='1',
     cache=True,
     data_home=None,
     as_frame=False,
@@ -14,6 +14,8 @@ def fetch_boston(
     warn=True,
 ):
     """Load the boston housing dataset (regression).
+
+    Download it if necessary.
 
     ==============   ==============
     Samples total               506
@@ -31,7 +33,6 @@ def fetch_boston(
 
     Parameters
     ----------
-
     version : integer or 'active', default='active'
         Version of the dataset. Can only be provided if also ``name`` is given.
         If 'active' the oldest version that's still active is used. Since
@@ -79,9 +80,9 @@ def fetch_boston(
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the California housing dataset.
+
     Notes
     -----
-
     This dataset consists of 506 samples and 14 features.
     """
     if warn:
