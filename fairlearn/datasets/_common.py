@@ -1,0 +1,2 @@
+class FairnessWarning(UserWarning):
+    pass
