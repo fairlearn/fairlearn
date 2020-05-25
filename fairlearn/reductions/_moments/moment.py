@@ -54,9 +54,8 @@ class Moment:
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
 
-    # add bound method that takes only self as argument
     def bound(self):  # noqa: D102
-        """Return vector of fairness bound constraint the length of gamma"""
+        """Return vector of fairness bound constraint the length of gamma."""
         raise NotImplementedError()
 
     def project_lambda(self, lambda_vec):  # noqa: D102

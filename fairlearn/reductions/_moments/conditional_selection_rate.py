@@ -5,11 +5,12 @@ import pandas as pd
 import numpy as np
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _MESSAGE_INVALID_BOUNDS
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
 from .error_rate import ErrorRate
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
+_MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be used."
 _DEFAULT_DIFFERENCE_BOUND = 0.01
 
 
@@ -41,15 +42,13 @@ class ConditionalSelectionRate(ClassificationMoment):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
-            self.eps = _DEFAULT_DIFFERENCE_BOUND
-            # TODO: figure out if this initialization of ratio is correct
-            self.ratio = 1.0
-        if difference_bound and ratio_bound:
+            difference_bound = _DEFAULT_DIFFERENCE_BOUND
+        if difference_bound is not None and ratio_bound is not None:
             raise ValueError(_MESSAGE_INVALID_BOUNDS)
-        if difference_bound:
+        if difference_bound is not None:
             self.eps = difference_bound
             self.ratio = 1.0
-        if ratio_bound:
+        if ratio_bound is not None:
             self.eps = ratio_bound_slack
             if not (0 < ratio_bound <= 1):
                 raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
@@ -129,13 +128,11 @@ class ConditionalSelectionRate(ClassificationMoment):
         return g_signed
 
     def bound(self):
-        ''' Return pandas Series of length of gamma
+        """Return bound vector.
 
-        i.e., returns vector of fairness bound constraint the length of gamma.
-        '''
-        # TODO: understand if NotImplementedError is appropriate here
-        if self.eps is None:
-            raise NotImplementedError("Bound Cannot be Handled!")
+        :return: a vector of bound values corresponding to all constraints
+        :rtype: pandas.Series
+        """
         return pd.Series(self.eps, index=self.index)
 
     # TODO: this can be further improved using the overcompleteness in group membership

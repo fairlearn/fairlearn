@@ -3,7 +3,6 @@
 import numpy as np
 
 import pandas as pd
-import pickle
 import pytest
 from sklearn.linear_model import LogisticRegression
 
@@ -37,7 +36,7 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_argument_types(self, transformX, transformY, transformA, A_two_dim):
+    def test_argument_types_difference_bound(self, transformX, transformY, transformA, A_two_dim):
         # This is an expanded-out version of one of the smoke tests
         X, y, A = _get_data(A_two_dim)
         merged_A = _map_into_single_column(A)
@@ -58,9 +57,51 @@ class TestExponentiatedGradientArguments:
         n_predictors = len(expgrad._predictors)
 
         disparity_moment = DemographicParity(difference_bound=eps)
-        disparity_moment_ratio = DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio)
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
-        disparity_moment_ratio.load_data(X, y, sensitive_features=merged_A)
+        error = ErrorRate()
+        error.load_data(X, y, sensitive_features=merged_A)
+        disparity = disparity_moment.gamma(Q).max()
+        disp = disparity_moment.gamma(Q)
+        disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
+        error = error.gamma(Q)[0]
+
+        assert expgrad._best_gap == pytest.approx(0.0000, abs=_PRECISION)
+        assert expgrad._last_t == 5
+        assert expgrad._best_t == 5
+        assert disparity == pytest.approx(0.1, abs=_PRECISION)
+        assert (np.all(np.isclose(disp - eps, disp_eps)))
+        assert error == pytest.approx(0.25, abs=_PRECISION)
+        assert expgrad._n_oracle_calls == 32
+        assert n_predictors == 3
+
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_argument_types_ratio_bound(self, transformX, transformY, transformA, A_two_dim):
+        # This is an expanded-out version of one of the smoke tests
+        X, y, A = _get_data(A_two_dim)
+        merged_A = _map_into_single_column(A)
+
+        transformed_X = transformX(X)
+        transformed_y = transformY(y)
+        transformed_A = transformA(A)
+        eps = 0.1
+        ratio = 1.0
+
+        expgrad = ExponentiatedGradient(
+            LeastSquaresBinaryClassifierLearner(),
+            constraints=DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio),
+            eps=eps)
+        expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
+
+        def Q(X): return expgrad._pmf_predict(X)[:, 1]
+
+        n_predictors = len(expgrad._predictors)
+
+        disparity_moment = DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio)
+        disparity_moment.load_data(X, y, sensitive_features=merged_A)
         error = ErrorRate()
         error.load_data(X, y, sensitive_features=merged_A)
         disparity = disparity_moment.gamma(Q).max()
@@ -102,7 +143,7 @@ class TestExponentiatedGradientArguments:
         mocker.patch('pickle.loads', return_value=estimator)
 
         # restrict ExponentiatedGradient to a single iteration
-        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), T=1) # added required DP bound
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), T=1)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
@@ -116,14 +157,13 @@ class TestExponentiatedGradientArguments:
                 assert isinstance(args[1], pd.Series)
                 assert isinstance(kwargs['sample_weight'], pd.Series)
 
-
     def test_binary_classifier_0_1_required(self):
         X, y, A = _get_data()
         y = 2 * y
 
         expgrad = ExponentiatedGradient(LogisticRegression(),
                                         constraints=DemographicParity(),
-                                        T=1) # added required DP bound
+                                        T=1)
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
         assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]

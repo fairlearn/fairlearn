@@ -16,7 +16,6 @@ class ConditionalLossMoment(LossMoment):
         self.upper_bound = upper_bound
         self.no_groups = no_groups
 
-
     def default_objective(self):
         """Return a default objective."""
         return AverageLossMoment(self.reduction_loss)
@@ -53,9 +52,12 @@ class ConditionalLossMoment(LossMoment):
         self._gamma_descr = str(expect_attr[[_LOSS]])
         return expect_attr[_LOSS]
 
-    # add new method bound() that returns vector for RHS
     def bound(self):
-        """Return bound vector"""
+        """Return bound vector.
+
+        :return: a vector of bound values corresponding to all constraints
+        :rtype: pandas.Series
+        """
         if self.upper_bound is None:
             raise ValueError("No Upper Bound")
         return pd.Series(self.upper_bound, index=self.index)
