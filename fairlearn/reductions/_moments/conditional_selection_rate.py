@@ -43,6 +43,7 @@ class ConditionalSelectionRate(ClassificationMoment):
         super(ConditionalSelectionRate, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
             self.eps = _DEFAULT_DIFFERENCE_BOUND
+            self.ratio = 1.0
         if difference_bound is not None and ratio_bound is not None:
             raise ValueError(_MESSAGE_INVALID_BOUNDS)
         if difference_bound is not None:
