@@ -1,9 +1,9 @@
 .. _faq:
 
-Frequently Asked Questions
+Frequently asked questions
 ==========================
 
-General Fairness Questions
+General fairness questions
 --------------------------
 
 Where can I learn more about machine learning?
@@ -52,7 +52,7 @@ Won't making a model fairer reduce its accuracy?
     in disparity (as measured by some suitable metric) at minimal cost in accuracy.
     Indeed, for certain subgroups in the data, accuracy may be improved dramatically.
 
-Fairlearn Questions
+Fairlearn questions
 -------------------
 
 Can Fairlearn make my model fair?
