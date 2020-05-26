@@ -22,8 +22,10 @@ Frequently Asked Questions
 
         There are also some papers such as
 
-        - Paper 1
-        - Paper 2
+        - `Big Data's Disparate Impact <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2477899##>`_ (Barocas & Selbst, 2016)
+        - `Measures and Mismeasures of Fairness <https://5harad.com/papers/fair-ml.pdf>`_ (Corbett-Davies & Goel, 2018)
+        - `Fairness and Abstraction in Sociotechnical Systems <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3265913>`_ (Selbst et al., 2018)
+        - `A Survey on Bias and Fairness in Machine Learning <https://arxiv.org/abs/1908.09635>`_ (Mehrabi et al. 2019)
 
     Why not just ignore the sensitive features?
         Because ignoring the sensitive feature usually doesn't work.
