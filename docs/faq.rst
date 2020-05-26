@@ -76,6 +76,8 @@ Frequently Asked Questions
         Any algorithm which provides (or can be wrapped to provide) `fit()` and
         `predict()` methods should work.
 
+    Does Fairlearn work for image and text data?
+
     Is Fairlearn available in languages other than Python?
 
         For the moment, we only support Python >= 3.6
