@@ -68,7 +68,7 @@ Can Fairlearn make my model fair?
 
 What sort of fairness related harms can Fairlearn address?
     Fairlean is focussed on group fairness.
-    That is, minimising the difference in some metric evalulated on
+    That is, obtaining the minimum disparity on some metric evaluated on
     specified subgroups in the data.
     This is certainly not the only way of looking at fairness, though.
 
