@@ -15,19 +15,10 @@ Where can I learn more about machine learning?
     - Maybe a book?
 
 Where can I learn more about fairness in machine learning?
-    There are a variety of sources. For a high level overview, see books such as:
-
-    - `Weapons of Math Destruction <https://weaponsofmathdestructionbook.com/>`_ by Cathy O'Neill
-    - `Artificial Unintelligence <https://mitpress.mit.edu/books/artificial-unintelligence>`_ by Meredith Broussard
-    - `Algorithms of Oppression <https://nyupress.org/9781479837243/algorithms-of-oppression/>`_ by Safiya Umoja Noble
-
-    There are also some papers such as
-
-    - `Big Data's Disparate Impact <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2477899##>`_ (Barocas & Selbst, 2016)
-    - `Measures and Mismeasures of Fairness <https://5harad.com/papers/fair-ml.pdf>`_ (Corbett-Davies & Goel, 2018)
-    - `Fairness and Abstraction in Sociotechnical Systems <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3265913>`_ (Selbst et al., 2018)
-    - `A Survey on Bias and Fairness in Machine Learning <https://arxiv.org/abs/1908.09635>`_ (Mehrabi et al. 2019)
-    - `Algorithmic Fairness from a Non-ideal Perspective <http://zacklipton.com/media/papers/fairness-non-ideal-fazelpour-lipton-2020.pdf>`_ (Fazelpour & Lipton, 2020)
+    In our :ref:`user guide <user_guide>` we provide links to the papers describing
+    Fairlearn's algorithms.
+    For a higher level view of the subject, please see the :ref:`further reading <further_reading>`
+    section.
 
 Why not just ignore the sensitive features?
     Because ignoring the sensitive feature usually doesn't work.
