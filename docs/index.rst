@@ -26,5 +26,3 @@ The source code and documentation are hosted on
    contributor_guide/index
 
    community/index
-
-   faq
