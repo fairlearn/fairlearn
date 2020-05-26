@@ -67,7 +67,7 @@ Can Fairlearn make my model fair?
     needs to be considered in terms of the societal context in which it is used.
 
 What sort of fairness related harms can Fairlearn address?
-    Fairlean is focussed on group fairness.
+    Fairlean concentrates on group fairness.
     That is, obtaining the minimum disparity on some metric evaluated on
     specified subgroups in the data.
     This is certainly not the only way of looking at fairness, though.
