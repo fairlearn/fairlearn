@@ -217,7 +217,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :rtype: pandas.DataFrame
         """
         check_is_fitted(self)
-        
+
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
             pred[t] = self._hs[t](X)
