@@ -111,13 +111,16 @@ Frequently Asked Questions
 
     What is the relationship between Fairlearn and Microsoft?
         Fairlearn has grown from a project at Microsoft Research in New York City.
+        The Azure Machine Learning team in Boston has a small team making new
+        contributions to Fairlearn.
 
     How does Fairlearn relate to Microsoft's push for Responsible AI?
         Need text for this...
 
     What is the relationship between Fairlearn and AzureML?
         Those of us who work for Microsoft are enabling Fairlearn to integrate
-        into the AzureML experience.
+        into the Azure Machine Learning experience.
         However, this is only to provide access to the rich MLOps Lifecycle
-        management capabilities of AzureML.
-        No functionality in Fairlearn itself will be tied to AzureML.
+        management capabilities of Azure Machine Learning.
+        No functionality in Fairlearn itself will be tied to Azure Machine
+        Learning.
