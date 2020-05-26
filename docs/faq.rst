@@ -68,7 +68,7 @@ Frequently Asked Questions
         Fairlean is focussed on group fairness.
         That is, minimising the difference in some metric evalulated on
         specified subgroups in the data.
-        This is certainly not the only way of looing at fairness, though.
+        This is certainly not the only way of looking at fairness, though.
 
     Can Fairlearn be used to detect bias in datasets?
         Not yet....

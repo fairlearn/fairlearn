@@ -26,3 +26,6 @@ The source code and documentation are hosted on
    contributor_guide/index
 
    community/index
+
+We also have a collection of :ref:`frequently asked questions <faq>` about
+both Fairlearn and fairness in machine learning.
