@@ -73,7 +73,7 @@ What sort of fairness related harms can Fairlearn address?
     This is certainly not the only way of looking at fairness, though.
 
 Can Fairlearn be used to detect bias in datasets?
-    Not yet....
+    We do not have concrete plans for this at the present time.
 
 Can Fairlearn recommend ways to make my model fairer?
     No. Fairlearn is not magic.
