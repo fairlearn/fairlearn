@@ -5,7 +5,9 @@ Frequently Asked Questions
 
 .. topic:: General Fairness Questions
 
-    1. Where can I learn more about fairness in machine learning
+    1. Where can I learn more about machine learning?
+
+    1. Where can I learn more about fairness in machine learning?
 
        There are a variety of sources. For a high level overview, see books such as:
             * Weapons of Math Destruction
@@ -63,6 +65,8 @@ Frequently Asked Questions
 
        No. Fairlearn is not magic.
 
+    1. What unfairness mitigation techniques does Fairlearn support?
+
     1. Which ML libraries does Fairlearn support?
 
        We have generally followed conventions for `scikit-learn` in Fairlearn.
@@ -78,5 +82,7 @@ Frequently Asked Questions
 .. topic:: Fairlearn and Microsoft
 
     1. What is the relationship between Fairlearn and Microsoft?
+
+    1. How does Fairlearn relate to Microsoft's push for Responsible AI?
 
     1. What is the relationship between Fairlearn and AzureML?
