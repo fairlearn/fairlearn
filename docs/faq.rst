@@ -6,11 +6,9 @@ Frequently Asked Questions
 .. topic:: General Fairness Questions
 
     Where can I learn more about machine learning?
-
         List some resources
 
     Where can I learn more about fairness in machine learning?
-
         There are a variety of sources. For a high level overview, see books such as:
             - Weapons of Math Destruction
             - Artificial Unintelligence
@@ -20,7 +18,6 @@ Frequently Asked Questions
             - Paper 2
 
     Why not just ignore the sensitive features?
-
         Because ignoring the sensitive feature usually doesn't work.
 
         To elaborate, information is often redundantly encoded in datasets, and machine learning
@@ -33,13 +30,11 @@ Frequently Asked Questions
         whether any use of ZIP code was as a proxy for race, or for some other reason.
 
     The model is unfair because the data are biased. Isn't it better to get better data?
-
         Yes, but gathering unbiased data might not always be practical.
         Fairlearn and similar packages offer techniques to redistribute harms between subgroups
         in the data.
 
     Won't making a model fairer reduce its accuracy?
-
         Any technique which reduces disparity in some metric is most likely to impact other metrics.
         However, we have found empirically that it is usually possible to obtain substantial reductions
         in disparity (as measured by some suitable metric) at minimal cost in accuracy.
