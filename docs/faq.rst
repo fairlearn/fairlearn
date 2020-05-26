@@ -26,6 +26,7 @@ Frequently Asked Questions
         - `Measures and Mismeasures of Fairness <https://5harad.com/papers/fair-ml.pdf>`_ (Corbett-Davies & Goel, 2018)
         - `Fairness and Abstraction in Sociotechnical Systems <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3265913>`_ (Selbst et al., 2018)
         - `A Survey on Bias and Fairness in Machine Learning <https://arxiv.org/abs/1908.09635>`_ (Mehrabi et al. 2019)
+        - `Algorithmic Fairness from a Non-ideal Perspective <http://zacklipton.com/media/papers/fairness-non-ideal-fazelpour-lipton-2020.pdf>`_ (Fazelpour & Lipton, 2020)
 
     Why not just ignore the sensitive features?
         Because ignoring the sensitive feature usually doesn't work.
