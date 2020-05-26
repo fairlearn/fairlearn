@@ -1,19 +1,18 @@
-import React from "react";
-import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
-import { IFairnessContext } from "../IFairnessContext";
 import _ from "lodash";
-import { MetricsCache } from "../MetricsCache";
-import { IAccuracyPickerProps, IParityPickerProps, IFeatureBinPickerProps } from "../FairnessWizard";
-import { ParityModes } from "../ParityMetrics";
-import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
-import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
-import { localization } from "../Localization/localization";
-import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
-import { mergeStyleSets } from "@uifabric/styling";
+import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
+import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
+import { Stack } from "office-ui-fabric-react/lib/Stack";
+import React from "react";
 import { AccuracyOptions } from "../AccuracyMetrics";
+import { IAccuracyPickerProps, IFeatureBinPickerProps, IParityPickerProps } from "../FairnessWizard";
 import { FormatMetrics } from "../FormatMetrics";
+import { IFairnessContext } from "../IFairnessContext";
 import { PredictionTypes } from "../IFairnessProps";
+import { localization } from "../Localization/localization";
+import { MetricsCache } from "../MetricsCache";
+import { ParityModes } from "../ParityMetrics";
 import { ModelComparisionChartStyles } from "./ModelComparisionChart.styles";
 
 export interface IModelComparisonProps {

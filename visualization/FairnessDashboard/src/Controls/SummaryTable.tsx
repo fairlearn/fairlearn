@@ -5,6 +5,7 @@ import { Text } from "office-ui-fabric-react/lib/Text";
 import { mergeStyleSets } from "@uifabric/styling";
 import { Separator } from "office-ui-fabric-react/lib/Separator";
 import { localization } from "../Localization/localization";
+import { SummaryTableStyles } from "./SummaryTable.styles";
 
 export interface ISummaryTableProps {
     binValues: number[];
@@ -22,88 +23,89 @@ interface IBinItem {
 }
 
 export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
-    private static readonly classNames = mergeStyleSets({
-        minMaxLabel: {
-            padding: "1px 9px",
-            marginTop: "4px",
-            color: "#FFFFFF",
-            fontSize: "10px",
-            lineHeight: "20px",
-            fontWeight: "400",
-            backgroundColor: "#999999"
-        },
-        groupCol: {
-            display: "inline-flex",
-            flexDirection:"column",
-            height: "100%",
-            width: "max-content"
-        },
-        groupLabel: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500",
-            height: "26px"
-        },
-        flexCol: {
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            borderTop: "1px solid #CCCCCC",
-            borderBottom: "1px solid #CCCCCC"
-        },
-        binBox: {
-            flex: 1,
-            // minWidth: "100px",
-            // maxWidth: "200px",
-            // width: "max-content",
-            width: "130px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            borderBottom: "0.5px dashed #CCCCCC"
-        },
-        binTitle: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "400"
-        },
-        metricCol: {
-            display: "inline-flex",
-            flexDirection:"column",
-            height: "100%",
-            width: "120px"
-        },
-        metricLabel: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500",
-            height: "26px",
-            paddingLeft: "10px"
-        },
-        metricBox: {
-            flex: 1,
-            paddingLeft: "10px",
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            borderLeft: "0.5px dashed #CCCCCC",
-            borderBottom: "0.5px dashed #CCCCCC"
+    // private static readonly classNames = mergeStyleSets({
+    //     minMaxLabel: {
+    //         padding: "1px 9px",
+    //         marginTop: "4px",
+    //         color: "#FFFFFF",
+    //         fontSize: "10px",
+    //         lineHeight: "20px",
+    //         fontWeight: "400",
+    //         backgroundColor: "#999999"
+    //     },
+    //     groupCol: {
+    //         display: "inline-flex",
+    //         flexDirection:"column",
+    //         height: "100%",
+    //         width: "max-content"
+    //     },
+    //     groupLabel: {
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "12px",
+    //         fontWeight: "500",
+    //         height: "26px"
+    //     },
+    //     flexCol: {
+    //         display: "flex",
+    //         flex: 1,
+    //         flexDirection: "column",
+    //         borderTop: "1px solid #CCCCCC",
+    //         borderBottom: "1px solid #CCCCCC"
+    //     },
+    //     binBox: {
+    //         flex: 1,
+    //         // minWidth: "100px",
+    //         // maxWidth: "200px",
+    //         // width: "max-content",
+    //         width: "130px",
+    //         display: "flex",
+    //         flexDirection: "column",
+    //         justifyContent: "center",
+    //         borderBottom: "0.5px dashed #CCCCCC"
+    //     },
+    //     binTitle: {
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "18px",
+    //         fontWeight: "400"
+    //     },
+    //     metricCol: {
+    //         display: "inline-flex",
+    //         flexDirection:"column",
+    //         height: "100%",
+    //         width: "120px"
+    //     },
+    //     metricLabel: {
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "12px",
+    //         fontWeight: "500",
+    //         height: "26px",
+    //         paddingLeft: "10px"
+    //     },
+    //     metricBox: {
+    //         flex: 1,
+    //         paddingLeft: "10px",
+    //         color: "#333333",
+    //         fontSize: "32px",
+    //         lineHeight: "39px",
+    //         fontWeight: "100",
+    //         display: "flex",
+    //         flexDirection: "column",
+    //         justifyContent: "center",
+    //         borderLeft: "0.5px dashed #CCCCCC",
+    //         borderBottom: "0.5px dashed #CCCCCC"
 
-        },
-        frame: {
-            paddingBottom: "19px",
-            display: "flex"
-        }
-    });
+    //     },
+    //     frame: {
+    //         paddingBottom: "19px",
+    //         display: "flex"
+    //     }
+    // });
     
     public render(): React.ReactNode {
+        const styles = SummaryTableStyles();
         let minIndexes = [];
         let maxIndexes = [];
         let minValue = Number.MAX_SAFE_INTEGER;
@@ -127,27 +129,27 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
             }
         });
         return (
-            <div className={SummaryTable.classNames.frame}>
-                <div className={SummaryTable.classNames.groupCol}>
-                    <div className={SummaryTable.classNames.groupLabel}>{this.props.binGroup}</div>
-                    <div className={SummaryTable.classNames.flexCol}>
+            <div className={styles.frame}>
+                <div className={styles.groupCol}>
+                    <div className={styles.groupLabel}>{this.props.binGroup}</div>
+                    <div className={styles.flexCol}>
                         {this.props.binLabels.map((label, index) => {
-                            return (<div className={SummaryTable.classNames.binBox} key={index}>
-                                <div className={SummaryTable.classNames.binTitle}>{label}</div>
+                            return (<div className={styles.binBox} key={index}>
+                                <div className={styles.binTitle}>{label}</div>
                                 <Stack horizontal>
-                                    {minIndexes.includes(index) && <div className={SummaryTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
-                                    {maxIndexes.includes(index) && <div className={SummaryTable.classNames.minMaxLabel}>{localization.Report.maxTag}</div>}
+                                    {minIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.minTag}</div>}
+                                    {maxIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.maxTag}</div>}
                                 </Stack>
                             </div>)
                         })}
                     </div>
                 </div>
-                <div className={SummaryTable.classNames.metricCol}>
-                    <div className={SummaryTable.classNames.metricLabel}>{this.props.metricLabel}</div>
-                    <div className={SummaryTable.classNames.flexCol}>
+                <div className={styles.metricCol}>
+                    <div className={styles.metricLabel}>{this.props.metricLabel}</div>
+                    <div className={styles.flexCol}>
                         {this.props.formattedBinValues.map((value, index) => {
                             return (
-                            <div className={SummaryTable.classNames.metricBox} key={index}>
+                            <div className={styles.metricBox} key={index}>
                                 {value !== undefined ? value : 'empty'}
                             </div>);
                         })}

@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, FontSizes } from "office-ui-fabric-react";
 
 export interface IIntroTabStyles {
     firstSection: IStyle;
@@ -20,33 +20,40 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
     return mergeStyleSets<IIntroTabStyles>({
         firstSection: {
             padding: "43px 94px",
-            fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
-            backgroundColor: "#333333",
-            color: "#FFFFFF",
+            //fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
+            //backgroundColor: "#333333",
+            backgroundColor: theme.palette.neutralPrimary,
+            color: theme.palette.white
+            //color: "#FFFFFF",
         },
         firstSectionTitle: {
             fontSize: "60px",
-            lineHeight: "82px",
-            fontWeight: "100"
+            //lineHeight: "82px",
+            //fontWeight: "100"
+            fontWeight: FontWeights.light
         },
         firstSectionSubtitle: {
             fontSize: "60px",
-            lineHeight: "82px",
-            fontWeight: "500"
+            //lineHeight: "82px",
+            //fontWeight: "500"
+            fontWeight: FontWeights.semibold
         },
         firstSectionBody: {
             paddingTop: "30px",
             paddingBottom: "70px",
             maxWidth: "500px",
-            color: "#EBEBEB",
-            fontWeight: "300",
-            fontSize: "18px",
-            lineHeight: "24px",
+            //color: "#EBEBEB",
+            //fontWeight: "300",
+            fontWeight: FontWeights.semilight,
+            //fontSize: "18px",
+            //lineHeight: "24px",
         },
         lowerSection: {
             padding: "50px 70px 90px 90px",
-            backgroundColor: "#F2F2F2",
-            color: "#333333",
+            //backgroundColor: "#F2F2F2",
+            //color: "#333333",
+            backgroundColor: theme.semanticColors.bodyBackground,
+            color: theme.semanticColors.bodyText,
             flexGrow: 1
         },
         stepsContainer: {
@@ -57,18 +64,20 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             paddingBottom: "38px"
         },
         boldStep: {
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "500",
+            //fontSize: "18px",
+            //lineHeight: "24px",
+            //fontWeight: "500",
             maxWidth: "300px",
             paddingRight: "25px",
             flex: 1,
         },
         numericLabel: {
-            display:"inline-block",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "700",
+            //display:"inline-block",
+            //fontSize: "18px",
+            fontSize: FontSizes.large,
+            //lineHeight: "24px",
+            //fontWeight: "700",
+            fontWeight: FontWeights.bold,
             color: "#000000",
             width: "30px"
         },
@@ -91,10 +100,12 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         },
         getStarted: {
             paddingTop: "30px",
-            color: "#333333",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "500"
+            //color: "#333333",
+            //fontSize: "18px",
+            fontSize: FontSizes.large,
+            //lineHeight: "24px",
+            //fontWeight: "500"
+            fontWeight: FontWeights.regular
         }
     });
 };
