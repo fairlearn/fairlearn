@@ -552,7 +552,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     this.props.accuracyPickerProps.selectedAccuracyKey);
             });
             const disparityMetric = this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
-                this.props.parityPickerProps.selectedParityKey : "average";
+                ParityOptions[this.props.parityPickerProps.selectedParityKey].parityMetric : "average";
             const parityMode = this.props.parityPickerProps.parityOptions.filter(option => option.key == this.props.parityPickerProps.selectedParityKey)[0].parityModes[0];
             const disparityPromises = new Array(this.props.modelCount).fill(0).map((unused, modelIndex) => {
                 return this.props.metricsCache.getDisparityMetric(
