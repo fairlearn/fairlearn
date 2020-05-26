@@ -74,13 +74,17 @@ Frequently Asked Questions
         `predict()` methods should work.
 
     Does Fairlearn work for image and text data?
-        Just needs fit and predict on Estimator
+        We have not (yet) looked at using Fairlearn on image or text data.
+        However, so long as the estimators used have `fit()` and `predict()` methods
+        as required by Fairlearn, it should be possible to use Fairlearn on
+        image or text models.
 
     Is Fairlearn available in languages other than Python?
         For the moment, we only support Python >= 3.6
 
     Can I contribute to Fairlearn?
-        Absolutely! Please see our Contributing Guide.
+        Absolutely! Please see our `Contributor Guide <_contributor_guide>`_ for
+        information on how to add your contributions.
 
 
 .. topic:: Fairlearn and Microsoft
