@@ -1,2 +1,103 @@
 Developer call May 7, 2020
 --------------------------
+
+Scribe: `Roman Lutz <https://github.com/romanlutz>`_
+
+Attendees:
+
+- `Andrew Anderson <https://www.linkedin.com/in/andrewanderson05/>`_
+- `Matthijs Brouns <https://github.com/mbrouns>`_
+- `Miro Dudik <https://github.com/MiroDudik>`_
+- `Richard Edgar <https://github.com/riedgar-ms>`_
+- `Parul Gupta <https://github.com/parul100495>`_
+- `Ken Holstein <https://kenholstein.myportfolio.com/>`_
+- `Adrin Jalali <https://github.com/adrinjalali>`_
+- `Abdul Hannan Kanji <https://github.com/hannanabdul55>`_
+- `Roman Lutz <https://github.com/romanlutz>`_
+- `Vanessa Milan <https://www.microsoft.com/en-us/research/people/vmilan/>`_
+- `Kevin Robinson <https://github.com/kevinrobinson>`_
+- `Mehrnoosh Sameki <https://github.com/mesameki>`_
+- `Hanna Wallach <https://www.microsoft.com/en-us/research/people/wallach/>`_
+
+Organizational updates
+^^^^^^^^^^^^^^^^^^^^^^
+
+#. Microsoft & Fairlearn:
+
+    - goal is to be an open source, community driven project
+    - sociotechnical framing is central to the project, careful and precise
+      wording matter
+    - currently many core members are from Microsoft, but the project is an
+      independent open source project
+        - more focus on governance when the project matures
+        - The Azure ML team will try to make Fairlearn easily usable in Azure,
+          but Fairlearn is a standalone and independent project. Any
+          functionality that can exist in the Fairlearn repository should live
+          there. The Azure ML goals do not affect Fairlearn project decisions,
+          just like with any other open source projects.
+	
+#. regular occurrence of developer call (2nd Thursday each month)
+#. new newsletter through python.org, used to keep community in the loop about major news/updates
+#. university collaborations with UMass Amherst and Stanford are currently ongoing
+#. documentation/website updates: overall proposal currently in 
+   `PR <https://github.com/fairlearn/fairlearn-proposals/pull/8/files>`_,
+   landing page designed, to be added mid-May
+	
+
+Topics
+^^^^^^
+The rest of the call was meant to be about the UX roadmap and potential
+collaboration with scikit-fairness. We knew ahead of time that this was
+ambitious, especially with lots of new people on the call. A lot of good
+points about the general direction of the project were made, which I'll try to
+summarize below:
+ 
+So far Fairlearn has focused on group fairness as opposed to individual or
+counterfactual fairness. The covered tasks are classification & regression
+only. Other settings are currently missing, e.g., partial observability
+(example: we don't have data on those that didn't get an opportunity such as
+getting the chance to pay back a loan). 
+
+Guiding question: **how to cover the sociotechnical frame properly?**
+[summary of points made by various participants]
+
+The sociotechnical nature of fairness needs to be at the center of the
+project. User experience starts with broadly accessible educational material
+to encourage people to think bigger, not necessarily visualizations (people
+first, not technology first). Fairlearn and similar toolkits will not 'solve'
+fairness because fairness is fundamentally sociotechnical. However, Fairlearn
+may have a role to play in a slice of the things that need to be done. This
+will require certain guardrails and lots of education. The project itself will
+need to go beyond just the code through community, outreach, and education.
+Accessibility serves as a source of inspiration after having faced some of the
+same obstacles including changing the way people talk about the topic.
+
+
+UX-specific points made throughout the conversation:
+
+* A lot of things depend on the specific context. To create domain-specific UX
+  flows we'll need to work with partners in those domains.
+
+* For data scientists the job doesn't end with metrics. They need to interpret
+  disparities, so there's potential for interactions with model
+  interpretability to "debug" issues (e.g. InterpretML)
+
+* We need to provide a process for how to iterate on new UX flows as well as
+  domain or case studies. To understand whether specific parts of the UX are
+  useful to data scientists we can add them and see how people use them, e.g.
+  through user studies. To some extent we've followed a similar approach with
+  our example notebooks. They are already ahead of the dashboard in terms of
+  context-specific visualizations (done with matplotlib). Those that resonate
+  with users could be added to the dashboard.
+
+
+For both major topics (UX, scikit-fairness) we'll have to start follow-up
+discussions.
+
+For reference:	
+
+* UX roadmap - discussion related to this `proposal <https://github.com/fairlearn/fairlearn-proposals/issues/2>`_
+* scikit-fairness - discussion related to this `issue <https://github.com/fairlearn/fairlearn/issues/406>`_
+
+
+ 
