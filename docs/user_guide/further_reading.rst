@@ -7,7 +7,7 @@ There are a number of sources of further information about fairness in machine l
 Here we list which concentrate more on the broader societal impact of machine learning,
 rather than technical details of algorithms.
 
-The following books provide a excellent overviews on the various ways in which machine
+The following books provide excellent overviews of the various ways in which machine
 learning algorithms can have harmful effects:
 
 - `Weapons of Math Destruction <https://weaponsofmathdestructionbook.com/>`_ by Cathy O'Neill
