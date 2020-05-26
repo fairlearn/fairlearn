@@ -6,7 +6,12 @@ Frequently Asked Questions
 .. topic:: General Fairness Questions
 
     Where can I learn more about machine learning?
-        List some resources
+        Machine learning is an extremely broad topic, and the following list is but
+        a small fraction of the possible sources of information:
+
+        - A website
+        - Another website
+        - Maybe a book?
 
     Where can I learn more about fairness in machine learning?
         There are a variety of sources. For a high level overview, see books such as:
