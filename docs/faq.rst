@@ -71,6 +71,9 @@ What sort of fairness related harms can Fairlearn address?
     That is, obtaining the minimum disparity on some metric evaluated on
     specified subgroups in the data.
     This is certainly not the only way of looking at fairness, though.
+    For example, there is the concept of individual fairness (where decisions are evaluated
+    on the level of individuals rather than groups) and counter-factual fairness (e.g. does the
+    decision change if an individual's gender is changed from male to female).
 
 Can Fairlearn be used to detect bias in datasets?
     We do not have concrete plans for this at the present time.
