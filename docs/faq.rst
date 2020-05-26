@@ -10,10 +10,12 @@ Frequently Asked Questions
 
     Where can I learn more about fairness in machine learning?
         There are a variety of sources. For a high level overview, see books such as:
-        - Weapons of Math Destruction
+
+        - `Weapons of Math Destruction <https://weaponsofmathdestructionbook.com/>`_ by Cathy O'Neill
         - Artificial Unintelligence
 
         There are also some papers such as
+
         - Paper 1
         - Paper 2
 
