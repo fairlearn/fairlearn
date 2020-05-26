@@ -5,13 +5,12 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
-from sklearn.exceptions import NotFittedError
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.dummy import DummyClassifier
+from sklearn.utils.validation import check_is_fitted
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
-from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from ._grid_generator import _GridGenerator
 
@@ -108,9 +107,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
         """
         self.predictors_ = []
-        self.lambda_vecs_ = pd.DataFrame()
+        self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)
         self.objectives_ = []
-        self.gammas_ = pd.DataFrame()
+        self.gammas_ = pd.DataFrame(dtype=np.float64)
         self.oracle_execution_times_ = []
 
         if isinstance(self.constraints, ClassificationMoment):
@@ -193,7 +192,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 return self.objective_weight * self.objectives_[i] + \
                     self.constraint_weight * self.gammas_[i].max()
             losses = [loss_fct(i) for i in range(len(self.objectives_))]
-            self.best_grid_index_ = losses.index(min(losses))
+            self.best_idx_ = losses.index(min(losses))
         else:
             raise RuntimeError("Unsupported selection rule")
 
@@ -208,9 +207,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self.best_grid_index_ is None:
-            raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self.predictors_[self.best_grid_index_].predict(X)
+        check_is_fitted(self)
+        return self.predictors_[self.best_idx_].predict(X)
 
     def predict_proba(self, X):
         """Provide the result of :code:`predict_proba` from the best model found by the grid search.
@@ -221,6 +219,5 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self.best_grid_index_ is None:
-            raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self.predictors_[self.best_grid_index_].predict_proba(X)
+        check_is_fitted(self)
+        return self.predictors_[self.best_idx_].predict_proba(X)

@@ -5,6 +5,7 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from sklearn.utils.validation import check_is_fitted
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_ITER, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
@@ -202,6 +203,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             the result will be a scalar. Otherwise the result will be a vector
         :rtype: Scalar or vector
         """
+        check_is_fitted(self)
+
         positive_probs = self._pmf_predict(X)[:, 1]
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
@@ -213,6 +216,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :return: Array of tuples with the probabilities of predicting 0 and 1.
         :rtype: pandas.DataFrame
         """
+        check_is_fitted(self)
+        
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
             pred[t] = self._hs[t](X)

@@ -163,7 +163,7 @@ def test_lambda_vec_zero_unchanged_model(A_two_dim):
     assert_n_grid_search_results(1, grid_search)
 
     # Check coefficients
-    gs_coeff = grid_search.predictors_[grid_search.best_grid_index_].coef_
+    gs_coeff = grid_search.predictors_[grid_search.best_idx_].coef_
     um_coeff = unmitigated_estimator.coef_
     assert np.array_equal(gs_coeff, um_coeff)
 

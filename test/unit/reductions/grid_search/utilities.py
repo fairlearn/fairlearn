@@ -33,7 +33,7 @@ def _quick_data(A_two_dim=False, n_groups=2):
 
 
 def assert_n_grid_search_results(n, grid_search_obj):
-    assert grid_search_obj.best_grid_index_ is not None
+    assert grid_search_obj.best_idx_ is not None
     assert len(grid_search_obj.predictors_) == n
     assert len(grid_search_obj.objectives_) == n
     assert len(grid_search_obj.oracle_execution_times_) == n
