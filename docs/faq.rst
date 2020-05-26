@@ -6,14 +6,6 @@ Frequently asked questions
 General fairness questions
 --------------------------
 
-Where can I learn more about machine learning?
-    Machine learning is an extremely broad topic, and the following list is but
-    a small fraction of the possible sources of information:
-
-    - A website
-    - Another website
-    - Maybe a book?
-
 Where can I learn more about fairness in machine learning?
     In our :ref:`user guide <user_guide>` we provide links to the papers describing
     Fairlearn's algorithms.
