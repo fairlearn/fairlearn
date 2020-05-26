@@ -34,13 +34,41 @@ Frequently Asked Questions
        Fairlearn and similar packages offer techniques to redistribute harms between subgroups
        in the data.
 
+    1. Won't making a model fairer reduce its accuracy?
+
+       Any technique which reduces disparity in some metric is most likely to impact other metrics.
+       However, we have found empirically that it is usually possible to obtain substantial reductions
+       in disparity (as measured by some suitable metric) at minimal cost in accuracy.
+       Indeed, for certain subgroups in the data, accuracy may be improved dramatically.
+
 .. topic:: Fairlearn Questions
 
+    1. Can Fairlearn make my model fair?
+
+       Naive use of Fairlearn is not going to result in fairer models.
+       Indeed, when used incorrectly, Fairlearn could produce model which is _less_ fair.
+
+       What Fairlearn can do is generate a model which has lower disparity as measured by
+       a user-specified metric.
+       Whether this makes the model fairer is outside the remit of Fairlearn - or indeed of
+       machine learning in general.
+       To determine whether the new model is fairer, the whole system of which it is a part
+       needs to be considered in terms of the societal context in which it is used.
+
     1. What sort of fairness related harms can Fairlearn address?
+
+    1. Can Fairlearn be used to detect bias in datasets?
 
     1. Can Fairlearn recommend ways to make my model fairer?
 
        No. Fairlearn is not magic.
+
+    1. Which ML libraries does Fairlearn support?
+
+       We have generally followed conventions for `scikit-learn` in Fairlearn.
+       However, support is not restricted to Estimators from `scikit-learn`.
+       Any algorithm which provides (or can be wrapped to provide) `fit()` and
+       `predict()` methods should work.
 
     1. Is Fairlearn available in languages other than Python?
 
