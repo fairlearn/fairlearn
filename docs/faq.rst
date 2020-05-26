@@ -10,12 +10,12 @@ Frequently Asked Questions
 
     Where can I learn more about fairness in machine learning?
         There are a variety of sources. For a high level overview, see books such as:
-            - Weapons of Math Destruction
-            - Artificial Unintelligence
+        - Weapons of Math Destruction
+        - Artificial Unintelligence
 
         There are also some papers such as
-            - Paper 1
-            - Paper 2
+        - Paper 1
+        - Paper 2
 
     Why not just ignore the sensitive features?
         Because ignoring the sensitive feature usually doesn't work.
