@@ -121,15 +121,15 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                     <div className={IntroTab.classNames.firstSectionBody}>{localization.Intro.introBody}</div>
                     <div className={IntroTab.classNames.firstSectionGraphics}>
                         <svg width="358" height="156" viewBox="0 0 358 156" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.5 121C14.1944 121 18 117.194 18 112.5C18 107.806 14.1944 104 9.5 104C4.80558 104 1 107.806 1 112.5C1 117.194 4.80558 121 9.5 121Z" stroke="white" stroke-width="2"/>
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M87.5 82C92.1944 82 96 78.1944 96 73.5C96 68.8056 92.1944 65 87.5 65C82.8056 65 79 68.8056 79 73.5C79 78.1944 82.8056 82 87.5 82Z" stroke="white" stroke-width="2"/>
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M169.5 155C174.194 155 178 151.194 178 146.5C178 141.806 174.194 138 169.5 138C164.806 138 161 141.806 161 146.5C161 151.194 164.806 155 169.5 155Z" stroke="white" stroke-width="2"/>
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M248.5 65C253.194 65 257 61.1944 257 56.5C257 51.8056 253.194 48 248.5 48C243.806 48 240 51.8056 240 56.5C240 61.1944 243.806 65 248.5 65Z" stroke="white" stroke-width="2"/>
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M348.5 18C353.194 18 357 14.1944 357 9.5C357 4.80558 353.194 1 348.5 1C343.806 1 340 4.80558 340 9.5C340 14.1944 343.806 18 348.5 18Z" stroke="white" stroke-width="2"/>
-                            <path d="M22 108L76 81" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M98.4189 80.4179L160 136" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M178.419 135.583L239.581 66.4167" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M336.379 15.2083L260.207 49.375" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M9.5 121C14.1944 121 18 117.194 18 112.5C18 107.806 14.1944 104 9.5 104C4.80558 104 1 107.806 1 112.5C1 117.194 4.80558 121 9.5 121Z" stroke="white" strokeWidth="2"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M87.5 82C92.1944 82 96 78.1944 96 73.5C96 68.8056 92.1944 65 87.5 65C82.8056 65 79 68.8056 79 73.5C79 78.1944 82.8056 82 87.5 82Z" stroke="white" strokeWidth="2"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M169.5 155C174.194 155 178 151.194 178 146.5C178 141.806 174.194 138 169.5 138C164.806 138 161 141.806 161 146.5C161 151.194 164.806 155 169.5 155Z" stroke="white" strokeWidth="2"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M248.5 65C253.194 65 257 61.1944 257 56.5C257 51.8056 253.194 48 248.5 48C243.806 48 240 51.8056 240 56.5C240 61.1944 243.806 65 248.5 65Z" stroke="white" strokeWidth="2"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M348.5 18C353.194 18 357 14.1944 357 9.5C357 4.80558 353.194 1 348.5 1C343.806 1 340 4.80558 340 9.5C340 14.1944 343.806 18 348.5 18Z" stroke="white" strokeWidth="2"/>
+                            <path d="M22 108L76 81" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M98.4189 80.4179L160 136" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M178.419 135.583L239.581 66.4167" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M336.379 15.2083L260.207 49.375" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                     </div>
                 </Stack>
