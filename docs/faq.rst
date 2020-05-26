@@ -12,7 +12,8 @@ Frequently Asked Questions
         There are a variety of sources. For a high level overview, see books such as:
 
         - `Weapons of Math Destruction <https://weaponsofmathdestructionbook.com/>`_ by Cathy O'Neill
-        - Artificial Unintelligence
+        - `Artificial Unintelligence <https://mitpress.mit.edu/books/artificial-unintelligence>`_ by Meredith Broussard
+        - `Algorithms of Oppression <https://nyupress.org/9781479837243/algorithms-of-oppression/>`_ by Safiya Umoja Noble
 
         There are also some papers such as
 
@@ -46,7 +47,7 @@ Frequently Asked Questions
 
     Can Fairlearn make my model fair?
        Naive use of Fairlearn is not going to result in fairer models.
-       Indeed, when used incorrectly, Fairlearn could produce model which is _less_ fair.
+       Indeed, when used incorrectly, Fairlearn could produce model which is *less* fair.
 
        What Fairlearn can do is generate a model which has lower disparity as measured by
        a user-specified metric.
@@ -83,7 +84,7 @@ Frequently Asked Questions
         For the moment, we only support Python >= 3.6
 
     Can I contribute to Fairlearn?
-        Absolutely! Please see our `Contributor Guide <_contributor_guide>`_ for
+        Absolutely! Please see our :ref:`Contributor Guide <contributor_guide>` for
         information on how to add your contributions.
 
 
