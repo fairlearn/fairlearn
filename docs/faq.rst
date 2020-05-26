@@ -57,7 +57,10 @@ Frequently Asked Questions
        needs to be considered in terms of the societal context in which it is used.
 
     What sort of fairness related harms can Fairlearn address?
-        Group fairness....
+        Fairlean is focussed on group fairness.
+        That is, minimising the difference in some metric evalulated on
+        specified subgroups in the data.
+        This is certainly not the only way of looing at fairness, though.
 
     Can Fairlearn be used to detect bias in datasets?
         Not yet....
