@@ -65,6 +65,14 @@ Frequently Asked Questions
     Can Fairlearn recommend ways to make my model fairer?
         No. Fairlearn is not magic.
 
+        Fairness is a social concept, and no technological solution can make
+        things fair automatically.
+        In order to use Fairlearn successfully, you first need to work out
+        what fairness means for your particular problem.
+        Once that is determined, you can then work out how to use the
+        various algorithms and fairness metrics which Fairlearn supports
+        to develop models which are *fairer by the standard you have chosen*.
+
     What unfairness mitigation techniques does Fairlearn support?
         ExpGrad, PostProcessing....
 
