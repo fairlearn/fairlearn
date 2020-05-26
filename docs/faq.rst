@@ -43,7 +43,6 @@ Frequently Asked Questions
 .. topic:: Fairlearn Questions
 
     Can Fairlearn make my model fair?
-
        Naive use of Fairlearn is not going to result in fairer models.
        Indeed, when used incorrectly, Fairlearn could produce model which is _less_ fair.
 
@@ -55,43 +54,42 @@ Frequently Asked Questions
        needs to be considered in terms of the societal context in which it is used.
 
     What sort of fairness related harms can Fairlearn address?
+        Group fairness....
 
     Can Fairlearn be used to detect bias in datasets?
+        Not yet....
 
     Can Fairlearn recommend ways to make my model fairer?
-
         No. Fairlearn is not magic.
 
     What unfairness mitigation techniques does Fairlearn support?
+        ExpGrad, PostProcessing....
 
     Which ML libraries does Fairlearn support?
-
         We have generally followed conventions for `scikit-learn` in Fairlearn.
         However, support is not restricted to Estimators from `scikit-learn`.
         Any algorithm which provides (or can be wrapped to provide) `fit()` and
         `predict()` methods should work.
 
     Does Fairlearn work for image and text data?
+        Just needs fit and predict on Estimator
 
     Is Fairlearn available in languages other than Python?
-
         For the moment, we only support Python >= 3.6
 
     Can I contribute to Fairlearn?
-
         Absolutely! Please see our Contributing Guide.
 
 
 .. topic:: Fairlearn and Microsoft
 
     What is the relationship between Fairlearn and Microsoft?
-
         Fairlearn has grown from a project at Microsoft Research in New York City.
 
     How does Fairlearn relate to Microsoft's push for Responsible AI?
+        Need text for this...
 
     What is the relationship between Fairlearn and AzureML?
-
         Those of us who work for Microsoft are enabling Fairlearn to integrate
         into the AzureML experience.
         However, this is only to provide access to the rich MLOps Lifecycle
