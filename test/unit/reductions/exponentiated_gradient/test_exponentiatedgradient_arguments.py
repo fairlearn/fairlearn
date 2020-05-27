@@ -70,7 +70,7 @@ class TestExponentiatedGradientArguments:
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
         assert (np.all(np.isclose(disp - eps, disp_eps)))
         assert error == pytest.approx(0.25, abs=_PRECISION)
-        assert expgrad._n_oracle_calls == 32
+        assert expgrad.n_oracle_calls_ == 32
         assert n_predictors == 3
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
@@ -97,7 +97,7 @@ class TestExponentiatedGradientArguments:
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
 
-        n_predictors = len(expgrad._predictors)
+        n_predictors = len(expgrad.predictors_)
 
         disparity_moment = DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio)
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
@@ -108,9 +108,9 @@ class TestExponentiatedGradientArguments:
         disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
         error = error.gamma(Q)[0]
 
-        assert expgrad._best_gap == pytest.approx(0.0000, abs=_PRECISION)
-        assert expgrad._last_t == 5
-        assert expgrad._best_t == 5
+        assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
+        assert expgrad.last_iter_ == 5
+        assert expgrad.best_iter_ == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
         assert (np.all(np.isclose(disp - eps, disp_eps)))
         assert error == pytest.approx(0.25, abs=_PRECISION)
