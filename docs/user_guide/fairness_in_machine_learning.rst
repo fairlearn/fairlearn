@@ -39,6 +39,27 @@ The Fairlearn package is most applicable to two kinds of harms:
   information are extended or withheld. Examples include varying accuracy in
   face recognition, document search, or product recommendation.
 
+Harms can have varying severities, but the cumulative impact of even
+*non-severe* harms can be extremely burdensome or make people feel singled out
+or undervalued.
+- Be clear that fairness-related harms can affect both the people who will use
+  an AI system and the people who will be directly or indirectly affected by
+  the system, either by choice or not. For this reason, when talking about the
+  people who might be harmed by a system, talk about *stakeholders* not
+  *users*.
+- When talking about who might be harmed, don’t just focus on demographic
+  groups (e.g., groups defined in terms of race, gender, age, disability
+  status, skin tone, and their intersections) or groups that are protected by
+  anti-discrimination laws – the most relevant groups may be context specific.
+- Be clear that stakeholders can belong to overlapping or intersectional
+  groups – e.g., different combinations of race, gender, and age – and
+  considering each group separately may obscure harms.
+
+- Be clear that fairness-related harms can be (re-)introduced at every stage
+  of the AI development and deployment lifecycle and can arise due to any
+  component of an AI system, not just datasets or models – e.g., task
+  definitions, user experiences, evaluation metrics, or deployment contexts.
+
 Fairness assessment and unfairness mitigation
 ---------------------------------------------
 
