@@ -51,7 +51,7 @@ class TestExponentiatedGradientArguments:
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
-        n_predictors = len(expgrad._predictors)
+        n_predictors = len(expgrad.predictors_)
 
         disparity_moment = DemographicParity()
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
@@ -60,12 +60,12 @@ class TestExponentiatedGradientArguments:
         disparity = disparity_moment.gamma(Q).max()
         error = error.gamma(Q)[0]
 
-        assert expgrad._best_gap == pytest.approx(0.0000, abs=_PRECISION)
-        assert expgrad._last_t == 5
-        assert expgrad._best_t == 5
+        assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
+        assert expgrad.last_iter_ == 5
+        assert expgrad.best_iter_ == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
         assert error == pytest.approx(0.25, abs=_PRECISION)
-        assert expgrad._n_oracle_calls == 32
+        assert expgrad.n_oracle_calls_ == 32
         assert n_predictors == 3
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
@@ -93,7 +93,8 @@ class TestExponentiatedGradientArguments:
         mocker.patch('pickle.loads', return_value=estimator)
 
         # restrict ExponentiatedGradient to a single iteration
-        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), T=1)
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(),
+                                        max_iter=1)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
@@ -113,7 +114,7 @@ class TestExponentiatedGradientArguments:
 
         expgrad = ExponentiatedGradient(LogisticRegression(),
                                         constraints=DemographicParity(),
-                                        T=1)
+                                        max_iter=1)
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
         assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]

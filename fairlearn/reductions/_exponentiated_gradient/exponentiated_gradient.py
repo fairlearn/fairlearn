@@ -5,8 +5,9 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from sklearn.utils.validation import check_is_fitted
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
-    _SHRINK_REGRET, _SHRINK_ETA, _MIN_T, _RUN_LP_STEP, _PRECISION, _INDENTATION
+    _SHRINK_REGRET, _SHRINK_ETA, _MIN_ITER, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
 
 from fairlearn.reductions._moments import ClassificationMoment
@@ -35,37 +36,31 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         violation is at most :code:`2*(eps+best_gap)`
     :type eps: float
 
-    :param T: Maximum number of iterations
-    :type T: int
+    :param max_iter: Maximum number of iterations
+    :type max_iter: int
 
     :param nu: Convergence threshold for the duality gap, corresponding to a
         conservative automatic setting based on the statistical uncertainty in measuring
         classification error
     :type nu: float
 
-    :param eta_mul: Initial setting of the learning rate
-    :type eta_mul: float
+    :param eta0: Initial setting of the learning rate
+    :type eta0: float
+
+    :param run_linprog_step: if True each step of exponentiated gradient is followed by the saddle
+        point optimization over the convex hull of classifiers returned so far; default True
+    :type run_linprog_step: bool
     """
 
-    def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):  # noqa: D103
-        self._estimator = estimator
-        self._constraints = constraints
-        self._eps = eps
-        self._T = T
-        self._nu = nu
-        self._eta_mul = eta_mul
-
-        self._best_gap = None
-        self._predictors = None
-        self._weights = None
-        self._last_t = None
-        self._best_t = None
-        self._n_oracle_calls = 0
-        self._n_oracle_calls_dummy_returned = 0
-        self._oracle_execution_times = None
-        self._lambda_vecs = pd.DataFrame()
-        self._lambda_vecs_LP = pd.DataFrame()
-        self._lambda_vecs_lagrangian = pd.DataFrame()
+    def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
+                 eta0=2.0, run_linprog_step=True):  # noqa: D103
+        self.estimator = estimator
+        self.constraints = constraints
+        self.eps = eps
+        self.max_iter = max_iter
+        self.nu = nu
+        self.eta0 = eta0
+        self.run_linprog_step = run_linprog_step
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -76,7 +71,11 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :param y: The label vector
         :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
-        if isinstance(self._constraints, ClassificationMoment):
+        self.lambda_vecs_EG_ = pd.DataFrame()
+        self.lambda_vecs_LP_ = pd.DataFrame()
+        self.lambda_vecs_ = pd.DataFrame()
+
+        if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
             is_classification_reduction = True
         else:
@@ -90,9 +89,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         logger.debug("...Exponentiated Gradient STARTING")
 
-        B = 1 / self._eps
-        lagrangian = _Lagrangian(X, sensitive_features, y_train, self._estimator,
-                                 self._constraints, self._eps, B)
+        B = 1 / self.eps
+        lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
+                                 self.constraints, self.eps, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
@@ -102,40 +101,40 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         last_regret_checked = _REGRET_CHECK_START_T
         last_gap = np.PINF
-        for t in range(0, self._T):
+        for t in range(0, self.max_iter):
             logger.debug("...iter=%03d", t)
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
-            self._lambda_vecs[t] = lambda_vec
-            lambda_EG = self._lambda_vecs.mean(axis=1)
+            self.lambda_vecs_EG_[t] = lambda_vec
+            lambda_EG = self.lambda_vecs_EG_.mean(axis=1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
 
             if t == 0:
-                if self._nu is None:
-                    self._nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
-                eta_min = self._nu / (2 * B)
-                eta = self._eta_mul / B
-                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
-                             self._eps, B, self._nu, self._T, eta_min)
+                if self.nu is None:
+                    self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
+                eta_min = self.nu / (2 * B)
+                eta = self.eta0 / B
+                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
+                             self.eps, B, self.nu, self.max_iter, eta_min)
 
             if h_idx not in Qsum.index:
                 Qsum.at[h_idx] = 0.0
             Qsum[h_idx] += 1.0
             gamma = lagrangian.gammas[h_idx]
             Q_EG = Qsum / Qsum.sum()
-            result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, self._nu)
+            result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, self.nu)
             gap_EG = result_EG.gap()
             gaps_EG.append(gap_EG)
 
-            if t == 0 or not _RUN_LP_STEP:
+            if t == 0 or not self.run_linprog_step:
                 gap_LP = np.PINF
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, self._lambda_vecs_LP[t], result_LP = lagrangian.solve_linprog(self._nu)
+                Q_LP, self.lambda_vecs_LP_[t], result_LP = lagrangian.solve_linprog(self.nu)
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
@@ -151,7 +150,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                          _INDENTATION, eta, result_EG.L_low, result_EG.L, result_EG.L_high,
                          gap_EG, result_EG.gamma.max(), result_EG.error, gap_LP)
 
-            if (gaps[t] < self._nu) and (t >= _MIN_T):
+            if (gaps[t] < self.nu) and (t >= _MIN_ITER):
                 # solution found
                 break
 
@@ -165,31 +164,31 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 last_gap = best_gap
 
             # update theta based on learning rate
-            theta += eta * (gamma - self._eps)
+            theta += eta * (gamma - self.eps)
 
         # retain relevant result data
         gaps_series = pd.Series(gaps)
         gaps_best = gaps_series[gaps_series <= gaps_series.min() + _PRECISION]
-        self._best_t = gaps_best.index[-1]
-        self._best_gap = gaps[self._best_t]
-        self._weights = Qs[self._best_t]
+        self.best_iter_ = gaps_best.index[-1]
+        self.best_gap_ = gaps[self.best_iter_]
+        self.weights_ = Qs[self.best_iter_]
         self._hs = lagrangian.hs
         for h_idx in self._hs.index:
-            if h_idx not in self._weights.index:
-                self._weights.at[h_idx] = 0.0
+            if h_idx not in self.weights_.index:
+                self.weights_.at[h_idx] = 0.0
 
-        self._last_t = len(Qs) - 1
-        self._predictors = lagrangian.classifiers
-        self._n_oracle_calls = lagrangian.n_oracle_calls
-        self._n_oracle_calls_dummy_returned = lagrangian.n_oracle_calls_dummy_returned
-        self._oracle_execution_times = lagrangian.oracle_execution_times
-        self._lambda_vecs_lagrangian = lagrangian.lambdas
+        self.last_iter_ = len(Qs) - 1
+        self.predictors_ = lagrangian.predictors
+        self.n_oracle_calls_ = lagrangian.n_oracle_calls
+        self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned
+        self.oracle_execution_times_ = lagrangian.oracle_execution_times
+        self.lambda_vecs_ = lagrangian.lambdas
 
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, T=%d, eta_min=%.6f",
-                     self._eps, B, self._nu, self._T, eta_min)
-        logger.debug("...last_t=%d, best_t=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
-                     self._last_t, self._best_t, self._best_gap, lagrangian.n_oracle_calls,
-                     len(lagrangian.classifiers))
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
+                     self.eps, B, self.nu, self.max_iter, eta_min)
+        logger.debug("...last_iter=%d, best_iter=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
+                     self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
+                     len(lagrangian.predictors))
 
     def predict(self, X):
         """Provide a prediction for the given input data.
@@ -204,6 +203,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             the result will be a scalar. Otherwise the result will be a vector
         :rtype: Scalar or vector
         """
+        check_is_fitted(self)
+
         positive_probs = self._pmf_predict(X)[:, 1]
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
 
@@ -215,8 +216,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :return: Array of tuples with the probabilities of predicting 0 and 1.
         :rtype: pandas.DataFrame
         """
+        check_is_fitted(self)
+
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
             pred[t] = self._hs[t](X)
-        positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
+        positive_probs = pred[self.weights_.index].dot(self.weights_).to_frame()
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
