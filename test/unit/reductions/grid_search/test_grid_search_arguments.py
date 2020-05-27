@@ -9,7 +9,6 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.model_selection import train_test_split
 
 from sklearn.exceptions import NotFittedError
-from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
@@ -30,6 +29,11 @@ from test.unit.reductions.grid_search.utilities import assert_n_grid_search_resu
 candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
 candidate_Y_transforms = conversions_for_1d
 candidate_A_transforms = conversions_for_1d
+
+# ==============================================================
+
+not_fitted_error_msg = "This {} instance is not fitted yet. Call 'fit' with " \
+    "appropriate arguments before using this estimator."
 
 
 # Base class for tests
@@ -258,7 +262,7 @@ class ArgumentTests:
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
 
-        assert _NO_PREDICT_BEFORE_FIT == execInfo.value.args[0]
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
     def test_no_predict_proba_before_fit(self):
         gs = GridSearch(self.estimator, self.disparity_criterion)
@@ -267,7 +271,7 @@ class ArgumentTests:
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
 
-        assert _NO_PREDICT_BEFORE_FIT == execInfo.value.args[0]
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
 
 # Tests specific to Classification
