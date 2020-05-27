@@ -80,10 +80,9 @@ workflows:
   build-webpage:
     jobs:
       - build-doc
-      # disabling doc deployments until we integrate landing page
-      # - deploy-doc:
-      #     requires:
-      #       - build-doc
-      #     filters:
-      #       branches:
-      #         only: master  # don't deploy to GitHub pages from other branches
+      - deploy-doc:
+          requires:
+            - build-doc
+          filters:
+            branches:
+              only: master  # don't deploy to GitHub pages from other branches
