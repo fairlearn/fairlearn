@@ -206,10 +206,11 @@ class TestExponentiatedGradientSmoke:
             y = self.y
 
         if "ratio" in data.keys():
-            expgrad =  ExponentiatedGradient(self.learner, constraints=data["cons_class"](ratio_bound_slack=data["eps"],
-                                                                                          ratio_bound=data["ratio"]), eps=data["eps"])
+            expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](
+                ratio_bound_slack=data["eps"], ratio_bound=data["ratio"]), eps=data["eps"])
         else:
-            expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](difference_bound=data["eps"]),eps=data["eps"])
+            expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](
+                difference_bound=data["eps"]), eps=data["eps"])
 
         expgrad.fit(self.X, y, sensitive_features=self.A)
 
@@ -217,7 +218,8 @@ class TestExponentiatedGradientSmoke:
         n_predictors = len(expgrad._predictors)
 
         if "ratio" in data.keys():
-            disparity_moment = data["cons_class"](ratio_bound_slack=data["eps"], ratio_bound=data["ratio"])
+            disparity_moment = data["cons_class"](ratio_bound_slack=data["eps"],
+                                                  ratio_bound=data["ratio"])
         else:
             disparity_moment = data["cons_class"](difference_bound=data["eps"])
 

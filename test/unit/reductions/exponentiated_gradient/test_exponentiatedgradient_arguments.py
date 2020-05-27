@@ -45,7 +45,6 @@ class TestExponentiatedGradientArguments:
         transformed_y = transformY(y)
         transformed_A = transformA(A)
         eps = 0.1
-        ratio = 1.0
 
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
