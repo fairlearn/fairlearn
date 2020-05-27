@@ -27,10 +27,11 @@ From a high-level point of view we need to be be clear that
   evaluation metrics, or deployment contexts), not just datasets or models.
 
 To complicate matters, there is no single definition of fairness that will
-apply equally well to all AI systems. TODO: reference fairness and abstraction in sociotechnical systems
+apply equally well to all AI systems [See the *portability trap* in [#1]_
+for further details].
 Any quantitative definition of fairness will omit aspects of fairness (as a
 societal concept) that cannot be quantified (e.g., justice, due process,
-remedying historical societal injustices). TODO: reference fairness and abstraction in sociotechnical systems
+remedying historical societal injustices).
 As a consequence, each application context needs to be examined individually
 and we need to represent all considerations appropriately.
 
@@ -87,3 +88,12 @@ that are protected by anti-discrimination laws. The most relevant groups may
 be context specific. Additionally, stakeholders can belong to overlapping or
 intersectional groups – e.g., different combinations of race, gender, and
 age – and considering each group separately may obscure harms.
+
+
+
+.. topic:: References:
+
+   .. [#1] Selbst, boyd, Friedler, Venkatasubramanian, Vertesi
+      `"Fairness and Abstraction in Sociotechnical Systems"
+      <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3265913>`_,
+      ACM FAT*, 2019.
