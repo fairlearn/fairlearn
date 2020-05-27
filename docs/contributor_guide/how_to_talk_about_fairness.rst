@@ -27,8 +27,8 @@ From a high-level point of view we need to be be clear that
   evaluation metrics, or deployment contexts), not just datasets or models.
 
 To complicate matters, there is no single definition of fairness that will
-apply equally well to all AI systems [See the *portability trap* in [#1]_
-for further details].
+apply equally well to all AI systems (see the *portability trap* in [#1]_
+for further details).
 Any quantitative definition of fairness will omit aspects of fairness (as a
 societal concept) that cannot be quantified (e.g., justice, due process,
 remedying historical societal injustices).
@@ -88,8 +88,6 @@ that are protected by anti-discrimination laws. The most relevant groups may
 be context specific. Additionally, stakeholders can belong to overlapping or
 intersectional groups – e.g., different combinations of race, gender, and
 age – and considering each group separately may obscure harms.
-
-
 
 .. topic:: References:
 
