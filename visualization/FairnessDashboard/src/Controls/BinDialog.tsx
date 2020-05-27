@@ -1,13 +1,13 @@
-import React from "react";
-import { INumericRange, RangeTypes } from "mlchartlib";
 import _ from "lodash";
-import { mergeStyleSets } from "@uifabric/styling";
-import { Checkbox, ICheckboxProps } from 'office-ui-fabric-react/lib/Checkbox';
+import { INumericRange, RangeTypes } from "mlchartlib";
+import { DefaultButton, PrimaryButton } from "office-ui-fabric-react/lib/Button";
+import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
 import { SpinButton } from 'office-ui-fabric-react/lib/SpinButton';
-import { localization } from "../Localization/localization";
-import { PrimaryButton, DefaultButton } from "office-ui-fabric-react/lib/Button";
-import { IBinnedResponse } from "../IBinnedResponse";
+import { Text } from 'office-ui-fabric-react';
+import React from "react";
 import { BinnedResponseBuilder } from "../BinnedResponseBuilder";
+import { IBinnedResponse } from "../IBinnedResponse";
+import { localization } from "../Localization/localization";
 import { BinDialogStyles } from "./BinDialog.styles";
 
 export interface IBinDialogProps {
@@ -129,12 +129,13 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
         const styles = BinDialogStyles();
         return (
             <div className={styles.frame}>
-                <div className={styles.header}>{localization.BinDialog.header}</div>
+                {/* <div className={styles.header}>{localization.BinDialog.header}</div> */}
+                <Text variant={"xLargePlus"} className={styles.header}>{localization.BinDialog.header}</Text>
                 <div className={styles.main}>
                     <div className={styles.controls}>
                         {this.props.range.rangeType === RangeTypes.integer &&
                             <Checkbox
-                                className={styles.checkbox}
+                                //className={styles.checkbox}
                                 label={localization.BinDialog.makeCategorical}
                                 checked={this.state.rangeType === RangeTypes.categorical}
                                 onChange={this.toggleCategorical}/>
@@ -166,7 +167,7 @@ export default class BinDialog extends React.PureComponent<IBinDialogProps, IBin
                             </div>
                         }
                     </div>
-                    <div className={styles.categoryHeader}>{localization.BinDialog.categoryHeader}</div>
+                    <Text>{localization.BinDialog.categoryHeader}</Text>
                     <div className={styles.scrollArea}>
                         {this.state.labelArray.map((val, i) => {
                             return <div className={styles.groupLabel} key={i}>{val}</div>;

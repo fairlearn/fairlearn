@@ -4,6 +4,7 @@ import { ActionButton } from "office-ui-fabric-react/lib/Button";
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { Stack } from "office-ui-fabric-react/lib/Stack";
+import { Text } from "office-ui-fabric-react";
 import React from "react";
 import { AccuracyOptions } from "../AccuracyMetrics";
 import { IAccuracyPickerProps, IFeatureBinPickerProps, IParityPickerProps } from "../FairnessWizard";
@@ -273,7 +274,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         return (
             <Stack className={styles.frame}>
                 <div className={styles.header}>
-                    <h2 className={styles.headerTitle}>{localization.ModelComparison.title}</h2>
+                    {/* <h2 className={styles.headerTitle}>{localization.ModelComparison.title}</h2> */}
+                    <Text  variant={"xxLargePlus"} className={styles.headerTitle}>{localization.ModelComparison.title}</Text>
                     <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
                 <div className={styles.main}>
@@ -285,13 +287,19 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         />
                     </div>
                     <div className={styles.mainRight}>
-                        <div className={styles.rightTitle}>{localization.ModelComparison.howToRead}</div>
+                        {/* <div className={styles.rightTitle}>{localization.ModelComparison.howToRead}</div>
                         <div className={styles.rightText}>{howToReadText}</div>
-                        <div className={styles.insights}>{localization.ModelComparison.insights}</div>
+                        <div className={styles.insights}>{localization.ModelComparison.insights}</div> */}
+                        <Text variant={"mediumPlus"} className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
+                        <Text variant={"medium"} className={styles.rightText} block>{howToReadText}</Text>
+                        <Text variant={"mediumPlus"} className={styles.insights} block>{localization.ModelComparison.insights}</Text>                        
                         <div className={styles.insightsText}>
-                            <div className={styles.textSection}>{insights2}</div>
+                            {/* <div className={styles.textSection}>{insights2}</div>
                             <div className={styles.textSection}>{insights3}</div>
-                            <div>{insights4}</div>
+                            <div>{insights4}</div> */}
+                            <Text variant={"medium"} className={styles.textSection} block>{insights2}</Text>
+                            <Text variant={"medium"} className={styles.textSection} block>{insights3}</Text>
+                            <Text>{insights4}</Text>
                         </div>
                     </div>
                 </div>

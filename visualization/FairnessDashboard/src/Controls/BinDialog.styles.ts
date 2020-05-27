@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, FontSizes } from "office-ui-fabric-react";
 
 export interface IBinDialogStyles {
     frame: IStyle;
@@ -8,8 +8,8 @@ export interface IBinDialogStyles {
     cancelButton: IStyle;
     binCounter: IStyle;
     main: IStyle;
-    categoryHeader: IStyle;
-    checkbox: IStyle;
+    //categoryHeader: IStyle;
+    //checkbox: IStyle;
     controls: IStyle;
     scrollArea: IStyle;
     groupLabel: IStyle;
@@ -23,16 +23,18 @@ export const BinDialogStyles: () => IProcessedStyleSet<IBinDialogStyles> = () =>
             width: "500px",
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "#F2F2F2"
+            backgroundColor: theme.semanticColors.bodyBackground //"#F2F2F2"
         },
         header: {
             padding: "12px",
             textAlign: "center",
-            backgroundColor: "#333333",
-            color: "#FFFFFF",
-            fontSize: "24px",
-            lineHeight: "30px",
-            fontWeight: "100"
+            //backgroundColor: "#333333",
+            backgroundColor: theme.semanticColors.bodyFrameBackground,
+            //color: "#FFFFFF",
+            color: theme.semanticColors.bodyText
+            //fontSize: "24px",
+            //lineHeight: "30px",
+            //fontWeight: "100"
         },
         buttons: {
             display: "inline-flex",
@@ -42,29 +44,29 @@ export const BinDialogStyles: () => IProcessedStyleSet<IBinDialogStyles> = () =>
         saveButton: {
             height: "44px",
             padding: "12px",
-            color: "#FFFFFF",
-            fontSize: "18px",
-            lineHeight: "24px",
-            backgroundColor: "#666666",
-            fontWeight: "400",
+            //color: "#FFFFFF",
+            //fontSize: "18px",
+            //lineHeight: "24px",
+            //backgroundColor: theme.semanticColors.buttonBackground,//"#666666",
+            //fontWeight: "400",
             marginLeft: "10px"
         },
         cancelButton: {
             height: "44px",
             padding: "12px",
-            color: "#333333",
-            fontSize: "18px",
-            lineHeight: "24px",
-            backgroundColor: "#FFFFFF",
-            fontWeight: "400"
+            //color: "#333333",
+            //fontSize: "18px",
+            //lineHeight: "24px",
+            //backgroundColor: "#FFFFFF",
+            //fontWeight: "400"
         },
         binCounter: {
             selectors: {
                 "& label": {
-                    color: "#333333",
-                    fontSize: "15px",
-                    lineHeight: "20px",
-                    fontWeight: "500"
+                    color: theme.semanticColors.bodyText, //"#333333",
+                    fontSize: FontSizes.mediumPlus,
+                    //lineHeight: "20px",
+                    fontWeight: FontWeights.regular
                 }
             }
         },
@@ -75,19 +77,19 @@ export const BinDialogStyles: () => IProcessedStyleSet<IBinDialogStyles> = () =>
             display: "flex",
             flexDirection: "column"
         },
-        categoryHeader: {
+        // categoryHeader: {
 
-        },
-        checkbox: {
-            selectors: {
-                "& span": {
-                    color: "#333333",
-                    fontSize: "15px",
-                    lineHeight: "20px",
-                    fontWeight: "500"
-                }
-            }
-        },
+        // },
+        // checkbox: {
+        //     selectors: {
+        //         "& span": {
+        //             color: "#333333",
+        //             fontSize: "15px",
+        //             lineHeight: "20px",
+        //             fontWeight: "500"
+        //         }
+        //     }
+        // },
         controls: {
             display: "inline-flex",
             width: "100%",
@@ -95,7 +97,8 @@ export const BinDialogStyles: () => IProcessedStyleSet<IBinDialogStyles> = () =>
             height: "30px",
             alignItems: "center",
             paddingBottom: "10px",
-            borderBottom: "1px solid #CCCCCC",
+            borderBottom: "1px solid",// #CCCCCC",
+            borderBottomColor: theme.semanticColors.bodyDivider,
             marginBottom: "10px"
         },
         scrollArea: {
@@ -104,12 +107,14 @@ export const BinDialogStyles: () => IProcessedStyleSet<IBinDialogStyles> = () =>
             flexGrow:"2"
         },
         groupLabel: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "20px",
-            fontWeight: "400",
+            //color: "#333333",
+            color: theme.semanticColors.bodyText,
+            //fontSize: "15px",
+            //lineHeight: "20px",
+            //fontWeight: "400",
             height: "25px",
-            borderBottom: "1px solid #CCCCCC",
+            borderBottom: "1px solid", //#CCCCCC",
+            borderBottomColor: theme.semanticColors.bodyDivider,
             paddingLeft: "12px"
         }
     });

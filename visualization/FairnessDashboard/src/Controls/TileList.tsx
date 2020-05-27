@@ -1,7 +1,7 @@
 import { Icon } from "office-ui-fabric-react/lib/Icon";
-import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
+import { Text, IProcessedStyleSet } from "office-ui-fabric-react";
 import React from "react";
-import { TileListStyles } from "./TileList.styles";
+import { TileListStyles, ITilesListStyles } from "./TileList.styles";
 
 export interface ITileProp {
     title: string;
@@ -16,8 +16,6 @@ export interface ITileListProps {
     items: ITileProp[];
     columnCount?: number;
 }
-
-const styles = TileListStyles();
 export class TileList extends React.PureComponent<ITileListProps> {
     // private static readonly classNames = mergeStyleSets({
     //     container: {
@@ -64,14 +62,15 @@ export class TileList extends React.PureComponent<ITileListProps> {
     //     }
     // });
     render(): React.ReactNode {
+        const styles = TileListStyles();
         return (
             <div className={styles.container}>
-                {this.props.items.map((item, index) => this._onRenderCell(item, index))}
+                {this.props.items.map((item, index) => this._onRenderCell(item, index, styles))}
             </div>
         );
     }
 
-    private _onRenderCell = (item: ITileProp, index: number | undefined): JSX.Element => {
+    private _onRenderCell = (item: ITileProp, index: number | undefined, styles: IProcessedStyleSet<ITilesListStyles>): JSX.Element => {
         const columnCount = this.props.columnCount || 3;
         return (
           <div
@@ -80,8 +79,10 @@ export class TileList extends React.PureComponent<ITileListProps> {
             key={index}
             data-is-focusable={true}>
             <Icon iconName={item.selected ? "RadioBtnOn" : "RadioBtnOff"} className={styles.iconClass}/>
-            <h2 className={styles.title}>{item.title}</h2>
-            <p className={styles.description}>{item.description}</p>
+            {/* <h2 className={styles.title}>{item.title}</h2> */}
+            <Text variant={"large"} className={styles.title} block>{item.title}</Text>
+            {/* <p className={styles.description}>{item.description}</p> */}
+            <Text variant={"mediumPlus"} className={styles.description}>{item.description}</Text>
           </div>
         );
     }

@@ -15,6 +15,7 @@ import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
 import { AccuracyOptions } from "./AccuracyMetrics";
 import { NONAME } from "dns";
 import { ChartColors } from "./ChartColors";
+import { WizardReportStyles } from "./WizardReport.styles";
 
 interface IMetrics {
     globalAccuracy: number;
@@ -50,161 +51,161 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         }]
     };
 
-    private static readonly classNames = mergeStyleSets({
-        spinner: {
-            margin: "auto",
-            padding: "40px"
-        },
-        header: {
-            padding: "0 90px",
-            backgroundColor: "#F2F2F2"
-        },
-        multimodelButton: {
-            marginTop: "20px",
-            padding: 0,
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "400"
-        },
-        headerTitle: {
-            paddingTop: "10px",
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100"
-        },
-        headerBanner: {
-            display: "flex"
-        },
-        bannerWrapper: {
-            width: "100%",
-            paddingTop: "18px",
-            paddingBottom: "15px",
-            display: "inline-flex",
-            flexDirection: "row",
-            justifyContent: "space-between"
-        },
-        editButton: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "20px",
-            fontWeight: "400"
-        },
-        metricText: {
-            color: "#333333",
-            fontSize: "36px",
-            lineHeight: "44px",
-            fontWeight: "100",
-            paddingRight: "12px"
-        },
-        firstMetricLabel: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "400",
-            padding: "8px 12px 0 12px",
-            maxWidth: "120px",
-            borderRight: "1px solid #CCCCCC",
-            marginRight: "20px"
-        },
-        metricLabel: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "400",
-            paddingTop: "8px",
-            maxWidth: "130px"
-        },
-        presentationArea: {
-            display: "flex",
-            flexDirection: "row",
-            padding: "20px 0 30px 90px",
-            backgroundColor: 'white'
-        },
-        chartWrapper: {
-            flex: "1 0 40%",
-            display: "flex",
-            flexDirection: "column"
-        },
-        chartBody: {
-            flex: 1
-        },
-        chartHeader: {
-            height: "23px",
-            paddingLeft: "10px",
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500"
-        },
-        mainRight: {
-            minWidth: "200px",
-            paddingLeft: "35px",
-            flexBasis: "300px",
-            flexShrink: 1
-        },
-        rightTitle: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "500",
-            paddingBottom: "11px",
-            borderBottom: "1px solid #CCCCCC"
-        },
-        rightText: {
-            padding: "16px 15px 30px 0",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "400",
-            borderBottom: "0.5px dashed #CCCCCC"
-        },
-        insights: {
-            textTransform: "uppercase",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "500",
-            padding: "18px 0",
-        },
-        insightsText: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "400",
-            paddingBottom: "18px",
-            paddingRight: "15px",
-            borderBottom: "1px solid #CCCCCC"
-        },
-        tableWrapper: {
-            paddingBottom: "20px"
-        },
-        textRow: {
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            paddingBottom: "7px"
-        },
-        colorBlock: {
-            width: "15px",
-            height: "15px",
-            marginRight: "9px"
-        },
-        multimodelSection: {
-            display: "flex",
-            flexDirection:"row"
-        },
-        modelLabel: {
-            alignSelf: "center",
-            paddingLeft: "35px",
-            paddingTop: "16px",
-            color: "#333333",
-            fontSize: "26px",
-            lineHeight: "16px",
-            fontWeight: "400"
-        }
-    });
+    // private static readonly classNames = mergeStyleSets({
+    //     spinner: {
+    //         margin: "auto",
+    //         padding: "40px"
+    //     },
+    //     header: {
+    //         padding: "0 90px",
+    //         backgroundColor: "#F2F2F2"
+    //     },
+    //     multimodelButton: {
+    //         marginTop: "20px",
+    //         padding: 0,
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "16px",
+    //         fontWeight: "400"
+    //     },
+    //     headerTitle: {
+    //         paddingTop: "10px",
+    //         color: "#333333",
+    //         fontSize: "32px",
+    //         lineHeight: "39px",
+    //         fontWeight: "100"
+    //     },
+    //     headerBanner: {
+    //         display: "flex"
+    //     },
+    //     bannerWrapper: {
+    //         width: "100%",
+    //         paddingTop: "18px",
+    //         paddingBottom: "15px",
+    //         display: "inline-flex",
+    //         flexDirection: "row",
+    //         justifyContent: "space-between"
+    //     },
+    //     editButton: {
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "20px",
+    //         fontWeight: "400"
+    //     },
+    //     metricText: {
+    //         color: "#333333",
+    //         fontSize: "36px",
+    //         lineHeight: "44px",
+    //         fontWeight: "100",
+    //         paddingRight: "12px"
+    //     },
+    //     firstMetricLabel: {
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "16px",
+    //         fontWeight: "400",
+    //         padding: "8px 12px 0 12px",
+    //         maxWidth: "120px",
+    //         borderRight: "1px solid #CCCCCC",
+    //         marginRight: "20px"
+    //     },
+    //     metricLabel: {
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "16px",
+    //         fontWeight: "400",
+    //         paddingTop: "8px",
+    //         maxWidth: "130px"
+    //     },
+    //     presentationArea: {
+    //         display: "flex",
+    //         flexDirection: "row",
+    //         padding: "20px 0 30px 90px",
+    //         backgroundColor: 'white'
+    //     },
+    //     chartWrapper: {
+    //         flex: "1 0 40%",
+    //         display: "flex",
+    //         flexDirection: "column"
+    //     },
+    //     chartBody: {
+    //         flex: 1
+    //     },
+    //     chartHeader: {
+    //         height: "23px",
+    //         paddingLeft: "10px",
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "12px",
+    //         fontWeight: "500"
+    //     },
+    //     mainRight: {
+    //         minWidth: "200px",
+    //         paddingLeft: "35px",
+    //         flexBasis: "300px",
+    //         flexShrink: 1
+    //     },
+    //     rightTitle: {
+    //         color: "#333333",
+    //         fontSize: "12px",
+    //         lineHeight: "16px",
+    //         fontWeight: "500",
+    //         paddingBottom: "11px",
+    //         borderBottom: "1px solid #CCCCCC"
+    //     },
+    //     rightText: {
+    //         padding: "16px 15px 30px 0",
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "18px",
+    //         fontWeight: "400",
+    //         borderBottom: "0.5px dashed #CCCCCC"
+    //     },
+    //     insights: {
+    //         textTransform: "uppercase",
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "16px",
+    //         fontWeight: "500",
+    //         padding: "18px 0",
+    //     },
+    //     insightsText: {
+    //         color: "#333333",
+    //         fontSize: "15px",
+    //         lineHeight: "16px",
+    //         fontWeight: "400",
+    //         paddingBottom: "18px",
+    //         paddingRight: "15px",
+    //         borderBottom: "1px solid #CCCCCC"
+    //     },
+    //     tableWrapper: {
+    //         paddingBottom: "20px"
+    //     },
+    //     textRow: {
+    //         display: "flex",
+    //         flexDirection: "row",
+    //         alignItems: "center",
+    //         paddingBottom: "7px"
+    //     },
+    //     colorBlock: {
+    //         width: "15px",
+    //         height: "15px",
+    //         marginRight: "9px"
+    //     },
+    //     multimodelSection: {
+    //         display: "flex",
+    //         flexDirection:"row"
+    //     },
+    //     modelLabel: {
+    //         alignSelf: "center",
+    //         paddingLeft: "35px",
+    //         paddingTop: "16px",
+    //         color: "#333333",
+    //         fontSize: "26px",
+    //         lineHeight: "16px",
+    //         fontWeight: "400"
+    //     }
+    // });
 
     private static barPlotlyProps: IPlotlyProperty = {
         config: { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian', 'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'] },
@@ -250,10 +251,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
     };
 
     render(): React.ReactNode {
+        const styles = WizardReportStyles();
         if (!this.state || !this.state.metrics) {
             this.loadData();
             return (
-                <Spinner className={WizardReport.classNames.spinner} size={SpinnerSize.large} label={localization.calculating}/>
+                <Spinner className={styles.spinner} size={SpinnerSize.large} label={localization.calculating}/>
             );
         }
 
@@ -334,26 +336,33 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             ];
             opportunityPlot.layout.xaxis.tickformat = ',.0%';
             howToReadAccuracySection = (<div>
-                <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                <div className={styles.textRow}>
+                    <div className={styles.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
                     <div>
-                        <div>{localization.Report.underestimationError}</div>
-                        <div>{localization.Report.underpredictionExplanation}</div>
+                        {/* <div>{localization.Report.underestimationError}</div>
+                        <div>{localization.Report.underpredictionExplanation}</div> */}
+                        <Text block>{localization.Report.underestimationError}</Text>
+                        <Text block>{localization.Report.underpredictionExplanation}</Text>
                     </div>
                 </div>
-                <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                <div className={styles.textRow}>
+                    <div className={styles.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
                     <div>
-                        <div>{localization.Report.overestimationError}</div>
-                        <div>{localization.Report.overpredictionExplanation}</div>
+                        {/* <div>{localization.Report.overestimationError}</div>
+                        <div>{localization.Report.overpredictionExplanation}</div> */}
+                        <Text block>{localization.Report.overestimationError}</Text>
+                        <Text block>{localization.Report.overpredictionExplanation}</Text>
                     </div>
                 </div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead1}</div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead2}</div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationAccuracyHowToRead3}</div>
+                {/* <div className={styles.textRow}>{localization.Report.classificationAccuracyHowToRead1}</div>
+                <div className={styles.textRow}>{localization.Report.classificationAccuracyHowToRead2}</div>
+                <div className={styles.textRow}>{localization.Report.classificationAccuracyHowToRead3}</div> */}
+                <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead1}</Text>
+                <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead2}</Text>
+                <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead3}</Text>
             </div>);
             howToReadOutcomesSection = (<div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.classificationOutcomesHowToRead}</div>
+                <Text className={styles.textRow} block>{localization.Report.classificationOutcomesHowToRead}</Text>
             </div>);
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
             accuracyPlot.data = [
@@ -420,20 +429,24 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 } as any
             ];
             howToReadAccuracySection = (<div>
-                <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
-                    <div>{localization.Report.overestimationError}</div>
+                <div className={styles.textRow}>
+                    <div className={styles.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                    <Text block>{localization.Report.overestimationError}</Text>
                 </div>
-                <div className={WizardReport.classNames.textRow}>
-                    <div className={WizardReport.classNames.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
-                    <div>{localization.Report.underestimationError}</div>
+                <div className={styles.textRow}>
+                    <div className={styles.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                    <Text block>{localization.Report.underestimationError}</Text>
                 </div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead1}</div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead2}</div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.probabilityAccuracyHowToRead3}</div>
+                {/* <div className={styles.textRow}>{localization.Report.probabilityAccuracyHowToRead1}</div>
+                <div className={styles.textRow}>{localization.Report.probabilityAccuracyHowToRead2}</div>
+                <div className={styles.textRow}>{localization.Report.probabilityAccuracyHowToRead3}</div> */}
+                <Text className={styles.textRow} block>{localization.Report.probabilityAccuracyHowToRead1}</Text>
+                <Text className={styles.textRow} block>{localization.Report.probabilityAccuracyHowToRead2}</Text>
+                <Text className={styles.textRow} block>{localization.Report.probabilityAccuracyHowToRead3}</Text>
             </div>);
             howToReadOutcomesSection = (<div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.regressionOutcomesHowToRead}</div>
+                {/* <div className={styles.textRow}>{localization.Report.regressionOutcomesHowToRead}</div> */}
+                <Text className={styles.textRow} block>{localization.Report.regressionOutcomesHowToRead}</Text>
             </div>);
             opportunityChartHeader = localization.Report.distributionOfPredictions;
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.regression) {
@@ -481,10 +494,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 } as any
             ];
             howToReadAccuracySection = (<div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.regressionAccuracyHowToRead}</div>
+                {/* <div className={styles.textRow}>{localization.Report.regressionAccuracyHowToRead}</div> */}
+                <Text className={styles.textRow} block>{localization.Report.regressionAccuracyHowToRead}</Text>
             </div>);
             howToReadOutcomesSection = (<div>
-                <div className={WizardReport.classNames.textRow}>{localization.Report.regressionOutcomesHowToRead}</div>
+                {/* <div className={styles.textRow}>{localization.Report.regressionOutcomesHowToRead}</div> */}
+                <Text className={styles.textRow} block>{localization.Report.regressionOutcomesHowToRead}</Text>
             </div>);
             opportunityChartHeader = localization.Report.distributionOfPredictions;
             accuracyChartHeader = localization.Report.distributionOfErrors;
@@ -505,43 +520,51 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         const formattedBinOutcomeValues = this.state.metrics.binnedOutcome.map(value => 
             this.formatNumbers(value, outcomeKey));
         return (<div style={{height: "100%", overflowY:"auto"}}>
-            <div className={WizardReport.classNames.header}>
+            <div className={styles.header}>
                 {this.props.modelCount > 1 &&
-                    <div className={WizardReport.classNames.multimodelSection}>
+                    <div className={styles.multimodelSection}>
                         <ActionButton
-                            className={WizardReport.classNames.multimodelButton}
+                            className={styles.multimodelButton}
                             iconProps={{iconName: "ChevronLeft"}}
                             onClick={this.clearModelSelection}>
                             {localization.Report.backToComparisons}
                         </ActionButton>
-                        <div className={WizardReport.classNames.modelLabel}>
+                        {/* <div className={styles.modelLabel}>
                             {this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}
-                        </div>
+                        </div> */}
+                        <Text variant={"xLarge"} className={styles.modelLabel}>
+                            {this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}
+                        </Text>
                     </div>}
-                <div className={WizardReport.classNames.headerTitle}>{localization.Report.title}</div>
-                <div className={WizardReport.classNames.bannerWrapper}>
-                    <div className={WizardReport.classNames.headerBanner}>
-                        <div className={WizardReport.classNames.metricText}>{globalAccuracyString}</div>
-                        <div className={WizardReport.classNames.firstMetricLabel}>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.title.toLowerCase())}</div>
-                        <div className={WizardReport.classNames.metricText}>{disparityAccuracyString}</div>
-                        <div className={WizardReport.classNames.metricLabel}>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.title.toLowerCase())}</div>
+                <Text className={styles.headerTitle}>{localization.Report.title}</Text>
+                <div className={styles.bannerWrapper}>
+                    <div className={styles.headerBanner}>
+                        {/* <div className={styles.metricText}>{globalAccuracyString}</div>
+                        <div className={styles.firstMetricLabel}>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.title.toLowerCase())}</div>
+                        <div className={styles.metricText}>{disparityAccuracyString}</div>
+                        <div className={styles.metricLabel}>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.title.toLowerCase())}</div> */}
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{globalAccuracyString}</Text>
+                        <Text variant={"small"} className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.title.toLowerCase())}</Text>
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{disparityAccuracyString}</Text>
+                        <Text variant={"small"} className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.title.toLowerCase())}</Text>
                     </div>
                     <ActionButton
-                        className={WizardReport.classNames.editButton}
+                        //className={styles.editButton}
                         iconProps={{iconName: "Edit"}}
                         onClick={this.onEditConfigs}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
             </div>
-            <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
+            <div className={styles.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
                         binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         binLabels={this.props.dashboardContext.groupNames}
                         formattedBinValues={formattedBinAccuracyValues}
                         metricLabel={selectedMetric.title}
                         binValues={this.state.metrics.binnedAccuracy}/>
-                    <div className={WizardReport.classNames.chartWrapper}>
-                        <div className={WizardReport.classNames.chartHeader}>{accuracyChartHeader}</div>
-                        <div className={WizardReport.classNames.chartBody}>
+                    <div className={styles.chartWrapper}>
+                        {/* <div className={styles.chartHeader}>{accuracyChartHeader}</div> */}
+                        <Text variant={"small"} className={styles.chartHeader}>{accuracyChartHeader}</Text>
+                        <div className={styles.chartBody}>
                             <AccessibleChart
                                 plotlyProps={accuracyPlot}
                                 sharedSelectionContext={undefined}
@@ -549,34 +572,41 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             />
                         </div>
                     </div>
-                    <div className={WizardReport.classNames.mainRight}>
-                        <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={WizardReport.classNames.rightText}>{howToReadAccuracySection}</div>
+                    <div className={styles.mainRight}>
+                        {/* <div className={styles.rightTitle}>{localization.ModelComparison.howToRead}</div>
+                        <div className={styles.rightText}>{howToReadAccuracySection}</div> */}
+                        <Text variant={"small"} className={styles.rightTitle}>{localization.ModelComparison.howToRead}</Text>
+                        <Text variant={"mediumPlus"} className={styles.rightText}>{howToReadAccuracySection}</Text>
                         {/* <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
                         <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
                     </div>
             </div>
-            <div className={WizardReport.classNames.header}>
-                <div className={WizardReport.classNames.headerTitle}>{localization.Report.outcomesTitle}</div>
-                <div className={WizardReport.classNames.bannerWrapper}>
-                    <div className={WizardReport.classNames.headerBanner}>
-                        <div className={WizardReport.classNames.metricText}>{globalOutcomeString}</div>
-                        <div className={WizardReport.classNames.firstMetricLabel}>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</div>
-                        <div className={WizardReport.classNames.metricText}>{disparityOutcomeString}</div>
-                        <div className={WizardReport.classNames.metricLabel}>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</div>
+            <div className={styles.header}>
+                <div className={styles.headerTitle}>{localization.Report.outcomesTitle}</div>
+                <div className={styles.bannerWrapper}>
+                    <div className={styles.headerBanner}>
+                        {/* <div className={styles.metricText}>{globalOutcomeString}</div>
+                        <div className={styles.firstMetricLabel}>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</div>
+                        <div className={styles.metricText}>{disparityOutcomeString}</div>
+                        <div className={styles.metricLabel}>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</div> */}
+                        <Text variant={"xxLarge"} className={styles.metricText} block>{globalOutcomeString}</Text>
+                        <Text variant={"small"} className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</Text>
+                        <Text variant={"xxLarge"} className={styles.metricText} block>{disparityOutcomeString}</Text>
+                        <Text variant={"small"}  className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</Text>
                     </div>
                 </div>
             </div>
-            <div className={WizardReport.classNames.presentationArea} style={{height: `${areaHeights}px`}}>
+            <div className={styles.presentationArea} style={{height: `${areaHeights}px`}}>
                     <SummaryTable 
                         binGroup={this.props.dashboardContext.modelMetadata.featureNames[this.props.featureBinPickerProps.selectedBinIndex]}
                         binLabels={this.props.dashboardContext.groupNames}
                         formattedBinValues={formattedBinOutcomeValues}
                         metricLabel={outcomeMetric.title}
                         binValues={this.state.metrics.binnedOutcome}/>
-                    <div className={WizardReport.classNames.chartWrapper}>
-                        <div className={WizardReport.classNames.chartHeader}>{opportunityChartHeader}</div>
-                        <div className={WizardReport.classNames.chartBody}>
+                    <div className={styles.chartWrapper}>
+                        {/* <div className={styles.chartHeader}>{opportunityChartHeader}</div> */}
+                        <Text variant={"small"} className={styles.chartHeader} block>{opportunityChartHeader}</Text>
+                        <div className={styles.chartBody}>
                             <AccessibleChart
                                 plotlyProps={opportunityPlot}
                                 sharedSelectionContext={undefined}
@@ -584,9 +614,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             />
                         </div>
                     </div>
-                    <div className={WizardReport.classNames.mainRight}>
-                        <div className={WizardReport.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={WizardReport.classNames.rightText}>{howToReadOutcomesSection}</div>
+                    <div className={styles.mainRight}>
+                        {/* <div className={styles.rightTitle}>{localization.ModelComparison.howToRead}</div>
+                        <div className={styles.rightText}>{howToReadOutcomesSection}</div> */}
+                        <Text variant={"small"} className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
+                        <Text variant={"mediumPlus"} className={styles.rightText} block>{howToReadOutcomesSection}</Text>
                         {/* <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
                         <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
                     </div>

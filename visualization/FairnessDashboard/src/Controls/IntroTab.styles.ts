@@ -9,7 +9,7 @@ export interface IIntroTabStyles {
     stepsContainer: IStyle;
     boldStep: IStyle;
     numericLabel: IStyle;
-    stepLabel: IStyle;
+    //stepLabel: IStyle;
     explanatoryStep: IStyle;
     explanatoryText: IStyle;
     getStarted: IStyle;
@@ -74,19 +74,20 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         numericLabel: {
             //display:"inline-block",
             //fontSize: "18px",
-            fontSize: FontSizes.large,
+            //fontSize: FontSizes.large,
             //lineHeight: "24px",
             //fontWeight: "700",
             fontWeight: FontWeights.bold,
-            color: "#000000",
+            //color: "#000000",
+            //color: theme.semanticColors.bodyText,
             width: "30px"
         },
-        stepLabel: {
-            color: "#333333",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "500",
-        },
+        // stepLabel: {
+        //     color: "#333333",
+        //     fontSize: "18px",
+        //     lineHeight: "24px",
+        //     fontWeight: "500",
+        // },
         explanatoryStep: {
             maxWidth: "300px",
             paddingRight: "20px",

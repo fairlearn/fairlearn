@@ -131,27 +131,33 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         return (
             <div className={styles.frame}>
                 <div className={styles.groupCol}>
-                    <div className={styles.groupLabel}>{this.props.binGroup}</div>
+                    {/* <div className={styles.groupLabel}>{this.props.binGroup}</div> */}
+                    <Text variant={"small"} className={styles.groupLabel}>{this.props.binGroup}</Text>
                     <div className={styles.flexCol}>
                         {this.props.binLabels.map((label, index) => {
                             return (<div className={styles.binBox} key={index}>
-                                <div className={styles.binTitle}>{label}</div>
+                                {/* <div className={styles.binTitle}>{label}</div> */}
+                                <Text variant={"medium"} className={styles.binTitle}>{label}</Text>
                                 <Stack horizontal>
-                                    {minIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.minTag}</div>}
-                                    {maxIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.maxTag}</div>}
+                                    {minIndexes.includes(index) && <Text variant={"xSmall"} className={styles.minMaxLabel}>{localization.Report.minTag}</Text>}
+                                    {maxIndexes.includes(index) && <Text variant={"xSmall"} className={styles.minMaxLabel}>{localization.Report.maxTag}</Text>}
                                 </Stack>
                             </div>)
                         })}
                     </div>
                 </div>
                 <div className={styles.metricCol}>
-                    <div className={styles.metricLabel}>{this.props.metricLabel}</div>
+                    {/* <div className={styles.metricLabel}>{this.props.metricLabel}</div> */}
+                    <Text variant={"small"} className={styles.metricLabel}>{this.props.metricLabel}</Text>
                     <div className={styles.flexCol}>
                         {this.props.formattedBinValues.map((value, index) => {
                             return (
-                            <div className={styles.metricBox} key={index}>
+                            // <div className={styles.metricBox} key={index}>
+                            //     {value !== undefined ? value : 'empty'}
+                            // </div>);
+                            <Text variant={"xxLargePlus"} className={styles.metricBox} key={index}>
                                 {value !== undefined ? value : 'empty'}
-                            </div>);
+                            </Text>);
                         })}
                     </div>
                 </div>

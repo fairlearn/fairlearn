@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontSizes, FontWeights } from "office-ui-fabric-react";
 
 export interface IFeatureTabStyles {
     itemCell: IStyle;
@@ -31,13 +31,18 @@ export const FeatureTabStyles: () => IProcessedStyleSet<IFeatureTabStyles> = () 
             cursor: "pointer",
             boxSizing: "border-box",
             borderBottom: "1px solid",
-            borderColor: "#CCCCCC",
+            //borderColor: "#CCCCCC",
+            borderBottomColor: theme.semanticColors.bodyDivider,
+            // selectors: {
+            //   '&:hover': { background: "light grey" }
+            // }
             selectors: {
-              '&:hover': { background: "light grey" }
-            }
+                '&:hover': { background: theme.semanticColors.listItemBackgroundHovered }
+              }
         },
         iconClass: {
-            fontSize: "20px"
+            //fontSize: "20px"
+            fontSize: FontSizes.large
         },
         itemsList: {
             overflowY: "auto"
@@ -51,44 +56,53 @@ export const FeatureTabStyles: () => IProcessedStyleSet<IFeatureTabStyles> = () 
             flex: 1
         },
         header: {
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100"
+            //color: "#333333",
+            //fontSize: "32px",
+            //lineHeight: "39px",
+            //fontWeight: "100"
+            color: theme.semanticColors.bodyText,
+            fontSize: FontSizes.xxLargePlus,
+            fontWeight: FontWeights.light,
         },
         textBody: {
             paddingTop: "12px",
             fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "300",
-            marginBottom: "15px"
+            //lineHeight: "24px",
+            //fontWeight: "300",
+            marginBottom: "15px",
+            fontWeight: FontWeights.semilight,
+            color: theme.semanticColors.bodySubtext
         },
         tableHeader: {
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             paddingBottom: "15px",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "500",
+            //color: "#333333",
+            color: theme.semanticColors.bodyText,
+            //fontSize: "15px",
+            //lineHeight: "18px",
+            //fontWeight: "500",
             borderBottom: "1px solid",
-            borderColor: "#CCCCCC"
+            //borderColor: "#CCCCCC"
+            borderColor: theme.semanticColors.bodyDivider,
 
         },
         itemTitle: {
             margin: 0,
-            color: "#333333",
-            fontSize: "22px",
-            lineHeight: "26px",
-            fontWeight: "300"
+            //color: "#333333",
+            color: theme.semanticColors.listText
+            //fontSize: "22px",
+            //lineHeight: "26px",
+            //fontWeight: "300"
         },
         valueCount: {
             paddingTop: "15px",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "500"
+            //color: "#333333",
+            color: theme.semanticColors.bodyText
+            //fontSize: "15px",
+            //lineHeight: "18px",
+            //fontWeight: "500"
         },
         iconWrapper: {
             paddingTop: "4px",

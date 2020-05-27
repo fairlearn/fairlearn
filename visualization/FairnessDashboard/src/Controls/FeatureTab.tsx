@@ -4,6 +4,7 @@ import { Icon } from "office-ui-fabric-react/lib/Icon";
 import { List } from "office-ui-fabric-react/lib/List";
 import { Modal } from 'office-ui-fabric-react/lib/Modal';
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
+import { Text, themeRulesStandardCreator, IProcessedStyleSet } from "office-ui-fabric-react";
 import React from "react";
 import { IBinnedResponse } from "../IBinnedResponse";
 import { IWizardTabProps } from "../IWizardTabProps";
@@ -11,9 +12,7 @@ import { localization } from "../Localization/localization";
 import BinDialog from "./BinDialog";
 import { DataSpecificationBlade } from "./DataSpecificationBlade";
 import { WizardFooter } from "./WizardFooter";
-import { FeatureTabStyles } from "./FeatureTab.styles";
-
-const styles = FeatureTabStyles();
+import { FeatureTabStyles, IFeatureTabStyles } from "./FeatureTab.styles";
 
 interface IFeatureItem {
     title: string;
@@ -142,6 +141,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
     }
     
     render(): React.ReactNode {
+        const styles = FeatureTabStyles();
         return(
             <Stack horizontal horizontalAlign="space-between" className={styles.frame}>
                 <Modal
@@ -162,13 +162,15 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                     </h2>
                     <p className={styles.textBody}>{localization.Feature.body}</p>
                     <div className={styles.tableHeader}>
-                        <div>{localization.Intro.features}</div>
-                        <div className={styles.subgroupHeader}>{localization.Feature.subgroups}</div>
+                        {/* <div>{localization.Intro.features}</div> */}
+                        <Text variant={"mediumPlus"} block>{localization.Intro.features}</Text>
+                        {/* <div className={styles.subgroupHeader}>{localization.Feature.subgroups}</div> */}
+                        <Text className={styles.subgroupHeader} block>{localization.Feature.subgroups}</Text>
                     </div>
                     <StackItem grow={2} className={styles.itemsList}>
                         <List
                             items={this.props.featureBins}
-                            onRenderCell={this._onRenderCell}
+                            onRenderCell={this._onRenderCell.bind(this, styles)}
                         />
                     </StackItem>
                     <WizardFooter onNext={this.props.onNext}/>
@@ -193,7 +195,8 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
         this.setState({editingFeatureIndex: index});
     }
 
-    private readonly _onRenderCell = (item: IBinnedResponse, index: number | undefined): JSX.Element => {
+    private readonly _onRenderCell = (styles: IProcessedStyleSet<IFeatureTabStyles>, item: IBinnedResponse, index: number | undefined): JSX.Element => {
+        //debugger;
         return (
           <div
             key={index}
@@ -204,17 +207,28 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             <div className={styles.iconWrapper}>
                 <Icon iconName={this.props.selectedFeatureIndex === index ? "RadioBtnOn" : "RadioBtnOff"} className={styles.iconClass}/>
             </div>
+            {/* <Text className={styles.iconWrapper} block>
+                <Icon iconName={this.props.selectedFeatureIndex === index ? "RadioBtnOn" : "RadioBtnOff"} className={styles.iconClass}/>
+            </Text> */}
             <div className={styles.featureDescriptionSection}>
-                <h2 className={styles.itemTitle}>{this.props.dashboardContext.modelMetadata.featureNames[index]}</h2>
+                {/* <h2 className={styles.itemTitle}>{this.props.dashboardContext.modelMetadata.featureNames[index]}</h2> */}
+                <Text variant={"large"} className={styles.itemTitle} block>{this.props.dashboardContext.modelMetadata.featureNames[index]}</Text>
                 {item.rangeType === RangeTypes.categorical &&
-                    <div className={styles.valueCount}>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</div>
+                    // <div className={styles.valueCount}>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</div>
+                    <Text variant={"mediumPlus"} className={styles.valueCount} block>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</Text>
                 }
                 {item.rangeType !== RangeTypes.categorical &&
-                    <div className={styles.valueCount}>
+                    // <div className={styles.valueCount}>
+                    // {localization.formatString(localization.Feature.summaryNumericCount, 
+                    //     (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).min, 
+                    //     (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).max, 
+                    //     item.labelArray.length) as string}</div>
+
+                    <Text variant={"mediumPlus"} className={styles.valueCount} block>
                     {localization.formatString(localization.Feature.summaryNumericCount, 
                         (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).min, 
                         (this.props.dashboardContext.modelMetadata.featureRanges[index] as INumericRange).max, 
-                        item.labelArray.length) as string}</div>
+                        item.labelArray.length) as string}</Text>
                 }
                 {!this.props.dashboardContext.modelMetadata.featureIsCategorical[index] && 
                     <ActionButton 

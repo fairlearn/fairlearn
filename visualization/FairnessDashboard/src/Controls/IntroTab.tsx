@@ -109,7 +109,7 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                     <div className={styles.explanatoryStep}>
                         <div>
                             {/* <span className={styles.numericLabel}>01</span> */}
-                            <Text className={styles.numericLabel}>01</Text>
+                            <Text variant={"large"} className={styles.numericLabel}>01</Text>
                             {/* <span className={styles.stepLabel}>{localization.Intro.features}</span> */}
                             <Text variant={"large"}>{localization.Intro.features}</Text>
                         </div>
@@ -119,7 +119,7 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                     <div className={styles.explanatoryStep}>
                         <div>
                             {/* <span className={styles.numericLabel}>02</span> */}
-                            <Text className={styles.numericLabel}>02</Text>
+                            <Text variant={"large"} className={styles.numericLabel}>02</Text>
                             {/* <span className={styles.stepLabel}>{localization.Intro.accuracy}</span> */}
                             <Text variant={"large"}>{localization.Intro.accuracy}</Text>
                         </div>
