@@ -38,7 +38,7 @@ class ConditionalSelectionRate(ClassificationMoment):
     where error(A = a) = total_error
     """
 
-    def __init__(self, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
+    def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
         """Initialize with the ratio value."""
         super(ConditionalSelectionRate, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
