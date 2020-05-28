@@ -301,7 +301,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                             <div>{insights4}</div> */}
                             <Text variant={"medium"} className={styles.textSection} block>{insights2}</Text>
                             <Text variant={"medium"} className={styles.textSection} block>{insights3}</Text>
-                            <Text>{insights4}</Text>
+                            <Text variant={"medium"} className={styles.textSection} block>{insights4}</Text>
                         </div>
                     </div>
                 </div>
