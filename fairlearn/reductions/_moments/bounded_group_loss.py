@@ -90,7 +90,7 @@ class AverageLossMoment(ConditionalLossMoment):
 class GroupLossMoment(ConditionalLossMoment):
     """Moment for Group Loss."""
 
-    def __init__(self, loss, upper_bound=None):
+    def __init__(self, loss, *, upper_bound=None):
         super().__init__(loss, upper_bound=upper_bound, no_groups=False)
 
 
