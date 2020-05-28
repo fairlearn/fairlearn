@@ -332,4 +332,4 @@ class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         self.estimator = LinearRegression()
         eps = 0.01
-        self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), eps)
+        self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), upper_bound=eps)

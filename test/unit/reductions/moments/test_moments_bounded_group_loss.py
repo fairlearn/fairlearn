@@ -17,7 +17,7 @@ class TestBoundedGroupLoss:
         eps = 0.01
         self.estimator = LinearRegression().fit(X, Y)
         def predictor(x): return self.estimator.predict(x)
-        self.disparity_criterion = GroupLossMoment(SquareLoss(-np.inf, np.inf), eps)
+        self.disparity_criterion = GroupLossMoment(SquareLoss(-np.inf, np.inf), upper_bound=eps)
         self.disparity_criterion.load_data(X, Y, sensitive_features=A)
         bnd = self.disparity_criterion.bound()
         loss_eps = self.disparity_criterion.gamma(predictor) - bnd
@@ -84,7 +84,7 @@ class TestBoundedGroupLoss:
         def predictor(x): return estimator.predict(x)
         eps = 0.05
 
-        disparity_criterion = GroupLossMoment(SquareLoss(-np.inf, np.inf), eps)
+        disparity_criterion = GroupLossMoment(SquareLoss(-np.inf, np.inf), upper_bound=eps)
         disparity_criterion.load_data(X, Y, sensitive_features=A)
         bnd = disparity_criterion.bound()
         loss_eps = disparity_criterion.gamma(predictor)
