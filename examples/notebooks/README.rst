@@ -7,4 +7,5 @@ examples soon.
 .. toctree::
    :maxdepth: 2
 
+   binary_classification_uci_credit_card_default
    plot_binary_classification_COMPAS
