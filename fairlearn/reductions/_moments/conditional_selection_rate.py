@@ -1,16 +1,26 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import logging
 import pandas as pd
 import numpy as np
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
 from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
 from .error_rate import ErrorRate
+from fairlearn._input_validation import _compress_multiple_sensitive_features_into_single_column
+
+logger = logging.getLogger(__name__)
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
-
+_SUBGROUP_NOT_SPECIFIED_ERROR_MESSAGE = "SubgroupParity requires group_cols to be specified."
+_SUBGROUP_ARGUMENT_TYPE_ERROR_MESSAGE = "group_cols needs to be of type list."
+_SUBGROUP_ARGUMENT_LIST_EMPTY_ERROR_MESSAGE = "group_cols is an empty list. Please provide " \
+    "column names or indices."
+_UNEXPECTED_DATA_TYPE_X = "X is expected to be of type pandas.DataFrame or numpy.ndarray"
+_SUBGROUP_COLUMN_RETRIEVAL_FALLBACK_MESSAGE = "Encountered KeyError when retrieving group " \
+    "columns from DataFrame. Attempting to use group columns as indices."
 
 class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness moment for selection rates.
@@ -285,3 +295,57 @@ class ErrorRateRatio(ConditionalSelectionRate):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, utilities=np.vstack([y, 1-y]).T, **kwargs)
+
+
+class SubgroupParity(ConditionalSelectionRate):
+    """Implementation of Subgroup Parity as a moment.
+
+    Subgroup Parity is identical to Demographic Parity within each group. Groups are specified
+    through the mandatory `group_cols` argument as a list of columns in X that identify how to
+    create groups. Within each group the goal is to achieve Demographic Parity between all the
+    subgroups, which are defined through the sensitive features. This is similar to Equalized
+    Odds, with the difference being the mechanism used to create the initial group split.
+    Equalized Odds uses the labels for groups based on label 0 and label 1, whereas Subgroup
+    Parity uses the user-specified features in X.
+
+    :param group_cols: a list of column indices of a numpy.ndarray to use for creating groups,
+        or a list of column names of a pandas.DataFrame to use for creating groups
+    :type group_cols: list
+    """
+    short_name = "SubgroupParity"
+
+    def __init__(self, * ratio=1.0, group_cols=None):
+        super(SubgroupParity, self).__init__(ratio)
+
+        if not group_cols:
+            raise ValueError(_SUBGROUP_NOT_SPECIFIED_ERROR_MESSAGE)
+
+        if type(group_cols) != list:
+            raise ValueError(_SUBGROUP_ARGUMENT_TYPE_ERROR_MESSAGE)
+
+        if len(group_cols) == 0:
+            raise ValueError(_SUBGROUP_ARGUMENT_LIST_EMPTY_ERROR_MESSAGE)
+
+        self.group_cols = group_cols
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        if type(X) == np.ndarray:
+            X_subgroup_features = X[:, self.group_cols]
+        elif type(X) == pd.DataFrame:
+            # group_cols could indicate indices or column names.
+            # Attempt to retrieve columns through column names, and if it fails try indices.
+            try:
+                X_subgroup_features = X[self.group_cols].values
+            except KeyError:
+                logger.warning(_SUBGROUP_COLUMN_RETRIEVAL_FALLBACK_MESSAGE)
+                X_subgroup_features = X[X.columns[self.group_cols]]
+        else:
+            raise ValueError(_UNEXPECTED_DATA_TYPE_X)
+
+        X_subgroup = _compress_multiple_sensitive_features_into_single_column(
+            X_subgroup_features)
+
+        super().load_data(X, y,
+                          event=pd.Series(X_subgroup),
+                          **kwargs)

@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.utils.validation import check_X_y, check_consistent_length, check_array
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 _KW_SENSITIVE_FEATURES = "sensitive_features"
 
