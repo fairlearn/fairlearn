@@ -42,7 +42,8 @@ export const FeatureTabStyles: () => IProcessedStyleSet<IFeatureTabStyles> = () 
         },
         iconClass: {
             //fontSize: "20px"
-            fontSize: FontSizes.large
+            fontSize: FontSizes.large,
+            color: theme.semanticColors.accentButtonBackground
         },
         itemsList: {
             overflowY: "auto"
@@ -129,7 +130,8 @@ export const FeatureTabStyles: () => IProcessedStyleSet<IFeatureTabStyles> = () 
         category: {
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            overflow: "hidden"
+            overflow: "hidden",
+            color: theme.semanticColors.bodyText
         },
         subgroupHeader: {
             width: "130px"

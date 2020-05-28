@@ -25,6 +25,7 @@ export interface IWizardReportStyles {
     colorBlock: IStyle;
     multimodelSection: IStyle;
     modelLabel: IStyle;
+    groupLabel: IStyle;
 }
 
 export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> = () => {
@@ -100,7 +101,8 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             display: "flex",
             flexDirection: "row",
             padding: "20px 0 30px 90px",
-            backgroundColor: 'white'
+            //backgroundColor: 'white'
+            backgroundColor: theme.semanticColors.bodyBackground
         },
         chartWrapper: {
             flex: "1 0 40%",
@@ -186,6 +188,9 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             //fontSize: "26px",
             //lineHeight: "16px",
             //fontWeight: "400"
+        },
+        groupLabel: {
+            color: theme.semanticColors.bodyText
         }
     });
 };

@@ -1,22 +1,20 @@
-import React from "react";
-import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
-import { IModelComparisonProps } from "./Controls/ModelComparisonChart";
-import { Text } from "office-ui-fabric-react/lib/Text";
-import { localization } from "./Localization/localization";
-import { Separator } from "office-ui-fabric-react/lib/Separator";
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
-import { mergeStyleSets } from "@uifabric/styling";
+import { getTheme, FontSizes } from "@uifabric/styling";
 import _ from "lodash";
-import { ParityModes } from "./ParityMetrics";
-import { IPlotlyProperty, AccessibleChart } from "mlchartlib";
+import { AccessibleChart, IPlotlyProperty } from "mlchartlib";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
-import { SummaryTable } from "./Controls/SummaryTable";
-import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
+import { Text } from "office-ui-fabric-react/lib/Text";
+import React from "react";
 import { AccuracyOptions } from "./AccuracyMetrics";
-import { NONAME } from "dns";
 import { ChartColors } from "./ChartColors";
+import { IModelComparisonProps } from "./Controls/ModelComparisonChart";
+import { SummaryTable } from "./Controls/SummaryTable";
+import { IMetricResponse, PredictionTypes } from "./IFairnessProps";
+import { localization } from "./Localization/localization";
+import { ParityModes } from "./ParityMetrics";
 import { WizardReportStyles } from "./WizardReport.styles";
 
+const theme = getTheme();
 interface IMetrics {
     globalAccuracy: number;
     binnedAccuracy: number[];
@@ -45,7 +43,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         root: [{
           selectors: {
             '::after': {
-              backgroundColor: 'darkgrey',
+              //backgroundColor: 'darkgrey',
+                backgroundColor: theme.palette.neutralTertiary
             },
           }
         }]
@@ -229,12 +228,14 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             },
             showlegend: false,
             hovermode: 'closest',
-            plot_bgcolor: "#FAFAFA",
+            //plot_bgcolor: "#FAFAFA",
+            plot_bgcolor: theme.palette.neutralQuaternary,
             xaxis: {
                 fixedrange: true,
                 autorange: true,
                 mirror: true,
-                linecolor: '#CCCCCC',
+                //linecolor: '#CCCCCC',
+                linecolor: theme.palette.neutralPrimaryAlt,
                 linewidth: 1,
             },
             yaxis: {
@@ -243,7 +244,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 showgrid: true,
                 dtick: 1,
                 tick0: 0.5,
-                gridcolor: '#CCCCCC',
+                //gridcolor: '#CCCCCC',
+                gridcolor: theme.palette.neutralPrimaryAlt,
                 gridwidth: 1,
                 autorange: "reversed"
             }
@@ -309,7 +311,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:'#666666', size: 10}
+                    //font: {color:'#666666', size: 10}
+                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
                 },
                 {
                     text: localization.Report.overestimationError,
@@ -317,7 +320,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:'#666666', size: 10}
+                    //font: {color:'#666666', size: 10}
+                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
                 }
             ];
             accuracyPlot.layout.xaxis.tickformat = ',.0%';
@@ -397,7 +401,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:'#666666', size: 10}
+                    //font: {color:'#666666', size: 10}
+                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
                 },
                 {
                     text: localization.Report.overestimationError,
@@ -405,7 +410,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:'#666666', size: 10}
+                    //font: {color:'#666666', size: 10}
+                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
                 }
             ];
             const opportunityText = this.state.metrics.predictions.map(val => {
@@ -576,13 +582,13 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         {/* <div className={styles.rightTitle}>{localization.ModelComparison.howToRead}</div>
                         <div className={styles.rightText}>{howToReadAccuracySection}</div> */}
                         <Text variant={"small"} className={styles.rightTitle}>{localization.ModelComparison.howToRead}</Text>
-                        <Text variant={"mediumPlus"} className={styles.rightText}>{howToReadAccuracySection}</Text>
+                        <Text variant={"medium"} className={styles.rightText}>{howToReadAccuracySection}</Text>
                         {/* <div className={WizardReport.classNames.insights}>{localization.ModelComparison.insights}</div>
                         <div className={WizardReport.classNames.insightsText}>{localization.loremIpsum}</div> */}
                     </div>
             </div>
             <div className={styles.header}>
-                <div className={styles.headerTitle}>{localization.Report.outcomesTitle}</div>
+                <Text className={styles.headerTitle}>{localization.Report.outcomesTitle}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
                         {/* <div className={styles.metricText}>{globalOutcomeString}</div>

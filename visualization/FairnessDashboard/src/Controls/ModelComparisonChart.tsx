@@ -1,10 +1,10 @@
 import _ from "lodash";
 import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
+import { getTheme, Text } from "office-ui-fabric-react";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { Stack } from "office-ui-fabric-react/lib/Stack";
-import { Text } from "office-ui-fabric-react";
 import React from "react";
 import { AccuracyOptions } from "../AccuracyMetrics";
 import { IAccuracyPickerProps, IFeatureBinPickerProps, IParityPickerProps } from "../FairnessWizard";
@@ -16,6 +16,7 @@ import { MetricsCache } from "../MetricsCache";
 import { ParityModes } from "../ParityMetrics";
 import { ModelComparisionChartStyles } from "./ModelComparisionChart.styles";
 
+const theme = getTheme();
 export interface IModelComparisonProps {
     dashboardContext: IFairnessContext;
     selections: SelectionContext;
@@ -68,7 +69,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 automargin: true,
                 fixedrange: true,
                 mirror: true,
-                linecolor: '#CCCCCC',
+                //linecolor: '#CCCCCC',
+                linecolor: theme.palette.neutralPrimaryAlt,
                 linewidth: 1,
                 title:{
                     text: 'Error'

@@ -207,9 +207,6 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             <div className={styles.iconWrapper}>
                 <Icon iconName={this.props.selectedFeatureIndex === index ? "RadioBtnOn" : "RadioBtnOff"} className={styles.iconClass}/>
             </div>
-            {/* <Text className={styles.iconWrapper} block>
-                <Icon iconName={this.props.selectedFeatureIndex === index ? "RadioBtnOn" : "RadioBtnOff"} className={styles.iconClass}/>
-            </Text> */}
             <div className={styles.featureDescriptionSection}>
                 {/* <h2 className={styles.itemTitle}>{this.props.dashboardContext.modelMetadata.featureNames[index]}</h2> */}
                 <Text variant={"large"} className={styles.itemTitle} block>{this.props.dashboardContext.modelMetadata.featureNames[index]}</Text>
@@ -239,8 +236,15 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
             </div>
             <div className={styles.binSection}>
                 {!this.state.expandedBins.includes(index) && !!item.labelArray && 
+                    // <div> 
+                    //     {item.labelArray.slice(0,7).map((category, index) => <div key={index} className={styles.category}>{category}</div>)}
+                    //     {item.labelArray.length > 7 && <ActionButton
+                    //         className={styles.expandButton}
+                    //         iconProps={{iconName: "ChevronDownMed"}}
+                    //         onClick={this.updateExpandedList.bind(this, index)}>{localization.Feature.showCategories}</ActionButton>}
+                    // </div>
                     <div> 
-                        {item.labelArray.slice(0,7).map((category, index) => <div key={index} className={styles.category}>{category}</div>)}
+                        {item.labelArray.slice(0,7).map((category, index) => <Text key={index} className={styles.category} block>{category}</Text>)}
                         {item.labelArray.length > 7 && <ActionButton
                             className={styles.expandButton}
                             iconProps={{iconName: "ChevronDownMed"}}
