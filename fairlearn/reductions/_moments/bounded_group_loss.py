@@ -11,7 +11,7 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group."""
 
-    def __init__(self, loss, upper_bound=None, no_groups=False):
+    def __init__(self, loss, *, upper_bound=None, no_groups=False):
         super().__init__(loss)
         self.upper_bound = upper_bound
         self.no_groups = no_groups
