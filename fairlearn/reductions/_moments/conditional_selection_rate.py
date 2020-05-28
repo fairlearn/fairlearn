@@ -22,6 +22,7 @@ _UNEXPECTED_DATA_TYPE_X = "X is expected to be of type pandas.DataFrame or numpy
 _SUBGROUP_COLUMN_RETRIEVAL_FALLBACK_MESSAGE = "Encountered KeyError when retrieving group " \
     "columns from DataFrame. Attempting to use group columns as indices."
 
+
 class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness moment for selection rates.
 
@@ -312,9 +313,10 @@ class SubgroupParity(ConditionalSelectionRate):
         or a list of column names of a pandas.DataFrame to use for creating groups
     :type group_cols: list
     """
+
     short_name = "SubgroupParity"
 
-    def __init__(self, * ratio=1.0, group_cols=None):
+    def __init__(self, *, ratio=1.0, group_cols=None):
         super(SubgroupParity, self).__init__(ratio)
 
         if not group_cols:
