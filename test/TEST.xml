@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="1" failures="0" hostname="DNa1c03f3.SUNet" name="pytest" skipped="0" tests="1" time="0.186" timestamp="2020-05-27T13:05:11.837389"><testcase classname="" file="notebooks/test_notebooks.py" name="notebooks.test_notebooks" time="0.000"><error message="collection failure">ImportError while importing test module &apos;/Users/andrafehmiu/PycharmProjects/fairlearn/test/notebooks/test_notebooks.py&apos;.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-notebooks/test_notebooks.py:5: in &lt;module&gt;
-    import papermill as pm
-E   ModuleNotFoundError: No module named &apos;papermill&apos;</error></testcase></testsuite></testsuites>
