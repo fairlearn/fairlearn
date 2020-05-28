@@ -40,6 +40,8 @@ X_train.loc[0], y_train[0]
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import matplotlib
+matplotlib.use('TKAgg')  # to suppress 'agg' plotting warnings
 
 # set layout parameters to avoid cutting off x-axis tick labels
 from matplotlib import rcParams

@@ -76,10 +76,8 @@ print(__doc__)
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
-# set layout parameters to avoid cutting off x-axis tick labels
-from matplotlib import rcParams
-rcParams.update({'figure.autolayout': True})
+import matplotlib
+matplotlib.use('TKAgg')  # to suppress 'agg' plotting warnings
 
 # Data processing
 from sklearn.model_selection import train_test_split
