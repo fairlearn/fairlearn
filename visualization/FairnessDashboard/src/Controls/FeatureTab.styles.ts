@@ -72,7 +72,7 @@ export const FeatureTabStyles: () => IProcessedStyleSet<IFeatureTabStyles> = () 
             //fontWeight: "300",
             marginBottom: "15px",
             fontWeight: FontWeights.semilight,
-            color: theme.semanticColors.bodySubtext
+            color: theme.semanticColors.bodyText
         },
         tableHeader: {
             display: "flex",

@@ -35,7 +35,7 @@ export const SummaryTableStyles: () => IProcessedStyleSet<ISummaryTableStyles> =
         },
         groupLabel: {
             //color: "#333333",
-            color: theme.semanticColors.bodySubtext,
+            color: theme.semanticColors.bodyText,
             //fontSize: "12px",
             //lineHeight: "12px",
             //fontWeight: "500",

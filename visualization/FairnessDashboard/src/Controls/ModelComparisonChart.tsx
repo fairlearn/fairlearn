@@ -313,11 +313,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                             {
                             key: 'accuracy',
                             text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
-                                accuracyMetricTitle.toLowerCase()) as string
+                                accuracyMetricTitle.toLowerCase()) as string,
+                            styles: { choiceFieldWrapper: styles.radioOptions} 
                             },
                             {
                             key: 'outcomes',
-                            text: localization.ModelComparison.disparityInOutcomes
+                            text: localization.ModelComparison.disparityInOutcomes,
+                            styles: { choiceFieldWrapper: styles.radioOptions}
                             }
                         ]}
                         onChange={this.disparityChanged}

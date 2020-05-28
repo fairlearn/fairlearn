@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, ThemeSettingName } from "office-ui-fabric-react";
 
 export interface IModelComparisionChartStyles {
     frame: IStyle;
@@ -15,6 +15,7 @@ export interface IModelComparisionChartStyles {
     chart: IStyle;
     textSection: IStyle;
     radio: IStyle;
+    radioOptions: IStyle;
 }
 
 export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelComparisionChartStyles> = () => {
@@ -79,7 +80,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
         rightText: {
             padding: "16px 15px 30px 0",
             //color: "#333333",
-            color: theme.semanticColors.bodySubtext,
+            color: theme.semanticColors.bodyText,
             //fontSize: "15px",
             //lineHeight: "18px",
             //fontWeight: "400",
@@ -90,7 +91,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
         insights: {
             textTransform: "uppercase",
             //color: "#333333",
-            color: theme.semanticColors.bodySubtext,
+            color: theme.semanticColors.bodyText,
             //fontSize: "15px",
             //lineHeight: "16px",
             //fontWeight: "500",
@@ -114,13 +115,16 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
         },
         textSection: {
             //color: "#333333"
-            color: theme.semanticColors.bodySubtext,
+            color: theme.semanticColors.bodyText,
             paddingBottom: "5px"
         },
         radio: {
             paddingBottom: "30px",
             paddingLeft: "75px",
-            color: theme.semanticColors.buttonText
+            backgroundColor: theme.semanticColors.bodyBackground
+        },
+        radioOptions: {
+            color: theme.semanticColors.bodyText
         }
     });
 };
