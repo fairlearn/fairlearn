@@ -337,8 +337,12 @@ class SubgroupParity(ConditionalSelectionRate):
 
     short_name = "SubgroupParity"
 
-    def __init__(self, *, ratio=1.0, group_cols=None):
-        super(SubgroupParity, self).__init__(ratio)
+    def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0,
+                 group_cols=None):
+        super(SubgroupParity, self).__init__(
+            difference_bound=difference_bound,
+            ratio_bound=ratio_bound,
+            ratio_bound_slack=ratio_bound_slack)
 
         if not group_cols:
             raise ValueError(_SUBGROUP_NOT_SPECIFIED_ERROR_MESSAGE)
@@ -366,6 +370,7 @@ class SubgroupParity(ConditionalSelectionRate):
         else:
             raise ValueError(_UNEXPECTED_DATA_TYPE_X)
 
+        # compress into single column if multiple columns were specified
         X_subgroup = _compress_multiple_sensitive_features_into_single_column(
             X_subgroup_features)
 
