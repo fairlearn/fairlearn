@@ -81,7 +81,7 @@ Can Fairlearn recommend ways to make my model fairer?
     to develop models which are *fairer by the standard you have chosen*.
 
 What unfairness mitigation techniques does Fairlearn support?
-    Please see our :ref:`_mitigation` section.
+    Please see our :ref:`mitigation` section.
 
 Which ML libraries does Fairlearn support?
     We have generally followed conventions for `scikit-learn` in Fairlearn.
