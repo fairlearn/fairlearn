@@ -61,7 +61,7 @@ What sort of fairness related harms can Fairlearn address?
     For example, there is the concept of individual fairness (where decisions are evaluated
     on the level of individuals rather than groups) and counter-factual fairness (e.g. does the
     decision change if an individual's gender is changed from male to female).
-    See :ref:`types_of_harms` for more information.
+    See :ref:`Types of harms` for more information.
     Beyond these, there are also fairness concepts which are note amenable to
     mathematical (and hence algorithmic) expression - justice, due process and
     righting historic iniquities for example.
@@ -81,7 +81,7 @@ Can Fairlearn recommend ways to make my model fairer?
     to develop models which are *fairer by the standard you have chosen*.
 
 What unfairness mitigation techniques does Fairlearn support?
-    Please see our :ref:`mitigation` section.
+    Please see our :ref:`Mitigation` section.
 
 Which ML libraries does Fairlearn support?
     We have generally followed conventions for `scikit-learn` in Fairlearn.
