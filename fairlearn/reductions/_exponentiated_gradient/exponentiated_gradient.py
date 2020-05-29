@@ -233,5 +233,5 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 pred = pred[self._weights.index]
                 randomized_pred = np.zeros(pred.shape[0])
                 for i in range(pred.shape[0]):
-                    randomized_pred[i] = np.random.choice(pred.iloc[i,:], p=self._weights)  # sample the prediction
+                    randomized_pred[i] = np.random.choice(pred.iloc[i, :], p=self._weights)  # sample the prediction
                 return randomized_pred
