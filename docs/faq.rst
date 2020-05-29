@@ -7,16 +7,16 @@ General fairness questions
 --------------------------
 
 Where can I learn more about fairness in machine learning?
-    In our :ref:`user guide <user_guide>` we provide links to the papers describing
-    Fairlearn's algorithms.
-    For a higher level view of the subject, please see the :ref:`further reading <further_reading>`
-    section.
+    For a high level view of the subject, please see the :ref:`further reading <further_reading>`
+    section, where we provide links to a variety of books and papers.
+    In our :ref:`user guide <user_guide>` we also have links to the papers describing
+    Fairlearn's mitigation algorithms.
 
 Why not just ignore the sensitive features?
     Because ignoring the sensitive feature usually doesn't work.
 
     To elaborate, information is often redundantly encoded in datasets, and machine learning
-    algorithms *will* ferret out these links (it is what they are designed to do).
+    algorithms *will* uncover these links (it is what they are designed to do).
     For example, in the US, the ZIP code where a person lives is well correlated with their
     race.
     Even if the model is not provided with race as a feature, the model will pick up on it
@@ -25,9 +25,13 @@ Why not just ignore the sensitive features?
     whether any use of ZIP code was as a proxy for race, or for some other reason.
 
 The model is unfair because the data are biased. Isn't it better to get better data?
-    Yes, but gathering unbiased data might not always be practical.
-    Fairlearn and similar packages offer techniques to redistribute harms between subgroups
-    in the data.
+    If a model is unfair due to biased data (note that this is not the only reason a model
+    may be unfair), then obtaining unbiased data is definitely the best solution.
+    However, doing so might not always be practical.
+    In these cases, the mitigation techniques in Fairlearn and similar packages can redistribute
+    harms between subgroups in the data.
+    The extent to which this is 'fair' will depend on how the harms are redistributed, and the
+    broader context of the system of which the model is a part.
 
 Won't making a model fairer reduce its accuracy?
     Any technique which reduces disparity in some metric is most likely to impact other metrics.
@@ -40,7 +44,7 @@ Fairlearn questions
 
 Can Fairlearn make my model fair?
     Naive use of Fairlearn is not going to result in fairer models.
-    Indeed, when used incorrectly, Fairlearn could produce model which is *less* fair.
+    Indeed, when used incorrectly, Fairlearn could produce a model which is *less* fair.
 
     What Fairlearn can do is generate a model which has lower disparity as measured by
     a user-specified metric.
@@ -53,10 +57,14 @@ What sort of fairness related harms can Fairlearn address?
     Fairlean concentrates on group fairness.
     That is, obtaining the minimum disparity on some metric evaluated on
     specified subgroups in the data.
-    This is certainly not the only way of looking at fairness, though.
+    This is certainly not the only way of looking at fairness.
     For example, there is the concept of individual fairness (where decisions are evaluated
     on the level of individuals rather than groups) and counter-factual fairness (e.g. does the
     decision change if an individual's gender is changed from male to female).
+    See :ref:`types_of_harms` for more information.
+    Beyond these, there are also fairness concepts which are note amenable to
+    mathematical (and hence algorithmic) expression - justice, due process and
+    righting historic iniquities for example.
 
 Can Fairlearn be used to detect bias in datasets?
     We do not have concrete plans for this at the present time.
@@ -73,7 +81,7 @@ Can Fairlearn recommend ways to make my model fairer?
     to develop models which are *fairer by the standard you have chosen*.
 
 What unfairness mitigation techniques does Fairlearn support?
-    ExpGrad, PostProcessing....
+    Please see our :ref:`mitigation` section.
 
 Which ML libraries does Fairlearn support?
     We have generally followed conventions for `scikit-learn` in Fairlearn.

@@ -19,6 +19,7 @@ A selection of these follows:
 
 - `Big Data's Disparate Impact <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2477899##>`_ (Barocas & Selbst, 2016)
 - `Measures and Mismeasures of Fairness <https://5harad.com/papers/fair-ml.pdf>`_ (Corbett-Davies & Goel, 2018)
-- `Fairness and Abstraction in Sociotechnical Systems <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3265913>`_ (Selbst et al., 2018)
-- `A Survey on Bias and Fairness in Machine Learning <https://arxiv.org/abs/1908.09635>`_ (Mehrabi et al. 2019)
+- `Fairness through Awareness <https://arxiv.org/abs/1104.3913>`_ (Dwork et al., 2011)
 - `Algorithmic Fairness from a Non-ideal Perspective <http://zacklipton.com/media/papers/fairness-non-ideal-fazelpour-lipton-2020.pdf>`_ (Fazelpour & Lipton, 2020)
+- `A Survey on Bias and Fairness in Machine Learning <https://arxiv.org/abs/1908.09635>`_ (Mehrabi et al. 2019)
+- `Fairness and Abstraction in Sociotechnical Systems <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3265913>`_ (Selbst et al., 2018)
