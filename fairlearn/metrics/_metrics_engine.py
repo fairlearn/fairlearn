@@ -2,9 +2,21 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import sklearn.metrics as skm
+from sklearn.utils import Bunch
+
+from ._extra_metrics import (
+    true_positive_rate, true_negative_rate,
+    false_positive_rate, false_negative_rate,
+    _root_mean_squared_error, _balanced_root_mean_squared_error,
+    mean_prediction,
+    selection_rate,
+    _mean_overprediction,
+    _mean_underprediction,
+    )
 
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
-from sklearn.utils import Bunch
+
 
 _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 
@@ -12,13 +24,14 @@ _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 _DEFAULT_INDEXED_PARAMS = {"sample_weight"}
 
 
-def group_summary(metric_function, y_true, y_pred,
+def group_summary(metric_function, y_true, y_pred, *,
                   sensitive_features,
                   indexed_params=None,
                   **metric_params):
     r"""Apply a metric to each subgroup of a set of data.
 
-    :param metric_function: Function ``(y_true, y_pred, \*\*metric_params)``
+    :param metric_function: Function with signature
+        ``metric_function(y_true, y_pred, \*\*metric_params)``
 
     :param y_true: Array of ground-truth values
 
@@ -82,33 +95,116 @@ def _check_metric_params(y_true, metric_params,
     return metric_params_validated
 
 
-def make_group_metric(metric_function, indexed_params=None):
-    """Turn a regular metric into a grouped metric.
+def _function_name(func):
+    if hasattr(func, '__name__'):
+        return func.__name__
+    else:
+        return str(func)
 
-    :param metric_function: The function to be wrapped. This must have signature
-        ``(y_true, y_pred, **metric_params)``
+
+class _MetricGroupSummaryCallable:
+    r"""Callable that calculates the group summary of a metric.
+
+    :param metric_function: A metric function with the signature
+        ``metric_function(y_true, y_pred, **metric_params)``
     :type metric_function: func
 
-    :param indexed_params: Names of ``metric_function`` parameters that
+    :param indexed_params: The names of parameters of ``metric_function`` that
         should be split according to ``sensitive_features`` in addition to ``y_true``
-        and ``y_pred``. Defaults to ``None`` corresponding to ``{"sample_weight"}``.
-
-    :return: A wrapped version of the supplied ``metric_function``. It will have
-        signature ``(y_true, y_pred, sensitive_features, **metric_params)``.
-    :rtype: func
+        and ``y_pred``. Defaults to ``None`` corresponding to ``['sample_weight']``.
     """
-    def wrapper(y_true, y_pred, sensitive_features, **metric_params):
-        return group_summary(metric_function,
-                             y_true,
-                             y_pred,
+
+    def __init__(self, metric_function, indexed_params=None, name=None):
+        self._metric_function = metric_function
+        self._indexed_params = indexed_params
+        if name is not None:
+            self.__name__ = name
+
+    def __repr__(self):
+        if self._indexed_params is None:
+            args_string = ""
+        else:
+            args_string = ", indexed_params={0}".format(self._indexed_params)
+        return "make_metric_group_summary({0}{1})".format(
+            _function_name(self._metric_function),
+            args_string)
+
+    def __call__(self, y_true, y_pred, *, sensitive_features, **metric_params):
+        return group_summary(self._metric_function,
+                             y_true, y_pred,
                              sensitive_features=sensitive_features,
-                             indexed_params=indexed_params,
+                             indexed_params=self._indexed_params,
                              **metric_params)
 
-    # Improve the name of the returned function
-    wrapper.__name__ = "group_{0}".format(metric_function.__name__)
 
-    return wrapper
+class _DerivedMetricCallable:
+    """Callable that calculates a derived metric.
+
+    :param transformation_function: A transformation function with the signature
+        ``transformation_function(summary)`` which can consume the result
+        produced by ``summary_function`` (typically a ``Bunch`` with fields including
+        ``overall`` and ``by_group``)
+    :type transformation_function: func
+
+    :param summary_function: A metric group summary function with the signature
+        ``summary_function(y_true, y_pred, *, sensitive_features, **metric_params)``
+    :type summary_function: func
+    """
+
+    def __init__(self, transformation_function, summary_function, name=None):
+        self._transformation_function = transformation_function
+        self._summary_function = summary_function
+        if name is not None:
+            self.__name__ = name
+
+    def __repr__(self):
+        return "make_derived_metric({0}, {1})".format(
+                _function_name(self._transformation_function),
+                _function_name(self._summary_function))
+
+    def __call__(self, y_true, y_pred, *, sensitive_features, **metric_params):
+        return self._transformation_function(self._summary_function(
+                y_true, y_pred,
+                sensitive_features=sensitive_features,
+                **metric_params))
+
+
+def make_metric_group_summary(metric_function, indexed_params=None, name=None):
+    """Make a callable that calculates the group summary of a metric.
+
+    :param metric_function: A metric function with the signature
+        ``metric_function(y_true, y_pred, **metric_params)``
+    :type metric_function: func
+
+    :param indexed_params: The names of parameters of ``metric_function`` that
+        should be split according to ``sensitive_features`` in addition to ``y_true``
+        and ``y_pred``. Defaults to ``None`` corresponding to ``['sample_weight']``.
+
+    :return: A callable object with the signature
+        ``metric_group_summary(y_true, y_pred, *, sensitive_features, **metric_params)``
+    :rtype: func
+    """
+    return _MetricGroupSummaryCallable(
+        metric_function, indexed_params=indexed_params, name=name)
+
+
+def make_derived_metric(transformation_function, summary_function, name=None):
+    """Make a callable that calculates a derived metric from the group summary.
+
+    :param transformation_function: A transformation function with the signature
+        ``transformation_function(summary)``
+    :type transformation_function: func
+
+    :param summary_function: A metric group summary function with the signature
+        ``summary_function(y_true, y_pred, *, sensitive_features, **metric_params)``
+    :type summary_function: func
+
+    :return: A callable object with the signature
+        ``derived_metric(y_true, y_pred, *, sensitive_features, **metric_params)``
+    :rtype: func
+    """
+    return _DerivedMetricCallable(
+        transformation_function, summary_function, name=name)
 
 
 def difference_from_summary(summary):
@@ -167,3 +263,66 @@ def group_max_from_summary(summary):
 def _check_array_sizes(a, b, a_name, b_name):
     if len(a) != len(b):
         raise ValueError(_MESSAGE_SIZE_MISMATCH.format(b_name, a_name))
+
+
+TRANSFORMATIONS = {
+    "difference": difference_from_summary,
+    "ratio": ratio_from_summary,
+    "group_min": group_min_from_summary,
+    "group_max": group_max_from_summary,
+}
+
+# Base metrics and the variants that are implemented by the metrics engine
+METRICS_SPEC = [
+    # base metrics from _extra_metrics
+    (true_positive_rate, ["difference", "ratio"]),
+    (true_negative_rate, ["difference", "ratio"]),
+    (false_positive_rate, ["difference", "ratio"]),
+    (false_negative_rate, ["difference", "ratio"]),
+    (selection_rate, ["difference", "ratio"]),
+    (mean_prediction, []),
+    (_root_mean_squared_error, []),
+    (_balanced_root_mean_squared_error, []),
+    (_mean_overprediction, []),
+    (_mean_underprediction, []),
+
+    # base metrics from sklearn.metrics
+    (skm.confusion_matrix, []),
+    (skm.accuracy_score, ["difference", "ratio", "group_min"]),
+    (skm.zero_one_loss, ["difference", "ratio", "group_max"]),
+    (skm.balanced_accuracy_score, ["group_min"]),
+    (skm.precision_score, ["group_min"]),
+    (skm.recall_score, ["group_min"]),
+    (skm.roc_auc_score, ["group_min"]),
+    (skm.mean_absolute_error, ["group_max"]),
+    (skm.mean_squared_error, ["group_max"]),
+    (skm.r2_score, ["group_min"]),
+]
+
+
+def _derive_metrics(metrics_spec):
+    metric_group_summary_dict = {}
+    derived_metric_dict = {}
+
+    for base_metric, variants in metrics_spec:
+        metric_group_summary_name = "{0}_group_summary".format(base_metric.__name__)
+        metric_group_summary = make_metric_group_summary(
+            base_metric,
+            name=metric_group_summary_name)
+        metric_group_summary_dict[metric_group_summary_name] = metric_group_summary
+
+        for variant in variants:
+            derived_metric_name = "{0}_{1}".format(base_metric.__name__, variant)
+            derived_metric = make_derived_metric(
+                TRANSFORMATIONS[variant],
+                metric_group_summary,
+                name=derived_metric_name)
+            derived_metric_dict[derived_metric_name] = derived_metric
+
+    return metric_group_summary_dict, derived_metric_dict
+
+
+_metric_group_summary_dict, _derived_metric_dict = _derive_metrics(METRICS_SPEC)
+
+globals().update(_metric_group_summary_dict)
+globals().update(_derived_metric_dict)

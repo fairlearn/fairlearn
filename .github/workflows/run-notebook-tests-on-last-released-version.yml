@@ -6,7 +6,7 @@ on:
     - master
 
 jobs:
-  run-perf-test:
+  run-notebooks-on-last-release-version:
     runs-on: 'vs2017-win2016'
 
     steps:

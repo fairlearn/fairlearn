@@ -97,7 +97,7 @@ def test_grid_search_for_binary_classification():
     test_values["best_lambda_second_grid"] = ScrapSpec(
         "lambda_best_second", pytest.approx(0.8333333333))
     test_values["best_coeff_second0"] = ScrapSpec(
-        "second_sweep._predictors[second_sweep._best_grid_index].coef_[0][0]",
+        "second_sweep.predictors_[second_sweep.best_idx_].coef_[0][0]",
         pytest.approx(2.53725364))
 
     assay_one_notebook(nb_name, test_values)
@@ -139,4 +139,12 @@ def test_mitigating_disparities_in_ranking_from_binary_data():
 def test_binary_classification_with_the_uci_credit_card_default_dataset():
     nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
     test_values = {}
+    test_values["GridSearch_17"] = ScrapSpec(
+        "int(sum(model_sweep_dict['GridSearch_17']))",
+        2533
+    )
+    test_values["GridSearch_31"] = ScrapSpec(
+        "int(sum(model_sweep_dict['GridSearch_31']))",
+        2775
+    )
     assay_one_notebook(nb_name, test_values)
