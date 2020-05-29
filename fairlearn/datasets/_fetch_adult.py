@@ -62,7 +62,7 @@ def fetch_adult(*, version='1', cache=True, data_home=None,
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (48842,)
             Each value represents whether the person earns more than $50,000
-            a year (1) or not (0).
+            a year (>50K) or not (<=50K).
             If ``as_frame`` is True, ``target`` is a pandas object.
         feature_names : list of length 14
             Array of ordered feature names used in the dataset.
