@@ -41,6 +41,7 @@ class _Lagrangian:
 
     def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
         self.X = X
+        self.n = self.X.shape[0]
         self.y = y
         self.constraints = constraints
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
@@ -51,14 +52,13 @@ class _Lagrangian:
         self.B = B
         self.opt_lambda = opt_lambda
         self.hs = pd.Series(dtype="float64")
-        self.classifiers = pd.Series(dtype="float64")
+        self.predictors = pd.Series(dtype="float64")
         self.errors = pd.Series(dtype="float64")
         self.gammas = pd.DataFrame()
         self.lambdas = pd.DataFrame()
-        self.n = self.X.shape[0]
         self.n_oracle_calls = 0
-        self.n_oracle_calls_dummy_returned = 0
         self.oracle_execution_times = []
+        self.n_oracle_calls_dummy_returned = 0
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
 
@@ -187,7 +187,7 @@ class _Lagrangian:
             logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
             h_idx = len(self.hs)
             self.hs.at[h_idx] = h
-            self.classifiers.at[h_idx] = classifier
+            self.predictors.at[h_idx] = classifier
             self.errors.at[h_idx] = h_error
             self.gammas[h_idx] = h_gamma
             self.lambdas[h_idx] = lambda_vec.copy()
