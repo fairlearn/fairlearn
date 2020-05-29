@@ -44,16 +44,16 @@ class ConditionalSelectionRate(ClassificationMoment):
         if (difference_bound is None) and (ratio_bound is None):
             self.eps = _DEFAULT_DIFFERENCE_BOUND
             self.ratio = 1.0
-        if difference_bound is not None and ratio_bound is not None:
-            raise ValueError(_MESSAGE_INVALID_BOUNDS)
-        if difference_bound is not None:
+        elif (difference_bound is not None) and (ratio_bound is None):
             self.eps = difference_bound
             self.ratio = 1.0
-        if ratio_bound is not None:
+        elif (difference_bound is None) and (ratio_bound is not None):
             self.eps = ratio_bound_slack
             if not (0 < ratio_bound <= 1):
                 raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
             self.ratio = ratio_bound
+        else:
+            raise ValueError(_MESSAGE_INVALID_BOUNDS)
 
     def default_objective(self):
         """Return the default objective for moments of this kind."""
