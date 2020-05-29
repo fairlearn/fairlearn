@@ -205,17 +205,24 @@ class TestExponentiatedGradientSmoke:
         else:
             y = self.y
 
-        ratio = 1.0
         if "ratio" in data.keys():
-            ratio = data["ratio"]
-        expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](ratio=ratio),
-                                        eps=data["eps"])
+            expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](
+                ratio_bound_slack=data["eps"], ratio_bound=data["ratio"]), eps=data["eps"])
+        else:
+            expgrad = ExponentiatedGradient(self.learner, constraints=data["cons_class"](
+                difference_bound=data["eps"]), eps=data["eps"])
+
         expgrad.fit(self.X, y, sensitive_features=self.A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad.predictors_)
 
-        disparity_moment = data["cons_class"](ratio=ratio)
+        if "ratio" in data.keys():
+            disparity_moment = data["cons_class"](ratio_bound_slack=data["eps"],
+                                                  ratio_bound=data["ratio"])
+        else:
+            disparity_moment = data["cons_class"](difference_bound=data["eps"])
+
         disparity_moment.load_data(self.X, y,
                                    sensitive_features=self.A)
         error = ErrorRate()
@@ -245,6 +252,7 @@ class TestExponentiatedGradientSmoke:
     @pytest.mark.parametrize("Constraints", [TruePositiveRateDifference, DemographicParity])
     def test_simple_fit_predict(self, Constraints):
         estimator = LeastSquaresBinaryClassifierLearner()
+
         expgrad = ExponentiatedGradient(estimator, Constraints())
         expgrad.fit(pd.DataFrame(X1), pd.Series(labels),
                     sensitive_features=pd.Series(sensitive_features))
