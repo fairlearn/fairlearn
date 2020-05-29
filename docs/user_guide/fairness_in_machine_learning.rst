@@ -23,6 +23,8 @@ terms of intent, such as prejudice.
 rather than specific causes (such as societal biases), we avoid the usage of
 the words *bias* or *debiasing* in describing the functionality of Fairlearn.
 
+.. _types_of_harms:
+
 Types of harms
 --------------
 
