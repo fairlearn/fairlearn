@@ -100,7 +100,7 @@ Is Fairlearn available in languages other than Python?
 
 Can I contribute to Fairlearn?
     Absolutely! Please see our :ref:`Contributor Guide <contributor_guide>` for
-    information on how to add your contributions.
+    information on how to add your contributions. We welcome all contributions!
 
 
 Fairlearn and Microsoft
