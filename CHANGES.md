@@ -5,8 +5,24 @@
 * Adjust classes to abide by naming conventions for attributes.
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
   `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.
+* API refactoring to separate out different uses of `eps` within
+  `ExponentiatedGradient`. It is now solely responsible for setting a bound on
+  the lambda vectors. The other usage of `eps` as a bound for constraints is
+  now captured directly on the moment classes as follows:
+  * Classification moments: `ConditionalSelectionRate` and its subclasses
+    have new arguments on the constructor:
+    * `difference_bound` - for difference-based constraints such as demographic
+      parity difference
+    * `ratio_bound_slack` - for ratio-based constraints such as demographic
+      parity ratio
+    * Additionally, there's a `ratio_bound` argument which represents the
+      argument previously called `ratio`.
+  * Regression moments: `ConditionalLossMoment` and its subclasses have a new
+    argument `upper_bound` with the same purpose for newly enabled regression
+    scenarios on `ExponentiatedGradient`.
 
 ### v0.4.6
+
 * Handle case where reductions relabeling results in a single class
 * Refactor metrics:
   * Remove `GroupMetricResult` type in favor of a `Bunch`.

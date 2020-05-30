@@ -9,7 +9,17 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 
 
 class ConditionalLossMoment(LossMoment):
-    """A moment that quantifies a loss by group."""
+    """A moment that quantifies a loss by group.
+    
+    :param loss: a loss object with an `eval` method, e.g. `SquareLoss` or `AbsoluteLoss`.
+    :param upper_bound: an upper bound on the loss, often referred to as :math:`\\zeta`;
+        `upper_bound` is an optional argument that is not required for certain mitigation
+        techniques; default None
+    :type upper_bound: float
+    :param no_groups: indicates whether not to calculate loss based on groups,
+        default False, i.e., grouping is the default behavior
+    :type no_groups: bool
+    """
 
     def __init__(self, loss, *, upper_bound=None, no_groups=False):
         super().__init__(loss)

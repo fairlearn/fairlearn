@@ -17,25 +17,43 @@ _DEFAULT_DIFFERENCE_BOUND = 0.01
 class ConditionalSelectionRate(ClassificationMoment):
     """Generic fairness moment for selection rates.
 
-    This serves as the base class for both :class:`DemographicParity`
-    and :class:`EqualizedOdds`. The two are distinguished by
-    the events they define, which in turn affect the
-    `index` field created by :meth:`load_data()`.
+    This serves as the base class for :class:`DemographicParity` :class:`EqualizedOdds`, and
+    others. All subclasses can be used as difference-based constraints or ratio-based constraints.
+    
+    Difference-based constraints are written with a difference bound :math:`\\epsilon`.
+    Ratio-based constraints have a similar :math:`\\epsilon`, referred to as ratio bound slack
+    below. Additionally, they require a ratio bound. Constraints are set up for each group
+    compared to the overall population (unless further events are specified, e.g., in Equalized
+    Odds). Constraint violation for difference-based constraints starts if the difference between
+    a group and the overall population with regard to a utility exceeds the difference bound. For
+    ratio-based constraints we consider the difference between the overall population's utility
+    and a group's utility multiplied with the ratio bound.
 
     The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the rows of
-    the DataFrames either required as arguments or returned by several
-    of the methods of the `ConditionalSelectionRate` class. It is the cartesian
-    product of:
+    the DataFrames either required as arguments or returned by several of the methods of the
+    `ConditionalSelectionRate` class. It is the cartesian product of:
 
     - The unique events defined for the particular object
     - The unique values for the sensitive feature
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
-    The `ratio` specifies the multiple at which error(A = a) should be compared with total_error
-    and vice versa. The value of `ratio` has to be in the range (0,1] with smaller values
-    corresponding to weaker constraint. The `ratio` equal to 1 corresponds to the constraint
-    where error(A = a) = total_error
+    :param difference_bound: the constraints' difference bound for constraints that are expressed
+        as differences, often referred to as :math:`\\epsilon`.
+        If `ratio_bound` is used then `difference_bound` needs to be None.
+        If neither `ratio_bound` nor `difference_bound` are set then a default difference bound of
+        0.01 is used for backwards compatibility. Default None.
+    :type difference_bound: float
+    :param: ratio_bound: the constraints' ratio bound for constraints that are expressed as
+        ratios. The specified value needs to abide by :math:`0 < \\text{ratio_bound} \\leq 1`.
+        If `difference_bound` is used then `ratio_bound` needs to be None.
+        Default None.
+    :type ratio_bound: float
+    :param ratio_bound_slack: the constraints' ratio bound slack for constraints that are
+        expressed as ratios, usually referred to as :math:`\\epsilon`.
+        `ratio_bound_slack` is ignored if `ratio_bound` is not specified.
+        Default 0.0
+    :type ratio_bound_slack: float
     """
 
     def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
@@ -53,6 +71,7 @@ class ConditionalSelectionRate(ClassificationMoment):
                 raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
             self.ratio = ratio_bound
         else:
+            # both difference_bound and ratio_bound specified
             raise ValueError(_MESSAGE_INVALID_BOUNDS)
 
     def default_objective(self):
