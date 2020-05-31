@@ -77,13 +77,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
-            self._is_classification_reduction = True
+            is_classification_reduction = True
         else:
             logger.debug("Regression problem detected")
-            self._is_classification_reduction = False
+            is_classification_reduction = False
 
         _, y_train, sensitive_features = _validate_and_reformat_input(
-            X, y, enforce_binary_labels=self._is_classification_reduction, **kwargs)
+            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
 
         n = y_train.shape[0]
 
@@ -205,11 +205,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
 
-        if self._is_classification_reduction:
+        if isinstance(self.constraints, ClassificationMoment):
             positive_probs = self._pmf_predict(X)[:, 1]
             return (positive_probs >= np.random.rand(len(positive_probs))) * 1
         else:
-            return self._pmf_predict(X)
+            pred = self._pmf_predict(X)
+            randomized_pred = np.zeros(pred.shape[0])
+            for i in range(pred.shape[0]):
+                randomized_pred[i] = np.random.choice(pred.iloc[i, :], p=self.weights_)
+            return randomized_pred
 
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
@@ -221,19 +225,19 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
 
-        pred = pd.DataFrame()
-        for t in range(len(self._hs)):
-            pred[t] = self._hs[t](X)
-        if self._is_classification_reduction:
+        n_samples = len(X)
+
+        def get_predictions(clf):
+            """ignore classifiers with weight 0 since they can only contribute 0 to the result"""
+            if self.weights_[int(clf.name)] == 0:
+                return np.zeros(n_samples)
+            else:
+                return self._hs[int(clf.name)](X)
+
+        pred = pd.DataFrame(0, index=range(n_samples),
+                            columns=range(len(self._hs))).apply(get_predictions)
+        if isinstance(self.constraints, ClassificationMoment):
             positive_probs = pred[self.weights_.index].dot(self.weights_).to_frame()
             return np.concatenate((1-positive_probs, positive_probs), axis=1)
         else:
-            if 1.0 in self.weights_:
-                # one predictor has all the probability mass: no need to randomize
-                return pred[self.weights_.index].dot(self.weights_)
-            else:
-                pred = pred[self.weights_.index]
-                randomized_pred = np.zeros(pred.shape[0])
-                for i in range(pred.shape[0]):
-                    randomized_pred[i] = np.random.choice(pred.iloc[i, :], p=self.weights_)
-                return randomized_pred
+            return pred
