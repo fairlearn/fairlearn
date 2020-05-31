@@ -27,12 +27,15 @@ parameters:
   type: string
 - name: freezeFile
   type: string
-  # Following are used if the installationType is PyPI
+# Following are used if the installationType is PyPI
 - name: pypiUrl
   type: string
 - name: versionArtifactName
   type: string
 - name: versionArtifactFile
+  type: string
+# Following used if the installationType is WheelArtifact
+- name: wheelArtifactName
   type: string
 
 steps:
@@ -62,6 +65,7 @@ steps:
     versionArtifactName: ${{parameters.versionArtifactName}}
     versionArtifactFile: ${{parameters.versionArtifactFile}}
     pipVersionVariable: variableForPipVersion
+    wheelArtifactName: ${{parameters.wheelArtifactName}}
   
 - script: flake8 .
   displayName: "Run flake8"

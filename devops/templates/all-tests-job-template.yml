@@ -25,6 +25,8 @@ parameters:
   targetType: 'Test'
   versionArtifactName:
   versionArtifactFile:
+  # Following used if installationType is WheelArtifact
+  wheelArtifactName:
 
 jobs:
   - ${{ each plat in parameters.platforms }}:
@@ -36,13 +38,13 @@ jobs:
             vmImage: ${{ plat.value }}
 
           variables:
-              ${{ if eq(parameters.targetType, 'Test') }}:
-                pypiUrl: https://test.pypi.org/simple/
-              ${{ if eq(parameters.targetType, 'Prod') }}:
-                pypiUrl: https://pypi.org/simple/
-              RequirementsFile: requirements-${{pyVer}}.txt
-              FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
-              FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
+            ${{ if eq(parameters.targetType, 'Test') }}:
+              pypiUrl: https://test.pypi.org/simple/
+            ${{ if eq(parameters.targetType, 'Production') }}:
+              pypiUrl: https://pypi.org/simple/
+            RequirementsFile: requirements-${{pyVer}}.txt
+            FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
+            FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
 
           steps:
           - template: test-run-step-template.yml
@@ -58,3 +60,5 @@ jobs:
               pypiUrl: $(pypiUrl)
               versionArtifactName: ${{parameters.versionArtifactName}}
               versionArtifactFile: ${{parameters.versionArtifactFile}}
+              # Following used if installationType is WheelArtifact
+              wheelArtifactName: ${{parameters.wheelArtifactName}}

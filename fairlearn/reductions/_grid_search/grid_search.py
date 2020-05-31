@@ -3,13 +3,14 @@
 
 import copy
 import logging
+import numpy as np
 import pandas as pd
-from sklearn.exceptions import NotFittedError
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from sklearn.dummy import DummyClassifier
+from sklearn.utils.validation import check_is_fitted
 from time import time
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
-from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from ._grid_generator import _GridGenerator
 
@@ -51,6 +52,10 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         distributed between :code:`-grid_limit` and :code:`grid_limit` by default
     :type grid_limit: float
 
+    :param grid_offset: shifts the grid of Lagrangian multiplier by that value
+         It is '0' by default
+    :type grid_offset: :class:`pandas:pandas.DataFrame`
+
     :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
         set of Lagrange multipliers they desire using this argument.
     """
@@ -62,6 +67,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                  constraint_weight=0.5,
                  grid_size=10,
                  grid_limit=2.0,
+                 grid_offset=None,
                  grid=None):
         """Construct a GridSearch object."""
         self.estimator = estimator
@@ -80,14 +86,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         self.grid_size = grid_size
         self.grid_limit = float(grid_limit)
+        self.grid_offset = grid_offset
         self.grid = grid
-
-        self._best_grid_index = None
-        self._predictors = []
-        self._lambda_vecs = pd.DataFrame()
-        self._objectives = []
-        self._gammas = pd.DataFrame()
-        self._oracle_execution_times = []
 
     def fit(self, X, y, **kwargs):
         """Run the grid search.
@@ -106,6 +106,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             feature used by the constraints object
         :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
         """
+        self.predictors_ = []
+        self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)
+        self.objectives_ = []
+        self.gammas_ = pd.DataFrame(dtype=np.float64)
+        self.oracle_execution_times_ = []
+
         if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
             is_classification_reduction = True
@@ -137,7 +143,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                                   pos_basis,
                                   neg_basis,
                                   neg_allowed,
-                                  objective_in_the_span).grid
+                                  objective_in_the_span,
+                                  self.grid_offset).grid
         else:
             logger.debug("Using supplied grid")
             grid = self.grid
@@ -158,27 +165,34 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             else:
                 y_reduction = y_train
 
-            current_estimator = copy.deepcopy(self.estimator)
-            logger.debug("Calling underlying estimator")
+            y_reduction_unique = np.unique(y_reduction)
+            if len(y_reduction_unique) == 1:
+                logger.debug("y_reduction had single value. Using DummyClassifier")
+                current_estimator = DummyClassifier(strategy='constant',
+                                                    constant=y_reduction_unique[0])
+            else:
+                logger.debug("Using underlying estimator")
+                current_estimator = copy.deepcopy(self.estimator)
+
             oracle_call_start_time = time()
             current_estimator.fit(X, y_reduction, sample_weight=weights)
             oracle_call_execution_time = time() - oracle_call_start_time
-            logger.debug("Call to underlying estimator complete")
+            logger.debug("Call to estimator complete")
 
             def predict_fct(X): return current_estimator.predict(X)
-            self._predictors.append(current_estimator)
-            self._lambda_vecs[i] = lambda_vec
-            self._objectives.append(objective.gamma(predict_fct)[0])
-            self._gammas[i] = self.constraints.gamma(predict_fct)
-            self._oracle_execution_times.append(oracle_call_execution_time)
+            self.predictors_.append(current_estimator)
+            self.lambda_vecs_[i] = lambda_vec
+            self.objectives_.append(objective.gamma(predict_fct)[0])
+            self.gammas_[i] = self.constraints.gamma(predict_fct)
+            self.oracle_execution_times_.append(oracle_call_execution_time)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(i):
-                return self.objective_weight * self._objectives[i] + \
-                    self.constraint_weight * self._gammas[i].max()
-            losses = [loss_fct(i) for i in range(len(self._objectives))]
-            self._best_grid_index = losses.index(min(losses))
+                return self.objective_weight * self.objectives_[i] + \
+                    self.constraint_weight * self.gammas_[i].max()
+            losses = [loss_fct(i) for i in range(len(self.objectives_))]
+            self.best_idx_ = losses.index(min(losses))
         else:
             raise RuntimeError("Unsupported selection rule")
 
@@ -193,9 +207,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self._best_grid_index is None:
-            raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self._predictors[self._best_grid_index].predict(X)
+        check_is_fitted(self)
+        return self.predictors_[self.best_idx_].predict(X)
 
     def predict_proba(self, X):
         """Provide the result of :code:`predict_proba` from the best model found by the grid search.
@@ -206,6 +219,5 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param X: Feature data
         :type X: numpy.ndarray or pandas.DataFrame
         """
-        if self._best_grid_index is None:
-            raise NotFittedError(_NO_PREDICT_BEFORE_FIT)
-        return self._predictors[self._best_grid_index].predict_proba(X)
+        check_is_fitted(self)
+        return self.predictors_[self.best_idx_].predict_proba(X)

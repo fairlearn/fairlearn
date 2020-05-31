@@ -11,8 +11,9 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group."""
 
-    def __init__(self, loss, no_groups=False):
+    def __init__(self, loss, *, upper_bound=None, no_groups=False):
         super().__init__(loss)
+        self.upper_bound = upper_bound
         self.no_groups = no_groups
 
     def default_objective(self):
@@ -51,6 +52,16 @@ class ConditionalLossMoment(LossMoment):
         self._gamma_descr = str(expect_attr[[_LOSS]])
         return expect_attr[_LOSS]
 
+    def bound(self):
+        """Return bound vector.
+
+        :return: a vector of bound values corresponding to all constraints
+        :rtype: pandas.Series
+        """
+        if self.upper_bound is None:
+            raise ValueError("No Upper Bound")
+        return pd.Series(self.upper_bound, index=self.index)
+
     def project_lambda(self, lambda_vec):
         """Return the lambda values."""
         return lambda_vec
@@ -73,14 +84,14 @@ class AverageLossMoment(ConditionalLossMoment):
     """Moment for Average Loss."""
 
     def __init__(self, loss):
-        super().__init__(loss, no_groups=True)
+        super().__init__(loss, upper_bound=None, no_groups=True)
 
 
 class GroupLossMoment(ConditionalLossMoment):
     """Moment for Group Loss."""
 
-    def __init__(self, loss):
-        super().__init__(loss, no_groups=False)
+    def __init__(self, loss, *, upper_bound=None):
+        super().__init__(loss, upper_bound=upper_bound, no_groups=False)
 
 
 class SquareLoss:
