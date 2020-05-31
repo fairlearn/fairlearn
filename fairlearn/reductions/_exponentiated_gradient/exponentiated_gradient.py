@@ -164,7 +164,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 last_gap = best_gap
 
             # update theta based on learning rate
-            theta += eta * (gamma - self.eps)
+            theta += eta * (gamma - self.constraints.bound())
 
         # retain relevant result data
         gaps_series = pd.Series(gaps)
