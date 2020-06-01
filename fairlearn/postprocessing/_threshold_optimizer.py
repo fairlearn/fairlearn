@@ -104,25 +104,25 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         Fairness constraints under which threshold optimization is performed.
         Possible inputs are:
 
-        'demographic_parity', 'selection_rate_parity' (synonymous)
-            match the selection rate across groups
+            'demographic_parity', 'selection_rate_parity' (synonymous)
+                match the selection rate across groups
 
-        'false_positive_rate_parity', false_negative_rate_parity',
-        'true_positive_rate_parity', 'true_positive_rate'
-            match the named metric across groups
+            '{false,true}_{positive,negative}_rate_parity'
+                match the named metric across groups
 
-        'equalized_odds'
-            match true positive and false positive rates across groups
+            'equalized_odds'
+                match true positive and false positive rates across groups
 
     objective : str, default='accuracy_score'
         Performance objective under which threshold optimization is performed.
         Not all objectives are allowed for all types of constraints.
         Possible inputs are:
 
-        'accuracy_score', 'balanced_accuracy_score'
-            allowed for all constraint types
-        'selection_rate', 'true_positive_rate', 'true_negative_rate',
-            allowed for all constraint types except 'equalized_odds'
+            'accuracy_score', 'balanced_accuracy_score'
+                allowed for all constraint types
+
+            'selection_rate', 'true_positive_rate', 'true_negative_rate',
+                allowed for all constraint types except 'equalized_odds'
 
     grid_size : int, default=1000
         The values of the constraint metric are discretized according to the grid
