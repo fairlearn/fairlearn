@@ -53,7 +53,6 @@ def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives,
         predicted_positives, predicted_negatives, positives, negatives, n : int
             Derived counts.
     """
-
     return Bunch(
         true_positives=true_positives,
         false_positives=false_positives,

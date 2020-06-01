@@ -484,7 +484,7 @@ postprocessed_predictor_EO.fit(
 for (
     group,
     interpolation,
-) in postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature.items():
+) in postprocessed_predictor_EO.interpolated_thresholder_.interpolation_dict.items():
     print("{}:".format(group))
     print("\n ".join(interpolation.__repr__().split(",")))
     print("-----------------------------------")

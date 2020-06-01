@@ -5,13 +5,15 @@ import numpy as np
 import pandas as pd
 import pytest
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
-from fairlearn.postprocessing._tradeoff_curve_utilities import (_calculate_tradeoff_points,
-                                                           _filter_points_to_get_convex_hull,
-                                                           _tradeoff_curve,
-                                                           _interpolate_curve)
+from fairlearn.postprocessing._tradeoff_curve_utilities import (
+    _calculate_tradeoff_points,
+    _filter_points_to_get_convex_hull,
+    _tradeoff_curve,
+    _interpolate_curve)
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
-from .conftest import (sensitive_features_ex1, labels_ex, scores_ex,
-                       _get_grouped_data_and_base_points, sensitive_feature_names_ex1)
+from .conftest import (
+    sensitive_features_ex1, labels_ex, scores_ex,
+    _get_grouped_data_and_base_points, sensitive_feature_names_ex1)
 
 
 def test_assert_interpolated_curve():

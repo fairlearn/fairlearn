@@ -106,9 +106,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         'demographic_parity', 'selection_rate_parity' (synonymous)
             match the selection rate across groups
+
         'false_positive_rate_parity', false_negative_rate_parity',
         'true_positive_rate_parity', 'true_positive_rate'
             match the named metric across groups
+
         'equalized_odds'
             match true positive and false positive rates across groups
 
@@ -141,7 +143,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     -----
     The procedure is based on the algorithm of
     `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_.
-
     """
 
     def __init__(self, *, estimator=None,
@@ -206,7 +207,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         scores = self.estimator_.predict(X)
         if self.constraints == "equalized_odds":
             self.x_metric_ = "false_positive_rate"
-            self.y_metric_ = "true_positive_rate" 
+            self.y_metric_ = "true_positive_rate"
             threshold_optimization_method = self._threshold_optimization_for_equalized_odds
         else:
             self.x_metric_ = SIMPLE_CONSTRAINTS[self.constraints]
