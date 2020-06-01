@@ -54,6 +54,10 @@ metric_group_summary_results = {
         "overall": 0.27777778, "by_group": {0: 0.22222222, 1: 0.33333333}},
     metrics.r2_score_group_summary: {
         "overall": -0.125, "by_group": {0: 0, 1: -0.35}},
+    metrics.f1_score_group_summary: {
+        "overall": 0.70588235, "by_group": {0: 0.75, 1: 0.66666666}},
+    metrics.log_loss_group_summary: {
+        "overall": 9.59423782, "by_group": {0: 7.67546133, 1: 11.51301430}},
 }
 
 derived_metric_results = {
@@ -80,6 +84,8 @@ derived_metric_results = {
     metrics.mean_absolute_error_group_max: 0.33333333,
     metrics.mean_squared_error_group_max: 0.33333333,
     metrics.r2_score_group_min: -0.35,
+    metrics.f1_score_group_max: 0.75,
+    metrics.log_loss_group_min: 7.67546133,
 }
 
 

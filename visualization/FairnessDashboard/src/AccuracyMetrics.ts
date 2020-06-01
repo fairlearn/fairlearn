@@ -181,5 +181,20 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         isMinimization: false,
         isPercentage: true,
         userVisible: true
-    }
+    },
+    "f1_score": {
+        key: "f1_score",
+        title: localization.Metrics.f1Score,
+        description: localization.Metrics.f1ScoreDescription,
+        isMinimization: false,
+        isPercentage: false,
+        userVisible: true
+    },
+    "log_loss": {
+        key: "log_loss",
+        title: localization.Metrics.logLoss,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: false
+    },
 };
