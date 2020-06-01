@@ -170,6 +170,7 @@ const lightTheme = createTheme({
 
       render() {
         const data = _.cloneDeep(App.choices[this.state.value].data);
+        const theme = App.themeChoices[this.state.themeIndex].data;
         return (
           <div style={{backgroundColor: 'grey', height:'100%'}}>
             <label>
