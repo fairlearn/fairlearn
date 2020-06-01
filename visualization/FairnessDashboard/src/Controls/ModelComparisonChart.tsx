@@ -69,7 +69,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 automargin: true,
                 fixedrange: true,
                 mirror: true,
-                //linecolor: '#CCCCCC',
                 linecolor: theme.palette.neutralPrimaryAlt,
                 linewidth: 1,
                 title:{
@@ -85,93 +84,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             },
         } as any
     };
-
-    // private static readonly classNames = mergeStyleSets({
-    //     frame: {
-    //         flex: 1,
-    //         display: "flex",
-    //         flexDirection: "column"
-    //     },
-    //     spinner: {
-    //         margin: "auto",
-    //         padding: "40px"
-    //     },
-    //     header: {
-    //         backgroundColor: "#EBEBEB",
-    //         padding: "0 90px",
-    //         height: "90px",
-    //         display: "inline-flex",
-    //         flexDirection: "row",
-    //         justifyContent: "space-between",
-    //         alignItems: "center"
-    //     },
-    //     headerTitle: {
-    //         color: "#333333",
-    //         fontSize: "32px",
-    //         lineHeight: "39px",
-    //         fontWeight: "100"
-    //     },
-    //     editButton: {
-    //         color: "#333333",
-    //         fontSize: "12px",
-    //         lineHeight: "20px",
-    //         fontWeight: "400"
-    //     },
-    //     main: {
-    //         height: "100%",
-    //         flex: 1,
-    //         display: "inline-flex",
-    //         flexDirection: "row"
-    //     },
-    //     mainRight: {
-    //         padding: "30px 0 0 35px",
-    //         width: "300px"
-    //     },
-    //     rightTitle: {
-    //         color: "#333333",
-    //         fontSize: "15px",
-    //         lineHeight: "16px",
-    //         fontWeight: "500",
-    //         paddingBottom: "18px",
-    //         borderBottom: "1px solid #CCCCCC"
-    //     },
-    //     rightText: {
-    //         padding: "16px 15px 30px 0",
-    //         color: "#333333",
-    //         fontSize: "15px",
-    //         lineHeight: "18px",
-    //         fontWeight: "400",
-    //         borderBottom: "0.5px dashed #CCCCCC"
-    //     },
-    //     insights: {
-    //         textTransform: "uppercase",
-    //         color: "#333333",
-    //         fontSize: "15px",
-    //         lineHeight: "16px",
-    //         fontWeight: "500",
-    //         padding: "18px 0",
-    //     },
-    //     insightsText: {
-    //         color: "#333333",
-    //         fontSize: "15px",
-    //         lineHeight: "16px",
-    //         fontWeight: "400",
-    //         paddingBottom: "18px",
-    //         paddingRight: "15px",
-    //         borderBottom: "1px solid #CCCCCC"
-    //     },
-    //     chart: {
-    //         padding: "60px 0 0 0",
-    //         flex: 1
-    //     },
-    //     textSection: {
-    //         paddingBottom: "5px"
-    //     },
-    //     radio: {
-    //         paddingBottom: "30px",
-    //         paddingLeft: "75px"
-    //     }
-    // });
 
     constructor(props: IModelComparisonProps) {
         super(props);
@@ -276,7 +188,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         return (
             <Stack className={styles.frame}>
                 <div className={styles.header}>
-                    {/* <h2 className={styles.headerTitle}>{localization.ModelComparison.title}</h2> */}
                     <Text  variant={"xxLargePlus"} className={styles.headerTitle}>{localization.ModelComparison.title}</Text>
                     <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
@@ -289,16 +200,10 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         />
                     </div>
                     <div className={styles.mainRight}>
-                        {/* <div className={styles.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={styles.rightText}>{howToReadText}</div>
-                        <div className={styles.insights}>{localization.ModelComparison.insights}</div> */}
                         <Text variant={"mediumPlus"} className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
                         <Text variant={"medium"} className={styles.rightText} block>{howToReadText}</Text>
                         <Text variant={"mediumPlus"} className={styles.insights} block>{localization.ModelComparison.insights}</Text>                        
                         <div className={styles.insightsText}>
-                            {/* <div className={styles.textSection}>{insights2}</div>
-                            <div className={styles.textSection}>{insights3}</div>
-                            <div>{insights4}</div> */}
                             <Text variant={"medium"} className={styles.textSection} block>{insights2}</Text>
                             <Text variant={"medium"} className={styles.textSection} block>{insights3}</Text>
                             <Text variant={"medium"} className={styles.textSection} block>{insights4}</Text>

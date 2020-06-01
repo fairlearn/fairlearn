@@ -8,35 +8,7 @@ export interface IWizardFooterProps {
     onPrevious?: () => void;
 }
 
-export class WizardFooter extends React.PureComponent<IWizardFooterProps> {
-//     private static readonly classNames = mergeStyleSets({
-//         frame: {
-//             display: "inline-flex",
-//             flexDirection: "row-reverse",
-//             paddingTop: "10px",
-//             paddingBottom: "10px"
-//         },
-//         next: {
-//             height: "44px",
-//             padding: "12px",
-//             color: "#FFFFFF",
-//             fontSize: "18px",
-//             lineHeight: "24px",
-//             backgroundColor: "#666666",
-//             fontWeight: "400",
-//             marginLeft: "10px"
-//         },
-//         back: {
-//             height: "44px",
-//             padding: "12px",
-//             color: "#333333",
-//             fontSize: "18px",
-//             lineHeight: "24px",
-//             backgroundColor: "#FFFFFF",
-//             fontWeight: "400"
-//         }
-//     });
-    
+export class WizardFooter extends React.PureComponent<IWizardFooterProps> {    
     public render(): React.ReactNode {
         const styles = WizardFooterStyles();
         return (

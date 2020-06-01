@@ -10,11 +10,7 @@ export const DataSpecificationBladeStyles: () => IProcessedStyleSet<IDataSpecifi
     const theme = getTheme();
     return mergeStyleSets<IDataSpecificationBladeStyles>({
         title: {
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "12px",
-            //lineHeight: "15px",
-            //fontWeight: "500",
             height: "20px",
             paddingBottom: "10px"
         },
@@ -25,8 +21,6 @@ export const DataSpecificationBladeStyles: () => IProcessedStyleSet<IDataSpecifi
             boxSizing: "content-box"
         },
         text: {
-            //fontSize: "12px",
-            //lineHeight: "15px",
             color: theme.semanticColors.bodyText
         }
     });

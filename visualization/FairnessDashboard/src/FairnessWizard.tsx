@@ -273,13 +273,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         if (this.state.featureBins.length === 0) {
             return (<Stack className={styles.frame}>
                 <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader} >
-                    {/* <div className={styles.headerLeft}>{localization.Header.title}</div> */}
                     <Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>
-                    {/* <Text variant={"mediumPlus"}>{localization.Header.title}</Text> */}
                 </Stack>
                 <Stack.Item grow={2} className={styles.body}>
-                    {/* <div>{localization.errorOnInputs}</div> */}
-                    {/* <Text className={styles.headerLeft}>{localization.errorOnInputs}</Text> */}
                     <Text variant={"mediumPlus"}>{localization.errorOnInputs}</Text>
                 </Stack.Item>
             </Stack>);
@@ -287,9 +283,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         return (
              <Stack className={styles.frame}>
                 <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader} >
-                    {/* <div className={styles.headerLeft}>{localization.Header.title}</div> */}
                     <Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>
-                    {/* <Text variant={"mediumPlus"}>{localization.Header.title}</Text> */}
                 </Stack>
                 {(this.state.activeTabKey === introTabKey) &&
                     <StackItem grow={2} className={styles.body}>

@@ -19,12 +19,7 @@ export const SummaryTableStyles: () => IProcessedStyleSet<ISummaryTableStyles> =
         minMaxLabel: {
             padding: "1px 9px",
             marginTop: "4px",
-            //color: "#FFFFFF",
             color: theme.semanticColors.bodySubtext,
-            //fontSize: "10px",
-            //lineHeight: "20px",
-            //fontWeight: "400",
-            //backgroundColor: "#999999"
             backgroundColor: theme.semanticColors.bodyStandoutBackground
         },
         groupCol: {
@@ -34,11 +29,7 @@ export const SummaryTableStyles: () => IProcessedStyleSet<ISummaryTableStyles> =
             width: "max-content"
         },
         groupLabel: {
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "12px",
-            //lineHeight: "12px",
-            //fontWeight: "500",
             height: "26px"
         },
         flexCol: {
@@ -47,27 +38,19 @@ export const SummaryTableStyles: () => IProcessedStyleSet<ISummaryTableStyles> =
             flexDirection: "column",
             borderTop: "1px solid",
             borderBottom: "1px solid",
-            borderColor: theme.semanticColors.bodyDivider //#CCCCCC
-            
+            borderColor: theme.semanticColors.bodyDivider
         },
         binBox: {
             flex: 1,
-            // minWidth: "100px",
-            // maxWidth: "200px",
-            // width: "max-content",
             width: "130px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             borderBottom: "0.5px dashed",
-            borderColor: theme.semanticColors.bodyDivider //#CCCCCC
+            borderColor: theme.semanticColors.bodyDivider
         },
         binTitle: {
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "15px",
-            //lineHeight: "18px",
-            //fontWeight: "400"
         },
         metricCol: {
             display: "inline-flex",
@@ -76,29 +59,21 @@ export const SummaryTableStyles: () => IProcessedStyleSet<ISummaryTableStyles> =
             width: "120px"
         },
         metricLabel: {
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "12px",
-            //lineHeight: "12px",
-            //fontWeight: "500",
             height: "26px",
             paddingLeft: "10px"
         },
         metricBox: {
             flex: 1,
             paddingLeft: "10px",
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "32px",
-            //lineHeight: "39px",
             fontWeight: FontWeights.light,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             borderLeft: "0.5px dashed",
             borderBottom: "0.5px dashed",
-            borderColor: theme.semanticColors.bodyDivider //#CCCCCC
-
+            borderColor: theme.semanticColors.bodyDivider
         },
         frame: {
             paddingBottom: "19px",

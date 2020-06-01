@@ -18,22 +18,16 @@ export const WizardFooterStyles: () => IProcessedStyleSet<IWizardFooterStyles> =
         next: {
             height: "44px",
             padding: "12px",
-            //color: "#FFFFFF",
-            //color: theme.semanticColors.buttonText,
             fontSize: "18px",
             lineHeight: "24px",
-            //backgroundColor: "#666666",
             fontWeight: "400",
             marginLeft: "10px"
         },
         back: {
             height: "44px",
             padding: "12px",
-            //color: "#333333",
-            //color: theme.semanticColors.buttonText,
             fontSize: "18px",
             lineHeight: "24px",
-            //backgroundColor: "#FFFFFF",
             fontWeight: "400"
         }
     });

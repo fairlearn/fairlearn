@@ -31,7 +31,6 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             padding: "40px"
         },
         header: {
-            //backgroundColor: "#EBEBEB",
             backgroundColor: theme.semanticColors.bodyFrameBackground, 
             padding: "0 90px",
             height: "90px",
@@ -41,19 +40,11 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             alignItems: "center"
         },
         headerTitle: {
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "32px",
-            //lineHeight: "39px",
-            //fontWeight: "100"
             fontWeight: FontWeights.light
         },
         editButton: {
-            //color: "#333333",
             color: theme.semanticColors.buttonText,
-            //fontSize: "12px",
-            //lineHeight: "20px",
-            //fontWeight: "400"
         },
         main: {
             height: "100%",
@@ -67,46 +58,26 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             width: "300px"
         },
         rightTitle: {
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "15px",
-            //lineHeight: "16px",
-            //fontWeight: "500",
             paddingBottom: "18px",
             borderBottom: "1px solid",
-            //borderColor:  "#CCCCCC"
             borderColor: theme.semanticColors.bodyDivider
         },
         rightText: {
             padding: "16px 15px 30px 0",
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "15px",
-            //lineHeight: "18px",
-            //fontWeight: "400",
             borderBottom: "0.5px dashed",
-            //borderColor:  "#CCCCCC"
             borderColor: theme.semanticColors.bodyDivider
         },
         insights: {
             textTransform: "uppercase",
-            //color: "#333333",
             color: theme.semanticColors.bodyText,
-            //fontSize: "15px",
-            //lineHeight: "16px",
-            //fontWeight: "500",
             padding: "18px 0",
         },
         insightsText: {
-            //color: "#333333",
-            //color: theme.semanticColors.bodyText,
-            //fontSize: "15px",
-            //lineHeight: "16px",
-            //fontWeight: "400",
             paddingBottom: "18px",
             paddingRight: "15px",
             borderBottom: "1px solid",
-            //borderColor:  "#CCCCCC",
             borderColor: theme.semanticColors.bodyDivider
         },
         chart: {
@@ -114,7 +85,6 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             flex: 1
         },
         textSection: {
-            //color: "#333333"
             color: theme.semanticColors.bodyText,
             paddingBottom: "5px"
         },
