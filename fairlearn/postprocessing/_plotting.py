@@ -4,7 +4,8 @@
 """Utilities for plotting curves."""
 
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
-from ._threshold_optimizer import ThresholdOptimizer, SIMPLE_CONSTRAINTS
+from ._threshold_optimizer import ThresholdOptimizer
+from sklearn.utils.validation import check_is_fitted
 
 
 def _get_debug_color(key):
@@ -79,30 +80,23 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
     _raise_if_not_threshold_optimizer(threshold_optimizer)
+    check_is_fitted(threshold_optimizer)
 
-    if threshold_optimizer.constraints in SIMPLE_CONSTRAINTS:
-        for sensitive_feature_value in threshold_optimizer._tradeoff_curve.keys():
-            _plot_curve(ax, sensitive_feature_value, 'x', 'y',
-                        threshold_optimizer._tradeoff_curve[sensitive_feature_value])
+    for sensitive_feature_value in threshold_optimizer._tradeoff_curve.keys():
+        _plot_curve(ax, sensitive_feature_value, 'x', 'y',
+                    threshold_optimizer._tradeoff_curve[sensitive_feature_value])
 
-        if ax is None:
-            ax = plt.figure()
-        _plot_solution(ax, threshold_optimizer._x_best, None, "Solution",
-                       threshold_optimizer.constraints, threshold_optimizer.objective)
-    elif threshold_optimizer.constraints == "equalized_odds":
-        for sensitive_feature_value in threshold_optimizer._roc_curve.keys():
-            _plot_curve(ax, sensitive_feature_value, 'x', 'y',
-                        threshold_optimizer._roc_curve[sensitive_feature_value])
+    if ax is None:
+        ax = plt.figure()
 
-        if ax is None:
-            ax = plt.figure()
+    if threshold_optimizer.constraints == "equalized_odds":
         _plot_overlap(ax, threshold_optimizer._x_grid, threshold_optimizer._y_min)
         _plot_solution(ax, threshold_optimizer._x_best, threshold_optimizer._y_best,
                        'Solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
     else:
-        raise ValueError("The plot can only be generated for a ThresholdOptimizer "
-                         "object with constraints from: {}, equalized_odds."
-                         .format(", ".join(SIMPLE_CONSTRAINTS)))
+        _plot_solution(ax, threshold_optimizer._x_best, None, "Solution",
+                       threshold_optimizer.x_metric_,
+                       threshold_optimizer.y_metric_)
 
     if show_plot:
         plt.show()

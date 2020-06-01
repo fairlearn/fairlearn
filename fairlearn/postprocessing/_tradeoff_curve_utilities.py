@@ -19,8 +19,6 @@ DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value
 METRIC_DICT = {
     'selection_rate': (
         lambda x: x.predicted_positives / x.n),
-    'demographic_parity': (
-        lambda x: x.predicted_positives / x.n),
     'false_positive_rate': (
         lambda x: x.false_positives / x.negatives),
     'false_negative_rate': (
@@ -37,7 +35,25 @@ METRIC_DICT = {
 
 
 def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives, false_negatives):
-    """Return the Bunch with the fields required for confusion-matrix metrics."""
+    """Extend the provided confusion matrix counts with additional implied fields.
+
+    Parameters
+    ----------
+    true_positives, false_positives, true_negatives, false_negatives : int
+        The counts appearing in the confusion matrix.
+
+    Returns
+    -------
+    result : sklearn.utils.Bunch
+        Dictionary-like object, with attributes:
+
+        true_positives, false_positives, true_negatives, false_negatives : int
+            The provided counts.
+
+        predicted_positives, predicted_negatives, positives, negatives, n : int
+            Derived counts.
+    """
+
     return Bunch(
         true_positives=true_positives,
         false_positives=false_positives,
@@ -51,45 +67,60 @@ def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives,
     )
 
 
-def _get_roc(data, sensitive_feature_value, flip=False,
-             x_metric="false_positive_rate", y_metric="true_positive_rate"):
-    """Get ROC curve's convex hull based on data columns 'score' and 'label'.
+def _tradeoff_curve(data, sensitive_feature_value, flip=False,
+                    x_metric="false_positive_rate", y_metric="true_positive_rate"):
+    """Get a convex hull of achievable tradeoffs between the two provided metrics.
 
-    Scores represent output values from the predictor.
+    The metrics are based on considering all possible thresholds of 'score' column of `data` and
+    evaluated with respect to 'label' column of `data`.
 
-    :param data: the DataFrame containing scores and labels
-    :type data: pandas.DataFrame
-    :param sensitive_feature_value: the sensitive feature value of the samples provided in `data`
-    :type sensitive_feature_value: str or int
-    :param flip: if True flip points below the ROC diagonal into points above by applying negative
-        weights; if False does not allow flipping; default True
-    :type flip: bool
-    :return: the convex hull over the ROC curve points
-    :rtype: pandas.DataFrame
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        Data frame with columns 'score' and 'label'.
+
+    sensitive_feature_value : str or int
+        The sensitive feature value of the samples providing in `data`. Only used
+        to generate a description when an exception is thrown.
+
+    flip : bool, default=False
+        If True, also consider the flipped thresholding (points below the threshold
+        classified as positive and above the threshold as negative).
+
+    Returns
+    -------
+    result : pandas.DataFrame
+        The convex hull over the achievabale tradeoff points with columns
+        'x', 'y', and 'operation'.
     """
-    roc_sorted = _calculate_roc_points(
+    points_sorted = _calculate_tradeoff_points(
         data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric)
-    roc_selected = _filter_points_to_get_convex_hull(roc_sorted)
-    roc_convex_hull = pd.DataFrame(roc_selected)[['x', 'y', 'operation']]
-    return roc_convex_hull
+    points_selected = _filter_points_to_get_convex_hull(points_sorted)
+    convex_hull = pd.DataFrame(points_selected)[['x', 'y', 'operation']]
+    return convex_hull
 
 
-def _filter_points_to_get_convex_hull(roc_sorted):
-    """Find the convex hull.
+def _filter_points_to_get_convex_hull(points_sorted):
+    """Find the upper convex hull.
 
-    Uses a simplified version of Andrew's monotone chain convex hull algorithm
-    https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
-    to get the convex hull. Since we can assume the points (0,0) and (1,1) to be part
-    of the convex hull the problem is simpler and we only need to make a single pass
-    through the data.
+    Parameters
+    ----------
+    points_sorted : pandas.DataFrame
+        Points represented as rows with 'x' and 'y' columns, sorted by 'x'.
 
-    :param roc_sorted: DataFrame with ROC curve points sorted by 'x'
-    :type roc_sorted: pandas.DataFrame
-    :return: the list of points that make up the convex hull
-    :rtype: list of named tuples
+    Returns
+    -------
+    result : pandas.DataFrame
+        Points that make the upper convex hull.
+
+    Notes
+    -----
+    Uses `Andrew's monotone chain convex hull algorithm
+    <https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain>`_.
+
     """
     selected = []
-    for r2 in roc_sorted.itertuples():
+    for r2 in points_sorted.itertuples():
         # For each set of three points, i.e. the last two points in selected
         # and the next point from the sorted list of base points, check
         # whether the middle point (r1) lies above the line between the
@@ -166,8 +197,8 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
 
 
-def _calculate_roc_points(data, sensitive_feature_value, flip=False,
-                          x_metric="false_positive_rate", y_metric="true_positive_rate"):
+def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
+                               x_metric="false_positive_rate", y_metric="true_positive_rate"):
     """Calculate the ROC points from the scores and labels.
 
     This is done by iterating through all possible

@@ -27,8 +27,8 @@ from ._constants import (
     OUTPUT_SEPARATOR,
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING)
-from ._roc_curve_utilities import (
-    _interpolate_curve, _get_roc,
+from ._tradeoff_curve_utilities import (
+    _interpolate_curve, _tradeoff_curve,
     _extend_confusion_matrix,
     METRIC_DICT)
 from ._interpolated_thresholder import InterpolatedThresholder
@@ -51,12 +51,12 @@ logger = logging.getLogger(__name__)
 # These metrics are also required to be "moments" in the same sense as
 # required by fairlearn.reductions, so that the interpolation is possible.
 SIMPLE_CONSTRAINTS = {
-    'selection_rate',
-    'demographic_parity',
-    'false_positive_rate',
-    'false_negative_rate',
-    'true_positive_rate',
-    'true_negative_rate',
+    'selection_rate_parity': 'selection_rate',
+    'demographic_parity': 'selection_rate',
+    'false_positive_rate_parity': 'false_positive_rate',
+    'false_negative_rate_parity': 'false_negative_rate',
+    'true_positive_rate_parity': 'true_positive_rate',
+    'true_negative_rate_parity': 'true_negative_rate',
 }
 
 # Any "moment" is allowed as a performance metric for simple constraints.
@@ -68,6 +68,8 @@ OBJECTIVES_FOR_SIMPLE_CONSTRAINTS = {
     'balanced_accuracy_score',
 }
 
+# Besides simple constraints we also allow 'equalized_odds' as a constraint.
+
 # For equalized odds, we only allow objectives that are non-decreasing in true_positives,
 # when holding n, positives, negatives, true_negatives, and false_positives fixed.
 OBJECTIVES_FOR_EQUALIZED_ODDS = {
@@ -77,7 +79,7 @@ OBJECTIVES_FOR_EQUALIZED_ODDS = {
 
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = (
     "Currently only the following constraints are supported: {}, equalized_odds.".format(
-        ", ".join(SIMPLE_CONSTRAINTS)))
+        ", ".join(SIMPLE_CONSTRAINTS.keys())))
 NOT_SUPPORTED_OBJECTIVES_FOR_SIMPLE_CONSTRAINTS_ERROR_MESSAGE = (
     "For {{}} only the following objectives are supported: {}.".format(
         ", ".join(OBJECTIVES_FOR_SIMPLE_CONSTRAINTS)))
@@ -87,23 +89,59 @@ NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
 
 
 class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
-    """An Estimator based on the threshold optimization approach.
+    """A classifier based on the threshold optimization approach.
 
-    The procedure followed is described in detail in
+    The classifier is obtained by applying group-specific thresholds to
+    the provided estimator. The thresholds are chosen to optimize the
+    provided performance objective subject to the provided fairness constraints.
+
+    Parameters
+    ----------
+    estimator : estimator object implementing 'predict' and possibly 'fit'
+        An estimator whose output is postprocessed.
+
+    constraints : str, default='demographic_parity'
+        Fairness constraints under which threshold optimization is performed.
+        Possible inputs are:
+
+        'demographic_parity', 'selection_rate_parity' (synonymous)
+            match the selection rate across groups
+        'false_positive_rate_parity', false_negative_rate_parity',
+        'true_positive_rate_parity', 'true_positive_rate'
+            match the named metric across groups
+        'equalized_odds'
+            match true positive and false positive rates across groups
+
+    objective : str, default='accuracy_score'
+        Performance objective under which threshold optimization is performed.
+        Not all objectives are allowed for all types of constraints.
+        Possible inputs are:
+
+        'accuracy_score', 'balanced_accuracy_score'
+            allowed for all constraint types
+        'selection_rate', 'true_positive_rate', 'true_negative_rate',
+            allowed for all constraint types except 'equalized_odds'
+
+    grid_size : int, default=1000
+        The values of the constraint metric are discretized according to the grid
+        of the specified size over the interval [0,1] and the optimization is
+        performed with respect to the constraints achieving those values. In case
+        of 'equalized_odds' the constraint metric is the false positive rate.
+
+    flip : bool, default=False
+        If True, then allow flipping the decision if it improves the resulting
+
+    prefit : bool, default=False
+        If True, avoid refitting the given estimator. Note that when used
+        with :func:`sklearn.model_selection.cross_val_score`,
+        :class:`sklearn.model_selection.GridSearchCV`, this will result in an error.
+        In that case, please use ``prefit=False``.
+
+    Notes
+    -----
+    The procedure is based on the algorithm of
     `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_.
 
-    :param estimator: An estimator whose output will be post processed
-    :type estimator: An estimator
-    :param grid_size: The number of ticks on the grid over which we evaluate the curves.
-        A large grid_size means that we approximate the actual curve, so it increases the chance
-        of being very close to the actual best solution.
-    :type grid_size: int
-    :param flip: Allow flipping to negative weights if it improves accuracy.
-    :type flip: bool, default=False
-    :param prefit: If ``True``, avoid re-fitting the given estimator if it's
-        already trained. Note that when used with ``cross_val_score``,
-        ``GridSearchCV``, this will result in an error. In that case, please use ``prefit=False``.
-    :type: bool, default=False
     """
 
     def __init__(self, *, estimator=None,
@@ -167,13 +205,16 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         scores = self.estimator_.predict(X)
         if self.constraints == "equalized_odds":
+            self.x_metric_ = "false_positive_rate"
+            self.y_metric_ = "true_positive_rate" 
             threshold_optimization_method = self._threshold_optimization_for_equalized_odds
         else:
+            self.x_metric_ = SIMPLE_CONSTRAINTS[self.constraints]
+            self.y_metric_ = self.objective
             threshold_optimization_method = self._threshold_optimization_for_simple_constraints
 
         self.interpolated_thresholder_ = threshold_optimization_method(
-            sensitive_feature_vector, y, scores,
-            self.constraints, self.objective, self.grid_size, self.flip)
+            sensitive_feature_vector, y, scores)
         return self
 
     def predict(self, X, *, sensitive_features, random_state=None):
@@ -210,9 +251,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         return self.interpolated_thresholder_._pmf_predict(
             X, sensitive_features=sensitive_features)
 
-    def _threshold_optimization_for_simple_constraints(self, sensitive_features, labels, scores,
-                                                       constraints, objective,
-                                                       grid_size=1000, flip=False):
+    def _threshold_optimization_for_simple_constraints(self, sensitive_features, labels, scores):
         """Calculate the objective value across all values of constraints.
 
         These calculations are made at different thresholds over the scores. Subsequently weighs
@@ -232,17 +271,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
         :param scores: the scores produced by a predictor's prediction
         :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :param grid_size: The number of ticks on the grid over which we evaluate the curves.
-            A large grid_size means that we approximate the actual curve, so it increases the
-            chance of being very close to the actual best solution.
-        :type grid_size: int
-        :param flip: allow flipping to negative weights if it improves accuracy.
-        :type flip: bool, default=False
         :return: the postprocessed predictor.
         """
         n = len(labels)
         self._tradeoff_curve = {}
-        self._x_grid = np.linspace(0, 1, grid_size + 1)
+        self._x_grid = np.linspace(0, 1, self.grid_size + 1)
         overall_tradeoff_curve = 0 * self._x_grid
 
         data_grouped_by_sensitive_feature = _reformat_and_group_data(
@@ -252,9 +285,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             # Determine probability of current sensitive feature group based on data.
             p_sensitive_feature_value = len(group) / n
 
-            roc_convex_hull = _get_roc(
-                group, sensitive_feature_value, flip=flip,
-                x_metric=constraints, y_metric=objective)
+            roc_convex_hull = _tradeoff_curve(
+                group, sensitive_feature_value, flip=self.flip,
+                x_metric=self.x_metric_, y_metric=self.y_metric_)
 
             self._tradeoff_curve[sensitive_feature_value] = \
                 _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation',
@@ -270,7 +303,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             logger.debug(OUTPUT_SEPARATOR)
             logger.debug("DATA")
             logger.debug(group)
-            logger.debug("ROC curve: convex")
+            logger.debug("Tradeoff curve")
             logger.debug(roc_convex_hull)
 
         # Find maximum objective point given that at each point the constraint value for each
@@ -291,17 +324,15 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                       operation1=best_interpolation.operation1)
 
         logger.debug(OUTPUT_SEPARATOR)
-        logger.debug("From ROC curves")
+        logger.debug("From tradeoff curves")
         logger.debug("Best point (simple constraints): %s=%.3f, %s=%.3f",
-                     objective, overall_tradeoff_curve[i_best], constraints, self._x_best)
+                     self.y_metric_, overall_tradeoff_curve[i_best], self.x_metric_, self._x_best)
         logger.debug(OUTPUT_SEPARATOR)
 
         return InterpolatedThresholder(
             self.estimator_, interpolation_dict, prefit=True).fit(None, None)
 
-    def _threshold_optimization_for_equalized_odds(self, sensitive_features, labels, scores,
-                                                   constraints, objective,
-                                                   grid_size=1000, flip=False):
+    def _threshold_optimization_for_equalized_odds(self, sensitive_features, labels, scores):
         """Calculate the ROC curve of every sensitive feature value at different thresholds.
 
         Subsequently takes the overlapping region of the ROC curves, and finds the best
@@ -317,12 +348,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
         :param scores: the scores produced by a predictor's prediction
         :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :param grid_size: The number of ticks on the grid over which we evaluate the curves.
-            A large grid_size means that we approximate the actual curve, so it increases the
-            chance of being very close to the actual best solution.
-        :type grid_size: int
-        :param flip: allow flipping to negative weights if it improves accuracy.
-        :type flip: bool
         :return: the postprocessed predictor.
         """
         data_grouped_by_sensitive_feature = _reformat_and_group_data(
@@ -335,15 +360,15 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         else:
             n_positive = sum(labels)
         n_negative = n - n_positive
-        self._roc_curve = {}
-        self._x_grid = np.linspace(0, 1, grid_size + 1)
+        self._tradeoff_curve = {}
+        self._x_grid = np.linspace(0, 1, self.grid_size + 1)
         y_values = pd.DataFrame()
 
         for sensitive_feature_value, group in data_grouped_by_sensitive_feature:
-            roc_convex_hull = _get_roc(group, sensitive_feature_value, flip=flip)
-            self._roc_curve[sensitive_feature_value] = \
+            roc_convex_hull = _tradeoff_curve(group, sensitive_feature_value, flip=self.flip)
+            self._tradeoff_curve[sensitive_feature_value] = \
                 _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', self._x_grid)
-            y_values[sensitive_feature_value] = self._roc_curve[sensitive_feature_value]['y']
+            y_values[sensitive_feature_value] = self._tradeoff_curve[sensitive_feature_value]['y']
 
             logger.debug(OUTPUT_SEPARATOR)
             logger.debug("Processing %s", str(sensitive_feature_value))
@@ -364,7 +389,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             true_positives=(n_positive * self._y_min),
             false_negatives=(n_positive * (1.0 - self._y_min))
         )
-        objective_values = np.around(METRIC_DICT[objective](counts), 15)
+        objective_values = np.around(METRIC_DICT[self.objective](counts), 15)
         # Calculate the error at any given x as the sum of
         # a) the proportion of negative labels multiplied by x which represents
         #    the conditional probability P[Y_hat=1 | Y=0], i.e. the probability
@@ -381,8 +406,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         # create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature
         interpolation_dict = {}
-        for sensitive_feature_value in self._roc_curve.keys():
-            roc_result = self._roc_curve[sensitive_feature_value].transpose()[i_best_EO]
+        for sensitive_feature_value in self._tradeoff_curve.keys():
+            roc_result = self._tradeoff_curve[sensitive_feature_value].transpose()[i_best_EO]
             # p_ignore * x_best represent the diagonal of the ROC plot.
             if roc_result.y == roc_result.x:
                 # result is on the diagonal of the ROC plot, i.e. p_ignore is not required
@@ -406,7 +431,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("From ROC curves")
         logger.debug("Best point (EO): %s=%.3f, FP rate=%.3f, TP rate=%.3f",
-                     objective, objective_values[i_best_EO], self._x_best, self._y_best)
+                     self.objective, objective_values[i_best_EO], self._x_best, self._y_best)
         logger.debug(OUTPUT_SEPARATOR)
 
         return InterpolatedThresholder(

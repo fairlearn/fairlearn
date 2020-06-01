@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 import pytest
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
-from fairlearn.postprocessing._roc_curve_utilities import (_calculate_roc_points,
+from fairlearn.postprocessing._tradeoff_curve_utilities import (_calculate_tradeoff_points,
                                                            _filter_points_to_get_convex_hull,
-                                                           _get_roc,
+                                                           _tradeoff_curve,
                                                            _interpolate_curve)
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
 from .conftest import (sensitive_features_ex1, labels_ex, scores_ex,
@@ -81,7 +81,7 @@ def test_convex_hull(base_points, expected_remaining_indices):
             [point.operation for point in convex_hull]).all()
 
 
-def test_calculate_roc_points():
+def test_calculate_tradeoff_points():
     data = pd.DataFrame({
         SENSITIVE_FEATURE_KEY: sensitive_features_ex1.squeeze(),
         SCORE_KEY: scores_ex.squeeze(),
@@ -89,7 +89,7 @@ def test_calculate_roc_points():
     grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group("A") \
         .sort_values(by=SCORE_KEY, ascending=False)
 
-    roc_points = _calculate_roc_points(grouped_data, "A", flip=True)
+    roc_points = _calculate_tradeoff_points(grouped_data, "A", flip=True)
     expected_roc_points = pd.DataFrame({
         "x": [0, .0, 0.25, .5, .5,    0.5, 0.5, .75,    1.0, 1],
         "y": [0, .0, 1/3,  .0, .1/.3, 2/3, 1,   .2/.3,  1.0, 1],
@@ -121,12 +121,12 @@ def test_calculate_roc_points():
     _assert_equal_points(expected_roc_convex_hull, selected_points)
 
 
-def test_get_roc():
+def test_tradeoff_curve():
     for sensitive_feature_value in sensitive_feature_names_ex1:
         grouped_data, base_points, ignore_for_base_points, x_grid = \
             _get_grouped_data_and_base_points(sensitive_feature_value)
 
-        roc_convex_hull = _get_roc(grouped_data, x_grid, sensitive_feature_value)
+        roc_convex_hull = _tradeoff_curve(grouped_data, x_grid, sensitive_feature_value)
         curve = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
 
         _assert_interpolated_points_are_between_base_points(base_points, curve,
