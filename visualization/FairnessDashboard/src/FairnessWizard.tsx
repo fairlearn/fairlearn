@@ -20,6 +20,7 @@ import { MetricsCache } from "./MetricsCache";
 import { WizardReport } from "./WizardReport";
 import { FairnessWizardStyles } from "./FairnessWizard.styles";
 import { loadTheme } from "office-ui-fabric-react";
+import { defaultTheme } from "./Themes";
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -188,7 +189,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         super(props);
         FairnessWizard.initializeIcons(props);
         let accuracyMetrics: IAccuracyOption[];
-        const theme = loadTheme(props.theme);
+        loadTheme(props.theme || defaultTheme);
         this.selections = new SelectionContext("models", 1);
         this.selections.subscribe({selectionCallback: (strings: string[]) => {
             const numbers = strings.map(s => +s);
