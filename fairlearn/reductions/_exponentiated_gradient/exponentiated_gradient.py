@@ -225,17 +225,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
 
-        n_samples = len(X)
-
-        def get_predictions(clf):
-            """ignore classifiers with weight 0 since they can only contribute 0 to the result"""
-            if self.weights_[int(clf.name)] == 0:
-                return np.zeros(n_samples)
+        pred = pd.DataFrame()
+        for t in range(len(self._hs)):
+            if self.weights_[t] == 0:
+                pred[t] = np.zeros(len(X))
             else:
-                return self._hs[int(clf.name)](X)
+                pred[t] = self._hs[t](X)
 
-        pred = pd.DataFrame(0, index=range(n_samples),
-                            columns=range(len(self._hs))).apply(get_predictions)
         if isinstance(self.constraints, ClassificationMoment):
             positive_probs = pred[self.weights_.index].dot(self.weights_).to_frame()
             return np.concatenate((1-positive_probs, positive_probs), axis=1)

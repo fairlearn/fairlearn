@@ -89,12 +89,11 @@ class _Lagrangian:
         else:
             L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
-        max_gamma = gamma.max()
-        max_bound = self.constraints.bound().max()
-        if max_gamma < max_bound:
+        max_constraint = (gamma - self.constraints.bound()).max()
+        if max_constraint <= 0:
             L_high = error
         else:
-            L_high = error + self.B * (max_gamma - max_bound)
+            L_high = error + self.B * max_constraint
         return L, L_high, gamma, error
 
     def eval_gap(self, Q, lambda_hat, nu):
@@ -117,7 +116,7 @@ class _Lagrangian:
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
-        A_ub = np.concatenate((self.gammas - self.constraints.bound().max(), -np.ones((n_constraints, 1))), axis=1)
+        A_ub = np.concatenate((self.gammas.sub(self.constraints.bound(), axis=0), -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
