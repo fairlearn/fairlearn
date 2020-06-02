@@ -69,24 +69,23 @@ def main(argv):
         # the dependency in fairlearn/widget/js with it.
         with _LogWrapper("yarn install for visualizations"):
             subprocess.check_call([args.yarn_path, "install"],
-                                   cwd=os.path.join(os.getcwd(), _visualization_directory))
-        
+                                  cwd=os.path.join(os.getcwd(), _visualization_directory))
+
         with _LogWrapper("yarn build for visualizations"):
             subprocess.check_call([args.yarn_path, "build"],
-                                   cwd=os.path.join(os.getcwd(), _visualization_directory))
-        
+                                  cwd=os.path.join(os.getcwd(), _visualization_directory))
+
         rel_extension = ["node_modules", "fairlearn-dashboard", "rel"]
         with _LogWrapper("removing existing visualizations pulled from npm"):
             shutil.rmtree(os.path.join(_widget_js_directory, *rel_extension))
-        
+
         with _LogWrapper("copying built visualizations into fairlearn widget dependencies"):
             shutil.copytree(os.path.join(_visualization_directory, "rel"),
                             os.path.join(_widget_js_directory, *rel_extension))
-        
+
         with _LogWrapper("yarn build with copied local changes"):
             subprocess.check_call([args.yarn_path, "build"],
-                                   cwd=os.path.join(os.getcwd(), _widget_js_directory))
-        
+                                  cwd=os.path.join(os.getcwd(), _widget_js_directory))
 
     else:
         with _LogWrapper("removal of extra directories"):
