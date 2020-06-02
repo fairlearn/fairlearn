@@ -136,7 +136,7 @@ class FairlearnDashboard(object):
                 "function": f1_score_group_summary
             },
             "log_loss": {
-                "model_type": ["regression"],
+                "model_type": ["probability"],
                 "function": log_loss_group_summary
             },
             "overprediction": {
