@@ -156,14 +156,14 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         );
         const insights3 = localization.formatString(
             localization.ModelComparison.insightsText3,
-            selectedMetric.title.toLowerCase(),
+            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
             selectedMetric.isMinimization ? formattedMinAccuracy : formattedMaxAccuracy, 
             FormatMetrics.formatNumbers(this.state.disparityArray[selectedMetric.isMinimization ? minAccuracyIndex : maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
         );
 
         const insights4 = localization.formatString(
             localization.ModelComparison.insightsText4,
-            selectedMetric.title.toLowerCase(),
+            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
             FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
             formattedMinDisparity
         );
@@ -171,7 +171,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const howToReadText = localization.formatString(
             localization.ModelComparison.howToReadText,
             this.props.modelCount.toString(),
-            selectedMetric.title.toLowerCase(),
+            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
         
@@ -182,9 +182,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             return series;
         });
         const accuracyMetricTitle = selectedMetric.title;
+        const accuracyMetricTitleAlwaysUpperCase = selectedMetric.alwaysUpperCase;
         props.layout.xaxis.title = accuracyMetricTitle;
         props.layout.yaxis.title = this.state.disparityInOutcomes ? localization.ModelComparison.disparityInOutcomes :
-            localization.formatString(localization.ModelComparison.disparityInAccuracy, accuracyMetricTitle.toLowerCase()) as string
+            localization.formatString(localization.ModelComparison.disparityInAccuracy,
+                                      accuracyMetricTitleAlwaysUpperCase ? accuracyMetricTitle : accuracyMetricTitle.toLowerCase()) as string
         return (
             <Stack className={styles.frame}>
                 <div className={styles.header}>
@@ -218,7 +220,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                             {
                             key: 'accuracy',
                             text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
-                                accuracyMetricTitle.toLowerCase()) as string,
+                                accuracyMetricTitleAlwaysUpperCase ? accuracyMetricTitle : accuracyMetricTitle.toLowerCase()) as string,
                             styles: { choiceFieldWrapper: styles.radioOptions} 
                             },
                             {

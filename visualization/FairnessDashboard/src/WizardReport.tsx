@@ -366,9 +366,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
                         <Text variant={"xxLargePlus"} className={styles.metricText} block>{globalAccuracyString}</Text>
-                        <Text variant={"small"} className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.title.toLowerCase())}</Text>
+                        <Text variant={"small"} className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
                         <Text variant={"xxLargePlus"} className={styles.metricText} block>{disparityAccuracyString}</Text>
-                        <Text variant={"small"} className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.title.toLowerCase())}</Text>
+                        <Text variant={"small"} className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
                     </div>
                     <ActionButton
                         iconProps={{iconName: "Edit"}}
