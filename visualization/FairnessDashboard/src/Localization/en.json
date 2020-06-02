@@ -140,7 +140,7 @@
         "r2Description": "The fraction of variance in the labels explained by the model.",
         "aucDescription": "The quality of the predictions, viewed as scores, in separating positive examples from negative examples.",
         "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced.",
-        "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced."
+        "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced.",
         "f1ScoreDescription": "F1-Score is the harmonic mean of precision and recall."
     },
     "BinDialog": {
