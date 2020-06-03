@@ -26,7 +26,7 @@ export const TileListStyles: () => IProcessedStyleSet<ITilesListStyles> = () => 
             float: "left",
             cursor: "pointer",
             boxSizing: "border-box",
-            backgroundColor: theme.semanticColors.bodyBackground,
+            backgroundColor: theme.semanticColors.bodyDivider,
             marginBottom: "10px",
             marginRight: "10px",
             selectors: {

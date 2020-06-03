@@ -53,15 +53,20 @@ export const FeatureTabStyles: () => IProcessedStyleSet<IFeatureTabStyles> = () 
         },
         header: {
             color: theme.semanticColors.bodyText,
-            fontSize: FontSizes.xxLargePlus,
-            fontWeight: FontWeights.light,
+            //fontSize: FontSizes.xxLargePlus,
+            fontWeight: FontWeights.semibold,
+            margin: "26px 0"
         },
         textBody: {
             paddingTop: "12px",
-            fontSize: "18px",
-            marginBottom: "15px",
             fontWeight: FontWeights.semilight,
-            color: theme.semanticColors.bodyText
+            color: theme.semanticColors.bodySubtext,
+            paddingBottom: "12px"
+        //     paddingTop: "12px",
+        //     //fontSize: "18px",
+        //     marginBottom: "15px",
+        //     fontWeight: FontWeights.semilight,
+        //     color: theme.semanticColors.bodyText
         },
         tableHeader: {
             display: "flex",

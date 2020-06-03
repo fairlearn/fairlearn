@@ -60,12 +60,16 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                         onCancel={this.hideModal}/>}
                 </Modal>
                 <Stack className={styles.main}>
-                    <h2 className={styles.header}>
+                    {/* <h2 className={styles.header}>
                         {localization.Feature.header}
-                    </h2>
-                    <p className={styles.textBody}>{localization.Feature.body}</p>
+                    </h2> */}
+                    <Text className={styles.header} block>
+                        {localization.Feature.header}
+                    </Text>
+                    {/* <p className={styles.textBody}>{localization.Feature.body}</p> */}
+                    <Text className={styles.textBody}block>{localization.Feature.body}</Text>
                     <div className={styles.tableHeader}>
-                        <Text variant={"mediumPlus"} block>{localization.Intro.features}</Text>
+                        <Text block>{localization.Intro.features}</Text>
                         <Text className={styles.subgroupHeader} block>{localization.Feature.subgroups}</Text>
                     </div>
                     <StackItem grow={2} className={styles.itemsList}>
@@ -108,7 +112,7 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                 <Icon iconName={this.props.selectedFeatureIndex === index ? "RadioBtnOn" : "RadioBtnOff"} className={styles.iconClass}/>
             </div>
             <div className={styles.featureDescriptionSection}>
-                <Text variant={"large"} className={styles.itemTitle} block>{this.props.dashboardContext.modelMetadata.featureNames[index]}</Text>
+                <Text className={styles.itemTitle} block>{this.props.dashboardContext.modelMetadata.featureNames[index]}</Text>
                 {item.rangeType === RangeTypes.categorical &&
                     <Text variant={"mediumPlus"} className={styles.valueCount} block>{localization.formatString(localization.Feature.summaryCategoricalCount, item.array.length) as string}</Text>
                 }

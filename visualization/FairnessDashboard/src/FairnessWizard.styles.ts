@@ -18,8 +18,10 @@ export const FairnessWizardStyles: () => IProcessedStyleSet<IFairnessWizardStyle
         },
         thinHeader: {
             height: "36px",
-            backgroundColor: theme.palette.neutralPrimary,
-            color: theme.palette.white
+            //backgroundColor: theme.palette.neutralPrimary,
+            backgroundColor: theme.semanticColors.bodyBackground,
+            color: theme.semanticColors.bodyText
+            //color: theme.palette.white
         },
         headerLeft: {
             padding: "20px"

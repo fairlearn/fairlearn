@@ -131,6 +131,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         textRow: {
             display: "flex",
             flexDirection: "row",
+            //alignItems: "stretch",
             alignItems: "center",
             paddingBottom: "7px"
         },

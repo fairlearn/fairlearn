@@ -69,7 +69,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 automargin: true,
                 fixedrange: true,
                 mirror: true,
-                linecolor: theme.palette.neutralPrimaryAlt,
+                linecolor: theme.semanticColors.disabledBorder,
                 linewidth: 1,
                 title:{
                     text: 'Error'
@@ -190,7 +190,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         return (
             <Stack className={styles.frame}>
                 <div className={styles.header}>
-                    <Text  variant={"xxLargePlus"} className={styles.headerTitle}>{localization.ModelComparison.title}</Text>
+                    <Text className={styles.headerTitle} block>{localization.ModelComparison.title}</Text>
                     <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
                 <div className={styles.main}>
