@@ -74,7 +74,7 @@ the following set of labels:
     >>> import fairlearn.metrics as flm
     >>> group_metrics = flm.group_summary(skm.recall_score, Y_true, Y_pred, sensitive_features=group_membership_data, sample_weight=None)
     >>> print("Overall recall = ", group_metrics.overall)
-    Overall recall =  0.
+    Overall recall =  0.5
     >>> print("recall by groups = ", group_metrics.by_group)
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
