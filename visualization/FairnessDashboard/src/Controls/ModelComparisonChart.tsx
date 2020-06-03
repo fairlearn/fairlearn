@@ -154,16 +154,17 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             formattedMinDisparity,
             formattedMaxDisparity
         );
+        const metricTitleAppropriateCase = selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase();
         const insights3 = localization.formatString(
             localization.ModelComparison.insightsText3,
-            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             selectedMetric.isMinimization ? formattedMinAccuracy : formattedMaxAccuracy, 
             FormatMetrics.formatNumbers(this.state.disparityArray[selectedMetric.isMinimization ? minAccuracyIndex : maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
         );
 
         const insights4 = localization.formatString(
             localization.ModelComparison.insightsText4,
-            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
             formattedMinDisparity
         );
@@ -171,7 +172,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const howToReadText = localization.formatString(
             localization.ModelComparison.howToReadText,
             this.props.modelCount.toString(),
-            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
         
