@@ -8,6 +8,7 @@ export interface IAccuracyOption {
     description?: string;
     tags?: string[];
     userVisible?: boolean;
+    alwaysUpperCase?: boolean;
 }
 
 export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
@@ -156,7 +157,8 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         description: localization.Metrics.r2Description,
         isMinimization: false,
         isPercentage: false,
-        userVisible: true
+        userVisible: true,
+        alwaysUpperCase: true
     },
     "root_mean_squared_error": {
         key: "root_mean_squared_error",
@@ -164,7 +166,8 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         description: localization.Metrics.rmseDescription,
         isMinimization: true,
         isPercentage: false,
-        userVisible: true
+        userVisible: true,
+        alwaysUpperCase: true
     },
     "auc": {
         key: "auc",
@@ -181,5 +184,21 @@ export const AccuracyOptions: {[key: string]: IAccuracyOption} = {
         isMinimization: false,
         isPercentage: true,
         userVisible: true
-    }
+    },
+    "f1_score": {
+        key: "f1_score",
+        title: localization.Metrics.f1Score,
+        description: localization.Metrics.f1ScoreDescription,
+        isMinimization: false,
+        isPercentage: false,
+        userVisible: true,
+        alwaysUpperCase: true
+    },
+    "log_loss": {
+        key: "log_loss",
+        title: localization.Metrics.logLoss,
+        description: localization.loremIpsum,
+        isMinimization: true,
+        isPercentage: false
+    },
 };

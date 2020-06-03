@@ -39,7 +39,8 @@ supported_metrics_weighted_binary = [
     (skm.recall_score, metrics.recall_score_group_summary),
     (skm.roc_auc_score, metrics.roc_auc_score_group_summary),
     (skm.mean_squared_error, metrics.mean_squared_error_group_summary),
-    (skm.r2_score, metrics.r2_score_group_summary)]
+    (skm.r2_score, metrics.r2_score_group_summary),
+    (skm.f1_score, metrics.f1_score_group_summary)]
 supported_metrics_weighted_binary = supported_metrics_weighted_binary + supported_metrics_weighted
 
 
@@ -51,11 +52,8 @@ supported_metrics_unweighted = metrics_no_sample_weights + supported_metrics_wei
 # =======================================================
 
 
-@pytest.mark.parametrize("func_tuple", supported_metrics_unweighted)
-def test_metric_unweighted(func_tuple):
-    metric_func = func_tuple[0]
-    group_metric_func = func_tuple[1]
-
+@pytest.mark.parametrize("metric_func,group_metric_func", supported_metrics_unweighted)
+def test_metric_unweighted(metric_func, group_metric_func):
     result = group_metric_func(Y_true, Y_pred, sensitive_features=groups)
     # We don't really care about the numbers (sklearn is responsible)
     # We just want to make sure we got a result
@@ -68,11 +66,8 @@ def test_metric_unweighted(func_tuple):
         assert expected_overall == result.overall
 
 
-@pytest.mark.parametrize("func_tuple", supported_metrics_weighted_binary)
-def test_metric_weighted(func_tuple):
-    metric_func = func_tuple[0]
-    group_metric_func = func_tuple[1]
-
+@pytest.mark.parametrize("metric_func,group_metric_func", supported_metrics_weighted_binary)
+def test_metric_weighted(metric_func, group_metric_func):
     result = group_metric_func(
         Y_true, Y_pred, sensitive_features=groups, sample_weight=weight)
     assert len(result.by_group) == 5
@@ -84,11 +79,8 @@ def test_metric_weighted(func_tuple):
         assert expected_overall == result.overall
 
 
-@pytest.mark.parametrize("func_tuple", supported_metrics_weighted)
-def test_metric_weighted_ternary(func_tuple):
-    metric_func = func_tuple[0]
-    group_metric_func = func_tuple[1]
-
+@pytest.mark.parametrize("metric_func,group_metric_func", supported_metrics_weighted)
+def test_metric_weighted_ternary(metric_func, group_metric_func):
     result = group_metric_func(
         Y_true_ternary, Y_pred_ternary, sensitive_features=groups, sample_weight=weight)
     assert len(result.by_group) == 5
@@ -106,7 +98,7 @@ def test_group_accuracy_score_unnormalized():
     result = metrics.accuracy_score_group_summary(
         Y_true, Y_pred, sensitive_features=groups, normalize=False)
 
-    expected_overall = skm.accuracy_score(Y_true, Y_pred, False)
+    expected_overall = skm.accuracy_score(Y_true, Y_pred, normalize=False)
 
     assert result.overall == expected_overall
 
@@ -179,13 +171,17 @@ def test_group_roc_auc_score_max_fpr():
 # ======================================================================================
 
 
-def test_group_zero_one_loss_unnormalized():
-    result = metrics.zero_one_loss_group_summary(
-        Y_true, Y_pred, sensitive_features=groups, normalize=False)
+@pytest.mark.parametrize("loss_function, group_summary", [
+    (skm.zero_one_loss, metrics.zero_one_loss_group_summary),
+    (skm.log_loss, metrics.log_loss_group_summary)
+])
+def test_group_losses_unnormalized(loss_function, group_summary):
+    result = group_summary(Y_true, Y_pred, sensitive_features=groups, normalize=False)
 
-    expected_overall = skm.zero_one_loss(Y_true, Y_pred, False)
+    expected_overall = loss_function(Y_true, Y_pred, normalize=False)
 
     assert result.overall == expected_overall
+
 
 # =============================================================================================
 
