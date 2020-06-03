@@ -43,7 +43,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         root: [{
           selectors: {
             '::after': {
-                backgroundColor: theme.semanticColors.bodyFrameBackground //theme.palette.neutralTertiary
+                backgroundColor: theme.semanticColors.bodyFrameBackground
             },
           }
         }]
@@ -71,13 +71,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             },
             showlegend: false,
             hovermode: 'closest',
-            //plot_bgcolor: theme.palette.neutralQuaternary,
             plot_bgcolor: theme.semanticColors.bodyFrameBackground,
             xaxis: {
                 fixedrange: true,
                 autorange: true,
                 mirror: true,
-                linecolor: theme.semanticColors.disabledBorder,//theme.palette.neutralPrimaryAlt,
+                linecolor: theme.semanticColors.disabledBorder,
                 linewidth: 1,
             },
             yaxis: {
@@ -86,7 +85,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 showgrid: true,
                 dtick: 1,
                 tick0: 0.5,
-                gridcolor: theme.semanticColors.disabledBorder, //theme.palette.neutralPrimaryAlt,
+                gridcolor: theme.semanticColors.disabledBorder,
                 gridwidth: 1,
                 autorange: "reversed"
             }
@@ -178,26 +177,6 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 } as any
             ];
             opportunityPlot.layout.xaxis.tickformat = ',.0%';
-            // howToReadAccuracySection = (<div>
-            //     <div className={styles.textRow}>
-            //         <div className={styles.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
-            //         <div>
-            //             <Text block>{localization.Report.underestimationError}</Text>
-            //             <Text block>{localization.Report.underpredictionExplanation}</Text>
-            //         </div>
-            //     </div>
-            //     <div className={styles.textRow}>
-            //         <div className={styles.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
-            //         <div>
-            //             <Text block>{localization.Report.overestimationError}</Text>
-            //             <Text block>{localization.Report.overpredictionExplanation}</Text>
-            //         </div>
-            //     </div>
-            //     <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead1}</Text>
-            //     <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead2}</Text>
-            //     <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead3}</Text>
-            // </div>);
-
             howToReadAccuracySection = (<div className={styles.rightText}>
                 <div className={styles.textRow}>
                     <div className={styles.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
@@ -217,10 +196,6 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     <Text block>{localization.Report.classificationAccuracyHowToRead2}</Text>
                     <Text block>{localization.Report.classificationAccuracyHowToRead3}</Text>
             </div>);
-
-            // howToReadOutcomesSection = (<div>
-            //     <Text className={styles.textRow} block>{localization.Report.classificationOutcomesHowToRead}</Text>
-            // </div>);
             howToReadOutcomesSection = <Text className={styles.textRow} block>{localization.Report.classificationOutcomesHowToRead}</Text>
         
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
@@ -418,7 +393,6 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     </div>
                     <div className={styles.mainRight}>
                         <Text className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
-                        {/* <div className={styles.rightText}>{howToReadAccuracySection}</div> */}
                         {howToReadAccuracySection}
                     </div>
             </div>
@@ -426,10 +400,10 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 <Text className={styles.headerTitle}>{localization.Report.outcomesTitle}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
-                        <Text variant={"xxLarge"} className={styles.metricText} block>{globalOutcomeString}</Text>
-                        <Text variant={"small"} className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</Text>
-                        <Text variant={"xxLarge"} className={styles.metricText} block>{disparityOutcomeString}</Text>
-                        <Text variant={"small"}  className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</Text>
+                        <Text className={styles.metricText} block>{globalOutcomeString}</Text>
+                        <Text className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</Text>
+                        <Text className={styles.metricText} block>{disparityOutcomeString}</Text>
+                        <Text className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</Text>
                     </div>
                 </div>
             </div>
