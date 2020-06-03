@@ -116,7 +116,7 @@ class _Lagrangian:
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
-        A_ub = np.concatenate((self.gammas.sub(self.constraints.bound(), axis=0), 
+        A_ub = np.concatenate((self.gammas.sub(self.constraints.bound(), axis=0),
                                -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
