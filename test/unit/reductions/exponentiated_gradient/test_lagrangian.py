@@ -14,6 +14,8 @@ from fairlearn.reductions import DemographicParity, EqualizedOdds
 from .test_utilities import _get_data
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 
+_PRECISION = 1e-6
+
 
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
@@ -69,8 +71,8 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
         'X3': 0.021186})
     assert (np.isclose(fitted_estimator.weights, expected_estimator_weights, atol=1.e-6)).all()
 
-    assert L == L_expected
-    assert L_high == L_high_expected
+    assert L == pytest.approx(L_expected, abs=_PRECISION)
+    assert L_high == pytest.approx(L_high_expected, abs=_PRECISION)
     assert error == 0.25
     assert (gamma == best_h_gamma).all()
 
