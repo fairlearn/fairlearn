@@ -16,7 +16,7 @@ jobs:
   parameters:
     platforms:  { Linux: ubuntu-latest }
     installationType: 'PipLocal'
-    pyVersions: [3.5]
+    pyVersions: [3.6]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
