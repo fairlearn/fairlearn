@@ -23,6 +23,8 @@ from fairlearn.metrics import (
     mean_absolute_error_group_summary,
     mean_squared_error_group_summary,
     r2_score_group_summary,
+    f1_score_group_summary,
+    log_loss_group_summary,
     )
 
 from IPython.display import display
@@ -128,6 +130,14 @@ class FairlearnDashboard(object):
             "r2_score": {
                 "model_type": ["regression"],
                 "function": r2_score_group_summary
+            },
+            "f1_score": {
+                "model_type": ["classification"],
+                "function": f1_score_group_summary
+            },
+            "log_loss": {
+                "model_type": ["probability"],
+                "function": log_loss_group_summary
             },
             "overprediction": {
                 "model_type": [],

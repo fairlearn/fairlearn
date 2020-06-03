@@ -297,6 +297,8 @@ METRICS_SPEC = [
     (skm.mean_absolute_error, ["group_max"]),
     (skm.mean_squared_error, ["group_max"]),
     (skm.r2_score, ["group_min"]),
+    (skm.f1_score, ["group_max"]),
+    (skm.log_loss, ["group_min"]),
 ]
 
 
