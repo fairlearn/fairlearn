@@ -35,8 +35,8 @@ export class TileList extends React.PureComponent<ITileListProps> {
             key={index}
             data-is-focusable={true}>
             <Icon iconName={item.selected ? "RadioBtnOn" : "RadioBtnOff"} className={styles.iconClass}/>
-            <Text variant={"large"} className={styles.title} block>{item.title}</Text>
-            <Text variant={"mediumPlus"} className={styles.description}>{item.description}</Text>
+            <Text className={styles.title} block>{item.title}</Text>
+            <Text className={styles.description}>{item.description}</Text>
           </div>
         );
     }
