@@ -154,7 +154,6 @@ def linkcode_resolve(domain, info):
         linespec = ""
 
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, '/')
-    print(fn)
     return f"http://github.com/fairlearn/fairlearn/blob/master/fairlearn/{fn}{linespec}"
 
 
