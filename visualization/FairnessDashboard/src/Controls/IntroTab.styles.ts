@@ -19,8 +19,8 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
     return mergeStyleSets<IIntroTabStyles>({
         firstSection: {
             padding: "43px 94px",
-            backgroundColor: theme.palette.neutralPrimary,
-            color: theme.palette.white
+            backgroundColor: theme.semanticColors.bodyBackground,
+            color: theme.semanticColors.bodyText
         },
         firstSectionTitle: {
             fontSize: "60px",
@@ -65,8 +65,7 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             flex: 1
         },
         explanatoryText: {
-            paddingTop: "15px",
-            //color: "#666666",
+            paddingTop: "15px"
         },
         getStarted: {
             paddingTop: "30px",

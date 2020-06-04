@@ -27,14 +27,14 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                             <Text variant={"large"} className={styles.numericLabel}>01</Text>
                             <Text variant={"large"}>{localization.Intro.features}</Text>
                         </div>
-                        <Text variant={"medium"} className={styles.explanatoryText} block>{localization.Intro.featuresInfo}</Text>
+                        <Text className={styles.explanatoryText} block>{localization.Intro.featuresInfo}</Text>
                     </div>
                     <div className={styles.explanatoryStep}>
                         <div>
                             <Text variant={"large"} className={styles.numericLabel}>02</Text>
                             <Text variant={"large"}>{localization.Intro.accuracy}</Text>
                         </div>
-                        <Text block>{localization.Intro.accuracyInfo}</Text>
+                        <Text className={styles.explanatoryText} block>{localization.Intro.accuracyInfo}</Text>
                     </div>
                 </div>
                 <Stack horizontalAlign={"center"}>

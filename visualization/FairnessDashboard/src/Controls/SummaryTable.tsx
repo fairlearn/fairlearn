@@ -51,7 +51,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                     <div className={styles.flexCol}>
                         {this.props.binLabels.map((label, index) => {
                             return (<div className={styles.binBox} key={index}>
-                                <Text variant={"medium"} className={styles.binTitle}>{label}</Text>
+                                <Text className={styles.binTitle}>{label}</Text>
                                 <Stack horizontal>
                                     {minIndexes.includes(index) && <Text variant={"xSmall"} className={styles.minMaxLabel}>{localization.Report.minTag}</Text>}
                                     {maxIndexes.includes(index) && <Text variant={"xSmall"} className={styles.minMaxLabel}>{localization.Report.maxTag}</Text>}
@@ -65,7 +65,7 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
                     <div className={styles.flexCol}>
                         {this.props.formattedBinValues.map((value, index) => {
                             return (
-                            <Text variant={"xxLargePlus"} className={styles.metricBox} key={index}>
+                            <Text variant={"xLargePlus"} className={styles.metricBox} key={index}>
                                 {value !== undefined ? value : 'empty'}
                             </Text>);
                         })}
