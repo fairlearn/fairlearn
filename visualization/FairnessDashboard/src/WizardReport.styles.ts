@@ -130,7 +130,8 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            paddingBottom: "7px"
+            paddingBottom: "7px",
+            color: theme.semanticColors.bodyText
         },
         colorBlock: {
             width: "15px",
