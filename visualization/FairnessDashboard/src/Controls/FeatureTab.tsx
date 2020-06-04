@@ -60,13 +60,9 @@ export class FeatureTab extends React.PureComponent<IFeatureTabProps, IState> {
                         onCancel={this.hideModal}/>}
                 </Modal>
                 <Stack className={styles.main}>
-                    {/* <h2 className={styles.header}>
-                        {localization.Feature.header}
-                    </h2> */}
                     <Text className={styles.header} block>
                         {localization.Feature.header}
                     </Text>
-                    {/* <p className={styles.textBody}>{localization.Feature.body}</p> */}
                     <Text className={styles.textBody}block>{localization.Feature.body}</Text>
                     <div className={styles.tableHeader}>
                         <Text block>{localization.Intro.features}</Text>

@@ -31,7 +31,6 @@ export const AccuracyTabStyles: () => IProcessedStyleSet<IAccuracyTabStyles> = (
           },
           header: {
               color: theme.semanticColors.bodyText,
-              //fontSize: FontSizes.xxLargePlus,
               fontWeight: FontWeights.semibold,
               margin: "26px 0"
           },
