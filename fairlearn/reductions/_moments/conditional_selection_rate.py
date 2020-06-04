@@ -15,11 +15,11 @@ _DEFAULT_DIFFERENCE_BOUND = 0.01
 
 
 class ConditionalSelectionRate(ClassificationMoment):
-    """Generic fairness moment for selection rates.
+    r"""Generic fairness moment for selection rates.
 
     This serves as the base class for :class:`DemographicParity` :class:`EqualizedOdds`, and
     others. All subclasses can be used as difference-based constraints or ratio-based constraints.
-    
+
     Difference-based constraints are written with a difference bound :math:`\\epsilon`.
     Ratio-based constraints have a similar :math:`\\epsilon`, referred to as ratio bound slack
     below. Additionally, they require a ratio bound. Constraints are set up for each group
