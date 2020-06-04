@@ -29,6 +29,7 @@ Organizational updates
       wording matter
     - currently many core members are from Microsoft, but the project is an
       independent open source project
+
         - more focus on governance when the project matures
         - The Azure ML team will try to make Fairlearn easily usable in Azure,
           but Fairlearn is a standalone and independent project. Any
