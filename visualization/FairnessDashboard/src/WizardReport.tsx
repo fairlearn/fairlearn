@@ -357,11 +357,11 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             onClick={this.clearModelSelection}>
                             {localization.Report.backToComparisons}
                         </ActionButton>
-                        <Text className={styles.modelLabel}>
+                        <Text variant={"large"} className={styles.modelLabel}>
                             {this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}
                         </Text>
                     </div>}
-                <Text className={styles.headerTitle}>{localization.Report.title}</Text>
+                <Text variant={"mediumPlus"} className={styles.headerTitle}>{localization.Report.title}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
                         <Text className={styles.metricText} block>{globalAccuracyString}</Text>
@@ -397,7 +397,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     </div>
             </div>
             <div className={styles.header}>
-                <Text className={styles.headerTitle}>{localization.Report.outcomesTitle}</Text>
+                <Text variant={"mediumPlus"} className={styles.headerTitle}>{localization.Report.outcomesTitle}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
                         <Text className={styles.metricText} block>{globalOutcomeString}</Text>
