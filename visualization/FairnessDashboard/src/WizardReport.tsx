@@ -364,9 +364,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 <Text variant={"mediumPlus"} className={styles.headerTitle}>{localization.Report.title}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
-                        <Text className={styles.metricText} block>{globalAccuracyString}</Text>
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{globalAccuracyString}</Text>
                         <Text className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
-                        <Text className={styles.metricText} block>{disparityAccuracyString}</Text>
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{disparityAccuracyString}</Text>
                         <Text className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
                     </div>
                     <ActionButton
@@ -400,9 +400,9 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 <Text variant={"mediumPlus"} className={styles.headerTitle}>{localization.Report.outcomesTitle}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
-                        <Text className={styles.metricText} block>{globalOutcomeString}</Text>
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{globalOutcomeString}</Text>
                         <Text className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</Text>
-                        <Text className={styles.metricText} block>{disparityOutcomeString}</Text>
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{disparityOutcomeString}</Text>
                         <Text className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</Text>
                     </div>
                 </div>
