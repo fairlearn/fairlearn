@@ -69,7 +69,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 automargin: true,
                 fixedrange: true,
                 mirror: true,
-                linecolor: theme.palette.neutralPrimaryAlt,
+                linecolor: theme.semanticColors.disabledBorder,
                 linewidth: 1,
                 title:{
                     text: 'Error'
@@ -190,7 +190,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         return (
             <Stack className={styles.frame}>
                 <div className={styles.header}>
-                    <Text  variant={"xxLargePlus"} className={styles.headerTitle}>{localization.ModelComparison.title}</Text>
+                    <Text variant={"large"} className={styles.headerTitle} block>{localization.ModelComparison.title}</Text>
                     <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
                 <div className={styles.main}>
@@ -202,13 +202,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         />
                     </div>
                     <div className={styles.mainRight}>
-                        <Text variant={"mediumPlus"} className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
-                        <Text variant={"medium"} className={styles.rightText} block>{howToReadText}</Text>
-                        <Text variant={"mediumPlus"} className={styles.insights} block>{localization.ModelComparison.insights}</Text>                        
+                        <Text className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
+                        <Text className={styles.rightText} block>{howToReadText}</Text>
+                        <Text className={styles.insights} block>{localization.ModelComparison.insights}</Text>                        
                         <div className={styles.insightsText}>
-                            <Text variant={"medium"} className={styles.textSection} block>{insights2}</Text>
-                            <Text variant={"medium"} className={styles.textSection} block>{insights3}</Text>
-                            <Text variant={"medium"} className={styles.textSection} block>{insights4}</Text>
+                            <Text className={styles.textSection} block>{insights2}</Text>
+                            <Text className={styles.textSection} block>{insights3}</Text>
+                            <Text className={styles.textSection} block>{insights4}</Text>
                         </div>
                     </div>
                 </div>

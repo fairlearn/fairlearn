@@ -41,7 +41,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
         },
         headerTitle: {
             color: theme.semanticColors.bodyText,
-            fontWeight: FontWeights.light
+            fontWeight: FontWeights.semibold
         },
         editButton: {
             color: theme.semanticColors.buttonText,
