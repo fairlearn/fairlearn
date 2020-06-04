@@ -6,6 +6,8 @@ Table of Contents
 .. toctree::
    :maxdepth: 1
    
+   about/index
+
    quickstart
 
    user_guide/index
@@ -15,5 +17,3 @@ Table of Contents
    auto_examples/notebooks/index
 
    contributor_guide/index
-
-   community/index
