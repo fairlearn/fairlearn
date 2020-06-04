@@ -1,4 +1,4 @@
-import { getTheme, FontSizes } from "@uifabric/styling";
+import { getTheme } from "@uifabric/styling";
 import _ from "lodash";
 import { AccessibleChart, IPlotlyProperty } from "mlchartlib";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
@@ -43,7 +43,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
         root: [{
           selectors: {
             '::after': {
-                backgroundColor: theme.palette.neutralTertiary
+                backgroundColor: theme.semanticColors.bodyFrameBackground
             },
           }
         }]
@@ -71,12 +71,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             },
             showlegend: false,
             hovermode: 'closest',
-            plot_bgcolor: theme.palette.neutralQuaternary,
+            plot_bgcolor: theme.semanticColors.bodyFrameBackground,
             xaxis: {
                 fixedrange: true,
                 autorange: true,
                 mirror: true,
-                linecolor: theme.palette.neutralPrimaryAlt,
+                linecolor: theme.semanticColors.disabledBorder,
                 linewidth: 1,
             },
             yaxis: {
@@ -85,7 +85,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 showgrid: true,
                 dtick: 1,
                 tick0: 0.5,
-                gridcolor: theme.palette.neutralPrimaryAlt,
+                gridcolor: theme.semanticColors.disabledBorder,
                 gridwidth: 1,
                 autorange: "reversed"
             }
@@ -151,7 +151,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
+                    font: {color:theme.semanticColors.bodySubtext, size: 10}
                 },
                 {
                     text: localization.Report.overestimationError,
@@ -159,7 +159,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
+                    font: {color:theme.semanticColors.bodySubtext, size: 10}
                 }
             ];
             accuracyPlot.layout.xaxis.tickformat = ',.0%';
@@ -177,7 +177,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 } as any
             ];
             opportunityPlot.layout.xaxis.tickformat = ',.0%';
-            howToReadAccuracySection = (<div>
+            howToReadAccuracySection = (<div className={styles.rightText}>
                 <div className={styles.textRow}>
                     <div className={styles.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
                     <div>
@@ -187,18 +187,17 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                 </div>
                 <div className={styles.textRow}>
                     <div className={styles.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
-                    <div>
+                    <div>  
                         <Text block>{localization.Report.overestimationError}</Text>
                         <Text block>{localization.Report.overpredictionExplanation}</Text>
                     </div>
                 </div>
-                <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead1}</Text>
-                <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead2}</Text>
-                <Text className={styles.textRow} block>{localization.Report.classificationAccuracyHowToRead3}</Text>
+                    <Text block>{localization.Report.classificationAccuracyHowToRead1}</Text>
+                    <Text block>{localization.Report.classificationAccuracyHowToRead2}</Text>
+                    <Text block>{localization.Report.classificationAccuracyHowToRead3}</Text>
             </div>);
-            howToReadOutcomesSection = (<div>
-                <Text className={styles.textRow} block>{localization.Report.classificationOutcomesHowToRead}</Text>
-            </div>);
+            howToReadOutcomesSection = <Text className={styles.textRow} block>{localization.Report.classificationOutcomesHowToRead}</Text>
+        
         } if (this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.probability) {
             accuracyPlot.data = [
                 {
@@ -232,7 +231,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
+                    font: {color:theme.semanticColors.bodySubtext, size: 10}
                 },
                 {
                     text: localization.Report.overestimationError,
@@ -240,7 +239,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                     y: 1,
                     yref: 'paper', xref: 'paper',
                     showarrow: false,
-                    font: {color:theme.palette.neutralPrimaryAlt, size: 10}
+                    font: {color:theme.semanticColors.bodySubtext, size: 10}
                 }
             ];
             const opportunityText = this.state.metrics.predictions.map(val => {
@@ -358,17 +357,17 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             onClick={this.clearModelSelection}>
                             {localization.Report.backToComparisons}
                         </ActionButton>
-                        <Text variant={"xLarge"} className={styles.modelLabel}>
+                        <Text variant={"large"} className={styles.modelLabel}>
                             {this.props.dashboardContext.modelNames[this.props.selectedModelIndex]}
                         </Text>
                     </div>}
-                <Text className={styles.headerTitle}>{localization.Report.title}</Text>
+                <Text variant={"mediumPlus"} className={styles.headerTitle}>{localization.Report.title}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
                         <Text variant={"xxLargePlus"} className={styles.metricText} block>{globalAccuracyString}</Text>
-                        <Text variant={"small"} className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
+                        <Text className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
                         <Text variant={"xxLargePlus"} className={styles.metricText} block>{disparityAccuracyString}</Text>
-                        <Text variant={"small"} className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
+                        <Text className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase())}</Text>
                     </div>
                     <ActionButton
                         iconProps={{iconName: "Edit"}}
@@ -393,18 +392,18 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         </div>
                     </div>
                     <div className={styles.mainRight}>
-                        <Text variant={"small"} className={styles.rightTitle}>{localization.ModelComparison.howToRead}</Text>
-                        <Text variant={"medium"} className={styles.rightText}>{howToReadAccuracySection}</Text>
+                        <Text className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
+                        {howToReadAccuracySection}
                     </div>
             </div>
             <div className={styles.header}>
-                <Text className={styles.headerTitle}>{localization.Report.outcomesTitle}</Text>
+                <Text variant={"mediumPlus"} className={styles.headerTitle}>{localization.Report.outcomesTitle}</Text>
                 <div className={styles.bannerWrapper}>
                     <div className={styles.headerBanner}>
-                        <Text variant={"xxLarge"} className={styles.metricText} block>{globalOutcomeString}</Text>
-                        <Text variant={"small"} className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</Text>
-                        <Text variant={"xxLarge"} className={styles.metricText} block>{disparityOutcomeString}</Text>
-                        <Text variant={"small"}  className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</Text>
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{globalOutcomeString}</Text>
+                        <Text className={styles.firstMetricLabel} block>{localization.formatString(localization.Report.globalAccuracyText, outcomeMetric.title.toLowerCase())}</Text>
+                        <Text variant={"xxLargePlus"} className={styles.metricText} block>{disparityOutcomeString}</Text>
+                        <Text className={styles.metricLabel} block>{localization.formatString(localization.Report.accuracyDisparityText, outcomeMetric.title.toLowerCase())}</Text>
                     </div>
                 </div>
             </div>
@@ -426,8 +425,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         </div>
                     </div>
                     <div className={styles.mainRight}>
-                        <Text variant={"small"} className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
-                        <Text variant={"mediumPlus"} className={styles.rightText} block>{howToReadOutcomesSection}</Text>
+                        <Text className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
+                        <Text className={styles.rightText} block>{howToReadOutcomesSection}</Text>
                     </div>
             </div>
         </div>);

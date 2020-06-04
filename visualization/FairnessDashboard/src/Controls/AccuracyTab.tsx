@@ -20,8 +20,8 @@ export class AccuracyTab extends React.PureComponent<IAccuracyPickingTabProps> {
         return(
             <Stack horizontal horizontalAlign="space-between" className={styles.frame}>
                 <Stack className={styles.main}>
-                    <Text className={styles.header}>{localization.Accuracy.header}</Text>
-                        <Text variant={"large"} className={styles.textBody}>{localization.formatString(localization.Accuracy.body,
+                    <Text className={styles.header} block>{localization.Accuracy.header}</Text>
+                        <Text className={styles.textBody} block>{localization.formatString(localization.Accuracy.body,
                         this.props.dashboardContext.modelMetadata.predictionType !== PredictionTypes.regression ?
                             localization.Accuracy.binary :
                             localization.Accuracy.continuous,
