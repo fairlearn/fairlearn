@@ -12,6 +12,8 @@
 #
 import os
 import sys
+from operator import attrgetter
+import inspect
 sys.path.insert(0, os.path.abspath('../'))
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 [print(p) for p in sys.path]
@@ -40,6 +42,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.linkcode",
     "sphinx.ext.extlinks",
     "sphinx.ext.mathjax",
     "sphinx_gallery.gen_gallery"
@@ -109,6 +112,51 @@ sphinx_gallery_conf = {
      'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
      'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
+
+# The following is used by sphinx.ext.linkcode to provide links to github
+# based on pandas doc/source/conf.py
+def linkcode_resolve(domain, info):
+    """
+    Determine the URL corresponding to Python object
+    """
+    if domain != "py":
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    submod = sys.modules.get(modname)
+    if submod is None:
+        return None
+
+    obj = submod
+    for part in fullname.split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return None
+
+    try:
+        fn = inspect.getsourcefile(inspect.unwrap(obj))
+    except TypeError:
+        fn = None
+    if not fn:
+        return None
+
+    try:
+        source, lineno = inspect.getsourcelines(obj)
+    except OSError:
+        lineno = None
+
+    if lineno:
+        linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
+    else:
+        linespec = ""
+
+    fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, '/')
+    print(fn)
+    return f"http://github.com/fairlearn/fairlearn/blob/master/fairlearn/{fn}{linespec}"
+
 
 # -- LaTeX macros ------------------------------------------------------------
 
