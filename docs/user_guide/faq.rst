@@ -112,6 +112,7 @@ What is the relationship between Fairlearn and Microsoft?
     Fairlearn has grown from a project at Microsoft Research in New York City.
 
 Bibliography
-------------
+------------    
 
 .. bibliography:: ../references.bib
+   :style: plain
