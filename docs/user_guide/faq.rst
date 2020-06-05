@@ -52,7 +52,7 @@ Can Fairlearn make my model fair?
     machine learning in general.
     To determine whether the new model is fairer, the whole system of which it is a part
     needs to be considered in terms of the societal context in which it is used.
-    See, for example, :cite:`10.1145/3287560.3287598`,
+    See, for example, :cite:`FairnessAbstraction2019`,
     listed on our :ref:`further_reading` page. 
 
 What sort of fairness related harms can Fairlearn address?
@@ -111,7 +111,4 @@ Fairlearn and Microsoft
 What is the relationship between Fairlearn and Microsoft?
     Fairlearn has grown from a project at Microsoft Research in New York City.
 
-Bibliography
-------------
-
-.. bibliography:: ../references.bib
+.. bibliography:: references.bib
