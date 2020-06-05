@@ -37,6 +37,5 @@ shap
 
 # Required for documentation
 sphinx
-sphinxcontrib-bibtex
 sphinx-gallery
 pydata-sphinx-theme
