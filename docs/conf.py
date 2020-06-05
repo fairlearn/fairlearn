@@ -42,7 +42,8 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
     "sphinx.ext.mathjax",
-    "sphinx_gallery.gen_gallery"
+    "sphinx_gallery.gen_gallery",
+    "sphinxcontrib.bibtex"
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
