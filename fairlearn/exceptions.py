@@ -1,4 +1,4 @@
-class FairnessWarning(UserWarning):
+class UnfairDataWarning(UserWarning):
     """Custom warning meant to be raised when loading unfair datasets."""
 
     pass

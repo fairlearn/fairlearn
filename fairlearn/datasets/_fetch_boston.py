@@ -1,10 +1,12 @@
+import pathlib
 import warnings
-from ._common import FairnessWarning
 
 from sklearn.datasets import fetch_openml
 
+from fairlearn.exceptions import UnfairDataWarning
 
-def fetch_boston(*, version='1', cache=True, data_home=None,
+
+def fetch_boston(*, cache=True, data_home=None,
                  as_frame=False, return_X_y=False, warn=True):
     """Load the boston housing dataset (regression).
 
@@ -20,9 +22,28 @@ def fetch_boston(*, version='1', cache=True, data_home=None,
     This dataset has known fairness issues. There's a "lower status of
     population" (LSTAT) parameter that you need to look out for and a column
     that is a derived from the proportion of people with a black skin color
-    that live in a neighborhood (B). This dataset should be used to explore
-    and benchmark fairness. Predicting a house-price while ignoring these
-    sensitive attributes is naive.
+    that live in a neighborhood (B). See the references at the bottom for
+    more detailed information.
+
+    Here's a table of all the variables in order:
+
+    =======  ======================================================================
+    CRIM     per capita crime rate by town
+    ZN       proportion of residential land zoned for lots over 25,000 sq.ft.
+    INDUS    proportion of non-retail business acres per town
+    CHAS     Charles River dummy variable (= 1 if tract bounds river; 0 otherwise)
+    NOX      nitric oxides concentration (parts per 10 million)
+    RM       average number of rooms per dwelling
+    AGE      proportion of owner-occupied units built prior to 1940
+    DIS      weighted distances to five Boston employment centres
+    RAD      index of accessibility to radial highways
+    TAX      full-value property-tax rate per $10,000
+    PTRATIO  pupil-teacher ratio by town
+    B        1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+    LSTAT    % lower status of the population
+    MEDV     Median value of owner-occupied homes in $1000's
+    =======  ======================================================================
+
 
     Parameters
     ----------
@@ -38,7 +59,7 @@ def fetch_boston(*, version='1', cache=True, data_home=None,
 
     data_home : optional, default: None
         Specify another download and cache folder for the datasets. By default
-        all scikit-learn data is stored in '~/scikit_learn_data' subfolders.
+        all fairlearn data is stored in '~/.fairlearn-data' subfolders.
 
     as_frame : boolean, default=False
         If True, the data is a pandas DataFrame including columns with
@@ -52,7 +73,7 @@ def fetch_boston(*, version='1', cache=True, data_home=None,
         If True, returns ``(data.data, data.target)`` instead of a Bunch
         object.
 
-    warn : boolean, default=False.
+    warn : boolean, default=True.
         If True, it raises an extra warning to make users aware of the unfairness
         aspect of this dataset.
 
@@ -62,29 +83,36 @@ def fetch_boston(*, version='1', cache=True, data_home=None,
     dataset : :class:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
-        data : ndarray, shape (506, 14)
-            Each row corresponding to the 8 feature values in order.
+        data : ndarray, shape (506, 13)
+            Each row corresponding to the 13 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (20640,)
             Each value corresponds to the average
             house value in units of 100,000.
             If ``as_frame`` is True, ``target`` is a pandas object.
-        feature_names : list of length 8
+        feature_names : list of length 13
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the California housing dataset.
 
     Notes
     -----
-    This dataset consists of 506 samples and 14 features.
+    This dataset consists of 506 samples and 13 features. It is notorious for the fairness
+    issues related to the `B` column. There's more information in the references.
+
+    References
+    ----------
+    https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8
+    https://github.com/scikit-learn/scikit-learn/issues/16155
     """
     if warn:
         msg = "You are about to use with an unfair dataset. Mind the `B` and `LSTAT` columns."
-        warnings.warn(FairnessWarning(msg))
+        warnings.warn(UnfairDataWarning(msg))
+    if not data_home:
+        data_home = pathlib.Path().home() / ".fairlearn-data"
     return fetch_openml(
         data_id=531,
         data_home=data_home,
-        version=version,
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
