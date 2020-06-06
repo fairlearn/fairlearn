@@ -15,7 +15,9 @@ def _vector_projection(vec, unto):
 
 
 class InformationFilter(BaseEstimator, TransformerMixin):
-    """
+    r"""
+    The `InformationFilter` filters out sensitive correlations in a dataset.
+
     The `InformationFilter` uses a variant of the gram smidt process
     to filter information out of the dataset. This can be useful if you
     want to filter information out of a dataset because of fairness.
