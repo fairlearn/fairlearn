@@ -86,14 +86,16 @@ def fetch_boston(*, cache=True, data_home=None,
         data : ndarray, shape (506, 13)
             Each row corresponding to the 13 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
-        target : numpy array of shape (20640,)
+        target : numpy array of shape (506,)
             Each value corresponds to the average
             house value in units of 100,000.
             If ``as_frame`` is True, ``target`` is a pandas object.
         feature_names : list of length 13
             Array of ordered feature names used in the dataset.
         DESCR : string
-            Description of the California housing dataset.
+            Description of the Boston housing dataset.
+
+    (data, target) : tuple if ``return_X_y`` is True
 
     Notes
     -----
