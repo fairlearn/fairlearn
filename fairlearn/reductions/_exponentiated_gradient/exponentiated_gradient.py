@@ -19,30 +19,29 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     The exponentiated gradient algorithm is described in detail by
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
-        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
-        `sample_weight` is a vector of weights; labels `y` and predictions returned by
-        :code:`predict(X)` are either 0 or 1.
-    :type estimator: estimator
-
-    :param constraints: The disparity constraints expressed as moments
-    :type constraints: fairlearn.reductions.Moment
-
-    :param eps: Allowed fairness constraint violation; the solution is guaranteed to have the
-        error within :code:`2*best_gap` of the best error under constraint eps; the constraint
-        violation is at most :code:`2*(eps+best_gap)`
-    :type eps: float
-
-    :param T: Maximum number of iterations
-    :type T: int
-
-    :param nu: Convergence threshold for the duality gap, corresponding to a
-        conservative automatic setting based on the statistical uncertainty in measuring
-        classification error
-    :type nu: float
-
-    :param eta_mul: Initial setting of the learning rate
-    :type eta_mul: float
+    Parameters
+    ----------
+    estimator : estimator
+        An estimator implementing methods :code:`fit(X, y, sample_weight)` and
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the
+        vector of labels, and `sample_weight` is a vector of weights;
+        labels `y` and predictions returned by :code:`predict(X)` are either
+        0 or 1.
+    constraints : fairlearn.reductions.Moment
+        The disparity constraints expressed as moments
+    eps : float
+        Allowed fairness constraint violation; the solution is guaranteed to
+        have the error within :code:`2*best_gap` of the best error under
+        constraint `eps`; the constraint violation is at most
+        :code:`2*(eps+best_gap)`
+    T : int
+        Maximum number of iterations
+    nu : float 
+        Convergence threshold for the duality gap, corresponding to a
+        conservative automatic setting based on the statistical uncertainty
+        in measuring classification error
+    eta_mul : float
+        Initial setting of the learning rate
     """
 
     def __init__(self, estimator, constraints, eps=0.01, T=50, nu=None, eta_mul=2.0):  # noqa: D103
@@ -67,11 +66,12 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
 
-        :param X: The feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
-
-        :param y: The label vector
-        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+        y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+            Label vector
         """
         _, y_train, sensitive_features = _validate_and_reformat_input(X, y, **kwargs)
 
@@ -180,22 +180,30 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                      len(lagrangian.classifiers))
 
     def predict(self, X):
-        """Provide a prediction for the given input data.
+        """Provide predictions for the given input data.
 
-        Chooses the prediction label randomly based on the probabilities from `_pmf_predict`,
-        i.e., based on the aggregate of the weighted predictions of all underlying classifiers.
-        This is equivalent to randomly choosing an individual classifier based on the weights and
-        returning its prediction.
-        Repeatedly calling `predict` with the same feature data may yield different output. This
-        non-deterministic behavior is intended and stems from the nature of exponentiated gradient
-        algorithm, which produces probabilistic classifiers.
+        Predictions are randomized, i.e., repeatedly calling `predict` with
+        the same feature data may yield different output. This
+        non-deterministic behavior is intended and stems from the nature of
+        the exponentiated gradient algorithm.
 
-        :param X: Feature data
-        :type X: numpy.ndarray or pandas.DataFrame
+        Notes
+        -----
+        A fitted `ExponentiatedGradient` has the members `predictors_` and
+        `weights_`. On each data point in `X` it picks one of its underlying
+        predictors randomly and applies it. `weights_` determines the
+        probabilities to choose the predictors.
 
-        :return: The prediction. If `X` represents the data for a single example
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+
+        Returns
+        -------
+        Scalar or vector
+            The prediction. If `X` represents the data for a single example
             the result will be a scalar. Otherwise the result will be a vector
-        :rtype: Scalar or vector
         """
         positive_probs = self._pmf_predict(X)[:, 1]
         return (positive_probs >= np.random.rand(len(positive_probs))) * 1
@@ -207,22 +215,19 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         subsequently multiplied by the classifiers' weights and aggregated into the returned
         probabilities.
 
-        :param X: Feature data
-        :type X: numpy.ndarray or pandas.DataFrame
-        :return: Array of tuples with the probabilities of predicting 0 and 1.
-        :rtype: pandas.DataFrame
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+
+        Returns
+        -------
+        pandas.DataFrame
+            Array of tuples with the probabilities of predicting 0 and 1.
         """
-        n_samples = len(X)
-
-        def get_weighted_predictions(row):
-            if self._weights[int(row.name)] == 0:
-                return np.zeros(n_samples)
-            else:
-                return self._hs[int(row.name)](X)
-
-        # ignore classifiers with weight 0 since they can only contribute 0 to the result
-        pred = pd.DataFrame(0, index=range(n_samples), columns=range(len(self._hs))) \
-            .apply(get_weighted_predictions)
+        pred = pd.DataFrame()
+        for t in range(len(self._hs)):
+            pred[t] = self._hs[t](X)
 
         positive_probs = pred[self._weights.index].dot(self._weights).to_frame()
         return np.concatenate((1-positive_probs, positive_probs), axis=1)
