@@ -12,7 +12,6 @@
 #
 import os
 import sys
-from operator import attrgetter
 import inspect
 sys.path.insert(0, os.path.abspath('../'))
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -113,12 +112,11 @@ sphinx_gallery_conf = {
      'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
+
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
 def linkcode_resolve(domain, info):
-    """
-    Determine the URL corresponding to Python object
-    """
+    """Determine the URL corresponding to Python object."""
     if domain != "py":
         return None
 
