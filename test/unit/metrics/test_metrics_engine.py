@@ -47,7 +47,6 @@ class TestGroupSummary:
         assert metrics.difference_from_summary(result) == 1
         assert metrics.ratio_from_summary(result) == pytest.approx(0.6666666667)
 
-
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_a", conversions_for_1d)
@@ -360,7 +359,7 @@ class TestMakeDerivedMetric:
             metrics.difference_from_summary, metric_group_summary)
         metric_ratio = metrics.make_derived_metric(
             metrics.ratio_from_summary, metric_group_summary)
-        
+
         # Run with the extra argument defaulted
         assert metric_group_min(y_a, y_p, sensitive_features=gid) == 2
         assert metric_group_max(y_a, y_p, sensitive_features=gid) == 3
@@ -371,7 +370,8 @@ class TestMakeDerivedMetric:
         assert metric_group_min(y_a, y_p, sensitive_features=gid, my_arg=2) == 4
         assert metric_group_max(y_a, y_p, sensitive_features=gid, my_arg=2) == 6
         assert metric_difference(y_a, y_p, sensitive_features=gid, my_arg=2) == 2
-        assert metric_ratio(y_a, y_p, sensitive_features=gid, my_arg=2) == pytest.approx(0.66666666667)
+        assert metric_ratio(y_a, y_p, sensitive_features=gid,
+                            my_arg=2) == pytest.approx(0.66666666667)
 
     @pytest.mark.parametrize("transform_s_w", conversions_for_1d)
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
