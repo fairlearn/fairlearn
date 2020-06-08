@@ -69,7 +69,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 automargin: true,
                 fixedrange: true,
                 mirror: true,
-                linecolor: theme.palette.neutralPrimaryAlt,
+                linecolor: theme.semanticColors.disabledBorder,
                 linewidth: 1,
                 title:{
                     text: 'Error'
@@ -154,16 +154,17 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             formattedMinDisparity,
             formattedMaxDisparity
         );
+        const metricTitleAppropriateCase = selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase();
         const insights3 = localization.formatString(
             localization.ModelComparison.insightsText3,
-            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             selectedMetric.isMinimization ? formattedMinAccuracy : formattedMaxAccuracy, 
             FormatMetrics.formatNumbers(this.state.disparityArray[selectedMetric.isMinimization ? minAccuracyIndex : maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
         );
 
         const insights4 = localization.formatString(
             localization.ModelComparison.insightsText4,
-            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
             formattedMinDisparity
         );
@@ -171,7 +172,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const howToReadText = localization.formatString(
             localization.ModelComparison.howToReadText,
             this.props.modelCount.toString(),
-            selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
         
@@ -182,15 +183,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             return series;
         });
         const accuracyMetricTitle = selectedMetric.title;
-        const accuracyMetricTitleAlwaysUpperCase = selectedMetric.alwaysUpperCase;
         props.layout.xaxis.title = accuracyMetricTitle;
         props.layout.yaxis.title = this.state.disparityInOutcomes ? localization.ModelComparison.disparityInOutcomes :
-            localization.formatString(localization.ModelComparison.disparityInAccuracy,
-                                      accuracyMetricTitleAlwaysUpperCase ? accuracyMetricTitle : accuracyMetricTitle.toLowerCase()) as string
+            localization.formatString(localization.ModelComparison.disparityInAccuracy, metricTitleAppropriateCase) as string
         return (
             <Stack className={styles.frame}>
                 <div className={styles.header}>
-                    <Text  variant={"xxLargePlus"} className={styles.headerTitle}>{localization.ModelComparison.title}</Text>
+                    <Text variant={"large"} className={styles.headerTitle} block>{localization.ModelComparison.title}</Text>
                     <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
                 <div className={styles.main}>
@@ -202,13 +201,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         />
                     </div>
                     <div className={styles.mainRight}>
-                        <Text variant={"mediumPlus"} className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
-                        <Text variant={"medium"} className={styles.rightText} block>{howToReadText}</Text>
-                        <Text variant={"mediumPlus"} className={styles.insights} block>{localization.ModelComparison.insights}</Text>                        
+                        <Text className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
+                        <Text className={styles.rightText} block>{howToReadText}</Text>
+                        <Text className={styles.insights} block>{localization.ModelComparison.insights}</Text>                        
                         <div className={styles.insightsText}>
-                            <Text variant={"medium"} className={styles.textSection} block>{insights2}</Text>
-                            <Text variant={"medium"} className={styles.textSection} block>{insights3}</Text>
-                            <Text variant={"medium"} className={styles.textSection} block>{insights4}</Text>
+                            <Text className={styles.textSection} block>{insights2}</Text>
+                            <Text className={styles.textSection} block>{insights3}</Text>
+                            <Text className={styles.textSection} block>{insights4}</Text>
                         </div>
                     </div>
                 </div>
@@ -219,8 +218,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                         options={[
                             {
                             key: 'accuracy',
-                            text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
-                                accuracyMetricTitleAlwaysUpperCase ? accuracyMetricTitle : accuracyMetricTitle.toLowerCase()) as string,
+                            text: localization.formatString(localization.ModelComparison.disparityInAccuracy, metricTitleAppropriateCase) as string,
                             styles: { choiceFieldWrapper: styles.radioOptions} 
                             },
                             {

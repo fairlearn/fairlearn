@@ -31,14 +31,13 @@ export const AccuracyTabStyles: () => IProcessedStyleSet<IAccuracyTabStyles> = (
           },
           header: {
               color: theme.semanticColors.bodyText,
-              fontSize: FontSizes.xxLargePlus,
-              fontWeight: FontWeights.light,
+              fontWeight: FontWeights.semibold,
               margin: "26px 0"
           },
           textBody: {
               paddingTop: "12px",
               fontWeight: FontWeights.semilight,
-              color: theme.semanticColors.bodySubtext,
+              color: theme.semanticColors.bodyText,
               paddingBottom: "12px"
           }
     });
