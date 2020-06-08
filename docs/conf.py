@@ -38,10 +38,10 @@ release = fairlearn.__version__
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery"
 ]
 
@@ -117,7 +117,7 @@ mathjax_config = {
         "Macros": {
             "E": '{\\mathbb{E}}',
             "P": '{\\mathbb{P}}',
-            "given": '\\mathbin{\\vert}'
+            "given": '\\mathbin{\\vert}',
             }
         }
     }

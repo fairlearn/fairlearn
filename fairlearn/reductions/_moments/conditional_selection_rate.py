@@ -14,7 +14,7 @@ _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be u
 _DEFAULT_DIFFERENCE_BOUND = 0.01
 
 
-class ConditionalSelectionRate(ClassificationMoment):
+class UtilityParity(ClassificationMoment):
     r"""Generic fairness moment for selection rates.
 
     This serves as the base class for :class:`DemographicParity` :class:`EqualizedOdds`, and
@@ -31,7 +31,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the rows of
     the DataFrames either required as arguments or returned by several of the methods of the
-    `ConditionalSelectionRate` class. It is the cartesian product of:
+    `UtilityParity` class. It is the cartesian product of:
 
     - The unique events defined for the particular object
     - The unique values for the sensitive feature
@@ -58,7 +58,7 @@ class ConditionalSelectionRate(ClassificationMoment):
 
     def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
         """Initialize with the ratio value."""
-        super(ConditionalSelectionRate, self).__init__()
+        super(UtilityParity, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
             self.eps = _DEFAULT_DIFFERENCE_BOUND
             self.ratio = 1.0
@@ -198,12 +198,12 @@ class ConditionalSelectionRate(ClassificationMoment):
         return signed_weights
 
 
-# Ensure that ConditionalSelectionRate shows up in correct place in documentation
+# Ensure that UtilityParity shows up in correct place in documentation
 # when it is used as a base class
-ConditionalSelectionRate.__module__ = "fairlearn.reductions"
+UtilityParity.__module__ = "fairlearn.reductions"
 
 
-class DemographicParity(ConditionalSelectionRate):
+class DemographicParity(UtilityParity):
     r"""Implementation of Demographic Parity as a moment.
 
     A classifier :math:`h(X)` satisfies DemographicParity if
@@ -211,7 +211,7 @@ class DemographicParity(ConditionalSelectionRate):
     .. math::
       P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
 
-    This implementation of :class:`ConditionalSelectionRate` defines
+    This implementation of :class:`UtilityParity` defines
     a single event, `all`. Consequently, the `prob_event`
     :class:`pandas:pandas.Series`
     will only have a single entry, which will be equal to 1.
@@ -230,41 +230,81 @@ class DemographicParity(ConditionalSelectionRate):
         super().load_data(X, y, event=_ALL, **kwargs)
 
 
-class TruePositiveRateDifference(ConditionalSelectionRate):
-    r"""Implementation of True Positive Rate Difference (Equal Opportunity Difference) as a moment.
+class TruePositiveRateParity(UtilityParity):
+    r"""Implementation of True Positive Rate Difference (Equal Opportunity
+    Difference) as a moment.
 
-    Adds conditioning on label `y=1` compared to Demographic parity, i.e.
+    Adds conditioning on label `Y=1` compared to Demographic parity, i.e.
 
     .. math::
        P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a
 
-    This implementation of :class:`ConditionalSelectionRate` defines
-    the event corresponding to `y=1`.
+    This implementation of :class:`UtilityParity` defines the event
+    corresponding to `Y=1`.
 
-    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction of the samples
-    corresponding to `y = 1` in the `Y` array.
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction
+    of the samples corresponding to `Y = 1` in the `Y` array.
 
-    The `index` MultiIndex will have a number of entries equal to the number of unique values of
-    the sensitive feature, multiplied by the number of unique non-NaN values of the constructed
-    `event` array, whose entries are either NaN or `label=1` (so only one unique non-NaN value),
-    multiplied by two (for the Lagrange multipliers for positive and negative constraints).
+    The `index` MultiIndex will have a number of entries equal to the number
+    of unique values of the sensitive feature, multiplied by the number of
+    unique non-NaN values of the constructed `event` array, whose entries
+    are either NaN or `label=1` (so only one unique non-NaN value), multiplied
+    by two (for the Lagrange multipliers for positive and negative
+    constraints).
 
-    With these definitions, the :meth:`signed_weights` method will calculate the costs for `y=1` as
-    they are calculated in Example 4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
-    but will use the weights equal to zero for `y=0`.
+    With these definitions, the :meth:`signed_weights` method will calculate
+    the costs for `Y=1` as they are calculated in Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`, but will use
+    the weights equal to zero for `Y=0`.
     """
 
-    short_name = "TruePositiveRateDifference"
+    short_name = "TruePositiveRateParity"
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
-        # The `where` clause is used to put `pd.nan` on all values where `y!=1`.
+        # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
                           **kwargs)
 
 
-class EqualizedOdds(ConditionalSelectionRate):
+class TrueNegativeRateParity(UtilityParity):
+    r"""Implementation of True Negative Rate Difference as a moment.
+
+    Adds conditioning on label `Y=0` compared to Demographic parity, i.e.
+
+    .. math::
+       P[h(X) = 0 | A = a, Y = 0] = P[h(X) = 0 | Y = 0] \; \forall a
+
+    This implementation of :class:`UtilityParity` defines the event
+    corresponding to `Y=0`.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction
+    of the samples corresponding to `Y = 0` in the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to the number
+    of unique values of the sensitive feature, multiplied by the number of
+    unique non-NaN values of the constructed `event` array, whose entries are
+    either NaN or `label=0` (so only one unique non-NaN value), multiplied by
+    two (for the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :meth:`signed_weights` method will calculate
+    the costs for `Y=0` as they are calculated in Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
+    but will use the weights equal to zero for `Y=1`.
+    """
+
+    short_name = "TrueNegativeRateParity"
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0),
+                          **kwargs)
+
+
+class EqualizedOdds(UtilityParity):
     r"""Implementation of Equalized Odds as a moment.
 
     Adds conditioning on label compared to Demographic parity, i.e.
@@ -272,7 +312,7 @@ class EqualizedOdds(ConditionalSelectionRate):
     .. math::
        P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
 
-    This implementation of :class:`ConditionalSelectionRate` defines
+    This implementation of :class:`UtilityParity` defines
     events corresponding to the unique values of the `Y` array.
 
     The `prob_event` :class:`pandas:pandas.Series` will record the
@@ -298,16 +338,16 @@ class EqualizedOdds(ConditionalSelectionRate):
                           **kwargs)
 
 
-class ErrorRateRatio(ConditionalSelectionRate):
+class ErrorRateParity(UtilityParity):
     r"""Implementation of Error Rate Ratio as a moment.
 
     Measures the ratio in errors per attribute by overall error.
     The 2-sided version of error ratio can be written as
     ratio <= error(A=a) / total_error <= 1/ratio
     .. math::
-    ratio <= E[abs(h(x) - y)| A = a] / E[abs(h(x) - y)] <= 1/ratio\; \forall a
+    ratio <= E[abs(h(X) - Y)| A = a] / E[abs(h(X) - Y)] <= 1/ratio\; \forall a
 
-    This implementation of :class:`ConditionalSelectionRate` defines a single event, `all`.
+    This implementation of :class:`UtilityParity` defines a single event, `all`.
     Consequently, the `prob_event` :class:`pandas:pandas.Series` will only have a single
     entry, which will be equal to 1.
 
@@ -319,7 +359,7 @@ class ErrorRateRatio(ConditionalSelectionRate):
     However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
     """
 
-    short_name = "ErrorRateRatio"
+    short_name = "ErrorRateParity"
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""

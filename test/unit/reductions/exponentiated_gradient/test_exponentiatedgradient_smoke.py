@@ -10,8 +10,8 @@ from sklearn.dummy import DummyClassifier
 
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions._exponentiated_gradient._constants import _MIN_ITER
-from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRateRatio,\
-    TruePositiveRateDifference, ErrorRate
+from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRateParity,\
+    TruePositiveRateParity, TrueNegativeRateParity, ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, labels, _get_data
 
@@ -128,66 +128,71 @@ class TestExponentiatedGradientSmoke:
          "error": 0.306411, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 4, "ratio": 0.8},
         # ================================================
-        {"cons_class": ErrorRateRatio, "eps": 0.1,
+        {"cons_class": ErrorRateParity, "eps": 0.1,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.100000,
          "error": 0.25625, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 3},
-        {"cons_class": ErrorRateRatio, "eps": 0.1,
+        {"cons_class": ErrorRateParity, "eps": 0.1,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.092857,
          "error": 0.25, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 3, "ratio": 0.8},
-        {"cons_class": ErrorRateRatio, "eps": 0.05,
+        {"cons_class": ErrorRateParity, "eps": 0.05,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.049999,
          "error": 0.3, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 3},
-        {"cons_class": ErrorRateRatio, "eps": 0.05,
+        {"cons_class": ErrorRateParity, "eps": 0.05,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.050000,
          "error": 0.253472, "n_oracle_calls": 26, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 6, "ratio": 0.8},
-        {"cons_class": ErrorRateRatio, "eps": 0.02,
+        {"cons_class": ErrorRateParity, "eps": 0.02,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.019999,
          "error": 0.326250, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 3},
         # ================================================
-        {"cons_class": ErrorRateRatio, "eps": 0.02,
+        {"cons_class": ErrorRateParity, "eps": 0.02,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.020000,
          "error": 0.268055, "n_oracle_calls": 26, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 5, "ratio": 0.8},
-        {"cons_class": ErrorRateRatio, "eps": 0.01,
+        {"cons_class": ErrorRateParity, "eps": 0.01,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.010000,
          "error": 0.325555, "n_oracle_calls": 18, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 4},
-        {"cons_class": ErrorRateRatio, "eps": 0.01,
+        {"cons_class": ErrorRateParity, "eps": 0.01,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.010000,
          "error": 0.272916, "n_oracle_calls": 26, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 5, "ratio": 0.8},
-        {"cons_class": ErrorRateRatio, "eps": 0.005,
+        {"cons_class": ErrorRateParity, "eps": 0.005,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
          "error": 0.329444, "n_oracle_calls": 19, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 5},
-        {"cons_class": ErrorRateRatio, "eps": 0.005,
+        {"cons_class": ErrorRateParity, "eps": 0.005,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
          "error": 0.275347, "n_oracle_calls": 26, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 5, "ratio": 0.8},
         # ================================================
-        {"cons_class": TruePositiveRateDifference, "eps": 0.005,
+        {"cons_class": TruePositiveRateParity, "eps": 0.005,
+         "best_gap": 0.0, "last_iter": 5,
+         "best_iter": 5, "disp": 0.005000,
+         "error": 0.25, "n_oracle_calls": 16, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 2},
+        {"cons_class": TrueNegativeRateParity, "eps": 0.005,
          "best_gap": 0.0, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
          "error": 0.25, "n_oracle_calls": 16, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 2}
     ]
     smoke_test_data_flipped = [
-        {"cons_class": TruePositiveRateDifference, "eps": 0.005,
+        {"cons_class": TruePositiveRateParity, "eps": 0.005,
          "best_gap": 0.0, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
          "error": 0.427133, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
@@ -249,7 +254,7 @@ class TestExponentiatedGradientSmoke:
     def test_smoke_flipped(self, testdata):
         self.run_smoke_test(testdata, flipped=True)
 
-    @pytest.mark.parametrize("Constraints", [TruePositiveRateDifference, DemographicParity])
+    @pytest.mark.parametrize("Constraints", [TruePositiveRateParity, DemographicParity])
     def test_simple_fit_predict(self, Constraints):
         estimator = LeastSquaresBinaryClassifierLearner()
 

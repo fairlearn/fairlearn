@@ -28,7 +28,7 @@ class ConditionalLossMoment(LossMoment):
 
     def default_objective(self):
         """Return a default objective."""
-        return AverageLossMoment(self.reduction_loss)
+        return MeanLoss(self.reduction_loss)
 
     def load_data(self, X, y, **kwargs):
         """Load data into the moment object."""
@@ -90,14 +90,14 @@ class ConditionalLossMoment(LossMoment):
 ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
-class AverageLossMoment(ConditionalLossMoment):
-    """Moment for Average Loss."""
+class MeanLoss(ConditionalLossMoment):
+    """Moment for Mean Loss."""
 
     def __init__(self, loss):
         super().__init__(loss, upper_bound=None, no_groups=True)
 
 
-class GroupLossMoment(ConditionalLossMoment):
+class BoundedGroupLoss(ConditionalLossMoment):
     """Moment for Group Loss."""
 
     def __init__(self, loss, *, upper_bound=None):

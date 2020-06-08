@@ -9,8 +9,8 @@
   `ExponentiatedGradient`. It is now solely responsible for setting a bound on
   the lambda vectors. The other usage of `eps` as a bound for constraints is
   now captured directly on the moment classes as follows:
-  * Classification moments: `ConditionalSelectionRate` and its subclasses
-    have new arguments on the constructor:
+  * Classification moments: `ConditionalSelectionRate` renamed to
+    `UtilityParity` and its subclasses have new arguments on the constructor:
     * `difference_bound` - for difference-based constraints such as demographic
       parity difference
     * `ratio_bound_slack` - for ratio-based constraints such as demographic
@@ -20,6 +20,22 @@
   * Regression moments: `ConditionalLossMoment` and its subclasses have a new
     argument `upper_bound` with the same purpose for newly enabled regression
     scenarios on `ExponentiatedGradient`.
+  For a comprehensive overview of available constraints refer to the new [user
+  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+* Renamed several constraints to create a uniform naming convention according
+  to the accepted [metric harmonization proposal](https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md):
+  * `ErrorRateRatio` renamed to `ErrorRateParity`, and
+    `TruePositiveRateDifference` renamed to `TruePositiveRateParity` since the
+    desired pattern is `<metric name>Parity` with the exception of
+    `EqualizedOdds` and `DemographicParity`.
+  * `ConditionalSelectionRate` renamed to `UtilityParity`.
+  * `GroupLossMoment` renamed to `BoundedGroupLoss` in order to have a
+    descriptive name and for consistency with the paper. Similarly,
+    `AverageLossMoment` renamed to `MeanLoss`.
+  For a comprehensive overview of available constraints refer to the new [user
+  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+* Added `TrueNegativeRateParity` to provide the opposite constraint of
+  `TruePositiveRateParity` to be used with reductions techniques.
 
 ### v0.4.6
 
