@@ -99,14 +99,13 @@ metric_group_summary_pos_label_keys = [
     metrics.false_positive_rate_group_summary,
     metrics.false_negative_rate_group_summary,
     metrics.selection_rate_group_summary,
-    metrics.accuracy_score_group_summary,
-    metrics.balanced_accuracy_score_group_summary,
     metrics.precision_score_group_summary,
     metrics.recall_score_group_summary
 ]
 
-metric_group_summary_results_classification_pos_0 = {
-    key:metric_group_summary_results[key] for key in metric_group_summary_pos_label_keys
+# Subset of metrics which accept a pos_label argument
+metric_group_summary_results_pos_label = {
+    key: metric_group_summary_results[key] for key in metric_group_summary_pos_label_keys
 }
 
 
@@ -132,16 +131,16 @@ def test_derived_metrics_smoke(func):
     assert result == pytest.approx(derived_metric_results[func])
 
 
-@pytest.mark.parametrize("func", metric_group_summary_results_classification_pos_0.keys())
+@pytest.mark.parametrize("func", metric_group_summary_results_pos_label.keys())
 def test_metric_group_summary_pos_label_0(func):
     # We're going to set pos_label=0, so for simplicity invert the previous inputs
     y_true_invert = [1-y for y in y_true]
     y_pred_invert = [1-y for y in y_pred]
     result = func(y_true_invert, y_pred_invert, sensitive_features=sf_binary, pos_label=0)
     assert result.overall == pytest.approx(
-        metric_group_summary_results_classification_pos_0[func]["overall"])
+        metric_group_summary_results_pos_label[func]["overall"])
     assert len(result.by_group) == 2
     assert result.by_group[0] == pytest.approx(
-        metric_group_summary_results_classification_pos_0[func]["by_group"][0])
+        metric_group_summary_results_pos_label[func]["by_group"][0])
     assert result.by_group[1] == pytest.approx(
-        metric_group_summary_results_classification_pos_0[func]["by_group"][1])
+        metric_group_summary_results_pos_label[func]["by_group"][1])
