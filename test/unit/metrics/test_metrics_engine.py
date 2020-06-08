@@ -47,16 +47,31 @@ class TestGroupSummary:
         assert metrics.difference_from_summary(result) == 1
         assert metrics.ratio_from_summary(result) == pytest.approx(0.6666666667)
 
-    def test_smoke_extra_arg(self):
-        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
-        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
-        gid = [0, 0, 0, 0, 1, 1, 1, 1]
 
-        # Sanity check the function itself
-        assert mock_func(y_a, y_p) == mock_func_extra_arg(y_a, y_p)
-        assert 2*mock_func(y_a, y_p) == mock_func_extra_arg(y_a, y_p, my_arg=2)
+    @pytest.mark.parametrize("transform_gid", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+    @pytest.mark.parametrize("transform_y_a", conversions_for_1d)
+    def test_smoke_extra_arg(self, transform_y_a, transform_y_p, transform_gid):
+        y_a = transform_y_a([0, 0, 1, 1, 0, 1, 1, 1])
+        y_p = transform_y_p([0, 1, 1, 1, 1, 0, 0, 1])
+        gid = transform_gid([0, 0, 0, 0, 1, 1, 1, 1])
 
-        result = metrics.group_summary(mock_func_extra_arg, y_a, y_p, sensitive_features=gid, extra_arg=2)
+        # Run with the argument defaulted
+        result = metrics.group_summary(mock_func_extra_arg,
+                                       y_a,
+                                       y_p,
+                                       sensitive_features=gid)
+        assert result.overall == 5
+        assert len(result.by_group) == 2
+        assert result.by_group[0] == 2
+        assert result.by_group[1] == 3
+
+        # Run with the argument speficied
+        result = metrics.group_summary(mock_func_extra_arg,
+                                       y_a,
+                                       y_p,
+                                       sensitive_features=gid,
+                                       my_arg=2)
         assert result.overall == 10
         assert len(result.by_group) == 2
         assert result.by_group[0] == 4
@@ -330,6 +345,33 @@ class TestMakeDerivedMetric:
         assert metric_group_max(y_a, y_p, sensitive_features=gid) == 3
         assert metric_difference(y_a, y_p, sensitive_features=gid) == 1
         assert metric_ratio(y_a, y_p, sensitive_features=gid) == pytest.approx(0.66666666667)
+
+    def test_smoke_extra_arg(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
+
+        metric_group_summary = metrics.make_metric_group_summary(mock_func_extra_arg)
+        metric_group_min = metrics.make_derived_metric(
+            metrics.group_min_from_summary, metric_group_summary)
+        metric_group_max = metrics.make_derived_metric(
+            metrics.group_max_from_summary, metric_group_summary)
+        metric_difference = metrics.make_derived_metric(
+            metrics.difference_from_summary, metric_group_summary)
+        metric_ratio = metrics.make_derived_metric(
+            metrics.ratio_from_summary, metric_group_summary)
+        
+        # Run with the extra argument defaulted
+        assert metric_group_min(y_a, y_p, sensitive_features=gid) == 2
+        assert metric_group_max(y_a, y_p, sensitive_features=gid) == 3
+        assert metric_difference(y_a, y_p, sensitive_features=gid) == 1
+        assert metric_ratio(y_a, y_p, sensitive_features=gid) == pytest.approx(0.66666666667)
+
+        # Run with the extra argument set to something
+        assert metric_group_min(y_a, y_p, sensitive_features=gid, my_arg=2) == 4
+        assert metric_group_max(y_a, y_p, sensitive_features=gid, my_arg=2) == 6
+        assert metric_difference(y_a, y_p, sensitive_features=gid, my_arg=2) == 2
+        assert metric_ratio(y_a, y_p, sensitive_features=gid, my_arg=2) == pytest.approx(0.66666666667)
 
     @pytest.mark.parametrize("transform_s_w", conversions_for_1d)
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
