@@ -88,6 +88,11 @@ derived_metric_results = {
     metrics.log_loss_group_min: 7.67546133,
 }
 
+metric_group_summary_results_pos_label_0 = {
+    metrics.true_positive_rate_group_summary: {
+        "overall": 0.25, "by_group": {0: 1, 1: 0.6}},
+}
+
 
 # =======================================================
 
@@ -109,3 +114,11 @@ def test_metric_group_summary_smoke(func):
 def test_derived_metrics_smoke(func):
     result = func(y_true, y_pred, sensitive_features=sf_binary)
     assert result == pytest.approx(derived_metric_results[func])
+
+@pytest.mark.parametrize("func", metric_group_summary_results_pos_label_0.keys())
+def test_metric_group_summary_pos_label_0(func):
+    result = func(y_true, y_pred, sensitive_features=sf_binary, pos_label=0)
+    assert result.overall == pytest.approx(metric_group_summary_results[func]["overall"])
+    assert len(result.by_group) == 2
+    assert result.by_group[0] == pytest.approx(metric_group_summary_results[func]["by_group"][0])
+    assert result.by_group[1] == pytest.approx(metric_group_summary_results[func]["by_group"][1])
