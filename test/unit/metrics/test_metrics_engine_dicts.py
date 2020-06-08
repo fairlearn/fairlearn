@@ -95,13 +95,31 @@ classification_keys = [
 
 metric_group_summary_results_classification_pos_0 = {
     metrics.true_positive_rate_group_summary: {
-        "overall": 0.25, "by_group": {0: 0, 1: 0.4}},
+        "overall": 0.75, "by_group": {0: 1, 1: 0.6}},
     metrics.true_negative_rate_group_summary: {
         "overall": 0.7, "by_group": {0: 0.66666667, 1: 0.75}},
     metrics.false_positive_rate_group_summary: {
         "overall": 0.3, "by_group": {0: 0.33333333, 1: 0.25}},
     metrics.false_negative_rate_group_summary: {
         "overall": 0.25, "by_group": {0: 0, 1: 0.4}},
+    metrics.mean_prediction_group_summary: {
+        "overall": 0.5, "by_group": {0: 0.55555556, 1: 0.44444444}},
+    metrics.selection_rate_group_summary: {
+        "overall": 0.5, "by_group": {0: 0.55555556, 1: 0.44444444}},
+    metrics._mean_overprediction_group_summary: {
+        "overall": 0.16666667, "by_group": {0: 0.22222222, 1: 0.11111111}},
+    metrics._mean_underprediction_group_summary: {
+        "overall": 0.11111111, "by_group": {0: -0, 1: 0.22222222}},
+    metrics.accuracy_score_group_summary: {
+        "overall": 0.72222222, "by_group": {0: 0.77777778, 1: 0.66666667}},
+    metrics.balanced_accuracy_score_group_summary: {
+        "overall": 0.725, "by_group": {0: 0.83333333, 1: 0.675}},
+    metrics.precision_score_group_summary: {
+        "overall": 0.66666667, "by_group": {0: 0.6, 1: 0.75}},
+    metrics.recall_score_group_summary: {
+        "overall": 0.75, "by_group": {0: 1, 1: 0.6}},
+    metrics.roc_auc_score_group_summary: {
+        "overall": 0.725, "by_group": {0: 0.83333333, 1: 0.675}},
 }
 
 
@@ -129,8 +147,14 @@ def test_derived_metrics_smoke(func):
 
 @pytest.mark.parametrize("func", metric_group_summary_results_classification_pos_0.keys())
 def test_metric_group_summary_pos_label_0(func):
-    result = func(y_true, y_pred, sensitive_features=sf_binary, pos_label=0)
-    assert result.overall == pytest.approx(metric_group_summary_results_classification_pos_0[func]["overall"])
+    # We're going to set pos_label=0, so for simplicity invert the previous inputs
+    y_true_invert = [1-y for y in y_true]
+    y_pred_invert = [1-y for y in y_pred]
+    result = func(y_true_invert, y_pred_invert, sensitive_features=sf_binary, pos_label=0)
+    assert result.overall == pytest.approx(
+        metric_group_summary_results_classification_pos_0[func]["overall"])
     assert len(result.by_group) == 2
-    assert result.by_group[0] == pytest.approx(metric_group_summary_results_classification_pos_0[func]["by_group"][0])
-    assert result.by_group[1] == pytest.approx(metric_group_summary_results_classification_pos_0[func]["by_group"][1])
+    assert result.by_group[0] == pytest.approx(
+        metric_group_summary_results_classification_pos_0[func]["by_group"][0])
+    assert result.by_group[1] == pytest.approx(
+        metric_group_summary_results_classification_pos_0[func]["by_group"][1])
