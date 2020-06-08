@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import pandas as pd
 from sklearn.utils import estimator_checks
 
 from fairlearn.preprocessing import InformationFilter
@@ -44,10 +45,13 @@ def test_estimator_checks(test_fn):
     test_fn(InformationFilter.__name__, InformationFilter(columns=[0]))
 
 
-def test_linear_dependence():
+@pytest.mark.parametrize("transform", [np.array, pd.DataFrame, list])
+def test_linear_dependence(transform):
     X = np.array([[0, 0, 1, 1, ],
                   [1, 1, 2, 2, ],
                   [0.1, 0.2, 1.2, 1.1, ]]).T
+
+    X = transform(X)
 
     X_tfm = InformationFilter(columns=[0]).fit(X).transform(X)
     assert X_tfm.shape[1] == 2

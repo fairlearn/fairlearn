@@ -5,6 +5,6 @@
 filter information that correlates with sensitive attributes.
 """
 
-from ._informationfilter import InformationFilter
+from ._information_filter import InformationFilter
 
 __all__ = ["InformationFilter"]
