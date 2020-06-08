@@ -100,7 +100,8 @@ metric_group_summary_pos_label_keys = [
     metrics.false_negative_rate_group_summary,
     metrics.selection_rate_group_summary,
     metrics.precision_score_group_summary,
-    metrics.recall_score_group_summary
+    metrics.recall_score_group_summary,
+    metrics.f1_score_group_summary
 ]
 
 # Subset of metrics which accept a pos_label argument
