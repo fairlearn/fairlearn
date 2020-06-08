@@ -36,7 +36,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :code:`2*(eps+best_gap)`
     T : int
         Maximum number of iterations
-    nu : float 
+    nu : float
         Convergence threshold for the duality gap, corresponding to a
         conservative automatic setting based on the statistical uncertainty
         in measuring classification error
