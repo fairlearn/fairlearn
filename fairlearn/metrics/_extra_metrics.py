@@ -15,9 +15,15 @@ from ._selection_rate import selection_rate  # noqa: F401,E501
 
 
 def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
+    """Figure out the labels argument for skm.confusion_matrix.
+    This assumes the input arrays are binary, and we need to specify a pos_label.
+    Given the way the calling routines work, this is achieved by ensuring that
+    the pos_label is last in the (two element) list."""
     my_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
-    assert len(my_labels) == 2
-    assert pos_label in my_labels
+    if len(my_labels) != 2:
+        raise ValueError("Must have two unique y values")
+    if pos_label not in my_labels:
+        raise ValueError("Must have pos_label in y values")
     if my_labels[1] != pos_label:
         my_labels = list(reversed(my_labels))
     return my_labels

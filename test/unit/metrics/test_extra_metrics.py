@@ -19,11 +19,21 @@ def test_get_labels_for_confusion_matrix_smoke():
     result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=0)
     assert np.array_equal(result, [1, 0])
 
-def test_get_labels_for_confusion_matrix_too_many():
-    y_true=[0,1]
-    y_pred = [1,2]
 
-    with 
+def test_get_labels_for_confusion_matrix_bad_unique_count():
+    with pytest.raises(ValueError) as exception:
+        _get_labels_for_confusion_matrix([0, 1], [1, 2], pos_label=1)
+    assert str(exception.value) == "Must have two unique y values"
+
+    with pytest.raises(ValueError) as exception:
+        _get_labels_for_confusion_matrix([0, 0], [0, 0], pos_label=0)
+    assert str(exception.value) == "Must have two unique y values"
+
+
+def test_get_labels_for_confusion_matrix_bad_pos_label():
+    with pytest.raises(ValueError) as exception:
+        _get_labels_for_confusion_matrix([0, 1], [1, 0], pos_label=2)
+    assert str(exception.value) == "Must have pos_label in y values"
 
 
 # ==============================================
