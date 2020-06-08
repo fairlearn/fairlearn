@@ -88,9 +88,13 @@ derived_metric_results = {
     metrics.log_loss_group_min: 7.67546133,
 }
 
-metric_group_summary_results_pos_label_0 = {
-    metrics.true_positive_rate_group_summary: {
-        "overall": 0.25, "by_group": {0: 1, 1: 0.6}},
+classification_keys = [
+    metrics.true_positive_rate_group_summary,
+    metrics.true_negative_rate_group_summary
+]
+
+metric_group_summary_results_classification = {
+    key:metric_group_summary_results[key] for key in classification_keys
 }
 
 
@@ -115,9 +119,12 @@ def test_derived_metrics_smoke(func):
     result = func(y_true, y_pred, sensitive_features=sf_binary)
     assert result == pytest.approx(derived_metric_results[func])
 
-@pytest.mark.parametrize("func", metric_group_summary_results_pos_label_0.keys())
-def test_metric_group_summary_pos_label_0(func):
-    result = func(y_true, y_pred, sensitive_features=sf_binary, pos_label=0)
+
+@pytest.mark.parametrize("func", metric_group_summary_results_classification.keys())
+def test_metric_group_summary_pos_label_2(func):
+    y_true_2 = [2*y for y in y_true]
+    y_pred_2 = [2*y for y in y_pred]
+    result = func(y_true_2, y_pred_2, sensitive_features=sf_binary)
     assert result.overall == pytest.approx(metric_group_summary_results[func]["overall"])
     assert len(result.by_group) == 2
     assert result.by_group[0] == pytest.approx(metric_group_summary_results[func]["by_group"][0])
