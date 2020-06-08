@@ -19,6 +19,10 @@ def mock_func_weight(y_true, y_pred, sample_weight):
     return np.sum(np.multiply(y_true, sample_weight))
 
 
+def mock_func_extra_arg(y_true, y_pred, my_arg=1):
+    return np.sum([my_arg * y for y in y_true])
+
+
 def mock_func_matrix_return(y_true, y_pred):
     return np.ones([len(y_true), sum(y_pred)])
 
@@ -42,6 +46,21 @@ class TestGroupSummary:
         assert metrics.group_max_from_summary(result) == 3
         assert metrics.difference_from_summary(result) == 1
         assert metrics.ratio_from_summary(result) == pytest.approx(0.6666666667)
+
+    def test_smoke_extra_arg(self):
+        y_a = [0, 0, 1, 1, 0, 1, 1, 1]
+        y_p = [0, 1, 1, 1, 1, 0, 0, 1]
+        gid = [0, 0, 0, 0, 1, 1, 1, 1]
+
+        # Sanity check the function itself
+        assert mock_func(y_a, y_p) == mock_func_extra_arg(y_a, y_p)
+        assert 2*mock_func(y_a, y_p) == mock_func_extra_arg(y_a, y_p, my_arg=2)
+
+        result = metrics.group_summary(mock_func_extra_arg, y_a, y_p, sensitive_features=gid, extra_arg=2)
+        assert result.overall == 10
+        assert len(result.by_group) == 2
+        assert result.by_group[0] == 4
+        assert result.by_group[1] == 6
 
     @pytest.mark.parametrize("transform_gid", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
