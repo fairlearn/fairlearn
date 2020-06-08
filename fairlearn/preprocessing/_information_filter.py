@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and contributors.
+# Licensed under the MIT License.
+
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -18,7 +21,7 @@ class InformationFilter(BaseEstimator, TransformerMixin):
     r"""
     The `InformationFilter` filters out sensitive correlations in a dataset.
 
-    The `InformationFilter` uses a variant of the gram smidt process
+    The `InformationFilter` uses a variant of the Gram-Schmidt process
     to filter information out of the dataset. This can be useful if you
     want to filter information out of a dataset because of fairness.
     To explain how it works: given a training matrix :math:`X` that contains
@@ -37,7 +40,7 @@ class InformationFilter(BaseEstimator, TransformerMixin):
        \\end{split}
 
     Concatenating our vectors (but removing the sensitive ones) gives us
-    a new training matrix :math:`X_{fair} =  [v_3, ..., v_k]`.
+    a new training matrix :math:`X_{filtered} =  [v_3, ..., v_k]`.
 
     :param columns: list of columns to filter out this can be a sequence of either int
                     (in the case of numpy) or string (in the case of pandas).
@@ -58,7 +61,7 @@ class InformationFilter(BaseEstimator, TransformerMixin):
             if isinstance(col, str):
                 if isinstance(X, np.ndarray):
                     raise ValueError(
-                        f"column {col} is a string but datatype receive is numpy."
+                        f"column {col} is a string but datatype received is numpy."
                     )
                 if isinstance(X, pd.DataFrame):
                     if col not in X.columns:
@@ -95,12 +98,12 @@ class InformationFilter(BaseEstimator, TransformerMixin):
             X = StandardScaler(with_std=False).fit_transform(X)
         X_fair = X.copy()
         v_vectors = self._make_v_vectors(X, self.col_ids_)
-        # gram smidt process but only on sensitive attributes
+        # Gram-Schmidt process but only on sensitive attributes
         for i, col in enumerate(X_fair.T):
             for v in v_vectors.T:
                 X_fair[:, i] = X_fair[:, i] - _vector_projection(X_fair[:, i], v)
-        # we want to learn matrix P: X P = X_fair
-        # this means we first need to create X_fair in order to learn P
+        # We want to learn matrix P: X P = X_filtered
+        # This means we first need to create X_filtered in order to learn P
         self.projection_, resid, rank, s = np.linalg.lstsq(X, X_fair, rcond=None)
         return self
 
