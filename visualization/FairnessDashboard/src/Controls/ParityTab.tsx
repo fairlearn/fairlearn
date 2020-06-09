@@ -8,71 +8,24 @@ import { WizardFooter } from "./WizardFooter";
 import { TileList, ITileProp } from "./TileList";
 import { IParityPickerProps } from "../FairnessWizard";
 import { mergeStyleSets } from "@uifabric/styling";
+import { ParityTabStyles } from "./ParityTab.styles";
 
 export interface IParityTabProps extends IWizardTabProps {
     parityPickerProps: IParityPickerProps;
 }
 
 export class ParityTab extends React.PureComponent<IParityTabProps> {
-    private static readonly classNames = mergeStyleSets({
-        itemCell: [
-          {
-            padding: "30px 36px 20px 0",
-            width: "100%",
-            position: "relative",
-            float: "left",
-            cursor: "pointer",
-            boxSizing: "border-box",
-            borderBottom: "1px solid #CCCCCC",
-            selectors: {
-              '&:hover': { background: "lightgray" }
-            }
-          }
-        ],
-        iconClass: {
-            fontSize: "20px",
-            position: "absolute",
-            right: "10px",
-            top: "10px"
-        },
-        itemsList: {
-            overflowY: "auto"
-        },
-        frame: {
-            width: "750px",
-            height: "100%",
-        },
-        main: {
-            height: "100%",
-            minWidth: "550px",
-            flex: 1
-        },
-        header: {
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "40px",
-            fontWeight: "300",
-            margin: "26px 0"
-        },
-        textBody: {
-            color: "#333333",
-            paddingTop: "12px",
-            fontSize: "15px",
-            lineHeight: "20px",
-            fontWeight: "normal",
-            paddingBottom: "12px"
-        }
-    });
     render(): React.ReactNode {
+        const styles = ParityTabStyles();
         return(
-            <Stack horizontal horizontalAlign="space-between" className={ParityTab.classNames.frame}>
+            <Stack horizontal horizontalAlign="space-between" className={styles.frame}>
                 <StackItem grow={2}>
-                    <Stack className={ParityTab.classNames.main}>
-                        <h2 className={ParityTab.classNames.header}>
+                    <Stack className={styles.main}>
+                        <h2 className={styles.header}>
                             {localization.Parity.header}
                         </h2>
-                        <p className={ParityTab.classNames.textBody}>{localization.Parity.body}</p>
-                        <StackItem grow={2} className={ParityTab.classNames.itemsList}>
+                        <p className={styles.textBody}>{localization.Parity.body}</p>
+                        <StackItem grow={2} className={styles.itemsList}>
                             <TileList
                                 items={this.props.parityPickerProps.parityOptions.map((parity, index): ITileProp => {
                                     const selected = this.props.parityPickerProps.selectedParityKey === parity.key;

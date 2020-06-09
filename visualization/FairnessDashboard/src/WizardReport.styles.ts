@@ -38,6 +38,7 @@ export interface IWizardReportStyles {
     modelLabel: IStyle;
     modalContentHelp: IStyle;
     groupLabel: IStyle;
+    legendPanel: IStyle;
     legendTitle: IStyle;
     legendSubtitle: IStyle;
 }
@@ -50,7 +51,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             padding: "40px"
         },
         header: {
-            padding: "0 90px",
+            padding: "0 100px",
             backgroundColor: theme.semanticColors.bodyStandoutBackground
         },
         multimodelButton: {
@@ -65,7 +66,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             display: "flex"
         },
         headerOptions: {
-            backgroundColor: "#222222",
+            backgroundColor: theme.semanticColors.bodyStandoutBackground,
         },
         bannerWrapper: {
             width: "100%",
@@ -99,12 +100,12 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             lineHeight: "16px",
             fontWeight: "normal",
             height: "26px",
-            marginLeft: "50px"
+            marginLeft: "100px"
         },
         overallArea: {
             display: "flex",
             flexDirection: "row",
-            padding: "20px 0 30px 50px",
+            padding: "20px 0 30px 100px",
             backgroundColor: 'white'
         },
         presentationArea: {
@@ -225,7 +226,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             lineHeight: "22px",
             fontWeight: "normal",
             paddingTop: "30px",
-            paddingLeft: "50px"
+            paddingLeft: "100px"
         },
         howTo: {
             paddingTop: "20px",
@@ -249,13 +250,16 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             textAlign: "center"
         },
         modelLabel: {
+            fontSize: "24px",
             alignSelf: "center",
-            paddingLeft: "35px",
             paddingTop: "16px",
             color: theme.semanticColors.bodyText
         },
         groupLabel: {
             color: theme.semanticColors.bodyText
+        },
+        legendPanel: {
+            marginLeft: "100px"
         },
         legendTitle: {
             color: "#333333",

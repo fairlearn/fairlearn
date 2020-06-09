@@ -40,7 +40,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             padding: "40px"
         },
         header: {
-            backgroundColor: theme.semanticColors.bodyFrameBackground, 
+            backgroundColor: theme.semanticColors.bodyStandoutBackground, 
             padding: "0 90px",
             height: "90px",
             display: "inline-flex",
@@ -50,14 +50,15 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
         },
         headerTitle: {
             color: theme.semanticColors.bodyText,
+            fontSize: "24px",
             fontWeight: FontWeights.semibold
         },
         headerOptions: {
-            backgroundColor: "#222222",
-            padding: "0 40px"
+            backgroundColor: theme.semanticColors.bodyStandoutBackground,
+            padding: "0 100px"
         },
         dropDown: {
-            margin: "10px 10px",
+            margin: "10px 10px 10px 0px",
             display: "inline-block"
         },
         infoButton: {

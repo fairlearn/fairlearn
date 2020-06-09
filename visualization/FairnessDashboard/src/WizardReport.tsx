@@ -468,18 +468,20 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                                     </div>
                                 </div>
                             </div>
-                            <div className={styles.textRow}>
-                                <div className={styles.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
-                                <div>
-                                    <div className={styles.legendTitle}>{localization.Report.underestimationError}</div>
-                                    <div className={styles.legendSubtitle}>{localization.Report.underpredictionExplanation}</div>
+                            <div className={styles.legendPanel}>
+                                <div className={styles.textRow}>
+                                    <div className={styles.colorBlock} style={{backgroundColor: ChartColors[1]}}/>
+                                    <div>
+                                        <div className={styles.legendTitle}>{localization.Report.underestimationError}</div>
+                                        <div className={styles.legendSubtitle}>{localization.Report.underpredictionExplanation}</div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className={styles.textRow}>
-                                <div className={styles.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
-                                <div>
-                                    <div className={styles.legendTitle}>{localization.Report.overestimationError}</div>
-                                    <div className={styles.legendSubtitle}>{localization.Report.overpredictionExplanation}</div>
+                                <div className={styles.textRow}>
+                                    <div className={styles.colorBlock} style={{backgroundColor: ChartColors[0]}}/>
+                                    <div>
+                                        <div className={styles.legendTitle}>{localization.Report.overestimationError}</div>
+                                        <div className={styles.legendSubtitle}>{localization.Report.overpredictionExplanation}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

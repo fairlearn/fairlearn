@@ -2,6 +2,7 @@ import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, Font
 
 export interface IIntroTabStyles {
     firstSection: IStyle;
+    firstSectionContainer: IStyle;
     firstSectionTitle: IStyle;
     firstSectionSubtitle: IStyle;
     firstSectionBody: IStyle;
@@ -23,6 +24,10 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             backgroundColor: theme.semanticColors.bodyBackground,
             color: theme.semanticColors.bodyText
         },
+        firstSectionContainer: {
+            width: "100%",
+            height: "350px"
+        },
         firstSectionTitle: {
             fontSize: "60px",
             fontWeight: FontWeights.light
@@ -40,6 +45,9 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         firstSectionGraphics: {
             width: "356px",
             height: "154px",
+            background: theme.semanticColors.bodyBackground,
+            fill: theme.semanticColors.bodyText,
+            stroke: theme.semanticColors.bodyText
         },
         lowerSection: {
             padding: "50px 70px 90px 90px",
@@ -62,7 +70,8 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         },
         numericLabel: {
             fontWeight: FontWeights.bold,
-            width: "30px"
+            width: "20px",
+            marginRight: "5px"
         },
         explanatoryStep: {
             maxWidth: "300px",

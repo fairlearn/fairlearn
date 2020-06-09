@@ -332,8 +332,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         return (
             <Stack className={styles.frame}>
                 <div className={styles.header}>
-                    <h2 className={styles.headerTitle}>{localization.ModelComparison.title} <b>assessment</b></h2>
-                    <Text variant={"large"} className={styles.headerTitle} block>{localization.ModelComparison.title}</Text>
+                    <Text variant={"large"} className={styles.headerTitle} block>{localization.ModelComparison.title} <b>assessment</b></Text>
                     {/*<ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>*/}
                 </div>
                 <div className={styles.headerOptions}>
