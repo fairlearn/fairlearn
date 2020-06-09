@@ -28,7 +28,7 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
     if len(my_labels) != 2:
         raise ValueError(_NEED_TWO_UNIQUE_Y_VALS)
     if pos_label not in my_labels:
-        raise ValueError(_NEED_TWO_UNIQUE_Y_VALS)
+        raise ValueError(_NEED_POS_LABEL_IN_Y_VALS)
     if my_labels[1] != pos_label:
         my_labels = list(reversed(my_labels))
     return my_labels
