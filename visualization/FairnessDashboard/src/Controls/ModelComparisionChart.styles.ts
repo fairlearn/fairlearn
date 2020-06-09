@@ -5,13 +5,22 @@ export interface IModelComparisionChartStyles {
     spinner: IStyle;
     header: IStyle;
     headerTitle: IStyle;
+    headerOptions: IStyle;
+    dropDown: IStyle;
+    doneButton: IStyle;
+    infoButton: IStyle;
+    modalContentIntro: IStyle;
+    modalContentHelp: IStyle;
     editButton: IStyle;
+    howTo: IStyle;
     main: IStyle;
+    mainLeft: IStyle;
     mainRight: IStyle;
     rightTitle: IStyle;
     rightText: IStyle;
     insights: IStyle;
     insightsText: IStyle;
+    downloadReport: IStyle;
     chart: IStyle;
     textSection: IStyle;
     radio: IStyle;
@@ -43,8 +52,55 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             color: theme.semanticColors.bodyText,
             fontWeight: FontWeights.semibold
         },
+        headerOptions: {
+            backgroundColor: "#222222",
+            padding: "0 40px"
+        },
+        dropDown: {
+            margin: "10px 10px",
+            display: "inline-block"
+        },
+        infoButton: {
+            color: "#999999",
+            float: "left",
+            width: "15px",
+            height: "15px",
+            textAlign: "center",
+            fontSize: "12px",
+            lineHeight: "14px",
+            fontWeight: "600",
+            borderRadius: "50%",
+            border: "1px solid",
+            marginTop: "3px",
+            marginRight: "3px"
+        },
+        doneButton: {
+            color: "#FFFFFF",
+            borderRadius: "5px",
+            background: "#5A53FF",
+            padding: "5px 15px",
+            selectors: {
+                '&:hover': { color: "#ffffff" }
+            }
+        },
+        modalContentIntro: {
+            float: 'left',
+            textAlign: 'center',
+            paddingTop: '10px',
+            paddingRight: '20px'
+        },
+        modalContentHelp: {
+            float: 'left',
+            textAlign: 'center',
+            paddingTop: '10px',
+            paddingRight: '20px',
+        },
         editButton: {
             color: theme.semanticColors.buttonText,
+        },
+        howTo: {
+            paddingTop: "20px",
+            paddingLeft: "100px"
         },
         main: {
             height: "100%",
@@ -52,6 +108,9 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             display: "inline-flex",
             flexDirection: "row",
             backgroundColor: theme.semanticColors.bodyBackground
+        },
+        mainLeft: {
+            width: "75%",
         },
         mainRight: {
             padding: "30px 0 0 35px",
@@ -79,6 +138,15 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             paddingRight: "15px",
             borderBottom: "1px solid",
             borderColor: theme.semanticColors.bodyDivider
+        },
+        downloadReport: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "normal",
+            paddingTop: "20px",
+            paddingBottom: "20px",
+            paddingLeft: "0px",
         },
         chart: {
             padding: "60px 0 0 0",

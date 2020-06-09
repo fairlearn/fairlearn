@@ -6,25 +6,40 @@ export interface IWizardReportStyles {
     multimodelButton: IStyle;
     headerTitle: IStyle;
     headerBanner: IStyle;
+    headerOptions: IStyle;
     bannerWrapper: IStyle;
     metricText: IStyle;
     firstMetricLabel: IStyle;
     metricLabel: IStyle;
+    expandAttributes: IStyle;
+    overallArea: IStyle;
     presentationArea: IStyle;
     chartWrapper: IStyle;
     chartBody: IStyle;
     chartHeader: IStyle;
+    dropDown: IStyle;
+    main: IStyle;
+    mainLeft: IStyle;
     mainRight: IStyle;
     rightTitle: IStyle;
     rightText: IStyle;
     insights: IStyle;
     insightsText: IStyle;
+    downloadReport: IStyle;
     tableWrapper: IStyle;
     textRow: IStyle;
+    infoButton: IStyle;
+    doneButton: IStyle;
+    closeButton: IStyle;
+    equalizedOdds: IStyle;
+    howTo: IStyle;
     colorBlock: IStyle;
     multimodelSection: IStyle;
     modelLabel: IStyle;
+    modalContentHelp: IStyle;
     groupLabel: IStyle;
+    legendTitle: IStyle;
+    legendSubtitle: IStyle;
 }
 
 export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> = () => {
@@ -48,6 +63,9 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         headerBanner: {
             display: "flex"
+        },
+        headerOptions: {
+            backgroundColor: "#222222",
         },
         bannerWrapper: {
             width: "100%",
@@ -75,6 +93,20 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             paddingTop: "8px",
             maxWidth: "130px"
         },
+        expandAttributes: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "normal",
+            height: "26px",
+            marginLeft: "50px"
+        },
+        overallArea: {
+            display: "flex",
+            flexDirection: "row",
+            padding: "20px 0 30px 50px",
+            backgroundColor: 'white'
+        },
         presentationArea: {
             display: "flex",
             flexDirection: "row",
@@ -93,6 +125,17 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             height: "23px",
             paddingLeft: "10px",
             color: theme.semanticColors.bodyText
+        },
+        main: {
+            display: "flex",
+            flexDirection: "row"
+        },
+        mainLeft: {
+            width: "75%",
+        },
+        dropDown: {
+            margin: "10px 0px",
+            display: "inline-block"
         },
         mainRight: {
             minWidth: "200px",
@@ -124,6 +167,15 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             borderBottom: "1px solid",
             borderBottomColor: theme.semanticColors.bodyDivider
         },
+        downloadReport: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+            fontWeight: "normal",
+            paddingTop: "20px",
+            paddingBottom: "20px",
+            paddingLeft: "0px",
+        },
         tableWrapper: {
             paddingBottom: "20px"
         },
@@ -134,6 +186,51 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             paddingBottom: "7px",
             color: theme.semanticColors.bodyText
         },
+        infoButton: {
+            color: "#999999",
+            float: "left",
+            width: "15px",
+            height: "15px",
+            textAlign: "center",
+            fontSize: "12px",
+            lineHeight: "14px",
+            fontWeight: "600",
+            borderRadius: "50%",
+            border: "1px solid",
+            marginTop: "3px",
+            marginRight: "3px",
+            marginLeft: "250px"
+        },
+        closeButton: {
+            color: "#FFFFFF",
+            float: "right",
+            fontFamily: "Arial",
+            fontSize: "20px",
+            lineHeight: "20px",
+            fontWeight: "400",
+            paddingLeft: "20px"
+        },
+        doneButton: {
+            color: "#FFFFFF",
+            borderRadius: "5px",
+            background: "#5A53FF",
+            padding: "5px 15px",
+            selectors: {
+                '&:hover': { color: "#ffffff" }
+            }
+        },
+        equalizedOdds: {
+            float: "left",
+            fontSize: "18px",
+            lineHeight: "22px",
+            fontWeight: "normal",
+            paddingTop: "30px",
+            paddingLeft: "50px"
+        },
+        howTo: {
+            paddingTop: "20px",
+            paddingLeft: "100px"
+        },
         colorBlock: {
             width: "15px",
             height: "15px",
@@ -143,6 +240,14 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             display: "flex",
             flexDirection:"row"
         },
+        modalContentHelp: {
+            float: 'left',
+            paddingTop: '10px',
+            paddingRight: '20px',
+            wordWrap: "break-word",
+            width: "300px",
+            textAlign: "center"
+        },
         modelLabel: {
             alignSelf: "center",
             paddingLeft: "35px",
@@ -151,6 +256,17 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         groupLabel: {
             color: theme.semanticColors.bodyText
+        },
+        legendTitle: {
+            color: "#333333",
+            fontSize: "12px",
+            lineHeight: "16px",
+        },
+        legendSubtitle: {
+            color: "#666666",
+            fontSize: "9px",
+            lineHeight: "12x",
+            fontStyle: "italic"
         }
     });
 };

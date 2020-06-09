@@ -5,6 +5,7 @@ export interface IIntroTabStyles {
     firstSectionTitle: IStyle;
     firstSectionSubtitle: IStyle;
     firstSectionBody: IStyle;
+    firstSectionGraphics: IStyle;
     lowerSection: IStyle;
     stepsContainer: IStyle;
     boldStep: IStyle;
@@ -35,6 +36,10 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             paddingBottom: "70px",
             maxWidth: "500px",
             fontWeight: FontWeights.semilight,
+        },
+        firstSectionGraphics: {
+            width: "356px",
+            height: "154px",
         },
         lowerSection: {
             padding: "50px 70px 90px 90px",
