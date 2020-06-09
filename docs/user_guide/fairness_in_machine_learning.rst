@@ -39,10 +39,6 @@ The Fairlearn package is most applicable to two kinds of harms:
   information are extended or withheld. Examples include varying accuracy in
   face recognition, document search, or product recommendation.
 
-Harms can have varying severities, but the cumulative impact of even
-*non-severe* harms can be extremely burdensome or make people feel singled out
-or undervalued.
-
 Fairness assessment and unfairness mitigation
 ---------------------------------------------
 
