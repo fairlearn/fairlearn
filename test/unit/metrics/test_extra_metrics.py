@@ -3,6 +3,7 @@
 
 import numpy as np
 import pytest
+import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
 from fairlearn.metrics._extra_metrics import _get_labels_for_confusion_matrix
@@ -69,6 +70,17 @@ def test_tpr_some_correct():
     assert result == 0.25
     result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
     assert result == 0.75
+
+
+def test_tpr_against_sklearn():
+    y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]
+    y_pred = [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
+
+    result = metrics.true_positive_rate(y_true, y_pred)
+    result_skm = skm.recall_score(y_true, y_pred)
+
+    assert result == pytest.approx(result_skm)
+
 
 # ==============================================
 # True Negative Rate
@@ -171,6 +183,16 @@ def test_fnr_some_correct_other_labels():
     assert result == 0.75
     result = metrics.false_negative_rate(y_true, y_pred, pos_label='b')
     assert result == 0.5
+
+
+def test_fnr_against_sklearn():
+    y_true = [0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]
+    y_pred = [1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
+
+    result = metrics.true_positive_rate(y_true, y_pred)
+    result_skm = 1 - skm.recall_score(y_true, y_pred)
+
+    assert result == pytest.approx(result_skm)
 
 
 # ============================
