@@ -20,9 +20,33 @@ _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
     """Figure out the labels argument for skm.confusion_matrix.
 
-    This assumes the input arrays are binary, and we need to specify a pos_label.
-    Given the way the calling routines work, this is achieved by ensuring that
-    the pos_label is last in the (two element) list.
+    This is an internal method used by the true/false positive/negative
+    rate metrics (and hence are restricted to binary data). We compute
+    these using the confusion matrix.
+    In general, we expect the input data to be :math:`\in {0, 1}`
+    with 1 being the 'positive' label. However, users might want to have
+    a different pair of values, and then specify the positive label
+    for themselves.
+    This method prepares the `labels` argument of
+    :py:func:\sklearn.metrics.confusion_matrix` based on the
+    user's specifications.
+
+    Parameters
+    ----------
+    y_true : array-like
+        The true values for the metric computation
+
+    y_pred : array-like
+        The predicted alues for the metric computation
+
+    pos_label : scalar
+        The value in the true and predicted arrays to treat as positive
+
+    Returns
+    -------
+    list
+        A two element list, consisting of the unique values of the two arrays
+        with the positive label listed last
     """
     my_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
     if len(my_labels) != 2:
@@ -35,7 +59,28 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
 
 
 def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
-    r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate)."""
+    r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
+
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
+
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. Defaults to 1.
+
+    Returns
+    -------
+    float
+        The true positive rate for the data
+    """
     my_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
         y_true, y_pred, sample_weight=sample_weight, labels=my_labels, normalize="true").ravel()
