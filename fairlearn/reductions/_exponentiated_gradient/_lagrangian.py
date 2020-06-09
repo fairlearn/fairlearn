@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -6,9 +6,11 @@ import numpy as np
 import pandas as pd
 import pickle
 import scipy.optimize as opt
+from sklearn.dummy import DummyClassifier
 from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,7 @@ class _Lagrangian:
 
     def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
         self.X = X
+        self.n = self.X.shape[0]
         self.constraints = constraints
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
@@ -47,13 +50,13 @@ class _Lagrangian:
         self.B = B
         self.opt_lambda = opt_lambda
         self.hs = pd.Series(dtype="float64")
-        self.classifiers = pd.Series(dtype="float64")
+        self.predictors = pd.Series(dtype="float64")
         self.errors = pd.Series(dtype="float64")
         self.gammas = pd.DataFrame()
         self.lambdas = pd.DataFrame()
-        self.n = self.X.shape[0]
         self.n_oracle_calls = 0
         self.oracle_execution_times = []
+        self.n_oracle_calls_dummy_returned = 0
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
 
@@ -137,7 +140,17 @@ class _Lagrangian:
         redW = signed_weights.abs()
         redW = self.n * redW / redW.sum()
 
-        classifier = pickle.loads(self.pickled_estimator)
+        redY_unique = np.unique(redY)
+
+        classifier = None
+        if len(redY_unique) == 1:
+            logger.debug("redY had single value. Using DummyClassifier")
+            classifier = DummyClassifier(strategy='constant',
+                                         constant=redY_unique[0])
+            self.n_oracle_calls_dummy_returned += 1
+        else:
+            classifier = pickle.loads(self.pickled_estimator)
+
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
         self.oracle_execution_times.append(time() - oracle_call_start_time)
@@ -169,7 +182,7 @@ class _Lagrangian:
             logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
             h_idx = len(self.hs)
             self.hs.at[h_idx] = h
-            self.classifiers.at[h_idx] = classifier
+            self.predictors.at[h_idx] = classifier
             self.errors.at[h_idx] = h_error
             self.gammas[h_idx] = h_gamma
             self.lambdas[h_idx] = lambda_vec.copy()

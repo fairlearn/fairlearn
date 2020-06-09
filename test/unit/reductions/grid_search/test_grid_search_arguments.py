@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -7,8 +7,8 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
+
 from sklearn.exceptions import NotFittedError
-from fairlearn import _NO_PREDICT_BEFORE_FIT
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
@@ -17,6 +17,7 @@ from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, G
 from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
     GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
 
+from test.unit.fixes import get_sklearn_expected_1d_message
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
 from test.unit.reductions.conftest import is_invalid_transformation
 from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results, _quick_data
@@ -28,6 +29,11 @@ from test.unit.reductions.grid_search.utilities import assert_n_grid_search_resu
 candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
 candidate_Y_transforms = conversions_for_1d
 candidate_A_transforms = conversions_for_1d
+
+# ==============================================================
+
+not_fitted_error_msg = "This {} instance is not fitted yet. Call 'fit' with " \
+    "appropriate arguments before using this estimator."
 
 
 # Base class for tests
@@ -230,8 +236,7 @@ class ArgumentTests:
             gs.fit(transformX(X),
                    Y_two_col_df,
                    sensitive_features=transformA(A))
-
-        assert "bad input shape" in execInfo.value.args[0]
+        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -246,8 +251,7 @@ class ArgumentTests:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
                    sensitive_features=transformA(A))
-
-        assert "bad input shape" in execInfo.value.args[0]
+        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     # ----------------------------
 
@@ -258,7 +262,7 @@ class ArgumentTests:
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
 
-        assert _NO_PREDICT_BEFORE_FIT == execInfo.value.args[0]
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
     def test_no_predict_proba_before_fit(self):
         gs = GridSearch(self.estimator, self.disparity_criterion)
@@ -267,7 +271,7 @@ class ArgumentTests:
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
 
-        assert _NO_PREDICT_BEFORE_FIT == execInfo.value.args[0]
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
 
 # Tests specific to Classification
@@ -327,4 +331,5 @@ class TestEqualizedOdds(ConditionalOpportunityTests):
 class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         self.estimator = LinearRegression()
-        self.disparity_criterion = GroupLossMoment(ZeroOneLoss())
+        eps = 0.01
+        self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), upper_bound=eps)

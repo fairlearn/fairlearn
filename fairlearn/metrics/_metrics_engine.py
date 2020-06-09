@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -8,7 +8,7 @@ from sklearn.utils import Bunch
 from ._extra_metrics import (
     true_positive_rate, true_negative_rate,
     false_positive_rate, false_negative_rate,
-    root_mean_squared_error, balanced_root_mean_squared_error,
+    _root_mean_squared_error, _balanced_root_mean_squared_error,
     mean_prediction,
     selection_rate,
     _mean_overprediction,
@@ -276,27 +276,29 @@ TRANSFORMATIONS = {
 METRICS_SPEC = [
     # base metrics from _extra_metrics
     (true_positive_rate, ["difference", "ratio"]),
-    (true_negative_rate, []),
+    (true_negative_rate, ["difference", "ratio"]),
     (false_positive_rate, ["difference", "ratio"]),
-    (false_negative_rate, []),
-    (root_mean_squared_error, []),
-    (balanced_root_mean_squared_error, []),
+    (false_negative_rate, ["difference", "ratio"]),
+    (selection_rate, ["difference", "ratio"]),
     (mean_prediction, []),
-    (selection_rate, ["difference", "ratio", "group_min", "group_max"]),
+    (_root_mean_squared_error, []),
+    (_balanced_root_mean_squared_error, []),
     (_mean_overprediction, []),
     (_mean_underprediction, []),
 
     # base metrics from sklearn.metrics
-    (skm.accuracy_score, ["difference", "ratio", "group_min", "group_max"]),
-    (skm.balanced_accuracy_score, []),
     (skm.confusion_matrix, []),
-    (skm.precision_score, []),
-    (skm.recall_score, []),
+    (skm.accuracy_score, ["difference", "ratio", "group_min"]),
+    (skm.zero_one_loss, ["difference", "ratio", "group_max"]),
+    (skm.balanced_accuracy_score, ["group_min"]),
+    (skm.precision_score, ["group_min"]),
+    (skm.recall_score, ["group_min"]),
     (skm.roc_auc_score, ["group_min"]),
-    (skm.zero_one_loss, []),
-    (skm.mean_absolute_error, ["difference", "ratio", "group_min", "group_max"]),
-    (skm.mean_squared_error, []),
-    (skm.r2_score, []),
+    (skm.mean_absolute_error, ["group_max"]),
+    (skm.mean_squared_error, ["group_max"]),
+    (skm.r2_score, ["group_min"]),
+    (skm.f1_score, ["group_max"]),
+    (skm.log_loss, ["group_min"]),
 ]
 
 

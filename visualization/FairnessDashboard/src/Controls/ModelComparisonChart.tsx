@@ -1,20 +1,22 @@
-import React from "react";
-import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
-import { IFairnessContext } from "../IFairnessContext";
 import _ from "lodash";
-import { MetricsCache } from "../MetricsCache";
-import { IAccuracyPickerProps, IParityPickerProps, IFeatureBinPickerProps } from "../FairnessWizard";
-import { ParityModes } from "../ParityMetrics";
-import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
-import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
-import { localization } from "../Localization/localization";
-import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
-import { mergeStyleSets } from "@uifabric/styling";
+import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
+import { getTheme, Text } from "office-ui-fabric-react";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
+import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
+import { Stack } from "office-ui-fabric-react/lib/Stack";
+import React from "react";
 import { AccuracyOptions } from "../AccuracyMetrics";
+import { IAccuracyPickerProps, IFeatureBinPickerProps, IParityPickerProps } from "../FairnessWizard";
 import { FormatMetrics } from "../FormatMetrics";
+import { IFairnessContext } from "../IFairnessContext";
 import { PredictionTypes } from "../IFairnessProps";
+import { localization } from "../Localization/localization";
+import { MetricsCache } from "../MetricsCache";
+import { ParityModes } from "../ParityMetrics";
+import { ModelComparisionChartStyles } from "./ModelComparisionChart.styles";
 
+const theme = getTheme();
 export interface IModelComparisonProps {
     dashboardContext: IFairnessContext;
     selections: SelectionContext;
@@ -67,7 +69,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 automargin: true,
                 fixedrange: true,
                 mirror: true,
-                linecolor: '#CCCCCC',
+                linecolor: theme.semanticColors.disabledBorder,
                 linewidth: 1,
                 title:{
                     text: 'Error'
@@ -83,93 +85,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         } as any
     };
 
-    private static readonly classNames = mergeStyleSets({
-        frame: {
-            flex: 1,
-            display: "flex",
-            flexDirection: "column"
-        },
-        spinner: {
-            margin: "auto",
-            padding: "40px"
-        },
-        header: {
-            backgroundColor: "#EBEBEB",
-            padding: "0 90px",
-            height: "90px",
-            display: "inline-flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center"
-        },
-        headerTitle: {
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "39px",
-            fontWeight: "100"
-        },
-        editButton: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "20px",
-            fontWeight: "400"
-        },
-        main: {
-            height: "100%",
-            flex: 1,
-            display: "inline-flex",
-            flexDirection: "row"
-        },
-        mainRight: {
-            padding: "30px 0 0 35px",
-            width: "300px"
-        },
-        rightTitle: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "500",
-            paddingBottom: "18px",
-            borderBottom: "1px solid #CCCCCC"
-        },
-        rightText: {
-            padding: "16px 15px 30px 0",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "18px",
-            fontWeight: "400",
-            borderBottom: "0.5px dashed #CCCCCC"
-        },
-        insights: {
-            textTransform: "uppercase",
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "500",
-            padding: "18px 0",
-        },
-        insightsText: {
-            color: "#333333",
-            fontSize: "15px",
-            lineHeight: "16px",
-            fontWeight: "400",
-            paddingBottom: "18px",
-            paddingRight: "15px",
-            borderBottom: "1px solid #CCCCCC"
-        },
-        chart: {
-            padding: "60px 0 0 0",
-            flex: 1
-        },
-        textSection: {
-            paddingBottom: "5px"
-        },
-        radio: {
-            paddingBottom: "30px",
-            paddingLeft: "75px"
-        }
-    });
-
     constructor(props: IModelComparisonProps) {
         super(props);
         this.state = {
@@ -178,10 +93,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     }
 
     public render(): React.ReactNode {
+        const styles = ModelComparisionChartStyles(); 
         if (!this.state || this.state.accuracyArray === undefined || this.state.disparityArray === undefined) {
             this.loadData();
             return (
-                <Spinner className={ModelComparisonChart.classNames.spinner} size={SpinnerSize.large} label={localization.calculating}/>
+                <Spinner className={styles.spinner} size={SpinnerSize.large} label={localization.calculating}/>
             );
         }
         const data = this.state.accuracyArray.map((accuracy, index) => {
@@ -238,16 +154,17 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             formattedMinDisparity,
             formattedMaxDisparity
         );
+        const metricTitleAppropriateCase = selectedMetric.alwaysUpperCase ? selectedMetric.title : selectedMetric.title.toLowerCase();
         const insights3 = localization.formatString(
             localization.ModelComparison.insightsText3,
-            selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             selectedMetric.isMinimization ? formattedMinAccuracy : formattedMaxAccuracy, 
             FormatMetrics.formatNumbers(this.state.disparityArray[selectedMetric.isMinimization ? minAccuracyIndex : maxAccuracyIndex], this.props.accuracyPickerProps.selectedAccuracyKey)
         );
 
         const insights4 = localization.formatString(
             localization.ModelComparison.insightsText4,
-            selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             FormatMetrics.formatNumbers(this.state.accuracyArray[minDisparityIndex], this.props.accuracyPickerProps.selectedAccuracyKey),
             formattedMinDisparity
         );
@@ -255,7 +172,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const howToReadText = localization.formatString(
             localization.ModelComparison.howToReadText,
             this.props.modelCount.toString(),
-            selectedMetric.title.toLowerCase(),
+            metricTitleAppropriateCase,
             selectedMetric.isMinimization ? localization.ModelComparison.lower : localization.ModelComparison.higher
         );
         
@@ -268,45 +185,46 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
         const accuracyMetricTitle = selectedMetric.title;
         props.layout.xaxis.title = accuracyMetricTitle;
         props.layout.yaxis.title = this.state.disparityInOutcomes ? localization.ModelComparison.disparityInOutcomes :
-            localization.formatString(localization.ModelComparison.disparityInAccuracy, accuracyMetricTitle.toLowerCase()) as string
+            localization.formatString(localization.ModelComparison.disparityInAccuracy, metricTitleAppropriateCase) as string
         return (
-            <Stack className={ModelComparisonChart.classNames.frame}>
-                <div className={ModelComparisonChart.classNames.header}>
-                    <h2 className={ModelComparisonChart.classNames.headerTitle}>{localization.ModelComparison.title}</h2>
-                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={ModelComparisonChart.classNames.editButton}>{localization.Report.editConfiguration}</ActionButton>
+            <Stack className={styles.frame}>
+                <div className={styles.header}>
+                    <Text variant={"large"} className={styles.headerTitle} block>{localization.ModelComparison.title}</Text>
+                    <ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>
                 </div>
-                <div className={ModelComparisonChart.classNames.main}>
-                    <div className={ModelComparisonChart.classNames.chart}>
+                <div className={styles.main}>
+                    <div className={styles.chart}>
                         <AccessibleChart
                             plotlyProps={props}
                             sharedSelectionContext={this.props.selections}
                             theme={undefined}
                         />
                     </div>
-                    <div className={ModelComparisonChart.classNames.mainRight}>
-                        <div className={ModelComparisonChart.classNames.rightTitle}>{localization.ModelComparison.howToRead}</div>
-                        <div className={ModelComparisonChart.classNames.rightText}>{howToReadText}</div>
-                        <div className={ModelComparisonChart.classNames.insights}>{localization.ModelComparison.insights}</div>
-                        <div className={ModelComparisonChart.classNames.insightsText}>
-                            <div className={ModelComparisonChart.classNames.textSection}>{insights2}</div>
-                            <div className={ModelComparisonChart.classNames.textSection}>{insights3}</div>
-                            <div>{insights4}</div>
+                    <div className={styles.mainRight}>
+                        <Text className={styles.rightTitle} block>{localization.ModelComparison.howToRead}</Text>
+                        <Text className={styles.rightText} block>{howToReadText}</Text>
+                        <Text className={styles.insights} block>{localization.ModelComparison.insights}</Text>                        
+                        <div className={styles.insightsText}>
+                            <Text className={styles.textSection} block>{insights2}</Text>
+                            <Text className={styles.textSection} block>{insights3}</Text>
+                            <Text className={styles.textSection} block>{insights4}</Text>
                         </div>
                     </div>
                 </div>
                 <div>
                     <ChoiceGroup
-                        className={ModelComparisonChart.classNames.radio}
+                        className={styles.radio}
                         selectedKey={this.state.disparityInOutcomes ? "outcomes" : "accuracy"}
                         options={[
                             {
                             key: 'accuracy',
-                            text: localization.formatString(localization.ModelComparison.disparityInAccuracy, 
-                                accuracyMetricTitle.toLowerCase()) as string
+                            text: localization.formatString(localization.ModelComparison.disparityInAccuracy, metricTitleAppropriateCase) as string,
+                            styles: { choiceFieldWrapper: styles.radioOptions} 
                             },
                             {
                             key: 'outcomes',
-                            text: localization.ModelComparison.disparityInOutcomes
+                            text: localization.ModelComparison.disparityInOutcomes,
+                            styles: { choiceFieldWrapper: styles.radioOptions}
                             }
                         ]}
                         onChange={this.disparityChanged}

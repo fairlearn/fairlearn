@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 """Defines the fairlearn dashboard class."""
@@ -8,8 +8,8 @@ from fairlearn.metrics import (
     true_negative_rate_group_summary,
     false_positive_rate_group_summary,
     false_negative_rate_group_summary,
-    root_mean_squared_error_group_summary,
-    balanced_root_mean_squared_error_group_summary,
+    _root_mean_squared_error_group_summary,
+    _balanced_root_mean_squared_error_group_summary,
     mean_prediction_group_summary,
     selection_rate_group_summary,
     _mean_overprediction_group_summary,
@@ -23,6 +23,8 @@ from fairlearn.metrics import (
     mean_absolute_error_group_summary,
     mean_squared_error_group_summary,
     r2_score_group_summary,
+    f1_score_group_summary,
+    log_loss_group_summary,
     )
 
 from IPython.display import display
@@ -111,11 +113,11 @@ class FairlearnDashboard(object):
             },
             "root_mean_squared_error": {
                 "model_type": ["regression", "probability"],
-                "function": root_mean_squared_error_group_summary
+                "function": _root_mean_squared_error_group_summary
             },
             "balanced_root_mean_squared_error": {
                 "model_type": ["probability"],
-                "function": balanced_root_mean_squared_error_group_summary
+                "function": _balanced_root_mean_squared_error_group_summary
             },
             "mean_squared_error": {
                 "model_type": ["regression", "probability"],
@@ -128,6 +130,14 @@ class FairlearnDashboard(object):
             "r2_score": {
                 "model_type": ["regression"],
                 "function": r2_score_group_summary
+            },
+            "f1_score": {
+                "model_type": ["classification"],
+                "function": f1_score_group_summary
+            },
+            "log_loss": {
+                "model_type": ["probability"],
+                "function": log_loss_group_summary
             },
             "overprediction": {
                 "model_type": [],

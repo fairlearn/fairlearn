@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 from sklearn import preprocessing
@@ -7,8 +7,8 @@ from . import (
     true_negative_rate_group_summary,
     false_positive_rate_group_summary,
     false_negative_rate_group_summary,
-    root_mean_squared_error_group_summary,
-    balanced_root_mean_squared_error_group_summary,
+    _root_mean_squared_error_group_summary,
+    _balanced_root_mean_squared_error_group_summary,
     mean_prediction_group_summary,
     selection_rate_group_summary,
     _mean_overprediction_group_summary,
@@ -22,6 +22,8 @@ from . import (
     mean_absolute_error_group_summary,
     mean_squared_error_group_summary,
     r2_score_group_summary,
+    f1_score_group_summary,
+    log_loss_group_summary,
     )
 
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
@@ -52,7 +54,9 @@ _allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
 # Issue 269 is about unifying the two sets
 ACCURACY_SCORE_GROUP_SUMMARY = "accuracy_score"
 BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY = "balanced_root_mean_squared_error"
+F1_SCORE_GROUP_SUMMARY = "f1_score"
 FALLOUT_RATE_GROUP_SUMMARY = "fallout_rate"
+LOG_LOSS_GROUP_SUMMARY = "log_loss"
 MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY = "mean_absolute_error"
 MEAN_OVERPREDICTION_GROUP_SUMMARY = "overprediction"
 MEAN_PREDICTION_GROUP_SUMMARY = "average"
@@ -71,6 +75,7 @@ ZERO_ONE_LOSS_GROUP_SUMMARY = "zero_one_loss"
 BINARY_CLASSIFICATION_METRICS = {}
 BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE_GROUP_SUMMARY] = accuracy_score_group_summary
 BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE_GROUP_SUMMARY] = false_positive_rate_group_summary
+BINARY_CLASSIFICATION_METRICS[F1_SCORE_GROUP_SUMMARY] = f1_score_group_summary
 BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction_group_summary  # noqa:E501
 BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction_group_summary  # noqa:E501
 BINARY_CLASSIFICATION_METRICS[MISS_RATE_GROUP_SUMMARY] = false_negative_rate_group_summary
@@ -81,14 +86,15 @@ BINARY_CLASSIFICATION_METRICS[SELECTION_RATE_GROUP_SUMMARY] = selection_rate_gro
 BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE_GROUP_SUMMARY] = true_negative_rate_group_summary
 
 REGRESSION_METRICS = {}
-REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = balanced_root_mean_squared_error_group_summary  # noqa:E501
+REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _balanced_root_mean_squared_error_group_summary  # noqa:E501
+REGRESSION_METRICS[LOG_LOSS_GROUP_SUMMARY] = log_loss_group_summary
 REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY] = mean_absolute_error_group_summary
 REGRESSION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction_group_summary
 REGRESSION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction_group_summary
 REGRESSION_METRICS[MEAN_PREDICTION_GROUP_SUMMARY] = mean_prediction_group_summary
 REGRESSION_METRICS[MEAN_SQUARED_ERROR_GROUP_SUMMARY] = mean_squared_error_group_summary
 REGRESSION_METRICS[R2_SCORE_GROUP_SUMMARY] = r2_score_group_summary
-REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = root_mean_squared_error_group_summary
+REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _root_mean_squared_error_group_summary
 REGRESSION_METRICS[ZERO_ONE_LOSS_GROUP_SUMMARY] = zero_one_loss_group_summary
 
 
