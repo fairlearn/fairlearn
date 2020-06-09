@@ -1,4 +1,7 @@
+import { getTheme } from "office-ui-fabric-react";
+
+const theme = getTheme();
 export const ChartColors = [
-    "#B3CCFF",
-    "#F7CF66"
+    theme.palette.blue, //"#1f77b4",
+    theme.palette.orangeLighter //"#ff7f0e"
 ];

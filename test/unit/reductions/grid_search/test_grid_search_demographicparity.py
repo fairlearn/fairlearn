@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch, DemographicParity
@@ -79,7 +79,7 @@ def test_demographicparity_fair_uneven_populations(A_two_dim):
     sample_proba = grid_search.predict_proba(test_X)
     assert np.allclose(sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]])
 
-    sample_results = grid_search._predictors[0].predict(test_X)
+    sample_results = grid_search.predictors_[0].predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
 
 
@@ -123,7 +123,7 @@ def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim, o
     sample_proba = grid_search.predict_proba(test_X)
     assert np.allclose(sample_proba, [[0.55069845, 0.44930155], [0.41546008, 0.58453992]])
 
-    sample_results = grid_search._predictors[0].predict(test_X)
+    sample_results = grid_search.predictors_[0].predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
 
 
@@ -163,7 +163,7 @@ def test_lambda_vec_zero_unchanged_model(A_two_dim):
     assert_n_grid_search_results(1, grid_search)
 
     # Check coefficients
-    gs_coeff = grid_search._predictors[grid_search._best_grid_index].coef_
+    gs_coeff = grid_search.predictors_[grid_search.best_idx_].coef_
     um_coeff = unmitigated_estimator.coef_
     assert np.array_equal(gs_coeff, um_coeff)
 
@@ -214,14 +214,14 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
 
     # Check we generated the same multipliers
     for i in range(3):
-        lm1 = grid_search1._lambda_vecs[i]
-        lm2 = grid_search2._lambda_vecs[i]
+        lm1 = grid_search1.lambda_vecs_[i]
+        lm2 = grid_search2.lambda_vecs_[i]
         assert lm1.equals(lm2)
 
     # Check the models are the same
     for i in range(3):
-        coef1 = grid_search1._predictors[i].coef_
-        coef2 = grid_search2._predictors[i].coef_
+        coef1 = grid_search1.predictors_[i].coef_
+        coef2 = grid_search2.predictors_[i].coef_
         assert np.array_equal(coef1, coef2)
 
 
@@ -255,6 +255,6 @@ def test_single_y_class():
     # Check all predictors are DummyClassifiers
     test_X_dict = {"c": [134534, 27381], "d": [1923, 14123]}
     test_X = pd.DataFrame(test_X_dict)
-    for p in grid_search._predictors:
+    for p in grid_search.predictors_:
         assert isinstance(p, DummyClassifier)
         assert np.array_equal(p.predict(test_X), [y_val, y_val])

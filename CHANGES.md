@@ -1,5 +1,11 @@
 # Changes
 
+### v0.5.0
+
+* Adjust classes to abide by naming conventions for attributes.
+* Change `ExponentiatedGradient` signature by renaming argument `T` to
+  `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.
+
 ### v0.4.6
 * Handle case where reductions relabeling results in a single class
 * Refactor metrics:
@@ -83,10 +89,12 @@
   objects
 
 ### v0.4.1, 2020-01-09
+
 * Fix to determine whether operating as binary classifier or regressor in
   dashboard
 
 ### v0.4.0, 2019-12-05
+
 * Initial release of fairlearn dashboard
 
 ### v0.3.0, 2019-11-01
@@ -100,7 +108,6 @@
   * Grid Search
   
 * Added grouped metrics
-
 
 ### v0.2.0, 2018-06-20
 

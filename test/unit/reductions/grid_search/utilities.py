@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -33,9 +33,9 @@ def _quick_data(A_two_dim=False, n_groups=2):
 
 
 def assert_n_grid_search_results(n, grid_search_obj):
-    assert grid_search_obj._best_grid_index is not None
-    assert len(grid_search_obj._predictors) == n
-    assert len(grid_search_obj._objectives) == n
-    assert len(grid_search_obj._oracle_execution_times) == n
-    assert len(grid_search_obj._lambda_vecs.columns) == n
-    assert len(grid_search_obj._gammas.columns) == n
+    assert grid_search_obj.best_idx_ is not None
+    assert len(grid_search_obj.predictors_) == n
+    assert len(grid_search_obj.objectives_) == n
+    assert len(grid_search_obj.oracle_execution_times_) == n
+    assert len(grid_search_obj.lambda_vecs_.columns) == n
+    assert len(grid_search_obj.gammas_.columns) == n

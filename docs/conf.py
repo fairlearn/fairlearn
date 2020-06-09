@@ -24,8 +24,8 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = 'Fairlearn'
-copyright = '2019, Microsoft Corporation.'
-author = 'Microsoft'
+copyright = '2019, Microsoft Corporation and contributors.'
+author = 'Microsoft and Fairlearn contributors'
 
 # The full version, including alpha/beta/rc tags
 release = fairlearn.__version__
@@ -57,7 +57,7 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-master_doc = 'index'
+master_doc = 'contents'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -82,20 +82,29 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-# html_logo = "path/to/some/file.png" TODO: add logo
+html_logo = "_static/images/fairlearn_full_color.png"
+
+# Additional templates that should be rendered to pages, maps page names to
+# template names.
+html_additional_pages = {
+    'index': 'index.html'
+}
+
+# If false, no index is generated.
+html_use_index = False
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_css_files = [
-    "css/cards.css"
-]
+html_css_files = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+# quickstart examples are only generated, but not shown in the gallery
+# since they are only needed for the quickstart page itself.
 sphinx_gallery_conf = {
      'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
      'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],

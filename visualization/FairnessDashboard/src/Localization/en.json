@@ -142,6 +142,9 @@
         "rms_error": "RMSE (root mean squared error)",
         "auc": "Area under ROC curve",
         "balancedRootMeanSquaredError": "Balanced RMSE",
+        "balancedAccuracy": "Balanced accuracy",
+        "f1Score": "F1-Score",
+        "logLoss": "Log Loss",
         "accuracyDescription": "The fraction of data points classified correctly.",
         "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
         "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity.",
@@ -151,7 +154,6 @@
         "r2Description": "The fraction of variance in the labels explained by the model.",
         "aucDescription": "The quality of the predictions, viewed as scores, in separating positive examples from negative examples.",
         "balancedRMSEDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced.",
-        "balancedAccuracy": "Balanced accuracy",
         "balancedAccuracyDescription": "Positive and negative examples are reweighted to have equal total weight. Suitable if the underlying data is highly imbalanced.",
         "parityDifference": "Parity difference",
         "parityDifferenceDescription": "Parity difference",
@@ -160,7 +162,8 @@
         "errorRateDifference": "Error rate difference",
         "errorRateDifferenceDescription": "Error rate difference",
         "equalOpportunityDifference": "Equal opportunity difference",
-        "equalOpportunityDifferenceDescription": "Equal opportunity difference"
+        "equalOpportunityDifferenceDescription": "Equal opportunity difference",
+        "f1ScoreDescription": "F1-Score is the harmonic mean of precision and recall."
     },
     "BinDialog": {
         "header": "Configure bins",

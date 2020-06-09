@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 """Tools for analyzing and mitigating disparity in Machine Learning models."""
@@ -10,9 +10,6 @@ from .show_versions import show_versions  # noqa: F401
 
 __name__ = "fairlearn"
 __version__ = "0.4.7.dev0"
-
-# Common strings
-_NO_PREDICT_BEFORE_FIT = "Must call fit before attempting to make predictions"
 
 
 # Setup logging infrastructure

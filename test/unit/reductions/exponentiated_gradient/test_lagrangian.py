@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 from copy import deepcopy
@@ -22,7 +22,7 @@ from .simple_learners import LeastSquaresBinaryClassifierLearner
 def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     X, y, A = _get_data(A_two_dim=False)
     estimator = LeastSquaresBinaryClassifierLearner()
-    constraints = Constraints()
+    constraints = Constraints(difference_bound=eps)
 
     # epsilon (and thereby also B) only affects L_high and L
     B = 1 / eps
@@ -137,7 +137,6 @@ def test_call_oracle_single_y_value(Constraints, eps, mocker):
     # We mock the estimator, but we only patch it for pickling
     estimator = mocker.MagicMock()
     mocker.patch('pickle.dumps')
-
     constraints = Constraints()
 
     lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, 1/eps)

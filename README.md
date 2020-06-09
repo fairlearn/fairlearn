@@ -63,12 +63,17 @@ For instructions on how to install Fairlearn check out our [Quickstart guide](ht
 ## Usage
 
 For common usage refer to the [Jupyter notebooks](./notebooks) and our
-[API guide](https://fairlearn.github.io/contributor_guide.html#api-design)
+[user guide](https://fairlearn.github.io/user_guide/index.html).
+Please note that our APIs are subject to change, so notebooks downloaded
+from `master` may not be compatible with Fairlearn installed with `pip`.
+In this case, please navigate the tags in the repository
+(e.g. [v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5))
+to locate the appropriate version of the notebook.
 
 ## Contributing
 
 To contribute please check our
-[contributor guide](https://fairlearn.github.io/contributor_guide.html).
+[contributor guide](https://fairlearn.github.io/contributor_guide/index.html).
 
 ## Maintainers
 
