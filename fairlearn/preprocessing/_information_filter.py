@@ -19,7 +19,7 @@ def _vector_projection(vec, unto):
 
 class InformationFilter(BaseEstimator, TransformerMixin):
     r"""
-    The `InformationFilter` filters out sensitive correlations in a dataset.
+    A component that filters out sensitive correlations in a dataset.
 
     The `InformationFilter` uses a variant of the Gram-Schmidt process
     to filter information out of the dataset. This can be useful if you
@@ -108,7 +108,7 @@ class InformationFilter(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        """Transforms X by applying the information filter."""
+        """Transform X by applying the information filter."""
         check_is_fitted(self, ["projection_", "col_ids_"])
         self._check_coltype(X)
         X = check_array(X, estimator=self)
