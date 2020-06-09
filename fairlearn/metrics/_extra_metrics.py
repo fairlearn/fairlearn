@@ -18,7 +18,7 @@ _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
 
 def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
-    """Figure out the labels argument for skm.confusion_matrix.
+    r"""Figure out the labels argument for skm.confusion_matrix.
 
     This is an internal method used by the true/false positive/negative
     rate metrics (and hence are restricted to binary data). We compute
