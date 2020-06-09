@@ -1,5 +1,6 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
+import numpy as np
 
 import pandas as pd
 import pytest
@@ -35,7 +36,7 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_argument_types(self, transformX, transformY, transformA, A_two_dim):
+    def test_argument_types_difference_bound(self, transformX, transformY, transformA, A_two_dim):
         # This is an expanded-out version of one of the smoke tests
         X, y, A = _get_data(A_two_dim)
         merged_A = _map_into_single_column(A)
@@ -43,27 +44,75 @@ class TestExponentiatedGradientArguments:
         transformed_X = transformX(X)
         transformed_y = transformY(y)
         transformed_A = transformA(A)
+        eps = 0.1
 
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(),
-            eps=0.1)
+            eps=eps)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
         n_predictors = len(expgrad.predictors_)
 
-        disparity_moment = DemographicParity()
+        disparity_moment = DemographicParity(difference_bound=eps)
         disparity_moment.load_data(X, y, sensitive_features=merged_A)
         error = ErrorRate()
         error.load_data(X, y, sensitive_features=merged_A)
         disparity = disparity_moment.gamma(Q).max()
+        disp = disparity_moment.gamma(Q)
+        disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
         error = error.gamma(Q)[0]
 
         assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
         assert expgrad.last_iter_ == 5
         assert expgrad.best_iter_ == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
+        assert (np.all(np.isclose(disp - eps, disp_eps)))
+        assert error == pytest.approx(0.25, abs=_PRECISION)
+        assert expgrad.n_oracle_calls_ == 32
+        assert n_predictors == 3
+
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_argument_types_ratio_bound(self, transformX, transformY, transformA, A_two_dim):
+        # This is an expanded-out version of one of the smoke tests
+        X, y, A = _get_data(A_two_dim)
+        merged_A = _map_into_single_column(A)
+
+        transformed_X = transformX(X)
+        transformed_y = transformY(y)
+        transformed_A = transformA(A)
+        eps = 0.1
+        ratio = 1.0
+
+        expgrad = ExponentiatedGradient(
+            LeastSquaresBinaryClassifierLearner(),
+            constraints=DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio),
+            eps=eps)
+        expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
+
+        def Q(X): return expgrad._pmf_predict(X)[:, 1]
+
+        n_predictors = len(expgrad.predictors_)
+
+        disparity_moment = DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio)
+        disparity_moment.load_data(X, y, sensitive_features=merged_A)
+        error = ErrorRate()
+        error.load_data(X, y, sensitive_features=merged_A)
+        disparity = disparity_moment.gamma(Q).max()
+        disp = disparity_moment.gamma(Q)
+        disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
+        error = error.gamma(Q)[0]
+
+        assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
+        assert expgrad.last_iter_ == 5
+        assert expgrad.best_iter_ == 5
+        assert disparity == pytest.approx(0.1, abs=_PRECISION)
+        assert (np.all(np.isclose(disp - eps, disp_eps)))
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad.n_oracle_calls_ == 32
         assert n_predictors == 3

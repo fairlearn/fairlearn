@@ -1,26 +1,26 @@
-import { IFairnessProps, PredictionType, PredictionTypes } from "./IFairnessProps";
 import { initializeIcons } from "@uifabric/icons";
-import React from "react";
-import { IFairnessContext, IFairnessModelMetadata } from "./IFairnessContext";
-import { localization } from "./Localization/localization";
 import _ from "lodash";
+import { ICategoricalRange, ModelMetadata, RangeTypes, SelectionContext } from "mlchartlib";
 import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
 import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
-import { SelectionContext, ICategoricalRange, IModelMetadata, ModelMetadata, RangeTypes } from "mlchartlib";
+import { Text } from "office-ui-fabric-react";
+import React from "react";
 import { AccuracyOptions, IAccuracyOption } from "./AccuracyMetrics";
-import { WizardReport } from "./WizardReport";
-import { AccuracyTab } from "./Controls/AccuracyTab";
-import { ParityTab } from "./Controls/ParityTab";
-import { ParityOptions, IParityOption } from "./ParityMetrics";
-import { MetricsCache } from "./MetricsCache";
-import { ModelComparisonChart } from "./Controls/ModelComparisonChart";
-import { FeatureTab } from "./Controls/FeatureTab";
-import { IBinnedResponse } from "./IBinnedResponse";
-import { Text } from "office-ui-fabric-react/lib/Text";
-import { IntroTab } from "./Controls/IntroTab";
-import { number } from "prop-types";
-import { mergeStyleSets } from "@uifabric/styling";
 import { BinnedResponseBuilder } from "./BinnedResponseBuilder";
+import { AccuracyTab } from "./Controls/AccuracyTab";
+import { FeatureTab } from "./Controls/FeatureTab";
+import { IntroTab } from "./Controls/IntroTab";
+import { ModelComparisonChart } from "./Controls/ModelComparisonChart";
+import { ParityTab } from "./Controls/ParityTab";
+import { IBinnedResponse } from "./IBinnedResponse";
+import { IFairnessContext, IFairnessModelMetadata } from "./IFairnessContext";
+import { IFairnessProps, PredictionType, PredictionTypes } from "./IFairnessProps";
+import { localization } from "./Localization/localization";
+import { MetricsCache } from "./MetricsCache";
+import { WizardReport } from "./WizardReport";
+import { FairnessWizardStyles } from "./FairnessWizard.styles";
+import { loadTheme } from "office-ui-fabric-react";
+import { defaultTheme } from "./Themes";
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -183,51 +183,13 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         return PredictionTypes.regression;
     }
 
-    private static readonly classNames = mergeStyleSets({
-        frame: {
-            minHeight: "800px",
-            minWidth: "800px",
-            fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`
-        },
-        thinHeader: {
-            height: "36px",
-            backgroundColor: "#333333",
-            color: "#FFFFFF"
-        },
-        headerLeft: {
-            fontSize: "15px",
-            lineHeight: "24px",
-            fontWeight: "500",
-            padding: "20px"
-        },
-        headerRight: {
-            fontSize: "12px",
-            padding: "20px"
-        },
-        pivot: {
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            backgroundColor: "#F2F2F2",
-            padding: "30px 90px 0 82px"
-        },
-        body: {
-            flex: 1,
-            display: "flex",
-            flexDirection: "column"
-        },
-        errorMessage: {
-            padding: "50px",
-            fontSize: "18px"
-        }
-    });
-
     private selections: SelectionContext;
 
     constructor(props: IFairnessProps) {
         super(props);
         FairnessWizard.initializeIcons(props);
         let accuracyMetrics: IAccuracyOption[];
+        loadTheme(props.theme || defaultTheme);
         this.selections = new SelectionContext("models", 1);
         this.selections.subscribe({selectionCallback: (strings: string[]) => {
             const numbers = strings.map(s => +s);
@@ -293,6 +255,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
     }
 
     public render(): React.ReactNode {
+        const styles = FairnessWizardStyles();
         const accuracyPickerProps = {
             accuracyOptions: this.state.accuracyMetrics,
             selectedAccuracyKey: this.state.selectedAccuracyKey,
@@ -309,31 +272,31 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             onBinChange: this.setBinIndex
         };
         if (this.state.featureBins.length === 0) {
-            return (<Stack className={FairnessWizard.classNames.frame}>
-                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
-                    <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
+            return (<Stack className={styles.frame}>
+                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader} >
+                    <Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>
                 </Stack>
-                <Stack.Item grow={2} className={FairnessWizard.classNames.body}>
-                    <div>{localization.errorOnInputs}</div>
+                <Stack.Item grow={2} className={styles.body}>
+                    <Text variant={"mediumPlus"}>{localization.errorOnInputs}</Text>
                 </Stack.Item>
             </Stack>);
         }
         return (
-             <Stack className={FairnessWizard.classNames.frame}>
-                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={FairnessWizard.classNames.thinHeader} >
-                    <div className={FairnessWizard.classNames.headerLeft}>{localization.Header.title}</div>
+             <Stack className={styles.frame}>
+                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader} >
+                    <Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>
                 </Stack>
                 {(this.state.activeTabKey === introTabKey) &&
-                    <StackItem grow={2} className={FairnessWizard.classNames.body}>
+                    <StackItem grow={2} className={styles.body}>
                         <IntroTab onNext={this.setTab.bind(this, featureBinTabKey)}/>
                     </StackItem>}
                  {(this.state.activeTabKey === featureBinTabKey ||
                    this.state.activeTabKey === accuracyTabKey ||
                    this.state.activeTabKey === disparityTabKey
                  ) &&
-                    <Stack.Item grow={2} className={FairnessWizard.classNames.body}>
+                    <Stack.Item grow={2} className={styles.body}>
                         <Pivot
-                            className={FairnessWizard.classNames.pivot}
+                            className={styles.pivot}
                             styles={{
                                 itemContainer: {
                                     height: "100%"

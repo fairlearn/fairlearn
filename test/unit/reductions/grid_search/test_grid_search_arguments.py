@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
+
 
 from sklearn.exceptions import NotFittedError
 from fairlearn._input_validation import \
@@ -330,4 +331,5 @@ class TestEqualizedOdds(ConditionalOpportunityTests):
 class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         self.estimator = LinearRegression()
-        self.disparity_criterion = GroupLossMoment(ZeroOneLoss())
+        eps = 0.01
+        self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), upper_bound=eps)
