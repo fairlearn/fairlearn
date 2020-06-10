@@ -88,7 +88,28 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
 
 
 def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
-    r"""Calculate the true negative rate (also called specificity or selectivity)."""
+    r"""Calculate the true negative rate (also called specificity or selectivity).
+
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
+
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. Defaults to 1.
+
+    Returns
+    -------
+    float
+        The true negative rate for the data
+    """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
         y_true, y_pred, sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
@@ -96,7 +117,28 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
 
 
 def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
-    r"""Calculate the false positive rate (also called fall-out)."""
+    r"""Calculate the false positive rate (also called fall-out).
+    
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
+
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. Defaults to 1.
+
+    Returns
+    -------
+    float
+        The false positive rate for the data
+    """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
         y_true, y_pred, sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
@@ -104,7 +146,28 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
 
 
 def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
-    r"""Calculate the false negative rate (also called miss rate)."""
+    r"""Calculate the false negative rate (also called miss rate).
+    
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
+
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. Defaults to 1.
+
+    Returns
+    -------
+    float
+        The false negative rate for the data
+    """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
         y_true, y_pred, sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
