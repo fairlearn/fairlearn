@@ -11,12 +11,12 @@ print(__doc__)
 # Contents
 # --------
 # 
-# #. `What is covered`_
-# #. `Introduction`_
-# #. `The UCI credit card default dataset`_
-# #. `Using a fairness unaware model`_
-# #. `Mitigating equalized odds difference with Postprocessing`_
-# #. `Mitigating equalized odds difference with GridSearch`_
+# 1. `What is covered`_
+# 2. `Introduction`_
+# 3. `The UCI credit card default dataset`_
+# 4. `Using a fairness unaware model`_
+# 5. `Mitigating equalized odds difference with Postprocessing`_
+# 6. `Mitigating equalized odds difference with GridSearch`_
 #
 # What is covered
 # ---------------
