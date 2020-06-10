@@ -118,7 +118,7 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
 
 def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     r"""Calculate the false positive rate (also called fall-out).
-    
+
     Parameters
     ----------
     y_true : array-like
@@ -147,7 +147,7 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
 
 def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     r"""Calculate the false negative rate (also called miss rate).
-    
+
     Parameters
     ----------
     y_true : array-like
