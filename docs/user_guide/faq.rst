@@ -57,9 +57,8 @@ Can the mitigation algorithms in Fairlearn make my model fair?
     you should be able to determine the most appropriate actions for your situation.
 
 What sort of fairness related harms can Fairlearn address?
-    Fairlearn concentrates on group fairness.
-    That is, obtaining the minimum disparity on some metric evaluated on
-    specified subgroups in the data.
+    Fairlearn concentrates on group fairness, meaning obtaining the minimum disparity on some
+    metric evaluated on specified subgroups in the data.
     This is certainly not the only way of looking at fairness.
     For example, there is the concept of individual fairness (where decisions are evaluated
     on the level of individuals rather than groups) and counter-factual fairness (e.g. does the
