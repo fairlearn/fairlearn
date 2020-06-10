@@ -83,7 +83,8 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred, sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
     return tpr
 
 
@@ -112,7 +113,8 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred, sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
     return tnr
 
 
@@ -141,7 +143,8 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred, sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
     return fpr
 
 
@@ -170,7 +173,8 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred, sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
     return fnr
 
 
