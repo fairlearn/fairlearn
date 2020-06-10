@@ -42,21 +42,22 @@ Won't making a model fairer reduce its accuracy?
 Fairlearn questions
 -------------------
 
-Can Fairlearn make my model fair?
-    Naive use of Fairlearn is not going to result in fairer models.
-    Indeed, when used incorrectly, Fairlearn could produce a model which is *less* fair.
+Can the mitigation algorithms in Fairlearn make my model fair?
+    Naive use of the Fairlearn library is not going to result in fairer models.
+    Indeed, when used incorrectly, these mitigation algorithms could produce a model which is *less* fair.
 
-    What Fairlearn can do is generate a model which has lower disparity as measured by
+    What mitigation algorithms do is generate a model which has lower disparity as measured by
     a user-specified metric.
-    Whether this makes the model fairer is outside the remit of Fairlearn - or indeed of
-    machine learning in general.
+    Whether this makes the model fairer is outside the scope of the algorithm.
     To determine whether the new model is fairer, the whole system of which it is a part
     needs to be considered in terms of the societal context in which it is used.
-    See, for example, "Fairness and Abstraction in Sociotechnical Systems" by Selbst et al.,
-    listed on our :ref:`further_reading` page. 
+    In Fairlearn, we aim to combine a Python library of disparity metrics and mitigation algorithms
+    with a deep discussion of fairness in machine learning.
+    By considering this extra information in the context of your particular machine learning system,
+    you should be able to determine the most appropriate actions for your situation.
 
 What sort of fairness related harms can Fairlearn address?
-    Fairlean concentrates on group fairness.
+    Fairlearn concentrates on group fairness.
     That is, obtaining the minimum disparity on some metric evaluated on
     specified subgroups in the data.
     This is certainly not the only way of looking at fairness.
