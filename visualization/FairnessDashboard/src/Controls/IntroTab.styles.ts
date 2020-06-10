@@ -24,11 +24,13 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         },
         firstSectionTitle: {
             fontSize: "60px",
-            fontWeight: FontWeights.light
+            fontWeight: FontWeights.light,
+            lineHeight: "50px"
         },
         firstSectionSubtitle: {
             fontSize: "60px",
-            fontWeight: FontWeights.semibold
+            fontWeight: FontWeights.semibold,
+            lineHeight: "50px"
         },
         firstSectionBody: {
             paddingTop: "30px",
