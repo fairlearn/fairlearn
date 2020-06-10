@@ -3,7 +3,7 @@ import warnings
 
 from sklearn.datasets import fetch_openml
 
-from fairlearn.exceptions import UnfairDataWarning
+from fairlearn.exceptions import DataFairnessWarning
 
 
 def fetch_boston(*, cache=True, data_home=None,
@@ -102,7 +102,7 @@ def fetch_boston(*, cache=True, data_home=None,
     """
     if warn:
         msg = "You are about to use with an unfair dataset. Mind the `B` and `LSTAT` columns."
-        warnings.warn(UnfairDataWarning(msg))
+        warnings.warn(DataFairnessWarning(msg))
     if not data_home:
         data_home = pathlib.Path().home() / ".fairlearn-data"
     return fetch_openml(
