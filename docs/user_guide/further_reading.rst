@@ -14,6 +14,11 @@ learning algorithms can have harmful effects:
 - `Artificial Unintelligence <https://mitpress.mit.edu/books/artificial-unintelligence>`_ by Meredith Broussard
 - `Algorithms of Oppression <https://nyupress.org/9781479837243/algorithms-of-oppression/>`_ by Safiya Umoja Noble
 
+In addition, the `Gender Shades <http://gendershades.org/>`_ study is a recent example of a
+*quality of service* harm. Specifically, algorithms which were designed to classify faces as male or
+female performed worse for darker skin tones and for females - and particularly badly on
+females with dark skin.
+
 There are also papers which focus less on individual algorithms, and more on societal impacts.
 A selection of these follows:
 
