@@ -27,3 +27,9 @@ Project roadmap
 Governance
 ----------
 
+
+Frequently Asked Questions
+--------------------------
+
+We have a :ref:`faq` page.
+

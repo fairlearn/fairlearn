@@ -18,4 +18,4 @@ Table of Contents
 
    contributor_guide/index
 
-   :ref:`FAQ <faq>`
+   faq
