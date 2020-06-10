@@ -56,7 +56,7 @@ Can the mitigation algorithms in Fairlearn make my model fair?
     By considering this extra information in the context of your particular machine learning system,
     you should be able to determine the most appropriate actions for your situation.
 
-What sort of fairness related harms can Fairlearn address?
+What sort of fairness related harms can the Fairlearn library address?
     Fairlearn concentrates on group fairness, meaning obtaining the minimum disparity on some
     metric evaluated on specified subgroups in the data.
     This is certainly not the only way of looking at fairness.
@@ -68,19 +68,20 @@ What sort of fairness related harms can Fairlearn address?
     mathematical (and hence algorithmic) expression - justice, due process and
     righting historic iniquities for example.
 
-Can Fairlearn be used to detect bias in datasets?
+Can the Fairlearn library be used to detect bias in datasets?
     We do not have concrete plans for this at the present time.
 
-Can Fairlearn recommend ways to make my model fairer?
-    No. Fairlearn is not magic.
-
+Can the Fairlearn library recommend ways to make my model fairer?
     Fairness is a social concept, and no technological solution can make
     things fair automatically.
-    In order to use Fairlearn successfully, you first need to work out
+    In order to use the Fairlearn library successfully, you first need to work out
     what fairness means for your particular problem.
-    Once that is determined, you can then work out how to use the
-    various algorithms and fairness metrics which Fairlearn supports
-    to develop models which are *fairer by the standard you have chosen*.
+    We aim to provide a rich discussion of the topic of fairness in machine learning
+    on this website, together with links to the literature.
+    Once you have determined what fairness means for your machine pipeline,
+    you can then work out how to use the various algorithms and fairness metrics
+    which Fairlearn supports to develop models which are
+    *fairer by the standard you have chosen*.
 
 What unfairness mitigation techniques does Fairlearn support?
     Please see our :ref:`mitigation` section.
