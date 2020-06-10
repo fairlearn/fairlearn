@@ -47,13 +47,6 @@ def fetch_boston(*, cache=True, data_home=None,
 
     Parameters
     ----------
-    version : integer or 'active', default='active'
-        Version of the dataset. Can only be provided if also ``name`` is given.
-        If 'active' the oldest version that's still active is used. Since
-        there may be more than one active version of a dataset, and those
-        versions may fundamentally be different from one another, setting an
-        exact version is highly recommended.
-
     cache : boolean, default=True
         Whether to cache downloaded datasets using joblib.
 
