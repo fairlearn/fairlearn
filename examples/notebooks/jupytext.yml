@@ -1,0 +1,3 @@
+# jupytext configuration to sync between .py and .ipynb files
+
+default_jupytext_formats: "ipynb,py"
