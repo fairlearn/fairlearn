@@ -23,7 +23,7 @@ print(__doc__)
 # 
 # * **Domain:**
 #
-#   * Finance (loan decisions). The data is semisynthetic to create a simple
+#   * Finance (loan decisions). The data is semi-synthetic to create a simple
 #     example of disparity in accuracy.
 # 
 # * **ML task:**

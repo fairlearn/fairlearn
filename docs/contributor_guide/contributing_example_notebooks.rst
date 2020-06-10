@@ -30,7 +30,9 @@ This allows them to be rendered properly with output from all cells.
 
 These notebooks are generated based on `.py` files in the
 `examples/notebooks directory <https://github.com/fairlearn/fairlearn/tree/master/examples/notebooks>`_
-of the repository.
+of the repository. To do this yourself make sure to install sphinx and its
+add-ons by running :code:`pip install -r requirements.txt` in the repository
+root directory.
 
 When working on the notebooks it can be tedious to make changes in the
 notebook and then make the same change in the `.py` file. To make the
