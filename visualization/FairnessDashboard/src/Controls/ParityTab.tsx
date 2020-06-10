@@ -38,7 +38,6 @@ export class ParityTab extends React.PureComponent<IParityTabProps> {
                                 })}
                             />
                         </StackItem>
-                        <Separator />
                         <WizardFooter onNext={this.props.onNext} onPrevious={this.props.onPrevious}/>
                     </Stack>
                 </StackItem>

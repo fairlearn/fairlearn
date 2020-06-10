@@ -52,6 +52,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         header: {
             padding: "0 100px",
+            marginBottom: "20px",
             backgroundColor: theme.semanticColors.bodyStandoutBackground
         },
         multimodelButton: {
@@ -100,7 +101,8 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             lineHeight: "16px",
             fontWeight: "normal",
             height: "26px",
-            marginLeft: "100px"
+            marginLeft: "100px",
+            marginBottom: "20px"
         },
         overallArea: {
             display: "flex",
@@ -160,8 +162,10 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             textTransform: "uppercase",
             color: theme.semanticColors.bodyText,
             padding: "18px 0",
+            display: "inline"
         },
         insightsText: {
+            marginTop: "20px",
             color: theme.semanticColors.bodyText,
             paddingBottom: "18px",
             paddingRight: "15px",

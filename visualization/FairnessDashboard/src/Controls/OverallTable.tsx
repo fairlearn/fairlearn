@@ -5,6 +5,7 @@ import { Text } from "office-ui-fabric-react/lib/Text";
 import { mergeStyleSets } from "@uifabric/styling";
 import { Separator } from "office-ui-fabric-react/lib/Separator";
 import { localization } from "../Localization/localization";
+import { OverallTableStyles } from "./OverallTable.styles";
 
 export interface IOverallTableProps {
     binValues: number[];
@@ -25,100 +26,11 @@ interface IBinItem {
 
 export class OverallTable extends React.PureComponent<IOverallTableProps> {
     private static readonly classNames = mergeStyleSets({
-        minMaxLabel: {
-            padding: "1px 9px",
-            marginTop: "4px",
-            color: "#FFFFFF",
-            fontSize: "10px",
-            lineHeight: "20px",
-            fontWeight: "400",
-            backgroundColor: "#999999"
-        },
-        groupCol: {
-            display: "inline-flex",
-            flexDirection:"column",
-            height: "100%",
-            width: "max-content"
-        },
-        groupLabel: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "12px",
-            fontWeight: "500",
-            height: "26px"
-        },
-        flexCol: {
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            borderTop: "0.5px solid #CCCCCC",
-            // borderBottom: "0.5px solid #CCCCCC"
-        },
-        binBox: {
-            flex: 1,
-            // minWidth: "100px",
-            // maxWidth: "200px",
-            // width: "max-content",
-            width: "130px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            borderBottom: "0.5px solid #CCCCCC"
-        },
-        binTitle: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "600"
-        },
-        binLabel: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "normal"
-        },
-        sensitiveAttributes: {
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "normal",
-            height: "26px",
-            paddingLeft: "10px"
-        },
-        metricCol: {
-            display: "inline-flex",
-            flexDirection:"column",
-            height: "100%",
-            width: "120px"
-        },
-        metricLabel: {
-            color: "#333333",
-            fontSize: "11px",
-            lineHeight: "16px",
-            fontWeight: "600",
-            height: "26px",
-            paddingLeft: "10px"
-        },
-        metricBox: {
-            flex: 1,
-            paddingLeft: "10px",
-            color: "#333333",
-            fontSize: "12px",
-            lineHeight: "16px",
-            fontWeight: "normal",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            // borderLeft: "0.5px dashed #CCCCCC",
-            borderBottom: "0.5px solid #CCCCCC"
-        },
-        frame: {
-            paddingBottom: "19px",
-            display: "flex"
-        }
+        
     });
     
     public render(): React.ReactNode {
+        const styles = OverallTableStyles();
         let minIndexes = [];
         let maxIndexes = [];
         let minValue = Number.MAX_SAFE_INTEGER;
@@ -142,19 +54,19 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
             }
         });
         return (
-            <div className={OverallTable.classNames.frame}>
-                <div className={OverallTable.classNames.groupCol}>
-                    <div className={OverallTable.classNames.groupLabel}>{/*this.props.binGroup*/}</div>
-                    <div className={OverallTable.classNames.flexCol}>
-                        <div className={OverallTable.classNames.binBox}>
-                                <div className={OverallTable.classNames.binTitle}>{localization.Report.overallLabel}</div>
+            <div className={styles.frame}>
+                <div className={styles.groupCol}>
+                    <div className={styles.groupLabel}>{/*this.props.binGroup*/}</div>
+                    <div className={styles.flexCol}>
+                        <div className={styles.binBox}>
+                                <div className={styles.binTitle}>{localization.Report.overallLabel}</div>
                         </div>
                         {this.props.binLabels.map((label, index) => {
-                            if (this.props.expandAttributes) return (<div className={OverallTable.classNames.binBox} key={index}>
-                                <div className={OverallTable.classNames.binLabel}>{label}</div>
+                            if (this.props.expandAttributes) return (<div className={styles.binBox} key={index}>
+                                <div className={styles.binLabel}>{label}</div>
                                 {/* <Stack horizontal>
-                                    {minIndexes.includes(index) && <div className={OverallTable.classNames.minMaxLabel}>{localization.Report.minTag}</div>}
-                                    {maxIndexes.includes(index) && <div className={OverallTable.classNames.minMaxLabel}>{localization.Report.maxTag}</div>}
+                                    {minIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.minTag}</div>}
+                                    {maxIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.maxTag}</div>}
                                 </Stack> */}
                             </div>)
                         })}
@@ -162,13 +74,13 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                 </div>
                 {this.props.metricLabels.map((metric, index) => {
                     return (
-                        <div className={OverallTable.classNames.metricCol}>
-                        <div className={OverallTable.classNames.metricLabel}>{metric}</div>
-                        <div className={OverallTable.classNames.flexCol}>
-                            <div className={OverallTable.classNames.metricBox}>{this.props.overallMetrics[index]}</div>
+                        <div className={styles.metricCol}>
+                        <div className={styles.metricLabel}>{metric}</div>
+                        <div className={styles.flexCol}>
+                            <div className={styles.metricBox}>{this.props.overallMetrics[index]}</div>
                             {this.props.formattedBinValues[index].map((value, index) => {
                                 if (this.props.expandAttributes) return (
-                                <div className={OverallTable.classNames.metricBox} key={index}>
+                                <div className={styles.metricBox} key={index}>
                                     {value !== undefined ? value : 'empty'}
                                 </div>);
                             })}

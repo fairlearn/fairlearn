@@ -26,14 +26,16 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         },
         firstSectionContainer: {
             width: "100%",
-            height: "350px"
+            height: "250px"
         },
         firstSectionTitle: {
-            fontSize: "60px",
+            fontSize: "42px",
+            lineHeight: "50px",
             fontWeight: FontWeights.light
         },
         firstSectionSubtitle: {
-            fontSize: "60px",
+            fontSize: "42px",
+            lineHeight: "50px",
             fontWeight: FontWeights.semibold
         },
         firstSectionBody: {

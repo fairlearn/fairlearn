@@ -132,9 +132,11 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
         insights: {
             textTransform: "uppercase",
             color: theme.semanticColors.bodyText,
-            padding: "18px 0",
+            padding: "18px 10px",
+            display: "inline"
         },
         insightsText: {
+            marginTop: "20px",
             paddingBottom: "18px",
             paddingRight: "15px",
             borderBottom: "1px solid",
@@ -150,7 +152,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             paddingLeft: "0px",
         },
         chart: {
-            padding: "60px 0 0 0",
+            padding: "0px 0 0 0",
             flex: 1
         },
         textSection: {
