@@ -21,7 +21,7 @@ Read more in [Fairlearn: A toolkit for assessing and improving fairness in AI](h
 
 ## Current release
 
-The current stable release is available at [Fairlearn v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6).  For older versions, see the [changelog](CHANGES.md) or [upgrading guide](https://fairlearn.github.io/contributor_guide/upgrading.html).
+The current stable release is available at [Fairlearn v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6).  For older versions, see the [changelog](CHANGES.md) or [upgrading guide](https://fairlearn.github.io/user_guide/upgrading.html).
 
 Fairlearn is currently an **alpha** project.  It started as a Python package to accompany the research paper, "A Reductions Approach to Fair Classification," ([Agarwal et al. 2018](https://arxiv.org/abs/1803.02453)), and we're working to translate that research into an open source toolkit that empowers data scientists and developers to assess and improve the fairness of their AI systems.
 
