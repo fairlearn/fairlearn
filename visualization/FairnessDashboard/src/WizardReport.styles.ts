@@ -59,10 +59,9 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         metricText: {
             color: theme.semanticColors.bodyText,
-            //paddingTop: "8px",
-            lineHeight: "44px",
             paddingRight: "12px",
             fontWeight: FontWeights.light,
+            lineHeight: "44px",
             fontSize: "36px"
         },
         firstMetricLabel: {
