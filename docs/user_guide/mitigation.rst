@@ -78,6 +78,54 @@ Reductions
 
 .. currentmodule:: fairlearn.reductions
 
+Our reduction algorithms are so called because they *reduce* the problem of
+training a model subject to a disparity constraint to one of training a model
+subject to weighted data.
+This approach was first described in [#1]_.
+We will start with a high level overview of the technique, and then look
+more deeply at its implementation.
+
+Consider the standard setting for binary classification.
+In such as case, we wish to learn the classifer
+:math:`h \in \mathcal{H}` which minimises the classification
+error :math:`\mbox{err}(h) = \P[ h(X) \neq Y]`.
+Now, let us suppose that we can devise a constraint function
+:math:`\mathbf{C}(h)` which measures the violation of our
+disparity constraint.
+We will then want to learn the classifier
+:math:`h \in \mathcal{H}`
+which satisfies
+
+.. math::
+   \min_{h \in \mathcal{H}} \mbox{err}{(h)}
+   \qquad
+   \mbox{subject to}
+   \qquad
+   \mathbf{C}(h) < \mathbf{c}
+
+where :math:`\mathbf{c}` is a (vector) tolerance of the constraint
+violation.
+
+To make progress with this, we rewrite it in terms of a Lagrangian
+optimization:
+
+.. math::
+   L(h, \mathbf{\lambda}) = \mbox{err}(h) +
+                            \mathbf{\lambda} ( \mathbf{C}(h) = \mathbf{c})
+
+We then want to minimise the error, while maximising the penalty for
+violating the parity constraint :math:`\mathbf{c}`.
+That is, we need to solve:
+
+.. math::
+   \min_{h \in \mathcal{H}}
+   \;
+   \max_{\mathbf{\lambda} \in \mathbb{R}^n}
+   \;
+   L(h, \mathbf{\lambda})
+
+
+
 Exponentiated Gradient
 ^^^^^^^^^^^^^^^^^^^^^^
 
