@@ -11,4 +11,3 @@ User Guide
    assessment
    mitigation
    further_reading
-   faq
