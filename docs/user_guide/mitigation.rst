@@ -85,6 +85,9 @@ This approach was first described in [#1]_.
 We will start with a high level overview of the technique, and then look
 more deeply at its implementation.
 
+Mathematical Overview
+^^^^^^^^^^^^^^^^^^^^^
+
 Consider the standard setting for binary classification.
 In such as case, we wish to learn the classifer
 :math:`h \in \mathcal{H}` which minimises the classification
@@ -111,7 +114,7 @@ optimization:
 
 .. math::
    L(h, \mathbf{\lambda}) = \mbox{err}(h) +
-                            \mathbf{\lambda} ( \mathbf{C}(h) = \mathbf{c})
+                            \mathbf{\lambda}^{\mbox{T}} ( \mathbf{C}(h) - \mathbf{c})
 
 We then want to minimise the error, while maximising the penalty for
 violating the parity constraint :math:`\mathbf{c}`.
@@ -124,6 +127,7 @@ That is, we need to solve:
    \;
    L(h, \mathbf{\lambda})
 
+This is a saddle point problem, which can be solved with well known techniques.
 
 
 Exponentiated Gradient
