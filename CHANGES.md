@@ -1,4 +1,5 @@
 # Changes
+See [upgrading](https://fairlearn.github.io/contributor_guide/upgrading.html) for specific instructions on how to migrate from older versions.
 
 ### v0.5.0
 

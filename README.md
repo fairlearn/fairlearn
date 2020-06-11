@@ -1,10 +1,12 @@
 [![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![StackOverflow](https://img.shields.io/badge/StackOverflow-questions-blueviolet)](https://stackoverflow.com/questions/tagged/fairlearn)
 
-# Fairlearn
+# Fairlearn - Alpha release
 
-Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. Fairlearn contains mitigation algorithms as well as a Jupyter widget for model assessment. Besides the source code, this repository also contains Jupyter notebooks with examples of Fairlearn usage.
+Fairlearn is an open source toolkit that empowers data scientists and developers to assess and improve the fairness of their AI systems.  Fairlearn has three components: Python functions for computing fairness metrics, mitigation algorithms for optimizing fairness metrics, and an interactive visualization dashboard.
 
-Website: https://fairlearn.github.io/
+While these components are designed to help with navigating trade-offs between fairness and model performance, we emphasize that prioritizing fairness in AI systems is a sociotechnical challenge.  Because there are many complex sources of unfairness — some societal and some technical — it is not possible to fully “debias” a system or to guarantee fairness; the goal is to mitigate fairness-related harms as much as possible.
+
+Read more in [Fairlearn: A toolkit for assessing and improving fairness in AI](https://www.microsoft.com/en-us/research/uploads/prod/2020/05/Fairlearn_whitepaper.pdf) or at [fairlearn.github.io](https://fairlearn.github.io/).
 
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
@@ -19,9 +21,11 @@ Website: https://fairlearn.github.io/
 
 ## Current release
 
-- The current stable release is available at [Fairlearn v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6).
+The current stable release is available at [Fairlearn v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6).  For older versions, see the [changelog](CHANGES.md) or [upgrading guide](https://fairlearn.github.io/contributor_guide/upgrading.html).
 
-- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://fairlearn.github.io/contributor_guide/development_process.html#onboarding-guide).
+Fairlearn is currently an **alpha** project.  It started as a Python package to accompany the research paper, "A Reductions Approach to Fair Classification," ([Agarwal et al. 2018](https://arxiv.org/abs/1803.02453)), and we're working to translate that research into an open source toolkit that empowers data scientists and developers to assess and improve the fairness of their AI systems.
+
+
 
 ## What we mean by _fairness_
 
