@@ -220,3 +220,34 @@ def test_fpr_some_correct():
     assert result == 0.5
     result = metrics.false_positive_rate(y_true, y_pred, pos_label=0)
     assert result == pytest.approx(0.6666667)
+
+# ============================
+# Single value arrays
+
+
+def test_all_zeros():
+    zeros = np.zeros(10)
+
+    assert metrics.true_positive_rate(zeros, zeros) == 0
+    assert metrics.false_positive_rate(zeros, zeros) == 0
+    assert metrics.true_negative_rate(zeros, zeros) == 1
+    assert metrics.false_negative_rate(zeros, zeros) == 0
+
+    assert metrics.true_positive_rate(zeros, zeros, pos_label=0) == 1
+    assert metrics.false_positive_rate(zeros, zeros, pos_label=0) == 0
+    assert metrics.true_negative_rate(zeros, zeros, pos_label=0) == 0
+    assert metrics.false_negative_rate(zeros, zeros, pos_label=0) == 0
+
+
+def test_all_ones():
+    zeros = np.ones(10)
+
+    assert metrics.true_positive_rate(zeros, zeros) == 1
+    assert metrics.false_positive_rate(zeros, zeros) == 0
+    assert metrics.true_negative_rate(zeros, zeros) == 0
+    assert metrics.false_negative_rate(zeros, zeros) == 0
+
+    assert metrics.true_positive_rate(zeros, zeros, pos_label=0) == 0
+    assert metrics.false_positive_rate(zeros, zeros, pos_label=0) == 0
+    assert metrics.true_negative_rate(zeros, zeros, pos_label=0) == 1
+    assert metrics.false_negative_rate(zeros, zeros, pos_label=0) == 0
