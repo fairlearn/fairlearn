@@ -82,6 +82,11 @@ Expressing the Constraint Violation with Moments
 
 In this section, we will discuss how to construct :math:`\mathbf{C}(h)`, which
 measures the constraint violation of a classifier :math:`h`.
+The form we choose to express the constraints is
+
+.. math::
+    M \mathbf{\mu}(h) \le \mathbf{c}
+    :label: eq_moment_definition
 
 To be continued....
 
@@ -150,6 +155,18 @@ be useful as we construct the reduction.
 Formulating the Reduction
 -------------------------
 
+Between equations :eq:`eq_fairclassify` and :eq:`eq_moment_definition` the
+problem we need to solve is:
+
+.. math::
+    \min_{Q \in \Delta} \hat{\mbox{err}}{(Q)}
+    \quad
+    \mbox{subject to}
+    \quad
+    M \hat{\mathbf{\mu}}(Q) \le \mathbf{\hat{c}}
+
+Note that all of the empirical dependence of the constraint function is in
+:math:`\mu`, and none is in :math:`M`.
 
 .. topic:: References:
 
