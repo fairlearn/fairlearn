@@ -74,7 +74,10 @@ def test_tpr_against_sklearn():
 
     result = metrics.true_positive_rate(y_true, y_pred)
     result_skm = skm.recall_score(y_true, y_pred)
+    assert result == pytest.approx(result_skm)
 
+    result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
+    result_skm = skm.recall_score(y_true, y_pred, pos_label=0)
     assert result == pytest.approx(result_skm)
 
 
@@ -182,12 +185,15 @@ def test_fnr_some_correct_other_labels():
 
 
 def test_fnr_against_sklearn():
-    y_true = [0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]
+    y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0]
     y_pred = [1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
 
-    result = metrics.true_positive_rate(y_true, y_pred)
+    result = metrics.false_negative_rate(y_true, y_pred)
     result_skm = 1 - skm.recall_score(y_true, y_pred)
+    assert result == pytest.approx(result_skm)
 
+    result = metrics.false_negative_rate(y_true, y_pred, pos_label=0)
+    result_skm = 1 - skm.recall_score(y_true, y_pred, pos_label=0)
     assert result == pytest.approx(result_skm)
 
 
