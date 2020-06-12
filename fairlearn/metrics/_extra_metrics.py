@@ -23,7 +23,7 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
     This is an internal method used by the true/false positive/negative
     rate metrics (and hence are restricted to binary data). We compute
     these using the confusion matrix.
-    In general, we expect the input data to be :math:`\in {0, 1}`
+    In general, we expect the input data to be in {0, 1}
     with 1 being the 'positive' label. However, users might want to have
     a different pair of values, and then specify the positive label
     for themselves.
