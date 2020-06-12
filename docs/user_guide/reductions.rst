@@ -164,9 +164,44 @@ problem we need to solve is:
     \mbox{subject to}
     \quad
     M \hat{\mathbf{\mu}}(Q) \le \mathbf{\hat{c}}
+    :label: eq_fairclassify_moments
 
 Note that all of the empirical dependence of the constraint function is in
 :math:`\mu`, and none is in :math:`M`.
+We now form the Lagrangian:
+
+.. math::
+    L(Q, \mathbf{\lambda})
+    =
+    \hat{\mbox{err}}(Q)
+    +
+    \mathbf{\lambda}^{\mbox{T}}( M \hat{\mathbf{\mu}}(Q) - \mathbf{\hat{c}} )
+
+The size of the vector of Lagrange multipliers, :math:`\mathbf{\lambda}`, is
+set by the number of constraints, :math:`|\mathcal{K}|`.
+With this Lagrangian, equation :eq:`eq_fairclassify_moments` is equivalent to:
+
+.. math::
+    \min_{Q \in \Delta}
+    \max_{\mathbf{\lambda} \in \mathbb{R}_+^{|\mathcal{K}|}}
+    L(Q, \mathbf{\lambda})
+
+where the restriction to :math:`\mathbb{R}_+` comes from our choice to split
+the moments into positive and negative violations of the constraint.
+Intuitively, we are seeking to minimise our error while maximising the penalty
+for violating the disparity constraint (since that penalty is controlled by
+:math:`\mathbf{\lambda}` and the components of that vector are required to be
+positive).
+
+To be continued....
+
+Solving for the Saddlepoint
+---------------------------
+
+Talk about the two players.
+Have a full overview at this level, and then go into detail in the subsections.
+
+
 
 .. topic:: References:
 
