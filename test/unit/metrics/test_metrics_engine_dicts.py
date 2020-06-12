@@ -88,11 +88,6 @@ derived_metric_results = {
     metrics.log_loss_group_min: 7.67546133,
 }
 
-classification_keys = [
-    metrics.true_positive_rate_group_summary,
-    metrics.true_negative_rate_group_summary
-]
-
 metric_group_summary_pos_label_keys = [
     metrics.true_positive_rate_group_summary,
     metrics.true_negative_rate_group_summary,
