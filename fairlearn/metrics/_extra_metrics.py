@@ -13,7 +13,7 @@ from ._balanced_root_mean_squared_error import _balanced_root_mean_squared_error
 from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_underprediction  # noqa: F401,E501
 from ._selection_rate import selection_rate  # noqa: F401,E501
 
-_NEED_TWO_UNIQUE_Y_VALS = "Must have two unique y values"
+_TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
 _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
 
@@ -28,7 +28,7 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
     a different pair of values, and then specify the positive label
     for themselves.
     This method prepares the `labels` argument of
-    :py:func:\sklearn.metrics.confusion_matrix` based on the
+    :py:func:`sklearn.metrics.confusion_matrix` based on the
     user's specifications.
 
     Parameters
@@ -37,7 +37,7 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
         The true values for the metric computation
 
     y_pred : array-like
-        The predicted alues for the metric computation
+        The predicted values for the metric computation
 
     pos_label : scalar
         The value in the true and predicted arrays to treat as positive
@@ -49,9 +49,9 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
         with the positive label listed last
     """
     my_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
-    if len(my_labels) != 2:
-        raise ValueError(_NEED_TWO_UNIQUE_Y_VALS)
-    if pos_label not in my_labels:
+    if len(my_labels) > 2:
+        raise ValueError(_TOO_MANY_UNIQUE_Y_VALS)
+    if pos_label not in my_labels and len(my_labels) == 2:
         raise ValueError(_NEED_POS_LABEL_IN_Y_VALS)
     if my_labels[1] != pos_label:
         my_labels = list(reversed(my_labels))
