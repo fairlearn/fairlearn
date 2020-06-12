@@ -81,7 +81,9 @@ Reductions
 Our reduction algorithms are so called because they *reduce* the problem of
 training a model subject to a disparity constraint to one of training a model
 subject to weighted data.
-This approach was first described in [#1]_.
+This approach was first described in [#2]_.
+
+
 We will start with a high level overview of the technique, and then look
 more deeply at its implementation.
 
