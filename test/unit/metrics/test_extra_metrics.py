@@ -33,6 +33,12 @@ def test_get_labels_for_confusion_matrix_bad_pos_label():
     assert str(exception.value) == "Must have pos_label in y values"
 
 
+def test_get_labels_for_confusion_matrix_ambiguous():
+    with pytest.raises(ValueError) as exception:
+        _get_labels_for_confusion_matrix([1, 1], [1, 1], None)
+    assert str(exception.value) == "Must specify pos_label for degenerate data"
+
+
 # ==============================================
 # True Positive Rate
 
@@ -234,10 +240,10 @@ def test_fpr_some_correct():
 def test_all_zeros():
     zeros = np.zeros(10)
 
-    assert metrics.true_positive_rate(zeros, zeros) == 0
-    assert metrics.false_positive_rate(zeros, zeros) == 0
-    assert metrics.true_negative_rate(zeros, zeros) == 1
-    assert metrics.false_negative_rate(zeros, zeros) == 0
+    assert metrics.true_positive_rate(zeros, zeros, pos_label=1) == 0
+    assert metrics.false_positive_rate(zeros, zeros, pos_label=1) == 0
+    assert metrics.true_negative_rate(zeros, zeros, pos_label=1) == 1
+    assert metrics.false_negative_rate(zeros, zeros, pos_label=1) == 0
 
     assert metrics.true_positive_rate(zeros, zeros, pos_label=0) == 1
     assert metrics.false_positive_rate(zeros, zeros, pos_label=0) == 0
@@ -246,14 +252,14 @@ def test_all_zeros():
 
 
 def test_all_ones():
-    zeros = np.ones(10)
+    ones = np.ones(10)
 
-    assert metrics.true_positive_rate(zeros, zeros) == 1
-    assert metrics.false_positive_rate(zeros, zeros) == 0
-    assert metrics.true_negative_rate(zeros, zeros) == 0
-    assert metrics.false_negative_rate(zeros, zeros) == 0
+    assert metrics.true_positive_rate(ones, ones, pos_label=1) == 1
+    assert metrics.false_positive_rate(ones, ones, pos_label=1) == 0
+    assert metrics.true_negative_rate(ones, ones, pos_label=1) == 0
+    assert metrics.false_negative_rate(ones, ones, pos_label=1) == 0
 
-    assert metrics.true_positive_rate(zeros, zeros, pos_label=0) == 0
-    assert metrics.false_positive_rate(zeros, zeros, pos_label=0) == 0
-    assert metrics.true_negative_rate(zeros, zeros, pos_label=0) == 1
-    assert metrics.false_negative_rate(zeros, zeros, pos_label=0) == 0
+    assert metrics.true_positive_rate(ones, ones, pos_label=0) == 0
+    assert metrics.false_positive_rate(ones, ones, pos_label=0) == 0
+    assert metrics.true_negative_rate(ones, ones, pos_label=0) == 1
+    assert metrics.false_negative_rate(ones, ones, pos_label=0) == 0

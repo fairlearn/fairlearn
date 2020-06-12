@@ -14,6 +14,7 @@ from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_unde
 from ._selection_rate import selection_rate  # noqa: F401,E501
 
 _TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
+_POS_LABEL_AMBIGUOUS = "Must specify pos_label for degenerate data"
 _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
 
@@ -23,10 +24,6 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
     This is an internal method used by the true/false positive/negative
     rate metrics (and hence are restricted to binary data). We compute
     these using the confusion matrix.
-    In general, we expect the input data to be in {0, 1}
-    with 1 being the 'positive' label. However, users might want to have
-    a different pair of values, and then specify the positive label
-    for themselves.
     This method prepares the `labels` argument of
     :py:func:`sklearn.metrics.confusion_matrix` based on the
     user's specifications.
@@ -40,7 +37,9 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
         The predicted values for the metric computation
 
     pos_label : scalar
-        The value in the true and predicted arrays to treat as positive
+        The value in the true and predicted arrays to treat as positive.
+        This must be set if the two y arrays contain a single unique value.
+        If set to None, then the larger of the two unique values will be used.
 
     Returns
     -------
@@ -51,14 +50,18 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
     my_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
     if len(my_labels) > 2:
         raise ValueError(_TOO_MANY_UNIQUE_Y_VALS)
-    if pos_label not in my_labels and len(my_labels) == 2:
-        raise ValueError(_NEED_POS_LABEL_IN_Y_VALS)
-    if len(my_labels) == 2 and my_labels[1] != pos_label:
-        my_labels = list(reversed(my_labels))
+    if pos_label is None:
+        if len(my_labels) == 1:
+            raise ValueError(_POS_LABEL_AMBIGUOUS)
+    else:
+        if pos_label not in my_labels and len(my_labels) == 2:
+            raise ValueError(_NEED_POS_LABEL_IN_Y_VALS)
+        if len(my_labels) == 2 and my_labels[1] != pos_label:
+            my_labels = list(reversed(my_labels))
     return my_labels
 
 
-def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
+def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
 
     Parameters
@@ -74,7 +77,8 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. Defaults to 1.
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
 
     Returns
     -------
@@ -91,7 +95,7 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     return tpr
 
 
-def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
+def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     r"""Calculate the true negative rate (also called specificity or selectivity).
 
     Parameters
@@ -107,7 +111,8 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. Defaults to 1.
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
 
     Returns
     -------
@@ -124,7 +129,7 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     return tnr
 
 
-def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
+def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     r"""Calculate the false positive rate (also called fall-out).
 
     Parameters
@@ -140,7 +145,8 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. Defaults to 1.
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
 
     Returns
     -------
@@ -157,7 +163,7 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=1):
     return fpr
 
 
-def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
+def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     r"""Calculate the false negative rate (also called miss rate).
 
     Parameters
@@ -173,7 +179,8 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=1):
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. Defaults to 1.
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
 
     Returns
     -------
