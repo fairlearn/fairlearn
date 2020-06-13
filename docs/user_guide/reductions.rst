@@ -185,6 +185,7 @@ With this Lagrangian, equation :eq:`eq_fairclassify_moments` is equivalent to:
     \min_{Q \in \Delta}
     \max_{\mathbf{\lambda} \in \mathbb{R}_+^{|\mathcal{K}|}}
     L(Q, \mathbf{\lambda})
+    :label: eq_saddlepoint
 
 where the restriction to :math:`\mathbb{R}_+` comes from our choice to split
 the moments into positive and negative violations of the constraint.
@@ -192,15 +193,63 @@ Intuitively, we are seeking to minimise our error while maximising the penalty
 for violating the disparity constraint (since that penalty is controlled by
 :math:`\mathbf{\lambda}` and the components of that vector are required to be
 positive).
+This is a saddlepoint problem.
+
+Analysing the Saddlepoint
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To be continued....
 
 Solving for the Saddlepoint
 ---------------------------
 
-Talk about the two players.
-Have a full overview at this level, and then go into detail in the subsections.
+Fairlearn contains two algorithms for solving :eq:eq_saddlepoint.
+Key to both is the ability to convert the vector of Lagrange multipliers,
+:math:`\mathbf{\lambda}` into sample weights for model training.
+We show how to do this in the more detailed sections below.
 
+The simpler approach is :code:`GridSearch` which selects a collection
+of :math:`\mathbf{\lambda}` vectors, and trains a model for each.
+The user can then select the model which best meets their needs
+(although to conform to `scikit-learn` semantics, :code:`GridSearch` will
+pick one of the models to use in :code:`predict()` calls).
+
+A fuller solution is given by the :code:`ExponentiatedGradient` algorithm.
+This uses the algorithm described in [#2]_ to reach the saddlepoint.
+At its core, this algorithm is a game between two players
+
+*   The :math:`\mathbf{\lambda}`-player who seeks to maximise
+    :math:`L(Q, \mathbf{\lambda})` by manipulating :math:`\mathbf{\lambda}`
+    for a given model :math:`Q`
+*   The :math:`Q`\-player who seeks to minimise
+    :math:`L(Q, \mathbf{\lambda})` by picking the best model for a given
+    :math:`\mathbf{\lambda}`
+
+The players take turns:
+
+#.  The :math:`\mathbf{\lambda}`-player proposes a :math:`\mathbf{\lambda}`
+#.  The :math:`Q`\-player trains a model, :math:`Q`, based on the given
+    :math:`\mathbf{\lambda}` and gives it back to the
+    :math:`\mathbf{\lambda}`-player
+#.  The :math:`\mathbf{\lambda}`-player examines how :math:`Q` violates the constraints
+    and proposes a new :math:`\mathbf{\lambda}`
+#.  Continue until the constraints are all satisfied
+
+In the sections below, we will discuss the optimal strategies for each of the
+two players.
+
+
+Strategy for the :math:`\mathbf{\lambda}`-player
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To be written
+
+Strategy for the :math:`Q`\-player
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To be written.
+This will contain how to turn the :math:`\mathbf{\lambda}` into
+a weighted classification problem.
 
 
 .. topic:: References:
@@ -208,3 +257,7 @@ Have a full overview at this level, and then go into detail in the subsections.
    .. [#1] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
       Approach to Fair Classification"
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
+
+   .. [#2] Freund and Schapire, `"A Decision-Theoretic Generalization of
+      On-Line Learning and an Application to Boosting" 
+      <https://dl.acm.org/doi/abs/10.1006/jcss.1997.1504>`_, COLT, 1996
