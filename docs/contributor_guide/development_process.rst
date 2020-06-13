@@ -14,6 +14,22 @@ run periodically. When adding new code paths or features, tests are a
 requirement to complete a pull request. They should be added in the
 :code:`test` directory.
 
+Documentation should be provided with pull requests that add or change
+functionality. This includes comments in the code itself, docstrings, and user
+guides. For exceptions to this rule the pull request author should coordinate
+with a maintainer. For changes that fix bugs, add new features, change APIs,
+etc., i.e., for changes that are relevant to developers and/or users please
+also add an entry in CHANGES.md in the section corresponding to the *next*
+release, since that's where your change will be included.
+If you're a new contributor please also add yourself to AUTHORS.md.
+
+Docstrings should follow
+`numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
+This is a
+`recent decision by the community <https://github.com/fairlearn/fairlearn/issues/314>`_.
+The new policy is to update docstrings that a PR touches, as opposed to
+changing all the docstrings in one PR.
+
 Developer certificate of origin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
