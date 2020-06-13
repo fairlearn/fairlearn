@@ -1,10 +1,8 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pkg_resources
-import platform
 import pytest
-import sys
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 
 from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3
@@ -44,11 +42,6 @@ def is_mpl_installed():
         return False
 
 
-def is_py35_on_macos():
-    return sys.version_info[0] == 3 and sys.version_info[1] == 5 and platform.system() == "Darwin"
-
-
-@pytest.mark.skipif(is_py35_on_macos(), reason="Python 3.5 on MacOS requires TkAgg.")
 @pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex1.png")
