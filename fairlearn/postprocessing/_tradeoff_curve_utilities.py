@@ -30,7 +30,7 @@ METRIC_DICT = {
     'accuracy_score': (
         lambda x: (x.true_positives + x.true_negatives) / x.n),
     'balanced_accuracy_score': (
-        lambda x: x.true_positives / x.positives + x.true_negatives / x.negatives),
+        lambda x: 0.5 * x.true_positives / x.positives + 0.5 * x.true_negatives / x.negatives),
 }
 
 

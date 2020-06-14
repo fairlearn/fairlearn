@@ -151,7 +151,7 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
 
 
 class PassThroughPredictor(BaseEstimator):
-    def __init__(self, transform):
+    def __init__(self, transform=None):
         self.transform = transform
 
     def fit(self, X, y=None, **kwargs):
@@ -159,7 +159,10 @@ class PassThroughPredictor(BaseEstimator):
         return self
 
     def predict(self, X):
-        return self.transform_(X[0])
+        if self.transform_ is None:
+            return X[0]
+        else:
+            return self.transform_(X[0])
 
 
 @pytest.mark.parametrize("score_transform", candidate_Y_transforms)
@@ -449,3 +452,197 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
                        match="Found input variables with inconsistent numbers of samples"):
         adjusted_predictor.predict(data_X_y_sf.X[:-1],
                                    sensitive_features=data_X_y_sf.sensitive_features)
+
+constraints_list = [
+    'selection_rate_parity',
+    'demographic_parity',
+    'false_positive_rate_parity',
+    'false_negative_rate_parity',
+    'true_positive_rate_parity',
+    'true_negative_rate_parity',
+    'equalized_odds',
+    'bad_constraints']
+
+objectives_list = [
+    'accuracy_score',
+    'balanced_accuracy_score',
+    'selection_rate',
+    'true_positive_rate',
+    'true_negative_rate',
+    'bad_objective']
+
+# For each combination of constraints and objective,
+# provide the returned solution as a dictionary, or
+# a string that represents the ValueError if the combination
+# is invalid.
+results = {
+    'selection_rate_parity, accuracy_score': {
+        0: {'p0': 0.625, 'op0': '>', 'thr0': 1.5, 'p1': 0.375, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'selection_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.2, 'op0': '>', 'thr0': np.inf, 'p1': 0.8, 'op1': '>', 'thr1': 0.5}},
+    'selection_rate_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'selection_rate_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'selection_rate_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'selection_rate_parity, bad_objective': (
+        'For selection_rate_parity only the following objectives are supported'),
+    'demographic_parity, accuracy_score': {
+        0: {'p0': 0.625, 'op0': '>', 'thr0': 1.5, 'p1': 0.375, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'demographic_parity, balanced_accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.2, 'op0': '>', 'thr0': np.inf, 'p1': 0.8, 'op1': '>', 'thr1': 0.5}},
+    'demographic_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'demographic_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'demographic_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'demographic_parity, bad_objective': (
+        'For demographic_parity only the following objectives are supported'),
+    'false_positive_rate_parity, accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, bad_objective': (
+        'For false_positive_rate_parity only the following objectives are supported'),
+    'false_negative_rate_parity, accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.75, 'op0': '>', 'thr0': 0.5, 'p1': 0.25, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, selection_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, true_positive_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, true_negative_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.75, 'op0': '>', 'thr0': 0.5, 'p1': 0.25, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, bad_objective': (
+        'For false_negative_rate_parity only the following objectives are supported'),
+    'true_positive_rate_parity, accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_positive_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.25, 'op0': '>', 'thr0': np.inf, 'p1': 0.75, 'op1': '>', 'thr1': 0.5}},
+    'true_positive_rate_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'true_positive_rate_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'true_positive_rate_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'true_positive_rate_parity, bad_objective': (
+        'For true_positive_rate_parity only the following objectives are supported'),
+    'true_negative_rate_parity, accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, selection_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, true_positive_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, true_negative_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, bad_objective': (
+        'For true_negative_rate_parity only the following objectives are supported'),
+    'equalized_odds, accuracy_score': {
+        0: {'p_ignore': 0.0, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p_ignore': 0.25, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'equalized_odds, balanced_accuracy_score': {
+        0: {'p_ignore': 0.0, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p_ignore': 0.25, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'equalized_odds, selection_rate': (
+        'For equalized_odds only the following objectives are supported'),
+    'equalized_odds, true_positive_rate': (
+        'For equalized_odds only the following objectives are supported'),
+    'equalized_odds, true_negative_rate': (
+        'For equalized_odds only the following objectives are supported'),
+    'equalized_odds, bad_objective': (
+        'For equalized_odds only the following objectives are supported'),
+    'bad_constraints, accuracy_score': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, balanced_accuracy_score': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, selection_rate': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, true_positive_rate': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, true_negative_rate': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, bad_objective': (
+        'Currently only the following constraints are supported')}
+
+PREC = 1e-6
+
+@pytest.mark.parametrize("constraints", constraints_list)
+@pytest.mark.parametrize("objective", objectives_list)
+def test_constraints_objective_pairs(constraints, objective):
+    X = pd.DataFrame({0:
+        [0, 1, 2, 3, 4, 0, 1, 2, 3]})
+    sf = pd.Series(
+        [0, 0, 0, 0, 0, 1, 1, 1, 1])
+    y = pd.Series(
+        [1, 0, 1, 1, 1, 0, 1, 1, 1])
+    thr_optimizer = ThresholdOptimizer(
+        estimator=PassThroughPredictor(),
+        constraints=constraints,
+        objective=objective,
+        grid_size=20)
+    expected = results[constraints+", "+objective]
+    if type(expected) is str:
+        with pytest.raises(ValueError) as error_info:
+            thr_optimizer.fit(X, y, sensitive_features=sf)
+        assert str(error_info.value).startswith(expected)
+    else:
+        thr_optimizer.fit(X, y, sensitive_features=sf)
+        res = thr_optimizer.interpolated_thresholder_.interpolation_dict
+        for key in [0, 1]:
+            assert res[key]['p0'] == pytest.approx(expected[key]['p0'], PREC)
+            assert res[key]['operation0']._operator == expected[key]['op0']
+            assert res[key]['operation0']._threshold == pytest.approx(expected[key]['thr0'], PREC)
+            assert res[key]['p1'] == pytest.approx(expected[key]['p1'], PREC)
+            assert res[key]['operation1']._operator == expected[key]['op1']
+            assert res[key]['operation1']._threshold == pytest.approx(expected[key]['thr1'], PREC)
+            if 'p_ignore' in expected[key]:
+                assert res[key]['p_ignore'] == pytest.approx(expected[key]['p_ignore'], PREC)
+                assert res[key]['prediction_constant'] == \
+                    pytest.approx(expected[key]['prediction_constant'], PREC)
+            else:
+                assert 'p_ignore' not in res[key]

@@ -59,6 +59,8 @@ SIMPLE_CONSTRAINTS = {
     'true_negative_rate_parity': 'true_negative_rate',
 }
 
+ALL_CONSTRAINTS = list(SIMPLE_CONSTRAINTS.keys()) + ['equalized_odds']
+
 # Any "moment" is allowed as a performance metric for simple constraints.
 OBJECTIVES_FOR_SIMPLE_CONSTRAINTS = {
     'selection_rate',
@@ -78,14 +80,14 @@ OBJECTIVES_FOR_EQUALIZED_ODDS = {
 }
 
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = (
-    "Currently only the following constraints are supported: {}, equalized_odds.".format(
-        ", ".join(SIMPLE_CONSTRAINTS.keys())))
+    "Currently only the following constraints are supported: {}.".format(
+        ", ".join(sorted(ALL_CONSTRAINTS))))
 NOT_SUPPORTED_OBJECTIVES_FOR_SIMPLE_CONSTRAINTS_ERROR_MESSAGE = (
     "For {{}} only the following objectives are supported: {}.".format(
-        ", ".join(OBJECTIVES_FOR_SIMPLE_CONSTRAINTS)))
+        ", ".join(sorted(OBJECTIVES_FOR_SIMPLE_CONSTRAINTS))))
 NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
     "For equalized_odds only the following objectives are supported: {}.".format(
-        ", ".join(OBJECTIVES_FOR_EQUALIZED_ODDS)))
+        ", ".join(sorted(OBJECTIVES_FOR_EQUALIZED_ODDS))))
 
 
 class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
