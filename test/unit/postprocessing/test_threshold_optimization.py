@@ -453,6 +453,7 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
         adjusted_predictor.predict(data_X_y_sf.X[:-1],
                                    sensitive_features=data_X_y_sf.sensitive_features)
 
+
 constraints_list = [
     'selection_rate_parity',
     'demographic_parity',
@@ -611,11 +612,12 @@ results = {
 
 PREC = 1e-6
 
+
 @pytest.mark.parametrize("constraints", constraints_list)
 @pytest.mark.parametrize("objective", objectives_list)
 def test_constraints_objective_pairs(constraints, objective):
-    X = pd.DataFrame({0:
-        [0, 1, 2, 3, 4, 0, 1, 2, 3]})
+    X = pd.Series(
+        [0, 1, 2, 3, 4, 0, 1, 2, 3]).to_frame()
     sf = pd.Series(
         [0, 0, 0, 0, 0, 1, 1, 1, 1])
     y = pd.Series(
