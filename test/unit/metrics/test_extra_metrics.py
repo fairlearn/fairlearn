@@ -14,68 +14,68 @@ from fairlearn.metrics._extra_metrics import _NO_SUCH_ELEMENT
 
 class TestGetLabelsForConfusionMatrix:
     def test_smoke(self):
-        r0 = _get_labels_for_confusion_matrix([0, 1], [1, 1], None)
+        r0 = _get_labels_for_confusion_matrix([0, 1], None)
         assert np.array_equal(r0, [0, 1])
-        r1 = _get_labels_for_confusion_matrix([-1, 1], [-1, -1], None)
+        r1 = _get_labels_for_confusion_matrix([-1, 1], None)
         assert np.array_equal(r1, [-1, 1])
 
     def test_smoke_numeric_pos_label(self):
-        r0 = _get_labels_for_confusion_matrix([0, 2], [2, 0], 2)
+        r0 = _get_labels_for_confusion_matrix([0, 2], 2)
         assert np.array_equal(r0, [0, 2])
-        r1 = _get_labels_for_confusion_matrix([0, 2], [2, 0], 0)
+        r1 = _get_labels_for_confusion_matrix([0, 2], 0)
         assert np.array_equal(r1, [2, 0])
 
     def test_smoke_alpha_pos_label(self):
-        r0 = _get_labels_for_confusion_matrix(['a', 'a'], ['a', 'b'], 'b')
+        r0 = _get_labels_for_confusion_matrix(['a', 'b'], 'b')
         assert np.array_equal(r0, ['a', 'b'])
-        r1 = _get_labels_for_confusion_matrix(['a', 'a'], ['a', 'b'], 'a')
+        r1 = _get_labels_for_confusion_matrix(['a', 'b'], 'a')
         assert np.array_equal(r1, ['b', 'a'])
 
     def test_single_value_numeric_no_pos_label(self):
-        r0 = _get_labels_for_confusion_matrix([0, 0], [0, 0], None)
+        r0 = _get_labels_for_confusion_matrix([0], None)
         assert np.array_equal(r0, [0, 1])
-        r1 = _get_labels_for_confusion_matrix([-1, -1], [-1, -1], None)
+        r1 = _get_labels_for_confusion_matrix([-1], None)
         assert np.array_equal(r1, [-1, 1])
-        r2 = _get_labels_for_confusion_matrix([1, 1], [1, 1], None)
+        r2 = _get_labels_for_confusion_matrix([1], None)
         assert np.array_equal(r2, [_NO_SUCH_ELEMENT, 1])
 
     def test_single_value_numeric_pos_label(self):
-        r0 = _get_labels_for_confusion_matrix([0, 0], [0, 0], 3)
+        r0 = _get_labels_for_confusion_matrix([0], 3)
         assert np.array_equal(r0, [0, 3])
-        r1 = _get_labels_for_confusion_matrix([0, 0], [0, 0], 0)
+        r1 = _get_labels_for_confusion_matrix([0], 0)
         assert np.array_equal(r1, [_NO_SUCH_ELEMENT, 0])
 
     def test_single_value_alpha_pos_label(self):
-        r0 = _get_labels_for_confusion_matrix(['a', 'a'], ['a', 'a'], 'a')
+        r0 = _get_labels_for_confusion_matrix(['a'], 'a')
         assert np.array_equal(r0, [_NO_SUCH_ELEMENT, 'a'])
-        r1 = _get_labels_for_confusion_matrix(['a', 'a'], ['a', 'a'], 0)
+        r1 = _get_labels_for_confusion_matrix(['a'], 0)
         assert np.array_equal(r1, ['a', 0])
 
     def test_too_many_values(self):
         expected_msg = "Must have no more than two unique y values"
         with pytest.raises(ValueError) as e0:
-            _get_labels_for_confusion_matrix([0, 1], [1, 2], None)
+            _get_labels_for_confusion_matrix([0, 1, 2], None)
         assert str(e0.value) == expected_msg
         with pytest.raises(ValueError) as e1:
-            _get_labels_for_confusion_matrix(['a', 'b'], ['a', 'c'], 'a')
+            _get_labels_for_confusion_matrix(['a', 'b', 'c'], 'a')
         assert str(e1.value) == expected_msg
 
     def test_need_pos_label(self):
         expected_msg = "If pos_label is not specified, values must be take from {0, 1} or {-1, 1}"
         with pytest.raises(ValueError) as e0:
-            _get_labels_for_confusion_matrix([0, 2], [2, 0], None)
+            _get_labels_for_confusion_matrix([0, 2], None)
         assert str(e0.value) == expected_msg
         with pytest.raises(ValueError) as e1:
-            _get_labels_for_confusion_matrix([-1, 0], [0, -1], None)
+            _get_labels_for_confusion_matrix([-1, 0], None)
         assert str(e1.value) == expected_msg
 
     def test_pos_label_not_in_data(self):
         expected_msg = "Must have pos_label in y values"
         with pytest.raises(ValueError) as e0:
-            _get_labels_for_confusion_matrix([0, 1], [1, 1], -1)
+            _get_labels_for_confusion_matrix([0, 1], -1)
         assert str(e0.value) == expected_msg
         with pytest.raises(ValueError) as e1:
-            _get_labels_for_confusion_matrix([4, 2], [2, 2], 3)
+            _get_labels_for_confusion_matrix([4, 2], 3)
         assert str(e1.value) == expected_msg
 
 
@@ -275,6 +275,12 @@ class TestSingleValueArrays:
     def test_all_zeros(self):
         zeros = np.zeros(10)
 
+        # Should behave as if pos_label=1
+        assert metrics.true_positive_rate(zeros, zeros) == 0
+        assert metrics.false_positive_rate(zeros, zeros) == 0
+        assert metrics.true_negative_rate(zeros, zeros) == 1
+        assert metrics.false_negative_rate(zeros, zeros) == 0
+
         assert metrics.true_positive_rate(zeros, zeros, pos_label=1) == 0
         assert metrics.false_positive_rate(zeros, zeros, pos_label=1) == 0
         assert metrics.true_negative_rate(zeros, zeros, pos_label=1) == 1
@@ -288,6 +294,12 @@ class TestSingleValueArrays:
     def test_all_ones(self):
         ones = np.ones(10)
 
+        # should behave as if pos_label=1
+        assert metrics.true_positive_rate(ones, ones) == 1
+        assert metrics.false_positive_rate(ones, ones) == 0
+        assert metrics.true_negative_rate(ones, ones) == 0
+        assert metrics.false_negative_rate(ones, ones) == 0
+
         assert metrics.true_positive_rate(ones, ones, pos_label=1) == 1
         assert metrics.false_positive_rate(ones, ones, pos_label=1) == 0
         assert metrics.true_negative_rate(ones, ones, pos_label=1) == 0
@@ -297,3 +309,22 @@ class TestSingleValueArrays:
         assert metrics.false_positive_rate(ones, ones, pos_label=0) == 0
         assert metrics.true_negative_rate(ones, ones, pos_label=0) == 1
         assert metrics.false_negative_rate(ones, ones, pos_label=0) == 0
+
+    def test_all_negative_ones(self):
+        neg_ones = -1 * np.ones(10)
+
+        # Should behave as if pos_label=1
+        assert metrics.true_positive_rate(neg_ones, neg_ones) == 0
+        assert metrics.false_positive_rate(neg_ones, neg_ones) == 0
+        assert metrics.true_negative_rate(neg_ones, neg_ones) == 1
+        assert metrics.false_negative_rate(neg_ones, neg_ones) == 0
+
+        assert metrics.true_positive_rate(neg_ones, neg_ones, pos_label=1) == 0
+        assert metrics.false_positive_rate(neg_ones, neg_ones, pos_label=1) == 0
+        assert metrics.true_negative_rate(neg_ones, neg_ones, pos_label=1) == 1
+        assert metrics.false_negative_rate(neg_ones, neg_ones, pos_label=1) == 0
+
+        assert metrics.true_positive_rate(neg_ones, neg_ones, pos_label=-1) == 1
+        assert metrics.false_positive_rate(neg_ones, neg_ones, pos_label=-1) == 0
+        assert metrics.true_negative_rate(neg_ones, neg_ones, pos_label=-1) == 0
+        assert metrics.false_negative_rate(neg_ones, neg_ones, pos_label=-1) == 0

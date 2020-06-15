@@ -19,7 +19,7 @@ _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 _NO_SUCH_ELEMENT = "16763842-875f-467c-9e58-24987dfe5d7d"
 
 
-def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
+def _get_labels_for_confusion_matrix(unique_labels, pos_label):
     r"""Figure out the labels argument for skm.confusion_matrix.
 
     This is an internal method used by the true/false positive/negative
@@ -31,16 +31,13 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
 
     Parameters
     ----------
-    y_true : array-like
-        The true values for the metric computation
-
-    y_pred : array-like
-        The predicted values for the metric computation
+    unique_labels : array-like
+        The sorted list of unique labels in the y arrays
 
     pos_label : scalar
         The value in the true and predicted arrays to treat as positive.
-        This must be set if the two y arrays contain a single unique value.
-        If set to None, then the larger of the two unique values will be used.
+        If this is not set, then the unique_labels must be a subset of
+        {0, 1} or {-1, 1}, and it will then be set to 1
 
     Returns
     -------
@@ -48,7 +45,6 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
         A two element list, consisting of the unique values of the two arrays
         with the positive label listed last
     """
-    unique_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
     if len(unique_labels) > 2:
         raise ValueError(_TOO_MANY_UNIQUE_Y_VALS)
 
@@ -103,13 +99,16 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     float
         The true positive rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
+
+    unique_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
+
     if len(unique_labels) == 1:
         tpr = float(unique_labels[0] == pos_label)
     else:
+        cm_labels = _get_labels_for_confusion_matrix(unique_labels, pos_label)
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
-            sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+            sample_weight=sample_weight, labels=cm_labels, normalize="true").ravel()
     return tpr
 
 
@@ -137,13 +136,14 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     float
         The true negative rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
+    unique_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
     if len(unique_labels) == 1:
         tnr = float(unique_labels[0] != pos_label)
     else:
+        cm_labels = _get_labels_for_confusion_matrix(unique_labels, pos_label)
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
-            sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+            sample_weight=sample_weight, labels=cm_labels, normalize="true").ravel()
     return tnr
 
 
@@ -171,13 +171,14 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     float
         The false positive rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
+    unique_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
     if len(unique_labels) == 1:
         fpr = 0.0
     else:
+        cm_labels = _get_labels_for_confusion_matrix(unique_labels, pos_label)
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
-            sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+            sample_weight=sample_weight, labels=cm_labels, normalize="true").ravel()
     return fpr
 
 
@@ -205,13 +206,14 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     float
         The false negative rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
+    unique_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
     if len(unique_labels) == 1:
         fnr = 0.0
     else:
+        cm_labels = _get_labels_for_confusion_matrix(unique_labels, pos_label)
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
-            sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+            sample_weight=sample_weight, labels=cm_labels, normalize="true").ravel()
     return fnr
 
 
