@@ -75,9 +75,9 @@ print(__doc__)
 # General imports
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('TKAgg')  # to suppress 'agg' plotting warnings
+import matplotlib.pyplot as plt
 
 # set layout parameters to avoid cutting off legend
 from matplotlib import rcParams

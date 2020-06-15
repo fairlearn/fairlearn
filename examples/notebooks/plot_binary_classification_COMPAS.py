@@ -38,10 +38,10 @@ X_train.loc[0], y_train[0]
 # well as predictions from our models. Feel free to skip to the next cell for
 # the actual logic.
 
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import matplotlib
 matplotlib.use('TKAgg')  # to suppress 'agg' plotting warnings
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 # set layout parameters to avoid cutting off x-axis tick labels
 from matplotlib import rcParams
