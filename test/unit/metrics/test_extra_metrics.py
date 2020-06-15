@@ -11,6 +11,40 @@ from fairlearn.metrics._extra_metrics import _get_labels_for_confusion_matrix
 # =============================================
 
 
+class TestGetLabelsForConfusionMatrix:
+    def test_smoke(self):
+        r0 = _get_labels_for_confusion_matrix([0, 1], [1, 1], None)
+        assert np.array_equal(r0, [0, 1])
+        r1 = _get_labels_for_confusion_matrix([-1, 1], [-1, -1], None)
+        assert np.array_equal(r1, [-1, 1])
+
+    def test_smoke_numeric_pos_label(self):
+        r0 = _get_labels_for_confusion_matrix([0, 2], [2, 0], 2)
+        assert np.array_equal(r0, [0, 2])
+        r1 = _get_labels_for_confusion_matrix([0, 2], [2, 0], 0)
+        assert np.array_equal(r1, [2, 0])
+
+    def test_smoke_alpha_pos_label(self):
+        r0 = _get_labels_for_confusion_matrix(['a', 'a'], ['a', 'b'], 'b')
+        assert np.array_equal(r0, ['a', 'b'])
+        r1 = _get_labels_for_confusion_matrix(['a', 'a'], ['a', 'b'], 'a')
+        assert np.array_equal(r1, ['b', 'a'])
+
+    def test_single_value_numeric(self):
+        r0 = _get_labels_for_confusion_matrix([0, 0], [0, 0], None)
+        assert np.array_equal(r0, [0, 1])
+        r1 = _get_labels_for_confusion_matrix([-1, -1], [-1, -1], None)
+        assert np.array_equal(r1, [-1, 1])
+        r2 = _get_labels_for_confusion_matrix([1, 1], [1, 1], None)
+        assert np.array_equal(r2, [0, 1])
+
+    def test_too_many_values(self):
+        expected_msg = "Must have no more than two unique y values"
+        with pytest.raises(ValueError) as exception:
+            _get_labels_for_confusion_matrix([0, 1], [1, 2], None)
+        assert str(exception.value) == expected_msg
+
+
 def test_get_labels_for_confusion_matrix_smoke():
     y_true = [0, 1]
     y_pred = [1, 1]

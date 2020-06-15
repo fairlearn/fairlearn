@@ -14,7 +14,7 @@ from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_unde
 from ._selection_rate import selection_rate  # noqa: F401,E501
 
 _TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
-_POS_LABEL_AMBIGUOUS = "Must specify pos_label for degenerate data"
+_RESTRICTED_VALS_IF_POS_LABEL_NONE = "If pos_label is not specified, values must be take from {0, 1} or {-1, 1}"  # noqa: E501
 _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
 
@@ -47,18 +47,35 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
         A two element list, consisting of the unique values of the two arrays
         with the positive label listed last
     """
-    my_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
-    if len(my_labels) > 2:
+    unique_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
+    if len(unique_labels) > 2:
         raise ValueError(_TOO_MANY_UNIQUE_Y_VALS)
+
+    # Set pos_label if needed
     if pos_label is None:
-        if len(my_labels) == 1:
-            raise ValueError(_POS_LABEL_AMBIGUOUS)
-    else:
-        if pos_label not in my_labels and len(my_labels) == 2:
-            raise ValueError(_NEED_POS_LABEL_IN_Y_VALS)
-        if len(my_labels) == 2 and my_labels[1] != pos_label:
-            my_labels = list(reversed(my_labels))
-    return my_labels
+        labels01 = frozenset([0, 1])
+        labels11 = frozenset([-1, 1])
+        if labels01.issuperset(unique_labels) or labels11.issuperset(unique_labels):
+            pos_label = 1
+        else:
+            raise ValueError(_RESTRICTED_VALS_IF_POS_LABEL_NONE)
+
+    # Ensure unique_labels has two elements
+    if len(unique_labels) == 1:
+        if unique_labels[0] == pos_label:
+            unique_labels = [0, pos_label]
+        else:
+            unique_labels.append(pos_label)
+
+    # Check that we have pos_label in the list
+    if pos_label not in unique_labels:
+        raise ValueError(_NEED_POS_LABEL_IN_Y_VALS)
+
+    # Reverse the list if needed
+    if unique_labels[1] != pos_label:
+        unique_labels = list(reversed(unique_labels))
+
+    return unique_labels
 
 
 def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
