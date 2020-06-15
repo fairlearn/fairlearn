@@ -200,10 +200,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         Notes
         -----
-        A fitted `ExponentiatedGradient` has the members `predictors_` and
-        `weights_`. On each data point in `X` it picks one of its underlying
-        predictors randomly and applies it. `weights_` determines the
-        probabilities to choose the predictors.
+        A fitted ExponentiatedGradient has an attribute `predictors_`, an
+        array of predictors, and an attribute `weights_`, an array of
+        non-negative floats of the same length.
+        The prediction on each data point in `X` is obtained by first picking
+        a random predictor according to the probabilities in `weights_` and
+        then applying it. Different predictors can be chosen on different data
+        points.
 
         Parameters
         ----------
@@ -224,9 +227,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
 
-        Calculates predictions for each of the underlying classifiers. The predictions are
-        subsequently multiplied by the classifiers' weights and aggregated into the returned
-        probabilities.
+        For each data point, provide the probabilities with which 0 and 1 is
+        returned as a prediction.
 
         Parameters
         ----------
