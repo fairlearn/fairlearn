@@ -15,7 +15,7 @@ include:
 Good examples of existing notebooks that abide by these requirements are:
 
 * `Mitigating Disparities in Ranking from Binary Data <https://github.com/fairlearn/fairlearn/blob/master/notebooks/Mitigating%20Disparities%20in%20Ranking%20from%20Binary%20Data.ipynb>`_
-* `Binary Classification with the UCI Credit-card Default Dataset <https://github.com/fairlearn/fairlearn/blob/master/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb>`_
+* `Binary Classification with the UCI Credit-card Default Dataset <https://fairlearn.github.io/auto_examples/notebooks/plot_binary_classification_uci_credit_card_default.html>`_
 
 Working with example notebooks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -36,29 +36,18 @@ root directory.
 
 When working on the notebooks it can be tedious to make changes in the
 notebook and then make the same change in the `.py` file. To make the
-development process smoother we recommend using the
-`jupytext <https://jupytext.readthedocs.io/>`_ package. Jupytext provides
-the functionality to keep `.py` and `.ipynb` files in sync.
-The synchronization is established automatically due to the jupytext.yml
-configuration file in the notebooks directory. All you need to do is run
+development process smoother we recommend using 
+`Visual Studio Code <https://code.visualstudio.com/docs/python/jupyter-support>`_.
+VS Code recognizes the lines starting with :code:`$ %%` as new cells.
+Each cell can be executed individually by clicking on *Run Cell*, and VS Code
+opens a *Python Interactive* tab to show the output.
 
-```bash
-> jupytext --to notebook .\examples\notebooks\plot_binary_classification_uci_credit_card_default.py
-[jupytext] Reading .\examples\notebooks\plot_binary_classification_uci_credit_card_default.py
-[jupytext] Writing .\examples\notebooks\plot_binary_classification_uci_credit_card_default.ipynb
-```
-followed by `jupyter notebook`. Any changes you make to the `.ipynb` file
-should now automatically be synced with the `.py` file.
+.. image:: ../_static/images/vscode-jupyter.png
 
-.. note::
-
-    Typical markdown cells in a jupyter notebook are written in ReST format
-    to render properly on the webpage. That means the generated `.ipynb` file
-    likely has strangely rendered markdown cells because it's trying to show
-    ReSt-formatted content in markdown.
-
-The generated `.ipynb` files are automatically ignored by git
-(version control), so there's no danger of checking them in by accident.
-
-You can also make changes to the `.py` file. The synchronization is goes both
-ways.
+Note that the text portion of these notebooks should be written in
+restructured text (ReST), not markdown, so that the sphinx documentation build
+can render it nicely for the website. However, when downloading the `.ipynb`
+file through the website certain parts of the ReST will look odd if viewed in
+tools like Jupyter since it is meant to render markdown. For that reason try
+to limit use of ReST directives (e.g., `.. note:`), internal links
+(e.g., `:ref:`), and other functionality that won't render well in markdown.
