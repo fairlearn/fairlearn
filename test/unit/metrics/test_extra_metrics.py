@@ -15,6 +15,8 @@ def test_get_labels_for_confusion_matrix_smoke():
     y_true = [0, 1]
     y_pred = [1, 1]
 
+    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=None)
+    assert np.array_equal(result, [0, 1])
     result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=1)
     assert np.array_equal(result, [0, 1])
     result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=0)
@@ -26,6 +28,10 @@ def test_get_labels_for_confusion_matrix_1_not_largest():
     y_pred = [2, 2, 1]
 
     result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=None)
+    assert np.array_equal(result, [1, 2])
+    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=1)
+    assert np.array_equal(result, [2, 1])
+    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=2)
     assert np.array_equal(result, [1, 2])
 
 
