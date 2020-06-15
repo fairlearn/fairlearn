@@ -32,7 +32,6 @@ xlrd
 
 # Required for notebooks
 jupyter
-jupytext
 nbval
 shap
 

@@ -104,19 +104,6 @@ def test_grid_search_for_binary_classification():
 
 
 @pytest.mark.notebooks
-def test_binary_classification_on_compas_dataset():
-    nb_name = "Binary Classification on COMPAS dataset"
-
-    test_values = {}
-    test_values["pp_eo_aa_pignore"] = ScrapSpec(
-        "postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature['African-American']._p_ignore",  # noqa: E501
-        pytest.approx(0.2320703126)
-    )
-
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
 def test_grid_search_with_census_data():
     nb_name = "Grid Search with Census Data"
     test_values = {}
@@ -132,19 +119,4 @@ def test_mitigating_disparities_in_ranking_from_binary_data():
     test_values["sel_eg_X_alt_disparity"] = ScrapSpec(
         "sel_expgrad_X_alt.loc[ 'disparity', :][0]",
         pytest.approx(0.35, abs=0.08))
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_binary_classification_with_the_uci_credit_card_default_dataset():
-    nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
-    test_values = {}
-    test_values["GridSearch_17"] = ScrapSpec(
-        "int(sum(model_sweep_dict['GridSearch_17']))",
-        2533
-    )
-    test_values["GridSearch_31"] = ScrapSpec(
-        "int(sum(model_sweep_dict['GridSearch_31']))",
-        2775
-    )
     assay_one_notebook(nb_name, test_values)

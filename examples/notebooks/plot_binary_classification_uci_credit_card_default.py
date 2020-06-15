@@ -3,9 +3,8 @@
 Binary Classification with the UCI Credit-card Default Dataset
 ==============================================================
 """
-print(__doc__)
 
-###############################################################################
+# %%
 # Mitigating disparities in accuracy as measured by equalized-odds difference
 # 
 # Contents
@@ -72,6 +71,8 @@ print(__doc__)
 # sex) from training. We then use Fairlearn to mitigate this disparity in
 # accuracy with either `ThresholdOptimizer` or `GridSearch`. 
 
+print(__doc__)
+
 # General imports
 import numpy as np
 import pandas as pd
@@ -98,7 +99,7 @@ from fairlearn.metrics import (
     equalized_odds_difference, difference_from_summary)
 from sklearn.metrics import balanced_accuracy_score, roc_auc_score
 
-###############################################################################
+# %%
 # The UCI credit card default dataset
 # -----------------------------------
 #
@@ -116,7 +117,7 @@ data_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/00350/defau
 dataset = pd.read_excel(io=data_url, header=1).drop(columns=['ID']).rename(columns={'PAY_0':'PAY_1'})
 dataset.head()
 
-###############################################################################
+# %%
 # Dataset columns:
 #
 # * `LIMIT_BAL`: credit card limit, will be replaced by a synthetic feature
@@ -130,7 +131,7 @@ dataset.head()
 A = dataset["SEX"]
 A_str = A.map({2: "female", 1: "male"})
 
-###############################################################################
+# %%
 # Extract the target
 
 Y = dataset["default payment next month"]
@@ -138,7 +139,7 @@ categorical_features = ['EDUCATION', 'MARRIAGE','PAY_1', 'PAY_2', 'PAY_3', 'PAY_
 for col in categorical_features:
     dataset[col] = dataset[col].astype('category')
 
-###############################################################################
+# %%
 # Introduce a synthetic feature
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
@@ -166,7 +167,7 @@ dataset['LIMIT_BAL'][(A==2) & (Y==1)].plot(kind='kde', label="Payment Default", 
                                            legend=True).legend(bbox_to_anchor=(1.6, 1))
 plt.show()
 
-###############################################################################
+# %%
 # We notice from the above figures that the new `LIMIT_BAL` feature is indeed
 # highly predictive for women, but not for men.
 
@@ -180,7 +181,7 @@ df_train, df_test, Y_train, Y_test, A_train, A_test, A_str_train, A_str_test = t
     random_state=12345,
     stratify=Y)
 
-###############################################################################
+# %%
 # Using a fairness unaware model
 # ------------------------------
 #
@@ -205,16 +206,16 @@ test_scores = model.predict_proba(df_test)[:, 1]
 # Train AUC
 roc_auc_score(Y_train, model.predict_proba(df_train)[:, 1])
 
-###############################################################################
+# %%
 # Predictions (0 or 1) on test set
 test_preds = (test_scores >= np.mean(Y_train)) * 1
 
-###############################################################################
+# %%
 # LightGBM feature importance 
 lgb.plot_importance(model, height=0.6, title="Features importance (LightGBM)", importance_type="gain", max_num_features=15) 
 plt.show()
 
-###############################################################################
+# %%
 # We notice that the synthetic feature `LIMIT_BAL` appears as the most
 # important feature in this model although it has no predictive power for an
 # entire demographic segment in the data. 
@@ -249,13 +250,13 @@ def get_metrics_df(models_dict, y_true, group):
                                 for model_name, (preds, scores) in models_dict.items()]
     return pd.DataFrame.from_dict(df_dict, orient="index", columns=models_dict.keys())
 
-###############################################################################
+# %%
 # We calculate several performance and disparity metrics below:
 
 models_dict = {"Unmitigated": (test_preds, test_scores)}
 get_metrics_df(models_dict, Y_test, A_str_test)
 
-###############################################################################
+# %%
 # As the overall performance metric we use the *area under ROC curve* (AUC),
 # which is suited to classification problems with a large imbalance between
 # positive and negative examples. For binary classifiers, this is the same as
@@ -278,7 +279,7 @@ get_metrics_df(models_dict, Y_test, A_str_test)
 # parity ratio, whose level (slightly above 0.8) is considered satisfactory
 # in this context.
 
-###############################################################################
+# %%
 # Mitigating equalized odds difference with Postprocessing
 # --------------------------------------------------------
 #
@@ -296,7 +297,7 @@ postprocess_est = ThresholdOptimizer(
     estimator=model,
     constraints="equalized_odds")
 
-###############################################################################
+# %%
 # Balanced data set is obtained by sampling the same number of points from
 # the majority class (Y=0) as there are points in the minority class (Y=1)
 balanced_idx1 = df_train[Y_train==1].index
@@ -314,7 +315,7 @@ models_dict = {"Unmitigated": (test_preds, test_scores),
                "ThresholdOptimizer": (postprocess_preds, postprocess_preds)}
 get_metrics_df(models_dict, Y_test, A_str_test)
 
-###############################################################################
+# %%
 # The `ThresholdOptimizer` algorithm significantly reduces the disparity
 # according to multiple metrics. However, the performance metrics (balanced
 # error rate as well as AUC) get worse. Before deploying such a model in
@@ -341,7 +342,7 @@ FairlearnDashboard(sensitive_features=A_str_test,
                    y_pred={"Unmitigated": test_preds,
                            "ThresholdOptimizer": postprocess_preds})
 
-###############################################################################
+# %%
 # Mitigating equalized odds difference with GridSearch
 # ----------------------------------------------------
 # We now attempt to mitigate disparities using the `GridSearch` algorithm.
@@ -369,7 +370,7 @@ equalized_odds_sweep = [
 balanced_accuracy_sweep = [balanced_accuracy_score(Y_test, preds) for preds in sweep_preds]
 auc_sweep = [roc_auc_score(Y_test, scores) for scores in sweep_scores]
 
-###############################################################################
+# %%
 # Select only non-dominated models (with respect to balanced accuracy and
 # equalized odds difference)
 all_results = pd.DataFrame(
@@ -387,7 +388,7 @@ equalized_odds_sweep_non_dominated = np.asarray(equalized_odds_sweep)[non_domina
 balanced_accuracy_non_dominated = np.asarray(balanced_accuracy_sweep)[non_dominated]
 auc_non_dominated = np.asarray(auc_sweep)[non_dominated]
 
-###############################################################################
+# %%
 # Plot equalized odds difference vs balanced accuracy
 plt.scatter(balanced_accuracy_non_dominated,
             equalized_odds_sweep_non_dominated,
@@ -403,7 +404,7 @@ plt.ylabel("Equalized Odds Difference")
 plt.legend(bbox_to_anchor=(1.55, 1))
 plt.show()
 
-###############################################################################
+# %%
 # As intended, `GridSearch` models appear along the trade-off curve between
 # the large balanced accuracy (but also large disparity), and low disparity
 # (but worse balanced accuracy). This gives the data scientist a flexibility
@@ -424,7 +425,7 @@ plt.ylabel("Equalized Odds Difference")
 plt.legend(bbox_to_anchor=(1.55, 1))
 plt.show()
 
-###############################################################################
+# %%
 # Similarly, `GridSearch` models appear along the trade-off curve between AUC
 # and equalized odds difference.
 
@@ -434,7 +435,7 @@ model_sweep_dict.update({
     "ThresholdOptimizer": postprocess_preds
 })
 
-###############################################################################
+# %%
 # **Grid Search: Dashboard Demo**
 # We compare the `GridSearch` candidate models with the unmitigated `lightgbm`
 # model and the `ThresholdOptimizer` model using the Fairlearn dashboard. We

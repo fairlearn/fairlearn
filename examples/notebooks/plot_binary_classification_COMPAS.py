@@ -5,7 +5,7 @@ Binary Classification on COMPAS dataset
 """
 print(__doc__)
 
-###############################################################################
+# %%
 # Getting and preparing the data
 # ------------------------------
 #
@@ -31,7 +31,7 @@ y_train, y_test = compas_dataset.get_y(format=pd.Series)
 ) = compas_dataset.get_sensitive_features("race", format=pd.Series)
 X_train.loc[0], y_train[0]
 
-###############################################################################
+# %%
 # Create a fairness-unaware model
 # -------------------------------
 # First we set up a helper function that will help in analyzing the dataset as
@@ -116,7 +116,7 @@ def show_proportions(
     )
 
 
-###############################################################################
+# %%
 # To get started we look at a very basic Logistic Regression model. We fit it
 # to the training data and plot some characteristics of training and test data
 # as well as the predictions of the model on those datasets.
@@ -135,7 +135,7 @@ from sklearn.linear_model import LogisticRegression
 estimator = LogisticRegression(solver="liblinear")
 estimator.fit(X_train, y_train)
 
-###############################################################################
+# %%
 # print and plot data from training and test set as well as predictions with
 # fairness-unaware classifier on both sets show only test data related plots by
 # default - uncomment the next two lines to see training data plots as well
@@ -163,7 +163,7 @@ show_proportions(
 )
 plt.show()
 
-###############################################################################
+# %%
 # Postprocessing the model to get a fair model
 # --------------------------------------------
 #
@@ -281,7 +281,7 @@ show_proportions(
 )
 plt.show()
 
-###############################################################################
+# %%
 # Post Processing in Detail
 # -------------------------
 #
@@ -300,7 +300,7 @@ plt.show()
 scores = estimator_wrapper.predict(X_train)
 scores
 
-###############################################################################
+# %%
 # Finding threshold rules
 # ***********************
 #
@@ -338,7 +338,7 @@ for group_name, group in data_grouped_by_sensitive_feature:
 print("Thresholding rules:")
 roc_points
 
-###############################################################################
+# %%
 # The base points with (x,y) as (0,0) and (1,1) always exist, because that
 # essentially just means that we're predicting everything as 0 or everything as
 # 1 regardless of the scores from the fairness-unaware model. Let's look at
@@ -382,12 +382,12 @@ for group_name, group in data_grouped_by_sensitive_feature:
     print("    P[Ŷ = 1 | Y = 0] = {}".format(x_group_0_5))
     print("    P[Ŷ = 1 | Y = 1] = {}".format(y_group_0_5))
 
-###############################################################################
+# %%
 # Note that it never makes sense to have :math:`x>y` because in that case you're
 # better off flipping labels, i.e. completely turning around the meaning of the
 # scores. The method automatically does that unless specified otherwise.
 
-###############################################################################
+# %%
 # Interpolated Predictions and Probabilistic Classifiers
 # ******************************************************
 #
@@ -404,7 +404,7 @@ for group_name, group in data_grouped_by_sensitive_feature:
 # probabilistic classifiers, since it could mean that two people with identical
 # features are classified differently.
 
-###############################################################################
+# %%
 # Finding the Equalized Odds solution
 # ***********************************
 #
@@ -417,7 +417,7 @@ plt.xlabel("$P [ \\hat{Y}=1 | Y=0 ]$")
 plt.ylabel("$P [ \\hat{Y}=1 | Y=1 ]$")
 plt.show()
 
-###############################################################################
+# %%
 # In the Equalized Odds case, we need to find a point where the presented
 # probabilities (false positive rate, true positive rate, and thereby also true
 # negative rate and false negative rate) for the corresponding groups match
