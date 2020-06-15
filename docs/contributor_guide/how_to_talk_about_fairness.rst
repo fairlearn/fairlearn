@@ -3,13 +3,13 @@
 How to talk and/or write about fairness in AI
 ---------------------------------------------
 
-The following styleguide builds on work by Aether (Microsoft's advisory
-committee on AI, ethics, and effects in engineering and research). It is meant
-to provide a clear and easy to follow guide for contributors. Every pull
-request is expected to abide by the guide. If you want to add to the list feel
-free to send a pull request.
+The following style guide builds on work from various sources including the
+Fairlearn contributors and
+`Microsoft's Aether Fairness Working Group <https://www.microsoft.com/en-us/ai/responsible-ai>`_.
+It is meant to provide a clear and easy to follow guide for contributors.
+Every pull request is expected to abide by the guide. If you want to add to
+the list feel free to send a pull request.
 
-- Talk about *responsible AI* rather than *ethical AI* (or “ethics”).
 - Be clear that there is no single definition of fairness that will apply
   equally well to all AI systems.
 - Be clear that any quantitative definition of fairness will omit aspects of
@@ -18,11 +18,9 @@ free to send a pull request.
 - Be clear that given the many complex sources of unfairness, it is not
   possible to fully *debias* a system or to guarantee fairness. The goal is to
   detect and to mitigate fairness-related harms as much as possible.
-  
-  - For this reason, don’t usewords like *debias*, *unbiased*, *solve* – they
-    set up unrealistic expectations. Use words like *mitigate*, *address*,
-    *prioritize*, *detect*, *identify*, *assess* instead.
-
+  For this reason, don’t usewords like *debias*, *unbiased*, *solve* – they
+  set up unrealistic expectations. Use words like *mitigate*, *address*,
+  *prioritize*, *assess* instead.
 - Be clear that AI systems (and technology in general) are never *neutral* –
   all AI systems necessarily reflect the assumptions, priorities, and values
   of the people involved in their development and deployment.
