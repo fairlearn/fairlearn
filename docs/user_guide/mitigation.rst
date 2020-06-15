@@ -372,8 +372,6 @@ loss of our classifier :math:`h`.
 BoundedGroupLoss
 ^^^^^^^^^^^^^^^^
 
-
-
 Exponentiated Gradient
 ^^^^^^^^^^^^^^^^^^^^^^
 
