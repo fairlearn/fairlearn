@@ -101,7 +101,6 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     float
         The true positive rate for the data
     """
-
     unique_labels = list(np.unique(np.concatenate((y_true, y_pred), axis=None)))
     cm_labels = _get_labels_for_confusion_matrix(unique_labels, pos_label)
     if len(unique_labels) == 1:
