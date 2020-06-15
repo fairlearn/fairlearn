@@ -103,6 +103,7 @@ def test_tpr_values_1_2():
 
     # Use sklearn for validation
     result = metrics.true_positive_rate(y_true, y_pred)
+    # Note that skm.recall_score default pos_label=1, not pos_label=1
     result_skm = skm.recall_score(y_true, y_pred, pos_label=2)
     assert result == pytest.approx(result_skm)
 
