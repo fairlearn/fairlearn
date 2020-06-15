@@ -21,6 +21,14 @@ def test_get_labels_for_confusion_matrix_smoke():
     assert np.array_equal(result, [1, 0])
 
 
+def test_get_labels_for_confusion_matrix_1_not_largest():
+    y_true = [1, 1, 2]
+    y_pred = [2, 2, 1]
+
+    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=None)
+    assert np.array_equal(result, [1, 2])
+
+
 def test_get_labels_for_confusion_matrix_bad_unique_count():
     with pytest.raises(ValueError) as exception:
         _get_labels_for_confusion_matrix([0, 1], [1, 2], pos_label=1)
@@ -85,6 +93,27 @@ def test_tpr_against_sklearn():
     result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
     result_skm = skm.recall_score(y_true, y_pred, pos_label=0)
     assert result == pytest.approx(result_skm)
+
+
+def test_tpr_values_1_2():
+    # Want to ensure that the 'pos_label' is taken to be 2 by default
+    # Since this logic is actually in a subroutine, only test for TPR
+    y_true = [1, 2, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2]
+    y_pred = [1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2, 2]
+
+    # Use sklearn for validation
+    result = metrics.true_positive_rate(y_true, y_pred)
+    result_skm = skm.recall_score(y_true, y_pred, pos_label=2)
+    assert result == pytest.approx(result_skm)
+
+    # Can also test against ourselves
+    result_1 = metrics.true_positive_rate(y_true, y_pred, pos_label=1)
+    result_2 = metrics.true_positive_rate(y_true, y_pred, pos_label=2)
+    assert result_2 == result
+    assert result_1 != result
+
+    result_skm_1 = skm.recall_score(y_true, y_pred, pos_label=1)
+    assert result_1 == pytest.approx(result_skm_1)
 
 
 # ==============================================
