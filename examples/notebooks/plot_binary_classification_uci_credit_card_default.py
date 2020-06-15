@@ -5,10 +5,10 @@ Binary Classification with the UCI Credit-card Default Dataset
 """
 # %%
 # Mitigating disparities in accuracy as measured by equalized-odds difference
-# 
+#
 # Contents
 # --------
-# 
+#
 # 1. `What is covered`_
 # 2. `Introduction`_
 # 3. `The UCI credit card default dataset`_
@@ -18,38 +18,38 @@ Binary Classification with the UCI Credit-card Default Dataset
 #
 # What is covered
 # ---------------
-# 
+#
 # * **Domain:**
 #
 #   * Finance (loan decisions). The data is semi-synthetic to create a simple
 #     example of disparity in accuracy.
-# 
+#
 # * **ML task:**
 #
 #   * Binary classification.
-# 
+#
 # * **Fairness tasks:**
 #
 #   * Assessment of unfairness using Fairlearn metrics and Fairlearn dashboard.
 #   * Mitigation of unfairness using Fairlearn mitigation algorithms.
-# 
+#
 # * **Performance metrics:**
 #
 #   * Area under ROC curve.
 #   * Balanced accuracy.
-# 
+#
 # * **Fairness metrics:**
 #
 #   * Equalized-odds difference.
-# 
+#
 # * **Mitigation algorithms:**
 #
 #   * :class:`fairlearn.reductions.GridSearch`
 #   * :class:`fairlearn.postprocessing.ThresholdOptimizer`
-# 
+#
 # Introduction
 # ------------
-# 
+#
 # In this example, we emulate the problem of accuracy disparities arising in
 # loan decisions. Specifically, we consider scenarios where algorithmic tools
 # are trained on historic data and their predictions about loan applicants
@@ -57,7 +57,7 @@ Binary Classification with the UCI Credit-card Default Dataset
 # `here <https://www.nytimes.com/2019/11/10/business/Apple-credit-card-investigation.html>`_
 # for an example involving sex-based discrimination for credit limit
 # decisions.
-# 
+#
 # We use the
 # `UCI dataset <https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients>`_
 # on credit-card defaults in 2005 in Taiwan. For the sake of this exercise,
@@ -68,7 +68,7 @@ Binary Classification with the UCI Credit-card Default Dataset
 # predictor that achieves a much better accuracy for women than for men, and
 # that it is insufficient to simply remove the sensitive feature (in this case
 # sex) from training. We then use Fairlearn to mitigate this disparity in
-# accuracy with either `ThresholdOptimizer` or `GridSearch`. 
+# accuracy with either `ThresholdOptimizer` or `GridSearch`.
 
 print(__doc__)
 
@@ -88,7 +88,6 @@ from sklearn.model_selection import train_test_split
 
 # Models
 import lightgbm as lgb
-from sklearn.calibration import CalibratedClassifierCV
 
 # Fairlearn algorithms and utils
 from fairlearn.postprocessing import ThresholdOptimizer
@@ -113,11 +112,11 @@ from sklearn.metrics import balanced_accuracy_score, roc_auc_score
 # card. The target is whether the client will default on a card payment in the
 # following month, October 2005. One can imagine that a model trained on this
 # data can be used in practice to determine whether a client is eligible for
-# another product such as an auto loan. 
+# another product such as an auto loan.
 
 # Load the data
 data_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/00350/default%20of%20credit%20card%20clients.xls"
-dataset = pd.read_excel(io=data_url, header=1).drop(columns=['ID']).rename(columns={'PAY_0':'PAY_1'})
+dataset = pd.read_excel(io=data_url, header=1).drop(columns=['ID']).rename(columns={'PAY_0': 'PAY_1'})
 dataset.head()
 
 # %%
@@ -138,7 +137,7 @@ A_str = A.map({2: "female", 1: "male"})
 # Extract the target
 
 Y = dataset["default payment next month"]
-categorical_features = ['EDUCATION', 'MARRIAGE','PAY_1', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5', 'PAY_6']
+categorical_features = ['EDUCATION', 'MARRIAGE', 'PAY_1', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5', 'PAY_6']
 for col in categorical_features:
     dataset[col] = dataset[col].astype('category')
 
@@ -156,18 +155,18 @@ np.random.seed(12345)
 # Make 'LIMIT_BAL' informative of the target
 dataset['LIMIT_BAL'] = Y + np.random.normal(scale=dist_scale, size=dataset.shape[0])
 # But then make it uninformative for the male clients
-dataset.loc[A==1, 'LIMIT_BAL'] = np.random.normal(scale=dist_scale, size=dataset[A==1].shape[0])
+dataset.loc[A == 1, 'LIMIT_BAL'] = np.random.normal(scale=dist_scale, size=dataset[A == 1].shape[0])
 
 fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
 # Plot distribution of LIMIT_BAL for men
-dataset['LIMIT_BAL'][(A==1) & (Y==0)].plot(kind='kde', label="Payment on Time", ax=ax1, 
-                                           title="LIMIT_BAL distribution for men")
-dataset['LIMIT_BAL'][(A==1) & (Y==1)].plot(kind='kde', label="Payment Default", ax=ax1)
+dataset['LIMIT_BAL'][(A == 1) & (Y == 0)].plot(kind='kde', label="Payment on Time", ax=ax1,
+                                               title="LIMIT_BAL distribution for men")
+dataset['LIMIT_BAL'][(A == 1) & (Y == 1)].plot(kind='kde', label="Payment Default", ax=ax1)
 # Plot distribution of LIMIT_BAL for women
-dataset['LIMIT_BAL'][(A==2) & (Y==0)].plot(kind='kde', label="Payment on Time", ax=ax2, 
-                                           legend=True, title="LIMIT_BAL distribution for women")
-dataset['LIMIT_BAL'][(A==2) & (Y==1)].plot(kind='kde', label="Payment Default", ax=ax2, 
-                                           legend=True).legend(bbox_to_anchor=(1.6, 1))
+dataset['LIMIT_BAL'][(A == 2) & (Y == 0)].plot(kind='kde', label="Payment on Time", ax=ax2,
+                                               legend=True, title="LIMIT_BAL distribution for women")
+dataset['LIMIT_BAL'][(A == 2) & (Y == 1)].plot(kind='kde', label="Payment Default", ax=ax2,
+                                               legend=True).legend(bbox_to_anchor=(1.6, 1))
 plt.show()
 
 # %%
@@ -176,11 +175,11 @@ plt.show()
 
 # Train-test split
 df_train, df_test, Y_train, Y_test, A_train, A_test, A_str_train, A_str_test = train_test_split(
-    dataset.drop(columns=['SEX', 'default payment next month']), 
-    Y, 
-    A, 
+    dataset.drop(columns=['SEX', 'default payment next month']),
+    Y,
+    A,
     A_str,
-    test_size = 0.3, 
+    test_size=0.3,
     random_state=12345,
     stratify=Y)
 
@@ -189,14 +188,14 @@ df_train, df_test, Y_train, Y_test, A_train, A_test, A_str_train, A_str_test = t
 # ------------------------------
 #
 # We train an out-of-the-box `lightgbm` model on the modified data and assess
-# several disparity metrics. 
+# several disparity metrics.
 
 lgb_params = {
-    'objective' : 'binary',
-    'metric' : 'auc',
+    'objective': 'binary',
+    'metric': 'auc',
     'learning_rate': 0.03,
-    'num_leaves' : 10,
-    'max_depth' : 3
+    'num_leaves': 10,
+    'max_depth': 3
 }
 
 model = lgb.LGBMClassifier(**lgb_params)
@@ -214,14 +213,15 @@ roc_auc_score(Y_train, model.predict_proba(df_train)[:, 1])
 test_preds = (test_scores >= np.mean(Y_train)) * 1
 
 # %%
-# LightGBM feature importance 
-lgb.plot_importance(model, height=0.6, title="Features importance (LightGBM)", importance_type="gain", max_num_features=15) 
+# LightGBM feature importance
+lgb.plot_importance(model, height=0.6, title="Features importance (LightGBM)", importance_type="gain", max_num_features=15)
 plt.show()
 
 # %%
 # We notice that the synthetic feature `LIMIT_BAL` appears as the most
 # important feature in this model although it has no predictive power for an
-# entire demographic segment in the data. 
+# entire demographic segment in the data.
+
 
 # Helper functions
 def get_metrics_df(models_dict, y_true, group):
@@ -249,9 +249,10 @@ def get_metrics_df(models_dict, y_true, group):
     }
     df_dict = {}
     for metric_name, (metric_func, use_preds) in metrics_dict.items():
-        df_dict[metric_name] = [metric_func(preds) if use_preds else metric_func(scores) 
+        df_dict[metric_name] = [metric_func(preds) if use_preds else metric_func(scores)
                                 for model_name, (preds, scores) in models_dict.items()]
     return pd.DataFrame.from_dict(df_dict, orient="index", columns=models_dict.keys())
+
 
 # %%
 # We calculate several performance and disparity metrics below:
@@ -264,7 +265,7 @@ get_metrics_df(models_dict, Y_test, A_str_test)
 # which is suited to classification problems with a large imbalance between
 # positive and negative examples. For binary classifiers, this is the same as
 # *balanced accuracy*.
-# 
+#
 # As the fairness metric we use *equalized odds difference*, which quantifies
 # the disparity in accuracy experienced by different demographics. Our goal is
 # to assure that neither of the two groups (men vs women) has substantially
@@ -272,7 +273,7 @@ get_metrics_df(models_dict, Y_test, A_str_test)
 # The equalized odds difference is equal to the larger of the following two
 # numbers: (1) the difference between false-positive rates of the two groups,
 # (2) the difference between false-negative rates of the two groups.
-# 
+#
 # The table above shows the overall AUC of 0.85 (based on continuous
 # predictions) and the overall balanced error rate of 0.22 (based on 0/1
 # predictions). Both of these are satisfactory in our application context.
@@ -303,8 +304,8 @@ postprocess_est = ThresholdOptimizer(
 # %%
 # Balanced data set is obtained by sampling the same number of points from
 # the majority class (Y=0) as there are points in the minority class (Y=1)
-balanced_idx1 = df_train[Y_train==1].index
-pp_train_idx = balanced_idx1.union(Y_train[Y_train==0].sample(n=balanced_idx1.size, random_state=1234).index)
+balanced_idx1 = df_train[Y_train == 1].index
+pp_train_idx = balanced_idx1.union(Y_train[Y_train == 0].sample(n=balanced_idx1.size, random_state=1234).index)
 
 df_train_balanced = df_train.loc[pp_train_idx, :]
 Y_train_balanced = Y_train.loc[pp_train_idx]
@@ -325,11 +326,11 @@ get_metrics_df(models_dict, Y_test, A_str_test)
 # practice, it would be important to examine in more detail why we observe
 # such a sharp trade-off. In our case it is because the available features are
 # much less informative for one of the demographic groups than for the other.
-# 
+#
 # Note that unlike the unmitigated model, `ThresholdOptimizer` produces 0/1
 # predictions, so its balanced error rate difference is equal to the AUC
 # difference, and its overall balanced error rate is equal to 1 - overall AUC.
-# 
+#
 # Below, we compare this model with the unmitigated `lightgbm` model using
 # the Fairlearn dashboard. As the performance metric, we can select the
 # balanced accuracy. The dashboard right now does not directly show the
@@ -363,8 +364,8 @@ sweep = GridSearch(model,
 
 sweep.fit(df_train_balanced, Y_train_balanced, sensitive_features=A_train_balanced)
 
-sweep_preds = [predictor.predict(df_test) for predictor in sweep.predictors_] 
-sweep_scores = [predictor.predict_proba(df_test)[:, 1] for predictor in sweep.predictors_] 
+sweep_preds = [predictor.predict(df_test) for predictor in sweep.predictors_]
+sweep_scores = [predictor.predict_proba(df_test)[:, 1] for predictor in sweep.predictors_]
 
 equalized_odds_sweep = [
     equalized_odds_difference(Y_test, preds, sensitive_features=A_str_test)
@@ -378,11 +379,11 @@ auc_sweep = [roc_auc_score(Y_test, scores) for scores in sweep_scores]
 # equalized odds difference)
 all_results = pd.DataFrame(
     {"predictor": sweep.predictors_, "accuracy": balanced_accuracy_sweep, "disparity": equalized_odds_sweep}
-) 
-non_dominated = [] 
-for row in all_results.itertuples(): 
-    accuracy_for_lower_or_eq_disparity = all_results["accuracy"][all_results["disparity"] <= row.disparity] 
-    if row.accuracy >= accuracy_for_lower_or_eq_disparity.max(): 
+)
+non_dominated = []
+for row in all_results.itertuples():
+    accuracy_for_lower_or_eq_disparity = all_results["accuracy"][all_results["disparity"] <= row.disparity]
+    if row.accuracy >= accuracy_for_lower_or_eq_disparity.max():
         non_dominated.append(True)
     else:
         non_dominated.append(False)
@@ -397,9 +398,9 @@ plt.scatter(balanced_accuracy_non_dominated,
             equalized_odds_sweep_non_dominated,
             label="GridSearch Models")
 plt.scatter(balanced_accuracy_score(Y_test, test_preds),
-            equalized_odds_difference(Y_test, test_preds, sensitive_features=A_str_test), 
+            equalized_odds_difference(Y_test, test_preds, sensitive_features=A_str_test),
             label="Unmitigated Model")
-plt.scatter(balanced_accuracy_score(Y_test, postprocess_preds), 
+plt.scatter(balanced_accuracy_score(Y_test, postprocess_preds),
             equalized_odds_difference(Y_test, postprocess_preds, sensitive_features=A_str_test),
             label="ThresholdOptimizer Model")
 plt.xlabel("Balanced Accuracy")
@@ -418,9 +419,9 @@ plt.scatter(auc_non_dominated,
             equalized_odds_sweep_non_dominated,
             label="GridSearch Models")
 plt.scatter(roc_auc_score(Y_test, test_scores),
-            equalized_odds_difference(Y_test, test_preds, sensitive_features=A_str_test), 
+            equalized_odds_difference(Y_test, test_preds, sensitive_features=A_str_test),
             label="Unmitigated Model")
-plt.scatter(roc_auc_score(Y_test, postprocess_preds), 
+plt.scatter(roc_auc_score(Y_test, postprocess_preds),
             equalized_odds_difference(Y_test, postprocess_preds, sensitive_features=A_str_test),
             label="ThresholdOptimizer Model")
 plt.xlabel("AUC")
