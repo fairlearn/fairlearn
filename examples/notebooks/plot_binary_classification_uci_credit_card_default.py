@@ -3,7 +3,6 @@
 Binary Classification with the UCI Credit-card Default Dataset
 ==============================================================
 """
-
 # %%
 # Mitigating disparities in accuracy as measured by equalized-odds difference
 # 
@@ -79,6 +78,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('TKAgg')  # to suppress 'agg' plotting warnings
+
+# set layout parameters to avoid cutting off legend
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
 
 # Data processing
 from sklearn.model_selection import train_test_split
