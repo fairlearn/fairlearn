@@ -42,8 +42,10 @@ def _get_labels_for_confusion_matrix(unique_labels, pos_label):
     Returns
     -------
     list
-        A two element list, consisting of the unique values of the two arrays
-        with the positive label listed last
+        A two element list, consisting of the unique labels
+        with the positive label listed last. This array will
+        always be two elements, even if the unique_labels array
+        only has one element.
     """
     if len(unique_labels) > 2:
         raise ValueError(_TOO_MANY_UNIQUE_Y_VALS)
