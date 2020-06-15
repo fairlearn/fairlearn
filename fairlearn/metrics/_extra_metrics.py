@@ -16,6 +16,7 @@ from ._selection_rate import selection_rate  # noqa: F401,E501
 _TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
 _RESTRICTED_VALS_IF_POS_LABEL_NONE = "If pos_label is not specified, values must be take from {0, 1} or {-1, 1}"  # noqa: E501
 _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
+_NO_SUCH_ELEMENT = "16763842-875f-467c-9e58-24987dfe5d7d"
 
 
 def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
@@ -63,7 +64,7 @@ def _get_labels_for_confusion_matrix(y_true, y_pred, pos_label):
     # Ensure unique_labels has two elements
     if len(unique_labels) == 1:
         if unique_labels[0] == pos_label:
-            unique_labels = [0, pos_label]
+            unique_labels = [_NO_SUCH_ELEMENT, pos_label]
         else:
             unique_labels.append(pos_label)
 
