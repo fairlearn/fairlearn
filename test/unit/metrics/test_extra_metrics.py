@@ -79,9 +79,6 @@ class TestGetLabelsForConfusionMatrix:
         assert str(e1.value) == expected_msg
 
 
-# ==============================================
-# True Positive Rate
-
 class TestTPR:
     def test_all_correct(self):
         y_true = [0, 0, 0, 0, 1]
@@ -134,7 +131,7 @@ class TestTPR:
         result_a = metrics.true_positive_rate(y_true, y_pred, pos_label=a)
         result_skm_a = skm.recall_score(y_true, y_pred, pos_label=a)
         assert result_a == pytest.approx(result_skm_a)
-        
+
         result_b = metrics.true_positive_rate(y_true, y_pred, pos_label=b)
         result_skm_b = skm.recall_score(y_true, y_pred, pos_label=b)
         assert result_b == pytest.approx(result_skm_b)
@@ -143,179 +140,160 @@ class TestTPR:
         assert result_a != result_b
 
 
-# ==============================================
-# True Negative Rate
+class TestTNR:
+    def test_all_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [0, 0, 0, 0, 1]
+
+        result = metrics.true_negative_rate(y_true, y_pred)
+        assert result == 1
+
+        result = metrics.true_negative_rate(y_true, y_pred, pos_label=0)
+        assert result == 1
+
+    def test_none_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [1, 1, 1, 1, 0]
+
+        result = metrics.true_negative_rate(y_true, y_pred)
+        assert result == 0
+
+        result = metrics.true_negative_rate(y_true, y_pred, pos_label=0)
+        assert result == 0
+
+    def test_some_correct(self):
+        y_true = [-1, -1, -1, -1, 1]
+        y_pred = [-1, -1, -1, 1, 1]
+
+        result = metrics.true_negative_rate(y_true, y_pred)
+        assert result == 0.75
+        result = metrics.true_negative_rate(y_true, y_pred, pos_label=-1)
+        assert result == 1
+
+    def test_some_correct_other_labels(self):
+        y_true = ['b', 'b', 'b', 'b', 'a']
+        y_pred = ['b', 'b', 'b', 'a', 'a']
+
+        result = metrics.true_negative_rate(y_true, y_pred, pos_label='b')
+        assert result == 1
+        result = metrics.true_negative_rate(y_true, y_pred, pos_label='a')
+        assert result == 0.75
+
+    def test_tnr_some_correct_with_false_negative(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [0, 0, 1, 0, 0]
+
+        result = metrics.true_negative_rate(y_true, y_pred)
+        assert result == 0.75
 
 
-def test_tnr_all_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [0, 0, 0, 0, 1]
+class TestFNR:
 
-    result = metrics.true_negative_rate(y_true, y_pred)
-    assert result == 1
+    def test_all_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [0, 0, 0, 0, 1]
 
-    result = metrics.true_negative_rate(y_true, y_pred, pos_label=0)
-    assert result == 1
+        result = metrics.false_negative_rate(y_true, y_pred)
+        assert result == 0
 
+    def test_none_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [1, 1, 1, 1, 0]
 
-def test_tnr_none_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [1, 1, 1, 1, 0]
+        result = metrics.false_negative_rate(y_true, y_pred)
+        assert result == 1
 
-    result = metrics.true_negative_rate(y_true, y_pred)
-    assert result == 0
+    def test_with_false_positive(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [0, 0, 0, 1, 1]
 
-    result = metrics.true_negative_rate(y_true, y_pred, pos_label=0)
-    assert result == 0
+        result = metrics.false_negative_rate(y_true, y_pred)
+        assert result == 0
 
+    def test_some_correct(self):
+        y_true = [1, 1, 1, 1, 0, 0]
+        y_pred = [0, 0, 1, 0, 0, 1]
 
-def test_tnr_some_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [0, 0, 0, 1, 1]
+        result = metrics.false_negative_rate(y_true, y_pred)
+        assert result == 0.75
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label=1)
+        assert result == 0.75
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label=0)
+        assert result == 0.5
 
-    result = metrics.true_negative_rate(y_true, y_pred)
-    assert result == 0.75
-    result = metrics.true_negative_rate(y_true, y_pred, pos_label=0)
-    assert result == 1
+    def test_some_correct_other_labels(self):
+        y_true = ['a', 'a', 'a', 'a', 'b', 'b']
+        y_pred = ['b', 'b', 'a', 'b', 'b', 'a']
 
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label='a')
+        assert result == 0.75
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label='b')
+        assert result == 0.5
 
-def test_tnr_some_correct_other_labels():
-    y_true = ['b', 'b', 'b', 'b', 'a']
-    y_pred = ['b', 'b', 'b', 'a', 'a']
+    def test_against_sklearn(self):
+        y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0]
+        y_pred = [1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
 
-    result = metrics.true_negative_rate(y_true, y_pred, pos_label='b')
-    assert result == 1
-    result = metrics.true_negative_rate(y_true, y_pred, pos_label='a')
-    assert result == 0.75
+        result = metrics.false_negative_rate(y_true, y_pred)
+        result_skm = 1 - skm.recall_score(y_true, y_pred)
+        assert result == pytest.approx(result_skm)
 
-
-def test_tnr_some_correct_with_false_negative():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [0, 0, 1, 0, 0]
-
-    result = metrics.true_negative_rate(y_true, y_pred)
-    assert result == 0.75
-
-
-# ========================================
-# False Negative Rate
-
-def test_fnr_all_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [0, 0, 0, 0, 1]
-
-    result = metrics.false_negative_rate(y_true, y_pred)
-    assert result == 0
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label=0)
+        result_skm = 1 - skm.recall_score(y_true, y_pred, pos_label=0)
+        assert result == pytest.approx(result_skm)
 
 
-def test_fnr_none_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [1, 1, 1, 1, 0]
+class TestFPR:
 
-    result = metrics.false_negative_rate(y_true, y_pred)
-    assert result == 1
+    def test_all_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [0, 0, 0, 0, 1]
 
+        result = metrics.false_positive_rate(y_true, y_pred)
+        assert result == 0
 
-def test_fnr_with_false_positive():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [0, 0, 0, 1, 1]
+    def test_none_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [1, 1, 1, 1, 0]
 
-    result = metrics.false_negative_rate(y_true, y_pred)
-    assert result == 0
+        result = metrics.false_positive_rate(y_true, y_pred)
+        assert result == 1
 
+    def test_some_correct(self):
+        y_true = [-1, -1, -1, -1, 1, 1, 1]
+        y_pred = [-1, 1, 1, -1, -1, 1, -1]
 
-def test_fnr_some_correct():
-    y_true = [1, 1, 1, 1, 0, 0]
-    y_pred = [0, 0, 1, 0, 0, 1]
-
-    result = metrics.false_negative_rate(y_true, y_pred)
-    assert result == 0.75
-    result = metrics.false_negative_rate(y_true, y_pred, pos_label=1)
-    assert result == 0.75
-    result = metrics.false_negative_rate(y_true, y_pred, pos_label=0)
-    assert result == 0.5
-
-
-def test_fnr_some_correct_other_labels():
-    y_true = ['a', 'a', 'a', 'a', 'b', 'b']
-    y_pred = ['b', 'b', 'a', 'b', 'b', 'a']
-
-    result = metrics.false_negative_rate(y_true, y_pred, pos_label='a')
-    assert result == 0.75
-    result = metrics.false_negative_rate(y_true, y_pred, pos_label='b')
-    assert result == 0.5
+        result = metrics.false_positive_rate(y_true, y_pred)
+        assert result == 0.5
+        result = metrics.false_positive_rate(y_true, y_pred, pos_label=1)
+        assert result == 0.5
+        result = metrics.false_positive_rate(y_true, y_pred, pos_label=-1)
+        assert result == pytest.approx(0.6666667)
 
 
-def test_fnr_against_sklearn():
-    y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0]
-    y_pred = [1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
+class TestSingleValueArrays:
+    def test_all_zeros(self):
+        zeros = np.zeros(10)
 
-    result = metrics.false_negative_rate(y_true, y_pred)
-    result_skm = 1 - skm.recall_score(y_true, y_pred)
-    assert result == pytest.approx(result_skm)
+        assert metrics.true_positive_rate(zeros, zeros, pos_label=1) == 0
+        assert metrics.false_positive_rate(zeros, zeros, pos_label=1) == 0
+        assert metrics.true_negative_rate(zeros, zeros, pos_label=1) == 1
+        assert metrics.false_negative_rate(zeros, zeros, pos_label=1) == 0
 
-    result = metrics.false_negative_rate(y_true, y_pred, pos_label=0)
-    result_skm = 1 - skm.recall_score(y_true, y_pred, pos_label=0)
-    assert result == pytest.approx(result_skm)
+        assert metrics.true_positive_rate(zeros, zeros, pos_label=0) == 1
+        assert metrics.false_positive_rate(zeros, zeros, pos_label=0) == 0
+        assert metrics.true_negative_rate(zeros, zeros, pos_label=0) == 0
+        assert metrics.false_negative_rate(zeros, zeros, pos_label=0) == 0
 
+    def test_all_ones(self):
+        ones = np.ones(10)
 
-# ============================
-# False Positive Rate
+        assert metrics.true_positive_rate(ones, ones, pos_label=1) == 1
+        assert metrics.false_positive_rate(ones, ones, pos_label=1) == 0
+        assert metrics.true_negative_rate(ones, ones, pos_label=1) == 0
+        assert metrics.false_negative_rate(ones, ones, pos_label=1) == 0
 
-def test_fpr_all_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [0, 0, 0, 0, 1]
-
-    result = metrics.false_positive_rate(y_true, y_pred)
-    assert result == 0
-
-
-def test_fpr_none_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [1, 1, 1, 1, 0]
-
-    result = metrics.false_positive_rate(y_true, y_pred)
-    assert result == 1
-
-
-def test_fpr_some_correct():
-    y_true = [0, 0, 0, 0, 1, 1, 1]
-    y_pred = [0, 1, 1, 0, 0, 1, 0]
-
-    result = metrics.false_positive_rate(y_true, y_pred)
-    assert result == 0.5
-    result = metrics.false_positive_rate(y_true, y_pred, pos_label=1)
-    assert result == 0.5
-    result = metrics.false_positive_rate(y_true, y_pred, pos_label=0)
-    assert result == pytest.approx(0.6666667)
-
-# ============================
-# Single value arrays
-
-
-def test_all_zeros():
-    zeros = np.zeros(10)
-
-    assert metrics.true_positive_rate(zeros, zeros, pos_label=1) == 0
-    assert metrics.false_positive_rate(zeros, zeros, pos_label=1) == 0
-    assert metrics.true_negative_rate(zeros, zeros, pos_label=1) == 1
-    assert metrics.false_negative_rate(zeros, zeros, pos_label=1) == 0
-
-    assert metrics.true_positive_rate(zeros, zeros, pos_label=0) == 1
-    assert metrics.false_positive_rate(zeros, zeros, pos_label=0) == 0
-    assert metrics.true_negative_rate(zeros, zeros, pos_label=0) == 0
-    assert metrics.false_negative_rate(zeros, zeros, pos_label=0) == 0
-
-
-def test_all_ones():
-    ones = np.ones(10)
-
-    assert metrics.true_positive_rate(ones, ones, pos_label=1) == 1
-    assert metrics.false_positive_rate(ones, ones, pos_label=1) == 0
-    assert metrics.true_negative_rate(ones, ones, pos_label=1) == 0
-    assert metrics.false_negative_rate(ones, ones, pos_label=1) == 0
-
-    assert metrics.true_positive_rate(ones, ones, pos_label=0) == 0
-    assert metrics.false_positive_rate(ones, ones, pos_label=0) == 0
-    assert metrics.true_negative_rate(ones, ones, pos_label=0) == 1
-    assert metrics.false_negative_rate(ones, ones, pos_label=0) == 0
+        assert metrics.true_positive_rate(ones, ones, pos_label=0) == 0
+        assert metrics.false_positive_rate(ones, ones, pos_label=0) == 0
+        assert metrics.true_negative_rate(ones, ones, pos_label=0) == 1
+        assert metrics.false_negative_rate(ones, ones, pos_label=0) == 0
