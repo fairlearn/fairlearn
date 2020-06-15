@@ -82,71 +82,65 @@ class TestGetLabelsForConfusionMatrix:
 # ==============================================
 # True Positive Rate
 
-def test_tpr_all_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [0, 0, 0, 0, 1]
+class TestTPR:
+    def test_all_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [0, 0, 0, 0, 1]
 
-    result = metrics.true_positive_rate(y_true, y_pred)
-    assert result == 1
+        result = metrics.true_positive_rate(y_true, y_pred)
+        assert result == 1
 
-    result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
-    assert result == 1
+        result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
+        assert result == 1
 
+    def test_none_correct(self):
+        y_true = [0, 0, 0, 0, 1]
+        y_pred = [1, 1, 1, 1, 0]
 
-def test_tpr_none_correct():
-    y_true = [0, 0, 0, 0, 1]
-    y_pred = [1, 1, 1, 1, 0]
+        result = metrics.true_positive_rate(y_true, y_pred)
+        assert result == 0
 
-    result = metrics.true_positive_rate(y_true, y_pred)
-    assert result == 0
+        result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
+        assert result == 0
 
-    result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
-    assert result == 0
+    def test_some_correct(self):
+        y_true = [0, 0, 0, 0, 1, 1, 1, 1]
+        y_pred = [0, 0, 0, 1, 1, 0, 0, 0]
 
+        result = metrics.true_positive_rate(y_true, y_pred)
+        assert result == 0.25
+        result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
+        assert result == 0.75
 
-def test_tpr_some_correct():
-    y_true = [0, 0, 0, 0, 1, 1, 1, 1]
-    y_pred = [0, 0, 0, 1, 1, 0, 0, 0]
+    def test_against_sklearn(self):
+        y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]
+        y_pred = [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
 
-    result = metrics.true_positive_rate(y_true, y_pred)
-    assert result == 0.25
-    result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
-    assert result == 0.75
+        result = metrics.true_positive_rate(y_true, y_pred)
+        result_skm = skm.recall_score(y_true, y_pred)
+        assert result == pytest.approx(result_skm)
 
+        result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
+        result_skm = skm.recall_score(y_true, y_pred, pos_label=0)
+        assert result == pytest.approx(result_skm)
 
-def test_tpr_against_sklearn():
-    y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]
-    y_pred = [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
+    def test_tpr_values_alpha(self):
+        a = 'a'
+        b = 'b'
+        y_true = [a, b, a, b, b, b, b, b, a, a, a, a, b, b, a, b]
+        y_pred = [a, b, b, a, a, b, a, a, b, b, a, b, a, b, a, a]
 
-    result = metrics.true_positive_rate(y_true, y_pred)
-    result_skm = skm.recall_score(y_true, y_pred)
-    assert result == pytest.approx(result_skm)
+        # Use sklearn for validation
+        result_a = metrics.true_positive_rate(y_true, y_pred, pos_label=a)
+        result_skm_a = skm.recall_score(y_true, y_pred, pos_label=a)
+        assert result_a == pytest.approx(result_skm_a)
+        
+        result_b = metrics.true_positive_rate(y_true, y_pred, pos_label=b)
+        result_skm_b = skm.recall_score(y_true, y_pred, pos_label=b)
+        assert result_b == pytest.approx(result_skm_b)
 
-    result = metrics.true_positive_rate(y_true, y_pred, pos_label=0)
-    result_skm = skm.recall_score(y_true, y_pred, pos_label=0)
-    assert result == pytest.approx(result_skm)
-
-
-def test_tpr_values_1_2():
-    # Want to ensure that the 'pos_label' is taken to be 2 by default
-    # Since this logic is actually in a subroutine, only test for TPR
-    y_true = [1, 2, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2]
-    y_pred = [1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2, 2]
-
-    # Use sklearn for validation
-    result = metrics.true_positive_rate(y_true, y_pred)
-    # Note that skm.recall_score default pos_label=1, not pos_label=1
-    result_skm = skm.recall_score(y_true, y_pred, pos_label=2)
-    assert result == pytest.approx(result_skm)
-
-    # Can also test against ourselves
-    result_1 = metrics.true_positive_rate(y_true, y_pred, pos_label=1)
-    result_2 = metrics.true_positive_rate(y_true, y_pred, pos_label=2)
-    assert result_2 == result
-    assert result_1 != result
-
-    result_skm_1 = skm.recall_score(y_true, y_pred, pos_label=1)
-    assert result_1 == pytest.approx(result_skm_1)
+        # Sanity check on the in put data
+        assert result_a != result_b
 
 
 # ==============================================
