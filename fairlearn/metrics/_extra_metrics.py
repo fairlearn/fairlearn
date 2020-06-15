@@ -87,7 +87,7 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     if len(unique_labels) == 1:
-        tpr = int(unique_labels[0] == pos_label)
+        tpr = float(unique_labels[0] == pos_label)
     else:
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
@@ -121,7 +121,7 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     if len(unique_labels) == 1:
-        tnr = (unique_labels[0] != pos_label)
+        tnr = float(unique_labels[0] != pos_label)
     else:
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
@@ -155,7 +155,7 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     if len(unique_labels) == 1:
-        fpr = 0
+        fpr = 0.0
     else:
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
@@ -189,7 +189,7 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     """
     unique_labels = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label)
     if len(unique_labels) == 1:
-        fnr = 0
+        fnr = 0.0
     else:
         tnr, fpr, fnr, tpr = skm.confusion_matrix(
             y_true, y_pred,
