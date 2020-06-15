@@ -19,22 +19,25 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
     return mergeStyleSets<IIntroTabStyles>({
         firstSection: {
             padding: "43px 94px",
-            backgroundColor: theme.palette.neutralPrimary,
-            color: theme.palette.white
+            backgroundColor: theme.semanticColors.bodyBackground,
+            color: theme.semanticColors.bodyText
         },
         firstSectionTitle: {
             fontSize: "60px",
-            fontWeight: FontWeights.light
+            fontWeight: FontWeights.light,
+            lineHeight: "82px"
         },
         firstSectionSubtitle: {
             fontSize: "60px",
-            fontWeight: FontWeights.semibold
+            fontWeight: FontWeights.semibold,
+            lineHeight: "82px"
         },
         firstSectionBody: {
             paddingTop: "30px",
             paddingBottom: "70px",
             maxWidth: "500px",
             fontWeight: FontWeights.semilight,
+            lineHeight: "24px"
         },
         lowerSection: {
             padding: "50px 70px 90px 90px",
@@ -57,7 +60,8 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         },
         numericLabel: {
             fontWeight: FontWeights.bold,
-            width: "30px"
+            width: "30px",
+            lineHeight: "24px"
         },
         explanatoryStep: {
             maxWidth: "300px",
@@ -65,8 +69,7 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             flex: 1
         },
         explanatoryText: {
-            paddingTop: "15px",
-            //color: "#666666",
+            paddingTop: "15px"
         },
         getStarted: {
             paddingTop: "30px",

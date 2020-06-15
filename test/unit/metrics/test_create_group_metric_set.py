@@ -197,7 +197,7 @@ class TestCreateGroupMetricSet:
         assert actual['trueY'] == y_t
         assert actual['predictedY'][0] == y_p
         assert actual['precomputedFeatureBins'][0]['binVector'] == s_f
-        assert len(actual['precomputedMetrics'][0][0]) == 10
+        assert len(actual['precomputedMetrics'][0][0]) == 11
 
         # Cross check the two metrics we computed
         # Comparisons simplified because s_f was already {0,1}

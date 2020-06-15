@@ -44,8 +44,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         headerTitle: {
             paddingTop: "10px",
-            color: theme.semanticColors.bodyText,
-            fontWeight: FontWeights.light
+            color: theme.semanticColors.bodyText
         },
         headerBanner: {
             display: "flex"
@@ -60,8 +59,10 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         metricText: {
             color: theme.semanticColors.bodyText,
+            paddingRight: "12px",
             fontWeight: FontWeights.light,
-            paddingRight: "12px"
+            lineHeight: "44px",
+            fontSize: "36px"
         },
         firstMetricLabel: {
             color: theme.semanticColors.bodyText,
@@ -69,7 +70,8 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             maxWidth: "120px",
             borderRight: "1px solid",
             borderRightColor: theme.semanticColors.bodyDivider,
-            marginRight: "20px"
+            marginRight: "20px",
+            lineHeight: "16px"
         },
         metricLabel: {
             color: theme.semanticColors.bodyText,
@@ -132,7 +134,8 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            paddingBottom: "7px"
+            paddingBottom: "7px",
+            color: theme.semanticColors.bodyText
         },
         colorBlock: {
             width: "15px",
