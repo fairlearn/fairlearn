@@ -53,9 +53,12 @@ class TestGetLabelsForConfusionMatrix:
 
     def test_too_many_values(self):
         expected_msg = "Must have no more than two unique y values"
-        with pytest.raises(ValueError) as exception:
+        with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 1], [1, 2], None)
-        assert str(exception.value) == expected_msg
+        assert str(e0.value) == expected_msg
+        with pytest.raises(ValueError) as e1:
+            _get_labels_for_confusion_matrix(['a', 'b'], ['a', 'c'], 'a')
+        assert str(e1.value) == expected_msg
 
     def test_need_pos_label(self):
         expected_msg = "If pos_label is not specified, values must be take from {0, 1} or {-1, 1}"
@@ -66,47 +69,14 @@ class TestGetLabelsForConfusionMatrix:
             _get_labels_for_confusion_matrix([-1, 0], [0, -1], None)
         assert str(e1.value) == expected_msg
 
-
-def test_get_labels_for_confusion_matrix_smoke():
-    y_true = [0, 1]
-    y_pred = [1, 1]
-
-    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=None)
-    assert np.array_equal(result, [0, 1])
-    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=1)
-    assert np.array_equal(result, [0, 1])
-    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=0)
-    assert np.array_equal(result, [1, 0])
-
-
-def test_get_labels_for_confusion_matrix_1_not_largest():
-    y_true = [1, 1, 2]
-    y_pred = [2, 2, 1]
-
-    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=None)
-    assert np.array_equal(result, [1, 2])
-    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=1)
-    assert np.array_equal(result, [2, 1])
-    result = _get_labels_for_confusion_matrix(y_true, y_pred, pos_label=2)
-    assert np.array_equal(result, [1, 2])
-
-
-def test_get_labels_for_confusion_matrix_bad_unique_count():
-    with pytest.raises(ValueError) as exception:
-        _get_labels_for_confusion_matrix([0, 1], [1, 2], pos_label=1)
-    assert str(exception.value) == "Must have no more than two unique y values"
-
-
-def test_get_labels_for_confusion_matrix_bad_pos_label():
-    with pytest.raises(ValueError) as exception:
-        _get_labels_for_confusion_matrix([0, 1], [1, 0], pos_label=2)
-    assert str(exception.value) == "Must have pos_label in y values"
-
-
-def test_get_labels_for_confusion_matrix_ambiguous():
-    with pytest.raises(ValueError) as exception:
-        _get_labels_for_confusion_matrix([1, 1], [1, 1], None)
-    assert str(exception.value) == "Must specify pos_label for degenerate data"
+    def test_pos_label_not_in_data(self):
+        expected_msg = "Must have pos_label in y values"
+        with pytest.raises(ValueError) as e0:
+            _get_labels_for_confusion_matrix([0, 1], [1, 1], -1)
+        assert str(e0.value) == expected_msg
+        with pytest.raises(ValueError) as e1:
+            _get_labels_for_confusion_matrix([4, 2], [2, 2], 3)
+        assert str(e1.value) == expected_msg
 
 
 # ==============================================
