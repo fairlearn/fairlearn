@@ -1,10 +1,10 @@
 Upgrading
 ==========
-See also [CHANGES.md](https://github.com/fairlearn/fairlearn/blob/master/CHANGES.md).
-
+See also `CHANGES.md` <https://github.com/fairlearn/fairlearn/blob/master/CHANGES.md>`_.
 
 Upgrading from 0.2 to 0.3
--------------------
+-------------------------
+
 Up to version 0.2, Fairlearn contained only the exponentiated gradient method.
 The Fairlearn repository now has a more comprehensive scope and aims to
 incorporate other methods. The same exponentiated gradient technique is now
