@@ -23,3 +23,6 @@ There are many different ways to contribute to Fairlearn, for example:
 - `Report bugs <https://github.com/fairlearn/fairlearn/issues/new/choose>`_.
 - `Request new features <https://github.com/fairlearn/fairlearn/issues/new/choose>`_.
 - :doc:`Write proposals <fairlearn_proposals>` for larger changes.
+
+All contributions are expected to follow the guide on
+:ref:`how_to_talk_about_fairness`.
