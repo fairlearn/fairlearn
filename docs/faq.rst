@@ -63,7 +63,8 @@ What sort of fairness related harms can the Fairlearn library address?
     For example, there is the concept of individual fairness (where decisions are evaluated
     on the level of individuals rather than groups) and counter-factual fairness (e.g. does the
     decision change if an individual's gender is changed from male to female).
-    See :ref:`types_of_harms` for more information.
+    See :ref:`types_of_harms` for more information; we would welcome contributions which
+    enabled Fairlearn to help address some of these other harms.
     Beyond these, there are also fairness concepts which are note amenable to
     mathematical (and hence algorithmic) expression - justice, due process and
     righting historic iniquities for example.
