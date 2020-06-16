@@ -35,13 +35,10 @@ from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, ErrorRate
 
-from sklearn import svm, neighbors, tree
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
 import shap
-
-import numpy as np
 
 # %%
 # We can now load and inspect the data from the :code:`shap` package:
@@ -151,7 +148,7 @@ sweep = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
 # attribute labels, and also the number of predictors to generate in our sweep.
 #
 # After :code:`fit()` completes, we extract the full set of predictors from the
-# :code:`fairlearn.reductions.GridSearch` object.
+# :class:`fairlearn.reductions.GridSearch` object.
 
 sweep.fit(X_train, Y_train,
           sensitive_features=A_train)
