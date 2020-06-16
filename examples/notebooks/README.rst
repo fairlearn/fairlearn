@@ -8,4 +8,4 @@ examples soon.
    :maxdepth: 2
 
    plot_binary_classification_COMPAS
-   plot_grid_search_census.py
+   plot_grid_search_census
