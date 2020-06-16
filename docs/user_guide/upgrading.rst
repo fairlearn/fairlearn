@@ -1,6 +1,6 @@
 Upgrading
 ==========
-See also `CHANGES.md` <https://github.com/fairlearn/fairlearn/blob/master/CHANGES.md>`_.
+See also `CHANGES.md <https://github.com/fairlearn/fairlearn/blob/master/CHANGES.md>`_.
 
 Upgrading from 0.2 to 0.3
 -------------------------
