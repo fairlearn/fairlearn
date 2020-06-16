@@ -64,12 +64,11 @@ class ThresholdOptimizer(BaseEstimator, ClassifierMixin, MetaEstimatorMixin):
     :type: bool, default=False
     """
 
-    def __init__(self, *, estimator=None,
+    def __init__(self, estimator=None, *,
                  constraints=DEMOGRAPHIC_PARITY, grid_size=1000, flip=True,
                  prefit=False):
         self.grid_size = grid_size
         self.flip = flip
-        self.post_processed_predictor_by_sensitive_feature = None
         self.constraints = constraints
         self.estimator = estimator
         self.prefit = prefit
