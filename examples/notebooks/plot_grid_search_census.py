@@ -5,7 +5,7 @@ GridSearch with Census Data
 ===========================
 """
 # %%
-# This notebook shows how to use `fairlearn` and the Fairness dashboard to generate predictors
+# This notebook shows how to use Fairlearn and the Fairness dashboard to generate predictors
 # for the Census dataset.
 # This dataset is a classification problem - given a range of data about 32,000 individuals,
 # predict whether their annual income is above or below fifty thousand dollars per year.
@@ -25,7 +25,7 @@ GridSearch with Census Data
 # %%
 # Load and preprocess the data set
 # --------------------------------
-# For simplicity, we import the data set from the `shap` package, which contains the data in
+# For simplicity, we import the data set from the :code:`shap` package, which contains the data in
 # a cleaned format.
 # We start by importing the various modules we're going to use:
 
@@ -43,7 +43,7 @@ import shap
 import numpy as np
 
 # %%
-# We can now load and inspect the data from the `shap` package:
+# We can now load and inspect the data from the :code:`shap` package:
 
 X_raw, Y = shap.datasets.adult()
 X_raw
@@ -93,7 +93,7 @@ A_test = A_test.map({0: "female", 1: "male"})
 # To show the effect of Fairlearn we will first train a standard ML predictor
 # that does not incorporate fairness.
 # For speed of demonstration, we use a simple logistic regression estimator
-# from `sklearn`:
+# from :code:`sklearn`:
 
 unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
 
@@ -125,8 +125,8 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # Mitigation with GridSearch
 # --------------------------
 #
-# The `GridSearch` class in Fairlearn implements a simplified version of the
-# exponentiated gradient reduction of [Agarwal et al. 2018](https://arxiv.org/abs/1803.02453).
+# The :class:`fairlearn.reductions.GridSearch` class implements a simplified version of the
+# exponentiated gradient reduction of `Agarwal et al. 2018<https://arxiv.org/abs/1803.02453>`_.
 # The user supplies a standard ML estimator, which is treated as a blackbox.
 # `GridSearch` works by generating a sequence of relabellings and reweightings, and
 # trains a predictor for each.
@@ -144,7 +144,7 @@ sweep = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
                    grid_size=71)
 
 # %%
-# Our algorithms provide `fit()` and `predict()` methods, so they behave in a similar manner
+# Our algorithms provide :code:`fit()` and :code:`predict()` methods, so they behave in a similar manner
 # to other ML packages in Python.
 # We do however have to specify two extra arguments to `fit()` - the column of protected
 # attribute labels, and also the number of predictors to generate in our sweep.
