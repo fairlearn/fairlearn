@@ -17,7 +17,7 @@ the list feel free to send a pull request.
   due process, remedying historical societal injustices).
 - Be clear that given the many complex sources of unfairness, it is not
   possible to fully *debias* a system or to guarantee fairness. The goal is to
-  detect and to mitigate fairness-related harms as much as possible.
+  assess and mitigate fairness-related harms as much as possible.
   For this reason, don’t usewords like *debias*, *unbiased*, *solve* – they
   set up unrealistic expectations. Use words like *mitigate*, *address*,
   *prioritize*, *assess* instead.
