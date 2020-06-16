@@ -20,7 +20,8 @@ GridSearch with Census Data
 #
 # We will first train a fairness-unaware predictor and show that it leads to unfair
 # decisions under a specific notion of fairness called *demographic parity*.
-# We then mitigate unfairness by applying the `GridSearch` algorithm from `fairlearn` package.
+# We then mitigate unfairness by applying the :code:`GridSearch` algorithm from the
+# Fairlearn package.
 
 # %%
 # Load and preprocess the data set
@@ -92,8 +93,8 @@ A_test = A_test.map({0: "female", 1: "male"})
 #
 # To show the effect of Fairlearn we will first train a standard ML predictor
 # that does not incorporate fairness.
-# For speed of demonstration, we use a simple logistic regression estimator
-# from :code:`sklearn`:
+# For speed of demonstration, we use the simple
+# :class:`sklearn.linear_models.LogisticRegression` class:
 
 unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
 
@@ -126,7 +127,7 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # --------------------------
 #
 # The :class:`fairlearn.reductions.GridSearch` class implements a simplified version of the
-# exponentiated gradient reduction of `Agarwal et al. 2018<https://arxiv.org/abs/1803.02453>`_.
+# exponentiated gradient reduction of `Agarwal et al. 2018 <https://arxiv.org/abs/1803.02453>`_.
 # The user supplies a standard ML estimator, which is treated as a blackbox.
 # `GridSearch` works by generating a sequence of relabellings and reweightings, and
 # trains a predictor for each.
@@ -146,10 +147,11 @@ sweep = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
 # %%
 # Our algorithms provide :code:`fit()` and :code:`predict()` methods, so they behave in a similar manner
 # to other ML packages in Python.
-# We do however have to specify two extra arguments to `fit()` - the column of protected
+# We do however have to specify two extra arguments to :code:`fit()` - the column of protected
 # attribute labels, and also the number of predictors to generate in our sweep.
 #
-# After `fit()` completes, we extract the full set of predictors from the `GridSearch` object.
+# After :code:`fit()` completes, we extract the full set of predictors from the
+# :code:`fairlearn.reductions.GridSearch` object.
 
 sweep.fit(X_train, Y_train,
           sensitive_features=A_train)
@@ -211,7 +213,7 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # Note the range of the axes - the disparity axis covers more values than the accuracy,
 # so we can reduce disparity substantially for a small loss in accuracy.
 #
-# By clicking on individual models on the plot, we can inspect their metrics for disparity 
+# By clicking on individual models on the plot, we can inspect their metrics for disparity
 # and accuracy in greater detail.
 # In a real example, we would then pick the model which represented the best trade-off
 # between accuracy and disparity given the relevant business constraints.
