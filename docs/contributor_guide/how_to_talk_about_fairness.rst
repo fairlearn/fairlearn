@@ -1,7 +1,7 @@
 .. _how_to_talk_about_fairness:
 
-How to talk and/or write about fairness in AI
----------------------------------------------
+How to talk and write about fairness in AI
+------------------------------------------
 
 The following style guide builds on work from various sources including the
 Fairlearn contributors and
