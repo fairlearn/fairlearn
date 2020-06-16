@@ -29,6 +29,8 @@ GridSearch with Census Data
 # a cleaned format.
 # We start by importing the various modules we're going to use:
 
+from fairlearn.widget import FairlearnDashboard
+from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, ErrorRate
 
@@ -55,7 +57,7 @@ X_raw
 # data into a format suitable for the ML algorithms
 
 A = X_raw["Sex"]
-X = X_raw.drop(labels=['Sex'],axis = 1)
+X = X_raw.drop(labels=['Sex'], axis=1)
 X = pd.get_dummies(X)
 
 sc = StandardScaler()
@@ -68,13 +70,12 @@ Y = le.fit_transform(Y)
 # %%
 # Finally, we split the data into training and test sets:
 
-from sklearn.model_selection import train_test_split
-X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(X_scaled, 
-                                                    Y, 
-                                                    A,
-                                                    test_size = 0.2,
-                                                    random_state=0,
-                                                    stratify=Y)
+X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(X_scaled,
+                                                                     Y,
+                                                                     A,
+                                                                     test_size=0.2,
+                                                                     random_state=0,
+                                                                     stratify=Y)
 
 # Work around indexing bug
 X_train = X_train.reset_index(drop=True)
@@ -83,4 +84,134 @@ X_test = X_test.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
 
 # Improve labels
-A_test = A_test.map({ 0:"female", 1:"male"})
+A_test = A_test.map({0: "female", 1: "male"})
+
+# %%
+# Training a fairness-unaware predictor
+# -------------------------------------
+#
+# To show the effect of Fairlearn we will first train a standard ML predictor
+# that does not incorporate fairness.
+# For speed of demonstration, we use a simple logistic regression estimator
+# from `sklearn`:
+
+unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
+
+unmitigated_predictor.fit(X_train, Y_train)
+
+# %%
+# We can load this predictor into the Fairness dashboard, and examine how it
+# is unfair (there is a warning about AzureML since we are not yet integrated
+# with that product):
+
+FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
+                   y_true=Y_test,
+                   y_pred={"unmitigated": unmitigated_predictor.predict(X_test)})
+
+# %%
+# Looking at the disparity in accuracy, we see that males have an error
+# about three times greater than the females.
+# More interesting is the disparity in opportunitiy - males are offered loans at
+# three times the rate of females.
+#
+# Despite the fact that we removed the feature from the training data, our
+# predictor still discriminates based on sex.
+# This demonstrates that simply ignoring a protected attribute when fitting a
+# predictor rarely eliminates unfairness.
+# There will generally be enough other features correlated with the removed
+# attribute to lead to disparate impact.
+
+# %%
+# Mitigation with GridSearch
+# --------------------------
+#
+# The `GridSearch` class in Fairlearn implements a simplified version of the
+# exponentiated gradient reduction of [Agarwal et al. 2018](https://arxiv.org/abs/1803.02453).
+# The user supplies a standard ML estimator, which is treated as a blackbox.
+# `GridSearch` works by generating a sequence of relabellings and reweightings, and
+# trains a predictor for each.
+#
+# For this example, we specify demographic parity (on the protected attribute of sex) as
+# the fairness metric.
+# Demographic parity requires that individuals are offered the opportunity (are approved
+# for a loan in this example) independent of membership in the protected class (i.e., females
+# and males should be offered loans at the same rate).
+# We are using this metric for the sake of simplicity; in general, the appropriate fairness
+# metric will not be obvious.
+
+sweep = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
+                   constraints=DemographicParity(),
+                   grid_size=71)
+
+# %%
+# Our algorithms provide `fit()` and `predict()` methods, so they behave in a similar manner
+# to other ML packages in Python.
+# We do however have to specify two extra arguments to `fit()` - the column of protected
+# attribute labels, and also the number of predictors to generate in our sweep.
+#
+# After `fit()` completes, we extract the full set of predictors from the `GridSearch` object.
+
+sweep.fit(X_train, Y_train,
+          sensitive_features=A_train)
+
+predictors = sweep.predictors_
+
+# %%
+# We could load these predictors into the Fairness dashboard now.
+# However, the plot would be somewhat confusing due to their number.
+# In this case, we are going to remove the predictors which are dominated in the
+# error-disparity space by others from the sweep (note that the disparity will only be
+# calculated for the protected attribute; other potentially protected attributes will
+# not be mitigated).
+# In general, one might not want to do this, since there may be other considerations
+# beyond the strict optimisation of error and disparity (of the given protected attribute).
+
+errors, disparities = [], []
+for m in predictors:
+    def classifier(X): return m.predict(X)
+
+    error = ErrorRate()
+    error.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
+    disparity = DemographicParity()
+    disparity.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
+
+    errors.append(error.gamma(classifier)[0])
+    disparities.append(disparity.gamma(classifier).max())
+
+all_results = pd.DataFrame({"predictor": predictors, "error": errors, "disparity": disparities})
+
+non_dominated = []
+for row in all_results.itertuples():
+    errors_for_lower_or_eq_disparity = all_results["error"][all_results["disparity"] <= row.disparity]
+    if row.error <= errors_for_lower_or_eq_disparity.min():
+        non_dominated.append(row.predictor)
+
+# %%
+# Finally, we can put the dominant models into the Fairness dashboard, along with the
+# unmitigated model.
+
+dashboard_predicted = {"unmitigated": unmitigated_predictor.predict(X_test)}
+for i in range(len(non_dominated)):
+    key = "dominant_model_{0}".format(i)
+    value = non_dominated[i].predict(X_test)
+    dashboard_predicted[key] = value
+
+
+FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
+                   y_true=Y_test,
+                   y_pred=dashboard_predicted)
+
+# %%
+# We see a Pareto front forming - the set of predictors which represent optimal tradeoffs
+# between accuracy and disparity in predictions.
+# In the ideal case, we would have a predictor at (1,0) - perfectly accurate and without
+# any unfairness under demographic parity (with respect to the protected attribute "sex").
+# The Pareto front represents the closest we can come to this ideal based on our data and
+# choice of estimator.
+# Note the range of the axes - the disparity axis covers more values than the accuracy,
+# so we can reduce disparity substantially for a small loss in accuracy.
+#
+# By clicking on individual models on the plot, we can inspect their metrics for disparity 
+# and accuracy in greater detail.
+# In a real example, we would then pick the model which represented the best trade-off
+# between accuracy and disparity given the relevant business constraints.
