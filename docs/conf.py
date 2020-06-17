@@ -50,7 +50,7 @@ extensions = [
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None)}
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
