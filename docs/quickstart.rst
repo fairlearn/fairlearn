@@ -99,7 +99,7 @@ we can evaluate metrics to get a group summary as below:
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
     >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.9844..., 'by_group': {'female': 0.925..., 'male': 0.804...}}
+    {'overall': 0.844..., 'by_group': {'female': 0.925..., 'male': 0.804...}}
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
