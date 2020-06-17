@@ -117,9 +117,9 @@ While this page shows only screenshots, the actual dashboard is interactive.
 
     >>> from fairlearn.widget import FairlearnDashboard
     >>> FairlearnDashboard(sensitive_features=sex,
-    ...                       sensitive_feature_names=['sex'],
-    ...                       y_true=y_true,
-    ...                       y_pred={"initial model": y_pred}) # doctest: +SKIP
+    ...                    sensitive_feature_names=['sex'],
+    ...                    y_true=y_true,
+    ...                    y_pred={"initial model": y_pred}) # doctest: +SKIP
 
 .. image:: ../img/fairlearn-dashboard-start.png
 
