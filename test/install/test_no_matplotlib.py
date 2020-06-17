@@ -7,7 +7,7 @@ import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
-from fairlearn.postprocessing._threshold_optimizer import _SUPPORTED_CONSTRAINTS
+from fairlearn.postprocessing._threshold_optimizer import SIMPLE_CONSTRAINTS
 from fairlearn.postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 
 
@@ -19,7 +19,7 @@ class FakePredictor(BaseEstimator, ClassifierMixin):
         return np.random.random(len(X))
 
 
-@pytest.mark.parametrize("constraints", _SUPPORTED_CONSTRAINTS)
+@pytest.mark.parametrize("constraints", [*SIMPLE_CONSTRAINTS, 'equalized_odds'])
 def test_no_matplotlib(constraints):
     n_samples = 50
     n_features = 50

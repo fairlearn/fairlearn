@@ -38,7 +38,7 @@ def test_smoke(Mitigator, constraints, Estimator, prefit):
     df['X1'] = df['X1'].astype('category')
 
     estimator = Estimator()
-    if not prefit:
+    if prefit:
         estimator.fit(df, Y)
 
     mitigator = Mitigator(estimator=estimator, constraints=constraints, prefit=prefit)

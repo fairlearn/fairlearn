@@ -1,21 +1,21 @@
 # Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
+from sklearn.base import BaseEstimator
+
 from copy import deepcopy
 import numpy as np
 import pytest
-from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
      _MESSAGE_SENSITIVE_FEATURES_NONE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import \
-    (_vectorized_prediction,
-     NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
-     ESTIMATOR_ERROR_MESSAGE,
+    (NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
+     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
      )
-from fairlearn.postprocessing._roc_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
+from fairlearn.postprocessing._tradeoff_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
 from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
                        _get_predictions_by_sensitive_feature,
@@ -24,12 +24,13 @@ from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        candidate_A_transforms, candidate_X_transforms,
                        candidate_Y_transforms)
 from test.unit.input_convertors import _map_into_single_column
+import pandas as pd
 
 
 @pytest.mark.parametrize("X_transform", candidate_X_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
 @pytest.mark.parametrize("predict_method_name", ['predict', '_pmf_predict'])
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 def test_predict_before_fit_error(X_transform, sensitive_features_transform, predict_method_name,
                                   constraints):
     X = X_transform(sensitive_features_ex1)
@@ -37,15 +38,15 @@ def test_predict_before_fit_error(X_transform, sensitive_features_transform, pre
     adjusted_predictor = ThresholdOptimizer(
         estimator=ExamplePredictor(scores_ex),
         constraints=constraints,
-        prefit=True)
+        prefit=False)
 
     with pytest.raises(ValueError, match='instance is not fitted yet'):
         getattr(adjusted_predictor, predict_method_name)(X, sensitive_features=sensitive_features)
 
 
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 def test_no_estimator_error(constraints):
-    with pytest.raises(ValueError, match=ESTIMATOR_ERROR_MESSAGE):
+    with pytest.raises(ValueError, match=BASE_ESTIMATOR_NONE_ERROR_MESSAGE):
         ThresholdOptimizer(constraints=constraints).fit(
             X_ex, labels_ex, sensitive_features=sensitive_features_ex1)
 
@@ -62,7 +63,7 @@ def test_constraints_not_supported():
 @pytest.mark.parametrize("X", [None, X_ex])
 @pytest.mark.parametrize("y", [None, labels_ex])
 @pytest.mark.parametrize("sensitive_features", [None, sensitive_features_ex1])
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 def test_none_input_data(X, y, sensitive_features, constraints):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints)
@@ -84,7 +85,7 @@ def test_none_input_data(X, y, sensitive_features, constraints):
         pass
 
 
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
     non_binary_y = deepcopy(data_X_y_sf.y)
@@ -106,14 +107,13 @@ _degenerate_labels_feature_name = {
 
 
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constraints):
     y = y_transform(degenerate_labels_ex)
 
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=constraints,
-                                            prefit=True)
+                                            constraints=constraints)
 
     feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
     with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)):
@@ -121,7 +121,7 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
                                sensitive_features=data_X_sf.sensitive_features)
 
 
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints):
     n = len(X_ex)
@@ -150,6 +150,21 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
                                    sensitive_features=data_X_y_sf.sensitive_features)
 
 
+class PassThroughPredictor(BaseEstimator):
+    def __init__(self, transform=None):
+        self.transform = transform
+
+    def fit(self, X, y=None, **kwargs):
+        self.transform_ = self.transform
+        return self
+
+    def predict(self, X):
+        if self.transform_ is None:
+            return X[0]
+        else:
+            return self.transform_(X[0])
+
+
 @pytest.mark.parametrize("score_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
@@ -157,16 +172,16 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                                    sensitive_features_transform):
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(estimator=ExamplePredictor(scores),
-                                   constraints=DEMOGRAPHIC_PARITY)
-    estimator.fit(X_ex, y, sensitive_features=sensitive_features)
+    # PassThroughPredictor takes scores_ex as input in predict and
+    # returns score_transform(scores_ex) as output
+    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
+                                   constraints='demographic_parity',
+                                   flip=True)
+    estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
-        return _vectorized_prediction(
-            estimator._post_processed_predictor_by_sensitive_feature,
-            sensitive_features,
-            scores)
+        return estimator._pmf_predict(
+            pd.DataFrame(scores), sensitive_features=sensitive_features)[0, 1]
 
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
@@ -226,16 +241,16 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
                                                sensitive_features_transform):
     y = y_transform(labels_ex)
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
-    scores = score_transform(scores_ex)
-    estimator = ThresholdOptimizer(estimator=ExamplePredictor(scores),
-                                   constraints=EQUALIZED_ODDS)
-    estimator.fit(X_ex, y, sensitive_features=sensitive_features)
+    # PassThroughPredictor takes scores_ex as input in predict and
+    # returns score_transform(scores_ex) as output
+    estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
+                                   constraints='equalized_odds',
+                                   flip=True)
+    estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
-        return _vectorized_prediction(
-            estimator._post_processed_predictor_by_sensitive_feature,
-            sensitive_features,
-            scores)
+        return estimator._pmf_predict(
+            pd.DataFrame(scores), sensitive_features=sensitive_features)[0, 1]
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
@@ -335,7 +350,8 @@ _expected_ps_demographic_parity = {
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_demographic_parity_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=DEMOGRAPHIC_PARITY)
+                                            constraints='demographic_parity',
+                                            flip=True)
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
     predictions = adjusted_predictor._pmf_predict(
@@ -382,7 +398,8 @@ _expected_ps_equalized_odds = {
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=EQUALIZED_ODDS)
+                                            constraints='equalized_odds',
+                                            flip=True)
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
 
@@ -404,7 +421,7 @@ def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
         assert np.isclose(average_probs_negative_indices[1], expected_ps[_NEG_P1])
 
 
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_predict_output_0_or_1(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
@@ -418,7 +435,7 @@ def test_predict_output_0_or_1(data_X_y_sf, constraints):
         assert prediction in [0, 1]
 
 
-@pytest.mark.parametrize("constraints", [DEMOGRAPHIC_PARITY, EQUALIZED_ODDS])
+@pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_predict_different_argument_lengths(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
@@ -437,9 +454,197 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
                                    sensitive_features=data_X_y_sf.sensitive_features)
 
 
-def create_adjusted_predictor(threshold_optimization_method, sensitive_features, labels, scores):
-    post_processed_predictor_by_sensitive_feature = threshold_optimization_method(
-        sensitive_features, labels, scores)
+constraints_list = [
+    'selection_rate_parity',
+    'demographic_parity',
+    'false_positive_rate_parity',
+    'false_negative_rate_parity',
+    'true_positive_rate_parity',
+    'true_negative_rate_parity',
+    'equalized_odds',
+    'bad_constraints']
 
-    return lambda sensitive_features_, scores: _vectorized_prediction(
-        post_processed_predictor_by_sensitive_feature, sensitive_features_, scores)
+objectives_list = [
+    'accuracy_score',
+    'balanced_accuracy_score',
+    'selection_rate',
+    'true_positive_rate',
+    'true_negative_rate',
+    'bad_objective']
+
+# For each combination of constraints and objective,
+# provide the returned solution as a dictionary, or
+# a string that represents the ValueError if the combination
+# is invalid.
+results = {
+    'selection_rate_parity, accuracy_score': {
+        0: {'p0': 0.625, 'op0': '>', 'thr0': 1.5, 'p1': 0.375, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'selection_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.2, 'op0': '>', 'thr0': np.inf, 'p1': 0.8, 'op1': '>', 'thr1': 0.5}},
+    'selection_rate_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'selection_rate_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'selection_rate_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'selection_rate_parity, bad_objective': (
+        'For selection_rate_parity only the following objectives are supported'),
+    'demographic_parity, accuracy_score': {
+        0: {'p0': 0.625, 'op0': '>', 'thr0': 1.5, 'p1': 0.375, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'demographic_parity, balanced_accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.2, 'op0': '>', 'thr0': np.inf, 'p1': 0.8, 'op1': '>', 'thr1': 0.5}},
+    'demographic_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'demographic_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'demographic_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'demographic_parity, bad_objective': (
+        'For demographic_parity only the following objectives are supported'),
+    'false_positive_rate_parity, accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'false_positive_rate_parity, bad_objective': (
+        'For false_positive_rate_parity only the following objectives are supported'),
+    'false_negative_rate_parity, accuracy_score': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.75, 'op0': '>', 'thr0': 0.5, 'p1': 0.25, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, selection_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, true_positive_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': np.inf},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, true_negative_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.75, 'op0': '>', 'thr0': 0.5, 'p1': 0.25, 'op1': '>', 'thr1': np.inf}},
+    'false_negative_rate_parity, bad_objective': (
+        'For false_negative_rate_parity only the following objectives are supported'),
+    'true_positive_rate_parity, accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 1.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_positive_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.25, 'op0': '>', 'thr0': np.inf, 'p1': 0.75, 'op1': '>', 'thr1': 0.5}},
+    'true_positive_rate_parity, selection_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'true_positive_rate_parity, true_positive_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': np.inf, 'p1': 1.0, 'op1': '>', 'thr1': -np.inf}},
+    'true_positive_rate_parity, true_negative_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'true_positive_rate_parity, bad_objective': (
+        'For true_positive_rate_parity only the following objectives are supported'),
+    'true_negative_rate_parity, accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, balanced_accuracy_score': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, selection_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, true_positive_rate': {
+        0: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 1.0, 'op0': '>', 'thr0': -np.inf, 'p1': 0.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, true_negative_rate': {
+        0: {'p0': 0.0, 'op0': '>', 'thr0': 0.5, 'p1': 1.0, 'op1': '>', 'thr1': 1.5},
+        1: {'p0': 0.0, 'op0': '>', 'thr0': -np.inf, 'p1': 1.0, 'op1': '>', 'thr1': 0.5}},
+    'true_negative_rate_parity, bad_objective': (
+        'For true_negative_rate_parity only the following objectives are supported'),
+    'equalized_odds, accuracy_score': {
+        0: {'p_ignore': 0.0, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p_ignore': 0.25, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'equalized_odds, balanced_accuracy_score': {
+        0: {'p_ignore': 0.0, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 1.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf},
+        1: {'p_ignore': 0.25, 'prediction_constant': 0.0,
+            'p0': 1.0, 'op0': '>', 'thr0': 0.5, 'p1': 0.0, 'op1': '>', 'thr1': -np.inf}},
+    'equalized_odds, selection_rate': (
+        'For equalized_odds only the following objectives are supported'),
+    'equalized_odds, true_positive_rate': (
+        'For equalized_odds only the following objectives are supported'),
+    'equalized_odds, true_negative_rate': (
+        'For equalized_odds only the following objectives are supported'),
+    'equalized_odds, bad_objective': (
+        'For equalized_odds only the following objectives are supported'),
+    'bad_constraints, accuracy_score': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, balanced_accuracy_score': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, selection_rate': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, true_positive_rate': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, true_negative_rate': (
+        'Currently only the following constraints are supported'),
+    'bad_constraints, bad_objective': (
+        'Currently only the following constraints are supported')}
+
+PREC = 1e-6
+
+
+@pytest.mark.parametrize("constraints", constraints_list)
+@pytest.mark.parametrize("objective", objectives_list)
+def test_constraints_objective_pairs(constraints, objective):
+    X = pd.Series(
+        [0, 1, 2, 3, 4, 0, 1, 2, 3]).to_frame()
+    sf = pd.Series(
+        [0, 0, 0, 0, 0, 1, 1, 1, 1])
+    y = pd.Series(
+        [1, 0, 1, 1, 1, 0, 1, 1, 1])
+    thr_optimizer = ThresholdOptimizer(
+        estimator=PassThroughPredictor(),
+        constraints=constraints,
+        objective=objective,
+        grid_size=20)
+    expected = results[constraints+", "+objective]
+    if type(expected) is str:
+        with pytest.raises(ValueError) as error_info:
+            thr_optimizer.fit(X, y, sensitive_features=sf)
+        assert str(error_info.value).startswith(expected)
+    else:
+        thr_optimizer.fit(X, y, sensitive_features=sf)
+        res = thr_optimizer.interpolated_thresholder_.interpolation_dict
+        for key in [0, 1]:
+            assert res[key]['p0'] == pytest.approx(expected[key]['p0'], PREC)
+            assert res[key]['operation0']._operator == expected[key]['op0']
+            assert res[key]['operation0']._threshold == pytest.approx(expected[key]['thr0'], PREC)
+            assert res[key]['p1'] == pytest.approx(expected[key]['p1'], PREC)
+            assert res[key]['operation1']._operator == expected[key]['op1']
+            assert res[key]['operation1']._threshold == pytest.approx(expected[key]['thr1'], PREC)
+            if 'p_ignore' in expected[key]:
+                assert res[key]['p_ignore'] == pytest.approx(expected[key]['p_ignore'], PREC)
+                assert res[key]['prediction_constant'] == \
+                    pytest.approx(expected[key]['prediction_constant'], PREC)
+            else:
+                assert 'p_ignore' not in res[key]
