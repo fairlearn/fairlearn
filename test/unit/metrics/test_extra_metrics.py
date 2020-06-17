@@ -56,7 +56,10 @@ class TestGetLabelsForConfusionMatrix:
             "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
         with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 1, 2], None)
+        # Note that while the following error message should be deterministic
+        # from a user PoV, either message is helpful
         assert str(e0.value) in {expected_msg, expected_msg_no_pos}
+        # In the following, only one error is possible
         with pytest.raises(ValueError) as e1:
             _get_labels_for_confusion_matrix(['a', 'b', 'c'], 'a')
         assert str(e1.value) == expected_msg
