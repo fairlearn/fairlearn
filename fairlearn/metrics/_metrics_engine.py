@@ -13,7 +13,7 @@ from ._extra_metrics import (
     selection_rate,
     _mean_overprediction,
     _mean_underprediction,
-    )
+)
 
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
@@ -60,9 +60,8 @@ def group_summary(metric_function, y_true, y_pred, *,
 
     # Evaluate the overall metric with the numpy arrays
     # This ensures consistency in how metric_function is called
-    result_overall = metric_function(
-        y_t, y_p,
-        **_check_metric_params(y_t, metric_params, indexed_params))
+    checked_args = _check_metric_params(y_t, metric_params, indexed_params)
+    result_overall = metric_function(y_t, y_p, **checked_args)
 
     groups = np.unique(s_f)
     result_by_group = {}
@@ -159,14 +158,14 @@ class _DerivedMetricCallable:
 
     def __repr__(self):
         return "make_derived_metric({0}, {1})".format(
-                _function_name(self._transformation_function),
-                _function_name(self._summary_function))
+            _function_name(self._transformation_function),
+            _function_name(self._summary_function))
 
     def __call__(self, y_true, y_pred, *, sensitive_features, **metric_params):
         return self._transformation_function(self._summary_function(
-                y_true, y_pred,
-                sensitive_features=sensitive_features,
-                **metric_params))
+            y_true, y_pred,
+            sensitive_features=sensitive_features,
+            **metric_params))
 
 
 def make_metric_group_summary(metric_function, indexed_params=None, name=None):
