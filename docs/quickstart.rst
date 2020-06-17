@@ -99,7 +99,7 @@ we can evaluate metrics to get a group summary as below:
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
     >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.8445686557538159, 'by_group': {'female': 0.9256336459010306, 'male': 0.8044974759063791}}
+    {'overall': 0.844..., 'by_group': {'female': 0.925..., 'male': 0.804...}}
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
@@ -108,7 +108,7 @@ selection rate, i.e., the percentage of the population with label 1:
 
     >>> from fairlearn.metrics import selection_rate_group_summary
     >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.1615429501550935, 'by_group': {'female': 0.059418809766966854, 'male': 0.21202386415787058}}
+    {'overall': 0.161..., 'by_group': {'female': 0.059..., 'male': 0.212...}}
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
@@ -155,7 +155,7 @@ a vastly reduced difference in selection rate:
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
     >>> selection_rate_group_summary(y_true, y_pred_mitigated, sensitive_features=sex)
-    {'overall': 0.15503209360891865, 'by_group': {'female': 0.142976511001764, 'male': 0.160991280403855}}
+    {'overall': 0.155..., 'by_group': {'female': 0.142..., 'male': 0.160...}}
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard
