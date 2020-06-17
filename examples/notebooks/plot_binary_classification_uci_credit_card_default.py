@@ -3,6 +3,8 @@
 Binary Classification with the UCI Credit-card Default Dataset
 ==============================================================
 """
+print(__doc__)
+
 # %%
 # Mitigating disparities in accuracy as measured by equalized-odds difference
 #
@@ -69,8 +71,6 @@ Binary Classification with the UCI Credit-card Default Dataset
 # that it is insufficient to simply remove the sensitive feature (in this case
 # sex) from training. We then use Fairlearn to mitigate this disparity in
 # accuracy with either `ThresholdOptimizer` or `GridSearch`.
-
-print(__doc__)
 
 # General imports
 import numpy as np

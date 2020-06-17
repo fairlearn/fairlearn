@@ -3,6 +3,8 @@
 Binary Classification on COMPAS dataset
 =======================================
 """
+print(__doc__)
+
 # %%
 # Getting and preparing the data
 # ------------------------------
@@ -15,8 +17,6 @@ Binary Classification on COMPAS dataset
 # sex, age, as well as information on prior incidents.
 #
 # To start, let's download the dataset using `tempeh`
-
-print(__doc__)
 
 import pandas as pd
 import numpy as np

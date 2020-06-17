@@ -27,7 +27,7 @@ jobs:
       - run:
           name: 'Build'
           command: python -m sphinx -b html -j auto docs docs/_build/html
-          no_output_timeout: 30m
+          no_output_timeout: 15m
 
       - persist_to_workspace:
           root: docs/_build

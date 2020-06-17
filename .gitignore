@@ -67,9 +67,6 @@ instance/
 docs/_build/
 docs/auto_examples/
 
-# synced ipynb files with jupytext
-/examples/notebooks/*.ipynb
-
 # PyBuilder
 target/
 
