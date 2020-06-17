@@ -86,19 +86,19 @@ we can evaluate metrics to get a group summary as below:
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> 
-    >>> classifier = DecisionTreeClassifier()
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> classifier.fit(X, y_true)
     >>> 
     >>> y_pred = classifier.predict(X)
     >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.976413500813857, 'by_group': {'female': 0.9958221149382601, 'male': 0.9668196420376319}}
+    {'overall': 0.8445686557538159, 'by_group': {'female': 0.9256336459010306, 'male': 0.8044974759063791}}
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
 
     >>> from fairlearn.metrics import selection_rate_group_summary
     >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.2249623783053346, 'by_group': {'female': 0.1065824900194968, 'male': 0.28347865993575033}}
+    {'overall': 0.1615429501550935, 'by_group': {'female': 0.059418809766966854, 'male': 0.21202386415787058}}
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
@@ -137,13 +137,13 @@ a vastly reduced difference in selection rate:
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>> 
     >>> constraint = DemographicParity()
-    >>> classifier = DecisionTreeClassifier()
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
     >>> selection_rate_group_summary(y_true, y_pred_mitigated, sensitive_features=sex)
-    {'overall': 0.2674057922053991, 'by_group': {'female': 0.2603286602915235, 'male': 0.27090408444240477}}
+    {'overall': 0.15503209360891865, 'by_group': {'female': 0.142976511001764, 'male': 0.160991280403855}}
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard
