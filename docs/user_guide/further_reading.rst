@@ -29,6 +29,7 @@ A selection of these follows:
 - `A Survey on Bias and Fairness in Machine Learning <https://arxiv.org/abs/1908.09635>`_ (Mehrabi et al., 2019)
 - `Fairness and Abstraction in Sociotechnical Systems <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3265913>`_ (Selbst et al., 2018)
 
-A paper discussing a process (using checklists) to ensure that fairness
+A paper discussing a process (using checklists) to ensure that fairness is considered
+throughout the lifecycle of AI systems:
 
 - `Co-Designing Checklists to Understand Organizational Challenges and Opportunities around Fairness in AI <https://dl.acm.org/doi/abs/10.1145/3313831.3376445>`_ (Madaio et al., 2020)
