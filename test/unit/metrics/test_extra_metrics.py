@@ -52,7 +52,8 @@ class TestGetLabelsForConfusionMatrix:
 
     def test_too_many_values(self):
         expected_msg = "Must have no more than two unique y values"
-        expected_msg_no_pos = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
+        expected_msg_no_pos = \
+            "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
         with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 1, 2], None)
         assert str(e0.value) in {expected_msg, expected_msg_no_pos}
