@@ -7,7 +7,6 @@ import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
 from fairlearn.metrics._extra_metrics import _get_labels_for_confusion_matrix
-from fairlearn.metrics._extra_metrics import _NO_SUCH_ELEMENT
 
 # =============================================
 
@@ -37,31 +36,32 @@ class TestGetLabelsForConfusionMatrix:
         r1 = _get_labels_for_confusion_matrix([-1], None)
         assert np.array_equal(r1, [-1, 1])
         r2 = _get_labels_for_confusion_matrix([1], None)
-        assert np.array_equal(r2, [_NO_SUCH_ELEMENT, 1])
+        assert np.array_equal(r2, [None, 1])
 
     def test_single_value_numeric_pos_label(self):
         r0 = _get_labels_for_confusion_matrix([0], 3)
         assert np.array_equal(r0, [0, 3])
         r1 = _get_labels_for_confusion_matrix([0], 0)
-        assert np.array_equal(r1, [_NO_SUCH_ELEMENT, 0])
+        assert np.array_equal(r1, [None, 0])
 
     def test_single_value_alpha_pos_label(self):
         r0 = _get_labels_for_confusion_matrix(['a'], 'a')
-        assert np.array_equal(r0, [_NO_SUCH_ELEMENT, 'a'])
+        assert np.array_equal(r0, [None, 'a'])
         r1 = _get_labels_for_confusion_matrix(['a'], 0)
         assert np.array_equal(r1, ['a', 0])
 
     def test_too_many_values(self):
         expected_msg = "Must have no more than two unique y values"
+        expected_msg_no_pos = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
         with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 1, 2], None)
-        assert str(e0.value) == expected_msg
+        assert str(e0.value) in {expected_msg, expected_msg_no_pos}
         with pytest.raises(ValueError) as e1:
             _get_labels_for_confusion_matrix(['a', 'b', 'c'], 'a')
         assert str(e1.value) == expected_msg
 
     def test_need_pos_label(self):
-        expected_msg = "If pos_label is not specified, values must be take from {0, 1} or {-1, 1}"
+        expected_msg = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
         with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 2], None)
         assert str(e0.value) == expected_msg
