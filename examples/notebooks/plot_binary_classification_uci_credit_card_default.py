@@ -141,7 +141,7 @@ for col in categorical_features:
 
 # %%
 # Introduce a synthetic feature
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# *****************************
 #
 # We manipulate the balance-limit feature `LIMIT_BAL` to make it highly
 # predictive for women but not for men. For example, we can imagine that a
