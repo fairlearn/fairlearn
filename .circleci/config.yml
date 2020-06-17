@@ -27,6 +27,7 @@ jobs:
       - run:
           name: 'Build doctest'
           command: python -m sphinx -b doctest -n -j auto docs docs/_build/html
+          no_output_timeout: 30m
 
       - run:
           name: 'Build html'
