@@ -79,7 +79,7 @@ Can the Fairlearn library recommend ways to make my model fairer?
     what fairness means for your particular problem.
     We aim to provide a rich discussion of the topic of fairness in machine learning
     on this website, together with links to the literature.
-    Once you have determined what fairness means for your machine pipeline,
+    Once you have determined what fairness means for your AI system,
     you can then work out how to use the various algorithms and fairness metrics
     which Fairlearn supports to develop models which are
     *fairer by the standard you have chosen*.
