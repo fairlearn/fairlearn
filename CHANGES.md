@@ -5,6 +5,8 @@
 * Adjust classes to abide by naming conventions for attributes.
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
   `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.
+* Add new constraints and objectives in `ThresholdOptimizer`
+* Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
 
 ### v0.4.6
 * Handle case where reductions relabeling results in a single class

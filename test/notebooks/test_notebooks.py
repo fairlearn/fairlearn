@@ -109,7 +109,7 @@ def test_binary_classification_on_compas_dataset():
 
     test_values = {}
     test_values["pp_eo_aa_pignore"] = ScrapSpec(
-        "postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature['African-American']._p_ignore",  # noqa: E501
+        "postprocessed_predictor_EO.interpolated_thresholder_.interpolation_dict['African-American'].p_ignore",  # noqa: E501
         pytest.approx(0.2320703126)
     )
 
