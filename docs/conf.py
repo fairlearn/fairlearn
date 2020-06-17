@@ -38,14 +38,14 @@ release = fairlearn.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.linkcode",
-    "sphinx.ext.extlinks",
-    "sphinx.ext.mathjax",
-    "sphinx_gallery.gen_gallery",
-    "sphinx.ext.doctest"
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.linkcode',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
+    'sphinx_gallery.gen_gallery'
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -109,8 +109,8 @@ pygments_style = 'sphinx'
 # quickstart examples are only generated, but not shown in the gallery
 # since they are only needed for the quickstart page itself.
 sphinx_gallery_conf = {
-     'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
-     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
+    'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
+    'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
 
@@ -164,6 +164,6 @@ mathjax_config = {
             "E": '{\\mathbb{E}}',
             "P": '{\\mathbb{P}}',
             "given": '\\mathbin{\\vert}'
-            }
         }
     }
+}
