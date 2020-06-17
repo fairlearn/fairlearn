@@ -220,7 +220,6 @@ plt.show()
 # important feature in this model although it has no predictive power for an
 # entire demographic segment in the data.
 
-
 # Helper functions
 def get_metrics_df(models_dict, y_true, group):
     metrics_dict = {
