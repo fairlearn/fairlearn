@@ -78,6 +78,7 @@ the following set of labels:
     13       1       0                     d
     14       1       0                     c
     15       1       1                     c
+    <BLANKLINE>
 
 We then calculate a group metric:
 
