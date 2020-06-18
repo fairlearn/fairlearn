@@ -59,6 +59,8 @@ the following set of labels:
     >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c',
     ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
     >>> pd.set_option('expand_frame_repr', True)
+    >>> pd.set_option('display.max_columns', 20)
+    >>> pd.set_option('display.width', 80)
     >>> pd.DataFrame({ 'Y_true': Y_true,
     ...                'Y_pred': Y_pred,
     ...                'group_membership_data': group_membership_data})
