@@ -1,16 +1,16 @@
 Contributing example notebooks
 ------------------------------
 
-To contribute new example notebooks please submit a pull request. We have
-certain requirements that need to be satisfied to contribute a notebook. Those
-include:
+We'd love to collaborate with anyone interested in describing scenarios for using fairlearn!
 
-* Clear structure
-* Appropriate framing of the problem while respecting that fairness is a
-  fundamentally sociotechnical challenge
-* Usage of at least some part of Fairlearn
+When discussing and critiquing examples, here are some lenses to consider:
 
-Good examples of existing notebooks that abide by these requirements are:
+Microrubric for critiques:
+"""""""""""""""""""""
+1. **Deployment context**: Describes a real deployment context, not just a dataset.
+2. **For developers**: Speaks the language of developers and data scientists.  Considers real practitioner needs.  Fits within the lifecycle of real practioner work.  See `Holstein et al (2019) <https://arxiv.org/pdf/1812.05239.pdf>`_, `Madaio et al. (2020) <http://www.jennwv.com/papers/checklists.pdf>`_.
+3. **Sociotechnical**: Models the team's value that fairness as a sociotechnical challenge.    Avoids abstraction traps.  See `Selbst et al. (2020) <https://andrewselbst.files.wordpress.com/2019/10/selbst-et-al-fairness-and-abstraction-in-sociotechnical-systems.pdf>`_.
+4. **Open**:  Discusses tradeoffs and compares alternatives.  Illustrates how fairlearn contributes.
+5. **Real harms**: Focuses on real harms to real people.  See `Blodget et al. (2020) <https://arxiv.org/abs/2005.14050>`_.
 
-* `Mitigating Disparities in Ranking from Binary Data <https://github.com/fairlearn/fairlearn/blob/master/notebooks/Mitigating%20Disparities%20in%20Ranking%20from%20Binary%20Data.ipynb>`_
-* `Binary Classification with the UCI Credit-card Default Dataset <https://github.com/fairlearn/fairlearn/blob/master/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb>`_
+If you'd like to collaborate, please reach out in gitter or open an issue!
