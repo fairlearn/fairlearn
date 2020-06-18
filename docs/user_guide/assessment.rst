@@ -53,7 +53,7 @@ the following set of labels:
     >>> import pandas as pd
     >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c', 'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
     >>> pd.DataFrame({ 'Y_true': Y_true, 'Y_pred': Y_pred, 'group_membership_data': group_membership_data})
-    Y_true  Y_pred group_membership_data
+        Y_true  Y_pred group_membership_data
     0        0       0                     d
     1        1       0                     a
     2        1       1                     c
@@ -120,8 +120,8 @@ is called :py:func:`fairlearn.metrics.make_metric_group_summary`:
     >>> recall_score_group_summary = flm.make_metric_group_summary(skm.recall_score)
     >>> results = recall_score_group_summary(Y_true, Y_pred, sensitive_features=group_membership_data)
     >>> print("Overall recall = ", results.overall)
-    >>> print("recall by groups = ", results.by_group)
     Overall recall =  0.5
+    >>> print("recall by groups = ", results.by_group)
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 .. _dashboard:
