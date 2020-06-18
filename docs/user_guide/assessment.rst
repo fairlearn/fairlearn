@@ -53,7 +53,7 @@ Suppose in addition to the :math:`Y_{true}` and :math:`Y_{pred}` above, we had
 the following set of labels:
 
 .. doctest:: assessment_metrics
-    :options: +NORMALIZE_WHITESPACE
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> import pandas as pd
     >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c',
