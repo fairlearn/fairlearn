@@ -32,6 +32,8 @@ input data. The `scikit-learn` package implements this in
 Suppose we have the following data we can see that the prediction is `1` in five
 of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 
+.. doctest::
+
     >>> import sklearn.metrics as skm
     >>> Y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
     >>> Y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
@@ -49,6 +51,9 @@ set of data.
 
 Suppose in addition to the :math:`Y_{true}` and :math:`Y_{pred}` above, we had
 the following set of labels:
+
+.. doctest::
+    :options: +NORMALIZE_WHITESPACE
 
     >>> import pandas as pd
     >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c', 'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
@@ -72,10 +77,13 @@ the following set of labels:
     15       1       1                     c
 
     >>> import fairlearn.metrics as flm
-    >>> group_metrics = flm.group_summary(skm.recall_score, Y_true, Y_pred, sensitive_features=group_membership_data, sample_weight=None)
+    >>> group_metrics = flm.group_summary(skm.recall_score, 
+    ...                                   Y_true, Y_pred,
+    ...                                   sensitive_features=group_membership_data,
+    ...                                   sample_weight=None)
     >>> print("Overall recall = ", group_metrics.overall)
-    Overall recall =  0.5
     >>> print("recall by groups = ", group_metrics.by_group)
+    Overall recall =  0.5
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 Note that the overall recall is the same as that calculated above in the
