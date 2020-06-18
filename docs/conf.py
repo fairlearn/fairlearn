@@ -111,6 +111,7 @@ pygments_style = 'sphinx'
 sphinx_gallery_conf = {
     'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
+    'show_memory': False,
 }
 
 
