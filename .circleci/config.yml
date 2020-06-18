@@ -26,12 +26,12 @@ jobs:
       
       - run:
           name: 'Build doctest'
-          command: python -m sphinx -b doctest -n -j auto docs docs/_build/html
+          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
 
       - run:
           name: 'Build html'
-          command: python -m sphinx -b html -n -j auto docs docs/_build/html
+          command: python -m sphinx -v -b html -n -j auto docs docs/_build/html
           no_output_timeout: 30m
 
       - persist_to_workspace:
