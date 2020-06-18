@@ -61,23 +61,23 @@ the following set of labels:
     >>> pd.DataFrame({ 'Y_true': Y_true,
     ...                'Y_pred': Y_pred,
     ...                'group_membership_data': group_membership_data})
-             Y_true  Y_pred     group_membership_data
-    0        0       0          d
-    1        1       0          a
-    2        1       1          c
-    3        1       0          b
-    4        1       1          b
-    5        0       1          c
-    6        1       1          c
-    7        0       0          c
-    8        1       0          b
-    9        0       1          d
-    10       0       1          c
-    11       0       1          a
-    12       1       1          b
-    13       1       0          d
-    14       1       0          c
-    15       1       1          c
+        Y_true  Y_pred group_membership_data
+    0        0       0                     d
+    1        1       0                     a
+    2        1       1                     c
+    3        1       0                     b
+    4        1       1                     b
+    5        0       1                     c
+    6        1       1                     c
+    7        0       0                     c
+    8        1       0                     b
+    9        0       1                     d
+    10       0       1                     c
+    11       0       1                     a
+    12       1       1                     b
+    13       1       0                     d
+    14       1       0                     c
+    15       1       1                     c
 
 We then calculate a group metric:
 
