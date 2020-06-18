@@ -86,8 +86,8 @@ We then calculate a group metric:
     ...                                   sensitive_features=group_membership_data,
     ...                                   sample_weight=None)
     >>> print("Overall recall = ", group_metrics.overall)
-    >>> print("recall by groups = ", group_metrics.by_group)
     Overall recall =  0.5
+    >>> print("recall by groups = ", group_metrics.by_group)
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 Note that the overall recall is the same as that calculated above in the
