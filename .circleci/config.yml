@@ -10,7 +10,6 @@ jobs:
   build-doc:
     docker:
       - image: circleci/python:3.7.3-stretch
-    resource_class: large
 
     working_directory: ~/tmp-fairlearn
     steps:
