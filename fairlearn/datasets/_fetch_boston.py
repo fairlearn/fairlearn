@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and contributors.
+# Licensed under the MIT License.
+
 import pathlib
 import warnings
 
@@ -101,7 +104,7 @@ def fetch_boston(*, cache=True, data_home=None,
     https://github.com/scikit-learn/scikit-learn/issues/16155
     """
     if warn:
-        msg = "You are about to use with an unfair dataset. Mind the `B` and `LSTAT` columns."
+        msg = "You are about to use with a dataset with known fairness issues."
         warnings.warn(DataFairnessWarning(msg))
     if not data_home:
         data_home = pathlib.Path().home() / ".fairlearn-data"
