@@ -10,3 +10,4 @@ API Reference
    fairlearn.postprocessing
    fairlearn.reductions
    fairlearn.widget
+   fairlearn.datasets
