@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and contributors. Vincent D. Warmerdam
 # Licensed under the MIT License.
 
 
