@@ -25,8 +25,12 @@ jobs:
           command: sudo pip install -r requirements.txt
       
       - run:
-          name: 'Build'
-          command: python -m sphinx -b html -j auto docs docs/_build/html
+          name: 'Build doctest'
+          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
+
+      - run:
+          name: 'Build html'
+          command: python -m sphinx -b html -n -j auto docs docs/_build/html
 
       - persist_to_workspace:
           root: docs/_build
