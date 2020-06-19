@@ -32,6 +32,8 @@ input data. The `scikit-learn` package implements this in
 Suppose we have the following data we can see that the prediction is `1` in five
 of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 
+.. doctest:: assessment_metrics
+
     >>> import sklearn.metrics as skm
     >>> Y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
     >>> Y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
@@ -50,10 +52,18 @@ set of data.
 Suppose in addition to the :math:`Y_{true}` and :math:`Y_{pred}` above, we had
 the following set of labels:
 
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
     >>> import pandas as pd
-    >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c', 'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
-    >>> pd.DataFrame({ 'Y_true': Y_true, 'Y_pred': Y_pred, 'group_membership_data': group_membership_data})
-    Y_true  Y_pred group_membership_data
+    >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c',
+    ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
+    >>> pd.set_option('display.max_columns', 20)
+    >>> pd.set_option('display.width', 80)
+    >>> pd.DataFrame({ 'Y_true': Y_true,
+    ...                'Y_pred': Y_pred,
+    ...                'group_membership_data': group_membership_data})
+        Y_true  Y_pred group_membership_data
     0        0       0                     d
     1        1       0                     a
     2        1       1                     c
@@ -70,9 +80,17 @@ the following set of labels:
     13       1       0                     d
     14       1       0                     c
     15       1       1                     c
+    <BLANKLINE>
+
+We then calculate a group metric:
+
+.. doctest:: assessment_metrics
 
     >>> import fairlearn.metrics as flm
-    >>> group_metrics = flm.group_summary(skm.recall_score, Y_true, Y_pred, sensitive_features=group_membership_data, sample_weight=None)
+    >>> group_metrics = flm.group_summary(skm.recall_score, 
+    ...                                   Y_true, Y_pred,
+    ...                                   sensitive_features=group_membership_data,
+    ...                                   sample_weight=None)
     >>> print("Overall recall = ", group_metrics.overall)
     Overall recall =  0.5
     >>> print("recall by groups = ", group_metrics.by_group)
@@ -85,6 +103,8 @@ we calculated by inspection from the table above.
 In addition to these basic scores, :py:func:`fairlearn.metrics` also provides
 convenience functions to recover the maximum and minimum values of the metric
 across groups and also the difference and ratio between the maximum and minimum:
+
+.. doctest:: assessment_metrics
 
     >>> print("min recall over groups = ", flm.group_min_from_summary(group_metrics))
     min recall over groups =  0.0
@@ -117,11 +137,13 @@ Rather than require a call to :code:`group_summary` each time, Fairlearn also
 provides a function which turns an ungrouped metric into a grouped one. This
 is called :py:func:`fairlearn.metrics.make_metric_group_summary`:
 
+.. doctest:: assessment_metrics
+
     >>> recall_score_group_summary = flm.make_metric_group_summary(skm.recall_score)
     >>> results = recall_score_group_summary(Y_true, Y_pred, sensitive_features=group_membership_data)
     >>> print("Overall recall = ", results.overall)
-    >>> print("recall by groups = ", results.by_group)
     Overall recall =  0.5
+    >>> print("recall by groups = ", results.by_group)
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 .. _dashboard:
