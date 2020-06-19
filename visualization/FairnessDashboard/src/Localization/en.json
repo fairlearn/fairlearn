@@ -1,5 +1,6 @@
 {
     "loremIpsum": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "_loremIpsum.comment": "DO NOT TRANSLATE. This is placeholder text the user will NOT see",
     "defaultClassNames": "Class {0}",
     "_defaultClassNames.comment": "models that output classes have this as the default class names when name are not given by the user",
     "defaultFeatureNames": "Sensitive feature {0}",
@@ -150,7 +151,9 @@
         "balancedRootMeanSquaredError": "Balanced RMSE",
         "balancedAccuracy": "Balanced accuracy",
         "f1Score": "F1-Score",
+        "_f1Score.comment": "Data science terminology: https://en.wikipedia.org/wiki/F1_score",
         "logLoss": "Log Loss",
+        "_logLoss.comment": "Data science terminology",
         "accuracyDescription": "The fraction of data points classified correctly.",
         "precisionDescription": "The fraction of data points classified correctly among those classified as 1.",
         "recallDescription": "The fraction of data points classified correctly among those whose true label is 1. Alternative names: true positive rate, sensitivity.",
