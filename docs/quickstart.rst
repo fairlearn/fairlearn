@@ -61,7 +61,7 @@ For this example we use the
 objective is to predict whether a person makes more (label 1) or less (0)
 than $50,000 a year.
 
-.. doctest::
+.. doctest:: quickstart
 
     >>> import numpy as np 
     >>> import matplotlib.pyplot as plt 
@@ -88,7 +88,7 @@ definitions from
 `scikit-learn <https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics>`_
 we can evaluate metrics to get a group summary as below:
 
-.. doctest::
+.. doctest:: quickstart
 
     >>> from fairlearn.metrics import group_summary
     >>> from sklearn.metrics import accuracy_score
@@ -104,7 +104,7 @@ we can evaluate metrics to get a group summary as below:
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
 
-.. doctest::
+.. doctest:: quickstart
 
     >>> from fairlearn.metrics import selection_rate_group_summary
     >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
@@ -113,7 +113,7 @@ selection rate, i.e., the percentage of the population with label 1:
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
 
-.. doctest::
+.. doctest:: quickstart
 
     >>> from fairlearn.widget import FairlearnDashboard
     >>> FairlearnDashboard(sensitive_features=sex,
@@ -145,6 +145,8 @@ such decisions. The Exponentiated Gradient mitigation technique used fits the
 provided classifier using Demographic Parity as the objective, leading to
 a vastly reduced difference in selection rate:
 
+.. doctest:: quickstart
+
     >>> from fairlearn.reductions import ExponentiatedGradient, DemographicParity
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>> 
@@ -160,6 +162,8 @@ a vastly reduced difference in selection rate:
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard
 through a multi-model comparison:
+
+.. doctest:: quickstart
 
     >>> FairlearnDashboard(sensitive_features=sex,
     ...                    sensitive_feature_names=['sex'],
