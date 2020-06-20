@@ -279,8 +279,8 @@ metric:
 
 .. _true_positive_rate_parity:
 
-True Positive Rate Parity
-^^^^^^^^^^^^^^^^^^^^^^^^^
+True Positive Rate Parity and False Positive Rate Parity
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A classifier :math:`h(X)` satisfies *True Positive Rate Parity* if
 
@@ -288,7 +288,15 @@ A classifier :math:`h(X)` satisfies *True Positive Rate Parity* if
 
     P[h(X) = 1 \given A = a, Y = 1] = P[h(X) = 1 \given Y = 1] \; \forall a
 
-Note that this formulation ignores what happens to samples with :math:`Y=0`.
+and *False Positive Rate Parity* if
+
+.. math::
+
+    P[h(X) = 1 \given A = a, Y = 0] = P[h(X) = 1 \given Y = 0] \; \forall a
+
+Note that this formulation of True Positive Rate Parity ignores what happens
+to samples with :math:`Y=0`, and the False Positive Rate Parity ignores
+:math:`Y=1`.
 Refer to :ref:`equalized_odds` for a constraint that extends this by
 considering all samples, i.e., the samples with :math:`Y=0` as well as the
 ones with :math:`Y=1`.
@@ -314,7 +322,8 @@ In practice this can be used in a difference-based version as follows:
                    b           0.238095
     dtype: float64
 
-    
+
+
 .. _equalized_odds:
     
 Equalized Odds
