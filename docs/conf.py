@@ -38,18 +38,19 @@ release = fairlearn.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.extlinks",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.linkcode",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
-    "sphinx_gallery.gen_gallery"
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.linkcode',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
+    'sphinx_gallery.gen_gallery'
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None)}
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -108,8 +109,8 @@ pygments_style = 'sphinx'
 # quickstart examples are only generated, but not shown in the gallery
 # since they are only needed for the quickstart page itself.
 sphinx_gallery_conf = {
-     'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
-     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
+    'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
+    'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
 
@@ -162,7 +163,7 @@ mathjax_config = {
         "Macros": {
             "E": '{\\mathbb{E}}',
             "P": '{\\mathbb{P}}',
-            "given": '\\mathbin{\\vert}',
-            }
+            "given": '\\mathbin{\\vert}'
         }
     }
+}

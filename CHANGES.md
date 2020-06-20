@@ -36,6 +36,8 @@
   guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
 * Added `TrueNegativeRateParity` to provide the opposite constraint of
   `TruePositiveRateParity` to be used with reductions techniques.
+* Add new constraints and objectives in `ThresholdOptimizer`
+* Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
 
 ### v0.4.6
 
