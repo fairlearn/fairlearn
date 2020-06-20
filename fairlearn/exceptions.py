@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors. Vincent D. Warmerdam
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 
