@@ -101,9 +101,9 @@ fairness or sensitive features. [#1]_ extends this to regression scenarios.
 
 From an API perspective this looks as follows in all situations
 
->>> reduction = Reduction(estimator, constraints, **kwargs)
->>> reduction.fit(X_train, y_train, sensitive_features=sensitive_features)
->>> reduction.predict(X_test)
+>>> reduction = Reduction(estimator, constraints, **kwargs)  # doctest: +SKIP
+>>> reduction.fit(X_train, y_train, sensitive_features=sensitive_features)  # doctest: +SKIP
+>>> reduction.predict(X_test)  # doctest: +SKIP
 
 Fairlearn doesn't impose restrictions on the referenced :code:`estimator`
 other than the existence of :code:`fit` and :code:`predict` methods.
@@ -150,7 +150,7 @@ The algorithms do not consider every kind of violation of these constraints,
 but rather violations that go beyond their :code:`difference_bound`. Such
 a difference-based constraint could be instantiated as
 
-    >>> ClassificationMoment(difference_bound=0.01)
+    >>> ClassificationMoment(difference_bound=0.01)  # doctest: +SKIP
 
 Note that achieving parity with the :code:`difference_bound` does not mean
 that the difference between the group with the highest metric value and the
@@ -226,7 +226,9 @@ Similarly, :code:`y_true` is technically irrelevant to the calculations
 because the underlying metric of Demographic Parity, selection rate, does not
 consider performance relative to the true labels, but rather proportions in
 the predicted labels.
- 
+
+.. doctest:: mitigation
+
     >>> from fairlearn.reductions import DemographicParity
     >>> from fairlearn.metrics import selection_rate_group_summary
     >>> import numpy as np
@@ -255,6 +257,8 @@ Rewriting this into a ratio-based constraint with :code:`ratio_bound`
 
 Revisiting the same example from above we get
 
+.. doctest:: mitigation
+
     >>> dp = DemographicParity(ratio_bound=0.9, ratio_bound_slack=0.01)
     >>> dp.load_data(X, y_pred, sensitive_features=sensitive_features)
     >>> dp.gamma(lambda X: y_pred)
@@ -280,6 +284,7 @@ metric:
     - \text{metric}_b + r \text{metric}_* = - 0.2 + 0.9 \times 0.4 = 0.16
 
 .. _true_positive_rate_parity:
+.. _false_positive_rate_parity:
 
 True Positive Rate Parity and False Positive Rate Parity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -304,14 +309,16 @@ considering all samples, i.e., the samples with :math:`Y=0` as well as the
 ones with :math:`Y=1`.
 
 In practice this can be used in a difference-based version as follows:
-    
+
+.. doctest:: mitigation
+
     >>> from fairlearn.reductions import TruePositiveRateParity
     >>> from fairlearn.metrics import true_positive_rate_group_summary
     >>> import numpy as np
     >>> tprp = TruePositiveRateParity(difference_bound=0.01)
     >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
-    >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
+    >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> true_positive_rate_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
@@ -324,7 +331,19 @@ In practice this can be used in a difference-based version as follows:
                    b           0.238095
     dtype: float64
 
+Similarly to other constraints a ratio-based version is also available:
 
+.. doctest:: mitigation
+
+    >>> tprp = TruePositiveRateParity(ratio_bound=0.9, ratio_bound_slack=0.01)
+    >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
+    >>> tprp.gamma(lambda X: y_pred)
+    sign  event    group_id
+    +     label=1  a           0.103571
+                   b          -0.271429
+    -     label=1  a          -0.235714
+                   b           0.180952
+    dtype: float64
 
 .. _equalized_odds:
     
@@ -337,6 +356,28 @@ A classifier :math:`h(X)` satisfies *Equalized Odds* if it satisfies both
 .. math::
 
     P[h(X) = y' \given A = a, Y = y] = P[h(X) = y' \given Y = y] \; \forall a, y, y'
+
+From a usage standpoint this works just like :ref:`true_positive_rate_parity`.
+The constraint violations with :code:`label=1` match exactly the ones from
+True Positive Rate Parity above, while the ones with :code:`label=0` represent
+the violations for False Positive Rate Parity.
+
+.. doctest:: mitigation
+
+    >>> from fairlearn.reductions import EqualizedOdds
+    >>> eo = EqualizedOdds(difference_bound=0.01)
+    >>> eo.load_data(X, y_true, sensitive_features=sensitive_features)
+    >>> eo.gamma(lambda X: y_pred)
+    sign  event    group_id
+    +     label=0  a          -0.333333
+                   b           0.166667
+          label=1  a           0.178571
+                   b          -0.238095
+    -     label=0  a           0.333333
+                   b          -0.166667
+          label=1  a          -0.178571
+                   b           0.238095
+    dtype: float64
 
 .. _error_rate_parity:
 
@@ -354,15 +395,44 @@ A classifier :math:`h(X)` satisfies *Error Rate Parity* if it satisfies
 
 This specifies that the error rate of any given group should not deviate from
 the overall error rate by more a :code:`difference_bound`.
+
+.. doctest:: mitigation
+
+    >>> from fairlearn.reductions import ErrorRateParity
+    >>> from fairlearn.metrics import accuracy_score_group_summary
+    >>> accuracy_score_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
+    {'overall': 0.6, 'by_group': {'a': 0.8, 'b': 0.4}}
+    >>> erp = ErrorRateParity(difference_bound=0.01)
+    >>> erp.load_data(X, y_true, sensitive_features=sensitive_features)
+    >>> erp.gamma(lambda X: y_pred)
+    sign  event  group_id
+    +     all    a          -0.2
+                 b           0.2
+    -     all    a           0.2
+                 b          -0.2
+    dtype: float64
+
 Similarly, *Error Rate Parity* can be expressed through a ratio constraint as
 
 .. math::
 
-   r <= \dfrac{\E[\lvert h(X) - Y \rvert \given A = a]}{\E[\lvert h(X) - Y \rvert]} <= \dfrac{1}{r} \; \forall a
+   r \leq \dfrac{\E[\lvert h(X) - Y \rvert \given A = a]}{\E[\lvert h(X) - Y \rvert]} \leq \dfrac{1}{r} \; \forall a
 
-with a :code:`ratio_bound` :math:`r`. A similar kind of slack to the
-:code:`difference_bound` from the difference-based formulation is applied in
-this ratio-based version, but it is referred to as :code:`ratio_bound_slack`.
+with a :code:`ratio_bound` :math:`r`. The usage is identical with other
+constraints:
+
+.. doctest:: mitigation
+
+    >>> from fairlearn.reductions import ErrorRateParity
+    >>> erp = ErrorRateParity(ratio_bound=0.9, ratio_bound_slack=0.01)
+    >>> erp.load_data(X, y_true, sensitive_features=sensitive_features)
+    >>> erp.gamma(lambda X: y_pred)
+    sign  event  group_id
+    +     all    a          -0.22
+                 b           0.14
+    -     all    a           0.16
+                 b          -0.24
+    dtype: float64
 
 .. _constraints_multi_class_classification:
 

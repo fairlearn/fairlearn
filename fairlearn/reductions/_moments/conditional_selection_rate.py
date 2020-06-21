@@ -231,8 +231,12 @@ class DemographicParity(UtilityParity):
 
 
 class TruePositiveRateParity(UtilityParity):
-    r"""Implementation of True Positive Rate Difference (Equal Opportunity
-    Difference) as a moment.
+    r"""Implementation of True Positive Rate Difference as a moment.
+
+    .. note:
+
+        True Positive Rate Difference is sometimes referred to as Equal
+        Opportunity Difference.
 
     Adds conditioning on label `Y=1` compared to Demographic parity, i.e.
 
