@@ -23,10 +23,6 @@ jobs:
       - run:
           name: 'Install required packages'
           command: sudo pip install -r requirements.txt
-      
-      - run:
-          name: 'Build doctest'
-          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
 
       - run:
           name: 'Build html'
@@ -39,6 +35,27 @@ jobs:
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
           path: docs/_build/html
+
+  build-doctest:
+    docker:
+      - image: circleci/python:3.7.3-stretch
+
+    working_directory: ~/tmp-fairlearn
+    steps:
+      # check out PR branch
+      - checkout
+
+      - run:
+          name: Upgrade pip, setuptools, and wheel before installing other dependencies
+          command: sudo python -m pip install --upgrade pip setuptools wheel
+      
+      - run:
+          name: 'Install required packages'
+          command: sudo pip install -r requirements.txt
+      
+      - run:
+          name: 'Build doctest'
+          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
       
   deploy-doc:
     docker:
@@ -84,6 +101,7 @@ workflows:
   build-webpage:
     jobs:
       - build-doc
+      - build-doctest
       - deploy-doc:
           requires:
             - build-doc
