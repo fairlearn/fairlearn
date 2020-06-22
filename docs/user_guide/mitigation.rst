@@ -20,7 +20,7 @@ Fairlearn contains the following algorithms for mitigating unfairness:
         *Approach to Fair Classification* [#2]_.
       - ✔
       - ✘ :superscript:`*`
-      - DP, EO, TPRP, ERR
+      - DP, EO, TPRP, FPRP, ERP
    *  - :code:`fairlearn.` :code:`reductions.` :code:`GridSearch`
       - Black-box approach described in Section 3.4 of *A Reductions*
         *Approach to Fair Classification* [#2]_. For regression it acts as a
@@ -29,7 +29,7 @@ Fairlearn contains the following algorithms for mitigating unfairness:
         *Algorithms* [#1]_.
       - ✔
       - ✔
-      - DP, EO, TPRP, ERR, BGL
+      - DP, EO, TPRP, FPRP, ERP, BGL
    *  - :code:`fairlearn.` :code:`postprocessing.` :code:`ThresholdOptimizer`
       - Postprocessing algorithm based on the paper *Equality of Opportunity*
         *in Supervised Learning* [#3]_. This technique takes as input an
@@ -42,8 +42,9 @@ Fairlearn contains the following algorithms for mitigating unfairness:
 
 .. [*] coming soon!
 
-DP refers to demographic parity, EO to equalized odds, TPRD to true positive
-rate difference, ERR to error rate ratio, and BGL to bounded group loss. For
+DP refers to Demographic Parity, EO to Equalized Odds, TPRP to True Positive
+Rate Parity, FPRP to False Positive Rate Parity, ERP to Rrror Rate Parity, and
+BGL to bounded group loss. For
 more information on the definitions refer to
 :ref:`fairness_in_machine_learning`. To request additional algorithms or
 fairness definitions, please open a
@@ -107,8 +108,9 @@ From an API perspective this looks as follows in all situations
 
 Fairlearn doesn't impose restrictions on the referenced :code:`estimator`
 other than the existence of :code:`fit` and :code:`predict` methods.
-At the moment, :code:`fit` also needs to provide a :code:`sample_weight`
-argument which the reductions techniques use to reweight samples.
+At the moment, the :code:`estimator`'s :code:`fit` method also needs to
+provide a :code:`sample_weight` argument which the reductions techniques use
+to reweight samples.
 In the future Fairlearn will provide functionality to handle this even
 without a :code:`sample_weight` argument.
 
@@ -143,7 +145,7 @@ population. This is internally represented as two inequalities
 
 .. math::
 
-    \text{metric}_a - \text{metric}_* \leq 0 \; \forall a
+    \text{metric}_a - \text{metric}_* \leq 0 \; \forall a \\
     -\text{metric}_a + \text{metric}_* \leq 0 \; \forall a
 
 The algorithms do not consider every kind of violation of these constraints,
@@ -172,29 +174,31 @@ separately as
 
 .. math::
 
-   r \leq \dfrac{\text{metric}_a}{\text{metric}_*} \; \forall a
+   r \leq \dfrac{\text{metric}_a}{\text{metric}_*} \; \forall a \\
    \dfrac{\text{metric}_a}{\text{metric}_*} \leq \dfrac{1}{r} \; \forall a
 
 and one step further in the equivalent form:
 
 .. math::
 
-   - \text{metric}_a + r \text{metric}_* \leq 0 \; \forall a
-   r \text{metric}_a - \text{metric}_* \leq 0 \; \forall a
+   - \text{metric}_a + r \cdot \text{metric}_* \leq 0 \; \forall a \\
+   r \cdot \text{metric}_a - \text{metric}_* \leq 0 \; \forall a
 
 To use a constraint in its ratio-based version simply indicate as much through
 its arguments
 
-    >>>> ClassificationMoment(ratio_bound=0.9, ratio_bound_slack=0.01)
+    >>> ClassificationMoment(ratio_bound=0.9, ratio_bound_slack=0.01)
 
 In other words, this means that
-:math:`0.9 \text{metric}_a \leq \text{metric}_*`, i.e., the metric value for
+:math:`0.9 \cdot \text{metric}_a \leq \text{metric}_*`, i.e., the metric value for
 each group needs to be at least 90% of the overall metric value, and
-:math:`0.9 \text{metric}_* \leq \text{metric}_a`, i.e., the overall metric
+:math:`0.9 \cdot \text{metric}_* \leq \text{metric}_a`, i.e., the overall metric
 value needs to be at least 90% of each group's metric value.
 
-It is not possible to specify both :code:`difference_bound` *and*
-:code:`ratio_bound` for the same constraint object.
+.. note::
+
+    It is not possible to specify both :code:`difference_bound` *and*
+    :code:`ratio_bound` for the same constraint object.
 
 .. _demographic_parity:
 
@@ -205,7 +209,7 @@ A classifier :math:`h(X)` satisfies *Demographic Parity* if
 
 .. math::
     
-    P[h(X) = y' \given A = a] = P[h(X) = y'] \; \forall a, y'
+    \P[h(X) = y' \given A = a] = \P[h(X) = y'] \; \forall a, y'
  
 In other words, the selection rate or percentage of samples with label 1
 should be equal between all groups. Implicitly this means the percentage
@@ -227,6 +231,13 @@ because the underlying metric of Demographic Parity, selection rate, does not
 consider performance relative to the true labels, but rather proportions in
 the predicted labels.
 
+.. note::
+
+    In mitigation examples we never need to call :code:`load_data` or
+    :code:`gamma` since the reductions techniques all automatically take care
+    of it. The example merely helps in illustrating the deviation from the
+    corresponding inequalities in :ref:`constraints_binary_classification`.
+
 .. doctest:: mitigation
 
     >>> from fairlearn.reductions import DemographicParity
@@ -237,7 +248,7 @@ the predicted labels.
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> selection_rate_group_summary(y_pred, y_pred, sensitive_features=sensitive_features)
+    >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
     {'overall': 0.4, 'by_group': {'a': 0.6, 'b': 0.2}}
     >>> dp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> dp.gamma(lambda X: y_pred)
@@ -253,7 +264,7 @@ Rewriting this into a ratio-based constraint with :code:`ratio_bound`
 
 .. math::
 
-    r \leq \dfrac{P[h(X) = y' \given A = a]}{P[h(X) = y']} \leq \dfrac{1}{r} \; \forall a, y'
+    r \leq \dfrac{\P[h(X) = y' \given A = a]}{\P[h(X) = y']} \leq \dfrac{1}{r} \; \forall a, y'
 
 Revisiting the same example from above we get
 
@@ -278,10 +289,10 @@ metric:
 
 .. math::
 
-    r \text{metric}_a - \text{metric}_* = 0.9 \times 0.6 - 0.4 = 0.14
-    r \text{metric}_b - \text{metric}_* = 0.9 \times 0.2 - 0.4 = -0.22
-    - \text{metric}_a + r \text{metric}_* = - 0.6 + 0.9 \times 0.4 = -0.24
-    - \text{metric}_b + r \text{metric}_* = - 0.2 + 0.9 \times 0.4 = 0.16
+    r \cdot \text{metric}_a - \text{metric}_* = 0.9 \times 0.6 - 0.4 = 0.14 \\
+    r \cdot \text{metric}_b - \text{metric}_* = 0.9 \times 0.2 - 0.4 = -0.22 \\
+    - \text{metric}_a + r \cdot \text{metric}_* = - 0.6 + 0.9 \times 0.4 = -0.24 \\
+    - \text{metric}_b + r \cdot \text{metric}_* = - 0.2 + 0.9 \times 0.4 = 0.16 \\
 
 .. _true_positive_rate_parity:
 .. _false_positive_rate_parity:
@@ -293,13 +304,13 @@ A classifier :math:`h(X)` satisfies *True Positive Rate Parity* if
 
 .. math::
 
-    P[h(X) = 1 \given A = a, Y = 1] = P[h(X) = 1 \given Y = 1] \; \forall a
+    \P[h(X) = 1 \given A = a, Y = 1] = \P[h(X) = 1 \given Y = 1] \; \forall a
 
 and *False Positive Rate Parity* if
 
 .. math::
 
-    P[h(X) = 1 \given A = a, Y = 0] = P[h(X) = 1 \given Y = 0] \; \forall a
+    \P[h(X) = 1 \given A = a, Y = 0] = \P[h(X) = 1 \given Y = 0] \; \forall a
 
 Note that this formulation of True Positive Rate Parity ignores what happens
 to samples with :math:`Y=0`, and the False Positive Rate Parity ignores
@@ -320,9 +331,9 @@ In practice this can be used in a difference-based version as follows:
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> true_positive_rate_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
     {'overall': 0.5714285714285714, 'by_group': {'a': 0.75, 'b': 0.3333333333333333}}
+    >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
     +     label=1  a           0.178571
@@ -330,6 +341,13 @@ In practice this can be used in a difference-based version as follows:
     -     label=1  a          -0.178571
                    b           0.238095
     dtype: float64
+
+.. note::
+
+    In mitigation examples we never need to call :code:`load_data` or
+    :code:`gamma` since the reductions techniques all automatically take care
+    of it. The example merely helps in illustrating the deviation from the
+    corresponding inequalities in :ref:`constraints_binary_classification`.
 
 Similarly to other constraints a ratio-based version is also available:
 
@@ -355,7 +373,7 @@ A classifier :math:`h(X)` satisfies *Equalized Odds* if it satisfies both
 
 .. math::
 
-    P[h(X) = y' \given A = a, Y = y] = P[h(X) = y' \given Y = y] \; \forall a, y, y'
+    \P[h(X) = y' \given A = a, Y = y] = \P[h(X) = y' \given Y = y] \; \forall a, y, y'
 
 From a usage standpoint this works just like :ref:`true_positive_rate_parity`.
 The constraint violations with :code:`label=1` match exactly the ones from
@@ -412,6 +430,13 @@ the overall error rate by more a :code:`difference_bound`.
                  b          -0.2
     dtype: float64
 
+.. note::
+
+    In mitigation examples we never need to call :code:`load_data` or
+    :code:`gamma` since the reductions techniques all automatically take care
+    of it. The example merely helps in illustrating the deviation from the
+    corresponding inequalities in :ref:`constraints_binary_classification`.
+
 Similarly, *Error Rate Parity* can be expressed through a ratio constraint as
 
 .. math::
@@ -450,14 +475,14 @@ Constraints for regression
 The performance objective in the regression scenario is to minimize the
 loss of our classifier :math:`h`.
 
-BoundedGroupLoss
-^^^^^^^^^^^^^^^^
+Bounded Group Loss
+^^^^^^^^^^^^^^^^^^
 
 Exponentiated Gradient
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 Grid Search
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 .. topic:: References:
 
@@ -472,4 +497,4 @@ Grid Search
    .. [#3] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
       Learning"
       <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
-      NIPS, 2016.
+      NeurIPS, 2016.
