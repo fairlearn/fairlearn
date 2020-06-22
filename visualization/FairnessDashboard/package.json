@@ -13,7 +13,9 @@
     "build": "tsc",
     "build-css": "node-sass-chokidar src/ -o rel/ && node-sass-chokidar src/ -o rel/FairnessDashboard",
     "build-dev": "npm run build && npm run copy",
-    "copy": "xcopy \"rel\" \"..\\test\\test-page\\node_modules\\fairlearn-dashboard\\rel\" /e /y"
+    "copy": "xcopy \"rel\" \"..\\test\\test-page\\node_modules\\fairlearn-dashboard\\rel\" /e /y",
+    "lintci": "eslint \"**/*.{js,ts,tsx}\" --quiet",
+    "lint": "eslint \"**/*.{js,ts,tsx}\" --quiet --fix"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
@@ -22,9 +24,16 @@
     "@types/plotly.js-dist": "npm:@types/plotly.js",
     "@types/react": "16.8.10",
     "@types/uuid": "3.4.4",
+    "@typescript-eslint/eslint-plugin": "^3.3.0",
+    "@typescript-eslint/parser": "^3.3.0",
+    "eslint": "^7.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.8.0",
     "node-sass-chokidar": "1.3.4",
+    "prettier": "^2.0.5",
     "react-test-renderer": "^16.8.6",
     "ts-jest": "^24.0.2",
     "typescript": "^3.5.2"
