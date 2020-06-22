@@ -19,7 +19,6 @@ import zhcn from "./zh-CN.json";
 import zhtw from "./zh-TW.json";
 
 
-
 export const localization = new LocalizedStrings({
     en,
     cs,

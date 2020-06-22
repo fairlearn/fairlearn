@@ -1,8 +1,8 @@
-import { Stack } from "office-ui-fabric-react/lib/Stack";
-import { Text } from "office-ui-fabric-react/lib/Text";
-import React from "react";
-import { localization } from "../Localization/localization";
-import { SummaryTableStyles } from "./SummaryTable.styles";
+import { Stack } from 'office-ui-fabric-react/lib/Stack';
+import { Text } from 'office-ui-fabric-react/lib/Text';
+import React from 'react';
+import { localization } from '../Localization/localization';
+import { SummaryTableStyles } from './SummaryTable.styles';
 
 export interface ISummaryTableProps {
     binValues: number[];
@@ -19,7 +19,7 @@ interface IBinItem {
     isMax: boolean;
 }
 
-export class SummaryTable extends React.PureComponent<ISummaryTableProps> {    
+export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
     public render(): React.ReactNode {
         const styles = SummaryTableStyles();
         let minIndexes = [];
@@ -47,27 +47,42 @@ export class SummaryTable extends React.PureComponent<ISummaryTableProps> {
         return (
             <div className={styles.frame}>
                 <div className={styles.groupCol}>
-                    <Text variant={"small"} className={styles.groupLabel}>{this.props.binGroup}</Text>
+                    <Text variant={'small'} className={styles.groupLabel}>
+                        {this.props.binGroup}
+                    </Text>
                     <div className={styles.flexCol}>
                         {this.props.binLabels.map((label, index) => {
-                            return (<div className={styles.binBox} key={index}>
-                                <Text className={styles.binTitle}>{label}</Text>
-                                <Stack horizontal>
-                                    {minIndexes.includes(index) && <Text variant={"xSmall"} className={styles.minMaxLabel}>{localization.Report.minTag}</Text>}
-                                    {maxIndexes.includes(index) && <Text variant={"xSmall"} className={styles.minMaxLabel}>{localization.Report.maxTag}</Text>}
-                                </Stack>
-                            </div>)
+                            return (
+                                <div className={styles.binBox} key={index}>
+                                    <Text className={styles.binTitle}>{label}</Text>
+                                    <Stack horizontal>
+                                        {minIndexes.includes(index) && (
+                                            <Text variant={'xSmall'} className={styles.minMaxLabel}>
+                                                {localization.Report.minTag}
+                                            </Text>
+                                        )}
+                                        {maxIndexes.includes(index) && (
+                                            <Text variant={'xSmall'} className={styles.minMaxLabel}>
+                                                {localization.Report.maxTag}
+                                            </Text>
+                                        )}
+                                    </Stack>
+                                </div>
+                            );
                         })}
                     </div>
                 </div>
                 <div className={styles.metricCol}>
-                    <Text variant={"small"} className={styles.metricLabel}>{this.props.metricLabel}</Text>
+                    <Text variant={'small'} className={styles.metricLabel}>
+                        {this.props.metricLabel}
+                    </Text>
                     <div className={styles.flexCol}>
                         {this.props.formattedBinValues.map((value, index) => {
                             return (
-                            <Text variant={"xLargePlus"} className={styles.metricBox} key={index}>
-                                {value !== undefined ? value : 'empty'}
-                            </Text>);
+                                <Text variant={'xLargePlus'} className={styles.metricBox} key={index}>
+                                    {value !== undefined ? value : 'empty'}
+                                </Text>
+                            );
                         })}
                     </div>
                 </div>

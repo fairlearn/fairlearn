@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets } from 'office-ui-fabric-react';
 
 export interface IDataSpecificationBladeStyles {
     title: IStyle;
@@ -11,17 +11,17 @@ export const DataSpecificationBladeStyles: () => IProcessedStyleSet<IDataSpecifi
     return mergeStyleSets<IDataSpecificationBladeStyles>({
         title: {
             color: theme.semanticColors.bodyText,
-            height: "20px",
-            paddingBottom: "10px"
+            height: '20px',
+            paddingBottom: '10px',
         },
         frame: {
-            paddingTop:"35px",
-            paddingLeft:"60px",
-            width: "120px",
-            boxSizing: "content-box"
+            paddingTop: '35px',
+            paddingLeft: '60px',
+            width: '120px',
+            boxSizing: 'content-box',
         },
         text: {
-            color: theme.semanticColors.bodyText
-        }
+            color: theme.semanticColors.bodyText,
+        },
     });
 };

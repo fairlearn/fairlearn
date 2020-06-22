@@ -1,2 +1,2 @@
-export * from "./FairnessWizard";
-export * from "./IFairnessProps"
+export * from './FairnessWizard';
+export * from './IFairnessProps';
