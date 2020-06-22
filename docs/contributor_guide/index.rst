@@ -44,3 +44,15 @@ All are welcome! Please reach out via
 `Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
 invitation to you.
 We keep notes from each meeting in the :ref:`developer_call_notes`.
+
+.. _notebook_deep_dive:
+
+Notebook deep dives
+-------------------
+
+We are currently experimenting with weekly notebook deep dives.
+They take place on Thursday at 11am New York City time whenever there is no
+:ref:`developer call <developer_calls>`.
+Please reach out via
+`Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
+invitation to you.
