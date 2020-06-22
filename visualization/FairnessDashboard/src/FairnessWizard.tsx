@@ -188,6 +188,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
     constructor(props: IFairnessProps) {
         super(props);
         FairnessWizard.initializeIcons(props);
+        if (this.props.locale) {
+            localization.setLanguage(this.props.locale);
+        }
         let accuracyMetrics: IAccuracyOption[];
         loadTheme(props.theme || defaultTheme);
         this.selections = new SelectionContext("models", 1);
