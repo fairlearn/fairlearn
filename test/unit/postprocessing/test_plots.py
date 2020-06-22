@@ -1,20 +1,11 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
-# On MacOS we need to use TKAgg before importing matplotlib.pyplot.
-# This used to work on all platforms until matplotlib 3.2.0 broke it on Linux.
-# Consider removing the OS-based if after a future release of matplotlib (issue #320).
-import platform
-if platform.system() == "Darwin":
-    import matplotlib
-    matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt  # noqa: E402
-import pkg_resources  # noqa: E402
-import pytest  # noqa: E402
-from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer  # noqa: E402
-from fairlearn.postprocessing._constants import DEMOGRAPHIC_PARITY, EQUALIZED_ODDS  # noqa: E402
+import pkg_resources
+import pytest
+from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 
-from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3  # noqa: E402
+from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3
 
 
 PYTEST_MPL_NOT_INSTALLED_MSG = "skipping plotting tests because pytest-mpl is not installed"
@@ -31,6 +22,8 @@ generated images with the baseline plots (using pytest --mpl)."""
 
 
 def _fit_and_plot(constraints, plotting_data):
+    import matplotlib.pyplot as plt
+
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints=constraints)
     adjusted_predictor.fit(plotting_data.X, plotting_data.y,
@@ -50,36 +43,27 @@ def is_mpl_installed():
 
 
 @pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-@pytest.mark.mpl_image_compare(filename="equalized_odds_ex1.png")
-def test_plot_equalized_odds_ex1():
-    return _fit_and_plot(EQUALIZED_ODDS, _data_ex1)
+class TestPlots:
+    @pytest.mark.mpl_image_compare(filename="equalized_odds_ex1.png")
+    def test_plot_equalized_odds_ex1(self):
+        return _fit_and_plot('equalized_odds', _data_ex1)
 
+    @pytest.mark.mpl_image_compare(filename="equalized_odds_ex2.png")
+    def test_plot_equalized_odds_ex2(self):
+        return _fit_and_plot('equalized_odds', _data_ex2)
 
-@pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-@pytest.mark.mpl_image_compare(filename="equalized_odds_ex2.png")
-def test_plot_equalized_odds_ex2():
-    return _fit_and_plot(EQUALIZED_ODDS, _data_ex2)
+    @pytest.mark.mpl_image_compare(filename="equalized_odds_ex3.png")
+    def test_plot_equalized_odds_ex3(self):
+        return _fit_and_plot('equalized_odds', _data_ex3)
 
+    @pytest.mark.mpl_image_compare(filename="demographic_parity_ex1.png")
+    def test_plot_demographic_parity_ex1(self):
+        return _fit_and_plot('demographic_parity', _data_ex1)
 
-@pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-@pytest.mark.mpl_image_compare(filename="equalized_odds_ex3.png")
-def test_plot_equalized_odds_ex3():
-    return _fit_and_plot(EQUALIZED_ODDS, _data_ex3)
+    @pytest.mark.mpl_image_compare(filename="demographic_parity_ex2.png")
+    def test_plot_demographic_parity_ex2(self):
+        return _fit_and_plot('demographic_parity', _data_ex2)
 
-
-@pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-@pytest.mark.mpl_image_compare(filename="demographic_parity_ex1.png")
-def test_plot_demographic_parity_ex1():
-    return _fit_and_plot(DEMOGRAPHIC_PARITY, _data_ex1)
-
-
-@pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-@pytest.mark.mpl_image_compare(filename="demographic_parity_ex2.png")
-def test_plot_demographic_parity_ex2():
-    return _fit_and_plot(DEMOGRAPHIC_PARITY, _data_ex2)
-
-
-@pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-@pytest.mark.mpl_image_compare(filename="demographic_parity_ex3.png")
-def test_plot_demographic_parity_ex3():
-    return _fit_and_plot(DEMOGRAPHIC_PARITY, _data_ex3)
+    @pytest.mark.mpl_image_compare(filename="demographic_parity_ex3.png")
+    def test_plot_demographic_parity_ex3(self):
+        return _fit_and_plot('demographic_parity', _data_ex3)

@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -38,7 +38,7 @@ def test_smoke(Mitigator, constraints, Estimator, prefit):
     df['X1'] = df['X1'].astype('category')
 
     estimator = Estimator()
-    if not prefit:
+    if prefit:
         estimator.fit(df, Y)
 
     mitigator = Mitigator(estimator=estimator, constraints=constraints, prefit=prefit)

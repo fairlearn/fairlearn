@@ -1,125 +1,46 @@
-import React from "react";
-import { Stack } from "office-ui-fabric-react/lib/Stack";
-import { mergeStyleSets } from "@uifabric/styling";
-import { Text } from "office-ui-fabric-react/lib/Text";
-import { localization } from "../Localization/localization";
 import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { Stack } from "office-ui-fabric-react/lib/Stack";
+import { Text } from "office-ui-fabric-react";
+import React from "react";
+import { localization } from "../Localization/localization";
+import { IntroTabStyles } from "./IntroTab.styles";
 
 export interface IIntroTabProps {
     onNext: () => void;
 }
 
 export class IntroTab extends React.PureComponent <IIntroTabProps> {
-    private static readonly classNames = mergeStyleSets({
-        firstSection: {
-            padding: "43px 94px",
-            fontFamily: `"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif`,
-            backgroundColor: "#333333",
-            color: "#FFFFFF",
-        },
-        firstSectionTitle: {
-            fontSize: "60px",
-            lineHeight: "82px",
-            fontWeight: "100"
-        },
-        firstSectionSubtitle: {
-            fontSize: "60px",
-            lineHeight: "82px",
-            fontWeight: "500"
-        },
-        firstSectionBody: {
-            paddingTop: "30px",
-            paddingBottom: "70px",
-            maxWidth: "500px",
-            color: "#EBEBEB",
-            fontWeight: "300",
-            fontSize: "18px",
-            lineHeight: "24px",
-        },
-        lowerSection: {
-            padding: "50px 70px 90px 90px",
-            backgroundColor: "#F2F2F2",
-            color: "#333333",
-            flexGrow: 1
-        },
-        stepsContainer: {
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            borderBottom: "1px solid #CCCCCC",
-            paddingBottom: "38px"
-        },
-        boldStep: {
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "500",
-            maxWidth: "300px",
-            paddingRight: "25px",
-            flex: 1,
-        },
-        numericLabel: {
-            display:"inline-block",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "700",
-            color: "#000000",
-            width: "30px"
-        },
-        stepLabel: {
-            color: "#333333",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "500",
-        },
-        explanatoryStep: {
-            maxWidth: "300px",
-            paddingRight: "20px",
-            flex: 1
-        },
-        explanatoryText: {
-            paddingTop: "15px",
-            fontSize: "15px",
-            lineHeight: "20px",
-            color: "#666666"
-        },
-        getStarted: {
-            paddingTop: "30px",
-            color: "#333333",
-            fontSize: "18px",
-            lineHeight: "24px",
-            fontWeight: "500"
-        }
-    });
-
+    
     render(): React.ReactNode {
+        const styles = IntroTabStyles();
         return (<Stack style={{height: "100%"}}>
-            <div className={IntroTab.classNames.firstSection}>
-                <div className={IntroTab.classNames.firstSectionTitle}>{localization.Intro.welcome}</div>
-                <div className={IntroTab.classNames.firstSectionSubtitle}>{localization.Intro.fairlearnDashboard}</div>
-                <div className={IntroTab.classNames.firstSectionBody}>{localization.Intro.introBody}</div>
+            <div className={styles.firstSection}>
+                <Text className={styles.firstSectionTitle} block>{localization.Intro.welcome}</Text>
+                <Text className={styles.firstSectionSubtitle} block>{localization.Intro.fairlearnDashboard}</Text>
+                <Text variant={"large"} block>{localization.Intro.introBody}</Text>
             </div>
-            <div className={IntroTab.classNames.lowerSection}>
-                <div className={IntroTab.classNames.stepsContainer}>
-                    <div className={IntroTab.classNames.boldStep}>{localization.Intro.explanatoryStep}</div>
-                    <div className={IntroTab.classNames.explanatoryStep}>
+            <div className={styles.lowerSection}>
+                <div className={styles.stepsContainer}>
+                    <Text variant = {"large"} className={styles.boldStep}>{localization.Intro.explanatoryStep}</Text>
+                    <div className={styles.explanatoryStep}>
                         <div>
-                            <span className={IntroTab.classNames.numericLabel}>01</span>
-                            <span className={IntroTab.classNames.stepLabel}>{localization.Intro.features}</span>
+                            <Text variant={"large"} className={styles.numericLabel}>01</Text>
+                            <Text variant={"large"}>{localization.Intro.features}</Text>
                         </div>
-                        <div className={IntroTab.classNames.explanatoryText}>{localization.Intro.featuresInfo}</div>
+                        <Text className={styles.explanatoryText} block>{localization.Intro.featuresInfo}</Text>
                     </div>
-                    <div className={IntroTab.classNames.explanatoryStep}>
+                    <div className={styles.explanatoryStep}>
                         <div>
-                            <span className={IntroTab.classNames.numericLabel}>02</span>
-                            <span className={IntroTab.classNames.stepLabel}>{localization.Intro.accuracy}</span>
+                            <Text variant={"large"} className={styles.numericLabel}>02</Text>
+                            <Text variant={"large"}>{localization.Intro.accuracy}</Text>
                         </div>
-                        <div className={IntroTab.classNames.explanatoryText}>{localization.Intro.accuracyInfo}</div>
+                        <Text className={styles.explanatoryText} block>{localization.Intro.accuracyInfo}</Text>
                     </div>
                 </div>
                 <Stack horizontalAlign={"center"}>
                     <ActionButton 
                         iconProps={{iconName: "Forward"}}
-                        className={IntroTab.classNames.getStarted}
+                        className={styles.getStarted}
                         onClick={this.props.onNext}>{localization.Intro.getStarted}</ActionButton>
                 </Stack>
             </div>

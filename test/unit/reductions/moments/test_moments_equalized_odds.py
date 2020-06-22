@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -112,12 +112,12 @@ def test_project_lambda_smoke_negatives():
 
     df = pd.DataFrame()
     # Note that the '-' labels are larger
-    df = 0 + pd.Series([1, 2, 11, 19, 1001, 1110, 1230, 1350], index=midx)
+    df = 0 + pd.Series([1, 2, 11, 19, 1001, 1110, 1230, 1350], index=midx, dtype=np.float64)
 
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx)
+    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -135,12 +135,12 @@ def test_project_lambda_smoke_positives():
 
     df = pd.DataFrame()
     # Note that the '-' indices are now smaller
-    df = 0 + pd.Series([200, 300, 100, 600, 4, 5, 6, 7], index=midx)
+    df = 0 + pd.Series([200, 300, 100, 600, 4, 5, 6, 7], index=midx, dtype=np.float64)
 
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx)
+    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 

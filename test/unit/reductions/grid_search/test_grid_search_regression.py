@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch
@@ -12,6 +12,7 @@ import pytest
 from sklearn.linear_model import LinearRegression
 
 from test.unit.utility_functions import logging_all_close
+from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
 
 
 def _simple_regression_data(number_a0, number_a1,
@@ -54,27 +55,29 @@ def test_bgl_unfair(A_two_dim):
     a0_factor = 1
     a1_factor = 16
 
+    grid_size = 7
+
     X, Y, A = _simple_regression_data(a0_count, a1_count,
                                       a0_factor, a1_factor,
                                       a0_label, a1_label, A_two_dim)
 
     bgl_square_loss = GroupLossMoment(SquareLoss(-np.inf, np.inf))
-    target = GridSearch(LinearRegression(),
-                        constraints=bgl_square_loss,
-                        grid_size=7)
+    grid_search = GridSearch(LinearRegression(),
+                             constraints=bgl_square_loss,
+                             grid_size=grid_size)
 
-    target.fit(X, Y, sensitive_features=A)
+    grid_search.fit(X, Y, sensitive_features=A)
 
-    assert len(target.all_results) == 7
+    assert_n_grid_search_results(grid_size, grid_search)
 
     test_X = pd.DataFrame({"actual_feature": [0.2, 0.7],
                            "sensitive_features": [a0_label, a1_label],
                            "constant_ones_feature": [1, 1]})
 
-    best_predict = target.predict(test_X)
+    best_predict = grid_search.predict(test_X)
     assert np.allclose([-1.91764706,  9.61176471], best_predict)
 
-    all_predict = [r.predictor.predict(test_X) for r in target.all_results]
+    all_predict = [predictor.predict(test_X) for predictor in grid_search.predictors_]
 
     # TODO: investigate where the different outcomes for the first grid point are from, likely
     # due to some ignored data points at the edge resulting in another solution with the same
@@ -119,13 +122,13 @@ def test_bgl_unmitigated_same(A_two_dim):
     lagrange_balanced_series = pd.Series([1.0, 1.0], index=idx)
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
-    target = GridSearch(estimator,
-                        constraints=GroupLossMoment(ZeroOneLoss()),
-                        grid=grid_df)
-    target.fit(X, y, sensitive_features=A)
+    grid_search = GridSearch(estimator,
+                             constraints=GroupLossMoment(ZeroOneLoss()),
+                             grid=grid_df)
+    grid_search.fit(X, y, sensitive_features=A)
 
     raw_coef = unmitigated_estimator.coef_
-    gs_coef = target.best_result.predictor.coef_
+    gs_coef = grid_search.predictors_[grid_search.best_idx_].coef_
     # Can't quite get exact match, but this should be very close
     assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
@@ -163,30 +166,30 @@ def test_bgl_lagrange_specifications(A_two_dim):
                          l4_series],
                         axis=1)
 
-    target1 = GridSearch(copy.deepcopy(estimator),
-                         constraints=GroupLossMoment(ZeroOneLoss()),
-                         grid_size=5)
+    grid_search1 = GridSearch(copy.deepcopy(estimator),
+                              constraints=GroupLossMoment(ZeroOneLoss()),
+                              grid_size=5)
 
-    target2 = GridSearch(copy.deepcopy(estimator),
-                         constraints=GroupLossMoment(ZeroOneLoss()),
-                         grid=grid_df)
+    grid_search2 = GridSearch(copy.deepcopy(estimator),
+                              constraints=GroupLossMoment(ZeroOneLoss()),
+                              grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
 
-    target1.fit(X, y, sensitive_features=A)
-    target2.fit(X, y, sensitive_features=A)
+    grid_search1.fit(X, y, sensitive_features=A)
+    grid_search2.fit(X, y, sensitive_features=A)
 
-    assert len(target1.all_results) == len(tradeoffs)
-    assert len(target2.all_results) == len(tradeoffs)
+    assert_n_grid_search_results(len(tradeoffs), grid_search1)
+    assert_n_grid_search_results(len(tradeoffs), grid_search2)
 
     # Check we generated the same multipliers
     for i in range(len(tradeoffs)):
-        lm1 = target1.all_results[i].lambda_vec
-        lm2 = target2.all_results[i].lambda_vec
+        lm1 = grid_search1.lambda_vecs_[i]
+        lm2 = grid_search2.lambda_vecs_[i]
         assert lm1.equals(lm2)
 
     # Check the models are the same
     for i in range(len(tradeoffs)):
-        coef1 = target1.all_results[i].predictor.coef_
-        coef2 = target2.all_results[i].predictor.coef_
+        coef1 = grid_search1.predictors_[i].coef_
+        coef2 = grid_search2.predictors_[i].coef_
         assert np.array_equal(coef1, coef2)

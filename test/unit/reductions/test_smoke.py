@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -24,7 +24,8 @@ if platform.system() != "Darwin":
 @pytest.mark.parametrize("Mitigator", [ExponentiatedGradient, GridSearch])
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
 @pytest.mark.parametrize("Estimator", _ESTIMATORS)
-def test_smoke(Mitigator, Constraints, Estimator):
+@pytest.mark.parametrize("n_sensitive_feature_values", [2, 3, 4, 10])
+def test_smoke(Mitigator, Constraints, Estimator, n_sensitive_feature_values):
     # This test case ensures that input validation doesn't remove metadata from the input
     # matrix X, as described at https://github.com/fairlearn/fairlearn/issues/312
     np.random.seed(0)
@@ -32,7 +33,7 @@ def test_smoke(Mitigator, Constraints, Estimator):
     X0 = np.random.normal(size=n)
     X1 = np.random.choice([1, 2, 3], size=n)
     Y = np.random.choice([0, 1], size=n)
-    A = np.random.choice([0, 1], size=n)
+    A = np.random.choice(list(range(n_sensitive_feature_values)), size=n)
     df = pd.DataFrame({"X0": X0, "X1": X1})
     # Set X1 as categorical
     df['X1'] = df['X1'].astype('category')

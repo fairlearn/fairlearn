@@ -65,6 +65,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/auto_examples/
 
 # PyBuilder
 target/
@@ -111,3 +112,6 @@ venv.bak/
 
 # Documentation
 docbuild/
+
+# IntelliJ
+/.idea

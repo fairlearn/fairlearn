@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Usage Questions - Gitter community
+    url: https://gitter.im/fairlearn/community
+    about: Please ask usage questions here.
+  - name: Usage Questions - StackOverflow
+    url: https://stackoverflow.com/questions/tagged/fairlearn
+    about: Please ask usage questions here and tag them with `fairlearn`.

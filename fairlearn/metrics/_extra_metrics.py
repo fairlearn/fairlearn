@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 """A variety of extra metrics useful for assessing fairness.
@@ -6,91 +6,200 @@
 These are metrics which are not part of `scikit-learn`.
 """
 
+import numpy as np
 import sklearn.metrics as skm
 
-from ._metrics_engine import make_group_metric
-
-from ._balanced_root_mean_squared_error import balanced_root_mean_squared_error  # noqa: F401
-from ._mean_predictions import mean_prediction, mean_overprediction, mean_underprediction  # noqa: F401,E501
+from ._balanced_root_mean_squared_error import _balanced_root_mean_squared_error  # noqa: F401
+from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_underprediction  # noqa: F401,E501
 from ._selection_rate import selection_rate  # noqa: F401,E501
 
+_TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
+_RESTRICTED_VALS_IF_POS_LABEL_NONE = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"  # noqa: E501
+_NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
-def specificity_score(y_true, y_pred, sample_weight=None):
-    r"""Calculate the specificity score (also called the True Negative Rate).
 
-    At the present time, this routine only supports binary
-    classifiers with labels :math:`\in {0, 1}`.
-    The calculation uses the :py:func:`sklearn.metrics.confusion_matrix` routine.
+def _get_labels_for_confusion_matrix(labels, pos_label):
+    r"""Figure out the labels argument for skm.confusion_matrix.
+
+    This is an internal method used by the true/false positive/negative
+    rate metrics (and hence are restricted to binary data). We compute
+    these using the confusion matrix.
+    This method prepares the `labels` argument of
+    :py:func:`sklearn.metrics.confusion_matrix` based on the
+    user's specifications.
+
+    Parameters
+    ----------
+    labels : array-like
+        Labels provided by the user
+
+    pos_label : scalar
+        The value in the true and predicted arrays to treat as positive.
+        If this is not set, then the unique_labels must be a subset of
+        {0, 1} or {-1, 1}, and it will then be set to 1
+
+    Returns
+    -------
+    list
+        A two element list, consisting of the unique labels
+        with the positive label listed last. This array will
+        always be two elements, even if the unique_labels array
+        only has one element.
     """
-    cm = skm.confusion_matrix(y_true, y_pred, sample_weight=sample_weight)
-    # Taken from
-    # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
-    # This restricts us to binary classification
-    tn, fp, _, _ = cm.ravel()
-    return tn / (tn + fp)
+    unique_labels = list(np.unique(labels))
+
+    # Set pos_label if needed
+    if pos_label is None:
+        labels01 = frozenset([0, 1])
+        labels11 = frozenset([-1, 1])
+        if labels01.issuperset(unique_labels) or labels11.issuperset(unique_labels):
+            pos_label = 1
+        else:
+            raise ValueError(_RESTRICTED_VALS_IF_POS_LABEL_NONE)
+
+    # Ensure unique_labels has two elements
+    if len(unique_labels) == 1:
+        if unique_labels[0] == pos_label:
+            unique_labels = [None, pos_label]
+        else:
+            unique_labels.append(pos_label)
+    elif len(unique_labels) == 2:
+        if pos_label == unique_labels[0]:
+            unique_labels = list(reversed(unique_labels))
+        elif pos_label == unique_labels[1]:
+            pass
+        else:
+            raise ValueError(_NEED_POS_LABEL_IN_Y_VALS)
+    else:
+        raise ValueError(_TOO_MANY_UNIQUE_Y_VALS)
+
+    return unique_labels
 
 
-def miss_rate(y_true, y_pred, sample_weight=None):
-    r"""Calculate the miss rate (also called the False Negative Rate).
+def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+    r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
 
-    At the present time, this routine only supports binary
-    classifiers with labels :math:`\in {0, 1}`.
-    By definition, this is the complement of the True Positive
-    Rate, so this routine uses the
-    :py:func:`sklearn.metrics.recall_score` routine.
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
+
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
+
+    Returns
+    -------
+    float
+        The true positive rate for the data
     """
-    # aka False Negative Rate
-    tpr = skm.recall_score(y_true, y_pred, sample_weight=sample_weight)
+    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    tnr, fpr, fnr, tpr = skm.confusion_matrix(
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+    return tpr
 
-    # FNR == 1 - TPR
-    return 1 - tpr
 
+def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+    r"""Calculate the true negative rate (also called specificity or selectivity).
 
-def fallout_rate(y_true, y_pred, sample_weight=None):
-    r"""Calculate the fallout rate (also called the False Positive Rate).
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
 
-    At the present time, this routine only supports binary
-    classifiers with labels :math:`\in {0, 1}`.
-    By definition, this is the complement of the
-    Specificity, and so uses :py:func:`specificity_score` in its
-    calculation.
+    y_pred : array-like
+        The list of predicted values
+
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
+
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
+
+    Returns
+    -------
+    float
+        The true negative rate for the data
     """
-    # aka False Positive Rate
-    # Since we use specificity, also restricted to binary classification
-    return 1 - specificity_score(y_true, y_pred, sample_weight)
-
-# =============================================================
-# Group metrics
-
-# Classification metrics
+    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    tnr, fpr, fnr, tpr = skm.confusion_matrix(
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+    return tnr
 
 
-group_fallout_rate = make_group_metric(fallout_rate)
-"""A grouped metric for the :py:func:`fallout_rate`
-"""
+def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+    r"""Calculate the false positive rate (also called fall-out).
 
-group_miss_rate = make_group_metric(miss_rate)
-"""A grouped metric for the :py:func:`miss_rate`
-"""
-group_specificity_score = make_group_metric(specificity_score)
-"""A grouped metric for the :py:func:`specificity_score`
-"""
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
 
-# Regression metrics
+    y_pred : array-like
+        The list of predicted values
 
-group_balanced_root_mean_squared_error = make_group_metric(
-    balanced_root_mean_squared_error)
-"""A grouped wrapper around the :py:func:`balanced_root_mean_squared_error` routine
-"""
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
 
-group_mean_prediction = make_group_metric(mean_prediction)
-"""A grouped wrapper around the :py:func:`mean_prediction` routine
-"""
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
 
-group_mean_overprediction = make_group_metric(mean_overprediction)
-"""A grouped wrapper around the :py:func:`mean_overprediction` routine
-"""
+    Returns
+    -------
+    float
+        The false positive rate for the data
+    """
+    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    tnr, fpr, fnr, tpr = skm.confusion_matrix(
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+    return fpr
 
-group_mean_underprediction = make_group_metric(mean_underprediction)
-"""A grouped wapper around the :py:func:`mean_underprediction` routine
-"""
+
+def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+    r"""Calculate the false negative rate (also called miss rate).
+
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sample_weight : array-like, optional
+        A list of weights to apply to each sample. By default all samples are weighted
+        equally
+
+    pos_label : scalar, optional
+        The value to treat as the 'positive' label in the samples. If `None` (the default)
+        then the largest unique value of the y arrays will be used.
+
+    Returns
+    -------
+    float
+        The false negative rate for the data
+    """
+    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    tnr, fpr, fnr, tpr = skm.confusion_matrix(
+        y_true, y_pred,
+        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+    return fnr
+
+
+def _root_mean_squared_error(y_true, y_pred, **kwargs):
+    r"""Calculate the root mean squared error."""
+    return skm.mean_squared_error(y_true, y_pred, squared=False, **kwargs)

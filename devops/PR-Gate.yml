@@ -14,38 +14,28 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: Linux
-    vmImage: 'ubuntu-16.04'
-    pyVersions: [3.7]
+    platforms:  { Linux: ubuntu-latest }
+    installationType: 'PipLocal'
+    pyVersions: [3.6]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: Windows
-    vmImage:  'vs2017-win2016'
+    platforms:  { Windows: vs2017-win2016 }
+    installationType: 'PipLocal'
     pyVersions: [3.6]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     
 - template: templates/all-tests-job-template.yml
   parameters:
-    name: MacOS
-    vmImage:  'macos-latest'
-    pyVersions: [3.7]
+    platforms: { MacOS: macos-latest }
+    testRunTypes: ['Unit']
+    installationType: 'None'
+    pyVersions: [3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
-
-- template: templates/notebook-job-template.yml
-  parameters:
-    name: LinuxNotebooks
-    pyVersions: [3.6]
-
-- template: templates/notebook-job-template.yml
-  parameters:
-    name: WindowsNotebooks
-    vmImage: 'vs2017-win2016'
-    pyVersions: [3.8]
 
 - template: templates/build-widget-job-template.yml
 

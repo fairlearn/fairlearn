@@ -1,9 +1,9 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pytest
 
-from fairlearn.metrics import group_accuracy_score, group_roc_auc_score
+from fairlearn.metrics import accuracy_score_group_summary, roc_auc_score_group_summary
 from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
 from fairlearn.metrics._group_metric_set import _create_group_metric_set
@@ -181,8 +181,8 @@ class TestCreateGroupMetricSet:
         y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
         s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
 
-        exp_acc = group_accuracy_score(y_t, y_p, s_f)
-        exp_roc = group_roc_auc_score(y_t, y_p, s_f)
+        exp_acc = accuracy_score_group_summary(y_t, y_p, sensitive_features=s_f)
+        exp_roc = roc_auc_score_group_summary(y_t, y_p, sensitive_features=s_f)
 
         predictions = {"some model": y_p}
         sensitive_feature = {"my sf": s_f}
@@ -197,7 +197,7 @@ class TestCreateGroupMetricSet:
         assert actual['trueY'] == y_t
         assert actual['predictedY'][0] == y_p
         assert actual['precomputedFeatureBins'][0]['binVector'] == s_f
-        assert len(actual['precomputedMetrics'][0][0]) == 10
+        assert len(actual['precomputedMetrics'][0][0]) == 11
 
         # Cross check the two metrics we computed
         # Comparisons simplified because s_f was already {0,1}

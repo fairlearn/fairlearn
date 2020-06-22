@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pandas as pd
@@ -11,8 +11,9 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 class ConditionalLossMoment(LossMoment):
     """A moment that quantifies a loss by group."""
 
-    def __init__(self, loss, no_groups=False):
+    def __init__(self, loss, *, upper_bound=None, no_groups=False):
         super().__init__(loss)
+        self.upper_bound = upper_bound
         self.no_groups = no_groups
 
     def default_objective(self):
@@ -33,7 +34,7 @@ class ConditionalLossMoment(LossMoment):
         attr_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
-        self.neg_basis_present = pd.Series()
+        self.neg_basis_present = pd.Series(dtype='float64')
         zero_vec = pd.Series(0.0, self.index)
         i = 0
         for attr in attr_vals:
@@ -50,6 +51,16 @@ class ConditionalLossMoment(LossMoment):
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
         self._gamma_descr = str(expect_attr[[_LOSS]])
         return expect_attr[_LOSS]
+
+    def bound(self):
+        """Return bound vector.
+
+        :return: a vector of bound values corresponding to all constraints
+        :rtype: pandas.Series
+        """
+        if self.upper_bound is None:
+            raise ValueError("No Upper Bound")
+        return pd.Series(self.upper_bound, index=self.index)
 
     def project_lambda(self, lambda_vec):
         """Return the lambda values."""
@@ -73,14 +84,14 @@ class AverageLossMoment(ConditionalLossMoment):
     """Moment for Average Loss."""
 
     def __init__(self, loss):
-        super().__init__(loss, no_groups=True)
+        super().__init__(loss, upper_bound=None, no_groups=True)
 
 
 class GroupLossMoment(ConditionalLossMoment):
     """Moment for Group Loss."""
 
-    def __init__(self, loss):
-        super().__init__(loss, no_groups=False)
+    def __init__(self, loss, *, upper_bound=None):
+        super().__init__(loss, upper_bound=upper_bound, no_groups=False)
 
 
 class SquareLoss:

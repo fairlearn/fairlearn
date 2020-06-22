@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -20,7 +20,7 @@ def mean_prediction(y_true, y_pred, sample_weight=None):
     return np.dot(y_p, s_w) / s_w.sum()
 
 
-def mean_overprediction(y_true, y_pred, sample_weight=None):
+def _mean_overprediction(y_true, y_pred, sample_weight=None):
     """Calculate the (weighted) mean overprediction.
 
     This is the (weighted) mean of the error where any negative
@@ -38,7 +38,7 @@ def mean_overprediction(y_true, y_pred, sample_weight=None):
     return np.dot(err, s_w) / s_w.sum()
 
 
-def mean_underprediction(y_true, y_pred, sample_weight=None):
+def _mean_underprediction(y_true, y_pred, sample_weight=None):
     """Calculate the (weighted) mean underprediction.
 
     This is the (weighted) mean of the error where any

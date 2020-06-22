@@ -1,17 +1,31 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 from sklearn import preprocessing
 
-from . import group_accuracy_score, group_balanced_root_mean_squared_error
-from . import group_fallout_rate, group_max_error
-from . import group_mean_absolute_error, group_mean_overprediction
-from . import group_mean_squared_error, group_mean_squared_log_error
-from . import group_mean_underprediction, group_median_absolute_error
-from . import group_mean_prediction
-from . import group_miss_rate, group_precision_score, group_r2_score
-from . import group_recall_score, group_roc_auc_score, group_root_mean_squared_error
-from . import group_selection_rate, group_specificity_score, group_zero_one_loss
+from . import (
+    true_negative_rate_group_summary,
+    false_positive_rate_group_summary,
+    false_negative_rate_group_summary,
+    _root_mean_squared_error_group_summary,
+    _balanced_root_mean_squared_error_group_summary,
+    mean_prediction_group_summary,
+    selection_rate_group_summary,
+    _mean_overprediction_group_summary,
+    _mean_underprediction_group_summary,
+
+    accuracy_score_group_summary,
+    precision_score_group_summary,
+    recall_score_group_summary,
+    roc_auc_score_group_summary,
+    zero_one_loss_group_summary,
+    mean_absolute_error_group_summary,
+    mean_squared_error_group_summary,
+    r2_score_group_summary,
+    f1_score_group_summary,
+    log_loss_group_summary,
+    )
+
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _Y_TRUE = 'trueY'
@@ -38,52 +52,50 @@ _allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
 # The following keys need to match those of _metric_methods in
 # _fairlearn_dashboard.py
 # Issue 269 is about unifying the two sets
-GROUP_ACCURACY_SCORE = "accuracy_score"
-GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR = "balanced_root_mean_squared_error"
-GROUP_FALLOUT_RATE = "fallout_rate"
-GROUP_MAX_ERROR = "max_error"
-GROUP_MEAN_ABSOLUTE_ERROR = "mean_absolute_error"
-GROUP_MEAN_OVERPREDICTION = "overprediction"
-GROUP_MEAN_PREDICTION = "average"
-GROUP_MEAN_SQUARED_ERROR = "mean_squared_error"
-GROUP_MEAN_SQUARED_LOG_ERROR = "6d106114-4433-40a2-b091-8983ab540a53"
-GROUP_MEAN_UNDERPREDICTION = "underprediction"
-GROUP_MEDIAN_ABSOLUTE_ERROR = "median_absolute_error"
-GROUP_MISS_RATE = "miss_rate"
-GROUP_PRECISION_SCORE = "precision_score"
-GROUP_R2_SCORE = "r2_score"
-GROUP_RECALL_SCORE = "recall_score"
-GROUP_ROC_AUC_SCORE = "balanced_accuracy_score"
-GROUP_ROOT_MEAN_SQUARED_ERROR = "root_mean_squared_error"
-GROUP_SELECTION_RATE = "selection_rate"
-GROUP_SPECIFICITY_SCORE = "specificity_score"
-GROUP_ZERO_ONE_LOSS = "zero_one_loss"
+ACCURACY_SCORE_GROUP_SUMMARY = "accuracy_score"
+BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY = "balanced_root_mean_squared_error"
+F1_SCORE_GROUP_SUMMARY = "f1_score"
+FALLOUT_RATE_GROUP_SUMMARY = "fallout_rate"
+LOG_LOSS_GROUP_SUMMARY = "log_loss"
+MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY = "mean_absolute_error"
+MEAN_OVERPREDICTION_GROUP_SUMMARY = "overprediction"
+MEAN_PREDICTION_GROUP_SUMMARY = "average"
+MEAN_SQUARED_ERROR_GROUP_SUMMARY = "mean_squared_error"
+MEAN_UNDERPREDICTION_GROUP_SUMMARY = "underprediction"
+MISS_RATE_GROUP_SUMMARY = "miss_rate"
+PRECISION_SCORE_GROUP_SUMMARY = "precision_score"
+R2_SCORE_GROUP_SUMMARY = "r2_score"
+RECALL_SCORE_GROUP_SUMMARY = "recall_score"
+ROC_AUC_SCORE_GROUP_SUMMARY = "balanced_accuracy_score"
+ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY = "root_mean_squared_error"
+SELECTION_RATE_GROUP_SUMMARY = "selection_rate"
+SPECIFICITY_SCORE_GROUP_SUMMARY = "specificity_score"
+ZERO_ONE_LOSS_GROUP_SUMMARY = "zero_one_loss"
 
 BINARY_CLASSIFICATION_METRICS = {}
-BINARY_CLASSIFICATION_METRICS[GROUP_ACCURACY_SCORE] = group_accuracy_score
-BINARY_CLASSIFICATION_METRICS[GROUP_FALLOUT_RATE] = group_fallout_rate
-BINARY_CLASSIFICATION_METRICS[GROUP_MEAN_OVERPREDICTION] = group_mean_overprediction
-BINARY_CLASSIFICATION_METRICS[GROUP_MEAN_UNDERPREDICTION] = group_mean_underprediction
-BINARY_CLASSIFICATION_METRICS[GROUP_MISS_RATE] = group_miss_rate
-BINARY_CLASSIFICATION_METRICS[GROUP_PRECISION_SCORE] = group_precision_score
-BINARY_CLASSIFICATION_METRICS[GROUP_RECALL_SCORE] = group_recall_score
-BINARY_CLASSIFICATION_METRICS[GROUP_ROC_AUC_SCORE] = group_roc_auc_score
-BINARY_CLASSIFICATION_METRICS[GROUP_SELECTION_RATE] = group_selection_rate
-BINARY_CLASSIFICATION_METRICS[GROUP_SPECIFICITY_SCORE] = group_specificity_score
+BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE_GROUP_SUMMARY] = accuracy_score_group_summary
+BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE_GROUP_SUMMARY] = false_positive_rate_group_summary
+BINARY_CLASSIFICATION_METRICS[F1_SCORE_GROUP_SUMMARY] = f1_score_group_summary
+BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction_group_summary  # noqa:E501
+BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction_group_summary  # noqa:E501
+BINARY_CLASSIFICATION_METRICS[MISS_RATE_GROUP_SUMMARY] = false_negative_rate_group_summary
+BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE_GROUP_SUMMARY] = precision_score_group_summary
+BINARY_CLASSIFICATION_METRICS[RECALL_SCORE_GROUP_SUMMARY] = recall_score_group_summary
+BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE_GROUP_SUMMARY] = roc_auc_score_group_summary
+BINARY_CLASSIFICATION_METRICS[SELECTION_RATE_GROUP_SUMMARY] = selection_rate_group_summary
+BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE_GROUP_SUMMARY] = true_negative_rate_group_summary
 
 REGRESSION_METRICS = {}
-REGRESSION_METRICS[GROUP_BALANCED_ROOT_MEAN_SQUARED_ERROR] = group_balanced_root_mean_squared_error  # noqa:E501
-REGRESSION_METRICS[GROUP_MAX_ERROR] = group_max_error
-REGRESSION_METRICS[GROUP_MEAN_ABSOLUTE_ERROR] = group_mean_absolute_error
-REGRESSION_METRICS[GROUP_MEAN_OVERPREDICTION] = group_mean_overprediction
-REGRESSION_METRICS[GROUP_MEAN_PREDICTION] = group_mean_prediction
-REGRESSION_METRICS[GROUP_MEAN_SQUARED_ERROR] = group_mean_squared_error
-REGRESSION_METRICS[GROUP_MEAN_SQUARED_LOG_ERROR] = group_mean_squared_log_error
-REGRESSION_METRICS[GROUP_MEAN_UNDERPREDICTION] = group_mean_underprediction
-REGRESSION_METRICS[GROUP_MEDIAN_ABSOLUTE_ERROR] = group_median_absolute_error
-REGRESSION_METRICS[GROUP_R2_SCORE] = group_r2_score
-REGRESSION_METRICS[GROUP_ROOT_MEAN_SQUARED_ERROR] = group_root_mean_squared_error
-REGRESSION_METRICS[GROUP_ZERO_ONE_LOSS] = group_zero_one_loss
+REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _balanced_root_mean_squared_error_group_summary  # noqa:E501
+REGRESSION_METRICS[LOG_LOSS_GROUP_SUMMARY] = log_loss_group_summary
+REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY] = mean_absolute_error_group_summary
+REGRESSION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction_group_summary
+REGRESSION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction_group_summary
+REGRESSION_METRICS[MEAN_PREDICTION_GROUP_SUMMARY] = mean_prediction_group_summary
+REGRESSION_METRICS[MEAN_SQUARED_ERROR_GROUP_SUMMARY] = mean_squared_error_group_summary
+REGRESSION_METRICS[R2_SCORE_GROUP_SUMMARY] = r2_score_group_summary
+REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _root_mean_squared_error_group_summary
+REGRESSION_METRICS[ZERO_ONE_LOSS_GROUP_SUMMARY] = zero_one_loss_group_summary
 
 
 def _process_sensitive_features(sensitive_features):
@@ -160,7 +172,7 @@ def _create_group_metric_set(y_true,
         for prediction in result[_Y_PRED]:
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
-                gmr = metric_func(result[_Y_TRUE], prediction, g[_BIN_VECTOR])
+                gmr = metric_func(result[_Y_TRUE], prediction, sensitive_features=g[_BIN_VECTOR])
                 curr_dict = dict()
                 curr_dict[_GLOBAL] = gmr.overall
                 curr_dict[_BINS] = list(gmr.by_group.values())

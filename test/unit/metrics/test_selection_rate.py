@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pytest
@@ -36,7 +36,7 @@ def test_selection_rate_non_numeric():
     assert result == 0.375
 
 
-def test_group_selection_rate():
+def test_selection_rate_group_summary():
     a = "a"
     b = "b"
     q = "q"
@@ -47,9 +47,11 @@ def test_group_selection_rate():
     weight = [1, 2, 3, 4, 1, 2, 4, 8]
     groups = [r, r, r, r, q, q, q, q]
 
-    result = metrics.group_selection_rate(y_true, y_pred, groups,
-                                          pos_label=b,
-                                          sample_weight=weight)
+    result = metrics.selection_rate_group_summary(
+        y_true, y_pred,
+        sensitive_features=groups,
+        pos_label=b,
+        sample_weight=weight)
 
     assert result.overall == 0.52
     assert result.by_group[r] == 0.2

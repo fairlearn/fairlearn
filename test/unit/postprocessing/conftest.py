@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 from collections import defaultdict, namedtuple
@@ -107,22 +107,15 @@ class ExamplePredictor(BaseEstimator, ClassifierMixin):
         self.scores = scores
 
     def fit(self, X, y=None, **kwargs):
+        self.scores_ = self.scores
         return self
 
     def predict(self, X):
-        return self.scores
+        return self.scores_
 
 
 class ExampleNotPredictor():
     pass
-
-
-class ExampleEstimator(BaseEstimator, ClassifierMixin):
-    def fit(self, X, Y):
-        pass
-
-    def predict(self, X):
-        return scores_ex
 
 
 class ExampleNotEstimator1():

@@ -1,0 +1,256 @@
+# Simplified PyPI release pipeline
+
+# At queue time, the user selects a Test or Production deployment. The following stages
+# then run:
+# - Predeployment validation (run a set of tests against the repository)
+# - Creates a wheel and stores in Pipeline Artifact
+# - Download wheel file from Artifact, pip install, and run tests
+# - Upload the wheel to PyPI (Test or Production as specified at queue time)
+# - Install from PyPI and run tests
+
+parameters:
+- name: releaseType
+  displayName: Release Type
+  type: string
+  default: Test
+  values:
+  - Test
+  - Production
+
+variables:
+  poolImage: "ubuntu-latest"
+  poolPythonVersion: 3.6
+  packageArtifactName: Wheels
+  versionArtifactName: Version
+  versionFileName: versionInfo.txt
+
+trigger: none # No CI build
+
+pr: none # Not for pull requests
+
+# ==================================================================================================
+
+
+stages:
+- stage: PredeploymentValidation
+  displayName: Predeployment Validation
+  pool:
+    vmImage: $(poolImage)
+
+  variables:
+    freezeArtifactStem: PredeployFreeze
+    freezeFileStem: predeploy-requirements
+
+  jobs:
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      installationType: 'PipLocal'
+      pyVersions: [3.6, 3.7, 3.8]
+      freezeArtifactStem: $(freezeArtifactStem)
+      freezeFileStem: $(freezeFileStem)
+      
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      installationType: 'None'
+      pyVersions: [3.6, 3.7, 3.8]
+      freezeArtifactStem: $(freezeArtifactStem)
+      freezeFileStem: $(freezeFileStem)
+
+  - template: templates/build-widget-job-template.yml
+
+  - template: templates/limited-installation-job-template.yml
+
+# ==================================================================================================
+
+- stage: CreateWheel
+  displayName: Create Wheel Artifact
+  dependsOn: PredeploymentValidation
+  pool:
+    vmImage: $(poolImage)
+
+  variables:
+    freezeArtifactName: CreateWheelFreeze
+    freezeFile: createwheel-freeze.txt
+
+  jobs:
+  - job: CreateWheel
+    displayName: Build and publish wheel
+    pool:
+      vmImage: $(poolImage)
+    
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(poolPythonVersion)'
+      inputs:
+        versionSpec: $(poolPythonVersion)
+        addToPath: true
+
+    - template: templates/python-infra-upgrade-steps-template.yml
+
+    - script: pip install setuptools wheel 
+      displayName: 'Install setuptools'
+
+    - script: pip install -r requirements.txt
+      displayName: "Install fairlearn requirements"
+
+    - template: templates/pip-freeze-to-artifact-steps-template.yml
+      parameters:
+        freezeArtifact: $(freezeArtifactName)
+        freezeFile: $(freezeFile)
+
+    # TODO: add --assert-no-changes to validate that no changes happened to widget files (Issue #270)
+    - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+      displayName: 'Build widget'
+
+    - script: python ./scripts/build_wheels.py --version-filename $(versionFilename) 
+      displayName: 'Build wheels'
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish wheels"
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/dist
+        artifact: $(packageArtifactName)
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish version information file"
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)/$(versionFilename)'
+        artifact: $(versionArtifactName)
+
+# ==================================================================================================
+
+- stage: TestWheel
+  displayName: Test Wheel from Artifact
+  dependsOn: CreateWheel
+  pool:
+    vmImage: $(poolImage)
+
+  variables:
+    freezeArtifactStem: TestWheelFreeze
+    freezeFileStem: requirements-wheel-test
+
+  jobs:
+    - template: templates/all-tests-job-template.yml
+      parameters:
+        platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+        installationType: 'WheelArtifact'
+        pyVersions: [3.6, 3.7, 3.8]
+        freezeArtifactStem: $(freezeArtifactStem)
+        freezeFileStem: $(freezeFileStem)
+        wheelArtifactName: $(packageArtifactName)
+
+    - template: templates/all-tests-job-template.yml
+      parameters:
+        platforms: { MacOS: macos-latest }
+        testRunTypes: ['Unit']
+        installationType: 'WheelArtifact'
+        pyVersions: [3.6, 3.7, 3.8]
+        freezeArtifactStem: $(freezeArtifactStem)
+        freezeFileStem: $(freezeFileStem)
+        wheelArtifactName: $(packageArtifactName)
+
+# ==================================================================================================
+
+- stage: UploadWheel
+  displayName: Upload Wheel to PyPI (${{parameters.releaseType}})
+  dependsOn: TestWheel
+  pool:
+    vmImage: $(poolImage)
+
+  variables:
+    # Following is actually the name of the service connection from the Project Settings page
+    kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)"
+    kvVaultName: fairlearndeploy
+    ${{ if eq(parameters.releaseType, 'Test')}}:
+      kvUsername: usernametest
+      kvPassword: passwordtest
+      pypiUrl: https://test.pypi.org/legacy/
+    ${{ if eq(parameters.releaseType, 'Production')}}:
+      kvUsername: 'usernameprod'
+      kvPassword: 'passwordprod'
+      pypiUrl: https://upload.pypi.org/legacy/
+
+  jobs:
+  - deployment: 'PyPI_${{parameters.releaseType}}_Upload'
+    displayName: PyPI ${{parameters.releaseType}} Upload
+    ${{ if eq(parameters.releaseType, 'Test')}}:
+      environment: 'PyPI-Test Deployment'
+    ${{ if eq(parameters.releaseType, 'Production')}}:
+      environment: 'PyPI Deployment'
+    pool:
+      vmImage: $(poolImage)
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: UsePythonVersion@0
+            displayName: 'Use Python $(poolPythonVersion)'
+            inputs:
+              versionSpec: $(poolPythonVersion)
+              addToPath: true
+          
+          - script: pip install twine
+            displayName: 'Install twine'
+
+          - task: AzureKeyVault@1
+            displayName: "Fetch deployment secrets from KeyVault"
+            inputs:
+              azureSubscription: ${{variables.kvSubscription}}
+              keyVaultName:  ${{variables.kvVaultName}}
+              secretsFilter: '${{variables.kvUsername}},${{variables.kvPassword}}'
+
+          # Quote the password argument in case it contains characters the shell might try to parse
+          - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{variables.kvUsername}}) -p "$(${{variables.kvPassword}})" $(Pipeline.Workspace)/$(packageArtifactName)/*'
+            displayName: Upload to ${{parameters.releaseType}} PyPI
+
+        # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention (Prod only)
+  
+  - job: PyPI_Pause
+    pool: server
+    dependsOn: 'PyPI_${{parameters.releaseType}}_Upload'
+    displayName: PyPI Pause
+
+    steps:
+    - task: Delay@1
+      displayName: "Pause to allow PyPI updates to complete"
+      inputs:
+        delayForMinutes: "5"
+
+# # ==================================================================================================
+
+- stage: TestFromPyPI
+  displayName: Test package from ${{parameters.releaseType}} PyPI
+  dependsOn: UploadWheel
+  pool:
+    vmImage: $(poolImage)
+  
+  variables:
+    freezeArtifactStem: TestPyPIFreeze
+    freezeFileStem: requirements-pypi-test
+
+  jobs:
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+      pyVersions: [3.6, 3.7, 3.8]
+      freezeArtifactStem: $(freezeArtifactStem)
+      freezeFileStem: $(freezeFileStem)
+      installationType: 'PyPI'
+      targetType: ${{parameters.releaseType}}
+      versionArtifactName: $(versionArtifactName)
+      versionArtifactFile: $(versionFileName)
+
+  - template: templates/all-tests-job-template.yml
+    parameters:
+      platforms: { MacOS: macos-latest }
+      testRunTypes: ['Unit']
+      freezeArtifactStem: $(freezeArtifactStem)
+      freezeFileStem: $(freezeFileStem)
+      installationType: 'PyPI'
+      targetType: ${{parameters.releaseType}}
+      versionArtifactName: $(versionArtifactName)
+      versionArtifactFile: $(versionFileName)
