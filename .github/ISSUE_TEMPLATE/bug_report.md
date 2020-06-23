@@ -42,7 +42,7 @@ from fairlearn.datasets import fetch_adult
 data = fetch_adult(as_frame=True)
 X = pd.get_dummies(data.data)
 y = (data.target == '>50K') * 1
-sensitive_features = X['sex_Male'].apply(lambda sex: "female" if sex == 0 else "male")
+sensitive_features = data.data['sex']
 mitigator = ExponentiatedGradient(LinearRegression(), DemographicParity())
 mitigator.fit(X, y, sensitive_features=sensitive_features)
 ```
