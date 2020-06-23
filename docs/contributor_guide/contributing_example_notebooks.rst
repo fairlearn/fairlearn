@@ -38,7 +38,7 @@ When working on the notebooks it can be tedious to make changes in the
 notebook and then make the same change in the `.py` file. To make the
 development process smoother we recommend using 
 `Visual Studio Code <https://code.visualstudio.com/docs/python/jupyter-support>`_.
-VS Code recognizes the lines starting with :code:`$ %%` as new cells.
+VS Code recognizes the lines starting with :code:`# %%` as new cells.
 Each cell can be executed individually by clicking on *Run Cell*, and VS Code
 opens a *Python Interactive* tab to show the output.
 
