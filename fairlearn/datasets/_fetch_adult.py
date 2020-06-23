@@ -1,10 +1,10 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import os
 import pathlib
 
 from sklearn.datasets import fetch_openml
+from ._common import _DOWNLOAD_DIRECTORY_NAME
 
 
 def fetch_adult(*, cache=True, data_home=None,
@@ -71,7 +71,7 @@ def fetch_adult(*, cache=True, data_home=None,
     This dataset consists of 48842 samples and 14 features.
     """
     if not data_home:
-        data_home = pathlib.Path().home() / ".fairlearn-data"
+        data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
     return fetch_openml(
         data_id=1590,
