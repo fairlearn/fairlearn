@@ -7,7 +7,6 @@ print(__doc__)
 
 from fairlearn.datasets import fetch_adult
 import matplotlib.pyplot as plt
-import pandas as pd
 
 
 data = fetch_adult(as_frame=True)
