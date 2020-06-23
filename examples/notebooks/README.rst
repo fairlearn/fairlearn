@@ -9,5 +9,4 @@ adding new ones please consult the guide on
 .. toctree::
    :maxdepth: 2
 
-   plot_binary_classification_uci_credit_card_default
    plot_binary_classification_COMPAS

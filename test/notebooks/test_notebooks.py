@@ -107,3 +107,19 @@ def test_mitigating_disparities_in_ranking_from_binary_data():
         "sel_expgrad_X_alt.loc[ 'disparity', :][0]",
         pytest.approx(0.35, abs=0.08))
     assay_one_notebook(nb_name, test_values)
+
+
+@pytest.mark.notebooks
+def test_binary_classification_with_the_uci_credit_card_default_dataset():
+    nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
+    test_values = {}
+    test_values["GridSearch_17"] = ScrapSpec(
+This conversation was marked as resolved by riedgar-ms
+        "int(sum(model_sweep_dict['GridSearch_17']))",
+        2533
+    )
+    test_values["GridSearch_31"] = ScrapSpec(
+        "int(sum(model_sweep_dict['GridSearch_31']))",
+        2775
+    )
+    assay_one_notebook(nb_name, test_values)

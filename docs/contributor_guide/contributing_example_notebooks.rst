@@ -15,8 +15,7 @@ include:
 Good examples of existing notebooks that abide by these requirements are:
 
 * `Mitigating Disparities in Ranking from Binary Data <https://github.com/fairlearn/fairlearn/blob/master/notebooks/Mitigating%20Disparities%20in%20Ranking%20from%20Binary%20Data.ipynb>`_
-* `Binary Classification with the UCI Credit-card Default Dataset <https://fairlearn.github.io/auto_examples/notebooks/plot_binary_classification_uci_credit_card_default.html>`_
-
+* `Binary Classification with the UCI Credit-card Default Dataset <https://github.com/fairlearn/fairlearn/blob/master/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb>`_
 Working with example notebooks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
