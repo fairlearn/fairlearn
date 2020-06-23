@@ -114,7 +114,6 @@ def test_binary_classification_with_the_uci_credit_card_default_dataset():
     nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
     test_values = {}
     test_values["GridSearch_17"] = ScrapSpec(
-This conversation was marked as resolved by riedgar-ms
         "int(sum(model_sweep_dict['GridSearch_17']))",
         2533
     )
