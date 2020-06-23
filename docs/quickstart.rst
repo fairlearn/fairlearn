@@ -64,11 +64,13 @@ than $50,000 a year.
 .. doctest:: quickstart
 
     >>> import numpy as np 
+    >>> import pandas as pd
     >>> import matplotlib.pyplot as plt 
-    >>> from shap.datasets import adult  # shap is only used its dataset utility
-    >>> X, y_true = adult()
-    >>> y_true = y_true * 1
-    >>> sex = X['Sex'].apply(lambda sex: "female" if sex == 0 else "male")
+    >>> from fairlearn.datasets import fetch_adult
+    >>> data = fetch_adult(as_frame=True)
+    >>> X = pd.get_dummies(data.data)
+    >>> y_true = (data.target == '>50K') * 1
+    >>> sex = X['sex_Male'].apply(lambda sex: "female" if sex == 0 else "male")
     >>> sex.value_counts()
     male      21790
     female    10771

@@ -1,9 +1,13 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 import os
+import pathlib
 
 from sklearn.datasets import fetch_openml
 
 
-def fetch_adult(*, version='1', cache=True, data_home=None,
+def fetch_adult(*, cache=True, data_home=None,
                 as_frame=False, return_X_y=False):
     """Load the UCI Adult dataset (binary classification).
 
@@ -26,13 +30,6 @@ def fetch_adult(*, version='1', cache=True, data_home=None,
 
     Parameters
     ----------
-    version : integer or 'active', default='active'
-        Version of the dataset. Can only be provided if also ``name`` is given.
-        If 'active' the oldest version that's still active is used. Since
-        there may be more than one active version of a dataset, and those
-        versions may fundamentally be different from one another, setting an
-        exact version is highly recommended.
-
     cache : boolean, default=True
         Whether to cache downloaded datasets using joblib.
 
@@ -73,13 +70,12 @@ def fetch_adult(*, version='1', cache=True, data_home=None,
     -----
     This dataset consists of 48842 samples and 14 features.
     """
-    if data_home is None:
-        data_home = os.path.join(os.path.expanduser('~'), "fairlearn_data")
+    if not data_home:
+        data_home = pathlib.Path().home() / ".fairlearn-data"
 
     return fetch_openml(
         data_id=1590,
         data_home=data_home,
-        # version=version,
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
