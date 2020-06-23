@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 
@@ -31,16 +31,18 @@ class ThresholdOperation():
         """Return the stored threshold operator."""
         return self._operator
 
-    def get_predictor_from_operation(self):
-        """Encode the threshold rule `Y_hat > t` or `Y_hat < t`.
+    def __call__(self, y_hat):
+        """Evaluate the threshold rule `y_hat > t` or `y_hat < t`.
 
-        :return: a function that takes a single argument to evaluate it against the threshold rule
-        :rtype: lambda
+        :param y_hat: the input array
+        :type y_hat: array
+        :return: the result of elementwise application of the threshold rule
+        :rtype: array
         """
         if self._operator == '>':
-            return lambda x: x > self._threshold
+            return y_hat > self._threshold
         elif self._operator == '<':
-            return lambda x: x < self._threshold
+            return y_hat < self._threshold
         else:
             raise ValueError("Unrecognized operator: " + self._operator)
 

@@ -1,7 +1,7 @@
 """Script for copying python version-specific requirements files to override requirements.txt.
 
 This is for pipelines only and should not be run by developers on their machines.
-The script checks for a requirements file that's specific to the python minor version, e.g. 3.5,
+The script checks for a requirements file that's specific to the python minor version, e.g. 3.6,
 and uses those requirements, or if no such file exists the script creates that file based on
 the generic requirements.txt file. Our pipelines rely on the existence of a
 requirements-{major}-{minor}.txt file.
@@ -28,7 +28,7 @@ def main(argv):
     parser = build_argument_parser()
     args = parser.parse_args(argv)
 
-    # extract minor version, e.g. '3.5'
+    # extract minor version, e.g. '3.6'
     py_version = ".".join(platform.python_version().split(".")[:2])
 
     # override only if a requirements file for the specific version exists

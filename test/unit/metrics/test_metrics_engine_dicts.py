@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pytest
@@ -54,6 +54,10 @@ metric_group_summary_results = {
         "overall": 0.27777778, "by_group": {0: 0.22222222, 1: 0.33333333}},
     metrics.r2_score_group_summary: {
         "overall": -0.125, "by_group": {0: 0, 1: -0.35}},
+    metrics.f1_score_group_summary: {
+        "overall": 0.70588235, "by_group": {0: 0.75, 1: 0.66666666}},
+    metrics.log_loss_group_summary: {
+        "overall": 9.59423782, "by_group": {0: 7.67546133, 1: 11.51301430}},
 }
 
 derived_metric_results = {
@@ -80,7 +84,20 @@ derived_metric_results = {
     metrics.mean_absolute_error_group_max: 0.33333333,
     metrics.mean_squared_error_group_max: 0.33333333,
     metrics.r2_score_group_min: -0.35,
+    metrics.f1_score_group_max: 0.75,
+    metrics.log_loss_group_min: 7.67546133,
 }
+
+metric_group_summary_pos_label_keys = [
+    metrics.true_positive_rate_group_summary,
+    metrics.true_negative_rate_group_summary,
+    metrics.false_positive_rate_group_summary,
+    metrics.false_negative_rate_group_summary,
+    metrics.selection_rate_group_summary,
+    metrics.precision_score_group_summary,
+    metrics.recall_score_group_summary,
+    metrics.f1_score_group_summary,
+]
 
 
 # =======================================================
@@ -103,3 +120,15 @@ def test_metric_group_summary_smoke(func):
 def test_derived_metrics_smoke(func):
     result = func(y_true, y_pred, sensitive_features=sf_binary)
     assert result == pytest.approx(derived_metric_results[func])
+
+
+@pytest.mark.parametrize("func", metric_group_summary_pos_label_keys)
+def test_metric_group_summary_pos_label_0(func):
+    # We're going to set pos_label=0, so for simplicity invert the previous inputs
+    y_true_invert = [1-y for y in y_true]
+    y_pred_invert = [1-y for y in y_pred]
+    result = func(y_true_invert, y_pred_invert, sensitive_features=sf_binary, pos_label=0)
+    assert result.overall == pytest.approx(metric_group_summary_results[func]["overall"])
+    assert len(result.by_group) == 2
+    assert result.by_group[0] == pytest.approx(metric_group_summary_results[func]["by_group"][0])
+    assert result.by_group[1] == pytest.approx(metric_group_summary_results[func]["by_group"][1])

@@ -1,1 +1,1 @@
-export * from "./FairnessWizard";
+export * from './FairnessWizard';

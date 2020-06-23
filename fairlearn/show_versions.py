@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and contributors.
+# Licensed under the MIT License.
+
 """Utility methods to print system info for debugging.
 
 Adapted from :py:func:`pandas.show_versions` and :py:func:`sklearn.show_versions`.

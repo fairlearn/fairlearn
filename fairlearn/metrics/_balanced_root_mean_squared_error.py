@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import math
@@ -41,6 +41,6 @@ def _balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
         y_ta_s = y_ta[indices]
         y_pa_s = y_pa[indices]
         s_w_s = s_w[indices]
-        errs[i] = math.sqrt(skm.mean_squared_error(y_ta_s, y_pa_s, s_w_s))
+        errs[i] = math.sqrt(skm.mean_squared_error(y_ta_s, y_pa_s, sample_weight=s_w_s))
 
     return errs.mean()

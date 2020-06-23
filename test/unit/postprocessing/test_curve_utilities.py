@@ -1,17 +1,19 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
 import pandas as pd
 import pytest
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
-from fairlearn.postprocessing._roc_curve_utilities import (_calculate_roc_points,
-                                                           _filter_points_to_get_convex_hull,
-                                                           _get_roc,
-                                                           _interpolate_curve)
+from fairlearn.postprocessing._tradeoff_curve_utilities import (
+    _calculate_tradeoff_points,
+    _filter_points_to_get_convex_hull,
+    _tradeoff_curve,
+    _interpolate_curve)
 from fairlearn.postprocessing._constants import SCORE_KEY, LABEL_KEY, SENSITIVE_FEATURE_KEY
-from .conftest import (sensitive_features_ex1, labels_ex, scores_ex,
-                       _get_grouped_data_and_base_points, sensitive_feature_names_ex1)
+from .conftest import (
+    sensitive_features_ex1, labels_ex, scores_ex,
+    _get_grouped_data_and_base_points, sensitive_feature_names_ex1)
 
 
 def test_assert_interpolated_curve():
@@ -81,7 +83,7 @@ def test_convex_hull(base_points, expected_remaining_indices):
             [point.operation for point in convex_hull]).all()
 
 
-def test_calculate_roc_points():
+def test_calculate_tradeoff_points():
     data = pd.DataFrame({
         SENSITIVE_FEATURE_KEY: sensitive_features_ex1.squeeze(),
         SCORE_KEY: scores_ex.squeeze(),
@@ -89,32 +91,44 @@ def test_calculate_roc_points():
     grouped_data = data.groupby(SENSITIVE_FEATURE_KEY).get_group("A") \
         .sort_values(by=SCORE_KEY, ascending=False)
 
-    roc_points = _calculate_roc_points(grouped_data, "A")
+    roc_points = _calculate_tradeoff_points(grouped_data, "A", flip=True)
     expected_roc_points = pd.DataFrame({
-        "x": [0, 0.25, 0.5, 0.5, 1],
-        "y": [0, 1/3,  2/3, 1,   1],
+        "x": [0, .0, 0.25, .5, .5,    0.5, 0.5, .75,    1.0, 1],
+        "y": [0, .0, 1/3,  .0, .1/.3, 2/3, 1,   .2/.3,  1.0, 1],
         "operation": [ThresholdOperation('>', np.inf),
+                      ThresholdOperation('<', -np.inf),
                       ThresholdOperation('<', 0.5),
+                      ThresholdOperation('>', 2.5),
+                      ThresholdOperation('>', 1.5),
                       ThresholdOperation('<', 1.5),
                       ThresholdOperation('<', 2.5),
+                      ThresholdOperation('>', 0.5),
+                      ThresholdOperation('<', np.inf),
                       ThresholdOperation('>', -np.inf)]
     })
 
     _assert_equal_points(expected_roc_points, roc_points)
 
+    expected_roc_convex_hull = pd.DataFrame({
+        "x": [0, 0.5, 1],
+        "y": [0, 1,   1],
+        "operation": [ThresholdOperation('>', np.inf),
+                      ThresholdOperation('<', 2.5),
+                      ThresholdOperation('>', -np.inf),
+                      ]
+    })
     # Try filtering to get the convex hull of the ROC points.
-    # This should drop the second and third point.
     selected_points = \
         pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[['x', 'y', 'operation']]
-    _assert_equal_points(expected_roc_points, selected_points, ignore_indices=[1, 2])
+    _assert_equal_points(expected_roc_convex_hull, selected_points)
 
 
-def test_get_roc():
+def test_tradeoff_curve():
     for sensitive_feature_value in sensitive_feature_names_ex1:
         grouped_data, base_points, ignore_for_base_points, x_grid = \
             _get_grouped_data_and_base_points(sensitive_feature_value)
 
-        roc_convex_hull = _get_roc(grouped_data, x_grid, sensitive_feature_value)
+        roc_convex_hull = _tradeoff_curve(grouped_data, x_grid, sensitive_feature_value)
         curve = _interpolate_curve(roc_convex_hull, 'x', 'y', 'operation', x_grid)
 
         _assert_interpolated_points_are_between_base_points(base_points, curve,
@@ -177,28 +191,13 @@ def _assert_interpolated_points_are_between_base_points(base_points, curve,
                           (next_base_point_y - y) / (next_base_point_x - x))
 
 
-def _assert_equal_points(expected_points, actual_points, ignore_indices=None):
-    if ignore_indices is None:
-        ignore_indices = []
-    assert len(expected_points) - len(ignore_indices) == len(actual_points)
+def _assert_equal_points(expected_points, actual_points):
+    assert len(expected_points) == len(actual_points)
 
-    # order by x to be able to iterate through
-    actual_points = actual_points.sort_values(by="x")
-    actual_points.index = range(len(actual_points))
-
-    index_offset = 0
     for i in range(len(expected_points)):
-        if i in ignore_indices:
-            index_offset += 1
-
-            if i > len(expected_points):
-                break
-
-            continue
-
-        assert np.isclose(actual_points.x[i - index_offset], expected_points.x[i])
-        assert np.isclose(actual_points.y[i - index_offset], expected_points.y[i])
-        assert actual_points.operation[i - index_offset].operator == \
+        assert np.isclose(actual_points.x[i], expected_points.x[i])
+        assert np.isclose(actual_points.y[i], expected_points.y[i])
+        assert actual_points.operation[i].operator == \
             expected_points.operation[i].operator
-        assert np.isclose(actual_points.operation[i - index_offset].threshold,
+        assert np.isclose(actual_points.operation[i].threshold,
                           expected_points.operation[i].threshold)

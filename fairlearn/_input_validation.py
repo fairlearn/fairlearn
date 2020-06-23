@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -54,9 +54,9 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
         if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
-            y = y.squeeze()
+            y = y.reshape(-1)
         elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
-            y = y.to_numpy().squeeze()
+            y = y.to_numpy().reshape(-1)
 
         X, y = check_X_y(X, y)
         y = check_array(y, ensure_2d=False, dtype='numeric')

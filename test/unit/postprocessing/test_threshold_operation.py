@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pytest
@@ -6,7 +6,7 @@ from fairlearn.postprocessing._threshold_operation import ThresholdOperation
 
 
 def test_predict_from_operation_less():
-    classifier = ThresholdOperation('<', 0.5).get_predictor_from_operation()
+    classifier = ThresholdOperation('<', 0.5)
     assert classifier(-10000) == 1
     assert classifier(0) == 1
     assert classifier(0.5) == 0
@@ -15,7 +15,7 @@ def test_predict_from_operation_less():
 
 
 def test_predict_from_operation_more():
-    classifier = ThresholdOperation('>', 0.5).get_predictor_from_operation()
+    classifier = ThresholdOperation('>', 0.5)
     assert classifier(-10000) == 0
     assert classifier(0) == 0
     assert classifier(0.5) == 0

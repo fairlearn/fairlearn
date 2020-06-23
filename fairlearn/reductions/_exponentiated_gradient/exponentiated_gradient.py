@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -22,34 +22,33 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     The exponentiated gradient algorithm is described in detail by
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
-        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
-        `sample_weight` is a vector of weights; labels `y` and predictions returned by
-        :code:`predict(X)` are either 0 or 1.
-    :type estimator: estimator
-
-    :param constraints: The disparity constraints expressed as moments
-    :type constraints: fairlearn.reductions.Moment
-
-    :param eps: Allowed fairness constraint violation; the solution is guaranteed to have the
-        error within :code:`2*best_gap` of the best error under constraint eps; the constraint
-        violation is at most :code:`2*(eps+best_gap)`
-    :type eps: float
-
-    :param max_iter: Maximum number of iterations
-    :type max_iter: int
-
-    :param nu: Convergence threshold for the duality gap, corresponding to a
-        conservative automatic setting based on the statistical uncertainty in measuring
-        classification error
-    :type nu: float
-
-    :param eta0: Initial setting of the learning rate
-    :type eta0: float
-
-    :param run_linprog_step: if True each step of exponentiated gradient is followed by the saddle
-        point optimization over the convex hull of classifiers returned so far; default True
-    :type run_linprog_step: bool
+    Parameters
+    ----------
+    estimator : estimator
+        An estimator implementing methods :code:`fit(X, y, sample_weight)` and
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the
+        vector of labels, and `sample_weight` is a vector of weights;
+        labels `y` and predictions returned by :code:`predict(X)` are either
+        0 or 1.
+    constraints : fairlearn.reductions.Moment
+        The disparity constraints expressed as moments
+    eps : float
+        Allowed fairness constraint violation; the solution is guaranteed to
+        have the error within :code:`2*best_gap` of the best error under
+        constraint `eps`; the constraint violation is at most
+        :code:`2*(eps+best_gap)`
+    max_iter : int
+        Maximum number of iterations
+    nu : float
+        Convergence threshold for the duality gap, corresponding to a
+        conservative automatic setting based on the statistical uncertainty
+        in measuring classification error
+    eta_0 : float
+        Initial setting of the learning rate
+    run_linprog_step : bool
+        if True each step of exponentiated gradient is followed by the saddle
+        point optimization over the convex hull of classifiers returned so
+        far; default True
     """
 
     def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
@@ -65,11 +64,12 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
 
-        :param X: The feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
-
-        :param y: The label vector
-        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+        y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+            Label vector
         """
         self.lambda_vecs_EG_ = pd.DataFrame()
         self.lambda_vecs_LP_ = pd.DataFrame()
@@ -191,17 +191,33 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                      len(lagrangian.predictors))
 
     def predict(self, X):
-        """Provide a prediction for the given input data.
+        """Provide predictions for the given input data.
 
-        Note that this is non-deterministic, due to the nature of the
-        exponentiated gradient algorithm.
+        Predictions are randomized, i.e., repeatedly calling `predict` with
+        the same feature data may yield different output. This
+        non-deterministic behavior is intended and stems from the nature of
+        the exponentiated gradient algorithm.
 
-        :param X: Feature data
-        :type X: numpy.ndarray or pandas.DataFrame
+        Notes
+        -----
+        A fitted ExponentiatedGradient has an attribute `predictors_`, an
+        array of predictors, and an attribute `weights_`, an array of
+        non-negative floats of the same length.
+        The prediction on each data point in `X` is obtained by first picking
+        a random predictor according to the probabilities in `weights_` and
+        then applying it. Different predictors can be chosen on different data
+        points.
 
-        :return: The prediction. If `X` represents the data for a single example
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+
+        Returns
+        -------
+        Scalar or vector
+            The prediction. If `X` represents the data for a single example
             the result will be a scalar. Otherwise the result will be a vector
-        :rtype: Scalar or vector
         """
         check_is_fitted(self)
 
@@ -211,10 +227,18 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
 
-        :param X: Feature data
-        :type X: numpy.ndarray or pandas.DataFrame
-        :return: Array of tuples with the probabilities of predicting 0 and 1.
-        :rtype: pandas.DataFrame
+        For each data point, provide the probabilities with which 0 and 1 is
+        returned as a prediction.
+
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+
+        Returns
+        -------
+        pandas.DataFrame
+            Array of tuples with the probabilities of predicting 0 and 1.
         """
         check_is_fitted(self)
 

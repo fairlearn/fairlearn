@@ -46,7 +46,7 @@ stages:
     parameters:
       platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
       installationType: 'PipLocal'
-      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      pyVersions: [3.6, 3.7, 3.8]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
       
@@ -55,7 +55,7 @@ stages:
       platforms: { MacOS: macos-latest }
       testRunTypes: ['Unit']
       installationType: 'None'
-      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      pyVersions: [3.6, 3.7, 3.8]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
 
@@ -137,7 +137,7 @@ stages:
       parameters:
         platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
         installationType: 'WheelArtifact'
-        pyVersions: [3.5, 3.6, 3.7, 3.8]
+        pyVersions: [3.6, 3.7, 3.8]
         freezeArtifactStem: $(freezeArtifactStem)
         freezeFileStem: $(freezeFileStem)
         wheelArtifactName: $(packageArtifactName)
@@ -147,7 +147,7 @@ stages:
         platforms: { MacOS: macos-latest }
         testRunTypes: ['Unit']
         installationType: 'WheelArtifact'
-        pyVersions: [3.5, 3.6, 3.7, 3.8]
+        pyVersions: [3.6, 3.7, 3.8]
         freezeArtifactStem: $(freezeArtifactStem)
         freezeFileStem: $(freezeFileStem)
         wheelArtifactName: $(packageArtifactName)
@@ -236,7 +236,7 @@ stages:
   - template: templates/all-tests-job-template.yml
     parameters:
       platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
-      pyVersions: [3.5, 3.6, 3.7, 3.8]
+      pyVersions: [3.6, 3.7, 3.8]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
       installationType: 'PyPI'
