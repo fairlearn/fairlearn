@@ -9,6 +9,7 @@ import { TileList, ITileProp } from "./TileList";
 import { IParityPickerProps } from "../FairnessWizard";
 import { mergeStyleSets } from "@uifabric/styling";
 import { ParityTabStyles } from "./ParityTab.styles";
+import { Text } from "office-ui-fabric-react";
 
 export interface IParityTabProps extends IWizardTabProps {
     parityPickerProps: IParityPickerProps;
@@ -21,10 +22,8 @@ export class ParityTab extends React.PureComponent<IParityTabProps> {
             <Stack horizontal horizontalAlign="space-between" className={styles.frame}>
                 <StackItem grow={2}>
                     <Stack className={styles.main}>
-                        <h2 className={styles.header}>
-                            {localization.Parity.header}
-                        </h2>
-                        <p className={styles.textBody}>{localization.Parity.body}</p>
+                        <Text className={styles.header} block>{localization.Accuracy.header}</Text>
+                        <Text className={styles.textBody} block>{localization.Parity.body}</Text>
                         <StackItem grow={2} className={styles.itemsList}>
                             <TileList
                                 items={this.props.parityPickerProps.parityOptions.map((parity, index): ITileProp => {

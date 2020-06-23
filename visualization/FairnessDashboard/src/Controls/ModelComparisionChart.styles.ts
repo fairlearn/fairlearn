@@ -19,7 +19,9 @@ export interface IModelComparisionChartStyles {
     rightTitle: IStyle;
     rightText: IStyle;
     insights: IStyle;
+    insightsIcon: IStyle;
     insightsText: IStyle;
+    downloadIcon: IStyle;
     downloadReport: IStyle;
     chart: IStyle;
     textSection: IStyle;
@@ -40,7 +42,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             padding: "40px"
         },
         header: {
-            backgroundColor: theme.semanticColors.bodyStandoutBackground, 
+            backgroundColor: theme.semanticColors.bodyBackground, 
             padding: "0 90px",
             height: "90px",
             display: "inline-flex",
@@ -54,7 +56,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             fontWeight: FontWeights.semibold
         },
         headerOptions: {
-            backgroundColor: theme.semanticColors.bodyStandoutBackground,
+            backgroundColor: theme.semanticColors.bodyBackground,
             padding: "0 100px"
         },
         dropDown: {
@@ -62,7 +64,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             display: "inline-block"
         },
         infoButton: {
-            color: "#999999",
+            color: theme.semanticColors.bodyText,
             float: "left",
             width: "15px",
             height: "15px",
@@ -112,6 +114,7 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
         },
         mainLeft: {
             width: "75%",
+            backgroundColor: theme.semanticColors.bodyBackground
         },
         mainRight: {
             padding: "30px 0 0 35px",
@@ -135,6 +138,12 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             padding: "18px 10px",
             display: "inline"
         },
+        insightsIcon: {
+            verticalAlign: "middle",
+            marginRight: "10px",
+            width: "24",
+            height: "28"
+        },
         insightsText: {
             marginTop: "20px",
             paddingBottom: "18px",
@@ -142,8 +151,14 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             borderBottom: "1px solid",
             borderColor: theme.semanticColors.bodyDivider
         },
+        downloadIcon: {
+            verticalAlign: "middle",
+            marginRight: "10px",
+            width: "17",
+            height: "18"
+        },
         downloadReport: {
-            color: "#333333",
+            color: theme.semanticColors.bodyText,
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "normal",

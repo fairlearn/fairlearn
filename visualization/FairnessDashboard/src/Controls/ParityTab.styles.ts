@@ -45,18 +45,14 @@ export const ParityTabStyles: () => IProcessedStyleSet<IParityTabStyles> = () =>
             flex: 1
         },
         header: {
-            color: "#333333",
-            fontSize: "32px",
-            lineHeight: "40px",
-            fontWeight: "300",
+            color: theme.semanticColors.bodyText,
+            fontWeight: FontWeights.semibold,
             margin: "26px 0"
         },
         textBody: {
-            color: "#333333",
+            fontWeight: FontWeights.semilight,
+            color: theme.semanticColors.bodyText,
             paddingTop: "12px",
-            fontSize: "15px",
-            lineHeight: "20px",
-            fontWeight: "normal",
             paddingBottom: "50px"
         }
     });

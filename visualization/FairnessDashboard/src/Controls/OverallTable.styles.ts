@@ -21,7 +21,6 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
         minMaxLabel: {
             padding: "1px 9px",
             marginTop: "4px",
-            color: "#FFFFFF",
             fontSize: "10px",
             lineHeight: "20px",
             fontWeight: "400",
@@ -34,7 +33,6 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
             width: "max-content"
         },
         groupLabel: {
-            color: "#333333",
             fontSize: "12px",
             lineHeight: "12px",
             fontWeight: "500",
@@ -59,19 +57,16 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
             borderBottom: "0.5px solid #CCCCCC"
         },
         binTitle: {
-            color: "#333333",
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "600"
         },
         binLabel: {
-            color: "#333333",
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "normal"
         },
         sensitiveAttributes: {
-            color: "#333333",
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "normal",
@@ -85,7 +80,6 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
             width: "120px"
         },
         metricLabel: {
-            color: "#333333",
             fontSize: "11px",
             lineHeight: "16px",
             fontWeight: "600",
@@ -95,7 +89,6 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
         metricBox: {
             flex: 1,
             paddingLeft: "10px",
-            color: "#333333",
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "normal",

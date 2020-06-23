@@ -24,8 +24,11 @@ export interface IWizardReportStyles {
     rightTitle: IStyle;
     rightText: IStyle;
     insights: IStyle;
+    insightsIcon: IStyle;
     insightsText: IStyle;
+    downloadIcon: IStyle;
     downloadReport: IStyle;
+    chevronIcon: IStyle;
     tableWrapper: IStyle;
     textRow: IStyle;
     infoButton: IStyle;
@@ -51,9 +54,8 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             padding: "40px"
         },
         header: {
-            padding: "0 100px",
-            marginBottom: "20px",
-            backgroundColor: theme.semanticColors.bodyStandoutBackground
+            padding: "0 100px 20px 100px",
+            backgroundColor: theme.semanticColors.bodyBackground
         },
         multimodelButton: {
             marginTop: "20px",
@@ -67,7 +69,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             display: "flex"
         },
         headerOptions: {
-            backgroundColor: theme.semanticColors.bodyStandoutBackground,
+            backgroundColor: theme.semanticColors.bodyBackground,
         },
         bannerWrapper: {
             width: "100%",
@@ -96,7 +98,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             maxWidth: "130px"
         },
         expandAttributes: {
-            color: "#333333",
+            color: theme.semanticColors.bodyText,
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "normal",
@@ -107,13 +109,14 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         overallArea: {
             display: "flex",
             flexDirection: "row",
-            padding: "20px 0 30px 100px",
-            backgroundColor: 'white'
+            padding: "20px 0 0 100px",
+            color: theme.semanticColors.bodyText,
+            backgroundColor: theme.semanticColors.bodyBackground
         },
         presentationArea: {
             display: "flex",
             flexDirection: "row",
-            padding: "20px 0 30px 90px",
+            padding: "20px 0 30px 100px",
             backgroundColor: theme.semanticColors.bodyBackground
         },
         chartWrapper: {
@@ -135,6 +138,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         mainLeft: {
             width: "75%",
+            backgroundColor: theme.semanticColors.bodyBackground
         },
         dropDown: {
             margin: "10px 0px",
@@ -144,7 +148,8 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             minWidth: "200px",
             paddingLeft: "35px",
             flexBasis: "300px",
-            flexShrink: 1
+            flexShrink: 1,
+            backgroundColor: theme.semanticColors.bodyBackground,
         },
         rightTitle: {
             color: theme.semanticColors.bodyText,
@@ -164,6 +169,12 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             padding: "18px 0",
             display: "inline"
         },
+        insightsIcon: {
+            verticalAlign: "middle",
+            marginRight: "10px",
+            width: "24",
+            height: "28"
+        },
         insightsText: {
             marginTop: "20px",
             color: theme.semanticColors.bodyText,
@@ -172,8 +183,20 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             borderBottom: "1px solid",
             borderBottomColor: theme.semanticColors.bodyDivider
         },
+        downloadIcon: {
+            verticalAlign: "middle",
+            marginRight: "10px",
+            width: "17",
+            height: "18"
+        },
+        chevronIcon: {
+            verticalAlign: "middle",
+            marginRight: "10px",
+            width: "9",
+            height: "6"
+        },
         downloadReport: {
-            color: "#333333",
+            color: theme.semanticColors.bodyText,
             fontSize: "12px",
             lineHeight: "16px",
             fontWeight: "normal",
@@ -192,7 +215,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             color: theme.semanticColors.bodyText
         },
         infoButton: {
-            color: "#999999",
+            color: theme.semanticColors.bodyText,
             float: "left",
             width: "15px",
             height: "15px",
@@ -225,6 +248,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             }
         },
         equalizedOdds: {
+            color: theme.semanticColors.bodyText,
             float: "left",
             fontSize: "18px",
             lineHeight: "22px",
@@ -266,12 +290,12 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             marginLeft: "100px"
         },
         legendTitle: {
-            color: "#333333",
+            color: theme.semanticColors.bodyText,
             fontSize: "12px",
             lineHeight: "16px",
         },
         legendSubtitle: {
-            color: "#666666",
+            color: theme.semanticColors.bodySubtext,
             fontSize: "9px",
             lineHeight: "12x",
             fontStyle: "italic"

@@ -61,7 +61,6 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                 </div>
                 <Stack horizontalAlign={"end"} style={{marginTop: "20px"}}>
                     <ActionButton 
-                        iconProps={{iconName: "Forward"}}
                         className={styles.getStarted}
                         onClick={this.props.onNext}>{localization.Intro.getStarted}</ActionButton>
                 </Stack>
