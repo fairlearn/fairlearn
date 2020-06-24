@@ -10,9 +10,10 @@ Where can I learn more about fairness in machine learning?
     Fairlearn's mitigation algorithms.
 
 Why not just ignore the sensitive features?
-    Because ignoring the sensitive feature usually doesn't work.
-
-    To elaborate, information is often redundantly encoded in datasets, and machine learning
+    If the fairness criterion is for the result of the machine learning pipeline to be
+    statistically independent of the sensitive features, simply ignoring the sensitive
+    features will not usually work.
+    Information is often redundantly encoded in datasets, and machine learning
     algorithms *will* uncover these links (it is what they are designed to do).
     For example, in the US, the ZIP code where a person lives is well correlated with their
     race.
