@@ -4,7 +4,7 @@ Frequently asked questions
 ==========================
 
 Where can I learn more about fairness in machine learning?
-    For a high level view of the subject, please see the :ref:`further reading <further_reading>`
+    For a high level view of the subject, please see the :ref:`further resources <further_resources>`
     section, where we provide links to a variety of books and papers.
     In our :ref:`user guide <user_guide>` we also have links to the papers describing
     Fairlearn's mitigation algorithms.

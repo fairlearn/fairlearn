@@ -1,7 +1,7 @@
-.. _further_reading:
+.. _further_resources:
 
-Further Reading
-===============
+Further Resources
+=================
 
 There are a number of sources of further information about fairness in machine learning.
 Here we list which concentrate more on the broader societal impact of machine learning,
