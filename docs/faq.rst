@@ -3,9 +3,6 @@
 Frequently asked questions
 ==========================
 
-General fairness questions
---------------------------
-
 Where can I learn more about fairness in machine learning?
     For a high level view of the subject, please see the :ref:`further reading <further_reading>`
     section, where we provide links to a variety of books and papers.
@@ -38,9 +35,6 @@ Won't making a model fairer reduce its accuracy?
     However, we have found empirically that it is usually possible to obtain substantial reductions
     in disparity (as measured by some suitable metric) at minimal cost in accuracy.
     Indeed, for certain subgroups in the data, accuracy may be improved dramatically.
-
-Fairlearn questions
--------------------
 
 Can the mitigation algorithms in Fairlearn make my model fair?
     Naive use of the Fairlearn library is not going to result in fairer models.
@@ -105,10 +99,6 @@ Is Fairlearn available in languages other than Python?
 Can I contribute to Fairlearn?
     Absolutely! Please see our :ref:`Contributor Guide <contributor_guide>` for
     information on how to add your contributions. We welcome all contributions!
-
-
-Fairlearn and Microsoft
------------------------
 
 What is the relationship between Fairlearn and Microsoft?
     Fairlearn has grown from a project at Microsoft Research in New York City.
