@@ -48,7 +48,6 @@ Won't making a model fairer reduce its accuracy?
 Can the mitigation algorithms in Fairlearn make my model fair?
     Naive use of the Fairlearn library is not going to result in fairer models.
     Indeed, when used incorrectly, these mitigation algorithms could produce a model which is *less* fair.
-
     What mitigation algorithms do is generate a model which has lower disparity as measured by
     a user-specified metric.
     Whether this makes the model fairer is outside the scope of the algorithm.
@@ -64,11 +63,11 @@ What sort of fairness related harms can the Fairlearn library address?
     metric evaluated on specified subgroups in the data.
     This is certainly not the only way of looking at fairness.
     For example, there is the concept of individual fairness (where decisions are evaluated
-    on the level of individuals rather than groups) and counter-factual fairness (e.g. does the
-    decision change if an individual's gender is changed from male to female).
-    See :ref:`types_of_harms` for more information; we would welcome contributions which
-    enabled Fairlearn to help address some of these other harms.
-    Beyond these, there are also fairness concepts which are note amenable to
+    on the level of individuals rather than groups), counter-factual fairness (e.g. does the
+    decision change if an individual's gender is changed from male to female), and many
+    others.
+    We would welcome contributions which enabled Fairlearn to help address some of these other harms.
+    Beyond these, there are also fairness concepts which are not amenable to
     mathematical (and hence algorithmic) expression - justice, due process and
     righting historic iniquities for example.
 
