@@ -23,19 +23,27 @@ Why not just ignore the sensitive features?
     whether any use of ZIP code was as a proxy for race, or for some other reason.
 
 The model is unfair because the data are biased. Isn't it better to get better data?
-    If a model is unfair due to biased data (note that this is not the only reason a model
-    may be unfair), then obtaining unbiased data is definitely the best solution.
-    However, doing so might not always be practical.
-    In these cases, the mitigation techniques in Fairlearn and similar packages can redistribute
-    harms between subgroups in the data.
-    The extent to which this is 'fair' will depend on how the harms are redistributed, and the
-    broader context of the system of which the model is a part.
+    One first has to decide that is meant by 'biased data' and 'better data' in a particular
+    context.
+    Consider the example of a company seeking to build a tool for screening the resumes of
+    job candidates.
+    If the company has historically hired few women, then this underrepresentation will
+    mean that any model will have less predictive power for women.
+    On the other hand, if women have received systematically poorer reviews due to biased
+    managers, then the model will appear to have good predictive power, but for incorrect
+    labels.
+    These are just two of the ways in which the data may be biased (they are not mutually
+    exclusive either), and the processes for getting 'better data' will be different for
+    each.
+    Ultimately, obtaining 'better data' may not be practical.
 
 Won't making a model fairer reduce its accuracy?
-    Any technique which reduces disparity in some metric is most likely to impact other metrics.
-    However, we have found empirically that it is usually possible to obtain substantial reductions
-    in disparity (as measured by some suitable metric) at minimal cost in accuracy.
-    Indeed, for certain subgroups in the data, accuracy may be improved dramatically.
+    There are often many machine learning models that achieve similar levels of accuracy
+    or other performance metrics, but that dramatically differ in how they affect
+    different subgroups.
+    Mitigation algorithms seek to improve the fairness metrics without strongly affecting
+    the accuracy, or more generally to navigate the trade-offs between performance and
+    fairness metrics.
 
 Can the mitigation algorithms in Fairlearn make my model fair?
     Naive use of the Fairlearn library is not going to result in fairer models.
