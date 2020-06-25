@@ -13,7 +13,7 @@ developers to assess and improve fairness of their AI systems.
 The toolkit aspires to include:
 
 - Fairness metrics and unfairness mitigation algorithms
-- An interactive dashboard for fairness assessment
+- Tools for interactive fairness assessment (e.g., dashboard, plotting, etc.)
 - Educational materials (comprehensive user guide, detailed case studies,
   white papers, etc.)
 
