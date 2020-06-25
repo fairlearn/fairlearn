@@ -132,7 +132,7 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # For this example, we specify demographic parity (on the sensitive feature of sex) as
 # the fairness metric.
 # Demographic parity requires that individuals are offered the opportunity (are approved
-# for a loan in this example) independent of membership in the protected class (i.e., females
+# for a loan in this example) independent of membership in the sensitive class (i.e., females
 # and males should be offered loans at the same rate).
 # We are using this metric for the sake of simplicity; in general, the appropriate fairness
 # metric will not be obvious.
