@@ -47,9 +47,9 @@ X_raw, Y = shap.datasets.adult()
 X_raw
 
 # %%
-# We are going to treat the sex of each individual as a protected
-# attribute (where 0 indicates female and 1 indicates male), and in
-# this particular case we are going separate this attribute out and drop it
+# We are going to treat the sex of each individual as a sensitive
+# feature (where 0 indicates female and 1 indicates male), and in
+# this particular case we are going separate this feature out and drop it
 # from the main data.
 # We then perform some standard data preprocessing steps to convert the
 # data into a format suitable for the ML algorithms
@@ -114,10 +114,10 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 #
 # Despite the fact that we removed the feature from the training data, our
 # predictor still discriminates based on sex.
-# This demonstrates that simply ignoring a protected attribute when fitting a
+# This demonstrates that simply ignoring a sensitive feature when fitting a
 # predictor rarely eliminates unfairness.
 # There will generally be enough other features correlated with the removed
-# attribute to lead to disparate impact.
+# feature to lead to disparate impact.
 
 # %%
 # Mitigation with GridSearch
@@ -129,7 +129,7 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # `GridSearch` works by generating a sequence of relabellings and reweightings, and
 # trains a predictor for each.
 #
-# For this example, we specify demographic parity (on the protected attribute of sex) as
+# For this example, we specify demographic parity (on the sensitive feature of sex) as
 # the fairness metric.
 # Demographic parity requires that individuals are offered the opportunity (are approved
 # for a loan in this example) independent of membership in the protected class (i.e., females
@@ -144,8 +144,8 @@ sweep = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
 # %%
 # Our algorithms provide :code:`fit()` and :code:`predict()` methods, so they behave in a similar manner
 # to other ML packages in Python.
-# We do however have to specify two extra arguments to :code:`fit()` - the column of protected
-# attribute labels, and also the number of predictors to generate in our sweep.
+# We do however have to specify two extra arguments to :code:`fit()` - the column of sensitive
+# feature labels, and also the number of predictors to generate in our sweep.
 #
 # After :code:`fit()` completes, we extract the full set of predictors from the
 # :class:`fairlearn.reductions.GridSearch` object.
@@ -160,10 +160,10 @@ predictors = sweep.predictors_
 # However, the plot would be somewhat confusing due to their number.
 # In this case, we are going to remove the predictors which are dominated in the
 # error-disparity space by others from the sweep (note that the disparity will only be
-# calculated for the protected attribute; other potentially protected attributes will
+# calculated for the sensitive feature; other potentially sensitive features will
 # not be mitigated).
 # In general, one might not want to do this, since there may be other considerations
-# beyond the strict optimization of error and disparity (of the given protected attribute).
+# beyond the strict optimization of error and disparity (of the given sensitive feature).
 
 errors, disparities = [], []
 for m in predictors:
@@ -204,7 +204,7 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # We see a Pareto front forming - the set of predictors which represent optimal tradeoffs
 # between accuracy and disparity in predictions.
 # In the ideal case, we would have a predictor at (1,0) - perfectly accurate and without
-# any unfairness under demographic parity (with respect to the protected attribute "sex").
+# any unfairness under demographic parity (with respect to the sensitive feature "sex").
 # The Pareto front represents the closest we can come to this ideal based on our data and
 # choice of estimator.
 # Note the range of the axes - the disparity axis covers more values than the accuracy,
