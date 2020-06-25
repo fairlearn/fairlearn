@@ -33,3 +33,9 @@ There are many different ways to contribute to Fairlearn, for example:
 
 All contributions are expected to follow the guide on
 :ref:`how_to_talk_about_fairness`.
+
+.. note::
+    To get an idea of what areas others are working on refer to the
+    `project boards <https://github.com/fairlearn/fairlearn/projects>`_.
+    If there's anything you want to prioritize and help with please 
+    :ref:`reach out <communication>` and we can discuss it.
