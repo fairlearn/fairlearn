@@ -1,6 +1,14 @@
 Contributing example notebooks
 ------------------------------
 
+.. note::
+
+    Current work on example notebooks is captured in the corresponding
+    `project board <https://github.com/fairlearn/fairlearn/projects/3>`_.
+    If you want to help us improve them please `reach out <communication>`_!
+    A great way to get started is through our
+    :ref:`application-specific deep dive sessions <notebook_deep_dive>`.
+
 To contribute new example notebooks please submit a pull request. We have
 certain requirements that need to be satisfied to contribute a notebook. Those
 include:

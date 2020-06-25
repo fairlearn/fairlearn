@@ -199,7 +199,7 @@ Tasks
 #. *Document and modularize the Fairlearn dashboard*
    The Fairlearn dashboard is currently not ready for contributions by
    the community.
-   Over the next few months, the Microsoft Research and Azure ML teams are
+   Over the next few months, the Microsoft Research and Azure ML teams will be
    working to properly open it for contributions similarly to all other parts
    of this project.
    In the meantime, we have set up a working group for those that would like
