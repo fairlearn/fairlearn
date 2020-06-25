@@ -107,7 +107,7 @@ def test_binary_classification_on_compas_dataset():
 def test_grid_search_with_census_data():
     nb_name = "Grid Search with Census Data"
     test_values = {}
-    test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 13)
+    test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 8)
     assay_one_notebook(nb_name, test_values)
 
 
