@@ -1,0 +1,96 @@
+Developer call June 11, 2020
+----------------------------
+
+Notes were taken by various attendees.
+
+Attendees:
+
+- `Miro Dudik <https://github.com/MiroDudik>`_
+- `Richard Edgar <https://github.com/riedgar-ms>`_
+- `Parul Gupta <https://github.com/parul100495>`_
+- `Adrin Jalali <https://github.com/adrinjalali>`_
+- `Roman Lutz <https://github.com/romanlutz>`_
+- `Vanessa Milan <https://www.microsoft.com/en-us/research/people/vmilan/>`_
+- `Kevin Robinson <https://github.com/kevinrobinson>`_
+- `Mehrnoosh Sameki <https://github.com/mesameki>`_
+- `Mark Soper <https://github.com/marksoper>`_
+- `Hanna Wallach <https://www.microsoft.com/en-us/research/people/wallach/>`_
+- `Hilde Weerts <https://github.com/hildeweerts>`_
+- `Vincent Xu <https://github.com/vingu>`_
+
+
+Agenda:
+
+- new website at https://fairlearn.github.io/
+
+    - please provide feedback and feel free to submit PRs to update/edit/add
+      content or styling
+    - content in the process of getting created, please help if you're
+      interested! This includes
+
+        - user guides
+        - roadmap, vision/mission, FAQ
+        - contributor guide
+        
+            - acceptance criteria for contributions
+
+- Governance
+
+    - copyright updated to "Copyright Microsoft Corporation and contributors"
+    - short-term:
+
+        - define how to become core dev
+        - define requirements for contributions to be accepted
+
+    - long-term:
+
+        - Would it help for Fairlearn to become a foundation / charity?
+          At which point? This will likely be something to keep revisiting.
+
+            - NumFocus may perhaps be an option?
+            - definitely need to transition to a different model if there are
+              outside institutional contributors (but possibly earlier, e.g., if we
+              reach a larger scale).
+
+- Kevin in Gitter:
+
+  - *Who are the current users of Fairlearn, what do they love about it?*
+        
+    - how do we find out?
+
+  - *What's the roadmap for the project in the next 3-6mos?*
+        
+    - TODO: start a PR around a short-term roadmap
+
+  - *I'd also be excited to discover if there are any co-conspirators
+    interested in working towards addressing practioner needs
+    (e.g., Holstein et al. 2019) or supporting practioners facing the wider
+    scope of sociotechnical fairness work (eg, Madaio et al. 2020;
+    Selbst et al. 2020).*
+    
+    - TODO: meet and discuss (already planned!)
+
+- Metrics: Simplicity/usability and more complex metrics group objects with
+  richer functionality don't need to be mutually exclusive. We will iterate on
+  the current state.
+- Notebooks
+
+    - development process needs to be established
+    - porting notebooks from `notebooks` over to `examples` as a good first 
+      issue
+    - To work out proper examples with a focus on sociotechnical framing we'll
+      set up a weekly hour where everyone who wants to discuss and contribute
+      can do so. It'll be at the same time as the developer call
+      (Thursday 11am New York time). Reach out to Roman via Gitter to participate. All are
+      welcome!
+
+- UX
+
+    - There's already a separate call scheduled (originally meant to be on
+      6/12, but had to be rescheduled to next week) to discuss various kinds
+      of potential UX research directions.
+    - Beyond that there's an immediate need to remove obstacles to contribute
+      to the UX. Clarifying the roadmap as mentioned above is one step in this
+      journey. Currently the contributor guide is focused entirely on Python
+      code, with basically no explanation on how to work with the typescript
+      based dashboard. 

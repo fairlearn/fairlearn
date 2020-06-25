@@ -54,7 +54,8 @@ class FairlearnDashboard(object):
             self, *,
             sensitive_features,
             y_true, y_pred,
-            sensitive_feature_names=None):
+            sensitive_feature_names=None,
+            locale=None):
         """Initialize the fairlearn Dashboard."""
         self._widget_instance = FairlearnWidget()
         if sensitive_features is None or y_true is None or y_pred is None:
@@ -196,6 +197,9 @@ class FairlearnDashboard(object):
                 raise Warning("Feature names shape does not match dataset, ignoring")
             else:
                 dataArg["features"] = sensitive_feature_names
+
+        if locale is not None:
+            dataArg["locale"] = locale
 
         self._widget_instance.value = dataArg
         self._widget_instance.observe(self._on_request, names="request")

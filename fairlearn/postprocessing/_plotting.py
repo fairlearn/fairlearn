@@ -3,26 +3,31 @@
 
 """Utilities for plotting curves."""
 
-from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE, DEMOGRAPHIC_PARITY, EQUALIZED_ODDS
-from ._threshold_optimizer import ThresholdOptimizer, _SUPPORTED_CONSTRAINTS
+from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+from ._threshold_optimizer import ThresholdOptimizer
+from sklearn.utils.validation import check_is_fitted
+
+_debug_colors = None
+_debug_ncolors = 10
+_debug_colormap = {}
 
 
 def _get_debug_color(key):
+    global _debug_colors, _debug_ncolors, _debug_colormap
     try:
         import matplotlib.cm as cm
         import matplotlib.colors
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
-    tab10_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
-    tab10_scalarMap = cm.ScalarMappable(norm=tab10_norm, cmap='Dark2')
-    debug_colors = [tab10_scalarMap.to_rgba(x) for x in range(10)]
-    debug_ncolors = len(debug_colors)
-    debug_colormap = {}
+    if _debug_colors is None:
+        tab_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
+        tab_scalarMap = cm.ScalarMappable(norm=tab_norm, cmap='Dark2')
+        _debug_colors = [tab_scalarMap.to_rgba(x) for x in range(_debug_ncolors)]
 
-    if key not in debug_colormap:
-        color = debug_colors[len(debug_colormap) % debug_ncolors]
-        debug_colormap[key] = color
-    return debug_colormap[key]
+    if key not in _debug_colormap:
+        color = _debug_colors[len(_debug_colormap) % _debug_ncolors]
+        _debug_colormap[key] = color
+    return _debug_colormap[key]
 
 
 def _plot_solution(ax, x_best, y_best, solution_label, xlabel, ylabel):
@@ -47,7 +52,7 @@ def _plot_curve(ax, sensitive_feature, x_col, y_col, points):
     """Plot the given curve with labels."""
     color = _get_debug_color(sensitive_feature)
     ax.plot(points[x_col], points[y_col], c=color, ls='-', lw=2.0,
-            label='sensitive feature value ' + str(sensitive_feature))
+            label='sensitive feature = ' + str(sensitive_feature))
 
 
 def _raise_if_not_threshold_optimizer(obj):
@@ -79,30 +84,23 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
     _raise_if_not_threshold_optimizer(threshold_optimizer)
+    check_is_fitted(threshold_optimizer)
 
-    if threshold_optimizer.constraints == DEMOGRAPHIC_PARITY:
-        for sensitive_feature_value in threshold_optimizer._selection_error_curve.keys():
-            _plot_curve(ax, sensitive_feature_value, 'selection', 'error',
-                        threshold_optimizer._selection_error_curve[sensitive_feature_value])
+    if ax is None:
+        ax = plt.axes()
 
-        if ax is None:
-            ax = plt.figure()
-        _plot_solution(ax, threshold_optimizer._x_best, None, "DP solution",
-                       "selection rate", "error")
-    elif threshold_optimizer.constraints == EQUALIZED_ODDS:
-        for sensitive_feature_value in threshold_optimizer._roc_curve.keys():
-            _plot_curve(ax, sensitive_feature_value, 'x', 'y',
-                        threshold_optimizer._roc_curve[sensitive_feature_value])
+    for sensitive_feature_value in threshold_optimizer._tradeoff_curve.keys():
+        _plot_curve(ax, sensitive_feature_value, 'x', 'y',
+                    threshold_optimizer._tradeoff_curve[sensitive_feature_value])
 
-        if ax is None:
-            ax = plt.figure()
+    if threshold_optimizer.constraints == "equalized_odds":
         _plot_overlap(ax, threshold_optimizer._x_grid, threshold_optimizer._y_min)
         _plot_solution(ax, threshold_optimizer._x_best, threshold_optimizer._y_best,
-                       'EO solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
+                       'solution', "$P[\\hat{Y}=1|Y=0]$", "$P[\\hat{Y}=1|Y=1]$")
     else:
-        raise ValueError("The plot can only be generated for a ThresholdOptimizer "
-                         "object with constraints {}."
-                         .format(" or ".join(_SUPPORTED_CONSTRAINTS)))
+        _plot_solution(ax, threshold_optimizer._x_best, None, "solution",
+                       threshold_optimizer.x_metric_,
+                       threshold_optimizer.y_metric_)
 
     if show_plot:
         plt.show()
