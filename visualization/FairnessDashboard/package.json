@@ -41,7 +41,6 @@
     "mlchartlib": "0.1.37",
     "moment": "^2.24.0",
     "office-ui-fabric-react": "^7.74.1",
-    "react-modal": "^3.11.1",
     "uuid": "^3.3.2"
   }
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import ReactModal from "react-modal";
 import { AccessibleChart, ChartBuilder, IPlotlyProperty, PlotlyMode, SelectionContext } from "mlchartlib";
 import { IFairnessContext } from "../IFairnessContext";
 import _ from "lodash";
@@ -8,8 +7,8 @@ import { IAccuracyPickerProps, IParityPickerProps, IFeatureBinPickerProps } from
 import { ParityOptions } from "../ParityMetrics";
 import { Stack } from "office-ui-fabric-react/lib/Stack";
 import { Dropdown, IDropdownStyles, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-import { getTheme, Text, Icon } from "office-ui-fabric-react";
-import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { getTheme, Text, Icon, Modal, IIconProps } from "office-ui-fabric-react";
+import { ActionButton, IconButton, PrimaryButton } from "office-ui-fabric-react/lib/Button";
 import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib/Spinner";
 import { AccuracyOptions } from "../AccuracyMetrics";
 import { FormatMetrics } from "../FormatMetrics";
@@ -115,25 +114,17 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             title: { borderRadius: "5px" }
         };
         
-        const modalStyles = {
-            content : {
-                top                   : '50%',
-                left                  : '50%',
-                right                 : 'auto',
-                bottom                : 'auto',
-                marginRight           : '-50%',
-                paddingTop            : '5px',
-                paddingRight          : '10px',
-                paddingBottom         : '10px',
-                transform             : 'translate(-50%, -50%)',
-                fontFamily: "Segoe UI",
-                color: "#FFFFFF",
-                borderRadius: "5px",
-                backgroundColor: "#222222",
-                boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.1)"
+        const iconButtonStyles = {
+            root: {
+              color: theme.semanticColors.bodyText,
+              marginLeft: 'auto',
+              marginTop: '4px',
+              marginRight: '2px',
             },
-            overlay: {zIndex: 1000}
-        };        
+            rootHovered: {
+              color: theme.semanticColors.bodyBackgroundHovered,
+            },
+          };
 
         const styles = ModelComparisionChartStyles();
         
@@ -252,28 +243,52 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
             const InsightsIcon = () => <Icon iconName="CRMCustomerInsightsApp" className={styles.insightsIcon} />;
             const DownloadIcon = () => <Icon iconName="Download" className={styles.downloadIcon} />;
 
+            const cancelIcon: IIconProps = { iconName: 'Cancel' };
+            
             mainChart = <div className={styles.main}>
                             <div className={styles.mainLeft}>
                                 <div className={styles.howTo}>
-                                    <ReactModal
-                                        style={modalStyles}
-                                        appElement={document.getElementById('app') as HTMLElement}
+                                    <Modal
+                                        titleAriaId="intro modal"
                                         isOpen={this.state.showModalIntro}
-                                        contentLabel="Intro Modal Example"
+                                        onDismiss={this.handleCloseModalIntro}
+                                        isModeless={true}
+                                        containerClassName={styles.modalContentIntro}
                                         >
-                                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalIntro}>x</ActionButton> */}
-                                        <p className={styles.modalContentIntro}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /><ActionButton className={styles.doneButton} onClick={this.handleCloseModalIntro}>Done</ActionButton></p>
-                                    </ReactModal>
+                                        <div style={{display: "flex"}}>
+                                            <IconButton
+                                            styles={iconButtonStyles}
+                                            iconProps={cancelIcon}
+                                            ariaLabel="Close intro modal"
+                                            onClick={this.handleCloseModalIntro}
+                                            />
+                                        </div>
+                                        <p className={styles.modalContentIntroText}>Each model is a selectable point. <br />Click or tap on model for it's<br />full fairness assessment. <br /><br /></p>
+                                        <div style={{display: "flex", paddingBottom: "20px"}}>
+                                            <PrimaryButton className={styles.doneButton} onClick={this.handleCloseModalIntro}>Done</PrimaryButton>
+                                        </div>
+                                    </Modal>
                                     <ActionButton onClick={this.handleOpenModalHelp}><div className={styles.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
-                                    <ReactModal
-                                        style={modalStyles}
-                                        appElement={document.getElementById('app') as HTMLElement}
+                                    <Modal
+                                        titleAriaId="help modal"
                                         isOpen={this.state.showModalHelp}
-                                        contentLabel="Minimal Modal Example"
+                                        onDismiss={this.handleCloseModalHelp}
+                                        isModeless={true}
+                                        containerClassName={styles.modalContentHelp}
                                         >
-                                        {/* <ActionButton className={ModelComparisonChart.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
-                                        <p className={styles.modalContentHelp}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.<br /><br /><ActionButton className={styles.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
-                                    </ReactModal>
+                                        <div style={{display: "flex"}}>
+                                            <IconButton
+                                            styles={iconButtonStyles}
+                                            iconProps={cancelIcon}
+                                            ariaLabel="Close popup modal"
+                                            onClick={this.handleCloseModalHelp}
+                                            />
+                                        </div>
+                                        <p className={styles.modalContentHelpText}>The <b>x-axis</b> represents accuracy, <br />with higher being better.<br /><br />The <b>y-axis</b> represents disparity, <br /> with lower being better.<br /><br /></p>
+                                        <div style={{display: "flex", paddingBottom: "20px"}}>
+                                            <PrimaryButton className={styles.doneButton} onClick={this.handleCloseModalHelp}>Done</PrimaryButton>
+                                        </div>
+                                     </Modal> 
                                 </div>
                                 <div className={styles.chart}>
                                     <AccessibleChart

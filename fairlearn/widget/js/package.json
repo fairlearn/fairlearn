@@ -54,7 +54,6 @@
     "fairlearn-dashboard": "0.0.20-beta.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-modal": "^3.11.1",
     "style-loader": "^0.23.1"
   },
   "jupyterlab": {

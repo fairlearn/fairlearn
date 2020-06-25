@@ -45,7 +45,7 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             fontWeight: FontWeights.semilight,
         },
         firstSectionGraphics: {
-            width: "356px",
+            width: "346px",
             height: "154px",
             background: theme.semanticColors.bodyBackground,
             fill: theme.semanticColors.bodyText,
@@ -84,7 +84,9 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             paddingTop: "15px"
         },
         getStarted: {
-            paddingTop: "30px",
+            height: "44px",
+            padding: "12px",
+            lineHeight: "24px",
             fontSize: FontSizes.large,
             fontWeight: FontWeights.regular
         }

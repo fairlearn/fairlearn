@@ -29,7 +29,6 @@
     "css-loader": "2.1.1",
     "fairlearn-dashboard": "0.0.16-beta.10",
     "react": "16.8.6",
-    "react-dom": "16.8.6",
-    "react-modal": "^3.11.1"
+    "react-dom": "16.8.6"
   }
 }

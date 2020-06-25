@@ -1,4 +1,4 @@
-import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { ActionButton, PrimaryButton } from "office-ui-fabric-react/lib/Button";
 import { Stack } from "office-ui-fabric-react/lib/Stack";
 import { Text } from "office-ui-fabric-react";
 import React from "react";
@@ -60,9 +60,10 @@ export class IntroTab extends React.PureComponent <IIntroTabProps> {
                     </div>
                 </div>
                 <Stack horizontalAlign={"end"} style={{marginTop: "20px"}}>
-                    <ActionButton 
+                    <PrimaryButton 
                         className={styles.getStarted}
-                        onClick={this.props.onNext}>{localization.Intro.getStarted}</ActionButton>
+                        onClick={this.props.onNext}>{localization.Intro.getStarted}
+                    </PrimaryButton>
                 </Stack>
             </div>
         </Stack>);

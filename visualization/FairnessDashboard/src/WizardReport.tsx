@@ -1,6 +1,5 @@
 import React from "react";
-import ReactModal from "react-modal";
-import { Icon } from "office-ui-fabric-react";
+import { Icon, Modal, IIconProps } from "office-ui-fabric-react";
 import { IModelComparisonProps } from "./Controls/ModelComparisonChart";
 import { Text } from "office-ui-fabric-react/lib/Text";
 import { localization } from "./Localization/localization";
@@ -11,7 +10,7 @@ import { mergeStyleSets } from "@uifabric/styling";
 import { getTheme } from "@uifabric/styling";
 import _ from "lodash";
 import { AccessibleChart, IPlotlyProperty } from "mlchartlib";
-import { ActionButton } from "office-ui-fabric-react/lib/Button";
+import { ActionButton, IconButton, PrimaryButton } from "office-ui-fabric-react/lib/Button";
 import { SummaryTable } from "./Controls/SummaryTable";
 import { OverallTable } from "./Controls/OverallTable";
 import { PredictionTypes, IMetricResponse } from "./IFairnessProps";
@@ -111,25 +110,18 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             dropdown: { width: 180 },
             title: { borderWidth: "1px", borderRadius: "5px" }
         };
-        const modalStyles = {
-            content : {
-                top                   : '50%',
-                left                  : '50%',
-                right                 : 'auto',
-                bottom                : 'auto',
-                marginRight           : '-50%',
-                paddingTop            : '5px',
-                paddingRight          : '10px',
-                paddingBottom         : '10px',
-                transform             : 'translate(-50%, -50%)',
-                fontFamily: "Segoe UI",
-                color: "#FFFFFF",
-                borderRadius: "5px",
-                backgroundColor: "#222222",
-                boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.1)"
+
+        const iconButtonStyles = {
+            root: {
+              color: theme.semanticColors.bodyText,
+              marginLeft: 'auto',
+              marginTop: '4px',
+              marginRight: '2px',
             },
-            overlay: {zIndex: 1000}
-        };
+            rootHovered: {
+              color: theme.semanticColors.bodyBackgroundHovered,
+            },
+          };
 
         const featureOptions: IDropdownOption[] = this.props.dashboardContext.modelMetadata.featureNames.map(x => { return {key: x, text: x}});
 
@@ -407,6 +399,8 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             const ChevronUp = () => <Icon iconName="ChevronUp" className={styles.chevronIcon} />;
             const ChevronDown = () => <Icon iconName="ChevronDown" className={styles.chevronIcon} />;
 
+            const cancelIcon: IIconProps = { iconName: 'Cancel' };
+            
             mainChart = 
                     <div className={styles.main}>
                         <div className={styles.mainLeft}>
@@ -429,15 +423,26 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                             </div>
                             <div className={styles.howTo}>
                                     <ActionButton onClick={this.handleOpenModalHelp}><div className={styles.infoButton}>i</div>{localization.ModelComparison.howToRead}</ActionButton>
-                                    <ReactModal
-                                        style={modalStyles}
-                                        appElement={document.getElementById('app') as HTMLElement}
+                                    <Modal
+                                        titleAriaId="intro modal"
                                         isOpen={this.state.showModalHelp}
-                                        contentLabel="Minimal Modal Example"
+                                        onDismiss={this.handleCloseModalHelp}
+                                        isModeless={true}
+                                        containerClassName={styles.modalContentHelp}
                                         >
-                                        {/* <ActionButton className={WizardReport.classNames.closeButton} onClick={this.handleCloseModalHelp}>x</ActionButton> */}
-                                        <p className={styles.modalContentHelp}>{localization.Report.classificationAccuracyHowToRead1}<br/><br/>{localization.Report.classificationAccuracyHowToRead2}<br/><br/>{localization.Report.classificationAccuracyHowToRead3}<br /><br /><ActionButton className={styles.doneButton} onClick={this.handleCloseModalHelp}>Done</ActionButton></p>
-                                    </ReactModal>
+                                        <div style={{display: "flex"}}>
+                                            <IconButton
+                                            styles={iconButtonStyles}
+                                            iconProps={cancelIcon}
+                                            ariaLabel="Close popup modal"
+                                            onClick={this.handleCloseModalHelp}
+                                            />
+                                        </div>
+                                        <p className={styles.modalContentHelpText}>{localization.Report.classificationAccuracyHowToRead1}<br/><br/>{localization.Report.classificationAccuracyHowToRead2}<br/><br/>{localization.Report.classificationAccuracyHowToRead3}<br /><br /></p>
+                                        <div style={{display: "flex", paddingBottom: "20px"}}>
+                                            <PrimaryButton className={styles.doneButton} onClick={this.handleCloseModalHelp}>Done</PrimaryButton>
+                                        </div>
+                                    </Modal>
                             </div>
                             <div className={styles.presentationArea} style={{height: `${areaHeights}px`}}>
                                 <SummaryTable 

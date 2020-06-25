@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, FontSizes } from "office-ui-fabric-react";
 
 export interface IWizardReportStyles {
     spinner: IStyle;
@@ -40,6 +40,7 @@ export interface IWizardReportStyles {
     multimodelSection: IStyle;
     modelLabel: IStyle;
     modalContentHelp: IStyle;
+    modalContentHelpText: IStyle;
     groupLabel: IStyle;
     legendPanel: IStyle;
     legendTitle: IStyle;
@@ -230,7 +231,7 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             marginLeft: "250px"
         },
         closeButton: {
-            color: "#FFFFFF",
+            color: theme.semanticColors.bodyText,
             float: "right",
             fontFamily: "Arial",
             fontSize: "20px",
@@ -239,13 +240,13 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
             paddingLeft: "20px"
         },
         doneButton: {
-            color: "#FFFFFF",
-            borderRadius: "5px",
-            background: "#5A53FF",
-            padding: "5px 15px",
-            selectors: {
-                '&:hover': { color: "#ffffff" }
-            }
+            margin: "auto",
+            height: "44px",
+            padding: "12px",
+            lineHeight: "24px",
+            color: theme.semanticColors.bodyText,
+            fontSize: FontSizes.large,
+            fontWeight: FontWeights.regular
         },
         equalizedOdds: {
             color: theme.semanticColors.bodyText,
@@ -271,11 +272,12 @@ export const WizardReportStyles: () => IProcessedStyleSet<IWizardReportStyles> =
         },
         modalContentHelp: {
             float: 'left',
-            paddingTop: '10px',
-            paddingRight: '20px',
-            wordWrap: "break-word",
-            width: "300px",
-            textAlign: "center"
+            width: "350px",
+        },
+        modalContentHelpText: {
+            padding: "0px 20px",
+            textAlign: "center",
+            wordWrap: "break-word"
         },
         modelLabel: {
             fontSize: "24px",

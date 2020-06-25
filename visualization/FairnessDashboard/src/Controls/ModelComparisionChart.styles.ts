@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, ThemeSettingName } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, ThemeSettingName, FontSizes } from "office-ui-fabric-react";
 
 export interface IModelComparisionChartStyles {
     frame: IStyle;
@@ -10,7 +10,9 @@ export interface IModelComparisionChartStyles {
     doneButton: IStyle;
     infoButton: IStyle;
     modalContentIntro: IStyle;
+    modalContentIntroText: IStyle;
     modalContentHelp: IStyle;
+    modalContentHelpText: IStyle;
     editButton: IStyle;
     howTo: IStyle;
     main: IStyle;
@@ -78,25 +80,31 @@ export const ModelComparisionChartStyles: () => IProcessedStyleSet<IModelCompari
             marginRight: "3px"
         },
         doneButton: {
-            color: "#FFFFFF",
-            borderRadius: "5px",
-            background: "#5A53FF",
-            padding: "5px 15px",
-            selectors: {
-                '&:hover': { color: "#ffffff" }
-            }
+            margin: "auto",
+            height: "44px",
+            padding: "12px",
+            lineHeight: "24px",
+            color: theme.semanticColors.bodyText,
+            fontSize: FontSizes.large,
+            fontWeight: FontWeights.regular
         },
         modalContentIntro: {
             float: 'left',
-            textAlign: 'center',
-            paddingTop: '10px',
-            paddingRight: '20px'
+            width: "250px"
+        },
+        modalContentIntroText: {
+            padding: "0px 20px",
+            textAlign: "center",
+            wordWrap: "break-word"
         },
         modalContentHelp: {
             float: 'left',
-            textAlign: 'center',
-            paddingTop: '10px',
-            paddingRight: '20px',
+            width: "250px",
+        },
+        modalContentHelpText: {
+            padding: "0px 20px",
+            textAlign: "center",
+            wordWrap: "break-word"
         },
         editButton: {
             color: theme.semanticColors.buttonText,
