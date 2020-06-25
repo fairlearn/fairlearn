@@ -85,6 +85,9 @@ Can the Fairlearn library recommend ways to make my model fairer?
     you can then work out how to use the various algorithms and fairness metrics
     which Fairlearn supports to develop models which are
     *fairer by the standard you have chosen*.
+    Even then, you should remember that some notions of fairness (such as justice
+    or due process) are not amenable to mathematical expression or algorithmic
+    mitigation.
 
 What unfairness mitigation techniques does Fairlearn support?
     Please see our :ref:`mitigation` section.
