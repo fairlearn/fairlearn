@@ -109,7 +109,7 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # %%
 # Looking at the disparity in accuracy, we see that males have an error
 # about three times greater than the females.
-# More interesting is the disparity in opportunitiy - males are offered loans at
+# More interesting is the disparity in opportunity - males are offered loans at
 # three times the rate of females.
 #
 # Despite the fact that we removed the feature from the training data, our
