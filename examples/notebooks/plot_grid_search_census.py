@@ -163,7 +163,7 @@ predictors = sweep.predictors_
 # calculated for the protected attribute; other potentially protected attributes will
 # not be mitigated).
 # In general, one might not want to do this, since there may be other considerations
-# beyond the strict optimisation of error and disparity (of the given protected attribute).
+# beyond the strict optimization of error and disparity (of the given protected attribute).
 
 errors, disparities = [], []
 for m in predictors:
