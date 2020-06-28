@@ -1,5 +1,5 @@
-import { IModelMetadata } from "mlchartlib";
-import { PredictionType } from "./IFairnessProps";
+import { IModelMetadata } from 'mlchartlib';
+import { PredictionType } from './IFairnessProps';
 
 export interface IFairnessContext {
     // rows by [aug columns + feature columns + trueY + groupIndex]
