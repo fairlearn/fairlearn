@@ -39,6 +39,9 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
        \frac{1}{n} \sum_{i=1}^{n} \mathbf{z}_{i}\left(\mathbf{s}_{i}-\overline{\mathbf{s}}\right)^{T}=\mathbf{0}
 
 
+    The solution to this problem is found by centering sensitive features, fitting a
+    linear regression model to the non-sensitive features and reporting the residual.
+
     The columns in :math:`S` will be dropped but the hyper parameter :math:`\alpha` does allow you to tweak
     the amount of filtering that gets applied.
 
