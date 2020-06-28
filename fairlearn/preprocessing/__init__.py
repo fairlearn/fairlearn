@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
-"""This module contains preprocessing steps that help make pipelines more fair."""
+"""This module contains preprocessing algorithms for unfairness mitigation."""
 
-from ._information_filter import InformationFilter
+from ._correlation_remover import CorrelationRemover
 
-__all__ = ["InformationFilter"]
+__all__ = ["CorrelationRemover"]

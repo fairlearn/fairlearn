@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import estimator_checks
 
-from fairlearn.preprocessing import InformationFilter
+from fairlearn.preprocessing import CorrelationRemover
 
 
 @pytest.mark.parametrize(
@@ -41,8 +41,8 @@ from fairlearn.preprocessing import InformationFilter
     ]
 )
 def test_estimator_checks(test_fn):
-    test_fn(InformationFilter.__name__, InformationFilter(columns=[]))
-    test_fn(InformationFilter.__name__, InformationFilter(columns=[0]))
+    test_fn(CorrelationRemover.__name__, CorrelationRemover(sensitive_feature_ids=[]))
+    test_fn(CorrelationRemover.__name__, CorrelationRemover(sensitive_feature_ids=[0]))
 
 
 @pytest.mark.parametrize("transform", [np.array, pd.DataFrame, list])
@@ -53,7 +53,7 @@ def test_linear_dependence(transform):
     X_sensitive = X[:, 0]
     X = transform(X)
 
-    X_tfm = InformationFilter(columns=[0]).fit(X).transform(X)
+    X_tfm = CorrelationRemover(sensitive_feature_ids=[0]).fit(X).transform(X)
 
     cov_col_0 = np.cov(X_sensitive, X_tfm[:, 0])
     cov_col_1 = np.cov(X_sensitive, X_tfm[:, 1])
