@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
@@ -50,20 +51,23 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
       X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
     """
 
-    def __init__(self, sensitive_feature_ids=None, alpha=1.0, center=True):
+    def __init__(self, *, sensitive_feature_ids=None, alpha=1.0, center=True):
         self.columns = sensitive_feature_ids
         self.alpha = alpha
         self.center = center
 
     def _split_X(self, X):
         """Split up X into a sensitive and non-sensitive group."""
-        sensitive = self.columns
-        non_sensitive = [i for i in range(X.shape[1]) if i not in sensitive]
-        return X[:, non_sensitive], X[:, sensitive]
+        if isinstance(X, pd.DataFrame):
+            sens_df = X[self.columns]
+            non_sens_df = X[[c for c in X.columns if c not in self.columns]]
+            return sens_df.values, non_sens_df.values
+        non_sensitive = [i for i in range(X.shape[1]) if i not in self.columns]
+        return X[:, non_sensitive], X[:, self.columns]
 
     def fit(self, X, y=None):
         """Learn the projection required to make the dataset orthogonal to sensitive columns."""
-        X = check_array(X, estimator=self)
+        X = check_array(X, estimator=self,  force_all_finite=True)
         if (not self.columns) or (len(self.columns) == 0):
                 raise ValueError(f"No sensitive feature ids were passed to this object, got {self.columns}")
         X_use, X_sensitive = self._split_X(X)
@@ -75,8 +79,8 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         """Transform X by applying the information filter."""
-        X = check_array(X, estimator=self)
-        check_is_fitted(self, ["beta_", "X_shape_"])
+        X = check_array(X, estimator=self, dtype=None, force_all_finite=True)
+        check_is_fitted(self, ["beta_", "X_shape_", "sensitive_mean_"])
         if self.X_shape_[1] != X.shape[1]:
             raise ValueError(f"The trained data has {self.X_shape_[1]} while this dataset has {X.shape[1]}.")
         X_use, X_sensitive = self._split_X(X)
