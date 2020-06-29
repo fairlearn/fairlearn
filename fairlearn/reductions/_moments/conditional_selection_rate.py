@@ -38,22 +38,26 @@ class UtilityParity(ClassificationMoment):
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
-    :param difference_bound: the constraints' difference bound for constraints that are expressed
+    Parameters
+    ----------
+    difference_bound : float
+        The constraints' difference bound for constraints that are expressed
         as differences, often referred to as :math:`\\epsilon`.
         If `ratio_bound` is used then `difference_bound` needs to be None.
-        If neither `ratio_bound` nor `difference_bound` are set then a default difference bound of
-        0.01 is used for backwards compatibility. Default None.
-    :type difference_bound: float
-    :param: ratio_bound: the constraints' ratio bound for constraints that are expressed as
-        ratios. The specified value needs to abide by :math:`0 < \\text{ratio_bound} \\leq 1`.
+        If neither `ratio_bound` nor `difference_bound` are set then a default
+        difference bound of 0.01 is used for backwards compatibility.
+        Default None.
+    ratio_bound : float
+        The constraints' ratio bound for constraints that are expressed as
+        ratios. The specified value needs to abide by
+        :math:`0 < \\text{ratio_bound} \\leq 1`.
         If `difference_bound` is used then `ratio_bound` needs to be None.
         Default None.
-    :type ratio_bound: float
-    :param ratio_bound_slack: the constraints' ratio bound slack for constraints that are
+    ratio_bound_slack : float
+        The constraints' ratio bound slack for constraints that are
         expressed as ratios, usually referred to as :math:`\\epsilon`.
         `ratio_bound_slack` is ignored if `ratio_bound` is not specified.
         Default 0.0
-    :type ratio_bound_slack: float
     """
 
     def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):

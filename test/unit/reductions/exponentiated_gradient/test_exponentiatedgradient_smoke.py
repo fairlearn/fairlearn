@@ -254,7 +254,12 @@ class TestExponentiatedGradientSmoke:
     def test_smoke_flipped(self, testdata):
         self.run_smoke_test(testdata, flipped=True)
 
-    @pytest.mark.parametrize("Constraints", [TruePositiveRateParity, DemographicParity])
+    @pytest.mark.parametrize("Constraints", [
+        TruePositiveRateParity,
+        TrueNegativeRateParity,
+        DemographicParity,
+        EqualizedOdds,
+        ErrorRateParity])
     def test_simple_fit_predict(self, Constraints):
         estimator = LeastSquaresBinaryClassifierLearner()
 
