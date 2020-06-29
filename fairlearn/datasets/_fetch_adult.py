@@ -4,7 +4,7 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
-from ._common import _DOWNLOAD_DIRECTORY_NAME
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
 def fetch_adult(*, cache=True, data_home=None,
@@ -66,9 +66,6 @@ def fetch_adult(*, cache=True, data_home=None,
         DESCR : string
             Description of the UCI Adult dataset.
 
-    Notes
-    -----
-    This dataset consists of 48842 samples and 14 features.
     """
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME

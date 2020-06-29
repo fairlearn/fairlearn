@@ -5,6 +5,7 @@ import pathlib
 import warnings
 
 from sklearn.datasets import fetch_openml
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 from fairlearn.exceptions import DataFairnessWarning
 
@@ -108,7 +109,7 @@ def fetch_boston(*, cache=True, data_home=None,
         msg = "You are about to use a dataset with known fairness issues."
         warnings.warn(DataFairnessWarning(msg))
     if not data_home:
-        data_home = pathlib.Path().home() / ".fairlearn-data"
+        data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
     return fetch_openml(
         data_id=531,
         data_home=data_home,

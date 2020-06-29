@@ -3,9 +3,3 @@
 
 
 _DOWNLOAD_DIRECTORY_NAME = ".fairlearn-data"
-
-
-class FairnessWarning(UserWarning):
-    """Custom warning meant to be raised when loading unfair datasets."""
-
-    pass
