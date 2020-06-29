@@ -42,7 +42,7 @@ You are a contractor working with the police department in a large city.  One of
 Scheduling maintenance within a factory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You work within a manufacturing company, and are starting a new project that will create a schedule assigning employees to check and update certain components of the machinery to prevent critical operation failures. The component assignment is based on data that show how often different components have worn out and broken down in the past.
-`Kyung Lee (2018) <AlgoManagePerception.pdf>`_
+`Kyung Lee (2018) <https://journals.sagepub.com/doi/full/10.1177/2053951718756684>`_
 
 Child protective services hotline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
