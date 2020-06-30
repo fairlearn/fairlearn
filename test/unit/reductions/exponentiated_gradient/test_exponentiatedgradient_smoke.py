@@ -188,8 +188,8 @@ class TestExponentiatedGradientSmoke:
         {"cons_class": TrueNegativeRateParity, "eps": 0.005,
          "best_gap": 0.0, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
-         "error": 0.25, "n_oracle_calls": 16, "n_oracle_calls_dummy_returned": 0,
-         "n_predictors": 2}
+         "error": 0.427133, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 3}
     ]
     smoke_test_data_flipped = [
         {"cons_class": TruePositiveRateParity, "eps": 0.005,
@@ -197,6 +197,11 @@ class TestExponentiatedGradientSmoke:
          "best_iter": 5, "disp": 0.005000,
          "error": 0.427133, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 3},
+        {"cons_class": TrueNegativeRateParity, "eps": 0.005,
+         "best_gap": 0.0, "last_iter": 5,
+         "best_iter": 5, "disp": 0.005000,
+         "error": 0.25, "n_oracle_calls": 16, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 2},
         {"cons_class": EqualizedOdds, "eps": 0.005,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
