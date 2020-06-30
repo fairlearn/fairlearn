@@ -92,8 +92,11 @@ def fetch_boston(*, cache=True, data_home=None,
         DESCR : string
             Description of the Boston housing dataset.
 
-    (data, target) : tuple
-        if ``return_X_y`` is True
+    (data, target) : tuple of (numpy.ndarray, numpy.ndarray) or (pandas.DataFrame, pandas.Series)
+        if ``return_X_y`` is True and ``as_frame`` is False
+
+    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
+        if ``return_X_y`` is True and ``as_frame`` is True
 
     Notes
     -----
@@ -104,6 +107,7 @@ def fetch_boston(*, cache=True, data_home=None,
     ----------
     https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8
     https://github.com/scikit-learn/scikit-learn/issues/16155
+
     """
     if warn:
         msg = "You are about to use a dataset with known fairness issues."

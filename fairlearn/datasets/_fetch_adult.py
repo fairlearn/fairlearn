@@ -66,6 +66,12 @@ def fetch_adult(*, cache=True, data_home=None,
         DESCR : string
             Description of the UCI Adult dataset.
 
+    (data, target) : tuple of (numpy.ndarray, numpy.ndarray) or (pandas.DataFrame, pandas.Series)
+        if ``return_X_y`` is True and ``as_frame`` is False
+
+    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
+        if ``return_X_y`` is True and ``as_frame`` is True
+
     """
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
