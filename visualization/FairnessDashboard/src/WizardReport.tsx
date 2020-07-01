@@ -664,7 +664,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                         />
                     </div>
                 </div>
-                {{ mainChart }}
+                {mainChart}
             </div>
         );
     }

@@ -13,7 +13,7 @@
     "build": "tsc",
     "build-css": "node-sass-chokidar src/ -o rel/ && node-sass-chokidar src/ -o rel/FairnessDashboard",
     "build-dev": "npm run build && npm run copy",
-    "copy": "cp -r rel/ ../test/test-page/node_modules/fairlearn-dashboard/ && cp -r rel/ ../../fairlearn/widget/js/node_modules/fairlearn-dashboard/",    
+    "copy": "xcopy \"rel\" \"..\\test\\test-page\\node_modules\\fairlearn-dashboard\\rel\" /e /y",
     "lintci": "eslint \"**/*.{js,ts,tsx}\" --quiet",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --quiet --fix"
   },

@@ -97,7 +97,11 @@ export class IntroTab extends React.PureComponent<IIntroTabProps> {
                                 </Text>
                                 <Text variant={'large'}>{localization.Intro.features}</Text>
                             </div>
-                            <div className={styles.explanatoryStep}>
+                            <Text className={styles.explanatoryText} block>
+                                {localization.Intro.featuresInfo}
+                            </Text>
+                        </div>
+                        <div className={styles.explanatoryStep}>
                                 <div>
                                     <Text variant={'large'} className={styles.numericLabel}>
                                         02
@@ -107,7 +111,6 @@ export class IntroTab extends React.PureComponent<IIntroTabProps> {
                                 <Text className={styles.explanatoryText} block>
                                     {localization.Intro.accuracyInfo}
                                 </Text>
-                            </div>
                         </div>
                         <div className={styles.explanatoryStep}>
                             <div>
@@ -116,7 +119,9 @@ export class IntroTab extends React.PureComponent<IIntroTabProps> {
                                 </Text>
                                 <Text variant={'large'}>{localization.Intro.parity}</Text>
                             </div>
-                            <div className={styles.explanatoryText}>{localization.Intro.parityInfo}</div>
+                            <Text className={styles.explanatoryText} block>
+                                {localization.Intro.parityInfo}
+                            </Text>
                         </div>
                     </div>
                     <Stack horizontalAlign={'end'} style={{ marginTop: '20px' }}>
