@@ -1,27 +1,26 @@
-import { initializeIcons } from "@uifabric/icons";
-import _ from "lodash";
-import { ICategoricalRange, ModelMetadata, RangeTypes, SelectionContext } from "mlchartlib";
-import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
-import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
-import { Text } from "office-ui-fabric-react";
-import React from "react";
-import { AccuracyOptions, IAccuracyOption } from "./AccuracyMetrics";
-import { ParityOptions, IParityOption } from "./ParityMetrics";
-import { BinnedResponseBuilder } from "./BinnedResponseBuilder";
-import { AccuracyTab } from "./Controls/AccuracyTab";
-import { FeatureTab } from "./Controls/FeatureTab";
-import { IntroTab } from "./Controls/IntroTab";
-import { ModelComparisonChart } from "./Controls/ModelComparisonChart";
-import { ParityTab } from "./Controls/ParityTab";
-import { IBinnedResponse } from "./IBinnedResponse";
-import { IFairnessContext, IFairnessModelMetadata } from "./IFairnessContext";
-import { IFairnessProps, PredictionType, PredictionTypes } from "./IFairnessProps";
-import { localization } from "./Localization/localization";
-import { MetricsCache } from "./MetricsCache";
-import { WizardReport } from "./WizardReport";
-import { FairnessWizardStyles } from "./FairnessWizard.styles";
-import { loadTheme } from "office-ui-fabric-react";
-import { defaultTheme } from "./Themes";
+import { initializeIcons } from '@uifabric/icons';
+import _ from 'lodash';
+import { ICategoricalRange, ModelMetadata, RangeTypes, SelectionContext } from 'mlchartlib';
+import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+import { Stack, StackItem } from 'office-ui-fabric-react/lib/Stack';
+import React from 'react';
+import { AccuracyOptions, IAccuracyOption } from './AccuracyMetrics';
+import { AccuracyTab } from './Controls/AccuracyTab';
+import { FeatureTab } from './Controls/FeatureTab';
+import { IntroTab } from './Controls/IntroTab';
+import { ModelComparisonChart } from './Controls/ModelComparisonChart';
+import { ParityTab } from './Controls/ParityTab';
+import { IBinnedResponse } from './IBinnedResponse';
+import { IFairnessContext, IFairnessModelMetadata } from './IFairnessContext';
+import { IFairnessProps, PredictionType, PredictionTypes } from './IFairnessProps';
+import { localization } from './Localization/localization';
+import { MetricsCache } from './MetricsCache';
+import { WizardReport } from './WizardReport';
+import { FairnessWizardStyles } from './FairnessWizard.styles';
+import { loadTheme } from 'office-ui-fabric-react';
+import { defaultTheme } from './Themes';
+import { IParityOption, ParityOptions } from './ParityMetrics';
+import { BinnedResponseBuilder } from './BinnedResponseBuilder';
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -42,7 +41,7 @@ export interface IFeatureBinPickerProps {
 }
 
 export interface IWizardState {
-    showIntro: boolean,
+    showIntro: boolean;
     activeTabKey: string;
     selectedModelId?: number;
     dashboardContext: IFairnessContext;
@@ -55,30 +54,30 @@ export interface IWizardState {
     metricCache: MetricsCache;
 }
 
-const introTabKey = "introTab";
-const featureBinTabKey = "featureBinTab";
-const accuracyTabKey = "accuracyTab";
-const disparityTabKey = "disparityTab";
-const reportTabKey = "reportTab";
+const introTabKey = 'introTab';
+const featureBinTabKey = 'featureBinTab';
+const accuracyTabKey = 'accuracyTab';
+const disparityTabKey = 'disparityTab';
+const reportTabKey = 'reportTab';
 
 const flights = {
-    skipDisparity: false
-}
-
+    skipDisparity: false,
+};
 
 export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardState> {
     private static iconsInitialized = false;
-    
+
     private static initializeIcons(props: IFairnessProps): void {
         if (FairnessWizard.iconsInitialized === false && props.shouldInitializeIcons !== false) {
             initializeIcons(props.iconUrl);
             FairnessWizard.iconsInitialized = true;
         }
     }
-    
+
     private static buildModelNames(props: IFairnessProps): string[] {
-        return (!!props.modelNames && props.modelNames.length === props.predictedY.length) ?
-        props.modelNames : props.predictedY.map((unused, modelIndex) => `Model ${modelIndex}`);
+        return !!props.modelNames && props.modelNames.length === props.predictedY.length
+            ? props.modelNames
+            : props.predictedY.map((unused, modelIndex) => `Model ${modelIndex}`);
     }
 
     private static buildInitialFairnessContext(props: IFairnessProps): IFairnessContext {
@@ -89,7 +88,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             binVector: [],
             groupNames: [],
             modelMetadata: FairnessWizard.buildModelMetadata(props),
-            modelNames: FairnessWizard.buildModelNames(props)
+            modelNames: FairnessWizard.buildModelNames(props),
         };
     }
 
@@ -101,37 +100,37 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             binVector: props.precomputedFeatureBins[0].binVector,
             groupNames: props.precomputedFeatureBins[0].binLabels,
             modelMetadata: FairnessWizard.buildPrecomputedModelMetadata(props),
-            modelNames: FairnessWizard.buildModelNames(props)
+            modelNames: FairnessWizard.buildModelNames(props),
         };
-
     }
 
     private static getClassLength(props: IFairnessProps): number {
         return _.uniq(props.trueY).length;
-    
     }
 
     private static buildPrecomputedModelMetadata(props: IFairnessProps): IFairnessModelMetadata {
         let featureNames = props.dataSummary.featureNames;
         if (!featureNames) {
             featureNames = props.precomputedFeatureBins.map((binObject, index) => {
-                return binObject.featureBinName ||  localization.formatString(localization.defaultFeatureNames, index);
+                return binObject.featureBinName || localization.formatString(localization.defaultFeatureNames, index);
             }) as string[];
         }
-        const classNames = props.dataSummary.classNames || FairnessWizard.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
-        const featureRanges = props.precomputedFeatureBins.map(binMeta => {
+        const classNames =
+            props.dataSummary.classNames ||
+            FairnessWizard.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
+        const featureRanges = props.precomputedFeatureBins.map((binMeta) => {
             return {
                 uniqueValues: binMeta.binLabels,
-                rangeType: RangeTypes.categorical
+                rangeType: RangeTypes.categorical,
             } as ICategoricalRange;
         });
         return {
             featureNames,
             featureNamesAbridged: featureNames,
             classNames,
-            featureIsCategorical: props.precomputedFeatureBins.map(binMeta => true),
+            featureIsCategorical: props.precomputedFeatureBins.map((binMeta) => true),
             featureRanges,
-            predictionType: props.predictionType
+            predictionType: props.predictionType,
         };
     }
 
@@ -142,36 +141,60 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             if (props.testData && props.testData[0] !== undefined) {
                 featureLength = props.testData[0].length;
             }
-            featureNames = featureLength === 1 ?
-                [localization.defaultSingleFeatureName] :
-                FairnessWizard.buildIndexedNames(featureLength, localization.defaultFeatureNames);
+            featureNames =
+                featureLength === 1
+                    ? [localization.defaultSingleFeatureName]
+                    : FairnessWizard.buildIndexedNames(featureLength, localization.defaultFeatureNames);
         }
-        const classNames = props.dataSummary.classNames || FairnessWizard.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
-        const featureIsCategorical = ModelMetadata.buildIsCategorical(featureNames.length, props.testData, props.dataSummary.categoricalMap);
-        const featureRanges = ModelMetadata.buildFeatureRanges(props.testData, featureIsCategorical, props.dataSummary.categoricalMap);
-        const predictionType = FairnessWizard.determinePredictionType(props.trueY, props.predictedY, props.predictionType);
+        const classNames =
+            props.dataSummary.classNames ||
+            FairnessWizard.buildIndexedNames(FairnessWizard.getClassLength(props), localization.defaultClassNames);
+        const featureIsCategorical = ModelMetadata.buildIsCategorical(
+            featureNames.length,
+            props.testData,
+            props.dataSummary.categoricalMap,
+        );
+        const featureRanges = ModelMetadata.buildFeatureRanges(
+            props.testData,
+            featureIsCategorical,
+            props.dataSummary.categoricalMap,
+        );
+        const predictionType = FairnessWizard.determinePredictionType(
+            props.trueY,
+            props.predictedY,
+            props.predictionType,
+        );
         return {
             featureNames,
             featureNamesAbridged: featureNames,
             classNames,
             featureIsCategorical,
             featureRanges,
-            predictionType
+            predictionType,
         };
     }
 
     private static buildIndexedNames(length: number, baseString: string): string[] {
-        return Array.from(Array(length).keys())
-        .map(i => localization.formatString(baseString, i.toString()) as string);
+        return Array.from(Array(length).keys()).map(
+            (i) => localization.formatString(baseString, i.toString()) as string,
+        );
     }
-    
-    private static determinePredictionType(trueY: number[], predictedYs: number[][], specifiedType?: PredictionType): PredictionType {
-        if (specifiedType === PredictionTypes.binaryClassification
-            || specifiedType === PredictionTypes.probability
-            || specifiedType === PredictionTypes.regression) {
+
+    private static determinePredictionType(
+        trueY: number[],
+        predictedYs: number[][],
+        specifiedType?: PredictionType,
+    ): PredictionType {
+        if (
+            specifiedType === PredictionTypes.binaryClassification ||
+            specifiedType === PredictionTypes.probability ||
+            specifiedType === PredictionTypes.regression
+        ) {
             return specifiedType;
         }
-        const predictedIsPossibleProba = predictedYs.every(predictionVector => predictionVector.every(x => x >= 0 && x <= 1));
+        const predictedIsPossibleProba = predictedYs.every((predictionVector) =>
+            predictionVector.every((x) => x >= 0 && x <= 1),
+        );
         const trueIsBinary = _.uniq(trueY).length < 3;
         if (!trueIsBinary) {
             return PredictionTypes.regression;
@@ -190,26 +213,31 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
     constructor(props: IFairnessProps) {
         super(props);
         FairnessWizard.initializeIcons(props);
+        if (this.props.locale) {
+            localization.setLanguage(this.props.locale);
+        }
         let accuracyMetrics: IAccuracyOption[];
         let parityMetrics: IParityOption[];
         loadTheme(props.theme || defaultTheme);
-        this.selections = new SelectionContext("models", 1);
-        this.selections.subscribe({selectionCallback: (strings: string[]) => {
-            const numbers = strings.map(s => +s);
-            this.setSelectedModel(numbers[0]);
-        }});
+        this.selections = new SelectionContext('models', 1);
+        this.selections.subscribe({
+            selectionCallback: (strings: string[]) => {
+                const numbers = strings.map((s) => +s);
+                this.setSelectedModel(numbers[0]);
+            },
+        });
         // handle the case of precomputed metrics separately. As it becomes more defined, can integrate with existing code path.
         if (this.props.precomputedMetrics && this.props.precomputedFeatureBins) {
             // we must assume that the same accuracy metrics are provided across models and bins
             accuracyMetrics = this.buildAccuracyListForPrecomputedMetrics();
             parityMetrics = this.buildParityListForPrecomputedMetrics();
-            let readonlyFeatureBins = this.props.precomputedFeatureBins.map((initialBin, index) => {
+            const readonlyFeatureBins = this.props.precomputedFeatureBins.map((initialBin, index) => {
                 return {
                     hasError: false,
                     array: initialBin.binLabels,
                     labelArray: initialBin.binLabels,
                     featureIndex: index,
-                    rangeType: RangeTypes.categorical
+                    rangeType: RangeTypes.categorical,
                 };
             });
             this.state = {
@@ -223,7 +251,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 featureBins: readonlyFeatureBins,
                 selectedBinIndex: 0,
                 selectedModelId: this.props.predictedY.length === 1 ? 0 : undefined,
-                metricCache: new MetricsCache(0,0,undefined, props.precomputedMetrics)
+                metricCache: new MetricsCache(0, 0, undefined, props.precomputedMetrics),
             };
             return;
         }
@@ -235,19 +263,21 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             fairnessContext.groupNames = featureBins[0].labelArray;
         }
 
-        accuracyMetrics = fairnessContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
-            this.props.supportedBinaryClassificationAccuracyKeys.map(key => AccuracyOptions[key]) :
-            (fairnessContext.modelMetadata.predictionType === PredictionTypes.regression ?
-                this.props.supportedRegressionAccuracyKeys.map(key => AccuracyOptions[key]) :
-                this.props.supportedProbabilityAccuracyKeys.map(key => AccuracyOptions[key]))
-        accuracyMetrics = accuracyMetrics.filter(metric => !!metric);
+        accuracyMetrics =
+            fairnessContext.modelMetadata.predictionType === PredictionTypes.binaryClassification
+                ? this.props.supportedBinaryClassificationAccuracyKeys.map((key) => AccuracyOptions[key])
+                : fairnessContext.modelMetadata.predictionType === PredictionTypes.regression
+                ? this.props.supportedRegressionAccuracyKeys.map((key) => AccuracyOptions[key])
+                : this.props.supportedProbabilityAccuracyKeys.map((key) => AccuracyOptions[key]);
+        accuracyMetrics = accuracyMetrics.filter((metric) => !!metric);
 
-        parityMetrics = fairnessContext.modelMetadata.predictionType === PredictionTypes.binaryClassification ?
-        this.props.supportedBinaryClassificationParityKeys.map(key => ParityOptions[key]) :
-        (fairnessContext.modelMetadata.predictionType === PredictionTypes.regression ?
-            this.props.supportedRegressionParityKeys.map(key => ParityOptions[key]) :
-            this.props.supportedProbabilityParityKeys.map(key => ParityOptions[key]))
-        parityMetrics = parityMetrics.filter(metric => !!metric);
+        parityMetrics =
+            fairnessContext.modelMetadata.predictionType === PredictionTypes.binaryClassification
+                ? this.props.supportedBinaryClassificationParityKeys.map((key) => ParityOptions[key])
+                : fairnessContext.modelMetadata.predictionType === PredictionTypes.regression
+                ? this.props.supportedRegressionParityKeys.map((key) => ParityOptions[key])
+                : this.props.supportedProbabilityParityKeys.map((key) => ParityOptions[key]);
+        parityMetrics = parityMetrics.filter((metric) => !!metric);
 
         this.state = {
             showIntro: true,
@@ -260,10 +290,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             featureBins,
             selectedBinIndex: 0,
             selectedModelId: this.props.predictedY.length === 1 ? 0 : undefined,
-            metricCache: new MetricsCache(
-                featureBins.length,
-                this.props.predictedY.length,
-                this.props.requestMetrics)
+            metricCache: new MetricsCache(featureBins.length, this.props.predictedY.length, this.props.requestMetrics),
         };
     }
 
@@ -272,80 +299,103 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         const accuracyPickerProps = {
             accuracyOptions: this.state.accuracyMetrics,
             selectedAccuracyKey: this.state.selectedAccuracyKey,
-            onAccuracyChange: this.setAccuracyKey
+            onAccuracyChange: this.setAccuracyKey,
         };
         const parityPickerProps = {
             parityOptions: this.state.parityMetrics,
             selectedParityKey: this.state.selectedParityKey,
-            onParityChange: this.setParityKey
+            onParityChange: this.setParityKey,
         };
         const featureBinPickerProps = {
             featureBins: this.state.featureBins,
             selectedBinIndex: this.state.selectedBinIndex,
-            onBinChange: this.setBinIndex
+            onBinChange: this.setBinIndex,
         };
         if (this.state.featureBins.length === 0) {
-            return (<Stack className={styles.frame}>
-                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader} >
-                    {/*<Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>*/}
+            return (
+                <Stack className={styles.frame}>
+                    <Stack
+                        horizontal
+                        horizontalAlign="space-between"
+                        verticalAlign="center"
+                        className={styles.thinHeader}
+                    >
+                        {/*<Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>*/}
+                    </Stack>
                 </Stack>
-                <Stack.Item grow={2} className={styles.body}>
-                    <Text variant={"mediumPlus"}>{localization.errorOnInputs}</Text>
-                </Stack.Item>
-            </Stack>);
+            );
         }
         return (
-             <Stack className={styles.frame}>
-                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader} >
+            <Stack className={styles.frame}>
+                <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader}>
                     {/*<Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>*/}
                 </Stack>
-                {(this.state.activeTabKey === introTabKey) &&
+                {this.state.activeTabKey === introTabKey && (
                     <StackItem grow={2} className={styles.body}>
-                        <IntroTab onNext={this.setTab.bind(this, featureBinTabKey)}/>
-                    </StackItem>}
-                 {(this.state.activeTabKey === featureBinTabKey ||
-                   this.state.activeTabKey === accuracyTabKey ||
-                   this.state.activeTabKey === disparityTabKey
-                 ) &&
+                        <IntroTab onNext={this.setTab.bind(this, featureBinTabKey)} />
+                    </StackItem>
+                )}
+                {(this.state.activeTabKey === featureBinTabKey ||
+                    this.state.activeTabKey === accuracyTabKey ||
+                    this.state.activeTabKey === disparityTabKey) && (
                     <Stack.Item grow={2} className={styles.body}>
                         <Pivot
                             className={styles.pivot}
                             styles={{
                                 itemContainer: {
-                                    height: "100%"
-                                }
+                                    height: '100%',
+                                },
                             }}
                             selectedKey={this.state.activeTabKey}
-                            onLinkClick={this.handleTabClick}>
-                            <PivotItem headerText={localization.sensitiveFeatures} itemKey={featureBinTabKey} style={{height: "100%", paddingLeft:"8px"}}>
+                            onLinkClick={this.handleTabClick}
+                        >
+                            <PivotItem
+                                headerText={localization.sensitiveFeatures}
+                                itemKey={featureBinTabKey}
+                                style={{ height: '100%', paddingLeft: '8px' }}
+                            >
                                 <FeatureTab
                                     dashboardContext={this.state.dashboardContext}
                                     selectedFeatureChange={this.setBinIndex}
                                     selectedFeatureIndex={this.state.selectedBinIndex}
-                                    featureBins={this.state.featureBins.filter(x => !!x)}
+                                    featureBins={this.state.featureBins.filter((x) => !!x)}
                                     onNext={this.setTab.bind(this, accuracyTabKey)}
                                     saveBin={this.saveBin}
                                 />
                             </PivotItem>
-                            <PivotItem headerText={localization.accuracyMetric} itemKey={accuracyTabKey} style={{height: "100%", paddingLeft:"8px"}}>
+                            <PivotItem
+                                headerText={localization.accuracyMetric}
+                                itemKey={accuracyTabKey}
+                                style={{ height: '100%', paddingLeft: '8px' }}
+                            >
                                 <AccuracyTab
                                     dashboardContext={this.state.dashboardContext}
                                     accuracyPickerProps={accuracyPickerProps}
-                                    onNext={this.setTab.bind(this, flights.skipDisparity ? reportTabKey : disparityTabKey)}
+                                    onNext={this.setTab.bind(
+                                        this,
+                                        flights.skipDisparity ? reportTabKey : disparityTabKey,
+                                    )}
                                     onPrevious={this.setTab.bind(this, featureBinTabKey)}
                                 />
                             </PivotItem>
-                            {(flights.skipDisparity === false) && (<PivotItem headerText={localization.disparityMetric} itemKey={disparityTabKey} style={{height: "100%", paddingLeft:"8px"}}>
-                                <ParityTab
-                                    dashboardContext={this.state.dashboardContext}
-                                    parityPickerProps={parityPickerProps}
-                                    onNext={this.setTab.bind(this, reportTabKey)}
-                                    onPrevious={this.setTab.bind(this, accuracyTabKey)}
-                                />
-                            </PivotItem>)}
+                            {flights.skipDisparity === false && (
+                                <PivotItem
+                                    headerText={localization.disparityMetric}
+                                    itemKey={disparityTabKey}
+                                    style={{ height: '100%', paddingLeft: '8px' }}
+                                >
+                                    <ParityTab
+                                        dashboardContext={this.state.dashboardContext}
+                                        parityPickerProps={parityPickerProps}
+                                        onNext={this.setTab.bind(this, reportTabKey)}
+                                        onPrevious={this.setTab.bind(this, accuracyTabKey)}
+                                    />
+                                </PivotItem>
+                            )}
                         </Pivot>
-                    </Stack.Item>}
-                {(this.state.activeTabKey === reportTabKey && this.state.selectedModelId !== undefined) &&
+                    </Stack.Item>
+                )}
+                {this.state.activeTabKey === reportTabKey && this.state.selectedModelId !== undefined && (
                     <WizardReport
                         showIntro={this.state.showIntro}
                         dashboardContext={this.state.dashboardContext}
@@ -358,8 +408,9 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         selectedModelIndex={this.state.selectedModelId}
                         onHideIntro={this.hideIntro.bind(this)}
                         onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
-                    />}
-                {(this.state.activeTabKey === reportTabKey && this.state.selectedModelId === undefined) &&
+                    />
+                )}
+                {this.state.activeTabKey === reportTabKey && this.state.selectedModelId === undefined && (
                     <ModelComparisonChart
                         showIntro={this.state.showIntro}
                         dashboardContext={this.state.dashboardContext}
@@ -371,58 +422,60 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         featureBinPickerProps={featureBinPickerProps}
                         onHideIntro={this.hideIntro.bind(this)}
                         onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
-                    />}
-             </Stack>
-         );
-        }
-        
-    private readonly hideIntro = () => {
-        this.setState({ showIntro: false});
+                    />
+                )}
+            </Stack>
+        );
     }
+
+    private readonly hideIntro = () => {
+        this.setState({ showIntro: false });
+    };
 
     private readonly buildAccuracyListForPrecomputedMetrics = (): IAccuracyOption[] => {
         const customMetrics: IAccuracyOption[] = [];
         const providedMetrics: IAccuracyOption[] = [];
-        Object.keys(this.props.precomputedMetrics[0][0]).forEach(key => {
-            let metric = AccuracyOptions[key];
+        Object.keys(this.props.precomputedMetrics[0][0]).forEach((key) => {
+            const metric = AccuracyOptions[key];
             if (metric !== undefined) {
                 if (metric.userVisible) {
                     providedMetrics.push(metric);
                 }
             } else {
                 const customIndex = this.props.customMetrics.findIndex((metric) => metric.id === key);
-                const customMetric = customIndex !== -1 ?
-                    this.props.customMetrics[customIndex] :
-                    {id: key};
+                const customMetric = customIndex !== -1 ? this.props.customMetrics[customIndex] : { id: key };
 
                 customMetrics.push({
                     key,
-                    title: customMetric.name ||
-                        localization.formatString(localization.defaultCustomMetricName, customMetrics.length) as string,
+                    title:
+                        customMetric.name ||
+                        (localization.formatString(
+                            localization.defaultCustomMetricName,
+                            customMetrics.length,
+                        ) as string),
                     isMinimization: true,
                     isPercentage: true,
-                    description: customMetric.description
+                    description: customMetric.description,
                 });
             }
         });
         return customMetrics.concat(providedMetrics);
-    }
+    };
 
     private readonly buildParityListForPrecomputedMetrics = (): IParityOption[] => {
         const customMetrics: IParityOption[] = [];
         const providedMetrics: IParityOption[] = [];
-        Object.keys(this.props.precomputedMetrics[0][0]).forEach(key => {
-            let metric = ParityOptions[key];
+        Object.keys(this.props.precomputedMetrics[0][0]).forEach((key) => {
+            const metric = ParityOptions[key];
             if (metric !== undefined) {
                 // if (metric.userVisible) {
-                    providedMetrics.push(metric);
+                providedMetrics.push(metric);
                 // }
             } else {
                 // const customIndex = this.props.customMetrics.findIndex((metric) => metric.id === key);
                 // const customMetric = customIndex !== -1 ?
                 //     this.props.customMetrics[customIndex] :
                 //     {id: key};
-
                 // customMetrics.push({
                 //     key,
                 //     title: customMetric.name ||
@@ -432,27 +485,27 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             }
         });
         return customMetrics.concat(providedMetrics);
-    }
+    };
 
     private readonly setTab = (key: string) => {
-        this.setState({ activeTabKey: key});
-    }
+        this.setState({ activeTabKey: key });
+    };
 
     private readonly setSelectedModel = (index: number) => {
-        this.setState({selectedModelId: index});
-    }
+        this.setState({ selectedModelId: index });
+    };
 
     private readonly setAccuracyKey = (key: string) => {
-        const value: Partial<IWizardState> = {selectedAccuracyKey: key};
+        const value: Partial<IWizardState> = { selectedAccuracyKey: key };
         if (flights.skipDisparity) {
             value.selectedParityKey = key;
         }
         this.setState(value as IWizardState);
-    }
+    };
 
     private readonly setParityKey = (key: string) => {
-        this.setState({selectedParityKey: key});
-    }
+        this.setState({ selectedParityKey: key });
+    };
 
     private readonly setBinIndex = (index: number) => {
         if (this.props.precomputedMetrics) {
@@ -461,18 +514,17 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             newContext.binVector = this.props.precomputedFeatureBins[index].binVector;
             newContext.groupNames = this.props.precomputedFeatureBins[index].binLabels;
 
-            this.setState({dashboardContext: newContext, selectedBinIndex: index});
+            this.setState({ dashboardContext: newContext, selectedBinIndex: index });
         } else {
             this.binningSet(this.state.featureBins[index]);
         }
-    }
+    };
 
     private readonly handleTabClick = (item: PivotItem) => {
-        this.setState({activeTabKey: item.props.itemKey});
-    }
+        this.setState({ activeTabKey: item.props.itemKey });
+    };
 
     private readonly binningSet = (value: IBinnedResponse) => {
-
         if (!value || value.hasError || value.array.length === 0) {
             return;
         }
@@ -481,8 +533,8 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         newContext.binVector = this.generateBinVectorForBin(value, this.state.dashboardContext.dataset);
         newContext.groupNames = value.labelArray;
 
-        this.setState({dashboardContext: newContext, selectedBinIndex: value.featureIndex});
-    }
+        this.setState({ dashboardContext: newContext, selectedBinIndex: value.featureIndex });
+    };
 
     private generateBinVectorForBin(value: IBinnedResponse, dataset: any[][]): number[] {
         return dataset.map((row, rowIndex) => {
@@ -491,24 +543,30 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 // this handles categorical, as well as integers when user requests to treat as categorical
                 return value.array.indexOf(featureValue);
             } else {
-                return value.array.findIndex((upperLimit, groupIndex) => { return upperLimit >= featureValue; });
+                return value.array.findIndex((upperLimit, groupIndex) => {
+                    return upperLimit >= featureValue;
+                });
             }
         });
     }
 
     private readonly buildFeatureBins = (fairnessContext: IFairnessContext): IBinnedResponse[] => {
         return fairnessContext.modelMetadata.featureNames.map((name, index) => {
-            return BinnedResponseBuilder.buildDefaultBin(fairnessContext.modelMetadata.featureRanges[index], index, fairnessContext.dataset);
+            return BinnedResponseBuilder.buildDefaultBin(
+                fairnessContext.modelMetadata.featureRanges[index],
+                index,
+                fairnessContext.dataset,
+            );
         });
-    }
+    };
 
     private readonly saveBin = (bin: IBinnedResponse): void => {
         this.state.featureBins[bin.featureIndex] = bin;
         this.state.metricCache.clearCache(bin.featureIndex);
         this.binningSet(bin);
-    }
+    };
 
     private readonly onMetricError = (error: any): void => {
-        this.setState({activeTabKey: accuracyTabKey});
-    }
+        this.setState({ activeTabKey: accuracyTabKey });
+    };
 }

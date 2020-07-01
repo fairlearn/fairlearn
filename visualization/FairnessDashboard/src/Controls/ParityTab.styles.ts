@@ -1,4 +1,4 @@
-import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, FontSizes } from "office-ui-fabric-react";
+import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, FontSizes } from 'office-ui-fabric-react';
 
 export interface IParityTabStyles {
     iconClass: IStyle;
@@ -13,47 +13,46 @@ export interface IParityTabStyles {
 export const ParityTabStyles: () => IProcessedStyleSet<IParityTabStyles> = () => {
     const theme = getTheme();
     return mergeStyleSets<IParityTabStyles>({
-        itemCell:
-        {
-            padding: "30px 36px 20px 0",
-            width: "100%",
-            position: "relative",
-            float: "left",
-            cursor: "pointer",
-            boxSizing: "border-box",
-            borderBottom: "1px solid #CCCCCC",
+        itemCell: {
+            padding: '30px 36px 20px 0',
+            width: '100%',
+            position: 'relative',
+            float: 'left',
+            cursor: 'pointer',
+            boxSizing: 'border-box',
+            borderBottom: '1px solid #CCCCCC',
             selectors: {
-              '&:hover': { background: "lightgray" }
-            }
-          },
+                '&:hover': { background: 'lightgray' },
+            },
+        },
         iconClass: {
-            fontSize: "20px",
-            position: "absolute",
-            right: "10px",
-            top: "10px"
+            fontSize: '20px',
+            position: 'absolute',
+            right: '10px',
+            top: '10px',
         },
         itemsList: {
-            overflowY: "auto"
+            overflowY: 'auto',
         },
         frame: {
-            width: "750px",
-            height: "100%",
+            width: '750px',
+            height: '100%',
         },
         main: {
-            height: "100%",
-            minWidth: "550px",
-            flex: 1
+            height: '100%',
+            minWidth: '550px',
+            flex: 1,
         },
         header: {
             color: theme.semanticColors.bodyText,
             fontWeight: FontWeights.semibold,
-            margin: "26px 0"
+            margin: '26px 0',
         },
         textBody: {
             fontWeight: FontWeights.semilight,
             color: theme.semanticColors.bodyText,
-            paddingTop: "12px",
-            paddingBottom: "50px"
-        }
+            paddingTop: '12px',
+            paddingBottom: '50px',
+        },
     });
 };

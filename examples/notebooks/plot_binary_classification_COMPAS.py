@@ -326,11 +326,11 @@ data_grouped_by_sensitive_feature = _reformat_and_group_data(
 )
 data_grouped_by_sensitive_feature.describe()
 
-from fairlearn.postprocessing._roc_curve_utilities import _calculate_roc_points
+from fairlearn.postprocessing._tradeoff_curve_utilities import _calculate_tradeoff_points
 
 roc_points = {}
 for group_name, group in data_grouped_by_sensitive_feature:
-    roc_points[group_name] = _calculate_roc_points(
+    roc_points[group_name] = _calculate_tradeoff_points(
         data_grouped_by_sensitive_feature.get_group(group_name), 0
     )
 print("Thresholding rules:")
@@ -484,7 +484,7 @@ postprocessed_predictor_EO.fit(
 for (
     group,
     interpolation,
-) in postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature.items():
+) in postprocessed_predictor_EO.interpolated_thresholder_.interpolation_dict.items():
     print("{}:".format(group))
     print("\n ".join(interpolation.__repr__().split(",")))
     print("-----------------------------------")

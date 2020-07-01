@@ -1,11 +1,11 @@
-import { IFairnessContext } from "../IFairnessContext";
-import { MetricsCache } from "../MetricsCache";
+import { IFairnessContext } from '../IFairnessContext';
+import { MetricsCache } from '../MetricsCache';
 
 export enum FairnessChartModes {
-    bar = "bar",
-    beehive = "beehive",
-    violin = "violin",
-    box = "box"
+    bar = 'bar',
+    beehive = 'beehive',
+    violin = 'violin',
+    box = 'box',
 }
 
 export interface IFairnessChartProps {
@@ -21,5 +21,5 @@ export interface IFairnessChartProps {
 export interface IFairnessChartPickerProps extends IFairnessChartProps {
     selectedChart: FairnessChartModes;
     setSelectedChart: (mode: FairnessChartModes) => void;
-    metric: "accuracy" | "opportunity";
+    metric: 'accuracy' | 'opportunity';
 }

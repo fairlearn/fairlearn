@@ -1,11 +1,11 @@
-import React from "react";
-import { List } from "office-ui-fabric-react/lib/List";
-import { Stack, StackItem } from "office-ui-fabric-react/lib/Stack";
-import { Text } from "office-ui-fabric-react/lib/Text";
-import { mergeStyleSets } from "@uifabric/styling";
-import { Separator } from "office-ui-fabric-react/lib/Separator";
-import { localization } from "../Localization/localization";
-import { OverallTableStyles } from "./OverallTable.styles";
+import React from 'react';
+import { List } from 'office-ui-fabric-react/lib/List';
+import { Stack, StackItem } from 'office-ui-fabric-react/lib/Stack';
+import { Text } from 'office-ui-fabric-react/lib/Text';
+import { mergeStyleSets } from '@uifabric/styling';
+import { Separator } from 'office-ui-fabric-react/lib/Separator';
+import { localization } from '../Localization/localization';
+import { OverallTableStyles } from './OverallTable.styles';
 
 export interface IOverallTableProps {
     binValues: number[];
@@ -25,10 +25,8 @@ interface IBinItem {
 }
 
 export class OverallTable extends React.PureComponent<IOverallTableProps> {
-    private static readonly classNames = mergeStyleSets({
-        
-    });
-    
+    private static readonly classNames = mergeStyleSets({});
+
     public render(): React.ReactNode {
         const styles = OverallTableStyles();
         let minIndexes = [];
@@ -59,34 +57,39 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                     <div className={styles.groupLabel}>{/*this.props.binGroup*/}</div>
                     <div className={styles.flexCol}>
                         <div className={styles.binBox}>
-                                <div className={styles.binTitle}>{localization.Report.overallLabel}</div>
+                            <div className={styles.binTitle}>{localization.Report.overallLabel}</div>
                         </div>
                         {this.props.binLabels.map((label, index) => {
-                            if (this.props.expandAttributes) return (<div className={styles.binBox} key={index}>
-                                <div className={styles.binLabel}>{label}</div>
-                                {/* <Stack horizontal>
+                            if (this.props.expandAttributes)
+                                return (
+                                    <div className={styles.binBox} key={index}>
+                                        <div className={styles.binLabel}>{label}</div>
+                                        {/* <Stack horizontal>
                                     {minIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.minTag}</div>}
                                     {maxIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.maxTag}</div>}
                                 </Stack> */}
-                            </div>)
+                                    </div>
+                                );
                         })}
                     </div>
                 </div>
                 {this.props.metricLabels.map((metric, index) => {
                     return (
                         <div className={styles.metricCol}>
-                        <div className={styles.metricLabel}>{metric}</div>
-                        <div className={styles.flexCol}>
-                            <div className={styles.metricBox}>{this.props.overallMetrics[index]}</div>
-                            {this.props.formattedBinValues[index].map((value, index) => {
-                                if (this.props.expandAttributes) return (
-                                <div className={styles.metricBox} key={index}>
-                                    {value !== undefined ? value : 'empty'}
-                                </div>);
-                            })}
+                            <div className={styles.metricLabel}>{metric}</div>
+                            <div className={styles.flexCol}>
+                                <div className={styles.metricBox}>{this.props.overallMetrics[index]}</div>
+                                {this.props.formattedBinValues[index].map((value, index) => {
+                                    if (this.props.expandAttributes)
+                                        return (
+                                            <div className={styles.metricBox} key={index}>
+                                                {value !== undefined ? value : 'empty'}
+                                            </div>
+                                        );
+                                })}
+                            </div>
                         </div>
-                    </div>                        
-                    )
+                    );
                 })}
             </div>
         );

@@ -1,19 +1,19 @@
 export interface IDatasetSummary {
     featureNames?: string[];
     classNames?: string[];
-    categoricalMap?: {[key: number]: string[]};
+    categoricalMap?: { [key: number]: string[] };
 }
 
 export enum PredictionTypes {
-    binaryClassification = "binaryClassification",
-    regression = "regression",
-    probability = "probability"
+    binaryClassification = 'binaryClassification',
+    regression = 'regression',
+    probability = 'probability',
 }
 
-export type PredictionType = 
-    PredictionTypes.binaryClassification |
-    PredictionTypes.probability |
-    PredictionTypes.regression;
+export type PredictionType =
+    | PredictionTypes.binaryClassification
+    | PredictionTypes.probability
+    | PredictionTypes.regression;
 
 export interface IMetricResponse {
     global?: number;
@@ -43,9 +43,9 @@ export interface IFairnessProps {
     startingTabIndex?: number;
     dataSummary: IDatasetSummary;
     testData?: any[][];
-    precomputedMetrics?: Array<Array<{[key: string]: IMetricResponse}>>;
+    precomputedMetrics?: Array<Array<{ [key: string]: IMetricResponse }>>;
     precomputedFeatureBins?: IFeatureBinMeta[];
-    customMetrics:ICustomMetric[];
+    customMetrics: ICustomMetric[];
     predictionType?: PredictionTypes;
     // One array per each model;
     predictedY: number[][];
@@ -53,6 +53,7 @@ export interface IFairnessProps {
     trueY: number[];
     theme?: any;
     showIntro: boolean;
+    locale?: string;
     stringParams?: any;
     supportedBinaryClassificationAccuracyKeys: string[];
     supportedBinaryClassificationParityKeys: string[];
@@ -63,5 +64,5 @@ export interface IFairnessProps {
     shouldInitializeIcons?: boolean;
     iconUrl?: string;
     // The request hook
-    requestMetrics: ( request: IMetricRequest, abortSignal?: AbortSignal) =>  Promise<IMetricResponse>;
+    requestMetrics: (request: IMetricRequest, abortSignal?: AbortSignal) => Promise<IMetricResponse>;
 }

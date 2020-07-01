@@ -92,6 +92,7 @@ const lightTheme = createTheme({
         this.handleChange = this.handleChange.bind(this);
         this.handleThemeChange = this.handleThemeChange.bind(this);
         this.generateRandomScore = this.generateRandomScore.bind(this);
+        this.handleLanguageChange = this.handleLanguageChange.bind(this);
       }
 
       static choices = [
@@ -110,7 +111,10 @@ const lightTheme = createTheme({
 
       static languages = [
         {label: "english", val: "en-EN"},
-        {label: "spanish", val: "es-ES"}
+        {label: "spanish", val: "es-ES"},
+        {label: "german", val: "de-DE"},
+        {label: "chinese-s", val: "zh-CN"},
+        {label: "japanese", val:"ja-JP"}
       ]
 
       messages = {
@@ -213,6 +217,7 @@ const lightTheme = createTheme({
                         stringParams={{contextualHelp: this.messages}}
                         requestMetrics={this.generateRandomMetrics.bind(this)}
                         theme={theme}
+                        locale={this.state.language}
                         key={new Date()}
                       />
                   </div>
