@@ -83,3 +83,8 @@ Choosing new retail sites
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You work at a clothing company, as an analyst working to select the location for three new physical stores that will be opened in the next six months.  You're collaborating with a third-party vendor to estimate potential revenues at new site locations.  You've gathered data on past store openings, and shared it with the vendor, who has created a model that can estimate the potential revenue for the first two years of operation in new sites.  The vendor's model relies on data you've provided about your company's past openings, and other undisclosed data sources about retail sales, real-estate prices, foot traffic, etc.
 `company blog post <https://customers.microsoft.com/en-us/story/816179-carhartt-retailers-azure>`_
+
+Streaming music recommendations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You’re a member of a team working on the music recommendation system of a music streaming platform. Previously, your team has primarily focused on optimizing recommendations for user satisfaction, which is measured implicitly as time spent listening on the platform. The company has received complaints from several artists that their music is not getting enough exposure, many of whom belong to groups that are historically underrepresented in the music industry. Your team decides to work on improving the recommendation system to allow for more diverse recommendations.
+`Ferraro et al. (2019) <https://arxiv.org/pdf/1911.04827.pdf>`_
