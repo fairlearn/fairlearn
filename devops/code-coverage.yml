@@ -13,4 +13,11 @@ schedules:
   always: true
 
 jobs:
-- template: templates/code-coverage-job-template.yml
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platforms:  { Linux: ubuntu-latest }
+    testRunTypes: ['CodeCoverage']
+    installationType: 'PipLocal'
+    pyVersions: [3.6]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
