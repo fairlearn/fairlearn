@@ -317,15 +317,11 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                                     />
                                 </div>
                                 <p className={styles.modalContentIntroText}>
-                                    Each model is a selectable point. <br />
-                                    Click or tap on model for it's
-                                    <br />
-                                    full fairness assessment. <br />
-                                    <br />
+                                    {localization.ModelComparison.introModalText}
                                 </p>
                                 <div style={{ display: 'flex', paddingBottom: '20px' }}>
                                     <PrimaryButton className={styles.doneButton} onClick={this.handleCloseModalIntro}>
-                                        Done
+                                        {localization.done}
                                     </PrimaryButton>
                                 </div>
                             </Modal>
@@ -349,17 +345,13 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                                     />
                                 </div>
                                 <p className={styles.modalContentHelpText}>
-                                    The <b>x-axis</b> represents accuracy, <br />
-                                    with higher being better.
-                                    <br />
-                                    <br />
-                                    The <b>y-axis</b> represents disparity, <br /> with lower being better.
-                                    <br />
-                                    <br />
+                                    {localization.ModelComparison.helpModalText1}
+                                    <br/><br/>
+                                    {localization.ModelComparison.helpModalText2}
                                 </p>
                                 <div style={{ display: 'flex', paddingBottom: '20px' }}>
                                     <PrimaryButton className={styles.doneButton} onClick={this.handleCloseModalHelp}>
-                                        Done
+                                        {localization.done}
                                     </PrimaryButton>
                                 </div>
                             </Modal>

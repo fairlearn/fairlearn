@@ -564,7 +564,7 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
                                 </p>
                                 <div style={{ display: 'flex', paddingBottom: '20px' }}>
                                     <PrimaryButton className={styles.doneButton} onClick={this.handleCloseModalHelp}>
-                                        Done
+                                        {localization.done}
                                     </PrimaryButton>
                                 </div>
                             </Modal>
