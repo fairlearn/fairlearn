@@ -1,5 +1,9 @@
 # Code Coverage build pipeline
 
+variables:
+  FreezeArtifactStem: 'freeze'
+  FreezeFileStem: 'requirements-freeze'
+
 trigger: none
 
 pr: none
