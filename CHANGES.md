@@ -6,9 +6,11 @@
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
   `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.
 * API refactoring to separate out different uses of `eps` within
-  `ExponentiatedGradient`. It is now solely responsible for setting a bound on
-  the lambda vectors. The other usage of `eps` as a bound for constraints is
-  now captured directly on the moment classes as follows:
+  `ExponentiatedGradient`. It is now solely responsible for setting the L1
+  norm bound in the optimization (which controls the excess constraint
+  violation beyond what is allowed byt the `constraints` object).
+  The other usage of `eps` as the right-hand side of constraints is
+  now captured directly in the moment classes as follows:
   * Classification moments: `ConditionalSelectionRate` renamed to
     `UtilityParity` and its subclasses have new arguments on the constructor:
     * `difference_bound` - for difference-based constraints such as demographic
