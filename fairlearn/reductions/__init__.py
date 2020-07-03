@@ -32,7 +32,7 @@ _moments = [
     "DemographicParity",
     "EqualizedOdds",
     "TruePositiveRateParity",
-    "TrueNegativeRateParity",
+    "FalsePositiveRateParity",
     "ErrorRateParity",
     "ErrorRate",
     "BoundedGroupLoss",
