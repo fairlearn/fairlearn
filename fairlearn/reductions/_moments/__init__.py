@@ -21,7 +21,7 @@ __all__ = [
     "DemographicParity",
     "EqualizedOdds",
     "TruePositiveRateParity",
-    "TrueNegativeRateParity",
+    "FalsePositiveRateParity",
     "ErrorRateParity",
     "ErrorRate",
     "BoundedGroupLoss",
