@@ -11,7 +11,7 @@ from sklearn.dummy import DummyClassifier
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions._exponentiated_gradient._constants import _MIN_ITER
 from fairlearn.reductions import DemographicParity, EqualizedOdds, ErrorRateParity,\
-    TruePositiveRateParity, TrueNegativeRateParity, ErrorRate
+    TruePositiveRateParity, FalsePositiveRateParity, ErrorRate
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import sensitive_features, X1, labels, _get_data
 
@@ -185,7 +185,7 @@ class TestExponentiatedGradientSmoke:
          "best_iter": 5, "disp": 0.005000,
          "error": 0.25, "n_oracle_calls": 16, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 2},
-        {"cons_class": TrueNegativeRateParity, "eps": 0.005,
+        {"cons_class": FalsePositiveRateParity, "eps": 0.005,
          "best_gap": 0.0, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
          "error": 0.427133, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
@@ -197,7 +197,7 @@ class TestExponentiatedGradientSmoke:
          "best_iter": 5, "disp": 0.005000,
          "error": 0.427133, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 3},
-        {"cons_class": TrueNegativeRateParity, "eps": 0.005,
+        {"cons_class": FalsePositiveRateParity, "eps": 0.005,
          "best_gap": 0.0, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
          "error": 0.25, "n_oracle_calls": 16, "n_oracle_calls_dummy_returned": 0,
@@ -261,7 +261,7 @@ class TestExponentiatedGradientSmoke:
 
     @pytest.mark.parametrize("Constraints", [
         TruePositiveRateParity,
-        TrueNegativeRateParity,
+        FalsePositiveRateParity,
         DemographicParity,
         EqualizedOdds,
         ErrorRateParity])
