@@ -104,14 +104,6 @@ def test_binary_classification_on_compas_dataset():
 
 
 @pytest.mark.notebooks
-def test_grid_search_with_census_data():
-    nb_name = "Grid Search with Census Data"
-    test_values = {}
-    test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 13)
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
 def test_mitigating_disparities_in_ranking_from_binary_data():
     nb_name = "Mitigating Disparities in Ranking from Binary Data"
     test_values = {}
