@@ -6,8 +6,8 @@
 from .moment import Moment  # noqa: F401
 from .moment import ClassificationMoment, LossMoment  # noq: F401
 
-from .utility_rate import UtilityParity  # noqa: F401
-from .utility_rate import DemographicParity, EqualizedOdds, \
+from .utility_parity import UtilityParity  # noqa: F401
+from .utility_parity import DemographicParity, EqualizedOdds, \
     TruePositiveRateParity, FalsePositiveRateParity, ErrorRateParity  # noqa: F401
 from .error_rate import ErrorRate   # noqa: F401
 from .bounded_group_loss import BoundedGroupLoss   # noqa: F401
