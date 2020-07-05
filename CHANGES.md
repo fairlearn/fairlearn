@@ -8,7 +8,7 @@
 * API refactoring to separate out different uses of `eps` within
   `ExponentiatedGradient`. It is now solely responsible for setting the L1
   norm bound in the optimization (which controls the excess constraint
-  violation beyond what is allowed byt the `constraints` object).
+  violation beyond what is allowed by the `constraints` object).
   The other usage of `eps` as the right-hand side of constraints is
   now captured directly in the moment classes as follows:
   * Classification moments: `ConditionalSelectionRate` renamed to
