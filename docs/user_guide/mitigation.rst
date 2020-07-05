@@ -215,7 +215,7 @@ bound the ratio between the pairs of groups, but such a bound is implied.
 Demographic Parity
 ^^^^^^^^^^^^^^^^^^
 
-A classifier :math:`h(X)` satisfies *demographic parity* if
+A binary classifier :math:`h(X)` satisfies *demographic parity* if
 
 .. math::
     
@@ -305,7 +305,7 @@ of the constraints, we obtain
 True Positive Rate Parity and False Positive Rate Parity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A classifier :math:`h(X)` satisfies *true positive rate parity* if
+A binary classifier :math:`h(X)` satisfies *true positive rate parity* if
 
 .. math::
 
@@ -373,7 +373,7 @@ Similarly to other parity constraints, a ratio-based relaxation is also availabl
 Equalized Odds
 ^^^^^^^^^^^^^^
 
-A classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
+A binary classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
 *true positive rate parity* and *false positive rate parity*, i.e.,
 
 .. math::
