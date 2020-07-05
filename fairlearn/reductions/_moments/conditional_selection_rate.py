@@ -15,26 +15,26 @@ _DEFAULT_DIFFERENCE_BOUND = 0.01
 
 
 class UtilityParity(ClassificationMoment):
-    r"""Generic fairness moment for selection rates.
+    r"""A generic moment for parity in utilities (or costs) under classification.
 
     This serves as the base class for :class:`DemographicParity` :class:`EqualizedOdds`, and
     others. All subclasses can be used as difference-based constraints or ratio-based constraints.
 
-    Difference-based constraints are written with a difference bound :math:`\\epsilon`.
-    Ratio-based constraints have a similar :math:`\\epsilon`, referred to as ratio bound slack
-    below. Additionally, they require a ratio bound. Constraints are set up for each group
-    compared to the overall population (unless further events are specified, e.g., in Equalized
-    Odds). Constraint violation for difference-based constraints starts if the difference between
-    a group and the overall population with regard to a utility exceeds the difference bound. For
-    ratio-based constraints we consider the difference between the overall population's utility
-    and a group's utility multiplied with the ratio bound.
+    Constraints compare the group-level mean utility for each group with the overall mean utility
+    (unless further events are specified, e.g., in equalized odds).
+    Constraint violation for difference-based constraints starts if the difference between
+    a group and the overall population with regard to a utility exceeds `difference_bound`. For
+    ratio-based constraints, the ratio between the group-level and overal mean utility needs
+    to be bounded between `ratio_bound` and its inverse (plus an additional additive
+    `ratio_bound_slack`).
 
-    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the rows of
-    the DataFrames either required as arguments or returned by several of the methods of the
-    `UtilityParity` class. It is the cartesian product of:
+    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the constraint ids.
+    It is an index of various DataFrame and Series objects that are either
+    required as arguments or returned by several of the methods of the
+    `UtilityParity` class. It is the Cartesian product of:
 
-    - The unique events defined for the particular object
-    - The unique values for the sensitive feature
+    - The unique events defining the particular moment object
+    - The unique values of the sensitive feature
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
@@ -42,20 +42,19 @@ class UtilityParity(ClassificationMoment):
     ----------
     difference_bound : float
         The constraints' difference bound for constraints that are expressed
-        as differences, often referred to as :math:`\\epsilon`.
+        as differences, also referred to as :math:`\\epsilon` in documentation.
         If `ratio_bound` is used then `difference_bound` needs to be None.
         If neither `ratio_bound` nor `difference_bound` are set then a default
         difference bound of 0.01 is used for backwards compatibility.
         Default None.
     ratio_bound : float
         The constraints' ratio bound for constraints that are expressed as
-        ratios. The specified value needs to abide by
-        :math:`0 < \\text{ratio_bound} \\leq 1`.
+        ratios. The specified value needs to be in (0,1].
         If `difference_bound` is used then `ratio_bound` needs to be None.
         Default None.
     ratio_bound_slack : float
         The constraints' ratio bound slack for constraints that are
-        expressed as ratios, usually referred to as :math:`\\epsilon`.
+        expressed as ratios, also referred to as :math:`\\epsilon` in documentation.
         `ratio_bound_slack` is ignored if `ratio_bound` is not specified.
         Default 0.0
     """
@@ -208,12 +207,12 @@ UtilityParity.__module__ = "fairlearn.reductions"
 
 
 class DemographicParity(UtilityParity):
-    r"""Implementation of Demographic Parity as a moment.
+    r"""Implementation of demographic parity as a moment.
 
-    A classifier :math:`h(X)` satisfies DemographicParity if
+    A classifier :math:`h(X)` satisfies demographic parity if
 
     .. math::
-      P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
+      P[h(X) = 1 | A = a] = P[h(X) = 1] \; \forall a
 
     This implementation of :class:`UtilityParity` defines
     a single event, `all`. Consequently, the `prob_event`
@@ -235,14 +234,14 @@ class DemographicParity(UtilityParity):
 
 
 class TruePositiveRateParity(UtilityParity):
-    r"""Implementation of True Positive Rate Difference as a moment.
+    r"""Implementation of true positive rate parity as a moment.
 
     .. note:
 
-        True Positive Rate Difference is sometimes referred to as Equal
-        Opportunity Difference.
+        The true positive rate parity fairness criterion is also known
+        as "equal opportunity".
 
-    Adds conditioning on label `Y=1` compared to Demographic parity, i.e.
+    Adds conditioning on label `Y=1` compared to demographic parity, i.e.,
 
     .. math::
        P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a
@@ -276,13 +275,13 @@ class TruePositiveRateParity(UtilityParity):
                           **kwargs)
 
 
-class TrueNegativeRateParity(UtilityParity):
-    r"""Implementation of True Negative Rate Difference as a moment.
+class FalsePositiveRateParity(UtilityParity):
+    r"""Implementation of false positive rate parity as a moment.
 
-    Adds conditioning on label `Y=0` compared to Demographic parity, i.e.
+    Adds conditioning on label `Y=0` compared to demographic parity, i.e.,
 
     .. math::
-       P[h(X) = 0 | A = a, Y = 0] = P[h(X) = 0 | Y = 0] \; \forall a
+       P[h(X) = 1 | A = a, Y = 0] = P[h(X) = 1 | Y = 0] \; \forall a
 
     This implementation of :class:`UtilityParity` defines the event
     corresponding to `Y=0`.
@@ -302,7 +301,7 @@ class TrueNegativeRateParity(UtilityParity):
     but will use the weights equal to zero for `Y=1`.
     """
 
-    short_name = "TrueNegativeRateParity"
+    short_name = "FalsePositiveRateParity"
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
@@ -313,12 +312,12 @@ class TrueNegativeRateParity(UtilityParity):
 
 
 class EqualizedOdds(UtilityParity):
-    r"""Implementation of Equalized Odds as a moment.
+    r"""Implementation of equalized odds as a moment.
 
-    Adds conditioning on label compared to Demographic parity, i.e.
+    Adds conditioning on label compared to demographic parity, i.e.
 
     .. math::
-       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
+       P[h(X) = 1 | A = a, Y = y] = P[h(X) = 1 | Y = y] \; \forall a, y
 
     This implementation of :class:`UtilityParity` defines
     events corresponding to the unique values of the `Y` array.
@@ -347,16 +346,16 @@ class EqualizedOdds(UtilityParity):
 
 
 class ErrorRateParity(UtilityParity):
-    r"""Implementation of Error Rate Ratio as a moment.
+    r"""Implementation of error rate parity as a moment.
 
-    Measures the ratio in errors per attribute by overall error.
-    The 2-sided version of error ratio can be written as
-    ratio <= error(A=a) / total_error <= 1/ratio
+    A classifier :math:`h(X)` satisfies error rate parity if
+
     .. math::
-    ratio <= E[abs(h(X) - Y)| A = a] / E[abs(h(X) - Y)] <= 1/ratio\; \forall a
+      P[h(X) \ne Y | A = a] = P[h(X) \ne Y] \; \forall a
 
-    This implementation of :class:`UtilityParity` defines a single event, `all`.
-    Consequently, the `prob_event` :class:`pandas:pandas.Series` will only have a single
+    This implementation of :class:`UtilityParity` defines
+    a single event, `all`. Consequently, the `prob_event`
+    :class:`pandas:pandas.Series` will only have a single
     entry, which will be equal to 1.
 
     The `index` property will have twice as many entries (corresponding to the Lagrange multipliers

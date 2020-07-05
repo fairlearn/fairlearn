@@ -5,7 +5,7 @@ Mitigation
 
 Fairlearn contains the following algorithms for mitigating unfairness:
 
-.. list-table:: Unfairness mitigation algorithms
+.. list-table::
    :header-rows: 1
    :widths: 5 20 5 5 8
    :stub-columns: 1
@@ -16,13 +16,13 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - regression
       - supported fairness definitions
    *  - :code:`fairlearn.` :code:`reductions.` :code:`ExponentiatedGradient`
-      - Black-box approach to fair classification described in *A Reductions*
+      - A wrapper (reduction) approach to fair classification described in *A Reductions*
         *Approach to Fair Classification* [#2]_.
       - ✔
-      - ✘ :superscript:`*`
+      - ✘ (coming soon!)
       - DP, EO, TPRP, FPRP, ERP
    *  - :code:`fairlearn.` :code:`reductions.` :code:`GridSearch`
-      - Black-box approach described in Section 3.4 of *A Reductions*
+      - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
         *Approach to Fair Classification* [#2]_. For regression it acts as a
         grid-search variant of the algorithm described in Section 5 of
         *Fair Regression: Quantitative Definitions and Reduction-based*
@@ -38,34 +38,28 @@ Fairlearn contains the following algorithms for mitigating unfairness:
         parity constraints.
       - ✔
       - ✘
-      - DP, EO
+      - DP, EO, TPRP, FPRP
 
-.. [*] coming soon!
-
-DP refers to Demographic Parity, EO to Equalized Odds, TPRP to True Positive
-Rate Parity, FPRP to False Positive Rate Parity, ERP to Rrror Rate Parity, and
-BGL to bounded group loss. For
+DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
+rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
+BGL to *bounded group loss*. For
 more information on the definitions refer to
 :ref:`fairness_in_machine_learning`. To request additional algorithms or
 fairness definitions, please open a
 `new issue <https://github.com/fairlearn/fairlearn/issues>`_ on GitHub.
 
-.. note: Randomized predictors
+.. note::
 
-The Fairlearn package largely follows the
-`terminology established by scikit-learn <https://scikit-learn.org/stable/developers/contributing.html#different-objects>`_,
-specifically:
-
-* *Estimators* implement a :code:`fit` method.
-* *Predictors* implement a :code:`predict` method.
-
-**Randomization.** In contrast with 
-`scikit-learn <https://scikit-learn.org/stable/glossary.html#term-estimator>`_,
-estimators in Fairlearn can produce randomized predictors. Randomization of
-predictions is required to satisfy many definitions of fairness. Because of
-randomization, it is possible to get different outputs from the predictor's
-:code:`predict` method on identical data. For each of our methods, we provide
-explicit access to the probability distribution used for randomization.
+   Fairlearn mitigation algorithms largely follow the
+   `conventions of scikit-learn <https://scikit-learn.org/stable/developers/contributing.html#different-objects>`_,
+   meaning that they implement the :code:`fit` method to train a model and the :code:`predict` method
+   to make predictions. However, in contrast with 
+   `scikit-learn <https://scikit-learn.org/stable/glossary.html#term-estimator>`_,
+   Fairlearn algorithms can produce randomized predictors. Randomization of
+   predictions is required to satisfy many definitions of fairness. Because of
+   randomization, it is possible to get different outputs from the predictor's
+   :code:`predict` method on identical data. For each of our algorithms, we provide
+   explicit access to the probability distribution used for randomization.
 
 .. _postprocessing:
 
@@ -81,119 +75,135 @@ Reductions
 
 .. currentmodule:: fairlearn.reductions
 
-From a very high-level perspective the reductions techniques within Fairlearn
-enable unfairness mitigation on an arbitrary machine learning model with
-respect to a user provided fairness objective. For more information on the
-supported kinds of fairness refer to :ref:`constraints_binary_classification`
-and :ref:`constraints_regression`. All of the constraints currently supported
-by reductions methods are group fairness constraints.
-Note that the choice of fairness constraint is crucial to the outcome, and
-choosing an unsuitable constraint can cause or worsen harms on individuals or
-groups affected by a decision. For a broader discussion of fairness as a
-sociotechnical challenge and how to view Fairlearn in this context refer to
-:ref:`fairness_in_machine_learning`.
+On a high level, the reduction algorithms within Fairlearn
+enable unfairness mitigation for an arbitrary machine learning model with
+respect to user-provided fairness constraints. All of the constraints currently supported
+by reduction alogrithms are group-fairness constraints. For more information on the
+supported fairness constraints refer to :ref:`constraints_binary_classification`
+and :ref:`constraints_regression`.
 
-The reductions approach is based on the idea in [#2]_ to reduce binary
-classification subject to fairness constraints to a sequence of cost-sensitive
-classification problems. As a result, the reductions methods in Fairlearn
-require only black-box access to a cost-sensitive classification algorithm,
-which does not need to have any knowledge of the desired definition of
-fairness or sensitive features. [#1]_ extends this to regression scenarios.
+.. note::
+
+   The choice of a fairness metric and fairness constraints is a crucial
+   step in the AI development and deployment, and
+   choosing an unsuitable constraint can lead to more harms.
+   For a broader discussion of fairness as a
+   sociotechnical challenge and how to view Fairlearn in this context refer to
+   :ref:`fairness_in_machine_learning`.
+
+The reductions approach for classification seeks to reduce binary
+classification subject to fairness constraints to a sequence of weighted
+classification problems (see [#2]_), and similarly for regression (see [#1]_).
+As a result, the reduction algorithms
+in Fairlearn only require a wrapper access to any "base" learning algorithm.
+By this we mean that the "base" algorithm only needs to implement :code:`fit` and
+:code:`predict` methods, as any standard scikit-learn estimator, but it
+does not need to have any knowledge of the desired fairness constraints or sensitive features.
 
 From an API perspective this looks as follows in all situations
 
->>> reduction = Reduction(estimator, constraints, **kwargs)  # doctest: +SKIP
+>>> reduction = Reduction(base_estimator, constraints, **kwargs)  # doctest: +SKIP
 >>> reduction.fit(X_train, y_train, sensitive_features=sensitive_features)  # doctest: +SKIP
 >>> reduction.predict(X_test)  # doctest: +SKIP
 
-Fairlearn doesn't impose restrictions on the referenced :code:`estimator`
+Fairlearn doesn't impose restrictions on the referenced :code:`base_estimator`
 other than the existence of :code:`fit` and :code:`predict` methods.
-At the moment, the :code:`estimator`'s :code:`fit` method also needs to
+At the moment, the :code:`base_estimator`'s :code:`fit` method also needs to
 provide a :code:`sample_weight` argument which the reductions techniques use
 to reweight samples.
 In the future Fairlearn will provide functionality to handle this even
 without a :code:`sample_weight` argument.
 
-Before looking more into the reductions approaches themselves this section
-examines the different constraints that are compatible with them. All of them
-are expressed as moments inheriting from :code:`ClassificationMoment` or
-:code:`LossMoment`, which in turn inherit from the base class :code:`Moment`.
+Before looking more into reduction algorithms, this section
+reviews the supported fairness constraints. All of them
+are expressed as objects inheriting from the base class :code:`Moment`.
 :code:`Moment`'s main purpose is to calculate the constraint violation of a
 current set of predictions through its :code:`gamma` function as well as to
 provide :code:`signed_weights` that are used to relabel and reweight samples.
 
 .. _constraints_binary_classification:
 
-Constraints for binary classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fairness constraints for binary classification
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All existing constraints for binary classification inherit from
-:code:`ClassificationMoment` and can be formulated as difference or ratio-based
-constraints.
-
-Difference-based constraints consider the difference with respect
-to a metric between a group of samples and the overall population or
-cohorts thereof.
-Parity represents the state where
+All supported fairness constraints for binary classification inherit from
+:code:`UtilityParity`. They are based on some underlying metric called *utility*,
+which can be evaluated on individual data points and is averaged
+over various groups of data points to form the *utility parity* constraint
+of the form
 
 .. math::
 
-    \text{metric}_a - \text{metric}_* = 0 \; \forall a
+    \text{utility}_{a,e} = \text{utility}_e \quad \forall a, e
 
-where :math:`a` is a group indentifier and :math:`*` represents the overall
-population. This is internally represented as two inequalities
+where :math:`a` is a sensitive feature value and :math:`e` is an *event*
+identifier. Each data point has only one value of a sensitive feature,
+and belongs to at most one event. In many examples, there is only
+a single event :math:`*`, which includes all the data points. Other
+examples of events include :math:`Y=0` and :math:`Y=1`. The utility
+parity requires that the mean utility within each event equals
+the mean utility of each group whose sensitive feature is :math:`a`
+within that event.
 
-.. math::
+The class :code:`UtilityParity` implements constraints that allow
+some amount of violation of the utility parity constraints, where
+the maximum allowed violation is specified either as a difference
+or a ratio.
 
-    \text{metric}_a - \text{metric}_* \leq 0 \; \forall a \\
-    -\text{metric}_a + \text{metric}_* \leq 0 \; \forall a
-
-The algorithms do not consider every kind of violation of these constraints,
-but rather violations that go beyond their :code:`difference_bound`. Such
-a difference-based constraint could be instantiated as
-
-    >>> ClassificationMoment(difference_bound=0.01)  # doctest: +SKIP
-
-Note that achieving parity with the :code:`difference_bound` does not mean
-that the difference between the group with the highest metric value and the
-group with the lowest metric value is below the :code:`difference_bound`, but
-rather the difference between each individual group and the metric value for
-the overall population (or cohort thereof) is below :code:`difference_bound`. 
-
-In constrast, ratio-based constraints consider the ratio as opposed to the
-difference. Parity is represented as
+The *difference-based relaxation* starts out by representing
+the utility parity constraints as pairs of
+inequalities
 
 .. math::
 
-    r \leq \dfrac{\text{metric}_a}{\text{metric}_*} \leq \dfrac{1}{r} \; \forall a
+    \text{utility}_{a,e} - \text{utility}_{e} \leq 0 \quad \forall a, e\\
+    -\text{utility}_{a,e} + \text{utility}_{e} \leq 0 \quad \forall a, e
 
-with a :code:`ratio_bound` :math:`r`. Similar to the :code:`difference_bound`
-for difference-based constraints, ratio-based constraints have a
-:code:`ratio_bound_slack`. The two inequalities can also be considered
-separately as
+and then replaces zero on the right-hand side
+with a value specified as :code:`difference_bound`. The resulting
+constraints are instantiated as
+
+    >>> UtilityParity(difference_bound=0.01)  # doctest: +SKIP
+
+Note that satisfying these constraints does not mean
+that the difference between the groups with the highest and
+smallest utility in each event is bounded by :code:`difference_bound`.
+The value of :code:`difference_bound` instead bounds
+the difference between the utility of each group and the overall mean
+utility within each event. This, however,
+implies that the difference between groups in each event is
+at most twice the value of :code:`difference_bound`.
+
+The *ratio-based relaxation* relaxes the parity
+constraint as
 
 .. math::
 
-   r \leq \dfrac{\text{metric}_a}{\text{metric}_*} \; \forall a \\
-   \dfrac{\text{metric}_a}{\text{metric}_*} \leq \dfrac{1}{r} \; \forall a
+    r \leq \dfrac{\text{utility}_{a,e}}{\text{utility}_e} \leq \dfrac{1}{r} \quad \forall a, e
 
-and one step further in the equivalent form:
+for some value of :math:`r` in (0,1]. For example, if :math:`r=0.9`, this means
+that within each event
+:math:`0.9 \cdot \text{utility}_{a,e} \leq \text{utility}_e`, i.e., the utility for
+each group needs to be at least 90% of the overall utility for the event, and
+:math:`0.9 \cdot \text{utility}_e \leq \text{utility}_{a,e}`, i.e., the overall utility
+for the event needs to be at least 90% of each group's utility.
+
+The two ratio constraints can be rewritten as
 
 .. math::
 
-   - \text{metric}_a + r \cdot \text{metric}_* \leq 0 \; \forall a \\
-   r \cdot \text{metric}_a - \text{metric}_* \leq 0 \; \forall a
+   - \text{utility}_{a,e} + r \cdot \text{utility}_e \leq 0 \quad \forall a, e \\
+   r \cdot \text{utility}_{a,e} - \text{utility}_e \leq 0 \quad \forall a, e
 
-To use a constraint in its ratio-based version simply indicate as much through
-its arguments
+When instantiating the ratio constraints, we use :code:`ratio_bound` for :math:`r`,
+and also allow further relaxation by replacing the zeros on the right hand side
+by some non-negative :code:`ratio_bound_slack`. The resulting instantiation
+looks as
 
-    >>> ClassificationMoment(ratio_bound=0.9, ratio_bound_slack=0.01)
+    >>> UtilityParity(ratio_bound=0.9, ratio_bound_slack=0.01)  # doctest: +SKIP
 
-In other words, this means that
-:math:`0.9 \cdot \text{metric}_a \leq \text{metric}_*`, i.e., the metric value for
-each group needs to be at least 90% of the overall metric value, and
-:math:`0.9 \cdot \text{metric}_* \leq \text{metric}_a`, i.e., the overall metric
-value needs to be at least 90% of each group's metric value.
+Similarly to the difference constraints, the ratio constraints do not directly
+bound the ratio between the pairs of groups, but such a bound is implied.
 
 .. note::
 
@@ -205,38 +215,37 @@ value needs to be at least 90% of each group's metric value.
 Demographic Parity
 ^^^^^^^^^^^^^^^^^^
 
-A classifier :math:`h(X)` satisfies *Demographic Parity* if
+A classifier :math:`h(X)` satisfies *demographic parity* if
 
 .. math::
     
-    \P[h(X) = y' \given A = a] = \P[h(X) = y'] \; \forall a, y'
+    \P[h(X) = 1 \given A = a] = \P[h(X) = 1] \quad \forall a
  
 In other words, the selection rate or percentage of samples with label 1
-should be equal between all groups. Implicitly this means the percentage
-with label 0 is equal as well.
+should be equal across all groups. Implicitly this means the percentage
+with label 0 is equal as well. In this case, the utility function
+is equal to :math:`h(X)` and there is only a single event :math:`*`.
 
-In the example below class :code:`"a"` has a selection rate of 60%,
+In the example below group :code:`"a"` has a selection rate of 60%,
 :code:`"b"` has a selection rate of 20%. The overall selection rate is 40%,
 so :code:`"a"` is `0.2` above the overall selection rate, and :code:`"b"` is
-`0.2` below. The seemingly redundantly stored constraint violation with both
-:code:`"a"` and :code:`"b"` showing up twice stems from the constraint
-definition outlined in :ref:`constraints_binary_classification`. Each equality
-constraint is written as two inequalities of which one contains
-:math:`\text{metric}_a` positively (sign :math:`+`) and one negatively
-(sign :math:`-`).
-Note that the specified :code:`difference_bound` is not used
-since the constraint object is not used in a mitigation in this example.
-Similarly, :code:`y_true` is technically irrelevant to the calculations
-because the underlying metric of Demographic Parity, selection rate, does not
+`0.2` below. Invoking the method :code:`gamma` shows the values
+of the left-hand sides of the constraints described
+in :ref:`constraints_binary_classification`, which is independent
+of the provided :code:`difference_bound`. Note that the left-hand sides
+corresponding to different values of :code:`sign` are just negatives
+of each other.
+The value of :code:`y_true` is in this example irrelevant to the calculations,
+because the underlying utility in demographic parity, selection rate, does not
 consider performance relative to the true labels, but rather proportions in
 the predicted labels.
 
 .. note::
 
-    In mitigation examples we never need to call :code:`load_data` or
-    :code:`gamma` since the reductions techniques all automatically take care
-    of it. The example merely helps in illustrating the deviation from the
-    corresponding inequalities in :ref:`constraints_binary_classification`.
+    When providing :code:`DemographicParity` to mitigation algorithms, only use
+    the constructor and the mitigation algorithm itself then invokes :code:`load_data`.
+    The example below uses :code:`load_data` to illustrate how :code:`DemographicParity`
+    instantiates inequalities from :ref:`constraints_binary_classification`.
 
 .. doctest:: mitigation
 
@@ -259,14 +268,14 @@ the predicted labels.
                  b           0.2
     dtype: float64
  
-Rewriting this into a ratio-based constraint with :code:`ratio_bound`
-:math:`r` we get
+The ratio constraints for the demographic parity with :code:`ratio_bound`
+:math:`r` (and :code:`ratio_bound_slack=0`) take form
 
 .. math::
 
-    r \leq \dfrac{\P[h(X) = y' \given A = a]}{\P[h(X) = y']} \leq \dfrac{1}{r} \; \forall a, y'
+    r \leq \dfrac{\P[h(X) = 1 \given A = a]}{\P[h(X) = 1]} \leq \dfrac{1}{r} \quad \forall a
 
-Revisiting the same example from above we get
+Revisiting the same example as above we get
 
 .. doctest:: mitigation
 
@@ -280,19 +289,15 @@ Revisiting the same example from above we get
                  b           0.16
     dtype: float64
 
-Just like :code:`difference_bound` before :code:`ratio_bound_slack` does not
-affect the outcome here, because no mitigation is applied in the example.
-This time the constraint violation is calculated using the :code:`ratio_bound`
-`0.9` and again with the definition from
-:ref:`constraints_binary_classification` and selection rate as the used
-metric:
+Following the expressions for the left-hand sides
+of the constraints, we obtain
 
 .. math::
 
-    r \cdot \text{metric}_a - \text{metric}_* = 0.9 \times 0.6 - 0.4 = 0.14 \\
-    r \cdot \text{metric}_b - \text{metric}_* = 0.9 \times 0.2 - 0.4 = -0.22 \\
-    - \text{metric}_a + r \cdot \text{metric}_* = - 0.6 + 0.9 \times 0.4 = -0.24 \\
-    - \text{metric}_b + r \cdot \text{metric}_* = - 0.2 + 0.9 \times 0.4 = 0.16 \\
+    r \cdot \text{utility}_{a,*} - \text{utility}_* = 0.9 \times 0.6 - 0.4 = 0.14 \\
+    r \cdot \text{utility}_{b,*} - \text{utility}_* = 0.9 \times 0.2 - 0.4 = -0.22 \\
+    - \text{utility}_{a,*} + r \cdot \text{utility}_* = - 0.6 + 0.9 \times 0.4 = -0.24 \\
+    - \text{utility}_{b,*} + r \cdot \text{utility}_* = - 0.2 + 0.9 \times 0.4 = 0.16 \\
 
 .. _true_positive_rate_parity:
 .. _false_positive_rate_parity:
@@ -300,26 +305,25 @@ metric:
 True Positive Rate Parity and False Positive Rate Parity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A classifier :math:`h(X)` satisfies *True Positive Rate Parity* if
+A classifier :math:`h(X)` satisfies *true positive rate parity* if
 
 .. math::
 
-    \P[h(X) = 1 \given A = a, Y = 1] = \P[h(X) = 1 \given Y = 1] \; \forall a
+    \P[h(X) = 1 \given A = a, Y = 1] = \P[h(X) = 1 \given Y = 1] \quad \forall a
 
-and *False Positive Rate Parity* if
+and *false positive rate parity* if
 
 .. math::
 
-    \P[h(X) = 1 \given A = a, Y = 0] = \P[h(X) = 1 \given Y = 0] \; \forall a
+    \P[h(X) = 1 \given A = a, Y = 0] = \P[h(X) = 1 \given Y = 0] \quad \forall a
 
-Note that this formulation of True Positive Rate Parity ignores what happens
-to samples with :math:`Y=0`, and the False Positive Rate Parity ignores
-:math:`Y=1`.
-Refer to :ref:`equalized_odds` for a constraint that extends this by
-considering all samples, i.e., the samples with :math:`Y=0` as well as the
-ones with :math:`Y=1`.
+In first case, we only have one event :math:`Y=1` and
+ignore the samples with :math:`Y=0`, and in the second case vice versa.
+Refer to :ref:`equalized_odds` for the fairness constraint type that simultaneously
+enforce both true positive rate parity and false positive rate parity
+by considering both events :math:`Y=0` and :math:`Y=1`.
 
-In practice this can be used in a difference-based version as follows:
+In practice this can be used in a difference-based relaxation as follows:
 
 .. doctest:: mitigation
 
@@ -344,12 +348,13 @@ In practice this can be used in a difference-based version as follows:
 
 .. note::
 
-    In mitigation examples we never need to call :code:`load_data` or
-    :code:`gamma` since the reductions techniques all automatically take care
-    of it. The example merely helps in illustrating the deviation from the
-    corresponding inequalities in :ref:`constraints_binary_classification`.
+    When providing :code:`TruePositiveRateParity` or :code:`FalsePositiveRateParity`
+    to mitigation algorithms, only use
+    the constructor. The mitigation algorithm itself then invokes :code:`load_data`.
+    The example uses :code:`load_data` to illustrate how :code:`TruePositiveRateParity`
+    instantiates inequalities from :ref:`constraints_binary_classification`.
 
-Similarly to other constraints a ratio-based version is also available:
+Similarly to other parity constraints, a ratio-based relaxation is also available:
 
 .. doctest:: mitigation
 
@@ -368,17 +373,15 @@ Similarly to other constraints a ratio-based version is also available:
 Equalized Odds
 ^^^^^^^^^^^^^^
 
-A classifier :math:`h(X)` satisfies *Equalized Odds* if it satisfies both
-*True Positive Rate Parity* and *False Positive Rate Parity*, i.e.,
+A classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
+*true positive rate parity* and *false positive rate parity*, i.e.,
 
 .. math::
 
-    \P[h(X) = y' \given A = a, Y = y] = \P[h(X) = y' \given Y = y] \; \forall a, y, y'
+    \P[h(X) = 1 \given A = a, Y = y] = \P[h(X) = 1 \given Y = y] \quad \forall a, y
 
-From a usage standpoint this works just like :ref:`true_positive_rate_parity`.
-The constraint violations with :code:`label=1` match exactly the ones from
-True Positive Rate Parity above, while the ones with :code:`label=0` represent
-the violations for False Positive Rate Parity.
+The constraints represent the union of constraints for true positive rate
+and false positive rate.
 
 .. doctest:: mitigation
 
@@ -402,17 +405,19 @@ the violations for False Positive Rate Parity.
 Error Rate Parity
 ^^^^^^^^^^^^^^^^^
 
-The basic idea behind *Error Rate Parity* is that the error rate should be
-similar between different groups of people.
-
-A classifier :math:`h(X)` satisfies *Error Rate Parity* if it satisfies
+The *error rate parity* requires that the error rates should be
+the same across all groups. For a classifier :math:`h(X)`
+this means that
 
 .. math::
 
-   \E[\lvert h(X) - Y \rvert \given A = a] - \E[\lvert h(X) - Y \rvert] \leq 0 \; \forall a
+   \P[h(X) \ne Y \given A = a] = \P[h(X) \ne Y] \quad \forall a
 
-This specifies that the error rate of any given group should not deviate from
-the overall error rate by more a :code:`difference_bound`.
+In this case, the utility is equal to 1 if :math:`h(X)\ne Y` and equal to
+0 if :math:`h(X)=Y`, and so large value of utility here actually correspond
+to poor outcomes. The difference-based relaxation specifies that
+the error rate of any given group should not deviate from
+the overall error rate by more than the value of :code:`difference_bound`.
 
 .. doctest:: mitigation
 
@@ -432,16 +437,16 @@ the overall error rate by more a :code:`difference_bound`.
 
 .. note::
 
-    In mitigation examples we never need to call :code:`load_data` or
-    :code:`gamma` since the reductions techniques all automatically take care
-    of it. The example merely helps in illustrating the deviation from the
-    corresponding inequalities in :ref:`constraints_binary_classification`.
+    When providing :code:`ErrorRateParity` to mitigation algorithms, only use
+    the constructor. The mitigation algorithm itself then invokes :code:`load_data`.
+    The example uses :code:`load_data` to illustrate how :code:`ErrorRateParity`
+    instantiates inequalities from :ref:`constraints_binary_classification`.
 
-Similarly, *Error Rate Parity* can be expressed through a ratio constraint as
+Similarly, error rate parity can be relaxed via ratio constraints as
 
 .. math::
 
-   r \leq \dfrac{\E[\lvert h(X) - Y \rvert \given A = a]}{\E[\lvert h(X) - Y \rvert]} \leq \dfrac{1}{r} \; \forall a
+   r \leq \dfrac{\P[h(X) \ne Y \given A = a]}{\P[h(X) \ne Y]} \leq \dfrac{1}{r} \quad \forall a
 
 with a :code:`ratio_bound` :math:`r`. The usage is identical with other
 constraints:
@@ -461,16 +466,16 @@ constraints:
 
 .. _constraints_multi_class_classification:
 
-Constraints for multi-class classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fairness constraints for multi-class classification
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Reductions approaches do not support multi-class classification yet at this
 point. If this is an important scenario for you please let us know!
 
 .. _constraints_regression:
 
-Constraints for regression
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fairness constraints for regression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The performance objective in the regression scenario is to minimize the
 loss of our classifier :math:`h`.

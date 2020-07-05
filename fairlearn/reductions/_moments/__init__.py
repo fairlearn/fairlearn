@@ -8,7 +8,7 @@ from .moment import ClassificationMoment, LossMoment  # noq: F401
 
 from .conditional_selection_rate import UtilityParity  # noqa: F401
 from .conditional_selection_rate import DemographicParity, EqualizedOdds, \
-    TruePositiveRateParity, TrueNegativeRateParity, ErrorRateParity  # noqa: F401
+    TruePositiveRateParity, FalsePositiveRateParity, ErrorRateParity  # noqa: F401
 from .error_rate import ErrorRate   # noqa: F401
 from .bounded_group_loss import BoundedGroupLoss   # noqa: F401
 from .bounded_group_loss import SquareLoss, AbsoluteLoss, ZeroOneLoss  # noqa: F401
@@ -21,7 +21,7 @@ __all__ = [
     "DemographicParity",
     "EqualizedOdds",
     "TruePositiveRateParity",
-    "TrueNegativeRateParity",
+    "FalsePositiveRateParity",
     "ErrorRateParity",
     "ErrorRate",
     "BoundedGroupLoss",

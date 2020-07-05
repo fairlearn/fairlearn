@@ -9,7 +9,7 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 
 
 class ConditionalLossMoment(LossMoment):
-    r"""A moment that quantifies a loss by group.
+    r"""A moment for constraining the mean loss or the worst-case loss by a group.
 
     Parameters
     ----------
@@ -17,12 +17,12 @@ class ConditionalLossMoment(LossMoment):
         A loss object with an `eval` method, e.g. `SquareLoss` or
         `AbsoluteLoss`.
     upper_bound : float
-        An upper bound on the loss, often referred to as :math:`\\zeta`;
-        `upper_bound` is an optional argument that is not required for certain
-        mitigation techniques; default None
+        An upper bound on the loss, also referred to as :math:`\\zeta`;
+        `upper_bound` is an optional argument that is not always
+        required; default None
     no_groups : bool
-        indicates whether not to calculate loss based on groups,
-        default False, i.e., grouping is the default behavior
+        indicates whether to calculate the mean loss or group-level losses,
+        default False, i.e., group-level losses are the default behavior
     """
 
     def __init__(self, loss, *, upper_bound=None, no_groups=False):
@@ -67,12 +67,12 @@ class ConditionalLossMoment(LossMoment):
         return expect_attr[_LOSS]
 
     def bound(self):
-        """Return bound vector.
+        """Return the vector of bounds.
 
         Returns
         -------
         pandas.Series
-            A vector of bound values corresponding to all constraints
+            A vector of bounds on group-level losses
         """
         if self.upper_bound is None:
             raise ValueError("No Upper Bound")
@@ -97,14 +97,14 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
 class MeanLoss(ConditionalLossMoment):
-    """Moment for Mean Loss."""
+    """Moment for evaluating the mean loss."""
 
     def __init__(self, loss):
         super().__init__(loss, upper_bound=None, no_groups=True)
 
 
 class BoundedGroupLoss(ConditionalLossMoment):
-    """Moment for Group Loss."""
+    """Moment for constraining the worst-case loss by a group."""
 
     def __init__(self, loss, *, upper_bound=None):
         super().__init__(loss, upper_bound=upper_bound, no_groups=False)

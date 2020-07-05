@@ -12,7 +12,7 @@ from ._exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from ._grid_search import GridSearch  # noqa: F401
 from ._moments import AbsoluteLoss, Moment, UtilityParity  # noqa: F401
 from ._moments import DemographicParity, EqualizedOdds, ErrorRateParity, ErrorRate, \
-    TruePositiveRateParity, TrueNegativeRateParity   # noqa: F401
+    TruePositiveRateParity, FalsePositiveRateParity   # noqa: F401
 from ._moments import BoundedGroupLoss, SquareLoss, ZeroOneLoss  # noqa: F401
 from ._moments import ClassificationMoment, LossMoment  # noqa: F401
 
@@ -32,7 +32,7 @@ _moments = [
     "DemographicParity",
     "EqualizedOdds",
     "TruePositiveRateParity",
-    "TrueNegativeRateParity",
+    "FalsePositiveRateParity",
     "ErrorRateParity",
     "ErrorRate",
     "BoundedGroupLoss",
