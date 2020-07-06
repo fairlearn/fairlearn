@@ -24,7 +24,7 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
             fontSize: '10px',
             lineHeight: '20px',
             fontWeight: '400',
-            backgroundColor: '#999999',
+            backgroundColor: theme.semanticColors.bodyBackground,
         },
         groupCol: {
             display: 'inline-flex',
@@ -42,19 +42,17 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
             display: 'flex',
             flex: 1,
             flexDirection: 'column',
-            borderTop: '0.5px solid #CCCCCC',
-            // borderBottom: "0.5px solid #CCCCCC"
+            borderTop: '0.5px solid',
+            borderTopColor: theme.semanticColors.inputBorder,
         },
         binBox: {
             flex: 1,
-            // minWidth: "100px",
-            // maxWidth: "200px",
-            // width: "max-content",
             width: '130px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            borderBottom: '0.5px solid #CCCCCC',
+            borderBottom: '0.5px solid',
+            borderBottomColor: theme.semanticColors.inputBorder,
         },
         binTitle: {
             fontSize: '12px',
@@ -95,8 +93,8 @@ export const OverallTableStyles: () => IProcessedStyleSet<IOverallTableStyles> =
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            // borderLeft: "0.5px dashed #CCCCCC",
-            borderBottom: '0.5px solid #CCCCCC',
+            borderBottom: '0.5px solid',
+            borderBottomColor: theme.semanticColors.inputBorder,
         },
         frame: {
             paddingBottom: '19px',

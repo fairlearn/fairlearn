@@ -3,7 +3,6 @@ import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, Font
 export interface IParityTabStyles {
     iconClass: IStyle;
     itemsList: IStyle;
-    itemCell: IStyle;
     frame: IStyle;
     main: IStyle;
     header: IStyle;
@@ -13,18 +12,6 @@ export interface IParityTabStyles {
 export const ParityTabStyles: () => IProcessedStyleSet<IParityTabStyles> = () => {
     const theme = getTheme();
     return mergeStyleSets<IParityTabStyles>({
-        itemCell: {
-            padding: '30px 36px 20px 0',
-            width: '100%',
-            position: 'relative',
-            float: 'left',
-            cursor: 'pointer',
-            boxSizing: 'border-box',
-            borderBottom: '1px solid #CCCCCC',
-            selectors: {
-                '&:hover': { background: 'lightgray' },
-            },
-        },
         iconClass: {
             fontSize: '20px',
             position: 'absolute',

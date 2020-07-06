@@ -64,11 +64,8 @@ export class FairlearnView extends DOMWidgetView {
             customMetrics={[]}
             locale={data.locale}
             supportedBinaryClassificationAccuracyKeys={data.classification_methods}
-            supportedBinaryClassificationParityKeys={data.classification_methods}
             supportedRegressionAccuracyKeys={data.regression_methods}
-            supportedRegressionParityKeys={data.regression_methods}
             supportedProbabilityAccuracyKeys={data.probability_methods}
-            supportedProbabilityParityKeys={data.probability_methods}
             requestMetrics={this.makeRequest.bind(this)}
         />, root_element);
         this.el.appendChild(root_element)

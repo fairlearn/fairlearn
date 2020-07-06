@@ -228,20 +228,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                 );
             }
 
-            // const insights2 = [selectedMetric.title,
-            //     localization.ModelComparison.rangesFrom,
-            //     <strong>{formattedMinAccuracy}</strong>,
-            //     localization.ModelComparison.to,
-            //     <strong>{formattedMaxAccuracy}</strong>,
-            //     localization.ModelComparison.period,
-            //     localization.ModelComparison.disparity,
-            //     localization.ModelComparison.rangesFrom,
-            //     <strong>{formattedMinDisparity}</strong>,
-            //     localization.ModelComparison.to,
-            //     <strong>{formattedMaxDisparity}</strong>,
-            //     localization.ModelComparison.period
-            // ];
-
             const insights2 = localization.formatString(
                 localization.ModelComparison.insightsText2,
                 selectedMetric.title,
@@ -346,7 +332,8 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                                 </div>
                                 <p className={styles.modalContentHelpText}>
                                     {localization.ModelComparison.helpModalText1}
-                                    <br/><br/>
+                                    <br />
+                                    <br />
                                     {localization.ModelComparison.helpModalText2}
                                 </p>
                                 <div style={{ display: 'flex', paddingBottom: '20px' }}>
@@ -399,7 +386,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     <Text variant={'large'} className={styles.headerTitle} block>
                         {localization.ModelComparison.title} <b>assessment</b>
                     </Text>
-                    {/*<ActionButton iconProps={{iconName: "Edit"}} onClick={this.props.onEditConfigs} className={styles.editButton}>{localization.Report.editConfiguration}</ActionButton>*/}
                 </div>
                 <div className={styles.headerOptions}>
                     <Dropdown
@@ -432,30 +418,6 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     />
                 </div>
                 {mainChart}
-                {/* <div>
-                    <ChoiceGroup
-                        className={styles.radio}
-                        selectedKey={this.state.disparityInOutcomes ? 'outcomes' : 'accuracy'}
-                        options={[
-                            {
-                                key: 'accuracy',
-                                text: localization.formatString(
-                                    localization.ModelComparison.disparityInAccuracy,
-                                    metricTitleAppropriateCase,
-                                ) as string,
-                                styles: { choiceFieldWrapper: styles.radioOptions },
-                            },
-                            {
-                                key: 'outcomes',
-                                text: localization.ModelComparison.disparityInOutcomes,
-                                styles: { choiceFieldWrapper: styles.radioOptions },
-                            },
-                        ]}
-                        onChange={this.disparityChanged}
-                        label={localization.ModelComparison.howToMeasureDisparity}
-                        required={false}
-                        ></ChoiceGroup>
-                </div> */}
             </Stack>
         );
     }
@@ -470,13 +432,12 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
                     this.props.accuracyPickerProps.selectedAccuracyKey,
                 );
             });
+            const parityOption = ParityOptions[this.props.parityPickerProps.selectedParityKey];
             const disparityMetric =
                 this.props.dashboardContext.modelMetadata.predictionType === PredictionTypes.binaryClassification
-                    ? ParityOptions[this.props.parityPickerProps.selectedParityKey].parityMetric
+                    ? parityOption.parityMetric
                     : 'average';
-            const parityMode = this.props.parityPickerProps.parityOptions.filter(
-                (option) => option.key == this.props.parityPickerProps.selectedParityKey,
-            )[0].parityModes[0];
+            const parityMode = parityOption.parityMode;
             const disparityPromises = new Array(this.props.modelCount).fill(0).map((unused, modelIndex) => {
                 return this.props.metricsCache.getDisparityMetric(
                     this.props.dashboardContext.binVector,
@@ -508,7 +469,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     private readonly accuracyChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
         const accuracyKey = option.key.toString();
         if (this.state.accuracyKey !== accuracyKey) {
-            this.props.accuracyPickerProps.selectedAccuracyKey = accuracyKey;
+            this.props.accuracyPickerProps.onAccuracyChange(accuracyKey);
             this.setState({ accuracyKey: accuracyKey, accuracyArray: undefined });
         }
     };
@@ -516,7 +477,7 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     private readonly parityChanged = (ev: React.FormEvent<HTMLInputElement>, option: IDropdownOption): void => {
         const parityKey = option.key.toString();
         if (this.state.parityKey !== parityKey) {
-            this.props.parityPickerProps.selectedParityKey = parityKey;
+            this.props.parityPickerProps.onParityChange(parityKey);
             this.setState({ parityKey: parityKey, disparityArray: undefined });
         }
     };
@@ -533,31 +494,4 @@ export class ModelComparisonChart extends React.PureComponent<IModelComparisonPr
     private readonly handleCloseModalHelp = (event): void => {
         this.setState({ showModalHelp: false });
     };
-
-    // TODO: Reuse if multiselect re-enters design
-    // private readonly applySelections = (chartId: string, selectionIds: string[], plotlyProps: IPlotlyProperty) => {
-    //     if (!plotlyProps.data || plotlyProps.data.length === 0) {
-    //         return;
-    //     }
-    //     const customData: string[] = (plotlyProps.data[0] as any).customdata;
-    //     if (!customData) {
-    //         return;
-    //     }
-    //     const colors = customData.map(modelIndex => {
-    //         const selectedIndex = this.props.selections.selectedIds.indexOf(modelIndex);
-    //         if (selectedIndex !== -1) {
-    //             return FabricStyles.plotlyColorPalette[selectedIndex % FabricStyles.plotlyColorPalette.length];
-    //         }
-    //         return "#111111";
-    //     });
-    //     const shapes = customData.map(modelIndex => {
-    //         const selectedIndex = this.props.selections.selectedIds.indexOf(modelIndex);
-    //         if (selectedIndex !== -1) {
-    //             return 1
-    //         }
-    //         return 0;
-    //     });
-    //     Plotly.restyle(chartId, 'marker.color' as any, [colors] as any);
-    //     Plotly.restyle(chartId, 'marker.symbol' as any, [shapes] as any);
-    // }
 }
