@@ -127,8 +127,8 @@ Fairness constraints for binary classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All supported fairness constraints for binary classification inherit from
-:code:`UtilityParity`. They are based on some underlying metric called *utility*,
-which can be evaluated on individual data points and is averaged
+:code:`UtilityParity`. They are based on some underlying metric called
+*utility*, which can be evaluated on individual data points and is averaged
 over various groups of data points to form the *utility parity* constraint
 of the form
 

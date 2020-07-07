@@ -17,18 +17,24 @@ _DEFAULT_DIFFERENCE_BOUND = 0.01
 class UtilityParity(ClassificationMoment):
     r"""A generic moment for parity in utilities (or costs) under classification.
 
-    This serves as the base class for :class:`DemographicParity` :class:`EqualizedOdds`, and
-    others. All subclasses can be used as difference-based constraints or ratio-based constraints.
+    This serves as the base class for :class:`DemographicParity`,
+    :class:`EqualizedOdds`, and others. All subclasses can be used as
+    difference-based constraints or ratio-based constraints.
+    Refer to the :ref:`user guide <constraints_binary_classification>` for
+    more information and example usage.
 
-    Constraints compare the group-level mean utility for each group with the overall mean utility
-    (unless further events are specified, e.g., in equalized odds).
-    Constraint violation for difference-based constraints starts if the difference between
-    a group and the overall population with regard to a utility exceeds `difference_bound`. For
-    ratio-based constraints, the ratio between the group-level and overal mean utility needs
-    to be bounded between `ratio_bound` and its inverse (plus an additional additive
+    Constraints compare the group-level mean utility for each group with the
+    overall mean utility (unless further events are specified, e.g., in
+    equalized odds).
+    Constraint violation for difference-based constraints starts if the
+    difference between a group and the overall population with regard to a
+    utility exceeds `difference_bound`. For ratio-based constraints, the ratio
+    between the group-level and overal mean utility needs to be bounded
+    between `ratio_bound` and its inverse (plus an additional additive
     `ratio_bound_slack`).
 
-    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the constraint ids.
+    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to
+    the constraint IDs.
     It is an index of various DataFrame and Series objects that are either
     required as arguments or returned by several of the methods of the
     `UtilityParity` class. It is the Cartesian product of:
@@ -54,7 +60,8 @@ class UtilityParity(ClassificationMoment):
         Default None.
     ratio_bound_slack : float
         The constraints' ratio bound slack for constraints that are
-        expressed as ratios, also referred to as :math:`\\epsilon` in documentation.
+        expressed as ratios, also referred to as :math:`\\epsilon` in
+        documentation.
         `ratio_bound_slack` is ignored if `ratio_bound` is not specified.
         Default 0.0
     """
@@ -86,12 +93,16 @@ class UtilityParity(ClassificationMoment):
 
         This adds a column `event` to the `tags` field.
 
-        The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`. The `utilities` defaults to
-        h(X), i.e. [0, 1] for each X_i. The first column is G^0 and the second is G^1.
+        The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
+        mentioned in the paper
+        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`.
+        The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
+        The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
+        
         .. math::
-        utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+        
+            utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
@@ -185,8 +196,10 @@ class UtilityParity(ClassificationMoment):
         signed weights to be applied to the data by the next call to the underlying
         estimator.
 
-        :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
-        :type lambda_vec: :class:`pandas:pandas.Series`
+        Parameters
+        ----------
+        lambda_vec : :class:`pandas:pandas.Series`
+            The vector of Lagrange multipliers indexed by `index`
         """
         lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
             self.prob_event
