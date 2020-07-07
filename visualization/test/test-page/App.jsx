@@ -203,7 +203,6 @@ const lightTheme = createTheme({
                         testData={data.augmentedData}
                         predictedY={data.predictedYs}
                         trueY={data.trueY}
-                        showIntro={true}
                         precomputedMetrics={data.precomputedMetrics}
                         precomputedFeatureBins={data.precomputedBins}
                         customMetrics={data.customMetrics}

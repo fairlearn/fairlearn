@@ -52,7 +52,6 @@ export interface IFairnessProps {
     modelNames?: string[];
     trueY: number[];
     theme?: any;
-    showIntro: boolean;
     locale?: string;
     stringParams?: any;
     supportedBinaryClassificationAccuracyKeys: string[];

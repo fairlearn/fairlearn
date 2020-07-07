@@ -59,7 +59,6 @@ export class FairlearnView extends DOMWidgetView {
             testData={data.dataset}
             predictedY={data.predicted_ys}
             trueY={data.true_y}
-            showIntro={true}
             modelNames={data.model_names}
             customMetrics={[]}
             locale={data.locale}
