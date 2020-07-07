@@ -100,7 +100,7 @@ class UtilityParity(ClassificationMoment):
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
         .. math::
-            utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+        utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
         super().load_data(X, y, **kwargs)
         self.tags[_EVENT] = event
