@@ -26,7 +26,7 @@ GridSearch with Census Data
 # %%
 # Load and preprocess the data set
 # --------------------------------
-# FWe download the data set using `fetch_adult` function in `fairlearn.datasets`.
+# We download the data set using `fetch_adult` function in `fairlearn.datasets`.
 # We start by importing the various modules we're going to use:
 
 from fairlearn.widget import FairlearnDashboard
