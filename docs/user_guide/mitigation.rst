@@ -354,7 +354,7 @@ In practice this can be used in a difference-based relaxation as follows:
     The example uses :code:`load_data` to illustrate how :code:`TruePositiveRateParity`
     instantiates inequalities from :ref:`constraints_binary_classification`.
 
-Similarly to other parity constraints, a ratio-based relaxation is also available:
+Alternatively, a ratio-based relaxation is also available:
 
 .. doctest:: mitigation
 
@@ -442,7 +442,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
     The example uses :code:`load_data` to illustrate how :code:`ErrorRateParity`
     instantiates inequalities from :ref:`constraints_binary_classification`.
 
-Similarly, error rate parity can be relaxed via ratio constraints as
+Alternatively, error rate parity can be relaxed via ratio constraints as
 
 .. math::
 
