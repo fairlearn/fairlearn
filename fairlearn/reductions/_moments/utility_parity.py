@@ -99,9 +99,7 @@ class UtilityParity(ClassificationMoment):
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
-        
         .. math::
-        
             utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
         super().load_data(X, y, **kwargs)
