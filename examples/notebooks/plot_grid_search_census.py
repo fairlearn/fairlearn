@@ -26,24 +26,25 @@ GridSearch with Census Data
 # %%
 # Load and preprocess the data set
 # --------------------------------
-# For simplicity, we import the data set from the :code:`shap` package, which contains the data in
-# a cleaned format.
+# We download the data set using `fetch_adult` function in `fairlearn.datasets`.
 # We start by importing the various modules we're going to use:
 
 from fairlearn.widget import FairlearnDashboard
 from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, ErrorRate
+from fairlearn.datasets import fetch_adult
 
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
-import shap
 
 # %%
-# We can now load and inspect the data from the :code:`shap` package:
+# We can now load and inspect the data by using the `fairlearn.datasets` module:
 
-X_raw, Y = shap.datasets.adult()
+data = fetch_adult(as_frame=True)
+X_raw = data.data
+Y = (data.target == '>50K') * 1
 X_raw
 
 # %%
@@ -54,8 +55,8 @@ X_raw
 # We then perform some standard data preprocessing steps to convert the
 # data into a format suitable for the ML algorithms
 
-A = X_raw["Sex"]
-X = X_raw.drop(labels=['Sex'], axis=1)
+A = X_raw["sex"]
+X = X_raw.drop(labels=['sex'], axis=1)
 X = pd.get_dummies(X)
 
 sc = StandardScaler()
@@ -81,9 +82,6 @@ A_train = A_train.reset_index(drop=True)
 X_test = X_test.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
 
-# Improve labels
-A_test = A_test.map({0: "female", 1: "male"})
-
 # %%
 # Training a fairness-unaware predictor
 # -------------------------------------
@@ -98,9 +96,7 @@ unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=Tru
 unmitigated_predictor.fit(X_train, Y_train)
 
 # %%
-# We can load this predictor into the Fairness dashboard, and examine how it
-# is unfair (there is a warning about AzureML since we are not yet integrated
-# with that product):
+# We can load this predictor into the Fairness dashboard, and assess its fairness:
 
 FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
                    y_true=Y_test,

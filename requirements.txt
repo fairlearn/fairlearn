@@ -33,7 +33,6 @@ xlrd
 # Required for notebooks
 jupyter
 nbval
-shap
 
 # Required for documentation
 sphinx
