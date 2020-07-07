@@ -336,7 +336,7 @@ In practice this can be used in a difference-based relaxation as follows:
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
     >>> true_positive_rate_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
-    {'overall': 0.5714285714285714, 'by_group': {'a': 0.75, 'b': 0.3333333333333333}}
+    {'overall': 0.571..., 'by_group': {'a': 0.75, 'b': 0.333...}}
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
