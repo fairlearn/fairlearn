@@ -91,7 +91,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         B = 1 / self.eps
         lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
-                                 self.constraints, self.eps, B)
+                                 self.constraints, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")

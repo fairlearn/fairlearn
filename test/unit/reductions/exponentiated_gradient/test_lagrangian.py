@@ -29,7 +29,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     # epsilon (and thereby also B) only affects L_high and L
     B = 1 / eps
 
-    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, B,
+    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), B,
                              opt_lambda=opt_lambda)
 
     # set up initial lambda vector based on a 0-initialized theta
@@ -92,7 +92,7 @@ def test_call_oracle(Constraints, eps, mocker):
     mocker.patch('pickle.dumps')
     pickle.loads = mocker.MagicMock(return_value=estimator)
 
-    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, 1/eps)
+    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), 1/eps)
 
     # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
     # object for it to avoid the dependence on the lagrangian object.
@@ -141,7 +141,7 @@ def test_call_oracle_single_y_value(Constraints, eps, mocker):
     mocker.patch('pickle.dumps')
     constraints = Constraints()
 
-    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), eps, 1/eps)
+    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), 1/eps)
 
     # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
     # object for it to avoid the dependence on the lagrangian object.
