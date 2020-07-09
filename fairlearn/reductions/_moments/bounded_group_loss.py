@@ -105,7 +105,7 @@ class MeanLoss(ConditionalLossMoment):
 
 class BoundedGroupLoss(ConditionalLossMoment):
     """Moment for constraining the worst-case loss by a group.
-    
+
     For more information refer to the :ref:`user guide <bounded_group_loss>`.
     """
 

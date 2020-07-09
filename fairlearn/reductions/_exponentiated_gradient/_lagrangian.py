@@ -19,27 +19,28 @@ logger = logging.getLogger(__name__)
 class _Lagrangian:
     """Operations related to the Lagrangian.
 
-    :param X: the training features
-    :type X: Array
-    :param sensitive_features: the sensitive features to use for constraints
-    :type sensitive_features: Array
-    :param y: the training labels
-    :type y: Array
-    :param estimator: the estimator to fit in every iteration of best_h
-    :type estimator: an estimator that has a `fit` method with arguments X, y, and sample_weight
-    :param constraints: Object describing the parity constraints. This provides the reweighting
-        and relabelling
-    :type constraints: `fairlearn.reductions.Moment`
-    :param eps: allowed constraint violation
-    :type eps: float
-    :param B:
-    :type B:
-    :param opt_lambda: indicates whether to optimize lambda during the calculation of the
+    Parameters
+    ----------
+    X : {numpy.ndarray, pandas.DataFrame}
+        the training features
+    sensitive_features : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the sensitive features to use for constraints
+    y : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the training labels
+    estimator :
+        the estimator to fit in every iteration of :meth:`best_h` using a
+        :meth:`fit` method with arguments `X`, `y`, and `sample_weight`
+    constraints : fairlearn.reductions.Moment
+        Object describing the parity constraints. This provides the reweighting
+        and relabelling.
+    B : float
+        bound on the L1-norm of the lambda vector
+    opt_lambda : bool
+        indicates whether to optimize lambda during the calculation of the
         Lagrangian; optional with default value True
-    :type opt_lambda: bool
     """
 
-    def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
+    def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True):
         self.X = X
         self.n = self.X.shape[0]
         self.y = y
@@ -48,7 +49,6 @@ class _Lagrangian:
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
         self.pickled_estimator = pickle.dumps(estimator)
-        self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
         self.hs = pd.Series(dtype="float64")
@@ -65,16 +65,23 @@ class _Lagrangian:
     def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
 
-        :param Q: `Q` is either a series of weights summing up to 1 that indicate the weight of
-            each `h` in contributing to the randomized classifier, or a callable corresponding to
-            a deterministic predict function.
-        :type Q: pandas.Series or callable
-        :param lambda_vec: lambda vector
-        :type lambda_vec: pandas.Series
+        Parameters
+        ----------
+        Q : {pandas.Series, callable}
+            `Q` is either a series of weights summing up to 1 that indicate
+            the weight of each `h` in contributing to the randomized
+            predictor, or a callable corresponding to a deterministic
+            `predict` function.
+        lambda_vec : pandas.Series
+            lambda vector
 
-        :return: tuple `(L, L_high, gamma, error)` where `L` is the value of the Lagrangian,
-            `L_high` is the value of the Lagrangian under the best response of the lambda player,
-            `gamma` is the vector of constraint violations, and `error` is the empirical error
+        Returns
+        -------
+        tuple
+            tuple `(L, L_high, gamma, error)` where `L` is the value of the
+            Lagrangian, `L_high` is the value of the Lagrangian under the best
+            response of the lambda player, `gamma` is the vector of constraint
+            violations, and `error` is the empirical error
         """
         if callable(Q):
             error = self.obj.gamma(Q)[0]
