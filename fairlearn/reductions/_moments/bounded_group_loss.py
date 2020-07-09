@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pandas as pd
@@ -9,7 +9,21 @@ from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 
 
 class ConditionalLossMoment(LossMoment):
-    """A moment that quantifies a loss by group."""
+    r"""A moment for constraining the mean loss or the worst-case loss by a group.
+
+    Parameters
+    ----------
+    loss : {SquareLoss, AbsoluteLoss}
+        A loss object with an `eval` method, e.g. `SquareLoss` or
+        `AbsoluteLoss`.
+    upper_bound : float
+        An upper bound on the loss, also referred to as :math:`\\zeta`;
+        `upper_bound` is an optional argument that is not always
+        required; default None
+    no_groups : bool
+        indicates whether to calculate the mean loss or group-level losses,
+        default False, i.e., group-level losses are the default behavior
+    """
 
     def __init__(self, loss, *, upper_bound=None, no_groups=False):
         super().__init__(loss)
@@ -18,7 +32,7 @@ class ConditionalLossMoment(LossMoment):
 
     def default_objective(self):
         """Return a default objective."""
-        return AverageLossMoment(self.reduction_loss)
+        return MeanLoss(self.reduction_loss)
 
     def load_data(self, X, y, **kwargs):
         """Load data into the moment object."""
@@ -53,10 +67,12 @@ class ConditionalLossMoment(LossMoment):
         return expect_attr[_LOSS]
 
     def bound(self):
-        """Return bound vector.
+        """Return the vector of bounds.
 
-        :return: a vector of bound values corresponding to all constraints
-        :rtype: pandas.Series
+        Returns
+        -------
+        pandas.Series
+            A vector of bounds on group-level losses
         """
         if self.upper_bound is None:
             raise ValueError("No Upper Bound")
@@ -80,15 +96,15 @@ class ConditionalLossMoment(LossMoment):
 ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
-class AverageLossMoment(ConditionalLossMoment):
-    """Moment for Average Loss."""
+class MeanLoss(ConditionalLossMoment):
+    """Moment for evaluating the mean loss."""
 
     def __init__(self, loss):
         super().__init__(loss, upper_bound=None, no_groups=True)
 
 
-class GroupLossMoment(ConditionalLossMoment):
-    """Moment for Group Loss."""
+class BoundedGroupLoss(ConditionalLossMoment):
+    """Moment for constraining the worst-case loss by a group."""
 
     def __init__(self, loss, *, upper_bound=None):
         super().__init__(loss, upper_bound=upper_bound, no_groups=False)

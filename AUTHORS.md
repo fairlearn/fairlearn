@@ -13,6 +13,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Adrin Jalali](https://github.com/adrinjalali)
 - [Stephanie Lindsey](https://github.com/salindsey0124)
 - [Roman Lutz](https://github.com/romanlutz)
+- [Janhavi Mahajan](https://github.com/janhavi13)
 - [Vanessa Milan](https://www.microsoft.com/en-us/research/people/vmilan/)
 - [Sangeeta Mudnal](https://www.linkedin.com/in/sangeeta-mudnal-36868429/)
 - [Lauren Pendo](https://github.com/laurenpendo)

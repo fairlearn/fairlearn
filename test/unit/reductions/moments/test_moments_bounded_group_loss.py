@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-from fairlearn.reductions import GroupLossMoment, SquareLoss
+from fairlearn.reductions import BoundedGroupLoss, SquareLoss
 from test.unit.reductions.grid_search.utilities import _quick_data
 
 
@@ -17,7 +17,7 @@ class TestBoundedGroupLoss:
         eps = 0.01
         self.estimator = LinearRegression().fit(X, Y)
         def predictor(x): return self.estimator.predict(x)
-        self.disparity_criterion = GroupLossMoment(SquareLoss(-np.inf, np.inf), upper_bound=eps)
+        self.disparity_criterion = BoundedGroupLoss(SquareLoss(-np.inf, np.inf), upper_bound=eps)
         self.disparity_criterion.load_data(X, Y, sensitive_features=A)
         bnd = self.disparity_criterion.bound()
         loss_eps = self.disparity_criterion.gamma(predictor) - bnd
@@ -84,7 +84,7 @@ class TestBoundedGroupLoss:
         def predictor(x): return estimator.predict(x)
         eps = 0.05
 
-        disparity_criterion = GroupLossMoment(SquareLoss(-np.inf, np.inf), upper_bound=eps)
+        disparity_criterion = BoundedGroupLoss(SquareLoss(-np.inf, np.inf), upper_bound=eps)
         disparity_criterion.load_data(X, Y, sensitive_features=A)
         bnd = disparity_criterion.bound()
         loss_eps = disparity_criterion.gamma(predictor)

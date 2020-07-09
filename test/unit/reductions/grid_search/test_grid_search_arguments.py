@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -12,7 +12,7 @@ from sklearn.exceptions import NotFittedError
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
-from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, GroupLossMoment, \
+from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, BoundedGroupLoss, \
     ZeroOneLoss
 from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
     GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
@@ -332,4 +332,4 @@ class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         self.estimator = LinearRegression()
         eps = 0.01
-        self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), upper_bound=eps)
+        self.disparity_criterion = BoundedGroupLoss(ZeroOneLoss(), upper_bound=eps)

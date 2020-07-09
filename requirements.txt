@@ -17,7 +17,7 @@ requirements-parser
 
 # Required for test
 nbformat
-# Pin papermill due to notebook test issue on Windows with python 3.5 & 3.6
+# Pin papermill due to notebook test issue on Windows with python 3.6
 papermill<2.0.0
 # Pin pytest due to VS Code issue
 pytest==5.0.1
@@ -33,7 +33,6 @@ xlrd
 # Required for notebooks
 jupyter
 nbval
-shap
 
 # Required for documentation
 sphinx

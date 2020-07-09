@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 """Defines the fairlearn dashboard class."""
@@ -23,6 +23,8 @@ from fairlearn.metrics import (
     mean_absolute_error_group_summary,
     mean_squared_error_group_summary,
     r2_score_group_summary,
+    f1_score_group_summary,
+    log_loss_group_summary,
     )
 
 from IPython.display import display
@@ -52,7 +54,8 @@ class FairlearnDashboard(object):
             self, *,
             sensitive_features,
             y_true, y_pred,
-            sensitive_feature_names=None):
+            sensitive_feature_names=None,
+            locale=None):
         """Initialize the fairlearn Dashboard."""
         self._widget_instance = FairlearnWidget()
         if sensitive_features is None or y_true is None or y_pred is None:
@@ -129,6 +132,14 @@ class FairlearnDashboard(object):
                 "model_type": ["regression"],
                 "function": r2_score_group_summary
             },
+            "f1_score": {
+                "model_type": ["classification"],
+                "function": f1_score_group_summary
+            },
+            "log_loss": {
+                "model_type": ["probability"],
+                "function": log_loss_group_summary
+            },
             "overprediction": {
                 "model_type": [],
                 "function": _mean_overprediction_group_summary
@@ -186,6 +197,9 @@ class FairlearnDashboard(object):
                 raise Warning("Feature names shape does not match dataset, ignoring")
             else:
                 dataArg["features"] = sensitive_feature_names
+
+        if locale is not None:
+            dataArg["locale"] = locale
 
         self._widget_instance.value = dataArg
         self._widget_instance.observe(self._on_request, names="request")

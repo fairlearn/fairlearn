@@ -1,52 +1,125 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
 import pandas as pd
 
-from ._constants import LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY
+from sklearn.utils import Bunch
+
+from ._constants import (
+    LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY)
 from ._threshold_operation import ThresholdOperation
 
 DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
 
+# Dictionary of metrics based on confusion matrix. Their input must be a Bunch with the fields
+# named n, positives, negatives, predicted_positives, predicted_negatives, true_positives,
+# true_negatives, false_positives, false_negatives. The fields indicate the counts. They can all
+# be numpy arrays of the same length. Metrics are expected to return NaN where undefined.
+METRIC_DICT = {
+    'selection_rate': (
+        lambda x: x.predicted_positives / x.n),
+    'false_positive_rate': (
+        lambda x: x.false_positives / x.negatives),
+    'false_negative_rate': (
+        lambda x: x.false_negatives / x.positives),
+    'true_positive_rate': (
+        lambda x: x.true_positives / x.positives),
+    'true_negative_rate': (
+        lambda x: x.true_negatives / x.negatives),
+    'accuracy_score': (
+        lambda x: (x.true_positives + x.true_negatives) / x.n),
+    'balanced_accuracy_score': (
+        lambda x: 0.5 * x.true_positives / x.positives + 0.5 * x.true_negatives / x.negatives),
+}
 
-def _get_roc(data, sensitive_feature_value, flip=True):
-    """Get ROC curve's convex hull based on data columns 'score' and 'label'.
 
-    Scores represent output values from the predictor.
+def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives, false_negatives):
+    """Extend the provided confusion matrix counts with additional implied fields.
 
-    :param data: the DataFrame containing scores and labels
-    :type data: pandas.DataFrame
-    :param sensitive_feature_value: the sensitive feature value of the samples provided in `data`
-    :type sensitive_feature_value: str or int
-    :param flip: if True flip points below the ROC diagonal into points above by applying negative
-        weights; if False does not allow flipping; default True
-    :type flip: bool
-    :return: the convex hull over the ROC curve points
-    :rtype: pandas.DataFrame
+    Parameters
+    ----------
+    true_positives, false_positives, true_negatives, false_negatives : int
+        The counts appearing in the confusion matrix.
+
+    Returns
+    -------
+    result : sklearn.utils.Bunch
+        Dictionary-like object, with attributes:
+
+        true_positives, false_positives, true_negatives, false_negatives : int
+            The provided counts.
+
+        predicted_positives, predicted_negatives, positives, negatives, n : int
+            Derived counts.
     """
-    roc_sorted = _calculate_roc_points(data, sensitive_feature_value, flip)
-    roc_selected = _filter_points_to_get_convex_hull(roc_sorted)
-    roc_convex_hull = pd.DataFrame(roc_selected)[['x', 'y', 'operation']]
-    return roc_convex_hull
+    return Bunch(
+        true_positives=true_positives,
+        false_positives=false_positives,
+        true_negatives=true_negatives,
+        false_negatives=false_negatives,
+        predicted_positives=(true_positives + false_positives),
+        predicted_negatives=(true_negatives + false_negatives),
+        positives=(true_positives + false_negatives),
+        negatives=(true_negatives + false_positives),
+        n=(true_positives + true_negatives + false_positives + false_negatives),
+    )
 
 
-def _filter_points_to_get_convex_hull(roc_sorted):
-    """Find the convex hull.
+def _tradeoff_curve(data, sensitive_feature_value, flip=False,
+                    x_metric="false_positive_rate", y_metric="true_positive_rate"):
+    """Get a convex hull of achievable tradeoffs between the two provided metrics.
 
-    Uses a simplified version of Andrew's monotone chain convex hull algorithm
-    https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
-    to get the convex hull. Since we can assume the points (0,0) and (1,1) to be part
-    of the convex hull the problem is simpler and we only need to make a single pass
-    through the data.
+    The metrics are based on considering all possible thresholds of 'score' column of `data` and
+    evaluated with respect to 'label' column of `data`.
 
-    :param roc_sorted: DataFrame with ROC curve points sorted by 'x'
-    :type roc_sorted: pandas.DataFrame
-    :return: the list of points that make up the convex hull
-    :rtype: list of named tuples
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        Data frame with columns 'score' and 'label'.
+
+    sensitive_feature_value : str or int
+        The sensitive feature value of the samples providing in `data`. Only used
+        to generate a description when an exception is thrown.
+
+    flip : bool, default=False
+        If True, also consider the flipped thresholding (points below the threshold
+        classified as positive and above the threshold as negative).
+
+    Returns
+    -------
+    result : pandas.DataFrame
+        The convex hull over the achievabale tradeoff points with columns
+        'x', 'y', and 'operation'.
+    """
+    points_sorted = _calculate_tradeoff_points(
+        data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric)
+    points_selected = _filter_points_to_get_convex_hull(points_sorted)
+    convex_hull = pd.DataFrame(points_selected)[['x', 'y', 'operation']]
+    return convex_hull
+
+
+def _filter_points_to_get_convex_hull(points_sorted):
+    """Find the upper convex hull.
+
+    Parameters
+    ----------
+    points_sorted : pandas.DataFrame
+        Points represented as rows with 'x' and 'y' columns, sorted by 'x'.
+
+    Returns
+    -------
+    result : pandas.DataFrame
+        Points that make the upper convex hull.
+
+    Notes
+    -----
+    Uses `Andrew's monotone chain convex hull algorithm
+    <https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain>`_.
+
     """
     selected = []
-    for r2 in roc_sorted.itertuples():
+    for r2 in points_sorted.itertuples():
         # For each set of three points, i.e. the last two points in selected
         # and the next point from the sorted list of base points, check
         # whether the middle point (r1) lies above the line between the
@@ -123,7 +196,8 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
 
 
-def _calculate_roc_points(data, sensitive_feature_value, flip=True):
+def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
+                               x_metric="false_positive_rate", y_metric="true_positive_rate"):
     """Calculate the ROC points from the scores and labels.
 
     This is done by iterating through all possible
@@ -147,8 +221,6 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
     scores.append(-np.inf)
     labels.append(np.nan)
 
-    x_list, y_list, operation_list = [0], [0], [ThresholdOperation('>', np.inf)]
-
     # Iterate through all samples which are sorted by increasing scores.
     # Setting the threshold between two scores means that everything smaller
     # than the threshold gets a label of 0 while everything larger than the
@@ -156,29 +228,48 @@ def _calculate_roc_points(data, sensitive_feature_value, flip=True):
     # labels provides better accuracy.
     i = 0
     count = [0, 0]
+    x_list, y_list, operation_list = [], [], []
     while i < n:
-        threshold = scores[i]
-        while scores[i] == threshold:
-            count[labels[i]] += 1
-            i += 1
+        # special handling of the initial point
+        if x_list == []:
+            threshold = np.inf
+        else:
+            threshold = scores[i]
+            while scores[i] == threshold:
+                count[labels[i]] += 1
+                i += 1
+            threshold = (threshold + scores[i]) / 2
+
         # For the ROC curve we calculate points (x, y), where x represents
         # the conditional probability P[Y_hat=1 | Y=0] and y represents
         # the conditional probability P[Y_hat=1 | Y=1]. The conditional
         # probability is achieved by dividing by only the number of
         # negative/positive samples.
-        x, y = count[0] / n_negative, count[1] / n_positive
-        threshold = (threshold + scores[i]) / 2
-        operation = ThresholdOperation('>', threshold)
+        actual_counts = _extend_confusion_matrix(
+            false_positives=count[0],
+            true_positives=count[1],
+            true_negatives=(n_negative - count[0]),
+            false_negatives=(n_positive - count[1]))
+        flipped_counts = _extend_confusion_matrix(
+            false_positives=(n_negative - count[0]),
+            true_positives=(n_positive - count[1]),
+            true_negatives=count[0],
+            false_negatives=count[1])
+        if flip:
+            operations = [('>', actual_counts), ('<', flipped_counts)]
+        else:
+            operations = [('>', actual_counts)]
 
-        if flip and x > y:
-            x, y = 1 - x, 1 - y
-            operation = ThresholdOperation('<', threshold)
-        x_list.append(x)
-        y_list.append(y)
-        operation_list.append(operation)
+        for operation_string, counts in operations:
+            x = METRIC_DICT[x_metric](counts)
+            y = METRIC_DICT[y_metric](counts)
+            operation = ThresholdOperation(operation_string, threshold)
+            x_list.append(x)
+            y_list.append(y)
+            operation_list.append(operation)
 
     return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}) \
-        .sort_values(by=['x', 'y'])
+        .sort_values(by=['x', 'y']).reset_index(drop=True)
 
 
 def _get_scores_labels_and_counts(data):

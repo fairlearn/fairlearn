@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import pandas as pd
@@ -14,33 +14,61 @@ _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be u
 _DEFAULT_DIFFERENCE_BOUND = 0.01
 
 
-class ConditionalSelectionRate(ClassificationMoment):
-    """Generic fairness moment for selection rates.
+class UtilityParity(ClassificationMoment):
+    r"""A generic moment for parity in utilities (or costs) under classification.
 
-    This serves as the base class for both :class:`DemographicParity`
-    and :class:`EqualizedOdds`. The two are distinguished by
-    the events they define, which in turn affect the
-    `index` field created by :meth:`load_data()`.
+    This serves as the base class for :class:`DemographicParity`,
+    :class:`EqualizedOdds`, and others. All subclasses can be used as
+    difference-based constraints or ratio-based constraints.
+    Refer to the :ref:`user guide <constraints_binary_classification>` for
+    more information and example usage.
 
-    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to the rows of
-    the DataFrames either required as arguments or returned by several
-    of the methods of the `ConditionalSelectionRate` class. It is the cartesian
-    product of:
+    Constraints compare the group-level mean utility for each group with the
+    overall mean utility (unless further events are specified, e.g., in
+    equalized odds).
+    Constraint violation for difference-based constraints starts if the
+    difference between a group and the overall population with regard to a
+    utility exceeds `difference_bound`. For ratio-based constraints, the ratio
+    between the group-level and overal mean utility needs to be bounded
+    between `ratio_bound` and its inverse (plus an additional additive
+    `ratio_bound_slack`).
 
-    - The unique events defined for the particular object
-    - The unique values for the sensitive feature
+    The `index` field is a :class:`pandas:pandas.MultiIndex` corresponding to
+    the constraint IDs.
+    It is an index of various DataFrame and Series objects that are either
+    required as arguments or returned by several of the methods of the
+    `UtilityParity` class. It is the Cartesian product of:
+
+    - The unique events defining the particular moment object
+    - The unique values of the sensitive feature
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
-    The `ratio` specifies the multiple at which error(A = a) should be compared with total_error
-    and vice versa. The value of `ratio` has to be in the range (0,1] with smaller values
-    corresponding to weaker constraint. The `ratio` equal to 1 corresponds to the constraint
-    where error(A = a) = total_error
+    Parameters
+    ----------
+    difference_bound : float
+        The constraints' difference bound for constraints that are expressed
+        as differences, also referred to as :math:`\\epsilon` in documentation.
+        If `ratio_bound` is used then `difference_bound` needs to be None.
+        If neither `ratio_bound` nor `difference_bound` are set then a default
+        difference bound of 0.01 is used for backwards compatibility.
+        Default None.
+    ratio_bound : float
+        The constraints' ratio bound for constraints that are expressed as
+        ratios. The specified value needs to be in (0,1].
+        If `difference_bound` is used then `ratio_bound` needs to be None.
+        Default None.
+    ratio_bound_slack : float
+        The constraints' ratio bound slack for constraints that are
+        expressed as ratios, also referred to as :math:`\\epsilon` in
+        documentation.
+        `ratio_bound_slack` is ignored if `ratio_bound` is not specified.
+        Default 0.0
     """
 
     def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
         """Initialize with the ratio value."""
-        super(ConditionalSelectionRate, self).__init__()
+        super(UtilityParity, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
             self.eps = _DEFAULT_DIFFERENCE_BOUND
             self.ratio = 1.0
@@ -53,6 +81,7 @@ class ConditionalSelectionRate(ClassificationMoment):
                 raise ValueError(_MESSAGE_RATIO_NOT_IN_RANGE)
             self.ratio = ratio_bound
         else:
+            # both difference_bound and ratio_bound specified
             raise ValueError(_MESSAGE_INVALID_BOUNDS)
 
     def default_objective(self):
@@ -64,9 +93,11 @@ class ConditionalSelectionRate(ClassificationMoment):
 
         This adds a column `event` to the `tags` field.
 
-        The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`. The `utilities` defaults to
-        h(X), i.e. [0, 1] for each X_i. The first column is G^0 and the second is G^1.
+        The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
+        mentioned in the paper
+        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`.
+        The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
+        The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
         .. math::
         utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
@@ -163,8 +194,10 @@ class ConditionalSelectionRate(ClassificationMoment):
         signed weights to be applied to the data by the next call to the underlying
         estimator.
 
-        :param lambda_vec: The vector of Lagrange multipliers indexed by `index`
-        :type lambda_vec: :class:`pandas:pandas.Series`
+        Parameters
+        ----------
+        lambda_vec : :class:`pandas:pandas.Series`
+            The vector of Lagrange multipliers indexed by `index`
         """
         lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
             self.prob_event
@@ -179,20 +212,20 @@ class ConditionalSelectionRate(ClassificationMoment):
         return signed_weights
 
 
-# Ensure that ConditionalSelectionRate shows up in correct place in documentation
+# Ensure that UtilityParity shows up in correct place in documentation
 # when it is used as a base class
-ConditionalSelectionRate.__module__ = "fairlearn.reductions"
+UtilityParity.__module__ = "fairlearn.reductions"
 
 
-class DemographicParity(ConditionalSelectionRate):
-    r"""Implementation of Demographic Parity as a moment.
+class DemographicParity(UtilityParity):
+    r"""Implementation of demographic parity as a moment.
 
-    A classifier :math:`h(X)` satisfies DemographicParity if
+    A classifier :math:`h(X)` satisfies demographic parity if
 
     .. math::
-      P[h(X) = y' | A = a] = P[h(X) = y'] \; \forall a, y'
+      P[h(X) = 1 | A = a] = P[h(X) = 1] \; \forall a
 
-    This implementation of :class:`ConditionalSelectionRate` defines
+    This implementation of :class:`UtilityParity` defines
     a single event, `all`. Consequently, the `prob_event`
     :class:`pandas:pandas.Series`
     will only have a single entry, which will be equal to 1.
@@ -211,49 +244,93 @@ class DemographicParity(ConditionalSelectionRate):
         super().load_data(X, y, event=_ALL, **kwargs)
 
 
-class TruePositiveRateDifference(ConditionalSelectionRate):
-    r"""Implementation of True Positive Rate Difference (Equal Opportunity Difference) as a moment.
+class TruePositiveRateParity(UtilityParity):
+    r"""Implementation of true positive rate parity as a moment.
 
-    Adds conditioning on label `y=1` compared to Demographic parity, i.e.
+    .. note:
+
+        The true positive rate parity fairness criterion is also known
+        as "equal opportunity".
+
+    Adds conditioning on label `Y=1` compared to demographic parity, i.e.,
 
     .. math::
        P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a
 
-    This implementation of :class:`ConditionalSelectionRate` defines
-    the event corresponding to `y=1`.
+    This implementation of :class:`UtilityParity` defines the event
+    corresponding to `Y=1`.
 
-    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction of the samples
-    corresponding to `y = 1` in the `Y` array.
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction
+    of the samples corresponding to `Y = 1` in the `Y` array.
 
-    The `index` MultiIndex will have a number of entries equal to the number of unique values of
-    the sensitive feature, multiplied by the number of unique non-NaN values of the constructed
-    `event` array, whose entries are either NaN or `label=1` (so only one unique non-NaN value),
-    multiplied by two (for the Lagrange multipliers for positive and negative constraints).
+    The `index` MultiIndex will have a number of entries equal to the number
+    of unique values of the sensitive feature, multiplied by the number of
+    unique non-NaN values of the constructed `event` array, whose entries
+    are either NaN or `label=1` (so only one unique non-NaN value), multiplied
+    by two (for the Lagrange multipliers for positive and negative
+    constraints).
 
-    With these definitions, the :meth:`signed_weights` method will calculate the costs for `y=1` as
-    they are calculated in Example 4 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
-    but will use the weights equal to zero for `y=0`.
+    With these definitions, the :meth:`signed_weights` method will calculate
+    the costs for `Y=1` as they are calculated in Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`, but will use
+    the weights equal to zero for `Y=0`.
     """
 
-    short_name = "TruePositiveRateDifference"
+    short_name = "TruePositiveRateParity"
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
-        # The `where` clause is used to put `pd.nan` on all values where `y!=1`.
+        # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
         super().load_data(X, y,
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
                           **kwargs)
 
 
-class EqualizedOdds(ConditionalSelectionRate):
-    r"""Implementation of Equalized Odds as a moment.
+class FalsePositiveRateParity(UtilityParity):
+    r"""Implementation of false positive rate parity as a moment.
 
-    Adds conditioning on label compared to Demographic parity, i.e.
+    Adds conditioning on label `Y=0` compared to demographic parity, i.e.,
 
     .. math::
-       P[h(X) = y' | A = a, Y = y] = P[h(X) = y' | Y = y] \; \forall a, y, y'
+       P[h(X) = 1 | A = a, Y = 0] = P[h(X) = 1 | Y = 0] \; \forall a
 
-    This implementation of :class:`ConditionalSelectionRate` defines
+    This implementation of :class:`UtilityParity` defines the event
+    corresponding to `Y=0`.
+
+    The `prob_event` :class:`pandas:pandas.DataFrame` will record the fraction
+    of the samples corresponding to `Y = 0` in the `Y` array.
+
+    The `index` MultiIndex will have a number of entries equal to the number
+    of unique values of the sensitive feature, multiplied by the number of
+    unique non-NaN values of the constructed `event` array, whose entries are
+    either NaN or `label=0` (so only one unique non-NaN value), multiplied by
+    two (for the Lagrange multipliers for positive and negative constraints).
+
+    With these definitions, the :meth:`signed_weights` method will calculate
+    the costs for `Y=0` as they are calculated in Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
+    but will use the weights equal to zero for `Y=1`.
+    """
+
+    short_name = "FalsePositiveRateParity"
+
+    def load_data(self, X, y, **kwargs):
+        """Load the specified data into the object."""
+        # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
+        super().load_data(X, y,
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0),
+                          **kwargs)
+
+
+class EqualizedOdds(UtilityParity):
+    r"""Implementation of equalized odds as a moment.
+
+    Adds conditioning on label compared to demographic parity, i.e.
+
+    .. math::
+       P[h(X) = 1 | A = a, Y = y] = P[h(X) = 1 | Y = y] \; \forall a, y
+
+    This implementation of :class:`UtilityParity` defines
     events corresponding to the unique values of the `Y` array.
 
     The `prob_event` :class:`pandas:pandas.Series` will record the
@@ -279,17 +356,17 @@ class EqualizedOdds(ConditionalSelectionRate):
                           **kwargs)
 
 
-class ErrorRateRatio(ConditionalSelectionRate):
-    r"""Implementation of Error Rate Ratio as a moment.
+class ErrorRateParity(UtilityParity):
+    r"""Implementation of error rate parity as a moment.
 
-    Measures the ratio in errors per attribute by overall error.
-    The 2-sided version of error ratio can be written as
-    ratio <= error(A=a) / total_error <= 1/ratio
+    A classifier :math:`h(X)` satisfies error rate parity if
+
     .. math::
-    ratio <= E[abs(h(x) - y)| A = a] / E[abs(h(x) - y)] <= 1/ratio\; \forall a
+      P[h(X) \ne Y | A = a] = P[h(X) \ne Y] \; \forall a
 
-    This implementation of :class:`ConditionalSelectionRate` defines a single event, `all`.
-    Consequently, the `prob_event` :class:`pandas:pandas.Series` will only have a single
+    This implementation of :class:`UtilityParity` defines
+    a single event, `all`. Consequently, the `prob_event`
+    :class:`pandas:pandas.Series` will only have a single
     entry, which will be equal to 1.
 
     The `index` property will have twice as many entries (corresponding to the Lagrange multipliers
@@ -300,7 +377,7 @@ class ErrorRateRatio(ConditionalSelectionRate):
     However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
     """
 
-    short_name = "ErrorRateRatio"
+    short_name = "ErrorRateParity"
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""

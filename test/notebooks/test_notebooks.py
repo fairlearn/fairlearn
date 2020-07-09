@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import nbformat as nbf
@@ -77,19 +77,6 @@ def assay_one_notebook(notebook_name, test_values):
 
 
 @pytest.mark.notebooks
-def test_group_metrics_notebook():
-    overall_recall_key = "overall_recall"
-    by_groups_key = "recall_by_groups"
-
-    test_values = {}
-    test_values[overall_recall_key] = ScrapSpec("group_metrics.overall", 0.5)
-    test_values[by_groups_key] = ScrapSpec(
-        "results.by_group", {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0})
-
-    assay_one_notebook("Group Metrics", test_values)
-
-
-@pytest.mark.notebooks
 def test_grid_search_for_binary_classification():
     nb_name = "Grid Search for Binary Classification"
 
@@ -109,18 +96,10 @@ def test_binary_classification_on_compas_dataset():
 
     test_values = {}
     test_values["pp_eo_aa_pignore"] = ScrapSpec(
-        "postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature['African-American']._p_ignore",  # noqa: E501
+        "postprocessed_predictor_EO.interpolated_thresholder_.interpolation_dict['African-American'].p_ignore",  # noqa: E501
         pytest.approx(0.2320703126)
     )
 
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_grid_search_with_census_data():
-    nb_name = "Grid Search with Census Data"
-    test_values = {}
-    test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 13)
     assay_one_notebook(nb_name, test_values)
 
 
