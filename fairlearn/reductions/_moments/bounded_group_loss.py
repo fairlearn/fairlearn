@@ -104,7 +104,10 @@ class MeanLoss(ConditionalLossMoment):
 
 
 class BoundedGroupLoss(ConditionalLossMoment):
-    """Moment for constraining the worst-case loss by a group."""
+    """Moment for constraining the worst-case loss by a group.
+    
+    For more information refer to the :ref:`user guide <bounded_group_loss>`.
+    """
 
     def __init__(self, loss, *, upper_bound=None):
         super().__init__(loss, upper_bound=upper_bound, no_groups=False)
