@@ -268,12 +268,28 @@ then the best response of the :math:`\mathbf{\lambda}`-player is given by
     B \mathbf{e}_{k^*} & \qquad & \mbox{otherwise, where $k^* = \operatorname{argmax}_k \left [\hat{\gamma}(Q)_k - \hat{c}_k \right ]$}
     \end{eqnarray}
 
+where :math:`\mathbf{e}_k` is the :math:`k^{\mbox{th}}` basis vector for :math:`\mathbf{\lambda}`.
+
 Strategy for the :math:`Q`\-player
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To be written.
-This will contain how to turn the :math:`\mathbf{\lambda}` into
-a weighted classification problem.
+For a given :math:`\mathbf{\lambda}`, the :math:`Q`\-player seeks to minimise
+:math:`L(Q, \mathbf{\lambda})` by picking a particular form for the ensemble of
+classifiers :math:`Q`.
+Since :math:`L` is linear in :math:`Q`, this can always be achieved by selecting
+a single classifier :math:`h \in Q`.
+This then gives:
+
+.. math::
+    \begin{eqnarray}
+    L(h, \mathbf{\lambda})
+    & = &
+    \hat{\mbox{err}}(h) + \mathbf{\lambda}^{\mbox{T}}( M \hat{\mathbf{\mu}}(h) - \mathbf{\hat{c}}) \\
+    & = &
+    \hat{\E} \left [ \mathbf{1} {h(X) \ne Y} \right ]
+        - \mathbf{\lambda}^{\mbox{T}}\mathbf{\hat{c}}
+        + \sum_{k,j} M_{k,j} \lambda_k \hat{\mu}_j (h)
+    \end{eqnarray}
 
 
 .. topic:: References:
