@@ -9,7 +9,7 @@ import os
 from .show_versions import show_versions  # noqa: F401
 
 __name__ = "fairlearn"
-__version__ = "0.4.7.dev8192"
+__version__ = "0.4.7.dev4201"
 
 
 # Setup logging infrastructure
