@@ -61,12 +61,20 @@ For this example we use the
 objective is to predict whether a person makes more (label 1) or less (0)
 than $50,000 a year.
 
+.. doctest:: quickstart
+
     >>> import numpy as np 
+    >>> import pandas as pd
     >>> import matplotlib.pyplot as plt 
-    >>> from shap.datasets import adult  # shap is only used its dataset utility
-    >>> X, y_true = adult()
-    >>> y_true = y_true * 1
-    >>> sex = X['Sex'].apply(lambda sex: "female" if sex == 0 else "male")
+    >>> from fairlearn.datasets import fetch_adult
+    >>> data = fetch_adult(as_frame=True)
+    >>> X = pd.get_dummies(data.data)
+    >>> y_true = (data.target == '>50K') * 1
+    >>> sex = data.data['sex']
+    >>> sex.value_counts()
+    Male      32650
+    Female    16192
+    Name: sex, dtype: int64
 
 .. figure:: auto_examples/quickstart/images/sphx_glr_plot_adult_dataset_001.png
    :target: auto_examples/quickstart/plot_adult_dataset.html
@@ -82,32 +90,38 @@ definitions from
 `scikit-learn <https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics>`_
 we can evaluate metrics to get a group summary as below:
 
+.. doctest:: quickstart
+
     >>> from fairlearn.metrics import group_summary
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> 
-    >>> classifier = DecisionTreeClassifier()
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> classifier.fit(X, y_true)
-    >>> 
+    DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
     >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.976413500813857, 'by_group': {'female': 0.9958221149382601, 'male': 0.9668196420376319}}
+    {'overall': 0.844..., 'by_group': {'Female': 0.925..., 'Male': 0.804...}}
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
 
+.. doctest:: quickstart
+
     >>> from fairlearn.metrics import selection_rate_group_summary
     >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.2249623783053346, 'by_group': {'female': 0.1065824900194968, 'male': 0.28347865993575033}}
+    {'overall': 0.163..., 'by_group': {'Female': 0.063..., 'Male': 0.213...}}
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
 
+.. doctest:: quickstart
+
     >>> from fairlearn.widget import FairlearnDashboard
     >>> FairlearnDashboard(sensitive_features=sex,
-                           sensitive_feature_names=['sex'],
-                           y_true=y_true,
-                           y_pred={"initial model": y_pred})
+    ...                    sensitive_feature_names=['sex'],
+    ...                    y_true=y_true,
+    ...                    y_pred={"initial model": y_pred}) # doctest: +SKIP
 
 .. image:: ../img/fairlearn-dashboard-start.png
 
@@ -133,26 +147,30 @@ such decisions. The Exponentiated Gradient mitigation technique used fits the
 provided classifier using Demographic Parity as the objective, leading to
 a vastly reduced difference in selection rate:
 
+.. doctest:: quickstart
+
     >>> from fairlearn.reductions import ExponentiatedGradient, DemographicParity
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>> 
     >>> constraint = DemographicParity()
-    >>> classifier = DecisionTreeClassifier()
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
     >>> selection_rate_group_summary(y_true, y_pred_mitigated, sensitive_features=sex)
-    {'overall': 0.2674057922053991, 'by_group': {'female': 0.2603286602915235, 'male': 0.27090408444240477}}
+    {'overall': 0.166..., 'by_group': {'Female': 0.155..., 'Male': 0.171...}}
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard
 through a multi-model comparison:
 
+.. doctest:: quickstart
+
     >>> FairlearnDashboard(sensitive_features=sex,
-                           sensitive_feature_names=['sex'],
-                           y_true=y_true,
-                           y_pred={"initial model": y_pred, "mitigated model": y_pred_mitigated})
+    ...                    sensitive_feature_names=['sex'],
+    ...                    y_true=y_true,
+    ...                    y_pred={"initial model": y_pred, "mitigated model": y_pred_mitigated}) # doctest: +SKIP
 
 .. image:: ../img/fairlearn-dashboard-comparison.png
 
