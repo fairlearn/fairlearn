@@ -92,7 +92,7 @@ The form we choose to express the constraints is
 
 The matrix :math:`M \in \mathbb{R}^{|\mathcal{K}| \times |\mathcal{J}|}` represents
 our constraints.
-We define :math:`\mathbf{\mu}{h}` as a vector of conditional moments
+We define :math:`\mathbf{\mu}(h)` as a vector of conditional moments
 
 .. math::
     \mu_j(h) = \E
