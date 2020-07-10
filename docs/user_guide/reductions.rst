@@ -253,7 +253,7 @@ If no constraints are violated, then the best option is to set all compoments
 of :math:`\mathbf{\lambda} = \mathbf{0}`.
 Otherwise, the constraint on the :math:`\mathcal{l}_1`-norm means that the
 best options is to put all of the weight (i.e. :math:`B`) into the element
-of :math:`mathbf{\lambda}` corresponding to the most violated constraint.
+of :math:`\mathbf{\lambda}` corresponding to the most violated constraint.
 
 Formally, if we define:
 
@@ -263,13 +263,10 @@ Formally, if we define:
 then the best response of the :math:`\mathbf{\lambda}`-player is given by
 
 .. math::
-
-    \left {
-        \begin{align}
-        \mathbf{0} & \text{if $\hat{\gamma}(Q) \le \hat{\mathbf{C}}, }\\
-        B \mathbf{e}_{k^*} & \text{otherwise}
-        \end{align}
-    \right .
+    \begin{eqnarray}
+    \mathbf{0} & \qquad & \mbox{if $\hat{\gamma}(Q) \le \hat{\mathbf{c}}$, }\\
+    B \mathbf{e}_{k^*} & \qquad & \mbox{otherwise, where $k^* = \operatorname{argmax}_k \left [\hat{\gamma}(Q)_k - \hat{c}_k \right ]$}
+    \end{eqnarray}
 
 Strategy for the :math:`Q`\-player
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
