@@ -82,13 +82,30 @@ Expressing the Constraint Violation with Moments
 
 In this section, we will discuss how to construct :math:`\mathbf{C}(h)`, which
 measures the constraint violation of a classifier :math:`h`.
+For the time being, we are using the true distributions, rather than the empircal
+ones.
 The form we choose to express the constraints is
 
 .. math::
     M \mathbf{\mu}(h) \le \mathbf{c}
+    :label: eq_constraint_function_defn
+
+The matrix :math:`M \in \mathbb{R}^{|\mathcal{K}| \times |\mathcal{J}|}` represents
+our constraints.
+We define :math:`\mathbf{\mu}{h}` as a vector of conditional moments
+
+.. math::
+    \mu_j(h) = \E
+        \left[ 
+            g_j(X, A, Y, h(X)) | \mathcal{E}_j
+        \right ] \qquad j \in \mathcal{J}
     :label: eq_moment_definition
 
-To be continued....
+    g_j \, : \, \mathcal{X} \times \mathcal{A} \times \{0,1\} \times \{0,1\} \rightarrow [0,1]
+
+and :math:`\mathcal{E}_j` is an event defined with respect to :math:`(X, A, Y)`.
+Note that the function :math:`g` depends on the classifier :math:`h`, but the event
+:math:`\mathcal{E}_j` does not have any such dependency.
 
 Example Moments
 ^^^^^^^^^^^^^^^
@@ -99,7 +116,18 @@ disparity constraints.
 Demographic Parity
 """"""""""""""""""
 
-Need to show both difference and ratio
+For a binary classification problem, demographic parity requires that
+
+.. math::
+    \E [ h(X)| A = a] = \E[ h(X) ]
+
+This is a set of :math:`|\mathcal{A}|` equality constraints.
+The relevant set of events :math:`\mathcal{E}_j` has one entry
+:math:`\mathcal{E}_a` for each :math:`a \in \mathcal{A}`, plus
+the event :math:`\mathcal{E}_{\ast}` which encompasses the
+entirety of the :math:`(X, A, Y)` space.
+This means that :math:`\mathcal{J} = \mathcal{A} \cup \{ \ast \}`.
+
 
 Equalized Odds
 """"""""""""""
@@ -155,7 +183,7 @@ be useful as we construct the reduction.
 Formulating the Reduction
 -------------------------
 
-Between equations :eq:`eq_fairclassify` and :eq:`eq_moment_definition` the
+Between equations :eq:`eq_fairclassify` and :eq:`eq_constraint_function_defn` the
 problem we need to solve is:
 
 .. math::
@@ -290,6 +318,8 @@ This then gives:
         - \mathbf{\lambda}^{\mbox{T}}\mathbf{\hat{c}}
         + \sum_{k,j} M_{k,j} \lambda_k \hat{\mu}_j (h)
     \end{eqnarray}
+
+We now need the definition of :math:`\mu` to make progress....
 
 
 .. topic:: References:
