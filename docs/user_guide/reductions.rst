@@ -130,6 +130,39 @@ right hand side of the definition of demographic parity given
 above).
 This means that :math:`\mathcal{J} = \mathcal{A} \cup \{ \ast \}`.
 
+If we set :math:`g_j(X, A, Y, h(X)) \def h(x)` then, substituting
+in to :eq:`eq_moment_definition` we see that
+:math:`\mu_{\ast}(h) = \E[ h(x) ]` and
+:math:`\mu_{a}(h) = \E[ h(x) | A = a]`.
+In this case, our definition of demographc parity becomes
+
+.. math::
+    \mu_{a}(h) = \mu_{\ast}(h)
+
+In order to make further progress towards the form of
+equation :eq:`eq_constraint_function_defn`, we need to decide
+the form of our constraint.
+
+First, let us express our constraints in terms of differences (rather
+than ratios).
+The demographic parity constraint can then be written as a pair of
+inequalities:
+
+.. math::
+    \mu_{a}(h) - \mu_{\ast}(h) \le c_a
+
+    -\mu_a(h) + \mu_{\ast})(h) \le c_a
+
+where there is one pair of inequalities for each :math:`a \in \mathcal{A}`.
+We have :math:`\mathcal{K} = \mathcal{A} \times \{ -, + \}`, and we can
+write these constraints in the form of equation :eq:`eq_constraint_function_defn`
+with:
+
+.. math::
+    M_{(a,+), a\prime} & = & \mathbf{1} \{ a\prime = a \} \\
+    M_{(a,+), \ast} & = & -1 \\
+    M_{(a,-), a\prime} & = & -\mathbf{1} \{ a\prime = a \} \\
+    M_{(a,-), \ast} & = & 1
 
 Equalized Odds
 """"""""""""""
