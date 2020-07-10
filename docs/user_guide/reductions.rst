@@ -183,12 +183,14 @@ With this Lagrangian, equation :eq:`eq_fairclassify_moments` is equivalent to:
 
 .. math::
     \min_{Q \in \Delta}
-    \max_{\mathbf{\lambda} \in \mathbb{R}_+^{|\mathcal{K}|}}
+    \max_{\mathbf{\lambda} \in \mathbb{R}_+^{|\mathcal{K}|} \; ||\mathbf{\lambda}||_1 \le B}
     L(Q, \mathbf{\lambda})
     :label: eq_saddlepoint
 
 where the restriction to :math:`\mathbb{R}_+` comes from our choice to split
 the moments into positive and negative violations of the constraint.
+The restriction on the :math:`\mathcal{l}_1`-norm of :math:`\mathbf{\lambda}`
+is imposed for computation and statistical reasons.
 Intuitively, we are seeking to minimise our error while maximising the penalty
 for violating the disparity constraint (since that penalty is controlled by
 :math:`\mathbf{\lambda}` and the components of that vector are required to be
@@ -242,7 +244,32 @@ two players.
 Strategy for the :math:`\mathbf{\lambda}`-player
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To be written
+For a given :math:`Q`, the :math:`\mathbf{\lambda}`-player seeks to maximise
+:math:`L(Q, \mathbf{\lambda})` by picking a valid :math:`\mathbf{\lambda}`
+vector.
+Recalling that this vector is constrained to have positive components and
+:math:`||\mathbf{\lambda}||_1 \le B`, there are two options.
+If no constraints are violated, then the best option is to set all compoments
+of :math:`\mathbf{\lambda} = \mathbf{0}`.
+Otherwise, the constraint on the :math:`\mathcal{l}_1`-norm means that the
+best options is to put all of the weight (i.e. :math:`B`) into the element
+of :math:`mathbf{\lambda}` corresponding to the most violated constraint.
+
+Formally, if we define:
+
+.. math::
+    \hat{\gamma}(Q) = M \hat{\mathbf{\mu}}(Q)
+
+then the best response of the :math:`\mathbf{\lambda}`-player is given by
+
+.. math::
+
+    \left {
+        \begin{align}
+        \mathbf{0} & \text{if $\hat{\gamma}(Q) \le \hat{\mathbf{C}}, }\\
+        B \mathbf{e}_{k^*} & \text{otherwise}
+        \end{align}
+    \right .
 
 Strategy for the :math:`Q`\-player
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
