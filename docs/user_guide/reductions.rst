@@ -125,7 +125,9 @@ This is a set of :math:`|\mathcal{A}|` equality constraints.
 The relevant set of events :math:`\mathcal{E}_j` has one entry
 :math:`\mathcal{E}_a` for each :math:`a \in \mathcal{A}`, plus
 the event :math:`\mathcal{E}_{\ast}` which encompasses the
-entirety of the :math:`(X, A, Y)` space.
+entirety of the :math:`(X, A, Y)` space (since that is on the
+right hand side of the definition of demographic parity given
+above).
 This means that :math:`\mathcal{J} = \mathcal{A} \cup \{ \ast \}`.
 
 
