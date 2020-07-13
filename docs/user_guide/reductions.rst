@@ -146,7 +146,7 @@ The violations can be expressed in terms of the differences between
 the :math:`\mu_{a}(h)`, or in terms of the ratios between them.
 
 First, let us express our constraints in terms of differences.
-We seek to ensure that the differences in the :math:`\mu_a(h) are
+We seek to ensure that the differences in the :math:`\mu_a(h)` are
 bounded by our tolerance vector :math:`\mathbf{c}`.
 In this case, the demographic parity condition can be written as
 a pair of inequalities:
@@ -358,8 +358,64 @@ This then gives:
         - \mathbf{\lambda}^{\mbox{T}}\mathbf{\hat{c}}
         + \sum_{k,j} M_{k,j} \lambda_k \hat{\mu}_j (h)
     \end{eqnarray}
+    :label: eq_q_player_lagrange
 
-We now need the definition of :math:`\mu` to make progress....
+From equation `eq`:eq_moment_definition` we have:
+
+.. math::
+    \hat{\mu}_j(h) = \hat{\E}
+        \left[ 
+            g_j(X, A, Y, h(X)) | \mathcal{E}_j
+        \right ]
+
+Using the empirical event probabilities
+
+.. math::
+    p_j = \hat{\P} [ \mathcal{E}_j ]
+
+we see that
+
+.. math::
+    \hat{\mu}_j(h) = \frac{1}{p_j}
+        \hat{\E}
+            \left [
+                g_j(X, A, Y, h(X)) \mathbf{1} \{ (X,A,Y) \in \mathcal{E}_j \}
+            \right ]
+
+Substituting this result into equation :eq:`eq_q_player_lagrange` we find:
+
+.. math::
+    L(h, \mathbf{\lambda}) =
+        - \mathbf{\lambda}^{\mbox{T}}\mathbf{\hat{c}}
+        + \hat{\E} \left [ \mathbf{1} {h(X) \ne Y} \right ]
+        + \sum_{k,j} \frac{M_{k,j} \lambda_k}{p_j} \hat{\E}
+            \left [
+                g_j(X, A, Y, h(X)) \mathbf{1} \{ (X,A,Y) \in \mathcal{E}_j \}
+            \right ]
+    :label: eq_q_player_lagrange_substituted
+
+Recall that we are seeking to minimise :math:`L(h, \mathbf{\lambda})` and that
+:math:`\mathbf{\lambda}` is a constant for the :math:`Q`\-player.
+In this case, equation :eq:`eq_q_player_lagrange_substituted` will be
+minimised by selecting :math:`h(X)` as the solution to a cost sensitive
+classification problem with
+
+.. math::
+    \begin{eqnarray}
+    C_i^0 & = &
+        \mathbf{1} \left{ Y_i \ne 0 \right}
+        + \sum_{k,j} \frac{M_{k,j} \lambda_k}{p_j}
+                    g_j(X_i, A_i, Y_i, 0) \mathbf{1} \left{ (X_i, A_i, Y_i) \in \mathcal{E}_j \right} \\
+    C_i^1 & = &
+        \mathbf{1} \left{ Y_i \ne 1 \right}
+        + \sum_{k,j} \frac{M_{k,j} \lambda_k}{p_j}
+                    g_j(X_i, A_i, Y_i, 1) \mathbf{1} \left{ (X_i, A_i, Y_i) \in \mathcal{E}_j \right} \\
+    \end{eqnarray}
+
+These can be used with equation :eq:`eq_weighted_training_from_cost_sensitive` to
+obtain a weighted classification problem.
+
+
 
 
 .. topic:: References:
