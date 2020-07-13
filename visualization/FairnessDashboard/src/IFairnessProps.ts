@@ -54,9 +54,9 @@ export interface IFairnessProps {
     theme?: any;
     locale?: string;
     stringParams?: any;
-    supportedBinaryClassificationAccuracyKeys?: string[];
-    supportedRegressionAccuracyKeys?: string[];
-    supportedProbabilityAccuracyKeys?: string[];
+    supportedBinaryClassificationAccuracyKeys: string[];
+    supportedRegressionAccuracyKeys: string[];
+    supportedProbabilityAccuracyKeys: string[];
     shouldInitializeIcons?: boolean;
     iconUrl?: string;
     // The request hook
