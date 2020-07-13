@@ -141,12 +141,15 @@ In this case, our definition of demographc parity becomes
 
 In order to make further progress towards the form of
 equation :eq:`eq_constraint_function_defn`, we need to decide
-the form of our constraint.
+how to measure constraint violations.
+The violations can be expressed in terms of the differences between
+the :math:`\mu_{a}(h)`, or in terms of the ratios between them.
 
-First, let us express our constraints in terms of differences (rather
-than ratios).
-The demographic parity constraint can then be written as a pair of
-inequalities:
+First, let us express our constraints in terms of differences.
+We seek to ensure that the differences in the :math:`\mu_a(h) are
+bounded by our tolerance vector :math:`\mathbf{c}`.
+In this case, the demographic parity condition can be written as
+a pair of inequalities:
 
 .. math::
     \mu_{a}(h) - \mu_{\star}(h) \le c_a
