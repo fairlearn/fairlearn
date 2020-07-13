@@ -11,7 +11,7 @@ Fair Classification
 -------------------
 
 Consider the standard setting for binary classification.
-In such as case, we wish to learn the classifer
+In such a case, we wish to learn the classifer
 :math:`h \in \mathcal{H}` which minimises the classification
 error :math:`\mbox{err}(h) = \P[ h(X) \neq Y]`.
 Now, let us suppose that we can devise a constraint function
@@ -124,20 +124,20 @@ For a binary classification problem, demographic parity requires that
 This is a set of :math:`|\mathcal{A}|` equality constraints.
 The relevant set of events :math:`\mathcal{E}_j` has one entry
 :math:`\mathcal{E}_a` for each :math:`a \in \mathcal{A}`, plus
-the event :math:`\mathcal{E}_{\ast}` which encompasses the
+the event :math:`\mathcal{E}_{\star}` which encompasses the
 entirety of the :math:`(X, A, Y)` space (since that is on the
 right hand side of the definition of demographic parity given
 above).
-This means that :math:`\mathcal{J} = \mathcal{A} \cup \{ \ast \}`.
+This means that :math:`\mathcal{J} = \mathcal{A} \cup \{ \star \}`.
 
-If we set :math:`g_j(X, A, Y, h(X)) \def h(x)` then, substituting
+If we set :math:`g_j(X, A, Y, h(X)) := h(x)` then, substituting
 in to :eq:`eq_moment_definition` we see that
-:math:`\mu_{\ast}(h) = \E[ h(x) ]` and
+:math:`\mu_{\star}(h) = \E[ h(x) ]` and
 :math:`\mu_{a}(h) = \E[ h(x) | A = a]`.
 In this case, our definition of demographc parity becomes
 
 .. math::
-    \mu_{a}(h) = \mu_{\ast}(h)
+    \mu_{a}(h) = \mu_{\star}(h)
 
 In order to make further progress towards the form of
 equation :eq:`eq_constraint_function_defn`, we need to decide
@@ -149,9 +149,9 @@ The demographic parity constraint can then be written as a pair of
 inequalities:
 
 .. math::
-    \mu_{a}(h) - \mu_{\ast}(h) \le c_a
+    \mu_{a}(h) - \mu_{\star}(h) \le c_a
 
-    -\mu_a(h) + \mu_{\ast})(h) \le c_a
+    -\mu_a(h) + \mu_{\star}(h) \le c_a
 
 where there is one pair of inequalities for each :math:`a \in \mathcal{A}`.
 We have :math:`\mathcal{K} = \mathcal{A} \times \{ -, + \}`, and we can
@@ -159,15 +159,15 @@ write these constraints in the form of equation :eq:`eq_constraint_function_defn
 with:
 
 .. math::
-    M_{(a,+), a\prime} & = & \mathbf{1} \{ a\prime = a \} \\
-    M_{(a,+), \ast} & = & -1 \\
-    M_{(a,-), a\prime} & = & -\mathbf{1} \{ a\prime = a \} \\
-    M_{(a,-), \ast} & = & 1
+    M_{(a,+), a^{\prime}} & = & \mathbf{1} \{ a^{\prime} = a \} \\
+    M_{(a,+), \star} & = & -1 \\
+    M_{(a,-), a^{\prime}} & = & -\mathbf{1} \{ a^{\prime} = a \} \\
+    M_{(a,-), \star} & = & 1
 
 Equalized Odds
 """"""""""""""
 
-Need difference and ratio
+To be written.
 
 
 Cost Sensitive and Weighted Classification
@@ -268,7 +268,7 @@ To be continued....
 Solving for the Saddlepoint
 ---------------------------
 
-Fairlearn contains two algorithms for solving :eq:eq_saddlepoint.
+Fairlearn contains two algorithms for solving :eq:eq_saddlepoint`.
 Key to both is the ability to convert the vector of Lagrange multipliers,
 :math:`\mathbf{\lambda}` into sample weights for model training.
 We show how to do this in the more detailed sections below.
@@ -328,10 +328,12 @@ then the best response of the :math:`\mathbf{\lambda}`-player is given by
 .. math::
     \begin{eqnarray}
     \mathbf{0} & \qquad & \mbox{if $\hat{\gamma}(Q) \le \hat{\mathbf{c}}$, }\\
-    B \mathbf{e}_{k^*} & \qquad & \mbox{otherwise, where $k^* = \operatorname{argmax}_k \left [\hat{\gamma}(Q)_k - \hat{c}_k \right ]$}
+    B \mathbf{e}_{k^*} & \qquad & \mbox{otherwise}
     \end{eqnarray}
 
-where :math:`\mathbf{e}_k` is the :math:`k^{\mbox{th}}` basis vector for :math:`\mathbf{\lambda}`.
+where :math:`\mathbf{e}_k` is the :math:`k^{\mbox{th}}` basis vector for :math:`\mathbf{\lambda}`,
+and :math:`k^* = \operatorname{argmax}_k \left [\hat{\gamma}(Q)_k - \hat{c}_k \right ]`
+is the index of the most-violated constraint.
 
 Strategy for the :math:`Q`\-player
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
