@@ -9,5 +9,4 @@ adding new ones please consult the guide on
 .. toctree::
    :maxdepth: 2
 
-   plot_binary_classification_COMPAS
    plot_grid_search_census

@@ -64,15 +64,17 @@ than $50,000 a year.
 .. doctest:: quickstart
 
     >>> import numpy as np 
+    >>> import pandas as pd
     >>> import matplotlib.pyplot as plt 
-    >>> from shap.datasets import adult  # shap is only used its dataset utility
-    >>> X, y_true = adult()
-    >>> y_true = y_true * 1
-    >>> sex = X['Sex'].apply(lambda sex: "female" if sex == 0 else "male")
+    >>> from fairlearn.datasets import fetch_adult
+    >>> data = fetch_adult(as_frame=True)
+    >>> X = pd.get_dummies(data.data)
+    >>> y_true = (data.target == '>50K') * 1
+    >>> sex = data.data['sex']
     >>> sex.value_counts()
-    male      21790
-    female    10771
-    Name: Sex, dtype: int64
+    Male      32650
+    Female    16192
+    Name: sex, dtype: int64
 
 .. figure:: auto_examples/quickstart/images/sphx_glr_plot_adult_dataset_001.png
    :target: auto_examples/quickstart/plot_adult_dataset.html
@@ -99,7 +101,7 @@ we can evaluate metrics to get a group summary as below:
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
     >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.844..., 'by_group': {'female': 0.925..., 'male': 0.804...}}
+    {'overall': 0.844..., 'by_group': {'Female': 0.925..., 'Male': 0.804...}}
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
@@ -108,7 +110,7 @@ selection rate, i.e., the percentage of the population with label 1:
 
     >>> from fairlearn.metrics import selection_rate_group_summary
     >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.161..., 'by_group': {'female': 0.059..., 'male': 0.212...}}
+    {'overall': 0.163..., 'by_group': {'Female': 0.063..., 'Male': 0.213...}}
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
@@ -157,7 +159,7 @@ a vastly reduced difference in selection rate:
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
     >>> selection_rate_group_summary(y_true, y_pred_mitigated, sensitive_features=sex)
-    {'overall': 0.155..., 'by_group': {'female': 0.142..., 'male': 0.160...}}
+    {'overall': 0.166..., 'by_group': {'Female': 0.155..., 'Male': 0.171...}}
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard
