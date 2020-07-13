@@ -91,27 +91,6 @@ def test_grid_search_for_binary_classification():
 
 
 @pytest.mark.notebooks
-def test_binary_classification_on_compas_dataset():
-    nb_name = "Binary Classification on COMPAS dataset"
-
-    test_values = {}
-    test_values["pp_eo_aa_pignore"] = ScrapSpec(
-        "postprocessed_predictor_EO.interpolated_thresholder_.interpolation_dict['African-American'].p_ignore",  # noqa: E501
-        pytest.approx(0.2320703126)
-    )
-
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_grid_search_with_census_data():
-    nb_name = "Grid Search with Census Data"
-    test_values = {}
-    test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 13)
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
 def test_mitigating_disparities_in_ranking_from_binary_data():
     nb_name = "Mitigating Disparities in Ranking from Binary Data"
     test_values = {}
