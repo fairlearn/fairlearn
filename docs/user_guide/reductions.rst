@@ -360,7 +360,7 @@ This then gives:
     \end{eqnarray}
     :label: eq_q_player_lagrange
 
-From equation `eq`:eq_moment_definition` we have:
+From equation :eq:`eq_moment_definition` we have:
 
 .. math::
     \hat{\mu}_j(h) = \hat{\E}
@@ -403,13 +403,13 @@ classification problem with
 .. math::
     \begin{eqnarray}
     C_i^0 & = &
-        \mathbf{1} \left{ Y_i \ne 0 \right}
+        \mathbf{1} \left \{ Y_i \ne 0 \right \}
         + \sum_{k,j} \frac{M_{k,j} \lambda_k}{p_j}
-                    g_j(X_i, A_i, Y_i, 0) \mathbf{1} \left{ (X_i, A_i, Y_i) \in \mathcal{E}_j \right} \\
+                    g_j(X_i, A_i, Y_i, 0) \mathbf{1} \left \{ (X_i, A_i, Y_i) \in \mathcal{E}_j \right \} \\
     C_i^1 & = &
-        \mathbf{1} \left{ Y_i \ne 1 \right}
+        \mathbf{1} \left \{ Y_i \ne 1 \right \}
         + \sum_{k,j} \frac{M_{k,j} \lambda_k}{p_j}
-                    g_j(X_i, A_i, Y_i, 1) \mathbf{1} \left{ (X_i, A_i, Y_i) \in \mathcal{E}_j \right} \\
+                    g_j(X_i, A_i, Y_i, 1) \mathbf{1} \left \{ (X_i, A_i, Y_i) \in \mathcal{E}_j \right \} \\
     \end{eqnarray}
 
 These can be used with equation :eq:`eq_weighted_training_from_cost_sensitive` to
