@@ -36,6 +36,16 @@ of the repository. To do this yourself make sure to install sphinx and its
 add-ons by running :code:`pip install -r requirements.txt` in the repository
 root directory.
 
+To build the webpage run the following command from the repository root
+directory:
+
+.. code::
+
+    python -m sphinx -v -b html -n -j auto docs docs/_build/html
+
+Rerunning this after making changes to individual files only rebuilds the
+changed pages, so the build time should be a lot shorter.
+
 To edit the notebook we recommend using 
 `Visual Studio Code <https://code.visualstudio.com/docs/python/jupyter-support>`_.
 VS Code recognizes the lines starting with :code:`# %%` as new cells.
@@ -46,6 +56,11 @@ opens a *Python Interactive* tab to show the output.
 
 If you prefer working with Jupyter simply open the `.py` file with Jupyter.
 Changes made in Jupyter automatically show up in the `.py` file.
+
+.. note:
+
+    The Fairlearn dashboard does not render in VS Code yet.
+    Jupyter will be required for examples that use the dashboard.
 
 Note that the text portion of these notebooks should be written in
 restructured text (ReST), not markdown, so that the sphinx documentation build
