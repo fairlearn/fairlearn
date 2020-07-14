@@ -21,7 +21,7 @@ Formatting of example notebooks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The example notebooks in Fairlearn are surfaced through the website's
-`example notebook page <https://fairlearn.github.io/auto_examples/notebooks/index.html>`_.
+:ref:`example notebook page <examples>`.
 This allows them to be rendered properly with output from all cells.
 
 .. note:
