@@ -9,6 +9,7 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
 from time import time
+from tqdm import tqdm
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn.reductions._moments import Moment, ClassificationMoment
@@ -151,7 +152,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         # Fit the estimates
         logger.debug("Setup complete. Starting grid search")
-        for i in grid.columns:
+        for i in tqdm(grid.columns):
             lambda_vec = grid[i]
             logger.debug("Obtaining weights")
             weights = self.constraints.signed_weights(lambda_vec)

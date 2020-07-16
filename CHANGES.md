@@ -41,6 +41,7 @@
 * Add new constraints and objectives in `ThresholdOptimizer`
 * Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
 * Add `fairlearn.datasets` module.
+* Display progress bar for grid search and exponentiated gradient
 
 ### v0.4.6
 

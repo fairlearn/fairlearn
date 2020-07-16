@@ -9,6 +9,7 @@ from sklearn.utils.validation import check_is_fitted
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_ITER, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
+from tqdm import tqdm
 
 from fairlearn.reductions._moments import ClassificationMoment
 from fairlearn._input_validation import _validate_and_reformat_input
@@ -101,7 +102,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         last_regret_checked = _REGRET_CHECK_START_T
         last_gap = np.PINF
-        for t in range(0, self.max_iter):
+        for t in tqdm(range(0, self.max_iter)):
             logger.debug("...iter=%03d", t)
 
             # set lambdas for every constraint

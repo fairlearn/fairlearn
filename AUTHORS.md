@@ -23,3 +23,4 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Hanna Wallach](https://www.microsoft.com/en-us/research/people/wallach/)
 - [Vincent Xu](https://github.com/vingu)
 - [Beth Zeranski](https://github.com/bethz)
+- [Arjun Singh](https://github.com/arjsingh)
