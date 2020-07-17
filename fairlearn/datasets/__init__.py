@@ -7,8 +7,10 @@
 
 from ._fetch_adult import fetch_adult
 from ._fetch_boston import fetch_boston
+from ._fetch_compas import fetch_compas
 
 __all__ = [
     "fetch_adult",
     "fetch_boston",
+    "fetch_compas"
 ]
