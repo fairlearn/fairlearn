@@ -28,8 +28,8 @@ Governance
 ----------
 
 
-Frequently Asked Questions
+Frequently asked questions
 --------------------------
 
-We have a :ref:`faq` page.
+See our :ref:`faq` page.
 
