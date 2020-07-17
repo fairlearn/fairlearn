@@ -4,38 +4,49 @@ Frequently asked questions
 ==========================
 
 Where can I learn more about fairness in machine learning?
-    For a high level view of the subject, please see the :ref:`further resources <further_resources>`
-    section, where we provide links to a variety of books and papers.
-    In our :ref:`user guide <user_guide>` we also have links to the papers describing
-    Fairlearn's mitigation algorithms.
+    Please review :ref:`further resources <further_resources>`,
+    where we provide links to various materials that we have found helpful.
+    Also, in our :ref:`user guide <user_guide>`, we link to the papers describing
+    the algorithms implemented in Fairlearn.
 
 Why not just ignore the sensitive features?
-    If the fairness criterion is for the result of the machine learning pipeline to be
-    statistically independent of the sensitive features, simply ignoring the sensitive
-    features will not usually work.
-    Information is often redundantly encoded in datasets, and machine learning
+    If your goal is to train a model whose predictions are statistically
+    independent of the sensitive features, then it is not enough to simply ignore the
+    sensitive features.
+    Information is often redundantly encoded across several features, and machine learning
     algorithms *will* uncover these links (it is what they are designed to do).
     For example, in the US, the ZIP code where a person lives is well correlated with their
     race.
     Even if the model is not provided with race as a feature, the model will pick up on it
     implicitly via the ZIP code (and other features).
-    Worse, without having the race available in the dataset, it is not possible to determine
-    whether any use of ZIP code was as a proxy for race, or for some other reason.
-
+    Worse, without having the race available in the dataset, it is hard to assess the
+    model's impact across different groups defined by race or by race intersected with other
+    demographic features.
+    
 The model is unfair because the data are biased. Isn't it better to get better data?
-    One first has to decide that is meant by 'biased data' and 'better data' in a particular
-    context.
+    The answer to this question depends on what is meant by 'unfair', 'biased data',
+    and 'better data' in any particular context.
     Consider the example of a company seeking to build a tool for screening the resumes of
     job candidates.
-    If the company has historically hired few women, then this underrepresentation will
-    mean that any model will have less predictive power for women.
-    On the other hand, if women have received systematically poorer reviews due to biased
-    managers, then the model will appear to have good predictive power, but for incorrect
-    labels.
-    These are just two of the ways in which the data may be biased (they are not mutually
-    exclusive either), and the processes for getting 'better data' will be different for
-    each.
-    Ultimately, obtaining 'better data' may not be practical.
+    The company is planning to use their internal job evaluation data and train a
+    model to predict job evaluations of the applicants; those with higher
+    predictions will be ranked higher by the screening tool. This setup might
+    present several fairness issues:
+    - If the company has historically hired few women, there will be fewer of them
+      in the training data set, and so a trained model may be less accurate
+      for them.
+    - The choice of features also affects the accuracy of the model. The features
+      that are predictive for one group of applicants might not be as predictive for another
+      group, and so more data will not necessarily improve the accuracy.
+    - The accuracy of a model might not mean that the model is fair. If women have received
+      systematically poorer reviews due to biased managers or worse workplace conditions,
+      then the model might appear to be accurate,
+      but the choice of the label (in this case, job evaluation)
+      does not accurately reflect the applicants' potential.
+    These are just three ways how the data may be 'biased', and they are not mutually
+    exclusive. The processes for getting 'better data' will be different for
+    each. In some of these cases, obtaining 'better data' may not be practical, but it
+    might still be possible to use some mitigation algorithms.
 
 Won't making a model fairer reduce its accuracy?
     There are often many machine learning models that achieve similar levels of accuracy
@@ -46,19 +57,14 @@ Won't making a model fairer reduce its accuracy?
     fairness metrics.
 
 Can the mitigation algorithms in Fairlearn make my model fair?
-    Naive use of the Fairlearn library is not going to result in fairer models.
-    Indeed, when used incorrectly, these mitigation algorithms could produce a model which is *less* fair.
-    What mitigation algorithms do is generate a model which has lower disparity as measured by
-    a user-specified metric.
-    Whether this makes the model fairer is outside the scope of the algorithm.
-    To determine whether the new model is fairer, the whole system of which it is a part
-    needs to be considered in terms of the societal context in which it is used.
-    In Fairlearn, we aim to combine a Python library of disparity metrics and mitigation algorithms
-    with a deep discussion of fairness in machine learning.
-    By considering this extra information in the context of your particular machine learning system,
-    you should be able to determine the most appropriate actions for your situation.
-
-What sort of fairness related harms can the Fairlearn library address?
+    There are many ways in which a model can be unfair. Fairlearn mitigation algorithms
+    only address some of them: those that can be quantified by our supported
+    fairness metrics.
+    However, to assess whether the new model is fairer, it is important to consider
+    not only the fairness metrics, but also the societal and technical context in which
+    the model is applied.
+    
+What sort of fairness-related harms can the Fairlearn library address?
     Fairlearn concentrates on group fairness, meaning obtaining the minimum disparity on some
     metric evaluated on specified subgroups in the data.
     This is certainly not the only way of looking at fairness.
