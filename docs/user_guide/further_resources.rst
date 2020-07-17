@@ -13,7 +13,7 @@ Books
 - `Weapons of Math Destruction: How Big Data Increases Inequality and Threatens Democracy <https://weaponsofmathdestructionbook.com/>`_ (O'Neill, 2016) 
 - `Artificial Unintelligence: How Computers Misunderstand the World <https://mitpress.mit.edu/books/artificial-unintelligence>`_ (Broussard, 2018)
 - `Algorithms of Oppression: How Search Engines Reinforce Racism <https://nyupress.org/9781479837243/algorithms-of-oppression/>`_ (Noble, 2018)
-- `Fairness and Machine Learning <https://fairmlbook.org/>`_ (Barocas, Hardt, & Narayanan, **online textbook in progress**)
+- `Fairness and Machine Learning <https://fairmlbook.org/>`_ (Barocas, Hardt, & Narayanan)
 
 Papers
 ------
