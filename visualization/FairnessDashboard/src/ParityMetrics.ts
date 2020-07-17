@@ -1,8 +1,11 @@
+import { localization } from './Localization/localization';
+
 export interface IParityOption {
     key: string;
     title: string;
     description?: string;
-    parityModes: ParityModes[];
+    parityMetric: string;
+    parityMode: ParityModes;
 }
 
 export enum ParityModes {
@@ -10,41 +13,33 @@ export enum ParityModes {
     'ratio',
 }
 
-export const ParityOptions: IParityOption[] = [
-    {
-        key: 'm1',
-        title: 'Method 1',
-        description: 'uses science to get the answer',
-        parityModes: [ParityModes.difference, ParityModes.ratio],
+export const ParityOptions: { [key: string]: IParityOption } = {
+    selection_rate: {
+        key: 'selection_rate',
+        title: localization.Metrics.parityDifference,
+        description: localization.Metrics.parityDifferenceDescription,
+        parityMetric: 'selection_rate',
+        parityMode: ParityModes.difference,
     },
-    {
-        key: 'm2',
-        title: 'Method 2',
-        description: 'guesses at truth',
-        parityModes: [ParityModes.difference, ParityModes.ratio],
+    selection_rate_ratio: {
+        key: 'selection_rate_ratio',
+        title: localization.Metrics.parityRatio,
+        description: localization.Metrics.parityRatioDescription,
+        parityMetric: 'selection_rate',
+        parityMode: ParityModes.ratio,
     },
-    {
-        key: 'm3',
-        title: 'Method 3',
-        description: 'guesses at truth',
-        parityModes: [ParityModes.difference, ParityModes.ratio],
+    zero_one_loss: {
+        key: 'zero_one_loss',
+        title: localization.Metrics.errorRateDifference,
+        description: localization.Metrics.errorRateDifferenceDescription,
+        parityMetric: 'zero_one_loss',
+        parityMode: ParityModes.difference,
     },
-    {
-        key: 'm4',
-        title: 'Method 4',
-        description: 'guesses at truth',
-        parityModes: [ParityModes.difference, ParityModes.ratio],
+    recall_score: {
+        key: 'recall_score',
+        title: localization.Metrics.equalOpportunityDifference,
+        description: localization.Metrics.equalOpportunityDifferenceDescription,
+        parityMetric: 'recall_score',
+        parityMode: ParityModes.difference,
     },
-    {
-        key: 'm5',
-        title: 'Method 5',
-        description: 'guesses at truth',
-        parityModes: [ParityModes.difference],
-    },
-    {
-        key: 'm6',
-        title: 'Method 6',
-        description: 'guesses at truth',
-        parityModes: [ParityModes.difference],
-    },
-];
+};

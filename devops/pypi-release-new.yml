@@ -161,17 +161,12 @@ stages:
     vmImage: $(poolImage)
 
   variables:
-    # Following is actually the name of the service connection from the Project Settings page
-    kvSubscription: "Fairness - Automation (cecafb73-04ae-4432-9f96-d96925d28058)"
-    kvVaultName: fairlearndeploy
     ${{ if eq(parameters.releaseType, 'Test')}}:
-      kvUsername: usernametest
-      kvPassword: passwordtest
-      pypiUrl: https://test.pypi.org/legacy/
+      twineConnection: PyPI-Test
+      twineEndpoint: PyPITest
     ${{ if eq(parameters.releaseType, 'Production')}}:
-      kvUsername: 'usernameprod'
-      kvPassword: 'passwordprod'
-      pypiUrl: https://upload.pypi.org/legacy/
+      twineConnection: PyPI-Prod
+      twineEndpoint: PyPIProd
 
   jobs:
   - deployment: 'PyPI_${{parameters.releaseType}}_Upload'
@@ -196,15 +191,11 @@ stages:
           - script: pip install twine
             displayName: 'Install twine'
 
-          - task: AzureKeyVault@1
-            displayName: "Fetch deployment secrets from KeyVault"
+          - task: TwineAuthenticate@0
             inputs:
-              azureSubscription: ${{variables.kvSubscription}}
-              keyVaultName:  ${{variables.kvVaultName}}
-              secretsFilter: '${{variables.kvUsername}},${{variables.kvPassword}}'
+              externalFeeds: ${{variables.twineConnection}}
 
-          # Quote the password argument in case it contains characters the shell might try to parse
-          - script: 'twine upload --verbose --repository-url $(pypiUrl) -u $(${{variables.kvUsername}}) -p "$(${{variables.kvPassword}})" $(Pipeline.Workspace)/$(packageArtifactName)/*'
+          - script: 'twine upload --verbose -r $(twineEndpoint) --config-file $(PYPIRC_PATH) $(Pipeline.Workspace)/$(packageArtifactName)/*'
             displayName: Upload to ${{parameters.releaseType}} PyPI
 
         # TODO: Add GitHub Release task, so links in PyPI ReadMe will work without manual intervention (Prod only)

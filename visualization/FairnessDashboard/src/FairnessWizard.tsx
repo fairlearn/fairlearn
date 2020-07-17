@@ -3,10 +3,8 @@ import _ from 'lodash';
 import { ICategoricalRange, ModelMetadata, RangeTypes, SelectionContext } from 'mlchartlib';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { Stack, StackItem } from 'office-ui-fabric-react/lib/Stack';
-import { Text } from 'office-ui-fabric-react';
 import React from 'react';
 import { AccuracyOptions, IAccuracyOption } from './AccuracyMetrics';
-import { BinnedResponseBuilder } from './BinnedResponseBuilder';
 import { AccuracyTab } from './Controls/AccuracyTab';
 import { FeatureTab } from './Controls/FeatureTab';
 import { IntroTab } from './Controls/IntroTab';
@@ -21,6 +19,8 @@ import { WizardReport } from './WizardReport';
 import { FairnessWizardStyles } from './FairnessWizard.styles';
 import { loadTheme } from 'office-ui-fabric-react';
 import { defaultTheme } from './Themes';
+import { IParityOption, ParityOptions } from './ParityMetrics';
+import { BinnedResponseBuilder } from './BinnedResponseBuilder';
 
 export interface IAccuracyPickerProps {
     accuracyOptions: IAccuracyOption[];
@@ -29,7 +29,7 @@ export interface IAccuracyPickerProps {
 }
 
 export interface IParityPickerProps {
-    parityOptions: IAccuracyOption[];
+    parityOptions: IParityOption[];
     selectedParityKey: string;
     onParityChange: (newKey: string) => void;
 }
@@ -41,11 +41,12 @@ export interface IFeatureBinPickerProps {
 }
 
 export interface IWizardState {
+    showIntro: boolean;
     activeTabKey: string;
     selectedModelId?: number;
     dashboardContext: IFairnessContext;
     accuracyMetrics: IAccuracyOption[];
-    parityMetrics: IAccuracyOption[];
+    parityMetrics: IParityOption[];
     selectedAccuracyKey: string;
     selectedParityKey: string;
     featureBins: IBinnedResponse[];
@@ -60,7 +61,7 @@ const disparityTabKey = 'disparityTab';
 const reportTabKey = 'reportTab';
 
 const flights = {
-    skipDisparity: true,
+    skipDisparity: false,
 };
 
 export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardState> {
@@ -216,6 +217,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
             localization.setLanguage(this.props.locale);
         }
         let accuracyMetrics: IAccuracyOption[];
+        let parityMetrics: IParityOption[];
         loadTheme(props.theme || defaultTheme);
         this.selections = new SelectionContext('models', 1);
         this.selections.subscribe({
@@ -228,6 +230,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
         if (this.props.precomputedMetrics && this.props.precomputedFeatureBins) {
             // we must assume that the same accuracy metrics are provided across models and bins
             accuracyMetrics = this.buildAccuracyListForPrecomputedMetrics();
+            parityMetrics = this.buildParityListForPrecomputedMetrics();
             const readonlyFeatureBins = this.props.precomputedFeatureBins.map((initialBin, index) => {
                 return {
                     hasError: false,
@@ -238,10 +241,11 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 };
             });
             this.state = {
+                showIntro: true,
                 accuracyMetrics,
                 selectedAccuracyKey: accuracyMetrics[0].key,
-                parityMetrics: accuracyMetrics,
-                selectedParityKey: accuracyMetrics[0].key,
+                parityMetrics: parityMetrics,
+                selectedParityKey: parityMetrics[0].key,
                 dashboardContext: FairnessWizard.buildPrecomputedFairnessContext(props),
                 activeTabKey: featureBinTabKey,
                 featureBins: readonlyFeatureBins,
@@ -267,11 +271,15 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 : this.props.supportedProbabilityAccuracyKeys.map((key) => AccuracyOptions[key]);
         accuracyMetrics = accuracyMetrics.filter((metric) => !!metric);
 
+        // TODO
+        parityMetrics = Object.values(ParityOptions);
+
         this.state = {
+            showIntro: true,
             accuracyMetrics,
             selectedAccuracyKey: accuracyMetrics[0].key,
-            parityMetrics: accuracyMetrics,
-            selectedParityKey: accuracyMetrics[0].key,
+            parityMetrics: parityMetrics,
+            selectedParityKey: parityMetrics[0].key,
             dashboardContext: fairnessContext,
             activeTabKey: introTabKey,
             featureBins,
@@ -307,22 +315,15 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         verticalAlign="center"
                         className={styles.thinHeader}
                     >
-                        <Text variant={'mediumPlus'} className={styles.headerLeft}>
-                            {localization.Header.title}
-                        </Text>
+                        {/*<Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>*/}
                     </Stack>
-                    <Stack.Item grow={2} className={styles.body}>
-                        <Text variant={'mediumPlus'}>{localization.errorOnInputs}</Text>
-                    </Stack.Item>
                 </Stack>
             );
         }
         return (
             <Stack className={styles.frame}>
                 <Stack horizontal horizontalAlign="space-between" verticalAlign="center" className={styles.thinHeader}>
-                    <Text variant={'mediumPlus'} className={styles.headerLeft}>
-                        {localization.Header.title}
-                    </Text>
+                    {/*<Text variant={"mediumPlus"} className={styles.headerLeft}>{localization.Header.title}</Text>*/}
                 </Stack>
                 {this.state.activeTabKey === introTabKey && (
                     <StackItem grow={2} className={styles.body}>
@@ -344,7 +345,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                             onLinkClick={this.handleTabClick}
                         >
                             <PivotItem
-                                headerText={localization.Intro.features}
+                                headerText={localization.sensitiveFeatures}
                                 itemKey={featureBinTabKey}
                                 style={{ height: '100%', paddingLeft: '8px' }}
                             >
@@ -373,7 +374,11 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                                 />
                             </PivotItem>
                             {flights.skipDisparity === false && (
-                                <PivotItem headerText={'Parity'} itemKey={disparityTabKey}>
+                                <PivotItem
+                                    headerText={localization.disparityMetric}
+                                    itemKey={disparityTabKey}
+                                    style={{ height: '100%', paddingLeft: '8px' }}
+                                >
                                     <ParityTab
                                         dashboardContext={this.state.dashboardContext}
                                         parityPickerProps={parityPickerProps}
@@ -387,6 +392,7 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                 )}
                 {this.state.activeTabKey === reportTabKey && this.state.selectedModelId !== undefined && (
                     <WizardReport
+                        showIntro={this.state.showIntro}
                         dashboardContext={this.state.dashboardContext}
                         metricsCache={this.state.metricCache}
                         selections={this.selections}
@@ -395,11 +401,13 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
                         selectedModelIndex={this.state.selectedModelId}
+                        onHideIntro={this.hideIntro.bind(this)}
                         onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
                     />
                 )}
                 {this.state.activeTabKey === reportTabKey && this.state.selectedModelId === undefined && (
                     <ModelComparisonChart
+                        showIntro={this.state.showIntro}
                         dashboardContext={this.state.dashboardContext}
                         metricsCache={this.state.metricCache}
                         selections={this.selections}
@@ -407,12 +415,17 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                         accuracyPickerProps={accuracyPickerProps}
                         parityPickerProps={parityPickerProps}
                         featureBinPickerProps={featureBinPickerProps}
+                        onHideIntro={this.hideIntro.bind(this)}
                         onEditConfigs={this.setTab.bind(this, featureBinTabKey)}
                     />
                 )}
             </Stack>
         );
     }
+
+    private readonly hideIntro = () => {
+        this.setState({ showIntro: false });
+    };
 
     private readonly buildAccuracyListForPrecomputedMetrics = (): IAccuracyOption[] => {
         const customMetrics: IAccuracyOption[] = [];
@@ -439,6 +452,31 @@ export class FairnessWizard extends React.PureComponent<IFairnessProps, IWizardS
                     isPercentage: true,
                     description: customMetric.description,
                 });
+            }
+        });
+        return customMetrics.concat(providedMetrics);
+    };
+
+    private readonly buildParityListForPrecomputedMetrics = (): IParityOption[] => {
+        const customMetrics: IParityOption[] = [];
+        const providedMetrics: IParityOption[] = [];
+        Object.keys(this.props.precomputedMetrics[0][0]).forEach((key) => {
+            const metric = ParityOptions[key];
+            if (metric !== undefined) {
+                // if (metric.userVisible) {
+                providedMetrics.push(metric);
+                // }
+            } else {
+                // const customIndex = this.props.customMetrics.findIndex((metric) => metric.id === key);
+                // const customMetric = customIndex !== -1 ?
+                //     this.props.customMetrics[customIndex] :
+                //     {id: key};
+                // customMetrics.push({
+                //     key,
+                //     title: customMetric.name ||
+                //         localization.formatString(localization.defaultCustomMetricName, customMetrics.length) as string,
+                //     description: customMetric.description
+                // });
             }
         });
         return customMetrics.concat(providedMetrics);

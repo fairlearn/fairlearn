@@ -2,9 +2,11 @@ import { getTheme, IProcessedStyleSet, IStyle, mergeStyleSets, FontWeights, Font
 
 export interface IIntroTabStyles {
     firstSection: IStyle;
+    firstSectionContainer: IStyle;
     firstSectionTitle: IStyle;
     firstSectionSubtitle: IStyle;
     firstSectionBody: IStyle;
+    firstSectionGraphics: IStyle;
     lowerSection: IStyle;
     stepsContainer: IStyle;
     boldStep: IStyle;
@@ -22,15 +24,19 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             backgroundColor: theme.semanticColors.bodyBackground,
             color: theme.semanticColors.bodyText,
         },
+        firstSectionContainer: {
+            width: '100%',
+            height: '250px',
+        },
         firstSectionTitle: {
-            fontSize: '60px',
+            fontSize: '42px',
+            lineHeight: '50px',
             fontWeight: FontWeights.light,
-            lineHeight: '82px',
         },
         firstSectionSubtitle: {
-            fontSize: '60px',
+            fontSize: '42px',
+            lineHeight: '50px',
             fontWeight: FontWeights.semibold,
-            lineHeight: '82px',
         },
         firstSectionBody: {
             paddingTop: '30px',
@@ -38,6 +44,13 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             maxWidth: '500px',
             fontWeight: FontWeights.semilight,
             lineHeight: '24px',
+        },
+        firstSectionGraphics: {
+            width: '346px',
+            height: '154px',
+            background: theme.semanticColors.bodyBackground,
+            fill: theme.semanticColors.bodyText,
+            stroke: theme.semanticColors.bodyText,
         },
         lowerSection: {
             padding: '50px 70px 90px 90px',
@@ -60,8 +73,8 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
         },
         numericLabel: {
             fontWeight: FontWeights.bold,
-            width: '30px',
-            lineHeight: '24px',
+            width: '20px',
+            marginRight: '5px',
         },
         explanatoryStep: {
             maxWidth: '300px',
@@ -72,7 +85,9 @@ export const IntroTabStyles: () => IProcessedStyleSet<IIntroTabStyles> = () => {
             paddingTop: '15px',
         },
         getStarted: {
-            paddingTop: '30px',
+            height: '44px',
+            padding: '12px',
+            lineHeight: '24px',
             fontSize: FontSizes.large,
             fontWeight: FontWeights.regular,
         },
