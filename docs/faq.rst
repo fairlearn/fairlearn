@@ -32,6 +32,7 @@ The model is unfair because the data are biased. Isn't it better to get better d
     model to predict job evaluations of the applicants; those with higher
     predictions will be ranked higher by the screening tool. This setup might
     present several fairness issues:
+
     - If the company has historically hired few women, there will be fewer of them
       in the training data set, and so a trained model may be less accurate
       for them.
@@ -43,6 +44,7 @@ The model is unfair because the data are biased. Isn't it better to get better d
       then the model might appear to be accurate,
       but the choice of the label (in this case, job evaluation)
       does not accurately reflect the applicants' potential.
+
     These are just three ways how the data may be 'biased', and they are not mutually
     exclusive. The processes for getting 'better data' will be different for
     each. In some of these cases, obtaining 'better data' may not be practical, but it
@@ -65,24 +67,21 @@ Can the mitigation algorithms in Fairlearn make my model fair?
     the model is applied.
     
 What sort of fairness-related harms can the Fairlearn library address?
-    Fairlearn concentrates on group fairness, meaning obtaining the minimum disparity on some
-    metric evaluated on specified subgroups in the data.
-    This is certainly not the only way of looking at fairness.
-    For example, there is the concept of individual fairness (where decisions are evaluated
-    on the level of individuals rather than groups), counter-factual fairness (e.g. does the
-    decision change if an individual's gender is changed from male to female), and many
-    others.
-    We would welcome contributions which enabled Fairlearn to help address some of these other harms.
-    Beyond these, there are also fairness concepts which are not amenable to
-    mathematical (and hence algorithmic) expression - justice, due process and
-    righting historic iniquities for example.
+    We focus on two kinds of harms:
+
+    - *Allocation harms.* 
+      These harms can occur when AI systems extend or withhold opportunities, resources,
+      or information. Some of the key applications are in hiring, school admissions, and lending.
+    - *Quality-of-service harms.* Quality of service refers to whether a system works
+      as well for one person as it does for another, even if no opportunities, resources,
+      or information are extended or withheld.
 
 Can the Fairlearn library be used to detect bias in datasets?
     We do not have concrete plans for this at the present time.
 
 Can the Fairlearn library recommend ways to make my model fairer?
-    Fairness is a social concept, and no technological solution can make
-    things fair automatically.
+    Fairness in AI is a sociotechnical challenge, and so there is no software tool that
+    will "solve" fairness in all AI systems.
     In order to use the Fairlearn library successfully, you first need to work out
     what fairness means for your particular problem.
     We aim to provide a rich discussion of the topic of fairness in machine learning
@@ -99,23 +98,27 @@ What unfairness mitigation techniques does Fairlearn support?
     Please see our :ref:`mitigation` section.
 
 Which ML libraries does Fairlearn support?
-    We have generally followed conventions for `scikit-learn` in Fairlearn.
-    However, support is not restricted to Estimators from `scikit-learn`.
-    Any algorithm which provides (or can be wrapped to provide) `fit()` and
-    `predict()` methods should work.
+    We have generally followed conventions of `scikit-learn`.
+    However, our mitigation algorithms can be used to augment
+    any ML algorithms that provide (or can be wrapped to provide) `fit()` and
+    `predict()` methods. Also, any classification or regression
+    algorithm can be evaluated using our metrics.
 
 Does Fairlearn work for image and text data?
     We have not (yet) looked at using Fairlearn on image or text data.
-    However, so long as the estimators used have `fit()` and `predict()` methods
-    as required by Fairlearn, it should be possible to use Fairlearn on
-    image or text models.
+    However, so long as the image or text classifier provide
+    `fit()` and `predict()` methods
+    as required by Fairlearn, it should be possible to use them
+    with Fairlearn mitigation algorithms. Also, any classification or regression
+    algorithm can be evaluated using our metrics (regardless of the
+    data it is operating on).
 
 Is Fairlearn available in languages other than Python?
     For the moment, we only support Python >= 3.6
 
 Can I contribute to Fairlearn?
-    Absolutely! Please see our :ref:`Contributor Guide <contributor_guide>` for
-    information on how to add your contributions. We welcome all contributions!
+    Absolutely! Please see our :ref:`contributor guide <contributor_guide>` to see
+    how. We welcome all contributions!
 
 What is the relationship between Fairlearn and Microsoft?
     Fairlearn has grown from a project at Microsoft Research in New York City.
