@@ -67,7 +67,7 @@ Can the mitigation algorithms in Fairlearn make my model fair?
     the model is applied.
     
 What sort of fairness-related harms can the Fairlearn library address?
-    We focus on two kinds of harms:
+    We currently focus on two kinds of harms:
 
     - *Allocation harms.* 
       These harms can occur when AI systems extend or withhold opportunities, resources,
@@ -80,19 +80,13 @@ Can the Fairlearn library be used to detect bias in datasets?
     We do not have concrete plans for this at the present time.
 
 Can the Fairlearn library recommend ways to make my model fairer?
-    Fairness in AI is a sociotechnical challenge, and so there is no software tool that
-    will "solve" fairness in all AI systems.
-    In order to use the Fairlearn library successfully, you first need to work out
-    what fairness means for your particular problem.
-    We aim to provide a rich discussion of the topic of fairness in machine learning
-    on this website, together with links to the literature.
-    Once you have determined what fairness means for your AI system,
-    you can then work out how to use the various algorithms and fairness metrics
-    which Fairlearn supports to develop models which are
-    *fairer by the standard you have chosen*.
-    Even then, you should remember that some notions of fairness (such as justice
-    or due process) are not amenable to mathematical expression or algorithmic
-    mitigation.
+    Right now we do not have an automated tool that would help you decide
+    which mitigation algorithm to use. Our focus is on expanding the documantation
+    and examples to highlight when each of the algorithms might be more applicable.
+    Note that model training is just one step in the AI development and
+    deployment lifecycle, and other steps, such as data gathering and curation,
+    or monitoring and debugging of the deployed system, may be better places
+    of intervention to improve the fairness of an AI system.
 
 What unfairness mitigation techniques does Fairlearn support?
     Please see our :ref:`mitigation` section.
