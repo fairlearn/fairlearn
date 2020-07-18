@@ -17,3 +17,5 @@ Table of Contents
    auto_examples/notebooks/index
 
    contributor_guide/index
+
+   FAQ <faq>
