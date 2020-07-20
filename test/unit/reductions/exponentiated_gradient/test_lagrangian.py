@@ -9,16 +9,29 @@ import pytest
 from sklearn.dummy import DummyClassifier
 
 from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
-from fairlearn.reductions import DemographicParity, EqualizedOdds
+from fairlearn.reductions import DemographicParity, EqualizedOdds, \
+    TruePositiveRateParity, FalsePositiveRateParity, ErrorRateParity, \
+    BoundedGroupLoss
 
 from .test_utilities import _get_data
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 
 _PRECISION = 1e-6
 
+CLASSIFICATION_CONSTRAINTS = [
+    DemographicParity,
+    EqualizedOdds,
+    TruePositiveRateParity,
+    FalsePositiveRateParity,
+    ErrorRateParity
+]
+
+REGRESSION_CONSTRAINTS = [
+    BoundedGroupLoss
+]
 
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
-@pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("Constraints", CLASSIFICATION_CONSTRAINTS)
 @pytest.mark.parametrize("use_Q_callable", [True, False])
 @pytest.mark.parametrize("opt_lambda", [True, False])
 def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
