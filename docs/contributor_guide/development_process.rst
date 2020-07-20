@@ -33,17 +33,55 @@ changing all the docstrings in one PR.
 Developer certificate of origin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Contributions require you to sign a *developer certificate of origin* (DCO)
-declaring that you have the right to, and actually do, grant us the rights to
-use your contribution. For details, visit https://developercertificate.org/.
+All contributions require you to sign the *developer certificate of origin (DCO)*. This is a developer's certification in which you declare that you have the right to, and actually do, grant us the rights to use your contribution. We use the exact same one created and used by the Linux kernel developers. You can read it at https://developercertificate.org.
 
-When you submit a pull request, a DCO-bot will automatically determine whether
-you need to provide a DCO and decorate the PR appropriately (e.g., label,
-comment).
+You sign the DCO by *signing off* every commit comment with your name and email address: *Signed-off-by: Your Name <your.email@example.com>*
 
-Signing off means you need to have your name and email address attached as a
-commit comment, which you can automate using git hooks as shown
-`here <https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#46536244>`_.
+When you submit a pull request, a DCO-bot will automatically determine whether you need to provide a DCO and indicate how you can decorate the PR appropriately (e.g., label, comment).
+
+Manually
+""""""""
+
+You can manually sign-off by adding a separate paragraph to your commit message:
+
+.. code-block::
+
+    git commit -m “Your message
+    Signed-off-by: Your Name <your.email@example.com>
+
+or
+
+.. code-block::
+
+    git commit -m “Your message" -m “Signed-off-by: Your Name <your.email@example.com>” 
+
+
+Automatically
+"""""""""""""
+
+If this feels like a lot of typing, you can configure your name and e-mail in git to sign-off automatically:
+
+.. code-block::
+
+    git config --global user.name “Your Name”
+    git config --global user.email “your.email@example.com”
+
+
+Now, you can sign off using :code:`-s` or :code:`--signoff`:
+
+.. code-block::
+
+    git commit -s -m "Your message"
+
+If you find :code:`-s` too much typing as well, you can also add an alias:
+
+.. code-block::
+
+    git config --global alias.c "commit --signoff"
+
+
+Which allows you to commit including a signoff as :code:`git c -m "Your Message"`. 
+
 
 .. _advanced_install:
 
