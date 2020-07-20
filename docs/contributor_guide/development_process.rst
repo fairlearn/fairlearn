@@ -55,11 +55,7 @@ or
 
     git commit -m “Your message" -m “Signed-off-by: Your Name <your.email@example.com>” 
 
-
-Automatically
-"""""""""""""
-
-If this feels like a lot of typing, you can configure your name and e-mail in git to sign-off automatically:
+If this feels like a lot of typing, you can configure your name and e-mail in git to sign-off:
 
 .. code-block::
 
@@ -84,6 +80,11 @@ Which allows you to commit including a signoff as :code:`git c -m "Your Message"
 
 These instructions were adapted from `this blog post <https://kauri.io/dco-signoff-commiting-code-to-hyperledger-besu/f58190e5e3bc4b1a9ed902bfccfe58b9/a>`_.
 
+Automatically
+"""""""""""""
+
+You can also fully automate signing off using git hooks, by following the instructions of
+`this stack overflow post <https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#46536244>`_.
 
 .. _advanced_install:
 
