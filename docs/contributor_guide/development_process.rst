@@ -82,6 +82,8 @@ If you find :code:`-s` too much typing as well, you can also add an alias:
 
 Which allows you to commit including a signoff as :code:`git c -m "Your Message"`. 
 
+These instructions were adapted from `this blog post <https://kauri.io/dco-signoff-commiting-code-to-hyperledger-besu/f58190e5e3bc4b1a9ed902bfccfe58b9/a>`_.
+
 
 .. _advanced_install:
 
