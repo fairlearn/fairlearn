@@ -174,7 +174,13 @@ class _Lagrangian:
         the vector of Lagrange multipliers `lambda_vec`.
         """
         classifier = self._call_oracle(lambda_vec)
-        def h(X): return classifier.predict(X).flatten()
+
+        def h(X):
+            pred = classifier.predict(X)
+            if getattr(pred, "flatten", None) is not None:
+                pred = pred.flatten()
+            return pred
+
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
