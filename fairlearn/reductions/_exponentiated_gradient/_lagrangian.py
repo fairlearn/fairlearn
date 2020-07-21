@@ -159,7 +159,7 @@ class _Lagrangian:
             if self.pickled_estimator is not None:
                 classifier = pickle.loads(self.pickled_estimator)
             else:
-                classifier = self.estimator_class(**self.estimator_params).set_params()
+                classifier = self.estimator_class().set_params(**self.estimator_params)
 
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
