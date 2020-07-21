@@ -8,7 +8,6 @@ import pickle
 import scipy.optimize as opt
 from sklearn.dummy import DummyClassifier
 from time import time
-import copy
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
