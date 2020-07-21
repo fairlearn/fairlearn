@@ -25,9 +25,7 @@ If you're a new contributor please also add yourself to AUTHORS.md.
 
 Docstrings should follow
 `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
-This is a
-`recent decision by the community
-<https://github.com/fairlearn/fairlearn/issues/314>`_.
+This is a `recent decision by the community <https://github.com/fairlearn/fairlearn/issues/314>`_.
 The new policy is to update docstrings that a PR touches, as opposed to
 changing all the docstrings in one PR.
 
@@ -89,17 +87,13 @@ If you find :code:`-s` too much typing as well, you can also add an alias:
 Which allows you to commit including a signoff as :code:`git c -m "Your
 Message"`.
 
-These instructions were adapted from `this blog post
-<https://kauri.io/dco-signoff-commiting-code-to-hyperledger-besu/f58190e5e3bc4b
-1a9ed902bfccfe58b9/a>`_.
+These instructions were adapted from `this blog post <https://kauri.io/dco-signoff-commiting-code-to-hyperledger-besu/f58190e5e3bc4b1a9ed902bfccfe58b9/a>`_.
 
 Automatically
 """""""""""""
 
 You can also fully automate signing off using git hooks, by following the
-instructions of `this stack overflow post <https://stackoverflow.com/questions/
-15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#
-46536244>`_.
+instructions of `this stack overflow post <https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#46536244>`_.
 
 .. _advanced_install:
 
@@ -142,8 +136,7 @@ command
 Note that the Fairlearn dashboard is built using nodejs and requires
 additional steps. To build the Fairlearn dashboard after making changes to it,
 `install Yarn <https://yarnpkg.com/lang/en/docs/install>`_, and then run the
-`widget build script <https://github.com/fairlearn/fairlearn/tree/master/
-scripts/build_widget.py>`_.
+`widget build script <https://github.com/fairlearn/fairlearn/tree/master/scripts/build_widget.py>`_.
 
 .. _onboarding-guide:
 
