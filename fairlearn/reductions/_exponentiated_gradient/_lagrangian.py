@@ -8,6 +8,7 @@ import pickle
 import scipy.optimize as opt
 from sklearn.dummy import DummyClassifier
 from time import time
+import copy
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
@@ -45,7 +46,13 @@ class _Lagrangian:
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
-        self.pickled_estimator = pickle.dumps(estimator)
+        if callable(getattr(estimator, "get_params", None)):
+            self.estimator_params = estimator.get_params()
+            self.estimator_class = estimator.__class__
+            self.pickled_estimator = None
+        else:
+            self.pickled_estimator = pickle.dumps(estimator)
+        self.estimator = estimator
         self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
@@ -149,7 +156,10 @@ class _Lagrangian:
                                          constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
-            classifier = pickle.loads(self.pickled_estimator)
+            if self.pickled_estimator is not None:
+                classifier = pickle.loads(self.pickled_estimator)
+            else:
+                classifier = self.estimator_class(**self.estimator_params).set_params()
 
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
@@ -165,7 +175,7 @@ class _Lagrangian:
         the vector of Lagrange multipliers `lambda_vec`.
         """
         classifier = self._call_oracle(lambda_vec)
-        def h(X): return classifier.predict(X)
+        def h(X): return classifier.predict(X).flatten()
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
