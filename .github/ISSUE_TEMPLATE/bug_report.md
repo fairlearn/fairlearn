@@ -34,14 +34,15 @@ going to copy-paste your code and we expect to get the same result as you.
 
 Example:
 ```python
+import pandas as pd
 from fairlearn.reductions import ExponentiatedGradient, DemographicParity
 from sklearn.linear_model import LinearRegression
-from tempeh.configurations import datasets
+from fairlearn.datasets import fetch_adult
 
-dataset = datasets['adult_uci']
-X, _ = dataset.get_X()
-y, _ = dataset.get_y()
-sensitive_features = X[:, 7]
+data = fetch_adult(as_frame=True)
+X = pd.get_dummies(data.data)
+y = (data.target == '>50K') * 1
+sensitive_features = data.data['sex']
 mitigator = ExponentiatedGradient(LinearRegression(), DemographicParity())
 mitigator.fit(X, y, sensitive_features=sensitive_features)
 ```

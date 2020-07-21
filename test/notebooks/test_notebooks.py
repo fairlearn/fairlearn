@@ -77,19 +77,6 @@ def assay_one_notebook(notebook_name, test_values):
 
 
 @pytest.mark.notebooks
-def test_group_metrics_notebook():
-    overall_recall_key = "overall_recall"
-    by_groups_key = "recall_by_groups"
-
-    test_values = {}
-    test_values[overall_recall_key] = ScrapSpec("group_metrics.overall", 0.5)
-    test_values[by_groups_key] = ScrapSpec(
-        "results.by_group", {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0})
-
-    assay_one_notebook("Group Metrics", test_values)
-
-
-@pytest.mark.notebooks
 def test_grid_search_for_binary_classification():
     nb_name = "Grid Search for Binary Classification"
 
@@ -100,27 +87,6 @@ def test_grid_search_for_binary_classification():
         "second_sweep.predictors_[second_sweep.best_idx_].coef_[0][0]",
         pytest.approx(2.53725364))
 
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_binary_classification_on_compas_dataset():
-    nb_name = "Binary Classification on COMPAS dataset"
-
-    test_values = {}
-    test_values["pp_eo_aa_pignore"] = ScrapSpec(
-        "postprocessed_predictor_EO._post_processed_predictor_by_sensitive_feature['African-American']._p_ignore",  # noqa: E501
-        pytest.approx(0.2320703126)
-    )
-
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_grid_search_with_census_data():
-    nb_name = "Grid Search with Census Data"
-    test_values = {}
-    test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 13)
     assay_one_notebook(nb_name, test_values)
 
 

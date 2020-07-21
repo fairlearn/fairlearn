@@ -7,7 +7,7 @@ import pytest
 
 from fairlearn.reductions._grid_search.grid_search import _GridGenerator
 from fairlearn.reductions import DemographicParity, EqualizedOdds
-from fairlearn.reductions._moments.conditional_selection_rate import _ALL, _SIGN, _EVENT, \
+from fairlearn.reductions._moments.utility_parity import _ALL, _SIGN, _EVENT, \
     _GROUP_ID
 
 from test.unit.reductions.grid_search.utilities import _quick_data

@@ -1,4 +1,4 @@
-import { RangeTypes } from "mlchartlib";
+import { RangeTypes } from 'mlchartlib';
 
 export interface IBinnedResponse {
     hasError: boolean;
