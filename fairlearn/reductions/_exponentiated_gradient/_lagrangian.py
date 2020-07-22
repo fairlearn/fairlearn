@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import scipy.optimize as opt
+from sklearn import clone
 from sklearn.dummy import DummyClassifier
 from time import time
 
@@ -45,12 +46,7 @@ class _Lagrangian:
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
-        if callable(getattr(estimator, "get_params", None)):
-            self.estimator_params = estimator.get_params()
-            self.estimator_class = estimator.__class__
-            self.pickled_estimator = None
-        else:
-            self.pickled_estimator = pickle.dumps(estimator)
+
         self.estimator = estimator
         self.eps = eps
         self.B = B
@@ -155,10 +151,7 @@ class _Lagrangian:
                                          constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
-            if self.pickled_estimator is not None:
-                classifier = pickle.loads(self.pickled_estimator)
-            else:
-                classifier = self.estimator_class().set_params(**self.estimator_params)
+            classifier = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
         classifier.fit(self.X, redY, sample_weight=redW)
@@ -174,13 +167,13 @@ class _Lagrangian:
         the vector of Lagrange multipliers `lambda_vec`.
         """
         classifier = self._call_oracle(lambda_vec)
-
         def h(X):
             pred = classifier.predict(X)
+            # Some estimators return an output of the shape (num_preds, 1) - flatten such
+            # results
             if getattr(pred, "flatten", None) is not None:
                 pred = pred.flatten()
             return pred
-
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
