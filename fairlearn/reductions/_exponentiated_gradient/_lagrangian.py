@@ -4,7 +4,6 @@
 import logging
 import numpy as np
 import pandas as pd
-import pickle
 import scipy.optimize as opt
 from sklearn import clone
 from sklearn.dummy import DummyClassifier
@@ -169,6 +168,7 @@ class _Lagrangian:
         the vector of Lagrange multipliers `lambda_vec`.
         """
         classifier = self._call_oracle(lambda_vec)
+
         def h(X):
             pred = classifier.predict(X)
             # Some estimators return an output of the shape (num_preds, 1) - flatten such
