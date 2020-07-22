@@ -46,7 +46,6 @@ class _Lagrangian:
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
-
         self.estimator = estimator
         self.eps = eps
         self.B = B
