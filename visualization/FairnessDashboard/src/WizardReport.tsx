@@ -455,12 +455,12 @@ export class WizardReport extends React.PureComponent<IReportProps, IState> {
             const formattedBinOutcomeValues = this.state.metrics.binnedOutcome.map((value) =>
                 this.formatNumbers(value, outcomeKey),
             );
-            const formattedBinOverPredictionValues = this.state.metrics.binnedOverprediction.map((value) =>
+            const formattedBinOverPredictionValues = this.state.metrics.binnedOverprediction ? this.state.metrics.binnedOverprediction.map((value) =>
                 this.formatNumbers(value, overpredicitonKey),
-            );
-            const formattedBinUnderPredictionValues = this.state.metrics.binnedUnderprediction.map((value) =>
+            ) : null;
+            const formattedBinUnderPredictionValues = this.state.metrics.binnedUnderprediction ? this.state.metrics.binnedUnderprediction.map((value) =>
                 this.formatNumbers(value, underpredictionKey),
-            );
+            ) : null;
 
             const globalOverpredictionString = this.formatNumbers(this.state.metrics.globalOverprediction, outcomeKey);
             const globalUnderpredictionString = this.formatNumbers(

@@ -64,10 +64,6 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                                 return (
                                     <div className={styles.binBox} key={index}>
                                         <div className={styles.binLabel}>{label}</div>
-                                        {/* <Stack horizontal>
-                                    {minIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.minTag}</div>}
-                                    {maxIndexes.includes(index) && <div className={styles.minMaxLabel}>{localization.Report.maxTag}</div>}
-                                </Stack> */}
                                     </div>
                                 );
                         })}
@@ -78,13 +74,18 @@ export class OverallTable extends React.PureComponent<IOverallTableProps> {
                         <div className={styles.metricCol}>
                             <div className={styles.metricLabel}>{metric}</div>
                             <div className={styles.flexCol}>
-                                <div className={styles.metricBox}>{this.props.overallMetrics[index]}</div>
-                                {this.props.formattedBinValues[index].map((value, index) => {
+                                <div className={styles.metricBox}>{this.props.overallMetrics[index] == NaN.toString() ? '-' : this.props.overallMetrics[index]}</div>
+                                {this.props.formattedBinValues[index] ? this.props.formattedBinValues[index].map((value, index) => {
                                     if (this.props.expandAttributes)
                                         return (
                                             <div className={styles.metricBox} key={index}>
                                                 {value !== undefined ? value : 'empty'}
                                             </div>
+                                        );
+                                }) : this.props.binLabels.map((label, index) => {
+                                    if (this.props.expandAttributes)
+                                        return (
+                                            <div className={styles.metricBox} key={index}>-</div>
                                         );
                                 })}
                             </div>
