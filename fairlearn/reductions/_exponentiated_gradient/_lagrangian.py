@@ -150,6 +150,9 @@ class _Lagrangian:
                                          constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
+            # use sklearn.base.clone to clone the estimator.
+            # Use safe=False to make a deep copy of the estimator if not an
+            # sklearn-based estimator.
             classifier = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
