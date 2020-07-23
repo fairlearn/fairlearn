@@ -150,8 +150,10 @@ class _Lagrangian:
             self.n_oracle_calls_dummy_returned += 1
         else:
             # use sklearn.base.clone to clone the estimator.
-            # Use safe=False to make a deep copy of the estimator if not an
-            # sklearn-based estimator.
+            # It is the same as copy.deepcopy for non-sklearn estimators (By using safe=False).
+            # For sklearn estimators, it is more efficient as it would not
+            # do a copy.deepcopy. Rather, instantiate a new estimator using the
+            # get_params() internally.
             classifier = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
