@@ -72,6 +72,14 @@ to locate the appropriate version of the notebook.
 
 ## Resources
 
+- [fairlearn.github.io](https://fairlearn.github.io/)
+- [FairLearn Whitepaper](https://www.microsoft.com/en-us/research/uploads/prod/2020/05/Fairlearn_whitepaper.pdf)
+- [FairLearn Documentation](https://fairlearn.github.io/auto_examples/notebooks/index.html)
+- [Fairlearn Examples](https://fairlearn.github.io/auto_examples/notebooks/index.html)
+- [Building fairer AI Systems with Fairlearn on Channel 9](https://channel9.msdn.com/Shows/AI-Show/Building-fairer-AI-Systems-with-Fairlearn)
+- [How to Test Models for Fairness with Fairlearn Deep-Dive on Channel 9](https://channel9.msdn.com/Shows/AI-Show/How-to-Test-Models-for-Fairness-with-Fairlearn-Deep-Dive)
+- [Fairlearn in Practice at EY on Channel 9](https://channel9.msdn.com/Shows/AI-Show/Fairlearn-in-Practice-at-EY)
+
 ## Contributing
 
 To contribute please check our
