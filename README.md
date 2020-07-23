@@ -70,6 +70,8 @@ In this case, please navigate the tags in the repository
 (e.g. [v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5))
 to locate the appropriate version of the notebook.
 
+## Resources
+
 ## Contributing
 
 To contribute please check our
