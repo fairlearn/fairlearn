@@ -11,7 +11,9 @@ from sklearn.dummy import DummyClassifier
 from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
 from fairlearn.reductions import DemographicParity, EqualizedOdds, \
     TruePositiveRateParity, FalsePositiveRateParity, ErrorRateParity, \
-    BoundedGroupLoss
+    BoundedGroupLoss, LossMoment, ZeroOneLoss
+from fairlearn.reductions._moments.utility_parity import \
+    _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE
 
 from .test_utilities import _get_data
 from .simple_learners import LeastSquaresBinaryClassifierLearner
@@ -30,14 +32,22 @@ REGRESSION_CONSTRAINTS = [
     BoundedGroupLoss
 ]
 
+ALL_CONSTRAINTS = CLASSIFICATION_CONSTRAINTS + REGRESSION_CONSTRAINTS
+
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
-@pytest.mark.parametrize("Constraints", CLASSIFICATION_CONSTRAINTS)
+@pytest.mark.parametrize("Constraints", ALL_CONSTRAINTS)
 @pytest.mark.parametrize("use_Q_callable", [True, False])
 @pytest.mark.parametrize("opt_lambda", [True, False])
 def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     X, y, A = _get_data(A_two_dim=False)
     estimator = LeastSquaresBinaryClassifierLearner()
-    constraints = Constraints(difference_bound=eps)
+
+    if issubclass(Constraints, LossMoment):
+        task_type = 'regression'
+        constraints = Constraints(ZeroOneLoss(), upper_bound=eps)
+    else:
+        task_type = 'classification'
+        constraints = Constraints(difference_bound=eps)
 
     # epsilon (and thereby also B) only affects L_high and L
     B = 1 / eps
@@ -45,12 +55,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), B,
                              opt_lambda=opt_lambda)
 
-    # set up initial lambda vector based on a 0-initialized theta
-    constraints.load_data(X, y, sensitive_features=A)
-    objective = constraints.default_objective()
-    objective.load_data(X, y, sensitive_features=A)
-    theta = pd.Series(0, constraints.index)
-    lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
+    lambda_vec = get_lambda_vec(constraints, X, y, A)
 
     # call oracle to determine error and gamma and calculate exp
     fitted_estimator = lagrangian._call_oracle(lambda_vec)
@@ -64,7 +69,8 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
         L_expected = best_h_error + np.sum(projected_lambda * best_h_gamma) - \
             eps * np.sum(projected_lambda)
     else:
-        L_expected = best_h_error + np.sum(lambda_vec * best_h_gamma) - eps * np.sum(lambda_vec)
+        L_expected = best_h_error + np.sum(lambda_vec * best_h_gamma) - \
+            eps * np.sum(lambda_vec)
 
     L_high_expected = best_h_error + B * (best_h_gamma.max() - eps)
 
@@ -78,11 +84,17 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     L, L_high, gamma, error = lagrangian._eval(h if use_Q_callable else Q_vec, lambda_vec)
 
     # in this particular example the estimator is always the same
-    expected_estimator_weights = pd.Series({
-        'X1': 0.538136,
-        'X2': 0.457627,
-        'X3': 0.021186})
-    assert (np.isclose(fitted_estimator.weights, expected_estimator_weights, atol=1.e-6)).all()
+    expected_estimator_weights = {
+        'regression': pd.Series({
+            'X1': 0.541252,
+            'X2': 0.454293,
+            'X3': 0.019203}),
+        'classification': pd.Series({
+            'X1': 0.538136,
+            'X2': 0.457627,
+            'X3': 0.021186})}
+    assert (np.isclose(fitted_estimator.weights,
+                       expected_estimator_weights[task_type], atol=1.e-6)).all()
 
     assert L == pytest.approx(L_expected, abs=_PRECISION)
     assert L_high == pytest.approx(L_high_expected, abs=_PRECISION)
@@ -90,14 +102,17 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     assert (gamma == best_h_gamma).all()
 
 
-@pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("Constraints", ALL_CONSTRAINTS)
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
 def test_call_oracle(Constraints, eps, mocker):
     X, y, A = _get_data(A_two_dim=False)
     # Using a mocked estimator here since we don't actually want to fit one, but rather care about
     # having that object's fit method called exactly once.
     estimator = mocker.MagicMock()
-    constraints = Constraints()
+    if issubclass(Constraints, LossMoment):
+        constraints = Constraints(ZeroOneLoss())
+    else:
+        constraints = Constraints()
 
     # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the mock
     # object, so we mock that process as well. It sets the result from pickle.loads as the
@@ -109,17 +124,8 @@ def test_call_oracle(Constraints, eps, mocker):
 
     # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
     # object for it to avoid the dependence on the lagrangian object.
-    constraints.load_data(X, y, sensitive_features=A)
-    objective = constraints.default_objective()
-    objective.load_data(X, y, sensitive_features=A)
-    theta = pd.Series(0, constraints.index)
-    lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
-
-    signed_weights = objective.signed_weights() + \
-        constraints.signed_weights(lambda_vec)
-    redY = 1 * (signed_weights > 0)
-    redW = signed_weights.abs()
-    redW = y.shape[0] * redW / redW.sum()
+    lambda_vec, new_weights, new_labels = get_lambda_new_weights_and_labels(
+        constraints, X, y, A)
 
     _ = lagrangian._call_oracle(lambda_vec)
 
@@ -131,46 +137,93 @@ def test_call_oracle(Constraints, eps, mocker):
     assert len(args) == 2
     assert len(kwargs) == 1
     assert (args[0] == X).all().all()
-    assert (args[1] == redY).all()
-    assert (kwargs['sample_weight'] == redW).all()
+    assert (args[1] == new_labels).all()
+    assert (kwargs['sample_weight'] == new_weights).all()
     assert lagrangian.n_oracle_calls == 1
     assert len(lagrangian.oracle_execution_times) == 1
 
 
-@pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
+@pytest.mark.parametrize("Constraints", ALL_CONSTRAINTS)
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
-def test_call_oracle_single_y_value(Constraints, eps, mocker):
+@pytest.mark.parametrize("y_value", [0, 1])
+def test_call_oracle_single_y_value(Constraints, eps, y_value, mocker):
     X_dict = {
         "c": [0, 1, 4, 1, 5, 1, 6, 0, 2, 4],
         "d": [1, 5, 1, 6, 2, 3, 5, 1, 5, 2]
     }
     X = pd.DataFrame(X_dict)
 
-    y = pd.Series([1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    # Try with both possible y values for binary classification to ensure that
+    # constraints that focus only on positives or negatives can handle the
+    # case where none of the rows apply to them.
+    y = pd.Series([y_value] * 10)
     A = pd.Series([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
 
     # We mock the estimator, but we only patch it for pickling
     estimator = mocker.MagicMock()
     mocker.patch('pickle.dumps')
-    constraints = Constraints()
+    if issubclass(Constraints, LossMoment):
+        constraints = Constraints(ZeroOneLoss(), upper_bound=eps)
+    else:
+        constraints = Constraints(difference_bound=eps)
 
-    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), 1/eps)
+    lagrangian_args = [X, A, y, estimator, deepcopy(constraints), 1/eps]
+    # Expect exceptions if true or false positive rate parity cannot be
+    # enforced due to a lack of positives or negatives, respectively.
+    if Constraints == FalsePositiveRateParity and y_value == 1:
+        with pytest.raises(ValueError) as exc:
+            _Lagrangian(*lagrangian_args)
+            assert str(exc.value) == \
+                _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE \
+                    .format(0, "false")
+        return
+    elif Constraints == TruePositiveRateParity and y_value == 0:
+        with pytest.raises(ValueError) as exc:
+            _Lagrangian(*lagrangian_args)
+            assert str(exc.value) == \
+                _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE \
+                    .format(1, "true")
+        return
+
+    lagrangian = _Lagrangian(*lagrangian_args)
 
     # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
     # object for it to avoid the dependence on the lagrangian object.
-    constraints.load_data(X, y, sensitive_features=A)
-    objective = constraints.default_objective()
-    objective.load_data(X, y, sensitive_features=A)
-    theta = pd.Series(0, constraints.index)
-    lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
+    lambda_vec = get_lambda_vec(constraints, X, y, A)
 
     test_X_dict = {"c": [10000], "d": [2000000]}
     test_X = pd.DataFrame(test_X_dict)
 
     result_estimator = lagrangian._call_oracle(lambda_vec)
     assert isinstance(result_estimator, DummyClassifier)
-    assert result_estimator.predict(test_X) == 1
+    assert result_estimator.predict(test_X) == y_value
     assert lagrangian.n_oracle_calls_dummy_returned == 1
 
     # Make sure the mocked estimator wasn't called
     assert len(estimator.method_calls) == 0
+
+
+def get_lambda_vec(constraints, X, y, A):
+    # set up initial lambda vector based on a 0-initialized theta
+    constraints.load_data(X, y, sensitive_features=A)
+    objective = constraints.default_objective()
+    objective.load_data(X, y, sensitive_features=A)
+    theta = pd.Series(0, constraints.index)
+    lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
+    return lambda_vec
+
+
+def get_lambda_new_weights_and_labels(constraints, X, y, A):
+    lambda_vec = get_lambda_vec(constraints, X, y, A)
+    objective = constraints.default_objective()
+    objective.load_data(X, y, sensitive_features=A)
+    signed_weights = objective.signed_weights() + \
+        constraints.signed_weights(lambda_vec)
+
+    if isinstance(constraints, LossMoment):
+        redY = y
+    else:  # classification
+        redY = 1 * (signed_weights > 0)
+    redW = signed_weights.abs()
+    redW = y.shape[0] * redW / redW.sum()
+    return lambda_vec, redW, redY

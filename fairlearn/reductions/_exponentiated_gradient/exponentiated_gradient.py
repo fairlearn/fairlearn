@@ -115,10 +115,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             if t == 0:
                 if self.nu is None:
                     self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
-                eta_min = self.nu / (2 * B)
                 eta = self.eta0 / B
-                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
-                             self.eps, B, self.nu, self.max_iter, eta_min)
+                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
+                             self.eps, B, self.nu, self.max_iter)
 
             if h_idx not in Qsum.index:
                 Qsum.at[h_idx] = 0.0
@@ -184,8 +183,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.oracle_execution_times_ = lagrangian.oracle_execution_times
         self.lambda_vecs_ = lagrangian.lambdas
 
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
-                     self.eps, B, self.nu, self.max_iter, eta_min)
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
+                     self.eps, B, self.nu, self.max_iter)
         logger.debug("...last_iter=%d, best_iter=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
                      self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
                      len(lagrangian.predictors))
