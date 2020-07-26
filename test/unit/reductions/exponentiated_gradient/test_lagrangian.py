@@ -34,6 +34,7 @@ REGRESSION_CONSTRAINTS = [
 
 ALL_CONSTRAINTS = CLASSIFICATION_CONSTRAINTS + REGRESSION_CONSTRAINTS
 
+
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
 @pytest.mark.parametrize("Constraints", ALL_CONSTRAINTS)
 @pytest.mark.parametrize("use_Q_callable", [True, False])
@@ -175,14 +176,14 @@ def test_call_oracle_single_y_value(Constraints, eps, y_value, mocker):
             _Lagrangian(*lagrangian_args)
             assert str(exc.value) == \
                 _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE \
-                    .format(0, "false")
+                .format(0, "false")
         return
     elif Constraints == TruePositiveRateParity and y_value == 0:
         with pytest.raises(ValueError) as exc:
             _Lagrangian(*lagrangian_args)
             assert str(exc.value) == \
                 _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE \
-                    .format(1, "true")
+                .format(1, "true")
         return
 
     lagrangian = _Lagrangian(*lagrangian_args)

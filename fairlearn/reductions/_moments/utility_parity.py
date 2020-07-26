@@ -412,4 +412,4 @@ def _raise_if_all_labels_equal(y, required_label, parity_kind):
     if sum(y == required_label) == 0:
         raise ValueError(
             _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE
-                .format(required_label, parity_kind))
+            .format(required_label, parity_kind))
