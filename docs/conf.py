@@ -114,9 +114,6 @@ sphinx_gallery_conf = {
     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
-# Following sets where Bokeh will look for imported scripts
-# bokeh_plot_pyfile_include_dirs = ["docs/about"]
-
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
 def linkcode_resolve(domain, info):
