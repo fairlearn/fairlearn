@@ -81,6 +81,8 @@ def process_stars(star_dates):
         accumulator += v['stars']
         v['cumulative'] = accumulator
 
+    # Remove last entry, which is an extra
+    by_month.pop("{0}-{1:02}".format(end_date.year, end_date.month))
     return by_month
 
 
