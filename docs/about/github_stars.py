@@ -116,8 +116,10 @@ def github_star_gazing():
     star_dates = fetch_all_stars(client)
     print("Found ", len(star_dates), " total stars")
     stats = process_stars(star_dates)
+    print("Creating plot")
     plot_stars(stats)
 
 
-print("Starting script")
+print("Starting script {0}".format(__file__))
 github_star_gazing()
+print("Script {0} complete".format(__file__))

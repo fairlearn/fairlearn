@@ -33,3 +33,10 @@ Frequently asked questions
 
 See our :ref:`faq` page.
 
+
+
+GitHub Statistics
+-----------------
+
+We keep some information about usage of our repository on our
+:ref:`github_stats` page.
