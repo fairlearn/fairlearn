@@ -1,5 +1,5 @@
 Repository Statistics from GitHub
 =================================
 
-.. bokeh-plot:: github_stars.py
+.. bokeh-plot:: about/github_stars.py
     :source-position: none

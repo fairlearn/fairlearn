@@ -91,7 +91,7 @@ def plot_stars(stats):
 
     p = figure(x_range=month_list,
                plot_height=512,
-               plot_width=1024,
+               plot_width=832,
                title="Stars",
                toolbar_location=None,
                tools="")
@@ -110,12 +110,14 @@ def plot_stars(stats):
 
 
 def github_star_gazing():
+    print("Getting client")
     client = get_client(os.environ["GITHUB_GRAPHQL"])
+    print("Getting data from GitHub")
     star_dates = fetch_all_stars(client)
     print("Found ", len(star_dates), " total stars")
     stats = process_stars(star_dates)
     plot_stars(stats)
 
 
-if __name__ == "__main__":
-    github_star_gazing()
+print("Starting script")
+github_star_gazing()
