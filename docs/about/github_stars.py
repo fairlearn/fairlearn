@@ -90,11 +90,11 @@ def plot_stars(stats):
     total_stars = [x['cumulative'] for x in stats.values()]
 
     p = figure(x_range=month_list,
-            plot_height=512,
-            plot_width=1024,
-            title="Stars",
-            toolbar_location=None,
-            tools="")
+               plot_height=512,
+               plot_width=1024,
+               title="Stars",
+               toolbar_location=None,
+               tools="")
 
     p.vbar(x=month_list, top=delta_stars, width=0.9)
     p.line(x=month_list, y=total_stars, color="red", line_width=2)
@@ -115,3 +115,7 @@ def github_star_gazing():
     print("Found ", len(star_dates), " total stars")
     stats = process_stars(star_dates)
     plot_stars(stats)
+
+
+if __name__ == "__main__":
+    github_star_gazing()

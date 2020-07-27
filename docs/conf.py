@@ -45,7 +45,8 @@ extensions = [
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'bokeh.sphinxext.bokeh_plot'
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -113,6 +114,8 @@ sphinx_gallery_conf = {
     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
+# Following sets where Bokeh will look for imported scripts
+bokeh_plot_pyfile_include_dirs = ["docs/about"]
 
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
