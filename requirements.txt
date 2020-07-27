@@ -38,3 +38,7 @@ nbval
 sphinx
 sphinx-gallery
 pydata-sphinx-theme
+
+bokeh
+gql==3.0.0a0
+python-dateutil
