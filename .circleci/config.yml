@@ -24,6 +24,11 @@ jobs:
           name: 'Install required packages'
           command: sudo pip install -r requirements.txt
 
+      - run: 
+          name: "echo an env var that is part of our project"
+          command: |
+            echo $GITHUB_GRAPHQL # this env var must be swt within the project
+          
       - run:
           name: 'Build html'
           command: python -m sphinx -b html -n -j auto docs docs/_build/html
