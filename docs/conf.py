@@ -114,10 +114,13 @@ sphinx_gallery_conf = {
     'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
 }
 
-# The following is used by sphinx.ext.linkcode to provide links to github
-# based on pandas doc/source/conf.py
+
 def linkcode_resolve(domain, info):
-    """Determine the URL corresponding to Python object."""
+    """Determine the URL corresponding to Python object.
+
+    Used by sphinx.ext.linkcode to provide links to github
+    based on pandas doc/source/conf.py
+    """
     if domain != "py":
         return None
 
