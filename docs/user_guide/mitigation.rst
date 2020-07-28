@@ -78,7 +78,7 @@ Reductions
 On a high level, the reduction algorithms within Fairlearn
 enable unfairness mitigation for an arbitrary machine learning model with
 respect to user-provided fairness constraints. All of the constraints currently supported
-by reduction alogrithms are group-fairness constraints. For more information on the
+by reduction algorithms are group-fairness constraints. For more information on the
 supported fairness constraints refer to :ref:`constraints_binary_classification`
 and :ref:`constraints_regression`.
 
