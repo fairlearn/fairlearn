@@ -7,6 +7,8 @@ import os
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 
+_SECRET_ENV_VAR = "GITHUB_GRAPHQL"
+
 base_query_string = '''
 {
   repository(owner: "fairlearn", name: "fairlearn") {
@@ -113,7 +115,7 @@ def plot_stars(stats):
 
 def github_star_gazing():
     print("Getting client")
-    client = get_client(os.environ["GITHUB_GRAPHQL"])
+    client = get_client(os.environ[_SECRET_ENV_VAR])
     print("Getting data from GitHub")
     star_dates = fetch_all_stars(client)
     print("Found ", len(star_dates), " total stars")
@@ -123,5 +125,8 @@ def github_star_gazing():
 
 
 print("Starting script {0}".format(__file__))
-github_star_gazing()
+if _SECRET_ENV_VAR in os.environ:
+    github_star_gazing()
+else:
+    print("Did not find environment variable {0}".format(_SECRET_ENV_VAR))
 print("Script {0} complete".format(__file__))
