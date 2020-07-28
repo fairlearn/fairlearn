@@ -124,9 +124,24 @@ def github_star_gazing():
     plot_stars(stats)
 
 
+def create_empty_plot():
+    xs = ["Unable", "to", "fetch", "data"]
+    ys = range(len(xs))
+    p = figure(x_range=xs,
+               plot_height=512,
+               plot_width=832,
+               title="Stars",
+               toolbar_location=None,
+               tools="")
+    p.vbar(x=xs, top=ys, width=0.5)
+
+    show(p)
+
+
 print("Starting script {0}".format(__file__))
 if _SECRET_ENV_VAR in os.environ:
     github_star_gazing()
 else:
     print("Did not find environment variable {0}".format(_SECRET_ENV_VAR))
+    create_empty_plot()
 print("Script {0} complete".format(__file__))
