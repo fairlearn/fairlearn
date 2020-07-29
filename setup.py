@@ -4,12 +4,15 @@
 import setuptools
 import fairlearn
 
+# Fetch ReadMe
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+# Use requirements.txt to set the install_requires
 with open('requirements.txt') as f:
     install_requires = [line.strip() for line in f]
 
+# Fetch separate requirements file for each extension
 extras = ["customplots"]
 extras_require = dict()
 for e in extras:
