@@ -7,6 +7,16 @@ import fairlearn
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open('requirements.txt') as f:
+    install_requires = [line.strip() for line in f]
+
+extras = ["customplots"]
+extras_require = dict()
+for e in extras:
+    req_file = "requirements-{0}.txxt".format(e)
+    with open(req_file) as f:
+        extras_require[e] = [line.strip() for line in f]
+
 setuptools.setup(
     name=fairlearn.__name__,
     version=fairlearn.__version__,
@@ -18,18 +28,8 @@ setuptools.setup(
     url="https://github.com/fairlearn/fairlearn",
     packages=setuptools.find_packages(),
     python_requires='>=3.6',
-    install_requires=[
-        "ipywidgets>=7.5.0",
-        "numpy>=1.17.2",
-        "pandas>=0.25.1",
-        "scikit-learn>=0.22.1",
-        "scipy>=1.3.1"
-    ],
-    extras_require={
-        "customplots": [
-            "matplotlib>=3.0.3"
-        ]
-    },
+    install_requires=install_requires,
+    extras_require=extras_require,
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
