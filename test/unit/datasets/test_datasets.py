@@ -3,6 +3,7 @@
 
 import pandas as pd
 import numpy as np
+import pytest
 
 from fairlearn.datasets import fetch_adult, fetch_boston
 
@@ -10,48 +11,28 @@ from fairlearn.datasets import fetch_adult, fetch_boston
 
 
 class TestFairlearnDataset:
-    def test_dataset_as_bunch_in_pandas_format(self):
+    @pytest.mark.parametrize("as_frame", [True, False])
+    def test_dataset_as_bunch(self, as_frame):
         fetch_function_list = [fetch_adult, fetch_boston]
         for fetch_function in fetch_function_list:
-            dataset = fetch_function(as_frame=True)
+            dataset = fetch_function(as_frame=as_frame)
             assert dataset is not None
             assert dataset['data'].shape is not None
-            assert isinstance(dataset['data'], pd.DataFrame)
+            assert isinstance(dataset['data'], pd.DataFrame if as_frame else np.ndarray)
             assert dataset['target'].shape is not None
-            assert isinstance(dataset['target'], pd.Series)
+            assert isinstance(dataset['target'], pd.Series if as_frame else np.ndarray)
             assert dataset['feature_names'] is not None
             assert isinstance(dataset['feature_names'], list)
             assert dataset['DESCR'] is not None
             assert isinstance(dataset['DESCR'], str)
 
-    def test_dataset_as_bunch_in_numpy_format(self):
+    @pytest.mark.parametrize("as_frame", [True, False])
+    def test_dataset_as_X_y(self, as_frame):
         fetch_function_list = [fetch_adult, fetch_boston]
         for fetch_function in fetch_function_list:
-            dataset = fetch_function()
-            assert dataset is not None
-            assert dataset['data'].shape is not None
-            assert isinstance(dataset['data'], np.ndarray)
-            assert dataset['target'].shape is not None
-            assert isinstance(dataset['target'], np.ndarray)
-            assert dataset['feature_names'] is not None
-            assert isinstance(dataset['feature_names'], list)
-            assert dataset['DESCR'] is not None
-            assert isinstance(dataset['DESCR'], str)
-
-    def test_dataset_as_data_target_in_pandas_format(self):
-        fetch_function_list = [fetch_adult, fetch_boston]
-        for fetch_function in fetch_function_list:
-            X, y = fetch_function(as_frame=True, return_X_y=True)
+            X, y = fetch_function(as_frame=as_frame, return_X_y=True)
             assert X is not None
-            assert isinstance(X, pd.DataFrame)
+            assert isinstance(X, pd.DataFrame if as_frame else np.ndarray)
             assert y is not None
-            assert isinstance(y, pd.Series)
+            assert isinstance(y, pd.Series if as_frame else np.ndarray)
 
-    def test_dataset_as_data_target_in_numpy_format(self):
-        fetch_function_list = [fetch_adult, fetch_boston]
-        for fetch_function in fetch_function_list:
-            X, y = fetch_function(as_frame=False, return_X_y=True)
-            assert X is not None
-            assert isinstance(X, np.ndarray)
-            assert y is not None
-            assert isinstance(y, np.ndarray)
