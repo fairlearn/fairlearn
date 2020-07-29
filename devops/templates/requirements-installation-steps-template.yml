@@ -2,9 +2,10 @@ parameters:
   pyVer:
   requirementsFile:
   pinRequirements:
+  reqFileList: [ 'requirements.txt', 'requirements-customplots.txt', 'requirements-dev.txt'] 
 
 steps:
-- ${{ each reqFile in [ 'requirements.txt', 'requirements-customplots.txt', 'requirements-dev.txt'] }}:
+- ${{ each reqFile in parameters.reqFileList }}:
   - script: python scripts/requirements_pin.py --input ${{reqFile}} --output '${{reqFile}}-fixed' --loglevel INFO
     displayName: "Pin ${{reqFile}}"
     condition: eq('${{parameters.pinRequirements}}', True)
