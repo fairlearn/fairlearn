@@ -35,4 +35,3 @@ class TestFairlearnDataset:
             assert isinstance(X, pd.DataFrame if as_frame else np.ndarray)
             assert y is not None
             assert isinstance(y, pd.Series if as_frame else np.ndarray)
-
