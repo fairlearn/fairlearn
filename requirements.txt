@@ -1,4 +1,4 @@
-# Required for fairlearn
+# Base requirements for Fairlearn
 numpy>=1.17.2
 ipywidgets>=7.5.0
 pandas>=0.25.1

@@ -13,7 +13,7 @@ with open('requirements.txt') as f:
 extras = ["customplots"]
 extras_require = dict()
 for e in extras:
-    req_file = "requirements-{0}.txxt".format(e)
+    req_file = "requirements-{0}.txt".format(e)
     with open(req_file) as f:
         extras_require[e] = [line.strip() for line in f]
 
