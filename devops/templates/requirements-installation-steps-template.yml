@@ -4,8 +4,7 @@ parameters:
   pinRequirements:
 
 steps:
-
-${{ each reqFile in [ 'requirements.txt', 'requirements-customplots.txt', 'requirements-dev.txt'] }}:
+- ${{ each reqFile in [ 'requirements.txt', 'requirements-customplots.txt', 'requirements-dev.txt'] }}:
   - script: python scripts/requirements_pin.py --input ${{reqFile}} --output '${{reqFile}}-fixed' --loglevel INFO
     displayName: "Pin ${{reqFile}}"
     condition: eq('${{parameters.pinRequirements}}', True)
