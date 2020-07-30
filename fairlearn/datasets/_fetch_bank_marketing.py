@@ -9,7 +9,7 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 def fetch_bank_marketing(*, cache=True, data_home=None,
                          as_frame=False, return_X_y=False):
-    """Load the UCI bank marketing dataset (binary classification)
+    """Load the UCI bank marketing dataset (binary classification).
 
     Download it if necessary.
 
