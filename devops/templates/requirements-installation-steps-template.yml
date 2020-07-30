@@ -4,5 +4,5 @@ parameters:
   default: False
 
 steps:
-- script: python scripts/install_requirements.py --fixed ${{parameters.pinRequirements}}
+- script: python scripts/install_requirements.py --pinned ${{parameters.pinRequirements}}
   displayName: Install all requirements

@@ -27,7 +27,7 @@ def _build_argument_parser():
     desc = "Install requirements using pip"
 
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--fixed",
+    parser.add_argument("--pinned",
                         help="Whether to convert '>=' to '==' in files",
                         type=lambda x: (str(x).lower() == 'true'),  # type=bool doesn't work
                         required=True)
@@ -85,10 +85,10 @@ def main(argv):
     if args.loglevel:
         logging.basicConfig(level=getattr(logging, args.loglevel))
 
-    _logger.info("Fixed set to: %s", args.fixed)
+    _logger.info("Pinned set to: %s", args.pinned)
 
     for rs in _REQUIREMENTS_STEMS:
-        _install_requirements_file(rs, args.fixed)
+        _install_requirements_file(rs, args.pinned)
     _logger.info("All requirements files installed")
 
 
