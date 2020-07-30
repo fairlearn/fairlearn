@@ -3,6 +3,7 @@
 import argparse
 import logging
 import os
+import subprocess
 import sys
 
 from _utils import _LogWrapper
@@ -28,7 +29,7 @@ def _build_argument_parser():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--fixed",
                         help="Whether to convert '>=' to '==' in files",
-                        type=lambda x: (str(x).lower() == 'true'),
+                        type=lambda x: (str(x).lower() == 'true'), # type=bool doesn't work
                         required=True)
     parser.add_argument("--loglevel",
                         help="Set log level",
@@ -69,8 +70,8 @@ def _install_requirements_file(file_stem, fix_requirements):
         requirements_file = "{0}.{1}".format(file_stem, _REQUIREMENTS_EXTENSION)
 
     with _LogWrapper("Running pip on {0}".format(requirements_file)):
-        commands = ["pip", "install", "-r", requirements_file]
-        print(commands, sep=" ")
+        command_args = ["pip", "install", "-r", requirements_file]
+        subprocess.check_call(command_args)
 
     if fix_requirements:
         _logger.info("Removing temporary file %s", requirements_file)
