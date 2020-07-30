@@ -1,7 +1,7 @@
 parameters:
-  pyVer:
-  requirementsFile:
-  pinRequirements:
+- name: pinRequirements
+  type: boolean
+  default: False
 
 steps:
 - script: python scripts/install_requirements.py --fixed ${{parameters.pinRequirements}}

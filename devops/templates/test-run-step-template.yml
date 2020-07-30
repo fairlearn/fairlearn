@@ -50,8 +50,6 @@ steps:
 
 - template: requirements-installation-steps-template.yml
   parameters:
-    pyVer: '${{parameters.pythonVersion}}'
-    requirementsFile: ${{parameters.requirementsFile}}
     pinRequirements: ${{parameters.pinRequirements}}
 
 - template: pip-freeze-to-artifact-steps-template.yml
