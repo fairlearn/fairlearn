@@ -29,7 +29,7 @@ def _build_argument_parser():
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--fixed",
                         help="Whether to convert '>=' to '==' in files",
-                        type=lambda x: (str(x).lower() == 'true'), # type=bool doesn't work
+                        type=lambda x: (str(x).lower() == 'true'),  # type=bool doesn't work
                         required=True)
     parser.add_argument("--loglevel",
                         help="Set log level",
