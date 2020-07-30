@@ -1,2 +1,1 @@
-# Requirements file to install Fairlearn with the customplots extension
 matplotlib>=3.2.1
