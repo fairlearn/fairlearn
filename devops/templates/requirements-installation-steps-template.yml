@@ -2,18 +2,7 @@ parameters:
   pyVer:
   requirementsFile:
   pinRequirements:
-  reqFileList: [ 'requirements.txt', 'requirements-customplots.txt', 'requirements-dev.txt'] 
 
 steps:
-- ${{ each reqFile in parameters.reqFileList }}:
-  - script: python scripts/requirements_pin.py --input ${{reqFile}} --output '${{reqFile}}-fixed' --loglevel INFO
-    displayName: "Pin ${{reqFile}}"
-    condition: eq('${{parameters.pinRequirements}}', True)
-
-  - script: pip install -r ${{reqFile}}-fixed
-    displayName: "Install ${{reqFile}}-fixed"
-    condition: eq('${{parameters.pinRequirements}}', True)
-
-  - script: pip install -r ${{reqFile}}
-    displayName: "Install ${{reqFile}}"
-    condition: ne('${{parameters.pinRequirements}}', True)
+- script: python scripts/install_requirements.py --fixed ${{parameters.pinRequirements}}
+  displayName: Install all requirements
