@@ -112,10 +112,10 @@ workflows:
   weekly-webpage:
     triggers:
       - schedule:
-        cron: "0 0 * * 0" # Midnight on Sundays
-        filters:
-          branches:
-            only: master
+          cron: "0 0 * * 0" # Midnight on Sundays
+          filters:
+            branches:
+              only: master
     jobs:
       - build-doc
       - deploy-doc:
