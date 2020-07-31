@@ -14,4 +14,4 @@ steps:
     displayName: "Publish pip freeze file to artifact ${{parameters.freezeArtifact}}"
     inputs:
       path: '$(System.DefaultWorkingDirectory)/${{parameters.freezeFile}}'
-      artifact: ${{parameters.freezeArtifact}}
+      artifact: '${{parameters.freezeArtifact}}.$(System.JobAttempt)'
