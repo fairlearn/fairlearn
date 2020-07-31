@@ -11,6 +11,7 @@ from fairlearn.datasets import fetch_adult, fetch_boston
 
 
 class TestFairlearnDataset:
+
     @pytest.mark.parametrize("as_frame", [True, False])
     @pytest.mark.parametrize("fetch_function", [fetch_adult, fetch_boston])
     def test_dataset_as_bunch(self, as_frame, fetch_function):
