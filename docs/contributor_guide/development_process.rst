@@ -143,20 +143,26 @@ The Requirements Files
 
 The prerequisites for Fairlearn are split between three separate files:
 
-    - `requirements.txt` contains the prerequisites for the core Fairlearn package
+    -  `requirements.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements.txt>`_
+       contains the prerequisites for the core Fairlearn package
 
-    - `requirements-customplots.txt` contains additional prerequisites for the `[customplots]`
-      extension for Fairlearn
+    -  `requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-customplots.txt>`_
+       contains additional prerequisites for the :code:`[customplots]` extension for Fairlearn
 
-    - `requirements-dev.txt` contains the prerequisites for Fairlearn development (such as flake8
-       and pytest)
+    -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-dev.txt>`_ contains
+       the prerequisites for Fairlearn development (such as flake8 and pytest)
 
-The `requirements.txt` and `requirements-customplots.txt` files are consumed by `setup.py`
-to specify the dependencies to be documented in the wheel files.
-To help simplify installation of the prerequisites, we have the `./scripts/install_requirements.py` script
-which runs `pip install` on all three of the above files.
+The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements.txt>`_
+and
+`requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-customplots.txt>`_
+files are consumed
+by `setup.py <https://github.com/fairlearn/fairlearn/blob/master/setup.py>`_ to specify the dependencies to be
+documented in the wheel files.
+To help simplify installation of the prerequisites, we have the
+`install_requirements.py <https://github.com/fairlearn/fairlearn/blob/master/scripts/install_requirements.py>`_
+script which runs :code:`pip install` on all three of the above files.
 This script will also optionally pin the requirements to any lower bound specified (by changing any
-occurences of `>=` to `==` in each file).
+occurrences of :code:`>=` to :code:`==` in each file).
 
 .. _onboarding-guide:
 
