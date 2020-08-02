@@ -133,7 +133,7 @@ class TestExponentiatedGradientArguments:
         # Using a mocked estimator here since we don't actually want to fit one, but rather care
         # about having that object's fit method called exactly twice through the best_h calls.
         estimator = LeastSquaresBinaryClassifierLearner()
-        estimator.predict = mocker.Mock(return_value=transformed_y)
+        estimator.predict = mocker.Mock(return_value=y)
         estimator.fit = mocker.MagicMock()
         # restrict ExponentiatedGradient to a single iteration
         expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(),
