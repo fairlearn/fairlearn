@@ -122,7 +122,7 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     def test_input_X_unchanged(self, transformA, transformY, transformX, mocker):
         # The purpose of this test is to ensure that X is passed to the underlying estimator
-        # unchanged. For y and sample_weight ExponentiatedGradient makews certain transformations
+        # unchanged. For y and sample_weight ExponentiatedGradient makes certain transformations
         # which are required. They are expected as pandas.Series.
         X, y, A = _get_data()
 
