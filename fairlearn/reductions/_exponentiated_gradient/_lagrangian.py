@@ -142,10 +142,10 @@ class _Lagrangian:
 
         redY_unique = np.unique(redY)
 
-        classifier = None
+        estimator = None
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
-            classifier = DummyClassifier(strategy='constant',
+            estimator = DummyClassifier(strategy='constant',
                                          constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
@@ -154,14 +154,14 @@ class _Lagrangian:
             # For sklearn estimators, it is more efficient as it would not
             # do a copy.deepcopy. Rather, instantiate a new estimator using the
             # get_params() internally.
-            classifier = clone(estimator=self.estimator, safe=False)
+            estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        classifier.fit(self.X, redY, sample_weight=redW)
+        estimator.fit(self.X, redY, sample_weight=redW)
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
-        return classifier
+        return estimator
 
     def best_h(self, lambda_vec):
         """Solve the best-response problem.
