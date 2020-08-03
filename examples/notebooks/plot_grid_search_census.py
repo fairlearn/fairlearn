@@ -41,16 +41,8 @@ import pandas as pd
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
 
-import pathlib
 from sklearn.datasets import fetch_openml
-data = fetch_openml(
-    data_id=1590,
-    data_home=pathlib.Path().home() / ".fairlearn-data",
-    cache=True,
-    as_frame=True)
-# In the future this will be available as follows:
-# from fairlearn.datasets import fetch_adult
-# data = fetch_adult(as_frame=True)
+data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
 Y = (data.target == '>50K') * 1
 X_raw
