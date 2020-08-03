@@ -8,6 +8,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Andra Fehmiu](https://github.com/afehmiu)
 - [Davide Giovanardi](https://github.com/dgiova)
 - [Chris Gregory](https://github.com/gregorybchris)
+- [Gaurav Gupta](https://github.com/gaugup)
 - [Parul Gupta](https://github.com/parul100495)
 - [Abdul Hannan](https://github.com/hannanabdul55)
 - [Brandon Horn](https://github.com/rihorn2)
