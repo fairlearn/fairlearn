@@ -11,7 +11,6 @@ from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -123,7 +122,8 @@ class _Lagrangian:
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
-        dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)]  # noqa: E501
+        dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in
+                       range(n_constraints + 1)]  # noqa: E501
         result_dual = opt.linprog(dual_c,
                                   A_ub=dual_A_ub,
                                   b_ub=dual_b_ub,
@@ -146,7 +146,7 @@ class _Lagrangian:
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
             estimator = DummyClassifier(strategy='constant',
-                                         constant=redY_unique[0])
+                                        constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
             # use sklearn.base.clone to clone the estimator.
@@ -178,6 +178,7 @@ class _Lagrangian:
             if getattr(pred, "flatten", None) is not None:
                 pred = pred.flatten()
             return pred
+
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
