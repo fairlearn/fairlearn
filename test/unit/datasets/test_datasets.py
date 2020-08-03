@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from fairlearn.datasets import fetch_adult, fetch_boston
+from fairlearn.datasets import fetch_adult, fetch_boston, fetch_bank_marketing
 
 # =============================================
 
@@ -13,7 +13,7 @@ from fairlearn.datasets import fetch_adult, fetch_boston
 class TestFairlearnDataset:
 
     @pytest.mark.parametrize("as_frame", [True, False])
-    @pytest.mark.parametrize("fetch_function", [fetch_adult, fetch_boston])
+    @pytest.mark.parametrize("fetch_function", [fetch_adult, fetch_boston, fetch_bank_marketing])
     def test_dataset_as_bunch(self, as_frame, fetch_function):
         dataset = fetch_function(as_frame=as_frame)
         assert dataset is not None
@@ -27,7 +27,7 @@ class TestFairlearnDataset:
         assert isinstance(dataset['DESCR'], str)
 
     @pytest.mark.parametrize("as_frame", [True, False])
-    @pytest.mark.parametrize("fetch_function", [fetch_adult, fetch_boston])
+    @pytest.mark.parametrize("fetch_function", [fetch_adult, fetch_boston, fetch_bank_marketing])
     def test_dataset_as_X_y(self, as_frame, fetch_function):
         X, y = fetch_function(as_frame=as_frame, return_X_y=True)
         assert X is not None
