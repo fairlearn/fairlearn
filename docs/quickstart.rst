@@ -66,15 +66,8 @@ than $50,000 a year.
     >>> import numpy as np 
     >>> import pandas as pd
     >>> import matplotlib.pyplot as plt 
-    >>> import pathlib
     >>> from sklearn.datasets import fetch_openml
-    >>> data = fetch_openml(data_id=1590,
-    ...     data_home=pathlib.Path().home() / ".fairlearn-data",
-    ...     cache=True,
-    ...     as_frame=True)
-    >>> # In the future this will be available as follows:
-    >>> # from fairlearn.datasets import fetch_adult
-    >>> # data = fetch_adult(as_frame=True)
+    >>> data = fetch_openml(data_id=1590, as_frame=True)
     >>> X = pd.get_dummies(data.data)
     >>> y_true = (data.target == '>50K') * 1
     >>> sex = data.data['sex']
