@@ -122,8 +122,7 @@ class _Lagrangian:
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
-        dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in
-                       range(n_constraints + 1)]  # noqa: E501
+        dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)]  # noqa: E501
         result_dual = opt.linprog(dual_c,
                                   A_ub=dual_A_ub,
                                   b_ub=dual_b_ub,
