@@ -120,7 +120,7 @@ To verify that the code works as expected run
 
 .. code-block::
 
-    pip install -r requirements.txt
+    python ./scripts/install_requirements.py --pinned False
     python -m pytest -s ./test/unit
 
 Fairlearn currently includes plotting functionality that requires the
@@ -137,6 +137,32 @@ Note that the Fairlearn dashboard is built using nodejs and requires
 additional steps. To build the Fairlearn dashboard after making changes to it,
 `install Yarn <https://yarnpkg.com/lang/en/docs/install>`_, and then run the
 `widget build script <https://github.com/fairlearn/fairlearn/tree/master/scripts/build_widget.py>`_.
+
+The Requirements Files
+""""""""""""""""""""""
+
+The prerequisites for Fairlearn are split between three separate files:
+
+    -  `requirements.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements.txt>`_
+       contains the prerequisites for the core Fairlearn package
+
+    -  `requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-customplots.txt>`_
+       contains additional prerequisites for the :code:`[customplots]` extension for Fairlearn
+
+    -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-dev.txt>`_ contains
+       the prerequisites for Fairlearn development (such as flake8 and pytest)
+
+The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements.txt>`_
+and
+`requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-customplots.txt>`_
+files are consumed
+by `setup.py <https://github.com/fairlearn/fairlearn/blob/master/setup.py>`_ to specify the dependencies to be
+documented in the wheel files.
+To help simplify installation of the prerequisites, we have the
+`install_requirements.py <https://github.com/fairlearn/fairlearn/blob/master/scripts/install_requirements.py>`_
+script which runs :code:`pip install` on all three of the above files.
+This script will also optionally pin the requirements to any lower bound specified (by changing any
+occurrences of :code:`>=` to :code:`==` in each file).
 
 .. _onboarding-guide:
 
@@ -225,7 +251,7 @@ is slightly involved:
 #. In this new environment, install this wheel by running
    :code:`pip install dist/<FILENAME>.whl`
 #. Install any pip packages required for the notebooks using
-   :code:`pip install -r requirements.txt`
+   :code:`python ./scripts/install_requirements.py --pinned false`
 #. Check that the dashboard loads in the notebooks
 
 We have an

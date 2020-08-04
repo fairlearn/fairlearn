@@ -91,7 +91,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         B = 1 / self.eps
         lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
-                                 self.constraints, self.eps, B)
+                                 self.constraints, B)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
@@ -115,10 +115,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             if t == 0:
                 if self.nu is None:
                     self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
-                eta_min = self.nu / (2 * B)
                 eta = self.eta0 / B
-                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
-                             self.eps, B, self.nu, self.max_iter, eta_min)
+                logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
+                             self.eps, B, self.nu, self.max_iter)
 
             if h_idx not in Qsum.index:
                 Qsum.at[h_idx] = 0.0
@@ -164,7 +163,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 last_gap = best_gap
 
             # update theta based on learning rate
-            theta += eta * (gamma - self.eps)
+            theta += eta * (gamma - self.constraints.bound())
 
         # retain relevant result data
         gaps_series = pd.Series(gaps)
@@ -184,8 +183,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.oracle_execution_times_ = lagrangian.oracle_execution_times
         self.lambda_vecs_ = lagrangian.lambdas
 
-        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d, eta_min=%.6f",
-                     self.eps, B, self.nu, self.max_iter, eta_min)
+        logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
+                     self.eps, B, self.nu, self.max_iter)
         logger.debug("...last_iter=%d, best_iter=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
                      self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
                      len(lagrangian.predictors))
@@ -221,8 +220,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
 
-        positive_probs = self._pmf_predict(X)[:, 1]
-        return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+        if isinstance(self.constraints, ClassificationMoment):
+            positive_probs = self._pmf_predict(X)[:, 1]
+            return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+        else:
+            pred = self._pmf_predict(X)
+            randomized_pred = np.zeros(pred.shape[0])
+            for i in range(pred.shape[0]):
+                randomized_pred[i] = np.random.choice(pred.iloc[i, :], p=self.weights_)
+            return randomized_pred
 
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.
@@ -244,6 +250,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         pred = pd.DataFrame()
         for t in range(len(self._hs)):
-            pred[t] = self._hs[t](X)
-        positive_probs = pred[self.weights_.index].dot(self.weights_).to_frame()
-        return np.concatenate((1-positive_probs, positive_probs), axis=1)
+            if self.weights_[t] == 0:
+                pred[t] = np.zeros(len(X))
+            else:
+                pred[t] = self._hs[t](X)
+
+        if isinstance(self.constraints, ClassificationMoment):
+            positive_probs = pred[self.weights_.index].dot(self.weights_).to_frame()
+            return np.concatenate((1-positive_probs, positive_probs), axis=1)
+        else:
+            return pred

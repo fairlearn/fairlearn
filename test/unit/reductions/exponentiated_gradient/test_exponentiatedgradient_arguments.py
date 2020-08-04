@@ -48,7 +48,7 @@ class TestExponentiatedGradientArguments:
 
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
-            constraints=DemographicParity(),
+            constraints=DemographicParity(difference_bound=eps),
             eps=eps)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
