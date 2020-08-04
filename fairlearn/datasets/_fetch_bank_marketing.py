@@ -66,7 +66,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
         feature_names : list of length 14
             Array of ordered feature names used in the dataset.
         DESCR : string
-            Description of the UCI Adult dataset.
+            Description of the UCI bank marketing dataset.
 
     (data, target) : tuple of (numpy.ndarray, numpy.ndarray) or (pandas.DataFrame, pandas.Series)
         if ``return_X_y`` is True and ``as_frame`` is False
