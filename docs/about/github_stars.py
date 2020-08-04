@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and contributors.
+# Licensed under the MIT License.
+
 from bokeh.plotting import figure, show
 import datetime
 from dateutil import relativedelta

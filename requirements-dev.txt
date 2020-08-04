@@ -33,3 +33,8 @@ nbval
 sphinx
 sphinx-gallery
 pydata-sphinx-theme
+
+# Used to pull GitHub stats
+bokeh
+gql==3.0.0a0
+python-dateutil
