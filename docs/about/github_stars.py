@@ -66,10 +66,11 @@ def fetch_all_stars(client):
 def process_stars(star_dates):
     by_month = {}
 
-    next_date = isoparse(star_dates[0])
-    end_date = datetime.datetime.now(datetime.timezone.utc) + \
-        relativedelta.relativedelta(months=1)
-    while next_date <= end_date:
+    # The differences in replaced day are to ensure that the bins include
+    # the current month, while respecting the times of day of each date object
+    next_date = isoparse(star_dates[0]).replace(day=1)
+    end_date = datetime.datetime.now(datetime.timezone.utc).replace(day=2)
+    while next_date < end_date:
         stats_dict = {}
         stats_dict['stars'] = 0
         stats_dict['cumulative'] = 0
@@ -86,9 +87,6 @@ def process_stars(star_dates):
     for v in by_month.values():
         accumulator += v['stars']
         v['cumulative'] = accumulator
-
-    # Remove last entry, which is an extra
-    by_month.pop("{0}-{1:02}".format(end_date.year, end_date.month))
     return by_month
 
 
