@@ -358,7 +358,6 @@ class TestExponentiatedGradientSmoke:
             error = default_objective.gamma(Q)[0]
             assert disparity == pytest.approx(data["disp"][i], abs=_PRECISION)
             assert error == pytest.approx(data["error"][i], abs=_PRECISION)
-            print(i)
             assert expgrad.weights_[i] == pytest.approx(data['weights'][i], abs=_PRECISION)
 
         assert sum(expgrad.weights_) == pytest.approx(1, abs=_PRECISION)
