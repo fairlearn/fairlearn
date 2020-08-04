@@ -13,10 +13,6 @@ _LOWER_BOUND_DIFF = "lower_bound_diff"
 _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be used."
 _DEFAULT_DIFFERENCE_BOUND = 0.01
 
-_POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE = "The dataset " \
-    "contains no rows with label {}. As a consequence, {} positive rate " \
-    "parity cannot be enforced."
-
 
 class UtilityParity(ClassificationMoment):
     r"""A generic moment for parity in utilities (or costs) under classification.
@@ -284,11 +280,9 @@ class TruePositiveRateParity(UtilityParity):
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
-        y_series = pd.Series(y)
-        _raise_if_all_labels_equal(y_series, 1, "true")
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
-        super().load_data(X, y,
-                          event=y_series.apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
+        super().load_data(X, pd.Series(y),
+                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
                           **kwargs)
 
 
@@ -322,10 +316,8 @@ class FalsePositiveRateParity(UtilityParity):
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
-        y_series = pd.Series(y)
-        _raise_if_all_labels_equal(y_series, 0, "false")
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        super().load_data(X, y,
+        super().load_data(X, pd.Series(y),
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0),
                           **kwargs)
 
@@ -390,26 +382,3 @@ class ErrorRateParity(UtilityParity):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y, event=_ALL, utilities=np.vstack([y, 1-y]).T, **kwargs)
-
-
-def _raise_if_all_labels_equal(y, required_label, parity_kind):
-    """Alerts user about undefined / unenforcable constraints.
-
-    Raises exception if a true or false positive rate parity constraint
-    cannot be enforced due to the lack of positives or negatives,
-    respectively.
-
-    Parameters
-    ----------
-    y : pandas.Series
-        The binary labels in the training data.
-    required_label : {0, 1}
-        The required label for the parity constraint.
-    parity_kind : {"true", "false"}
-        The kind of parity constraint where "true" represents true positive
-        rate parity and false represents false positive rate parity.
-    """
-    if sum(y == required_label) == 0:
-        raise ValueError(
-            _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE
-            .format(required_label, parity_kind))

@@ -12,8 +12,6 @@ from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
 from fairlearn.reductions import DemographicParity, EqualizedOdds, \
     TruePositiveRateParity, FalsePositiveRateParity, ErrorRateParity, \
     BoundedGroupLoss, LossMoment, ZeroOneLoss
-from fairlearn.reductions._moments.utility_parity import \
-    _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE
 
 from .test_utilities import _get_data
 from .simple_learners import LeastSquaresBinaryClassifierLearner
@@ -144,7 +142,8 @@ def test_call_oracle(Constraints, eps, mocker):
     assert len(lagrangian.oracle_execution_times) == 1
 
 
-@pytest.mark.parametrize("Constraints", ALL_CONSTRAINTS)
+@pytest.mark.parametrize("Constraints", [
+    DemographicParity, EqualizedOdds, ErrorRateParity, BoundedGroupLoss])
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
 @pytest.mark.parametrize("y_value", [0, 1])
 def test_call_oracle_single_y_value(Constraints, eps, y_value, mocker):
@@ -169,22 +168,6 @@ def test_call_oracle_single_y_value(Constraints, eps, y_value, mocker):
         constraints = Constraints(difference_bound=eps)
 
     lagrangian_args = [X, A, y, estimator, deepcopy(constraints), 1/eps]
-    # Expect exceptions if true or false positive rate parity cannot be
-    # enforced due to a lack of positives or negatives, respectively.
-    if Constraints == FalsePositiveRateParity and y_value == 1:
-        with pytest.raises(ValueError) as exc:
-            _Lagrangian(*lagrangian_args)
-            assert str(exc.value) == \
-                _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE \
-                .format(0, "false")
-        return
-    elif Constraints == TruePositiveRateParity and y_value == 0:
-        with pytest.raises(ValueError) as exc:
-            _Lagrangian(*lagrangian_args)
-            assert str(exc.value) == \
-                _POSITIVE_RATE_PARITY_IMPOSSIBLE_ERROR_MESSAGE_TEMPLATE \
-                .format(1, "true")
-        return
 
     lagrangian = _Lagrangian(*lagrangian_args)
 

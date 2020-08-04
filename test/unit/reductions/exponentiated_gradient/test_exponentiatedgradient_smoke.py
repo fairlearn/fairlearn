@@ -214,6 +214,7 @@ class TestExponentiatedGradientSmoke:
     smoke_test_data_regression = [
         {"constraint_class": BoundedGroupLoss, "loss": SquareLoss(0, 1),
          "eps": 0.01, "best_gap": 0.003905, "last_iter": 6, "best_iter": 6,
+         "upper_bound": 0.01,  # infeasible
          "disp": [0.178333, 0.178333, 0.178333, 0.178333, 0.178333,
                   0.178333, 0.028045, 0.178333, 0.178333, 0.178333,
                   0.030853, 0.178333, 0.178333, 0.178333, 0.178333,
@@ -221,24 +222,63 @@ class TestExponentiatedGradientSmoke:
          "error": [0.1035, 0.1035, 0.1035, 0.1035, 0.1035, 0.1035,
                    0.024412, 0.1035, 0.1035, 0.1035, 0.025691,
                    0.1035, 0.1035, 0.1035, 0.1035, 0.1035],
+         "weights": [0, 0, 0, 0, 0, 0, 0.956748, 0, 0, 0, 0.043251, 0, 0, 0, 0, 0, 0],
          "n_oracle_calls": 23, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 16},
+        {"constraint_class": BoundedGroupLoss, "loss": SquareLoss(0, 1),
+         "eps": 0.01, "best_gap": 0.0, "last_iter": 5, "best_iter": 5,
+         "upper_bound": 0.05,  # feasible
+         "disp": [0.178333, 0.178333, 0.036690, 0.178333, 0.178333,
+                  0.178333, 0.178333],
+         "error": [0.1035, 0.1035, 0.021988, 0.1035, 0.1035, 0.1035, 0.1035],
+         "weights": [0, 0, 1, 0, 0, 0, 0],
+         "n_oracle_calls": 32, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 7},
+        {"constraint_class": BoundedGroupLoss, "loss": SquareLoss(0, 1),
+         "eps": 0.01, "best_gap": 0.0, "last_iter": 5, "best_iter": 5,
+         "max_iter": 20, "nu": 1e-6, "upper_bound": 0.05,  # feasible
+         "disp": [0.178333, 0.178333, 0.036690, 0.178333, 0.178333,
+                  0.178333, 0.178333],
+         "error": [0.1035, 0.1035, 0.021988, 0.1035, 0.1035, 0.1035, 0.1035],
+         "weights": [0, 0, 1, 0, 0, 0, 0],
+         "n_oracle_calls": 29, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 7},
         {"constraint_class": BoundedGroupLoss, "loss": ZeroOneLoss(),
          "eps": 0.01, "best_gap": 0.007185, "last_iter": 5, "best_iter": 5,
+         "upper_bound": 0.01,  # infeasible
          "disp": [0.383333, 0.383333, 0.383333, 0.383333, 0.1479,
                   0.383333, 0.383333, 0.383333, 0.140256, 0.383333,
                   0.383333, 0.383333, 0.383333, 0.383333],
          "error": [0.255, 0.255, 0.255, 0.255, 0.140198, 0.255, 0.255,
                    0.255, 0.135674, 0.255, 0.255, 0.255, 0.255, 0.255],
+         "weights": [0, 0, 0, 0, 0.221468, 0, 0, 0, 0.778531, 0, 0, 0, 0, 0],
          "n_oracle_calls": 20, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 14},
+        {"constraint_class": BoundedGroupLoss, "loss": ZeroOneLoss(),
+         "eps": 0.01, "best_gap": 0.0, "last_iter": 5, "best_iter": 5,
+         "upper_bound": 0.2,  # feasible
+         "disp": [0.383333, 0.383333, 0.166918],
+         "error": [0.255, 0.255, 0.116949],
+         "weights": [0, 0, 1],
+         "n_oracle_calls": 20, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 3},
+        {"constraint_class": BoundedGroupLoss, "loss": ZeroOneLoss(),
+         "eps": 0.01, "best_gap": 0.0, "last_iter": 5, "best_iter": 5,
+         "max_iter": 20, "nu": 1e-6, "upper_bound": 0.2,  # feasible
+         "disp": [0.383333, 0.383333, 0.166918],
+         "error": [0.255, 0.255, 0.116949],
+         "weights": [0, 0, 1],
+         "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 3},
         {"constraint_class": BoundedGroupLoss, "loss": AbsoluteLoss(0, 1),
          "eps": 0.01, "best_gap": 0.007185, "last_iter": 5, "best_iter": 5,
+         "upper_bound": 0.01,  # infeasible
          "disp": [0.383333, 0.383333, 0.383333, 0.383333, 0.1479,
                   0.383333, 0.383333, 0.383333, 0.140256, 0.383333,
                   0.383333, 0.383333, 0.383333, 0.383333],
          "error": [0.255, 0.255, 0.255, 0.255, 0.140198, 0.255, 0.255,
                    0.255, 0.135674, 0.255, 0.255, 0.255, 0.255, 0.255],
+         "weights": [0, 0, 0, 0, 0.221468, 0, 0, 0, 0.778531, 0, 0, 0, 0, 0],
          "n_oracle_calls": 20, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 14},
     ]
@@ -290,7 +330,7 @@ class TestExponentiatedGradientSmoke:
         learner = LeastSquaresRegressor()
         disparity_moment = data["constraint_class"](
                 loss=data["loss"],
-                upper_bound=data["eps"])
+                upper_bound=data["upper_bound"])
 
         # Create Exponentiated Gradient object with a copy of the constraint.
         # The original disparity_moment object is used for validation, so the
@@ -298,7 +338,9 @@ class TestExponentiatedGradientSmoke:
         expgrad = ExponentiatedGradient(
             learner,
             constraints=deepcopy(disparity_moment),
-            eps=data["eps"])
+            eps=data["eps"],
+            nu=data.get('nu'),
+            max_iter=data.get("max_iter", 50))
 
         X, y, A = _get_data(A_two_dim=False, y_as_scores=True)
 
@@ -316,6 +358,10 @@ class TestExponentiatedGradientSmoke:
             error = default_objective.gamma(Q)[0]
             assert disparity == pytest.approx(data["disp"][i], abs=_PRECISION)
             assert error == pytest.approx(data["error"][i], abs=_PRECISION)
+            print(i)
+            assert expgrad.weights_[i] == pytest.approx(data['weights'][i], abs=_PRECISION)
+
+        assert sum(expgrad.weights_) == pytest.approx(1, abs=_PRECISION)
 
     @pytest.mark.parametrize("Constraints", [
         TruePositiveRateParity,
