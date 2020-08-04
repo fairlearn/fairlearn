@@ -69,7 +69,7 @@ def process_stars(star_dates):
     next_date = isoparse(star_dates[0])
     end_date = datetime.datetime.now(datetime.timezone.utc) + \
         relativedelta.relativedelta(months=1)
-    while next_date < end_date:
+    while next_date <= end_date:
         stats_dict = {}
         stats_dict['stars'] = 0
         stats_dict['cumulative'] = 0
