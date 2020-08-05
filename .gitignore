@@ -116,5 +116,5 @@ docbuild/
 # IntelliJ
 /.idea
 
-# OSX
+# OSX directory info files
 .DS_Store
