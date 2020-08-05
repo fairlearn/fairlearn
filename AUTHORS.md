@@ -23,5 +23,6 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Mehrnoosh Sameki](https://github.com/mesameki)
 - [Chinmay Singh](https://www.microsoft.com/en-us/research/people/chsingh/)
 - [Hanna Wallach](https://www.microsoft.com/en-us/research/people/wallach/)
+- [Hilde Weerts](https://github.com/hildeweerts)
 - [Vincent Xu](https://github.com/vingu)
 - [Beth Zeranski](https://github.com/bethz)
