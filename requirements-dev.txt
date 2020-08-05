@@ -32,4 +32,5 @@ nbval
 # Required for documentation
 sphinx
 sphinx-gallery
+sphinx-multiversion
 pydata-sphinx-theme
