@@ -1,4 +1,4 @@
-# Nightly build pipeline which pins requirements to specified lower bounds (if any)
+# Nightly build pipeline with requirements pinned to lower bounds (if any)
 # This does not run on MacOS due to issues with the pinned requirements
 
 variables:
