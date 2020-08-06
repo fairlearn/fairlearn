@@ -49,14 +49,18 @@ extensions = [
     'sphinx_multiversion'
 ]
 
+# Multiversion settings
+
+smv_tag_whitelist = r'^v0\.4\.6$'
+smv_branch_whitelist = r'^master$'
+
+# Intersphinx
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'sklearn': ('https://scikit-learn.org/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -96,9 +100,9 @@ html_additional_pages = {
     'index': 'index.html'
 }
 
-html_sidebars = [
-    "versioning.html",
-]
+html_sidebars = {
+    '*': "versioning.html",
+}
 
 # If false, no index is generated.
 html_use_index = False
