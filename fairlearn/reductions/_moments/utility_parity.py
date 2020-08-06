@@ -281,7 +281,7 @@ class TruePositiveRateParity(UtilityParity):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
-        super().load_data(X, y,
+        super().load_data(X, pd.Series(y),
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
                           **kwargs)
 
@@ -317,7 +317,7 @@ class FalsePositiveRateParity(UtilityParity):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        super().load_data(X, y,
+        super().load_data(X, pd.Series(y),
                           event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0),
                           **kwargs)
 

@@ -11,8 +11,10 @@ learning training.
 from ._exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from ._grid_search import GridSearch  # noqa: F401
 from ._moments import AbsoluteLoss, Moment, UtilityParity  # noqa: F401
-from ._moments import DemographicParity, EqualizedOdds, ErrorRateParity, ErrorRate, \
-    TruePositiveRateParity, FalsePositiveRateParity   # noqa: F401
+from ._moments import (DemographicParity, EqualizedOdds,  # noqa: F401
+                       ErrorRateParity, ErrorRate,  # noqa: F401
+                       TruePositiveRateParity,   # noqa: F401
+                       FalsePositiveRateParity)   # noqa: F401
 from ._moments import BoundedGroupLoss, SquareLoss, ZeroOneLoss  # noqa: F401
 from ._moments import ClassificationMoment, LossMoment  # noqa: F401
 

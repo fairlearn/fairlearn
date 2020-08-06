@@ -11,3 +11,4 @@ User Guide
    assessment
    mitigation
    reductions
+   further_resources
