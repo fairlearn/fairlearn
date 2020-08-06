@@ -56,14 +56,15 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
     dataset : :class:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
-        data : ndarray, shape (48842, 14)
-            Each row corresponding to the 14 feature values in order.
+        data : ndarray, shape (45211, 17)
+            Each row corresponding to the 17 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
-        target : numpy array of shape (48842,)
-            Each value represents whether the person earns more than $50,000
-            a year (>50K) or not (<=50K).
+        target : numpy array of shape (45211,)
+            Each value represents whether the client subscribed a
+            term deposit which is 'yes' if the client subscribed and 'no'
+            otherwise.
             If ``as_frame`` is True, ``target`` is a pandas object.
-        feature_names : list of length 14
+        feature_names : list of length 17
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the UCI bank marketing dataset.
