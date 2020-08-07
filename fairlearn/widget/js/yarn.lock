@@ -1255,10 +1255,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-fairlearn-dashboard@0.0.21:
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/fairlearn-dashboard/-/fairlearn-dashboard-0.0.21.tgz#644eff7bf408317cbaf8c9e197888ac61a817ac0"
-  integrity sha512-vxBnnzmFDeE978VsY/JvwtYSHIfW105LVBLl9KFg8sfpYk4EIHDPdAV/djp2XEarDaHQ4gJUycp1zmpHMNowjg==
+fairlearn-dashboard@0.0.22:
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/fairlearn-dashboard/-/fairlearn-dashboard-0.0.22.tgz#554b20570fdce62f2d8c33a62552a2c1f74358c1"
+  integrity sha512-0EEmkX9JWfnQy72d47w21YmLLyhxMjCKlyE9iTJMPQ7mZhplIrkzJM1cCKBC+wA+RG9hm+jCAzYLittcMi526A==
   dependencies:
     jmespath "^0.15.0"
     localized-strings "^0.2.2"
@@ -1862,9 +1862,9 @@ locate-path@^3.0.0:
     path-exists "^3.0.0"
 
 lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.4:
-  version "4.17.15"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+  version "4.17.19"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
+  integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
 
 loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
