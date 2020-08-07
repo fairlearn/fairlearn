@@ -66,8 +66,8 @@ than $50,000 a year.
     >>> import numpy as np 
     >>> import pandas as pd
     >>> import matplotlib.pyplot as plt 
-    >>> from fairlearn.datasets import fetch_adult
-    >>> data = fetch_adult(as_frame=True)
+    >>> from sklearn.datasets import fetch_openml
+    >>> data = fetch_openml(data_id=1590, as_frame=True)
     >>> X = pd.get_dummies(data.data)
     >>> y_true = (data.target == '>50K') * 1
     >>> sex = data.data['sex']
@@ -181,4 +181,5 @@ What's next?
 Please refer to our :ref:`user_guide` for a comprehensive view on Fairness in
 Machine Learning and how Fairlearn fits in, as well as an exhaustive guide on
 all parts of the toolkit. For concrete examples check out the
-:ref:`sphx_glr_auto_examples` section.
+:ref:`sphx_glr_auto_examples` section. Finally, we also have a collection
+of :ref:`faq`.

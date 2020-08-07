@@ -11,6 +11,7 @@ from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
+from fairlearn.reductions._moments import ClassificationMoment
 
 logger = logging.getLogger(__name__)
 
@@ -18,35 +19,36 @@ logger = logging.getLogger(__name__)
 class _Lagrangian:
     """Operations related to the Lagrangian.
 
-    :param X: the training features
-    :type X: Array
-    :param sensitive_features: the sensitive features to use for constraints
-    :type sensitive_features: Array
-    :param y: the training labels
-    :type y: Array
-    :param estimator: the estimator to fit in every iteration of best_h
-    :type estimator: an estimator that has a `fit` method with arguments X, y, and sample_weight
-    :param constraints: Object describing the parity constraints. This provides the reweighting
-        and relabelling
-    :type constraints: `fairlearn.reductions.Moment`
-    :param eps: allowed constraint violation
-    :type eps: float
-    :param B:
-    :type B:
-    :param opt_lambda: indicates whether to optimize lambda during the calculation of the
+    Parameters
+    ----------
+    X : {numpy.ndarray, pandas.DataFrame}
+        the training features
+    sensitive_features : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the sensitive features to use for constraints
+    y : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the training labels
+    estimator :
+        the estimator to fit in every iteration of :meth:`best_h` using a
+        :meth:`fit` method with arguments `X`, `y`, and `sample_weight`
+    constraints : fairlearn.reductions.Moment
+        Object describing the parity constraints. This provides the reweighting
+        and relabelling.
+    B : float
+        bound on the L1-norm of the lambda vector
+    opt_lambda : bool
+        indicates whether to optimize lambda during the calculation of the
         Lagrangian; optional with default value True
-    :type opt_lambda: bool
     """
 
-    def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
+    def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True):
         self.X = X
         self.n = self.X.shape[0]
+        self.y = y
         self.constraints = constraints
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
         self.pickled_estimator = pickle.dumps(estimator)
-        self.eps = eps
         self.B = B
         self.opt_lambda = opt_lambda
         self.hs = pd.Series(dtype="float64")
@@ -63,16 +65,23 @@ class _Lagrangian:
     def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
 
-        :param Q: `Q` is either a series of weights summing up to 1 that indicate the weight of
-            each `h` in contributing to the randomized classifier, or a callable corresponding to
-            a deterministic predict function.
-        :type Q: pandas.Series or callable
-        :param lambda_vec: lambda vector
-        :type lambda_vec: pandas.Series
+        Parameters
+        ----------
+        Q : {pandas.Series, callable}
+            `Q` is either a series of weights summing up to 1 that indicate
+            the weight of each `h` in contributing to the randomized
+            predictor, or a callable corresponding to a deterministic
+            `predict` function.
+        lambda_vec : pandas.Series
+            lambda vector
 
-        :return: tuple `(L, L_high, gamma, error)` where `L` is the value of the Lagrangian,
-            `L_high` is the value of the Lagrangian under the best response of the lambda player,
-            `gamma` is the vector of constraint violations, and `error` is the empirical error
+        Returns
+        -------
+        tuple
+            tuple `(L, L_high, gamma, error)` where `L` is the value of the
+            Lagrangian, `L_high` is the value of the Lagrangian under the best
+            response of the lambda player, `gamma` is the vector of constraint
+            violations, and `error` is the empirical error
         """
         if callable(Q):
             error = self.obj.gamma(Q)[0]
@@ -83,15 +92,15 @@ class _Lagrangian:
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
-            L = error + np.sum(lambda_projected * gamma) - self.eps * np.sum(lambda_projected)
+            L = error + np.sum(lambda_projected * (gamma - self.constraints.bound()))
         else:
-            L = error + np.sum(lambda_vec * gamma) - self.eps * np.sum(lambda_vec)
+            L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
-        max_gamma = gamma.max()
-        if max_gamma < self.eps:
+        max_constraint = (gamma - self.constraints.bound()).max()
+        if max_constraint <= 0:
             L_high = error
         else:
-            L_high = error + self.B * (max_gamma - self.eps)
+            L_high = error + self.B * max_constraint
         return L, L_high, gamma, error
 
     def eval_gap(self, Q, lambda_hat, nu):
@@ -114,7 +123,8 @@ class _Lagrangian:
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
-        A_ub = np.concatenate((self.gammas - self.eps, -np.ones((n_constraints, 1))), axis=1)
+        A_ub = np.concatenate((self.gammas.sub(self.constraints.bound(), axis=0),
+                               -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
@@ -136,7 +146,10 @@ class _Lagrangian:
 
     def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
-        redY = 1 * (signed_weights > 0)
+        if isinstance(self.constraints, ClassificationMoment):
+            redY = 1 * (signed_weights > 0)
+        else:
+            redY = self.y
         redW = signed_weights.abs()
         redW = self.n * redW / redW.sum()
 

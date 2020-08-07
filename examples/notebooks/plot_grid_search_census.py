@@ -33,7 +33,6 @@ from fairlearn.widget import FairlearnDashboard
 from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, ErrorRate
-from fairlearn.datasets import fetch_adult
 
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -42,7 +41,8 @@ import pandas as pd
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
 
-data = fetch_adult(as_frame=True)
+from sklearn.datasets import fetch_openml
+data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
 Y = (data.target == '>50K') * 1
 X_raw
