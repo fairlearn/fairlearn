@@ -51,8 +51,8 @@ extensions = [
 
 # Multiversion settings
 
-smv_tag_whitelist = r'^v0\.4\.6$'
-smv_branch_whitelist = r'^master$'
+smv_tag_whitelist = None #  r'^v0\.4\.6$'
+smv_branch_whitelist = r'^master$|^riedgar-ms/versioned-docs-01$'
 
 # Intersphinx
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -97,7 +97,6 @@ html_logo = "_static/images/fairlearn_full_color.png"
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 html_additional_pages = {
-    'index': 'index.html'
 }
 
 html_sidebars = {
