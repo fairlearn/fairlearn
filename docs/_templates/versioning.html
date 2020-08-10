@@ -5,6 +5,7 @@
 
 <head>
   <title>Version selection</title>
+  <script type="text/javascript" src="./_static/js/versionselector.js"></script>
   <script type="text/javascript">
       //<![CDATA[
         var data = {
@@ -14,28 +15,15 @@
         };
       //]]>
 
-      function LoadVersions(targetfile) {
-        console.log("Starting LoadVersions");
-        listElement = document.getElementById('versionlist')
-        for(const [k,v] of Object.entries(data)) {
-          console.log("Processing "+k)
-          var link = document.createElement("a");
-          link.innerHTML = k;
-          filepath = v.split("/");
-          filepath[filepath.length-1] = targetfile;
-          link.href=filepath.join("/");
-          var li = document.createElement("li");
-          li.appendChild(link)
-          listElement.appendChild(li);
-        }
-        console.log("Completed LoadVersions")
+      function GenerateList(target) {
+        LoadVersions(target, data);
       }
   </script>
 </head>
 
-<body onload="LoadVersions('contents.html')">
+<body onload="GenerateList('contents.html')">
   <h1>Please select a version</h1>
-  <ul id='versionlist' />
+  <ul id='versionlist'></ul>
 </body>
 
 </html>
