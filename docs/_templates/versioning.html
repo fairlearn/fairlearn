@@ -14,15 +14,15 @@
         };
       //]]>
 
-      function LoadVersions() {
+      function LoadVersions(targetfile) {
         console.log("Starting LoadVersions");
         listElement = document.getElementById('versionlist')
         for(const [k,v] of Object.entries(data)) {
+          console.log("Processing "+k)
           var link = document.createElement("a");
           link.innerHTML = k;
-          // Always point to contents.html
           filepath = v.split("/");
-          filepath[filepath.length-1] = "contents.html";
+          filepath[filepath.length-1] = targetfile;
           link.href=filepath.join("/");
           var li = document.createElement("li");
           li.appendChild(link)
@@ -33,7 +33,7 @@
   </script>
 </head>
 
-<body onload="LoadVersions()">
+<body onload="LoadVersions('contents.html')">
   <h1>Please select a version</h1>
   <ul id='versionlist' />
 </body>
