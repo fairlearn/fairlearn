@@ -1,8 +1,38 @@
-{% if versions %}
-<h3>{{ _('Versions') }}</h3>
-<ul>
-  {%- for item in versions %}
-  <li><a href="{{ item.url }}">{{ item.name }}</a></li>
-  {%- endfor %}
-</ul>
-{% endif %}
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
+
+<head>
+  <title>Version selection</title>
+  <script type="text/javascript">
+      //<![CDATA[
+        var data = {
+          {%- for item in versions %}
+          "{{ item.name }}": "{{ item.url }}",
+          {%- endfor %}
+        };
+      //]]>
+
+      function LoadVersions() {
+        console.log("Starting LoadVersions");
+        listElement = document.getElementById('versionlist')
+        for(const [k,v] of Object.entries(data)) {
+          var link = document.createElement("a");
+          link.innerHTML = k;
+          link.href=v;
+          var li = document.createElement("li");
+          li.appendChild(link)
+          listElement.appendChild(li);
+        }
+        console.log("Completed LoadVersions")
+      }
+  </script>
+</head>
+
+<body onload="LoadVersions()">
+  <h1>Please select a version</h1>
+  <ul id='versionlist' />
+</body>
+
+</html>

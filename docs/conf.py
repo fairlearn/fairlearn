@@ -51,7 +51,7 @@ extensions = [
 
 # Multiversion settings
 
-smv_tag_whitelist = None #  r'^v0\.4\.6$'
+smv_tag_whitelist = None  # r'^v0\.4\.6$'
 smv_branch_whitelist = r'^master$|^riedgar-ms/versioned-docs-01$'
 
 # Intersphinx
@@ -97,10 +97,11 @@ html_logo = "_static/images/fairlearn_full_color.png"
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 html_additional_pages = {
+    'versions': 'versioning.html'
 }
 
 html_sidebars = {
-    '*': "versioning.html",
+    # '*': "versioning.html"
 }
 
 # If false, no index is generated.
