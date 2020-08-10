@@ -97,7 +97,9 @@ html_logo = "_static/images/fairlearn_full_color.png"
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 html_additional_pages = {
-    'versions': 'versioning.html'
+    'version_guide': 'version_guide.html',
+    'version_apireference': 'version_apireference.html',
+    'version_contribute': 'version_contribute.html',
 }
 
 html_sidebars = {
