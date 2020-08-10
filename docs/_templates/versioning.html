@@ -20,7 +20,10 @@
         for(const [k,v] of Object.entries(data)) {
           var link = document.createElement("a");
           link.innerHTML = k;
-          link.href=v.replace(/versions.html|index.html/, "contents.html")
+          // Always point to contents.html
+          filepath = v.split("/");
+          filepath[filepath.length-1] = "contents.html";
+          link.href=filepath.join("/");
           var li = document.createElement("li");
           li.appendChild(link)
           listElement.appendChild(li);
