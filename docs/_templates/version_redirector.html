@@ -7,12 +7,26 @@
   <title>Version selection</title>
   <script type="text/javascript">
     //<![CDATA[
+    /*
+      The following dictionary will be filled in by Sphinx-MultiVersion
+    */
     var data = {
   {%- for item in versions %}
       "{{ item.name }}":"{{ item.url }}",
   {%- endfor %}
         };
 
+    /*
+        Generate the list items for the versions
+
+        The branch/tag names and relative paths are provided in the
+        dictionary by Sphinx-MultiVersion.
+        This processes the data into the list items, one per version.
+        The specific file linked to is set via the query parameters for
+        this page when it is loaded.
+        Specifically
+        ..../version_redirector.html?target=<relative/path/to/target.html>
+    */
     function LoadVersions() {
       console.log("Starting LoadVersions");
       console.log("URI is " + document.documentURI)
