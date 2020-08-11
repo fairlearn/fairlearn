@@ -52,7 +52,7 @@ extensions = [
 # Multiversion settings
 
 smv_tag_whitelist = None  # r'^v0\.4\.6$'
-smv_branch_whitelist = r'^master$|^riedgar-ms/versioned-docs-01$'
+smv_branch_whitelist = r'^master$'
 
 # Intersphinx
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
