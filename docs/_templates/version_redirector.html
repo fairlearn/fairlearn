@@ -15,7 +15,9 @@
 
     function LoadVersions() {
       console.log("Starting LoadVersions");
-      targetfile = document.URL.searchParams.get('target')
+      console.log("URI is " + document.documentURI)
+      targetfile = (new URL(document.documentURI)).searchParams.get('target')
+      console.log("Target file is " + targetfile)
       listElement = document.getElementById('versionlist')
       for (const [k, v] of Object.entries(data)) {
         console.log("Processing " + k)
