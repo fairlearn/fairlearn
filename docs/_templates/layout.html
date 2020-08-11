@@ -1,0 +1,14 @@
+{% extends "!pydata_sphinx_theme/layout.html" %}
+{% block docs_navbar %}
+{{ super() }}
+{% if versions %}
+<div class="container-xl">
+<h4>{{ _('Versions') }}</h4>
+<ul>
+  {%- for item in versions %}
+  <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+  {%- endfor %}
+</ul>
+</div>
+{% endif %}
+{% endblock %}

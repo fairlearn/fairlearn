@@ -66,7 +66,7 @@ master_doc = 'contents'
 # Multiversion settings
 
 smv_tag_whitelist = None  # r'^v0\.4\.6$'
-smv_branch_whitelist = r'^master$|alternate-01$'
+smv_branch_whitelist = r'^master$|^riedgar-ms/versioned-docs-alternate-01$'
 
 # -- Options for HTML output -------------------------------------------------
 
