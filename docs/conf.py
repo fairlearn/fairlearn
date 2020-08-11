@@ -62,6 +62,11 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 master_doc = 'contents'
 
+# Multiversion settings
+
+smv_tag_whitelist = None  # r'^v0\.4\.6$'
+smv_branch_whitelist = r'^master$|alternate-01$'
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
