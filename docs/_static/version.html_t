@@ -1,0 +1,15 @@
+{% extends "docs-sidebar.html" %}
+{% block body %}
+{% if current_version and latest_version and current_version != latest_version %}
+<p>
+  <strong>
+    {% if current_version.is_released %}
+    You're reading an old version of this documentation.
+    {% else %}
+    You're reading the documentation for a development version.
+    {% endif %}
+  <strong>
+</p>
+{% endif %}
+{{ super() }}
+{% endblock %}
