@@ -34,7 +34,7 @@ jobs:
 
       - run:
           name: 'Copy logo (used by both static landing page and versioned docs)'
-          command: cp docs/_static/images/fairlearn_full_color.png docs/_build/html
+          command: cp docs/_static/images/fairlearn_full_color.png docs/_build/html/landing_page_assets/
 
       - persist_to_workspace:
           root: docs/_build
