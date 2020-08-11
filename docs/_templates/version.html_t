@@ -1,5 +1,6 @@
 {% extends "docs-sidebar.html" %}
 {% block body %}
+<h1>This is a version sidebar</h1>
 {% if current_version and latest_version and current_version != latest_version %}
 <p>
   <strong>
