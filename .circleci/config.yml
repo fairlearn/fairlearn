@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: 'Copy static files'
-          command: cp -r static_landing_page/* docs/_build/html
+          command: cp -r docs/static_landing_page/* docs/_build/html
 
       - persist_to_workspace:
           root: docs/_build
