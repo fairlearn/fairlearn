@@ -28,6 +28,14 @@ jobs:
           name: 'Build html'
           command: sphinx-multiversion docs/ docs/_build/html # python -m sphinx -b html -n -j auto docs docs/_build/html
 
+      - run:
+          name: 'Copy static files'
+          command: cp -r docs/static_landing_page/* docs/_build/html
+
+      - run:
+          name: 'Copy logo (used by both static landing page and versioned docs)'
+          command: cp docs/_static/images/fairlearn_full_color.png docs/_build/html/images/
+
       - persist_to_workspace:
           root: docs/_build
           paths: html
