@@ -8,14 +8,14 @@ About
 Mission
 -------
 
-Fairlearn is an open source toolkit that seeks to empower data scientists and
-developers to assess and improve fairness of their AI systems.
-The toolkit aspires to include:
+Fairlearn is an open source project that seeks to empower data scientists and
+developers to assess and improve fairness of AI systems.
+The project aspires to include:
 
-- Fairness metrics and unfairness mitigation algorithms
-- Tools for interactive fairness assessment (e.g., dashboard, plotting, etc.)
+- A Python library of fairness metrics and mitigation algorithms
+- Tools for (interactive) fairness assessment (e.g., plotting, dashboards, etc.)
 - Educational materials (comprehensive user guide, detailed case studies,
-  white papers, etc.)
+  Jupyter notebooks, white papers, etc.)
 
 Development of Fairlearn is firmly grounded in the understanding that fairness
 in AI systems is a sociotechnical challenge.
@@ -26,9 +26,10 @@ Our goal is to enable humans to assess fairness-related harms, review the
 impacts of different mitigation strategies and then make trade-offs
 appropriate to their scenario.
 
-Fairlearn is a community-driven open source project which is to be shaped
-through stakeholder engagement.
-Its development and growth are guided by the belief that meaningful progress
+Fairlearn is currently driven by Microsoft Research and Azure with a substantial
+involvement of external contributors and an intention to eventually transition to a
+community-driven open source project under by a neutral organization.
+The development and growth of Fairlearn are guided by the belief that meaningful progress
 toward fairer AI systems requires input from a breadth of perspectives,
 ranging from data scientists, developers, and business decision makers to the
 people whose lives may be affected by the predictions of AI systems. 
@@ -53,9 +54,9 @@ The package provided a reduction algorithm for mitigating unfairness in binary
 classification models&mdash; a setting that was commonly studied in the
 machine learning community.
 The paper and the Python package were well received, so Miro Dudik and Hanna
-Wallach sought to translate the research into an industry context.
+Wallach with their collaborators sought to translate the research into an industry context.
 However, they discovered that practitioners typically need to address more
-fundamental fairness issues before they can use specific algorithms, and that
+fundamental fairness issues before applying specific algorithms, and that
 mitigating unfairness in binary classification models is a relatively rare use
 case.
 They also discovered that fairness assessment is a common need, along with
@@ -80,8 +81,8 @@ As an open-source project, Fairlearn strives to incorporate the best of
 research and practice.
 AI is a rapidly evolving field, and fairness in AI is all the more so.
 We therefore encourage researchers, practitioners, and other stakeholders to
-contribute fairness metrics, unfairness mitigation algorithms, visualization
-capabilities, as well as educational materials to Fairlearn as we experiment,
+contribute fairness metrics and assessment tools, unfairness mitigation algorithms,
+case studies and other educational materials to Fairlearn as we experiment,
 learn, and evolve the project together.
 
 There are many areas for future enhancement and growth. For example, Fairlearn
