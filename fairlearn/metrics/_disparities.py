@@ -72,7 +72,7 @@ def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=No
     :param 1D-array sensitive_features: Sensitive features.
     :param 1D-array sample_weight: Sample weights.
     :return: The smaller of two metrics: `true_positive_rate_ratio` and
-        `false_negative_rate_ratio`. The former is the ratio between the
+        `false_postive_rate_ratio`. The former is the ratio between the
         smallest and largest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
         of the sensitive feature. The latter is defined similarly, but for
         :math:`P[h(X)=1 | A=a, Y=0]`.
