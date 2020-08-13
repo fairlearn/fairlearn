@@ -20,7 +20,7 @@ The project aspires to include:
 Development of Fairlearn is firmly grounded in the understanding that fairness
 in AI systems is a sociotechnical challenge.
 Because there are many complex sources of unfairness&mdash;some societal and
-some technical&mdash; it is not possible to fully "debias" a system or to
+some technical&mdash;it is not possible to fully "debias" a system or to
 guarantee fairness.
 Our goal is to enable humans to assess fairness-related harms, review the
 impacts of different mitigation strategies and then make trade-offs
@@ -28,7 +28,7 @@ appropriate to their scenario.
 
 Fairlearn is currently driven by Microsoft Research and Azure with a substantial
 involvement of external contributors and an intention to eventually transition to a
-community-driven open source project under by a neutral organization.
+community-driven open source project under a neutral organization.
 The development and growth of Fairlearn are guided by the belief that meaningful progress
 toward fairer AI systems requires input from a breadth of perspectives,
 ranging from data scientists, developers, and business decision makers to the
@@ -112,8 +112,9 @@ Short and medium-term focus areas
      while still being downloadable as `.py` or `.ipynb` files.
 
    - **Improve the usability, relevance, and look of Fairlearn website** with the audience of practitioners in mind.
-     The current `website proposal <https://github.com/fairlearn/fairlearn-proposals/blob/master/documentation/STRUCTURE.md>`_
-     outlines the planned efforts, some of which have been completed. The plan itself is open for discussion.
+     Engage by participanting in the discussions on developer calls or in the issues on the `project board about the Fairlearn
+     website design <https://github.com/fairlearn/fairlearn/projects/9>`_. You can also give us feedback by filing
+     a new issue.
 
    - **Improve the usability and relevance of fairness metrics** by
      `critiquing and improving the current metrics API <https://github.com/fairlearn/fairlearn-proposals/issues/12`_,
@@ -145,7 +146,9 @@ Short and medium-term focus areas
      
 #. *Create metrics, assessment tools, and algorithms to cover more complex ML tasks*
 
-   - **Create notebooks and use cases** that deal with concrete fairness issues in complex ML tasks including
+   - **Create notebooks and use cases** that deal with
+     `concrete fairness issues <https://fairlearn.github.io/contributor_guide/contributing_example_notebooks.html>`_
+     in complex ML tasks including
      ranking, counterfactual estimation, text, computer vision, and speech.
    
    - **Lead and participate in contribution efforts** around under-researched, but practically relevant
