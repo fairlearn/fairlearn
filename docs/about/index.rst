@@ -100,7 +100,7 @@ Short and medium-term focus areas
 #. *Decrease adoption barriers for the current assessment and mitigation tools in Fairlearn*
 
    - **Improve existing notebooks and create new notebooks** that
-     `make fairness issues concrete https://fairlearn.github.io/contributor_guide/contributing_example_notebooks.html>`_
+     `make fairness issues concrete <https://fairlearn.github.io/contributor_guide/contributing_example_notebooks.html>`_
      while demonstrating how to apply Fairlearn. To accelerate this process, we are experimenting with
      :ref:`weekly sessions <notebook_deep_dive>` where people can discuss
      individual example notebooks in detail.
@@ -117,7 +117,7 @@ Short and medium-term focus areas
      a new issue.
 
    - **Improve the usability and relevance of fairness metrics** by
-     `critiquing and improving the current metrics API <https://github.com/fairlearn/fairlearn-proposals/issues/12`_,
+     `critiquing and improving the current metrics API <https://github.com/fairlearn/fairlearn-proposals/issues/12>`_,
      suggesting new metrics motivated by concrete use cases, and implementing the new metrics.
    
    - **Move towards compatibility with scikit-learn**: identify non-compatible aspects, improve code
