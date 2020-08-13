@@ -51,7 +51,7 @@ Fairlearn was started in 2018 by Miro Dudik from Microsoft Research as a
 Python package to accompany the research paper,
 `A Reductions Approach to Fair Classification <http://proceedings.mlr.press/v80/agarwal18a/agarwal18a.pdf>`_.
 The package provided a reduction algorithm for mitigating unfairness in binary
-classification models&mdash; a setting that was commonly studied in the
+classification models&mdash;a setting that was commonly studied in the
 machine learning community.
 The paper and the Python package were well received, so Miro Dudik and Hanna
 Wallach with their collaborators sought to translate the research into an industry context.
@@ -74,8 +74,8 @@ At that time, the project started to have regular releases.
 
 .. _roadmap:
 
-Project roadmap
----------------
+Project focus areas
+-------------------
 
 As an open-source project, Fairlearn strives to incorporate the best of
 research and practice.
@@ -85,129 +85,73 @@ contribute fairness metrics and assessment tools, unfairness mitigation algorith
 case studies and other educational materials to Fairlearn as we experiment,
 learn, and evolve the project together.
 
-There are many areas for future enhancement and growth. For example, Fairlearn
-currently supports only *group fairness*&mdash;i.e., fairness with respect to
-groups of people, such as those defined in terms of race, sex, age, or
-disability status&mdash;and not other conceptualizations of fairness, such as
-*individual fairness* or *counterfactual fairness.* Fairlearn also currently
-includes only a limited set of unfairness mitigation algorithms, although we
-note that these algorithms are not restricted to classification tasks. Besides
-adding fairness metrics, conceptualizations of fairness, and unfairness
-mitigation algorithms, we also hope that Fairlearn will expand to cover more
-complex machine learning tasks in areas like counterfactual reasoning,
-computer vision, and natural language processing.
-We also anticipate integrating Fairlearn with interpretability tools, such as
-`InterpretML <https://github.com/interpretml>`_.
+Below we list the key areas that we prioritize in the short
+and medium term, but we are happy to consider other directions
+if they are aligned with the mission of Fairlearn and there is enough commitment
+from the contributors. If you want to get involved, please
+:ref:`reach out <communication>`. For concrete opportunities and
+work in progress please review our `project boards <https://github.com/fairlearn/fairlearn/projects>`_.
 
-Ultimately, we hope that Fairlearn will become more than a software
-tool&mdash;a vibrant community and resource center that provides not only
-code, but also resources like domain-specific guides for when and when not to
-use different fairness metrics and unfairness mitigation algorithms.
+Short and medium-term focus areas
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Short-term roadmap
-^^^^^^^^^^^^^^^^^^
+*Last update: August 12, 2020*
 
-*Last update: June 19, 2020*
+#. *Decrease adoption barriers for the current assessment and mitigation tools in Fairlearn*
 
-Here we list some specific areas we would like to work on in the next few
-weeks and months. If you want to get involved, please
-:ref:`reach out <communication>`.
-The inclusion of tasks in the list below does not mean that we are committing
-to deliver them by a specific date.
-It merely represents a current list of tasks that members of the community
-work on.
-If you are interested to work on a topic that is not covered, please reach
-out.
-
-Tasks
-~~~~~
-
-#. *Improve the `fairlearn.metrics` API*
-   More information in the
-   `fairlearn-proposals <https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md>`_
-   repository.
-
-   **How you can help:** critique the proposal, suggest new metrics, work on
-   implementing new metrics.
-
-#. *Improve the project documentation*
-   The Fairlearn website is still very new and raw with lots of gaps.
-   `This proposal <https://github.com/fairlearn/fairlearn-proposals/pull/8>`_
-   outlines the planned efforts, some of which have been completed. There are
-   still massive gaps, particularly in the user guides.
-
-   **How you can help:** critique the current content, improve writing and
-   examples, port the current documentation to the numpydoc format.
-
-#. *Improve example notebooks and add new ones*
-   The repository started out with all notebooks in the `notebooks` directory
-   as `.ipynb` files. These notebooks are now being
-   converted into `.py` files that
-   `render properly on the website <https://fairlearn.github.io/auto_examples/notebooks/index.html>`_,
-   while still being downloadable as `.py` or `.ipynb` files.
-   
-   - Some of the notebooks may be better off as parts of the user guide.
-   - As pointed out in various issues the existing notebooks have plenty of
-     potential for improvement to better reflect the sociotechnical focus of
-     Fairlearn.
-     To accelerate this process, we are experimenting with
+   - **Improve existing notebooks and create new notebooks** that
+     `make fairness issues concrete https://fairlearn.github.io/contributor_guide/contributing_example_notebooks.html>`_
+     while demonstrating how to apply Fairlearn. To accelerate this process, we are experimenting with
      :ref:`weekly sessions <notebook_deep_dive>` where people can discuss
      individual example notebooks in detail.
-   - There are only very few existing example notebooks. To cover a
-     wider range of applications we need to work with stakeholders to develop
-     more guides.
+     
+   - **Improve the project documentation**: critique the current content, expand user guides,
+     improve writing and examples, port the current Python documentation to the numpydoc format. 
+     Convert existing example notebooks from `.ipynb` into `.py` files that
+     `render properly on the website <https://fairlearn.github.io/auto_examples/notebooks/index.html>`_,
+     while still being downloadable as `.py` or `.ipynb` files.
 
-   **How you can help:** critique and improve existing notebooks, join the
-   discussion sessions, create new notebooks, move the notebooks to the user
-   guide.
+   - **Improve the usability, relevance, and look of Fairlearn website** with the audience of practitioners in mind.
+     The current `website proposal <https://github.com/fairlearn/fairlearn-proposals/blob/master/documentation/STRUCTURE.md>`_
+     outlines the planned efforts, some of which have been completed. The plan itself is open for discussion.
 
-#. *Nurture a diverse community of contributors*
-   We would like to ensure that all feel welcome and can contribute in a way
-   of their choosing. So far we have
-   :ref:`monthly developer calls <developer_calls>`.
-   We are experimenting with adding
-   :ref:`deep dive sessions <notebook_deep_dive>` around sociotechnical
-   aspects of notebooks.
-   We also work with universities on engaging with student contributors
-   through course projects.
-   Finally, we are working to improve documentation.
+   - **Improve the usability and relevance of fairness metrics** by
+     `critiquing and improving the current metrics API <https://github.com/fairlearn/fairlearn-proposals/issues/12`_,
+     suggesting new metrics motivated by concrete use cases, and implementing the new metrics.
    
-   **How you can help:** reach out with feedback on what is working and what
-   is not working; suggest how to improve things; point out where
-   documentation, our processes or any other aspect of the projects create
-   barriers of entry.
+   - **Move towards compatibility with scikit-learn**: identify non-compatible aspects, improve code
+     towards compatibility.
+     While we aim for compatibility there may be aspects that are too
+     restricting for Fairlearn, so this may need to be evaluated on a
+     case-by-case basis.
 
-#. *Move towards compatibility with scikit-learn*
-   While we aim for compatibility there may be aspects that are too
-   restricting for Fairlearn, so this may need to be evaluated on a
-   case-by-case basis.
+#. *Grow and nurture a diverse community of contributors*
+   
+   - **Reach out** with feedback on what is working and what
+     is not working; suggest how to improve things; point out where
+     documentation, our processes or any other aspect of the projects create
+     barriers of entry.
 
-   **How can you help:** help identify non-compatible aspects, improve code
-   towards compatibility.
+   - **Participate** in our :ref:`monthly developer calls <developer_calls>`.
+     We are experimenting with adding :ref:`deep dive sessions <notebook_deep_dive>` around sociotechnical
+     aspects of notebooks.
+     We also work with universities to engage student contributors
+     through course projects and are also open to other forms of collaboration&mdash;let us know if you
+     are interested.
 
-#. *Add regression to the exponentiated gradient algorithm*
-   The exponentiated gradient algorithm originally worked only for binary
-   classification.
-   There is a
-   `pull request <https://github.com/fairlearn/fairlearn/pull/442>`_ that
-   implements the extension to regression (and the bounded group loss fairness
-   criterion).
-   We intend to add the corresponding documentation before completing it.
+   - **Improve the Fairlearn website and documentation** with the audience of contributors in mind.
+   
+   - **Add tests and improve testing infrastructure.**
+     
+#. *Create metrics, assessment tools, and algorithms to cover more complex ML tasks*
 
-   **How you can help:** review and improve the documentation once it's added
-   to the repository
-
-#. *Document and modularize the Fairlearn dashboard*
-   The Fairlearn dashboard is currently not ready for contributions by
-   the community.
-   Over the next few months, the Microsoft Research and Azure ML teams will be
-   working to properly open it for contributions similarly to all other parts
-   of this project.
-   In the meantime, we have set up a working group for those that would like
-   to work on UX design and HCI research within Fairlearn.
-
-   **How you can help:** join the working group if you are interested in
-   questions around UX design
+   - **Create notebooks and use cases** that deal with concrete fairness issues in complex ML tasks including
+     ranking, counterfactual estimation, text, computer vision, and speech.
+   
+   - **Lead and participate in contribution efforts** around under-researched, but practically relevant
+     ML areas in ranking, counterfactual estimation, text, computer vision, and speech. These are likely
+     to be mixed research / practice efforts and we expect substantial contributor commitment before
+     embarking on these.
 
 .. _governance:
 
