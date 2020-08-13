@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator
 
 
 class LeastSquaresBinaryClassifierLearner:
@@ -42,11 +43,3 @@ class MockEstimator:
 
     def predict(self, X):
         return np.ones(X.shape[0])
-
-
-class MockSKLearnEstimator(MockEstimator):
-    def get_params(self):
-        return {}
-
-    def set_params(self):
-        pass

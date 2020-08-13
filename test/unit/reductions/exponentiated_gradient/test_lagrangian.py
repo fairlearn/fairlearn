@@ -5,6 +5,7 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import pytest
+from sklearn.base import BaseEstimator
 from sklearn.dummy import DummyClassifier
 
 from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
@@ -13,8 +14,7 @@ from fairlearn.reductions import DemographicParity, EqualizedOdds, \
     BoundedGroupLoss, LossMoment, ZeroOneLoss
 
 from .test_utilities import _get_data
-from .simple_learners import LeastSquaresBinaryClassifierLearner, MockEstimator, \
-    MockSKLearnEstimator
+from .simple_learners import LeastSquaresBinaryClassifierLearner, MockEstimator
 
 _PRECISION = 1e-6
 
@@ -103,7 +103,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
 
 @pytest.mark.parametrize("Constraints", ALL_CONSTRAINTS)
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
-@pytest.mark.parametrize("estimator", [MockEstimator, MockSKLearnEstimator])
+@pytest.mark.parametrize("estimator", [MockEstimator, BaseEstimator])
 def test_call_oracle(Constraints, eps, estimator, mocker):
     X, y, A = _get_data(A_two_dim=False)
     # Using a real estimator here with a mocked `fit` method since we don't actually
