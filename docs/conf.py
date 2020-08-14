@@ -38,6 +38,7 @@ release = fairlearn.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'bokeh.sphinxext.bokeh_plot',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
@@ -112,7 +113,6 @@ pygments_style = 'sphinx'
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',
      'gallery_dirs': 'auto_examples',
-     'filename_pattern': r'plot_adult_dataset\.py',
 }
 
 
