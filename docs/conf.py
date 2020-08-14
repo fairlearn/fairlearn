@@ -106,11 +106,13 @@ html_css_files = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-# quickstart examples are only generated, but not shown in the gallery
-# since they are only needed for the quickstart page itself.
+# Use filename_pattern so that plot_adult_dataset is not
+# included in the gallery, but its plot is available for
+# the quickstart
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',
      'gallery_dirs': 'auto_examples',
+     'filename_pattern': r'plot_adult_dataset\.py',
 }
 
 
