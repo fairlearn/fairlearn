@@ -41,6 +41,7 @@
 * Add new constraints and objectives in `ThresholdOptimizer`
 * Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
 * Add `fairlearn.datasets` module.
+* Add optional `verbose` argument to `GridSearch.fit` to diplay progress using `tqdm`.
 
 ### v0.4.6
 

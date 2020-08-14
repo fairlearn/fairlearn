@@ -157,7 +157,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         # Fit the estimates
         logger.debug("Setup complete. Starting grid search")
-        grid_iter = tqdm(grid.columns) if verbose else grid.columns
+        grid_iter = tqdm(grid.columns, desc="Grid search progress") if verbose else grid.columns
         for i in grid_iter:
             lambda_vec = grid[i]
             logger.debug("Obtaining weights")
