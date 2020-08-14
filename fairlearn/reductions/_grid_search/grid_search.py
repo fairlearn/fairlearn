@@ -9,6 +9,7 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
 from time import time
+from tqdm import tqdm
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn.reductions._moments import Moment, ClassificationMoment
@@ -105,12 +106,17 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :param sensitive_features: A (currently) required keyword argument listing the
             feature used by the constraints object
         :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
+
+        :param verbose: An optional argument to enable/disable the progress bar.
+            Default: True
+        :type verbose: bool
         """
         self.predictors_ = []
         self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)
         self.objectives_ = []
         self.gammas_ = pd.DataFrame(dtype=np.float64)
         self.oracle_execution_times_ = []
+        verbose = kwargs.pop('verbose', True)
 
         if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
@@ -151,7 +157,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         # Fit the estimates
         logger.debug("Setup complete. Starting grid search")
-        for i in grid.columns:
+        grid_iter = tqdm(grid.columns) if verbose else grid.columns
+        for i in grid_iter:
             lambda_vec = grid[i]
             logger.debug("Obtaining weights")
             weights = self.constraints.signed_weights(lambda_vec)
