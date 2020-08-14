@@ -2,7 +2,11 @@
 # Licensed under the MIT License.
 
 
-"""This module contains functions for visualizing dataframes, metrics, or the impact of reductions."""
+"""Functions for plotting charts in notebooks.
+
+This module contains functions for visualizing dataframes,
+metrics, or the impact of reductions.
+"""
 
 
 from .plot_disparities_in_performance import plot_disparities_in_performance

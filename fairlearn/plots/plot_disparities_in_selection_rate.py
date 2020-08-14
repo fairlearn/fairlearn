@@ -4,7 +4,6 @@
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
-from sklearn.metrics import accuracy_score
 from fairlearn.metrics import selection_rate_group_summary
 
 
@@ -13,15 +12,16 @@ def plot_disparities_in_selection_rate(y_true, y_pred, sensitive_features):
 
     This helps visualize differences in overall selection rate, and selection rates
     for groups classified by sensitive attributes.
-    
+
     :param 1D-array y_true: Ground truth (correct) labels.
     :param 1D-array y_pred: Predicted labels :math:`h(X)` returned by the classifier.
     :param 1D-array sensitive_features: Sensitive features.
     :return: None (shows a matplotlib plot)
     """
-  
     # compute
-    selection_rate_summary = selection_rate_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
+    selection_rate_summary = selection_rate_group_summary(y_true,
+                                                          y_pred,
+                                                          sensitive_features=sensitive_features)
     sensitive_values = sensitive_features.unique()
     selection_rates = []
     for sensitive_value in sensitive_values:
@@ -35,35 +35,49 @@ def plot_disparities_in_selection_rate(y_true, y_pred, sensitive_features):
     overall_performance_text = 'Overall'
     selection_rate_text = 'selection rate'
     disparity_text = 'disparity'
-  
+
     # chart styles
-    figsize=(12, 4)
+    figsize = (12, 4)
     plt.rc('font', size=12)
     height = 0.4
-    selection_rate_color = '#666' # grey
+    selection_rate_color = '#666'  # grey
     overall_vertical_line_color = '#333'
     label_padding = 2
 
     # bars
-    labels = list("{}\n{:.1%}\n{}".format(sensitive_value, selection_rate_summary['by_group'][sensitive_value], selection_rate_text) for sensitive_value in sensitive_values)
+    labels = []
+    for sensitive_value in sensitive_values:
+        label = "{}\n{:.1%}\n{}".format(sensitive_value,
+                                        selection_rate_summary['by_group'][sensitive_value],
+                                        selection_rate_text)
+        labels.append(label)
     fig, ax = plt.subplots(figsize=figsize)
-    ax.barh(labels, selection_rates, height,
-          color=[selection_rate_color],
-          left=0)
-  
+    ax.barh(labels,
+            selection_rates,
+            height,
+            color=[selection_rate_color],
+            left=0)
+
     # labels
     for index, selection_rate in enumerate(selection_rates):
-        plt.annotate("{:.1%}".format(selection_rate), (selection_rate, index), textcoords="offset points", xytext=(label_padding,0), ha="left")
+        plt.annotate("{:.1%}".format(selection_rate),
+                     (selection_rate, index),
+                     textcoords="offset points",
+                     xytext=(label_padding, 0),
+                     ha="left")
 
     # axes, titles, legend, etc
     plt.title("\n{}\n".format(title_text), fontsize=24, loc="left")
-    plt.title("{}:\n{:.1%} {}\n{:.1%} {}\n".format(overall_performance_text, selection_rate_summary['overall'], selection_rate_text, disparity, disparity_text), fontsize=12, loc="right")
+    right_title = "{}:\n{:.1%} {}\n{:.1%} {}\n".format(overall_performance_text,
+                                                       selection_rate_summary['overall'],
+                                                       selection_rate_text,
+                                                       disparity,
+                                                       disparity_text)
+    plt.title(right_title, fontsize=12, loc="right")
     ax.set_ylabel(ylabel_text)
     ax.set_xlabel(xlabel_text)
-    ax.xaxis.set_major_formatter(mtick.PercentFormatter(xmax=1,decimals=None))
+    ax.xaxis.set_major_formatter(mtick.PercentFormatter(xmax=1, decimals=None))
     ax.axvline(linewidth=1, color=overall_vertical_line_color, x=selection_rate_summary['overall'])
     plt.gca().set_xlim(0, 1)
 
     return None
-
-
