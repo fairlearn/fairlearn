@@ -50,7 +50,7 @@ def equalized_odds_difference(y_true, y_pred, *, sensitive_features, sample_weig
     :param 1D-array sensitive_features: Sensitive features.
     :param 1D-array sample_weight: Sample weights.
     :return: The greater of two metrics: `true_positive_rate_difference` and
-        `false_negative_rate_difference`. The former is the difference between the
+        `false_positive_rate_difference`. The former is the difference between the
         largest and smallest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
         of the sensitive feature. The latter is defined similarly, but for
         :math:`P[h(X)=1 | A=a, Y=0]`.
@@ -72,7 +72,7 @@ def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=No
     :param 1D-array sensitive_features: Sensitive features.
     :param 1D-array sample_weight: Sample weights.
     :return: The smaller of two metrics: `true_positive_rate_ratio` and
-        `false_negative_rate_ratio`. The former is the ratio between the
+        `false_positive_rate_ratio`. The former is the ratio between the
         smallest and largest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
         of the sensitive feature. The latter is defined similarly, but for
         :math:`P[h(X)=1 | A=a, Y=0]`.
