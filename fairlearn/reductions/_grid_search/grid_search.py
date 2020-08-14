@@ -9,7 +9,6 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
 from time import time
-from tqdm import tqdm
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn.reductions._moments import Moment, ClassificationMoment
@@ -19,6 +18,7 @@ from ._grid_generator import _GridGenerator
 logger = logging.getLogger(__name__)
 
 TRADEOFF_OPTIMIZATION = "tradeoff_optimization"
+_TQDM_IMPORT_ERROR_MESSAGE = "To use `verbose=True` in GridSearch.fit, please install tqdm."
 
 
 class GridSearch(BaseEstimator, MetaEstimatorMixin):
@@ -108,7 +108,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
 
         :param verbose: An optional argument to enable/disable the progress bar.
-            Default: True
+            Default: False
         :type verbose: bool
         """
         self.predictors_ = []
@@ -116,7 +116,14 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self.objectives_ = []
         self.gammas_ = pd.DataFrame(dtype=np.float64)
         self.oracle_execution_times_ = []
-        verbose = kwargs.pop('verbose', True)
+        verbose = kwargs.pop('verbose', False)
+
+        if verbose:
+            # We need tqdm to show the progress bar.
+            try:
+                from tqdm import tqdm
+            except ImportError:
+                raise RuntimeError(_TQDM_IMPORT_ERROR_MESSAGE)
 
         if isinstance(self.constraints, ClassificationMoment):
             logger.debug("Classification problem detected")
