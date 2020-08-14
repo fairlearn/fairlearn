@@ -14,7 +14,7 @@ Table of Contents
 
    api_reference/index
    
-   auto_examples/notebooks/index
+   auto_examples/index
 
    contributor_guide/index
 
