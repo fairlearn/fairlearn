@@ -1,8 +1,4 @@
-"""
-==============================
-Plotting the UCI Adult Dataset
-==============================
-"""
+"""Produce plot of selection rates for the quickstart guide."""
 from bokeh.plotting import figure, show
 from fairlearn.metrics import selection_rate_group_summary
 from fairlearn.datasets import fetch_adult
