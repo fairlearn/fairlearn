@@ -38,6 +38,7 @@ release = fairlearn.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'bokeh.sphinxext.bokeh_plot',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
@@ -111,11 +112,12 @@ html_css_files = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-# quickstart examples are only generated, but not shown in the gallery
-# since they are only needed for the quickstart page itself.
+# Use filename_pattern so that plot_adult_dataset is not
+# included in the gallery, but its plot is available for
+# the quickstart
 sphinx_gallery_conf = {
-    'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
-    'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
+     'examples_dirs': '../examples',
+     'gallery_dirs': 'auto_examples',
 }
 
 

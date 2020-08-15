@@ -30,6 +30,7 @@ jupyter
 nbval
 
 # Required for documentation
+bokeh
 sphinx
 sphinx-gallery
 sphinx-multiversion
