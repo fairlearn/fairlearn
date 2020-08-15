@@ -76,10 +76,8 @@ than $50,000 a year.
     Female    16192
     Name: sex, dtype: int64
 
-.. figure:: auto_examples/quickstart/images/sphx_glr_plot_adult_dataset_001.png
-   :target: auto_examples/quickstart/plot_adult_dataset.html
-   :align: center
-   :scale: 70%
+.. bokeh-plot:: quickstart_plot.py
+    :source-position: none
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
