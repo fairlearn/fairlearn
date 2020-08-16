@@ -148,6 +148,54 @@ is called :py:func:`fairlearn.metrics.make_metric_group_summary`:
 
 .. _dashboard:
 
+Metrics plots
+-------------
+
+.. currentmodule:: fairlearn.metrics_plots
+
+The :py:mod:`fairlearn.metrics_plots` module visualizes fairness metrics from different perspectives.
+
+The examples below illustrate a scenario where *binary gender* is
+a sensitive feature and *accuracy rate* is the performance metric.
+
+Disparity in performance
+^^^^^^^^^^^^^^^^^^^^^^^^
+`plot_disparities_in_performance` shows: (1) the performance of your model with respect to
+your selected performance metric (e.g., *accuracy rate*) overall as
+well as on different subgroups based on your selected sensitive
+feature (e.g., *accuracy rate* for females, *accuracy rate* for
+males); (2) the disparity (difference) in the values of the selected
+performance metric across different subgroups; (3) the distribution of
+errors in each subgroup (e.g., female, male). For binary
+classification, the errors are further split into overprediction
+(predicting 1 when the true label is 0), and underprediction
+(predicting 0 when the true label is 1).
+
+.. code-block::
+    from fairlearn.metrics_plots import plot_disparities_in_performance
+    
+    # y_true contains ground truth labels
+    # y_pred contains labels predicted by binary classifier
+    # sensitive_features contains sensitive feature values
+    plot_disparities_in_performance(y_true, y_pred, sensitive_features)
+
+.. image:: ../../img/plot_disparities_in_performance.png
+
+Disparity in selection rate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`plot_disparities_in_selection_rate` shows a bar chart that contains the selection rate in each group, meaning the fraction of data classified as 1 (in binary classification) or distribution of prediction values (in regression).
+
+.. code-block::
+    from fairlearn.metrics_plots import plot_disparities_in_selection_rate
+
+    # y_true contains ground truth labels
+    # y_pred contains labels predicted by binary classifier
+    # sensitive_features contains sensitive feature values
+    plot_disparities_in_selection_rate(y_true, y_pred, sensitive_features)
+
+.. image:: ../../img/plot_disparities_in_selection_rate.png
+
+
 Fairlearn dashboard
 -------------------
 

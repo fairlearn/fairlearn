@@ -2,10 +2,10 @@
 # Licensed under the MIT License.
 
 
-"""Functions for plotting charts in notebooks.
+"""Module for visualization metrics in notebooks.
 
-This module contains functions for visualizing dataframes,
-metrics, or the impact of reductions.
+This module contains functions for visualizing metrics within
+notebooks.
 """
 
 
