@@ -14,7 +14,7 @@ inplace:
 	$(PYTHON) setup.py build_ext -i
 
 test-coverage:
-	$(PYTEST) test -m "not notebooks" --ignore=test/install --cov=fairlearn --cov-report=xml --cov-report=html
+	$(PYTEST) test -m "not notebooks" --cov=fairlearn --cov-report=xml --cov-report=html
 
 test-unit:
 	$(PYTEST) ./test/unit

@@ -71,7 +71,7 @@ steps:
 
 # =================================================
 - ${{ if eq(parameters.testRunType, 'Unit')}}:
-  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest test/ -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run unit tests'
 
 - ${{ if eq(parameters.testRunType, 'Notebooks')}}:
@@ -79,7 +79,7 @@ steps:
     displayName: 'Run notebooks as tests'
 
 - ${{ if eq(parameters.testRunType, 'CodeCoverage')}}:
-  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="$(Agent.JobName)}"
+  - script: python -m pytest test/ -m "not notebooks" --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="$(Agent.JobName)}"
     displayName: 'Run unit tests with code coverage'
   
   # Publish code coverage results
