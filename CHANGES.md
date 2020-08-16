@@ -1,7 +1,7 @@
 # Changes
 
 ### v0.5.0
-
+* Add `plot_disparities_in_performance` and `plot_disparities_in_selection_rate` functions https://github.com/fairlearn/fairlearn/pull/561
 * Adjust classes to abide by naming conventions for attributes.
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
   `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.

@@ -12,14 +12,6 @@ with open("README.md", "r") as fh:
 with open('requirements.txt') as f:
     install_requires = [line.strip() for line in f]
 
-# Fetch separate requirements file for each extension
-extras = ["customplots"]
-extras_require = dict()
-for e in extras:
-    req_file = "requirements-{0}.txt".format(e)
-    with open(req_file) as f:
-        extras_require[e] = [line.strip() for line in f]
-
 setuptools.setup(
     name=fairlearn.__name__,
     version=fairlearn.__version__,

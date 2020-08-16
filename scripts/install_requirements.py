@@ -10,7 +10,6 @@ from _utils import _LogWrapper
 
 _REQUIREMENTS_STEMS = [
     "requirements",
-    "requirements-customplots",
     "requirements-dev"
 ]
 

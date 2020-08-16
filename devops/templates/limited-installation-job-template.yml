@@ -32,7 +32,7 @@ jobs:
   - template: python-infra-upgrade-steps-template.yml
 
   - script: pip install .
-    displayName: 'Install fairlearn without customplots extensions'
+    displayName: 'Install fairlearn'
 
   - script: pip install pytest
     displayName: 'Install pytest'
