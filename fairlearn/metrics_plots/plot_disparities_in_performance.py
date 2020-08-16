@@ -52,7 +52,7 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features):
     overall_performance_text = 'Overall performance'
     accuracy_text = 'accuracy'
     disparity_text = 'disparity'
-    underprediction_legend_text = "Underprediction\n  predicted=1\n  true=0"
+    underprediction_legend_text = "Underprediction\n  predicted=0\n  true=1"
     overprediction_legend_text = "Overprediction\n  predicted=1\n  true=0"
 
     # chart styles
