@@ -13,10 +13,21 @@ def plot_disparities_in_selection_rate(y_true, y_pred, sensitive_features):
     This helps visualize differences in overall selection rate, and selection rates
     for groups classified by sensitive attributes.
 
-    :param 1D-array y_true: Ground truth (correct) labels.
-    :param 1D-array y_pred: Predicted labels :math:`h(X)` returned by the classifier.
-    :param 1D-array sensitive_features: Sensitive features.
-    :return: None (shows a matplotlib plot)
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sensitive_features : array-like
+        the sensitive attributes
+
+    Returns
+    -------
+    None
+        The function renders a matplotlib plot
     """
     # compute
     selection_rate_summary = selection_rate_group_summary(y_true,
