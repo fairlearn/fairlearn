@@ -2,8 +2,9 @@
 # Licensed under the MIT License.
 
 """Utilities for plotting curves."""
-
-from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.colors
 from ._threshold_optimizer import ThresholdOptimizer
 from sklearn.utils.validation import check_is_fitted
 
@@ -14,11 +15,6 @@ _debug_colormap = {}
 
 def _get_debug_color(key):
     global _debug_colors, _debug_ncolors, _debug_colormap
-    try:
-        import matplotlib.cm as cm
-        import matplotlib.colors
-    except ImportError:
-        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
     if _debug_colors is None:
         tab_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
         tab_scalarMap = cm.ScalarMappable(norm=tab_norm, cmap='Dark2')
@@ -78,11 +74,6 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
     :param show_plot: whether or not the generated plot should be shown, default True
     :type show_plot: bool
     """
-    try:
-        import matplotlib.pyplot as plt
-    except ImportError:
-        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
-
     _raise_if_not_threshold_optimizer(threshold_optimizer)
     check_is_fitted(threshold_optimizer)
 
