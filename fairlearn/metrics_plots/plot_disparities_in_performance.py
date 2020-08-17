@@ -9,15 +9,27 @@ from fairlearn.metrics import group_summary, false_positive_rate, false_negative
 
 
 def plot_disparities_in_performance(y_true, y_pred, sensitive_features):
-    """Plot disparities in performance for a binary classifier with a single binary sensitive feature.
+    """Plot disparities in performance for a binary classifier across a single sensitive feature.
 
     This helps visualize differences in overall prediction error, as well as false positive
-    and false negative error rates across the binary values of a sensitive attribute.
+    and false negative error rates across the values of a single sensitive attribute
+    (eg, group membership).
 
-    :param 1D-array y_true: Ground truth (correct) labels.
-    :param 1D-array y_pred: Predicted labels :math:`h(X)` returned by the classifier.
-    :param 1D-array sensitive_features: Sensitive features.
-    :return: None (shows a matplotlib plot)
+    Parameters
+    ----------
+    y_true : array-like
+        The list of true values
+
+    y_pred : array-like
+        The list of predicted values
+
+    sensitive_features : array-like
+        the sensitive attributes
+
+    Returns
+    -------
+    None
+        The function renders a matplotlib plot
     """
     # compute
     accuracy_summary = group_summary(

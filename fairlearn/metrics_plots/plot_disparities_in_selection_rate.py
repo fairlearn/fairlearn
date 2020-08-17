@@ -8,7 +8,7 @@ from fairlearn.metrics import selection_rate_group_summary
 
 
 def plot_disparities_in_selection_rate(y_true, y_pred, sensitive_features):
-    """Plot disparities in selection for a binary classifier with a single binary sensitive feature.
+    """Plot disparities in selection for a binary classifier with a single sensitive feature.
 
     This helps visualize differences in overall selection rate, and selection rates
     for groups classified by sensitive attributes.
