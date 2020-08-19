@@ -86,7 +86,7 @@ master_doc = 'contents'
 # Multiversion settings
 
 smv_tag_whitelist = r'^v0\.4\.6$'
-smv_branch_whitelist = r'^master$'
+smv_branch_whitelist = r'^master$|^riedgar-ms/versioned-docs-alternate-01$'
 
 if check_if_v046():
     print("Current version is v0.4.6, will apply overrides")
@@ -182,8 +182,9 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
+    tag_or_branch = os.getenv("SPHINX_MULTIVERSION_NAME", default="master")
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, '/')
-    return f"http://github.com/fairlearn/fairlearn/blob/master/fairlearn/{fn}{linespec}"
+    return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
 
 
 # -- LaTeX macros ------------------------------------------------------------
