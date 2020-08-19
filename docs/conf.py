@@ -13,7 +13,8 @@
 import os
 import sys
 import inspect
-sys.path.insert(0, os.path.abspath('../'))
+rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default="."), "..")
+sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 [print(p) for p in sys.path]
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
