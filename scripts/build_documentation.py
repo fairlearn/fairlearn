@@ -5,9 +5,12 @@ since we only want one copy of it as we enable multiple documentation
 versions.
 
 This makes the documentation build a three-stage process:
-1. Do the actual sphinx build
-2. Copy the static pages into the output directory
+1. Copy the static pages into the output directory
+2. Do the sphinx build
 3. Make a duplicate copy of a single PNG in the output directory (a logo)
+
+This ordering is in part because shutil.copytree() only acquired the
+dirs_exist_ok argument in Python 3.8
 """
 
 import argparse
@@ -46,15 +49,14 @@ def main(argv):
     parser = _build_argument_parser()
     args = parser.parse_args(argv)
 
+    with _LogWrapper("Copy static files"):
+        shutil.copytree(os.path.join(args.documentation_path, landing_page_directory),
+                        args.output_path)
+
     with _LogWrapper("Run Sphinx-Multiversion"):
         subprocess.check_call(["sphinx-multiversion",
                                args.documentation_path,
                                args.output_path])
-
-    with _LogWrapper("Copy static files"):
-        shutil.copytree(os.path.join(args.documentation_path, landing_page_directory),
-                        args.output_path,
-                        dirs_exist_ok=True)
 
     with _LogWrapper("Copy individual PNG"):
         shutil.copy2(os.path.join(args.documentation_path, extra_png_src_path),
