@@ -35,7 +35,7 @@ def _build_argument_parser():
     parser = argparse.ArgumentParser(description=desc)
 
     parser.add_argument("--documentation-path",
-                        help="The path to the documentation sources (the directory containing conf.py)",
+                        help="The path to the documentation sources (conf.py directory)",
                         required=True)
 
     parser.add_argument("--output-path",
