@@ -66,7 +66,7 @@ master_doc = 'contents'
 
 # Multiversion settings
 
-smv_tag_whitelist = r'^v0\.4\.6$'
+smv_tag_whitelist = None  # r'^v0\.4\.6$'
 smv_branch_whitelist = r'^master$'
 
 # -- Options for HTML output -------------------------------------------------
@@ -116,8 +116,8 @@ pygments_style = 'sphinx'
 # included in the gallery, but its plot is available for
 # the quickstart
 sphinx_gallery_conf = {
-     'examples_dirs': '../examples',
-     'gallery_dirs': 'auto_examples',
+    'examples_dirs': '../examples',
+    'gallery_dirs': 'auto_examples',
 }
 
 
