@@ -32,6 +32,24 @@ author = 'Microsoft and Fairlearn contributors'
 release = fairlearn.__version__
 
 
+def check_if_v046():
+    """Check to see if current version being built is v0.4.6."""
+    result = False
+
+    if fairlearn.__version__ == "0.4.6":
+        print("Detected 0.4.6 in fairlearn.__version__")
+        result = True
+
+    smv_name = os.getenv("SPHINX_MULTIVERSION_NAME")
+    if smv_name is not None:
+        print("Found SPHINX_MULTIVERSION_NAME: ", smv_name)
+        result = smv_name == "v0.4.6"
+    else:
+        print("SPHINX_MULTIVERSION_NAME not in environment")
+
+    return result
+
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -66,8 +84,12 @@ master_doc = 'contents'
 
 # Multiversion settings
 
-smv_tag_whitelist = None  # r'^v0\.4\.6$'
+smv_tag_whitelist = r'^v0\.4\.6$'
 smv_branch_whitelist = r'^master$'
+
+if check_if_v046():
+    print("Current version is v0.4.6, will apply overrides")
+    master_doc = 'index'
 
 # -- Options for HTML output -------------------------------------------------
 
