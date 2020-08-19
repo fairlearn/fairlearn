@@ -6,7 +6,11 @@
 <h4>{{ _('Versions') }}</h4>
 <ul>
   {%- for item in versions %}
+  {% if vhasdoc(item.name) %}
   <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+  {% else %}
+  <li>Renamed or removed in {{item.name}}</li>
+  {% endif %}
   {%- endfor %}
 </ul>
 </div>
