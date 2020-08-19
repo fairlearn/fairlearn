@@ -1,3 +1,15 @@
+"""Build Fairlearn documentation
+
+The static landing page is no longer under the control of Sphinx,
+since we only want one copy of it as we enable multiple documentation
+versions.
+
+This makes the documentation build a three-stage process:
+1. Do the actual sphinx build
+2. Copy the static pages into the output directory
+3. Make a duplicate copy of a single PNG in the output directory (a logo)
+"""
+
 import argparse
 import logging
 import os
@@ -41,7 +53,8 @@ def main(argv):
 
     with _LogWrapper("Copy static files"):
         shutil.copytree(os.path.join(args.documentation_path, landing_page_directory),
-                        args.output_path)
+                        args.output_path,
+                        dirs_exist_ok=True)
 
     with _LogWrapper("Copy individual PNG"):
         shutil.copy2(os.path.join(args.documentation_path, extra_png_src_path),
