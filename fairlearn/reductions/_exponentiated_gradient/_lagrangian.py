@@ -150,9 +150,11 @@ class _Lagrangian:
             redY = 1 * (signed_weights > 0)
             redW = signed_weights.abs()
         elif isinstance(self.constraints,CDF_DemographicParity):
+            #for the demographic parity in the regression case
             redY = self.constraints.optimal_label(signed_weights)
             redW = pd.Series(1,index=redY.index)
         else:
+            #currently all clases inherited from ConditionalMomentLoss, including BoundedGroupLoss.
             redY = self.y
             redW = signed_weights.abs()
 
