@@ -44,7 +44,7 @@ class CDF_DemographicParity(Moment):
         #check the validity of y_range
         assert (self.y_range is not None), "You should specify the range of y"
         assert self.y_range[0] <= self.y_range[1], "The range of the label y is not valid!"
-        print(self.grids)
+        
         #determine the grids
         if self.grids.size == 0:
             self.grids = np.linspace(self.y_range[0],self.y_range[1],self.grid_num)
