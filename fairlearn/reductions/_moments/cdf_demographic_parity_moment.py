@@ -10,6 +10,26 @@ import numpy as np
 from itertools import repeat
 
 class CDF_DemographicParity(Moment):
+    r"""A moment for constraining the demographic parity for regression tasks.
+
+    Parameters
+    ----------
+    loss : {SquareLoss, AbsoluteLoss}
+        A loss object with an `eval` method, e.g. `SquareLoss` or
+        `AbsoluteLoss`.
+    y_range : (float,float)
+        A tiple that specifies the range of y labels of the data.
+    differece_bound : bool
+        The constraints' difference bound for constraints that are expressed
+        as differences, also referred to as :math:`\\epsilon` in documentation.
+        Default None
+    grids: list of floats
+        Instead of supplying a number for the grid, users may specify the exact
+        set of grids they desire using this argument.
+    grid_num: int
+        If use does not specify grids, then grid_num and y_range is used to calculate the grids
+        used as thresholds.
+    """
     short_name = "CDF_DemographicParity"
 
     def __init__(self,loss,y_range,difference_bound=None,grids=[],grid_num=41):
@@ -47,7 +67,6 @@ class CDF_DemographicParity(Moment):
         if index == 0:
             return self.grids[index] - (self.grids[1]-self.grids[0])/2
         else:
-            #return self.grids[index] - (self.grids[1]  - self.grids[0])/2
             return (self.grids[index] + self.grids[index-1])/2
     def nextGrid(self,theta):
         index = np.where(self.grids==theta)[0][0]
@@ -55,7 +74,6 @@ class CDF_DemographicParity(Moment):
             return self.grids[index] + (self.grids[1]-self.grids[0])/2
         else:
             return (self.grids[index+1]  + self.grids[index])/2
-            #return self.grids[index] + (self.grids[1]  +self.grids[0])/2
 
 
     def augment_data(self,x,a,y):
@@ -75,7 +93,6 @@ class CDF_DemographicParity(Moment):
         Y_values.index = range(self.n * self.grid_num)
 
         weight_assign = lambda theta, y: (self.loss.eval([self.nextGrid(_theta) for _theta in theta], y) - self.loss.eval([self.prevGrid(_theta) for _theta in theta], y))
-        #weight_assign = lambda theta, y: (self.loss.eval(theta+self.alpha, y) - self.loss.eval(theta-self.alpha, y))
         W = weight_assign(X_aug['theta'],Y_values)
         Y_aug = 1*(W < 0)
         W = abs(W)

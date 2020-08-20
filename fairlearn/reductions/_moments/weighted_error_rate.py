@@ -8,16 +8,22 @@ from .moment import LossMoment,ClassificationMoment,_ALL, _LABEL
 from .bounded_group_loss import SquareLoss
 _WEIGHTS = "weights"
 
-class WeightedErrorRate(LossMoment):
-    """Weighted Loss error."""
-    ## Not Sure about whether this should inherit from ClassificationMoment or LossMoment
+class WeightedErrorRate(ClassificationMoment):
+    r"""Weighted Loss error.
+
+    Parameters
+    ----------
+    loss : {SquareLoss, AbsoluteLoss}
+        A loss object with an `eval` method, e.g. `SquareLoss` or
+        `AbsoluteLoss`.
+    """
 
     short_name = "Weighted Error Rate"
     def __init__(self,loss):
         super(WeightedErrorRate,self).__init__(loss)
 
-    ## for what we need here is augmented data. Hence to avoid unnecessary calculation, we use augmented data having been calculated in regression_moment here
-    ## and directly return in the function load_data to suit the inferface of _lagrangian.
+    # for what we need here is augmented data. Hence to avoid unnecessary calculation, we use augmented data having been calculated in regression_moment here
+    # and directly return in the function load_data to suit the inferface of _lagrangian.
     def load_augmented_data(self, X, y,**kwargs):
         """Load the specified data into the object."""
         super().load_data(X, y, **kwargs)
