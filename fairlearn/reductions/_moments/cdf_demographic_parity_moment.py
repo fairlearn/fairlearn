@@ -47,15 +47,15 @@ class CDF_DemographicParity(Moment):
         if index == 0:
             return self.grids[index] - (self.grids[1]-self.grids[0])/2
         else:
-            return self.grids[index] - (self.grids[1]  - self.grids[0])/2
-            #return self.grids[index] - (self.grids[index]-self.grids[index-1])/2
+            #return self.grids[index] - (self.grids[1]  - self.grids[0])/2
+            return (self.grids[index] + self.grids[index-1])/2
     def nextGrid(self,theta):
         index = np.where(self.grids==theta)[0][0]
         if index + 1== self.grids.size:
             return self.grids[index] + (self.grids[1]-self.grids[0])/2
         else:
-            #return self.grids[index] + (self.grids[index+1]  - self.grids[index])/2
-            return self.grids[index] + (self.grids[1]  - self.grids[0])/2
+            return (self.grids[index+1]  + self.grids[index])/2
+            #return self.grids[index] + (self.grids[1]  +self.grids[0])/2
 
 
     def augment_data(self,x,a,y):
