@@ -12,7 +12,7 @@ from time import time
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
 from fairlearn.reductions._moments import ClassificationMoment
-
+from fairlearn.reductions._moments import CDF_DemographicParity
 logger = logging.getLogger(__name__)
 
 
@@ -148,9 +148,14 @@ class _Lagrangian:
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
+            redW = signed_weights.abs()
+        elif isinstance(self.constraints,CDF_DemographicParity):
+            redY = self.constraints.optimal_label(signed_weights)
+            redW = pd.Series(1,index=redY.index)
         else:
             redY = self.y
-        redW = signed_weights.abs()
+            redW = signed_weights.abs()
+
         redW = self.n * redW / redW.sum()
 
         redY_unique = np.unique(redY)
