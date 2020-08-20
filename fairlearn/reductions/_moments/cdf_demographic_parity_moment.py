@@ -44,7 +44,7 @@ class CDF_DemographicParity(Moment):
         #check the validity of y_range
         assert (self.y_range is not None), "You should specify the range of y"
         assert self.y_range[0] <= self.y_range[1], "The range of the label y is not valid!"
-        
+
         #determine the grids
         if self.grids.size == 0:
             self.grids = np.linspace(self.y_range[0],self.y_range[1],self.grid_num)
@@ -53,7 +53,7 @@ class CDF_DemographicParity(Moment):
             self.grids = np.unique(self.grids) #ensure grids are listed in an increasing order and are unique
         # in case the grids have already included the two endpoints of the range 
         # prepare for the calculation of optimal labels
-        self.pred_grid = [self.y_range[0]] + list([self.nextGrid(grid) for grid in self.grids]) + [self.y_range[1]]
+        self.pred_grid = [self.y_range[0]] + list([self.next_grid(grid) for grid in self.grids]) + [self.y_range[1]]
         
         #self.pred_grid = [self.y_range[0]] + list(self.grids+self.alpha) + [self.y_range[1]]
         self.pred_grid = list(filter(lambda x: x >= self.y_range[0], self.pred_grid))
@@ -62,13 +62,13 @@ class CDF_DemographicParity(Moment):
         for pred in self.pred_grid:
             self.pred_vec[pred] = (1 * (pred >= pd.Series(self.grids)))
 
-    def prevGrid(self,theta):
+    def prev_grid(self,theta):
         index = np.where(self.grids==theta)[0][0]
         if index == 0:
             return self.grids[index] - (self.grids[1]-self.grids[0])/2
         else:
             return (self.grids[index] + self.grids[index-1])/2
-    def nextGrid(self,theta):
+    def next_grid(self,theta):
         index = np.where(self.grids==theta)[0][0]
         if index + 1== self.grids.size:
             return self.grids[index] + (self.grids[1]-self.grids[0])/2
@@ -92,7 +92,7 @@ class CDF_DemographicParity(Moment):
         A_aug.index = range(self.n * self.grid_num)
         Y_values.index = range(self.n * self.grid_num)
 
-        weight_assign = lambda theta, y: (self.loss.eval([self.nextGrid(_theta) for _theta in theta], y) - self.loss.eval([self.prevGrid(_theta) for _theta in theta], y))
+        weight_assign = lambda theta, y: (self.loss.eval([self.next_grid(_theta) for _theta in theta], y) - self.loss.eval([self.prev_grid(_theta) for _theta in theta], y))
         W = weight_assign(X_aug['theta'],Y_values)
         Y_aug = 1*(W < 0)
         W = abs(W)
