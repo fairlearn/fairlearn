@@ -10,7 +10,7 @@ from .show_versions import show_versions  # noqa: F401
 
 __name__ = "fairlearn"
 __version__ = "0.4.7.dev0"
-_base_version = __version__
+_base_version = __version__  # To enable the v0.4.6 docs
 
 # Setup logging infrastructure
 # Only log to disk if environment variable FAIRLEARN_LOGS specified
