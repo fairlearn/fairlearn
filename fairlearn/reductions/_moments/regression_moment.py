@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and contributors.
+# Licensed under the MIT License.
+
 from .utility_parity import UtilityParity
 from .moment import Moment,_LABEL,_GROUP_ID
 from .weighted_error_rate import WeightedErrorRate
