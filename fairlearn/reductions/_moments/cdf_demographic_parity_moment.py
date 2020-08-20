@@ -36,7 +36,7 @@ class CDF_DemographicParity(Moment):
         super().__init__()
         self.utility_parity = UtilityParity(difference_bound=difference_bound)
         self.loss = loss
-        self.objective = WeightedErrorRate(self.loss)
+        self.objective = WeightedErrorRate()
         self.grids = grids
         self.grid_num = grid_num
         self.y_range = y_range

@@ -18,8 +18,8 @@ class WeightedErrorRate(ClassificationMoment):
 
     short_name = "Weighted Error Rate"
 
-    def __init__(self, loss):
-        super(WeightedErrorRate, self).__init__(loss)
+    def __init__(self):
+        super(WeightedErrorRate, self).__init__()
 
     '''for what we need here is augmented data. Hence to avoid unnecessary calculation, we use
     augmented data having been calculated in regression_moment here and directly return in
