@@ -168,6 +168,19 @@ class CDF_DemographicParity(Moment):
         return self.utility_parity.signed_weights(lambda_vec)
 
     def optimal_label(self, signed_weights):
+        """ A heuristic is used to calculate the optimal y, as suggested in the
+        section 4.4 of 'Agarwal et al. (2019) <https://arxiv.org/abs/1905.12843v1>'.
+
+        Parameters
+        ----------
+        signed_weights : pandas.DataFrame
+            signed weights
+        
+        Returns
+        -------
+        pandas.Series
+            The optimal score y for each x before augmentation.
+        """
         redY = 1 * (signed_weights > 0)
         redW = signed_weights.abs()
         redW = self.n * self.grid_num * redW / redW.sum()
