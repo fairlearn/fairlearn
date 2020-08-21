@@ -11,7 +11,7 @@ from .utility_parity import DemographicParity, EqualizedOdds, \
     TruePositiveRateParity, FalsePositiveRateParity, ErrorRateParity  # noqa: F401
 from .error_rate import ErrorRate   # noqa: F401
 from .bounded_group_loss import BoundedGroupLoss   # noqa: F401
-from .bounded_group_loss import SquareLoss, AbsoluteLoss, ZeroOneLoss  # noqa: F401
+from .loss import SquareLoss, AbsoluteLoss, ZeroOneLoss  # noqa: F401
 from .weighted_error_rate import WeightedErrorRate
 from .cdf_demographic_parity_moment import CDF_DemographicParity
 __all__ = [
