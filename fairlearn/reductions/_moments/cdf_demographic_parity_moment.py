@@ -81,6 +81,31 @@ class CDF_DemographicParity(Moment):
             return (self.grids[index+1] + self.grids[index])/2
 
     def augment_data(self, x, a, y):
+        """For each x, we create self.grid_num copies and add a new column named 
+        "theta" for each copy. The values of this columns for copies is the chose 
+        grids. 
+
+        The weight for each new data point is calculated in the section 4.1 of 
+        'Agarwal et al. (2019) <https://arxiv.org/abs/1905.12843v1>', but consider
+        the more general case where the grids are not equally spaced.
+
+        The binary label for each new data point is determined by whether the 
+        corresponding weight is positve or not.
+
+
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+        y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+            Label vector
+
+        
+        Returns
+        -------
+        pandas.DataFrame, pandas.DataFrame, pandas.DataFrame, pandas.DataFrame
+            Represent the augmented features, sensitive features, labels, and weights.
+        """
         self.n = np.shape(x)[0]
         self.width = self.grids[1] - self.grids[0]
 
