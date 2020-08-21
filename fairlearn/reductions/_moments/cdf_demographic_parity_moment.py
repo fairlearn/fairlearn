@@ -32,7 +32,7 @@ class CDF_DemographicParity(Moment):
     """
     short_name = "CDF_DemographicParity"
 
-    def __init__(self, loss, y_range, difference_bound=None, grids=[], grid_num=41):
+    def __init__(self, loss, y_range, difference_bound=None, grids=None, grid_num=41):
         super().__init__()
         self.utility_parity = UtilityParity(difference_bound=difference_bound)
         self.loss = loss
@@ -46,7 +46,7 @@ class CDF_DemographicParity(Moment):
         assert self.y_range[0] <= self.y_range[1], "The range of the label y is not valid!"
 
         # determine the grids
-        if self.grids.size == 0:
+        if self.grids == None:
             self.grids = np.linspace(self.y_range[0], self.y_range[1], self.grid_num)
         else:
             # check whether all grids fall into the empirical range of y
