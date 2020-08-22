@@ -49,16 +49,16 @@ def main(argv):
     parser = _build_argument_parser()
     args = parser.parse_args(argv)
 
-    with _LogWrapper("Copy static files"):
+    with _LogWrapper("copying static files"):
         shutil.copytree(os.path.join(args.documentation_path, landing_page_directory),
                         args.output_path)
 
-    with _LogWrapper("Run Sphinx-Multiversion"):
+    with _LogWrapper("running Sphinx-Multiversion"):
         subprocess.check_call(["sphinx-multiversion",
                                args.documentation_path,
                                args.output_path])
 
-    with _LogWrapper("Copy individual PNG"):
+    with _LogWrapper("copy of individual PNG"):
         shutil.copy2(os.path.join(args.documentation_path, extra_png_src_path),
                      os.path.join(args.output_path, "images"))
 
