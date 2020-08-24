@@ -1,6 +1,8 @@
 Developer call August 13, 2020
 ------------------------------
 
+Notes taken by Roman Lutz.
+
 Attendees:
 
 - `Michael Amoako <https://github.com/michaelamoako>`_
@@ -14,6 +16,7 @@ Attendees:
 - `Ke Xu <https://github.com/KeXu444>`_
 
 Agenda:
+
 - UX refactoring
 
     - `Proposal <https://github.com/fairlearn/fairlearn-proposals/pull/14>`_
