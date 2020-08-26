@@ -153,7 +153,7 @@ def process_issue_comments(issues):
     return by_month
 
 
-def plot_issues(stats):
+def plot_issue_comments(stats):
     month_list = list(stats.keys())
     all_comments = [x[_ALL_KEY] for x in stats.values()]
     filtered_comments = [x[_FILTERED_KEY] for x in stats.values()]
