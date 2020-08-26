@@ -8,10 +8,10 @@ from bokeh.transform import dodge
 import datetime
 from dateutil import relativedelta
 from dateutil.parser import isoparse
+from gql import gql
 import os
 
-from gql import gql, Client
-from gql.transport.requests import RequestsHTTPTransport
+from github_stats_utils import create_no_fetch_data_plot, get_client, get_month_string
 
 _SECRET_ENV_VAR = "GITHUB_GRAPHQL"
 
@@ -47,17 +47,6 @@ _FILTERED_KEY = 'filtered'
 _TROUBLEMAKERS = ['MiroDudik', 'romanlutz', 'riedgar-ms']
 
 
-def get_client(token):
-    # Note that for an Auth token, we have to have "token" in the header value
-    transport = RequestsHTTPTransport(
-        url='https://api.github.com/graphql',
-        headers={'Authorization': "token {0}".format(token)})
-    client = Client(
-        transport=transport,
-        fetch_schema_from_transport=True)
-    return client
-
-
 def fetch_all_issues(client):
     result = []
     have_more_results = True
@@ -85,10 +74,6 @@ def fetch_all_issues(client):
     return result
 
 
-def _get_month_string(target_date):
-    return "{0}-{1:02}".format(target_date.year, target_date.month)
-
-
 def process_issues(issues):
     by_month = {}
 
@@ -100,11 +85,11 @@ def process_issues(issues):
         stats_dict = {}
         stats_dict[_ALL_KEY] = 0
         stats_dict[_FILTERED_KEY] = 0
-        by_month[_get_month_string(next_date)] = stats_dict
+        by_month[get_month_string(next_date)] = stats_dict
         next_date = next_date + relativedelta.relativedelta(months=1)
 
     for issue in issues:
-        month_str = _get_month_string(isoparse(issue[_CREATE_KEY]))
+        month_str = get_month_string(isoparse(issue[_CREATE_KEY]))
         by_month[month_str][_ALL_KEY] += 1
         if issue[_AUTHOR_KEY] not in _TROUBLEMAKERS:
             by_month[month_str][_FILTERED_KEY] += 1
@@ -158,20 +143,6 @@ def github_issue_creation():
     print("Issues processed")
     plot_issues(issues_by_month)
     print("Done")
-
-
-def create_no_fetch_data_plot():
-    xs = ["Unable", "to", "fetch", "data"]
-    ys = range(len(xs))
-    p = figure(x_range=xs,
-               plot_height=512,
-               plot_width=832,
-               title="Stars",
-               toolbar_location=None,
-               tools="")
-    p.vbar(x=xs, top=ys, width=0.5)
-
-    show(p)
 
 
 print("Starting script {0}".format(__file__))
