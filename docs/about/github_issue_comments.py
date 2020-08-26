@@ -16,7 +16,7 @@ from github_stats_utils import SECRET_ENV_VAR
 
 base_issue_number_query = '''
 {
-  repository(owner: "fairlearn", name: "fairlearn") {
+   repository(owner: "fairlearn", name: "fairlearn") {
     issues(first: 50, REPLACE_CURSOR) {
       edges {
         node {
@@ -134,7 +134,8 @@ def process_issue_comments(issues):
 
     # The differences in replaced day are to ensure that the bins include
     # the current month, while respecting the times of day of each date object
-    next_date = isoparse(issues[0][_CREATE_KEY]).replace(day=1)
+    all_dates = list(sorted([x[_CREATE_KEY] for x in issues]))
+    next_date = isoparse(all_dates[0]).replace(day=1)
     end_date = datetime.datetime.now(datetime.timezone.utc).replace(day=2)
     while next_date < end_date:
         stats_dict = {}

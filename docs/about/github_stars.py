@@ -68,7 +68,7 @@ def process_stars(star_dates):
 
     # The differences in replaced day are to ensure that the bins include
     # the current month, while respecting the times of day of each date object
-    next_date = isoparse(star_dates[0]).replace(day=1)
+    next_date = isoparse(list(sorted(star_dates))[0]).replace(day=1)
     end_date = datetime.datetime.now(datetime.timezone.utc).replace(day=2)
     while next_date < end_date:
         stats_dict = {}
