@@ -11,3 +11,4 @@ GitHub stars, binned by month:
 Issues created by month, with and without known troublemakers:
 
 .. bokeh-plot:: about/github_issue_created.py
+    :source-position: none
