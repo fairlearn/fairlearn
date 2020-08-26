@@ -12,3 +12,8 @@ Issues created by month, with and without known troublemakers:
 
 .. bokeh-plot:: about/github_issue_created.py
     :source-position: none
+
+Issue comments by month, with and without known troublemakers:
+
+.. bokeh-plot:: about/github_issue_comments.py
+    :source-position: none
