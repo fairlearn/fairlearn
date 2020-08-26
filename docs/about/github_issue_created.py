@@ -117,9 +117,6 @@ def plot_issues(stats):
     all_issues = [x[_ALL_KEY] for x in stats.values()]
     filtered_issues = [x[_FILTERED_KEY] for x in stats.values()]
 
-    groups = [_ALL_KEY, _FILTERED_KEY]
-    group_labels = ['All', 'Filtered']
-
     data = {
         'months': month_list,
         _ALL_KEY: all_issues,
