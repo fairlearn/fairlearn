@@ -125,7 +125,6 @@ def fetch_all_issue_comments(client):
     for i in issue_numbers:
         comments = fetch_comments_for_issue(client, i)
         result.extend(comments)
-    print("Found {0} comments".format(len(result)))
 
     return result
 
