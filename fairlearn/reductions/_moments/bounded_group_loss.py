@@ -82,13 +82,13 @@ class ConditionalLossMoment(LossMoment):
         """Return the lambda values."""
         return lambda_vec
 
-    def signed_weights(self, lambda_vec):
+    def signed_weights(self, lambda_vec=None):
         """Return the signed weights."""
-        adjust = lambda_vec / self.prob_attr
-        signed_weights = self.tags.apply(
-            lambda row: adjust[row[_GROUP_ID]], axis=1
-        )
-        return signed_weights
+        if lambda_vec is None:
+            adjust = pd.Series(1.0, index=self.index)
+        else:
+            adjust = lambda_vec / self.prob_attr
+        return self.tags.apply(lambda row: adjust[row[_GROUP_ID]], axis=1)
 
 
 # Ensure that ConditionalLossMoment shows up in correct place in documentation
@@ -104,7 +104,10 @@ class MeanLoss(ConditionalLossMoment):
 
 
 class BoundedGroupLoss(ConditionalLossMoment):
-    """Moment for constraining the worst-case loss by a group."""
+    """Moment for constraining the worst-case loss by a group.
+
+    For more information refer to the :ref:`user guide <bounded_group_loss>`.
+    """
 
     def __init__(self, loss, *, upper_bound=None):
         super().__init__(loss, upper_bound=upper_bound, no_groups=False)

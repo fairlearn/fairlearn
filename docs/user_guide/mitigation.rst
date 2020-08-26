@@ -19,8 +19,8 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - A wrapper (reduction) approach to fair classification described in *A Reductions*
         *Approach to Fair Classification* [#2]_.
       - ✔
-      - ✘ (coming soon!)
-      - DP, EO, TPRP, FPRP, ERP
+      - ✔
+      - DP, EO, TPRP, FPRP, ERP, BGL
    *  - :code:`fairlearn.` :code:`reductions.` :code:`GridSearch`
       - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
         *Approach to Fair Classification* [#2]_. For regression it acts as a
@@ -478,13 +478,85 @@ Fairness constraints for regression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The performance objective in the regression scenario is to minimize the
-loss of our classifier :math:`h`.
+loss of our regressor :math:`h`. The loss can be expressed as
+:class:`SquareLoss` or :class:`AbsoluteLoss`. Both take constructor arguments
+:code:`min_val` and :code:`max_val` that define the value range within which
+the loss is evaluated. Values outside of the value range get clipped.
+
+.. doctest:: mitigation
+
+    >>> from fairlearn.reductions import SquareLoss, AbsoluteLoss, ZeroOneLoss
+    >>> y_true = [0,   0.3, 1,   0.9]
+    >>> y_pred = [0.1, 0.2, 0.9, 1.3]
+    >>> SquareLoss(0, 2).eval(y_true, y_pred)
+    array([0.01, 0.01, 0.01, 0.16])
+    >>> # clipping at 1 reduces the error for the fourth entry
+    >>> SquareLoss(0, 1).eval(y_true, y_pred)
+    array([0.01, 0.01, 0.01, 0.01])
+    >>> AbsoluteLoss(0, 2).eval(y_true, y_pred)
+    array([0.1, 0.1, 0.1, 0.4])
+    >>> AbsoluteLoss(0, 1).eval(y_true, y_pred)
+    array([0.1, 0.1, 0.1, 0.1])
+    >>> # ZeroOneLoss is identical to AbsoluteLoss(0, 1)
+    >>> ZeroOneLoss().eval(y_true, y_pred)
+    array([0.1, 0.1, 0.1, 0.1])
+
+When using Fairlearn's reduction techniques for regression it's required to
+specify the type of loss by passing the corresponding loss object when
+instantiating the object that represents our fairness constraint. The only
+supported type of constraint at this point is :class:`BoundedGroupLoss`.
+
+.. _bounded_group_loss:
 
 Bounded Group Loss
 ^^^^^^^^^^^^^^^^^^
 
+*Bounded group loss* requires the loss of each group to be below a
+user-specified amount :math:`\zeta`. If :math:`\zeta` is chosen reasonably
+small the losses of all groups are very similar.
+Formally, a predictor :math:`h` satisfies bounded group loss at level
+:math:`\zeta` under a distribution over :math:`(X, A, Y)` if
+
+.. math::
+
+    \E[loss(Y, h(X)) \given A=a] \leq \zeta \quad \forall a
+
+In the example below we use :class:`BoundedGroupLoss` with
+:class:`ZeroOneLoss` on two groups :code:`"a"` and :code:`"b"`.
+Group :code:`"a"` has an average loss of :math:`0.05`, while group
+:code:`"b"`'s average loss is :math:`0.5`.
+
+.. doctest:: mitigation
+
+    >>> from fairlearn.reductions import BoundedGroupLoss, ZeroOneLoss
+    >>> from fairlearn.metrics import mean_absolute_error_group_summary
+    >>> bgl = BoundedGroupLoss(ZeroOneLoss(), upper_bound=0.1)
+    >>> X                  = np.array([[0], [1], [2], [3]])
+    >>> y_true             = np.array([0.3, 0.5, 0.1, 1.0])
+    >>> y_pred             = np.array([0.3, 0.6, 0.6, 0.5])
+    >>> sensitive_features = np.array(["a", "a", "b", "b"])
+    >>> mean_absolute_error_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
+    {'overall': 0.275, 'by_group': {'a': 0.0499..., 'b': 0.5}}
+    >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
+    >>> bgl.gamma(lambda X: y_pred)
+    group_id
+    a    0.05
+    b    0.50
+    Name: loss, dtype: float64
+
+.. note::
+
+    In the example above the :code:`BoundedGroupLoss` object does not use the
+    :code:`upper_bound` argument. It is only used by reductions techniques
+    during the unfairness mitigation. As a result the constraint violation
+    detected by :code:`gamma` is identical to the mean absolute error.
+
+.. _exponentiated_gradient:
+
 Exponentiated Gradient
 ~~~~~~~~~~~~~~~~~~~~~~
+
+.. _grid_search:
 
 Grid Search
 ~~~~~~~~~~~
