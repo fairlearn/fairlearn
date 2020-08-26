@@ -2,7 +2,9 @@
 # Licensed under the MIT License.
 
 
+from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure, show
+from bokeh.transform import dodge
 import datetime
 from dateutil import relativedelta
 from dateutil.parser import isoparse
@@ -44,6 +46,7 @@ _FILTERED_KEY = 'filtered'
 
 _TROUBLEMAKERS = ['MiroDudik', 'romanlutz', 'riedgar-ms']
 
+
 def get_client(token):
     # Note that for an Auth token, we have to have "token" in the header value
     transport = RequestsHTTPTransport(
@@ -59,7 +62,7 @@ def fetch_all_issues(client):
     result = []
     have_more_results = True
     from_cursor = ""
-    
+
     while have_more_results:
         query_string = base_issue_query.replace("REPLACE_CURSOR", from_cursor)
         query = gql(query_string)
@@ -81,8 +84,10 @@ def fetch_all_issues(client):
 
     return result
 
+
 def _get_month_string(target_date):
     return "{0}-{1:02}".format(target_date.year, target_date.month)
+
 
 def process_issues(issues):
     by_month = {}
@@ -103,11 +108,47 @@ def process_issues(issues):
         by_month[month_str][_ALL_KEY] += 1
         if issue[_AUTHOR_KEY] not in _TROUBLEMAKERS:
             by_month[month_str][_FILTERED_KEY] += 1
-        else:
-            print(issue[_AUTHOR_KEY])
 
-    return  by_month
+    return by_month
 
+
+def plot_issues(stats):
+    month_list = list(stats.keys())
+    all_issues = [x[_ALL_KEY] for x in stats.values()]
+    filtered_issues = [x[_FILTERED_KEY] for x in stats.values()]
+
+    groups = [_ALL_KEY, _FILTERED_KEY]
+    group_labels = ['All', 'Filtered']
+
+    data = {
+        'months': month_list,
+        _ALL_KEY: all_issues,
+        _FILTERED_KEY: filtered_issues
+    }
+    source = ColumnDataSource(data=data)
+
+    p = figure(x_range=month_list,
+               plot_height=512,
+               plot_width=832,
+               title="Issues Created",
+               toolbar_location=None,
+               tools="")
+
+    p.vbar(x=dodge('months', -0.2, range=p.x_range),
+           top=_ALL_KEY, width=0.3, source=source, color="#c9d9d3", legend_label="All")
+    p.vbar(x=dodge('months', 0.2, range=p.x_range),
+           top=_FILTERED_KEY, width=0.3, source=source, color="#718dbf", legend_label="Filtered")
+
+    p.y_range.start = 0
+    p.x_range.range_padding = 0.1
+    p.xgrid.grid_line_color = None
+    p.axis.minor_tick_line_color = None
+    p.xaxis.major_label_orientation = 45.0
+    p.outline_line_color = None
+    p.legend.location = "top_left"
+    p.legend.orientation = "horizontal"
+
+    show(p)
 
 
 def github_issue_creation():
@@ -117,7 +158,9 @@ def github_issue_creation():
     issues = fetch_all_issues(client)
     print("Found {0} issues in total".format(len(issues)))
     issues_by_month = process_issues(issues)
-
+    print("Issues processed")
+    plot_issues(issues_by_month)
+    print("Done")
 
 
 def create_no_fetch_data_plot():
