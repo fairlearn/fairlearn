@@ -12,8 +12,7 @@ from gql import gql
 import os
 
 from github_stats_utils import create_no_fetch_data_plot, get_client, get_month_string
-
-_SECRET_ENV_VAR = "GITHUB_GRAPHQL"
+from github_stats_utils import SECRET_ENV_VAR
 
 
 base_issue_query = '''
@@ -35,7 +34,6 @@ base_issue_query = '''
     }
   }
 }
-
 '''
 
 _CREATE_KEY = 'createdAt'
@@ -135,7 +133,7 @@ def plot_issues(stats):
 
 def github_issue_creation():
     print("Getting client")
-    client = get_client(os.environ[_SECRET_ENV_VAR])
+    client = get_client(os.environ[SECRET_ENV_VAR])
     print("Getting data from GitHub")
     issues = fetch_all_issues(client)
     print("Found {0} issues in total".format(len(issues)))
@@ -146,9 +144,9 @@ def github_issue_creation():
 
 
 print("Starting script {0}".format(__file__))
-if _SECRET_ENV_VAR in os.environ:
+if SECRET_ENV_VAR in os.environ:
     github_issue_creation()
 else:
-    print("Did not find environment variable {0}".format(_SECRET_ENV_VAR))
+    print("Did not find environment variable {0}".format(SECRET_ENV_VAR))
     create_no_fetch_data_plot()
 print("Script {0} complete".format(__file__))

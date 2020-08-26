@@ -5,6 +5,7 @@ from bokeh.plotting import figure, show
 from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
 
+SECRET_ENV_VAR = "GITHUB_GRAPHQL"
 
 def get_client(token):
     # Note that for an Auth token, we have to have "token" in the header value
