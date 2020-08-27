@@ -11,7 +11,9 @@ import os
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 
-_SECRET_ENV_VAR = "GITHUB_GRAPHQL"
+from github_stats_utils import create_no_fetch_data_plot, get_client, get_month_string
+from github_stats_utils import SECRET_ENV_VAR
+
 
 base_query_string = '''
 {
@@ -28,17 +30,6 @@ base_query_string = '''
   }
 }
 '''
-
-
-def get_client(token):
-    # Note that for an Auth token, we have to have "token" in the header value
-    transport = RequestsHTTPTransport(
-        url='https://api.github.com/graphql',
-        headers={'Authorization': "token {0}".format(token)})
-    client = Client(
-        transport=transport,
-        fetch_schema_from_transport=True)
-    return client
 
 
 def fetch_all_stars(client):
@@ -74,13 +65,13 @@ def process_stars(star_dates):
         stats_dict = {}
         stats_dict['stars'] = 0
         stats_dict['cumulative'] = 0
-        month_str = "{0}-{1:02}".format(next_date.year, next_date.month)
+        month_str = get_month_string(next_date)
         by_month[month_str] = stats_dict
         next_date = next_date + relativedelta.relativedelta(months=1)
 
     for star_date in star_dates:
         starred = isoparse(star_date)
-        month_str = "{0}-{1:02}".format(starred.year, starred.month)
+        month_str = get_month_string(starred)
         by_month[month_str]['stars'] += 1
 
     accumulator = 0
@@ -117,7 +108,7 @@ def plot_stars(stats):
 
 def github_star_gazing():
     print("Getting client")
-    client = get_client(os.environ[_SECRET_ENV_VAR])
+    client = get_client(os.environ[SECRET_ENV_VAR])
     print("Getting data from GitHub")
     star_dates = fetch_all_stars(client)
     print("Found ", len(star_dates), " total stars")
@@ -126,24 +117,10 @@ def github_star_gazing():
     plot_stars(stats)
 
 
-def create_no_fetch_data_plot():
-    xs = ["Unable", "to", "fetch", "data"]
-    ys = range(len(xs))
-    p = figure(x_range=xs,
-               plot_height=512,
-               plot_width=832,
-               title="Stars",
-               toolbar_location=None,
-               tools="")
-    p.vbar(x=xs, top=ys, width=0.5)
-
-    show(p)
-
-
 print("Starting script {0}".format(__file__))
-if _SECRET_ENV_VAR in os.environ:
+if SECRET_ENV_VAR in os.environ:
     github_star_gazing()
 else:
-    print("Did not find environment variable {0}".format(_SECRET_ENV_VAR))
+    print("Did not find environment variable {0}".format(SECRET_ENV_VAR))
     create_no_fetch_data_plot()
 print("Script {0} complete".format(__file__))
