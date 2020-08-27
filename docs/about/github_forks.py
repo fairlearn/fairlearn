@@ -91,8 +91,8 @@ def plot_forks(stats):
     total_forks = [x[_CUMULATIVE_KEY] for x in stats.values()]
 
     p = figure(x_range=month_list,
-               plot_height=512,
-               plot_width=832,
+               plot_height=400,
+               plot_width=800,
                title="Forks",
                toolbar_location=None,
                tools="")

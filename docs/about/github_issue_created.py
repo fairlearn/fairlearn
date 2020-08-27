@@ -109,8 +109,8 @@ def plot_issues(stats):
     source = ColumnDataSource(data=data)
 
     p = figure(x_range=month_list,
-               plot_height=512,
-               plot_width=832,
+               plot_height=400,
+               plot_width=800,
                title="Issues Created",
                toolbar_location=None,
                tools="")

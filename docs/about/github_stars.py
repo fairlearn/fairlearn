@@ -86,8 +86,8 @@ def plot_stars(stats):
     total_stars = [x['cumulative'] for x in stats.values()]
 
     p = figure(x_range=month_list,
-               plot_height=512,
-               plot_width=832,
+               plot_height=400,
+               plot_width=800,
                title="Stars",
                toolbar_location=None,
                tools="")

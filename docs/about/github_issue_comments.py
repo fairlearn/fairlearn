@@ -166,8 +166,8 @@ def plot_issue_comments(stats):
     source = ColumnDataSource(data=data)
 
     p = figure(x_range=month_list,
-               plot_height=512,
-               plot_width=832,
+               plot_height=400,
+               plot_width=800,
                title="Issue Comments Made",
                toolbar_location=None,
                tools="")
