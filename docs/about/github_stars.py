@@ -8,8 +8,7 @@ from dateutil import relativedelta
 from dateutil.parser import isoparse
 import os
 
-from gql import gql, Client
-from gql.transport.requests import RequestsHTTPTransport
+from gql import gql
 
 from github_stats_utils import create_no_fetch_data_plot, get_client, get_month_string
 from github_stats_utils import SECRET_ENV_VAR
