@@ -1,0 +1,158 @@
+Developer call August 27, 2020
+------------------------------
+
+Scribe: `Kevin Robinson <https://github.com/kevinrobinson>`_
+
+1. Introductions
+----------------
+- Arjun: Worked on NLP, Bert, previously.  Responsible AI for last 4mos, doing mix of things including consulting on projects with text
+- Michael A: in Responsible AI, working this semester on SHAP and image and text explainers, interesting in if we can learn from interpretml about why their adoption has been better than fairlearn
+- Miro: Intested in community building, whateve the community wants, we'll listen.  Focused now on single thing: study of how data scientists navigate tradeoffs in metrics and fairness issues, whether they can discover them with a tool like fairlearn.  Also working with lawyers on governance, and feeling behind on PRs & issues, so trying to figure out how this work can be sustainable and how to organize it.  It's okay if this work doesn't have a product but also hope it can go in a notebook or on the webpage.
+- Mehrnoosh: Interested in discovering use cases, hope this process uncovers where fairlearn is falling short in the real world.  Hope this can help with educational materials and real world adoption.  Talked with someone recently about how they liked that the fairlearn API was aligned with scikit-learn, and that it's better than other fairness projects at engaging with sociotechnical work.  Hope this is the goto package for industry and research.
+- Hilde: Doing education and applied research.  Like the sociotechnical aspect, no one in university is doing that, it's all just algorithms.  I like the values here and learning from folks.
+- Varoon: I'm interested in tools for auditing, not just for ML devs.  We need multiple stakeholders involved to do sociotechnical work, so this is part of that.
+- Alex: Undergraduate, past intern at MS Azure, curious and looking to learn more
+- Michael M: Focused on data science and AI product teams, and how they use tools to drive sociotechnical fairness work.  That can be artifacts that shape design, tools for design conversations, and tools that help them justify their work.
+- Richard: Engineer on Responsible AI.
+- Roman: Wanted to work on real scenarios and make an example notebook, interested in other outputs like sociotechnical talking points too.
+- Lisa: Echo the same kinds of goals: learning, community, growing adoption and what helps data scientists.
+
+
+
+
+2. Candidate screening presentation
+-----------------------------------
+- Hackmd: https://hackmd.io/GMli82s7SxORABkabCgw8Q?view
+- Kevin presented
+  - Recap
+  - 1. Introductions
+  - 2. How does it work
+  - 3. Sociotechnical context (skipped maybe 25% at the end)
+  - There was some discussion about the legal section (Miro), about how legal contexts shift across countries (Arjun).
+- Kevin flashed quickly through:
+  - 4. ANZ college recruiting
+  - 5. Notebook drafts
+  - 6. Opportunities to engage
+
+
+3. Closing discussion
+---------------------
+There was some discussion about:
+- how this work translates to the website, or to some other tangible output, how we think about sustainability and scaling this process (Miro)
+- how to think about what is for deeper education and what is for practicing data scientists to use practically (Richard, Michael M, Roman, see chat)
+- how to interpret what all this, and how to think about the primary function of this work as building community and capacity first, and output products second (Kevin)
+
+Kevin closed saying he'd present some more next week, and if folks wanted tto collaborate on any of the blue boxes called out to reach out in chat or email.  Or if they wanted to present or discuss other things to please bring that too!
+
+
+4. Chat transcript
+------------------
+Solon:
+I'm sorry to say that I can't make it today either
+
+I'm sorry to miss you folks
+
+
+Hanna:
+I am also unable to make it -- I'm sorry. I'm dealing iwth a time sensitive issue. I may be able to join at 1130 if it's resolved by then.
+
+
+Kevin:
+https://hackmd.io/GMli82s7SxORABkabCgw8Q?view
+
+
+Roman:
+Miro Dudik  did you mean this: https://arxiv.org/abs/1912.00761 ?
+
+I highly recommend that paper btw  super relevant to everything we're doing in this session.
+
+
+Miro:
+Kim 2017: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2801251
+
+
+Michael A:
+Kevin made an interesting point I want to +1: sometimes trying to approach different subgroups "equally" or in the exact same way can lead to disparate outcomes, though on the surface seems "fair"
+
+
+Miro:
+i've been thinking exactly the same thought as Michael Madaio
+
+
+Michael M:
+As a follow-up (maybe not to discuss right now), how do we establish these community norms and model for practitioners how they might go through this (or some version of this) process that Kevin (Guest)    went through
+
+
+Michael A:
+Implicit question for the group:
+
+How do we encourage the responsible use of Fairlearn in a way that doesn't distract from the fact that fairness is a socio-technical issue, and not just something to be "solved" in a procedural/technical way
+
+
+Richard:
+Michael Amoako, creating these sample cases is part of that. We do want the Fairlearn website to be a collection of educational materials, and not just documentation for a Python package
+
+
+Michael A:
+Love that
+
+
+Roman:
+Michael Madaio  I've discussed this with Kevin before actually  The conclusion at that time was that providing examples of this work shows practictioners how to do it. Perhaps Kevin has more thoughts on it now, though.
+
+I do wonder whether practitioners (I'm thinking data scientists) have the scope and time to think this broadly as opposed to very narrowly about the ML task. (There's no doubt in my mind that they should.) Michael Madaio  you may have more knowledge about that since you're studying actual practitioners  In my mind that creates some tension on how to present this because if it's not concise and actionable then they may not engage with it.
+
+Michael Amoako  redesigning the webpage with exactly that in mind is something that's going to get started soon. If you're interested I can keep you looped into those discussions (no pressure!)
+
+Coincidentally we have a first sync an hour from now
+
+
+Michael M:
+Richard, definitely agreed - but it does seem like there may be a difference between our team developing educational materials on the sociotechnical context for a particular application area, and using those resources for a particular application area as a model to guide practitioners to think though those issues for their own application areas (and potentially develop their own sets of sociotechnical materials)
+
+
+Richard:
+As has been pointed out by Arjun Singh, data scientists may not always be able to do as full a fairness analysis as they (or we) would like. I think that part of this is going to show that there are different levels and scopes of fairness work. Ideally, one would do an end-to-end analysis every time. If one is a freshly-hired-from-university DS, one might not be allowed to do that.
+ 
+So if we can show how even small things can be done, that would be helpful too
+
+
+Michael A:
+Please loop me in !!
+
+
+Roman:
+Richard Edgar  I think your point is excellent and is a much better description for my point as well
+
+
+Richard:
+Michael Madaio, agreed. We should try to write our case studies so that readers can say "I see how that can apply to my situation" rather than "I don't do hiring models, so this isn't relevant to me"
+
+
+Michael M:
+Richard and Roman agreed! Would love to think more about how to help get them there from where they are
+
+
+Richard:
+But we do also need at least some variety, since some people will only scan the titles
+
+
+Michael M:
+Michael love that meta-framing
+
+
+Varoon:
+^^^ yup!
+
+
+Richard:
+And in a way, this is an example of what we say about 'the ML model is part of a bigger system - and sometimes all you can do is stop your portion of the system leaking, so be humble.'
+
+
+Michael M:
+Agreed with Miro - there may be some middle ground between presenting this entire resource (which may be intimidating and offputting), and using this (or some version of this) as an example of what a sociotechnical approach to thinking about fairness in their product (and how Fairlearn fits into that) might look like
+
+
+Roman:
+I actually think it depends on who's looking at it  for someone who wants to do this properly and comprehensively it may be immensely helpful to see this and look at similar categories as Kevin did.
+For others it might be impossible to take this much time, so we need to perhaps distill it more.
