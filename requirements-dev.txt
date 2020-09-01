@@ -33,5 +33,5 @@ nbval
 bokeh
 sphinx
 sphinx-gallery
-git+https://github.com/Holzhaus/sphinx-multiversion.git@env-vars#egg=sphinx-multiversion
+git+https://github.com/Holzhaus/sphinx-multiversion.git
 pydata-sphinx-theme
