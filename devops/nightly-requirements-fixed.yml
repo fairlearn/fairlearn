@@ -23,9 +23,18 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    platforms:  { Linux: ubuntu-latest, Windows: windows-latest }
+    platforms:  { Linux: ubuntu-latest }
     installationType: 'PipLocal'
     pyVersions: [3.6, 3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
+    pinRequirements: True
+
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platforms:  { Windows: windows-latest }
+    installationType: 'PipLocal'
+    pyVersions: [3.6, 3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     pinRequirements: True
