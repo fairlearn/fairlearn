@@ -3,3 +3,6 @@ ipywidgets>=7.5.0
 pandas>=0.25.1
 scikit-learn>=0.22.1
 scipy>=1.4.1
+# Following from https://github.com/pypa/setuptools/issues/2368
+# This affects Nightly Fixed on Windows 3.8
+setuptools<49.2

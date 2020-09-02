@@ -23,7 +23,7 @@ pool:
 jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
-    platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+    platforms:  { Linux: ubuntu-latest, Windows: windows-latest }
     installationType: 'PipLocal'
     pyVersions: [3.6, 3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
