@@ -30,6 +30,11 @@ jobs:
     freezeFileStem: $(FreezeFileStem)
     pinRequirements: True
 
+# There is some issue with the Python 3.8 installation on Windows
+# It appears related to this:
+# https://github.com/pypa/setuptools/issues/2368
+# Unfortunately, just putting an upper bound on setuptools is not
+# resolving it
 - template: templates/all-tests-job-template.yml
   parameters:
     platforms:  { Windows: windows-latest }
