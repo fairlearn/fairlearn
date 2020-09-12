@@ -1255,10 +1255,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-fairlearn-dashboard@0.0.21:
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/fairlearn-dashboard/-/fairlearn-dashboard-0.0.21.tgz#644eff7bf408317cbaf8c9e197888ac61a817ac0"
-  integrity sha512-vxBnnzmFDeE978VsY/JvwtYSHIfW105LVBLl9KFg8sfpYk4EIHDPdAV/djp2XEarDaHQ4gJUycp1zmpHMNowjg==
+fairlearn-dashboard@0.0.22:
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/fairlearn-dashboard/-/fairlearn-dashboard-0.0.22.tgz#554b20570fdce62f2d8c33a62552a2c1f74358c1"
+  integrity sha512-0EEmkX9JWfnQy72d47w21YmLLyhxMjCKlyE9iTJMPQ7mZhplIrkzJM1cCKBC+wA+RG9hm+jCAzYLittcMi526A==
   dependencies:
     jmespath "^0.15.0"
     localized-strings "^0.2.2"
@@ -2102,9 +2102,9 @@ nice-try@^1.0.4:
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
 node-fetch@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
-  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
+  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
 node-libs-browser@^2.2.1:
   version "2.2.1"
