@@ -37,8 +37,8 @@ def test_basic():
 
     expected_overall = skm.recall_score(y_t, y_p)
 
-    assert target.overall == expected_overall
+    assert target.overall['recall_score'][0] == expected_overall
     expected_A = skm.recall_score(y_t_A, y_p_A)
-    assert target.by_group['A'] == expected_A
+    assert target.by_group['recall_score']['A'] == expected_A
     expected_B = skm.recall_score(y_t_B, y_p_B)
-    assert target.by_group['B'] == expected_B
+    assert target.by_group['recall_score']['B'] == expected_B
