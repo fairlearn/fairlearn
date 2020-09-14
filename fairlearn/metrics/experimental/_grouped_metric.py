@@ -6,7 +6,10 @@ import pandas as pd
 
 
 class GroupedMetric:
-    def __init__(self, metric_functions, y_true, y_pred, sensitive_features, sample_param_names, params):
+    def __init__(self, metric_functions,y_true, y_pred, *,
+                 sensitive_features,
+                 sample_param_names=[],
+                 params=dict()):
         pass
 
     @property

@@ -2,26 +2,43 @@
 # Licensed under the MIT License.
 
 import numpy as np
-import pytest
+import pandas as pd
+import sklearn.metrics as skm
 
 import fairlearn.metrics.experimental as metrics
 from test.unit.input_convertors import conversions_for_1d
 
-
-# ===========================================================
-
-
-def mock_func(y_true, y_pred):
-    return np.sum(y_true)
+# ============================================================
 
 
-def mock_func_weight(y_true, y_pred, sample_weight):
-    return np.sum(np.multiply(y_true, sample_weight))
+y_t_A = [0, 1, 1, 1, 0, 0, 1, 1, 0]
+y_p_A = [1, 1, 1, 0, 0, 0, 0, 1, 0]
+wgt_A = [1, 2, 1, 2, 1, 2, 1, 3, 4]
+As = np.full(len(y_t_A), 'A')
+y_t_B = [0, 1, 1, 0, 0, 0, 0, 1]
+y_p_B = [0, 1, 0, 1, 0, 1, 0, 1]
+wgt_B = [2, 2, 1, 1, 3, 3, 4, 1]
+Bs = np.full(len(y_t_B), 'B')
+
+y_t = np.concatenate((y_t_A, y_t_B))
+y_p = np.concatenate((y_p_A, y_p_B))
+wgt = np.concatenate((wgt_A, wgt_B))
+gid = np.concatenate((As, Bs))
 
 
-def mock_func_extra_arg(y_true, y_pred, my_arg=1):
-    return np.sum([my_arg * y for y in y_true])
+def test_basic():
+    target = metrics.GroupedMetric(skm.recall_score,
+                                   y_t, y_p,
+                                   sensitive_features=gid)
 
+    # Check we have correct return types
+    assert isinstance(target.overall, pd.DataFrame)
+    assert isinstance(target.by_group, pd.DataFrame)
 
-def mock_func_matrix_return(y_true, y_pred):
-    return np.ones([len(y_true), sum(y_pred)])
+    expected_overall = skm.recall_score(y_t, y_p)
+
+    assert target.overall == expected_overall
+    expected_A = skm.recall_score(y_t_A, y_p_A)
+    assert target.by_group['A'] == expected_A
+    expected_B = skm.recall_score(y_t_B, y_p_B)
+    assert target.by_group['B'] == expected_B
