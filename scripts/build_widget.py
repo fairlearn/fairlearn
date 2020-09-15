@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Fairlearn dashboard widget build scripts.
 
 To build the widget in order to validate local changes to the visualizations
