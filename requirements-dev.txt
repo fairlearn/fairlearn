@@ -5,6 +5,7 @@ autopep8
 flake8
 flake8-blind-except
 flake8-builtins
+flake8-copyright
 flake8-docstrings
 flake8-logging-format
 flake8-rst-docstrings
