@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Produce plot of selection rates for the quickstart guide."""
 from bokeh.plotting import figure, show
 from fairlearn.metrics import selection_rate_group_summary
