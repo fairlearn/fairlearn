@@ -55,16 +55,20 @@ class GroupedMetric:
             result.append(SensitiveFeature(features, 0, None))
         elif isinstance(features, pd.DataFrame):
             for i in range(len(features.columns)):
-                column = features.iloc[:,i]
+                column = features.iloc[:, i]
                 self._check_feature_length(column, expected_length)
                 result.append(SensitiveFeature(column, i, None))
         else:
-            f_arr = np.squeeze(np.asarray(features))
+            # Need to specify dtype to avoid inadvertent type conversions
+            f_arr = np.squeeze(np.asarray(features, dtype=np.object))
             if len(f_arr.shape) == 1:
                 self._check_feature_length(f_arr, expected_length)
                 result.append(SensitiveFeature(f_arr, 0, None))
             elif len(f_arr.shape) == 2:
-                raise NotImplementedError("2d array")
+                for i in range(f_arr.shape[0]):
+                    col = f_arr[i, :]
+                    self._check_feature_length(col, expected_length)
+                    result.append(SensitiveFeature(col, i, None))
             else:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
