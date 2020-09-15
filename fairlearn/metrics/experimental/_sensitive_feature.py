@@ -8,12 +8,14 @@ from sklearn.preprocessing import LabelEncoder
 
 
 class SensitiveFeature:
-    def __init__(self, feature_vector, index):
+    def __init__(self, feature_vector, index, name):
         self._encoder = LabelEncoder()
         self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
 
         self._name = "SF {0}".format(index)
-        if isinstance(feature_vector, pd.Series):
+        if name is not None:
+            self._name = name
+        elif isinstance(feature_vector, pd.Series):
             if feature_vector.name is not None:
                 self._name = feature_vector.name
 
