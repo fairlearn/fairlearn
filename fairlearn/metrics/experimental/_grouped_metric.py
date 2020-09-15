@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-from ._sensitive_feature import SensitiveFeature
+from ._group_feature import GroupFeature
 
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
@@ -47,28 +47,28 @@ class GroupedMetric:
             msg = _BAD_FEATURE_LENGTH.format(len(feature), expected_length)
             raise ValueError(msg)
 
-    def _process_features(self, features, expected_length):
+    def _process_features(self, base_name, features, expected_length):
         result = []
 
         if isinstance(features, pd.Series):
             self._check_feature_length(features, expected_length)
-            result.append(SensitiveFeature(features, 0, None))
+            result.append(GroupFeature(base_name, features, 0, None))
         elif isinstance(features, pd.DataFrame):
             for i in range(len(features.columns)):
                 column = features.iloc[:, i]
                 self._check_feature_length(column, expected_length)
-                result.append(SensitiveFeature(column, i, None))
+                result.append(GroupFeature(base_name, column, i, None))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
             f_arr = np.squeeze(np.asarray(features, dtype=np.object))
             if len(f_arr.shape) == 1:
                 self._check_feature_length(f_arr, expected_length)
-                result.append(SensitiveFeature(f_arr, 0, None))
+                result.append(GroupFeature(base_name, f_arr, 0, None))
             elif len(f_arr.shape) == 2:
                 for i in range(f_arr.shape[0]):
                     col = f_arr[i, :]
                     self._check_feature_length(col, expected_length)
-                    result.append(SensitiveFeature(col, i, None))
+                    result.append(GroupFeature(base_name, col, i, None))
             else:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 

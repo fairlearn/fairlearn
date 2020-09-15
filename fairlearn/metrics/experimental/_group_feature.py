@@ -7,12 +7,12 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 
-class SensitiveFeature:
-    def __init__(self, feature_vector, index, name):
+class GroupFeature:
+    def __init__(self, base_name, feature_vector, index, name):
         self._encoder = LabelEncoder()
         self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
 
-        self._name = "SF {0}".format(index)
+        self._name = "{0} {1}".format(base_name, index)
         if name is not None:
             self._name = name
         elif isinstance(feature_vector, pd.Series):
