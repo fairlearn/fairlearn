@@ -2,5 +2,9 @@
 # Licensed under the MIT License.
 
 from ._grouped_metric import GroupedMetric
+from ._sensitive_feature import SensitiveFeature
 
-__all__ = ['GroupedMetric']
+__all__ = [
+    'GroupedMetric',
+    'SensitiveFeature'
+]

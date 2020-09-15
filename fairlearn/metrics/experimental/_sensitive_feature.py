@@ -12,14 +12,14 @@ class SensitiveFeature:
         self._encoder = LabelEncoder()
         self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
 
-        feature_vector = "SF {0}".format(index)
+        self._name = "SF {0}".format(index)
         if isinstance(feature_vector, pd.Series):
             if feature_vector.name is not None:
                 self._name = feature_vector.name
 
-    def get_mask(self, class_index):
-        assert class_index is int
-        return (self._encoded == class_index)
+    def get_mask_for_class(self, target_class):
+        idx = self.classes.index(target_class)
+        return (self._encoded == idx)
 
     @property
     def name(self):
