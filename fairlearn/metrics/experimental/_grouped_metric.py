@@ -87,3 +87,13 @@ class GroupedMetric:
         zipped = zip(index_list, feature_list)
 
         return tuple([x[1].classes[x[0]] for x in zipped])
+
+    def _mask_from_indices(self, index_list, feature_list):
+        assert len(index_list) == len(feature_list)
+
+        result = feature_list[0].get_mask_for_class_index(index_list[0])
+        for i in range(1, len(index_list)):
+            result = np.logical_and(
+                result,
+                feature_list[i].get_mask_for_class_index(index_list[i]))
+        return result
