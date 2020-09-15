@@ -30,4 +30,47 @@ class TestSingleFeatureIndexing:
         assert np.array_equal(result, [0])
         result = target._group_indices_from_index(1, [gf1])
         assert np.array_equal(result, [1])
-    
+
+    def test_group_tuple_from_index_0(self):
+        target = _get_raw_GroupedMetric()
+
+        result = target._group_tuple_from_indices([0], [gf0])
+        assert result == ('a',)
+        result = target._group_tuple_from_indices([1], [gf0])
+        assert result == ('b',)
+        result = target._group_tuple_from_indices([2], [gf0])
+        assert result == ('c',)
+
+
+class TestTwoFeatureIndexing:
+    def test_group_indices_from_index(self):
+        target = _get_raw_GroupedMetric()
+
+        result = target._group_indices_from_index(0, [gf0, gf1])
+        assert np.array_equal(result, [0, 0])
+        result = target._group_indices_from_index(1, [gf0, gf1])
+        assert np.array_equal(result, [0, 1])
+        result = target._group_indices_from_index(2, [gf0, gf1])
+        assert np.array_equal(result, [1, 0])
+        result = target._group_indices_from_index(3, [gf0, gf1])
+        assert np.array_equal(result, [1, 1])
+        result = target._group_indices_from_index(4, [gf0, gf1])
+        assert np.array_equal(result, [2, 0])
+        result = target._group_indices_from_index(5, [gf0, gf1])
+        assert np.array_equal(result, [2, 1])
+
+    def test_group_tuple_from_index(self):
+        target = _get_raw_GroupedMetric()
+
+        result = target._group_tuple_from_indices([0, 0], [gf0, gf1])
+        assert result == ('a', 'x')
+        result = target._group_tuple_from_indices([0, 1], [gf0, gf1])
+        assert result == ('a', 'y')
+        result = target._group_tuple_from_indices([1, 0], [gf0, gf1])
+        assert result == ('b', 'x')
+        result = target._group_tuple_from_indices([1, 1], [gf0, gf1])
+        assert result == ('b', 'y')
+        result = target._group_tuple_from_indices([2, 0], [gf0, gf1])
+        assert result == ('c', 'x')
+        result = target._group_tuple_from_indices([2, 1], [gf0, gf1])
+        assert result == ('c', 'y')
