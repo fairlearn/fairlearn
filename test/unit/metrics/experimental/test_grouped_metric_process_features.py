@@ -3,14 +3,9 @@
 
 import numpy as np
 import pandas as pd
-import sklearn.metrics as skm
 
 import fairlearn.metrics.experimental as metrics
-
-
-def _get_raw_GroupedMetric():
-    # Gets an uninitialised GroupedMetric for testing purposes
-    return metrics.GroupedMetric.__new__(metrics.GroupedMetric)
+from .utils import _get_raw_GroupedMetric
 
 
 class TestSingleFeature():

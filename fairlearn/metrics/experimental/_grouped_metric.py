@@ -73,3 +73,12 @@ class GroupedMetric:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
+
+    def _group_indices_from_index(self, index, feature_list):
+        dims = [len(x.classes) for x in feature_list]
+
+        assert index < np.product(dims)
+        
+        unravel = np.unravel_index(index, dims)
+
+        return unravel
