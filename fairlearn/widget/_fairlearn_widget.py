@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 """Defines the python side of the shared state of the fairlearn widget."""
