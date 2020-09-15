@@ -47,15 +47,16 @@ class TestSingleFeatures():
         self._common_validations(result, "SF 0")
 
     def test_single_column_dataframe(self):
-        raw_feature = pd.Series(data=self._get_raw_data(), columns=["My Feature"])
+        raw_feature = pd.DataFrame(data=self._get_raw_data(), columns=["My Feature"])
 
         target = _get_raw_GroupedMetric()
         result = target._process_features(raw_feature, len(self._get_raw_data()))
         self._common_validations(result, "My Feature")
 
     def test_single_column_dataframe_unnamed(self):
-        raw_feature = pd.Series(data=self._get_raw_data(), columns=["My Feature"])
+        raw_feature = pd.DataFrame(data=self._get_raw_data())
 
         target = _get_raw_GroupedMetric()
         result = target._process_features(raw_feature, len(self._get_raw_data()))
-        self._common_validations(result, "My Feature")
+        # If we don't specify names for the columns, then they are 'named' with integers
+        self._common_validations(result, 0)

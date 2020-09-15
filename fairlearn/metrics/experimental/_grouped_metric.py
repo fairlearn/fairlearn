@@ -54,7 +54,10 @@ class GroupedMetric:
             self._check_feature_length(features, expected_length)
             result.append(SensitiveFeature(features, 0, None))
         elif isinstance(features, pd.DataFrame):
-            raise NotImplementedError("DataFrame Yet")
+            for i in range(len(features.columns)):
+                column = features.iloc[:,i]
+                self._check_feature_length(column, expected_length)
+                result.append(SensitiveFeature(column, i, None))
         else:
             f_arr = np.squeeze(np.asarray(features))
             if len(f_arr.shape) == 1:
