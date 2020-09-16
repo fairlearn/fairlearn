@@ -6,16 +6,22 @@ import numpy as np
 
 class FunctionContainer:
     def __init__(self, func, name, sample_param_names, params):
+        assert func is not None
         self._func = func
+        
         if name is None:
             self._name = func.__name__
         else:
             self._name = name
 
-        assert isinstance(sample_param_names, list)
-        self._sample_param_names = sample_param_names
-        assert isinstance(params, dict)
-        self._params = params
+        self._sample_param_names = []
+        if sample_param_names is not None:
+            assert isinstance(sample_param_names, list)
+            self._sample_param_names = sample_param_names
+        self._params = dict()
+        if params is not None:
+            assert isinstance(params, dict)
+            self._params = params
 
         # Coerce any sample_params to being ndarrays for easy masking
         for param_name in self.sample_param_names:
@@ -56,3 +62,6 @@ class FunctionContainer:
         params = self.generate_params_for_mask(mask)
 
         return self.func(y_true[mask], y_pred[mask], **params)
+
+    def evaluate_all(self, y_true, y_pred):
+        return self.func(y_true, y_pred, **(self.params))

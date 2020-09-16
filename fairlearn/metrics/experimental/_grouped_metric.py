@@ -4,6 +4,7 @@
 import numpy as np
 import pandas as pd
 
+from ._function_container import FunctionContainer
 from ._group_feature import GroupFeature
 
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
@@ -15,45 +16,36 @@ class GroupedMetric:
                  y_true, y_pred, *,
                  sensitive_features,
                  conditional_features=None,
-                 sample_param_names=[],
-                 params=dict()):
-        metric_name = metric_functions.__name__
+                 sample_param_names=None,
+                 params=None):
+        func_dict = self._process_functions(metric_functions, sample_param_names, params)
 
         cf_list = None
         if conditional_features is None:
-            self._overall = pd.DataFrame(data=metric_functions(y_true, y_pred, **params),
+            metrics = [x.evaluate_all(y_true, y_pred) for x in func_dict.values()]
+            self._overall = pd.DataFrame(data=metrics,
                                          index=['overall'],
-                                         columns=[metric_name])
+                                         columns=func_dict.keys())
         else:
             cf_list = self._process_features("CF", conditional_features, len(y_true))
             cf_index = pd.MultiIndex.from_product([x.classes for x in cf_list],
                                                   names=[x.name for x in cf_list])
 
             metric_results = []
-            self._overall = pd.DataFrame(index=cf_index, columns=[metric_name])
-            for cf_curr in cf_index:
-                mask = self._mask_from_tuple(cf_curr, cf_list)
+            self._overall = pd.DataFrame(index=cf_index, columns=[x.name for x in func_dict.values()])
+            for func_name in func_dict:
+                for cf_curr in cf_index:
+                    mask = self._mask_from_tuple(cf_curr, cf_list)
+                    curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
 
-                curr_params = dict()
-                for name, value in params.items():
-                    if name in sample_param_names:
-                        # Once we figure out more things, probably want to
-                        # haul this np.asarray to a higher level
-                        curr_params[name] = np.asarray(value)[mask]
-                    else:
-                        curr_params[name] = value
-
-                curr_metric = metric_functions(y_true[mask], y_pred[mask],
-                                               **curr_params)
-
-                self._overall[metric_name][cf_curr] = curr_metric
+                    self._overall[func_name][cf_curr] = curr_metric
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("SF", sensitive_features, len(y_true))
         sf_index = pd.MultiIndex.from_product([x.classes for x in sf_list],
                                               names=[x.name for x in sf_list])
 
-        col_lists = [[metric_name]]
+        col_lists = [list(func_dict.keys())]
         col_titles = ["Metric Name"]
         if cf_list is not None:
             col_lists = col_lists + [x.classes for x in cf_list]
@@ -64,7 +56,7 @@ class GroupedMetric:
 
         metric_results = []
         for col_curr in columns:
-            curr_metric_name = col_curr[0]
+            current_function = func_dict[col_curr[0]]
             cf_mask = np.full(len(y_true), fill_value=True)
             if cf_list is not None:
                 cf_mask = self._mask_from_tuple(col_curr[1:], cf_list)
@@ -73,18 +65,7 @@ class GroupedMetric:
                 sf_mask = self._mask_from_tuple(sf_curr, sf_list)
                 mask = np.logical_and(cf_mask, sf_mask)
 
-                curr_params = dict()
-                for name, value in params.items():
-                    if name in sample_param_names:
-                        # Once we figure out more things, probably want to
-                        # haul this np.asarray to a higher level
-                        curr_params[name] = np.asarray(value)[mask]
-                    else:
-                        curr_params[name] = value
-
-                curr_metric = metric_functions(
-                    y_true[mask], y_pred[mask],
-                    **curr_params)
+                curr_metric = current_function.evaluate(y_true, y_pred, mask)
 
                 metrics[col_curr][sf_curr] = curr_metric
 
@@ -102,6 +83,15 @@ class GroupedMetric:
         if len(feature) != expected_length:
             msg = _BAD_FEATURE_LENGTH.format(len(feature), expected_length)
             raise ValueError(msg)
+
+    def _process_functions(self, metric_functions, sample_param_names, params):
+        func_dict = dict()
+        if isinstance(metric_functions, list):
+            raise NotImplementedError
+        else:
+            fc = FunctionContainer(metric_functions, None, sample_param_names, params)
+            func_dict[fc.name] = fc
+        return func_dict
 
     def _process_features(self, base_name, features, expected_length):
         result = []

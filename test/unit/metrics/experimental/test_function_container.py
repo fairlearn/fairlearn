@@ -65,3 +65,7 @@ def test_function_evaluation():
     expected = recall_score(y_t_masked, y_p_masked, pos_label=0, sample_weight=wgt_masked)
     actual = fc.evaluate(y_t, y_p, mask)
     assert expected == actual
+
+    expected_all = recall_score(y_t, y_p, pos_label=0, sample_weight=params['sample_weight'])
+    actual_all = fc.evaluate_all(y_t, y_p)
+    assert expected_all == actual_all
