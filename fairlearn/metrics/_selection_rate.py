@@ -16,7 +16,7 @@ def selection_rate(y_true, y_pred, *, pos_label=1, sample_weight=None):
     """
     if len(y_pred) == 0:
         raise ValueError(_EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE)
-    
+
     selected = (_convert_to_ndarray_and_squeeze(y_pred) == pos_label)
     s_w = np.ones(len(selected))
     if sample_weight is not None:
