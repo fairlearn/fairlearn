@@ -181,3 +181,18 @@ def test_two_metrics():
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
     assert isinstance(target.by_group, pd.DataFrame)
+
+    recall_overall = skm.recall_score(y_t, y_p, sample_weight=wgt, pos_label=0)
+    assert target.overall['recall_score'][0] == recall_overall
+    precision_overall = skm.precision_score(y_t, y_p, sample_weight=wgt)
+    assert target.overall['precision_score'][0] == precision_overall
+
+    recall_A = skm.recall_score(y_t_A, y_p_A, sample_weight=wgt_A, pos_label=0)
+    assert target.by_group[('recall_score',)][('A',)] == recall_A
+    recall_B = skm.recall_score(y_t_B, y_p_B, sample_weight=wgt_B, pos_label=0)
+    assert target.by_group[('recall_score',)][('B',)] == recall_B
+
+    precision_A = skm.precision_score(y_t_A, y_p_A, sample_weight=wgt_A)
+    assert target.by_group[('precision_score',)][('A',)] == precision_A
+    precision_B = skm.precision_score(y_t_B, y_p_B, sample_weight=wgt_B)
+    assert target.by_group[('precision_score',)][('B',)] == precision_B
