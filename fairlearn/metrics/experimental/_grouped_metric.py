@@ -35,9 +35,16 @@ class GroupedMetric:
         for sf_curr in sf_index:
             mask = self._mask_from_tuple(sf_curr, sf_list)
 
+            curr_params = dict()
+            for name, value in params.items():
+                if name in sample_param_names:
+                    curr_params[name] = np.asarray(value)[mask]
+                else:
+                    curr_params[name] = value
+
             curr_metric = metric_functions(
                 y_true[mask], y_pred[mask],
-                **params)
+                **curr_params)
 
             metric_results.append(curr_metric)
 
