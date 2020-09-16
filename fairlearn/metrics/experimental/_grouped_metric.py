@@ -80,20 +80,6 @@ class GroupedMetric:
 
         return result
 
-    def _group_indices_from_index(self, index, feature_list):
-        dims = [len(x.classes) for x in feature_list]
-
-        assert index < np.product(dims)
-
-        return list(np.unravel_index(index, dims))
-
-    def _group_tuple_from_indices(self, index_list, feature_list):
-        assert len(index_list) == len(feature_list)
-
-        zipped = zip(index_list, feature_list)
-
-        return tuple([x[1].classes[x[0]] for x in zipped])
-
     def _mask_from_tuple(self, index_tuple, feature_list):
         assert len(index_tuple) == len(feature_list)
 
