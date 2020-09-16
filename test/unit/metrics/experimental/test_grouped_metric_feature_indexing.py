@@ -41,14 +41,14 @@ class TestSingleFeatureIndexing:
         result = target._group_tuple_from_indices([2], [gf0])
         assert result == ('c',)
 
-    def test_mask_from_indices_0(self):
+    def test_mask_from_tuple_0(self):
         target = _get_raw_GroupedMetric()
 
-        result = target._mask_from_indices([0], [gf0])
+        result = target._mask_from_tuple(('a',), [gf0])
         assert np.array_equal(result, [True, True, False, False, False, False])
-        result = target._mask_from_indices([1], [gf0])
+        result = target._mask_from_tuple(('b',), [gf0])
         assert np.array_equal(result, [False, False, True, True, False, False])
-        result = target._mask_from_indices([2], [gf0])
+        result = target._mask_from_tuple(('c',), [gf0])
         assert np.array_equal(result, [False, False, False, False, True, True])
 
 
@@ -85,18 +85,18 @@ class TestTwoFeatureIndexing:
         result = target._group_tuple_from_indices([2, 1], [gf0, gf1])
         assert result == ('c', 'y')
 
-    def test_mask_from_indices(self):
+    def test_mask_from_tuple(self):
         target = _get_raw_GroupedMetric()
 
-        result = target._mask_from_indices([0, 0], [gf0, gf1])
+        result = target._mask_from_tuple(('a', 'x'), [gf0, gf1])
         assert np.array_equal(result, [True, False, False, False, False, False])
-        result = target._mask_from_indices([0, 1], [gf0, gf1])
+        result = target._mask_from_tuple(('a', 'y'), [gf0, gf1])
         assert np.array_equal(result, [False, True, False, False, False, False])
-        result = target._mask_from_indices([1, 0], [gf0, gf1])
+        result = target._mask_from_tuple(('b', 'x'), [gf0, gf1])
         assert np.array_equal(result, [False, False, True, False, False, False])
-        result = target._mask_from_indices([1, 1], [gf0, gf1])
+        result = target._mask_from_tuple(('b', 'y'), [gf0, gf1])
         assert np.array_equal(result, [False, False, False, True, False, False])
-        result = target._mask_from_indices([2, 0], [gf0, gf1])
+        result = target._mask_from_tuple(('c', 'x'), [gf0, gf1])
         assert np.array_equal(result, [False, False, False, False, True, False])
-        result = target._mask_from_indices([2, 1], [gf0, gf1])
+        result = target._mask_from_tuple(('c', 'y'), [gf0, gf1])
         assert np.array_equal(result, [False, False, False, False, False, True])

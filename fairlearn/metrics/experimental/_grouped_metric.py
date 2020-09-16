@@ -22,9 +22,18 @@ class GroupedMetric:
                                      index=['overall'],
                                      columns=[metric_name])
 
-        groups = np.unique(sensitive_features)
-        result_by_group = {}
-        for group in groups:
+        if conditional_features is not None:
+            raise NotImplementedError("conditional_features")
+
+        sf_list = self._process_features("SF", sensitive_features, len(y_true))
+
+        sf_index = pd.MultiIndex.from_product([x.classes for x in sf_list],
+                                              names=[x.name for x in sf_list])
+        self._by_group = pd.DataFrame(columns=[metric_name], index=sf_index)
+
+        for sfs in sf_index:
+            mask = self._mask_from_indices(indices)
+
             group_indices = (group == np.asarray(sensitive_features))
             result_by_group[group] = metric_functions(
                 y_true[group_indices], y_pred[group_indices],
@@ -96,4 +105,14 @@ class GroupedMetric:
             result = np.logical_and(
                 result,
                 feature_list[i].get_mask_for_class_index(index_list[i]))
+        return result
+
+    def _mask_from_tuple(self, index_tuple, feature_list):
+        assert len(index_tuple) == len(feature_list)
+
+        result = feature_list[0].get_mask_for_class(index_tuple[0])
+        for i in range(1, len(index_tuple)):
+            result = np.logical_and(
+                result,
+                feature_list[i].get_mask_for_class(index_tuple[i]))
         return result
