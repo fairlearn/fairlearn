@@ -55,7 +55,7 @@ wgts = np.random.random(size=len(Y_test))
 
 fns = [skm.recall_score, skm.precision_score, skm.fbeta_score]
 spn = [['sample_weight'], ['sample_weight'], ['sample_weight']]
-params = [{'sample_weight': wgts, 'zero_division':0},
+params = [{'sample_weight': wgts, 'zero_division': 0},
           {'sample_weight': wgts},
           {'sample_weight': wgts, 'beta': 0.75}]
 
@@ -75,11 +75,10 @@ print("By group =============")
 print(result.by_group)
 
 
-
 result2 = metrics.GroupedMetric(fns, Y_test, Y_pred,
-                               sensitive_features=[A_test['Race'], A_test['Sex']],
-                               sample_param_names=spn,
-                               params=params)
+                                sensitive_features=[A_test['Race'], A_test['Sex']],
+                                sample_param_names=spn,
+                                params=params)
 
 print()
 print("Result 2")
