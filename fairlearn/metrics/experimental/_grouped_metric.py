@@ -31,17 +31,14 @@ class GroupedMetric:
                                               names=[x.name for x in sf_list])
         self._by_group = pd.DataFrame(columns=[metric_name], index=sf_index)
 
-        for sfs in sf_index:
-            mask = self._mask_from_indices(indices)
+        for sf_curr in sf_index:
+            mask = self._mask_from_tuple(sf_curr, sf_list)
 
-            group_indices = (group == np.asarray(sensitive_features))
-            result_by_group[group] = metric_functions(
-                y_true[group_indices], y_pred[group_indices],
+            curr_metric = metric_functions(
+                y_true[mask], y_pred[mask],
                 **params)
 
-        self._by_group = pd.DataFrame.from_dict(data=result_by_group,
-                                                orient='index',
-                                                columns=[metric_name])
+            self._by_group[metric_name][sf_curr] = curr_metric
 
     @property
     def overall(self):
@@ -96,16 +93,6 @@ class GroupedMetric:
         zipped = zip(index_list, feature_list)
 
         return tuple([x[1].classes[x[0]] for x in zipped])
-
-    def _mask_from_indices(self, index_list, feature_list):
-        assert len(index_list) == len(feature_list)
-
-        result = feature_list[0].get_mask_for_class_index(index_list[0])
-        for i in range(1, len(index_list)):
-            result = np.logical_and(
-                result,
-                feature_list[i].get_mask_for_class_index(index_list[i]))
-        return result
 
     def _mask_from_tuple(self, index_tuple, feature_list):
         assert len(index_tuple) == len(feature_list)
