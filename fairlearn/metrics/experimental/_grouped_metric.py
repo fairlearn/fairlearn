@@ -22,7 +22,9 @@ class GroupedMetric:
 
         cf_list = None
         if conditional_features is None:
-            metrics = [x.evaluate_all(y_true, y_pred) for x in func_dict.values()]
+            metrics = {}
+            for fc in func_dict.values():
+                metrics[fc.name] = fc.evaluate_all(y_true,y_pred)
             self._overall = pd.DataFrame(data=metrics,
                                          index=['overall'],
                                          columns=func_dict.keys())
