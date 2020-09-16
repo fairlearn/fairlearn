@@ -32,7 +32,8 @@ class GroupedMetric:
                                                   names=[x.name for x in cf_list])
 
             metric_results = []
-            self._overall = pd.DataFrame(index=cf_index, columns=[x.name for x in func_dict.values()])
+            self._overall = pd.DataFrame(index=cf_index, columns=[
+                                         x.name for x in func_dict.values()])
             for func_name in func_dict:
                 for cf_curr in cf_index:
                     mask = self._mask_from_tuple(cf_curr, cf_list)
@@ -87,7 +88,25 @@ class GroupedMetric:
     def _process_functions(self, metric_functions, sample_param_names, params):
         func_dict = dict()
         if isinstance(metric_functions, list):
-            raise NotImplementedError
+            # Verify the arguments
+            spn = np.full(len(metric_functions), fill_value=None)
+            if sample_param_names is not None:
+                assert isinstance(sample_param_names, list)
+                assert len(metric_functions) == len(sample_param_names)
+                spn = sample_param_names
+            prms = np.full(len(metric_functions), fill_value=None)
+            if params is not None:
+                assert isinstance(params, list)
+                for p in params:
+                    assert isinstance(p, dict)
+                assert len(metric_functions) == len(params)
+                prms = params
+
+            # Iterate
+            for i in range(len(metric_functions)):
+                fc = FunctionContainer(metric_functions[i], None, spn[i], prms[i])
+                assert fc.name not in func_dict
+                func_dict[fc.name] = fc
         else:
             fc = FunctionContainer(metric_functions, None, sample_param_names, params)
             func_dict[fc.name] = fc

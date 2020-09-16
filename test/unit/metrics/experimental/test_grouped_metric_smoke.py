@@ -164,3 +164,20 @@ def test_single_conditional_feature():
     y_p_B_y = np.asarray(y_p_B)[B_y_mask]
     expected_B_y = skm.recall_score(y_t_B_y, y_p_B_y)
     assert target.by_group[('recall_score', 'y')][('B',)] == expected_B_y
+
+
+def test_two_metrics():
+    fns = [skm.recall_score, skm.precision_score]
+    sample_param_names = [['sample_weight'], ['sample_weight']]
+    params = [{'sample_weight': wgt, 'pos_label': 0},
+              {'sample_weight': wgt}]
+
+    target = metrics.GroupedMetric(fns,
+                                   y_t, y_p,
+                                   sensitive_features=gid,
+                                   sample_param_names=sample_param_names,
+                                   params=params)
+
+    # Check we have correct return types
+    assert isinstance(target.overall, pd.DataFrame)
+    assert isinstance(target.by_group, pd.DataFrame)
