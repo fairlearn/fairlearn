@@ -38,6 +38,8 @@ class GroupedMetric:
             curr_params = dict()
             for name, value in params.items():
                 if name in sample_param_names:
+                    # Once we figure out more things, probably want to
+                    # haul this np.asarray to a higher level
                     curr_params[name] = np.asarray(value)[mask]
                 else:
                     curr_params[name] = value

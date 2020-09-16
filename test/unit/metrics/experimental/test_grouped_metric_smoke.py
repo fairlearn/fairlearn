@@ -6,7 +6,6 @@ import pandas as pd
 import sklearn.metrics as skm
 
 import fairlearn.metrics.experimental as metrics
-from test.unit.input_convertors import conversions_for_1d
 
 # ============================================================
 
