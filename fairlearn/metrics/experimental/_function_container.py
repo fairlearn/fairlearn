@@ -46,3 +46,13 @@ class FunctionContainer:
                 curr_params[name] = value[mask]
             else:
                 curr_params[name] = value
+        return curr_params
+
+    def evaluate(self, y_true, y_pred, mask):
+        assert isinstance(y_true, np.ndarray)
+        assert isinstance(y_pred, np.ndarray)
+        assert len(y_true) == len(y_pred)
+        assert len(y_true) == len(mask)
+        params = self.generate_params_for_mask(mask)
+
+        return self.func(y_true[mask], y_pred[mask], **params)
