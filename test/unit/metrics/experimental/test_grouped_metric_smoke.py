@@ -36,9 +36,24 @@ def test_basic():
     assert isinstance(target.by_group, pd.DataFrame)
 
     expected_overall = skm.recall_score(y_t, y_p)
-
     assert target.overall['recall_score'][0] == expected_overall
+
     expected_A = skm.recall_score(y_t_A, y_p_A)
     assert target.by_group['recall_score'][('A',)] == expected_A
     expected_B = skm.recall_score(y_t_B, y_p_B)
+    assert target.by_group['recall_score'][('B',)] == expected_B
+
+
+def test_basic_with_broadcast_arg():
+    target = metrics.GroupedMetric(skm.recall_score,
+                                   y_t, y_p,
+                                   sensitive_features=gid,
+                                   params={'pos_label': 0})
+
+    expected_overall = skm.recall_score(y_t, y_p, pos_label=0)
+    assert target.overall['recall_score'][0] == expected_overall
+
+    expected_A = skm.recall_score(y_t_A, y_p_A, pos_label=0)
+    assert target.by_group['recall_score'][('A',)] == expected_A
+    expected_B = skm.recall_score(y_t_B, y_p_B, pos_label=0)
     assert target.by_group['recall_score'][('B',)] == expected_B
