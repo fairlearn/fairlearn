@@ -31,6 +31,7 @@ class GroupedMetric:
                                               names=[x.name for x in sf_list])
         self._by_group = pd.DataFrame(columns=[metric_name], index=sf_index)
 
+        metric_results = []
         for sf_curr in sf_index:
             mask = self._mask_from_tuple(sf_curr, sf_list)
 
@@ -38,7 +39,11 @@ class GroupedMetric:
                 y_true[mask], y_pred[mask],
                 **params)
 
-            self._by_group[metric_name][sf_curr] = curr_metric
+            metric_results.append(curr_metric)
+
+        nxt_column = pd.Series(data=metric_results, index=sf_index, name=metric_name)
+
+        self._by_group = pd.concat([nxt_column], axis=1)
 
     @property
     def overall(self):
