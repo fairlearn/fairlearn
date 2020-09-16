@@ -18,41 +18,77 @@ class GroupedMetric:
                  sample_param_names=[],
                  params=dict()):
         metric_name = metric_functions.__name__
-        self._overall = pd.DataFrame(data=metric_functions(y_true, y_pred, **params),
-                                     index=['overall'],
-                                     columns=[metric_name])
 
-        if conditional_features is not None:
-            raise NotImplementedError("conditional_features")
+        cf_list = None
+        if conditional_features is None:
+            self._overall = pd.DataFrame(data=metric_functions(y_true, y_pred, **params),
+                                         index=['overall'],
+                                         columns=[metric_name])
+        else:
+            cf_list = self._process_features("CF", conditional_features, len(y_true))
+            cf_index = pd.MultiIndex.from_product([x.classes for x in cf_list],
+                                                  names=[x.name for x in cf_list])
 
+            metric_results = []
+            self._overall = pd.DataFrame(index=cf_index, columns=[metric_name])
+            for cf_curr in cf_index:
+                mask = self._mask_from_tuple(cf_curr, cf_list)
+
+                curr_params = dict()
+                for name, value in params.items():
+                    if name in sample_param_names:
+                        # Once we figure out more things, probably want to
+                        # haul this np.asarray to a higher level
+                        curr_params[name] = np.asarray(value)[mask]
+                    else:
+                        curr_params[name] = value
+
+                curr_metric = metric_functions(y_true[mask], y_pred[mask],
+                                               **curr_params)
+
+                self._overall[metric_name][cf_curr] = curr_metric
+
+        # Now, prepare the sensitive features
         sf_list = self._process_features("SF", sensitive_features, len(y_true))
-
         sf_index = pd.MultiIndex.from_product([x.classes for x in sf_list],
                                               names=[x.name for x in sf_list])
-        self._by_group = pd.DataFrame(columns=[metric_name], index=sf_index)
+
+        col_lists = [[metric_name]]
+        col_titles = ["Metric Name"]
+        if cf_list is not None:
+            col_lists = col_lists + [x.classes for x in cf_list]
+            col_titles = col_titles + [x.name for x in cf_list]
+        columns = pd.MultiIndex.from_product(col_lists, names=col_titles)
+
+        metrics = pd.DataFrame(index=sf_index, columns=columns)
 
         metric_results = []
-        for sf_curr in sf_index:
-            mask = self._mask_from_tuple(sf_curr, sf_list)
+        for col_curr in columns:
+            curr_metric_name = col_curr[0]
+            cf_mask = np.full(len(y_true), fill_value=True)
+            if cf_list is not None:
+                cf_mask = self._mask_from_tuple(col_curr[1:], cf_list)
 
-            curr_params = dict()
-            for name, value in params.items():
-                if name in sample_param_names:
-                    # Once we figure out more things, probably want to
-                    # haul this np.asarray to a higher level
-                    curr_params[name] = np.asarray(value)[mask]
-                else:
-                    curr_params[name] = value
+            for sf_curr in sf_index:
+                sf_mask = self._mask_from_tuple(sf_curr, sf_list)
+                mask = np.logical_and(cf_mask, sf_mask)
 
-            curr_metric = metric_functions(
-                y_true[mask], y_pred[mask],
-                **curr_params)
+                curr_params = dict()
+                for name, value in params.items():
+                    if name in sample_param_names:
+                        # Once we figure out more things, probably want to
+                        # haul this np.asarray to a higher level
+                        curr_params[name] = np.asarray(value)[mask]
+                    else:
+                        curr_params[name] = value
 
-            metric_results.append(curr_metric)
+                curr_metric = metric_functions(
+                    y_true[mask], y_pred[mask],
+                    **curr_params)
 
-        nxt_column = pd.Series(data=metric_results, index=sf_index, name=metric_name)
+                metrics[col_curr][sf_curr] = curr_metric
 
-        self._by_group = pd.concat([nxt_column], axis=1)
+        self._by_group = metrics
 
     @property
     def overall(self):
