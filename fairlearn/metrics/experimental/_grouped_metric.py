@@ -24,7 +24,7 @@ class GroupedMetric:
         if conditional_features is None:
             metrics = {}
             for fc in func_dict.values():
-                metrics[fc.name] = fc.evaluate_all(y_true,y_pred)
+                metrics[fc.name] = fc.evaluate_all(y_true, y_pred)
             self._overall = pd.DataFrame(data=metrics,
                                          index=['overall'],
                                          columns=func_dict.keys())
@@ -125,6 +125,22 @@ class GroupedMetric:
                 column = features.iloc[:, i]
                 self._check_feature_length(column, expected_length)
                 result.append(GroupFeature(base_name, column, i, None))
+        elif isinstance(features, list):
+            if np.isscalar(features[0]):
+                f_arr = np.squeeze(np.asarray(features))
+                assert len(f_arr.shape) == 1
+                self._check_feature_length(f_arr, expected_length)
+                result.append(GroupFeature(base_name, f_arr, 0, None))
+            else:
+                for i in range(len(features)):
+                    if isinstance(features[i], pd.Series):
+                        self._check_feature_length(features[i], expected_length)
+                        result.append(GroupFeature(base_name, features[i], i, None))
+                    else:
+                        f_arr = np.squeeze(np.asarray(features[i]))
+                        assert len(f_arr.shape) == 1
+                        self._check_feature_length(f_arr, expected_length)
+                        result.append(GroupFeature(base_name, f_arr, i, None))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
             f_arr = np.squeeze(np.asarray(features, dtype=np.object))

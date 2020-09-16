@@ -105,3 +105,11 @@ class TestTwoFeatures():
         target = _get_raw_GroupedMetric()
         result = target._process_features('Unused', rf, 4)
         self._common_validations(result, [0, 1])
+
+    def test_list_of_series(self):
+        a, b = self._get_raw_data()
+
+        rf = [pd.Series(data=a, name="Alpha"), pd.Series(data=b, name="Beta")]
+        target = _get_raw_GroupedMetric()
+        result = target._process_features('Unused', rf, 4)
+        self._common_validations(result, ['Alpha', 'Beta'])
