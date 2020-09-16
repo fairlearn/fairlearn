@@ -88,3 +88,37 @@ def test_basic_with_broadcast_and_sample_arg():
     assert target.by_group['recall_score'][('A',)] == expected_A
     expected_B = skm.recall_score(y_t_B, y_p_B, sample_weight=wgt_B, pos_label=0)
     assert target.by_group['recall_score'][('B',)] == expected_B
+
+
+def test_two_sensitive_features():
+    sf_2 = ['x' if (x % 2) == 0 else 'y' for x in range(len(y_t))]
+
+    target = metrics.GroupedMetric(skm.recall_score,
+                                   y_t, y_p,
+                                   sensitive_features=[gid, sf_2])
+
+    expected_overall = skm.recall_score(y_t, y_p)
+    assert target.overall['recall_score'][0] == expected_overall
+
+    A_x_mask = [x % 2 == 0 for x in range(len(y_t_A))]
+    A_y_mask = [x % 2 == 1 for x in range(len(y_t_A))]
+    y_t_A_x = np.asarray(y_t_A)[A_x_mask]
+    y_p_A_x = np.asarray(y_p_A)[A_x_mask]
+    expected_A_x = skm.recall_score(y_t_A_x, y_p_A_x)
+    assert target.by_group['recall_score'][('A', 'x')] == expected_A_x
+    y_t_A_y = np.asarray(y_t_A)[A_y_mask]
+    y_p_A_y = np.asarray(y_p_A)[A_y_mask]
+    expected_A_y = skm.recall_score(y_t_A_y, y_p_A_y)
+    assert target.by_group['recall_score'][('A', 'y')] == expected_A_y
+
+    # Rely on B's being after the A's, but don't assume even numbers
+    B_x_mask = [x % 2 == 0 for x in range(len(y_t_A), len(y_t))]
+    B_y_mask = [x % 2 == 1 for x in range(len(y_t_A), len(y_t))]
+    y_t_B_x = np.asarray(y_t_B)[B_x_mask]
+    y_p_B_x = np.asarray(y_p_B)[B_x_mask]
+    expected_B_x = skm.recall_score(y_t_B_x, y_p_B_x)
+    assert target.by_group['recall_score'][('B', 'x')] == expected_B_x
+    y_t_B_y = np.asarray(y_t_B)[B_y_mask]
+    y_p_B_y = np.asarray(y_p_B)[B_y_mask]
+    expected_B_y = skm.recall_score(y_t_B_y, y_p_B_y)
+    assert target.by_group['recall_score'][('B', 'y')] == expected_B_y
