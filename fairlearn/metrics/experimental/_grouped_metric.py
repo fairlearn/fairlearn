@@ -33,7 +33,6 @@ class GroupedMetric:
             cf_index = pd.MultiIndex.from_product([x.classes for x in cf_list],
                                                   names=[x.name for x in cf_list])
 
-            metric_results = []
             self._overall = pd.DataFrame(index=cf_index, columns=[
                                          x.name for x in func_dict.values()])
             for func_name in func_dict:

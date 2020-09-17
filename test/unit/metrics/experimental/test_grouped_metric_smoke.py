@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -262,7 +262,7 @@ def test_two_metrics_single_conditional_feature():
     assert target.overall['recall_score'][('x',)] == overall_x
     overall_y = skm.recall_score(y_t[cf_y_mask], y_p[cf_y_mask], sample_weight=wgt[cf_y_mask])
     assert target.overall['recall_score'][('y',)] == overall_y
-    
+
     overall_x = skm.precision_score(y_t[cf_x_mask], y_p[cf_x_mask], sample_weight=wgt[cf_x_mask])
     assert target.overall['precision_score'][('x',)] == overall_x
     overall_y = skm.precision_score(y_t[cf_y_mask], y_p[cf_y_mask], sample_weight=wgt[cf_y_mask])
