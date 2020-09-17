@@ -104,3 +104,11 @@ print("fbeta_difference (Sex):", fbeta_difference(Y_test, Y_pred,
 print("fbeta_difference (Race, Sex):", fbeta_difference(Y_test, Y_pred,
                                                         beta=0.7,
                                                         sensitive_features=A_test))
+
+result3 = metrics.GroupedMetric(skm.fbeta_score,
+                                Y_test, Y_pred,
+                                sensitive_features=A_test,
+                                sample_param_names=['sample_weights'],
+                                params={'beta': 0.7})
+print("\n\nresult3.by_group\n")
+print(result3.by_group)
