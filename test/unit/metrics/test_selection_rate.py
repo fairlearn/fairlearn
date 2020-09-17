@@ -1,9 +1,23 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import pytest
 
 import fairlearn.metrics as metrics
+from fairlearn.metrics._selection_rate import _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE
+
+
+def test_selection_rate_empty():
+    with pytest.raises(ValueError) as exc:
+        _ = metrics.selection_rate([], [])
+    assert _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE == exc.value.args[0]
+
+
+def test_selection_rate_single_element():
+    assert 1 == metrics.selection_rate([1], [1])
+    assert 1 == metrics.selection_rate([0], [1])
+    assert 0 == metrics.selection_rate([1], [0])
+    assert 0 == metrics.selection_rate([0], [0])
 
 
 def test_selection_rate_unweighted():
