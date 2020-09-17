@@ -30,6 +30,7 @@ from fairlearn.metrics import (
 from IPython.display import display
 from scipy.sparse import issparse
 import copy
+import logging
 import numpy as np
 import pandas as pd
 
@@ -56,7 +57,7 @@ class FairlearnDashboard(object):
             y_true, y_pred,
             sensitive_feature_names=None,
             locale=None):
-        """Initialize the fairlearn Dashboard."""
+        """Initialize the Fairlearn Dashboard."""
         self._widget_instance = FairlearnWidget()
         if sensitive_features is None or y_true is None or y_pred is None:
             raise ValueError("Required parameters not provided")
