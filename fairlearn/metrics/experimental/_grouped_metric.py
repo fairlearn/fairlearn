@@ -87,7 +87,7 @@ class GroupedMetric:
         return self.by_group.min()
 
     def difference(self):
-        pass
+        return self.group_max() - self.group_min()
 
     def difference_to_overall(self):
         pass

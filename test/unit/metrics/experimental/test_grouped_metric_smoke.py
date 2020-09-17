@@ -56,6 +56,11 @@ def test_basic():
     assert len(min_vals) == 1
     assert min_vals[('recall_score',)] == min([expected_A, expected_B])
 
+    diffs = target.difference()
+    assert isinstance(diffs, pd.Series)
+    assert len(diffs) == 1
+    assert diffs[('recall_score',)] == abs(expected_A - expected_B)
+
 
 def test_basic_with_broadcast_arg():
     target = metrics.GroupedMetric(skm.recall_score,
@@ -322,6 +327,19 @@ def test_two_metrics_two_sensitive_features():
     assert max_vals[('recall_score',)] == max(expected_recall)
     assert max_vals[('precision_score',)] == max(expected_precision)
 
+    min_vals = target.group_min()
+    assert isinstance(min_vals, pd.Series)
+    assert len(min_vals) == 2
+    assert min_vals[('recall_score',)] == min(expected_recall)
+    assert min_vals[('precision_score',)] == min(expected_precision)
+
+    diffs = target.difference()
+    assert isinstance(diffs, pd.Series)
+    assert len(diffs) == 2
+    assert diffs[('recall_score',)] == max(expected_recall) - min(expected_recall)
+    assert diffs[('precision_score',)] == max(expected_precision) - min(expected_precision)
+
+
 
 def test_two_metrics_single_conditional_feature():
     cf = ['x' if (x % 2) == 0 else 'y' for x in range(len(y_t))]
@@ -418,3 +436,12 @@ def test_two_metrics_single_conditional_feature():
     assert min_vals[('recall_score', 'y')] == min(expected_recall_y)
     assert min_vals[('precision_score', 'x')] == min(expected_precision_x)
     assert min_vals[('precision_score', 'y')] == min(expected_precision_y)
+
+    diffs = target.difference()
+    assert isinstance(diffs, pd.Series)
+    assert len(diffs) == 4
+    assert diffs[('recall_score', 'x')] == max(expected_recall_x) - min(expected_recall_x)
+    assert diffs[('recall_score', 'y')] == max(expected_recall_y) - min(expected_recall_y)
+    assert diffs[('precision_score', 'x')] == max(expected_precision_x) - min(expected_precision_x)
+    assert diffs[('precision_score', 'y')] == max(expected_precision_y) - min(expected_precision_y)
+
