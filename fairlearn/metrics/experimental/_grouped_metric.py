@@ -57,7 +57,6 @@ class GroupedMetric:
 
         metrics = pd.DataFrame(index=sf_index, columns=columns)
 
-        metric_results = []
         for col_curr in columns:
             current_function = func_dict[col_curr[0]]
             cf_mask = np.full(len(y_true), fill_value=True)
