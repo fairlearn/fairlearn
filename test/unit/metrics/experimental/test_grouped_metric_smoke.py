@@ -46,7 +46,10 @@ def test_basic():
     expected_B = skm.recall_score(y_t_B, y_p_B)
     assert target.by_group[('recall_score',)][('B',)] == expected_B
 
-    assert target.difference()[('recall_score',)][0] == abs(expected_A-expected_B)
+    max_vals = target.group_max()
+    assert isinstance(max_vals, pd.Series)
+    assert len(max_vals) == 1
+    assert max_vals[('recall_score',)] == max([expected_A, expected_B])
 
 
 def test_basic_with_broadcast_arg():
@@ -145,6 +148,12 @@ def test_two_sensitive_features():
     expected_B_y = skm.recall_score(y_t_B_y, y_p_B_y)
     assert target.by_group[('recall_score',)][('B', 'y')] == expected_B_y
 
+    expected = [expected_A_x, expected_A_y, expected_B_x, expected_B_y]
+    max_vals = target.group_max()
+    assert isinstance(max_vals, pd.Series)
+    assert len(max_vals) == 1
+    assert max_vals[('recall_score',)] == max(expected)
+
 
 def test_single_conditional_feature():
     cf = ['x' if (x % 2) == 0 else 'y' for x in range(len(y_t))]
@@ -155,7 +164,7 @@ def test_single_conditional_feature():
                                    y_t, y_p,
                                    conditional_features=[cf],
                                    sensitive_features=[gid])
-    
+
     # Check we have expected number of elements
     assert target.overall.shape == (2, 1)
     assert target.by_group.shape == (2, 2)
@@ -191,6 +200,14 @@ def test_single_conditional_feature():
     expected_B_y = skm.recall_score(y_t_B_y, y_p_B_y)
     assert target.by_group[('recall_score', 'y')][('B',)] == expected_B_y
 
+    expected_x = [expected_A_x, expected_B_x]
+    expected_y = [expected_A_y, expected_B_y]
+    max_vals = target.group_max()
+    assert isinstance(max_vals, pd.Series)
+    assert len(max_vals) == 2
+    assert max_vals[('recall_score', 'x')] == max(expected_x)
+    assert max_vals[('recall_score', 'y')] == max(expected_y)
+
 
 def test_two_metrics():
     fns = [skm.recall_score, skm.precision_score]
@@ -207,7 +224,7 @@ def test_two_metrics():
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
     assert isinstance(target.by_group, pd.DataFrame)
-    
+
     # Check we have expected number of elements
     assert target.overall.shape == (1, 2)
     assert target.by_group.shape == (2, 2)
@@ -227,6 +244,14 @@ def test_two_metrics():
     precision_B = skm.precision_score(y_t_B, y_p_B, sample_weight=wgt_B)
     assert target.by_group[('precision_score',)][('B',)] == precision_B
 
+    expected_recall = [recall_A, recall_B]
+    expected_precision = [precision_A, precision_B]
+    max_vals = target.group_max()
+    assert isinstance(max_vals, pd.Series)
+    assert len(max_vals) == 2
+    assert max_vals[('recall_score',)] == max(expected_recall)
+    assert max_vals[('precision_score',)] == max(expected_precision)
+
 
 def test_two_metrics_two_sensitive_features():
     sf_2 = ['x' if (x % 2) == 0 else 'y' for x in range(len(y_t))]
@@ -244,20 +269,27 @@ def test_two_metrics_two_sensitive_features():
     precision_overall = skm.precision_score(y_t, y_p)
     assert target.overall['precision_score'][0] == precision_overall
 
+    expected_recall = []
+    expected_precision = []
+
     A_x_mask = [x % 2 == 0 for x in range(len(y_t_A))]
     A_y_mask = [x % 2 == 1 for x in range(len(y_t_A))]
     y_t_A_x = np.asarray(y_t_A)[A_x_mask]
     y_p_A_x = np.asarray(y_p_A)[A_x_mask]
     expected_A_x = skm.recall_score(y_t_A_x, y_p_A_x)
     assert target.by_group[('recall_score',)][('A', 'x')] == expected_A_x
+    expected_recall.append(expected_A_x)
     expected_A_x = skm.precision_score(y_t_A_x, y_p_A_x)
     assert target.by_group[('precision_score',)][('A', 'x')] == expected_A_x
+    expected_precision.append(expected_A_x)
     y_t_A_y = np.asarray(y_t_A)[A_y_mask]
     y_p_A_y = np.asarray(y_p_A)[A_y_mask]
     expected_A_y = skm.recall_score(y_t_A_y, y_p_A_y)
     assert target.by_group[('recall_score',)][('A', 'y')] == expected_A_y
+    expected_recall.append(expected_A_y)
     expected_A_y = skm.precision_score(y_t_A_y, y_p_A_y)
     assert target.by_group[('precision_score',)][('A', 'y')] == expected_A_y
+    expected_precision.append(expected_A_y)
 
     # Rely on B's being after the A's, but don't assume even numbers
     B_x_mask = [x % 2 == 0 for x in range(len(y_t_A), len(y_t))]
@@ -266,14 +298,24 @@ def test_two_metrics_two_sensitive_features():
     y_p_B_x = np.asarray(y_p_B)[B_x_mask]
     expected_B_x = skm.recall_score(y_t_B_x, y_p_B_x)
     assert target.by_group[('recall_score',)][('B', 'x')] == expected_B_x
+    expected_recall.append(expected_B_x)
     expected_B_x = skm.precision_score(y_t_B_x, y_p_B_x)
     assert target.by_group[('precision_score',)][('B', 'x')] == expected_B_x
+    expected_precision.append(expected_B_x)
     y_t_B_y = np.asarray(y_t_B)[B_y_mask]
     y_p_B_y = np.asarray(y_p_B)[B_y_mask]
     expected_B_y = skm.recall_score(y_t_B_y, y_p_B_y)
     assert target.by_group[('recall_score',)][('B', 'y')] == expected_B_y
+    expected_recall.append(expected_B_y)
     expected_B_y = skm.precision_score(y_t_B_y, y_p_B_y)
     assert target.by_group[('precision_score',)][('B', 'y')] == expected_B_y
+    expected_precision.append(expected_B_y)
+
+    max_vals = target.group_max()
+    assert isinstance(max_vals, pd.Series)
+    assert len(max_vals) == 2
+    assert max_vals[('recall_score',)] == max(expected_recall)
+    assert max_vals[('precision_score',)] == max(expected_precision)
 
 
 def test_two_metrics_single_conditional_feature():
@@ -291,7 +333,7 @@ def test_two_metrics_single_conditional_feature():
                                    sensitive_features=[gid],
                                    sample_param_names=sample_param_names,
                                    params=params)
-    
+
     # Check we have expected number of elements
     assert target.overall.shape == (2, 2)
     assert target.by_group.shape == (2, 4)
@@ -306,6 +348,10 @@ def test_two_metrics_single_conditional_feature():
     overall_y = skm.precision_score(y_t[cf_y_mask], y_p[cf_y_mask], sample_weight=wgt[cf_y_mask])
     assert target.overall['precision_score'][('y',)] == overall_y
 
+    expected_recall_x = []
+    expected_recall_y = []
+    expected_precision_x = []
+    expected_precision_y = []
     # This will look somewhat familiar from above.... mathematically
     # there's no difference between conditional and sensitive features
     # The difference is how they are inserted into the table
@@ -316,15 +362,19 @@ def test_two_metrics_single_conditional_feature():
     wgt_A_x = np.asarray(wgt_A)[A_x_mask]
     expected_A_x = skm.recall_score(y_t_A_x, y_p_A_x, sample_weight=wgt_A_x)
     assert target.by_group[('recall_score', 'x')][('A',)] == expected_A_x
+    expected_recall_x.append(expected_A_x)
     expected_A_x = skm.precision_score(y_t_A_x, y_p_A_x, sample_weight=wgt_A_x)
     assert target.by_group[('precision_score', 'x')][('A',)] == expected_A_x
+    expected_precision_x.append(expected_A_x)
     y_t_A_y = np.asarray(y_t_A)[A_y_mask]
     y_p_A_y = np.asarray(y_p_A)[A_y_mask]
     wgt_A_y = np.asarray(wgt_A)[A_y_mask]
     expected_A_y = skm.recall_score(y_t_A_y, y_p_A_y, sample_weight=wgt_A_y)
     assert target.by_group[('recall_score', 'y')][('A',)] == expected_A_y
+    expected_recall_y.append(expected_A_y)
     expected_A_y = skm.precision_score(y_t_A_y, y_p_A_y, sample_weight=wgt_A_y)
     assert target.by_group[('precision_score', 'y')][('A',)] == expected_A_y
+    expected_precision_y.append(expected_A_y)
 
     # Rely on B's being after the A's, but don't assume even numbers
     B_x_mask = [x % 2 == 0 for x in range(len(y_t_A), len(y_t))]
@@ -334,12 +384,24 @@ def test_two_metrics_single_conditional_feature():
     wgt_B_x = np.asarray(wgt_B)[B_x_mask]
     expected_B_x = skm.recall_score(y_t_B_x, y_p_B_x, sample_weight=wgt_B_x)
     assert target.by_group[('recall_score', 'x')][('B',)] == expected_B_x
+    expected_recall_x.append(expected_B_x)
     expected_B_x = skm.precision_score(y_t_B_x, y_p_B_x, sample_weight=wgt_B_x)
     assert target.by_group[('precision_score', 'x')][('B',)] == expected_B_x
+    expected_precision_x.append(expected_B_x)
     y_t_B_y = np.asarray(y_t_B)[B_y_mask]
     y_p_B_y = np.asarray(y_p_B)[B_y_mask]
     wgt_B_y = np.asarray(wgt_B)[B_y_mask]
     expected_B_y = skm.recall_score(y_t_B_y, y_p_B_y, sample_weight=wgt_B_y)
     assert target.by_group[('recall_score', 'y')][('B',)] == expected_B_y
+    expected_recall_y.append(expected_B_y)
     expected_B_y = skm.precision_score(y_t_B_y, y_p_B_y, sample_weight=wgt_B_y)
     assert target.by_group[('precision_score', 'y')][('B',)] == expected_B_y
+    expected_precision_y.append(expected_B_y)
+
+    max_vals = target.group_max()
+    assert isinstance(max_vals, pd.Series)
+    assert len(max_vals) == 4
+    assert max_vals[('recall_score', 'x')] == max(expected_recall_x)
+    assert max_vals[('recall_score', 'y')] == max(expected_recall_y)
+    assert max_vals[('precision_score', 'x')] == max(expected_precision_x)
+    assert max_vals[('precision_score', 'y')] == max(expected_precision_y)
