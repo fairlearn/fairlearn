@@ -225,6 +225,14 @@ def test_single_conditional_feature():
     assert max_vals[('recall_score', 'x')] == max(expected_x)
     assert max_vals[('recall_score', 'y')] == max(expected_y)
 
+    diffs_x = [abs(x-overall_x) for x in expected_x]
+    diffs_y = [abs(y-overall_y) for y in expected_y]
+    diff_overall = target.difference_to_overall()
+    assert isinstance(diff_overall, pd.Series)
+    assert len(diff_overall) == 2
+    assert diff_overall[('recall_score', 'x')] == max(diffs_x)
+    assert diff_overall[('recall_score', 'y')] == max(diffs_y)
+
 
 def test_two_metrics():
     fns = [skm.recall_score, skm.precision_score]

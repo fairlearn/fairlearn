@@ -22,6 +22,8 @@ class GroupedMetric:
 
         cf_list = None
         if conditional_features is None:
+            # This ends up making the 'overall' property vary rather dramatically based on whether
+            # we have conditional features. We might not want to do that
             metrics = {}
             for fc in func_dict.values():
                 metrics[fc.name] = fc.evaluate_all(y_true, y_pred)
@@ -92,7 +94,13 @@ class GroupedMetric:
     def difference_to_overall(self):
         all_diffs = pd.DataFrame(columns=self.by_group.columns, index=self.by_group.index)
         for idx in all_diffs:
-            all_diffs[idx] = self.by_group[idx] - self.overall[idx[0]]['overall']
+            subtrahend = np.nan  # Thanks to Hilde
+            if len(idx) == 1:
+                # No conditional features
+                subtrahend = self.overall[idx[0]]['overall']
+            else:
+                subtrahend = self.overall[idx[0]][idx[1:]]
+            all_diffs[idx] = self.by_group[idx] - subtrahend
 
         return all_diffs.abs().max()
 
