@@ -25,8 +25,10 @@ class FunctionContainer:
 
         # Coerce any sample_params to being ndarrays for easy masking
         for param_name in self.sample_param_names:
-            assert param_name in self.params
-            self.params[param_name] = np.asarray(self.params[param_name])
+            # However, users might have a standard sample_param_names list
+            # but not invoke with all of them
+            if param_name in self.params:
+                self.params[param_name] = np.asarray(self.params[param_name])
 
     @property
     def func(self):
