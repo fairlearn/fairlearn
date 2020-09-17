@@ -64,7 +64,8 @@ def test_basic():
     diff_overall = target.difference_to_overall()
     assert isinstance(diff_overall, pd.Series)
     assert len(diff_overall) == 1
-    expected_diff_overall = max([abs(expected_A-expected_overall), abs(expected_B-expected_overall)])
+    expected_diff_overall = max([abs(expected_A-expected_overall),
+                                 abs(expected_B-expected_overall)])
     assert diff_overall[('recall_score',)] == expected_diff_overall
 
 
@@ -268,6 +269,14 @@ def test_two_metrics():
     assert max_vals[('recall_score',)] == max(expected_recall)
     assert max_vals[('precision_score',)] == max(expected_precision)
 
+    recall_diffs_overall = [abs(x-recall_overall) for x in expected_recall]
+    precision_diffs_overall = [abs(x-precision_overall) for x in expected_precision]
+    diff_overall = target.difference_to_overall()
+    assert isinstance(diff_overall, pd.Series)
+    assert len(diff_overall) == 2
+    assert diff_overall[('recall_score',)] == max(recall_diffs_overall)
+    assert diff_overall[('precision_score',)] == max(precision_diffs_overall)
+
 
 def test_two_metrics_two_sensitive_features():
     sf_2 = ['x' if (x % 2) == 0 else 'y' for x in range(len(y_t))]
@@ -344,7 +353,6 @@ def test_two_metrics_two_sensitive_features():
     assert len(diffs) == 2
     assert diffs[('recall_score',)] == max(expected_recall) - min(expected_recall)
     assert diffs[('precision_score',)] == max(expected_precision) - min(expected_precision)
-
 
 
 def test_two_metrics_single_conditional_feature():
@@ -450,4 +458,3 @@ def test_two_metrics_single_conditional_feature():
     assert diffs[('recall_score', 'y')] == max(expected_recall_y) - min(expected_recall_y)
     assert diffs[('precision_score', 'x')] == max(expected_precision_x) - min(expected_precision_x)
     assert diffs[('precision_score', 'y')] == max(expected_precision_y) - min(expected_precision_y)
-
