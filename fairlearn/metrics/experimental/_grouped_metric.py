@@ -80,6 +80,24 @@ class GroupedMetric:
     def by_group(self):
         return self._by_group
 
+    def group_max(self):
+        pass
+
+    def group_min(self):
+        pass
+
+    def difference(self):
+        pass
+
+    def difference_to_overall(self):
+        pass
+
+    def ratio(self):
+        pass
+
+    def ratio_to_overall(self):
+        pass
+
     def _check_feature_length(self, feature, expected_length):
         if len(feature) != expected_length:
             msg = _BAD_FEATURE_LENGTH.format(len(feature), expected_length)
