@@ -51,6 +51,11 @@ def test_basic():
     assert len(max_vals) == 1
     assert max_vals[('recall_score',)] == max([expected_A, expected_B])
 
+    min_vals = target.group_min()
+    assert isinstance(min_vals, pd.Series)
+    assert len(min_vals) == 1
+    assert min_vals[('recall_score',)] == min([expected_A, expected_B])
+
 
 def test_basic_with_broadcast_arg():
     target = metrics.GroupedMetric(skm.recall_score,
@@ -405,3 +410,11 @@ def test_two_metrics_single_conditional_feature():
     assert max_vals[('recall_score', 'y')] == max(expected_recall_y)
     assert max_vals[('precision_score', 'x')] == max(expected_precision_x)
     assert max_vals[('precision_score', 'y')] == max(expected_precision_y)
+
+    min_vals = target.group_min()
+    assert isinstance(min_vals, pd.Series)
+    assert len(min_vals) == 4
+    assert min_vals[('recall_score', 'x')] == min(expected_recall_x)
+    assert min_vals[('recall_score', 'y')] == min(expected_recall_y)
+    assert min_vals[('precision_score', 'x')] == min(expected_precision_x)
+    assert min_vals[('precision_score', 'y')] == min(expected_precision_y)

@@ -81,10 +81,10 @@ class GroupedMetric:
         return self._by_group
 
     def group_max(self):
-        return self._by_group.max()
+        return self.by_group.max()
 
     def group_min(self):
-        pass
+        return self.by_group.min()
 
     def difference(self):
         pass
