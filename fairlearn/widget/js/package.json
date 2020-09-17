@@ -43,17 +43,20 @@
     "ts-loader": "^5.2.1",
     "typescript": "~3.1.2",
     "terser-webpack-plugin": "^1.4.2",
-    "serialize-javascript": ">=2.1.1",
+    "serialize-javascript": ">=3.1.0",
     "webpack": "4.41.2",
     "webpack-cli": "^3.3.1"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10",
     "css-loader": "^2.1.1",
-    "lodash": "^4.17.11",
-    "fairlearn-dashboard": "0.0.22",
+    "elliptic": "6.5.3",
+    "lodash": "^4.17.19",
+    "node-fetch": "2.6.1",
+    "fairlearn-dashboard": "0.0.21",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "serialize-javascript": "5.0.1",
     "style-loader": "^0.23.1"
   },
   "jupyterlab": {
