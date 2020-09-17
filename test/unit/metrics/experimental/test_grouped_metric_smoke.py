@@ -61,6 +61,12 @@ def test_basic():
     assert len(diffs) == 1
     assert diffs[('recall_score',)] == abs(expected_A - expected_B)
 
+    diff_overall = target.difference_to_overall()
+    assert isinstance(diff_overall, pd.Series)
+    assert len(diff_overall) == 1
+    expected_diff_overall = max([abs(expected_A-expected_overall), abs(expected_B-expected_overall)])
+    assert diff_overall[('recall_score',)] == expected_diff_overall
+
 
 def test_basic_with_broadcast_arg():
     target = metrics.GroupedMetric(skm.recall_score,

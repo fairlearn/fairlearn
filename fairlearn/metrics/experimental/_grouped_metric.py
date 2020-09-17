@@ -90,7 +90,11 @@ class GroupedMetric:
         return self.group_max() - self.group_min()
 
     def difference_to_overall(self):
-        pass
+        all_diffs = pd.DataFrame(columns=self.by_group.columns, index=self.by_group.index)
+        for idx in all_diffs:
+            all_diffs[idx] = self.by_group[idx] - self.overall[idx[0]]['overall']
+
+        return all_diffs.abs().max()
 
     def ratio(self):
         pass
