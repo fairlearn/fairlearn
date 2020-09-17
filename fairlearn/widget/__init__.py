@@ -11,7 +11,7 @@ __all__ = ['FairlearnDashboard']
 
 logger = logging.getLogger(__file__)
 logger.warning("The fairlearn.widget module will be moved into a different "
-            "package called raiwidgets with the next release.")
+               "package called raiwidgets with the next release.")
 
 
 def _jupyter_nbextension_paths():
