@@ -34,6 +34,10 @@ def test_basic():
     assert isinstance(target.overall, pd.DataFrame)
     assert isinstance(target.by_group, pd.DataFrame)
 
+    # Check we have expected number of elements
+    assert target.overall.shape == (1, 1)
+    assert target.by_group.shape == (2, 1)
+
     expected_overall = skm.recall_score(y_t, y_p)
     assert target.overall['recall_score'][0] == expected_overall
 
@@ -42,12 +46,18 @@ def test_basic():
     expected_B = skm.recall_score(y_t_B, y_p_B)
     assert target.by_group[('recall_score',)][('B',)] == expected_B
 
+    assert target.difference()[('recall_score',)][0] == abs(expected_A-expected_B)
+
 
 def test_basic_with_broadcast_arg():
     target = metrics.GroupedMetric(skm.recall_score,
                                    y_t, y_p,
                                    sensitive_features=gid,
                                    params={'pos_label': 0})
+
+    # Check we have expected number of elements
+    assert target.overall.shape == (1, 1)
+    assert target.by_group.shape == (2, 1)
 
     expected_overall = skm.recall_score(y_t, y_p, pos_label=0)
     assert target.overall['recall_score'][0] == expected_overall
@@ -65,6 +75,10 @@ def test_basic_with_sample_arg():
                                    sample_param_names=['sample_weight'],
                                    params={'sample_weight': wgt})
 
+    # Check we have expected number of elements
+    assert target.overall.shape == (1, 1)
+    assert target.by_group.shape == (2, 1)
+
     expected_overall = skm.recall_score(y_t, y_p, sample_weight=wgt)
     assert target.overall['recall_score'][0] == expected_overall
 
@@ -81,6 +95,10 @@ def test_basic_with_broadcast_and_sample_arg():
                                    sample_param_names=['sample_weight'],
                                    params={'sample_weight': wgt, 'pos_label': 0})
 
+    # Check we have expected number of elements
+    assert target.overall.shape == (1, 1)
+    assert target.by_group.shape == (2, 1)
+
     expected_overall = skm.recall_score(y_t, y_p, sample_weight=wgt, pos_label=0)
     assert target.overall['recall_score'][0] == expected_overall
 
@@ -96,6 +114,10 @@ def test_two_sensitive_features():
     target = metrics.GroupedMetric(skm.recall_score,
                                    y_t, y_p,
                                    sensitive_features=[gid, sf_2])
+
+    # Check we have expected number of elements
+    assert target.overall.shape == (1, 1)
+    assert target.by_group.shape == (4, 1)
 
     expected_overall = skm.recall_score(y_t, y_p)
     assert target.overall['recall_score'][0] == expected_overall
@@ -133,6 +155,10 @@ def test_single_conditional_feature():
                                    y_t, y_p,
                                    conditional_features=[cf],
                                    sensitive_features=[gid])
+    
+    # Check we have expected number of elements
+    assert target.overall.shape == (2, 1)
+    assert target.by_group.shape == (2, 2)
 
     overall_x = skm.recall_score(y_t[cf_x_mask], y_p[cf_x_mask])
     assert target.overall['recall_score'][('x',)] == overall_x
@@ -181,6 +207,10 @@ def test_two_metrics():
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
     assert isinstance(target.by_group, pd.DataFrame)
+    
+    # Check we have expected number of elements
+    assert target.overall.shape == (1, 2)
+    assert target.by_group.shape == (2, 2)
 
     recall_overall = skm.recall_score(y_t, y_p, sample_weight=wgt, pos_label=0)
     assert target.overall['recall_score'][0] == recall_overall
@@ -204,6 +234,10 @@ def test_two_metrics_two_sensitive_features():
     target = metrics.GroupedMetric([skm.recall_score, skm.precision_score],
                                    y_t, y_p,
                                    sensitive_features=[gid, sf_2])
+
+    # Check we have expected number of elements
+    assert target.overall.shape == (1, 2)
+    assert target.by_group.shape == (4, 2)
 
     recall_overall = skm.recall_score(y_t, y_p)
     assert target.overall['recall_score'][0] == recall_overall
@@ -257,6 +291,10 @@ def test_two_metrics_single_conditional_feature():
                                    sensitive_features=[gid],
                                    sample_param_names=sample_param_names,
                                    params=params)
+    
+    # Check we have expected number of elements
+    assert target.overall.shape == (2, 2)
+    assert target.by_group.shape == (2, 4)
 
     overall_x = skm.recall_score(y_t[cf_x_mask], y_p[cf_x_mask], sample_weight=wgt[cf_x_mask])
     assert target.overall['recall_score'][('x',)] == overall_x
