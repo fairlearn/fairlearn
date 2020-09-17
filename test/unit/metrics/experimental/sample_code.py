@@ -87,3 +87,20 @@ print(result2.overall)
 print()
 print("By group =============")
 print(result2.by_group)
+
+
+fbeta_difference = metrics.make_derived_metric('difference',
+                                               skm.fbeta_score,
+                                               sample_param_names=['sample_weights'])
+
+print("fbeta_difference (Race):", fbeta_difference(Y_test, Y_pred,
+                                                   beta=0.7,
+                                                   sensitive_features=A_test['Race']))
+
+print("fbeta_difference (Sex):", fbeta_difference(Y_test, Y_pred,
+                                                  beta=0.7,
+                                                  sensitive_features=A_test['Sex']))
+
+print("fbeta_difference (Race, Sex):", fbeta_difference(Y_test, Y_pred,
+                                                        beta=0.7,
+                                                        sensitive_features=A_test))

@@ -25,7 +25,7 @@ gid = np.concatenate((As, Bs))
 
 
 def test_derived_difference():
-    my_fn = metrics._derived_metrics.make_derived_metric('difference',
+    my_fn = metrics.make_derived_metric('difference',
                                                          skm.accuracy_score,
                                                          sample_param_names=['sample_weight'])
 
@@ -38,7 +38,7 @@ def test_derived_difference():
 
 
 def test_derived_difference_scalar_arg():
-    my_fn = metrics._derived_metrics.make_derived_metric('difference',
+    my_fn = metrics.make_derived_metric('difference',
                                                          skm.fbeta_score,
                                                          sample_param_names=['sample_weight'])
     grouped = metrics.GroupedMetric(skm.fbeta_score,
@@ -50,7 +50,7 @@ def test_derived_difference_scalar_arg():
 
 
 def test_derived_difference_both_arg_types():
-    my_fn = metrics._derived_metrics.make_derived_metric('difference',
+    my_fn = metrics.make_derived_metric('difference',
                                                          skm.fbeta_score,
                                                          sample_param_names=['sample_weight'])
     grouped = metrics.GroupedMetric(skm.fbeta_score,
