@@ -30,7 +30,6 @@ from fairlearn.metrics import (
 from IPython.display import display
 from scipy.sparse import issparse
 import copy
-import logging
 import numpy as np
 import pandas as pd
 
