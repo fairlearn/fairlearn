@@ -1,35 +1,36 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import othermlpackages.package_test_common as ptc
+import test_othermlpackages.package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
 
 import lightgbm as lgb
 
+
 def test_expgrad_classification():
     lgb_params = {
-        'objective' : 'binary',
-        'metric' : 'auc',
+        'objective': 'binary',
+        'metric': 'auc',
         'learning_rate': 0.03,
-        'num_leaves' : 10,
-        'max_depth' : 3
+        'num_leaves': 10,
+        'max_depth': 3
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
     disparity_moment = DemographicParity()
 
     ptc.run_expgrad_classification(estimator, disparity_moment)
 
+
 def test_gridsearch_classification():
     lgb_params = {
-        'objective' : 'binary',
-        'metric' : 'auc',
+        'objective': 'binary',
+        'metric': 'auc',
         'learning_rate': 0.03,
-        'num_leaves' : 10,
-        'max_depth' : 3
+        'num_leaves': 10,
+        'max_depth': 3
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
     disparity_moment = DemographicParity()
 
     ptc.run_gridsearch_classification(estimator, disparity_moment)
-
