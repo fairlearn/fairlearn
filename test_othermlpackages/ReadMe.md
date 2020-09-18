@@ -9,7 +9,7 @@ To avoid making our developer install too large (at best) or impossible to satis
 We have separate directories for other machine learning packages (`lightgbm`, `xgboost` etc.) and each one has a `conda-env.yaml` file, which specifies the required dependencies.
 
 To run the tests for a particular package, do the following from the repository root:
-1. Create a new conda environment with `conda create --name <env-name> --file=./test_othermlpackages/<package>/conda-env.yaml`
+1. Create a new conda environment with `conda env create -n <env-name> -f ./test_othermlpackages/<package>/conda-env.yaml`
 1. Activate the environment `conda activate <env-name>`
 1. Install Fairlearn with `pip install .`
 1. Run the tests with `python -m pytest ./test_othermlpackages/`
