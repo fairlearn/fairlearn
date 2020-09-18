@@ -1,11 +1,16 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import pytest
+
 import test_othermlpackages.package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
 
-import lightgbm as lgb
+try:
+    import lightgbm as lgb
+except ImportError:
+    pytestmark = pytest.mark.skip(reason="XGBoost not installed")
 
 
 def test_expgrad_classification():
