@@ -5,5 +5,7 @@ channels:
 dependencies:
 - python==3.8
 - pip>=19.1.1
+- pandas
+- numpy
 - pytest
 - lightgbm
