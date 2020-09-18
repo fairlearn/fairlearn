@@ -3,6 +3,10 @@
 
 import pytest
 
+import test_othermlpackages.package_test_common as ptc
+
+from fairlearn.reductions import DemographicParity
+
 try:
     import xgboost as xgb
 except ImportError:
@@ -10,9 +14,14 @@ except ImportError:
 
 
 def test_expgrad_classification():
-    print(xgb.__name__)  # Shut up warning
-    assert False
+    estimator = xgb.XGBClassifier()
+    disparity_moment = DemographicParity()
+
+    ptc.run_expgrad_classification(estimator, disparity_moment)
 
 
 def test_gridsearch_classification():
-    assert False
+    estimator = xgb.XGBClassifier()
+    disparity_moment = DemographicParity()
+
+    ptc.run_gridsearch_classification(estimator, disparity_moment)
