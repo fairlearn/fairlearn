@@ -10,7 +10,7 @@ from fairlearn.reductions import DemographicParity
 try:
     import lightgbm as lgb
 except ImportError:
-    pytestmark = pytest.mark.skip(reason="XGBoost not installed")
+    pytestmark = pytest.mark.skip(reason="LightGBM not installed")
 
 
 def test_expgrad_classification():
