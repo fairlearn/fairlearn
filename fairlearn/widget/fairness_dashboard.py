@@ -1,9 +1,9 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 """Defines the fairness dashboard class."""
 
-from rai_core_flask import FlaskHelper, environment_detector
+from rai_core_flask import FlaskHelper
 from fairlearn.metrics import (
     true_negative_rate_group_summary,
     false_positive_rate_group_summary,
@@ -52,6 +52,7 @@ class FairlearnDashboard(object):
     :param sensitive_feature_names: Feature names
     :type sensitive_feature_names: numpy.array or list[]
     """
+
     env = Environment(loader=PackageLoader(__name__, 'templates'))
     default_template = env.get_template("inlineDashboard.html")
     _dashboard_js = None
@@ -160,18 +161,18 @@ class FairlearnDashboard(object):
                            if "probability" in method[1]["model_type"]]
 
     @FlaskHelper.app.route('/')
-    def list_view():
+    def list_view():  # noqa: D102
         return "No global list view supported at this time."
 
     @FlaskHelper.app.route('/<id>')
-    def fairness_visual_view(id):
+    def fairness_visual_view(id):  # noqa: D102, A002
         if id in FairlearnDashboard.fairness_inputs:
             return generate_inline_html(FairlearnDashboard.fairness_inputs[id], None)
         else:
             return "Unknown model id."
 
     @FlaskHelper.app.route('/<id>/metrics', methods=['POST'])
-    def fairness_metrics_calc(id):
+    def fairness_metrics_calc(id):  # noqa: D102, A002
         try:
             data = request.get_json(force=True)
             if id in FairlearnDashboard.fairness_inputs:
@@ -191,14 +192,16 @@ class FairlearnDashboard(object):
                     "bins": list(prediction.by_group.values())
                 }})
         except Exception as ex:
-            import sys, traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
+            # debug only
+            # import sys
+            # import traceback
+            # exc_type, exc_value, exc_traceback = sys.exc_info()
 
             return jsonify({
                 "error": str(ex),
-                "stacktrace": str(repr(traceback.format_exception(
-                    exc_type, exc_value, exc_traceback))),
-                "locals": str(locals()),
+                # "stacktrace": str(repr(traceback.format_exception(
+                #     exc_type, exc_value, exc_traceback))),
+                # "locals": str(locals()),
             })
 
     def __init__(
@@ -212,7 +215,7 @@ class FairlearnDashboard(object):
         """Initialize the fairness dashboard."""
         if sensitive_features is None or y_true is None or y_pred is None:
             raise ValueError("Required parameters not provided")
-        
+
         dataset = self._sanitize_data_shape(sensitive_features)
         model_names = None
         if isinstance(y_pred, dict):
@@ -265,7 +268,7 @@ class FairlearnDashboard(object):
             except Exception as e:
                 FairlearnDashboard._service = None
                 raise e
-        
+
         FairlearnDashboard.model_count += 1
         model_count = FairlearnDashboard.model_count
 
@@ -311,7 +314,7 @@ class FairlearnDashboard(object):
         return array
 
 
-def generate_inline_html(fairness_input, local_url):
+def generate_inline_html(fairness_input, local_url):  # noqa: D102, D103
     return FairlearnDashboard.default_template.render(
         fairness_input=json.dumps(fairness_input),
         main_js=FairlearnDashboard._dashboard_js,
