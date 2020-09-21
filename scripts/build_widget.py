@@ -10,7 +10,6 @@ add the --use-local-changes option and run `pip install .` after completion.
 import argparse
 import logging
 import os
-import shutil
 import subprocess
 import sys
 
