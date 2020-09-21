@@ -48,7 +48,7 @@ def main(argv):
                               cwd=os.path.join(os.getcwd(), _widget_js_directory))
 
     with _LogWrapper("yarn build"):
-        subprocess.check_call([args.yarn_path, "build:all"],
+        subprocess.check_call([args.yarn_path, "build"],
                               cwd=os.path.join(os.getcwd(), _widget_js_directory))
 
 
