@@ -1,4 +1,4 @@
-name: fairlearn-lightgm
+name: fairlearn-lightgbm
 channels:
 - defaults
 - conda-forge
