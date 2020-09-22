@@ -62,8 +62,8 @@ def test_1m_1cf():
     mask_b = (g_1 == 'b')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a])
     exp_recall_b = skm.recall_score(y_t[mask_b], y_p[mask_b])
-    assert result['recall_score'][('a',)] == exp_recall_a
-    assert result['recall_score'][('b',)] == exp_recall_b
+    assert result['recall_score']['a'] == exp_recall_a
+    assert result['recall_score']['b'] == exp_recall_b
 
 
 def test_1m_1cf_wgt():
@@ -84,8 +84,8 @@ def test_1m_1cf_wgt():
                                     sample_weight=s_w[mask_a])
     exp_recall_b = skm.recall_score(y_t[mask_b], y_p[mask_b],
                                     sample_weight=s_w[mask_b])
-    assert result['recall_score'][('a',)] == exp_recall_a
-    assert result['recall_score'][('b',)] == exp_recall_b
+    assert result['recall_score']['a'] == exp_recall_a
+    assert result['recall_score']['b'] == exp_recall_b
 
 
 def test_1m_2cf():

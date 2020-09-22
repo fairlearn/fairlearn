@@ -52,8 +52,11 @@ class GroupedMetric:
         return self._compute_dataframe_from_rows(func_dict, y_true, y_pred, rows)
 
     def _compute_dataframe_from_rows(self, func_dict, y_true, y_pred, rows):
-        row_index = pd.MultiIndex.from_product([x.classes for x in rows],
-                                               names=[x.name for x in rows])
+        if len(rows) == 1:
+            row_index = pd.Index(data=rows[0].classes, name=rows[0].name)
+        else:
+            row_index = pd.MultiIndex.from_product([x.classes for x in rows],
+                                                   names=[x.name for x in rows])
 
         result = pd.DataFrame(index=row_index, columns=func_dict.keys())
         for func_name in func_dict:
@@ -72,7 +75,14 @@ class GroupedMetric:
         return self._by_group
 
     def group_max(self):
-        return self.by_group.groupby(level=list(range(len(self._cf_names)))).max()
+        if self._cf_names is None:
+            result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
+            for c in result.columns:
+                max_val = self.by_group[c].max()
+                result[c]['overall'] = max_val
+        else:
+            result = self.by_group.groupby(level=list(range(len(self._cf_names)))).max()
+        return result
 
     def group_min(self):
         if self._cf_names is None:

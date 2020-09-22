@@ -32,14 +32,18 @@ def test_basic():
     mask_q = (g_4 == 'q')
     recall_p = skm.recall_score(y_t[mask_p], y_p[mask_p])
     recall_q = skm.recall_score(y_t[mask_q], y_p[mask_q])
-    assert target.by_group['recall_score'][('p',)] == recall_p
-    assert target.by_group['recall_score'][('q',)] == recall_q
+    assert target.by_group['recall_score']['p'] == recall_p
+    assert target.by_group['recall_score']['q'] == recall_q
 
     target_mins = target.group_min()
     assert isinstance(target_mins, pd.DataFrame)
     assert target_mins.shape == (1, 1)
     assert target_mins['recall_score']['overall'] == min(recall_p, recall_q)
 
+    target_maxes = target.group_max()
+    assert isinstance(target_mins, pd.DataFrame)
+    assert target_maxes.shape == (1, 1)
+    assert target_maxes['recall_score']['overall'] == max(recall_p, recall_q)
 
 def test_1m_1sf_1cf():
     target = metrics.GroupedMetric(skm.recall_score,
@@ -62,8 +66,8 @@ def test_1m_1sf_1cf():
 
     recall_k = skm.recall_score(y_t[mask_k], y_p[mask_k])
     recall_m = skm.recall_score(y_t[mask_m], y_p[mask_m])
-    assert target.overall['recall_score'][('k',)] == recall_k
-    assert target.overall['recall_score'][('m',)] == recall_m
+    assert target.overall['recall_score']['k'] == recall_k
+    assert target.overall['recall_score']['m'] == recall_m
 
     mask_k_f = np.logical_and(mask_k, mask_f)
     mask_k_g = np.logical_and(mask_k, mask_g)
@@ -86,6 +90,12 @@ def test_1m_1sf_1cf():
     assert target_mins.shape == (2, 1)
     assert target_mins['recall_score']['k'] == min(recall_k_arr)
     assert target_mins['recall_score']['m'] == min(recall_m_arr)
+    
+    target_maxs = target.group_max()
+    assert isinstance(target_mins, pd.DataFrame)
+    assert target_maxs.shape == (2, 1)
+    assert target_maxs['recall_score']['k'] == max(recall_k_arr)
+    assert target_maxs['recall_score']['m'] == max(recall_m_arr)
 
 
 '''
