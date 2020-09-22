@@ -26,21 +26,21 @@ gid = np.concatenate((As, Bs))
 
 def test_derived_difference():
     my_fn = metrics.make_derived_metric('difference',
-                                                         skm.accuracy_score,
-                                                         sample_param_names=['sample_weight'])
+                                        skm.accuracy_score,
+                                        sample_param_names=['sample_weight'])
 
     grouped = metrics.GroupedMetric(skm.accuracy_score,
                                     y_t, y_p,
                                     sensitive_features=gid)
 
     actual = my_fn(y_t, y_p, sensitive_features=gid)
-    assert actual == grouped.difference()['accuracy_score'][0]
+    assert actual == grouped.difference()['accuracy_score']['overall']
 
 
 def test_derived_difference_scalar_arg():
     my_fn = metrics.make_derived_metric('difference',
-                                                         skm.fbeta_score,
-                                                         sample_param_names=['sample_weight'])
+                                        skm.fbeta_score,
+                                        sample_param_names=['sample_weight'])
     grouped = metrics.GroupedMetric(skm.fbeta_score,
                                     y_t, y_p,
                                     sensitive_features=gid,
@@ -51,8 +51,8 @@ def test_derived_difference_scalar_arg():
 
 def test_derived_difference_both_arg_types():
     my_fn = metrics.make_derived_metric('difference',
-                                                         skm.fbeta_score,
-                                                         sample_param_names=['sample_weight'])
+                                        skm.fbeta_score,
+                                        sample_param_names=['sample_weight'])
     grouped = metrics.GroupedMetric(skm.fbeta_score,
                                     y_t, y_p,
                                     sensitive_features=gid,
