@@ -25,8 +25,10 @@ class GroupedMetric:
         sf_list = self._process_features("SF", sensitive_features, len(y_true))
 
         cf_list = None
+        self._cf_names = None
         if conditional_features is not None:
             cf_list = self._process_features("CF", conditional_features, len(y_true))
+            self._cf_names = [x.name for x in cf_list]
 
         self._overall = self._compute_overall(func_dict, y_true, y_pred, cf_list)
         self._by_group = self._compute_by_group(func_dict, y_true, y_pred, sf_list, cf_list)
@@ -70,31 +72,22 @@ class GroupedMetric:
         return self._by_group
 
     def group_max(self):
-        return self.by_group.max()
+        return self.by_group.groupby(level=list(range(len(self._cf_names)))).max()
 
     def group_min(self):
-        return self.by_group.min()
+        if self._cf_names is None:
+            result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
+            for c in result.columns:
+                min_val = self.by_group[c].min()
+                result[c]['overall'] = min_val
+        else:
+            result = self.by_group.groupby(level=list(range(len(self._cf_names)))).min()
+        return result
 
     def difference(self):
         return self.group_max() - self.group_min()
 
-    def difference_to_overall(self):
-        all_diffs = pd.DataFrame(columns=self.by_group.columns, index=self.by_group.index)
-        for idx in all_diffs:
-            subtrahend = np.nan  # Thanks to Hilde
-            if len(idx) == 1:
-                # No conditional features
-                subtrahend = self.overall[idx[0]]['overall']
-            else:
-                subtrahend = self.overall[idx[0]][idx[1:]]
-            all_diffs[idx] = self.by_group[idx] - subtrahend
-
-        return all_diffs.abs().max()
-
     def ratio(self):
-        pass
-
-    def ratio_to_overall(self):
         pass
 
     def _check_feature_length(self, feature, expected_length):
