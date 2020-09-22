@@ -5,39 +5,8 @@ import numpy as np
 import pandas as pd
 import sklearn.metrics as skm
 
-import fairlearn.metrics.experimental as metrics
+from .data_for_test import y_t, y_p, s_w, g_1, g_2
 from .utils import _get_raw_GroupedMetric
-
-
-y_t = np.asarray(
-    [1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1,
-        1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0,
-        0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1]
-)
-
-y_p = np.asarray(
-    [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1,
-        1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0,
-        1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]
-)
-
-s_w = np.asarray(
-    [1, 2, 3, 1, 2, 1, 2, 3, 1, 1, 1, 2, 3, 3, 1, 2, 1, 1, 1, 2, 3,
-        2, 2, 1, 2, 1, 3, 1, 3, 1, 4, 1, 2, 1, 3, 2, 3, 3, 4, 1, 4, 1,
-        3, 1, 1, 1, 2, 3, 3, 1, 2, 1, 1, 1, 2, 3, 1, 1, 2, 3, 2, 1, 2]
-)
-
-
-def _group_gen(x, runs, groups):
-    # For producing arrays such as ['a', 'a', 'b', 'b', 'a', 'a', ... ]
-    assert runs >= len(groups)
-    return groups[(x//runs) % len(groups)]
-
-
-g_1 = np.asarray([_group_gen(x, 2, ['a', 'b']) for x in range(len(y_t))])
-g_2 = np.asarray([_group_gen(x, 3, ['f', 'g']) for x in range(len(y_t))])
-g_3 = np.asarray([_group_gen(x, 4, ['k', 'm']) for x in range(len(y_t))])
-g_4 = np.asarray([_group_gen(x, 5, ['p', 'q']) for x in range(len(y_t))])
 
 
 def test_1m_0cf():
@@ -140,6 +109,7 @@ def test_1m_2cf():
     assert result['recall_score'][('a', 'g')] == exp_a_g
     assert result['recall_score'][('b', 'f')] == exp_b_f
     assert result['recall_score'][('b', 'g')] == exp_b_g
+
 
 def test_2m_2cf():
     target = _get_raw_GroupedMetric()
