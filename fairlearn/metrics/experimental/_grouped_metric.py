@@ -28,29 +28,10 @@ class GroupedMetric:
         if conditional_features is not None:
             cf_list = self._process_features("CF", conditional_features, len(y_true))
 
-        if conditional_features is None:
-            # This ends up making the 'overall' property vary rather dramatically based on whether
-            # we have conditional features. We might not want to do that
-            metrics = {}
-            self._overall = pd.DataFrame(index=['overall'], columns=col_list)
-            for func_name in func_dict:
-                metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
-                self._overall[func_name]['overall'] = metric_value
-        else:
-            cf_index = pd.MultiIndex.from_product([x.classes for x in cf_list],
-                                                  names=[x.name for x in cf_list])
-
-            self._overall = pd.DataFrame(index=cf_index, columns=col_list)
-            for func_name in func_dict:
-                for cf_curr in cf_index:
-                    mask = self._mask_from_tuple(cf_curr, cf_list)
-                    curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
-
-                    self._overall[func_name][cf_curr] = curr_metric
+        self._overall = self._compute_overall(func_list, cf_list)
 
         feature_values = [x.classes for x in sf_list]
         feature_names = [x.name for x in sf_list]
-        if conditional_features is None:
 
 
         sf_index = pd.MultiIndex.from_product([x.classes for x in sf_list],
@@ -72,6 +53,25 @@ class GroupedMetric:
                 metrics[col_curr][sf_curr] = curr_metric
 
         self._by_group = metrics
+
+    def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
+        if cf_list is None:
+            result = pd.DataFrame(index=['overall'], columns=func_dict.keys())
+            for func_name in func_dict:
+                metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
+                result[func_name]['overall'] = metric_value
+        else:
+            cf_index = pd.MultiIndex.from_product([x.classes for x in cf_list],
+                                                  names=[x.name for x in cf_list])
+
+            result = pd.DataFrame(index=cf_index, columns=func_dict.keys())
+            for func_name in func_dict:
+                for cf_curr in cf_index:
+                    mask = self._mask_from_tuple(cf_curr, cf_list)
+                    curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
+
+                    result[func_name][cf_curr] = curr_metric
+        return result
 
     @property
     def overall(self):
