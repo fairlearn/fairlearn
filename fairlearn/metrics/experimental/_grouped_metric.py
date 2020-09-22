@@ -20,7 +20,6 @@ class GroupedMetric:
                  sample_param_names=None,
                  params=None):
         func_dict = self._process_functions(metric_functions, sample_param_names, params)
-        col_list = [list(func_dict.keys())]
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("SF", sensitive_features, len(y_true))
@@ -29,30 +28,8 @@ class GroupedMetric:
         if conditional_features is not None:
             cf_list = self._process_features("CF", conditional_features, len(y_true))
 
-        self._overall = self._compute_overall(func_list, cf_list)
-
-        feature_values = [x.classes for x in sf_list]
-        feature_names = [x.name for x in sf_list]
-
-        sf_index = pd.MultiIndex.from_product([x.classes for x in sf_list],
-                                              names=[x.name for x in sf_list])
-
-        metrics = pd.DataFrame(index=sf_index, columns=col_list)
-        for col_curr in col_list:
-            current_function = func_dict[col_curr]
-            cf_mask = np.full(len(y_true), fill_value=True)
-            if cf_list is not None:
-                cf_mask = self._mask_from_tuple(col_curr[1:], cf_list)
-
-            for sf_curr in sf_index:
-                sf_mask = self._mask_from_tuple(sf_curr, sf_list)
-                mask = np.logical_and(cf_mask, sf_mask)
-
-                curr_metric = current_function.evaluate(y_true, y_pred, mask)
-
-                metrics[col_curr][sf_curr] = curr_metric
-
-        self._by_group = metrics
+        self._overall = self._compute_overall(func_dict, y_true, y_pred, cf_list)
+        self._by_group = self._compute_by_group(func_dict, y_true, y_pred, sf_list, cf_list)
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
         if cf_list is None:
@@ -67,7 +44,8 @@ class GroupedMetric:
     def _compute_by_group(self, func_dict, y_true, y_pred, sf_list, cf_list):
         rows = copy.deepcopy(sf_list)
         if cf_list is not None:
-            rows = rows + copy.deepcopy(cf_list)
+            # Prepend the conditional features, so they are 'higher'
+            rows = copy.deepcopy(cf_list) + rows
 
         return self._compute_dataframe_from_rows(func_dict, y_true, y_pred, rows)
 
