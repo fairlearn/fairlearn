@@ -45,6 +45,7 @@ def test_basic():
     assert target_maxes.shape == (1, 1)
     assert target_maxes['recall_score']['overall'] == max(recall_p, recall_q)
 
+
 def test_1m_1sf_1cf():
     target = metrics.GroupedMetric(skm.recall_score,
                                    y_t, y_p,
@@ -90,34 +91,9 @@ def test_1m_1sf_1cf():
     assert target_mins.shape == (2, 1)
     assert target_mins['recall_score']['k'] == min(recall_k_arr)
     assert target_mins['recall_score']['m'] == min(recall_m_arr)
-    
+
     target_maxs = target.group_max()
     assert isinstance(target_mins, pd.DataFrame)
     assert target_maxs.shape == (2, 1)
     assert target_maxs['recall_score']['k'] == max(recall_k_arr)
     assert target_maxs['recall_score']['m'] == max(recall_m_arr)
-
-
-'''
-    max_vals = target.group_max()
-    assert isinstance(max_vals, pd.Series)
-    assert len(max_vals) == 1
-    assert max_vals[('recall_score',)] == max([expected_A, expected_B])
-
-    min_vals = target.group_min()
-    assert isinstance(min_vals, pd.Series)
-    assert len(min_vals) == 1
-    assert min_vals[('recall_score',)] == min([expected_A, expected_B])
-
-    diffs = target.difference()
-    assert isinstance(diffs, pd.Series)
-    assert len(diffs) == 1
-    assert diffs[('recall_score',)] == abs(expected_A - expected_B)
-
-    diff_overall = target.difference_to_overall()
-    assert isinstance(diff_overall, pd.Series)
-    assert len(diff_overall) == 1
-    expected_diff_overall = max([abs(expected_A-expected_overall),
-                                 abs(expected_B-expected_overall)])
-    assert diff_overall[('recall_score',)] == expected_diff_overall
-'''
