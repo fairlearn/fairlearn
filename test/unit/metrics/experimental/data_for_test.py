@@ -32,7 +32,7 @@ def _group_gen(x, runs, groups):
     return groups[(x//runs) % len(groups)]
 
 
-g_1 = np.asarray([_group_gen(x, 2, ['a', 'b']) for x in range(len(y_t))])
+g_1 = np.asarray([_group_gen(x, 2, ['aa', 'ba']) for x in range(len(y_t))])
 g_2 = np.asarray([_group_gen(x, 3, ['f', 'g']) for x in range(len(y_t))])
-g_3 = np.asarray([_group_gen(x, 4, ['k', 'm']) for x in range(len(y_t))])
-g_4 = np.asarray([_group_gen(x, 5, ['p', 'q']) for x in range(len(y_t))])
+g_3 = np.asarray([_group_gen(x, 4, ['kk', 'm']) for x in range(len(y_t))])
+g_4 = np.asarray([_group_gen(x, 5, ['pp', 'q']) for x in range(len(y_t))])

@@ -58,12 +58,12 @@ def test_1m_1cf():
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 1)
     assert np.array_equal(result.index.names, ['CF 0'])
-    mask_a = (g_1 == 'a')
-    mask_b = (g_1 == 'b')
+    mask_a = (g_1 == 'aa')
+    mask_b = (g_1 == 'ba')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a])
     exp_recall_b = skm.recall_score(y_t[mask_b], y_p[mask_b])
-    assert result['recall_score']['a'] == exp_recall_a
-    assert result['recall_score']['b'] == exp_recall_b
+    assert result['recall_score']['aa'] == exp_recall_a
+    assert result['recall_score']['ba'] == exp_recall_b
 
 
 def test_1m_1cf_wgt():
@@ -78,14 +78,14 @@ def test_1m_1cf_wgt():
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 1)
     assert np.array_equal(result.index.names, ['CondF 0'])
-    mask_a = (g_1 == 'a')
-    mask_b = (g_1 == 'b')
+    mask_a = (g_1 == 'aa')
+    mask_b = (g_1 == 'ba')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a],
                                     sample_weight=s_w[mask_a])
     exp_recall_b = skm.recall_score(y_t[mask_b], y_p[mask_b],
                                     sample_weight=s_w[mask_b])
-    assert result['recall_score']['a'] == exp_recall_a
-    assert result['recall_score']['b'] == exp_recall_b
+    assert result['recall_score']['aa'] == exp_recall_a
+    assert result['recall_score']['ba'] == exp_recall_b
 
 
 def test_1m_2cf():
@@ -98,20 +98,20 @@ def test_1m_2cf():
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (4, 1)
     assert np.array_equal(result.index.names, ['CF 0', 'CF 1'])
-    mask_a_f = np.logical_and((g_1 == 'a'), (g_2 == 'f'))
-    mask_a_g = np.logical_and((g_1 == 'a'), (g_2 == 'g'))
-    mask_b_f = np.logical_and((g_1 == 'b'), (g_2 == 'f'))
-    mask_b_g = np.logical_and((g_1 == 'b'), (g_2 == 'g'))
+    mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))
+    mask_a_g = np.logical_and((g_1 == 'aa'), (g_2 == 'g'))
+    mask_b_f = np.logical_and((g_1 == 'ba'), (g_2 == 'f'))
+    mask_b_g = np.logical_and((g_1 == 'ba'), (g_2 == 'g'))
 
     exp_a_f = skm.recall_score(y_t[mask_a_f], y_p[mask_a_f])
     exp_a_g = skm.recall_score(y_t[mask_a_g], y_p[mask_a_g])
     exp_b_f = skm.recall_score(y_t[mask_b_f], y_p[mask_b_f])
     exp_b_g = skm.recall_score(y_t[mask_b_g], y_p[mask_b_g])
 
-    assert result['recall_score'][('a', 'f')] == exp_a_f
-    assert result['recall_score'][('a', 'g')] == exp_a_g
-    assert result['recall_score'][('b', 'f')] == exp_b_f
-    assert result['recall_score'][('b', 'g')] == exp_b_g
+    assert result['recall_score'][('aa', 'f')] == exp_a_f
+    assert result['recall_score'][('aa', 'g')] == exp_a_g
+    assert result['recall_score'][('ba', 'f')] == exp_b_f
+    assert result['recall_score'][('ba', 'g')] == exp_b_g
 
 
 def test_2m_2cf():
@@ -123,25 +123,25 @@ def test_2m_2cf():
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (4, 2)
-    mask_a_f = np.logical_and((g_1 == 'a'), (g_2 == 'f'))
-    mask_a_g = np.logical_and((g_1 == 'a'), (g_2 == 'g'))
-    mask_b_f = np.logical_and((g_1 == 'b'), (g_2 == 'f'))
-    mask_b_g = np.logical_and((g_1 == 'b'), (g_2 == 'g'))
+    mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))
+    mask_a_g = np.logical_and((g_1 == 'aa'), (g_2 == 'g'))
+    mask_b_f = np.logical_and((g_1 == 'ba'), (g_2 == 'f'))
+    mask_b_g = np.logical_and((g_1 == 'ba'), (g_2 == 'g'))
 
     recall_a_f = skm.recall_score(y_t[mask_a_f], y_p[mask_a_f])
     recall_a_g = skm.recall_score(y_t[mask_a_g], y_p[mask_a_g])
     recall_b_f = skm.recall_score(y_t[mask_b_f], y_p[mask_b_f])
     recall_b_g = skm.recall_score(y_t[mask_b_g], y_p[mask_b_g])
-    assert result['recall_score'][('a', 'f')] == recall_a_f
-    assert result['recall_score'][('a', 'g')] == recall_a_g
-    assert result['recall_score'][('b', 'f')] == recall_b_f
-    assert result['recall_score'][('b', 'g')] == recall_b_g
+    assert result['recall_score'][('aa', 'f')] == recall_a_f
+    assert result['recall_score'][('aa', 'g')] == recall_a_g
+    assert result['recall_score'][('ba', 'f')] == recall_b_f
+    assert result['recall_score'][('ba', 'g')] == recall_b_g
 
     prec_a_f = skm.precision_score(y_t[mask_a_f], y_p[mask_a_f])
     prec_a_g = skm.precision_score(y_t[mask_a_g], y_p[mask_a_g])
     prec_b_f = skm.precision_score(y_t[mask_b_f], y_p[mask_b_f])
     prec_b_g = skm.precision_score(y_t[mask_b_g], y_p[mask_b_g])
-    assert result['precision_score'][('a', 'f')] == prec_a_f
-    assert result['precision_score'][('a', 'g')] == prec_a_g
-    assert result['precision_score'][('b', 'f')] == prec_b_f
-    assert result['precision_score'][('b', 'g')] == prec_b_g
+    assert result['precision_score'][('aa', 'f')] == prec_a_f
+    assert result['precision_score'][('aa', 'g')] == prec_a_g
+    assert result['precision_score'][('ba', 'f')] == prec_b_f
+    assert result['precision_score'][('ba', 'g')] == prec_b_g

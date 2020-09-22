@@ -64,7 +64,12 @@ class GroupedMetric:
         result = pd.DataFrame(index=row_index, columns=func_dict.keys())
         for func_name in func_dict:
             for row_curr in row_index:
-                mask = self._mask_from_tuple(row_curr, rows)
+                mask = None
+                if len(rows) > 1:
+                    mask = self._mask_from_tuple(row_curr, rows)
+                else:
+                    # Have to force row_curr to be an unary tuple
+                    mask = self._mask_from_tuple((row_curr,), rows)
                 curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
                 result[func_name][row_curr] = curr_metric
         return result
@@ -206,6 +211,7 @@ class GroupedMetric:
         return result
 
     def _mask_from_tuple(self, index_tuple, feature_list):
+        assert isinstance(index_tuple, tuple)
         assert len(index_tuple) == len(feature_list)
 
         result = feature_list[0].get_mask_for_class(index_tuple[0])
