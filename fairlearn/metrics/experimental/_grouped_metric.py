@@ -94,8 +94,29 @@ class GroupedMetric:
             result = self.by_group.groupby(level=list(range(len(self._cf_names)))).min()
         return result
 
-    def difference(self):
-        return self.group_max() - self.group_min()
+    def difference(self, method='minmax'):
+        subtrahend = np.nan
+        if method == 'minmax':
+            subtrahend = self.group_min()
+        elif method == 'to_overall':
+            subtrahend = self.overall
+        else:
+            raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
+
+        result = None
+        if self._cf_names is None:
+            result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
+            for c in result.columns:
+                diff = (self.by_group[c] - subtrahend[c]['overall']).abs().max()
+                result[c]['overall'] = diff
+        else:
+            # It's easiest to give in to the DataFrame columns preference
+            cf_levels = list(range(len(self._cf_names)))
+            diffs = (self.by_group.unstack(level=cf_levels) -
+                     subtrahend.unstack(level=cf_levels)).abs()
+            result = diffs.max().unstack(0)
+
+        return result
 
     def ratio(self):
         pass
