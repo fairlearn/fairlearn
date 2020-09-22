@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import copy
 import numpy as np
 import pandas as pd
 
@@ -60,20 +61,27 @@ class GroupedMetric:
                 metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
                 result[func_name]['overall'] = metric_value
         else:
-            cf_index = pd.MultiIndex.from_product([x.classes for x in cf_list],
-                                                  names=[x.name for x in cf_list])
-
-            result = pd.DataFrame(index=cf_index, columns=func_dict.keys())
-            for func_name in func_dict:
-                for cf_curr in cf_index:
-                    mask = self._mask_from_tuple(cf_curr, cf_list)
-                    curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
-
-                    result[func_name][cf_curr] = curr_metric
+            result = self._compute_dataframe_from_rows(func_dict, y_true, y_pred, cf_list)
         return result
 
-    def _compute_by_group(self, func_dic, y_true, y_pred, sf_list, cf_list):
-        pass
+    def _compute_by_group(self, func_dict, y_true, y_pred, sf_list, cf_list):
+        rows = copy.deepcopy(sf_list)
+        if cf_list is not None:
+            rows = rows + copy.deepcopy(cf_list)
+
+        return self._compute_dataframe_from_rows(func_dict, y_true, y_pred, rows)
+
+    def _compute_dataframe_from_rows(self, func_dict, y_true, y_pred, rows):
+        row_index = pd.MultiIndex.from_product([x.classes for x in rows],
+                                               names=[x.name for x in rows])
+
+        result = pd.DataFrame(index=row_index, columns=func_dict.keys())
+        for func_name in func_dict:
+            for row_curr in row_index:
+                mask = self._mask_from_tuple(row_curr, rows)
+                curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
+                result[func_name][row_curr] = curr_metric
+        return result
 
     @property
     def overall(self):
