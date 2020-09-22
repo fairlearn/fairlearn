@@ -19,24 +19,28 @@ class GroupedMetric:
                  sample_param_names=None,
                  params=None):
         func_dict = self._process_functions(metric_functions, sample_param_names, params)
+        col_list = [list(func_dict.keys())]
+
+        # Now, prepare the sensitive features
+        sf_list = self._process_features("SF", sensitive_features, len(y_true))
 
         cf_list = None
+        if conditional_features is not None:
+            cf_list = self._process_features("CF", conditional_features, len(y_true))
+
         if conditional_features is None:
             # This ends up making the 'overall' property vary rather dramatically based on whether
             # we have conditional features. We might not want to do that
             metrics = {}
-            for fc in func_dict.values():
-                metrics[fc.name] = fc.evaluate_all(y_true, y_pred)
-            self._overall = pd.DataFrame(data=metrics,
-                                         index=['overall'],
-                                         columns=func_dict.keys())
+            self._overall = pd.DataFrame(index=['overall'], columns=col_list)
+            for func_name in func_dict:
+                metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
+                self._overall[func_name]['overall'] = metric_value
         else:
-            cf_list = self._process_features("CF", conditional_features, len(y_true))
             cf_index = pd.MultiIndex.from_product([x.classes for x in cf_list],
                                                   names=[x.name for x in cf_list])
 
-            self._overall = pd.DataFrame(index=cf_index, columns=[
-                                         x.name for x in func_dict.values()])
+            self._overall = pd.DataFrame(index=cf_index, columns=col_list)
             for func_name in func_dict:
                 for cf_curr in cf_index:
                     mask = self._mask_from_tuple(cf_curr, cf_list)
@@ -44,22 +48,17 @@ class GroupedMetric:
 
                     self._overall[func_name][cf_curr] = curr_metric
 
-        # Now, prepare the sensitive features
-        sf_list = self._process_features("SF", sensitive_features, len(y_true))
+        feature_values = [x.classes for x in sf_list]
+        feature_names = [x.name for x in sf_list]
+        if conditional_features is None:
+
+
         sf_index = pd.MultiIndex.from_product([x.classes for x in sf_list],
                                               names=[x.name for x in sf_list])
 
-        col_lists = [list(func_dict.keys())]
-        col_titles = ["Metric Name"]
-        if cf_list is not None:
-            col_lists = col_lists + [x.classes for x in cf_list]
-            col_titles = col_titles + [x.name for x in cf_list]
-        columns = pd.MultiIndex.from_product(col_lists, names=col_titles)
-
-        metrics = pd.DataFrame(index=sf_index, columns=columns)
-
-        for col_curr in columns:
-            current_function = func_dict[col_curr[0]]
+        metrics = pd.DataFrame(index=sf_index, columns=col_list)
+        for col_curr in col_list:
+            current_function = func_dict[col_curr]
             cf_mask = np.full(len(y_true), fill_value=True)
             if cf_list is not None:
                 cf_mask = self._mask_from_tuple(col_curr[1:], cf_list)
