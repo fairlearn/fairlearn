@@ -5,10 +5,13 @@ import numpy as np
 
 
 class FunctionContainer:
+    """Read a placeholder comment."""
+
     def __init__(self, func, name, sample_param_names, params):
+        """Read a placeholder comment."""
         assert func is not None
         self._func = func
-        
+
         if name is None:
             self._name = func.__name__
         else:
@@ -32,21 +35,26 @@ class FunctionContainer:
 
     @property
     def func(self):
+        """Read a placeholder comment."""
         return self._func
 
     @property
     def name(self):
+        """Read a placeholder comment."""
         return self._name
 
     @property
     def sample_param_names(self):
+        """Read a placeholder comment."""
         return self._sample_param_names
 
     @property
     def params(self):
+        """Read a placeholder comment."""
         return self._params
 
     def generate_params_for_mask(self, mask):
+        """Read a placeholder comment."""
         curr_params = dict()
         for name, value in self.params.items():
             if name in self.sample_param_names:
@@ -57,6 +65,7 @@ class FunctionContainer:
         return curr_params
 
     def evaluate(self, y_true, y_pred, mask):
+        """Read a placeholder comment."""
         assert isinstance(y_true, np.ndarray)
         assert isinstance(y_pred, np.ndarray)
         assert len(y_true) == len(y_pred)
@@ -66,4 +75,5 @@ class FunctionContainer:
         return self.func(y_true[mask], y_pred[mask], **params)
 
     def evaluate_all(self, y_true, y_pred):
+        """Read a placeholder comment."""
         return self.func(y_true, y_pred, **(self.params))

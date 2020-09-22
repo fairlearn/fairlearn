@@ -7,7 +7,7 @@ import sklearn.metrics as skm
 
 import fairlearn.metrics.experimental as metrics
 
-from .data_for_test import y_t, y_p, s_w, g_1, g_2, g_3, g_4
+from .data_for_test import y_t, y_p, g_2, g_3, g_4
 
 
 def test_basic():

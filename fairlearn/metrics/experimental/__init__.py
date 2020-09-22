@@ -1,9 +1,11 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+"""Read a placeholder comment."""
+
 from ._derived_metrics import make_derived_metric
-from ._group_feature import GroupFeature
-from ._grouped_metric import GroupedMetric
+from ._group_feature import GroupFeature  # noqa: F401
+from ._grouped_metric import GroupedMetric  # noqa: F401
 from . import _function_container
 
 __all__ = [

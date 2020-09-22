@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 from sklearn.model_selection import train_test_split
 import sklearn.metrics as skm
 

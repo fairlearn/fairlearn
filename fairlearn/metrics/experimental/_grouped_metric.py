@@ -13,12 +13,15 @@ _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 
 
 class GroupedMetric:
+    """Read a placeholder comment."""
+
     def __init__(self, metric_functions,
                  y_true, y_pred, *,
                  sensitive_features,
                  conditional_features=None,
                  sample_param_names=None,
                  params=None):
+        """Read a placeholder comment."""
         func_dict = self._process_functions(metric_functions, sample_param_names, params)
 
         # Now, prepare the sensitive features
@@ -68,13 +71,16 @@ class GroupedMetric:
 
     @property
     def overall(self):
+        """Read a placeholder comment."""
         return self._overall
 
     @property
     def by_group(self):
+        """Read a placeholder comment."""
         return self._by_group
 
     def group_max(self):
+        """Read a placeholder comment."""
         if self._cf_names is None:
             result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
             for c in result.columns:
@@ -85,6 +91,7 @@ class GroupedMetric:
         return result
 
     def group_min(self):
+        """Read a placeholder comment."""
         if self._cf_names is None:
             result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
             for c in result.columns:
@@ -95,6 +102,7 @@ class GroupedMetric:
         return result
 
     def difference(self, method='minmax'):
+        """Read a placeholder comment."""
         subtrahend = np.nan
         if method == 'minmax':
             subtrahend = self.group_min()
@@ -119,6 +127,7 @@ class GroupedMetric:
         return result
 
     def ratio(self):
+        """Read a placeholder comment."""
         pass
 
     def _check_feature_length(self, feature, expected_length):

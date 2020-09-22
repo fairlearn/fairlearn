@@ -40,4 +40,5 @@ class _DerivedMetric:
 
 
 def make_derived_metric(aggregate, metric_fn, sample_param_names=None):
+    """Read a placeholder comment."""
     return _DerivedMetric(aggregate, metric_fn, sample_param_names)
