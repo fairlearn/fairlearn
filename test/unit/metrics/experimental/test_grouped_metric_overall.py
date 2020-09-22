@@ -57,6 +57,7 @@ def test_1m_1cf():
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 1)
+    assert np.array_equal(result.index.names, ['CF 0'])
     mask_a = (g_1 == 'a')
     mask_b = (g_1 == 'b')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a])
@@ -70,12 +71,13 @@ def test_1m_1cf_wgt():
     func_dict = target._process_functions(skm.recall_score,
                                           ['sample_weight'],
                                           {'sample_weight': s_w})
-    cf_list = target._process_features("CF", g_1, len(y_t))
+    cf_list = target._process_features("CondF", g_1, len(y_t))
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 1)
+    assert np.array_equal(result.index.names, ['CondF 0'])
     mask_a = (g_1 == 'a')
     mask_b = (g_1 == 'b')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a],
@@ -95,6 +97,7 @@ def test_1m_2cf():
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (4, 1)
+    assert np.array_equal(result.index.names, ['CF 0', 'CF 1'])
     mask_a_f = np.logical_and((g_1 == 'a'), (g_2 == 'f'))
     mask_a_g = np.logical_and((g_1 == 'a'), (g_2 == 'g'))
     mask_b_f = np.logical_and((g_1 == 'b'), (g_2 == 'f'))
