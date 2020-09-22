@@ -33,7 +33,6 @@ class GroupedMetric:
         feature_values = [x.classes for x in sf_list]
         feature_names = [x.name for x in sf_list]
 
-
         sf_index = pd.MultiIndex.from_product([x.classes for x in sf_list],
                                               names=[x.name for x in sf_list])
 
@@ -72,6 +71,9 @@ class GroupedMetric:
 
                     result[func_name][cf_curr] = curr_metric
         return result
+
+    def _compute_by_group(self, func_dic, y_true, y_pred, sf_list, cf_list):
+        pass
 
     @property
     def overall(self):
