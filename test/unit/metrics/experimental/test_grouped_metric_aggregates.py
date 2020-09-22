@@ -95,6 +95,63 @@ def test_1m_1sf_1cf():
     assert target_maxs['recall_score']['m'] == max(recall_m_arr)
 
 
+def test_1m_1sf_2cf():
+    target = metrics.GroupedMetric(skm.recall_score,
+                                   y_t, y_p,
+                                   sensitive_features=g_2,
+                                   conditional_features=[g_3, g_1])
+
+    # Check we have correct return types
+    assert isinstance(target.overall, pd.DataFrame)
+    assert isinstance(target.by_group, pd.DataFrame)
+
+    mask_a = (g_1 == 'a')
+    mask_b = (g_1 == 'b')
+    mask_f = (g_2 == 'f')
+    mask_g = (g_2 == 'g')
+    mask_k = (g_3 == 'k')
+    mask_m = (g_3 == 'm')
+
+    mask_k_a_f = np.logical_and(np.logical_and(mask_k, mask_a), mask_f)
+    mask_k_a_g = np.logical_and(np.logical_and(mask_k, mask_a), mask_g)
+    mask_k_b_f = np.logical_and(np.logical_and(mask_k, mask_b), mask_f)
+    mask_k_b_g = np.logical_and(np.logical_and(mask_k, mask_b), mask_g)
+    mask_m_a_f = np.logical_and(np.logical_and(mask_m, mask_a), mask_f)
+    mask_m_a_g = np.logical_and(np.logical_and(mask_m, mask_a), mask_g)
+    mask_m_b_f = np.logical_and(np.logical_and(mask_m, mask_b), mask_f)
+    mask_m_b_g = np.logical_and(np.logical_and(mask_m, mask_b), mask_g)
+
+    recall_k_a_f = skm.recall_score(y_t[mask_k_a_f], y_p[mask_k_a_f])
+    recall_k_a_g = skm.recall_score(y_t[mask_k_a_g], y_p[mask_k_a_g])
+    recall_k_b_f = skm.recall_score(y_t[mask_k_b_f], y_p[mask_k_b_f])
+    recall_k_b_g = skm.recall_score(y_t[mask_k_b_g], y_p[mask_k_b_g])
+    recall_m_a_f = skm.recall_score(y_t[mask_m_a_f], y_p[mask_m_a_f])
+    recall_m_a_g = skm.recall_score(y_t[mask_m_a_g], y_p[mask_m_a_g])
+    recall_m_b_f = skm.recall_score(y_t[mask_m_b_f], y_p[mask_m_b_f])
+    recall_m_b_g = skm.recall_score(y_t[mask_m_b_g], y_p[mask_m_b_g])
+
+    recall_k_a_arr = [recall_k_a_f, recall_k_a_g]
+    recall_k_b_arr = [recall_k_b_f, recall_k_b_g]
+    recall_m_a_arr = [recall_m_a_f, recall_m_a_g]
+    recall_m_b_arr = [recall_m_b_f, recall_m_b_g]
+
+    target_mins = target.group_min()
+    assert isinstance(target_mins, pd.DataFrame)
+    assert target_mins.shape == (4, 1)
+    assert target_mins['recall_score'][('k', 'a')] == min(recall_k_a_arr)
+    assert target_mins['recall_score'][('k', 'b')] == min(recall_k_b_arr)
+    assert target_mins['recall_score'][('m', 'a')] == min(recall_m_a_arr)
+    assert target_mins['recall_score'][('m', 'b')] == min(recall_m_b_arr)
+
+    target_maxs = target.group_max()
+    assert isinstance(target_mins, pd.DataFrame)
+    assert target_maxs.shape == (4, 1)
+    assert target_maxs['recall_score'][('k', 'a')] == max(recall_k_a_arr)
+    assert target_maxs['recall_score'][('k', 'b')] == max(recall_k_b_arr)
+    assert target_maxs['recall_score'][('m', 'a')] == max(recall_m_a_arr)
+    assert target_maxs['recall_score'][('m', 'b')] == max(recall_m_b_arr)
+
+
 def test_2m_1sf_1cf():
     target = metrics.GroupedMetric([skm.recall_score, skm.precision_score],
                                    y_t, y_p,
