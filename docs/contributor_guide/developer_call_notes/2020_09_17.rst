@@ -56,7 +56,8 @@ Agenda:
 - Metrics API progress
 
     - Proposal: https://github.com/fairlearn/fairlearn-proposals/pull/15 
-      --> Richard started implementation
+      --> Richard started
+      `implementation <https://github.com/riedgar-ms/fairlearn/blob/riedgar-ms/return-of-the-GMR/test/unit/metrics/experimental/sample_code.py>`_
     - https://hackmd.io/zMSG-_oWSxOs-AVbLwNywQ
 
 - UI recap
