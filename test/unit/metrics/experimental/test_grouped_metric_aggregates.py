@@ -15,6 +15,7 @@ def test_1m_1sf_0cf():
                                    y_t, y_p,
                                    sensitive_features=g_4)
 
+    recall = skm.recall_score(y_t, y_p)
     mask_p = (g_4 == 'p')
     mask_q = (g_4 == 'q')
     recall_p = skm.recall_score(y_t[mask_p], y_p[mask_p])
@@ -29,6 +30,17 @@ def test_1m_1sf_0cf():
     assert isinstance(target_mins, pd.DataFrame)
     assert target_maxes.shape == (1, 1)
     assert target_maxes['recall_score']['overall'] == max(recall_p, recall_q)
+
+    target_diff = target.difference()
+    assert isinstance(target_diff, pd.DataFrame)
+    assert target_diff.shape == (1, 1)
+    assert target_diff['recall_score']['overall'] == abs(recall_p - recall_q)
+
+    target_diff_overall = target.difference(method='to_overall')
+    assert isinstance(target_diff_overall, pd.DataFrame)
+    assert target_diff_overall.shape == (1, 1)
+    diffs_overall = [abs(recall_p-recall), abs(recall_q-recall)]
+    assert target_diff_overall['recall_score']['overall'] == max(diffs_overall)
 
 
 def test_2m_1sf_0cf():
@@ -55,17 +67,18 @@ def test_2m_1sf_0cf():
     assert target_maxes['recall_score']['overall'] == max(recall_p, recall_q)
     assert target_maxes['precision_score']['overall'] == max(prec_p, prec_q)
 
+    target_diffs = target.difference()
+    assert isinstance(target_diffs, pd.DataFrame)
+    assert target_diffs.shape == (1, 2)
+    assert target_diffs['recall_score']['overall'] == abs(recall_p - recall_q)
+    assert target_diffs['precision_score']['overall'] == abs(prec_p - prec_q)
+
 
 def test_1m_1sf_1cf():
     target = metrics.GroupedMetric(skm.recall_score,
                                    y_t, y_p,
                                    sensitive_features=g_2,
                                    conditional_features=g_3)
-
-    # Check we have correct return types
-    assert isinstance(target.overall, pd.DataFrame)
-    assert isinstance(target.by_group, pd.DataFrame)
-
     mask_f = (g_2 == 'f')
     mask_g = (g_2 == 'g')
     mask_k = (g_3 == 'k')
