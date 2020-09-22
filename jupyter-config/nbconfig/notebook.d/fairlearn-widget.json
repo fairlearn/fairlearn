@@ -1,7 +1,0 @@
-{
-  "load_extensions": {
-    "jupyter-js-widgets/extension": true,
-    "fairlearn-widget/extension": true,
-    "fairlearn-widget/index": true
-  }
-}

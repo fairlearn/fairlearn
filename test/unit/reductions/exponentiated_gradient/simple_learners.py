@@ -34,3 +34,11 @@ class LeastSquaresRegressor:
 
     def predict(self, X):
         return X.dot(self.weights)
+
+
+class MockEstimator:
+    def fit(self, X, y, sample_weight):
+        pass
+
+    def predict(self, X):
+        return np.ones(X.shape[0])
