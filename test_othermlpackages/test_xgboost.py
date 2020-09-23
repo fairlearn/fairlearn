@@ -21,6 +21,7 @@ def test_gridsearch_classification():
 
     ptc.run_gridsearch_classification(estimator, disparity_moment)
 
+
 def test_thresholdoptimizer_classification():
     estimator = xgb.XGBClassifier()
 
