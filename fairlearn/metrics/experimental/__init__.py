@@ -4,7 +4,7 @@
 """Read a placeholder comment."""
 
 from ._derived_metrics import make_derived_metric
-from ._grouped_metric import GroupedMetric  # noqa: F401
+from ._grouped_metric import GroupedMetric
 from . import _function_container
 from . import _group_feature
 
