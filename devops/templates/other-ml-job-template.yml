@@ -18,7 +18,7 @@ jobs:
         
     variables:
       condaFile: "${{ format('{0}/conda-{1}.yaml', parameters.baseDir, package.Value) }}"
-      envArtifact: "${ format('{0}-{1}', parameters.envInfoArtifactBase, package.Key) }}"
+      envArtifact: "${{ format('{0}-{1}', parameters.envInfoArtifactBase, package.Key) }}"
       testFile: "${{ format('{0}/test_{1}.py', parameters.baseDir, package.Value) }}"
 
     steps:
