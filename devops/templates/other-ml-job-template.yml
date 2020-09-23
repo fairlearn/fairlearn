@@ -31,7 +31,7 @@ jobs:
 
     - bash: |
         source activate ${{parameters.condaEnv}}
-        python -m pytest $(testFile) --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)
+        python -m pytest $(testFile) --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
       displayName: Run tests for ${{package.Key}}
     
     - task: PublishTestResults@2
