@@ -1,4 +1,6 @@
 parameters:
+  baseDir: test_othermlpackages
+  condaEnv: test-conda-env
   packages: { LightGBM: lightgbm, XGBoost: xgboost }
   poolImage: ubuntu-latest
   pythonVersion: 3.8
@@ -10,10 +12,20 @@ jobs:
     displayName: "${{ format('Test {0}', package.Key) }}"
     pool:
       vmImage: ${{parameters.poolImage}}
+        
+    variables:
+      condaFile: "${{ format('{0}/conda-{1}.yaml', parameters.baseDir, package.Value }}"
 
     steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python ${{parameters.pythonVersion}}'
-      inputs:
-        versionSpec: ${{parameters.pythonVersion}}
-        addToPath: true
+    - bash: echo "##vso[task.prependpath]$CONDA/bin"
+      displayName: Add conda to PATH for Linux
+
+    - bash: conda env create --name ${{parameters.condaEnv}} --file=$(condaFile)
+      displayName: Create Anaconda environment
+
+    - bash: |
+        source activate ${{parameters.condaEnv}}
+        pip install .
+      displayName: Install Fairlearn
+
+    
