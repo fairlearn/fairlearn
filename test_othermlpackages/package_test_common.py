@@ -8,6 +8,7 @@ import pandas as pd
 from sklearn.datasets import fetch_openml
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
 
 
@@ -18,7 +19,6 @@ def fetch_adult():
     X = pd.get_dummies(X)
     Y = (data.target == '>50K') * 1
     A = data.data['sex']
-    A = pd.get_dummies(A)
 
     le = LabelEncoder()
     Y = le.fit_transform(Y)
@@ -57,3 +57,14 @@ def run_gridsearch_classification(estimator, moment):
     gs.fit(X, Y, sensitive_features=A)
 
     assert len(gs.predictors_) == num_predictors
+
+
+def run_thresholdoptimizer_classification(estimator):
+    """Run classification test with ThresholdOptimizer."""
+    X, Y, A = fetch_adult()
+
+    to = ThresholdOptimizer(estimator=estimator, prefit=False)
+    to.fit(X, Y, sensitive_features=A)
+
+    results = to.predict(X, sensitive_features=A)
+    assert results is not None

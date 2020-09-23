@@ -1,9 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import pytest
-
-import .package_test_common as ptc
+from . import package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
 
@@ -22,3 +20,8 @@ def test_gridsearch_classification():
     disparity_moment = DemographicParity()
 
     ptc.run_gridsearch_classification(estimator, disparity_moment)
+
+def test_thresholdoptimizer_classification():
+    estimator = xgb.XGBClassifier()
+
+    ptc.run_thresholdoptimizer_classification(estimator)
