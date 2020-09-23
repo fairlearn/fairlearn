@@ -15,6 +15,7 @@ jobs:
         
     variables:
       condaFile: "${{ format('{0}/conda-{1}.yaml', parameters.baseDir, package.Value) }}"
+      testFile: "${{ format('{0}/test_{1}.py', parameters.baseDir, package.Value) }}"
 
     steps:
     - bash: echo "##vso[task.prependpath]$CONDA/bin"
@@ -28,4 +29,12 @@ jobs:
         pip install .
       displayName: Install Fairlearn
 
+    - bash: |
+        source activate ${{parameters.condaEnv}}
+        python -m pytest $(testFile) --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)
+      displayName: Run tests for ${{package.Key}}
+    
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results **/TEST-*.xml'
+      condition: succeededOrFailed()
     
