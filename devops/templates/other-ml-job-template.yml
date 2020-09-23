@@ -7,7 +7,7 @@ parameters:
 jobs:
 - ${{ each package in parameters.packages }}:
   - job:
-    displayName: "format('Test {0}', package.Key) }}"
+    displayName: "${{ format('Test {0}', package.Key) }}"
     pool:
       vmImage: ${{parameters.poolImage}}
 
