@@ -116,7 +116,20 @@ pygments_style = 'sphinx'
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',
      'gallery_dirs': 'auto_examples',
+     # pypandoc enables rst to md conversion in downloadable notebooks
      'pypandoc': True,
+     'binder': {
+        'org': 'fairlearn',
+        'repo': 'fairlearn',
+        'branch': 'master',
+        'binderhub_url': 'https://mybinder.org',
+        'dependencies': [
+            '../requirements.txt',
+            '../requirements-dev.txt',
+            '../requirements-customplots.txt'],
+        'notebooks_dir': 'binder',
+        'use_jupyter_lab': False
+     }
 }
 
 

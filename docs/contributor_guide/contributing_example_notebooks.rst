@@ -75,10 +75,9 @@ Changes made in Jupyter automatically show up in the `.py` file.
 
 Note that the text portion of these notebooks should be written in
 restructured text (ReST), not markdown, so that the sphinx documentation build
-can render it nicely for the website. However, when downloading the `.ipynb`
-file through the website certain parts of the ReST will look odd if viewed in
-tools like Jupyter since it is meant to render markdown. For that reason try
-to limit use of ReST directives (e.g., `.. note:`), internal links
-(e.g., `:ref:`), and other functionality that won't render well in markdown.
-The next release of `sphinx-gallery` should fix the ReST-to-markdown
-conversion problem.
+can render it nicely for the website. When downloading the `.ipynb` file through
+the website the text portions will be in markdown due to automatic conversion from
+ReST to markdown by sphinx-gallery. This currently only works for basic ReST
+functionality, so try to limit use of ReST directives (e.g., `.. note:`),
+internal links (e.g., `:ref:`), and other functionality that won't render well
+in markdown.
