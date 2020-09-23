@@ -1,7 +1,7 @@
 # Pipeline for smoke testing other ML packages
 
 variables:
-  OtherPackages : { LightGBM:lightgbm, XGBoost:xgboost }
+  OtherPackages : { LightGBM: lightgbm, XGBoost: xgboost }
   PoolImage: ubuntu-latest
   PythonVersion: 3.8
   FreezeArtifactStem: 'freeze'
