@@ -41,8 +41,8 @@ jobs:
 
     - bash: |
         source activate  ${{parameters.condaEnv}}
-        pip freeze --all > ${{parameters.envInfoFileBase}}-${{packages.Key}}-pip.txt
-        conda list > ${{parameters.envInfoFileBase}}-${{packages.Key}}-conda.txt
+        pip freeze --all > ${{parameters.envInfoFileBase}}-${{package.Key}}-pip.txt
+        conda list > ${{parameters.envInfoFileBase}}-${{package.Key}}-conda.txt
       displayName: "Gather environment information"
       workingDirectory: '${{parameters.envInfoDir}}'
 
