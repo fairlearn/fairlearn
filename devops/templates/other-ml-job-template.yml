@@ -1,6 +1,9 @@
 parameters:
   baseDir: test_othermlpackages
   condaEnv: test-conda-env
+  envInfoArtifactBase: Environment
+  envInfoDir: environment
+  envInfoFileBase: env
   packages: { LightGBM: lightgbm, XGBoost: xgboost }
   poolImage: ubuntu-latest
   pythonVersion: 3.8
@@ -15,9 +18,11 @@ jobs:
         
     variables:
       condaFile: "${{ format('{0}/conda-{1}.yaml', parameters.baseDir, package.Value) }}"
+      envArtifact: "${ format('{0}-{1}', parameters.envInfoArtifactBase, package.Key) }}"
       testFile: "${{ format('{0}/test_{1}.py', parameters.baseDir, package.Value) }}"
 
     steps:
+
     - bash: echo "##vso[task.prependpath]$CONDA/bin"
       displayName: Add conda to PATH for Linux
 
@@ -28,6 +33,26 @@ jobs:
         source activate ${{parameters.condaEnv}}
         pip install .
       displayName: Install Fairlearn
+
+    # ====================================================
+
+    - bash: mkdir ${{parameters.envInfoDir}}
+      displayName: Create directory for environment information
+
+    - bash: |
+        source activate  ${{parameters.condaEnv}}
+        pip freeze --all > ${{parameters.envInfoFileBase}}-${{packages.Key}}-pip.txt
+        conda list > ${{parameters.envInfoFileBase}}-${{packages.Key}}-conda.txt
+      displayName: "Gather environment information"
+      workingDirectory: '${{parameters.envInfoDir}}'
+
+    - task: PublishPipelineArtifact@1
+      displayName: "Publish environment info to artifact $(envArtifact)"
+      inputs:
+        path: ${{parameters.envInfoDir}}
+        artifact: $(envArtifact)
+    
+    # ====================================================
 
     - bash: |
         source activate ${{parameters.condaEnv}}
