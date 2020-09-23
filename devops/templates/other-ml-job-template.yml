@@ -1,0 +1,19 @@
+parameters:
+  packages: { LightGBM: lightgbm, XGBoost: xgboost }
+  poolImage: ubuntu-latest
+  pythonVersion: 3.8
+
+
+jobs:
+- ${{ each package in parameters.packages }}:
+  - job:
+    displayName: "format('Test {0}', package.Key) }}"
+    pool:
+      vmImage: ${{parameters.poolImage}}
+
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python ${{parameters.pythonVersion}}'
+      inputs:
+        versionSpec: ${{parameters.pythonVersion}}
+        addToPath: true

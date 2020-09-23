@@ -1,12 +1,5 @@
 # Pipeline for smoke testing other ML packages
 
-variables:
-  OtherPackages: { LightGBM: lightgbm, XGBoost: xgboost }
-  PoolImage: ubuntu-latest
-  PythonVersion: 3.8
-  FreezeArtifactStem: 'freeze'
-  FreezeFileStem: 'requirements-freeze'
-
 trigger: none # No CI build
 
 pr: none # Not for pull requests
@@ -15,15 +8,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- ${{ each package in variables.OtherPackages }}:
-  - job:
-    displayName: "format('Test {0}', package.Key) }}"
-    pool:
-      vmImage: $(variables.PoolImage)
-
-    steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python ${{parameters.pythonVersion}}'
-      inputs:
-        versionSpec: $(variables.PythonVersion)
-        addToPath: true
+- template: templates/other-ml-job-template.yml
+  parameters:
+    poolImage: ubuntu-latest
