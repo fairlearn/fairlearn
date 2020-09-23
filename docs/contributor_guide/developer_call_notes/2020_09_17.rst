@@ -4,6 +4,7 @@ Developer Call September 17, 2020
 These are collaborative notes.
 
 Attendees:
+
 - `Miro Dudik <https://github.com/MiroDudik>`_
 - `Richard Edgar <https://github.com/riedgar-ms>`_
 - `Adrin Jalali <https://github.com/adrinjalali>`_
