@@ -4,6 +4,14 @@ trigger: none # No CI build
 
 pr: none # Not for pull requests
 
+schedules:
+- cron: "0 8 * * *" # Time is UTC
+  displayName: Nightly Build
+  branches:
+    include:
+      - master
+  always: true
+
 pool:
   vmImage: 'ubuntu-latest'
 
