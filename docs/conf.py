@@ -116,6 +116,7 @@ pygments_style = 'sphinx'
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',
      'gallery_dirs': 'auto_examples',
+     'pypandoc': True,
 }
 
 
