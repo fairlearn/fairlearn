@@ -3,14 +3,11 @@
 
 import pytest
 
-import test_othermlpackages.package_test_common as ptc
+import .package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
 
-try:
-    import lightgbm as lgb
-except ImportError:
-    pytestmark = pytest.mark.skip(reason="LightGBM not installed")
+import lightgbm as lgb
 
 
 def test_expgrad_classification():

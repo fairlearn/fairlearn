@@ -3,14 +3,11 @@
 
 import pytest
 
-import test_othermlpackages.package_test_common as ptc
+import .package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
 
-try:
-    import xgboost as xgb
-except ImportError:
-    pytestmark = pytest.mark.skip(reason="XGBoost not installed")
+import xgboost as xgb
 
 
 def test_expgrad_classification():
