@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Script to install the requirements files, optionally pinning versions."""
 
 import argparse

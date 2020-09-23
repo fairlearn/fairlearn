@@ -1,0 +1,38 @@
+Developer call August 13, 2020
+------------------------------
+
+Notes taken by Roman Lutz.
+
+Attendees:
+
+- `Michael Amoako <https://github.com/michaelamoako>`_
+- `Andrew Anderson <https://www.linkedin.com/in/andrewanderson05/>`_
+- `Miro Dudik <https://github.com/MiroDudik>`_
+- `Richard Edgar <https://github.com/riedgar-ms>`_
+- `Adrin Jalali <https://github.com/adrinjalali>`_
+- `Roman Lutz <https://github.com/romanlutz>`_
+- `Kevin Robinson <https://github.com/kevinrobinson>`_
+- `Hanna Wallach <https://www.microsoft.com/en-us/research/people/wallach/>`_
+- `Ke Xu <https://github.com/KeXu444>`_
+
+Agenda:
+
+- UX refactoring
+
+    - `Proposal <https://github.com/fairlearn/fairlearn-proposals/pull/14>`_
+      published earlier this week.
+
+    - Feedback:
+
+        - user guides need to reflect the separation
+        - all steps required need to be outlined
+        - make it clear and easy how to contribute to UI
+        - communication around UI repo should also be open
+        - proposal needs to address community-driven UI development, not just
+          the future of the existing UI under a Microsoft repo.
+
+- datasets module - skipped this since Hilde / Vincent should be involved
+
+- webpage redesign:
+    - Vanessa has some capacity
+    - effort starting soon --> anyone interested please reach out

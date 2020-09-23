@@ -1,11 +1,11 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 from copy import deepcopy
 import numpy as np
 import pandas as pd
-import pickle
 import pytest
+from sklearn.base import BaseEstimator
 from sklearn.dummy import DummyClassifier
 
 from fairlearn.reductions._exponentiated_gradient._lagrangian import _Lagrangian
@@ -14,7 +14,7 @@ from fairlearn.reductions import DemographicParity, EqualizedOdds, \
     BoundedGroupLoss, LossMoment, ZeroOneLoss
 
 from .test_utilities import _get_data
-from .simple_learners import LeastSquaresBinaryClassifierLearner
+from .simple_learners import LeastSquaresBinaryClassifierLearner, MockEstimator
 
 _PRECISION = 1e-6
 
@@ -103,21 +103,16 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
 
 @pytest.mark.parametrize("Constraints", ALL_CONSTRAINTS)
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
-def test_call_oracle(Constraints, eps, mocker):
+@pytest.mark.parametrize("estimator", [MockEstimator, BaseEstimator])
+def test_call_oracle(Constraints, eps, estimator, mocker):
     X, y, A = _get_data(A_two_dim=False)
-    # Using a mocked estimator here since we don't actually want to fit one, but rather care about
-    # having that object's fit method called exactly once.
-    estimator = mocker.MagicMock()
+    # Using a real estimator here with a mocked `fit` method since we don't actually
+    # want to fit one, but rather care about having that object's fit method called exactly once.
+    estimator.fit = mocker.MagicMock(name='fit')
     if issubclass(Constraints, LossMoment):
         constraints = Constraints(ZeroOneLoss())
     else:
         constraints = Constraints()
-
-    # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the mock
-    # object, so we mock that process as well. It sets the result from pickle.loads as the
-    # estimator, so we can simply overwrite the return value to be our mocked estimator object.
-    mocker.patch('pickle.dumps')
-    pickle.loads = mocker.MagicMock(return_value=estimator)
 
     lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), 1/eps)
 
@@ -130,11 +125,8 @@ def test_call_oracle(Constraints, eps, mocker):
 
     # Ideally we'd prefer calling assert_called_once_with(args) but that is not compatible with
     # pandas data structures.
-    assert len(estimator.method_calls) == 1
-    name, args, kwargs = estimator.method_calls[0]
-    assert name == 'fit'
-    assert len(args) == 2
-    assert len(kwargs) == 1
+    assert len(estimator.fit.mock_calls) == 1
+    _, args, kwargs = estimator.fit.mock_calls[0]
     assert (args[0] == X).all().all()
     assert (args[1] == new_labels).all()
     assert (kwargs['sample_weight'] == new_weights).all()
@@ -161,7 +153,6 @@ def test_call_oracle_single_y_value(Constraints, eps, y_value, mocker):
 
     # We mock the estimator, but we only patch it for pickling
     estimator = mocker.MagicMock()
-    mocker.patch('pickle.dumps')
     if issubclass(Constraints, LossMoment):
         constraints = Constraints(ZeroOneLoss(), upper_bound=eps)
     else:
