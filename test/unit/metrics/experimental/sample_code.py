@@ -57,16 +57,18 @@ Y_pred = unmitigated_predictor.predict(X_test)
 wgts = np.random.random(size=len(Y_test))
 
 fns = [skm.recall_score, skm.precision_score, skm.fbeta_score]
-spn = [['sample_weight'], ['sample_weight'], ['sample_weight']]
-params = [{'sample_weight': wgts, 'zero_division': 0},
-          {'sample_weight': wgts},
-          {'sample_weight': wgts, 'beta': 0.75}]
+sample_params = [{'sample_weight': wgts},
+                 {'sample_weight': wgts},
+                 {'sample_weight': wgts}]
+params = [{'zero_division': 0},
+          {},
+          {'beta': 0.75}]
 
 
 result = metrics.GroupedMetric(fns, Y_test, Y_pred,
                                sensitive_features=[A_test['Race'], A_test['Sex']],
                                conditional_features=[X_test['Workclass']],
-                               sample_param_names=spn,
+                               sample_params=sample_params,
                                params=params)
 
 print()
@@ -80,7 +82,7 @@ print(result.by_group)
 
 result2 = metrics.GroupedMetric(fns, Y_test, Y_pred,
                                 sensitive_features=[A_test['Race'], A_test['Sex']],
-                                sample_param_names=spn,
+                                sample_params=sample_params,
                                 params=params)
 
 print()
@@ -111,7 +113,6 @@ print("fbeta_difference (Race, Sex):", fbeta_difference(Y_test, Y_pred,
 result3 = metrics.GroupedMetric(skm.fbeta_score,
                                 Y_test, Y_pred,
                                 sensitive_features=A_test,
-                                sample_param_names=['sample_weights'],
                                 params={'beta': 0.7})
 print("\n\nresult3.by_group\n")
 print(result3.by_group)
