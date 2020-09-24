@@ -56,7 +56,7 @@ def test_derived_difference_both_arg_types():
     grouped = metrics.GroupedMetric(skm.fbeta_score,
                                     y_t, y_p,
                                     sensitive_features=gid,
-                                    sample_param_names=['sample_weight'],
-                                    params={'beta': 0.6, 'sample_weight': wgt})
+                                    sample_params={'sample_weight': wgt},
+                                    params={'beta': 0.6})
     actual = my_fn(y_t, y_p, sensitive_features=gid, beta=0.6, sample_weight=wgt)
     assert actual == grouped.difference()['fbeta_score'][0]

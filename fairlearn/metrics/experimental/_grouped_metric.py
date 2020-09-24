@@ -19,10 +19,10 @@ class GroupedMetric:
                  y_true, y_pred, *,
                  sensitive_features,
                  conditional_features=None,
-                 sample_param_names=None,
+                 sample_params=None,
                  params=None):
         """Read a placeholder comment."""
-        func_dict = self._process_functions(metric_functions, sample_param_names, params)
+        func_dict = self._process_functions(metric_functions, sample_params, params)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("SF", sensitive_features, len(y_true))
@@ -140,31 +140,33 @@ class GroupedMetric:
             msg = _BAD_FEATURE_LENGTH.format(len(feature), expected_length)
             raise ValueError(msg)
 
-    def _process_functions(self, metric_functions, sample_param_names, params):
+    def _process_functions(self, metric_functions, sample_params, params):
         func_dict = dict()
         if isinstance(metric_functions, list):
             # Verify the arguments
-            spn = np.full(len(metric_functions), fill_value=None)
-            if sample_param_names is not None:
-                assert isinstance(sample_param_names, list)
-                assert len(metric_functions) == len(sample_param_names)
-                spn = sample_param_names
-            prms = np.full(len(metric_functions), fill_value=None)
+            sp_list = np.full(len(metric_functions), fill_value=None)
+            if sample_params is not None:
+                assert isinstance(sample_params, list)
+                for sp in sample_params:
+                    assert isinstance(sp, dict)
+                assert len(metric_functions) == len(sample_params)
+                sp_list = sample_params
+            p_list = np.full(len(metric_functions), fill_value=None)
             if params is not None:
                 assert isinstance(params, list)
                 for p in params:
                     assert isinstance(p, dict)
                 assert len(metric_functions) == len(params)
-                prms = params
+                p_list = params
 
             # Iterate
             for i in range(len(metric_functions)):
-                fc = FunctionContainer(metric_functions[i], None, spn[i], prms[i])
-                assert fc.name not in func_dict
-                func_dict[fc.name] = fc
+                fc = FunctionContainer(metric_functions[i], None, sp_list[i], p_list[i])
+                assert fc.name_ not in func_dict
+                func_dict[fc.name_] = fc
         else:
-            fc = FunctionContainer(metric_functions, None, sample_param_names, params)
-            func_dict[fc.name] = fc
+            fc = FunctionContainer(metric_functions, None, sample_params, params)
+            func_dict[fc.name_] = fc
         return func_dict
 
     def _process_features(self, base_name, features, expected_length):

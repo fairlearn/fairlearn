@@ -57,8 +57,8 @@ def test_1m_1sf_1cf():
 def test_2m_2sf_2cf():
     target = _get_raw_GroupedMetric()
     func_dict = target._process_functions([skm.recall_score, skm.precision_score],
-                                          [['sample_weight'], []],
-                                          [{'sample_weight': s_w}, dict()])
+                                          [{'sample_weight': s_w}, dict()],
+                                          [dict(), dict()])
     sf_list = target._process_features("Sens", [g_1, g_3], len(y_t))
     cf_list = target._process_features("Cond", [g_2, g_4], len(y_t))
 

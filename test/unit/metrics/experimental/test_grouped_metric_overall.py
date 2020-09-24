@@ -23,8 +23,8 @@ def test_1m_0cf():
 def test_1m_0cf_wgt():
     target = _get_raw_GroupedMetric()
     func_dict = target._process_functions(skm.recall_score,
-                                          ['sample_weight'],
-                                          {'sample_weight': s_w})
+                                          {'sample_weight': s_w},
+                                          None)
 
     result = target._compute_overall(func_dict, y_t, y_p, None)
 
@@ -69,8 +69,8 @@ def test_1m_1cf():
 def test_1m_1cf_wgt():
     target = _get_raw_GroupedMetric()
     func_dict = target._process_functions(skm.recall_score,
-                                          ['sample_weight'],
-                                          {'sample_weight': s_w})
+                                          {'sample_weight': s_w},
+                                          None)
     cf_list = target._process_features("CondF", g_1, len(y_t))
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)

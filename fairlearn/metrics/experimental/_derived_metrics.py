@@ -21,11 +21,19 @@ class _DerivedMetric:
 
         self._sample_param_names = sample_param_names
 
-    def __call__(self, y_true, y_pred, *, sensitive_features, **params):
+    def __call__(self, y_true, y_pred, *, sensitive_features, **all_params):
+        params = dict()
+        sample_params = dict()
+        for k, v in all_params.items():
+            if k in self._sample_param_names:
+                sample_params[k] = v
+            else:
+                params[k] = v
+
         all_metrics = GroupedMetric(self._metric_fn,
                                     y_true, y_pred,
                                     sensitive_features=sensitive_features,
-                                    sample_param_names=self._sample_param_names,
+                                    sample_params=sample_params,
                                     params=params)
 
         result = np.nan
