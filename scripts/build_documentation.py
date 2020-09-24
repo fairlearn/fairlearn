@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Build Fairlearn documentation
 
 The static landing page is no longer under the control of Sphinx,
