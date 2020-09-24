@@ -26,38 +26,40 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     The approach used is taken from section 3.4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
-        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
-        `sample_weight` is a vector of weights; labels `y` and predictions returned by
+    Parameters
+    ----------
+    estimator : estimator
+        An estimator implementing methods :code:`fit(X, y, sample_weight)` and
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the
+        vector of labels (binary classification) or continuous values
+        (regression), and `sample_weight` is a vector of weights.
+        In binary classification labels `y` and predictions returned by
         :code:`predict(X)` are either 0 or 1.
-    :type estimator: estimator
-
-    :param constraints: The disparity constraints expressed as moments.
-    :type constraints: fairlearn.reductions.Moment
-
-    :param selection_rule: Specifies the procedure for selecting the best model found by the
-        grid search. At the present time, the only valid value is "tradeoff_optimization" which
-        minimises a weighted sum of the error rate and constraint violation.
-    :type selection_rule: str
-
-    :param constraint_weight: When the `selection_rule` is "tradeoff_optimization" this specifies
-        the relative weight put on the constraint violation when selecting the best model.
-        The weight placed on the error rate will be :code:`1-constraint_weight`
-    :type constraint_weight: float
-
-    :param grid_size: The number of Lagrange multipliers to generate in the grid
-    :type grid_size: int
-
-    :param grid_limit: The largest Lagrange multiplier to generate. The grid will contain values
-        distributed between :code:`-grid_limit` and :code:`grid_limit` by default
-    :type grid_limit: float
-
-    :param grid_offset: shifts the grid of Lagrangian multiplier by that value
-         It is '0' by default
-    :type grid_offset: :class:`pandas:pandas.DataFrame`
-
-    :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
-        set of Lagrange multipliers they desire using this argument.
+        In regression values `y` and predictions are continuous.
+    constraints : fairlearn.reductions.Moment
+        The disparity constraints expressed as moments
+    selection_rule : str
+        Specifies the procedure for selecting the best model found by the grid
+        search. At the present time, the only valid value is
+        "tradeoff_optimization" which minimizes a weighted sum of the error
+        rate and constraint violation.
+    constraint_weight : float
+        When the `selection_rule` is "tradeoff_optimization" this specifies
+        the relative weight put on the constraint violation when selecting the
+        best model. The weight placed on the error rate will be
+        :code:`1-constraint_weight`
+    grid_size : int
+        The number of Lagrange multipliers to generate in the grid
+    grid_limit : float
+        The largest Lagrange multiplier to generate. The grid will contain
+        values distributed between :code:`-grid_limit` and :code:`grid_limit`
+        by default
+    grid_offset : :class:`pandas:pandas.DataFrame`
+        Shifts the grid of Lagrangian multiplier by that value.
+        It is '0' by default
+    grid :
+        Instead of supplying a size and limit for the grid, users may specify
+        the exact set of Lagrange multipliers they desire using this argument.
     """
 
     def __init__(self,
