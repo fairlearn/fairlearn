@@ -1,13 +1,14 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import copy
 import numpy as np
 
 
 class FunctionContainer:
     """Read a placeholder comment."""
 
-    def __init__(self, func, name, sample_param_names, params):
+    def __init__(self, func, name, sample_params, params):
         """Read a placeholder comment."""
         assert func is not None
         self._func = func
@@ -17,51 +18,48 @@ class FunctionContainer:
         else:
             self._name = name
 
-        self._sample_param_names = []
-        if sample_param_names is not None:
-            assert isinstance(sample_param_names, list)
-            self._sample_param_names = sample_param_names
+        self._sample_params = dict()
+        if sample_params is not None:
+            assert isinstance(sample_params, dict)
+            self._sample_params = sample_params
         self._params = dict()
         if params is not None:
             assert isinstance(params, dict)
             self._params = params
 
+        all_param_names = list(self._sample_params.keys()) + list(self._params.keys())
+        unique_param_names = np.unique(all_param_names)
+        assert len(all_param_names) == len(unique_param_names)
+
         # Coerce any sample_params to being ndarrays for easy masking
-        for param_name in self.sample_param_names:
-            # However, users might have a standard sample_param_names list
-            # but not invoke with all of them
-            if param_name in self.params:
-                self.params[param_name] = np.asarray(self.params[param_name])
+        for k, v in self._sample_params.items():
+            self._sample_params[k] = np.asarray(v)
 
     @property
-    def func(self):
+    def func_(self):
         """Read a placeholder comment."""
         return self._func
 
     @property
-    def name(self):
+    def name_(self):
         """Read a placeholder comment."""
         return self._name
 
     @property
-    def sample_param_names(self):
+    def sample_params_(self):
         """Read a placeholder comment."""
-        return self._sample_param_names
+        return self._sample_params
 
     @property
-    def params(self):
+    def params_(self):
         """Read a placeholder comment."""
         return self._params
 
     def generate_params_for_mask(self, mask):
         """Read a placeholder comment."""
-        curr_params = dict()
-        for name, value in self.params.items():
-            if name in self.sample_param_names:
-                # Constructor has forced the value to be an ndarray
-                curr_params[name] = value[mask]
-            else:
-                curr_params[name] = value
+        curr_params = copy.deepcopy(self.params_)
+        for name, value in self.sample_params_.items():
+            curr_params[name] = value[mask]
         return curr_params
 
     def evaluate(self, y_true, y_pred, mask):
@@ -72,8 +70,9 @@ class FunctionContainer:
         assert len(y_true) == len(mask)
         params = self.generate_params_for_mask(mask)
 
-        return self.func(y_true[mask], y_pred[mask], **params)
+        return self.func_(y_true[mask], y_pred[mask], **params)
 
     def evaluate_all(self, y_true, y_pred):
         """Read a placeholder comment."""
-        return self.func(y_true, y_pred, **(self.params))
+        all_params = {**self.params_, **self.sample_params_}
+        return self.func_(y_true, y_pred, **all_params)
