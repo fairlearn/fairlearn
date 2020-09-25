@@ -3,6 +3,8 @@
 
 """Common testing methods for use with other ML packages."""
 
+import copy
+
 import pandas as pd
 
 from sklearn.datasets import fetch_openml
@@ -36,20 +38,38 @@ def fetch_adult():
                          random_state=12345,
                          stratify=Y)
 
-    return X_train, Y_train, A_train
+    # Ensure indices are aligned
+    X_train = X_train.reset_index(drop=True)
+    A_train = A_train.reset_index(drop=True)
+    X_test = X_test.reset_index(drop=True)
+    A_test = A_test.reset_index(drop=True)
+
+    return X_train, Y_train, A_train, X_test, Y_test, A_test
 
 
 def run_expgrad_classification(estimator, moment):
     """Run classification test with ExponentiatedGradient."""
-    X, Y, A = fetch_adult()
+    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_adult()
+    verification_moment = copy.deepcopy(moment)
+
+    unmitigated = copy.deepcopy(estimator)
+    unmitigated.fit(X_train, Y_train)
 
     expgrad = ExponentiatedGradient(
         estimator,
         constraints=moment)
-    expgrad.fit(X, Y, sensitive_features=A)
+    expgrad.fit(X_train, Y_train, sensitive_features=A_train)
 
     assert expgrad.n_oracle_calls_ > 1
     assert len(expgrad.predictors_) > 1
+
+    verification_moment.load_data(X_test, Y_test, sensitive_features=A_test)
+    gamma_unmitigated = verification_moment.gamma(lambda x: unmitigated.predict(x))
+    gamma_mitigated = verification_moment.gamma(lambda x: expgrad.predict(x))
+
+    print(gamma_unmitigated, "\n\n")
+    print(gamma_mitigated)
+
 
 
 def run_gridsearch_classification(estimator, moment):
