@@ -13,7 +13,7 @@ from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 def create_model():
     # create model
     model = Sequential()
-    model.add(Dense(12, input_dim=8, activation='relu'))
+    model.add(Dense(12, input_dim=103, activation='relu'))
     model.add(Dense(8, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     # Compile model
@@ -26,3 +26,16 @@ def test_expgrad_classification():
     disparity_moment = DemographicParity()
 
     ptc.run_expgrad_classification(estimator, disparity_moment)
+
+
+def test_gridsearch_classification():
+    estimator = KerasClassifier(build_fn=create_model)
+    disparity_moment = DemographicParity()
+
+    ptc.run_gridsearch_classification(estimator, disparity_moment)
+
+
+def test_thresholdoptimizer_classification():
+    estimator = KerasClassifier(build_fn=create_model)
+
+    ptc.run_thresholdoptimizer_classification(estimator)
