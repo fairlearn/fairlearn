@@ -6,6 +6,7 @@
 import pandas as pd
 
 from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from fairlearn.postprocessing import ThresholdOptimizer
@@ -29,7 +30,13 @@ def fetch_adult():
     X_scaled = sc.fit_transform(X)
     X_scaled = pd.DataFrame(X_scaled, columns=X.columns)
 
-    return X_scaled, Y, A
+    X_train, X_test, Y_train, Y_test, A_train, A_test = \
+        train_test_split(X_scaled, Y, A,
+                         test_size=0.3,
+                         random_state=12345,
+                         stratify=Y)
+
+    return X_train, Y_train, A_train
 
 
 def run_expgrad_classification(estimator, moment):
