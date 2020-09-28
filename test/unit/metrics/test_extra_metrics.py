@@ -125,6 +125,21 @@ class TestTPR:
         result_skm = skm.recall_score(y_true, y_pred, pos_label=0)
         assert result == pytest.approx(result_skm)
 
+    def test_against_sklearn_weighted(self):
+        y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1]
+        y_pred = [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
+        weight = [1, 2, 4, 5, 1, 2, 2, 3, 1, 2, 1, 3, 1, 5, 4, 2]
+
+        result = metrics.true_positive_rate(y_true, y_pred, sample_weight=weight)
+        result_skm = skm.recall_score(y_true, y_pred, sample_weight=weight)
+        assert result == pytest.approx(result_skm)
+
+        result = metrics.true_positive_rate(y_true, y_pred,
+                                            pos_label=0, sample_weight=weight)
+        result_skm = skm.recall_score(y_true, y_pred,
+                                      pos_label=0, sample_weight=weight)
+        assert result == pytest.approx(result_skm)
+
     def test_tpr_values_alpha(self):
         a = 'a'
         b = 'b'
@@ -190,6 +205,37 @@ class TestTNR:
         result = metrics.true_negative_rate(y_true, y_pred)
         assert result == 0.75
 
+    def test_against_sklearn(self):
+        y_true = [0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1,
+                  0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0]
+        y_pred = [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0,
+                  1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1]
+
+        actual = metrics.true_negative_rate(y_true, y_pred)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred).ravel()
+        assert (tn/(tn+fp)) == actual
+        actual = metrics.true_negative_rate(y_true, y_pred, pos_label=0)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, labels=[1, 0]).ravel()
+        assert (tn/(tn+fp)) == actual
+
+    def test_against_sklearn_weighted(self):
+        y_true = [0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1,
+                  0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0]
+        y_pred = [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0,
+                  1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1]
+        weights = [1, 2, 3, 5, 3, 2, 5, 3, 5, 1, 5, 3, 5, 2, 3,
+                   2, 5, 2, 3, 1, 5, 3, 2, 1, 1, 5, 2, 3, 5, 1]
+
+        actual = metrics.true_negative_rate(y_true, y_pred, sample_weight=weights)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, sample_weight=weights).ravel()
+        assert (tn/(tn+fp)) == actual
+        actual = metrics.true_negative_rate(y_true, y_pred, pos_label=0, sample_weight=weights)
+        tn, fp, fn, tp = skm.confusion_matrix(
+            y_true, y_pred,
+            labels=[1, 0],
+            sample_weight=weights).ravel()
+        assert (tn/(tn+fp)) == actual
+
 
 class TestFNR:
 
@@ -246,6 +292,21 @@ class TestFNR:
         result_skm = 1 - skm.recall_score(y_true, y_pred, pos_label=0)
         assert result == pytest.approx(result_skm)
 
+    def test_against_sklearn_weighted(self):
+        y_true = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0]
+        y_pred = [1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1]
+        weight = [1, 2, 3, 1, 5, 2, 3, 1, 2, 5, 3, 2, 5, 2, 1, 3]
+
+        result = metrics.false_negative_rate(y_true, y_pred, sample_weight=weight)
+        result_skm = 1 - skm.recall_score(y_true, y_pred, sample_weight=weight)
+        assert result == pytest.approx(result_skm)
+
+        result = metrics.false_negative_rate(y_true, y_pred,
+                                             pos_label=0, sample_weight=weight)
+        result_skm = 1 - skm.recall_score(y_true, y_pred,
+                                          pos_label=0, sample_weight=weight)
+        assert result == pytest.approx(result_skm)
+
 
 class TestFPR:
 
@@ -293,8 +354,10 @@ class TestFPR:
         actual = metrics.false_positive_rate(y_true, y_pred, sample_weight=weight)
         tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, sample_weight=weight).ravel()
         assert (fp/(fp+tn)) == actual
-        actual = metrics.false_positive_rate(y_true, y_pred, pos_label=0, sample_weight=weight)
-        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, labels=[1, 0], sample_weight=weight).ravel()
+        actual = metrics.false_positive_rate(y_true, y_pred,
+                                             pos_label=0, sample_weight=weight)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred,
+                                              labels=[1, 0], sample_weight=weight).ravel()
         assert (fp/(fp+tn)) == actual
 
 
