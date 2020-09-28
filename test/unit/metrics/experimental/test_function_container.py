@@ -1,4 +1,4 @@
-m# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -7,7 +7,7 @@ from fairlearn.metrics.experimental._function_container import FunctionContainer
 
 
 def test_constructor_unnamed():
-o    sample_params = {'sample_weight': [1, 2, 3]}
+    sample_params = {'sample_weight': [1, 2, 3]}
 
     fc = FunctionContainer(recall_score, None, sample_params)
     assert fc.name_ == recall_score.__name__
