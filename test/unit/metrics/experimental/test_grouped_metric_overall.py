@@ -35,9 +35,9 @@ def test_1m_0cf_wgt():
 
 def test_2m_0cf():
     target = _get_raw_GroupedMetric()
-    func_dict = target._process_functions({'recall': skm.recall_score, 'prec': skm.precision_score},
-                                          None)
-    result = target._compute_overall(func_dict, y_t, y_p, None)
+    funcs = {'recall': skm.recall_score, 'prec': skm.precision_score}
+    func_container_dict = target._process_functions(funcs, None)
+    result = target._compute_overall(func_container_dict, y_t, y_p, None)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (1, 2)

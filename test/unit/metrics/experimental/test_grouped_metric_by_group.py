@@ -56,12 +56,13 @@ def test_1m_1sf_1cf():
 
 def test_2m_2sf_2cf():
     target = _get_raw_GroupedMetric()
-    func_dict = target._process_functions({'recall': skm.recall_score, 'prec': skm.precision_score},
-                                          {'recall':{'sample_weight': s_w}})
+    funcs = {'recall': skm.recall_score, 'prec': skm.precision_score}
+    func_container_dict = target._process_functions(funcs,
+                                                    {'recall': {'sample_weight': s_w}})
     sf_list = target._process_features("Sens", [g_1, g_3], len(y_t))
     cf_list = target._process_features("Cond", [g_2, g_4], len(y_t))
 
-    result = target._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
+    result = target._compute_by_group(func_container_dict, y_t, y_p, sf_list, cf_list)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (16, 2)
