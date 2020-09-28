@@ -44,7 +44,7 @@ def test_1m_1sf_0cf():
 
 
 def test_2m_1sf_0cf():
-    target = metrics.GroupedMetric([skm.recall_score, skm.precision_score],
+    target = metrics.GroupedMetric({'recall': skm.recall_score, 'prec': skm.precision_score},
                                    y_t, y_p,
                                    sensitive_features=g_4)
 
@@ -60,28 +60,28 @@ def test_2m_1sf_0cf():
     target_mins = target.group_min()
     assert isinstance(target_mins, pd.DataFrame)
     assert target_mins.shape == (1, 2)
-    assert target_mins['recall_score']['overall'] == min(recall_p, recall_q)
-    assert target_mins['precision_score']['overall'] == min(prec_p, prec_q)
+    assert target_mins['recall']['overall'] == min(recall_p, recall_q)
+    assert target_mins['prec']['overall'] == min(prec_p, prec_q)
 
     target_maxes = target.group_max()
     assert isinstance(target_mins, pd.DataFrame)
     assert target_maxes.shape == (1, 2)
-    assert target_maxes['recall_score']['overall'] == max(recall_p, recall_q)
-    assert target_maxes['precision_score']['overall'] == max(prec_p, prec_q)
+    assert target_maxes['recall']['overall'] == max(recall_p, recall_q)
+    assert target_maxes['prec']['overall'] == max(prec_p, prec_q)
 
     target_diffs = target.difference()
     assert isinstance(target_diffs, pd.DataFrame)
     assert target_diffs.shape == (1, 2)
-    assert target_diffs['recall_score']['overall'] == abs(recall_p - recall_q)
-    assert target_diffs['precision_score']['overall'] == abs(prec_p - prec_q)
+    assert target_diffs['recall']['overall'] == abs(recall_p - recall_q)
+    assert target_diffs['prec']['overall'] == abs(prec_p - prec_q)
 
     target_diff_overall = target.difference(method='to_overall')
     assert isinstance(target_diff_overall, pd.DataFrame)
     assert target_diff_overall.shape == (1, 2)
     recall_diffs_overall = [abs(recall_p-recall), abs(recall_q-recall)]
     prec_diffs_overall = [abs(prec_p-prec), abs(prec_q-prec)]
-    assert target_diff_overall['recall_score']['overall'] == max(recall_diffs_overall)
-    assert target_diff_overall['precision_score']['overall'] == max(prec_diffs_overall)
+    assert target_diff_overall['recall']['overall'] == max(recall_diffs_overall)
+    assert target_diff_overall['prec']['overall'] == max(prec_diffs_overall)
 
 
 def test_1m_1sf_1cf():
@@ -221,7 +221,7 @@ def test_1m_1sf_2cf():
 
 
 def test_2m_1sf_1cf():
-    target = metrics.GroupedMetric([skm.recall_score, skm.precision_score],
+    target = metrics.GroupedMetric({'recall': skm.recall_score, 'prec': skm.precision_score},
                                    y_t, y_p,
                                    sensitive_features=g_2,
                                    conditional_features=g_3)
@@ -259,26 +259,26 @@ def test_2m_1sf_1cf():
     target_mins = target.group_min()
     assert isinstance(target_mins, pd.DataFrame)
     assert target_mins.shape == (2, 2)
-    assert target_mins['recall_score']['kk'] == min(recall_k_arr)
-    assert target_mins['recall_score']['m'] == min(recall_m_arr)
-    assert target_mins['precision_score']['kk'] == min(precision_k_arr)
-    assert target_mins['precision_score']['m'] == min(precision_m_arr)
+    assert target_mins['recall']['kk'] == min(recall_k_arr)
+    assert target_mins['recall']['m'] == min(recall_m_arr)
+    assert target_mins['prec']['kk'] == min(precision_k_arr)
+    assert target_mins['prec']['m'] == min(precision_m_arr)
 
     target_maxs = target.group_max()
     assert isinstance(target_mins, pd.DataFrame)
     assert target_maxs.shape == (2, 2)
-    assert target_maxs['recall_score']['kk'] == max(recall_k_arr)
-    assert target_maxs['recall_score']['m'] == max(recall_m_arr)
-    assert target_maxs['precision_score']['kk'] == max(precision_k_arr)
-    assert target_maxs['precision_score']['m'] == max(precision_m_arr)
+    assert target_maxs['recall']['kk'] == max(recall_k_arr)
+    assert target_maxs['recall']['m'] == max(recall_m_arr)
+    assert target_maxs['prec']['kk'] == max(precision_k_arr)
+    assert target_maxs['prec']['m'] == max(precision_m_arr)
 
     diffs = target.difference()
     assert isinstance(diffs, pd.DataFrame)
     assert diffs.shape == (2, 2)
-    assert diffs['recall_score']['kk'] == max(recall_k_arr) - min(recall_k_arr)
-    assert diffs['recall_score']['m'] == max(recall_m_arr) - min(recall_m_arr)
-    assert diffs['precision_score']['kk'] == max(precision_k_arr) - min(precision_k_arr)
-    assert diffs['precision_score']['m'] == max(precision_m_arr) - min(precision_m_arr)
+    assert diffs['recall']['kk'] == max(recall_k_arr) - min(recall_k_arr)
+    assert diffs['recall']['m'] == max(recall_m_arr) - min(recall_m_arr)
+    assert diffs['prec']['kk'] == max(precision_k_arr) - min(precision_k_arr)
+    assert diffs['prec']['m'] == max(precision_m_arr) - min(precision_m_arr)
 
     diffs_overall = target.difference(method='to_overall')
     assert isinstance(diffs_overall, pd.DataFrame)
@@ -287,7 +287,7 @@ def test_2m_1sf_1cf():
     recall_m_overall = max([abs(x-recall_m) for x in recall_m_arr])
     precision_k_overall = max([abs(x-precision_k) for x in precision_k_arr])
     precision_m_overall = max([abs(x-precision_m) for x in precision_m_arr])
-    assert diffs_overall['recall_score']['kk'] == recall_k_overall
-    assert diffs_overall['recall_score']['m'] == recall_m_overall
-    assert diffs_overall['precision_score']['kk'] == precision_k_overall
-    assert diffs_overall['precision_score']['m'] == precision_m_overall
+    assert diffs_overall['recall']['kk'] == recall_k_overall
+    assert diffs_overall['recall']['m'] == recall_m_overall
+    assert diffs_overall['prec']['kk'] == precision_k_overall
+    assert diffs_overall['prec']['m'] == precision_m_overall

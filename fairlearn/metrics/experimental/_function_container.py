@@ -11,6 +11,7 @@ class FunctionContainer:
     def __init__(self, func, name, sample_params):
         """Read a placeholder comment."""
         assert func is not None
+        assert callable(func)
         self._func = func
 
         if name is None:

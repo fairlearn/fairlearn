@@ -19,10 +19,9 @@ class GroupedMetric:
                  y_true, y_pred, *,
                  sensitive_features,
                  conditional_features=None,
-                 sample_params=None,
-                 params=None):
+                 sample_params=None):
         """Read a placeholder comment."""
-        func_dict = self._process_functions(metric_functions, sample_params, params)
+        func_dict = self._process_functions(metric_functions, sample_params)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("SF", sensitive_features, len(y_true))
@@ -140,32 +139,23 @@ class GroupedMetric:
             msg = _BAD_FEATURE_LENGTH.format(len(feature), expected_length)
             raise ValueError(msg)
 
-    def _process_functions(self, metric_functions, sample_params, params):
+    def _process_functions(self, metric_functions, sample_params):
         func_dict = dict()
-        if isinstance(metric_functions, list):
-            # Verify the arguments
-            sp_list = np.full(len(metric_functions), fill_value=None)
+        if isinstance(metric_functions, dict):
+            s_p = dict()
             if sample_params is not None:
-                assert isinstance(sample_params, list)
-                for sp in sample_params:
-                    assert isinstance(sp, dict)
-                assert len(metric_functions) == len(sample_params)
-                sp_list = sample_params
-            p_list = np.full(len(metric_functions), fill_value=None)
-            if params is not None:
-                assert isinstance(params, list)
-                for p in params:
-                    assert isinstance(p, dict)
-                assert len(metric_functions) == len(params)
-                p_list = params
+                assert isinstance(sample_params, dict)
+                assert set(sample_params.keys()).issubset(set(metric_functions.keys()))
+                s_p = sample_params
 
-            # Iterate
-            for i in range(len(metric_functions)):
-                fc = FunctionContainer(metric_functions[i], None, sp_list[i], p_list[i])
-                assert fc.name_ not in func_dict
+            for name, func in metric_functions.items():
+                curr_s_p = None
+                if name in s_p:
+                    curr_s_p = s_p[name]
+                fc = FunctionContainer(func, name, curr_s_p)
                 func_dict[fc.name_] = fc
         else:
-            fc = FunctionContainer(metric_functions, None, sample_params, params)
+            fc = FunctionContainer(metric_functions, None, sample_params)
             func_dict[fc.name_] = fc
         return func_dict
 

@@ -12,29 +12,19 @@ aggregate_options = [
 
 
 class _DerivedMetric:
-    def __init__(self, aggregate, metric_fn, sample_param_names):
+    def __init__(self, aggregate, metric_fn):
         assert aggregate in aggregate_options
         self._aggregate = aggregate
 
         assert callable(metric_fn)
         self._metric_fn = metric_fn
 
-        self._sample_param_names = sample_param_names
-
-    def __call__(self, y_true, y_pred, *, sensitive_features, **all_params):
-        params = dict()
-        sample_params = dict()
-        for k, v in all_params.items():
-            if k in self._sample_param_names:
-                sample_params[k] = v
-            else:
-                params[k] = v
+    def __call__(self, y_true, y_pred, *, sensitive_features, **sample_params):
 
         all_metrics = GroupedMetric(self._metric_fn,
                                     y_true, y_pred,
                                     sensitive_features=sensitive_features,
-                                    sample_params=sample_params,
-                                    params=params)
+                                    sample_params=sample_params)
 
         result = np.nan
         if self._aggregate == 'difference':
@@ -47,6 +37,6 @@ class _DerivedMetric:
         return result
 
 
-def make_derived_metric(aggregate, metric_fn, sample_param_names=None):
+def make_derived_metric(aggregate, metric_fn):
     """Read a placeholder comment."""
-    return _DerivedMetric(aggregate, metric_fn, sample_param_names)
+    return _DerivedMetric(aggregate, metric_fn)

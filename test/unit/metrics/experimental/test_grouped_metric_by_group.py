@@ -11,7 +11,7 @@ from .utils import _get_raw_GroupedMetric
 
 def test_1m_1sf_0cf():
     target = _get_raw_GroupedMetric()
-    func_dict = target._process_functions(skm.recall_score, None, None)
+    func_dict = target._process_functions(skm.recall_score, None)
     sf_list = target._process_features("SF", g_1, len(y_t))
 
     result = target._compute_by_group(func_dict, y_t, y_p, sf_list, None)
@@ -29,7 +29,7 @@ def test_1m_1sf_0cf():
 
 def test_1m_1sf_1cf():
     target = _get_raw_GroupedMetric()
-    func_dict = target._process_functions(skm.recall_score, None, None)
+    func_dict = target._process_functions(skm.recall_score, None)
     sf_list = target._process_features("SF", g_1, len(y_t))
     cf_list = target._process_features("CF", g_2, len(y_t))
 
@@ -56,9 +56,8 @@ def test_1m_1sf_1cf():
 
 def test_2m_2sf_2cf():
     target = _get_raw_GroupedMetric()
-    func_dict = target._process_functions([skm.recall_score, skm.precision_score],
-                                          [{'sample_weight': s_w}, dict()],
-                                          [dict(), dict()])
+    func_dict = target._process_functions({'recall': skm.recall_score, 'prec': skm.precision_score},
+                                          {'recall':{'sample_weight': s_w}})
     sf_list = target._process_features("Sens", [g_1, g_3], len(y_t))
     cf_list = target._process_features("Cond", [g_2, g_4], len(y_t))
 
@@ -77,12 +76,12 @@ def test_2m_2sf_2cf():
     recall_f_q_a_k = skm.recall_score(y_t[mask_f_q_a_k], y_p[mask_f_q_a_k],
                                       sample_weight=s_w[mask_f_q_a_k])
     prec_f_q_a_k = skm.precision_score(y_t[mask_f_q_a_k], y_p[mask_f_q_a_k])
-    assert result['recall_score'][('f', 'q', 'aa', 'kk')] == recall_f_q_a_k
-    assert result['precision_score'][('f', 'q', 'aa', 'kk')] == prec_f_q_a_k
+    assert result['recall'][('f', 'q', 'aa', 'kk')] == recall_f_q_a_k
+    assert result['prec'][('f', 'q', 'aa', 'kk')] == prec_f_q_a_k
 
     mask_g_q_b_k = np.logical_and(mask_b_g, mask_k_q)
     recall_g_q_b_k = skm.recall_score(y_t[mask_g_q_b_k], y_p[mask_g_q_b_k],
                                       sample_weight=s_w[mask_g_q_b_k])
     prec_g_q_b_k = skm.precision_score(y_t[mask_g_q_b_k], y_p[mask_g_q_b_k])
-    assert result['recall_score'][('g', 'q', 'ba', 'kk')] == recall_g_q_b_k
-    assert result['precision_score'][('g', 'q', 'ba', 'kk')] == prec_g_q_b_k
+    assert result['recall'][('g', 'q', 'ba', 'kk')] == recall_g_q_b_k
+    assert result['prec'][('g', 'q', 'ba', 'kk')] == prec_g_q_b_k

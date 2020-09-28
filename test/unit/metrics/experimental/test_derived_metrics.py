@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import functools
 import numpy as np
 import sklearn.metrics as skm
 
@@ -26,8 +27,7 @@ gid = np.concatenate((As, Bs))
 
 def test_derived_difference():
     my_fn = metrics.make_derived_metric('difference',
-                                        skm.accuracy_score,
-                                        sample_param_names=['sample_weight'])
+                                        skm.accuracy_score)
 
     grouped = metrics.GroupedMetric(skm.accuracy_score,
                                     y_t, y_p,
@@ -37,26 +37,14 @@ def test_derived_difference():
     assert actual == grouped.difference()['accuracy_score']['overall']
 
 
-def test_derived_difference_scalar_arg():
-    my_fn = metrics.make_derived_metric('difference',
-                                        skm.fbeta_score,
-                                        sample_param_names=['sample_weight'])
-    grouped = metrics.GroupedMetric(skm.fbeta_score,
+def test_derived_difference_sample_arg():
+    my_fbeta = functools.partial(skm.fbeta_score, beta=0.6)
+    my_fbeta.__name__ = "my_fbeta"
+    my_fn = metrics.make_derived_metric('difference', my_fbeta)
+
+    grouped = metrics.GroupedMetric(my_fbeta,
                                     y_t, y_p,
                                     sensitive_features=gid,
-                                    params={'beta': 0.6})
-    actual = my_fn(y_t, y_p, sensitive_features=gid, beta=0.6)
-    assert actual == grouped.difference()['fbeta_score'][0]
-
-
-def test_derived_difference_both_arg_types():
-    my_fn = metrics.make_derived_metric('difference',
-                                        skm.fbeta_score,
-                                        sample_param_names=['sample_weight'])
-    grouped = metrics.GroupedMetric(skm.fbeta_score,
-                                    y_t, y_p,
-                                    sensitive_features=gid,
-                                    sample_params={'sample_weight': wgt},
-                                    params={'beta': 0.6})
-    actual = my_fn(y_t, y_p, sensitive_features=gid, beta=0.6, sample_weight=wgt)
-    assert actual == grouped.difference()['fbeta_score'][0]
+                                    sample_params={'sample_weight': wgt})
+    actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt)
+    assert actual == grouped.difference()['my_fbeta'][0]
