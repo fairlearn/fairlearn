@@ -274,6 +274,29 @@ class TestFPR:
         result = metrics.false_positive_rate(y_true, y_pred, pos_label=-1)
         assert result == pytest.approx(0.6666667)
 
+    def test_against_sklearn(self):
+        y_true = [0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0]
+        y_pred = [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0]
+
+        actual = metrics.false_positive_rate(y_true, y_pred)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred).ravel()
+        assert (fp/(fp+tn)) == actual
+        actual = metrics.false_positive_rate(y_true, y_pred, pos_label=0)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, labels=[1, 0]).ravel()
+        assert (fp/(fp+tn)) == actual
+
+    def test_against_sklearn_weighted(self):
+        y_true = [0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0]
+        y_pred = [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0]
+        weight = [1, 2, 1, 1, 1, 3, 1, 4, 1, 2, 3, 4, 2, 3, 1, 2, 3, 1, 3, 2, 4, 2, 3, 1, 1, 5]
+
+        actual = metrics.false_positive_rate(y_true, y_pred, sample_weight=weight)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, sample_weight=weight).ravel()
+        assert (fp/(fp+tn)) == actual
+        actual = metrics.false_positive_rate(y_true, y_pred, pos_label=0, sample_weight=weight)
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, labels=[1, 0], sample_weight=weight).ravel()
+        assert (fp/(fp+tn)) == actual
+
 
 class TestSingleValueArrays:
     def test_all_zeros(self):
