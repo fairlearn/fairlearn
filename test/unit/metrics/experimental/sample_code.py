@@ -57,9 +57,11 @@ Y_pred = unmitigated_predictor.predict(X_test)
 wgts = np.random.random(size=len(Y_test))
 
 fns = [skm.recall_score, skm.precision_score, skm.fbeta_score]
+# fns = { 'rec': skm.recall_score, 'prec':skm.precision_score }
 sample_params = [{'sample_weight': wgts},
                  {'sample_weight': wgts},
                  {'sample_weight': wgts}]
+# sample_params = { 'rec': { 'sample_weight': wgts }, 'prec':{ 'sample_weight':wgts}}
 params = [{'zero_division': 0},
           {},
           {'beta': 0.75}]
