@@ -4,6 +4,7 @@
 import copy
 import numpy as np
 import pandas as pd
+from sklearn.utils import check_consistent_length
 
 from ._function_container import FunctionContainer
 from ._group_feature import GroupFeature
@@ -21,6 +22,7 @@ class GroupedMetric:
                  conditional_features=None,
                  sample_params=None):
         """Read a placeholder comment."""
+        check_consistent_length(y_true, y_pred)
         func_dict = self._process_functions(metric_functions, sample_params)
 
         # Now, prepare the sensitive features
@@ -37,7 +39,7 @@ class GroupedMetric:
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
         if cf_list is None:
-            result = pd.Series(index=func_dict.keys())
+            result = pd.Series(index=func_dict.keys(), dtype='object')
             for func_name in func_dict:
                 metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
                 result[func_name] = metric_value
@@ -86,7 +88,7 @@ class GroupedMetric:
     def group_max(self):
         """Read a placeholder comment."""
         if self._cf_names is None:
-            result = pd.Series(index=self.by_group.columns)
+            result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 max_val = self.by_group[m].max()
                 result[m] = max_val
@@ -97,7 +99,7 @@ class GroupedMetric:
     def group_min(self):
         """Read a placeholder comment."""
         if self._cf_names is None:
-            result = pd.Series(index=self.by_group.columns)
+            result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 min_val = self.by_group[m].min()
                 result[m] = min_val
