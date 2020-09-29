@@ -22,7 +22,7 @@ class FunctionContainer:
             if hasattr(func, '__name__'):
                 self._name = func.__name__
             else:
-                logger.warn("Supplied 'func' had no __name__ attribute")
+                logger.warning("Supplied 'func' had no __name__ attribute")
                 self._name = _DEFAULT_NAME
         else:
             self._name = name
