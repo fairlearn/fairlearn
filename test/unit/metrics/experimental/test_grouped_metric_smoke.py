@@ -17,16 +17,16 @@ def test_basic():
                                    sensitive_features=g_f)
 
     # Check we have correct return types
-    assert isinstance(target.overall, pd.DataFrame)
+    assert isinstance(target.overall, pd.Series)
     assert isinstance(target.by_group, pd.DataFrame)
 
     # Check we have expected number of elements
-    assert target.overall.shape == (1, 1)
+    assert len(target.overall) == 1
     assert target.by_group.shape == (2, 1)
     assert np.array_equal(target.by_group.index.names, ['My feature'])
 
     recall_overall = skm.recall_score(y_t, y_p)
-    assert target.overall['recall_score']['overall'] == recall_overall
+    assert target.overall['recall_score'] == recall_overall
 
     mask_p = (g_4 == 'pp')
     mask_q = (g_4 == 'q')
@@ -36,14 +36,14 @@ def test_basic():
     assert target.by_group['recall_score']['q'] == recall_q
 
     target_mins = target.group_min()
-    assert isinstance(target_mins, pd.DataFrame)
-    assert target_mins.shape == (1, 1)
-    assert target_mins['recall_score']['overall'] == min(recall_p, recall_q)
+    assert isinstance(target_mins, pd.Series)
+    assert len(target_mins) == 1
+    assert target_mins['recall_score'] == min(recall_p, recall_q)
 
     target_maxes = target.group_max()
-    assert isinstance(target_mins, pd.DataFrame)
-    assert target_maxes.shape == (1, 1)
-    assert target_maxes['recall_score']['overall'] == max(recall_p, recall_q)
+    assert isinstance(target_mins, pd.Series)
+    assert len(target_maxes) == 1
+    assert target_maxes['recall_score'] == max(recall_p, recall_q)
 
 
 def test_1m_1sf_1cf():

@@ -34,7 +34,7 @@ def test_derived_difference():
                                     sensitive_features=gid)
 
     actual = my_fn(y_t, y_p, sensitive_features=gid)
-    assert actual == grouped.difference()['accuracy_score']['overall']
+    assert actual == grouped.difference()['accuracy_score']
 
 
 def test_derived_difference_sample_arg():
@@ -47,4 +47,4 @@ def test_derived_difference_sample_arg():
                                     sensitive_features=gid,
                                     sample_params={'sample_weight': wgt})
     actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt)
-    assert actual == grouped.difference()['my_fbeta'][0]
+    assert actual == grouped.difference()['my_fbeta']

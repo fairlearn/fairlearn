@@ -28,9 +28,9 @@ class _DerivedMetric:
 
         result = np.nan
         if self._aggregate == 'difference':
-            result = all_metrics.difference().iloc[0, 0]
+            result = all_metrics.difference()[self._metric_fn.__name__]
         elif self._aggregate == 'difference_to_overall':
-            result = all_metrics.difference(method='to_overall').iloc[0, 0]
+            result = all_metrics.difference(method='to_overall')[self._metric_fn.__name__]
         else:
             raise ValueError("Cannot get here")
 

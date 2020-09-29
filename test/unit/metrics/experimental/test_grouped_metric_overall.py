@@ -14,10 +14,10 @@ def test_1m_0cf():
     func_dict = target._process_functions(skm.recall_score, None)
     result = target._compute_overall(func_dict, y_t, y_p, None)
 
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (1, 1)
+    assert isinstance(result, pd.Series)
+    assert len(result) == 1
     expected = skm.recall_score(y_t, y_p)
-    assert result['recall_score']['overall'] == expected
+    assert result['recall_score'] == expected
 
 
 def test_1m_0cf_wgt():
@@ -27,10 +27,10 @@ def test_1m_0cf_wgt():
 
     result = target._compute_overall(func_dict, y_t, y_p, None)
 
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (1, 1)
+    assert isinstance(result, pd.Series)
+    assert len(result) == 1
     expected = skm.recall_score(y_t, y_p, sample_weight=s_w)
-    assert result['recall_score']['overall'] == expected
+    assert result['recall_score'] == expected
 
 
 def test_2m_0cf():
@@ -39,12 +39,12 @@ def test_2m_0cf():
     func_container_dict = target._process_functions(funcs, None)
     result = target._compute_overall(func_container_dict, y_t, y_p, None)
 
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (1, 2)
+    assert isinstance(result, pd.Series)
+    assert len(result) == 2
     exp_recall = skm.recall_score(y_t, y_p)
     exp_prec = skm.precision_score(y_t, y_p)
-    assert result['recall']['overall'] == exp_recall
-    assert result['prec']['overall'] == exp_prec
+    assert result['recall'] == exp_recall
+    assert result['prec'] == exp_prec
 
 
 def test_1m_1cf():

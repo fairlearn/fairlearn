@@ -37,10 +37,10 @@ class GroupedMetric:
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
         if cf_list is None:
-            result = pd.DataFrame(index=['overall'], columns=func_dict.keys())
+            result = pd.Series(index=func_dict.keys())
             for func_name in func_dict:
                 metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
-                result[func_name]['overall'] = metric_value
+                result[func_name] = metric_value
         else:
             result = self._compute_dataframe_from_rows(func_dict, y_true, y_pred, cf_list)
         return result
@@ -86,10 +86,10 @@ class GroupedMetric:
     def group_max(self):
         """Read a placeholder comment."""
         if self._cf_names is None:
-            result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
-            for c in result.columns:
-                max_val = self.by_group[c].max()
-                result[c]['overall'] = max_val
+            result = pd.Series(index=self.by_group.columns)
+            for m in result.index:
+                max_val = self.by_group[m].max()
+                result[m] = max_val
         else:
             result = self.by_group.groupby(level=list(range(len(self._cf_names)))).max()
         return result
@@ -97,10 +97,10 @@ class GroupedMetric:
     def group_min(self):
         """Read a placeholder comment."""
         if self._cf_names is None:
-            result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
-            for c in result.columns:
-                min_val = self.by_group[c].min()
-                result[c]['overall'] = min_val
+            result = pd.Series(index=self.by_group.columns)
+            for m in result.index:
+                min_val = self.by_group[m].min()
+                result[m] = min_val
         else:
             result = self.by_group.groupby(level=list(range(len(self._cf_names)))).min()
         return result
@@ -117,10 +117,7 @@ class GroupedMetric:
 
         result = None
         if self._cf_names is None:
-            result = pd.DataFrame(index=['overall'], columns=self.by_group.columns)
-            for c in result.columns:
-                diff = (self.by_group[c] - subtrahend[c]['overall']).abs().max()
-                result[c]['overall'] = diff
+            result = (self.by_group - subtrahend).abs().max()
         else:
             # It's easiest to give in to the DataFrame columns preference
             cf_levels = list(range(len(self._cf_names)))
