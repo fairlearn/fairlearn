@@ -1,0 +1,12 @@
+name: fairlearn-lightgbm
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python==3.8
+- pip>=19.1.1
+- numpy
+- pandas
+- pytest
+- scikit-learn
+- lightgbm

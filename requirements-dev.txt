@@ -32,5 +32,5 @@ nbval
 # Required for documentation
 bokeh
 sphinx
-sphinx-gallery
+sphinx-gallery>=0.8.1
 pydata-sphinx-theme

@@ -116,6 +116,8 @@ pygments_style = 'sphinx'
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',
      'gallery_dirs': 'auto_examples',
+     # pypandoc enables rst to md conversion in downloadable notebooks
+     'pypandoc': True,
 }
 
 
