@@ -10,7 +10,7 @@ from .utils import _get_raw_GroupedMetric
 
 class TestSingleFeature():
     def _get_raw_data(self):
-        return ['a', 'a', 'b', 'c']
+        return ['a', 'a', 'b', 'c'], pd.Series(data=[0, 0, 1, 1])
 
     def _common_validations(self, result, expected_name):
         assert isinstance(result, list)
@@ -21,45 +21,49 @@ class TestSingleFeature():
         assert np.array_equal(sf.classes, ['a', 'b', 'c'])
 
     def test_single_list(self):
-        raw_feature = self._get_raw_data()
+        raw_feature, y_true = self._get_raw_data()
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features("SF", raw_feature, len(raw_feature))
+        result = target._process_features("SF", raw_feature, y_true)
         self._common_validations(result, "SF 0")
 
     def test_single_series(self):
-        raw_feature = pd.Series(data=self._get_raw_data(), name="Some Series")
+        r_f, y_true = self._get_raw_data()
+        raw_feature = pd.Series(data=r_f, name="Some Series")
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features("Ignored", raw_feature, len(raw_feature))
+        result = target._process_features("Ignored", raw_feature, y_true)
         self._common_validations(result, "Some Series")
 
     def test_1d_array(self):
-        raw_feature = np.asarray(self._get_raw_data())
+        r_f, y_true = self._get_raw_data()
+        raw_feature = np.asarray(r_f)
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features("CF", raw_feature, len(self._get_raw_data()))
+        result = target._process_features("CF", raw_feature, y_true)
         self._common_validations(result, "CF 0")
 
     def test_single_column_dataframe(self):
-        raw_feature = pd.DataFrame(data=self._get_raw_data(), columns=["My Feature"])
+        r_f, y_true = self._get_raw_data()
+        raw_feature = pd.DataFrame(data=r_f, columns=["My Feature"])
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features("Ignored", raw_feature, len(self._get_raw_data()))
+        result = target._process_features("Ignored", raw_feature, y_true)
         self._common_validations(result, "My Feature")
 
     def test_single_column_dataframe_unnamed(self):
-        raw_feature = pd.DataFrame(data=self._get_raw_data())
+        r_f, y_true = self._get_raw_data()
+        raw_feature = pd.DataFrame(data=r_f)
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features("Unused", raw_feature, len(self._get_raw_data()))
+        result = target._process_features("Unused", raw_feature, y_true)
         # If we don't specify names for the columns, then they are 'named' with integers
         self._common_validations(result, 0)
 
 
 class TestTwoFeatures():
     def _get_raw_data(self):
-        return ['a', 'a', 'b', 'c'], [5, 6, 6, 5]
+        return ['a', 'a', 'b', 'c'], [5, 6, 6, 5], np.asarray([0, 1, 1, 0])
 
     def _common_validations(self, result, expected_names):
         assert isinstance(result, list)
@@ -71,45 +75,45 @@ class TestTwoFeatures():
         assert np.array_equal(result[1].classes, [5, 6])
 
     def test_nested_list(self):
-        a, b = self._get_raw_data()
+        a, b, y_true = self._get_raw_data()
         rf = [a, b]
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features('SF', rf, 4)
+        result = target._process_features('SF', rf, y_true)
         self._common_validations(result, ['SF 0', 'SF 1'])
 
     def test_2d_array(self):
-        a, b = self._get_raw_data()
+        a, b, y_true = self._get_raw_data()
         # Specify dtype to avoid unwanted string conversion
         rf = np.asarray([a, b], dtype=np.object)
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features('CF', rf, 4)
+        result = target._process_features('CF', rf, y_true)
         self._common_validations(result, ['CF 0', 'CF 1'])
 
     def test_named_dataframe(self):
         cols = ["Col Alpha", "Col Num"]
-        a, b = self._get_raw_data()
+        a, b, y_true = self._get_raw_data()
 
         rf = pd.DataFrame(data=zip(a, b), columns=cols)
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features('Ignored', rf, 4)
+        result = target._process_features('Ignored', rf, y_true)
         self._common_validations(result, cols)
 
     def test_unnamed_dataframe(self):
-        a, b = self._get_raw_data()
+        a, b, y_true = self._get_raw_data()
 
         rf = pd.DataFrame(data=zip(a, b))
 
         target = _get_raw_GroupedMetric()
-        result = target._process_features('Unused', rf, 4)
+        result = target._process_features('Unused', rf, y_true)
         self._common_validations(result, [0, 1])
 
     def test_list_of_series(self):
-        a, b = self._get_raw_data()
+        a, b, y_true = self._get_raw_data()
 
         rf = [pd.Series(data=a, name="Alpha"), pd.Series(data=b, name="Beta")]
         target = _get_raw_GroupedMetric()
-        result = target._process_features('Unused', rf, 4)
+        result = target._process_features('Unused', rf, y_true)
         self._common_validations(result, ['Alpha', 'Beta'])

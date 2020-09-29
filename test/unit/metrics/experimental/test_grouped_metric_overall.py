@@ -50,7 +50,7 @@ def test_2m_0cf():
 def test_1m_1cf():
     target = _get_raw_GroupedMetric()
     func_dict = target._process_functions(skm.recall_score, None)
-    cf_list = target._process_features("CF", g_1, len(y_t))
+    cf_list = target._process_features("CF", g_1, y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 
@@ -69,7 +69,7 @@ def test_1m_1cf_wgt():
     target = _get_raw_GroupedMetric()
     func_dict = target._process_functions(skm.recall_score,
                                           {'sample_weight': s_w})
-    cf_list = target._process_features("CondF", g_1, len(y_t))
+    cf_list = target._process_features("CondF", g_1, y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 
@@ -89,7 +89,7 @@ def test_1m_1cf_wgt():
 def test_1m_2cf():
     target = _get_raw_GroupedMetric()
     func_dict = target._process_functions(skm.recall_score, None)
-    cf_list = target._process_features("CF", [g_1, g_2], len(y_t))
+    cf_list = target._process_features("CF", [g_1, g_2], y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 
@@ -117,7 +117,7 @@ def test_2m_2cf():
     func_dict = target._process_functions(
         {'recall': skm.recall_score, 'prec': skm.precision_score},
         None)
-    cf_list = target._process_features("CF", [g_1, g_2], len(y_t))
+    cf_list = target._process_features("CF", [g_1, g_2], y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 

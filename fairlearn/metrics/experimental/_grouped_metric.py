@@ -26,12 +26,12 @@ class GroupedMetric:
         func_dict = self._process_functions(metric_functions, sample_params)
 
         # Now, prepare the sensitive features
-        sf_list = self._process_features("SF", sensitive_features, len(y_true))
+        sf_list = self._process_features("SF", sensitive_features, y_true)
 
         cf_list = None
         self._cf_names = None
         if conditional_features is not None:
-            cf_list = self._process_features("CF", conditional_features, len(y_true))
+            cf_list = self._process_features("CF", conditional_features, y_true)
             self._cf_names = [x.name for x in cf_list]
 
         self._overall = self._compute_overall(func_dict, y_true, y_pred, cf_list)
@@ -133,11 +133,6 @@ class GroupedMetric:
         """Read a placeholder comment."""
         pass
 
-    def _check_feature_length(self, feature, expected_length):
-        if len(feature) != expected_length:
-            msg = _BAD_FEATURE_LENGTH.format(len(feature), expected_length)
-            raise ValueError(msg)
-
     def _process_functions(self, metric_functions, sample_params):
         func_dict = dict()
         if isinstance(metric_functions, dict):
@@ -158,43 +153,43 @@ class GroupedMetric:
             func_dict[fc.name_] = fc
         return func_dict
 
-    def _process_features(self, base_name, features, expected_length):
+    def _process_features(self, base_name, features, sample_array):
         result = []
 
         if isinstance(features, pd.Series):
-            self._check_feature_length(features, expected_length)
+            check_consistent_length(features, sample_array)
             result.append(GroupFeature(base_name, features, 0, None))
         elif isinstance(features, pd.DataFrame):
             for i in range(len(features.columns)):
                 column = features.iloc[:, i]
-                self._check_feature_length(column, expected_length)
+                check_consistent_length(column, sample_array)
                 result.append(GroupFeature(base_name, column, i, None))
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.squeeze(np.asarray(features))
                 assert len(f_arr.shape) == 1
-                self._check_feature_length(f_arr, expected_length)
+                check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
             else:
                 for i in range(len(features)):
                     if isinstance(features[i], pd.Series):
-                        self._check_feature_length(features[i], expected_length)
+                        check_consistent_length(features[i], sample_array)
                         result.append(GroupFeature(base_name, features[i], i, None))
                     else:
                         f_arr = np.squeeze(np.asarray(features[i]))
                         assert len(f_arr.shape) == 1
-                        self._check_feature_length(f_arr, expected_length)
+                        check_consistent_length(f_arr, sample_array)
                         result.append(GroupFeature(base_name, f_arr, i, None))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
             f_arr = np.squeeze(np.asarray(features, dtype=np.object))
             if len(f_arr.shape) == 1:
-                self._check_feature_length(f_arr, expected_length)
+                check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
             elif len(f_arr.shape) == 2:
                 for i in range(f_arr.shape[0]):
                     col = f_arr[i, :]
-                    self._check_feature_length(col, expected_length)
+                    check_consistent_length(col, sample_array)
                     result.append(GroupFeature(base_name, col, i, None))
             else:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
