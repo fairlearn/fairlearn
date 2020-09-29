@@ -4,7 +4,7 @@ parameters:
   envInfoArtifactBase: Environment
   envInfoDir: environment
   envInfoFileBase: env
-  packages: { LightGBM: lightgbm, XGBoost: xgboost }
+  packages: { LightGBM: lightgbm, XGBoost: xgboost, TensorFlow: tensorflow }
   poolImage: ubuntu-latest
   pythonVersion: 3.8
 

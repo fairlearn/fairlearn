@@ -106,7 +106,7 @@ class UtilityParity(ClassificationMoment):
         self.tags[_EVENT] = event
         if utilities is None:
             utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
-                                  np.ones(y.shape, dtype=np.float64)]).T
+                                   np.ones(y.shape, dtype=np.float64)]).T
         self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
@@ -142,7 +142,11 @@ class UtilityParity(ClassificationMoment):
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
         utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
-        pred = utility_diff.T * predictor(self.X) + self.utilities[:, 0]
+        predictions = predictor(self.X)
+        if isinstance(predictions, np.ndarray):
+            # TensorFlow seems to return an (n,1) array instead of an (n) array
+            predictions = np.squeeze(predictions)
+        pred = utility_diff.T * predictions + self.utilities[:, 0]
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
         expect_group_event = self.tags.groupby(

@@ -2,7 +2,13 @@
 
 trigger: none # No CI build
 
-pr: none # Not for pull requests
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - test_othermlpackages/*
 
 schedules:
 - cron: "0 8 * * *" # Time is UTC
