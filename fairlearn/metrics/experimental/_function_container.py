@@ -1,7 +1,12 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import logging
 import numpy as np
+
+logger = logging.getLogger(__name__)
+
+_DEFAULT_NAME = 'metric'
 
 
 class FunctionContainer:
@@ -14,7 +19,11 @@ class FunctionContainer:
         self._func = func
 
         if name is None:
-            self._name = func.__name__
+            if hasattr(func, '__name__'):
+                self._name = func.__name__
+            else:
+                logger.warn("Supplied 'func' had no __name__ attribute")
+                self._name = _DEFAULT_NAME
         else:
             self._name = name
 
