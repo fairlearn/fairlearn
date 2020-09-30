@@ -20,6 +20,7 @@ Metrics with Multiple Features
 # and we train a simple model on it. We start with some
 # uncontroversial `import` statements:
 
+import functools
 from fairlearn.metrics.experimental import GroupedMetric
 import sklearn.metrics as skm
 from sklearn.linear_model import LogisticRegression
@@ -70,7 +71,7 @@ colB.name = "Feature B"
 A = X_raw[['race', 'sex']]
 A['Feature A'] = colA
 A['Feature B'] = colB
-print(A)
+A
 
 # %%
 # With the data imported, we perform some standard processing, and a test/train split:
@@ -140,14 +141,15 @@ print(basic_metric.by_group)
 
 wgts = np.random.random(size=len(Y_test))
 
-basic_metric_wgts = GroupedMetric(skm.recall_score, 
-                                  Y_test, Y_pred, 
-                                  sensitive_features=A_test['sex'], 
-                                  sample_params={ 'sample_weight':wgts })
+basic_metric_wgts = GroupedMetric(skm.recall_score,
+                                  Y_test, Y_pred,
+                                  sensitive_features=A_test['sex'],
+                                  sample_params={'sample_weight': wgts})
 
 print("Overall:")
 print(basic_metric_wgts.overall)
-print("For comparison, calculate from recall_score:", skm.recall_score(Y_test, Y_pred, sample_weight=wgts))
+print("For comparison, calculate from recall_score:",
+      skm.recall_score(Y_test, Y_pred, sample_weight=wgts))
 
 print("\nBy Group")
 print(basic_metric_wgts.by_group)
@@ -157,7 +159,6 @@ print(basic_metric_wgts.by_group)
 # wrapped. An example is `fbeta_score()` which requires a value for
 # `beta`. The `functools.partial` routine makes this easy:
 
-import functools
 
 fbeta_05 = functools.partial(skm.fbeta_score, beta=0.5)
 
@@ -175,8 +176,8 @@ print(basic_metric_wrapped.by_group)
 # that argument becomes a dictionary of dictionaries, with the top
 # set of keys matching those in the metrics dictionary:
 
-metric_dict = { 'recall':skm.recall_score, 'fbeta_0.5':fbeta_05 }
-sample_params = { 'recall':{ 'sample_weight':wgts }, 'fbeta_0.5':{ 'sample_weight':wgts } }
+metric_dict = {'recall': skm.recall_score, 'fbeta_0.5': fbeta_05}
+sample_params = {'recall': {'sample_weight': wgts}, 'fbeta_0.5': {'sample_weight': wgts}}
 
 basic_metric_two = GroupedMetric(metric_dict,
                                  Y_test, Y_pred,
@@ -259,7 +260,7 @@ cond_metric = GroupedMetric(skm.recall_score,
 print(cond_metric.overall)
 
 # %%
-# The `by_group` property still looks similar - indeed, 
+# The `by_group` property still looks similar - indeed,
 # can compare it to a metric which moves the conditional
 # feature into the sensitive feature list:
 
@@ -295,4 +296,3 @@ print("\nBy Group")
 print(cond_metric_two.by_group)
 print("\nDifference to overall")
 print(cond_metric_two.difference(method='to_overall'))
-
