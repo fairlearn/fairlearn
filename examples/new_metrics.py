@@ -9,8 +9,7 @@ Metrics with Multiple Features
 # %%
 # This notebook demonstrates the new API for metrics, which supports
 # multiple sensitive and conditional features.
-
-# %%
+#
 # Getting the Data
 # ================
 #
