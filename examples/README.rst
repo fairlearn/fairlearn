@@ -12,3 +12,5 @@ adding new ones please consult the guide on
    :maxdepth: 2
 
    plot_grid_search_census
+
+   new_metrics
