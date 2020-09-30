@@ -125,7 +125,7 @@ basic_metric = GroupedMetric(skm.recall_score, Y_test, Y_pred, sensitive_feature
 
 basic_metric.overall
 
-# %% 
+# %%
 # This can be compared to a direct calculation from SciKit-Learn:
 skm.recall_score(Y_test, Y_pred)
 
