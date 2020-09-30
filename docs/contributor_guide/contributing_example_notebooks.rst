@@ -44,7 +44,7 @@ These notebooks are generated based on `.py` files in
 in the
 `examples/notebooks directory <https://github.com/fairlearn/fairlearn/tree/master/examples/notebooks>`_
 of the repository. To do this yourself make sure to install sphinx and its
-add-ons by running :code:`pip install -r requirements.txt` in the repository
+add-ons by running :code:`python scripts/install_requirements.py --pinned False` in the repository
 root directory.
 
 To build the webpage run the following command from the repository root
