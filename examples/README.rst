@@ -13,4 +13,4 @@ adding new ones please consult the guide on
 
    plot_grid_search_census
 
-   new_metrics
+   plot_new_metrics
