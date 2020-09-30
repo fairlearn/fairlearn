@@ -17,6 +17,9 @@ jobs:
       - checkout
 
       - run:
+          command: sudo apt-get install pandoc
+
+      - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
           command: sudo python -m pip install --upgrade pip setuptools wheel
       
