@@ -39,7 +39,7 @@ This allows them to be rendered properly with output from all cells.
 
     Rendering the Fairlearn dashboard is still an outstanding issue.
 
-These notebooks are generated based on `.py` files in
+These notebooks are generated based on `plot_*.py` files in
 `percent format <https://jupytext.readthedocs.io/en/latest/formats.html#the-percent-format>`_
 in the
 `examples/notebooks directory <https://github.com/fairlearn/fairlearn/tree/master/examples/notebooks>`_
@@ -47,6 +47,7 @@ of the repository.
 To do this yourself make sure to install sphinx and its
 add-ons by running :code:`python scripts/install_requirements.py --pinned False` in the repository
 root directory. You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
+The filename *must* begin with `plot_` for the cell output to be rendered as a webpage.
 
 To build the webpage run the following command from the repository root
 directory:
