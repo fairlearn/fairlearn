@@ -123,12 +123,15 @@ basic_metric = GroupedMetric(skm.recall_score, Y_test, Y_pred, sensitive_feature
 # on the entire dataset), as well as the metric evaluated on each
 # of the unique values of the specified sensitive feature:
 
-print("Overall:")
-print(basic_metric.overall)
-print("For comparison, calculate from recall_score:", skm.recall_score(Y_test, Y_pred))
+basic_metric.overall
 
-print("\nBy Group")
-print(basic_metric.by_group)
+# %% 
+# This can be compared to a direct calculation from SciKit-Learn:
+skm.recall_score(Y_test, Y_pred)
+
+# %%
+# The results for each value of the sensitive feature:
+basic_metric.by_group
 
 # %%
 # Suppose that we have sample weights which we want to use in the
@@ -145,29 +148,33 @@ basic_metric_wgts = GroupedMetric(skm.recall_score,
                                   sensitive_features=A_test['sex'],
                                   sample_params={'sample_weight': wgts})
 
-print("Overall:")
-print(basic_metric_wgts.overall)
-print("For comparison, calculate from recall_score:",
-      skm.recall_score(Y_test, Y_pred, sample_weight=wgts))
+# %%
+# The overall values
+basic_metric_wgts.overall
 
-print("\nBy Group")
-print(basic_metric_wgts.by_group)
+# %%
+# And compare with SciKit-Learn:
+skm.recall_score(Y_test, Y_pred, sample_weight=wgts)
+
+# %%
+# The values for the sensitive feature:
+basic_metric_wgts.by_group
 
 # %%
 # If the metric function has other arguments, then it will need to be
 # wrapped. An example is `fbeta_score()` which requires a value for
 # `beta`. The `functools.partial` routine makes this easy:
-
-
 fbeta_05 = functools.partial(skm.fbeta_score, beta=0.5)
 
 basic_metric_wrapped = GroupedMetric(fbeta_05, Y_test, Y_pred, sensitive_features=A_test['sex'])
 
-print("Overall")
-print(basic_metric_wrapped.overall)
+# %%
+# The overall values
+basic_metric_wrapped.overall
 
-print("\nBy Group")
-print(basic_metric_wrapped.by_group)
+# %%
+# The Values for the sensitive feature
+basic_metric_wrapped.by_group
 
 # %%
 # We can evaluate multiple metrics at once by passing in a dictionary
@@ -183,11 +190,13 @@ basic_metric_two = GroupedMetric(metric_dict,
                                  sensitive_features=A_test['sex'],
                                  sample_params=sample_params)
 
-print("Overall")
-print(basic_metric_two.overall)
+# %%
+# Now we inspect the overall values
+basic_metric_two.overall
 
-print("\nBy Group")
-print(basic_metric_two.by_group)
+# %%
+# And the values for the sensitive feature
+basic_metric_two.by_group
 
 # %%
 # Aggregates
@@ -196,24 +205,28 @@ print(basic_metric_two.by_group)
 # We provide some aggregating functions, which provide means of
 # obtaining scalar measures. First are the `group_min()` and
 # `group_max()` methods which compute the minimum and maximum
-# values of each metric across the sensitive feature:
+# values of each metric across the sensitive feature.
+#
+# First the minimum:
+basic_metric_two.group_min()
 
-print("Group Min")
-print(basic_metric_two.group_min())
-print("\nGroup Max")
-print(basic_metric_two.group_max())
+# %%
+# And the maximum:
+basic_metric_two.group_max()
 
 # %%
 # There is also a `difference()` method, which calculates the
 # difference between the minimum and maximum. Alternatively,
 # its `method=` argument can compute the difference relative to
 # the overall value of the metric (returning the largest
-# absolute value):
+# absolute value).
+#
+# First the default difference between the minimum and maximum:
+basic_metric_two.difference()
 
-print("Basic difference")
-print(basic_metric_two.difference())
-print("\nDifference to overall")
-print(basic_metric_two.difference(method='to_overall'))
+# %%
+# And the difference to the overall value:
+basic_metric_two.difference(method='to_overall')
 
 # %%
 # Multiple Sensitive Features
@@ -228,12 +241,18 @@ two_sf = GroupedMetric(metric_dict,
                        Y_test, Y_pred,
                        sensitive_features=A_test[['sex', 'race']])
 
-print("Overall")
-print(two_sf.overall)
-print("\nBy Group")
-print(two_sf.by_group)
-print("Difference to overall")
-print(two_sf.difference(method='to_overall'))
+# %%
+# The overall values
+two_sf.overall
+
+# %%
+# The values for the intersections of the sensitive features:
+two_sf.by_group
+
+# %%
+# The maximum absolute difference to the overall value for each
+# intersection of the sensitive features:
+two_sf.difference(method='to_overall')
 
 # %%
 # Conditional Features
@@ -256,29 +275,32 @@ cond_metric = GroupedMetric(skm.recall_score,
 # rows correspond to the unique values of the conditional
 # feature:
 
-print(cond_metric.overall)
+cond_metric.overall
 
 # %%
 # The `by_group` property still looks similar - indeed,
 # can compare it to a metric which moves the conditional
-# feature into the sensitive feature list:
+# feature into the sensitive feature list.
+#
+# First computed from the object above:
+cond_metric.by_group
 
-print(cond_metric.by_group)
-
+# %%
+# Now recompute, with the conditional feature moved to the
+# list of sensitive features:
 cond_metric_alt = GroupedMetric(skm.recall_score,
                                 Y_test, Y_pred,
                                 sensitive_features=A_test[['Feature A', 'sex', 'race']])
-print("\nFor comparision")
-print(cond_metric_alt.by_group)
+cond_metric_alt.by_group
 
 # %%
 # The aggregates are also evaluated for each unique value
-# of the conditional feature:
+# of the conditional feature. For example the maximum:
+cond_metric.group_max()
 
-print("Group Max")
-print(cond_metric.group_max())
-print("\nDifference")
-print(cond_metric.difference())
+# %%
+# And the difference:
+cond_metric.difference()
 
 # %%
 # We also support multiple conditional features, and
@@ -289,9 +311,15 @@ cond_metric_two = GroupedMetric(metric_dict,
                                 sensitive_features=A_test[['sex', 'race']],
                                 conditional_features=A_test[['Feature A', 'Feature B']])
 
-print("Overall")
-print(cond_metric_two.overall)
-print("\nBy Group")
-print(cond_metric_two.by_group)
-print("\nDifference to overall")
-print(cond_metric_two.difference(method='to_overall'))
+# %%
+# First the overall values
+cond_metric_two.overall
+
+# %%
+# The values for the intersections of sensitive and conditional features:
+cond_metric_two.by_group
+
+# %%
+# The maximum absolute values of the difference to the overall value
+# for each intersection of conditional features:
+cond_metric_two.difference(method='to_overall')
