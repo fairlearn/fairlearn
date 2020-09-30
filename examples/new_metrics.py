@@ -6,9 +6,7 @@
 Metrics with Multiple Features
 ==============================
 """
-
 # %%
-#
 # This notebook demonstrates the new API for metrics, which supports
 # multiple sensitive and conditional features.
 
@@ -48,6 +46,7 @@ Y = (Y == '>50K') * 1
 
 
 def marriage_transform(m_s_string):
+    """Perform some simple manipulations."""
     result = 'A'
     if m_s_string.startswith("Married"):
         result = 'B'
@@ -57,6 +56,7 @@ def marriage_transform(m_s_string):
 
 
 def occupation_transform(occ_string):
+    """Perform some simple manipulations."""
     result = 'pp'
     if occ_string.startswith("Machine"):
         result = 'qq'
