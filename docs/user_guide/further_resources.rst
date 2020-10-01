@@ -18,6 +18,7 @@ Books
 Papers
 ------
 
+- `Fairlearn: A toolkit for assessing and improving fairness in AI <https://www.microsoft.com/en-us/research/uploads/prod/2020/05/Fairlearn_whitepaper.pdf>`_ (Bird et al., 2020)
 - `Fairness through Awareness <https://arxiv.org/abs/1104.3913>`_ (Dwork et al., 2011)
 - `Big Data's Disparate Impact <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2477899##>`_ (Barocas & Selbst, 2016)
 - `Measures and Mismeasures of Fairness <https://5harad.com/papers/fair-ml.pdf>`_ (Corbett-Davies & Goel, 2018)

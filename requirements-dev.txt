@@ -5,6 +5,7 @@ autopep8
 flake8
 flake8-blind-except
 flake8-builtins
+flake8-copyright
 flake8-docstrings
 flake8-logging-format
 flake8-rst-docstrings
@@ -12,8 +13,7 @@ requirements-parser
 
 # Required for test
 nbformat
-# Pin papermill due to notebook test issue on Windows with python 3.6
-papermill<2.0.0
+papermill
 # Pin pytest due to VS Code issue
 pytest==5.0.1
 pytest-cov
@@ -30,6 +30,8 @@ jupyter
 nbval
 
 # Required for documentation
+bokeh
+pypandoc
 sphinx
-sphinx-gallery
+sphinx-gallery>=0.8.1
 pydata-sphinx-theme

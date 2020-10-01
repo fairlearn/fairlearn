@@ -1,62 +1,38 @@
 {
-  "name": "fairlearn-widget",
-  "version": "0.1.0",
-  "description": "Fairlearn widget for Jupyter notebooks",
-  "author": "Brandon Horn (rihorn@microsoft.com)",
+  "name": "inline-fairness-dashboard",
+  "version": "1.0.0",
+  "description": "Host for component to be consumed as npm package",
   "license": "MIT",
-  "main": "lib/index.js",
-  "types": "./lib/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fairlearn/fairlearn"
-  },
-  "keywords": [
-    "jupyter",
-    "widgets",
-    "ipython",
-    "ipywidgets",
-    "jupyterlab-extension"
-  ],
-  "files": [
-    "lib/**/*.js",
-    "dist/*.js"
-  ],
+  "author": "",
+  "main": "main.js",
   "scripts": {
-    "build": "npm run build:lib && npm run build:nbextension",
-    "build:labextension": "npm run clean:labextension && mkdirp fairlearn_widget/labextension && cd fairlearn_widget/labextension && npm pack ../..",
-    "build:lib": "tsc",
-    "build:nbextension": "webpack -p",
-    "build:all": "npm run build:lib && npm run build:labextension && npm run build:nbextension",
-    "clean": "npm run clean:lib && npm run clean:nbextension",
-    "clean:lib": "rimraf lib",
-    "clean:labextension": "rimraf fairlearn_widget/labextension",
-    "clean:nbextension": "rimraf fairlearn_widget/nbextension/static/index.js"
-  },
-  "devDependencies": {
-    "@phosphor/application": "^1.6.0",
-    "@phosphor/widgets": "^1.6.0",
-    "@types/node": "^10.11.6",
-    "@types/react-dom": "^16.8.4",
-    "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.1",
-    "source-map-loader": "^0.2.4",
-    "ts-loader": "^5.2.1",
-    "typescript": "~3.1.2",
-    "terser-webpack-plugin": "^1.4.2",
-    "serialize-javascript": ">=2.1.1",
-    "webpack": "4.41.2",
-    "webpack-cli": "^3.3.1"
+    "build": "webpack",
+    "start": "start http://localhost:7777/ & webpack-dev-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^1.1.10",
-    "css-loader": "^2.1.1",
-    "lodash": "^4.17.11",
+    "@babel/core": "7.4.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-transform-runtime": "7.11.5",
+    "@babel/preset-env": "7.4.3",
+    "@babel/preset-react": "7.0.0",
+    "axios": "^0.19.2",
+    "babel-loader": "8.0.5",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "6.24.1",
+    "babel-preset-react": "6.24.1",
+    "core-js": "3.6.5",
+    "css-loader": "2.1.1",
     "fairlearn-dashboard": "0.0.21",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "style-loader": "^0.23.1"
+    "lodash": "4.17.20",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "style-loader": "0.23.1",
+    "webpack": "4.29.6",
+    "webpack-cli": "3.3.0",
+    "webpack-dev-server": "3.2.1"
   },
-  "jupyterlab": {
-    "extension": "lib/labplugin"
+  "devDependencies": {
+    "babel-plugin-transform-regenerator": "^6.26.0"
   }
 }

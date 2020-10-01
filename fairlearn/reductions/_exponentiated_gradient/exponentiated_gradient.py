@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -27,9 +27,11 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     estimator : estimator
         An estimator implementing methods :code:`fit(X, y, sample_weight)` and
         :code:`predict(X)`, where `X` is the matrix of features, `y` is the
-        vector of labels, and `sample_weight` is a vector of weights;
-        labels `y` and predictions returned by :code:`predict(X)` are either
-        0 or 1.
+        vector of labels (binary classification) or continuous values
+        (regression), and `sample_weight` is a vector of weights.
+        In binary classification labels `y` and predictions returned by
+        :code:`predict(X)` are either 0 or 1.
+        In regression values `y` and predictions are continuous.
     constraints : fairlearn.reductions.Moment
         The disparity constraints expressed as moments
     eps : float

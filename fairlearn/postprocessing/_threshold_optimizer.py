@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 """Threshold Optimization Post Processing algorithm.
@@ -198,7 +198,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             y = [int(y_val) for y_val in y]
 
         if not self.prefit:
-            self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
+            # Following is on two lines due to issue when estimator comes from TensorFlow
+            self.estimator_ = clone(self.estimator)
+            self.estimator_.fit(X, y, **kwargs)
         else:
             try:
                 check_is_fitted(self.estimator)
