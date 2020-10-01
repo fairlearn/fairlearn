@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import numpy as np
-import pandas as pd
 import pytest
 import sklearn.metrics as skm
 
@@ -112,6 +111,8 @@ def test_missing_conditional_feature_combinations():
                 expected_min = min(by_groups[i_A][i_B].values())
                 assert expected_max == target.group_max()[metric_fn.__name__][(i_A, i_B)]
                 assert expected_min == target.group_min()[metric_fn.__name__][(i_A, i_B)]
+                assert target.difference()[metric_fn.__name__][(i_A, i_B)] == expected_max - expected_min
             else:
                 assert target.group_max()[metric_fn.__name__][(i_A, i_B)] is None
                 assert target.group_min()[metric_fn.__name__][(i_A, i_B)] is None
+                assert target.difference()[metric_fn.__name__][(i_A, i_B)] is None
