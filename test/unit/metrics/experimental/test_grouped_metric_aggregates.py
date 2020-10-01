@@ -42,6 +42,11 @@ def test_1m_1sf_0cf():
     diffs_overall = [abs(recall_p-recall), abs(recall_q-recall)]
     assert target_diff_overall['recall_score'] == max(diffs_overall)
 
+    target_ratio = target.ratio()
+    assert isinstance(target_ratio)
+    assert len(target_ratio) == 1
+    assert target_ratio['recall_score'] == min(recall_p, recall_q)/max(recall_p, recall_q)
+
 
 def test_2m_1sf_0cf():
     target = metrics.GroupedMetric({'recall': skm.recall_score, 'prec': skm.precision_score},
