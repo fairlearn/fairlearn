@@ -116,9 +116,9 @@ def test_2m_1sf_0cf():
     # preq_q/prec and prec/prec_q, it only calculates the former,
     # and inverts it if the result is greater than unity
     assert target_ratio_overall['recall'] == pytest.approx(recall_ratio_overall,
-                                                           rel=1e-10, abs=1e-12)
+                                                           rel=1e-10, abs=1e-16)
     assert target_ratio_overall['prec'] == pytest.approx(prec_ratio_overall,
-                                                         rel=1e-10, abs=1e-12)
+                                                         rel=1e-10, abs=1e-16)
 
 
 def test_1m_1sf_1cf():
@@ -272,6 +272,31 @@ def test_1m_1sf_2cf():
     assert diffs_overall['recall_score'][('m', 'aa')] == diff_overall_m_a
     assert diffs_overall['recall_score'][('m', 'ba')] == diff_overall_m_b
 
+    ratios = target.ratio()
+    assert isinstance(ratios, pd.DataFrame)
+    assert ratios.shape == (4, 1)
+    assert ratios['recall_score'][('kk', 'aa')] == min(recall_k_a_arr) / max(recall_k_a_arr)
+    assert ratios['recall_score'][('kk', 'ba')] == min(recall_k_b_arr) / max(recall_k_b_arr)
+    assert ratios['recall_score'][('m', 'aa')] == min(recall_m_a_arr) / max(recall_m_a_arr)
+    assert ratios['recall_score'][('m', 'ba')] == min(recall_m_b_arr) / max(recall_m_b_arr)
+
+    ratios_overall = target.ratio(method='to_overall')
+    assert isinstance(ratios_overall, pd.DataFrame)
+    assert ratios_overall.shape == (4, 1)
+    ratio_overall_k_a = [x/recall_k_a for x in recall_k_a_arr] + \
+        [recall_k_a/x for x in recall_k_a_arr]
+    ratio_overall_k_b = [x/recall_k_b for x in recall_k_b_arr] + \
+        [recall_k_b/x for x in recall_k_b_arr]
+    ratio_overall_m_a = [x/recall_m_a for x in recall_m_a_arr] + \
+        [recall_m_a/x for x in recall_m_a_arr]
+    ratio_overall_m_b = [x/recall_m_b for x in recall_m_b_arr] + \
+        [recall_m_b/x for x in recall_m_b_arr]
+    assert ratios_overall['recall_score'][('kk', 'aa')] == min(ratio_overall_k_a)
+    assert ratios_overall['recall_score'][('kk', 'ba')] == min(ratio_overall_k_b)
+    assert ratios_overall['recall_score'][('m', 'aa')] == min(ratio_overall_m_a)
+    assert ratios_overall['recall_score'][('m', 'ba')] == pytest.approx(min(ratio_overall_m_b),
+                                                                        rel=1e-10, abs=1e-16)
+
 
 def test_2m_1sf_1cf():
     target = metrics.GroupedMetric({'recall': skm.recall_score, 'prec': skm.precision_score},
@@ -344,3 +369,28 @@ def test_2m_1sf_1cf():
     assert diffs_overall['recall']['m'] == recall_m_overall
     assert diffs_overall['prec']['kk'] == precision_k_overall
     assert diffs_overall['prec']['m'] == precision_m_overall
+
+    ratios = target.ratio()
+    assert isinstance(ratios, pd.DataFrame)
+    assert ratios.shape == (2, 2)
+    assert ratios['recall']['kk'] == min(recall_k_arr) / max(recall_k_arr)
+    assert ratios['recall']['m'] == min(recall_m_arr) / max(recall_m_arr)
+    assert ratios['prec']['kk'] == min(precision_k_arr) / max(precision_k_arr)
+    assert ratios['prec']['m'] == min(precision_m_arr) / max(precision_m_arr)
+
+    ratios_overall = target.ratio(method='to_overall')
+    assert isinstance(ratios_overall, pd.DataFrame)
+    assert ratios_overall.shape == (2, 2)
+    recall_k_overall = [x/recall_k for x in recall_k_arr] + \
+        [recall_k/x for x in recall_k_arr]
+    recall_m_overall = [x/recall_m for x in recall_m_arr] + \
+        [recall_m/x for x in recall_m_arr]
+    precision_k_overall = [x/precision_k for x in precision_k_arr] + \
+        [precision_k/x for x in precision_k_arr]
+    precision_m_overall = [x/precision_m for x in precision_m_arr] + \
+        [precision_m/x for x in precision_m_arr]
+    assert ratios_overall['recall']['kk'] == min(recall_k_overall)
+    assert ratios_overall['recall']['m'] == min(recall_m_overall)
+    assert ratios_overall['prec']['kk'] == min(precision_k_overall)
+    assert ratios_overall['prec']['m'] == pytest.approx(min(precision_m_overall),
+                                                        rel=1e-10, abs=1e-16)
