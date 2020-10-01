@@ -43,9 +43,18 @@ def test_1m_1sf_0cf():
     assert target_diff_overall['recall_score'] == max(diffs_overall)
 
     target_ratio = target.ratio()
-    assert isinstance(target_ratio)
+    assert isinstance(target_ratio, pd.Series)
     assert len(target_ratio) == 1
     assert target_ratio['recall_score'] == min(recall_p, recall_q)/max(recall_p, recall_q)
+
+    target_ratio_overall = target.ratio(method='to_overall')
+    assert isinstance(target_ratio_overall, pd.Series)
+    assert len(target_ratio_overall) == 1
+    expected_ratio_overall = min(recall_p/recall,
+                                 recall/recall_p,
+                                 recall_q/recall,
+                                 recall/recall_q)
+    assert target_ratio_overall['recall_score'] == expected_ratio_overall
 
 
 def test_2m_1sf_0cf():

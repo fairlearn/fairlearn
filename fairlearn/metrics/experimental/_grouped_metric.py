@@ -129,9 +129,23 @@ class GroupedMetric:
 
         return result
 
-    def ratio(self):
+    def ratio(self, method='minmax'):
         """Read a placeholder comment."""
-        pass
+        if method == 'minmax':
+            return self.group_min() / self.group_max()
+        elif method == 'to_overall':
+            ratios = self.by_group / self.overall
+
+            def ratio_sub_one(x):
+                if x > 1:
+                    return 1/x
+                else:
+                    return x
+
+            ratios.apply(lambda x: x.transform(ratio_sub_one))
+            return ratios.min()
+        else:
+            raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
     def _process_functions(self, metric_functions, sample_params):
         func_dict = dict()
