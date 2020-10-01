@@ -17,7 +17,8 @@ jobs:
       - checkout
 
       - run:
-          command: sudo apt-get install pandoc
+          name: Install pandoc
+          command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
@@ -47,6 +48,10 @@ jobs:
     steps:
       # check out PR branch
       - checkout
+      
+      - run:
+          name: Install pandoc
+          command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
