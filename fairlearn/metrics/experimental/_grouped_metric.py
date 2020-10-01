@@ -71,7 +71,13 @@ class GroupedMetric:
                 else:
                     # Have to force row_curr to be an unary tuple
                     mask = self._mask_from_tuple((row_curr,), rows)
-                curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
+
+                # Check that we have some results
+                if sum(mask) > 0:
+                    curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
+                else:
+                    # Everything masked out, so return None
+                    curr_metric = None
                 result[func_name][row_curr] = curr_metric
         return result
 
