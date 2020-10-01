@@ -99,7 +99,9 @@ class GroupedMetric:
                 max_val = self.by_group[m].max()
                 result[m] = max_val
         else:
-            result = self.by_group.groupby(level=list(range(len(self._cf_names)))).max().mask(np.isnan, None)
+            lvls = list(range(len(self._cf_names)))
+            # Final mask is to use None rather than NaN for missing values
+            result = self.by_group.groupby(level=lvls).max().mask(np.isnan, None)
         return result
 
     def group_min(self):
@@ -110,7 +112,9 @@ class GroupedMetric:
                 min_val = self.by_group[m].min()
                 result[m] = min_val
         else:
-            result = self.by_group.groupby(level=list(range(len(self._cf_names)))).min().mask(np.isnan, None)
+            lvls = list(range(len(self._cf_names)))
+            # Final mask is to use None rather than NaN for missing values
+            result = self.by_group.groupby(level=lvls).min().mask(np.isnan, None)
         return result
 
     def difference(self, method='minmax'):
