@@ -131,8 +131,9 @@ class GroupedMetric:
 
     def ratio(self, method='minmax'):
         """Read a placeholder comment."""
+        result = None
         if method == 'minmax':
-            return self.group_min() / self.group_max()
+            result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             ratios = self.by_group / self.overall
 
@@ -142,10 +143,17 @@ class GroupedMetric:
                 else:
                     return x
 
-            ratios.apply(lambda x: x.transform(ratio_sub_one))
-            return ratios.min()
+            ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
+            if self._cf_names is None:
+                result = ratios.min()
+            else:
+                # It's easiest to give in to the DataFrame columns preference
+                cf_levels = list(range(len(self._cf_names)))
+                result = ratios.unstack(level=cf_levels).min().unstack(0)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
+
+        return result
 
     def _process_functions(self, metric_functions, sample_params):
         func_dict = dict()

@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics.experimental as metrics
@@ -97,6 +98,28 @@ def test_2m_1sf_0cf():
     assert target_diff_overall['recall'] == max(recall_diffs_overall)
     assert target_diff_overall['prec'] == max(prec_diffs_overall)
 
+    target_ratio = target.ratio()
+    assert isinstance(target_ratio, pd.Series)
+    assert len(target_ratio) == 2
+    assert target_ratio['recall'] == min(recall_p, recall_q)/max(recall_p, recall_q)
+    assert target_ratio['prec'] == min(prec_p/prec_q, prec_q/prec_p)
+
+    target_ratio_overall = target.ratio(method='to_overall')
+    assert isinstance(target_ratio_overall, pd.Series)
+    assert len(target_ratio_overall) == 2
+    recall_ratio_overall = min(recall_p/recall, recall/recall_p,
+                               recall_q/recall, recall/recall_q)
+    prec_ratio_overall = min(prec_p/prec, prec/prec_p,
+                             prec_q/prec, prec/prec_q)
+    # Need pytest.approx because ratio() doesn't do quite the same
+    # calculations as above. Specifically, rather than doing both
+    # preq_q/prec and prec/prec_q, it only calculates the former,
+    # and inverts it if the result is greater than unity
+    assert target_ratio_overall['recall'] == pytest.approx(recall_ratio_overall,
+                                                           rel=1e-10, abs=1e-12)
+    assert target_ratio_overall['prec'] == pytest.approx(prec_ratio_overall,
+                                                         rel=1e-10, abs=1e-12)
+
 
 def test_1m_1sf_1cf():
     target = metrics.GroupedMetric(skm.recall_score,
@@ -146,6 +169,22 @@ def test_1m_1sf_1cf():
     m_diffs_overall = [abs(recall_m_f-recall_m), abs(recall_m_g-recall_m)]
     assert target_diff_overall['recall_score']['kk'] == max(k_diffs_overall)
     assert target_diff_overall['recall_score']['m'] == max(m_diffs_overall)
+
+    target_ratio = target.ratio()
+    assert isinstance(target_ratio, pd.DataFrame)
+    assert target_ratio.shape == (2, 1)
+    assert target_ratio['recall_score']['kk'] == min(recall_k_arr)/max(recall_k_arr)
+    assert target_ratio['recall_score']['m'] == min(recall_m_arr)/max(recall_m_arr)
+
+    target_ratio_overall = target.ratio(method='to_overall')
+    assert isinstance(target_ratio_overall, pd.DataFrame)
+    assert target_ratio_overall.shape == (2, 1)
+    k_ratios_overall = [x/recall_k for x in recall_k_arr] + \
+        [recall_k/x for x in recall_k_arr]
+    m_ratios_overall = [x/recall_m for x in recall_m_arr] + \
+        [recall_m/x for x in recall_m_arr]
+    assert target_ratio_overall['recall_score']['kk'] == min(k_ratios_overall)
+    assert target_ratio_overall['recall_score']['m'] == min(m_ratios_overall)
 
 
 def test_1m_1sf_2cf():
