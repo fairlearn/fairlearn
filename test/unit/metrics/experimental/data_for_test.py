@@ -28,7 +28,6 @@ s_w = np.asarray(
 
 def group_gen(x, runs, groups):
     # For producing arrays such as ['a', 'a', 'b', 'b', 'a', 'a', ... ]
-    assert runs >= len(groups)
     return groups[(x//runs) % len(groups)]
 
 
