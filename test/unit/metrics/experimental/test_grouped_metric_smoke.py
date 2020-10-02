@@ -12,6 +12,7 @@ from .data_for_test import y_t, y_p, g_2, g_3, g_4
 
 from test.unit.input_convertors import conversions_for_1d
 
+
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
 def test_basic(transform_y_t, transform_y_p):
