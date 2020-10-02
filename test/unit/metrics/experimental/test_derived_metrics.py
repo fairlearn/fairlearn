@@ -37,6 +37,18 @@ def test_derived_difference():
     assert actual == grouped.difference()['accuracy_score']
 
 
+def test_derived_difference_to_overall():
+    my_fn = metrics.make_derived_metric('difference_to_overall',
+                                        skm.accuracy_score)
+
+    grouped = metrics.GroupedMetric(skm.accuracy_score,
+                                    y_t, y_p,
+                                    sensitive_features=gid)
+
+    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    assert actual == grouped.difference(method='to_overall')['accuracy_score']
+
+
 def test_derived_difference_sample_arg():
     my_fbeta = functools.partial(skm.fbeta_score, beta=0.6)
     my_fbeta.__name__ = "my_fbeta"
@@ -48,3 +60,25 @@ def test_derived_difference_sample_arg():
                                     sample_params={'sample_weight': wgt})
     actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt)
     assert actual == grouped.difference()['my_fbeta']
+
+
+def test_derived_ratio():
+    my_fn = metrics.make_derived_metric('ratio',
+                                        skm.precision_score)
+
+    grouped = metrics.GroupedMetric(skm.precision_score,
+                                    y_t, y_p,
+                                    sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    assert actual == grouped.ratio()['precision_score']
+
+
+def test_derived_ratio_to_overall():
+    my_fn = metrics.make_derived_metric('ratio_to_overall',
+                                        skm.precision_score)
+
+    grouped = metrics.GroupedMetric(skm.precision_score,
+                                    y_t, y_p,
+                                    sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    assert actual == grouped.ratio(method='to_overall')['precision_score']

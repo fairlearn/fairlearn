@@ -7,7 +7,9 @@ from ._grouped_metric import GroupedMetric
 
 aggregate_options = [
     'difference',
-    'difference_to_overall'
+    'difference_to_overall',
+    'ratio',
+    'ratio_to_overall',
 ]
 
 
@@ -31,6 +33,10 @@ class _DerivedMetric:
             result = all_metrics.difference()[self._metric_fn.__name__]
         elif self._aggregate == 'difference_to_overall':
             result = all_metrics.difference(method='to_overall')[self._metric_fn.__name__]
+        elif self._aggregate == 'ratio':
+            result = all_metrics.ratio()[self._metric_fn.__name__]
+        elif self._aggregate == 'ratio_to_overall':
+            result = all_metrics.ratio(method='to_overall')[self._metric_fn.__name__]
         else:
             raise ValueError("Cannot get here")
 
