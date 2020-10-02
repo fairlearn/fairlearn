@@ -72,13 +72,10 @@ class GroupedMetric:
                     # Have to force row_curr to be an unary tuple
                     mask = self._mask_from_tuple((row_curr,), rows)
 
-                # Check that we have some results
+                # Only call the metric function if the mask is non-empty
                 if sum(mask) > 0:
                     curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
-                else:
-                    # Everything masked out, so return None
-                    curr_metric = None
-                result[func_name][row_curr] = curr_metric
+                    result[func_name][row_curr] = curr_metric
         return result
 
     @property
@@ -100,8 +97,7 @@ class GroupedMetric:
                 result[m] = max_val
         else:
             lvls = list(range(len(self._cf_names)))
-            # Final mask is to use None rather than NaN for missing values
-            result = self.by_group.groupby(level=lvls).max().mask(np.isnan, None)
+            result = self.by_group.groupby(level=lvls).max()
         return result
 
     def group_min(self):
@@ -113,8 +109,7 @@ class GroupedMetric:
                 result[m] = min_val
         else:
             lvls = list(range(len(self._cf_names)))
-            # Final mask is to use None rather than NaN for missing values
-            result = self.by_group.groupby(level=lvls).min().mask(np.isnan, None)
+            result = self.by_group.groupby(level=lvls).min()
         return result
 
     def difference(self, method='minmax'):

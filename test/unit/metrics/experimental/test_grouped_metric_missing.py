@@ -43,7 +43,7 @@ def test_missing_sensitive_feature_combinations(metric_fn):
     assert len(direct_eval) == 5
 
     # Check we have expected values
-    assert target.by_group[metric_fn.__name__][('bb', 'x')] is None
+    assert np.isnan(target.by_group[metric_fn.__name__][('bb', 'x')])
     assert target.group_min()[metric_fn.__name__] == min(direct_eval)
     assert target.group_max()[metric_fn.__name__] == max(direct_eval)
     assert target.difference()[metric_fn.__name__] == max(direct_eval)-min(direct_eval)
@@ -54,9 +54,8 @@ def test_missing_sensitive_feature_combinations(metric_fn):
         min([x/overall for x in direct_eval] + [overall/x for x in direct_eval])
 
 
-def test_missing_conditional_feature_combinations():
-    metric_fn = skm.accuracy_score
-
+@pytest.mark.parametrize("metric_fn", metric_functions)
+def test_missing_conditional_feature_combinations(metric_fn):
     target = metrics.GroupedMetric(metric_fn,
                                    y_t, y_p,
                                    conditional_features=[g_A, g_B],
@@ -89,19 +88,20 @@ def test_missing_conditional_feature_combinations():
         by_groups[i_A] = by_groups_B
 
     # Check values are as expected
+    mfn = metric_fn.__name__
     for i_A in np.unique(g_A):
         for i_B in np.unique(g_B):
             if i_B in overall[i_A]:
                 assert overall[i_A][i_B] == \
-                    target.overall[metric_fn.__name__][(i_A, i_B)]
+                    target.overall[mfn][(i_A, i_B)]
                 for i_1 in np.unique(g_1):
                     if i_1 in by_groups[i_A][i_B]:
                         assert by_groups[i_A][i_B][i_1] == \
-                            target.by_group[metric_fn.__name__][(i_A, i_B, i_1)]
+                            target.by_group[mfn][(i_A, i_B, i_1)]
                     else:
-                        assert target.by_group[metric_fn.__name__][(i_A, i_B, i_1)] is None
+                        assert np.isnan(target.by_group[mfn][(i_A, i_B, i_1)])
             else:
-                assert target.overall[metric_fn.__name__][(i_A, i_B)] is None
+                assert np.isnan(target.overall[mfn][(i_A, i_B)])
 
     # Check differences and ratios
     for i_A in np.unique(g_A):
@@ -109,10 +109,24 @@ def test_missing_conditional_feature_combinations():
             if i_B in overall[i_A]:
                 expected_max = max(by_groups[i_A][i_B].values())
                 expected_min = min(by_groups[i_A][i_B].values())
-                assert expected_max == target.group_max()[metric_fn.__name__][(i_A, i_B)]
-                assert expected_min == target.group_min()[metric_fn.__name__][(i_A, i_B)]
-                assert target.difference()[metric_fn.__name__][(i_A, i_B)] == expected_max - expected_min
+                assert expected_max == target.group_max()[mfn][(i_A, i_B)]
+                assert expected_min == target.group_min()[mfn][(i_A, i_B)]
+                assert target.difference()[mfn][(i_A, i_B)] == \
+                    expected_max - expected_min
+                diffs_overall = [abs(x-overall[i_A][i_B]) for x in by_groups[i_A][i_B].values()]
+                assert target.difference(method='to_overall')[mfn][(i_A, i_B)] == \
+                    max(diffs_overall)
+                assert target.ratio()[mfn][(i_A, i_B)] == \
+                    expected_min / expected_max
+                ratio_overall = [(x/overall[i_A][i_B]) for x in by_groups[i_A][i_B].values()] + \
+                    [(overall[i_A][i_B]/x) for x in by_groups[i_A][i_B].values()]
+                assert target.ratio(method='to_overall')[mfn][(i_A, i_B)] == \
+                    pytest.approx(min(ratio_overall), rel=1e-10, abs=1e-16)
             else:
-                assert target.group_max()[metric_fn.__name__][(i_A, i_B)] is None
-                assert target.group_min()[metric_fn.__name__][(i_A, i_B)] is None
-                assert target.difference()[metric_fn.__name__][(i_A, i_B)] is None
+                assert np.isnan(target.group_max()[metric_fn.__name__][(i_A, i_B)])
+                assert np.isnan(target.group_min()[metric_fn.__name__][(i_A, i_B)])
+                assert np.isnan(target.difference()[metric_fn.__name__][(i_A, i_B)])
+                assert np.isnan(target.difference(method='to_overall')
+                                [metric_fn.__name__][(i_A, i_B)])
+                assert np.isnan(target.ratio()[metric_fn.__name__][(i_A, i_B)])
+                assert np.isnan(target.ratio(method='to_overall')[metric_fn.__name__][(i_A, i_B)])
