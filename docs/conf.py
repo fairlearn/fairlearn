@@ -43,14 +43,14 @@ release = fairlearn.__version__
 extensions = [
     'bokeh.sphinxext.bokeh_plot',
     'sphinx.ext.autodoc',
-    'sphinx_autodoc_typehints',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx_autodoc_typehints',  # Has to load after Napoleon
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -115,10 +115,10 @@ pygments_style = 'sphinx'
 # included in the gallery, but its plot is available for
 # the quickstart
 sphinx_gallery_conf = {
-     'examples_dirs': '../examples',
-     'gallery_dirs': 'auto_examples',
-     # pypandoc enables rst to md conversion in downloadable notebooks
-     'pypandoc': True,
+    'examples_dirs': '../examples',
+    'gallery_dirs': 'auto_examples',
+    # pypandoc enables rst to md conversion in downloadable notebooks
+    'pypandoc': True,
 }
 
 

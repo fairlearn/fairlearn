@@ -9,6 +9,7 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
 from time import time
+from typing import Optional, Union
 
 from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn.reductions._moments import Moment, ClassificationMoment
@@ -36,27 +37,27 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         In binary classification labels `y` and predictions returned by
         :code:`predict(X)` are either 0 or 1.
         In regression values `y` and predictions are continuous.
-    constraints : fairlearn.reductions.Moment
+    constraints :
         The disparity constraints expressed as moments
-    selection_rule : str
+    selection_rule :
         Specifies the procedure for selecting the best model found by the grid
         search. At the present time, the only valid value is
         "tradeoff_optimization" which minimizes a weighted sum of the error
         rate and constraint violation.
-    constraint_weight : float
+    constraint_weight :
         When the `selection_rule` is "tradeoff_optimization" this specifies
         the relative weight put on the constraint violation when selecting the
         best model. The weight placed on the error rate will be
         :code:`1-constraint_weight`
-    grid_size : int
+    grid_size : 
         The number of Lagrange multipliers to generate in the grid
     grid_limit : float
         The largest Lagrange multiplier to generate. The grid will contain
         values distributed between :code:`-grid_limit` and :code:`grid_limit`
         by default
-    grid_offset : :class:`pandas:pandas.DataFrame`
-        Shifts the grid of Lagrangian multiplier by that value.
-        It is '0' by default
+    grid_offset :
+        Shifts the grid of Lagrangian multipliers by that value.
+        If not specified, the grid is left untouched.
     grid :
         Instead of supplying a size and limit for the grid, users may specify
         the exact set of Lagrange multipliers they desire using this argument.
@@ -64,12 +65,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
     def __init__(self,
                  estimator,
-                 constraints,
-                 selection_rule=TRADEOFF_OPTIMIZATION,
-                 constraint_weight=0.5,
-                 grid_size=10,
-                 grid_limit=2.0,
-                 grid_offset=None,
+                 constraints: Moment,
+                 selection_rule: str = TRADEOFF_OPTIMIZATION,
+                 constraint_weight: float = 0.5,
+                 grid_size: int = 10,
+                 grid_limit: float = 2.0,
+                 grid_offset: Optional[pd.DataFrame] = None,
                  grid=None):
         """Construct a GridSearch object."""
         self.estimator = estimator
@@ -91,22 +92,27 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self.grid_offset = grid_offset
         self.grid = grid
 
-    def fit(self, X, y, **kwargs):
+    def fit(self,
+            X: Union[np.ndarray, pd.DataFrame],
+            y: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+            **kwargs):
         """Run the grid search.
 
         This will result in multiple copies of the
         estimator being made, and the :code:`fit(X)` method
         of each one called.
 
-        :param X: The feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
+        Parameters
+        ----------
+        X:
+            The feature matrix
 
-        :param y: The label vector
-        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        y:
+            The label vector
 
-        :param sensitive_features: A (currently) required keyword argument listing the
+        sensitive_features:
+            A (currently) required keyword argument listing the
             feature used by the constraints object
-        :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
         """
         self.predictors_ = []
         self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)
