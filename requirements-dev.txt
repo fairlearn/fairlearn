@@ -9,6 +9,7 @@ flake8-copyright
 flake8-docstrings
 flake8-logging-format
 flake8-rst-docstrings
+mypy
 requirements-parser
 
 # Required for test
