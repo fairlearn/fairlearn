@@ -32,7 +32,12 @@ def group_gen(x, runs, groups):
     return groups[(x//runs) % len(groups)]
 
 
-g_1 = np.asarray([group_gen(x, 2, ['aa', 'ba']) for x in range(len(y_t))])
-g_2 = np.asarray([group_gen(x, 3, ['f', 'g']) for x in range(len(y_t))])
-g_3 = np.asarray([group_gen(x, 4, ['kk', 'm']) for x in range(len(y_t))])
-g_4 = np.asarray([group_gen(x, 5, ['pp', 'q']) for x in range(len(y_t))])
+def array_gen(groups, run_length, num_samples):
+    vals = [group_gen(x, run_length, groups) for x in range(num_samples)]
+    return np.asarray(vals)
+
+
+g_1 = array_gen(['aa', 'ba'], 2, len(y_t))
+g_2 = array_gen(['f', 'g'], 3, len(y_t))
+g_3 = array_gen(['kk', 'm'], 4, len(y_t))
+g_4 = array_gen(['pp', 'q'], 5, len(y_t))
