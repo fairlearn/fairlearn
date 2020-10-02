@@ -18,15 +18,16 @@ Metrics with Multiple Features
 # uncontroversial `import` statements:
 
 import functools
-from fairlearn.metrics.experimental import GroupedMetric
 import sklearn.metrics as skm
-from sklearn.linear_model import LogisticRegression
 import numpy as np
 import pandas as pd
 
 from sklearn.datasets import fetch_openml
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+from fairlearn.metrics.experimental import GroupedMetric, make_derived_metric
 
 
 # %%
@@ -323,3 +324,38 @@ cond_metric_two.by_group
 # The maximum absolute values of the difference to the overall value
 # for each intersection of conditional features:
 cond_metric_two.difference(method='to_overall')
+
+# %%
+# Obtaining Scalars
+# =================
+#
+# It is quite common for a training pipeline to require scalar
+# metrics in order to monitor progress. To this end, we provide
+# a 'make_derived_metric()` routine, which creates a scalar-production
+# metric function based on a given underlying metric and
+# an aggregation function:
+accuracy_difference = make_derived_metric('difference',
+                                          skm.accuracy_score)
+
+# %%
+# This then acts like any other metric:
+accuracy_difference(Y_test, Y_pred, sensitive_features=A_test['sex'])
+# %%
+# Internally, this has called the `.difference()` method and extracted the
+# single result. Compare:
+acc_group = GroupedMetric(skm.accuracy_score,
+                          Y_test, Y_pred,
+                          sensitive_features=A_test['sex'])
+acc_group.difference()
+# %%
+# Conditional features are obviously not supported, but sample parameters
+# (such as weights) are:
+accuracy_difference(Y_test, Y_pred,
+                    sensitive_features=A_test['sex'],
+                    sample_weight=wgts)
+
+# %%
+# Any parameter passed to the generated function is presumed to be a sample
+# parameter. The `functools.partial` pattern shown above can be used for
+# parameters (such as `pos_label`) which control the overall workings of the
+# metric function.
