@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import check_consistent_length
 
+from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._function_container import FunctionContainer
 from ._group_feature import GroupFeature
 
@@ -23,19 +24,22 @@ class GroupedMetric:
                  sample_params=None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
+        y_t = _convert_to_ndarray_and_squeeze(y_true)
+        y_p = _convert_to_ndarray_and_squeeze(y_pred)
+
         func_dict = self._process_functions(metric_functions, sample_params)
 
         # Now, prepare the sensitive features
-        sf_list = self._process_features("SF", sensitive_features, y_true)
+        sf_list = self._process_features("SF", sensitive_features, y_t)
 
         cf_list = None
         self._cf_names = None
         if conditional_features is not None:
-            cf_list = self._process_features("CF", conditional_features, y_true)
+            cf_list = self._process_features("CF", conditional_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
-        self._overall = self._compute_overall(func_dict, y_true, y_pred, cf_list)
-        self._by_group = self._compute_by_group(func_dict, y_true, y_pred, sf_list, cf_list)
+        self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
+        self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
         if cf_list is None:

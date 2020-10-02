@@ -3,17 +3,22 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics.experimental as metrics
 
 from .data_for_test import y_t, y_p, g_2, g_3, g_4
 
+from test.unit.input_convertors import conversions_for_1d
 
-def test_basic():
+@pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+@pytest.mark.parametrize("transform_y_t", conversions_for_1d)
+def test_basic(transform_y_t, transform_y_p):
     g_f = pd.DataFrame(data=g_4, columns=['My feature'])
     target = metrics.GroupedMetric(skm.recall_score,
-                                   y_t, y_p,
+                                   transform_y_t(y_t),
+                                   transform_y_p(y_p),
                                    sensitive_features=g_f)
 
     # Check we have correct return types
@@ -46,9 +51,12 @@ def test_basic():
     assert target_maxes['recall_score'] == max(recall_p, recall_q)
 
 
-def test_1m_1sf_1cf():
+@pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+@pytest.mark.parametrize("transform_y_t", conversions_for_1d)
+def test_1m_1sf_1cf(transform_y_t, transform_y_p):
     target = metrics.GroupedMetric(skm.recall_score,
-                                   y_t, y_p,
+                                   transform_y_t(y_t),
+                                   transform_y_p(y_p),
                                    sensitive_features=g_2,
                                    conditional_features=g_3)
 
