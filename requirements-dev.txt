@@ -33,5 +33,6 @@ nbval
 bokeh
 pypandoc
 sphinx
+sphinx-autodoc-typehints
 sphinx-gallery>=0.8.1
 pydata-sphinx-theme
