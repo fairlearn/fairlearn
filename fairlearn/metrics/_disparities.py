@@ -2,6 +2,9 @@
 # Licensed under the MIT License.
 
 """Metrics for measuring disparity."""
+import numpy as np
+import pandas as pd
+from typing import Optional, Union
 
 from ._metrics_engine import (
     selection_rate_difference,
@@ -12,14 +15,29 @@ from ._metrics_engine import (
     false_positive_rate_ratio)
 
 
-def demographic_parity_difference(y_true, y_pred, *, sensitive_features, sample_weight=None):
+def demographic_parity_difference(
+        y_true: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        y_pred: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        *,
+        sensitive_features: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        sample_weight: Optional[Union[list, np.ndarray, pd.Series, pd.DataFrame]]) -> float:
     """Calculate the demographic parity difference.
 
-    :param 1D-array y_true: Ground truth (correct) labels.
-    :param 1D-array y_pred: Predicted labels :math:`h(X)` returned by the classifier.
-    :param 1D-array sensitive_features: Sensitive features.
-    :param 1D-array sample_weight: Sample weights.
-    :return: The difference between the largest and the smallest group-level selection rate,
+    Parameters
+    ----------
+    y_true :
+        Ground truth (correct) labels.
+    y_pred :
+        Predicted labels :math:`h(X)` returned by the classifier.
+    sensitive_features :
+        Sensitive features.
+    sample_weight :
+        Sample weights.
+
+    Returns
+    -------
+    float
+        The difference between the largest and the smallest group-level selection rate,
         :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature.
         The demographic parity difference of 0 means that all groups have the same selection rate.
     """
