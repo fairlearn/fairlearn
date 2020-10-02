@@ -7,7 +7,9 @@ These are metrics which are not part of `scikit-learn`.
 """
 
 import numpy as np
+import pandas as pd
 import sklearn.metrics as skm
+from typing import Any, List, Optional, Union
 
 from ._balanced_root_mean_squared_error import _balanced_root_mean_squared_error  # noqa: F401
 from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_underprediction  # noqa: F401,E501
@@ -18,7 +20,7 @@ _RESTRICTED_VALS_IF_POS_LABEL_NONE = "If pos_label is not specified, values must
 _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
 
-def _get_labels_for_confusion_matrix(labels, pos_label):
+def _get_labels_for_confusion_matrix(labels, pos_label) -> List[Any]:
     r"""Figure out the labels argument for skm.confusion_matrix.
 
     This is an internal method used by the true/false positive/negative
@@ -76,22 +78,26 @@ def _get_labels_for_confusion_matrix(labels, pos_label):
     return unique_labels
 
 
-def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def true_positive_rate(
+        y_true: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        y_pred: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        sample_weight: Optional[Union[list, np.ndarray, pd.Series, pd.DataFrame]] = None,
+        pos_label: Optional[Any] = None) -> float:
     r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
 
     Parameters
     ----------
-    y_true : array-like
+    y_true :
         The list of true values
 
-    y_pred : array-like
+    y_pred :
         The list of predicted values
 
-    sample_weight : array-like, optional
+    sample_weight :
         A list of weights to apply to each sample. By default all samples are weighted
         equally
 
-    pos_label : scalar, optional
+    pos_label :
         The value to treat as the 'positive' label in the samples. If `None` (the default)
         then the largest unique value of the y arrays will be used.
 
@@ -107,22 +113,26 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     return tpr
 
 
-def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def true_negative_rate(
+        y_true: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        y_pred: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        sample_weight: Optional[Union[list, np.ndarray, pd.Series, pd.DataFrame]] = None,
+        pos_label: Optional[Any] = None) -> float:
     r"""Calculate the true negative rate (also called specificity or selectivity).
 
     Parameters
     ----------
-    y_true : array-like
+    y_true :
         The list of true values
 
-    y_pred : array-like
+    y_pred :
         The list of predicted values
 
-    sample_weight : array-like, optional
+    sample_weight :
         A list of weights to apply to each sample. By default all samples are weighted
         equally
 
-    pos_label : scalar, optional
+    pos_label :
         The value to treat as the 'positive' label in the samples. If `None` (the default)
         then the largest unique value of the y arrays will be used.
 
@@ -138,22 +148,26 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     return tnr
 
 
-def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def false_positive_rate(
+        y_true: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        y_pred: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        sample_weight: Optional[Union[list, np.ndarray, pd.Series, pd.DataFrame]] = None,
+        pos_label: Optional[Any] = None) -> float:
     r"""Calculate the false positive rate (also called fall-out).
 
     Parameters
     ----------
-    y_true : array-like
+    y_true :
         The list of true values
 
-    y_pred : array-like
+    y_pred :
         The list of predicted values
 
-    sample_weight : array-like, optional
+    sample_weight :
         A list of weights to apply to each sample. By default all samples are weighted
         equally
 
-    pos_label : scalar, optional
+    pos_label :
         The value to treat as the 'positive' label in the samples. If `None` (the default)
         then the largest unique value of the y arrays will be used.
 
@@ -169,22 +183,26 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     return fpr
 
 
-def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def false_negative_rate(
+        y_true: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        y_pred: Union[list, np.ndarray, pd.Series, pd.DataFrame],
+        sample_weight: Optional[Union[list, np.ndarray, pd.Series, pd.DataFrame]] = None,
+        pos_label: Optional[Any] = None) -> float:
     r"""Calculate the false negative rate (also called miss rate).
 
     Parameters
     ----------
-    y_true : array-like
+    y_true :
         The list of true values
 
-    y_pred : array-like
+    y_pred :
         The list of predicted values
 
-    sample_weight : array-like, optional
+    sample_weight :
         A list of weights to apply to each sample. By default all samples are weighted
         equally
 
-    pos_label : scalar, optional
+    pos_label :
         The value to treat as the 'positive' label in the samples. If `None` (the default)
         then the largest unique value of the y arrays will be used.
 
@@ -200,6 +218,6 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     return fnr
 
 
-def _root_mean_squared_error(y_true, y_pred, **kwargs):
+def _root_mean_squared_error(y_true, y_pred, **kwargs) -> float:
     r"""Calculate the root mean squared error."""
     return skm.mean_squared_error(y_true, y_pred, squared=False, **kwargs)

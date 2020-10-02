@@ -49,7 +49,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         the relative weight put on the constraint violation when selecting the
         best model. The weight placed on the error rate will be
         :code:`1-constraint_weight`
-    grid_size : 
+    grid_size :
         The number of Lagrange multipliers to generate in the grid
     grid_limit : float
         The largest Lagrange multiplier to generate. The grid will contain
