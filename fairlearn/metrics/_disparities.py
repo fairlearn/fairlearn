@@ -20,7 +20,7 @@ def demographic_parity_difference(
         y_pred: Union[list, np.ndarray, pd.Series, pd.DataFrame],
         *,
         sensitive_features: Union[list, np.ndarray, pd.Series, pd.DataFrame],
-        sample_weight: Optional[Union[list, np.ndarray, pd.Series, pd.DataFrame]]) -> float:
+        sample_weight: Optional[Union[list, np.ndarray, pd.Series, pd.DataFrame]] = None) -> float:
     """Calculate the demographic parity difference.
 
     Parameters
