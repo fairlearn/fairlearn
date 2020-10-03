@@ -53,6 +53,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
+                       'numpy': ('http://docs.scipy.org/doc/numpy', None),
                        'sklearn': ('https://scikit-learn.org/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)}
 
@@ -114,10 +115,10 @@ pygments_style = 'sphinx'
 # included in the gallery, but its plot is available for
 # the quickstart
 sphinx_gallery_conf = {
-     'examples_dirs': '../examples',
-     'gallery_dirs': 'auto_examples',
-     # pypandoc enables rst to md conversion in downloadable notebooks
-     'pypandoc': True,
+    'examples_dirs': '../examples',
+    'gallery_dirs': 'auto_examples',
+    # pypandoc enables rst to md conversion in downloadable notebooks
+    'pypandoc': True,
 }
 
 
