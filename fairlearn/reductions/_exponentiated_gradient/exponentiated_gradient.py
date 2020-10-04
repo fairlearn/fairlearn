@@ -51,10 +51,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         if True each step of exponentiated gradient is followed by the saddle
         point optimization over the convex hull of classifiers returned so
         far; default True
+    sample_weight_key : str
+        Argument to supply `sample_weight` in `estimator.fit`.
     """
 
     def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
-                 eta0=2.0, run_linprog_step=True):  # noqa: D103
+                 eta0=2.0, run_linprog_step=True,
+                 sample_weight_key='sample_weight'):  # noqa: D103
         self.estimator = estimator
         self.constraints = constraints
         self.eps = eps
@@ -62,6 +65,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.nu = nu
         self.eta0 = eta0
         self.run_linprog_step = run_linprog_step
+        self.sample_weight_key = sample_weight_key
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -93,7 +97,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         B = 1 / self.eps
         lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
-                                 self.constraints, B)
+                                 self.constraints, B,
+                                 sample_weight_key=self.sample_weight_key)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
