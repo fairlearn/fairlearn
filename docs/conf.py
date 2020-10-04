@@ -53,8 +53,9 @@ extensions = [
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)}
+                       'numpy': ('https://numpy.org/doc/stable/', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+                       'sklearn': ('https://scikit-learn.org/stable/', None), }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -114,8 +115,10 @@ pygments_style = 'sphinx'
 # included in the gallery, but its plot is available for
 # the quickstart
 sphinx_gallery_conf = {
-     'examples_dirs': '../examples',
-     'gallery_dirs': 'auto_examples',
+    'examples_dirs': '../examples',
+    'gallery_dirs': 'auto_examples',
+    # pypandoc enables rst to md conversion in downloadable notebooks
+    'pypandoc': True,
 }
 
 

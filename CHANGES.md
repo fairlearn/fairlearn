@@ -41,6 +41,7 @@
 * Add new constraints and objectives in `ThresholdOptimizer`
 * Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
 * Add `fairlearn.datasets` module.
+* Change the method to make copies of the estimator in `ExponentiatedGradient` from `pickle.dump` to `sklearn.clone`. 
 
 ### v0.4.6
 
