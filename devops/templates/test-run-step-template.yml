@@ -1,0 +1,98 @@
+# Template to run a single set of tests
+# - Specifies Python version
+# - Installs requirements
+# - Saves 'pip freeze' to Artifact
+# - Installs fairlearn via specified means
+# - Runs flake8
+# - Runs specified test suite
+# - Saves test results
+
+parameters:
+- name: testRunType
+  type: string
+  values:
+  - Unit
+  - Notebooks
+  - CodeCoverage
+- name: installationType
+  type: string
+- name: pythonVersion
+  type: number
+  default: 3.7
+- name: pinRequirements
+  type: boolean
+  default: False
+- name: requirementsFile
+  type: string
+- name: freezeArtifact
+  type: string
+- name: freezeFile
+  type: string
+# Following are used if the installationType is PyPI
+- name: pypiUrl
+  type: string
+- name: versionArtifactName
+  type: string
+- name: versionArtifactFile
+  type: string
+# Following used if the installationType is WheelArtifact
+- name: wheelArtifactName
+  type: string
+
+steps:
+- task: UsePythonVersion@0
+  displayName: 'Use Python ${{parameters.pythonVersion}}'
+  inputs:
+    versionSpec: '${{parameters.pythonVersion}}' 
+    addToPath: true
+
+- template: python-infra-upgrade-steps-template.yml
+
+- template: requirements-installation-steps-template.yml
+  parameters:
+    pinRequirements: ${{parameters.pinRequirements}}
+
+- template: pip-freeze-to-artifact-steps-template.yml
+  parameters:
+    freezeArtifact: ${{parameters.freezeArtifact}}
+    freezeFile: ${{parameters.freezeFile}}
+
+- template: fairlearn-installation-step-template.yml
+  parameters:
+    installationType: ${{parameters.installationType}}
+    pypiUrl: ${{parameters.pypiUrl}}
+    versionArtifactName: ${{parameters.versionArtifactName}}
+    versionArtifactFile: ${{parameters.versionArtifactFile}}
+    pipVersionVariable: variableForPipVersion
+    wheelArtifactName: ${{parameters.wheelArtifactName}}
+  
+- script: flake8 .
+  displayName: "Run flake8"
+
+# =================================================
+- ${{ if eq(parameters.testRunType, 'Unit')}}:
+  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+    displayName: 'Run unit tests'
+
+- ${{ if eq(parameters.testRunType, 'Notebooks')}}:
+  - script: python -m pytest test/ -m notebooks --junitxml=./TEST-TEST.xml -o junit_suite_name="$(Agent.JobName)"
+    displayName: 'Run notebooks as tests'
+
+- ${{ if eq(parameters.testRunType, 'CodeCoverage')}}:
+  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST-TEST.xml --cov=fairlearn --cov-report=xml --cov-report=html -o unit_suite_name="$(Agent.JobName)}"
+    displayName: 'Run unit tests with code coverage'
+  
+  # Publish code coverage results
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'cobertura'
+      summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
+      pathToSources: $(System.DefaultWorkingDirectory)
+      additionalCodeCoverageFiles: $(System.DefaultWorkingDirectory)/htmlcov/**
+      failIfCoverageEmpty: false
+      displayName: "Publish Code Coverage"
+# =================================================
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/TEST-*.xml'
+  condition: succeededOrFailed()

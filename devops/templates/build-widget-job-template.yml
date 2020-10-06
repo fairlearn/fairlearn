@@ -1,0 +1,21 @@
+# template for building the widget/fairlearn dashboard
+
+parameters:
+  name: 'BuildWidget'
+  vmImage: 'ubuntu-latest'
+  pyVersion: 3.6
+
+jobs:
+- job:  ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  steps:
+  - bash: |
+      cd ./visualization/FairnessDashboard
+      yarn lintci
+      cd ../..
+    displayName: "Run visualization linter"
+
+  - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+    displayName: 'Build widget'

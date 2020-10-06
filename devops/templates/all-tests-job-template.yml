@@ -1,0 +1,64 @@
+# Template for running tests on multiple Python versions and platforms
+#
+# This is a driver for test-run-step-template.yml
+#
+# platforms is a dictionary to specify the VM images to use
+# for the runs. The keys are human-readable titles, the values
+# are vmImage names
+#
+# testRunTypes specifies the different test suites to run
+#
+# pyVersions lists the Python versions to use
+#
+# The set of jobs submitted is the Cartesian product of these
+# three parameters
+
+parameters:
+  platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+  testRunTypes: ['Unit', 'Notebooks']
+  installationType:
+  pyVersions: [3.6, 3.7, 3.8]
+  pinRequirements: False
+  freezeArtifactStem: 
+  freezeFileStem:
+  # Following are used if the installationType is PyPI
+  targetType: 'Test'
+  versionArtifactName:
+  versionArtifactFile:
+  # Following used if installationType is WheelArtifact
+  wheelArtifactName:
+
+jobs:
+  - ${{ each plat in parameters.platforms }}:
+    - ${{ each testRunType in parameters.testRunTypes }}:
+      - ${{ each pyVer in parameters.pyVersions }}:
+        - job:
+          displayName: ${{ format('{0} {1} {2}', plat.Key , testRunType, pyVer) }}
+          pool:
+            vmImage: ${{ plat.value }}
+
+          variables:
+            ${{ if eq(parameters.targetType, 'Test') }}:
+              pypiUrl: https://test.pypi.org/simple/
+            ${{ if eq(parameters.targetType, 'Production') }}:
+              pypiUrl: https://pypi.org/simple/
+            RequirementsFile: requirements-${{pyVer}}.txt
+            FreezeArtifact: '${{parameters.freezeArtifactStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}'
+            FreezeFile: '${{parameters.freezeFileStem}}-${{plat.Key}}-${{testRunType}}-${{pyVer}}.txt'
+
+          steps:
+          - template: test-run-step-template.yml
+            parameters:
+              testRunType: ${{testRunType}}
+              installationType: ${{parameters.installationType}}
+              pythonVersion: ${{pyVer}}
+              pinRequirements: ${{parameters.pinRequirements}}
+              requirementsFile: $(RequirementsFile)
+              freezeArtifact: $(FreezeArtifact)
+              freezeFile: $(FreezeFile)
+              # Following are used if the installationType is PyPI
+              pypiUrl: $(pypiUrl)
+              versionArtifactName: ${{parameters.versionArtifactName}}
+              versionArtifactFile: ${{parameters.versionArtifactFile}}
+              # Following used if installationType is WheelArtifact
+              wheelArtifactName: ${{parameters.wheelArtifactName}}

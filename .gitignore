@@ -65,6 +65,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/auto_examples/
 
 # PyBuilder
 target/
@@ -108,3 +109,15 @@ venv.bak/
 
 # VS Code
 /.vscode
+
+# Documentation
+docbuild/
+
+# IntelliJ
+/.idea
+
+# OSX directory info files
+.DS_Store
+
+# widget files
+fairlearn/widget/js/node_modules/*

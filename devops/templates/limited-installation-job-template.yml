@@ -1,0 +1,50 @@
+# template for installing limited versions of fairlearn and testing them.
+# Specifically, this installs fairlearn without extensions before
+# executing the tests under test/install.
+
+parameters:
+  name: 'LimitedInstallation'
+  vmImage: 'ubuntu-latest'
+  pyVersions: [3.6, 3.7, 3.8]
+  freezeArtifactStem: 
+  freezeFileStem:
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    maxParallel: 2
+    matrix:
+      ${{ each pyVer in parameters.pyVersions }}:
+        ${{ pyVer }}:
+          PyVer: ${{ pyVer }}
+          FreezeArtifact: '${{parameters.freezeArtifactStem}}${{parameters.name}}${{pyVer}}'
+          FreezeFile: '${{parameters.freezeFileStem}}-${{parameters.name}}${{pyVer}}.txt'
+
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(PyVer)'
+    inputs:
+      versionSpec: '$(PyVer)' 
+      addToPath: true
+
+  - template: python-infra-upgrade-steps-template.yml
+
+  - script: pip install .
+    displayName: 'Install fairlearn without customplots extensions'
+
+  - script: pip install pytest
+    displayName: 'Install pytest'
+
+  - template: pip-freeze-to-artifact-steps-template.yml
+    parameters:
+      freezeArtifact: $(FreezeArtifact)
+      freezeFile: $(FreezeFile)
+
+  - script: python -m pytest test/install --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+    displayName: 'Run installation tests'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TEST-*.xml'
+    condition: succeededOrFailed()

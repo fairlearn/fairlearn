@@ -1,134 +1,108 @@
-[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)
+[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![StackOverflow](https://img.shields.io/badge/StackOverflow-questions-blueviolet)](https://stackoverflow.com/questions/tagged/fairlearn)
 
+# Fairlearn
 
+Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. Fairlearn contains mitigation algorithms as well as a Jupyter widget for model assessment. Besides the source code, this repository also contains Jupyter notebooks with examples of Fairlearn usage.
 
-# Fairness in machine learning - Mitigation algorithms
+Website: https://fairlearn.github.io/
 
-A Python package that implements a variety of algorithms that mitigate unfairness in supervised machine learning.
+- [Current release](#current-release)
+- [What we mean by _fairness_](#what-we-mean-by-fairness)
+- [Overview of Fairlearn](#overview-of-fairlearn)
+  - [Fairlearn algorithms](#fairlearn-algorithms)
+  - [Fairlearn dashboard](#fairlearn-dashboard)
+- [Install Fairlearn](#install-fairlearn)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Maintainers](#maintainers)
+- [Issues](#issues)
 
-## Current Release
+## Current release
 
-* The current stable release is available at [FairLearn v0.2.0](https://github.com/fairlearn/fairlearn/tree/v0.2.0).
+- The current stable release is available at [Fairlearn v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6).
 
-* Our latest work differs substantively from version 0.2.0, please visit the repo for further information. In particular, look at [Existing users: How to onboard to fairlearn v0.3+](#existing).
+- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://fairlearn.github.io/contributor_guide/development_process.html#onboarding-guide).
 
-#  Algorithms
+## What we mean by _fairness_
 
-A variety of fairness-related algorithms to mitigate bias are included:
+An AI system can behave unfairly for a variety of reasons. In Fairlearn, we define whether an AI system is behaving unfairly in terms of its impact on people &ndash; i.e., in terms of harms. We focus on two kinds of harms:
 
-| algorithm | description | classification/regression | protected attributes | supported fairness definitions |
-| --- | --- | --- | --- | --- |
-| `fairlearn.` `reductions.` `ExponentiatedGradient` | Black-box approach to fair classification described in the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | categorical | DP, EO |
-| `fairlearn.` `reductions.` `GridSearch` | Black-box approach described in Section 3.4 of the paper [A Reductions Approach to Fair Classification](https://arxiv.org/abs/1803.02453)| binary classification | binary | DP |
-| `fairlearn.` `reductions.` `GridSearch` | Grid search for regression | regression | binary | BGL |
-| `fairlearn.` `post_processing.` `ThresholdOptimizer` | Post-processing algorithm based on the paper [Equality of Opportunity in Supervised Learning](https://arxiv.org/pdf/1610.02413.pdf)| binary classification | categorical | DP, EO |
+- _Allocation harms._ These harms can occur when AI systems extend or withhold opportunities, resources, or information. Some of the key applications are in hiring, school admissions, and lending.
 
-DP refers to Demographic Parity, EO to Equalized Odds, and BGL to Bounded Group Loss. For more information on these and other terms we use in this repository please refer to the [terminology page](TERMINOLOGY.md).
+- _Quality-of-service harms._ Quality of service refers to whether a system works as well for one person as it does for another, even if no opportunities, resources, or information are extended or withheld.
 
-To request additional algorithms or fairness definitions, please open a new issue.
+We follow the approach known as **group fairness**, which asks: _Which groups of individuals are at risk for experiencing harms?_ The relevant groups need to be specified by the data scientist and are application specific.
 
-# <a name="existing"></a>
+Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The Fairlearn package enables assessment and mitigation of unfairness under several common definitions.
+To learn more about our definitions of fairness, please visit our
+[user guide on Fairness of AI Systems](https://fairlearn.github.io/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems).
 
-# Existing users: How to onboard to fairlearn v0.3+
+>_Note_:
+> Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
 
-<details>
-<summary>
-<strong>
-<em>
-Onboarding guide
-</em>
-</strong>
-</summary>
+## Overview of Fairlearn
 
-As of version 0.2 fairlearn contained only the exponentiated gradient method. The fairlearn repository now has a more comprehensive scope and aims to incorporate other methods as specified above. The same exponentiated gradient technique is now located under `fairlearn.reductions.ExponentiatedGradient` as a class. While in the past one could have run
+The Fairlearn Python package has two components:
 
-```python
-import numpy as np
-from fairlearn.classred import expgrad
-from fairlearn.moments import DP
+- A _dashboard_ for assessing which groups are negatively impacted by a model, and for comparing multiple models in terms of various fairness and accuracy metrics.
 
-estimator = LogisticRegression()  # or any other estimator
-exponentiated_gradient_result = expgrad(X, group_data, y, estimator, constraints=DP())
-positive_probabilities = exponentiated_gradient_result.best_classifier(X)
-randomized_predictions = (positive_probabilities >= np.random.rand(len(positive_probabilities))) * 1
-```
+- _Algorithms_ for mitigating unfairness in a variety of AI tasks and along a variety of fairness definitions.
 
-the equivalent operation is now
+### Fairlearn algorithms
 
-```python
-from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions.moments import DemographicParity
+For an overview of our algorithms please refer to our [website](https://fairlearn.github.io/user_guide/mitigation.html).
 
-estimator = LogisticRegression()  # or any other estimator
-exponentiated_gradient = ExponentiatedGradient(estimator, constraints=DemographicParity())
-exponentiated_gradient.fit(X, y, group_data)
-randomized_predictions = exponentiated_gradient.predict(X)
-```
+### Fairlearn dashboard
 
-Please open a new issue if you encounter any problems.
+Check out our in-depth [guide on the Fairlearn dashboard](https://fairlearn.github.io/user_guide/assessment.html#fairlearn-dashboard).
 
-</details>
+## Install Fairlearn
 
-# Installation
+For instructions on how to install Fairlearn check out our [Quickstart guide](https://fairlearn.github.io/quickstart.html).
 
-The package can be installed via
+## Usage
 
-```python
-pip install fairlearn
-```
+For common usage refer to the [Jupyter notebooks](./notebooks) and our
+[user guide](https://fairlearn.github.io/user_guide/index.html).
+Please note that our APIs are subject to change, so notebooks downloaded
+from `master` may not be compatible with Fairlearn installed with `pip`.
+In this case, please navigate the tags in the repository
+(e.g. [v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5))
+to locate the appropriate version of the notebook.
 
-or you can clone the repository locally via
+## Contributing
 
-```python
-git clone git@github.com:fairlearn/fairlearn.git
-```
+To contribute please check our
+[contributor guide](https://fairlearn.github.io/contributor_guide/index.html).
 
-To verify that it works run
+## Maintainers
 
-```python
-pip install -r requirements.txt
-python -m pytest -s ./test
-```
-
-# Usage
-
-For common usage refer to the [Jupyter notebooks](./notebooks) and our [API guide](CONTRIBUTING.md#api)
-
-# Contributing
-
-To contribute please check our [Contributing guide](CONTRIBUTING.md).
-
-# Maintainers
-
-fairlearn is maintained by:
+The Fairlearn project is maintained by:
 
 - **@MiroDudik**
-- **@romanlutz**
 - **@riedgar-ms**
-- **@bethz**
+- **@rihorn2**
+- **@romanlutz**
 
-## Releasing
+For a full list of contributors refer to the [authors page](./AUTHORS.md)
 
-If you are the current maintainer of this project:
+## Issues
 
-1. Create a branch for the release: `git checkout -b release-vxx.xx`
-1. Ensure that all tests return "ok": `python -m pytest -s ./test`
-1. Bump the module version in `fairlearn/__init__.py`
-1. Make a pull request to fairlearn/fairlearn
-1. Merge fairlearn/fairlearn pull request
-1. Tag and push: `git tag vxx.xx; git push --tags`
+### Usage Questions
 
-# Issues
+Pose questions and help answer them on [Stack
+Overflow](https://stackoverflow.com/questions/tagged/fairlearn) with the tag
+`fairlearn` or on [Gitter](https://gitter.im/fairlearn/community#).
 
-## Regular (non-security) issues
-Please submit a report through [GitHub issues](https://github.com/fairlearn/fairlearn/issues). A maintainer will respond promptly as follows:
-- bug: triage as `bug` and provide estimated timeline based on severity
-- feature request: triage as `feature request` and provide estimated timeline
-- question or discussion: triage as `question` and respond or notify/identify a suitable expert to respond
+### Regular (non-security) issues
 
-Maintainers are supposed to link duplicate issues when possible.
+Issues are meant for bugs, feature requests, and documentation improvements.
+Please submit a report through
+[GitHub issues](https://github.com/fairlearn/fairlearn/issues). A maintainer
+will respond promptly as appropriate.
 
+Maintainers will try to link duplicate issues when possible.
 
-## Reporting security issues
+### Reporting security issues
 
-Please take a look at our guidelines for reporting [security issues](SECURITY.md).
+Please take a look at our guidelines for reporting [security issues](./SECURITY.md).

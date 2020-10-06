@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -17,7 +17,7 @@ class LeastSquaresBinaryClassifierLearner:
         self.weights = pd.Series(self.lsqinfo[0], index=list(X))
 
     def predict(self, X):
-        pred = X.dot(self.weights)
+        pred = X.dot(np.asarray(self.weights))
         return 1 * (pred > 0.5)
 
 
@@ -34,3 +34,11 @@ class LeastSquaresRegressor:
 
     def predict(self, X):
         return X.dot(self.weights)
+
+
+class MockEstimator:
+    def fit(self, X, y, sample_weight):
+        pass
+
+    def predict(self, X):
+        return np.ones(X.shape[0])

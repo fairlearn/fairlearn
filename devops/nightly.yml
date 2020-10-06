@@ -1,3 +1,9 @@
+# Nightly build pipeline
+
+variables:
+  FreezeArtifactStem: 'freeze'
+  FreezeFileStem: 'requirements-freeze'
+
 trigger: none # No CI build
 
 pr: none # Not for pull requests
@@ -8,29 +14,29 @@ schedules:
   branches:
     include:
       - master
-      - dev
   always: true
 
 pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- template: all-tests-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
-    name: Linux
-    vmImage: 'ubuntu-16.04'
-
-- template: all-tests-job-template.yml
-  parameters:
-    name: Windows
-    vmImage:  'vs2017-win2016'
+    platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+    installationType: 'PipLocal'
+    pyVersions: [3.6, 3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
     
-- template: all-tests-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
-    name: MacOS
-    vmImage:  'macOS-10.13'
-    pyVersions: [3.6, 3.7] 
+    platforms: { MacOS: macos-latest }
+    testRunTypes: ['Unit']
+    installationType: 'None'
+    pyVersions: [3.6, 3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
 
-- template: notebook-job-template.yml
-  parameters:
-    vmImage: 'ubuntu-16.04'
+- template: templates/build-widget-job-template.yml
+
+- template: templates/limited-installation-job-template.yml

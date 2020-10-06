@@ -1,0 +1,168 @@
+{
+    "modelNames": [
+        "some model of mine"
+    ],
+    "precomputedFeatureBins": [
+        {
+            "binLabels": [
+                "Group 4",
+                "Group 5"
+            ],
+            "binVector": [
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1
+            ],
+            "featureBinName": "Sensitive Feature 0"
+        }
+    ],
+    "precomputedMetrics": [
+        [
+            {
+                "accuracy_score": {
+                    "bins": [
+                        0.4,
+                        0.6
+                    ],
+                    "global": 0.5
+                },
+                "balanced_accuracy_score": {
+                    "bins": [
+                        0.375,
+                        0.5833333333333333
+                    ],
+                    "global": 0.5
+                },
+                "fallout_rate": {
+                    "bins": [
+                        0.5,
+                        0.5
+                    ],
+                    "global": 0.5
+                },
+                "f1_score": {
+                    "bins": [
+                        0.25,
+                        0.6666666666666666
+                    ],
+                    "global": 0.5
+                },
+                "miss_rate": {
+                    "bins": [
+                        0.75,
+                        0.3333333333333333
+                    ],
+                    "global": 0.5
+                },
+                "overprediction": {
+                    "bins": [
+                        0.3,
+                        0.2
+                    ],
+                    "global": 0.25
+                },
+                "precision_score": {
+                    "bins": [
+                        0.25,
+                        0.6666666666666666
+                    ],
+                    "global": 0.5
+                },
+                "recall_score": {
+                    "bins": [
+                        0.25,
+                        0.6666666666666666
+                    ],
+                    "global": 0.5
+                },
+                "selection_rate": {
+                    "bins": [
+                        0.4,
+                        0.6
+                    ],
+                    "global": 0.5
+                },
+                "specificity_score": {
+                    "bins": [
+                        0.5,
+                        0.5
+                    ],
+                    "global": 0.5
+                },
+                "underprediction": {
+                    "bins": [
+                        0.3,
+                        0.2
+                    ],
+                    "global": 0.25
+                }
+            }
+        ]
+    ],
+    "predictedY": [
+        [
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+        ]
+    ],
+    "predictionType": "binaryClassification",
+    "schemaType": "dashboardDictionary",
+    "schemaVersion": 0,
+    "trueY": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0
+    ]
+}

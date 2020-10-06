@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -7,229 +7,271 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
-from fairlearn.reductions import GridSearch
-from fairlearn.reductions.grid_search.simple_quality_metrics import SimpleClassificationQualityMetric, SimpleRegressionQualityMetric  # noqa: E501
-import fairlearn.reductions.moments as moments
+
+from sklearn.exceptions import NotFittedError
+from fairlearn._input_validation import \
+    (_MESSAGE_Y_NONE,
+     _LABELS_NOT_0_1_ERROR_MESSAGE)
+from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, BoundedGroupLoss, \
+    ZeroOneLoss
+from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
+    GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
+
+from test.unit.fixes import get_sklearn_expected_1d_message
+from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
+from test.unit.reductions.conftest import is_invalid_transformation
+from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results, _quick_data
 
 # ==============================================================
 
-# The following are functions which convert ndarrays into other datatypes
-# They are used to generate different argument types for calls to
-# GridSearch
-
-
-def identity(X):
-    return X
-
-
-def pylist(X):
-    return X.tolist()
-
-
-def pandasdf(X):
-    return pd.DataFrame(X)
-
-
-def pandasseries(X):
-    # Will not work if ndarray has more than one dimension
-    return pd.Series(X)
-
-
-def ndarray2d(X):
-    # Adds a second dimension of length 1 onto a 1D
-    # array. This is for checking that shapes n and
-    # n*1 behave the same
-    if len(X.shape) != 1:
-        raise RuntimeError("ndarray2d requires 1d ndarray")
-
-    X = np.expand_dims(X, 1)
-    assert len(X.shape) == 2
-    return X
-
-
 # List the different datatypes which need to succeed for
 # all GridSearch calls
-candidate_X_transforms = [identity, pandasdf]
-candidate_Y_transforms = [identity, pylist, pandasdf, pandasseries, ndarray2d]
-candidate_A_transforms = [identity, pylist, pandasdf, pandasseries, ndarray2d]
+candidate_X_transforms = [ensure_ndarray, ensure_dataframe]
+candidate_Y_transforms = conversions_for_1d
+candidate_A_transforms = conversions_for_1d
+
+# ==============================================================
+
+not_fitted_error_msg = "This {} instance is not fitted yet. Call 'fit' with " \
+    "appropriate arguments before using this estimator."
 
 
 # Base class for tests
 # Tests which must be passed by all calls to the GridSearch
 # go here
 class ArgumentTests:
-    def _quick_data(self):
-        # Data are random and do not matter for these tests
-        feature_1 = [0, 1, 2, 3, 4, 5, 6, 7]
-        feature_2 = [5, 4, 3, 2, 7, 8, 3, 4]
-        feature_3 = [9, 2, 4, 2, 9, 3, 1, 8]
-        X = np.stack((feature_1, feature_2, feature_3), -1)
-        Y = np.array([0, 1, 0, 1, 1, 1, 1, 0])
-        A = np.array([1, 0, 0, 0, 0, 1, 1, 1])
-        return X, Y, A
-
-    # ----------------------------
-
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_valid_inputs(self, transformX, transformY, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric, grid_size=2)
-        X, Y, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_valid_inputs(self, transformX, transformY, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=2)
+        X, Y, A = _quick_data(A_two_dim)
         gs.fit(transformX(X),
                transformY(Y),
                sensitive_features=transformA(A))
-        assert len(gs.all_results) == 2
+        assert_n_grid_search_results(2, gs)
 
     # ----------------------------
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
-    def test_X_is_None(self, transformY, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric, grid_size=3)
-        _, Y, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_X_is_None(self, transformY, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=3)
+        _, Y, A = _quick_data(A_two_dim)
 
-        message = str("Must supply X")
         with pytest.raises(ValueError) as execInfo:
             gs.fit(None,
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert "Expected 2D array, got scalar array instead" in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_Y_is_None(self, transformX, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, _, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_Y_is_None(self, transformX, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, _, A = _quick_data()
 
-        message = str("Must supply y")
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    None,
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _MESSAGE_Y_NONE == execInfo.value.args[0]
 
     # ----------------------------
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_X_Y_different_rows(self, transformX, transformY, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, _, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_X_Y_different_rows(self, transformX, transformY, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, _, A = _quick_data()
         Y = np.random.randint(2, size=len(A)+1)
 
-        message = str("X and y must have same number of rows")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        expected_exception_message = "Found input variables with inconsistent numbers of samples"
+        assert expected_exception_message in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_X_A_different_rows(self, transformX, transformY, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, _ = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_X_A_different_rows(self, transformX, transformY, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, Y, _ = _quick_data(A_two_dim)
         A = np.random.randint(2, size=len(Y)+1)
+        if A_two_dim:
+            A = np.stack((A, A), -1)
 
-        message = str("X and the sensitive features must have same number of rows")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
                    sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        expected_exception_message = "Found input variables with inconsistent numbers of samples"
+        assert expected_exception_message in execInfo.value.args[0]
 
     # ----------------------------
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_sensitive_feature_non_binary(self, transformX, transformY, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
-        A[0] = 0
-        A[1] = 1
-        A[2] = 2
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_many_sensitive_feature_groups_warning(self, transformX, transformY, transformA,
+                                                   A_two_dim, caplog):
+        # The purpose of this test case is to create enough groups to trigger certain expected
+        # warnings. The scenario should still work and succeed.
+        grid_size = 10
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size)
+        X, Y, A = _quick_data(A_two_dim)
 
-        message = str("Sensitive features contain more than two unique values")
-        with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(transformX(X),
-                   transformY(Y),
-                   sensitive_features=transformA(A))
+        if A_two_dim:
+            A[0][0] = 0
+            A[0][1] = 0
+            A[1][0] = 1
+            A[1][1] = 1
+            A[2][0] = 2
+            A[2][1] = 2
+            A[3][0] = 3
+            A[3][1] = 3
+            A[4][0] = 4
+            A[4][1] = 4
+            A[5][0] = 5
+            A[5][1] = 5
+        else:
+            A[0] = 0
+            A[1] = 1
+            A[2] = 2
+            A[3] = 3
+            A[4] = 4
+            A[5] = 5
 
-        assert message == execInfo.value.args[0]
+        caplog.set_level(logging.WARNING)
+        gs.fit(transformX(X),
+               transformY(Y),
+               sensitive_features=transformA(A))
+
+        log_records = caplog.get_records('call')
+        dimension_log_record = log_records[0]
+        size_log_record = log_records[1]
+        if isinstance(self.disparity_criterion, EqualizedOdds):
+            # not every label occurs with every group
+            grid_dimensions = 10
+        else:
+            # 6 groups total, but one is not part of the basis, so 5 dimensions
+            grid_dimensions = 5
+
+        # expect both the dimension warning and the grid size warning
+        assert len(log_records) == 2
+        assert GRID_DIMENSION_WARN_TEMPLATE \
+            .format(grid_dimensions, GRID_DIMENSION_WARN_THRESHOLD) \
+            in dimension_log_record.msg.format(*dimension_log_record.args)
+        assert GRID_SIZE_WARN_TEMPLATE.format(grid_size, 2**grid_dimensions) \
+            in size_log_record.msg.format(*size_log_record.args)
+
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.parametrize("n_groups", [2, 3, 4, 5])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_grid_size_warning_up_to_5_sensitive_feature_group(self, transformX, transformY,
+                                                               transformA, A_two_dim, n_groups,
+                                                               caplog):
+        if isinstance(self.disparity_criterion, EqualizedOdds):
+            pytest.skip('With EqualizedOdds there would be multiple warnings due to higher grid '
+                        'dimensionality.')
+
+        grid_size = 10
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size)
+        X, Y, A = _quick_data(A_two_dim, n_groups=n_groups)
+
+        caplog.set_level(logging.WARNING)
+        gs.fit(transformX(X),
+               transformY(Y),
+               sensitive_features=transformA(A))
+
+        # don't expect the dimension warning;
+        # but expect the grid size warning for large numbers of groups
+        log_records = caplog.get_records('call')
+
+        # 6 groups total, but one is not part of the basis, so 5 dimensions
+        grid_dimensions = n_groups - 1
+
+        if 2**(n_groups-1) > grid_size:
+            assert len(log_records) == 1
+            size_log_record = log_records[0]
+            assert GRID_SIZE_WARN_TEMPLATE.format(grid_size, 2**grid_dimensions) \
+                in size_log_record.msg.format(*size_log_record.args)
+        else:
+            assert len(log_records) == 0
 
     # ----------------------------
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_Y_df_bad_columns(self, transformX, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_Y_df_bad_columns(self, transformX, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
-        message = str("y is a DataFrame with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_df,
                    sensitive_features=transformA(A))
-
-        assert message == execInfo.value.args[0]
+        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_Y_ndarray_bad_columns(self, transformX, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_Y_ndarray_bad_columns(self, transformX, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
-        message = str("y is an ndarray with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    Y_two_col_ndarray,
                    sensitive_features=transformA(A))
-
-        assert message == execInfo.value.args[0]
+        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     # ----------------------------
 
-    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
-    @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_A_df_bad_columns(self, transformX, transformY):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+    def test_no_predict_before_fit(self):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, _, _ = _quick_data()
 
-        A_two_col_df = pd.DataFrame({"a": A, "b": A})
-        message = str("sensitive_features is a DataFrame with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(transformX(X),
-                   transformY(Y),
-                   sensitive_features=A_two_col_df,
-                   number_of_lagrange_multipliers=3)
+        with pytest.raises(NotFittedError) as execInfo:
+            gs.predict(X)
 
-        assert message == execInfo.value.args[0]
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
-    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
-    @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_A_ndarray_bad_columns(self, transformX, transformY):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+    def test_no_predict_proba_before_fit(self):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, _, _ = _quick_data()
 
-        A_two_col_ndarray = np.stack((A, A), -1)
-        message = str("sensitive_features is an ndarray with more than one column")
-        with pytest.raises(RuntimeError) as execInfo:
-            gs.fit(transformX(X),
-                   transformY(Y),
-                   sensitive_features=A_two_col_ndarray,
-                   number_of_lagrange_multipliers=3)
+        with pytest.raises(NotFittedError) as execInfo:
+            gs.predict_proba(X)
 
-        assert message == execInfo.value.args[0]
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
 
 # Tests specific to Classification
@@ -237,62 +279,57 @@ class ConditionalOpportunityTests(ArgumentTests):
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_Y_ternary(self, transformX, transformY, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_Y_ternary(self, transformX, transformY, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, Y, A = _quick_data(A_two_dim)
         Y[0] = 0
         Y[1] = 1
         Y[2] = 2
 
-        message = str("Supplied y labels are not 0 or 1")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_features=transformA(A),
-                   number_of_lagrange_multipliers=3)
+                   sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
-    def test_Y_not_0_1(self, transformX, transformY, transformA):
-        gs = GridSearch(self.estimator, self.disparity_criterion, self.quality_metric)
-        X, Y, A = self._quick_data()
+    @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.uncollect_if(func=is_invalid_transformation)
+    def test_Y_not_0_1(self, transformX, transformY, transformA, A_two_dim):
+        gs = GridSearch(self.estimator, self.disparity_criterion)
+        X, Y, A = _quick_data(A_two_dim)
         Y = Y + 1
 
-        message = str("Supplied y labels are not 0 or 1")
-        with pytest.raises(RuntimeError) as execInfo:
+        with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X),
                    transformY(Y),
-                   sensitive_features=transformA(A),
-                   number_of_lagrange_multipliers=3)
+                   sensitive_features=transformA(A))
 
-        assert message == execInfo.value.args[0]
+        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
 
 
 # Set up DemographicParity
 class TestDemographicParity(ConditionalOpportunityTests):
     def setup_method(self, method):
-        logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LogisticRegression(solver='liblinear')
-        self.disparity_criterion = moments.DemographicParity()
-        self.quality_metric = SimpleClassificationQualityMetric()
+        self.disparity_criterion = DemographicParity()
 
 
 # Test EqualizedOdds
 class TestEqualizedOdds(ConditionalOpportunityTests):
     def setup_method(self, method):
-        logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LogisticRegression(solver='liblinear')
-        self.disparity_criterion = moments.EqualizedOdds()
-        self.quality_metric = SimpleClassificationQualityMetric()
+        self.disparity_criterion = EqualizedOdds()
 
 
 # Tests specific to BoundedGroupLoss
 class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
-        logging.info("setup_method      method:%s" % method.__name__)
         self.estimator = LinearRegression()
-        self.disparity_criterion = moments.GroupLossMoment(moments.ZeroOneLoss())
-        self.quality_metric = SimpleRegressionQualityMetric()
+        eps = 0.01
+        self.disparity_criterion = BoundedGroupLoss(ZeroOneLoss(), upper_bound=eps)

@@ -1,0 +1,35 @@
+# Configuration for .github/workflows/auto-assign-reviewers.yml
+# Documentation for the action and configuration: https://github.com/marketplace/actions/auto-assign-action
+
+# Set to true to add reviewers to pull requests
+addReviewers: true
+
+# Set addAssignees to 'author' to set the PR creator as the assignee.
+addAssignees: author
+
+# A number of reviewers added to the pull request
+# Set 0 to add all the reviewers (default: 0)
+numberOfReviewers: 0
+
+reviewers:
+  - romanlutz
+  - riedgar-ms
+
+# TODO: eventually use reviewGroups to split up by logic, e.g. to have a
+# - mitigationGroup
+# - visualizationGroup
+# depending on the path. That doesn't seem to be possible yet.
+
+# Set to true to add reviewers from different groups to pull requests
+# useReviewGroups: true
+
+# A list of reviewers, split into different groups, to be added to pull requests (GitHub user name)
+# reviewGroups:
+#   groupA:
+#     - reviewerA
+#     - reviewerB
+#     - reviewerC
+#   groupB:
+#     - reviewerD
+#     - reviewerE
+#     - reviewerF

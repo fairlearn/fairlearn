@@ -1,6 +1,10 @@
+variables:
+  FreezeArtifactStem: 'freeze'
+  FreezeFileStem: 'requirements-freeze'
+
 pr:
 - master
-- dev
+- release/*
 
 trigger: none # No CI build
 
@@ -8,22 +12,31 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- template: all-tests-job-template.yml
+- template: templates/all-tests-job-template.yml
   parameters:
-    name: Linux
-    vmImage: 'ubuntu-16.04'
-    pyVersions: [3.5]
-
-- template: all-tests-job-template.yml
-  parameters:
-    name: Windows
-    vmImage:  'vs2017-win2016'
+    platforms:  { Linux: ubuntu-latest }
+    installationType: 'PipLocal'
     pyVersions: [3.6]
-    
-- template: all-tests-job-template.yml
-  parameters:
-    name: MacOS
-    vmImage:  'macOS-10.13'
-    pyVersions: [3.7] 
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
 
-- template: notebook-job-template.yml
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platforms:  { Windows: vs2017-win2016 }
+    installationType: 'PipLocal'
+    pyVersions: [3.6]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
+    
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platforms: { MacOS: macos-latest }
+    testRunTypes: ['Unit']
+    installationType: 'None'
+    pyVersions: [3.7, 3.8]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
+
+- template: templates/build-widget-job-template.yml
+
+- template: templates/limited-installation-job-template.yml

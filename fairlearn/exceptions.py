@@ -1,7 +1,8 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 
-class NotFittedException(ValueError):
-    """ Exception to use if predict is called before fit.
-    """
+class DataFairnessWarning(UserWarning):
+    """Custom warning meant to be raised when loading datasets with fairness issues."""
+
+    pass

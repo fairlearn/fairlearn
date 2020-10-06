@@ -1,3 +1,9 @@
+# Code Coverage build pipeline
+
+variables:
+  FreezeArtifactStem: 'freeze'
+  FreezeFileStem: 'requirements-freeze'
+
 trigger: none
 
 pr: none
@@ -8,8 +14,14 @@ schedules:
   branches:
     include:
       - master
-      - dev
   always: true
 
 jobs:
-- template: code-coverage-job-template.yml
+- template: templates/all-tests-job-template.yml
+  parameters:
+    platforms:  { Linux: ubuntu-latest }
+    testRunTypes: ['CodeCoverage']
+    installationType: 'PipLocal'
+    pyVersions: [3.6]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)

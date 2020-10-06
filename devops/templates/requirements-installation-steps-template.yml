@@ -1,0 +1,8 @@
+parameters:
+- name: pinRequirements
+  type: boolean
+  default: False
+
+steps:
+- script: python scripts/install_requirements.py --pinned ${{parameters.pinRequirements}}
+  displayName: Install all requirements

@@ -1,0 +1,17 @@
+# template to save a list of installed packages to an artifact
+# in order to reuse it at a later point.
+
+parameters:
+  freezeArtifact:
+  freezeFile:
+
+  
+steps:
+  - script: pip freeze --all > ${{parameters.freezeFile}}
+    displayName: "Run pip freeze"
+
+  - task: PublishPipelineArtifact@1
+    displayName: "Publish pip freeze file to artifact ${{parameters.freezeArtifact}}"
+    inputs:
+      path: '$(System.DefaultWorkingDirectory)/${{parameters.freezeFile}}'
+      artifact: '${{parameters.freezeArtifact}}-Attempt-$(System.JobAttempt)'
