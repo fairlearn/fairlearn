@@ -4,13 +4,15 @@
 import pytest
 pytest.importorskip("fairlearn.metrics.accuracy_score_group_summary")
 
-from fairlearn.metrics import accuracy_score_group_summary, roc_auc_score_group_summary
-from fairlearn.metrics._group_metric_set import _process_predictions
-from fairlearn.metrics._group_metric_set import _process_sensitive_features
-from fairlearn.metrics._group_metric_set import _create_group_metric_set
+# E402 is pending the removal of pytest.importorskip above
+from fairlearn.metrics import accuracy_score_group_summary, \
+    roc_auc_score_group_summary  # noqa: E402
+from fairlearn.metrics._group_metric_set import _process_predictions  # noqa: E402
+from fairlearn.metrics._group_metric_set import _process_sensitive_features  # noqa: E402
+from fairlearn.metrics._group_metric_set import _create_group_metric_set  # noqa: E402
 
-from .sample_loader import load_sample_dashboard
-from test.unit.input_convertors import conversions_for_1d
+from .sample_loader import load_sample_dashboard  # noqa: E402
+from test.unit.input_convertors import conversions_for_1d  # noqa: E402
 
 _BC_1P_1F = "bc-1p-1f.json"
 _BC_2P_3F = "bc-2p-3f.json"

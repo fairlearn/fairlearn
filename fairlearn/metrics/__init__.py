@@ -18,8 +18,8 @@ The metric is evaluated for the entire set of data, and also
 for each subgroup identified in ``group_membership``.
 """
 
-from ._derived_metrics import make_derived_metric
-from ._grouped_metric import GroupedMetric
+from ._derived_metrics import make_derived_metric  # noqa: F401
+from ._grouped_metric import GroupedMetric  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
@@ -57,6 +57,6 @@ _disparities = [
 
 
 __all__ = (
-    _core + 
+    _core +
     _extra_metrics +
     _disparities)

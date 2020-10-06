@@ -3,10 +3,11 @@
 
 import pytest
 pytest.importorskip("fairlearn.metrics.confusion_matrix_group_summary")
-import numpy as np
-import sklearn.metrics as skm
+# E402 is pending the removal of pytest.importorskip above
+import numpy as np  # noqa: E402
+import sklearn.metrics as skm  # noqa: E402
 
-import fairlearn.metrics as metrics
+import fairlearn.metrics as metrics  # noqa: E402
 
 # ======================================================
 
