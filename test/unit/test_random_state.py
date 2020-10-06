@@ -35,7 +35,7 @@ def test_random_state_threshold_optimizer():
     assert (y_pred_test != to.predict(X_test, sensitive_features=race_test, random_state=1)).any()
 
 
-def test_random_state_reductions():
+def test_random_state_exponentiated_gradient():
     """Test that the random_state argument works as expected.
 
     This test case reproduces the problem reported in issue 588 if the
