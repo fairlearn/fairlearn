@@ -4,7 +4,7 @@
 import functools
 import numpy as np
 from sklearn.metrics import recall_score
-from fairlearn.metrics.experimental._function_container import FunctionContainer
+from fairlearn.metrics._function_container import FunctionContainer
 
 
 def test_constructor_unnamed():

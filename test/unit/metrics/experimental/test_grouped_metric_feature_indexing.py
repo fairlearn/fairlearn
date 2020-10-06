@@ -3,7 +3,7 @@
 
 import numpy as np
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 from .utils import _get_raw_GroupedMetric
 
 

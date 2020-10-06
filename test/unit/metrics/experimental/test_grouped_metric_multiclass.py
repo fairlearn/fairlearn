@@ -5,7 +5,7 @@ import functools
 import numpy as np
 import sklearn.metrics as skm
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 
 y_true = np.array([0, 1, 2, 0, 1, 2, 2, 1])
 y_pred = np.array([

@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 
 
 raw_feature = ['a', 'b', 'c', 'a']

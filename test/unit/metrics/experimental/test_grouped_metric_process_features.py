@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 from .utils import _get_raw_GroupedMetric
 
 

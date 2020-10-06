@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import sklearn.metrics as skm
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 
 from .data_for_test import array_gen
 

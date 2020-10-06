@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 
 
 def _get_raw_GroupedMetric():

@@ -5,7 +5,7 @@ import functools
 import numpy as np
 import sklearn.metrics as skm
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 
 
 # ============================================================

@@ -4,7 +4,7 @@
 import numpy as np
 import sklearn.metrics as skm
 
-import fairlearn.metrics.experimental as metrics
+import fairlearn.metrics as metrics
 
 from .data_for_test import y_t, y_p, g_1, g_2
 
