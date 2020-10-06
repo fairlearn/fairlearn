@@ -61,7 +61,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         Instead of supplying a size and limit for the grid, users may specify
         the exact set of Lagrange multipliers they desire using this argument.
     sample_weight_key : str
-        Argument to supply `sample_weight` in `estimator.fit`.
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
     def __init__(self,

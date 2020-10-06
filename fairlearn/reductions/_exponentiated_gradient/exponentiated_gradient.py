@@ -52,7 +52,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         point optimization over the convex hull of classifiers returned so
         far; default True
     sample_weight_key : str
-        Argument to supply `sample_weight` in `estimator.fit`.
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
     def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
