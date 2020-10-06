@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import pytest
+pytest.importorskip("fairlearn.metrics.confusion_matrix_group_summary")
 import numpy as np
 import sklearn.metrics as skm
 

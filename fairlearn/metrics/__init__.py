@@ -30,20 +30,6 @@ from ._extra_metrics import (  # noqa: F401
     _mean_underprediction,
     )
 
-from ._metrics_engine import (  # noqa: F401
-    make_metric_group_summary, group_summary,
-    make_derived_metric,
-    group_min_from_summary, group_max_from_summary,
-    difference_from_summary, ratio_from_summary,
-    _metric_group_summary_dict, _derived_metric_dict)
-
-from ._disparities import (  # noqa: F401
-    demographic_parity_difference,
-    demographic_parity_ratio,
-    equalized_odds_difference,
-    equalized_odds_ratio,
-)
-
 
 _extra_metrics = [
     "true_positive_rate",
@@ -58,34 +44,10 @@ _extra_metrics = [
 ]
 
 
-_metrics_engine = [
-    "make_metric_group_summary",
-    "group_summary",
-    "make_derived_metric",
-    "group_min_from_summary",
-    "group_max_from_summary",
-    "difference_from_summary",
-    "ratio_from_summary"
-]
-
-
-# Add the generated metrics of the form `<metric>_group summary` and
-# `<metric>_{difference,ratio,group_min,group_max`
-globals().update(_metric_group_summary_dict)
-globals().update(_derived_metric_dict)
-
-
 _disparities = [
-    "demographic_parity_difference",
-    "demographic_parity_ratio",
-    "equalized_odds_difference",
-    "equalized_odds_ratio",
 ]
 
 
 __all__ = (
     _extra_metrics +
-    _metrics_engine +
-    list(_metric_group_summary_dict.keys()) +
-    list(_derived_metric_dict.keys()) +
     _disparities)

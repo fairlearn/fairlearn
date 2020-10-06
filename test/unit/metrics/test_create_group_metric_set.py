@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import pytest
+pytest.importorskip("fairlearn.metrics.accuracy_score_group_summary")
 
 from fairlearn.metrics import accuracy_score_group_summary, roc_auc_score_group_summary
 from fairlearn.metrics._group_metric_set import _process_predictions
