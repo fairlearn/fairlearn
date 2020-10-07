@@ -27,7 +27,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-from fairlearn.metrics.experimental import GroupedMetric, make_derived_metric
+from fairlearn.metrics import GroupedMetric, make_derived_metric
 
 
 # %%
@@ -217,13 +217,10 @@ basic_metric_two.group_max()
 
 # %%
 # There is also a `difference()` method, which calculates the
-# difference between the minimum and maximum. Alternatively,
-# its `method=` argument can compute the difference relative to
-# the overall value of the metric (returning the largest
-# absolute value).
+# difference based on its `method=` argument.
 #
 # First the default difference between the minimum and maximum:
-basic_metric_two.difference()
+basic_metric_two.difference(method='minmax')
 
 # %%
 # And the difference to the overall value:
@@ -301,7 +298,7 @@ cond_metric.group_max()
 
 # %%
 # And the difference:
-cond_metric.difference()
+cond_metric.difference(method='minmax')
 
 # %%
 # We also support multiple conditional features, and
@@ -335,7 +332,8 @@ cond_metric_two.difference(method='to_overall')
 # metric function based on a given underlying metric and
 # an aggregation function:
 accuracy_difference = make_derived_metric('difference',
-                                          skm.accuracy_score)
+                                          skm.accuracy_score,
+                                          sample_param_names=['sample_weight'])
 
 # %%
 # This then acts like any other metric:
@@ -346,7 +344,7 @@ accuracy_difference(Y_test, Y_pred, sensitive_features=A_test['sex'])
 acc_group = GroupedMetric(skm.accuracy_score,
                           Y_test, Y_pred,
                           sensitive_features=A_test['sex'])
-acc_group.difference()
+acc_group.difference(method='minmax')
 # %%
 # Conditional features are obviously not supported, but sample parameters
 # (such as weights) are:
