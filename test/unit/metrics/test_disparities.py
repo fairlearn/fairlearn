@@ -31,3 +31,67 @@ def test_demographic_parity_difference_weighted():
                        sample_params={'sample_weight': s_w})
 
     assert actual == gm.difference(method='minmax')['selection_rate']
+
+
+def test_demographic_parity_ratio():
+    actual = demographic_parity_ratio(y_t, y_p, sensitive_features=g_1)
+
+    gm = GroupedMetric(selection_rate, y_t, y_p, sensitive_features=g_1)
+
+    assert actual == gm.ratio(method='minmax')['selection_rate']
+
+
+def test_demographic_parity_ratio_weighted():
+    actual = demographic_parity_ratio(y_t, y_p,
+                                      sensitive_features=g_1,
+                                      sample_weight=s_w)
+
+    gm = GroupedMetric(selection_rate, y_t, y_p,
+                       sensitive_features=g_1,
+                       sample_params={'sample_weight': s_w})
+
+    assert actual == gm.ratio(method='minmax')['selection_rate']
+
+
+def test_equalized_odds_difference():
+    actual = equalized_odds_difference(y_t, y_p, sensitive_features=g_1)
+
+    metrics = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
+    gm = GroupedMetric(metrics, y_t, y_p, sensitive_features=g_1)
+
+    diffs = gm.difference(method='minmax')
+    assert actual == diffs.max()
+
+
+def test_equalized_odds_difference_weighted():
+    actual = equalized_odds_difference(y_t, y_p, sensitive_features=g_1, sample_weight=s_w)
+
+    metrics = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
+    sw = {'sample_weight': s_w}
+    sp = {'tpr': sw, 'fpr': sw}
+    gm = GroupedMetric(metrics, y_t, y_p, sensitive_features=g_1, sample_params=sp)
+
+    diffs = gm.difference(method='minmax')
+    assert actual == diffs.max()
+
+
+def test_equalized_odds_ratio():
+    actual = equalized_odds_ratio(y_t, y_p, sensitive_features=g_1)
+
+    metrics = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
+    gm = GroupedMetric(metrics, y_t, y_p, sensitive_features=g_1)
+
+    ratios = gm.ratio(method='minmax')
+    assert actual == ratios.min()
+
+
+def test_equalized_odds_ratio_weighted():
+    actual = equalized_odds_ratio(y_t, y_p, sensitive_features=g_1, sample_weight=s_w)
+
+    metrics = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
+    sw = {'sample_weight': s_w}
+    sp = {'tpr': sw, 'fpr': sw}
+    gm = GroupedMetric(metrics, y_t, y_p, sensitive_features=g_1, sample_params=sp)
+
+    ratios = gm.ratio(method='minmax')
+    assert actual == ratios.min()
