@@ -164,14 +164,14 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
         in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
 
-        :param X: The feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
-        :param y: The label vector
-        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
-        :param sensitive_features: sensitive features to identify groups by, currently allows
-            only a single column
-        :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
-            or pandas.Series
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            The feature matrix
+        y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+            The label vector
+        sensitive_features : numpy.ndarray, list, pandas.DataFrame, or pandas.Series
+            sensitive features to identify groups by
         """
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
@@ -225,15 +225,21 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     def predict(self, X, *, sensitive_features, random_state=None):
         """Predict label for each sample in X while taking into account sensitive features.
 
-        :param X: feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
-        :param sensitive_features: sensitive features to identify groups by, currently allows
-            only a single column
-        :type sensitive_features: currently 1D array as numpy.ndarray, list, pandas.DataFrame,
-            or pandas.Series
-        :param random_state: set to a constant for reproducibility
-        :type random_state: int
-        :return: predictions in numpy.ndarray
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            feature matrix
+        sensitive_features : numpy.ndarray, list, pandas.DataFrame, pandas.Series
+            sensitive features to identify groups by
+        random_state : int or RandomState instance, default=None
+            Controls random numbers used for randomized predictions. Pass an
+            int for reproducible output across multiple function calls.
+
+        Returns
+        -------
+        Scalar or vector as numpy.ndarray
+            The prediction. If `X` represents the data for a single example
+            the result will be a scalar. Otherwise the result will be a vector
         """
         check_is_fitted(self)
         return self.interpolated_thresholder_.predict(
@@ -242,15 +248,19 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     def _pmf_predict(self, X, *, sensitive_features):
         """Probabilistic mass function.
 
-        :param X: Feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
-        :param sensitive_features: Sensitive features to identify groups by, currently allows
-            only a single column
-        :type sensitive_features: Currently 1D array as numpy.ndarray, list, pandas.DataFrame,
-            or pandas.Series
-        :return: array of tuples with probabilities for predicting 0 or 1, respectively. The sum
-            of the two numbers in each tuple needs to add up to 1.
-        :rtype: numpy.ndarray
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature matrix
+        sensitive_features : numpy.ndarray, list, pandas.DataFrame, pandas.Series
+            Sensitive features to identify groups by
+
+        Returns
+        -------
+        numpy.ndarray
+            array of tuples with probabilities for predicting 0 or 1,
+            respectively. The sum of the two numbers in each tuple needs to
+            add up to 1.
         """
         check_is_fitted(self)
         return self.interpolated_thresholder_._pmf_predict(
@@ -269,14 +279,19 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         This method assumes that sensitive_features, labels, and scores are non-empty data
         structures of equal length, and labels contains only binary labels 0 and 1.
 
-        :param sensitive_features: the feature data that determines the groups for which
-            the parity constraints are enforced
-        :type sensitive_features: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :param labels: the labels of the dataset
-        :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :param scores: the scores produced by a predictor's prediction
-        :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :return: the postprocessed predictor.
+        Parameters
+        ----------
+        sensitive_features : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+            Sensitive features to identify groups by
+        labels : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+            the labels of the dataset
+        scores : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+            the scores produced by a predictor's prediction
+
+        Returns
+        -------
+        InterpolatedThresholder
+            the postprocessed predictor.
         """
         n = len(labels)
         self._tradeoff_curve = {}
@@ -346,14 +361,19 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         This method assumes that sensitive_features, labels, and scores are non-empty data
         structures of equal length, and labels contains only binary labels 0 and 1.
 
-        :param sensitive_features: the feature data that determines the groups for which the
-            parity constraints are enforced
-        :type sensitive_features: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :param labels: the labels of the dataset
-        :type labels: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :param scores: the scores produced by a predictor's prediction
-        :type scores: list, numpy.ndarray, pandas.DataFrame, or pandas.Series
-        :return: the postprocessed predictor.
+        Parameters
+        ----------
+        sensitive_features : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+            Sensitive features to identify groups by
+        labels : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+            the labels of the dataset
+        scores : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+            the scores produced by a predictor's prediction
+
+        Returns
+        -------
+        InterpolatedThresholder
+            the postprocessed predictor.
         """
         data_grouped_by_sensitive_feature = _reformat_and_group_data(
             sensitive_features, labels, scores)
@@ -450,19 +470,23 @@ def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_featu
     the new  DataFrame is grouped by sensitive feature values so that subsequently each group
     can be handled separately.
 
-    :param sensitive_features: the sensitive features based on which the grouping is determined;
-        currently only a single sensitive feature is supported
-    :type sensitive_features: pandas.Series, pandas.DataFrame, numpy.ndarray, or list
-    :param labels: the training labels
-    :type labels: pandas.Series, pandas.DataFrame, numpy.ndarray, or list
-    :param scores: the output from the unconstrained predictor used for training the mitigator
-    :type scores: pandas.Series, pandas.DataFrame, numpy.ndarray, or list
-    :param sensitive_feature_names: list of names for the sensitive features in case they were
-        not implicitly provided (e.g. if `sensitive_features` is of type DataFrame); default
-        None
-    :type sensitive_feature_names: list of strings
-    :return: the training data for the mitigator, grouped by sensitive feature value
-    :rtype: pandas.DataFrameGroupBy
+    Parameters
+    ----------
+    sensitive_features : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+        Sensitive features to identify groups by
+    labels : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+        the labels of the dataset
+    scores : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
+        the scores produced by a predictor's prediction
+    sensitive_feature_names : list of strings
+        list of names for the sensitive features in case they were not
+        implicitly provided (e.g. if `sensitive_features` is of type
+        pandas.DataFrame); default None
+
+    Returns
+    -------
+    pandas.DataFrameGroupBy
+        the training data for the mitigator, grouped by sensitive feature value
     """
     data_dict = {}
 
@@ -488,14 +512,21 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
     Before `additional_data` is added to `data_dict` it is first
     reformatted into a numpy.ndarray or list.
 
-    :param key: the key in `data_dict` at which `additional_data` should be stored;
+    Parameters
+    ----------
+    key : str
+        the key in `data_dict` at which `additional_data` should be stored;
         `key` should describe the purpose of `additional_data` in `data_dict`
-    :type key: str
-    :param data_dict: the dictionary containing all the relevant data; `additional_data` will be
-        inserted at the key `key`.
-    :type data_dict: dict
-    :param additional_data: the data to be added to `data_dict` at the specified `key`
-    :type additional_data: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+    data_dict : dict
+        the dictionary containing all the relevant data; `additional_data`
+        will be inserted at the key `key`.
+    additional_data : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        the data to be added to `data_dict` at the specified `key`
+
+    Returns
+    -------
+    dict
+        The updated `data_dict` with reformatted data at the `key` slot
     """
     if type(additional_data) == np.ndarray:
         if len(additional_data.shape) > 2 or (len(additional_data.shape) == 2 and
