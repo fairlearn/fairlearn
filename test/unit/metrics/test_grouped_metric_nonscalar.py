@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import functools
 import numpy as np
 import sklearn.metrics as skm
 
@@ -66,3 +67,22 @@ def test_mixed_metrics():
         expected = skm.precision_score(y_t[mask], y_p[mask])
         actual = target.by_group['prec'][g]
         assert expected == actual
+
+
+def test_mean_squared_error_multioutput():
+    # In this, both y_t and y_p are 2d arrays
+    metric_fn = functools.partial(skm.r2_score, multioutput='raw_values')
+
+    y_t_2 = np.random.rand(len(g_1), 2)
+    y_p_2 = np.random.rand(len(g_1), 2)
+
+    target = metrics.GroupedMetric(metric_fn, y_t_2, y_p_2, sensitive_features=g_1)
+
+    expected_overall = skm.r2_score(y_t_2, y_p_2, multioutput='raw_values')
+    assert np.array_equal(target.overall['metric'], expected_overall)
+    for g in np.unique(g_1):
+        mask = g_1 == g
+
+        expected = skm.r2_score(y_t_2[mask], y_p_2[mask], multioutput='raw_values')
+        actual = target.by_group['metric'][g]
+        assert np.array_equal(actual, expected)
