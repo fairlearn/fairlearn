@@ -40,7 +40,7 @@ from ._extra_metrics import (  # noqa: F401
 
 
 _core = [
-    "mGroupedMetric",
+    "GroupedMetric",
     "make_derived_metric",
 ]
 
