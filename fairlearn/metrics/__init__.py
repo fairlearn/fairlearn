@@ -49,9 +49,9 @@ _extra_metrics = [
     "true_negative_rate",
     "false_positive_rate",
     "false_negative_rate",
-    "balanced_root_mean_squared_error",
     "mean_prediction",
     "selection_rate",
+    "_balanced_root_mean_squared_error",
     "_mean_overprediction",
     "_mean_underprediction",
 ]
