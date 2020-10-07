@@ -3,29 +3,19 @@
 
 """Defines the fairness dashboard class."""
 
-from rai_core_flask import FlaskHelper
-from fairlearn.metrics import (
-    true_negative_rate_group_summary,
-    false_positive_rate_group_summary,
-    false_negative_rate_group_summary,
-    _root_mean_squared_error_group_summary,
-    _balanced_root_mean_squared_error_group_summary,
-    mean_prediction_group_summary,
-    selection_rate_group_summary,
-    _mean_overprediction_group_summary,
-    _mean_underprediction_group_summary,
+import sklearn.metrics as skm
 
-    accuracy_score_group_summary,
-    precision_score_group_summary,
-    recall_score_group_summary,
-    roc_auc_score_group_summary,
-    zero_one_loss_group_summary,
-    mean_absolute_error_group_summary,
-    mean_squared_error_group_summary,
-    r2_score_group_summary,
-    f1_score_group_summary,
-    log_loss_group_summary,
-)
+from rai_core_flask import FlaskHelper
+from fairlearn.metrics import GroupedMetric
+from fairlearn.metrics._extra_metrics import (_balanced_root_mean_squared_error,
+                                              _mean_overprediction,
+                                              _mean_underprediction,
+                                              _root_mean_squared_error,
+                                              false_negative_rate,
+                                              false_positive_rate,
+                                              mean_prediction,
+                                              selection_rate,
+                                              true_negative_rate)
 
 from flask import jsonify, request
 from IPython.display import display, HTML
@@ -65,91 +55,91 @@ class FairlearnDashboard(object):
     _metric_methods = {
         "accuracy_score": {
             "model_type": ["classification"],
-            "function": accuracy_score_group_summary
+            "function": skm.accuracy_score
         },
         "balanced_accuracy_score": {
             "model_type": ["classification"],
-            "function": roc_auc_score_group_summary
+            "function": skm.roc_auc_score
         },
         "precision_score": {
             "model_type": ["classification"],
-            "function": precision_score_group_summary
+            "function": skm.precision_score
         },
         "recall_score": {
             "model_type": ["classification"],
-            "function": recall_score_group_summary
+            "function": skm.recall_score
         },
         "zero_one_loss": {
             "model_type": [],
-            "function": zero_one_loss_group_summary
+            "function": skm.zero_one_loss
         },
         "specificity_score": {
             "model_type": [],
-            "function": true_negative_rate_group_summary
+            "function": true_negative_rate
         },
         "miss_rate": {
             "model_type": [],
-            "function": false_negative_rate_group_summary
+            "function": false_negative_rate
         },
         "fallout_rate": {
             "model_type": [],
-            "function": false_positive_rate_group_summary
+            "function": false_positive_rate
         },
         "false_positive_over_total": {
             "model_type": [],
-            "function": false_positive_rate_group_summary
+            "function": false_positive_rate
         },
         "false_negative_over_total": {
             "model_type": [],
-            "function": false_negative_rate_group_summary
+            "function": false_negative_rate
         },
         "selection_rate": {
             "model_type": [],
-            "function": selection_rate_group_summary
+            "function": selection_rate
         },
         "auc": {
             "model_type": ["probability"],
-            "function": roc_auc_score_group_summary
+            "function": skm.roc_auc_score
         },
         "root_mean_squared_error": {
             "model_type": ["regression", "probability"],
-            "function": _root_mean_squared_error_group_summary
+            "function": _root_mean_squared_error
         },
         "balanced_root_mean_squared_error": {
             "model_type": ["probability"],
-            "function": _balanced_root_mean_squared_error_group_summary
+            "function": _balanced_root_mean_squared_error
         },
         "mean_squared_error": {
             "model_type": ["regression", "probability"],
-            "function": mean_squared_error_group_summary
+            "function": skm.mean_squared_error
         },
         "mean_absolute_error": {
             "model_type": ["regression", "probability"],
-            "function": mean_absolute_error_group_summary
+            "function": skm.mean_absolute_error
         },
         "r2_score": {
             "model_type": ["regression"],
-            "function": r2_score_group_summary
+            "function": skm.r2_score
         },
         "f1_score": {
             "model_type": ["classification"],
-            "function": f1_score_group_summary
+            "function": skm.f1_score
         },
         "log_loss": {
             "model_type": ["probability"],
-            "function": log_loss_group_summary
+            "function": skm.log_loss
         },
         "overprediction": {
             "model_type": [],
-            "function": _mean_overprediction_group_summary
+            "function": _mean_overprediction
         },
         "underprediction": {
             "model_type": [],
-            "function": _mean_underprediction_group_summary
+            "function": _mean_underprediction
         },
         "average": {
             "model_type": [],
-            "function": mean_prediction_group_summary
+            "function": mean_prediction
         }
     }
 
