@@ -42,6 +42,8 @@
 * Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
 * Add `fairlearn.datasets` module.
 * Change the method to make copies of the estimator in `ExponentiatedGradient` from `pickle.dump` to `sklearn.clone`. 
+* Add an argument to GridSearch and ExponentialGradient `sample_weight_name` to control
+  how `sample_weight` is supplied to `estimator.fit`.
 
 ### v0.4.6
 

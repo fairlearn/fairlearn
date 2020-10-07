@@ -182,5 +182,5 @@ class TestExponentiatedGradientArguments:
         expgrad = ExponentiatedGradient(estimator,
                                         constraints=DemographicParity(),
                                         max_iter=1,
-                                        sample_weight_key='logistic__sample_weight')
+                                        sample_weight_name='logistic__sample_weight')
         expgrad.fit(X, y, sensitive_features=(A))
