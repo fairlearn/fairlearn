@@ -121,3 +121,27 @@ def test_derived_ratio_to_overall():
                                     sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid)
     assert actual == grouped.ratio(method='to_overall')['precision_score']
+
+
+def test_group_min():
+    my_fn = metrics.make_derived_metric('group_min',
+                                        skm.precision_score,
+                                        sample_param_names=['sample_weight'])
+
+    grouped = metrics.GroupedMetric(skm.precision_score,
+                                    y_t, y_p,
+                                    sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    assert actual == grouped.group_min()['precision_score']
+
+
+def test_group_max():
+    my_fn = metrics.make_derived_metric('group_max',
+                                        skm.precision_score,
+                                        sample_param_names=['sample_weight'])
+
+    grouped = metrics.GroupedMetric(skm.precision_score,
+                                    y_t, y_p,
+                                    sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    assert actual == grouped.group_max()['precision_score']

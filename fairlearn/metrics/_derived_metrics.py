@@ -9,6 +9,8 @@ from ._grouped_metric import GroupedMetric
 aggregate_options = [
     'difference',
     'difference_to_overall',
+    'group_min',
+    'group_max',
     'ratio',
     'ratio_to_overall',
 ]
@@ -53,6 +55,10 @@ class _DerivedMetric:
             result = all_metrics.ratio(method='minmax')[metric_name]
         elif self._aggregate == 'ratio_to_overall':
             result = all_metrics.ratio(method='to_overall')[metric_name]
+        elif self._aggregate == 'group_min':
+            result = all_metrics.group_min()[metric_name]
+        elif self._aggregate == 'group_max':
+            result = all_metrics.group_max()[metric_name]
         else:
             raise ValueError("Cannot get here")
 
