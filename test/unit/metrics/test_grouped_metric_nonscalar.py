@@ -69,8 +69,9 @@ def test_mixed_metrics():
         assert expected == actual
 
 
-def test_mean_squared_error_multioutput():
+def test_multid_input_output():
     # In this, both y_t and y_p are 2d arrays
+    # The metric results are also arrays
     metric_fn = functools.partial(skm.r2_score, multioutput='raw_values')
 
     y_t_2 = np.random.rand(len(g_1), 2)
