@@ -73,3 +73,24 @@ def test_function_evaluation():
                                 sample_weight=sample_params['sample_weight'])
     actual_all = fc.evaluate_all(y_t, y_p)
     assert expected_all == actual_all
+
+
+def test_function_evaluation_sample_param_none():
+    sample_params = {'sample_weight': None}
+
+    fc = FunctionContainer(recall_score, None, sample_params)
+
+    mask = [True, False, True, False, False, True, True, False]
+    y_t = np.asarray([0, 1, 0, 1, 0, 1, 0, 1])
+    y_p = np.asarray([0, 0, 0, 0, 1, 1, 1, 1])
+
+    y_t_masked = [0, 0, 1, 0]
+    y_p_masked = [0, 0, 1, 1]
+
+    expected = recall_score(y_t_masked, y_p_masked)
+    actual = fc.evaluate(y_t, y_p, mask)
+    assert expected == actual
+
+    expected_all = recall_score(y_t, y_p)
+    actual_all = fc.evaluate_all(y_t, y_p)
+    assert expected_all == actual_all

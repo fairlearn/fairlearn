@@ -19,6 +19,11 @@ for each subgroup identified in ``group_membership``.
 """
 
 from ._derived_metrics import make_derived_metric  # noqa: F401
+from ._disparities import (  # noqa: F401
+    demographic_parity_difference,
+    demographic_parity_ratio,
+    equalized_odds_difference,
+    equalized_odds_ratio)
 from ._grouped_metric import GroupedMetric  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
@@ -53,6 +58,10 @@ _extra_metrics = [
 
 
 _disparities = [
+    "demographic_parity_difference",
+    "demographic_parity_ratio",
+    "equalized_odds_difference",
+    "equalized_odds_ratio"
 ]
 
 

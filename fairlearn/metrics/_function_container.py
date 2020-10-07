@@ -30,11 +30,10 @@ class FunctionContainer:
         self._sample_params = dict()
         if sample_params is not None:
             assert isinstance(sample_params, dict)
-            self._sample_params = sample_params
-
-        # Coerce any sample_params to being ndarrays for easy masking
-        for k, v in self._sample_params.items():
-            self._sample_params[k] = np.asarray(v)
+            for k, v in sample_params.items():
+                if v is not None:
+                    # Coerce any sample_params to being ndarrays for easy masking
+                    self._sample_params[k] = np.asarray(v)
 
     @property
     def func_(self):

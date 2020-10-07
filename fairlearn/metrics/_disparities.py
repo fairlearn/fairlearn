@@ -3,13 +3,8 @@
 
 """Metrics for measuring disparity."""
 
-from ._metrics_engine import (
-    selection_rate_difference,
-    selection_rate_ratio,
-    true_positive_rate_difference,
-    true_positive_rate_ratio,
-    false_positive_rate_difference,
-    false_positive_rate_ratio)
+from ._extra_metrics import selection_rate, true_positive_rate, false_positive_rate
+from ._derived_metrics import make_derived_metric
 
 
 def demographic_parity_difference(y_true, y_pred, *, sensitive_features, sample_weight=None):
@@ -23,8 +18,13 @@ def demographic_parity_difference(y_true, y_pred, *, sensitive_features, sample_
         :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature.
         The demographic parity difference of 0 means that all groups have the same selection rate.
     """
-    return selection_rate_difference(
-        y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight)
+    sel_rate_diff = make_derived_metric('difference',
+                                        selection_rate,
+                                        sample_param_names=['sample_weight'])
+    result = sel_rate_diff(y_true, y_pred,
+                           sensitive_features=sensitive_features,
+                           sample_weight=sample_weight)
+    return result
 
 
 def demographic_parity_ratio(y_true, y_pred, *, sensitive_features, sample_weight=None):
@@ -38,8 +38,13 @@ def demographic_parity_ratio(y_true, y_pred, *, sensitive_features, sample_weigh
         :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature.
         The demographic parity ratio of 1 means that all groups have the same selection rate.
     """
-    return selection_rate_ratio(
-        y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight)
+    sel_rate_diff = make_derived_metric('ratio',
+                                        selection_rate,
+                                        sample_param_names=['sample_weight'])
+    result = sel_rate_diff(y_true, y_pred,
+                           sensitive_features=sensitive_features,
+                           sample_weight=sample_weight)
+    return result
 
 
 def equalized_odds_difference(y_true, y_pred, *, sensitive_features, sample_weight=None):
@@ -57,11 +62,18 @@ def equalized_odds_difference(y_true, y_pred, *, sensitive_features, sample_weig
         The equalized odds difference of 0 means that all groups have the same
         true positive, true negative, false positive, and false negative rates.
     """
-    return max(
-        true_positive_rate_difference(
-            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight),
-        false_positive_rate_difference(
-            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight))
+    spn = ['sample_weight']
+    tpr_diff = make_derived_metric('difference', true_positive_rate, sample_param_names=spn)
+    fpr_diff = make_derived_metric('difference', false_positive_rate, sample_param_names=spn)
+
+    tpr_d = tpr_diff(y_true, y_pred,
+                     sensitive_features=sensitive_features,
+                     sample_weight=sample_weight)
+    fpr_d = fpr_diff(y_true, y_pred,
+                     sensitive_features=sensitive_features,
+                     sample_weight=sample_weight)
+
+    return max(tpr_d, fpr_d)
 
 
 def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=None):
@@ -79,8 +91,15 @@ def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=No
         The equalized odds ratio of 1 means that all groups have the same
         true positive, true negative, false positive, and false negative rates.
     """
-    return min(
-        true_positive_rate_ratio(
-            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight),
-        false_positive_rate_ratio(
-            y_true, y_pred, sensitive_features=sensitive_features, sample_weight=sample_weight))
+    spn = ['sample_weight']
+    tpr_ratio = make_derived_metric('ratio', true_positive_rate, sample_param_names=spn)
+    fpr_ratio = make_derived_metric('ratio', false_positive_rate, sample_param_names=spn)
+
+    tpr_r = tpr_ratio(y_true, y_pred,
+                      sensitive_features=sensitive_features,
+                      sample_weight=sample_weight)
+    fpr_r = fpr_ratio(y_true, y_pred,
+                      sensitive_features=sensitive_features,
+                      sample_weight=sample_weight)
+
+    return min(tpr_r, fpr_r)
