@@ -46,7 +46,8 @@ def test_missing_sensitive_feature_combinations(metric_fn):
     assert np.isnan(target.by_group[metric_fn.__name__][('bb', 'x')])
     assert target.group_min()[metric_fn.__name__] == min(direct_eval)
     assert target.group_max()[metric_fn.__name__] == max(direct_eval)
-    assert target.difference(method='minmax')[metric_fn.__name__] == max(direct_eval)-min(direct_eval)
+    assert target.difference(method='minmax')[metric_fn.__name__] == \
+        max(direct_eval)-min(direct_eval)
     assert target.difference(method='to_overall')[metric_fn.__name__] == \
         max([abs(x-overall) for x in direct_eval])
     assert target.ratio(method='minmax')[metric_fn.__name__] == min(direct_eval) / max(direct_eval)
