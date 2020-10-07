@@ -173,13 +173,13 @@ class FairlearnDashboard(object):
 
                 method = FairlearnDashboard._metric_methods \
                     .get(data["metricKey"]).get("function")
-                prediction = method(
-                    data['true_y'],
-                    data['predicted_ys'][data["modelIndex"]],
-                    sensitive_features=data["binVector"])
+                prediction = GroupedMetric(method,
+                                           data['true_y'],
+                                           data['predicted_ys'][data["modelIndex"]],
+                                           sensitive_features=data["binVector"])
                 return jsonify({"data": {
-                    "global": prediction.overall,
-                    "bins": list(prediction.by_group.values())
+                    "global": prediction.overall[method.__name__],
+                    "bins": list(prediction.by_group[method.__name__])
                 }})
         except Exception as ex:
             # debug only
