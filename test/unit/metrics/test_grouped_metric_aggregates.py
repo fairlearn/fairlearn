@@ -41,7 +41,7 @@ def test_1m_1sf_0cf(metric_fn):
     assert len(target_maxes) == 1
     assert target_maxes[mfn] == max(metric_p, metric_q)
 
-    target_diff = target.difference()
+    target_diff = target.difference(method='minmax')
     assert isinstance(target_diff, pd.Series)
     assert len(target_diff) == 1
     assert target_diff[mfn] == abs(metric_p - metric_q)
@@ -52,7 +52,7 @@ def test_1m_1sf_0cf(metric_fn):
     diffs_overall = [abs(metric_p-overall), abs(metric_q-overall)]
     assert target_diff_overall[mfn] == max(diffs_overall)
 
-    target_ratio = target.ratio()
+    target_ratio = target.ratio(method='minmax')
     assert isinstance(target_ratio, pd.Series)
     assert len(target_ratio) == 1
     assert target_ratio[mfn] == min(metric_p, metric_q)/max(metric_p, metric_q)
@@ -97,7 +97,7 @@ def test_2m_1sf_0cf():
     assert target_maxes['recall'] == max(recall_p, recall_q)
     assert target_maxes['prec'] == max(prec_p, prec_q)
 
-    target_diffs = target.difference()
+    target_diffs = target.difference(method='minmax')
     assert isinstance(target_diffs, pd.Series)
     assert len(target_diffs) == 2
     assert target_diffs['recall'] == abs(recall_p - recall_q)
@@ -111,7 +111,7 @@ def test_2m_1sf_0cf():
     assert target_diff_overall['recall'] == max(recall_diffs_overall)
     assert target_diff_overall['prec'] == max(prec_diffs_overall)
 
-    target_ratio = target.ratio()
+    target_ratio = target.ratio(method='minmax')
     assert isinstance(target_ratio, pd.Series)
     assert len(target_ratio) == 2
     assert target_ratio['recall'] == min(recall_p, recall_q)/max(recall_p, recall_q)
@@ -172,7 +172,7 @@ def test_1m_1sf_1cf(metric_fn):
     assert target_maxs[mfn]['kk'] == max(metric_k_arr)
     assert target_maxs[mfn]['m'] == max(metric_m_arr)
 
-    target_diff = target.difference()
+    target_diff = target.difference(method='minmax')
     assert isinstance(target_diff, pd.DataFrame)
     assert target_diff.shape == (2, 1)
     assert target_diff[mfn]['kk'] == max(metric_k_arr)-min(metric_k_arr)
@@ -186,7 +186,7 @@ def test_1m_1sf_1cf(metric_fn):
     assert target_diff_overall[mfn]['kk'] == max(k_diffs_overall)
     assert target_diff_overall[mfn]['m'] == max(m_diffs_overall)
 
-    target_ratio = target.ratio()
+    target_ratio = target.ratio(method='minmax')
     assert isinstance(target_ratio, pd.DataFrame)
     assert target_ratio.shape == (2, 1)
     assert target_ratio[mfn]['kk'] == min(metric_k_arr)/max(metric_k_arr)
@@ -274,7 +274,7 @@ def test_1m_1sf_2cf(metric_fn):
     assert target_maxs[mfn][('m', 'aa')] == max(metric_m_a_arr)
     assert target_maxs[mfn][('m', 'ba')] == max(metric_m_b_arr)
 
-    diffs = target.difference()
+    diffs = target.difference(method='minmax')
     assert isinstance(diffs, pd.DataFrame)
     assert diffs.shape == (4, 1)
     assert diffs[mfn][('kk', 'aa')] == max(metric_k_a_arr) - min(metric_k_a_arr)
@@ -295,7 +295,7 @@ def test_1m_1sf_2cf(metric_fn):
     assert diffs_overall[mfn][('m', 'aa')] == diff_overall_m_a
     assert diffs_overall[mfn][('m', 'ba')] == diff_overall_m_b
 
-    ratios = target.ratio()
+    ratios = target.ratio(method='minmax')
     assert isinstance(ratios, pd.DataFrame)
     assert ratios.shape == (4, 1)
     assert ratios[mfn][('kk', 'aa')] == min(metric_k_a_arr) / max(metric_k_a_arr)
@@ -373,7 +373,7 @@ def test_2m_1sf_1cf():
     assert target_maxs['prec']['kk'] == max(precision_k_arr)
     assert target_maxs['prec']['m'] == max(precision_m_arr)
 
-    diffs = target.difference()
+    diffs = target.difference(method='minmax')
     assert isinstance(diffs, pd.DataFrame)
     assert diffs.shape == (2, 2)
     assert diffs['recall']['kk'] == max(recall_k_arr) - min(recall_k_arr)
@@ -393,7 +393,7 @@ def test_2m_1sf_1cf():
     assert diffs_overall['prec']['kk'] == precision_k_overall
     assert diffs_overall['prec']['m'] == precision_m_overall
 
-    ratios = target.ratio()
+    ratios = target.ratio(method='minmax')
     assert isinstance(ratios, pd.DataFrame)
     assert ratios.shape == (2, 2)
     assert ratios['recall']['kk'] == min(recall_k_arr) / max(recall_k_arr)
@@ -485,7 +485,7 @@ def test_2m_1sf_2cf():
         assert target_maxs[mfn][('m', 'aa')] == max(metric_m_a_arr)
         assert target_maxs[mfn][('m', 'ba')] == max(metric_m_b_arr)
 
-        diffs = target.difference()
+        diffs = target.difference(method='minmax')
         assert isinstance(diffs, pd.DataFrame)
         assert diffs.shape == (4, 2)
         assert diffs[mfn][('kk', 'aa')] == max(metric_k_a_arr) - min(metric_k_a_arr)
@@ -506,7 +506,7 @@ def test_2m_1sf_2cf():
         assert diffs_overall[mfn][('m', 'aa')] == diff_overall_m_a
         assert diffs_overall[mfn][('m', 'ba')] == diff_overall_m_b
 
-        ratios = target.ratio()
+        ratios = target.ratio(method='minmax')
         assert isinstance(ratios, pd.DataFrame)
         assert ratios.shape == (4, 2)
         assert ratios[mfn][('kk', 'aa')] == min(metric_k_a_arr) / max(metric_k_a_arr)

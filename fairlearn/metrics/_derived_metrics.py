@@ -30,11 +30,11 @@ class _DerivedMetric:
 
         result = np.nan
         if self._aggregate == 'difference':
-            result = all_metrics.difference()[self._metric_fn.__name__]
+            result = all_metrics.difference(method='minmax')[self._metric_fn.__name__]
         elif self._aggregate == 'difference_to_overall':
             result = all_metrics.difference(method='to_overall')[self._metric_fn.__name__]
         elif self._aggregate == 'ratio':
-            result = all_metrics.ratio()[self._metric_fn.__name__]
+            result = all_metrics.ratio(method='minmax')[self._metric_fn.__name__]
         elif self._aggregate == 'ratio_to_overall':
             result = all_metrics.ratio(method='to_overall')[self._metric_fn.__name__]
         else:

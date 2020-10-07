@@ -25,7 +25,7 @@ wgt = np.concatenate((wgt_A, wgt_B))
 gid = np.concatenate((As, Bs))
 
 
-def test_derived_difference():
+def test_derived_difference_minmax():
     my_fn = metrics.make_derived_metric('difference',
                                         skm.accuracy_score)
 
@@ -34,7 +34,7 @@ def test_derived_difference():
                                     sensitive_features=gid)
 
     actual = my_fn(y_t, y_p, sensitive_features=gid)
-    assert actual == grouped.difference()['accuracy_score']
+    assert actual == grouped.difference(method='minmax')['accuracy_score']
 
 
 def test_derived_difference_to_overall():
@@ -59,10 +59,10 @@ def test_derived_difference_sample_arg():
                                     sensitive_features=gid,
                                     sample_params={'sample_weight': wgt})
     actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt)
-    assert actual == grouped.difference()['my_fbeta']
+    assert actual == grouped.difference(method='minmax')['my_fbeta']
 
 
-def test_derived_ratio():
+def test_derived_ratio_minmax():
     my_fn = metrics.make_derived_metric('ratio',
                                         skm.precision_score)
 
@@ -70,7 +70,7 @@ def test_derived_ratio():
                                     y_t, y_p,
                                     sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid)
-    assert actual == grouped.ratio()['precision_score']
+    assert actual == grouped.ratio(method='minmax')['precision_score']
 
 
 def test_derived_ratio_to_overall():
