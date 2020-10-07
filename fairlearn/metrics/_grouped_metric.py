@@ -116,7 +116,7 @@ class GroupedMetric:
             result = self.by_group.groupby(level=lvls).min()
         return result
 
-    def difference(self, method='minmax'):
+    def difference(self, method):
         """Read a placeholder comment."""
         subtrahend = np.nan
         if method == 'minmax':
@@ -138,7 +138,7 @@ class GroupedMetric:
 
         return result
 
-    def ratio(self, method='minmax'):
+    def ratio(self, method):
         """Read a placeholder comment."""
         result = None
         if method == 'minmax':
