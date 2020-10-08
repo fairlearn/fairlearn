@@ -10,7 +10,7 @@ values predicted by a machine learning algorithm. Other
 arguments may be present (most often sample weights), which will
 affect how the metric is calculated.
 
-This module provides the concept of a _grouped metric_.
+This module provides the concept of a *grouped metric*.
 This is a metric where in addition to ``y_true`` and ``y_pred``
 values, the user provides information about group membership
 for each sample.
