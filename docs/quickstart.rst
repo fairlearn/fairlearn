@@ -89,8 +89,9 @@ definitions from
 we can evaluate metrics to get a group summary as below:
 
 .. doctest:: quickstart
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import group_summary
+    >>> from fairlearn.metrics import GroupedMetric
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> 
@@ -98,17 +99,32 @@ we can evaluate metrics to get a group summary as below:
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.844..., 'by_group': {'Female': 0.925..., 'Male': 0.804...}}
+    >>> gm = GroupedMetric(accuracy_score, y_true, y_pred, sensitive_features=sex)
+    >>> print(gm.overall)
+    accuracy_score    0.844355
+    dtype: object
+    >>> print(gm.by_group)
+           accuracy_score
+    sex
+    Female       0.925148
+    Male         0.804288
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
 
 .. doctest:: quickstart
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import selection_rate_group_summary
-    >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.163..., 'by_group': {'Female': 0.063..., 'Male': 0.213...}}
+    >>> from fairlearn.metrics import selection_rate
+    >>> sr = GroupedMetric(selection_rate, y_true, y_pred, sensitive_features=sex)
+    >>> sr.overall
+    selection_rate    0.163855
+    dtype: object
+    >>> sr.by_group
+           selection_rate
+    sex
+    Female      0.0635499
+    Male         0.213599    
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
@@ -145,7 +161,8 @@ such decisions. The Exponentiated Gradient mitigation technique used fits the
 provided classifier using Demographic Parity as the objective, leading to
 a vastly reduced difference in selection rate:
 
-.. doctest:: quickstart
+.. doctest:: quickstart 
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import ExponentiatedGradient, DemographicParity
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
@@ -156,8 +173,15 @@ a vastly reduced difference in selection rate:
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
-    >>> selection_rate_group_summary(y_true, y_pred_mitigated, sensitive_features=sex)
-    {'overall': 0.166..., 'by_group': {'Female': 0.155..., 'Male': 0.171...}}
+    >>> sr_mitigated = GroupedMetric(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
+    >>> print(sr_mitigated.overall)
+    selection_rate    0.166148
+    dtype: object
+    >>> print(sr_mitigated.by_group)
+           selection_rate
+    sex
+    Female       0.155262
+    Male         0.171547
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard
