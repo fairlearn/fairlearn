@@ -8,11 +8,9 @@ from ._grouped_metric import GroupedMetric
 
 aggregate_options = [
     'difference',
-    'difference_to_overall',
     'group_min',
     'group_max',
     'ratio',
-    'ratio_to_overall',
 ]
 
 
@@ -28,7 +26,7 @@ class _DerivedMetric:
         if sample_param_names is not None:
             self._sample_param_names = sample_param_names
 
-    def __call__(self, y_true, y_pred, *, sensitive_features, **other_params):
+    def __call__(self, y_true, y_pred, *, sensitive_features, method=None, **other_params):
         metric_name = 'computed_metric'
         sample_params = dict()
         params = dict()
@@ -48,13 +46,9 @@ class _DerivedMetric:
 
         result = np.nan
         if self._aggregate == 'difference':
-            result = all_metrics.difference(method='minmax')[metric_name]
-        elif self._aggregate == 'difference_to_overall':
-            result = all_metrics.difference(method='to_overall')[metric_name]
+            result = all_metrics.difference(method=method)[metric_name]
         elif self._aggregate == 'ratio':
-            result = all_metrics.ratio(method='minmax')[metric_name]
-        elif self._aggregate == 'ratio_to_overall':
-            result = all_metrics.ratio(method='to_overall')[metric_name]
+            result = all_metrics.ratio(method=method)[metric_name]
         elif self._aggregate == 'group_min':
             result = all_metrics.group_min()[metric_name]
         elif self._aggregate == 'group_max':

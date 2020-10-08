@@ -23,7 +23,8 @@ def demographic_parity_difference(y_true, y_pred, *, sensitive_features, sample_
                                         sample_param_names=['sample_weight'])
     result = sel_rate_diff(y_true, y_pred,
                            sensitive_features=sensitive_features,
-                           sample_weight=sample_weight)
+                           sample_weight=sample_weight,
+                           method='minmax')
     return result
 
 
@@ -43,7 +44,8 @@ def demographic_parity_ratio(y_true, y_pred, *, sensitive_features, sample_weigh
                                         sample_param_names=['sample_weight'])
     result = sel_rate_diff(y_true, y_pred,
                            sensitive_features=sensitive_features,
-                           sample_weight=sample_weight)
+                           sample_weight=sample_weight,
+                           method='minmax')
     return result
 
 
@@ -68,10 +70,12 @@ def equalized_odds_difference(y_true, y_pred, *, sensitive_features, sample_weig
 
     tpr_d = tpr_diff(y_true, y_pred,
                      sensitive_features=sensitive_features,
-                     sample_weight=sample_weight)
+                     sample_weight=sample_weight,
+                     method='minmax')
     fpr_d = fpr_diff(y_true, y_pred,
                      sensitive_features=sensitive_features,
-                     sample_weight=sample_weight)
+                     sample_weight=sample_weight,
+                     method='minmax')
 
     return max(tpr_d, fpr_d)
 
@@ -97,9 +101,11 @@ def equalized_odds_ratio(y_true, y_pred, *, sensitive_features, sample_weight=No
 
     tpr_r = tpr_ratio(y_true, y_pred,
                       sensitive_features=sensitive_features,
-                      sample_weight=sample_weight)
+                      sample_weight=sample_weight,
+                      method='minmax')
     fpr_r = fpr_ratio(y_true, y_pred,
                       sensitive_features=sensitive_features,
-                      sample_weight=sample_weight)
+                      sample_weight=sample_weight,
+                      method='minmax')
 
     return min(tpr_r, fpr_r)

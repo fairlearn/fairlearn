@@ -34,12 +34,12 @@ def test_derived_difference_minmax():
                                     y_t, y_p,
                                     sensitive_features=gid)
 
-    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid, method='minmax')
     assert actual == grouped.difference(method='minmax')['accuracy_score']
 
 
 def test_derived_difference_to_overall():
-    my_fn = metrics.make_derived_metric('difference_to_overall',
+    my_fn = metrics.make_derived_metric('difference',
                                         skm.accuracy_score,
                                         sample_param_names=['sample_weight'])
 
@@ -47,7 +47,7 @@ def test_derived_difference_to_overall():
                                     y_t, y_p,
                                     sensitive_features=gid)
 
-    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid, method='to_overall')
     assert actual == grouped.difference(method='to_overall')['accuracy_score']
 
 
@@ -63,7 +63,7 @@ def test_derived_difference_broadcast_arg():
                                     y_t, y_p,
                                     sensitive_features=gid)
 
-    actual = my_fn(y_t, y_p, sensitive_features=gid, beta=my_beta)
+    actual = my_fn(y_t, y_p, sensitive_features=gid, beta=my_beta, method='minmax')
     assert actual == grouped.difference(method='minmax')['my_fbeta']
 
 
@@ -78,7 +78,7 @@ def test_derived_difference_sample_arg():
                                     y_t, y_p,
                                     sensitive_features=gid,
                                     sample_params={'sample_weight': wgt})
-    actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt)
+    actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt, method='minmax')
     assert actual == grouped.difference(method='minmax')['my_fbeta']
 
 
@@ -95,7 +95,11 @@ def test_derived_difference_both_arg_types():
                                     sensitive_features=gid,
                                     sample_params={'sample_weight': wgt})
 
-    actual = my_fn(y_t, y_p, sensitive_features=gid, beta=my_beta, sample_weight=wgt)
+    actual = my_fn(y_t, y_p,
+                   sensitive_features=gid,
+                   beta=my_beta,
+                   sample_weight=wgt,
+                   method='minmax')
     assert actual == grouped.difference(method='minmax')['my_fbeta']
 
 
@@ -107,19 +111,19 @@ def test_derived_ratio_minmax():
     grouped = metrics.GroupedMetric(skm.precision_score,
                                     y_t, y_p,
                                     sensitive_features=gid)
-    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid, method='minmax')
     assert actual == grouped.ratio(method='minmax')['precision_score']
 
 
 def test_derived_ratio_to_overall():
-    my_fn = metrics.make_derived_metric('ratio_to_overall',
+    my_fn = metrics.make_derived_metric('ratio',
                                         skm.precision_score,
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.GroupedMetric(skm.precision_score,
                                     y_t, y_p,
                                     sensitive_features=gid)
-    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid, method='to_overall')
     assert actual == grouped.ratio(method='to_overall')['precision_score']
 
 
