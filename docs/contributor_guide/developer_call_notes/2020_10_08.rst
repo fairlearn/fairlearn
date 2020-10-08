@@ -12,6 +12,7 @@ Attendees:
 - Alex Quach
 - `Kevin Robinson <https://github.com/kevinrobinson>`_
 - `Mehrnoosh Sameki <https://github.com/mesameki>`_
+- `Hanna Wallach <https://www.microsoft.com/en-us/research/people/wallach/>`_
 - `Hilde Weerts <https://github.com/hildeweerts>`_
 
 Agenda:
@@ -33,4 +34,13 @@ Agenda:
 
 - Naming the metrics API
 
-    With the basic API for the new style metrics agreed, we need to decide on names
+    With the basic API for the new style metrics agreed, we need to decide on names for
+    everything. This is currently
+    `an open issue <https://github.com/fairlearn/fairlearn-proposals/issues/17>`_
+    and *really* needs to be brought to resolution.
+
+    We had a lengthy discussion. There was a feeling that `MetricFrame` would be better than
+    `GroupedMetric` for the whole class, but we did not agree on alternatives for
+    `conditional_features=`. At Kevin's suggestion, RGE will rewrite the example code
+    introducing the new metric API to be focussed on the sociotechnical side, rather than
+    just an API demonstration. We will also reach out to Solon Barocas.
