@@ -10,12 +10,15 @@ values predicted by a machine learning algorithm. Other
 arguments may be present (most often sample weights), which will
 affect how the metric is calculated.
 
-The group metrics in this module have signatures
-``g(y_true, y_pred, group_membership, ...)``
-where ``group_membership`` is an array of values indicating
-a group to which each pair of true and predicted values belong.
-The metric is evaluated for the entire set of data, and also
-for each subgroup identified in ``group_membership``.
+This module provides the concept of a _grouped metric_.
+This is a metric where in addition to ``y_true`` and ``y_pred``
+values, the user provides information about group membership
+for each sample.
+For example, a user could provide a 'Gender' column, and the
+grouped metric would contain separate results for the subgroups
+'male', 'female' and 'nonbinary' indicated by that column.
+This extends to multiple grouping columns, calculating the metric
+for each combination of subgroups.
 """
 
 import sklearn.metrics as skm
@@ -56,3 +59,29 @@ accuracy_score_difference = make_derived_metric('difference',
 accuracy_score_ratio = make_derived_metric('ratio',
                                            skm.accuracy_score,
                                            sample_param_names=_standard_spn)
+
+# ============================================
+# Build list of items to be listed in the docs
+
+_core = [
+    "GroupedMetric",
+    "make_derived_metric"
+]
+
+_disparities = [
+    "demographic_parity_difference",
+    "demographic_parity_ratio",
+    "equalized_odds_difference",
+    "equalized_odds_ratio"
+]
+
+_extra_metrics = [
+    "true_positive_rate",
+    "true_negative_rate",
+    "false_positive_rate",
+    "false_negative_rate",
+    "mean_prediction",
+    "selection_rate",
+]
+
+__all__ = _core + _disparities + _extra_metrics
