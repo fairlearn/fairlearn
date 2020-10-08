@@ -1,0 +1,15 @@
+Developer Call 2020-10-08
+-------------------------
+
+Scribbler: `Richard Edgar <https://github.com/riedgar-ms>`_
+
+Attendees:
+
+- `Miro Dudik <https://github.com/MiroDudik>`_
+- `Richard Edgar <https://github.com/riedgar-ms>`_
+- `Adrin Jalali <https://github.com/adrinjalali>`_
+- Diondra Peck
+- Alex Quach
+- `Kevin Robinson <https://github.com/kevinrobinson>`_
+- `Mehrnoosh Sameki <https://github.com/mesameki>`_
+- `Hilde Weerts <https://github.com/hildeweerts>`_
