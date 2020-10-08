@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import copy
+import logging
 import numpy as np
 import pandas as pd
 from sklearn.utils import check_consistent_length
@@ -10,7 +11,12 @@ from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squee
 from ._function_container import FunctionContainer
 from ._group_feature import GroupFeature
 
+logger = logging.getLogger(__name__)
+
+_SUBGROUP_COUNT_WARNING_THRESHOLD = 20
+
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
+_SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 
 
@@ -65,6 +71,10 @@ class GroupedMetric:
         else:
             row_index = pd.MultiIndex.from_product([x.classes for x in rows],
                                                    names=[x.name for x in rows])
+
+        if len(row_index) > _SUBGROUP_COUNT_WARNING_THRESHOLD:
+            msg = _SUBGROUP_COUNT_WARNING.format(len(row_index))
+            logger.warning(msg)
 
         result = pd.DataFrame(index=row_index, columns=func_dict.keys())
         for func_name in func_dict:
