@@ -28,6 +28,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from fairlearn.metrics import GroupedMetric, make_derived_metric
+from fairlearn.metrics import accuracy_score_group_min, accuracy_score_difference
 
 
 # %%
@@ -331,29 +332,51 @@ cond_metric_two.difference(method='to_overall')
 # a 'make_derived_metric()` routine, which creates a scalar-production
 # metric function based on a given underlying metric and
 # an aggregation function:
-accuracy_difference = make_derived_metric('difference',
-                                          skm.accuracy_score,
-                                          sample_param_names=['sample_weight'])
+calc_min_accuracy = make_derived_metric('group_min',
+                                        skm.accuracy_score,
+                                        sample_param_names=['sample_weight'])
 
 # %%
 # This then acts like any other metric:
-accuracy_difference(Y_test, Y_pred, sensitive_features=A_test['sex'])
+calc_min_accuracy(Y_test, Y_pred, sensitive_features=A_test['sex'])
 # %%
 # Internally, this has called the `.difference()` method and extracted the
 # single result. Compare:
 acc_group = GroupedMetric(skm.accuracy_score,
                           Y_test, Y_pred,
                           sensitive_features=A_test['sex'])
-acc_group.difference(method='minmax')
+acc_group.group_min()
+# %%
+# Aggregations of `'group_min'`, `'group_max'`, `'difference'`, and
+# `'ratio'` are supported. For the last two, the resulting function
+# requires a `method=` argument to specify how to calculate the final
+# value:
+calc_acc_diff = make_derived_metric('difference',
+                                    skm.accuracy_score,
+                                    sample_param_names=['sample_weight'])
+acc_from_func = calc_acc_diff(Y_test, Y_pred,
+                              sensitive_features=A_test['sex'],
+                              method='minmax')
+acc_from_gm = acc_group.difference(method='minmax')['accuracy_score']
+print("Calculation from derived function: ", acc_from_func)
+print("Calculation from GroupedMetric:", acc_from_gm)
+assert acc_from_func == acc_from_gm
 # %%
 # Conditional features are obviously not supported, but sample parameters
 # (such as weights) are:
-accuracy_difference(Y_test, Y_pred,
-                    sensitive_features=A_test['sex'],
-                    sample_weight=wgts)
+calc_acc_diff(Y_test, Y_pred,
+              method='minmax',
+              sensitive_features=A_test['sex'],
+              sample_weight=wgts)
 
 # %%
-# Any parameter passed to the generated function is presumed to be a sample
-# parameter. The `functools.partial` pattern shown above can be used for
-# parameters (such as `pos_label`) which control the overall workings of the
-# metric function.
+# As a convenience, we have pre-wrapped a number of metrics from SciKit-Learn.
+# For example:
+pre_wrapped_acc_min = accuracy_score_group_min(Y_test, Y_pred,
+                                               sensitive_features=A_test['sex'])
+pre_wrapped_acc_diff = accuracy_score_difference(Y_test, Y_pred,
+                                                 sensitive_features=A_test['sex'],
+                                                 method='minmax')
+print("Prewrapped Min: ", pre_wrapped_acc_min)
+print("Prewrapped Diff: ", pre_wrapped_acc_diff)
+assert pre_wrapped_acc_diff == acc_from_func
