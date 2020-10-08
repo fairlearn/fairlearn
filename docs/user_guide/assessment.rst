@@ -87,13 +87,12 @@ We then calculate a group metric:
 .. doctest:: assessment_metrics
 
     >>> import fairlearn.metrics as flm
-    >>> group_metrics = flm.group_summary(skm.recall_score, 
+    >>> group_metrics = flm.GroupedMetric(skm.recall_score, 
     ...                                   Y_true, Y_pred,
-    ...                                   sensitive_features=group_membership_data,
-    ...                                   sample_weight=None)
-    >>> print("Overall recall = ", group_metrics.overall)
+    ...                                   sensitive_features=group_membership_data)
+    >>> print("Overall recall = ", group_metrics.overall['recall_score'])
     Overall recall =  0.5
-    >>> print("recall by groups = ", group_metrics.by_group)
+    >>> print("recall by groups = ", group_metrics.by_group['recall_score'].to_dict())
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 Note that the overall recall is the same as that calculated above in the
