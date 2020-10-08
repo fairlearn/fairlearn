@@ -8,8 +8,29 @@ Attendees:
 - `Miro Dudik <https://github.com/MiroDudik>`_
 - `Richard Edgar <https://github.com/riedgar-ms>`_
 - `Adrin Jalali <https://github.com/adrinjalali>`_
-- Diondra Peck
+- `Diondra Peck <https://github.com/diondrapeck>`_
 - Alex Quach
 - `Kevin Robinson <https://github.com/kevinrobinson>`_
 - `Mehrnoosh Sameki <https://github.com/mesameki>`_
 - `Hilde Weerts <https://github.com/hildeweerts>`_
+
+Agenda:
+
+- Requirements for next release
+    - Still need new metrics API
+    - Need to announce deprecation of ``FairnessDashboard``
+    - Need to make sure Quickstart will actually work
+      (short term fix: put note about running `pip install` against GitHub at the top)
+    - Not clear what ``ThresholdOptimizer`` doc fixes Roman had in mind
+      but they probably shouldn't block the release
+
+- Governance
+
+    An update from Miro. Probably won't be ready for the October NumFocus application
+    deadline, but Microsoft will hopefully separate Fairlearn as a neutral organisation
+    during October. This will remove the need for things like `Security.md` which are not
+    particularly open source friendly.
+
+- Naming the metrics API
+
+    With the basic API for the new style metrics agreed, we need to decide on names
