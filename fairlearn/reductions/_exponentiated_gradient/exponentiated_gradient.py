@@ -5,6 +5,7 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_ITER, _PRECISION, _INDENTATION
@@ -191,7 +192,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                      self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
                      len(lagrangian.predictors))
 
-    def predict(self, X):
+    def predict(self, X, random_state=None):
         """Provide predictions for the given input data.
 
         Predictions are randomized, i.e., repeatedly calling `predict` with
@@ -213,6 +214,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         ----------
         X : numpy.ndarray or pandas.DataFrame
             Feature data
+        random_state : int or RandomState instance, default=None
+            Controls random numbers used for randomized predictions. Pass an
+            int for reproducible output across multiple function calls.
 
         Returns
         -------
@@ -221,15 +225,16 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             the result will be a scalar. Otherwise the result will be a vector
         """
         check_is_fitted(self)
+        random_state = check_random_state(random_state)
 
         if isinstance(self.constraints, ClassificationMoment):
             positive_probs = self._pmf_predict(X)[:, 1]
-            return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+            return (positive_probs >= random_state.rand(len(positive_probs))) * 1
         else:
             pred = self._pmf_predict(X)
             randomized_pred = np.zeros(pred.shape[0])
             for i in range(pred.shape[0]):
-                randomized_pred[i] = np.random.choice(pred.iloc[i, :], p=self.weights_)
+                randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=self.weights_)
             return randomized_pred
 
     def _pmf_predict(self, X):
