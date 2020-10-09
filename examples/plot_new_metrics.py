@@ -61,8 +61,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-from fairlearn.metrics import GroupedMetric, make_derived_metric
-from fairlearn.metrics import accuracy_score_group_min, accuracy_score_difference
+from fairlearn.metrics import GroupedMetric
+from fairlearn.metrics import selection_rate
 
 
 # %%
@@ -169,12 +169,12 @@ Y_pred = unmitigated_predictor.predict(X_test)
 #
 # In a traditional model analysis, we would now look at some metrics
 # evaluated on the entire dataset. Suppose in this case, the relevant
-# metrics are :func:`sklearn.metrics.precision_score()` and
-# :func:`sklearn.metrics.fbeta_score` (with 
+# metrics are :func:`fairlearn.metrics.selection_rate` and
+# :func:`sklearn.metrics.fbeta_score` (with
 # ``beta=0.6``).
-# We can evaluate these metrics using SciKit-Learn:
+# We can evaluate these metrics directly:
 
-print("Precision:", skm.precision_score(Y_test, Y_pred))
+print("Selection Rate:", selection_rate(Y_test, Y_pred))
 print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
 
 # %%
@@ -187,7 +187,7 @@ print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
 
 fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 
-metric_fns = {'precision': skm.precision_score, 'fbeta_06': fbeta_06}
+metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06}
 
 grouped_on_sex = GroupedMetric(metric_fns,
                                Y_test, Y_pred,
@@ -216,7 +216,7 @@ grouped_on_sex = GroupedMetric(metric_fns,
 # the metrics evaluated on the entire dataset. We see that this contains the
 # same values calculated above:
 
-assert grouped_on_sex.overall['precision'] == skm.precision_score(Y_test, Y_pred)
+assert grouped_on_sex.overall['selection_rate'] == selection_rate(Y_test, Y_pred)
 assert grouped_on_sex.overall['fbeta_06'] == skm.fbeta_score(Y_test, Y_pred, beta=0.6)
 print(grouped_on_sex.overall)
 
@@ -226,4 +226,73 @@ print(grouped_on_sex.overall)
 # by the categories in the ``sensitive_features=`` argument. In this case, we
 # have results for males and females:
 
-print(grouped_on_sex.by_group)
+grouped_on_sex.by_group
+
+# %%
+# We can immediately see a substantial disparity in the selection rate between
+# males and females.
+#
+# We can also create another :class:`fairlearn.metrics.GroupedMetric` object
+# using race as the sensitive feature:
+
+grouped_on_race = GroupedMetric(metric_fns,
+                                Y_test, Y_pred,
+                                sensitive_features=A_test['race'])
+
+# %%
+# The ``overall`` property is unchanged:
+assert (grouped_on_sex.overall == grouped_on_race.overall).all()
+
+# %%
+# The ``by_group`` property now contains the metrics evaluated based on the 'race'
+# column:
+grouped_on_race.by_group
+
+# %%
+# We see that there is also a significant disparity in selection rates when
+# grouping by race.
+
+# %%
+# Quantifying Disparities
+# -----------------------
+#
+# We now know that our model is selecting individuals who are female far less
+# often than individuals who are male. There is a similar effect when
+# examining the results by race, with blacks being selected far less often than
+# whites (and those classified as 'other'). However, there are many cases where
+# presenting all these numbers at once will not be useful (for example, a high
+# level dashboard which is monitoring model performance). Fairlearn provides
+# several means of aggregating metrics across the subgroups, so that disparities
+# can be readily quantified.
+#
+# The simplest of these aggregations is ``group_min()``, which reports the
+# minimum value seen for a subgroup for each underlying metric (we also provide
+# ``group_max()``). This is
+# useful if there is a mandate that "no subgroup should have an ``fbeta_score()``
+# of less than 0.6." We can evaluate the minimum values easily:
+grouped_on_race.group_min()
+
+# %%
+# As noted above, the selection rates varies greatly by race and by sex.
+# This can be quantified in terms of a difference between the subgroup with
+# the highest value of the metric, and the subgroup with the lowest value.
+# For this, we provide the method ``difference(method='minmax)``:
+grouped_on_race.difference(method='minmax')
+
+# %%
+# We can also evaluate the difference relative to the corresponding overall
+# value of the metric. In this case we take the absolute value, so that the
+# result is always positive:
+grouped_on_race.difference(method='to_overall')
+
+# %%
+# There are situations where knowing the ratios of the metrics evaluated on
+# the subgroups is more useful. For this we have the ``ratios()`` method.
+# We can take the ratios between the minimum and maximum values of each metric:
+grouped_on_race.ratio(method='minmax')
+
+# %%
+# We can also compute the ratios relative to the overall value for each
+# metric. Analogous to the differences, the ratios are always in the range
+# :math:`[0,1]`:
+grouped_on_race.ratio(method='to_overall')
