@@ -415,4 +415,4 @@ counts.by_group
 
 # %%
 # Recall that ``NaN`` indicates that there were no individuals
-# in a cell - ``member_counts()`` will no even have been called.
+# in a cell - ``member_counts()`` will not even have been called.
