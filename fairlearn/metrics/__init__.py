@@ -60,6 +60,11 @@ accuracy_score_ratio = make_derived_metric('ratio',
                                            skm.accuracy_score,
                                            sample_param_names=_standard_spn)
 
+
+selection_rate_group_min = make_derived_metric('group_min',
+                                               selection_rate,
+                                               sample_param_names=_standard_spn)
+
 # ============================================
 # Build list of items to be listed in the docs
 

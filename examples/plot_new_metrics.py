@@ -51,8 +51,6 @@ Metrics with Multiple Features
 # and manufacture credit score bands and loan sizes from other columns.
 # We start with some uncontroversial `import` statements:
 
-from fairlearn.metrics import GroupedMetric
-from fairlearn.metrics import selection_rate
 import functools
 import sklearn.metrics as skm
 import numpy as np
@@ -172,6 +170,7 @@ Y_pred = unmitigated_predictor.predict(X_test)
 # :func:`sklearn.metrics.fbeta_score` (with
 # ``beta=0.6``).
 # We can evaluate these metrics directly:
+from fairlearn.metrics import selection_rate
 
 print("Selection Rate:", selection_rate(Y_test, Y_pred))
 print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
@@ -183,7 +182,7 @@ print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
 # :class:`fairlearn.metrics.GroupedMetric`
 # class. Let us construct an instance of this class, and then look at
 # its capabilities:
-
+from fairlearn.metrics import GroupedMetric
 
 fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 
@@ -254,7 +253,7 @@ grouped_on_race.by_group
 
 # %%
 # Sample weights and other arrays
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# -------------------------------
 #
 # We noted above that the underlying metric functions passed to the
 # :class:`fairlearn.metrics.GroupedMetric` constructor need to be of
@@ -298,7 +297,7 @@ grouped_with_weights.by_group
 
 # %%
 # Quantifying Disparities
-# -----------------------
+# =======================
 #
 # We now know that our model is selecting individuals who are female far less
 # often than individuals who are male. There is a similar effect when
@@ -343,7 +342,7 @@ grouped_on_race.ratio(method='to_overall')
 
 # %%
 # Intersections of Features
-# -------------------------
+# =========================
 #
 # So far we have only considered a single sensitive feature at a time,
 # and we have already found some serious issues in our example data.
@@ -383,7 +382,7 @@ grouped_on_race_and_sex.ratio(method='minmax')
 
 # %%
 # Conditional Cases
-# -----------------
+# =================
 #
 # There is a further way we can slice up our data. We have (*completely
 # made up*) features for the individuals' credit scores (in three bands)
@@ -462,6 +461,93 @@ counts.by_group
 # in a cell - ``member_counts()`` will not even have been called.
 
 # %%
-# Creating Scoring Functions
-# --------------------------
+# Deriving Metric Functions
+# =========================
 #
+# Sometimes, all we require is a function which uses on of the aggregations
+# described above to produce a single scalar. These are useful in larger
+# pipelines, where they can be used to monitor and automate the training of
+# collections of models. Fairlearn provides a means of creating these functions
+# via :func:`fairlearn.metrics.make_derived_metric`:
+from fairlearn.metrics import make_derived_metric
+
+my_select_diff = make_derived_metric('group_min',
+                                     selection_rate,
+                                     sample_param_names=['sample_weight'])
+
+# %%
+# The resultant object is a callable with the same signature as the underlying
+# metric (:func:`fairlearn.metrics.selection_rate` in this case), but an added
+# argument of `sensitive_features=`:
+
+min_select_over_sex = my_select_diff(Y_test, Y_pred,
+                                     sensitive_features=A_test['sex'])
+min_select_over_race = my_select_diff(Y_test, Y_pred,
+                                      sensitive_features=A_test['race'])
+min_select_over_race_and_sex = my_select_diff(Y_test, Y_pred,
+                                              sensitive_features=A_test[['sex', 'race']])
+
+assert min_select_over_sex == grouped_on_sex.group_min()['selection_rate']
+assert min_select_over_race == grouped_on_race.group_min()['selection_rate']
+assert min_select_over_race_and_sex == grouped_on_race_and_sex.group_min()['selection_rate']
+
+print('Min over sex', min_select_over_sex)
+print('Min over race', min_select_over_race)
+print('Min over sex and race', min_select_over_race_and_sex)
+
+# %%
+# Any arguments named in the ``sample_param_names=`` list will be treated as a sample
+# parameter, and split into subgroups:
+
+min_select_weights = my_select_diff(Y_test, Y_pred,
+                                    sensitive_features=A_test['sex'],
+                                    sample_weight=random_weights)
+
+assert min_select_weights == grouped_with_weights.group_min()['selection_rate']
+
+print("Min with weights", min_select_weights)
+
+# %%
+# When creating a derived metric, it is not necessary to pre-bind scalar argument
+# to the underlying metric. If they are not listed in the `sample_param_names=`
+# argument, they will be pre-bound internally:
+
+my_fbeta_min = make_derived_metric('group_min',
+                                   skm.fbeta_score,
+                                   sample_param_names=['sample_weight'])
+
+fbeta_weights = my_fbeta_min(Y_test, Y_pred,
+                             beta=0.6,
+                             sensitive_features=A_test['sex'],
+                             sample_weight=random_weights)
+
+assert fbeta_weights == grouped_with_weights.group_min()['fbeta_06']
+
+print("Fbeta min with weights", fbeta_weights)
+
+# %%
+# We can also pass ``difference`` and ``ratio`` to
+# :func:`fairlearn.metrics.make_derived_metric`. In this case, the
+# returned function accepts an extra argument of ``method=``:
+
+my_sel_diff = make_derived_metric('difference',
+                                  selection_rate,
+                                  sample_param_names=['sample_weight'])
+
+diff_over_sex = my_sel_diff(Y_test, Y_pred,
+                            method='minmax',
+                            sensitive_features=A_test['sex'])
+
+assert diff_over_sex == grouped_on_sex.difference(method='minmax')['selection_rate']
+
+print("minmax difference by sex", diff_over_sex)
+
+# %%
+# We provide a number of these preconstructed methods as part of
+# Fairlearn. For example :func:`fairlearn.metrics.selection_rate_group_min`:
+from fairlearn.metrics import selection_rate_group_min
+
+min_select_over_sex2 = selection_rate_group_min(Y_test, Y_pred,
+                                                sensitive_features=A_test['sex'])
+
+assert min_select_over_sex == min_select_over_sex2
