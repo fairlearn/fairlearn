@@ -296,3 +296,43 @@ grouped_on_race.ratio(method='minmax')
 # metric. Analogous to the differences, the ratios are always in the range
 # :math:`[0,1]`:
 grouped_on_race.ratio(method='to_overall')
+
+# %%
+# Intersections of Features
+# -------------------------
+#
+# So far we have only considered a single sensitive feature at a time,
+# and we have already found some serious issues in our example data.
+# However, sometimes serious issues can be hiding in intersections of
+# features. For example, the
+# `Gender Shades project <https://www.media.mit.edu/projects/gender-shades/overview/>`_
+# found that facial recognition algorithms performed worse for blacks
+# than whites, and also worse for women than men (despite overall high
+# accuracy score). Moreover, performance on black females was *terrible*.
+# We can examine the intersections of sensitive features by passing
+# multiple columns to the :class:`fairlearn.metrics.GroupedMetric`
+# constructor:
+
+grouped_on_race_and_sex = GroupedMetric(metric_fns,
+                                        Y_test, Y_pred,
+                                        sensitive_features=A_test[['race', 'sex']])
+
+# %%
+# The overall values are unchanged, but the ``by_group`` table now
+# shows the intersections between subgroups:
+assert (grouped_on_race_and_sex.overall == grouped_on_race.overall).all()
+grouped_on_race_and_sex.by_group
+
+# %%
+# The aggregations are still performed across all subgroups for each metric,
+# so each continues to reduce to a single value. If we look at the
+# ``group_min()``, we see that we violate the mandate we specified for the
+# ``fbeta_score()`` suggested above (for females with a race of 'Other' in
+# fact):
+grouped_on_race_and_sex.group_min()
+
+# %%
+# Looking at the ``ratio()`` method, we see that the disparity is worse
+# (specifically between white males and black females, if we check in
+# the ``by_group`` table):
+grouped_on_race_and_sex.ratio(method='minmax')
