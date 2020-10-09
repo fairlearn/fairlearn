@@ -8,14 +8,48 @@ Metrics with Multiple Features
 """
 # %%
 # This notebook demonstrates the new API for metrics, which supports
-# multiple sensitive and conditional features.
+# multiple sensitive and conditional features. This example does not
+# contain a proper discussion of how fairness relates to the dataset
+# used, although it does highlight issues which users may want to
+# consider when analysing their datasets.
+#
+# We are going to consider a lending scenario, supposing that we have
+# a model which predicts whether or not a particular customer will
+# repay a loan. This could be used as the basis of deciding whether
+# or not to offer that customer a loan. With traditional metrics,
+# we would assess the model using:
+#
+# - The 'true' values from the test set
+# - The model predictions from the test set
+#
+# Our fairness metrics compute group-based fairness statistics.
+# To use these, we also need categorical columns from the test
+# set. For this example, we will include:
+#
+# - The sex of each individual (two unique values)
+# - The race of each individual (three unique values)
+# - The credit score band of each individual (three unique values)
+# - Whether the loan is considered 'large' or 'small'
+#
+# An individual's sex and race should not affect a lending decision,
+# but it would be legitimate to consider an individual's credit score
+# and the relative size of the loan which they desired.
+#
+# A real scenario will be more complicated, but this will serve to
+# illustrate the use of the new metrics.
 #
 # Getting the Data
 # ================
 #
-# To demonstrate the API, we use the well-known 'Adult' dataset,
-# and we train a simple model on it. We start with some
-# uncontroversial `import` statements:
+# *This section may be skipped. It simply creates a dataset for
+# illustrative purposes*
+#
+# We will use the well-known UCI 'Adult' dataset as the basis of this
+# demonstration. This is not for a lending scenario, but we will regard
+# it as one for the purposes of this example. We will use the existing
+# 'race' and 'sex' columns (trimming the former to three unique values),
+# and manufacture credit score bands and loan sizes from other columns.
+# We start with some uncontroversial `import` statements:
 
 import functools
 import sklearn.metrics as skm
@@ -32,46 +66,61 @@ from fairlearn.metrics import accuracy_score_group_min, accuracy_score_differenc
 
 
 # %%
-# Next, we import the data, dropping some of the values to
-# help maintain clarity:
+# Next, we import the data:
 
 data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
-X_raw = X_raw[X_raw.race != 'Other']
-Y = data.target[data.data.race != 'Other']
-Y = (Y == '>50K') * 1
+Y = (data.target == '>50K') * 1
 
 # %%
-# We can select some columns which we might want to use for
-# our sensitive and conditional features:
+# For purposes of clarity, we consolidate the 'race' column to have
+# three unique values:
+
+
+def race_transform(input_str):
+    """Reduce values to White, Black and Other."""
+    result = 'Other'
+    if input_str == 'White' or input_str == 'Black':
+        result = input_str
+    return result
+
+
+X_raw['race'] = X_raw['race'].map(race_transform).fillna('Other')
+print(np.unique(X_raw['race']))
+
+# %%
+# Now, we manufacture the columns for the credit score band and
+# requested loan size. These are wholly constructed, and not
+# part of the actual dataset in any way. They are simply for
+# illustrative purposes.
 
 
 def marriage_transform(m_s_string):
     """Perform some simple manipulations."""
-    result = 'A'
+    result = 'Low'
     if m_s_string.startswith("Married"):
-        result = 'B'
+        result = 'Medium'
     elif m_s_string.startswith("Widowed"):
-        result = 'C'
+        result = 'High'
     return result
 
 
 def occupation_transform(occ_string):
     """Perform some simple manipulations."""
-    result = 'pp'
+    result = 'Small'
     if occ_string.startswith("Machine"):
-        result = 'qq'
+        result = 'Large'
     return result
 
 
-colA = X_raw['marital-status'].map(marriage_transform).fillna('C')
-colA.name = "Feature A"
-colB = X_raw['occupation'].map(occupation_transform).fillna('qq')
-colB.name = "Feature B"
+col_credit = X_raw['marital-status'].map(marriage_transform).fillna('Low')
+col_credit.name = "Credit Score"
+col_loan_size = X_raw['occupation'].map(occupation_transform).fillna('Small')
+col_loan_size.name = "Loan Size"
 
 A = X_raw[['race', 'sex']]
-A['Feature A'] = colA
-A['Feature B'] = colB
+A['Credit Score'] = col_credit
+A['Loan Size'] = col_loan_size
 A
 
 # %%
@@ -86,11 +135,10 @@ X_dummies = pd.get_dummies(X_raw)
 X_scaled = sc.fit_transform(X_dummies)
 X_scaled = pd.DataFrame(X_scaled, columns=X_dummies.columns)
 
-X_train, X_test, Y_train, Y_test, A_train, A_test = \
-    train_test_split(X_scaled, Y, A,
-                     test_size=0.3,
-                     random_state=12345,
-                     stratify=Y)
+X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(X_scaled, Y, A,
+                                                                     test_size=0.3,
+                                                                     random_state=12345,
+                                                                     stratify=Y)
 
 # Ensure indices are aligned
 X_train = X_train.reset_index(drop=True)
@@ -109,274 +157,73 @@ unmitigated_predictor.fit(X_train, Y_train)
 Y_pred = unmitigated_predictor.predict(X_test)
 
 # %%
-# Simple Metrics
-# ==============
+# Analysing the Model with Metrics
+# ================================
 #
-# We now start computing metrics. The new API is based around the
-# `GroupedMetric` object. The constructor specifies the data, the
-# metric and the sensitive feature:
-
-
-basic_metric = GroupedMetric(skm.recall_score, Y_test, Y_pred, sensitive_features=A_test['sex'])
-
-# %%
-# The `GroupedMetric` object has properties of `overall` and
-# `by_group`, which show the overall value of the metric (evaluated
-# on the entire dataset), as well as the metric evaluated on each
-# of the unique values of the specified sensitive feature:
-
-basic_metric.overall
-
-# %%
-# This can be compared to a direct calculation from SciKit-Learn:
-skm.recall_score(Y_test, Y_pred)
-
-# %%
-# The results for each value of the sensitive feature:
-basic_metric.by_group
-
-# %%
-# Suppose that we have sample weights which we want to use in the
-# metric calculation. For this we use the `sample_params=` argument
-# in the constructor. This contains a dictionary of arrays which
-# need to be sliced up with the `y_true` and `y_pred` arrays, before
-# being passed into the metric function. The dictionary keys are the
-# names of the arguments in the metric function signature:
-
-wgts = np.random.random(size=len(Y_test))
-
-basic_metric_wgts = GroupedMetric(skm.recall_score,
-                                  Y_test, Y_pred,
-                                  sensitive_features=A_test['sex'],
-                                  sample_params={'sample_weight': wgts})
-
-# %%
-# The overall values
-basic_metric_wgts.overall
-
-# %%
-# And compare with SciKit-Learn:
-skm.recall_score(Y_test, Y_pred, sample_weight=wgts)
-
-# %%
-# The values for the sensitive feature:
-basic_metric_wgts.by_group
-
-# %%
-# If the metric function has other arguments, then it will need to be
-# wrapped. An example is `fbeta_score()` which requires a value for
-# `beta`. The `functools.partial` routine makes this easy:
-fbeta_05 = functools.partial(skm.fbeta_score, beta=0.5)
-
-basic_metric_wrapped = GroupedMetric(fbeta_05, Y_test, Y_pred, sensitive_features=A_test['sex'])
-
-# %%
-# The overall values
-basic_metric_wrapped.overall
-
-# %%
-# The Values for the sensitive feature
-basic_metric_wrapped.by_group
-
-# %%
-# We can evaluate multiple metrics at once by passing in a dictionary
-# of metric functions. If we have sample parameters as well, then
-# that argument becomes a dictionary of dictionaries, with the top
-# set of keys matching those in the metrics dictionary:
-
-metric_dict = {'recall': skm.recall_score, 'fbeta_0.5': fbeta_05}
-sample_params = {'recall': {'sample_weight': wgts}, 'fbeta_0.5': {'sample_weight': wgts}}
-
-basic_metric_two = GroupedMetric(metric_dict,
-                                 Y_test, Y_pred,
-                                 sensitive_features=A_test['sex'],
-                                 sample_params=sample_params)
-
-# %%
-# Now we inspect the overall values
-basic_metric_two.overall
-
-# %%
-# And the values for the sensitive feature
-basic_metric_two.by_group
-
-# %%
-# Aggregates
-# ----------
+# After our data manipulations and model training, we have the following
+# from our test set:
 #
-# We provide some aggregating functions, which provide means of
-# obtaining scalar measures. First are the `group_min()` and
-# `group_max()` methods which compute the minimum and maximum
-# values of each metric across the sensitive feature.
+# - A vector of true values called ``Y_test``
+# - A vector of model predictions called ``Y_pred``
+# - A DataFrame of categorical features relevant to fairness called ```A_test``
 #
-# First the minimum:
-basic_metric_two.group_min()
+# In a traditional model analysis, we would now look at some metrics
+# evaluated on the entire dataset. Suppose in this case, the relevant
+# metrics are :func:`sklearn.metrics.precision_score()` and
+# :func:`sklearn.metrics.fbeta_score` (with 
+# ``beta=0.6``).
+# We can evaluate these metrics using SciKit-Learn:
+
+print("Precision:", skm.precision_score(Y_test, Y_pred))
+print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
 
 # %%
-# And the maximum:
-basic_metric_two.group_max()
+# We know that there are sensitive features in our data, and we want to
+# ensure that we're not harming individuals due to membership in any of
+# these groups. For this purpose, Fairlearn provides the
+# :class:`fairlearn.metrics.GroupedMetric`
+# class. Let us construct an instance of this class, and then look at
+# its capabilities:
+
+fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
+
+metric_fns = {'precision': skm.precision_score, 'fbeta_06': fbeta_06}
+
+grouped_on_sex = GroupedMetric(metric_fns,
+                               Y_test, Y_pred,
+                               sensitive_features=A_test['sex'])
 
 # %%
-# There is also a `difference()` method, which calculates the
-# difference based on its `method=` argument.
+# The :class:`fairlearn.metrics.GroupedMetric` object requires a
+# minimum of four arguments:
 #
-# First the default difference between the minimum and maximum:
-basic_metric_two.difference(method='minmax')
-
-# %%
-# And the difference to the overall value:
-basic_metric_two.difference(method='to_overall')
-
-# %%
-# Multiple Sensitive Features
-# ===========================
+# 1. The underlying metric function(s) to be evaluated
+# 2. The true values
+# 3. The predicted values
+# 4. The sensitive feature values
 #
-# The new metrics are not constrained to considering a
-# single sensitive feature at a time. Multiple columns can
-# be passed into as senstive features, and the intersections
-# of all subgroups will be computed:
-
-two_sf = GroupedMetric(metric_dict,
-                       Y_test, Y_pred,
-                       sensitive_features=A_test[['sex', 'race']])
-
-# %%
-# The overall values
-two_sf.overall
-
-# %%
-# The values for the intersections of the sensitive features:
-two_sf.by_group
-
-# %%
-# The maximum absolute difference to the overall value for each
-# intersection of the sensitive features:
-two_sf.difference(method='to_overall')
-
-# %%
-# Conditional Features
-# ====================
+# These are all passed as arguments to the constructor. If more than
+# one underlying metric is required (as in this case), then we must
+# provide them in a dictionary.
 #
-# Conditional features denote groups for which outcomes are
-# allowed to differ. For example, in a loan scenario, it is
-# acceptable for people in a high income group to be offered
-# loans more often than those in a low income group. While
-# this could be monitored by splitting the input array,
-# `GroupedMetric` supports this directly:
-
-cond_metric = GroupedMetric(skm.recall_score,
-                            Y_test, Y_pred,
-                            sensitive_features=A_test[['sex', 'race']],
-                            conditional_features=A_test['Feature A'])
-
-# %%
-# This changes the `overall` property to be a DataFrame. The
-# rows correspond to the unique values of the conditional
-# feature:
-
-cond_metric.overall
-
-# %%
-# The `by_group` property still looks similar - indeed,
-# can compare it to a metric which moves the conditional
-# feature into the sensitive feature list.
+# The underlying metrics must have a signature ``fn(y_true, y_pred)``,
+# so we have to use :func:`functools.partial` on ``fbeta_score()`` to
+# furnish ``beta=0.6`` (we will show how to pass in extra array
+# arguments such as sample weights shortly).
 #
-# First computed from the object above:
-cond_metric.by_group
+# We will now take a closer look at the :class:`fairlearn.metrics.GroupedMetric`
+# object. First, there is the ``overall`` property, which contains
+# the metrics evaluated on the entire dataset. We see that this contains the
+# same values calculated above:
+
+assert grouped_on_sex.overall['precision'] == skm.precision_score(Y_test, Y_pred)
+assert grouped_on_sex.overall['fbeta_06'] == skm.fbeta_score(Y_test, Y_pred, beta=0.6)
+print(grouped_on_sex.overall)
 
 # %%
-# Now recompute, with the conditional feature moved to the
-# list of sensitive features:
-cond_metric_alt = GroupedMetric(skm.recall_score,
-                                Y_test, Y_pred,
-                                sensitive_features=A_test[['Feature A', 'sex', 'race']])
-cond_metric_alt.by_group
+# The other property in the :class:`fairlearn.metrics.GroupedMetric` object
+# is ``by_group``. This contains the metrics evaluated on each subgroup defined
+# by the categories in the ``sensitive_features=`` argument. In this case, we
+# have results for males and females:
 
-# %%
-# The aggregates are also evaluated for each unique value
-# of the conditional feature. For example the maximum:
-cond_metric.group_max()
-
-# %%
-# And the difference:
-cond_metric.difference(method='minmax')
-
-# %%
-# We also support multiple conditional features, and
-# evaluate multiple metrics at once:
-
-cond_metric_two = GroupedMetric(metric_dict,
-                                Y_test, Y_pred,
-                                sensitive_features=A_test[['sex', 'race']],
-                                conditional_features=A_test[['Feature A', 'Feature B']])
-
-# %%
-# First the overall values
-cond_metric_two.overall
-
-# %%
-# The values for the intersections of sensitive and conditional features:
-cond_metric_two.by_group
-
-# %%
-# The maximum absolute values of the difference to the overall value
-# for each intersection of conditional features:
-cond_metric_two.difference(method='to_overall')
-
-# %%
-# Obtaining Scalars
-# =================
-#
-# It is quite common for a training pipeline to require scalar
-# metrics in order to monitor progress. To this end, we provide
-# a 'make_derived_metric()` routine, which creates a scalar-production
-# metric function based on a given underlying metric and
-# an aggregation function:
-calc_min_accuracy = make_derived_metric('group_min',
-                                        skm.accuracy_score,
-                                        sample_param_names=['sample_weight'])
-
-# %%
-# This then acts like any other metric:
-calc_min_accuracy(Y_test, Y_pred, sensitive_features=A_test['sex'])
-# %%
-# Internally, this has called the `.difference()` method and extracted the
-# single result. Compare:
-acc_group = GroupedMetric(skm.accuracy_score,
-                          Y_test, Y_pred,
-                          sensitive_features=A_test['sex'])
-acc_group.group_min()
-# %%
-# Aggregations of `'group_min'`, `'group_max'`, `'difference'`, and
-# `'ratio'` are supported. For the last two, the resulting function
-# requires a `method=` argument to specify how to calculate the final
-# value:
-calc_acc_diff = make_derived_metric('difference',
-                                    skm.accuracy_score,
-                                    sample_param_names=['sample_weight'])
-acc_from_func = calc_acc_diff(Y_test, Y_pred,
-                              sensitive_features=A_test['sex'],
-                              method='minmax')
-acc_from_gm = acc_group.difference(method='minmax')['accuracy_score']
-print("Calculation from derived function: ", acc_from_func)
-print("Calculation from GroupedMetric:", acc_from_gm)
-assert acc_from_func == acc_from_gm
-# %%
-# Conditional features are obviously not supported, but sample parameters
-# (such as weights) are:
-calc_acc_diff(Y_test, Y_pred,
-              method='minmax',
-              sensitive_features=A_test['sex'],
-              sample_weight=wgts)
-
-# %%
-# As a convenience, we have pre-wrapped a number of metrics from SciKit-Learn.
-# For example:
-pre_wrapped_acc_min = accuracy_score_group_min(Y_test, Y_pred,
-                                               sensitive_features=A_test['sex'])
-pre_wrapped_acc_diff = accuracy_score_difference(Y_test, Y_pred,
-                                                 sensitive_features=A_test['sex'],
-                                                 method='minmax')
-print("Prewrapped Min: ", pre_wrapped_acc_min)
-print("Prewrapped Diff: ", pre_wrapped_acc_diff)
-assert pre_wrapped_acc_diff == acc_from_func
+print(grouped_on_sex.by_group)
