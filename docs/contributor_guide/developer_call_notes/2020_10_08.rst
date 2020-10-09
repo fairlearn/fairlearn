@@ -25,6 +25,14 @@ Agenda:
     - Not clear what ``ThresholdOptimizer`` doc fixes Roman had in mind
       but they probably shouldn't block the release
 
+  To clear up confusion over the ``FairnessDashboard``, it has been updated with a
+  ``flask`` backend but we have rolled back the major UI change which had been put
+  in (after the ``v0.4.6`` release). We plan on deprecating the ``FairnessDashboard``
+  within Fairlearn, since its code has been moved to an explicitly Microsoft-owned
+  repository (which will be open sourced Real Soon Now), since there are
+  Azure-imposed requirements on that code. The Fairlearn community will then be
+  free to add any desired visualisations within Fairlearn in the future.
+
 - Governance
 
     An update from Miro. Probably won't be ready for the October NumFocus application
@@ -41,6 +49,7 @@ Agenda:
 
     We had a lengthy discussion. There was a feeling that `MetricFrame` would be better than
     `GroupedMetric` for the whole class, but we did not agree on alternatives for
-    `conditional_features=`. At Kevin's suggestion, RGE will rewrite the example code
+    `conditional_features=`. At Kevin's suggestion to focus on how users will first encounter
+    the code, RGE will rewrite the example code
     introducing the new metric API to be focussed on the sociotechnical side, rather than
     just an API demonstration. We will also reach out to Solon Barocas.
