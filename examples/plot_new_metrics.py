@@ -336,3 +336,83 @@ grouped_on_race_and_sex.group_min()
 # (specifically between white males and black females, if we check in
 # the ``by_group`` table):
 grouped_on_race_and_sex.ratio(method='minmax')
+
+# %%
+# Conditional Cases
+# -----------------
+#
+# There is a further way we can slice up our data. We have (*completely
+# made up*) features for the individuals' credit scores (in three bands)
+# and also the size of the loan requested (large or small). In our loan
+# scenario, it is acceptable that individuals with high credit scores
+# are selected more often than individuals with low credit scores.
+# However, within each credit score band, we do not want a disparity
+# between (say) black females and white males. To example these cases,
+# we have the concept of *conditional features*.
+#
+# Conditional features are introduced by the ``conditional_features=``
+# argument to the :class:`fairlearn.metrics.GroupedMetric` object:
+cond_credit_score = GroupedMetric(metric_fns,
+                                  Y_test, Y_pred,
+                                  sensitive_features=A_test[['race', 'sex']],
+                                  conditional_features=A_test['Credit Score'])
+
+# %%
+# This has an immediate effect on the ``overall`` property. Instead
+# of having one value for each metric, we now have a value for each
+# unique value of the conditional feature:
+cond_credit_score.overall
+
+# %%
+# The ``by_group`` property is similarly expanded:
+cond_credit_score.by_group
+
+# %%
+# The aggregates are also evaluated once for each group identified
+# by the conditional feature:
+cond_credit_score.group_min()
+
+# %%
+# And:
+cond_credit_score.ratio(method='minmax')
+
+# %%
+# In our data, we see that we have a dearth of positive results
+# for high income non-whites, which significantly affects the
+# aggregates.
+#
+# We can continue adding more conditional features:
+cond_both = GroupedMetric(metric_fns,
+                          Y_test, Y_pred,
+                          sensitive_features=A_test[['race', 'sex']],
+                          conditional_features=A_test[['Loan Size', 'Credit Score']])
+
+# %%
+# The ``overall`` property now splits into more values:
+cond_both.overall
+
+# %%
+# As does the ``by_groups`` property, where ``NaN`` values
+# indicate that there were no samples in the cell:
+cond_both.by_group
+
+# %%
+# The aggregates behave similarly. By this point, we are having significant issues
+# with under-populated intersections. Consider:
+
+
+def member_counts(y_true, y_pred):
+    assert len(y_true) == len(y_pred)
+    return len(y_true)
+
+
+counts = GroupedMetric(member_counts,
+                       Y_test, Y_pred,
+                       sensitive_features=A_test[['race', 'sex']],
+                       conditional_features=A_test[['Loan Size', 'Credit Score']])
+
+counts.by_group
+
+# %%
+# Recall that ``NaN`` indicates that there were no individuals
+# in a cell - ``member_counts()`` will no even have been called.
