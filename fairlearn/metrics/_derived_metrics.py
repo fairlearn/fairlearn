@@ -3,6 +3,7 @@
 
 import functools
 import numpy as np
+from typing import Callable, List
 
 from ._grouped_metric import GroupedMetric
 
@@ -59,6 +60,8 @@ class _DerivedMetric:
         return result
 
 
-def make_derived_metric(aggregate, metric_fn, sample_param_names):
+def make_derived_metric(aggregate: str,
+                        metric_fn: Callable,
+                        sample_param_names: List[str]) -> Callable:
     """Read a placeholder comment."""
     return _DerivedMetric(aggregate, metric_fn, sample_param_names)
