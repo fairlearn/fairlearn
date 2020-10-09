@@ -13,7 +13,7 @@ _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE = "Empty y_pred passed to selection_rate 
 def selection_rate(y_true,
                    y_pred,
                    *,
-                   pos_label=1: Any,
+                   pos_label: Any = 1,
                    sample_weight=None) -> float:
     """Calculate the fraction of predicted labels matching the 'good' outcome.
 
