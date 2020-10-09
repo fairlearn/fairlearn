@@ -60,6 +60,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     grid :
         Instead of supplying a size and limit for the grid, users may specify
         the exact set of Lagrange multipliers they desire using this argument.
+    sample_weight_name : str
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
     def __init__(self,
@@ -70,7 +73,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                  grid_size=10,
                  grid_limit=2.0,
                  grid_offset=None,
-                 grid=None):
+                 grid=None,
+                 sample_weight_name="sample_weight"):
         """Construct a GridSearch object."""
         self.estimator = estimator
         if not isinstance(constraints, Moment):
@@ -90,6 +94,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self.grid_limit = float(grid_limit)
         self.grid_offset = grid_offset
         self.grid = grid
+        self.sample_weight_name = sample_weight_name
 
     def fit(self, X, y, **kwargs):
         """Run the grid search.
@@ -177,7 +182,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 current_estimator = copy.deepcopy(self.estimator)
 
             oracle_call_start_time = time()
-            current_estimator.fit(X, y_reduction, sample_weight=weights)
+            current_estimator.fit(X, y_reduction, **{self.sample_weight_name: weights})
             oracle_call_execution_time = time() - oracle_call_start_time
             logger.debug("Call to estimator complete")
 
