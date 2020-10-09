@@ -51,6 +51,8 @@ Metrics with Multiple Features
 # and manufacture credit score bands and loan sizes from other columns.
 # We start with some uncontroversial `import` statements:
 
+from fairlearn.metrics import GroupedMetric
+from fairlearn.metrics import selection_rate
 import functools
 import sklearn.metrics as skm
 import numpy as np
@@ -60,9 +62,6 @@ from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-
-from fairlearn.metrics import GroupedMetric
-from fairlearn.metrics import selection_rate
 
 
 # %%
@@ -185,6 +184,7 @@ print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
 # class. Let us construct an instance of this class, and then look at
 # its capabilities:
 
+
 fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 
 metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06}
@@ -251,6 +251,50 @@ grouped_on_race.by_group
 # %%
 # We see that there is also a significant disparity in selection rates when
 # grouping by race.
+
+# %%
+# Sample weights and other arrays
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# We noted above that the underlying metric functions passed to the
+# :class:`fairlearn.metrics.GroupedMetric` constructor need to be of
+# the form ``fn(y_true, y_pred)`` - we do not support scalar arguments
+# such as ``pos_label=`` or ``beta=`` in the constructor. Such
+# arguments should be bound into a new function using
+# :func:`functools.partial`, and the result passed in. However, we do
+# support arguments which have one entry for each sample, with an array
+# of sample weights being the most common example. These are divided
+# into subgroups along with ``y_true`` and ``y_pred``, and passed along
+# to the underlying metric.
+#
+# To use these arguments, we pass in a dictionary as the ``sample_params=``
+# argument of the constructor. Let us generate some random weights, and
+# pass these along:
+
+random_weights = np.random.rand(len(Y_test))
+
+example_sample_params = {
+    'selection_rate': {'sample_weight': random_weights},
+    'fbeta_06': {'sample_weight': random_weights},
+}
+
+
+grouped_with_weights = GroupedMetric(metric_fns,
+                                     Y_test, Y_pred,
+                                     sensitive_features=A_test['sex'],
+                                     sample_params=example_sample_params)
+
+# %%
+# We can inspect the overall values, and check they are as expected:
+assert grouped_with_weights.overall['selection_rate'] == \
+    selection_rate(Y_test, Y_pred, sample_weight=random_weights)
+assert grouped_with_weights.overall['fbeta_06'] == \
+    skm.fbeta_score(Y_test, Y_pred, beta=0.6, sample_weight=random_weights)
+print(grouped_with_weights.overall)
+
+# %%
+# We can also see the effect on the metric being evaluated on the subgroups:
+grouped_with_weights.by_group
 
 # %%
 # Quantifying Disparities
@@ -416,3 +460,8 @@ counts.by_group
 # %%
 # Recall that ``NaN`` indicates that there were no individuals
 # in a cell - ``member_counts()`` will not even have been called.
+
+# %%
+# Creating Scoring Functions
+# --------------------------
+#
