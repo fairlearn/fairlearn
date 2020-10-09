@@ -287,7 +287,7 @@ grouped_on_race.difference(method='to_overall')
 
 # %%
 # There are situations where knowing the ratios of the metrics evaluated on
-# the subgroups is more useful. For this we have the ``ratios()`` method.
+# the subgroups is more useful. For this we have the ``ratio()`` method.
 # We can take the ratios between the minimum and maximum values of each metric:
 grouped_on_race.ratio(method='minmax')
 
