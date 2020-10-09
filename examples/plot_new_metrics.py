@@ -165,7 +165,7 @@ Y_pred = unmitigated_predictor.predict(X_test)
 #
 # - A vector of true values called ``Y_test``
 # - A vector of model predictions called ``Y_pred``
-# - A DataFrame of categorical features relevant to fairness called ```A_test``
+# - A DataFrame of categorical features relevant to fairness called ``A_test``
 #
 # In a traditional model analysis, we would now look at some metrics
 # evaluated on the entire dataset. Suppose in this case, the relevant
