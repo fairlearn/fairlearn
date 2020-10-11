@@ -38,9 +38,13 @@ class _Lagrangian:
     opt_lambda : bool
         indicates whether to optimize lambda during the calculation of the
         Lagrangian; optional with default value True
+    sample_weight_name : str
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
-    def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True):
+    def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True,
+                 sample_weight_name='sample_weight'):
         self.X = X
         self.n = self.X.shape[0]
         self.y = y
@@ -61,6 +65,7 @@ class _Lagrangian:
         self.n_oracle_calls_dummy_returned = 0
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
+        self.sample_weight_name = sample_weight_name
 
     def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
@@ -170,7 +175,7 @@ class _Lagrangian:
             estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        estimator.fit(self.X, redY, sample_weight=redW)
+        estimator.fit(self.X, redY, **{self.sample_weight_name: redW})
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
