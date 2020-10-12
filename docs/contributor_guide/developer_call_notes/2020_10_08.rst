@@ -19,15 +19,14 @@ Agenda:
 
 - Requirements for next release
     - Still need new metrics API
-    - Need to announce deprecation of ``FairnessDashboard``
+    - Need to announce deprecation of ``FairlearnDashboard``
     - Need to make sure Quickstart will actually work
       (short term fix: put note about running `pip install` against GitHub at the top)
-    - Not clear what ``ThresholdOptimizer`` doc fixes Roman had in mind
-      but they probably shouldn't block the release
+    - Roman is writing up a userguide for ``ThresholdOptimizer``
 
-  To clear up confusion over the ``FairnessDashboard``, it has been updated with a
+  To clear up confusion over the ``FairlearnDashboard``, it has been updated with a
   ``flask`` backend but we have rolled back the major UI change which had been put
-  in (after the ``v0.4.6`` release). We plan on deprecating the ``FairnessDashboard``
+  in (after the ``v0.4.6`` release). We plan on deprecating the ``FairlearnDashboard``
   within Fairlearn, since its code has been moved to an explicitly Microsoft-owned
   repository (which will be open sourced Real Soon Now), since there are
   Azure-imposed requirements on that code. The Fairlearn community will then be
@@ -50,6 +49,6 @@ Agenda:
     We had a lengthy discussion. There was a feeling that `MetricFrame` would be better than
     `GroupedMetric` for the whole class, but we did not agree on alternatives for
     `conditional_features=`. At Kevin's suggestion to focus on how users will first encounter
-    the code, RGE will rewrite the example code
+    the code, Richard will rewrite the example code
     introducing the new metric API to be focussed on the sociotechnical side, rather than
     just an API demonstration. We will also reach out to Solon Barocas.
