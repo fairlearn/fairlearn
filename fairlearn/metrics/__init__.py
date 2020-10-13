@@ -21,9 +21,6 @@ This extends to multiple grouping columns, calculating the metric
 for each combination of subgroups.
 """
 
-import sklearn.metrics as skm
-
-from ._derived_metrics import make_derived_metric  # noqa: F401
 from ._disparities import (  # noqa: F401
     demographic_parity_difference,
     demographic_parity_ratio,
@@ -44,33 +41,11 @@ from ._extra_metrics import (  # noqa: F401
     )
 
 
-# Derived metrics from SciKit-Learn
-_standard_spn = ['sample_weight']
-
-accuracy_score_group_min = make_derived_metric('group_min',
-                                               skm.accuracy_score,
-                                               sample_param_names=_standard_spn)
-accuracy_score_group_max = make_derived_metric('group_max',
-                                               skm.accuracy_score,
-                                               sample_param_names=_standard_spn)
-accuracy_score_difference = make_derived_metric('difference',
-                                                skm.accuracy_score,
-                                                sample_param_names=_standard_spn)
-accuracy_score_ratio = make_derived_metric('ratio',
-                                           skm.accuracy_score,
-                                           sample_param_names=_standard_spn)
-
-
-selection_rate_group_min = make_derived_metric('group_min',
-                                               selection_rate,
-                                               sample_param_names=_standard_spn)
-
 # ============================================
 # Build list of items to be listed in the docs
 
 _core = [
-    "MetricsFrame",
-    "make_derived_metric"
+    "MetricsFrame"
 ]
 
 _disparities = [

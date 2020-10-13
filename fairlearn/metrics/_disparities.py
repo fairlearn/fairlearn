@@ -4,7 +4,7 @@
 """Metrics for measuring disparity."""
 
 from ._extra_metrics import selection_rate, true_positive_rate, false_positive_rate
-from ._derived_metrics import make_derived_metric
+from ._metrics_frame import MetricsFrame
 
 
 def demographic_parity_difference(
@@ -39,13 +39,11 @@ def demographic_parity_difference(
     float
         The demographic parity difference
     """
-    sel_rate_diff = make_derived_metric('difference',
-                                        selection_rate,
-                                        sample_param_names=['sample_weight'])
-    result = sel_rate_diff(y_true, y_pred,
-                           sensitive_features=sensitive_features,
-                           sample_weight=sample_weight,
-                           method='minmax')
+    sel_rate = MetricsFrame(selection_rate,
+                            y_true, y_pred,
+                            sensitive_features=sensitive_features,
+                            sample_params={'sample_weight': sample_weight})
+    result = sel_rate.difference(method='minmax')['selection_rate']
     return result
 
 
@@ -81,13 +79,11 @@ def demographic_parity_ratio(
     float
         The demographic parity ratio
     """
-    sel_rate_diff = make_derived_metric('ratio',
-                                        selection_rate,
-                                        sample_param_names=['sample_weight'])
-    result = sel_rate_diff(y_true, y_pred,
-                           sensitive_features=sensitive_features,
-                           sample_weight=sample_weight,
-                           method='minmax')
+    sel_rate = MetricsFrame(selection_rate,
+                            y_true, y_pred,
+                            sensitive_features=sensitive_features,
+                            sample_params={'sample_weight': sample_weight})
+    result = sel_rate.ratio(method='minmax')['selection_rate']
     return result
 
 
@@ -126,20 +122,9 @@ def equalized_odds_difference(
     float
         The equalized odds difference
     """
-    spn = ['sample_weight']
-    tpr_diff = make_derived_metric('difference', true_positive_rate, sample_param_names=spn)
-    fpr_diff = make_derived_metric('difference', false_positive_rate, sample_param_names=spn)
+    eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    tpr_d = tpr_diff(y_true, y_pred,
-                     sensitive_features=sensitive_features,
-                     sample_weight=sample_weight,
-                     method='minmax')
-    fpr_d = fpr_diff(y_true, y_pred,
-                     sensitive_features=sensitive_features,
-                     sample_weight=sample_weight,
-                     method='minmax')
-
-    return max(tpr_d, fpr_d)
+    return max(eo.difference(method='minmax'))
 
 
 def equalized_odds_ratio(
@@ -177,17 +162,17 @@ def equalized_odds_ratio(
     float
         The equalized odds ratio
     """
-    spn = ['sample_weight']
-    tpr_ratio = make_derived_metric('ratio', true_positive_rate, sample_param_names=spn)
-    fpr_ratio = make_derived_metric('ratio', false_positive_rate, sample_param_names=spn)
+    eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    tpr_r = tpr_ratio(y_true, y_pred,
-                      sensitive_features=sensitive_features,
-                      sample_weight=sample_weight,
-                      method='minmax')
-    fpr_r = fpr_ratio(y_true, y_pred,
-                      sensitive_features=sensitive_features,
-                      sample_weight=sample_weight,
-                      method='minmax')
+    return min(eo.ratio(method='minmax'))
 
-    return min(tpr_r, fpr_r)
+
+def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricsFrame:
+    fns = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
+    sw_dict = {'sample_weight': sample_weight}
+    sp = {'tpr': sw_dict, 'fpr': sw_dict}
+    eo = MetricsFrame(fns,
+                      y_true, y_pred,
+                      sensitive_features=sensitive_features,
+                      sample_params=sp)
+    return eo
