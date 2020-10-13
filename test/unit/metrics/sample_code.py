@@ -66,9 +66,9 @@ sample_params = {'recall': {'sample_weight': wgts},
 
 
 result = metrics.MetricsFrame(fns, Y_test, Y_pred,
-                               sensitive_features=[A_test['Race'], A_test['Sex']],
-                               conditional_features=[X_test['Workclass']],
-                               sample_params=sample_params)
+                              sensitive_features=[A_test['Race'], A_test['Sex']],
+                              conditional_features=[X_test['Workclass']],
+                              sample_params=sample_params)
 
 print()
 print("Result")
@@ -80,8 +80,8 @@ print(result.by_group)
 
 
 result2 = metrics.MetricsFrame(fns, Y_test, Y_pred,
-                                sensitive_features=[A_test['Race'], A_test['Sex']],
-                                sample_params=sample_params)
+                               sensitive_features=[A_test['Race'], A_test['Sex']],
+                               sample_params=sample_params)
 
 print()
 print("Result 2")
@@ -108,7 +108,7 @@ print("fbeta_difference (Race, Sex):", fbeta_difference(Y_test, Y_pred,
                                                         sensitive_features=A_test))
 
 result3 = metrics.MetricsFrame(fbeta_05,
-                                Y_test, Y_pred,
-                                sensitive_features=A_test)
+                               Y_test, Y_pred,
+                               sensitive_features=A_test)
 print("\n\nresult3.by_group\n")
 print(result3.by_group)

@@ -51,9 +51,9 @@ def test_3m_2sf_2cf():
 
     # Create the target object
     target = metrics.MetricsFrame(metric_dict,
-                                   y_true, y_pred,
-                                   sensitive_features=[sf_1_arr, sf_2_arr],
-                                   conditional_features=[cf_1_arr, cf_2_arr])
+                                  y_true, y_pred,
+                                  sensitive_features=[sf_1_arr, sf_2_arr],
+                                  conditional_features=[cf_1_arr, cf_2_arr])
 
     # Check everything
     for name, f in metric_dict.items():

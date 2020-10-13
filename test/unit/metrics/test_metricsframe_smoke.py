@@ -18,9 +18,9 @@ from test.unit.input_convertors import conversions_for_1d
 def test_basic(transform_y_t, transform_y_p):
     g_f = pd.DataFrame(data=g_4, columns=['My feature'])
     target = metrics.MetricsFrame(skm.recall_score,
-                                   transform_y_t(y_t),
-                                   transform_y_p(y_p),
-                                   sensitive_features=g_f)
+                                  transform_y_t(y_t),
+                                  transform_y_p(y_p),
+                                  sensitive_features=g_f)
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.Series)
@@ -56,10 +56,10 @@ def test_basic(transform_y_t, transform_y_p):
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
 def test_1m_1sf_1cf(transform_y_t, transform_y_p):
     target = metrics.MetricsFrame(skm.recall_score,
-                                   transform_y_t(y_t),
-                                   transform_y_p(y_p),
-                                   sensitive_features=g_2,
-                                   conditional_features=g_3)
+                                  transform_y_t(y_t),
+                                  transform_y_p(y_p),
+                                  sensitive_features=g_2,
+                                  conditional_features=g_3)
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

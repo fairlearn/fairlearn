@@ -12,9 +12,9 @@ from .data_for_test import y_t, y_p, g_1, g_2
 
 def test_1m_1sf_0cf():
     target = metrics.MetricsFrame(skm.confusion_matrix,
-                                   y_t,
-                                   y_p,
-                                   sensitive_features=g_1)
+                                  y_t,
+                                  y_p,
+                                  sensitive_features=g_1)
 
     overall = skm.confusion_matrix(y_t, y_p)
     assert np.array_equal(target.overall['confusion_matrix'], overall)
@@ -28,10 +28,10 @@ def test_1m_1sf_0cf():
 
 def test_1m_1sf_1cf():
     target = metrics.MetricsFrame(skm.confusion_matrix,
-                                   y_t,
-                                   y_p,
-                                   sensitive_features=g_1,
-                                   conditional_features=g_2)
+                                  y_t,
+                                  y_p,
+                                  sensitive_features=g_1,
+                                  conditional_features=g_2)
 
     for cf in np.unique(g_2):
         mask_c = g_2 == cf
@@ -51,8 +51,8 @@ def test_mixed_metrics():
     metric_dict = {'cm': skm.confusion_matrix, 'prec': skm.precision_score}
 
     target = metrics.MetricsFrame(metric_dict,
-                                   y_t, y_p,
-                                   sensitive_features=g_1)
+                                  y_t, y_p,
+                                  sensitive_features=g_1)
 
     assert target.overall['prec'] == skm.precision_score(y_t, y_p)
     assert np.array_equal(target.overall['cm'], skm.confusion_matrix(y_t, y_p))
