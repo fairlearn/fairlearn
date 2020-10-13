@@ -4,6 +4,6 @@
 import fairlearn.metrics as metrics
 
 
-def _get_raw_GroupedMetric():
-    # Gets an uninitialised GroupedMetric for testing purposes
-    return metrics.GroupedMetric.__new__(metrics.GroupedMetric)
+def _get_raw_MetricsFrame():
+    # Gets an uninitialised MetricsFrame for testing purposes
+    return metrics.MetricsFrame.__new__(metrics.MetricsFrame)

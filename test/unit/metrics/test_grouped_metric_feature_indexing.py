@@ -4,7 +4,7 @@
 import numpy as np
 
 import fairlearn.metrics as metrics
-from .utils import _get_raw_GroupedMetric
+from .utils import _get_raw_MetricsFrame
 
 
 gf0 = metrics._group_feature.GroupFeature('SF', ['a', 'a', 'b', 'b', 'c', 'c'], 0, None)
@@ -13,7 +13,7 @@ gf1 = metrics._group_feature.GroupFeature('SF', ['x', 'y', 'x', 'y', 'x', 'y'], 
 
 class TestSingleFeatureIndexing:
     def test_mask_from_tuple_0(self):
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
 
         result = target._mask_from_tuple(('a',), [gf0])
         assert np.array_equal(result, [True, True, False, False, False, False])
@@ -25,7 +25,7 @@ class TestSingleFeatureIndexing:
 
 class TestTwoFeatureIndexing:
     def test_mask_from_tuple(self):
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
 
         result = target._mask_from_tuple(('a', 'x'), [gf0, gf1])
         assert np.array_equal(result, [True, False, False, False, False, False])

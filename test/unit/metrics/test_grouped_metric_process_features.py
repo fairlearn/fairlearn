@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 import fairlearn.metrics as metrics
-from .utils import _get_raw_GroupedMetric
+from .utils import _get_raw_MetricsFrame
 
 
 class TestSingleFeature():
@@ -23,7 +23,7 @@ class TestSingleFeature():
     def test_single_list(self):
         raw_feature, y_true = self._get_raw_data()
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features("SF", raw_feature, y_true)
         self._common_validations(result, "SF 0")
 
@@ -31,7 +31,7 @@ class TestSingleFeature():
         r_f, y_true = self._get_raw_data()
         raw_feature = pd.Series(data=r_f, name="Some Series")
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features("Ignored", raw_feature, y_true)
         self._common_validations(result, "Some Series")
 
@@ -39,7 +39,7 @@ class TestSingleFeature():
         r_f, y_true = self._get_raw_data()
         raw_feature = np.asarray(r_f)
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features("CF", raw_feature, y_true)
         self._common_validations(result, "CF 0")
 
@@ -47,7 +47,7 @@ class TestSingleFeature():
         r_f, y_true = self._get_raw_data()
         raw_feature = pd.DataFrame(data=r_f, columns=["My Feature"])
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features("Ignored", raw_feature, y_true)
         self._common_validations(result, "My Feature")
 
@@ -55,7 +55,7 @@ class TestSingleFeature():
         r_f, y_true = self._get_raw_data()
         raw_feature = pd.DataFrame(data=r_f)
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features("Unused", raw_feature, y_true)
         # If we don't specify names for the columns, then they are 'named' with integers
         self._common_validations(result, 0)
@@ -78,7 +78,7 @@ class TestTwoFeatures():
         a, b, y_true = self._get_raw_data()
         rf = [a, b]
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features('SF', rf, y_true)
         self._common_validations(result, ['SF 0', 'SF 1'])
 
@@ -87,7 +87,7 @@ class TestTwoFeatures():
         # Specify dtype to avoid unwanted string conversion
         rf = np.asarray([a, b], dtype=np.object)
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features('CF', rf, y_true)
         self._common_validations(result, ['CF 0', 'CF 1'])
 
@@ -97,7 +97,7 @@ class TestTwoFeatures():
 
         rf = pd.DataFrame(data=zip(a, b), columns=cols)
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features('Ignored', rf, y_true)
         self._common_validations(result, cols)
 
@@ -106,7 +106,7 @@ class TestTwoFeatures():
 
         rf = pd.DataFrame(data=zip(a, b))
 
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features('Unused', rf, y_true)
         self._common_validations(result, [0, 1])
 
@@ -114,6 +114,6 @@ class TestTwoFeatures():
         a, b, y_true = self._get_raw_data()
 
         rf = [pd.Series(data=a, name="Alpha"), pd.Series(data=b, name="Beta")]
-        target = _get_raw_GroupedMetric()
+        target = _get_raw_MetricsFrame()
         result = target._process_features('Unused', rf, y_true)
         self._common_validations(result, ['Alpha', 'Beta'])

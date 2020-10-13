@@ -26,7 +26,7 @@ def test_roc_auc():
     ras = functools.partial(skm.roc_auc_score,
                             multi_class='ovr',
                             labels=[0, 1, 2])
-    target = metrics.GroupedMetric(ras,
+    target = metrics.MetricsFrame(ras,
                                    y_true, y_pred,
                                    sensitive_features=s_f)
 

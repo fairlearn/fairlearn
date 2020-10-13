@@ -20,7 +20,7 @@ _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 
 
-class GroupedMetric:
+class MetricsFrame:
     """Read a placeholder comment."""
 
     def __init__(self, metric_functions,

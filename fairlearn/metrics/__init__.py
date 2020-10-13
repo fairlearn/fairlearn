@@ -29,7 +29,7 @@ from ._disparities import (  # noqa: F401
     demographic_parity_ratio,
     equalized_odds_difference,
     equalized_odds_ratio)
-from ._grouped_metric import GroupedMetric  # noqa: F401
+from ._grouped_metric import MetricsFrame  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
@@ -69,7 +69,7 @@ selection_rate_group_min = make_derived_metric('group_min',
 # Build list of items to be listed in the docs
 
 _core = [
-    "GroupedMetric",
+    "MetricsFrame",
     "make_derived_metric"
 ]
 

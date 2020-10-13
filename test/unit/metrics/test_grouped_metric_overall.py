@@ -7,7 +7,7 @@ import pytest
 import sklearn.metrics as skm
 
 from .data_for_test import y_t, y_p, s_w, g_1, g_2
-from .utils import _get_raw_GroupedMetric
+from .utils import _get_raw_MetricsFrame
 
 
 metric_functions = [skm.recall_score,
@@ -18,7 +18,7 @@ metric_functions = [skm.recall_score,
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_0cf(metric_fn):
-    target = _get_raw_GroupedMetric()
+    target = _get_raw_MetricsFrame()
     func_dict = target._process_functions(metric_fn, None)
     result = target._compute_overall(func_dict, y_t, y_p, None)
 
@@ -30,7 +30,7 @@ def test_1m_0cf(metric_fn):
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_0cf_wgt(metric_fn):
-    target = _get_raw_GroupedMetric()
+    target = _get_raw_MetricsFrame()
     func_dict = target._process_functions(metric_fn,
                                           {'sample_weight': s_w})
 
@@ -43,7 +43,7 @@ def test_1m_0cf_wgt(metric_fn):
 
 
 def test_2m_0cf():
-    target = _get_raw_GroupedMetric()
+    target = _get_raw_MetricsFrame()
     funcs = {'recall': skm.recall_score, 'prec': skm.precision_score}
     func_container_dict = target._process_functions(funcs, None)
     result = target._compute_overall(func_container_dict, y_t, y_p, None)
@@ -58,7 +58,7 @@ def test_2m_0cf():
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1cf(metric_fn):
-    target = _get_raw_GroupedMetric()
+    target = _get_raw_MetricsFrame()
     func_dict = target._process_functions(metric_fn, None)
     cf_list = target._process_features("CF", g_1, y_t)
 
@@ -76,7 +76,7 @@ def test_1m_1cf(metric_fn):
 
 
 def test_1m_1cf_wgt():
-    target = _get_raw_GroupedMetric()
+    target = _get_raw_MetricsFrame()
     func_dict = target._process_functions(skm.recall_score,
                                           {'sample_weight': s_w})
     cf_list = target._process_features("CondF", g_1, y_t)
@@ -97,7 +97,7 @@ def test_1m_1cf_wgt():
 
 
 def test_1m_2cf():
-    target = _get_raw_GroupedMetric()
+    target = _get_raw_MetricsFrame()
     func_dict = target._process_functions(skm.recall_score, None)
     cf_list = target._process_features("CF", [g_1, g_2], y_t)
 
@@ -123,7 +123,7 @@ def test_1m_2cf():
 
 
 def test_2m_2cf():
-    target = _get_raw_GroupedMetric()
+    target = _get_raw_MetricsFrame()
     func_dict = target._process_functions(
         {'recall': skm.recall_score, 'prec': skm.precision_score},
         None)

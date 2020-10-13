@@ -5,7 +5,7 @@ import functools
 import numpy as np
 from typing import Callable, List
 
-from ._grouped_metric import GroupedMetric
+from ._grouped_metric import MetricsFrame
 
 aggregate_options = [
     'difference',
@@ -40,7 +40,7 @@ class _DerivedMetric:
         dispatch_fn = functools.partial(self._metric_fn, **params)
         dispatch_fn.__name__ = metric_name
 
-        all_metrics = GroupedMetric(dispatch_fn,
+        all_metrics = MetricsFrame(dispatch_fn,
                                     y_true, y_pred,
                                     sensitive_features=sensitive_features,
                                     sample_params=sample_params)

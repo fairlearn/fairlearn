@@ -6,7 +6,7 @@
 import sklearn.metrics as skm
 
 from rai_core_flask import FlaskHelper
-from fairlearn.metrics import GroupedMetric
+from fairlearn.metrics import MetricsFrame
 from fairlearn.metrics._extra_metrics import (_balanced_root_mean_squared_error,
                                               _mean_overprediction,
                                               _mean_underprediction,
@@ -173,7 +173,7 @@ class FairlearnDashboard(object):
 
                 method = FairlearnDashboard._metric_methods \
                     .get(data["metricKey"]).get("function")
-                prediction = GroupedMetric(method,
+                prediction = MetricsFrame(method,
                                            data['true_y'],
                                            data['predicted_ys'][data["modelIndex"]],
                                            sensitive_features=data["binVector"])

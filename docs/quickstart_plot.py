@@ -3,7 +3,7 @@
 
 """Produce plot of selection rates for the quickstart guide."""
 from bokeh.plotting import figure, show
-from fairlearn.metrics import GroupedMetric, selection_rate
+from fairlearn.metrics import MetricsFrame, selection_rate
 from fairlearn.datasets import fetch_adult
 
 
@@ -12,7 +12,7 @@ X = data.data
 y_true = (data.target == '>50K') * 1
 sex = X['sex']
 
-selection_rates = GroupedMetric(selection_rate,
+selection_rates = MetricsFrame(selection_rate,
                                 y_true, y_true,
                                 sensitive_features=sex)
 

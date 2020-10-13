@@ -91,7 +91,7 @@ we can evaluate metrics to get a group summary as below:
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import GroupedMetric
+    >>> from fairlearn.metrics import MetricsFrame
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> 
@@ -99,7 +99,7 @@ we can evaluate metrics to get a group summary as below:
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> gm = GroupedMetric(accuracy_score, y_true, y_pred, sensitive_features=sex)
+    >>> gm = MetricsFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
     >>> print(gm.overall)
     accuracy_score    0.844355
     dtype: object
@@ -116,7 +116,7 @@ selection rate, i.e., the percentage of the population with label 1:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import selection_rate
-    >>> sr = GroupedMetric(selection_rate, y_true, y_pred, sensitive_features=sex)
+    >>> sr = MetricsFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
     >>> sr.overall
     selection_rate    0.163855
     dtype: object
@@ -173,7 +173,7 @@ a vastly reduced difference in selection rate:
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
-    >>> sr_mitigated = GroupedMetric(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
+    >>> sr_mitigated = MetricsFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
     >>> print(sr_mitigated.overall)
     selection_rate    0.166148
     dtype: object

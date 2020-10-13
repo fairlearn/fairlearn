@@ -13,7 +13,7 @@ from ._extra_metrics import (_balanced_root_mean_squared_error,
                              mean_prediction,
                              selection_rate,
                              true_negative_rate)
-from ._grouped_metric import GroupedMetric
+from ._grouped_metric import MetricsFrame
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _Y_TRUE = 'trueY'
@@ -160,7 +160,7 @@ def _create_group_metric_set(y_true,
         for prediction in result[_Y_PRED]:
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
-                gmr = GroupedMetric(metric_func,
+                gmr = MetricsFrame(metric_func,
                                     result[_Y_TRUE], prediction, sensitive_features=g[_BIN_VECTOR])
                 curr_dict = dict()
                 curr_dict[_GLOBAL] = gmr.overall[0]
