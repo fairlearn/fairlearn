@@ -9,6 +9,10 @@ logger = logging.getLogger(__name__)
 
 _DEFAULT_NAME = 'metric'
 
+_METRIC_FUNCTION_NONE = "Found 'None' instead of metric function"
+_METRIC_FUNCTION_NOT_CALLABLE = "Object passed as metric function not callable"
+_SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
+
 
 class FunctionContainer:
     """A helper class for metrics.
@@ -33,8 +37,10 @@ class FunctionContainer:
                  name: Optional[str],
                  sample_params: Optional[Dict[str, Any]]):
         """Read a placeholder comment."""
-        assert func is not None
-        assert callable(func)
+        if func is None:
+            raise ValueError(_METRIC_FUNCTION_NONE)
+        if not callable(func):
+            raise ValueError(_METRIC_FUNCTION_NOT_CALLABLE)
         self._func = func
 
         if name is None:
@@ -48,7 +54,8 @@ class FunctionContainer:
 
         self._sample_params = dict()
         if sample_params is not None:
-            assert isinstance(sample_params, dict)
+            if not isinstance(sample_params, dict):
+                raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
             for k, v in sample_params.items():
                 if v is not None:
                     # Coerce any sample_params to being ndarrays for easy masking
@@ -86,6 +93,7 @@ class FunctionContainer:
         The mask will be applied to ``y_true``, ``y_pred`` and
         the sample parameters.
         """
+        # Following are internal sanity checks
         assert isinstance(y_true, np.ndarray)
         assert isinstance(y_pred, np.ndarray)
         assert len(y_true) == len(y_pred)

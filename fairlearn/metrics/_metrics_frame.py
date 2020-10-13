@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, Optional, Union
 from sklearn.utils import check_consistent_length
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
-from ._function_container import FunctionContainer
+from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -19,6 +19,8 @@ _SUBGROUP_COUNT_WARNING_THRESHOLD = 20
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
+_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
+    "Keys in 'sample_params' do not match those in 'metric_functions'"
 
 
 class MetricsFrame:
@@ -238,8 +240,13 @@ class MetricsFrame:
         if isinstance(metric_functions, dict):
             s_p = dict()
             if sample_params is not None:
-                assert isinstance(sample_params, dict)
-                assert set(sample_params.keys()).issubset(set(metric_functions.keys()))
+                if not isinstance(sample_params, dict):
+                    raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
+
+                sp_keys = set(sample_params.keys())
+                mf_keys = set(metric_functions.keys())
+                if not sp_keys.issubset(mf_keys):
+                    raise ValueError(_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT)
                 s_p = sample_params
 
             for name, func in metric_functions.items():
@@ -297,6 +304,7 @@ class MetricsFrame:
         return result
 
     def _mask_from_tuple(self, index_tuple, feature_list):
+        # Following are internal sanity checks
         assert isinstance(index_tuple, tuple)
         assert len(index_tuple) == len(feature_list)
 
