@@ -17,7 +17,7 @@ def demographic_parity_difference(
 
     The demographic parity difference is defined as the difference
     between the largest and the smallest group-level selection rate,
-    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature.
+    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
     The demographic parity difference of 0 means that all groups have the same selection rate.
 
     Parameters
@@ -55,9 +55,9 @@ def demographic_parity_ratio(
         sample_weight=None) -> float:
     """Calculate the demographic parity ratio.
 
-    The demographic parity difference is defined as the difference
-    between the largest and the smallest group-level selection rate,
-    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature.
+    The demographic parity ratio is defined as the ratio
+    between the smallest and the largest group-level selection rate,
+    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
     The demographic parity ratio of 1 means that all groups have the same selection rate.
 
     Parameters
@@ -98,7 +98,7 @@ def equalized_odds_difference(
     The greater of two metrics: `true_positive_rate_difference` and
     `false_positive_rate_difference`. The former is the difference between the
     largest and smallest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
-    of the sensitive feature. The latter is defined similarly, but for
+    of the sensitive feature(s). The latter is defined similarly, but for
     :math:`P[h(X)=1 | A=a, Y=0]`.
     The equalized odds difference of 0 means that all groups have the same
     true positive, true negative, false positive, and false negative rates.
@@ -133,12 +133,12 @@ def equalized_odds_ratio(
         *,
         sensitive_features,
         sample_weight=None) -> float:
-    """Calculate the equalized odds difference.
+    """Calculate the equalized odds ratio.
 
-    The greater of two metrics: `true_positive_rate_difference` and
-    `false_positive_rate_difference`. The former is the difference between the
-    largest and smallest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
-    of the sensitive feature. The latter is defined similarly, but for
+    The smaller of two metrics: `true_positive_rate_ratio` and
+    `false_positive_rate_ratio`. The former is the ratio between the
+    smallest and largest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
+    of the sensitive feature(s). The latter is defined similarly, but for
     :math:`P[h(X)=1 | A=a, Y=0]`.
     The equalized odds ratio of 1 means that all groups have the same
     true positive, true negative, false positive, and false negative rates.

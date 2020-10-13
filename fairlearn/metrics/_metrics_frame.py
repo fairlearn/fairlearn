@@ -26,11 +26,26 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
 class MetricsFrame:
     """Contains a collection of group fairness metrics.
 
-    This class holds grouped metrics calculated for any number of underlying
+    This class holds group fairness metrics calculated for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
     to split the data into subgroups. The underlying metric(s) is(are) calculated
     across the entire dataset (made available by the ``overall`` property) and
     for each identified subgroup (made available by the ``by_group`` property).
+
+    The only limitations placed on the metric functions are that:
+
+    * The first two arguments they take must be ``y_true`` and ``y_pred`` arrays
+    * Any other arguments must be *sample* based, and will be split up along with
+      the ``y_true`` and ``y_pred`` arrays
+
+    The interpretation of the ``y_true`` and ``y_pred`` arrays is up to the
+    underlying metric - it is perfectly possible to pass in lists of class
+    probability tuples. The return value of the metric is also very flexible;
+    there is no problem around returning confusion matrices.
+
+    Once calculated, scalar group fairness metrics can be aggregated over
+    sensitive (but not TODO conditional) features, by taking differences or ratios,
+    and then reporting the maximum or minimum respectively.
 
     Parameters
     ----------
@@ -142,7 +157,7 @@ class MetricsFrame:
                     result[func_name][row_curr] = curr_metric
         return result
 
-    @ property
+    @property
     def overall(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
@@ -156,13 +171,40 @@ class MetricsFrame:
         """
         return self._overall
 
-    @ property
+    @property
     def by_group(self) -> pd.DataFrame:
-        """Read a placeholder comment."""
+        """Return the collection of metrics evaluated for each subgroup.
+
+        This :class:`pandas.DataFrame` contains the result of evaluating
+        each underlying metric for each combination of classes in the
+        sensitive and TODO conditional features. The columns identify
+        the underlying metric, while the rows are indexed by the unqiue
+        combinations of classes found in the sensitive and TODO conditional
+        features. If TODO conditional features are present, they are at
+        in the 'outer' layer of the row indexing.
+
+        If a particular combination of classes was not present in the dataset
+        (likely to occur as more sensitive and TODO conditional features
+        are specified), then The corresponding entry in the DataFrame will
+        be NaN.
+        """
         return self._by_group
 
     def group_max(self) -> Union[pd.Series, pd.DataFrame]:
-        """Read a placeholder comment."""
+        """Return the maximum value of the metric over the sensitive features.
+
+        This method computes the maximum value over all combinations of
+        sensitive features for each underlying metric function in the ``by_groups``
+        property (it will only succeed if all the underlying metric
+        functions return scalar values). If there are no TODO conditional
+        features, then the result will be a :class:`pandas.Series`,
+        with rows corresponding to the underying metrics.
+
+        If there are TODO conditional features, then the result is a
+        :class:`pandas.DataFrame` with columns corresponding to the
+        underlying metrics, and rows indexed by the classes identified
+        by the TODO conditional features.
+        """
         if self._cf_names is None:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
@@ -187,7 +229,28 @@ class MetricsFrame:
 
     def difference(self,
                    method: str) -> Union[pd.Series, pd.DataFrame]:
-        """Read a placeholder comment."""
+        """Return the maximum absolute difference between groups for each metric.
+
+        This method calculates a scalar value for each underlying metric by
+        finding the maximum absolute difference between the entries in each
+        column of the ``by_groups`` DataFrame.
+
+        Similar to other methods, the result will be a :class:`pandas.Series`
+        if there are no TODO conditional features, with rows corresponding
+        to each underlying metric. If there are TODO condtiional features,
+        then the result will be a :class:`pandas.DataFrame` with a column
+        for each underlying metric, and rows corresponding to the subgroups
+        identified by the TODO conditional feature(s).
+
+        There are two allowed values for the ``method=`` parameter. The
+        value ``between_pairs`` computes the maximum difference between any
+        two pairs of groups in the ``by_groups`` DataFrame (i.e.
+        ``group_max() - group_min()``). Althernatively, ``to_overall``
+        computes the difference between each subgroup and the
+        corresponding value from ``overall`` (if there are TODO
+        conditional features, then ``overall`` is multivalued for each metric).
+        The result is the absolute maximum of these values.
+        """
         subtrahend = np.nan
         if method == 'between_pairs':
             subtrahend = self.group_min()
