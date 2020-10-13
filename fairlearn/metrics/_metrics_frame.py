@@ -32,7 +32,6 @@ class MetricsFrame:
 
     Parameters
     ----------
-
     metric_functions :
         The underlying metric functions which are to be calculated. This
         can either be a single metric function or a dictionary of functions.
@@ -48,11 +47,18 @@ class MetricsFrame:
     y_pred : array_like
         The predicted values
 
-    sensitive_features :
+    sensitive_features : It's complicated
         The sensitive features which should be used to create the subgroups.
         At least one sensitive feature must be provided. Allowed types are
         pandas Series, DataFrames, lists of Series, numpy arrays, lists of
-        numpy arrays and lists of lists (of scalars)
+        numpy arrays and lists of lists (of scalars). If the supplied type
+        has associated names (Series or DataFrames) then the corresponding
+        sensitive feature will take its name from that. Otherwise, a name
+        of the format ``SF [n]`` will be generated, with ``n`` indicating
+        the index of the feature.
+
+    conditional_features : It's complicated
+        TODO Similar to sensitive_features, but....
 
     sample_params :
         Parameters for the metric function(s). If there is only one metric function,
@@ -136,7 +142,16 @@ class MetricsFrame:
 
     @ property
     def overall(self) -> Union[pd.Series, pd.DataFrame]:
-        """Read a placeholder commentRetur."""
+        """Return the underlying metrics evaluated on the whole dataset.
+
+        If TODO no ``conditional_features`` were specified, then this is
+        a :class:`pandas.Series` with one row for each underlying metric.
+
+        If TODO ``conditional_features`` were specified, then this is a
+        :class:`pandas.DataFrame`, with columns corresponding to the
+        underling metric(s) and the rows indexed by the combinations of
+        the TODO conditional features.
+        """
         return self._overall
 
     @ property
