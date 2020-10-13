@@ -5,7 +5,7 @@ import functools
 import numpy as np
 from typing import Callable, List
 
-from ._grouped_metric import MetricsFrame
+from ._metrics_frame import MetricsFrame
 
 aggregate_options = [
     'difference',
@@ -41,9 +41,9 @@ class _DerivedMetric:
         dispatch_fn.__name__ = metric_name
 
         all_metrics = MetricsFrame(dispatch_fn,
-                                    y_true, y_pred,
-                                    sensitive_features=sensitive_features,
-                                    sample_params=sample_params)
+                                   y_true, y_pred,
+                                   sensitive_features=sensitive_features,
+                                   sample_params=sample_params)
 
         result = np.nan
         if self._aggregate == 'difference':

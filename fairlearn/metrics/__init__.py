@@ -29,7 +29,7 @@ from ._disparities import (  # noqa: F401
     demographic_parity_ratio,
     equalized_odds_difference,
     equalized_odds_ratio)
-from ._grouped_metric import MetricsFrame  # noqa: F401
+from ._metrics_frame import MetricsFrame  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
