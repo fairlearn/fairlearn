@@ -5,6 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
+from typing import Any, Callable, Dict, Optional, Union
 from sklearn.utils import check_consistent_length
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
@@ -21,13 +22,54 @@ _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 
 
 class MetricsFrame:
-    """Read a placeholder comment."""
+    """Contains a collection of group fairness metrics.
 
-    def __init__(self, metric_functions,
-                 y_true, y_pred, *,
+    This class holds grouped metrics calculated for any number of underlying
+    metrics. At least one sensitive feature must be supplied, which is used
+    to split the data into subgroups. The underlying metric(s) is(are) calculated
+    across the entire dataset (made available by the ``overall`` property) and
+    for each identified subgroup (made available by the ``by_group`` property).
+
+    Parameters
+    ----------
+
+    metric_functions :
+        The underlying metric functions which are to be calculated. This
+        can either be a single metric function or a dictionary of functions.
+        These functions must be callable as
+        ``fn(y_true, y_pred, **sample_params)``.
+        If there are any other arguments required (such as ``beta`` for
+        :func:`sklearn.metrics.fbeta_score`) then
+        :func:`functools.partial` must be used.
+
+    y_true : array_like
+        The true values
+
+    y_pred : array_like
+        The predicted values
+
+    sensitive_features :
+        The sensitive features which should be used to create the subgroups.
+        At least one sensitive feature must be provided. Allowed types are
+        pandas Series, DataFrames, lists of Series, numpy arrays, lists of
+        numpy arrays and lists of lists (of scalars)
+
+    sample_params :
+        Parameters for the metric function(s). If there is only one metric function,
+        then this is a dictionary of strings and array_likes, which are split
+        alongside the ``y_true`` and ``y_pred`` arrays, and passed to the metric function.
+        If there are multiple metric functions (passed as a dictioary), then this is
+        a nested dictionary, with the first set of string keys identifying the
+        metric function name, with the values being the string-to-array_like dictionaries.
+    """
+
+    def __init__(self,
+                 metric_functions: Union[Callable, Dict[str, Callable]],
+                 y_true,
+                 y_pred, *,
                  sensitive_features,
-                 conditional_features=None,
-                 sample_params=None):
+                 conditional_features: Optional = None,
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
         y_t = _convert_to_ndarray_and_squeeze(y_true)
@@ -92,17 +134,17 @@ class MetricsFrame:
                     result[func_name][row_curr] = curr_metric
         return result
 
-    @property
-    def overall(self):
-        """Read a placeholder comment."""
+    @ property
+    def overall(self) -> Union[pd.Series, pd.DataFrame]:
+        """Read a placeholder commentRetur."""
         return self._overall
 
-    @property
-    def by_group(self):
+    @ property
+    def by_group(self) -> pd.DataFrame:
         """Read a placeholder comment."""
         return self._by_group
 
-    def group_max(self):
+    def group_max(self) -> Union[pd.Series, pd.DataFrame]:
         """Read a placeholder comment."""
         if self._cf_names is None:
             result = pd.Series(index=self.by_group.columns, dtype='object')
@@ -114,7 +156,7 @@ class MetricsFrame:
             result = self.by_group.groupby(level=lvls).max()
         return result
 
-    def group_min(self):
+    def group_min(self) -> Union[pd.Series, pd.DataFrame]:
         """Read a placeholder comment."""
         if self._cf_names is None:
             result = pd.Series(index=self.by_group.columns, dtype='object')
@@ -126,10 +168,11 @@ class MetricsFrame:
             result = self.by_group.groupby(level=lvls).min()
         return result
 
-    def difference(self, method):
+    def difference(self,
+                   method: str) -> Union[pd.Series, pd.DataFrame]:
         """Read a placeholder comment."""
         subtrahend = np.nan
-        if method == 'minmax':
+        if method == 'between_pairs':
             subtrahend = self.group_min()
         elif method == 'to_overall':
             subtrahend = self.overall
@@ -148,10 +191,11 @@ class MetricsFrame:
 
         return result
 
-    def ratio(self, method):
+    def ratio(self,
+              method: str) -> Union[pd.Series, pd.DataFrame]:
         """Read a placeholder comment."""
         result = None
-        if method == 'minmax':
+        if method == 'between_pairs':
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             ratios = self.by_group / self.overall

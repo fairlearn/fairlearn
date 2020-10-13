@@ -43,7 +43,7 @@ def demographic_parity_difference(
                             y_true, y_pred,
                             sensitive_features=sensitive_features,
                             sample_params={'sample_weight': sample_weight})
-    result = sel_rate.difference(method='minmax')['selection_rate']
+    result = sel_rate.difference(method='between_pairs')['selection_rate']
     return result
 
 
@@ -83,7 +83,7 @@ def demographic_parity_ratio(
                             y_true, y_pred,
                             sensitive_features=sensitive_features,
                             sample_params={'sample_weight': sample_weight})
-    result = sel_rate.ratio(method='minmax')['selection_rate']
+    result = sel_rate.ratio(method='between_pairs')['selection_rate']
     return result
 
 
@@ -124,7 +124,7 @@ def equalized_odds_difference(
     """
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return max(eo.difference(method='minmax'))
+    return max(eo.difference(method='between_pairs'))
 
 
 def equalized_odds_ratio(
@@ -164,7 +164,7 @@ def equalized_odds_ratio(
     """
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return min(eo.ratio(method='minmax'))
+    return min(eo.ratio(method='between_pairs'))
 
 
 def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricsFrame:
