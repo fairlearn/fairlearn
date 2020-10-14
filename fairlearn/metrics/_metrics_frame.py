@@ -5,7 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 from sklearn.utils import check_consistent_length
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
@@ -216,7 +216,7 @@ class MetricsFrame:
         return result
 
     def group_min(self) -> Union[pd.Series, pd.DataFrame]:
-        """Read a placeholder comment."""
+        """Return the maximum value of the metric over the sensitive features."""
         if self._cf_names is None:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
@@ -273,7 +273,7 @@ class MetricsFrame:
 
     def ratio(self,
               method: str) -> Union[pd.Series, pd.DataFrame]:
-        """Read a placeholder comment."""
+        """Return the minimum ratio between groups for each metric."""
         result = None
         if method == 'between_pairs':
             result = self.group_min() / self.group_max()
@@ -298,7 +298,8 @@ class MetricsFrame:
 
         return result
 
-    def _process_functions(self, metric_functions, sample_params):
+    def _process_functions(self, metric_functions, sample_params) -> Dict[str, FunctionContainer]:
+        """Get the underlying metrics into :class:`fairlearn.metrics.FunctionContainer` objects."""
         func_dict = dict()
         if isinstance(metric_functions, dict):
             s_p = dict()
@@ -323,7 +324,8 @@ class MetricsFrame:
             func_dict[fc.name_] = fc
         return func_dict
 
-    def _process_features(self, base_name, features, sample_array):
+    def _process_features(self, base_name, features, sample_array) -> List[GroupFeature]:
+        """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
         result = []
 
         if isinstance(features, pd.Series):
@@ -337,7 +339,7 @@ class MetricsFrame:
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.squeeze(np.asarray(features))
-                assert len(f_arr.shape) == 1
+                assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
             else:
@@ -347,7 +349,7 @@ class MetricsFrame:
                         result.append(GroupFeature(base_name, features[i], i, None))
                     else:
                         f_arr = np.squeeze(np.asarray(features[i]))
-                        assert len(f_arr.shape) == 1
+                        assert len(f_arr.shape) == 1  # Sanity check
                         check_consistent_length(f_arr, sample_array)
                         result.append(GroupFeature(base_name, f_arr, i, None))
         else:
@@ -366,7 +368,13 @@ class MetricsFrame:
 
         return result
 
-    def _mask_from_tuple(self, index_tuple, feature_list):
+    def _mask_from_tuple(self, index_tuple, feature_list) -> np.ndarray:
+        """Generate a mask for the ``y_true``, ``y_pred`` and ``sample_params`` arrays.
+
+        Given a tuple of feature values (which indexes the ``by_groups``
+        DataFrame), generate a mask to select the corresponding samples
+        from the input
+        """
         # Following are internal sanity checks
         assert isinstance(index_tuple, tuple)
         assert len(index_tuple) == len(feature_list)
