@@ -163,7 +163,7 @@ dictionaries, with the first key corresponding matching that in the dictionary h
 the desired underlying metric functions.
 
 We do not support non-sample parameters at the current time. If these are required, then
-use :func:``functools.partial`` to prebind the required arguments to the metric
+use :func:`functools.partial` to prebind the required arguments to the metric
 function:
 
 .. doctest:: assessment_metrics
