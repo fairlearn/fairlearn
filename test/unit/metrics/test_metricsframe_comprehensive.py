@@ -93,9 +93,9 @@ def test_3m_2sf_2cf():
                 assert target.group_min()[name][(cf_1, cf_2)] == min_val
                 assert target.group_max()[name][(cf_1, cf_2)] == max_val
 
-                assert target.difference(method='between_pairs')[name][(cf_1, cf_2)] == \
+                assert target.difference(method='between_groups')[name][(cf_1, cf_2)] == \
                     max_val-min_val
-                assert target.ratio(method='between_pairs')[name][(cf_1, cf_2)] == \
+                assert target.ratio(method='between_groups')[name][(cf_1, cf_2)] == \
                     min_val/max_val
 
                 diffs = [abs(x-overall) for x in metric_vals]

@@ -18,7 +18,7 @@ def test_demographic_parity_difference():
 
     gm = MetricsFrame(selection_rate, y_t, y_p, sensitive_features=g_1)
 
-    assert actual == gm.difference(method='between_pairs')['selection_rate']
+    assert actual == gm.difference(method='between_groups')['selection_rate']
 
 
 def test_demographic_parity_difference_weighted():
@@ -30,7 +30,7 @@ def test_demographic_parity_difference_weighted():
                       sensitive_features=g_1,
                       sample_params={'sample_weight': s_w})
 
-    assert actual == gm.difference(method='between_pairs')['selection_rate']
+    assert actual == gm.difference(method='between_groups')['selection_rate']
 
 
 def test_demographic_parity_ratio():
@@ -38,7 +38,7 @@ def test_demographic_parity_ratio():
 
     gm = MetricsFrame(selection_rate, y_t, y_p, sensitive_features=g_1)
 
-    assert actual == gm.ratio(method='between_pairs')['selection_rate']
+    assert actual == gm.ratio(method='between_groups')['selection_rate']
 
 
 def test_demographic_parity_ratio_weighted():
@@ -50,7 +50,7 @@ def test_demographic_parity_ratio_weighted():
                       sensitive_features=g_1,
                       sample_params={'sample_weight': s_w})
 
-    assert actual == gm.ratio(method='between_pairs')['selection_rate']
+    assert actual == gm.ratio(method='between_groups')['selection_rate']
 
 
 def test_equalized_odds_difference():
@@ -59,7 +59,7 @@ def test_equalized_odds_difference():
     metrics = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
     gm = MetricsFrame(metrics, y_t, y_p, sensitive_features=g_1)
 
-    diffs = gm.difference(method='between_pairs')
+    diffs = gm.difference(method='between_groups')
     assert actual == diffs.max()
 
 
@@ -71,7 +71,7 @@ def test_equalized_odds_difference_weighted():
     sp = {'tpr': sw, 'fpr': sw}
     gm = MetricsFrame(metrics, y_t, y_p, sensitive_features=g_1, sample_params=sp)
 
-    diffs = gm.difference(method='between_pairs')
+    diffs = gm.difference(method='between_groups')
     assert actual == diffs.max()
 
 
@@ -81,7 +81,7 @@ def test_equalized_odds_ratio():
     metrics = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
     gm = MetricsFrame(metrics, y_t, y_p, sensitive_features=g_1)
 
-    ratios = gm.ratio(method='between_pairs')
+    ratios = gm.ratio(method='between_groups')
     assert actual == ratios.min()
 
 
@@ -93,5 +93,5 @@ def test_equalized_odds_ratio_weighted():
     sp = {'tpr': sw, 'fpr': sw}
     gm = MetricsFrame(metrics, y_t, y_p, sensitive_features=g_1, sample_params=sp)
 
-    ratios = gm.ratio(method='between_pairs')
+    ratios = gm.ratio(method='between_groups')
     assert actual == ratios.min()

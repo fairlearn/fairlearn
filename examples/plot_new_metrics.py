@@ -319,8 +319,8 @@ grouped_on_race.group_min()
 # As noted above, the selection rates varies greatly by race and by sex.
 # This can be quantified in terms of a difference between the subgroup with
 # the highest value of the metric, and the subgroup with the lowest value.
-# For this, we provide the method ``difference(method='between_pairs)``:
-grouped_on_race.difference(method='between_pairs')
+# For this, we provide the method ``difference(method='between_groups)``:
+grouped_on_race.difference(method='between_groups')
 
 # %%
 # We can also evaluate the difference relative to the corresponding overall
@@ -332,7 +332,7 @@ grouped_on_race.difference(method='to_overall')
 # There are situations where knowing the ratios of the metrics evaluated on
 # the subgroups is more useful. For this we have the ``ratio()`` method.
 # We can take the ratios between the minimum and maximum values of each metric:
-grouped_on_race.ratio(method='between_pairs')
+grouped_on_race.ratio(method='between_groups')
 
 # %%
 # We can also compute the ratios relative to the overall value for each
@@ -378,7 +378,7 @@ grouped_on_race_and_sex.group_min()
 # Looking at the ``ratio()`` method, we see that the disparity is worse
 # (specifically between white males and black females, if we check in
 # the ``by_group`` table):
-grouped_on_race_and_sex.ratio(method='between_pairs')
+grouped_on_race_and_sex.ratio(method='between_groups')
 
 # %%
 # Conditional Cases
@@ -417,7 +417,7 @@ cond_credit_score.group_min()
 
 # %%
 # And:
-cond_credit_score.ratio(method='between_pairs')
+cond_credit_score.ratio(method='between_groups')
 
 # %%
 # In our data, we see that we have a dearth of positive results

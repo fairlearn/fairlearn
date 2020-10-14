@@ -243,7 +243,7 @@ class MetricsFrame:
         identified by the TODO conditional feature(s).
 
         There are two allowed values for the ``method=`` parameter. The
-        value ``between_pairs`` computes the maximum difference between any
+        value ``between_groups`` computes the maximum difference between any
         two pairs of groups in the ``by_groups`` DataFrame (i.e.
         ``group_max() - group_min()``). Althernatively, ``to_overall``
         computes the difference between each subgroup and the
@@ -252,7 +252,7 @@ class MetricsFrame:
         The result is the absolute maximum of these values.
         """
         subtrahend = np.nan
-        if method == 'between_pairs':
+        if method == 'between_groups':
             subtrahend = self.group_min()
         elif method == 'to_overall':
             subtrahend = self.overall
@@ -275,7 +275,7 @@ class MetricsFrame:
               method: str) -> Union[pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric."""
         result = None
-        if method == 'between_pairs':
+        if method == 'between_groups':
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             ratios = self.by_group / self.overall

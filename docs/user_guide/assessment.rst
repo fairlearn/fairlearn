@@ -109,9 +109,9 @@ across groups and also the difference and ratio between the maximum and minimum:
     min recall over groups =  0.0
     >>> print("max recall over groups = ", grouped_metric.group_max()['recall_score'])
     max recall over groups =  0.75
-    >>> print("difference in recall = ", grouped_metric.difference(method='between_pairs')['recall_score'])
+    >>> print("difference in recall = ", grouped_metric.difference(method='between_groups')['recall_score'])
     difference in recall =  0.75
-    >>> print("ratio in recall = ", grouped_metric.ratio(method='between_pairs')['recall_score'])    
+    >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups')['recall_score'])    
     ratio in recall =  0.0
 
 A single instance of :class:`fairlearn.metrics.MetricsFrame` can evaluate multiple
