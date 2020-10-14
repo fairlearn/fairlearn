@@ -18,6 +18,21 @@ def selection_rate(y_true,
     """Calculate the fraction of predicted labels matching the 'good' outcome.
 
     The argument `pos_label` specifies the 'good' outcome.
+
+    
+    Parameters
+    ----------
+    y_true : array_like
+        The true labels (ignored)
+
+    y_pred : array_like
+        The predicted labels
+
+    pos_label : Scalar
+        The label to treat as the 'good' outcome
+
+    sample_weight : array_like
+        Optional array of sample weights
     """
     if len(y_pred) == 0:
         raise ValueError(_EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE)

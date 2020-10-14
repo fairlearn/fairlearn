@@ -18,7 +18,7 @@ def mean_prediction(y_true, y_pred, sample_weight=None) -> float:
         The true labels (ignored)
 
     y_pred : array_like
-        The predicted labels. Must be :math:`\in {0, 1}`.
+        The predicted labels
 
     sample_weight : array_like
         Optional array of sample weights
