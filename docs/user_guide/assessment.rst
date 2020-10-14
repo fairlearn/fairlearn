@@ -144,9 +144,9 @@ in a dictionary via the ``sample_params`` argument.:
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricsFrame(skm.recall_score,
-    ...                          Y_true, Y_pred,
-    ...                          sensitive_features=group_membership_data,
-    ...                          sample_params=s_p)
+    ...                         Y_true, Y_pred,
+    ...                         sensitive_features=group_membership_data,
+    ...                         sample_params=s_p)
     >>> weighted.overall
     recall_score    0.45
     dtype: object
