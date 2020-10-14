@@ -32,15 +32,15 @@ class FairlearnDashboard(object):
 
     :param sensitive_features: A matrix of feature vector examples (# examples x # features),
         these can be from the initial dataset, or reserved from training.
-    :type sensitive_features: numpy.array or list[][] or pandas.DataFrame or pandas.Series
+    :type sensitive_features: numpy.ndarray or list[][] or pandas.DataFrame or pandas.Series
     :param y_true: The true labels or values for the provided dataset.
-    :type y_true: numpy.array or list[]
+    :type y_true: numpy.ndarray or list[]
     :param y_pred: Array of output predictions from models to be evaluated. Can be a single
         array of predictions, or a 2D list over multiple models. Can be a dictionary
         of named model predictions.
-    :type y_pred: numpy.array or list[][] or list[] or dict {string: list[]}
+    :type y_pred: numpy.ndarray or list[][] or list[] or dict {string: list[]}
     :param sensitive_feature_names: Feature names
-    :type sensitive_feature_names: numpy.array or list[]
+    :type sensitive_feature_names: numpy.ndarray or list[]
     """
 
     env = Environment(loader=PackageLoader(__name__, 'templates'))
