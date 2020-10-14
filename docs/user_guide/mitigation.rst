@@ -248,17 +248,27 @@ the predicted labels.
     instantiates inequalities from :ref:`constraints_binary_classification`.
 
 .. doctest:: mitigation
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import DemographicParity
-    >>> from fairlearn.metrics import selection_rate_group_summary
+    >>> from fairlearn.metrics import MetricsFrame, selection_rate
     >>> import numpy as np
     >>> dp = DemographicParity(difference_bound=0.01)
     >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
-    {'overall': 0.4, 'by_group': {'a': 0.6, 'b': 0.2}}
+    >>> selection_rate_summary = MetricsFrame(selection_rate,
+    ...                                       y_true, y_pred,
+    ...                                       sensitive_features=sensitive_features)
+    >>> selection_rate_summary.overall
+        selection_rate    0.4
+    dtype: object
+    >>> selection_rate_summary.by_group
+         selection_rate
+    SF 0
+    a               0.6
+    b               0.2
     >>> dp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> dp.gamma(lambda X: y_pred)
     sign  event  group_id
@@ -326,17 +336,27 @@ by considering both events :math:`Y=0` and :math:`Y=1`.
 In practice this can be used in a difference-based relaxation as follows:
 
 .. doctest:: mitigation
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import TruePositiveRateParity
-    >>> from fairlearn.metrics import true_positive_rate_group_summary
+    >>> from fairlearn.metrics import true_positive_rate
     >>> import numpy as np
     >>> tprp = TruePositiveRateParity(difference_bound=0.01)
     >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> true_positive_rate_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
-    {'overall': 0.571..., 'by_group': {'a': 0.75, 'b': 0.333...}}
+    >>> tpr_summary = MetricsFrame(true_positive_rate,
+    ...                            y_true, y_pred,
+    ...                            sensitive_features=sensitive_features)
+    >>> tpr_summary.overall
+    true_positive_rate    0.571429
+    dtype: object
+    >>> tpr_summary.by_group
+         true_positive_rate
+    SF 0
+    a                  0.75
+    b              0.333333
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
@@ -420,11 +440,21 @@ the error rate of any given group should not deviate from
 the overall error rate by more than the value of :code:`difference_bound`.
 
 .. doctest:: mitigation
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import ErrorRateParity
-    >>> from fairlearn.metrics import accuracy_score_group_summary
-    >>> accuracy_score_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
-    {'overall': 0.6, 'by_group': {'a': 0.8, 'b': 0.4}}
+    >>> from sklearn.metrics import accuracy_score
+    >>> accuracy_summary = MetricsFrame(accuracy_score,
+    ...                                 y_true, y_pred,
+    ...                                 sensitive_features=sensitive_features)
+    >>> accuracy_summary.overall
+    accuracy_score    0.6
+    dtype: object
+    >>> accuracy_summary.by_group
+         accuracy_score
+    SF 0
+    a               0.8
+    b               0.4
     >>> erp = ErrorRateParity(difference_bound=0.01)
     >>> erp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> erp.gamma(lambda X: y_pred)
@@ -527,16 +557,26 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
 :code:`"b"`'s average loss is :math:`0.5`.
 
 .. doctest:: mitigation
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import BoundedGroupLoss, ZeroOneLoss
-    >>> from fairlearn.metrics import mean_absolute_error_group_summary
+    >>> from sklearn.metrics import mean_absolute_error
     >>> bgl = BoundedGroupLoss(ZeroOneLoss(), upper_bound=0.1)
     >>> X                  = np.array([[0], [1], [2], [3]])
     >>> y_true             = np.array([0.3, 0.5, 0.1, 1.0])
     >>> y_pred             = np.array([0.3, 0.6, 0.6, 0.5])
     >>> sensitive_features = np.array(["a", "a", "b", "b"])
-    >>> mean_absolute_error_group_summary(y_true, y_pred, sensitive_features=sensitive_features)
-    {'overall': 0.275, 'by_group': {'a': 0.0499..., 'b': 0.5}}
+    >>> mae_summary = MetricsFrame(mean_absolute_error,
+    ...                            y_true, y_pred,
+    ...                            sensitive_features=sensitive_features)
+    >>> mae_summary.overall
+    mean_absolute_error    0.275
+    dtype: object
+    >>> mae_summary.by_group
+         mean_absolute_error
+    SF 0
+    a                   0.05
+    b                    0.5
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
     group_id
