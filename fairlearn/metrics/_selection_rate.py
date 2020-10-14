@@ -19,7 +19,7 @@ def selection_rate(y_true,
 
     The argument `pos_label` specifies the 'good' outcome.
 
-    
+
     Parameters
     ----------
     y_true : array_like
