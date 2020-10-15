@@ -1,7 +1,6 @@
 # Changes
 
 ### v0.5.0
-
 * Adjust classes to abide by naming conventions for attributes.
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
   `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.
@@ -46,7 +45,6 @@
   how `sample_weight` is supplied to `estimator.fit`.
 
 ### v0.4.6
-
 * Handle case where reductions relabeling results in a single class
 * Refactor metrics:
   * Remove `GroupMetricResult` type in favor of a `Bunch`.
@@ -80,7 +78,6 @@
   pending a better solution for Issue 339.
 
 ### v0.4.5
-
 * Changes to `ThresholdOptimizer`:
   * Separate plotting for `ThresholdOptimizer` into its own plotting function.
   * `ThresholdOptimizer` now performs validations during `fit`, and not during
@@ -103,7 +100,6 @@
   provided as a `pandas.DataFrame`.
 
 ### v0.4.4
-
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
 * Add basic support for multiple sensitive features
 * Refactor `ThresholdOptimizer` to use mixins from scikit-learn
@@ -159,4 +155,4 @@
 
 ### v0.1, 2018-05-14
 
-* initial release
+* initial released
