@@ -44,7 +44,7 @@ class MetricFrame:
     there is no problem around returning confusion matrices.
 
     Once calculated, scalar group fairness metrics can be aggregated over
-    sensitive (but not control) features, by taking differences or ratios,
+    sensitive features, by taking differences or ratios,
     and then reporting the maximum or minimum respectively.
 
     This class also supports the concept of 'control features.' Like the sensitive
@@ -89,7 +89,7 @@ class MetricFrame:
         Parameters for the metric function(s). If there is only one metric function,
         then this is a dictionary of strings and array_likes, which are split
         alongside the ``y_true`` and ``y_pred`` arrays, and passed to the metric function.
-        If there are multiple metric functions (passed as a dictioary), then this is
+        If there are multiple metric functions (passed as a dictionary), then this is
         a nested dictionary, with the first set of string keys identifying the
         metric function name, with the values being the string-to-array_like dictionaries.
     """
@@ -188,8 +188,8 @@ class MetricFrame:
         sensitive and control features. The columns identify
         the underlying metric, while the rows are indexed by the unqiue
         combinations of classes found in the sensitive and control
-        features. If control features are present, they are at
-        in the 'outer' layer of the row indexing.
+        features. If control features are present, they are in the
+        'outer' layer of the row indexing.
 
         If a particular combination of classes was not present in the dataset
         (likely to occur as more sensitive and control features

@@ -17,6 +17,8 @@ for each sample.
 For example, a user could provide a 'Gender' column, and the
 grouped metric would contain separate results for the subgroups
 'male', 'female' and 'nonbinary' indicated by that column.
+The underlying metric function is evaluated for each of these three
+subgroups.
 This extends to multiple grouping columns, calculating the metric
 for each combination of subgroups.
 """
