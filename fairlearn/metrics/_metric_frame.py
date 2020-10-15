@@ -44,12 +44,18 @@ class MetricFrame:
     there is no problem around returning confusion matrices.
 
     Once calculated, scalar group fairness metrics can be aggregated over
-    sensitive (but not TODO conditional) features, by taking differences or ratios,
+    sensitive (but not control) features, by taking differences or ratios,
     and then reporting the maximum or minimum respectively.
+
+    This class also supports the concept of 'control features.' Like the sensitive
+    features, control features identify subgroups within the data, but
+    aggregations are not performed over the control features. Instead, the
+    aggregations produce a result for each subgroup identified by the control
+    feature(s).
 
     Parameters
     ----------
-    metric_functions :
+    metric_functions : callable or dict
         The underlying metric functions which are to be calculated. This
         can either be a single metric function or a dictionary of functions.
         These functions must be callable as
@@ -75,9 +81,11 @@ class MetricFrame:
         the index of the feature.
 
     control_features : It's complicated
-        TODO Similar to sensitive_features, but....
+        Control features can be specified similarly to the sensitive features.
+        However, their default names (if none can be identified in the
+        input values) are of the format ``CF [n]``.
 
-    sample_params :
+    sample_params : dict
         Parameters for the metric function(s). If there is only one metric function,
         then this is a dictionary of strings and array_likes, which are split
         alongside the ``y_true`` and ``y_pred`` arrays, and passed to the metric function.
@@ -161,13 +169,13 @@ class MetricFrame:
     def overall(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
-        If TODO no ``control_features`` were specified, then this is
+        If no ``control_features`` were specified, then this is
         a :class:`pandas.Series` with one row for each underlying metric.
 
-        If TODO ``control_features`` were specified, then this is a
+        If ``control_features`` were specified, then this is a
         :class:`pandas.DataFrame`, with columns corresponding to the
-        underling metric(s) and the rows indexed by the combinations of
-        the TODO conditional features.
+        underling metric(s) and the rows indexed by the subgroups of
+        the control features.
         """
         return self._overall
 
@@ -177,15 +185,15 @@ class MetricFrame:
 
         This :class:`pandas.DataFrame` contains the result of evaluating
         each underlying metric for each combination of classes in the
-        sensitive and TODO conditional features. The columns identify
+        sensitive and control features. The columns identify
         the underlying metric, while the rows are indexed by the unqiue
-        combinations of classes found in the sensitive and TODO conditional
-        features. If TODO conditional features are present, they are at
+        combinations of classes found in the sensitive and control
+        features. If control features are present, they are at
         in the 'outer' layer of the row indexing.
 
         If a particular combination of classes was not present in the dataset
-        (likely to occur as more sensitive and TODO conditional features
-        are specified), then The corresponding entry in the DataFrame will
+        (likely to occur as more sensitive and control features
+        are specified), then the corresponding entry in the DataFrame will
         be NaN.
         """
         return self._by_group
@@ -196,14 +204,14 @@ class MetricFrame:
         This method computes the maximum value over all combinations of
         sensitive features for each underlying metric function in the ``by_groups``
         property (it will only succeed if all the underlying metric
-        functions return scalar values). If there are no TODO conditional
+        functions return scalar values). If there are no control
         features, then the result will be a :class:`pandas.Series`,
         with rows corresponding to the underying metrics.
 
-        If there are TODO conditional features, then the result is a
+        If there are control features, then the result is a
         :class:`pandas.DataFrame` with columns corresponding to the
         underlying metrics, and rows indexed by the classes identified
-        by the TODO conditional features.
+        by the control features.
         """
         if self._cf_names is None:
             result = pd.Series(index=self.by_group.columns, dtype='object')
@@ -216,7 +224,20 @@ class MetricFrame:
         return result
 
     def group_min(self) -> Union[pd.Series, pd.DataFrame]:
-        """Return the maximum value of the metric over the sensitive features."""
+        """Return the minimum value of the metric over the sensitive features.
+
+        This method computes the minimum value over all combinations of
+        sensitive features for each underlying metric function in the ``by_groups``
+        property (it will only succeed if all the underlying metric
+        functions return scalar values). If there are no control
+        features, then the result will be a :class:`pandas.Series`,
+        with rows corresponding to the underying metrics.
+
+        If there are control features, then the result is a
+        :class:`pandas.DataFrame` with columns corresponding to the
+        underlying metrics, and rows indexed by the classes identified
+        by the control features.
+        """
         if self._cf_names is None:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
@@ -236,19 +257,19 @@ class MetricFrame:
         column of the ``by_groups`` DataFrame.
 
         Similar to other methods, the result will be a :class:`pandas.Series`
-        if there are no TODO conditional features, with rows corresponding
-        to each underlying metric. If there are TODO condtiional features,
+        if there are no control features, with rows corresponding
+        to each underlying metric. If there are control features,
         then the result will be a :class:`pandas.DataFrame` with a column
         for each underlying metric, and rows corresponding to the subgroups
-        identified by the TODO conditional feature(s).
+        identified by the control feature(s).
 
         There are two allowed values for the ``method=`` parameter. The
-        value ``between_groups`` computes the maximum difference between any
-        two pairs of groups in the ``by_groups`` DataFrame (i.e.
-        ``group_max() - group_min()``). Althernatively, ``to_overall``
+        value ``between_groups`` computes the maximum difference between
+        any two pairs of groups in the ``by_groups`` DataFrame (i.e.
+        ``group_max() - group_min()``). Alternatively, ``to_overall``
         computes the difference between each subgroup and the
-        corresponding value from ``overall`` (if there are TODO
-        conditional features, then ``overall`` is multivalued for each metric).
+        corresponding value from ``overall`` (if there are control
+        features, then ``overall`` is multivalued for each metric).
         The result is the absolute maximum of these values.
         """
         subtrahend = np.nan
@@ -273,7 +294,30 @@ class MetricFrame:
 
     def ratio(self,
               method: str) -> Union[pd.Series, pd.DataFrame]:
-        """Return the minimum ratio between groups for each metric."""
+        """Return the minimum ratio between groups for each metric.
+
+        This method calculates a scalar value for each underlying metric by
+        finding the minimum ratio (that is, the ratio is forced to be
+        less than unity) between the entries in each
+        column of the ``by_groups`` DataFrame.
+
+        Similar to other methods, the result will be a :class:`pandas.Series`
+        if there are no control features, with rows corresponding
+        to each underlying metric. If there are control features,
+        then the result will be a :class:`pandas.DataFrame` with a column
+        for each underlying metric, and rows corresponding to the subgroups
+        identified by the control feature(s).
+
+        There are two allowed values for the ``method=`` parameter. The
+        value ``between_groups`` computes the minimum ratio between
+        any two pairs of groups in the ``by_groups`` DataFrame (i.e.
+        ``group_min() / group_max()``). Alternatively, ``to_overall``
+        computes the ratio between each subgroup and the
+        corresponding value from ``overall`` (if there are control
+        features, then ``overall`` is multivalued for each metric),
+        expressing the ratio as a number less than 1.
+        The result is the minimum of these values.
+        """
         result = None
         if method == 'between_groups':
             result = self.group_min() / self.group_max()

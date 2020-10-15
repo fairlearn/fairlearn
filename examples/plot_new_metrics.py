@@ -381,8 +381,8 @@ grouped_on_race_and_sex.group_min()
 grouped_on_race_and_sex.ratio(method='between_groups')
 
 # %%
-# Conditional Cases
-# =================
+# Control Features
+# ================
 #
 # There is a further way we can slice up our data. We have (*completely
 # made up*) features for the individuals' credit scores (in three bands)
@@ -391,9 +391,9 @@ grouped_on_race_and_sex.ratio(method='between_groups')
 # are selected more often than individuals with low credit scores.
 # However, within each credit score band, we do not want a disparity
 # between (say) black females and white males. To example these cases,
-# we have the concept of *conditional features*.
+# we have the concept of *control features*.
 #
-# Conditional features are introduced by the ``control_features=``
+# Control features are introduced by the ``control_features=``
 # argument to the :class:`fairlearn.metrics.MetricFrame` object:
 cond_credit_score = MetricFrame(metric_fns,
                                 Y_test, Y_pred,
@@ -403,7 +403,7 @@ cond_credit_score = MetricFrame(metric_fns,
 # %%
 # This has an immediate effect on the ``overall`` property. Instead
 # of having one value for each metric, we now have a value for each
-# unique value of the conditional feature:
+# unique value of the control feature:
 cond_credit_score.overall
 
 # %%
@@ -412,7 +412,7 @@ cond_credit_score.by_group
 
 # %%
 # The aggregates are also evaluated once for each group identified
-# by the conditional feature:
+# by the control feature:
 cond_credit_score.group_min()
 
 # %%
@@ -424,7 +424,7 @@ cond_credit_score.ratio(method='between_groups')
 # for high income non-whites, which significantly affects the
 # aggregates.
 #
-# We can continue adding more conditional features:
+# We can continue adding more control features:
 cond_both = MetricFrame(metric_fns,
                         Y_test, Y_pred,
                         sensitive_features=A_test[['race', 'sex']],
