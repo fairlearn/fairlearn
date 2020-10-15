@@ -86,8 +86,8 @@ We then calculate a metric which shows the subgroups:
 
 .. doctest:: assessment_metrics
 
-    >>> from fairlearn.metrics import MetricsFrame
-    >>> grouped_metric = MetricsFrame(skm.recall_score, 
+    >>> from fairlearn.metrics import MetricFrame
+    >>> grouped_metric = MetricFrame(skm.recall_score, 
     ...                               Y_true, Y_pred,
     ...                               sensitive_features=group_membership_data)
     >>> print("Overall recall = ", grouped_metric.overall['recall_score'])
@@ -114,13 +114,13 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups')['recall_score'])    
     ratio in recall =  0.0
 
-A single instance of :class:`fairlearn.metrics.MetricsFrame` can evaluate multiple
+A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> multi_metric = MetricsFrame({'precision':skm.precision_score, 'recall':skm.recall_score},
+    >>> multi_metric = MetricFrame({'precision':skm.precision_score, 'recall':skm.recall_score},
     ...                             Y_true, Y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
@@ -143,7 +143,7 @@ in a dictionary via the ``sample_params`` argument.:
 
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
     >>> s_p = { 'sample_weight':s_w }
-    >>> weighted = MetricsFrame(skm.recall_score,
+    >>> weighted = MetricFrame(skm.recall_score,
     ...                         Y_true, Y_pred,
     ...                         sensitive_features=group_membership_data,
     ...                         sample_params=s_p)
@@ -171,7 +171,7 @@ function:
 
     >>> import functools
     >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
-    >>> metric_beta = MetricsFrame(fbeta_06,
+    >>> metric_beta = MetricFrame(fbeta_06,
     ...                            Y_true, Y_pred,
     ...                            sensitive_features=group_membership_data)
     >>> metric_beta.overall
@@ -192,7 +192,7 @@ holds the intersections of these groups:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6]
-    >>> metric_2sf = MetricsFrame(skm.recall_score,
+    >>> metric_2sf = MetricFrame(skm.recall_score,
     ...                           Y_true, Y_pred,
     ...                           sensitive_features=[group_membership_data, g_2])
     >>> metric_2sf.overall  # Same as before
@@ -219,7 +219,7 @@ that there were no samples in it.
 Supported Ungrouped Metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To be used by :class:`fairlearn.metrics.MetricsFrame`, the supplied Python
+To be used by :class:`fairlearn.metrics.MetricFrame`, the supplied Python
 function must take arguments :code:`y_true` and :code:`y_pred`: 
 
 :code:`my_metric_func(y_true, y_pred)`

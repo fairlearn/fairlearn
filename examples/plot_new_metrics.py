@@ -51,7 +51,7 @@ Metrics with Multiple Features
 # and manufacture credit score bands and loan sizes from other columns.
 # We start with some uncontroversial `import` statements:
 
-from fairlearn.metrics import MetricsFrame
+from fairlearn.metrics import MetricFrame
 from fairlearn.metrics import selection_rate
 import functools
 import sklearn.metrics as skm
@@ -180,7 +180,7 @@ print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
 # We know that there are sensitive features in our data, and we want to
 # ensure that we're not harming individuals due to membership in any of
 # these groups. For this purpose, Fairlearn provides the
-# :class:`fairlearn.metrics.MetricsFrame`
+# :class:`fairlearn.metrics.MetricFrame`
 # class. Let us construct an instance of this class, and then look at
 # its capabilities:
 
@@ -188,12 +188,12 @@ fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 
 metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06}
 
-grouped_on_sex = MetricsFrame(metric_fns,
+grouped_on_sex = MetricFrame(metric_fns,
                               Y_test, Y_pred,
                               sensitive_features=A_test['sex'])
 
 # %%
-# The :class:`fairlearn.metrics.MetricsFrame` object requires a
+# The :class:`fairlearn.metrics.MetricFrame` object requires a
 # minimum of four arguments:
 #
 # 1. The underlying metric function(s) to be evaluated
@@ -210,7 +210,7 @@ grouped_on_sex = MetricsFrame(metric_fns,
 # furnish ``beta=0.6`` (we will show how to pass in extra array
 # arguments such as sample weights shortly).
 #
-# We will now take a closer look at the :class:`fairlearn.metrics.MetricsFrame`
+# We will now take a closer look at the :class:`fairlearn.metrics.MetricFrame`
 # object. First, there is the ``overall`` property, which contains
 # the metrics evaluated on the entire dataset. We see that this contains the
 # same values calculated above:
@@ -220,7 +220,7 @@ assert grouped_on_sex.overall['fbeta_06'] == skm.fbeta_score(Y_test, Y_pred, bet
 print(grouped_on_sex.overall)
 
 # %%
-# The other property in the :class:`fairlearn.metrics.MetricsFrame` object
+# The other property in the :class:`fairlearn.metrics.MetricFrame` object
 # is ``by_group``. This contains the metrics evaluated on each subgroup defined
 # by the categories in the ``sensitive_features=`` argument. In this case, we
 # have results for males and females:
@@ -231,10 +231,10 @@ grouped_on_sex.by_group
 # We can immediately see a substantial disparity in the selection rate between
 # males and females.
 #
-# We can also create another :class:`fairlearn.metrics.MetricsFrame` object
+# We can also create another :class:`fairlearn.metrics.MetricFrame` object
 # using race as the sensitive feature:
 
-grouped_on_race = MetricsFrame(metric_fns,
+grouped_on_race = MetricFrame(metric_fns,
                                Y_test, Y_pred,
                                sensitive_features=A_test['race'])
 
@@ -256,7 +256,7 @@ grouped_on_race.by_group
 # -------------------------------
 #
 # We noted above that the underlying metric functions passed to the
-# :class:`fairlearn.metrics.MetricsFrame` constructor need to be of
+# :class:`fairlearn.metrics.MetricFrame` constructor need to be of
 # the form ``fn(y_true, y_pred)`` - we do not support scalar arguments
 # such as ``pos_label=`` or ``beta=`` in the constructor. Such
 # arguments should be bound into a new function using
@@ -278,7 +278,7 @@ example_sample_params = {
 }
 
 
-grouped_with_weights = MetricsFrame(metric_fns,
+grouped_with_weights = MetricFrame(metric_fns,
                                     Y_test, Y_pred,
                                     sensitive_features=A_test['sex'],
                                     sample_params=example_sample_params)
@@ -353,10 +353,10 @@ grouped_on_race.ratio(method='to_overall')
 # than whites, and also worse for women than men (despite overall high
 # accuracy score). Moreover, performance on black females was *terrible*.
 # We can examine the intersections of sensitive features by passing
-# multiple columns to the :class:`fairlearn.metrics.MetricsFrame`
+# multiple columns to the :class:`fairlearn.metrics.MetricFrame`
 # constructor:
 
-grouped_on_race_and_sex = MetricsFrame(metric_fns,
+grouped_on_race_and_sex = MetricFrame(metric_fns,
                                        Y_test, Y_pred,
                                        sensitive_features=A_test[['race', 'sex']])
 
@@ -394,8 +394,8 @@ grouped_on_race_and_sex.ratio(method='between_groups')
 # we have the concept of *conditional features*.
 #
 # Conditional features are introduced by the ``conditional_features=``
-# argument to the :class:`fairlearn.metrics.MetricsFrame` object:
-cond_credit_score = MetricsFrame(metric_fns,
+# argument to the :class:`fairlearn.metrics.MetricFrame` object:
+cond_credit_score = MetricFrame(metric_fns,
                                  Y_test, Y_pred,
                                  sensitive_features=A_test[['race', 'sex']],
                                  conditional_features=A_test['Credit Score'])
@@ -425,7 +425,7 @@ cond_credit_score.ratio(method='between_groups')
 # aggregates.
 #
 # We can continue adding more conditional features:
-cond_both = MetricsFrame(metric_fns,
+cond_both = MetricFrame(metric_fns,
                          Y_test, Y_pred,
                          sensitive_features=A_test[['race', 'sex']],
                          conditional_features=A_test[['Loan Size', 'Credit Score']])
@@ -449,7 +449,7 @@ def member_counts(y_true, y_pred):
     return len(y_true)
 
 
-counts = MetricsFrame(member_counts,
+counts = MetricFrame(member_counts,
                       Y_test, Y_pred,
                       sensitive_features=A_test[['race', 'sex']],
                       conditional_features=A_test[['Loan Size', 'Credit Score']])

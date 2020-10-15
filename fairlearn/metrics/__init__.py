@@ -26,7 +26,7 @@ from ._disparities import (  # noqa: F401
     demographic_parity_ratio,
     equalized_odds_difference,
     equalized_odds_ratio)
-from ._metrics_frame import MetricsFrame  # noqa: F401
+from ._metrics_frame import MetricFrame  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
@@ -45,7 +45,7 @@ from ._extra_metrics import (  # noqa: F401
 # Build list of items to be listed in the docs
 
 _core = [
-    "MetricsFrame"
+    "MetricFrame"
 ]
 
 _disparities = [

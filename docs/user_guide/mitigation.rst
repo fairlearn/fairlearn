@@ -251,14 +251,14 @@ the predicted labels.
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import DemographicParity
-    >>> from fairlearn.metrics import MetricsFrame, selection_rate
+    >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> import numpy as np
     >>> dp = DemographicParity(difference_bound=0.01)
     >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> selection_rate_summary = MetricsFrame(selection_rate,
+    >>> selection_rate_summary = MetricFrame(selection_rate,
     ...                                       y_true, y_pred,
     ...                                       sensitive_features=sensitive_features)
     >>> selection_rate_summary.overall
@@ -346,7 +346,7 @@ In practice this can be used in a difference-based relaxation as follows:
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> tpr_summary = MetricsFrame(true_positive_rate,
+    >>> tpr_summary = MetricFrame(true_positive_rate,
     ...                            y_true, y_pred,
     ...                            sensitive_features=sensitive_features)
     >>> tpr_summary.overall
@@ -444,7 +444,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> from sklearn.metrics import accuracy_score
-    >>> accuracy_summary = MetricsFrame(accuracy_score,
+    >>> accuracy_summary = MetricFrame(accuracy_score,
     ...                                 y_true, y_pred,
     ...                                 sensitive_features=sensitive_features)
     >>> accuracy_summary.overall
@@ -566,7 +566,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> y_true             = np.array([0.3, 0.5, 0.1, 1.0])
     >>> y_pred             = np.array([0.3, 0.6, 0.6, 0.5])
     >>> sensitive_features = np.array(["a", "a", "b", "b"])
-    >>> mae_summary = MetricsFrame(mean_absolute_error,
+    >>> mae_summary = MetricFrame(mean_absolute_error,
     ...                            y_true, y_pred,
     ...                            sensitive_features=sensitive_features)
     >>> mae_summary.overall

@@ -50,7 +50,7 @@ def test_3m_2sf_2cf():
     assert len(np.unique(sf_2_arr)) == len(sf_2_groups)
 
     # Create the target object
-    target = metrics.MetricsFrame(metric_dict,
+    target = metrics.MetricFrame(metric_dict,
                                   y_true, y_pred,
                                   sensitive_features=[sf_1_arr, sf_2_arr],
                                   conditional_features=[cf_1_arr, cf_2_arr])

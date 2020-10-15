@@ -4,6 +4,6 @@
 import fairlearn.metrics as metrics
 
 
-def _get_raw_MetricsFrame():
-    # Gets an uninitialised MetricsFrame for testing purposes
-    return metrics.MetricsFrame.__new__(metrics.MetricsFrame)
+def _get_raw_MetricFrame():
+    # Gets an uninitialised MetricFrame for testing purposes
+    return metrics.MetricFrame.__new__(metrics.MetricFrame)

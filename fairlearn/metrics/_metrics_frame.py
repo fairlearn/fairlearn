@@ -23,7 +23,7 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric_functions'"
 
 
-class MetricsFrame:
+class MetricFrame:
     """Contains a collection of group fairness metrics.
 
     This class holds group fairness metrics calculated for any number of underlying

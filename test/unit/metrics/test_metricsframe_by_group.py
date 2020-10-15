@@ -7,7 +7,7 @@ import pytest
 import sklearn.metrics as skm
 
 from .data_for_test import y_t, y_p, s_w, g_1, g_2, g_3, g_4
-from .utils import _get_raw_MetricsFrame
+from .utils import _get_raw_MetricFrame
 
 
 metric_functions = [skm.recall_score,
@@ -18,7 +18,7 @@ metric_functions = [skm.recall_score,
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_0cf(metric_fn):
-    target = _get_raw_MetricsFrame()
+    target = _get_raw_MetricFrame()
     func_dict = target._process_functions(metric_fn, None)
     sf_list = target._process_features("SF", g_1, y_t)
 
@@ -37,7 +37,7 @@ def test_1m_1sf_0cf(metric_fn):
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_1cf(metric_fn):
-    target = _get_raw_MetricsFrame()
+    target = _get_raw_MetricFrame()
     func_dict = target._process_functions(metric_fn, None)
     sf_list = target._process_features("SF", g_1, y_t)
     cf_list = target._process_features("CF", g_2, y_t)
@@ -64,7 +64,7 @@ def test_1m_1sf_1cf(metric_fn):
 
 
 def test_2m_2sf_2cf():
-    target = _get_raw_MetricsFrame()
+    target = _get_raw_MetricFrame()
     funcs = {'recall': skm.recall_score, 'prec': skm.precision_score}
     func_container_dict = target._process_functions(funcs,
                                                     {'recall': {'sample_weight': s_w}})

@@ -4,7 +4,7 @@
 """Metrics for measuring disparity."""
 
 from ._extra_metrics import selection_rate, true_positive_rate, false_positive_rate
-from ._metrics_frame import MetricsFrame
+from ._metrics_frame import MetricFrame
 
 
 def demographic_parity_difference(
@@ -39,7 +39,7 @@ def demographic_parity_difference(
     float
         The demographic parity difference
     """
-    sel_rate = MetricsFrame(selection_rate,
+    sel_rate = MetricFrame(selection_rate,
                             y_true, y_pred,
                             sensitive_features=sensitive_features,
                             sample_params={'sample_weight': sample_weight})
@@ -79,7 +79,7 @@ def demographic_parity_ratio(
     float
         The demographic parity ratio
     """
-    sel_rate = MetricsFrame(selection_rate,
+    sel_rate = MetricFrame(selection_rate,
                             y_true, y_pred,
                             sensitive_features=sensitive_features,
                             sample_params={'sample_weight': sample_weight})
@@ -167,11 +167,11 @@ def equalized_odds_ratio(
     return min(eo.ratio(method='between_groups'))
 
 
-def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricsFrame:
+def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFrame:
     fns = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
     sw_dict = {'sample_weight': sample_weight}
     sp = {'tpr': sw_dict, 'fpr': sw_dict}
-    eo = MetricsFrame(fns,
+    eo = MetricFrame(fns,
                       y_true, y_pred,
                       sensitive_features=sensitive_features,
                       sample_params=sp)

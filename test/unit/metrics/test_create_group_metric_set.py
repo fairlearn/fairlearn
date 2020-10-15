@@ -5,7 +5,7 @@ import pytest
 
 import sklearn.metrics as skm
 
-from fairlearn.metrics import MetricsFrame
+from fairlearn.metrics import MetricFrame
 from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
 from fairlearn.metrics._group_metric_set import _create_group_metric_set
@@ -183,7 +183,7 @@ class TestCreateGroupMetricSet:
         y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
         s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
 
-        expected = MetricsFrame({'accuracy_score': skm.accuracy_score,
+        expected = MetricFrame({'accuracy_score': skm.accuracy_score,
                                  'roc_auc_score': skm.roc_auc_score},
                                 y_t, y_p,
                                 sensitive_features=s_f)

@@ -19,7 +19,7 @@ metric_functions = [skm.recall_score,
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_0cf(metric_fn):
-    target = metrics.MetricsFrame(metric_fn,
+    target = metrics.MetricFrame(metric_fn,
                                   y_t, y_p,
                                   sensitive_features=g_4)
 
@@ -65,14 +65,14 @@ def test_1m_1sf_0cf(metric_fn):
                                  metric_q/overall,
                                  overall/metric_q)
     # Need to use approx, due to internal method of calculating
-    # the correct ratio. Internally, MetricsFrame computes a ratio
+    # the correct ratio. Internally, MetricFrame computes a ratio
     # and takes the reciprocal if it's greater than 1
     assert target_ratio_overall[mfn] == pytest.approx(expected_ratio_overall,
                                                       rel=1e-10, abs=1e-16)
 
 
 def test_2m_1sf_0cf():
-    target = metrics.MetricsFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
+    target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
                                   y_t, y_p,
                                   sensitive_features=g_4)
 
@@ -136,7 +136,7 @@ def test_2m_1sf_0cf():
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_1cf(metric_fn):
-    target = metrics.MetricsFrame(metric_fn,
+    target = metrics.MetricFrame(metric_fn,
                                   y_t, y_p,
                                   sensitive_features=g_2,
                                   conditional_features=g_3)
@@ -209,7 +209,7 @@ def test_1m_1sf_1cf(metric_fn):
 
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_2cf(metric_fn):
-    target = metrics.MetricsFrame(metric_fn,
+    target = metrics.MetricFrame(metric_fn,
                                   y_t, y_p,
                                   sensitive_features=g_2,
                                   conditional_features=[g_3, g_1])
@@ -322,7 +322,7 @@ def test_1m_1sf_2cf(metric_fn):
 
 
 def test_2m_1sf_1cf():
-    target = metrics.MetricsFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
+    target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
                                   y_t, y_p,
                                   sensitive_features=g_2,
                                   conditional_features=g_3)
@@ -421,7 +421,7 @@ def test_2m_1sf_1cf():
 
 def test_2m_1sf_2cf():
     func_dict = {'recall': skm.recall_score, 'prec': skm.precision_score}
-    target = metrics.MetricsFrame(func_dict,
+    target = metrics.MetricFrame(func_dict,
                                   y_t, y_p,
                                   sensitive_features=g_2,
                                   conditional_features=[g_3, g_1])

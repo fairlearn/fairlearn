@@ -11,7 +11,7 @@ from .data_for_test import y_t, y_p, g_1, g_2
 
 
 def test_1m_1sf_0cf():
-    target = metrics.MetricsFrame(skm.confusion_matrix,
+    target = metrics.MetricFrame(skm.confusion_matrix,
                                   y_t,
                                   y_p,
                                   sensitive_features=g_1)
@@ -27,7 +27,7 @@ def test_1m_1sf_0cf():
 
 
 def test_1m_1sf_1cf():
-    target = metrics.MetricsFrame(skm.confusion_matrix,
+    target = metrics.MetricFrame(skm.confusion_matrix,
                                   y_t,
                                   y_p,
                                   sensitive_features=g_1,
@@ -50,7 +50,7 @@ def test_1m_1sf_1cf():
 def test_mixed_metrics():
     metric_dict = {'cm': skm.confusion_matrix, 'prec': skm.precision_score}
 
-    target = metrics.MetricsFrame(metric_dict,
+    target = metrics.MetricFrame(metric_dict,
                                   y_t, y_p,
                                   sensitive_features=g_1)
 
@@ -77,7 +77,7 @@ def test_multid_input_output():
     y_t_2 = np.random.rand(len(g_1), 2)
     y_p_2 = np.random.rand(len(g_1), 2)
 
-    target = metrics.MetricsFrame(metric_fn, y_t_2, y_p_2, sensitive_features=g_1)
+    target = metrics.MetricFrame(metric_fn, y_t_2, y_p_2, sensitive_features=g_1)
 
     expected_overall = skm.r2_score(y_t_2, y_p_2, multioutput='raw_values')
     assert np.array_equal(target.overall['metric'], expected_overall)
