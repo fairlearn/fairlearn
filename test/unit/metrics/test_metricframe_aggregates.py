@@ -20,8 +20,8 @@ metric_functions = [skm.recall_score,
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_0cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
-                                  y_t, y_p,
-                                  sensitive_features=g_4)
+                                 y_t, y_p,
+                                 sensitive_features=g_4)
 
     overall = metric_fn(y_t, y_p)
     mask_p = (g_4 == 'pp')
@@ -73,8 +73,8 @@ def test_1m_1sf_0cf(metric_fn):
 
 def test_2m_1sf_0cf():
     target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
-                                  y_t, y_p,
-                                  sensitive_features=g_4)
+                                 y_t, y_p,
+                                 sensitive_features=g_4)
 
     recall = skm.recall_score(y_t, y_p)
     prec = skm.precision_score(y_t, y_p)
@@ -137,9 +137,9 @@ def test_2m_1sf_0cf():
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_1cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
-                                  y_t, y_p,
-                                  sensitive_features=g_2,
-                                  conditional_features=g_3)
+                                 y_t, y_p,
+                                 sensitive_features=g_2,
+                                 conditional_features=g_3)
     mask_f = (g_2 == 'f')
     mask_g = (g_2 == 'g')
     mask_k = (g_3 == 'kk')
@@ -210,9 +210,9 @@ def test_1m_1sf_1cf(metric_fn):
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_1m_1sf_2cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
-                                  y_t, y_p,
-                                  sensitive_features=g_2,
-                                  conditional_features=[g_3, g_1])
+                                 y_t, y_p,
+                                 sensitive_features=g_2,
+                                 conditional_features=[g_3, g_1])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -323,9 +323,9 @@ def test_1m_1sf_2cf(metric_fn):
 
 def test_2m_1sf_1cf():
     target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
-                                  y_t, y_p,
-                                  sensitive_features=g_2,
-                                  conditional_features=g_3)
+                                 y_t, y_p,
+                                 sensitive_features=g_2,
+                                 conditional_features=g_3)
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -422,9 +422,9 @@ def test_2m_1sf_1cf():
 def test_2m_1sf_2cf():
     func_dict = {'recall': skm.recall_score, 'prec': skm.precision_score}
     target = metrics.MetricFrame(func_dict,
-                                  y_t, y_p,
-                                  sensitive_features=g_2,
-                                  conditional_features=[g_3, g_1])
+                                 y_t, y_p,
+                                 sensitive_features=g_2,
+                                 conditional_features=[g_3, g_1])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

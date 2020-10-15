@@ -13,8 +13,8 @@ y_true = (data.target == '>50K') * 1
 sex = X['sex']
 
 selection_rates = MetricFrame(selection_rate,
-                               y_true, y_true,
-                               sensitive_features=sex)
+                              y_true, y_true,
+                              sensitive_features=sex)
 
 xs = list(selection_rates.by_group.index)
 ys = [selection_rates.by_group['selection_rate'][s] for s in xs]

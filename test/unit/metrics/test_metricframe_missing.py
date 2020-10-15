@@ -24,8 +24,8 @@ g_B = np.asarray([group_gen(x, 1+int(n/3), ['x', 'y', 'z']) for x in range(n)])
 def test_missing_sensitive_feature_combinations(metric_fn):
 
     target = metrics.MetricFrame(metric_fn,
-                                  y_t, y_p,
-                                  sensitive_features=[g_A, g_B])
+                                 y_t, y_p,
+                                 sensitive_features=[g_A, g_B])
 
     # Make sure our missing combination is in an expected place
     overall = metric_fn(y_t, y_p)
@@ -59,9 +59,9 @@ def test_missing_sensitive_feature_combinations(metric_fn):
 @pytest.mark.parametrize("metric_fn", metric_functions)
 def test_missing_conditional_feature_combinations(metric_fn):
     target = metrics.MetricFrame(metric_fn,
-                                  y_t, y_p,
-                                  conditional_features=[g_A, g_B],
-                                  sensitive_features=g_1)
+                                 y_t, y_p,
+                                 conditional_features=[g_A, g_B],
+                                 sensitive_features=g_1)
 
     # Build all the expected values
     overall = dict()

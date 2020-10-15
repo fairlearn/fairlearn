@@ -174,9 +174,9 @@ class FairlearnDashboard(object):
                 method = FairlearnDashboard._metric_methods \
                     .get(data["metricKey"]).get("function")
                 prediction = MetricFrame(method,
-                                          data['true_y'],
-                                          data['predicted_ys'][data["modelIndex"]],
-                                          sensitive_features=data["binVector"])
+                                         data['true_y'],
+                                         data['predicted_ys'][data["modelIndex"]],
+                                         sensitive_features=data["binVector"])
                 return jsonify({"data": {
                     "global": prediction.overall[method.__name__],
                     "bins": list(prediction.by_group[method.__name__])

@@ -27,8 +27,8 @@ def test_roc_auc():
                             multi_class='ovr',
                             labels=[0, 1, 2])
     target = metrics.MetricFrame(ras,
-                                  y_true, y_pred,
-                                  sensitive_features=s_f)
+                                 y_true, y_pred,
+                                 sensitive_features=s_f)
 
     overall = ras(y_true, y_pred)
     assert target.overall['metric'] == overall

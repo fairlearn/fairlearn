@@ -189,8 +189,8 @@ fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06}
 
 grouped_on_sex = MetricFrame(metric_fns,
-                              Y_test, Y_pred,
-                              sensitive_features=A_test['sex'])
+                             Y_test, Y_pred,
+                             sensitive_features=A_test['sex'])
 
 # %%
 # The :class:`fairlearn.metrics.MetricFrame` object requires a
@@ -235,8 +235,8 @@ grouped_on_sex.by_group
 # using race as the sensitive feature:
 
 grouped_on_race = MetricFrame(metric_fns,
-                               Y_test, Y_pred,
-                               sensitive_features=A_test['race'])
+                              Y_test, Y_pred,
+                              sensitive_features=A_test['race'])
 
 # %%
 # The ``overall`` property is unchanged:
@@ -279,9 +279,9 @@ example_sample_params = {
 
 
 grouped_with_weights = MetricFrame(metric_fns,
-                                    Y_test, Y_pred,
-                                    sensitive_features=A_test['sex'],
-                                    sample_params=example_sample_params)
+                                   Y_test, Y_pred,
+                                   sensitive_features=A_test['sex'],
+                                   sample_params=example_sample_params)
 
 # %%
 # We can inspect the overall values, and check they are as expected:
@@ -357,8 +357,8 @@ grouped_on_race.ratio(method='to_overall')
 # constructor:
 
 grouped_on_race_and_sex = MetricFrame(metric_fns,
-                                       Y_test, Y_pred,
-                                       sensitive_features=A_test[['race', 'sex']])
+                                      Y_test, Y_pred,
+                                      sensitive_features=A_test[['race', 'sex']])
 
 # %%
 # The overall values are unchanged, but the ``by_group`` table now
@@ -396,9 +396,9 @@ grouped_on_race_and_sex.ratio(method='between_groups')
 # Conditional features are introduced by the ``conditional_features=``
 # argument to the :class:`fairlearn.metrics.MetricFrame` object:
 cond_credit_score = MetricFrame(metric_fns,
-                                 Y_test, Y_pred,
-                                 sensitive_features=A_test[['race', 'sex']],
-                                 conditional_features=A_test['Credit Score'])
+                                Y_test, Y_pred,
+                                sensitive_features=A_test[['race', 'sex']],
+                                conditional_features=A_test['Credit Score'])
 
 # %%
 # This has an immediate effect on the ``overall`` property. Instead
@@ -426,9 +426,9 @@ cond_credit_score.ratio(method='between_groups')
 #
 # We can continue adding more conditional features:
 cond_both = MetricFrame(metric_fns,
-                         Y_test, Y_pred,
-                         sensitive_features=A_test[['race', 'sex']],
-                         conditional_features=A_test[['Loan Size', 'Credit Score']])
+                        Y_test, Y_pred,
+                        sensitive_features=A_test[['race', 'sex']],
+                        conditional_features=A_test[['Loan Size', 'Credit Score']])
 
 # %%
 # The ``overall`` property now splits into more values:
@@ -450,9 +450,9 @@ def member_counts(y_true, y_pred):
 
 
 counts = MetricFrame(member_counts,
-                      Y_test, Y_pred,
-                      sensitive_features=A_test[['race', 'sex']],
-                      conditional_features=A_test[['Loan Size', 'Credit Score']])
+                     Y_test, Y_pred,
+                     sensitive_features=A_test[['race', 'sex']],
+                     conditional_features=A_test[['Loan Size', 'Credit Score']])
 
 counts.by_group
 

@@ -27,8 +27,8 @@ def test_demographic_parity_difference_weighted():
                                            sample_weight=s_w)
 
     gm = MetricFrame(selection_rate, y_t, y_p,
-                      sensitive_features=g_1,
-                      sample_params={'sample_weight': s_w})
+                     sensitive_features=g_1,
+                     sample_params={'sample_weight': s_w})
 
     assert actual == gm.difference(method='between_groups')['selection_rate']
 
@@ -47,8 +47,8 @@ def test_demographic_parity_ratio_weighted():
                                       sample_weight=s_w)
 
     gm = MetricFrame(selection_rate, y_t, y_p,
-                      sensitive_features=g_1,
-                      sample_params={'sample_weight': s_w})
+                     sensitive_features=g_1,
+                     sample_params={'sample_weight': s_w})
 
     assert actual == gm.ratio(method='between_groups')['selection_rate']
 
