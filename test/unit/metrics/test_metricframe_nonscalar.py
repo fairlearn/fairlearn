@@ -31,7 +31,7 @@ def test_1m_1sf_1cf():
                                  y_t,
                                  y_p,
                                  sensitive_features=g_1,
-                                 conditional_features=g_2)
+                                 control_features=g_2)
 
     for cf in np.unique(g_2):
         mask_c = g_2 == cf

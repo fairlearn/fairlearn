@@ -139,7 +139,7 @@ def test_1m_1sf_1cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,
                                  sensitive_features=g_2,
-                                 conditional_features=g_3)
+                                 control_features=g_3)
     mask_f = (g_2 == 'f')
     mask_g = (g_2 == 'g')
     mask_k = (g_3 == 'kk')
@@ -212,7 +212,7 @@ def test_1m_1sf_2cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,
                                  sensitive_features=g_2,
-                                 conditional_features=[g_3, g_1])
+                                 control_features=[g_3, g_1])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -325,7 +325,7 @@ def test_2m_1sf_1cf():
     target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
                                  y_t, y_p,
                                  sensitive_features=g_2,
-                                 conditional_features=g_3)
+                                 control_features=g_3)
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -424,7 +424,7 @@ def test_2m_1sf_2cf():
     target = metrics.MetricFrame(func_dict,
                                  y_t, y_p,
                                  sensitive_features=g_2,
-                                 conditional_features=[g_3, g_1])
+                                 control_features=[g_3, g_1])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

@@ -393,12 +393,12 @@ grouped_on_race_and_sex.ratio(method='between_groups')
 # between (say) black females and white males. To example these cases,
 # we have the concept of *conditional features*.
 #
-# Conditional features are introduced by the ``conditional_features=``
+# Conditional features are introduced by the ``control_features=``
 # argument to the :class:`fairlearn.metrics.MetricFrame` object:
 cond_credit_score = MetricFrame(metric_fns,
                                 Y_test, Y_pred,
                                 sensitive_features=A_test[['race', 'sex']],
-                                conditional_features=A_test['Credit Score'])
+                                control_features=A_test['Credit Score'])
 
 # %%
 # This has an immediate effect on the ``overall`` property. Instead
@@ -428,7 +428,7 @@ cond_credit_score.ratio(method='between_groups')
 cond_both = MetricFrame(metric_fns,
                         Y_test, Y_pred,
                         sensitive_features=A_test[['race', 'sex']],
-                        conditional_features=A_test[['Loan Size', 'Credit Score']])
+                        control_features=A_test[['Loan Size', 'Credit Score']])
 
 # %%
 # The ``overall`` property now splits into more values:
@@ -452,7 +452,7 @@ def member_counts(y_true, y_pred):
 counts = MetricFrame(member_counts,
                      Y_test, Y_pred,
                      sensitive_features=A_test[['race', 'sex']],
-                     conditional_features=A_test[['Loan Size', 'Credit Score']])
+                     control_features=A_test[['Loan Size', 'Credit Score']])
 
 counts.by_group
 

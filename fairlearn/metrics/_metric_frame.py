@@ -74,7 +74,7 @@ class MetricFrame:
         of the format ``SF [n]`` will be generated, with ``n`` indicating
         the index of the feature.
 
-    conditional_features : It's complicated
+    control_features : It's complicated
         TODO Similar to sensitive_features, but....
 
     sample_params :
@@ -91,7 +91,7 @@ class MetricFrame:
                  y_true,
                  y_pred, *,
                  sensitive_features,
-                 conditional_features: Optional = None,
+                 control_features: Optional = None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -105,8 +105,8 @@ class MetricFrame:
 
         cf_list = None
         self._cf_names = None
-        if conditional_features is not None:
-            cf_list = self._process_features("CF", conditional_features, y_t)
+        if control_features is not None:
+            cf_list = self._process_features("CF", control_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
         self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
@@ -161,10 +161,10 @@ class MetricFrame:
     def overall(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
-        If TODO no ``conditional_features`` were specified, then this is
+        If TODO no ``control_features`` were specified, then this is
         a :class:`pandas.Series` with one row for each underlying metric.
 
-        If TODO ``conditional_features`` were specified, then this is a
+        If TODO ``control_features`` were specified, then this is a
         :class:`pandas.DataFrame`, with columns corresponding to the
         underling metric(s) and the rows indexed by the combinations of
         the TODO conditional features.

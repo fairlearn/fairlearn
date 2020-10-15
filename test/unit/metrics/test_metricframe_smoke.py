@@ -59,7 +59,7 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
                                  transform_y_t(y_t),
                                  transform_y_p(y_p),
                                  sensitive_features=g_2,
-                                 conditional_features=g_3)
+                                 control_features=g_3)
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
