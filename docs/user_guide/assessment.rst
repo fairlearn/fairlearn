@@ -45,8 +45,8 @@ Metrics with Grouping
 
 When considering fairness, each row of input data will have an associated
 group label :math:`g \in G`, and we will want to know how the metric behaves
-for each :math:`g`. To help with this, Fairlearn provides as a class, which takes
-an existing (ungrouped) metric function, and apply it to each group within a
+for each :math:`g`. To help with this, Fairlearn provides a class, which takes
+an existing (ungrouped) metric function, and applies it to each group within a
 set of data.
 
 Suppose in addition to the :math:`Y_{true}` and :math:`Y_{pred}` above, we had
@@ -88,18 +88,18 @@ We then calculate a metric which shows the subgroups:
 
     >>> from fairlearn.metrics import MetricFrame
     >>> grouped_metric = MetricFrame(skm.recall_score, 
-    ...                               Y_true, Y_pred,
-    ...                               sensitive_features=group_membership_data)
+    ...                              Y_true, Y_pred,
+    ...                              sensitive_features=group_membership_data)
     >>> print("Overall recall = ", grouped_metric.overall['recall_score'])
     Overall recall =  0.5
     >>> print("recall by groups = ", grouped_metric.by_group['recall_score'].to_dict())
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 Note that the overall recall is the same as that calculated above in the
-Ungrouped Metric section, while the `by_group` dictionary matches the values
-we calculated by inspection from the table above.
+Ungrouped Metric section, while the 'by group' dictionary can be checked
+against the table above.
 
-In addition to these basic scores, we also provides
+In addition to these basic scores, Fairlearn also provides
 convenience functions to recover the maximum and minimum values of the metric
 across groups and also the difference and ratio between the maximum and minimum:
 
@@ -135,7 +135,7 @@ metrics simultaneously:
     c          0.6   0.75
     d            0      0
 
-If there are per-sample arguments (suh as sample weights), these can also be provided
+If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
 
 .. doctest:: assessment_metrics
@@ -144,9 +144,9 @@ in a dictionary via the ``sample_params`` argument.:
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(skm.recall_score,
-    ...                         Y_true, Y_pred,
-    ...                         sensitive_features=group_membership_data,
-    ...                         sample_params=s_p)
+    ...                        Y_true, Y_pred,
+    ...                        sensitive_features=group_membership_data,
+    ...                        sample_params=s_p)
     >>> weighted.overall
     recall_score    0.45
     dtype: object
@@ -172,8 +172,8 @@ function:
     >>> import functools
     >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
     >>> metric_beta = MetricFrame(fbeta_06,
-    ...                            Y_true, Y_pred,
-    ...                            sensitive_features=group_membership_data)
+    ...                           Y_true, Y_pred,
+    ...                           sensitive_features=group_membership_data)
     >>> metric_beta.overall
     metric    0.539683
     dtype: object
@@ -193,8 +193,8 @@ holds the intersections of these groups:
 
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6]
     >>> metric_2sf = MetricFrame(skm.recall_score,
-    ...                           Y_true, Y_pred,
-    ...                           sensitive_features=[group_membership_data, g_2])
+    ...                          Y_true, Y_pred,
+    ...                          sensitive_features=[group_membership_data, g_2])
     >>> metric_2sf.overall  # Same as before
     recall_score    0.5
     dtype: object
@@ -215,21 +215,6 @@ there are no members in a particular combination of sensitive features. In this
 case we see that the subgroup ``(a, 8)`` has a result of ``NaN``, indicating
 that there were no samples in it.
 
-
-Supported Ungrouped Metrics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To be used by :class:`fairlearn.metrics.MetricFrame`, the supplied Python
-function must take arguments :code:`y_true` and :code:`y_pred`: 
-
-:code:`my_metric_func(y_true, y_pred)`
-
-An additional argument of `sample_weight` is also supported:
-
-:code:`my_metric_with_weight(y_true, y_pred, sample_weight=None)`
-
-The :code:`sample_weight` argument is always invoked by name, and *only* if
-the user supplies a :code:`sample_weight` argument.
 
 .. _dashboard:
 

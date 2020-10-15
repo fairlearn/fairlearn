@@ -86,7 +86,7 @@ Firstly, Fairlearn provides fairness-related metrics that can be compared
 between groups and for the overall population. Using existing metric
 definitions from
 `scikit-learn <https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics>`_
-we can evaluate metrics to get a group summary as below:
+we can evaluate metrics for subgroups within the data as below:
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
@@ -110,7 +110,8 @@ we can evaluate metrics to get a group summary as below:
     Male         0.804288
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
-selection rate, i.e., the percentage of the population with label 1:
+selection rate, i.e., the percentage of the population which have '1' as
+their label:
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
