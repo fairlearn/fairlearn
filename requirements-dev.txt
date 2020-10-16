@@ -31,6 +31,7 @@ nbval
 
 # Required for documentation
 bokeh
+pypandoc
 sphinx
 sphinx-gallery
 git+https://github.com/Holzhaus/sphinx-multiversion.git

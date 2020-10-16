@@ -1,0 +1,54 @@
+Developer Call 2020-10-08
+-------------------------
+
+Scribbler: `Richard Edgar <https://github.com/riedgar-ms>`_
+
+Attendees:
+
+- `Miro Dudik <https://github.com/MiroDudik>`_
+- `Richard Edgar <https://github.com/riedgar-ms>`_
+- `Adrin Jalali <https://github.com/adrinjalali>`_
+- `Diondra Peck <https://github.com/diondrapeck>`_
+- Alex Quach
+- `Kevin Robinson <https://github.com/kevinrobinson>`_
+- `Mehrnoosh Sameki <https://github.com/mesameki>`_
+- `Hanna Wallach <https://www.microsoft.com/en-us/research/people/wallach/>`_
+- `Hilde Weerts <https://github.com/hildeweerts>`_
+
+Agenda:
+
+- Requirements for next release
+    - Still need new metrics API
+    - Need to announce deprecation of ``FairlearnDashboard``
+    - Need to make sure Quickstart will actually work
+      (short term fix: put note about running `pip install` against GitHub at the top)
+    - Roman is writing up a userguide for ``ThresholdOptimizer``
+
+  To clear up confusion over the ``FairlearnDashboard``, it has been updated with a
+  ``flask`` backend but we have rolled back the major UI change which had been put
+  in (after the ``v0.4.6`` release). We plan on deprecating the ``FairlearnDashboard``
+  within Fairlearn, since its code has been moved to an explicitly Microsoft-owned
+  repository (which will be open sourced Real Soon Now), since there are
+  Azure-imposed requirements on that code. The Fairlearn community will then be
+  free to add any desired visualisations within Fairlearn in the future.
+
+- Governance
+
+    An update from Miro. Probably won't be ready for the October NumFocus application
+    deadline, but Microsoft will hopefully separate Fairlearn as a neutral organisation
+    during October. This will remove the need for things like `Security.md` which are not
+    particularly open source friendly.
+
+- Naming the metrics API
+
+    With the basic API for the new style metrics agreed, we need to decide on names for
+    everything. This is currently
+    `an open issue <https://github.com/fairlearn/fairlearn-proposals/issues/17>`_
+    and *really* needs to be brought to resolution.
+
+    We had a lengthy discussion. There was a feeling that `MetricFrame` would be better than
+    `GroupedMetric` for the whole class, but we did not agree on alternatives for
+    `conditional_features=`. At Kevin's suggestion to focus on how users will first encounter
+    the code, Richard will rewrite the example code
+    introducing the new metric API to be focussed on the sociotechnical side, rather than
+    just an API demonstration. We will also reach out to Solon Barocas.

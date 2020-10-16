@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import numpy as np
 import pandas as pd
 from .moment import ClassificationMoment
 from .moment import _ALL, _LABEL
@@ -19,6 +20,11 @@ class ErrorRate(ClassificationMoment):
     def gamma(self, predictor):
         """Return the gamma values for the given predictor."""
         pred = predictor(self.X)
+        if isinstance(pred, np.ndarray):
+            # TensorFlow is returning an (n,1) array, which results
+            # in the subtraction in the 'error =' line generating an
+            # (n,n) array
+            pred = np.squeeze(pred)
         error = pd.Series(data=(self.tags[_LABEL] - pred).abs().mean(),
                           index=self.index)
         self._gamma_descr = str(error)
