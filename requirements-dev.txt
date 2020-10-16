@@ -22,7 +22,6 @@ pytest-mpl>=0.11
 nteract-scrapbook
 wheel
 lightgbm
-xlrd
 
 # Required for notebooks
 jupyter
