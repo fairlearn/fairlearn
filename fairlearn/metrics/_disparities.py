@@ -12,6 +12,7 @@ def demographic_parity_difference(
         y_pred,
         *,
         sensitive_features,
+        method='between_groups',
         sample_weight=None) -> float:
     """Calculate the demographic parity difference.
 
@@ -31,6 +32,10 @@ def demographic_parity_difference(
     sensitive_features :
         The sensitive features over which demographic parity should be assessed
 
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        for details.
+
     sample_weight : array-like
         The sample weights
 
@@ -43,7 +48,7 @@ def demographic_parity_difference(
                            y_true, y_pred,
                            sensitive_features=sensitive_features,
                            sample_params={'sample_weight': sample_weight})
-    result = sel_rate.difference(method='between_groups')['selection_rate']
+    result = sel_rate.difference(method=method)['selection_rate']
     return result
 
 
@@ -52,6 +57,7 @@ def demographic_parity_ratio(
         y_pred,
         *,
         sensitive_features,
+        method='between_groups',
         sample_weight=None) -> float:
     """Calculate the demographic parity ratio.
 
@@ -71,6 +77,10 @@ def demographic_parity_ratio(
     sensitive_features :
         The sensitive features over which demographic parity should be assessed
 
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        for details.
+
     sample_weight : array-like
         The sample weights
 
@@ -83,7 +93,7 @@ def demographic_parity_ratio(
                            y_true, y_pred,
                            sensitive_features=sensitive_features,
                            sample_params={'sample_weight': sample_weight})
-    result = sel_rate.ratio(method='between_groups')['selection_rate']
+    result = sel_rate.ratio(method=method)['selection_rate']
     return result
 
 
@@ -92,6 +102,7 @@ def equalized_odds_difference(
         y_pred,
         *,
         sensitive_features,
+        method='between_groups',
         sample_weight=None) -> float:
     """Calculate the equalized odds difference.
 
@@ -114,6 +125,10 @@ def equalized_odds_difference(
     sensitive_features :
         The sensitive features over which demographic parity should be assessed
 
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        for details.
+
     sample_weight : array-like
         The sample weights
 
@@ -124,7 +139,7 @@ def equalized_odds_difference(
     """
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return max(eo.difference(method='between_groups'))
+    return max(eo.difference(method=method))
 
 
 def equalized_odds_ratio(
@@ -132,6 +147,7 @@ def equalized_odds_ratio(
         y_pred,
         *,
         sensitive_features,
+        method='between_groups',
         sample_weight=None) -> float:
     """Calculate the equalized odds ratio.
 
@@ -154,6 +170,10 @@ def equalized_odds_ratio(
     sensitive_features :
         The sensitive features over which demographic parity should be assessed
 
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        for details.
+
     sample_weight : array-like
         The sample weights
 
@@ -164,7 +184,7 @@ def equalized_odds_ratio(
     """
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return min(eo.ratio(method='between_groups'))
+    return min(eo.ratio(method=method))
 
 
 def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFrame:
