@@ -51,7 +51,8 @@ class MetricFrame:
     features, control features identify subgroups within the data, but
     aggregations are not performed over the control features. Instead, the
     aggregations produce a result for each subgroup identified by the control
-    feature(s).
+    feature(s). The name 'control features' refers to the statistical practice
+    of 'controlling' for a variable.
 
     Parameters
     ----------
@@ -81,6 +82,12 @@ class MetricFrame:
         the index of the feature.
 
     control_features : It's complicated
+        Control features are similar to sensitive features, in that they
+        divide the input data into subgroups.
+        Unlike the sensitive features, aggregations are not performed
+        across the control features - for example, the ``overall`` property
+        will have one value for each subgroup in the control feature(s),
+        rather than a single value for the entire data set.
         Control features can be specified similarly to the sensitive features.
         However, their default names (if none can be identified in the
         input values) are of the format ``CF [n]``.
