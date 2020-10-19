@@ -23,6 +23,11 @@ def test_1m_1sf_0cf(metric_fn):
                                  y_t, y_p,
                                  sensitive_features=g_4)
 
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [0])
+
     overall = metric_fn(y_t, y_p)
     mask_p = (g_4 == 'pp')
     mask_q = (g_4 == 'q')
@@ -75,6 +80,11 @@ def test_2m_1sf_0cf():
     target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
                                  y_t, y_p,
                                  sensitive_features=g_4)
+
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [0])
 
     recall = skm.recall_score(y_t, y_p)
     prec = skm.precision_score(y_t, y_p)
@@ -140,6 +150,12 @@ def test_1m_1sf_1cf(metric_fn):
                                  y_t, y_p,
                                  sensitive_features=g_2,
                                  control_features=g_3)
+
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [0])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [1])
+
     mask_f = (g_2 == 'f')
     mask_g = (g_2 == 'g')
     mask_k = (g_3 == 'kk')
@@ -213,6 +229,11 @@ def test_1m_1sf_2cf(metric_fn):
                                  y_t, y_p,
                                  sensitive_features=g_2,
                                  control_features=[g_3, g_1])
+
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [0, 1])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [2])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -327,6 +348,11 @@ def test_2m_1sf_1cf():
                                  sensitive_features=g_2,
                                  control_features=g_3)
 
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [0])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [1])
+
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
     assert isinstance(target.by_group, pd.DataFrame)
@@ -425,6 +451,11 @@ def test_2m_1sf_2cf():
                                  y_t, y_p,
                                  sensitive_features=g_2,
                                  control_features=[g_3, g_1])
+
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [0, 1])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [2])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

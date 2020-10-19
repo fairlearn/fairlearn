@@ -22,6 +22,12 @@ def test_basic(transform_y_t, transform_y_p):
                                  transform_y_p(y_p),
                                  sensitive_features=g_f)
 
+    # Check on the indices properties
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [0])
+
     # Check we have correct return types
     assert isinstance(target.overall, pd.Series)
     assert isinstance(target.by_group, pd.DataFrame)
@@ -60,6 +66,12 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
                                  transform_y_p(y_p),
                                  sensitive_features=g_2,
                                  control_features=g_3)
+
+    # Check on the indices properties
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [0])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [1])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

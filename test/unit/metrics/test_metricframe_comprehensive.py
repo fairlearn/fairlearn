@@ -55,6 +55,12 @@ def test_3m_2sf_2cf():
                                  sensitive_features=[sf_1_arr, sf_2_arr],
                                  control_features=[cf_1_arr, cf_2_arr])
 
+    # Check on the indices properties
+    assert isinstance(target.control_feature_indices, list)
+    assert (target.control_feature_indices == [0, 1])
+    assert isinstance(target.sensitive_feature_indices, list)
+    assert (target.sensitive_feature_indices == [2, 3])
+
     # Check everything
     for name, f in metric_dict.items():
         for cf_1 in cf_1_groups:

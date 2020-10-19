@@ -117,12 +117,16 @@ class MetricFrame:
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("SF", sensitive_features, y_t)
+        self._sf_indices = list(range(len(sf_list)))
 
+        # Prepare the control features
+        # Adjust _sf_indices if needed
         cf_list = None
-        self._cf_names = None
+        self._cf_indices = []
         if control_features is not None:
             cf_list = self._process_features("CF", control_features, y_t)
-            self._cf_names = [x.name for x in cf_list]
+            self._cf_indices = list(range(len(cf_list)))
+            self._sf_indices = [x+len(cf_list) for x in self._sf_indices]
 
         self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
         self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
@@ -205,6 +209,25 @@ class MetricFrame:
         """
         return self._by_group
 
+    @property
+    def control_feature_indices(self) -> List[int]:
+        """Return a list of feature indices which are produced by control features.
+
+        If control features are present, then the rows of the ``by_group``
+        property have a :class:`pd.MultiIndex` index. This property
+        identifies which elements of that index are control features.
+        """
+        return self._cf_indices
+
+    @property
+    def sensitive_feature_indices(self) -> List[int]:
+        """Return a list of the feature indices which are produced by sensitive features.
+
+        In cases where the ``by_group`` property has a :class:`pd.MultiIndex`
+        index, this identifies which elements of the index are sensitive features.
+        """
+        return self._sf_indices
+
     def group_max(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
@@ -220,14 +243,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if self._cf_names is None:
+        if not self.control_feature_indices:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 max_val = self.by_group[m].max()
                 result[m] = max_val
         else:
-            lvls = list(range(len(self._cf_names)))
-            result = self.by_group.groupby(level=lvls).max()
+            result = self.by_group.groupby(level=self.control_feature_indices).max()
         return result
 
     def group_min(self) -> Union[pd.Series, pd.DataFrame]:
@@ -245,14 +267,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if self._cf_names is None:
+        if not self.control_feature_indices:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 min_val = self.by_group[m].min()
                 result[m] = min_val
         else:
-            lvls = list(range(len(self._cf_names)))
-            result = self.by_group.groupby(level=lvls).min()
+            result = self.by_group.groupby(level=self.control_feature_indices).min()
         return result
 
     def difference(self,
@@ -288,13 +309,12 @@ class MetricFrame:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
         result = None
-        if self._cf_names is None:
+        if not self.control_feature_indices:
             result = (self.by_group - subtrahend).abs().max()
         else:
             # It's easiest to give in to the DataFrame columns preference
-            cf_levels = list(range(len(self._cf_names)))
-            diffs = (self.by_group.unstack(level=cf_levels) -
-                     subtrahend.unstack(level=cf_levels)).abs()
+            diffs = (self.by_group.unstack(level=self.control_feature_indices) -
+                     subtrahend.unstack(level=self.control_feature_indices)).abs()
             result = diffs.max().unstack(0)
 
         return result
@@ -338,12 +358,11 @@ class MetricFrame:
                     return x
 
             ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-            if self._cf_names is None:
+            if not self.control_feature_indices:
                 result = ratios.min()
             else:
                 # It's easiest to give in to the DataFrame columns preference
-                cf_levels = list(range(len(self._cf_names)))
-                result = ratios.unstack(level=cf_levels).min().unstack(0)
+                result = ratios.unstack(level=self.control_feature_indices).min().unstack(0)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
