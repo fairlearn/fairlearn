@@ -20,7 +20,6 @@ pytest-cov
 pytest-mock
 pytest-mpl>=0.11
 nteract-scrapbook
-tempeh==0.1.12
 wheel
 lightgbm
 xlrd
