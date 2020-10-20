@@ -180,7 +180,7 @@ function:
     dtype: object
     >>> metric_beta.by_group
             metric
-    sensitive_feature_
+    sensitive_feature_0
     a            0
     b     0.790698
     c      0.63354
