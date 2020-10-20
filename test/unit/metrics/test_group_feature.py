@@ -23,15 +23,15 @@ def common_validations(sf):
 
 
 def test_list():
-    target = metrics._group_feature.GroupFeature("Sens", raw_feature, 0, None)
+    target = metrics._group_feature.GroupFeature(raw_feature, None)
 
-    assert target.name == "Sens 0"
+    assert target.name is None
     common_validations(target)
 
 
 def test_named_list():
     expected_name = "My Named List"
-    target = metrics._group_feature.GroupFeature("Ignored", raw_feature, 2, expected_name)
+    target = metrics._group_feature.GroupFeature(raw_feature, expected_name)
 
     assert target.name == expected_name
     common_validations(target)
@@ -40,18 +40,18 @@ def test_named_list():
 def test_ndarray():
     rf = np.asarray(raw_feature)
 
-    target = metrics._group_feature.GroupFeature("SF", rf, 1, None)
+    target = metrics._group_feature.GroupFeature(rf, None)
 
-    assert target.name == "SF 1"
+    assert target.name is None
     common_validations(target)
 
 
 def test_unnamed_Series():
     rf = pd.Series(data=raw_feature)
 
-    target = metrics._group_feature.GroupFeature("SF", rf, 2, None)
+    target = metrics._group_feature.GroupFeature(rf, None)
 
-    assert target.name == "SF 2"
+    assert target.name is None
     common_validations(target)
 
 
@@ -59,7 +59,7 @@ def test_named_Series():
     name = "My Feature"
     rf = pd.Series(data=raw_feature, name=name)
 
-    target = metrics._group_feature.GroupFeature("Ignored", rf, 2, None)
+    target = metrics._group_feature.GroupFeature(rf, None)
 
     assert target.name == name
     common_validations(target)
@@ -70,7 +70,7 @@ def test_named_Series_override_name():
     series_name = "Unused Name"
 
     rf = pd.Series(data=raw_feature, name=series_name)
-    target = metrics._group_feature.GroupFeature("Not seen", rf, 2, expected_name)
+    target = metrics._group_feature.GroupFeature(rf, expected_name)
 
     assert target.name == expected_name
     common_validations(target)
