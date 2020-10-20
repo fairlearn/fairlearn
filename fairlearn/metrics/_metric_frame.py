@@ -349,7 +349,9 @@ class MetricFrame:
         if method == 'between_groups':
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
-            ratios = self.by_group / self.overall
+            # It's easiest to give in to the DataFrame columns preference
+            ratios = self.by_group.unstack(level=self.control_feature_indices) /  \
+                self.overall.unstack(level=self.control_feature_indices)
 
             def ratio_sub_one(x):
                 if x > 1:
@@ -361,8 +363,7 @@ class MetricFrame:
             if not self.control_feature_indices:
                 result = ratios.min()
             else:
-                # It's easiest to give in to the DataFrame columns preference
-                result = ratios.unstack(level=self.control_feature_indices).min().unstack(0)
+                result = ratios.min().unstack(0)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
