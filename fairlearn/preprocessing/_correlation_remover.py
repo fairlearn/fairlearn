@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Vincent D. Warmerdam, Microsoft Corporation and contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -51,7 +51,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
       X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
     """
 
-    def __init__(self, *, sensitive_feature_ids=None, alpha=1.0, center=True):
+    def __init__(self, sensitive_feature_ids=None, alpha=1.0, center=True):
         self.columns = sensitive_feature_ids
         self.alpha = alpha
         self.center = center
@@ -71,7 +71,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
         if (not self.columns) or (len(self.columns) == 0):
                 raise ValueError(f"No sensitive feature ids were passed to this object, got {self.columns}")
         X_use, X_sensitive = self._split_X(X)
-        self.sensitive_mean_ = X_sensitive.mean()
+        self.sensitive_mean_ = X_sensitive.mean(axis=0)
         X_s_center = X_sensitive - self.sensitive_mean_
         self.beta_, _, _, _ = np.linalg.lstsq(X_s_center, X_use, rcond=None)
         self.X_shape_ = X.shape
