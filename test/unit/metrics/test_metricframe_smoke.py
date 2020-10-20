@@ -8,7 +8,7 @@ import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
 
-from .data_for_test import y_t, y_p, g_2, g_3, g_4
+from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
 
 from test.unit.input_convertors import conversions_for_1d
 
@@ -118,3 +118,39 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
     assert target_maxs.shape == (2, 1)
     assert target_maxs['recall_score']['kk'] == max(recall_k_arr)
     assert target_maxs['recall_score']['m'] == max(recall_m_arr)
+
+
+def test_duplicate_sf_names():
+    groups = pd.DataFrame(np.stack([g_2, g_3], axis=1), columns=["A", "A"])
+    msg = "Detected duplicate feature name: 'A'"
+    with pytest.raises(ValueError) as execInfo:
+        _ = metrics.MetricFrame(skm.recall_score,
+                                y_t,
+                                y_p,
+                                sensitive_features=groups)
+    assert execInfo.value.args[0] == msg
+
+
+def test_duplicate_cf_names():
+    groups = pd.DataFrame(np.stack([g_2, g_3], axis=1), columns=["B", "B"])
+    msg = "Detected duplicate feature name: 'B'"
+    with pytest.raises(ValueError) as execInfo:
+        _ = metrics.MetricFrame(skm.recall_score,
+                                y_t,
+                                y_p,
+                                sensitive_features=g_4,
+                                control_features=groups)
+    assert execInfo.value.args[0] == msg
+
+
+def test_duplicate_cf_sf_names():
+    cf = pd.DataFrame(np.stack([g_2, g_3], axis=1), columns=["A", "B"])
+    sf = {"B": g_1, "C": g_4}
+    msg = "Detected duplicate feature name: 'B'"
+    with pytest.raises(ValueError) as execInfo:
+        _ = metrics.MetricFrame(skm.recall_score,
+                                y_t,
+                                y_p,
+                                sensitive_features=sf,
+                                control_features=cf)
+    assert execInfo.value.args[0] == msg

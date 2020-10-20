@@ -20,6 +20,7 @@ _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expe
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
 _FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}' is of type {1}"
+_DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric_functions'"
@@ -124,8 +125,6 @@ class MetricFrame:
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
         self._sf_names = [x.name for x in sf_list]
 
-        assert len(self._sf_names) == len(np.unique(self._sf_names))
-
         # Prepare the control features
         # Adjust _sf_indices if needed
         cf_list = None
@@ -134,9 +133,12 @@ class MetricFrame:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
-        assert len(self._cf_names) == len(np.unique(self._cf_names))
-        all_names = set(self._sf_names + self._cf_names)
-        assert len(all_names) == len(self._sf_names)+len(self._cf_names)
+        # Check for duplicate feature names
+        nameset = set()
+        for name in (self._sf_names + self._cf_names):
+            if name in nameset:
+                raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
+            nameset.add(name)
 
         self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
         self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
