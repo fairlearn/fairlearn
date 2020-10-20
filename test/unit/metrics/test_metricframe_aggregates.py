@@ -560,4 +560,4 @@ def test_2m_1sf_2cf():
         assert ratios_overall[mfn][('kk', 'ba')] == min(ratio_overall_k_b)
         assert ratios_overall[mfn][('m', 'aa')] == min(ratio_overall_m_a)
         assert ratios_overall[mfn][('m', 'ba')] == pytest.approx(min(ratio_overall_m_b),
-                                                                 rel = 1e-10, abs = 1e-16)
+                                                                 rel=1e-10, abs=1e-16)

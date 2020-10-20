@@ -76,9 +76,10 @@ def test_named_Series_override_name():
     assert target.name == expected_name
     common_validations(target)
 
+
 def test_Series_int_name():
     rf = pd.Series(data=raw_feature, name=1)
-    
+
     msg = "Series name must be a string. Value '1' was of type <class 'int'>"
     with pytest.raises(ValueError) as execInfo:
         _ = metrics._group_feature.GroupFeature("Not seen", rf, 2, None)
