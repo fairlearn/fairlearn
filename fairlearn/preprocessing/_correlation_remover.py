@@ -9,41 +9,45 @@ from sklearn.utils.validation import check_is_fitted
 
 class CorrelationRemover(BaseEstimator, TransformerMixin):
     r"""
-    A component that filters out sensitive correlations in a dataset.
+     A component that filters out sensitive correlations in a dataset.
 
-    The `InformationFilter` uses a variant of the Gram-Schmidt process
-    to filter information out of the dataset. This can be useful if you
-    want to filter information out of a dataset because of fairness.
-    To explain how it works: given a training matrix :math:`X` that contains
-    columns :math:`x_1, ..., x_k`. If we assume columns :math:`x_1` and :math:`x_2`
-    to be the sensitive columns then the information-filter will
-    remove information by applying these transformations;
+     CorrelationRemover applies a linear transformation to the non-sensitive feature columns in order
+     to remove their correlation with the sensitive feature columns while retaining as much information
+     as possible (as measured by the least-squares error).
 
-    .. math::
+     Parameters
+     ----------
+     sensitive_feature_ids : list of columns to filter out this can be a sequence of either int
+       ,in the case of numpy, or string, in the case of pandas.
+     alpha : parameter to control how much to filter, for alpha=1.0 we filter out
+       all information while for alpha=0.0 we don't apply any.
+     center : setting to tell if this preprocessing step should center the data for
+       numerical stability
 
-       \\begin{split}
-       v_1 & = x_1 \\\\
-       v_2 & = x_2 - \\frac{x_2 v_1}{v_1 v_1}\\\\
-       v_3 & = x_3 - \\frac{x_k v_1}{v_1 v_1} - \\frac{x_2 v_2}{v_2 v_2}\\\\
-       ... \\\\
-       v_k & = x_k - \\frac{x_k v_1}{v_1 v_1} - \\frac{x_2 v_2}{v_2 v_2}
-       \\end{split}
+     Notes
+     -----
 
-    Concatenating our vectors (but removing the sensitive ones) gives us
-    a new training matrix :math:`X_{filtered} =  [v_3, ..., v_k]`. The final output
-    is an interpolation between the original dataset (without sensitive columns)
-    and the fitlered dataset.
+     This method will change the original dataset by removing all correlation with sensitive values.
+     To describe that mathematically, let's assume in the original dataset :math:`X` we've got a set of
+     sensitive atttributes :math:`S` and a set of non-sensitive attributes :math:`Z`. Mathmatically this method
+     will be solving the following problem.
 
-    .. math::
+     .. math::
 
-      X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
+        \min _{\mathbf{z}_{1}, \ldots, \mathbf{z}_{n}} \sum_{i=1}^{n}\left\|\mathbf{z}_{i}-\mathbf{x}_{i}\right\|^{2} \\
+        \text{subject to} \\
+        \frac{1}{n} \sum_{i=1}^{n} \mathbf{z}_{i}\left(\mathbf{s}_{i}-\overline{\mathbf{s}}\right)^{T}=\mathbf{0}
 
-    :param sensitive_feature_ids: list of columns to filter out this can be a sequence of either int
-                    (in the case of numpy) or string (in the case of pandas).
-    :param alpha: parameter to control how much to filter, for alpha=1 we filter out
-                  all information while for alpha=0 we don't apply any.
-    :param center: setting to tell if this preprocessing step should center the data for
-                   numerical stability
+
+     The solution to this problem is found by centering sensitive features, fitting a
+     linear regression model to the non-sensitive features and reporting the residual.
+
+     The columns in :math:`S` will be dropped but the hyper parameter :math:`\alpha` does allow you to tweak
+     the amount of filtering that gets applied.
+
+     .. math::
+
+       X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
     """
 
     def __init__(self, sensitive_feature_ids, alpha=1, center=True):
