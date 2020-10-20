@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from sklearn.utils import estimator_checks
 
-from fairlearn.preprocessing import InformationFilter
+from fairlearn.preprocessing import CorrelationRemover
 
 
 @pytest.mark.parametrize(
@@ -14,7 +14,7 @@ from fairlearn.preprocessing import InformationFilter
         estimator_checks.check_transformers_unfitted,
         # general estimator checks
         estimator_checks.check_fit2d_predict1d,
-        # estimator_checks.check_methods_subset_invariance,
+        estimator_checks.check_methods_subset_invariance,
         estimator_checks.check_fit2d_1sample,
         estimator_checks.check_fit2d_1feature,
         estimator_checks.check_fit1d,
@@ -40,8 +40,8 @@ from fairlearn.preprocessing import InformationFilter
     ]
 )
 def test_estimator_checks(test_fn):
-    test_fn(InformationFilter.__name__, InformationFilter(columns=[]))
-    test_fn(InformationFilter.__name__, InformationFilter(columns=[0]))
+    test_fn(CorrelationRemover.__name__, CorrelationRemover(sensitive_feature_ids=[]))
+    test_fn(CorrelationRemover.__name__, CorrelationRemover(sensitive_feature_ids=[0]))
 
 
 def test_linear_dependence():
@@ -49,6 +49,6 @@ def test_linear_dependence():
                   [1, 1, 2, 2, ],
                   [0.1, 0.2, 1.2, 1.1, ]]).T
 
-    X_tfm = InformationFilter(columns=[0]).fit(X).transform(X)
+    X_tfm = CorrelationRemover(sensitive_feature_ids=[0]).fit(X).transform(X)
     assert X_tfm.shape[1] == 2
-    assert np.all(X_tfm[:, 0] == 0)
+    assert np.allclose(X_tfm[:, 0], 1.5)

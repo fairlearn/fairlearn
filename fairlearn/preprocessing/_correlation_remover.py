@@ -47,13 +47,13 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, sensitive_feature_ids, alpha=1, center=True):
-        self.columns = sensitive_feature_ids
+        self.sensitive_feature_ids = sensitive_feature_ids
         self.alpha = alpha
         self.center = center
 
     def _split_X(self, X):
         """Split up X into a sensitive and non-sensitive group."""
-        sensitive = self.columns
+        sensitive = self.sensitive_feature_ids
         non_sensitive = [i for i in range(X.shape[1]) if i not in sensitive]
         return X[:, non_sensitive], X[:, sensitive]
 
