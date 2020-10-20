@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import fairlearn.metrics as metrics
 
@@ -25,7 +26,7 @@ def common_validations(sf):
 def test_list():
     target = metrics._group_feature.GroupFeature("Sens", raw_feature, 0, None)
 
-    assert target.name == "Sens 0"
+    assert target.name == "Sens0"
     common_validations(target)
 
 
@@ -42,7 +43,7 @@ def test_ndarray():
 
     target = metrics._group_feature.GroupFeature("SF", rf, 1, None)
 
-    assert target.name == "SF 1"
+    assert target.name == "SF1"
     common_validations(target)
 
 
@@ -51,7 +52,7 @@ def test_unnamed_Series():
 
     target = metrics._group_feature.GroupFeature("SF", rf, 2, None)
 
-    assert target.name == "SF 2"
+    assert target.name == "SF2"
     common_validations(target)
 
 
@@ -74,3 +75,11 @@ def test_named_Series_override_name():
 
     assert target.name == expected_name
     common_validations(target)
+
+def test_Series_int_name():
+    rf = pd.Series(data=raw_feature, name=1)
+    
+    msg = "Series name must be a string. Value '1' was of type <class 'int'>"
+    with pytest.raises(ValueError) as execInfo:
+        _ = metrics._group_feature.GroupFeature("Not seen", rf, 2, None)
+    assert execInfo.value.args[0] == msg

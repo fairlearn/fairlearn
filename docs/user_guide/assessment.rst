@@ -55,6 +55,7 @@ the following set of labels:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> import numpy as np
     >>> import pandas as pd
     >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c',
     ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
@@ -129,7 +130,7 @@ metrics simultaneously:
     dtype: object
     >>> multi_metric.by_group
          precision recall
-    SF 0
+    sensitive_feature_0
     a            0      0
     b            1    0.5
     c          0.6   0.75
@@ -145,7 +146,7 @@ in a dictionary via the ``sample_params`` argument.:
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(skm.recall_score,
     ...                        Y_true, Y_pred,
-    ...                        sensitive_features=group_membership_data,
+    ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
     recall_score    0.45
@@ -179,7 +180,7 @@ function:
     dtype: object
     >>> metric_beta.by_group
             metric
-    SF 0
+    sensitive_feature_0
     a            0
     b     0.790698
     c      0.63354
@@ -192,9 +193,11 @@ holds the intersections of these groups:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6]
+    >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
+    ...                          columns=['SF 0', 'SF 1'])
     >>> metric_2sf = MetricFrame(skm.recall_score,
     ...                          Y_true, Y_pred,
-    ...                          sensitive_features=[group_membership_data, g_2])
+    ...                          sensitive_features=s_f_frame)
     >>> metric_2sf.overall  # Same as before
     recall_score    0.5
     dtype: object

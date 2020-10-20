@@ -8,6 +8,9 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 
+_SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
+
+
 class GroupFeature:
     """A helper class for Fairlearn metrics.
 
@@ -15,6 +18,11 @@ class GroupFeature:
     on behalf of a metric object. A grouping feature is either
     a sensitive or conditional feature which is used to divide
     up the sample population.
+
+    Note that if a Pandas Series is provided then its name must either
+    be ``None`` or a string. This is to prevent integer 'names' leaking out
+    which then make calls which accept names or indices ambiguous (think
+    `unstack()` and `groupby()`).
 
     This class takes care of encoding the grouping feature, and producing
     masks (used to select samples from the population) corresponding
@@ -49,12 +57,17 @@ class GroupFeature:
         self._encoder = LabelEncoder()
         self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
 
-        self._name = "{0} {1}".format(base_name, index)
+        self._name = "{0}{1}".format(base_name, index)
         if name is not None:
             self._name = name
         elif isinstance(feature_vector, pd.Series):
             if feature_vector.name is not None:
-                self._name = feature_vector.name
+                if isinstance(feature_vector.name, str):
+                    self._name = feature_vector.name
+                else:
+                    msg = _SERIES_NAME_NOT_STRING.format(feature_vector.name,
+                                                         type(feature_vector.name))
+                    raise ValueError(msg)
 
     def get_mask_for_class(self,
                            target_class: Any) -> np.ndarray:

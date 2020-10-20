@@ -253,6 +253,7 @@ the predicted labels.
     >>> from fairlearn.reductions import DemographicParity
     >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> import numpy as np
+    >>> import pandas as pd
     >>> dp = DemographicParity(difference_bound=0.01)
     >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
@@ -260,7 +261,7 @@ the predicted labels.
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
     >>> selection_rate_summary = MetricFrame(selection_rate,
     ...                                      y_true, y_pred,
-    ...                                      sensitive_features=sensitive_features)
+    ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> selection_rate_summary.overall
         selection_rate    0.4
     dtype: object
@@ -354,7 +355,7 @@ In practice this can be used in a difference-based relaxation as follows:
     dtype: object
     >>> tpr_summary.by_group
          true_positive_rate
-    SF 0
+    sensitive_feature_0
     a                  0.75
     b              0.333333
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
@@ -452,7 +453,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
     dtype: object
     >>> accuracy_summary.by_group
          accuracy_score
-    SF 0
+    sensitive_feature_0
     a               0.8
     b               0.4
     >>> erp = ErrorRateParity(difference_bound=0.01)
@@ -568,7 +569,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> sensitive_features = np.array(["a", "a", "b", "b"])
     >>> mae_summary = MetricFrame(mean_absolute_error,
     ...                           y_true, y_pred,
-    ...                           sensitive_features=sensitive_features)
+    ...                           sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> mae_summary.overall
     mean_absolute_error    0.275
     dtype: object

@@ -49,17 +49,21 @@ def test_3m_2sf_2cf():
     assert len(np.unique(cf_2_arr)) == len(cf_2_groups)
     assert len(np.unique(sf_2_arr)) == len(sf_2_groups)
 
+    # Make some inputs
+    sf_frame = pd.DataFrame(np.stack([sf_1_arr, sf_2_arr], axis=1), columns=["SF0", "SF1"])
+    cf_array = np.stack([cf_1_arr, cf_2_arr], axis=1)
+
     # Create the target object
     target = metrics.MetricFrame(metric_dict,
                                  y_true, y_pred,
-                                 sensitive_features=[sf_1_arr, sf_2_arr],
-                                 control_features=[cf_1_arr, cf_2_arr])
+                                 sensitive_features=sf_frame,
+                                 control_features=cf_array)
 
     # Check on the indices properties
-    assert isinstance(target.control_feature_indices, list)
-    assert (target.control_feature_indices == [0, 1])
-    assert isinstance(target.sensitive_feature_indices, list)
-    assert (target.sensitive_feature_indices == [2, 3])
+    assert isinstance(target.control_feature_names, list)
+    assert (target.control_feature_names == ["control_feature_0", "control_feature_1"])
+    assert isinstance(target.sensitive_feature_names, list)
+    assert (target.sensitive_feature_names == ["SF0", "SF1"])
 
     # Check everything
     for name, f in metric_dict.items():

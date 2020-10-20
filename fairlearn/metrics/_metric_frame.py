@@ -18,6 +18,8 @@ _SUBGROUP_COUNT_WARNING_THRESHOLD = 20
 
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
+_FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
+_FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}' is of type {1}"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric_functions'"
@@ -73,13 +75,16 @@ class MetricFrame:
 
     sensitive_features : It's complicated
         The sensitive features which should be used to create the subgroups.
-        At least one sensitive feature must be provided. Allowed types are
-        pandas Series, DataFrames, lists of Series, numpy arrays, lists of
-        numpy arrays and lists of lists (of scalars). If the supplied type
-        has associated names (Series or DataFrames) then the corresponding
-        sensitive feature will take its name from that. Otherwise, a name
-        of the format ``SF [n]`` will be generated, with ``n`` indicating
-        the index of the feature.
+        At least one sensitive feature must be provided. There are several
+        possible input types. Acceptable 'unnamed' types are lists (of
+        scalars), :class:`np.ndarray`, and :class:`pd.Series`. In these
+        cases, names of the form ``sensitive_feature_[n]`` will be automatically
+        generated. If the input type is :class:`np.ndarray` and there are
+        two dimensions (after squeezing) then multiple sensitive features
+        are generated. Acceptable 'named' types are :class:`pd.Series`,
+        :class:`pd.DataFrame` and dictionaries of 1d array-likes.
+        In all cases, the names *must* be strings.
+        We also forbid DataFrames with column names of ``None``.
 
     control_features : It's complicated
         Control features are similar to sensitive features, in that they
@@ -90,7 +95,7 @@ class MetricFrame:
         rather than a single value for the entire data set.
         Control features can be specified similarly to the sensitive features.
         However, their default names (if none can be identified in the
-        input values) are of the format ``CF [n]``.
+        input values) are of the format ``control_feature_[n]``.
 
     sample_params : dict
         Parameters for the metric function(s). If there is only one metric function,
@@ -116,17 +121,22 @@ class MetricFrame:
         func_dict = self._process_functions(metric_functions, sample_params)
 
         # Now, prepare the sensitive features
-        sf_list = self._process_features("SF", sensitive_features, y_t)
-        self._sf_indices = list(range(len(sf_list)))
+        sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
+        self._sf_names = [x.name for x in sf_list]
+
+        assert len(self._sf_names) == len(np.unique(self._sf_names))
 
         # Prepare the control features
         # Adjust _sf_indices if needed
         cf_list = None
-        self._cf_indices = []
+        self._cf_names = []
         if control_features is not None:
-            cf_list = self._process_features("CF", control_features, y_t)
-            self._cf_indices = list(range(len(cf_list)))
-            self._sf_indices = [x+len(cf_list) for x in self._sf_indices]
+            cf_list = self._process_features("control_feature_", control_features, y_t)
+            self._cf_names = [x.name for x in cf_list]
+
+        assert len(self._cf_names) == len(np.unique(self._cf_names))
+        all_names = set(self._sf_names + self._cf_names)
+        assert len(all_names) == len(self._sf_names)+len(self._cf_names)
 
         self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
         self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
@@ -210,23 +220,23 @@ class MetricFrame:
         return self._by_group
 
     @property
-    def control_feature_indices(self) -> List[int]:
-        """Return a list of feature indices which are produced by control features.
+    def control_feature_names(self) -> List[str]:
+        """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the ``by_group``
         property have a :class:`pd.MultiIndex` index. This property
         identifies which elements of that index are control features.
         """
-        return self._cf_indices
+        return self._cf_names
 
     @property
-    def sensitive_feature_indices(self) -> List[int]:
-        """Return a list of the feature indices which are produced by sensitive features.
+    def sensitive_feature_names(self) -> List[str]:
+        """Return a list of the feature names which are produced by sensitive features.
 
         In cases where the ``by_group`` property has a :class:`pd.MultiIndex`
         index, this identifies which elements of the index are sensitive features.
         """
-        return self._sf_indices
+        return self._sf_names
 
     def group_max(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -243,13 +253,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if not self.control_feature_indices:
+        if not self.control_feature_names:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 max_val = self.by_group[m].max()
                 result[m] = max_val
         else:
-            result = self.by_group.groupby(level=self.control_feature_indices).max()
+            result = self.by_group.groupby(level=self.control_feature_names).max()
         return result
 
     def group_min(self) -> Union[pd.Series, pd.DataFrame]:
@@ -267,13 +277,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if not self.control_feature_indices:
+        if not self.control_feature_names:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 min_val = self.by_group[m].min()
                 result[m] = min_val
         else:
-            result = self.by_group.groupby(level=self.control_feature_indices).min()
+            result = self.by_group.groupby(level=self.control_feature_names).min()
         return result
 
     def difference(self,
@@ -309,12 +319,12 @@ class MetricFrame:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
         result = None
-        if not self.control_feature_indices:
+        if not self.control_feature_names:
             result = (self.by_group - subtrahend).abs().max()
         else:
             # It's easiest to give in to the DataFrame columns preference
-            diffs = (self.by_group.unstack(level=self.control_feature_indices) -
-                     subtrahend.unstack(level=self.control_feature_indices)).abs()
+            diffs = (self.by_group.unstack(level=self.control_feature_names) -
+                     subtrahend.unstack(level=self.control_feature_names)).abs()
             result = diffs.max().unstack(0)
 
         return result
@@ -350,8 +360,8 @@ class MetricFrame:
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             # It's easiest to give in to the DataFrame columns preference
-            ratios = self.by_group.unstack(level=self.control_feature_indices) /  \
-                self.overall.unstack(level=self.control_feature_indices)
+            ratios = self.by_group.unstack(level=self.control_feature_names) /  \
+                self.overall.unstack(level=self.control_feature_names)
 
             def ratio_sub_one(x):
                 if x > 1:
@@ -360,7 +370,7 @@ class MetricFrame:
                     return x
 
             ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-            if not self.control_feature_indices:
+            if not self.control_feature_names:
                 result = ratios.min()
             else:
                 result = ratios.min().unstack(0)
@@ -404,6 +414,10 @@ class MetricFrame:
             result.append(GroupFeature(base_name, features, 0, None))
         elif isinstance(features, pd.DataFrame):
             for i in range(len(features.columns)):
+                col_name = features.columns[i]
+                if not isinstance(col_name, str):
+                    msg = _FEATURE_DF_COLUMN_BAD_NAME.format(col_name, type(col_name))
+                    raise ValueError(msg)
                 column = features.iloc[:, i]
                 check_consistent_length(column, sample_array)
                 result.append(GroupFeature(base_name, column, i, None))
@@ -414,15 +428,17 @@ class MetricFrame:
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
             else:
-                for i in range(len(features)):
-                    if isinstance(features[i], pd.Series):
-                        check_consistent_length(features[i], sample_array)
-                        result.append(GroupFeature(base_name, features[i], i, None))
-                    else:
-                        f_arr = np.squeeze(np.asarray(features[i]))
-                        assert len(f_arr.shape) == 1  # Sanity check
-                        check_consistent_length(f_arr, sample_array)
-                        result.append(GroupFeature(base_name, f_arr, i, None))
+                raise ValueError(_FEATURE_LIST_NONSCALAR)
+        elif isinstance(features, dict):
+            df = pd.DataFrame.from_dict(features)
+            for i in range(len(df.columns)):
+                col_name = df.columns[i]
+                if not isinstance(col_name, str):
+                    msg = _FEATURE_DF_COLUMN_BAD_NAME.format(col_name, type(col_name))
+                    raise ValueError(msg)
+                column = df.iloc[:, i]
+                check_consistent_length(column, sample_array)
+                result.append(GroupFeature(base_name, column, i, None))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
             f_arr = np.squeeze(np.asarray(features, dtype=np.object))
@@ -430,8 +446,9 @@ class MetricFrame:
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
             elif len(f_arr.shape) == 2:
-                for i in range(f_arr.shape[0]):
-                    col = f_arr[i, :]
+                # Work similarly to pd.DataFrame(data=ndarray)
+                for i in range(f_arr.shape[1]):
+                    col = f_arr[:, i]
                     check_consistent_length(col, sample_array)
                     result.append(GroupFeature(base_name, col, i, None))
             else:
