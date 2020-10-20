@@ -10,4 +10,8 @@ API Reference
    fairlearn.postprocessing
    fairlearn.reductions
    fairlearn.widget
+<<<<<<< HEAD
    fairlearn.preprocessing
+=======
+   fairlearn.datasets
+>>>>>>> The Boston Dataset - Clean (#494)
