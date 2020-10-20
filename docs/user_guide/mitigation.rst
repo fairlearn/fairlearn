@@ -266,6 +266,7 @@ the predicted labels.
     dtype: object
     >>> selection_rate_summary.by_group
          selection_rate
+    SF 0
     a               0.6
     b               0.2
     >>> dp.load_data(X, y_true, sensitive_features=sensitive_features)
@@ -353,6 +354,7 @@ In practice this can be used in a difference-based relaxation as follows:
     dtype: object
     >>> tpr_summary.by_group
          true_positive_rate
+    SF 0
     a                  0.75
     b              0.333333
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
@@ -450,6 +452,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
     dtype: object
     >>> accuracy_summary.by_group
          accuracy_score
+    SF 0
     a               0.8
     b               0.4
     >>> erp = ErrorRateParity(difference_bound=0.01)
@@ -571,6 +574,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     dtype: object
     >>> mae_summary.by_group
          mean_absolute_error
+    SF 0
     a                   0.05
     b                    0.5
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)

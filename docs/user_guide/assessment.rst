@@ -129,6 +129,7 @@ metrics simultaneously:
     dtype: object
     >>> multi_metric.by_group
          precision recall
+    SF 0
     a            0      0
     b            1    0.5
     c          0.6   0.75
@@ -151,6 +152,7 @@ in a dictionary via the ``sample_params`` argument.:
     dtype: object
     >>> weighted.by_group
          recall_score
+    SF 0
     a               0
     b             0.5
     c        0.714286
@@ -177,6 +179,7 @@ function:
     dtype: object
     >>> metric_beta.by_group
             metric
+    SF 0
     a            0
     b     0.790698
     c      0.63354
@@ -197,6 +200,7 @@ holds the intersections of these groups:
     dtype: object
     >>> metric_2sf.by_group
               recall_score
+    SF 0 SF 1
     a    6               0
          8             NaN
     b    6             0.5

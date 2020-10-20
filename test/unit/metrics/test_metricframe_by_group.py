@@ -20,13 +20,13 @@ metric_functions = [skm.recall_score,
 def test_1m_1sf_0cf(metric_fn):
     target = _get_raw_MetricFrame()
     func_dict = target._process_functions(metric_fn, None)
-    sf_list = target._process_features(g_1, y_t)
+    sf_list = target._process_features("SF", g_1, y_t)
 
     result = target._compute_by_group(func_dict, y_t, y_p, sf_list, None)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 1)
-    assert np.array_equal(result.index.names, [None])
+    assert np.array_equal(result.index.names, ['SF 0'])
     mask_a = (g_1 == 'aa')
     mask_b = (g_1 == 'ba')
     metric_a = metric_fn(y_t[mask_a], y_p[mask_a])
@@ -39,14 +39,14 @@ def test_1m_1sf_0cf(metric_fn):
 def test_1m_1sf_1cf(metric_fn):
     target = _get_raw_MetricFrame()
     func_dict = target._process_functions(metric_fn, None)
-    sf_list = target._process_features(g_1, y_t)
-    cf_list = target._process_features(g_2, y_t)
+    sf_list = target._process_features("SF", g_1, y_t)
+    cf_list = target._process_features("CF", g_2, y_t)
 
     result = target._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (4, 1)
-    assert np.array_equal(result.index.names, [None, None])
+    assert np.array_equal(result.index.names, ['CF 0', 'SF 0'])
 
     mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))
     mask_a_g = np.logical_and((g_1 == 'aa'), (g_2 == 'g'))
@@ -68,14 +68,14 @@ def test_2m_2sf_2cf():
     funcs = {'recall': skm.recall_score, 'prec': skm.precision_score}
     func_container_dict = target._process_functions(funcs,
                                                     {'recall': {'sample_weight': s_w}})
-    sf_list = target._process_features([g_1, g_3], y_t)
-    cf_list = target._process_features([g_2, g_4], y_t)
+    sf_list = target._process_features("Sens", [g_1, g_3], y_t)
+    cf_list = target._process_features("Cond", [g_2, g_4], y_t)
 
     result = target._compute_by_group(func_container_dict, y_t, y_p, sf_list, cf_list)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (16, 2)
-    assert np.array_equal(result.index.names, [None, None, None, None])
+    assert np.array_equal(result.index.names, ['Cond 0', 'Cond 1', 'Sens 0', 'Sens 1'])
 
     # Only check some isolated results, rather than all 32
     mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))

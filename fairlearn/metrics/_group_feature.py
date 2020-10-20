@@ -21,26 +21,35 @@ class GroupFeature:
     to the subgroups it identifies.
 
     It also holds the feature name, which can be supplied by the caller,
-    or taken from the name of the Pandas object.
+    or generated from a base and and index.
 
     Parameters
     ----------
+    base_name : str
+        The base string to use as a feature name if `name` is not specified.
+        The value of `index` is appended
+
     feature_vector : array_like
         Some sort of array encoding the feature. It is fed into
         :class:`sklrearn.preprocessing.LabelEncoder` for easy masking
+
+    index : int
+        Used together with `base_name` when automatically generating a name
 
     name : str
         Optional name for the feature
     """
 
     def __init__(self,
+                 base_name: str,
                  feature_vector,
+                 index: int,
                  name: Optional[str]):
         """Help with the metrics."""
         self._encoder = LabelEncoder()
         self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
 
-        self._name = None
+        self._name = "{0} {1}".format(base_name, index)
         if name is not None:
             self._name = name
         elif isinstance(feature_vector, pd.Series):

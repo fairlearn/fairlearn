@@ -7,8 +7,8 @@ import fairlearn.metrics as metrics
 from .utils import _get_raw_MetricFrame
 
 
-gf0 = metrics._group_feature.GroupFeature(['a', 'a', 'b', 'b', 'c', 'c'],  None)
-gf1 = metrics._group_feature.GroupFeature(['x', 'y', 'x', 'y', 'x', 'y'],  None)
+gf0 = metrics._group_feature.GroupFeature('SF', ['a', 'a', 'b', 'b', 'c', 'c'], 0, None)
+gf1 = metrics._group_feature.GroupFeature('SF', ['x', 'y', 'x', 'y', 'x', 'y'], 0, None)
 
 
 class TestSingleFeatureIndexing:

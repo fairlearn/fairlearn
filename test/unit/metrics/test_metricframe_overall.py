@@ -60,13 +60,13 @@ def test_2m_0cf():
 def test_1m_1cf(metric_fn):
     target = _get_raw_MetricFrame()
     func_dict = target._process_functions(metric_fn, None)
-    cf_list = target._process_features(g_1, y_t)
+    cf_list = target._process_features("CF", g_1, y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 1)
-    assert np.array_equal(result.index.names, [None])
+    assert np.array_equal(result.index.names, ['CF 0'])
     mask_a = (g_1 == 'aa')
     mask_b = (g_1 == 'ba')
     exp_metric_a = metric_fn(y_t[mask_a], y_p[mask_a])
@@ -79,13 +79,13 @@ def test_1m_1cf_wgt():
     target = _get_raw_MetricFrame()
     func_dict = target._process_functions(skm.recall_score,
                                           {'sample_weight': s_w})
-    cf_list = target._process_features(g_1, y_t)
+    cf_list = target._process_features("CondF", g_1, y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 1)
-    assert np.array_equal(result.index.names, [None])
+    assert np.array_equal(result.index.names, ['CondF 0'])
     mask_a = (g_1 == 'aa')
     mask_b = (g_1 == 'ba')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a],
@@ -99,13 +99,13 @@ def test_1m_1cf_wgt():
 def test_1m_2cf():
     target = _get_raw_MetricFrame()
     func_dict = target._process_functions(skm.recall_score, None)
-    cf_list = target._process_features([g_1, g_2], y_t)
+    cf_list = target._process_features("CF", [g_1, g_2], y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (4, 1)
-    assert np.array_equal(result.index.names, [None, None])
+    assert np.array_equal(result.index.names, ['CF 0', 'CF 1'])
     mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))
     mask_a_g = np.logical_and((g_1 == 'aa'), (g_2 == 'g'))
     mask_b_f = np.logical_and((g_1 == 'ba'), (g_2 == 'f'))
@@ -127,7 +127,7 @@ def test_2m_2cf():
     func_dict = target._process_functions(
         {'recall': skm.recall_score, 'prec': skm.precision_score},
         None)
-    cf_list = target._process_features([g_1, g_2], y_t)
+    cf_list = target._process_features("CF", [g_1, g_2], y_t)
 
     result = target._compute_overall(func_dict, y_t, y_p, cf_list)
 

@@ -24,15 +24,15 @@ class TestSingleFeature():
         raw_feature, y_true = self._get_raw_data()
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(raw_feature, y_true)
-        self._common_validations(result, None)
+        result = target._process_features("SF", raw_feature, y_true)
+        self._common_validations(result, "SF 0")
 
     def test_single_series(self):
         r_f, y_true = self._get_raw_data()
         raw_feature = pd.Series(data=r_f, name="Some Series")
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(raw_feature, y_true)
+        result = target._process_features("Ignored", raw_feature, y_true)
         self._common_validations(result, "Some Series")
 
     def test_1d_array(self):
@@ -40,15 +40,15 @@ class TestSingleFeature():
         raw_feature = np.asarray(r_f)
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(raw_feature, y_true)
-        self._common_validations(result, None)
+        result = target._process_features("CF", raw_feature, y_true)
+        self._common_validations(result, "CF 0")
 
     def test_single_column_dataframe(self):
         r_f, y_true = self._get_raw_data()
         raw_feature = pd.DataFrame(data=r_f, columns=["My Feature"])
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(raw_feature, y_true)
+        result = target._process_features("Ignored", raw_feature, y_true)
         self._common_validations(result, "My Feature")
 
     def test_single_column_dataframe_unnamed(self):
@@ -56,7 +56,7 @@ class TestSingleFeature():
         raw_feature = pd.DataFrame(data=r_f)
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(raw_feature, y_true)
+        result = target._process_features("Unused", raw_feature, y_true)
         # If we don't specify names for the columns, then they are 'named' with integers
         self._common_validations(result, 0)
 
@@ -79,8 +79,8 @@ class TestTwoFeatures():
         rf = [a, b]
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(rf, y_true)
-        self._common_validations(result, [None, None])
+        result = target._process_features('SF', rf, y_true)
+        self._common_validations(result, ['SF 0', 'SF 1'])
 
     def test_2d_array(self):
         a, b, y_true = self._get_raw_data()
@@ -88,8 +88,8 @@ class TestTwoFeatures():
         rf = np.asarray([a, b], dtype=np.object)
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(rf, y_true)
-        self._common_validations(result, [None, None])
+        result = target._process_features('CF', rf, y_true)
+        self._common_validations(result, ['CF 0', 'CF 1'])
 
     def test_named_dataframe(self):
         cols = ["Col Alpha", "Col Num"]
@@ -98,7 +98,7 @@ class TestTwoFeatures():
         rf = pd.DataFrame(data=zip(a, b), columns=cols)
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(rf, y_true)
+        result = target._process_features('Ignored', rf, y_true)
         self._common_validations(result, cols)
 
     def test_unnamed_dataframe(self):
@@ -107,7 +107,7 @@ class TestTwoFeatures():
         rf = pd.DataFrame(data=zip(a, b))
 
         target = _get_raw_MetricFrame()
-        result = target._process_features(rf, y_true)
+        result = target._process_features('Unused', rf, y_true)
         self._common_validations(result, [0, 1])
 
     def test_list_of_series(self):
@@ -115,5 +115,5 @@ class TestTwoFeatures():
 
         rf = [pd.Series(data=a, name="Alpha"), pd.Series(data=b, name="Beta")]
         target = _get_raw_MetricFrame()
-        result = target._process_features(rf, y_true)
+        result = target._process_features('Unused', rf, y_true)
         self._common_validations(result, ['Alpha', 'Beta'])
