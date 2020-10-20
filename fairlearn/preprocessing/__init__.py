@@ -1,3 +1,3 @@
-from ._informationfilter import InformationFilter
+from ._correlation_remover import CorrelationRemover
 
-__all__ = ["InformationFilter"]
+__all__ = ["CorrelationRemover"]
