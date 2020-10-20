@@ -10,4 +10,8 @@ API Reference
    fairlearn.postprocessing
    fairlearn.reductions
    fairlearn.widget
+<<<<<<< HEAD
    fairlearn.datasets
+=======
+   fairlearn.preprocessing
+>>>>>>> v0-information-filter
