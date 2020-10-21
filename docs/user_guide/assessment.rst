@@ -242,7 +242,7 @@ be launched within a Jupyter notebook as follows:
     from fairlearn.widget import FairlearnDashboard
 
     # A_test containts your sensitive features (e.g., age, binary gender)
-    # sensitive_feature_names containts your sensitive feature names
+    # sensitive_feature_names contains your sensitive feature names
     # y_true contains ground truth labels
     # y_pred contains prediction labels
 

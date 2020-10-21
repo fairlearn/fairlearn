@@ -222,7 +222,7 @@ class MetricFrame:
         return self._by_group
 
     @property
-    def control_feature_names(self) -> List[str]:
+    def control_features(self) -> List[str]:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the ``by_group``
@@ -232,7 +232,7 @@ class MetricFrame:
         return self._cf_names
 
     @property
-    def sensitive_feature_names(self) -> List[str]:
+    def sensitive_features(self) -> List[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
         In cases where the ``by_group`` property has a :class:`pd.MultiIndex`
@@ -255,13 +255,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if not self.control_feature_names:
+        if not self.control_features:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 max_val = self.by_group[m].max()
                 result[m] = max_val
         else:
-            result = self.by_group.groupby(level=self.control_feature_names).max()
+            result = self.by_group.groupby(level=self.control_features).max()
         return result
 
     def group_min(self) -> Union[pd.Series, pd.DataFrame]:
@@ -279,13 +279,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if not self.control_feature_names:
+        if not self.control_features:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 min_val = self.by_group[m].min()
                 result[m] = min_val
         else:
-            result = self.by_group.groupby(level=self.control_feature_names).min()
+            result = self.by_group.groupby(level=self.control_features).min()
         return result
 
     def difference(self,
@@ -321,12 +321,12 @@ class MetricFrame:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
         result = None
-        if not self.control_feature_names:
+        if not self.control_features:
             result = (self.by_group - subtrahend).abs().max()
         else:
             # It's easiest to give in to the DataFrame columns preference
-            diffs = (self.by_group.unstack(level=self.control_feature_names) -
-                     subtrahend.unstack(level=self.control_feature_names)).abs()
+            diffs = (self.by_group.unstack(level=self.control_features) -
+                     subtrahend.unstack(level=self.control_features)).abs()
             result = diffs.max().unstack(0)
 
         return result
@@ -362,8 +362,8 @@ class MetricFrame:
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             # It's easiest to give in to the DataFrame columns preference
-            ratios = self.by_group.unstack(level=self.control_feature_names) /  \
-                self.overall.unstack(level=self.control_feature_names)
+            ratios = self.by_group.unstack(level=self.control_features) /  \
+                self.overall.unstack(level=self.control_features)
 
             def ratio_sub_one(x):
                 if x > 1:
@@ -372,7 +372,7 @@ class MetricFrame:
                     return x
 
             ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-            if not self.control_feature_names:
+            if not self.control_features:
                 result = ratios.min()
             else:
                 result = ratios.min().unstack(0)

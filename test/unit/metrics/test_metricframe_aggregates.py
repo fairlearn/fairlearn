@@ -23,10 +23,10 @@ def test_1m_1sf_0cf(metric_fn):
                                  y_t, y_p,
                                  sensitive_features=g_4)
 
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == [])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['sensitive_feature_0'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == [])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['sensitive_feature_0'])
 
     overall = metric_fn(y_t, y_p)
     mask_p = (g_4 == 'pp')
@@ -81,10 +81,10 @@ def test_2m_1sf_0cf():
                                  y_t, y_p,
                                  sensitive_features=pd.Series(data=g_4))
 
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == [])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['sensitive_feature_0'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == [])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['sensitive_feature_0'])
 
     recall = skm.recall_score(y_t, y_p)
     prec = skm.precision_score(y_t, y_p)
@@ -151,10 +151,10 @@ def test_1m_1sf_1cf(metric_fn):
                                  sensitive_features=pd.Series(data=g_2, name='sf0'),
                                  control_features=pd.Series(data=g_3, name='cf0'))
 
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == ['cf0'])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['sf0'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == ['cf0'])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['sf0'])
 
     mask_f = (g_2 == 'f')
     mask_g = (g_2 == 'g')
@@ -230,10 +230,10 @@ def test_1m_1sf_2cf(metric_fn):
                                  sensitive_features=list(g_2),
                                  control_features=np.stack([g_3, g_1], axis=1))
 
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == ['control_feature_0', 'control_feature_1'])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['sensitive_feature_0'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == ['control_feature_0', 'control_feature_1'])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['sensitive_feature_0'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -348,10 +348,10 @@ def test_2m_1sf_1cf():
                                  sensitive_features=g_2,
                                  control_features=g_3)
 
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == ['control_feature_0'])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['sensitive_feature_0'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == ['control_feature_0'])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['sensitive_feature_0'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -452,10 +452,10 @@ def test_2m_1sf_2cf():
                                  sensitive_features=list(g_2),
                                  control_features={'cf0': g_3, 'cf1': g_1})
 
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == ['cf0', 'cf1'])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['sensitive_feature_0'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == ['cf0', 'cf1'])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['sensitive_feature_0'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

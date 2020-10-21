@@ -23,10 +23,10 @@ def test_basic(transform_y_t, transform_y_p):
                                  sensitive_features=g_f)
 
     # Check on the indices properties
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == [])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['My feature'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == [])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['My feature'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.Series)
@@ -68,10 +68,10 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
                                  control_features=g_3)
 
     # Check on the indices properties
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == ['control_feature_0'])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ['sensitive_feature_0'])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == ['control_feature_0'])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ['sensitive_feature_0'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

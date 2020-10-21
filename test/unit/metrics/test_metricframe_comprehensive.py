@@ -60,10 +60,10 @@ def test_3m_2sf_2cf():
                                  control_features=cf_array)
 
     # Check on the indices properties
-    assert isinstance(target.control_feature_names, list)
-    assert (target.control_feature_names == ["control_feature_0", "control_feature_1"])
-    assert isinstance(target.sensitive_feature_names, list)
-    assert (target.sensitive_feature_names == ["SF0", "SF1"])
+    assert isinstance(target.control_features, list)
+    assert (target.control_features == ["control_feature_0", "control_feature_1"])
+    assert isinstance(target.sensitive_features, list)
+    assert (target.sensitive_features == ["SF0", "SF1"])
 
     # Check everything
     for name, f in metric_dict.items():
