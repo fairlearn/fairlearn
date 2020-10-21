@@ -46,11 +46,23 @@ def _build_argument_parser():
                         required=True)
     return parser
 
+def _pip_backwards_compatibility():
+    """Install extra pip packages for backwards compatibility
+
+    This is specifically targeted at tempeh for v0.4.6.
+    """
+    extra_packages = [ 'tempeh' ]
+
+    with _LogWrapper("Running pip install"):
+        subprocess.check_call(["pip", "install"] + extra_packages)
+
 
 def main(argv):
     _ensure_cwd_is_fairlearn_root_dir()
     parser = _build_argument_parser()
     args = parser.parse_args(argv)
+
+    _pip_backwards_compatibility()
 
     with _LogWrapper("copying static files"):
         shutil.copytree(os.path.join(args.documentation_path, landing_page_directory),
