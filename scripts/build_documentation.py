@@ -46,12 +46,13 @@ def _build_argument_parser():
                         required=True)
     return parser
 
+
 def _pip_backwards_compatibility():
     """Install extra pip packages for backwards compatibility
 
     This is specifically targeted at tempeh for v0.4.6.
     """
-    extra_packages = [ 'tempeh' ]
+    extra_packages = ['tempeh']
 
     with _LogWrapper("Running pip install"):
         subprocess.check_call(["pip", "install"] + extra_packages)
