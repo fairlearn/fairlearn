@@ -29,7 +29,7 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
 class MetricFrame:
     """Contains a collection of group fairness metrics.
 
-    This class holds group fairness metrics calculated for any number of underlying
+    This data structure stores and manipulates disaggregated values for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
     to split the data into subgroups. The underlying metric(s) is(are) calculated
     across the entire dataset (made available by the ``overall`` property) and
@@ -50,7 +50,7 @@ class MetricFrame:
     sensitive features, by taking differences or ratios,
     and then reporting the maximum or minimum respectively.
 
-    This class also supports the concept of 'control features.' Like the sensitive
+    This data structure also supports the concept of 'control features.' Like the sensitive
     features, control features identify subgroups within the data, but
     aggregations are not performed over the control features. Instead, the
     aggregations produce a result for each subgroup identified by the control
