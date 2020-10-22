@@ -69,25 +69,30 @@ class MetricFrame:
         :func:`functools.partial` must be used.
 
     y_true : array_like
-        The true values
+        The true values. We consider an input 'array_like' if passing it
+        to :func:`numpy.asarray` and :func:`numpy.squeeze` succeed.
 
     y_pred : array_like
-        The predicted values
+        The predicted values. We consider an input 'array_like' if passing it
+        to :func:`numpy.asarray` and :func:`numpy.squeeze` succeed.
 
-    sensitive_features : It's complicated
+    sensitive_features : Series, DataFrame, dict of 1d array-like, array-like
         The sensitive features which should be used to create the subgroups.
-        At least one sensitive feature must be provided. There are several
-        possible input types. Acceptable 'unnamed' types are lists (of
-        scalars), :class:`np.ndarray`, and :class:`pd.Series`. In these
-        cases, names of the form ``sensitive_feature_[n]`` will be automatically
-        generated. If the input type is :class:`np.ndarray` and there are
-        two dimensions (after squeezing) then multiple sensitive features
-        are generated. Acceptable 'named' types are :class:`pd.Series`,
-        :class:`pd.DataFrame` and dictionaries of 1d array-likes.
-        In all cases, the names *must* be strings.
-        We also forbid DataFrames with column names of ``None``.
+        At least one sensitive feature must be provided.
+        There are a variety of supported input types:
 
-    control_features : It's complicated
+        - :class:`pandas.Series`
+        - :class:`pandas.DataFrame`
+        - array_like (works with :func:`numpy.asarray`)
+        - Dictionary of 1d array_like (works with :meth:`pandas.DataFrame.from_dict`)
+
+        In all cases, the names *must* be strings (both pandas objects and dictionary
+        keys).
+        We also forbid DataFrames with column names of ``None``.
+        For cases where no names are provided (array_like and a :class:`pandas.Series`
+        with `name=None`) we generate names `sensitive_feature_[n]`.
+
+    control_features : Series, DataFrame, dict of 1d array-like, array-like
         Control features are similar to sensitive features, in that they
         divide the input data into subgroups.
         Unlike the sensitive features, aggregations are not performed
