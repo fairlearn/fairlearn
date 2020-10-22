@@ -74,14 +74,14 @@ class MetricFrame:
     y_pred : List, pandas.Series, numpy.ndarray, pandas.DataFrame
         The predicted values.
 
-    sensitive_features : Series, DataFrame, dictionary of 1d arrays, numpy.ndarray, pandas.DataFrame
+    sensitive_features : Series, DataFrame, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         The sensitive features which should be used to create the subgroups.
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
         We also forbid DataFrames with column names of ``None``.
         For cases where no names are provided we generate names `sensitive_feature_[n]`.
 
-    control_features : Series, DataFrame, dictionary of 1d arrays, numpy.ndarray, pandas.DataFrame
+    control_features : Series, DataFrame, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         Control features are similar to sensitive features, in that they
         divide the input data into subgroups.
         Unlike the sensitive features, aggregations are not performed
@@ -188,7 +188,7 @@ class MetricFrame:
 
         Returns
         -------
-        pandas.Series or pandas.DataFrame        
+        pandas.Series or pandas.DataFrame
             If no ``control_levels`` were specified, then this is
             a :class:`pandas.Series` with one row for each underlying metric.
 
@@ -205,7 +205,7 @@ class MetricFrame:
 
         Returns
         -------
-        pandas.DataFrame  
+        pandas.DataFrame
             This :class:`pandas.DataFrame` contains the result of evaluating
             each underlying metric for each combination of classes in the
             sensitive and control features. The columns identify
@@ -323,7 +323,7 @@ class MetricFrame:
         corresponding value from ``overall`` (if there are control
         features, then ``overall`` is multivalued for each metric).
         The result is the absolute maximum of these values.
-        
+
         Returns
         -------
         pandas.Series or pandas.DataFrame
@@ -376,7 +376,7 @@ class MetricFrame:
         features, then ``overall`` is multivalued for each metric),
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
-        
+
         Returns
         -------
         pandas.Series or pandas.DataFrame
