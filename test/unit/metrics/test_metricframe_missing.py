@@ -9,10 +9,10 @@ import fairlearn.metrics as metrics
 
 from .data_for_test import y_t, y_p, group_gen, g_1
 
-metric_functions = [skm.recall_score,
-                    skm.precision_score,
-                    skm.accuracy_score,
-                    skm.balanced_accuracy_score]
+metric = [skm.recall_score,
+          skm.precision_score,
+          skm.accuracy_score,
+          skm.balanced_accuracy_score]
 
 
 n = len(y_t)
@@ -20,7 +20,7 @@ g_A = np.asarray([group_gen(x, int(n/2), ['aa', 'bb']) for x in range(n)])
 g_B = np.asarray([group_gen(x, 1+int(n/3), ['x', 'y', 'z']) for x in range(n)])
 
 
-@pytest.mark.parametrize("metric_fn", metric_functions)
+@pytest.mark.parametrize("metric_fn", metric)
 def test_missing_sensitive_feature_combinations(metric_fn):
 
     target = metrics.MetricFrame(metric_fn,
@@ -56,7 +56,7 @@ def test_missing_sensitive_feature_combinations(metric_fn):
         min([x/overall for x in direct_eval] + [overall/x for x in direct_eval])
 
 
-@pytest.mark.parametrize("metric_fn", metric_functions)
+@pytest.mark.parametrize("metric_fn", metric)
 def test_missing_conditional_feature_combinations(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,

@@ -23,7 +23,7 @@ _FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}
 _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
-    "Keys in 'sample_params' do not match those in 'metric_functions'"
+    "Keys in 'sample_params' do not match those in 'metric'"
 
 
 class MetricFrame:
@@ -59,7 +59,7 @@ class MetricFrame:
 
     Parameters
     ----------
-    metric_functions : callable or dict
+    metric : callable or dict
         The underlying metric functions which are to be calculated. This
         can either be a single metric function or a dictionary of functions.
         These functions must be callable as
@@ -113,7 +113,7 @@ class MetricFrame:
     """
 
     def __init__(self,
-                 metric_functions: Union[Callable, Dict[str, Callable]],
+                 metric: Union[Callable, Dict[str, Callable]],
                  y_true,
                  y_pred, *,
                  sensitive_features,
@@ -124,7 +124,7 @@ class MetricFrame:
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        func_dict = self._process_functions(metric_functions, sample_params)
+        func_dict = self._process_functions(metric, sample_params)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
@@ -386,29 +386,29 @@ class MetricFrame:
 
         return result
 
-    def _process_functions(self, metric_functions, sample_params) -> Dict[str, FunctionContainer]:
+    def _process_functions(self, metric, sample_params) -> Dict[str, FunctionContainer]:
         """Get the underlying metrics into :class:`fairlearn.metrics.FunctionContainer` objects."""
         func_dict = dict()
-        if isinstance(metric_functions, dict):
+        if isinstance(metric, dict):
             s_p = dict()
             if sample_params is not None:
                 if not isinstance(sample_params, dict):
                     raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
                 sp_keys = set(sample_params.keys())
-                mf_keys = set(metric_functions.keys())
+                mf_keys = set(metric.keys())
                 if not sp_keys.issubset(mf_keys):
                     raise ValueError(_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT)
                 s_p = sample_params
 
-            for name, func in metric_functions.items():
+            for name, func in metric.items():
                 curr_s_p = None
                 if name in s_p:
                     curr_s_p = s_p[name]
                 fc = FunctionContainer(func, name, curr_s_p)
                 func_dict[fc.name_] = fc
         else:
-            fc = FunctionContainer(metric_functions, None, sample_params)
+            fc = FunctionContainer(metric, None, sample_params)
             func_dict[fc.name_] = fc
         return func_dict
 

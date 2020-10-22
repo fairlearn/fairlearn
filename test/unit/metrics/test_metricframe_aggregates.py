@@ -11,13 +11,13 @@ import fairlearn.metrics as metrics
 from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
 
 
-metric_functions = [skm.recall_score,
-                    skm.precision_score,
-                    skm.accuracy_score,
-                    skm.balanced_accuracy_score]
+metric = [skm.recall_score,
+          skm.precision_score,
+          skm.accuracy_score,
+          skm.balanced_accuracy_score]
 
 
-@pytest.mark.parametrize("metric_fn", metric_functions)
+@pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_0cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,
@@ -144,7 +144,7 @@ def test_2m_1sf_0cf():
                                                          rel=1e-10, abs=1e-16)
 
 
-@pytest.mark.parametrize("metric_fn", metric_functions)
+@pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_1cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,
@@ -223,7 +223,7 @@ def test_1m_1sf_1cf(metric_fn):
                                                            rel=1e-10, abs=1e-16)
 
 
-@pytest.mark.parametrize("metric_fn", metric_functions)
+@pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_2cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,

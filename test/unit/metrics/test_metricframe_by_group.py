@@ -10,13 +10,13 @@ from .data_for_test import y_t, y_p, s_w, g_1, g_2, g_3, g_4
 from .utils import _get_raw_MetricFrame
 
 
-metric_functions = [skm.recall_score,
-                    skm.precision_score,
-                    skm.accuracy_score,
-                    skm.balanced_accuracy_score]
+metric = [skm.recall_score,
+          skm.precision_score,
+          skm.accuracy_score,
+          skm.balanced_accuracy_score]
 
 
-@pytest.mark.parametrize("metric_fn", metric_functions)
+@pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_0cf(metric_fn):
     target = _get_raw_MetricFrame()
     func_dict = target._process_functions(metric_fn, None)
@@ -35,7 +35,7 @@ def test_1m_1sf_0cf(metric_fn):
     assert result[metric_fn.__name__]['ba'] == metric_b
 
 
-@pytest.mark.parametrize("metric_fn", metric_functions)
+@pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_1cf(metric_fn):
     target = _get_raw_MetricFrame()
     func_dict = target._process_functions(metric_fn, None)
