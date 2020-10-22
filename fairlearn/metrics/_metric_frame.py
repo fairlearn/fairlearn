@@ -68,12 +68,12 @@ class MetricFrame:
         :func:`sklearn.metrics.fbeta_score`) then
         :func:`functools.partial` must be used.
 
-    y_true : array_like
-        The true values. We consider an input 'array_like' if passing it
+    y_true : array-like
+        The true values. We consider an input 'array-like' if passing it
         to :func:`numpy.asarray` and :func:`numpy.squeeze` succeed.
 
-    y_pred : array_like
-        The predicted values. We consider an input 'array_like' if passing it
+    y_pred : array-like
+        The predicted values. We consider an input 'array-like' if passing it
         to :func:`numpy.asarray` and :func:`numpy.squeeze` succeed.
 
     sensitive_features : Series, DataFrame, dict of 1d array-like, array-like
@@ -83,8 +83,8 @@ class MetricFrame:
 
         - :class:`pandas.Series`
         - :class:`pandas.DataFrame`
-        - array_like (works with :func:`numpy.asarray`)
-        - Dictionary of 1d array_like (works with :meth:`pandas.DataFrame.from_dict`)
+        - array-like (works with :func:`numpy.asarray`)
+        - Dictionary of 1d array-like (works with :meth:`pandas.DataFrame.from_dict`)
 
         In all cases, the names *must* be strings (both pandas objects and dictionary
         keys).
