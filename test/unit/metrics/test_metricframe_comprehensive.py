@@ -57,11 +57,11 @@ def test_3m_2sf_2cf():
     target = metrics.MetricFrame(metric_dict,
                                  y_true, y_pred,
                                  sensitive_features=sf_frame,
-                                 control_features=cf_array)
+                                 control_levels=cf_array)
 
     # Check on the indices properties
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == ["control_feature_0", "control_feature_1"])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == ["control_feature_0", "control_feature_1"])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ["SF0", "SF1"])
 

@@ -23,8 +23,8 @@ def test_basic(transform_y_t, transform_y_p):
                                  sensitive_features=g_f)
 
     # Check on the indices properties
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == [])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == [])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['My feature'])
 
@@ -65,11 +65,11 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
                                  transform_y_t(y_t),
                                  transform_y_p(y_p),
                                  sensitive_features=g_2,
-                                 control_features=g_3)
+                                 control_levels=g_3)
 
     # Check on the indices properties
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == ['control_feature_0'])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == ['control_feature_0'])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['sensitive_feature_0'])
 
@@ -139,7 +139,7 @@ def test_duplicate_cf_names():
                                 y_t,
                                 y_p,
                                 sensitive_features=g_4,
-                                control_features=groups)
+                                control_levels=groups)
     assert execInfo.value.args[0] == msg
 
 
@@ -152,5 +152,5 @@ def test_duplicate_cf_sf_names():
                                 y_t,
                                 y_p,
                                 sensitive_features=sf,
-                                control_features=cf)
+                                control_levels=cf)
     assert execInfo.value.args[0] == msg

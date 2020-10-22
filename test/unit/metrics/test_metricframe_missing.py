@@ -60,7 +60,7 @@ def test_missing_sensitive_feature_combinations(metric_fn):
 def test_missing_conditional_feature_combinations(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,
-                                 control_features=np.stack([g_A, g_B], axis=1),
+                                 control_levels=np.stack([g_A, g_B], axis=1),
                                  sensitive_features=g_1)
 
     # Build all the expected values

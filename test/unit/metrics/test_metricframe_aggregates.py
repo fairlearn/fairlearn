@@ -23,8 +23,8 @@ def test_1m_1sf_0cf(metric_fn):
                                  y_t, y_p,
                                  sensitive_features=g_4)
 
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == [])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == [])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['sensitive_feature_0'])
 
@@ -81,8 +81,8 @@ def test_2m_1sf_0cf():
                                  y_t, y_p,
                                  sensitive_features=pd.Series(data=g_4))
 
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == [])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == [])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['sensitive_feature_0'])
 
@@ -149,10 +149,10 @@ def test_1m_1sf_1cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,
                                  sensitive_features=pd.Series(data=g_2, name='sf0'),
-                                 control_features=pd.Series(data=g_3, name='cf0'))
+                                 control_levels=pd.Series(data=g_3, name='cf0'))
 
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == ['cf0'])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == ['cf0'])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['sf0'])
 
@@ -228,10 +228,10 @@ def test_1m_1sf_2cf(metric_fn):
     target = metrics.MetricFrame(metric_fn,
                                  y_t, y_p,
                                  sensitive_features=list(g_2),
-                                 control_features=np.stack([g_3, g_1], axis=1))
+                                 control_levels=np.stack([g_3, g_1], axis=1))
 
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == ['control_feature_0', 'control_feature_1'])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == ['control_feature_0', 'control_feature_1'])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['sensitive_feature_0'])
 
@@ -346,10 +346,10 @@ def test_2m_1sf_1cf():
     target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
                                  y_t, y_p,
                                  sensitive_features=g_2,
-                                 control_features=g_3)
+                                 control_levels=g_3)
 
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == ['control_feature_0'])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == ['control_feature_0'])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['sensitive_feature_0'])
 
@@ -450,10 +450,10 @@ def test_2m_1sf_2cf():
     target = metrics.MetricFrame(func_dict,
                                  y_t, y_p,
                                  sensitive_features=list(g_2),
-                                 control_features={'cf0': g_3, 'cf1': g_1})
+                                 control_levels={'cf0': g_3, 'cf1': g_1})
 
-    assert isinstance(target.control_features, list)
-    assert (target.control_features == ['cf0', 'cf1'])
+    assert isinstance(target.control_levels, list)
+    assert (target.control_levels == ['cf0', 'cf1'])
     assert isinstance(target.sensitive_features, list)
     assert (target.sensitive_features == ['sensitive_feature_0'])
 

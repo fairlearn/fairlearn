@@ -92,7 +92,7 @@ class MetricFrame:
         For cases where no names are provided (array_like and a :class:`pandas.Series`
         with `name=None`) we generate names `sensitive_feature_[n]`.
 
-    control_features : Series, DataFrame, dict of 1d array-like, array-like
+    control_levels : Series, DataFrame, dict of 1d array-like, array-like
         Control features are similar to sensitive features, in that they
         divide the input data into subgroups.
         Unlike the sensitive features, aggregations are not performed
@@ -117,7 +117,7 @@ class MetricFrame:
                  y_true,
                  y_pred, *,
                  sensitive_features,
-                 control_features: Optional = None,
+                 control_levels: Optional = None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -134,8 +134,8 @@ class MetricFrame:
         # Adjust _sf_indices if needed
         cf_list = None
         self._cf_names = []
-        if control_features is not None:
-            cf_list = self._process_features("control_feature_", control_features, y_t)
+        if control_levels is not None:
+            cf_list = self._process_features("control_feature_", control_levels, y_t)
             self._cf_names = [x.name for x in cf_list]
 
         # Check for duplicate feature names
@@ -197,10 +197,10 @@ class MetricFrame:
     def overall(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
-        If no ``control_features`` were specified, then this is
+        If no ``control_levels`` were specified, then this is
         a :class:`pandas.Series` with one row for each underlying metric.
 
-        If ``control_features`` were specified, then this is a
+        If ``control_levels`` were specified, then this is a
         :class:`pandas.DataFrame`, with columns corresponding to the
         underling metric(s) and the rows indexed by the subgroups of
         the control features.
@@ -227,7 +227,7 @@ class MetricFrame:
         return self._by_group
 
     @property
-    def control_features(self) -> List[str]:
+    def control_levels(self) -> List[str]:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the ``by_group``
@@ -260,13 +260,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if not self.control_features:
+        if not self.control_levels:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 max_val = self.by_group[m].max()
                 result[m] = max_val
         else:
-            result = self.by_group.groupby(level=self.control_features).max()
+            result = self.by_group.groupby(level=self.control_levels).max()
         return result
 
     def group_min(self) -> Union[pd.Series, pd.DataFrame]:
@@ -284,13 +284,13 @@ class MetricFrame:
         underlying metrics, and rows indexed by the classes identified
         by the control features.
         """
-        if not self.control_features:
+        if not self.control_levels:
             result = pd.Series(index=self.by_group.columns, dtype='object')
             for m in result.index:
                 min_val = self.by_group[m].min()
                 result[m] = min_val
         else:
-            result = self.by_group.groupby(level=self.control_features).min()
+            result = self.by_group.groupby(level=self.control_levels).min()
         return result
 
     def difference(self,
@@ -326,12 +326,12 @@ class MetricFrame:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
         result = None
-        if not self.control_features:
+        if not self.control_levels:
             result = (self.by_group - subtrahend).abs().max()
         else:
             # It's easiest to give in to the DataFrame columns preference
-            diffs = (self.by_group.unstack(level=self.control_features) -
-                     subtrahend.unstack(level=self.control_features)).abs()
+            diffs = (self.by_group.unstack(level=self.control_levels) -
+                     subtrahend.unstack(level=self.control_levels)).abs()
             result = diffs.max().unstack(0)
 
         return result
@@ -367,8 +367,8 @@ class MetricFrame:
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             # It's easiest to give in to the DataFrame columns preference
-            ratios = self.by_group.unstack(level=self.control_features) /  \
-                self.overall.unstack(level=self.control_features)
+            ratios = self.by_group.unstack(level=self.control_levels) /  \
+                self.overall.unstack(level=self.control_levels)
 
             def ratio_sub_one(x):
                 if x > 1:
@@ -377,7 +377,7 @@ class MetricFrame:
                     return x
 
             ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-            if not self.control_features:
+            if not self.control_levels:
                 result = ratios.min()
             else:
                 result = ratios.min().unstack(0)
