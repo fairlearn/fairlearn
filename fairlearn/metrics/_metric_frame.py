@@ -74,14 +74,14 @@ class MetricFrame:
     y_pred : List, pandas.Series, numpy.ndarray, pandas.DataFrame
         The predicted values.
 
-    sensitive_features : Series, DataFrame, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
+    sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         The sensitive features which should be used to create the subgroups.
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
         We also forbid DataFrames with column names of ``None``.
         For cases where no names are provided we generate names `sensitive_feature_[n]`.
 
-    control_features : Series, DataFrame, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
+    control_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         Control features are similar to sensitive features, in that they
         divide the input data into subgroups.
         Unlike the sensitive features, aggregations are not performed
@@ -206,10 +206,10 @@ class MetricFrame:
         Returns
         -------
         pandas.DataFrame
-            This :class:`pandas.DataFrame` contains the result of evaluating
+            The result of evaluating
             each underlying metric for each combination of classes in the
             sensitive and control features. The columns identify
-            the underlying metric, while the rows are indexed by the unqiue
+            the underlying metric, while the rows are indexed by the unique
             combinations of classes found in the sensitive and control
             features. If control features are present, they are in the
             'outer' layer of the row indexing.
@@ -225,12 +225,15 @@ class MetricFrame:
     def control_levels(self) -> List[str]:
         """Return a list of feature names which are produced by control features.
 
+        If control features are present, then the rows of the ``by_group``
+        property have a :class:`pd.MultiIndex` index. This property
+        identifies which elements of that index are control features.
+
         Returns
         -------
         List[str]
-            If control features are present, then the rows of the ``by_group``
-            property have a :class:`pd.MultiIndex` index. This property
-            identifies which elements of that index are control features.
+            List of names, which can be used in calls to
+            :meth:`pandas.DataFrame.groupby` etc.
         """
         return self._cf_names
 
@@ -238,11 +241,14 @@ class MetricFrame:
     def sensitive_levels(self) -> List[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
+        In cases where the ``by_group`` property has a :class:`pd.MultiIndex`
+        index, this identifies which elements of the index are sensitive features.
+
         Returns
         -------
         List[str]
-            In cases where the ``by_group`` property has a :class:`pd.MultiIndex`
-            index, this identifies which elements of the index are sensitive features.
+            List of names, which can be used in calls to
+            :meth:`pandas.DataFrame.groupby` etc.
         """
         return self._sf_names
 
@@ -262,7 +268,8 @@ class MetricFrame:
             If there are control features, then the result is a
             :class:`pandas.DataFrame` with columns corresponding to the
             underlying metrics, and rows indexed by the classes identified
-            by the control features.
+            by the control features. Otherwise, a :class:`pandas.Series`
+            indexed by the names of the underlying metrics.
         """
         if not self.control_levels:
             result = pd.Series(index=self.by_group.columns, dtype='object')
@@ -289,7 +296,8 @@ class MetricFrame:
             If there are control features, then the result is a
             :class:`pandas.DataFrame` with columns corresponding to the
             underlying metrics, and rows indexed by the classes identified
-            by the control features.
+            by the control features. Otherwise, a :class:`pandas.Series`
+            indexed by the names of the underlying metrics.
         """
         if not self.control_levels:
             result = pd.Series(index=self.by_group.columns, dtype='object')
@@ -330,7 +338,8 @@ class MetricFrame:
             If there are control features, then the result is a
             :class:`pandas.DataFrame` with columns corresponding to the
             underlying metrics, and rows indexed by the classes identified
-            by the control features.
+            by the control features. Otherwise, a :class:`pandas.Series`
+            indexed by the names of the underlying metrics.
         """
         subtrahend = np.nan
         if method == 'between_groups':
@@ -383,7 +392,8 @@ class MetricFrame:
             If there are control features, then the result is a
             :class:`pandas.DataFrame` with columns corresponding to the
             underlying metrics, and rows indexed by the classes identified
-            by the control features.
+            by the control features. Otherwise, a :class:`pandas.Series`
+            indexed by the names of the underlying metrics.
         """
         result = None
         if method == 'between_groups':
