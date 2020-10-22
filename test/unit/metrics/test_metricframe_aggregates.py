@@ -25,8 +25,8 @@ def test_1m_1sf_0cf(metric_fn):
 
     assert isinstance(target.control_levels, list)
     assert (target.control_levels == [])
-    assert isinstance(target.sensitive_features, list)
-    assert (target.sensitive_features == ['sensitive_feature_0'])
+    assert isinstance(target.sensitive_levels, list)
+    assert (target.sensitive_levels == ['sensitive_feature_0'])
 
     overall = metric_fn(y_t, y_p)
     mask_p = (g_4 == 'pp')
@@ -83,8 +83,8 @@ def test_2m_1sf_0cf():
 
     assert isinstance(target.control_levels, list)
     assert (target.control_levels == [])
-    assert isinstance(target.sensitive_features, list)
-    assert (target.sensitive_features == ['sensitive_feature_0'])
+    assert isinstance(target.sensitive_levels, list)
+    assert (target.sensitive_levels == ['sensitive_feature_0'])
 
     recall = skm.recall_score(y_t, y_p)
     prec = skm.precision_score(y_t, y_p)
@@ -153,8 +153,8 @@ def test_1m_1sf_1cf(metric_fn):
 
     assert isinstance(target.control_levels, list)
     assert (target.control_levels == ['cf0'])
-    assert isinstance(target.sensitive_features, list)
-    assert (target.sensitive_features == ['sf0'])
+    assert isinstance(target.sensitive_levels, list)
+    assert (target.sensitive_levels == ['sf0'])
 
     mask_f = (g_2 == 'f')
     mask_g = (g_2 == 'g')
@@ -232,8 +232,8 @@ def test_1m_1sf_2cf(metric_fn):
 
     assert isinstance(target.control_levels, list)
     assert (target.control_levels == ['control_feature_0', 'control_feature_1'])
-    assert isinstance(target.sensitive_features, list)
-    assert (target.sensitive_features == ['sensitive_feature_0'])
+    assert isinstance(target.sensitive_levels, list)
+    assert (target.sensitive_levels == ['sensitive_feature_0'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -350,8 +350,8 @@ def test_2m_1sf_1cf():
 
     assert isinstance(target.control_levels, list)
     assert (target.control_levels == ['control_feature_0'])
-    assert isinstance(target.sensitive_features, list)
-    assert (target.sensitive_features == ['sensitive_feature_0'])
+    assert isinstance(target.sensitive_levels, list)
+    assert (target.sensitive_levels == ['sensitive_feature_0'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
@@ -454,8 +454,8 @@ def test_2m_1sf_2cf():
 
     assert isinstance(target.control_levels, list)
     assert (target.control_levels == ['cf0', 'cf1'])
-    assert isinstance(target.sensitive_features, list)
-    assert (target.sensitive_features == ['sensitive_feature_0'])
+    assert isinstance(target.sensitive_levels, list)
+    assert (target.sensitive_levels == ['sensitive_feature_0'])
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)

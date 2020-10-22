@@ -62,8 +62,8 @@ def test_3m_2sf_2cf():
     # Check on the indices properties
     assert isinstance(target.control_levels, list)
     assert (target.control_levels == ["control_feature_0", "control_feature_1"])
-    assert isinstance(target.sensitive_features, list)
-    assert (target.sensitive_features == ["SF0", "SF1"])
+    assert isinstance(target.sensitive_levels, list)
+    assert (target.sensitive_levels == ["SF0", "SF1"])
 
     # Check everything
     for name, f in metric_dict.items():

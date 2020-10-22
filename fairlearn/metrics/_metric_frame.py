@@ -237,7 +237,7 @@ class MetricFrame:
         return self._cf_names
 
     @property
-    def sensitive_features(self) -> List[str]:
+    def sensitive_levels(self) -> List[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
         In cases where the ``by_group`` property has a :class:`pd.MultiIndex`
