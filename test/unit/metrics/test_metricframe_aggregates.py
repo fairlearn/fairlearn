@@ -29,10 +29,10 @@ class Test1m1sf0cf:
         assert (self.target.sensitive_levels == ['sensitive_feature_0'])
 
         self.overall = metric_fn(y_t, y_p)
-        self.mask_p = (g_4 == 'pp')
-        self.mask_q = (g_4 == 'q')
-        self.metric_p = metric_fn(y_t[self.mask_p], y_p[self.mask_p])
-        self.metric_q = metric_fn(y_t[self.mask_q], y_p[self.mask_q])
+        mask_p = (g_4 == 'pp')
+        mask_q = (g_4 == 'q')
+        self.metric_p = metric_fn(y_t[mask_p], y_p[mask_p])
+        self.metric_q = metric_fn(y_t[mask_q], y_p[mask_q])
 
         self.mfn = metric_fn.__name__
 
@@ -102,72 +102,92 @@ class Test1m1sf0cf:
                                                                rel=1e-10, abs=1e-16)
 
 
-def test_2m_1sf_0cf():
-    target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
-                                 y_t, y_p,
-                                 sensitive_features=pd.Series(data=g_4))
+class Test2m1sf0cf:
+    def _prepare(self):
+        fns = {'recall': skm.recall_score, 'prec': skm.precision_score}
+        self.target = metrics.MetricFrame(fns,
+                                          y_t, y_p,
+                                          sensitive_features=pd.Series(data=g_4))
 
-    assert isinstance(target.control_levels, list)
-    assert (target.control_levels == [])
-    assert isinstance(target.sensitive_levels, list)
-    assert (target.sensitive_levels == ['sensitive_feature_0'])
+        assert isinstance(self.target.control_levels, list)
+        assert (self.target.control_levels == [])
+        assert isinstance(self.target.sensitive_levels, list)
+        assert (self.target.sensitive_levels == ['sensitive_feature_0'])
 
-    recall = skm.recall_score(y_t, y_p)
-    prec = skm.precision_score(y_t, y_p)
-    mask_p = (g_4 == 'pp')
-    mask_q = (g_4 == 'q')
-    recall_p = skm.recall_score(y_t[mask_p], y_p[mask_p])
-    recall_q = skm.recall_score(y_t[mask_q], y_p[mask_q])
-    prec_p = skm.precision_score(y_t[mask_p], y_p[mask_p])
-    prec_q = skm.precision_score(y_t[mask_q], y_p[mask_q])
+        self.recall = skm.recall_score(y_t, y_p)
+        self.prec = skm.precision_score(y_t, y_p)
+        mask_p = (g_4 == 'pp')
+        mask_q = (g_4 == 'q')
+        self.recall_p = skm.recall_score(y_t[mask_p], y_p[mask_p])
+        self.recall_q = skm.recall_score(y_t[mask_q], y_p[mask_q])
+        self.prec_p = skm.precision_score(y_t[mask_p], y_p[mask_p])
+        self.prec_q = skm.precision_score(y_t[mask_q], y_p[mask_q])
 
-    target_mins = target.group_min()
-    assert isinstance(target_mins, pd.Series)
-    assert len(target_mins) == 2
-    assert target_mins['recall'] == min(recall_p, recall_q)
-    assert target_mins['prec'] == min(prec_p, prec_q)
+    def test_min(self):
+        self._prepare()
 
-    target_maxes = target.group_max()
-    assert isinstance(target_mins, pd.Series)
-    assert isinstance(target_maxes, pd.Series)
-    assert target_maxes['recall'] == max(recall_p, recall_q)
-    assert target_maxes['prec'] == max(prec_p, prec_q)
+        target_mins = self.target.group_min()
+        assert isinstance(target_mins, pd.Series)
+        assert len(target_mins) == 2
+        assert target_mins['recall'] == min(self.recall_p, self.recall_q)
+        assert target_mins['prec'] == min(self.prec_p, self.prec_q)
 
-    target_diffs = target.difference(method='between_groups')
-    assert isinstance(target_diffs, pd.Series)
-    assert len(target_diffs) == 2
-    assert target_diffs['recall'] == abs(recall_p - recall_q)
-    assert target_diffs['prec'] == abs(prec_p - prec_q)
+    def test_max(self):
+        self._prepare()
 
-    target_diff_overall = target.difference(method='to_overall')
-    assert isinstance(target_diff_overall, pd.Series)
-    assert len(target_diff_overall) == 2
-    recall_diffs_overall = [abs(recall_p-recall), abs(recall_q-recall)]
-    prec_diffs_overall = [abs(prec_p-prec), abs(prec_q-prec)]
-    assert target_diff_overall['recall'] == max(recall_diffs_overall)
-    assert target_diff_overall['prec'] == max(prec_diffs_overall)
+        target_maxes = self.target.group_max()
+        assert isinstance(target_maxes, pd.Series)
+        assert target_maxes['recall'] == max(self.recall_p, self.recall_q)
+        assert target_maxes['prec'] == max(self.prec_p, self.prec_q)
 
-    target_ratio = target.ratio(method='between_groups')
-    assert isinstance(target_ratio, pd.Series)
-    assert len(target_ratio) == 2
-    assert target_ratio['recall'] == min(recall_p, recall_q)/max(recall_p, recall_q)
-    assert target_ratio['prec'] == min(prec_p/prec_q, prec_q/prec_p)
+    def test_difference_between_groups(self):
+        self._prepare()
 
-    target_ratio_overall = target.ratio(method='to_overall')
-    assert isinstance(target_ratio_overall, pd.Series)
-    assert len(target_ratio_overall) == 2
-    recall_ratio_overall = min(recall_p/recall, recall/recall_p,
-                               recall_q/recall, recall/recall_q)
-    prec_ratio_overall = min(prec_p/prec, prec/prec_p,
-                             prec_q/prec, prec/prec_q)
-    # Need pytest.approx because ratio() doesn't do quite the same
-    # calculations as above. Specifically, rather than doing both
-    # preq_q/prec and prec/prec_q, it only calculates the former,
-    # and inverts it if the result is greater than unity
-    assert target_ratio_overall['recall'] == pytest.approx(recall_ratio_overall,
-                                                           rel=1e-10, abs=1e-16)
-    assert target_ratio_overall['prec'] == pytest.approx(prec_ratio_overall,
-                                                         rel=1e-10, abs=1e-16)
+        target_diffs = self.target.difference(method='between_groups')
+        assert isinstance(target_diffs, pd.Series)
+        assert len(target_diffs) == 2
+        assert target_diffs['recall'] == abs(self.recall_p - self.recall_q)
+        assert target_diffs['prec'] == abs(self.prec_p - self.prec_q)
+
+    def test_difference_to_overall(self):
+        self._prepare()
+
+        target_diff_overall = self.target.difference(method='to_overall')
+        assert isinstance(target_diff_overall, pd.Series)
+        assert len(target_diff_overall) == 2
+        recall_diffs_overall = [abs(self.recall_p-self.recall), abs(self.recall_q-self.recall)]
+        prec_diffs_overall = [abs(self.prec_p-self.prec), abs(self.prec_q-self.prec)]
+        assert target_diff_overall['recall'] == max(recall_diffs_overall)
+        assert target_diff_overall['prec'] == max(prec_diffs_overall)
+
+    def test_ratio_between_groups(self):
+        self._prepare()
+
+        target_ratio = self.target.ratio(method='between_groups')
+        assert isinstance(target_ratio, pd.Series)
+        assert len(target_ratio) == 2
+        assert target_ratio['recall'] == min(self.recall_p, self.recall_q) / \
+            max(self.recall_p, self.recall_q)
+        assert target_ratio['prec'] == min(self.prec_p/self.prec_q, self.prec_q/self.prec_p)
+
+    def test_ratio_to_overall(self):
+        self._prepare()
+
+        target_ratio_overall = self.target.ratio(method='to_overall')
+        assert isinstance(target_ratio_overall, pd.Series)
+        assert len(target_ratio_overall) == 2
+        recall_ratio_overall = min(self.recall_p/self.recall, self.recall/self.recall_p,
+                                   self.recall_q/self.recall, self.recall/self.recall_q)
+        prec_ratio_overall = min(self.prec_p/self.prec, self.prec/self.prec_p,
+                                 self.prec_q/self.prec, self.prec/self.prec_q)
+        # Need pytest.approx because ratio() doesn't do quite the same
+        # calculations as above. Specifically, rather than doing both
+        # preq_q/prec and prec/prec_q, it only calculates the former,
+        # and inverts it if the result is greater than unity
+        assert target_ratio_overall['recall'] == pytest.approx(recall_ratio_overall,
+                                                               rel=1e-10, abs=1e-16)
+        assert target_ratio_overall['prec'] == pytest.approx(prec_ratio_overall,
+                                                             rel=1e-10, abs=1e-16)
 
 
 @pytest.mark.parametrize("metric_fn", metric)
