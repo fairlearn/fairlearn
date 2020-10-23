@@ -190,83 +190,109 @@ class Test2m1sf0cf:
                                                              rel=1e-10, abs=1e-16)
 
 
-@pytest.mark.parametrize("metric_fn", metric)
-def test_1m_1sf_1cf(metric_fn):
-    target = metrics.MetricFrame(metric_fn,
-                                 y_t, y_p,
-                                 sensitive_features=pd.Series(data=g_2, name='sf0'),
-                                 control_features=pd.Series(data=g_3, name='cf0'))
+class Test1m1cf1sf:
+    def _prepare(self, metric_fn):
+        self.target = metrics.MetricFrame(metric_fn,
+                                          y_t, y_p,
+                                          sensitive_features=pd.Series(data=g_2, name='sf0'),
+                                          control_features=pd.Series(data=g_3, name='cf0'))
 
-    assert isinstance(target.control_levels, list)
-    assert (target.control_levels == ['cf0'])
-    assert isinstance(target.sensitive_levels, list)
-    assert (target.sensitive_levels == ['sf0'])
+        assert isinstance(self.target.control_levels, list)
+        assert (self.target.control_levels == ['cf0'])
+        assert isinstance(self.target.sensitive_levels, list)
+        assert (self.target.sensitive_levels == ['sf0'])
 
-    mask_f = (g_2 == 'f')
-    mask_g = (g_2 == 'g')
-    mask_k = (g_3 == 'kk')
-    mask_m = (g_3 == 'm')
+        mask_f = (g_2 == 'f')
+        mask_g = (g_2 == 'g')
+        mask_k = (g_3 == 'kk')
+        mask_m = (g_3 == 'm')
 
-    mask_k_f = np.logical_and(mask_k, mask_f)
-    mask_k_g = np.logical_and(mask_k, mask_g)
-    mask_m_f = np.logical_and(mask_m, mask_f)
-    mask_m_g = np.logical_and(mask_m, mask_g)
-    metric_k = metric_fn(y_t[mask_k], y_p[mask_k])
-    metric_m = metric_fn(y_t[mask_m], y_p[mask_m])
-    metric_k_f = metric_fn(y_t[mask_k_f], y_p[mask_k_f])
-    metric_m_f = metric_fn(y_t[mask_m_f], y_p[mask_m_f])
-    metric_k_g = metric_fn(y_t[mask_k_g], y_p[mask_k_g])
-    metric_m_g = metric_fn(y_t[mask_m_g], y_p[mask_m_g])
-    metric_k_arr = [metric_k_f, metric_k_g]
-    metric_m_arr = [metric_m_f, metric_m_g]
+        mask_k_f = np.logical_and(mask_k, mask_f)
+        mask_k_g = np.logical_and(mask_k, mask_g)
+        mask_m_f = np.logical_and(mask_m, mask_f)
+        mask_m_g = np.logical_and(mask_m, mask_g)
+        self.metric_k = metric_fn(y_t[mask_k], y_p[mask_k])
+        self.metric_m = metric_fn(y_t[mask_m], y_p[mask_m])
+        self.metric_k_f = metric_fn(y_t[mask_k_f], y_p[mask_k_f])
+        self.metric_m_f = metric_fn(y_t[mask_m_f], y_p[mask_m_f])
+        self.metric_k_g = metric_fn(y_t[mask_k_g], y_p[mask_k_g])
+        self.metric_m_g = metric_fn(y_t[mask_m_g], y_p[mask_m_g])
+        self.metric_k_arr = [self.metric_k_f, self.metric_k_g]
+        self.metric_m_arr = [self.metric_m_f, self.metric_m_g]
 
-    mfn = metric_fn.__name__
+        self.mfn = metric_fn.__name__
 
-    target_mins = target.group_min()
-    assert isinstance(target_mins, pd.DataFrame)
-    assert target_mins.shape == (2, 1)
-    assert target_mins[mfn]['kk'] == min(metric_k_arr)
-    assert target_mins[mfn]['m'] == min(metric_m_arr)
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_min(self, metric_fn):
+        self._prepare(metric_fn)
 
-    target_maxs = target.group_max()
-    assert isinstance(target_mins, pd.DataFrame)
-    assert target_maxs.shape == (2, 1)
-    assert target_maxs[mfn]['kk'] == max(metric_k_arr)
-    assert target_maxs[mfn]['m'] == max(metric_m_arr)
+        target_mins = self.target.group_min()
+        assert isinstance(target_mins, pd.DataFrame)
+        assert target_mins.shape == (2, 1)
+        assert target_mins[self.mfn]['kk'] == min(self.metric_k_arr)
+        assert target_mins[self.mfn]['m'] == min(self.metric_m_arr)
 
-    target_diff = target.difference(method='between_groups')
-    assert isinstance(target_diff, pd.DataFrame)
-    assert target_diff.shape == (2, 1)
-    assert target_diff[mfn]['kk'] == max(metric_k_arr)-min(metric_k_arr)
-    assert target_diff[mfn]['m'] == max(metric_m_arr)-min(metric_m_arr)
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_max(self, metric_fn):
+        self._prepare(metric_fn)
 
-    target_diff_overall = target.difference(method='to_overall')
-    assert isinstance(target_diff_overall, pd.DataFrame)
-    assert target_diff_overall.shape == (2, 1)
-    k_diffs_overall = [abs(metric_k_f-metric_k), abs(metric_k_g-metric_k)]
-    m_diffs_overall = [abs(metric_m_f-metric_m), abs(metric_m_g-metric_m)]
-    assert target_diff_overall[mfn]['kk'] == max(k_diffs_overall)
-    assert target_diff_overall[mfn]['m'] == max(m_diffs_overall)
+        target_maxs = self.target.group_max()
+        assert isinstance(target_maxs, pd.DataFrame)
+        assert target_maxs.shape == (2, 1)
+        assert target_maxs[self.mfn]['kk'] == max(self.metric_k_arr)
+        assert target_maxs[self.mfn]['m'] == max(self.metric_m_arr)
 
-    target_ratio = target.ratio(method='between_groups')
-    assert isinstance(target_ratio, pd.DataFrame)
-    assert target_ratio.shape == (2, 1)
-    assert target_ratio[mfn]['kk'] == min(metric_k_arr)/max(metric_k_arr)
-    assert target_ratio[mfn]['m'] == min(metric_m_arr)/max(metric_m_arr)
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_difference_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
 
-    target_ratio_overall = target.ratio(method='to_overall')
-    assert isinstance(target_ratio_overall, pd.DataFrame)
-    assert target_ratio_overall.shape == (2, 1)
-    k_ratios_overall = [x/metric_k for x in metric_k_arr] + \
-        [metric_k/x for x in metric_k_arr]
-    m_ratios_overall = [x/metric_m for x in metric_m_arr] + \
-        [metric_m/x for x in metric_m_arr]
-    # Ratio to overall is forced to be <1 in a slightly different way
-    # internally, so have to use pytest.approx
-    assert target_ratio_overall[mfn]['kk'] == pytest.approx(min(k_ratios_overall),
-                                                            rel=1e-10, abs=1e-16)
-    assert target_ratio_overall[mfn]['m'] == pytest.approx(min(m_ratios_overall),
-                                                           rel=1e-10, abs=1e-16)
+        target_diff = self.target.difference(method='between_groups')
+        assert isinstance(target_diff, pd.DataFrame)
+        assert target_diff.shape == (2, 1)
+        assert target_diff[self.mfn]['kk'] == max(self.metric_k_arr)-min(self.metric_k_arr)
+        assert target_diff[self.mfn]['m'] == max(self.metric_m_arr)-min(self.metric_m_arr)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_difference_to_overall(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_diff_overall = self.target.difference(method='to_overall')
+        assert isinstance(target_diff_overall, pd.DataFrame)
+        assert target_diff_overall.shape == (2, 1)
+        k_diffs_overall = [abs(self.metric_k_f-self.metric_k),
+                           abs(self.metric_k_g-self.metric_k)]
+        m_diffs_overall = [abs(self.metric_m_f-self.metric_m),
+                           abs(self.metric_m_g-self.metric_m)]
+        assert target_diff_overall[self.mfn]['kk'] == max(k_diffs_overall)
+        assert target_diff_overall[self.mfn]['m'] == max(m_diffs_overall)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_ratio_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_ratio = self.target.ratio(method='between_groups')
+        assert isinstance(target_ratio, pd.DataFrame)
+        assert target_ratio.shape == (2, 1)
+        assert target_ratio[self.mfn]['kk'] == min(self.metric_k_arr)/max(self.metric_k_arr)
+        assert target_ratio[self.mfn]['m'] == min(self.metric_m_arr)/max(self.metric_m_arr)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_ratio_to_overall(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_ratio_overall = self.target.ratio(method='to_overall')
+        assert isinstance(target_ratio_overall, pd.DataFrame)
+        assert target_ratio_overall.shape == (2, 1)
+        k_ratios_overall = [x/self.metric_k for x in self.metric_k_arr] + \
+            [self.metric_k/x for x in self.metric_k_arr]
+        m_ratios_overall = [x/self.metric_m for x in self.metric_m_arr] + \
+            [self.metric_m/x for x in self.metric_m_arr]
+        # Ratio to overall is forced to be <1 in a slightly different way
+        # internally, so have to use pytest.approx
+        assert target_ratio_overall[self.mfn]['kk'] == pytest.approx(min(k_ratios_overall),
+                                                                     rel=1e-10, abs=1e-16)
+        assert target_ratio_overall[self.mfn]['m'] == pytest.approx(min(m_ratios_overall),
+                                                                    rel=1e-10, abs=1e-16)
 
 
 @pytest.mark.parametrize("metric_fn", metric)
