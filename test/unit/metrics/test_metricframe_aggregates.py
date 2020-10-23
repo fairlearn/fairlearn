@@ -17,63 +17,89 @@ metric = [skm.recall_score,
           skm.balanced_accuracy_score]
 
 
-@pytest.mark.parametrize("metric_fn", metric)
-def test_1m_1sf_0cf(metric_fn):
-    target = metrics.MetricFrame(metric_fn,
-                                 y_t, y_p,
-                                 sensitive_features=g_4)
+class Test1m1sf0cf:
+    def _prepare(self, metric_fn):
+        self.target = metrics.MetricFrame(metric_fn,
+                                          y_t, y_p,
+                                          sensitive_features=g_4)
 
-    assert isinstance(target.control_levels, list)
-    assert (target.control_levels == [])
-    assert isinstance(target.sensitive_levels, list)
-    assert (target.sensitive_levels == ['sensitive_feature_0'])
+        assert isinstance(self.target.control_levels, list)
+        assert (self.target.control_levels == [])
+        assert isinstance(self.target.sensitive_levels, list)
+        assert (self.target.sensitive_levels == ['sensitive_feature_0'])
 
-    overall = metric_fn(y_t, y_p)
-    mask_p = (g_4 == 'pp')
-    mask_q = (g_4 == 'q')
-    metric_p = metric_fn(y_t[mask_p], y_p[mask_p])
-    metric_q = metric_fn(y_t[mask_q], y_p[mask_q])
+        self.overall = metric_fn(y_t, y_p)
+        self.mask_p = (g_4 == 'pp')
+        self.mask_q = (g_4 == 'q')
+        self.metric_p = metric_fn(y_t[self.mask_p], y_p[self.mask_p])
+        self.metric_q = metric_fn(y_t[self.mask_q], y_p[self.mask_q])
 
-    mfn = metric_fn.__name__
+        self.mfn = metric_fn.__name__
 
-    target_mins = target.group_min()
-    assert isinstance(target_mins, pd.Series)
-    assert len(target_mins) == 1
-    assert target_mins[mfn] == min(metric_p, metric_q)
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_min(self, metric_fn):
+        self._prepare(metric_fn)
 
-    target_maxes = target.group_max()
-    assert isinstance(target_mins, pd.Series)
-    assert len(target_maxes) == 1
-    assert target_maxes[mfn] == max(metric_p, metric_q)
+        target_mins = self.target.group_min()
+        assert isinstance(target_mins, pd.Series)
+        assert len(target_mins) == 1
+        assert target_mins[self.mfn] == min(self.metric_p, self.metric_q)
 
-    target_diff = target.difference(method='between_groups')
-    assert isinstance(target_diff, pd.Series)
-    assert len(target_diff) == 1
-    assert target_diff[mfn] == abs(metric_p - metric_q)
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_max(self, metric_fn):
+        self._prepare(metric_fn)
 
-    target_diff_overall = target.difference(method='to_overall')
-    assert isinstance(target_diff_overall, pd.Series)
-    assert len(target_diff_overall) == 1
-    diffs_overall = [abs(metric_p-overall), abs(metric_q-overall)]
-    assert target_diff_overall[mfn] == max(diffs_overall)
+        target_maxes = self.target.group_max()
+        assert isinstance(target_maxes, pd.Series)
+        assert len(target_maxes) == 1
+        assert target_maxes[self.mfn] == max(self.metric_p, self.metric_q)
 
-    target_ratio = target.ratio(method='between_groups')
-    assert isinstance(target_ratio, pd.Series)
-    assert len(target_ratio) == 1
-    assert target_ratio[mfn] == min(metric_p, metric_q)/max(metric_p, metric_q)
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_difference_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
 
-    target_ratio_overall = target.ratio(method='to_overall')
-    assert isinstance(target_ratio_overall, pd.Series)
-    assert len(target_ratio_overall) == 1
-    expected_ratio_overall = min(metric_p/overall,
-                                 overall/metric_p,
-                                 metric_q/overall,
-                                 overall/metric_q)
-    # Need to use approx, due to internal method of calculating
-    # the correct ratio. Internally, MetricFrame computes a ratio
-    # and takes the reciprocal if it's greater than 1
-    assert target_ratio_overall[mfn] == pytest.approx(expected_ratio_overall,
-                                                      rel=1e-10, abs=1e-16)
+        target_diff = self.target.difference(method='between_groups')
+        assert isinstance(target_diff, pd.Series)
+        assert len(target_diff) == 1
+        assert target_diff[self.mfn] == abs(self.metric_p - self.metric_q)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_difference_to_overall(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_diff_overall = self.target.difference(method='to_overall')
+        assert isinstance(target_diff_overall, pd.Series)
+        assert len(target_diff_overall) == 1
+        diffs_overall = [abs(self.metric_p-self.overall),
+                         abs(self.metric_q-self.overall)]
+        assert target_diff_overall[self.mfn] == max(diffs_overall)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_ratio_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_ratio = self.target.ratio(method='between_groups')
+        assert isinstance(target_ratio, pd.Series)
+        assert len(target_ratio) == 1
+        assert target_ratio[self.mfn] == min(self.metric_p, self.metric_q) / \
+            max(self.metric_p, self.metric_q)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_ratio_to_overall(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_ratio_overall = self.target.ratio(method='to_overall')
+        assert isinstance(target_ratio_overall, pd.Series)
+        assert len(target_ratio_overall) == 1
+        expected_ratio_overall = min(self.metric_p/self.overall,
+                                     self.overall/self.metric_p,
+                                     self.metric_q/self.overall,
+                                     self.overall/self.metric_q)
+        # Need to use approx, due to internal method of calculating
+        # the correct ratio. Internally, MetricFrame computes a ratio
+        # and takes the reciprocal if it's greater than 1
+        assert target_ratio_overall[self.mfn] == pytest.approx(expected_ratio_overall,
+                                                               rel=1e-10, abs=1e-16)
 
 
 def test_2m_1sf_0cf():
