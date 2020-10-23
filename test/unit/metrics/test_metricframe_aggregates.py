@@ -442,110 +442,131 @@ class Test1m1sf2cf:
                                                                       rel=1e-10, abs=1e-16)
 
 
-def test_2m_1sf_1cf():
-    target = metrics.MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
-                                 y_t, y_p,
-                                 sensitive_features=g_2,
-                                 control_features=g_3)
+class Test2m1sf1cf:
+    def _prepare(self):
+        fns = {'recall': skm.recall_score, 'prec': skm.precision_score}
+        self.target = metrics.MetricFrame(fns,
+                                          y_t, y_p,
+                                          sensitive_features=g_2,
+                                          control_features=g_3)
 
-    assert isinstance(target.control_levels, list)
-    assert (target.control_levels == ['control_feature_0'])
-    assert isinstance(target.sensitive_levels, list)
-    assert (target.sensitive_levels == ['sensitive_feature_0'])
+        assert isinstance(self.target.control_levels, list)
+        assert (self.target.control_levels == ['control_feature_0'])
+        assert isinstance(self.target.sensitive_levels, list)
+        assert (self.target.sensitive_levels == ['sensitive_feature_0'])
 
-    # Check we have correct return types
-    assert isinstance(target.overall, pd.DataFrame)
-    assert isinstance(target.by_group, pd.DataFrame)
+        # Check we have correct return types
+        assert isinstance(self.target.overall, pd.DataFrame)
+        assert isinstance(self.target.by_group, pd.DataFrame)
 
-    mask_f = (g_2 == 'f')
-    mask_g = (g_2 == 'g')
-    mask_k = (g_3 == 'kk')
-    mask_m = (g_3 == 'm')
+        mask_f = (g_2 == 'f')
+        mask_g = (g_2 == 'g')
+        mask_k = (g_3 == 'kk')
+        mask_m = (g_3 == 'm')
 
-    mask_k_f = np.logical_and(mask_k, mask_f)
-    mask_k_g = np.logical_and(mask_k, mask_g)
-    mask_m_f = np.logical_and(mask_m, mask_f)
-    mask_m_g = np.logical_and(mask_m, mask_g)
-    recall_k = skm.recall_score(y_t[mask_k], y_p[mask_k])
-    recall_m = skm.recall_score(y_t[mask_m], y_p[mask_m])
-    recall_k_f = skm.recall_score(y_t[mask_k_f], y_p[mask_k_f])
-    recall_m_f = skm.recall_score(y_t[mask_m_f], y_p[mask_m_f])
-    recall_k_g = skm.recall_score(y_t[mask_k_g], y_p[mask_k_g])
-    recall_m_g = skm.recall_score(y_t[mask_m_g], y_p[mask_m_g])
-    recall_k_arr = [recall_k_f, recall_k_g]
-    recall_m_arr = [recall_m_f, recall_m_g]
-    precision_k = skm.precision_score(y_t[mask_k], y_p[mask_k])
-    precision_m = skm.precision_score(y_t[mask_m], y_p[mask_m])
-    precision_k_f = skm.precision_score(y_t[mask_k_f], y_p[mask_k_f])
-    precision_m_f = skm.precision_score(y_t[mask_m_f], y_p[mask_m_f])
-    precision_k_g = skm.precision_score(y_t[mask_k_g], y_p[mask_k_g])
-    precision_m_g = skm.precision_score(y_t[mask_m_g], y_p[mask_m_g])
-    precision_k_arr = [precision_k_f, precision_k_g]
-    precision_m_arr = [precision_m_f, precision_m_g]
+        mask_k_f = np.logical_and(mask_k, mask_f)
+        mask_k_g = np.logical_and(mask_k, mask_g)
+        mask_m_f = np.logical_and(mask_m, mask_f)
+        mask_m_g = np.logical_and(mask_m, mask_g)
+        self.recall_k = skm.recall_score(y_t[mask_k], y_p[mask_k])
+        self.recall_m = skm.recall_score(y_t[mask_m], y_p[mask_m])
+        self.recall_k_f = skm.recall_score(y_t[mask_k_f], y_p[mask_k_f])
+        self.recall_m_f = skm.recall_score(y_t[mask_m_f], y_p[mask_m_f])
+        self.recall_k_g = skm.recall_score(y_t[mask_k_g], y_p[mask_k_g])
+        self.recall_m_g = skm.recall_score(y_t[mask_m_g], y_p[mask_m_g])
+        self.recall_k_arr = [self.recall_k_f, self.recall_k_g]
+        self.recall_m_arr = [self.recall_m_f, self.recall_m_g]
+        self.precision_k = skm.precision_score(y_t[mask_k], y_p[mask_k])
+        self.precision_m = skm.precision_score(y_t[mask_m], y_p[mask_m])
+        self.precision_k_f = skm.precision_score(y_t[mask_k_f], y_p[mask_k_f])
+        self.precision_m_f = skm.precision_score(y_t[mask_m_f], y_p[mask_m_f])
+        self.precision_k_g = skm.precision_score(y_t[mask_k_g], y_p[mask_k_g])
+        self.precision_m_g = skm.precision_score(y_t[mask_m_g], y_p[mask_m_g])
+        self.precision_k_arr = [self.precision_k_f, self.precision_k_g]
+        self.precision_m_arr = [self.precision_m_f, self.precision_m_g]
 
-    target_mins = target.group_min()
-    assert isinstance(target_mins, pd.DataFrame)
-    assert target_mins.shape == (2, 2)
-    assert target_mins['recall']['kk'] == min(recall_k_arr)
-    assert target_mins['recall']['m'] == min(recall_m_arr)
-    assert target_mins['prec']['kk'] == min(precision_k_arr)
-    assert target_mins['prec']['m'] == min(precision_m_arr)
+    def test_min(self):
+        self._prepare()
 
-    target_maxs = target.group_max()
-    assert isinstance(target_mins, pd.DataFrame)
-    assert target_maxs.shape == (2, 2)
-    assert target_maxs['recall']['kk'] == max(recall_k_arr)
-    assert target_maxs['recall']['m'] == max(recall_m_arr)
-    assert target_maxs['prec']['kk'] == max(precision_k_arr)
-    assert target_maxs['prec']['m'] == max(precision_m_arr)
+        target_mins = self.target.group_min()
+        assert isinstance(target_mins, pd.DataFrame)
+        assert target_mins.shape == (2, 2)
+        assert target_mins['recall']['kk'] == min(self.recall_k_arr)
+        assert target_mins['recall']['m'] == min(self.recall_m_arr)
+        assert target_mins['prec']['kk'] == min(self.precision_k_arr)
+        assert target_mins['prec']['m'] == min(self.precision_m_arr)
 
-    diffs = target.difference(method='between_groups')
-    assert isinstance(diffs, pd.DataFrame)
-    assert diffs.shape == (2, 2)
-    assert diffs['recall']['kk'] == max(recall_k_arr) - min(recall_k_arr)
-    assert diffs['recall']['m'] == max(recall_m_arr) - min(recall_m_arr)
-    assert diffs['prec']['kk'] == max(precision_k_arr) - min(precision_k_arr)
-    assert diffs['prec']['m'] == max(precision_m_arr) - min(precision_m_arr)
+    def test_max(self):
+        self._prepare()
 
-    diffs_overall = target.difference(method='to_overall')
-    assert isinstance(diffs_overall, pd.DataFrame)
-    assert diffs_overall.shape == (2, 2)
-    recall_k_overall = max([abs(x-recall_k) for x in recall_k_arr])
-    recall_m_overall = max([abs(x-recall_m) for x in recall_m_arr])
-    precision_k_overall = max([abs(x-precision_k) for x in precision_k_arr])
-    precision_m_overall = max([abs(x-precision_m) for x in precision_m_arr])
-    assert diffs_overall['recall']['kk'] == recall_k_overall
-    assert diffs_overall['recall']['m'] == recall_m_overall
-    assert diffs_overall['prec']['kk'] == precision_k_overall
-    assert diffs_overall['prec']['m'] == precision_m_overall
+        target_maxs = self.target.group_max()
+        assert isinstance(target_maxs, pd.DataFrame)
+        assert target_maxs.shape == (2, 2)
+        assert target_maxs['recall']['kk'] == max(self.recall_k_arr)
+        assert target_maxs['recall']['m'] == max(self.recall_m_arr)
+        assert target_maxs['prec']['kk'] == max(self.precision_k_arr)
+        assert target_maxs['prec']['m'] == max(self.precision_m_arr)
 
-    ratios = target.ratio(method='between_groups')
-    assert isinstance(ratios, pd.DataFrame)
-    assert ratios.shape == (2, 2)
-    assert ratios['recall']['kk'] == min(recall_k_arr) / max(recall_k_arr)
-    assert ratios['recall']['m'] == min(recall_m_arr) / max(recall_m_arr)
-    assert ratios['prec']['kk'] == min(precision_k_arr) / max(precision_k_arr)
-    assert ratios['prec']['m'] == min(precision_m_arr) / max(precision_m_arr)
+    def test_difference_between_groups(self):
+        self._prepare()
 
-    ratios_overall = target.ratio(method='to_overall')
-    assert isinstance(ratios_overall, pd.DataFrame)
-    assert ratios_overall.shape == (2, 2)
-    recall_k_overall = [x/recall_k for x in recall_k_arr] + \
-        [recall_k/x for x in recall_k_arr]
-    recall_m_overall = [x/recall_m for x in recall_m_arr] + \
-        [recall_m/x for x in recall_m_arr]
-    precision_k_overall = [x/precision_k for x in precision_k_arr] + \
-        [precision_k/x for x in precision_k_arr]
-    precision_m_overall = [x/precision_m for x in precision_m_arr] + \
-        [precision_m/x for x in precision_m_arr]
-    assert ratios_overall['recall']['kk'] == min(recall_k_overall)
-    assert ratios_overall['recall']['m'] == min(recall_m_overall)
-    assert ratios_overall['prec']['kk'] == min(precision_k_overall)
-    assert ratios_overall['prec']['m'] == pytest.approx(min(precision_m_overall),
-                                                        rel=1e-10, abs=1e-16)
+        diffs = self.target.difference(method='between_groups')
+        assert isinstance(diffs, pd.DataFrame)
+        assert diffs.shape == (2, 2)
+        assert diffs['recall']['kk'] == max(self.recall_k_arr) - min(self.recall_k_arr)
+        assert diffs['recall']['m'] == max(self.recall_m_arr) - min(self.recall_m_arr)
+        assert diffs['prec']['kk'] == max(self.precision_k_arr) - min(self.precision_k_arr)
+        assert diffs['prec']['m'] == max(self.precision_m_arr) - min(self.precision_m_arr)
+
+    def test_difference_to_overall(self):
+        self._prepare()
+
+        diffs_overall = self.target.difference(method='to_overall')
+        assert isinstance(diffs_overall, pd.DataFrame)
+        assert diffs_overall.shape == (2, 2)
+        recall_k_overall = max([abs(x-self.recall_k) for x in self.recall_k_arr])
+        recall_m_overall = max([abs(x-self.recall_m) for x in self.recall_m_arr])
+        precision_k_overall = max([abs(x-self.precision_k) for x in self.precision_k_arr])
+        precision_m_overall = max([abs(x-self.precision_m) for x in self.precision_m_arr])
+        assert diffs_overall['recall']['kk'] == recall_k_overall
+        assert diffs_overall['recall']['m'] == recall_m_overall
+        assert diffs_overall['prec']['kk'] == precision_k_overall
+        assert diffs_overall['prec']['m'] == precision_m_overall
+
+    def test_ratio_between_groups(self):
+        self._prepare()
+
+        ratios = self.target.ratio(method='between_groups')
+        assert isinstance(ratios, pd.DataFrame)
+        assert ratios.shape == (2, 2)
+        assert ratios['recall']['kk'] == min(self.recall_k_arr) / max(self.recall_k_arr)
+        assert ratios['recall']['m'] == min(self.recall_m_arr) / max(self.recall_m_arr)
+        assert ratios['prec']['kk'] == min(self.precision_k_arr) / max(self.precision_k_arr)
+        assert ratios['prec']['m'] == min(self.precision_m_arr) / max(self.precision_m_arr)
+
+    def test_ratio_to_overall(self):
+        self._prepare()
+
+        ratios_overall = self.target.ratio(method='to_overall')
+        assert isinstance(ratios_overall, pd.DataFrame)
+        assert ratios_overall.shape == (2, 2)
+        recall_k_overall = [x/self.recall_k for x in self.recall_k_arr] + \
+            [self.recall_k/x for x in self.recall_k_arr]
+        recall_m_overall = [x/self.recall_m for x in self.recall_m_arr] + \
+            [self.recall_m/x for x in self.recall_m_arr]
+        precision_k_overall = [x/self.precision_k for x in self.precision_k_arr] + \
+            [self.precision_k/x for x in self.precision_k_arr]
+        precision_m_overall = [x/self.precision_m for x in self.precision_m_arr] + \
+            [self.precision_m/x for x in self.precision_m_arr]
+        assert ratios_overall['recall']['kk'] == min(recall_k_overall)
+        assert ratios_overall['recall']['m'] == min(recall_m_overall)
+        assert ratios_overall['prec']['kk'] == min(precision_k_overall)
+        assert ratios_overall['prec']['m'] == pytest.approx(min(precision_m_overall),
+                                                            rel=1e-10, abs=1e-16)
 
 
 def test_2m_1sf_2cf():
+    # This test is structured differently, and hence not written as a class
     func_dict = {'recall': skm.recall_score, 'prec': skm.precision_score}
     target = metrics.MetricFrame(func_dict,
                                  y_t, y_p,
