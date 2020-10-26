@@ -263,13 +263,12 @@ the predicted labels.
     ...                                      y_true, y_pred,
     ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> selection_rate_summary.overall
-        selection_rate    0.4
-    dtype: object
+        0.4
     >>> selection_rate_summary.by_group
-         selection_rate
     SF 0
-    a               0.6
-    b               0.2
+    a    0.6
+    b    0.2
+    Name: selection_rate, dtype: object
     >>> dp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> dp.gamma(lambda X: y_pred)
     sign  event  group_id
@@ -351,13 +350,12 @@ In practice this can be used in a difference-based relaxation as follows:
     ...                           y_true, y_pred,
     ...                           sensitive_features=sensitive_features)
     >>> tpr_summary.overall
-    true_positive_rate    0.571429
-    dtype: object
+    0.5714285714285714
     >>> tpr_summary.by_group
-         true_positive_rate
     sensitive_feature_0
-    a                  0.75
-    b              0.333333
+    a        0.75
+    b    0.333333
+    Name: true_positive_rate, dtype: object
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
@@ -449,13 +447,12 @@ the overall error rate by more than the value of :code:`difference_bound`.
     ...                                y_true, y_pred,
     ...                                sensitive_features=sensitive_features)
     >>> accuracy_summary.overall
-    accuracy_score    0.6
-    dtype: object
+    0.6
     >>> accuracy_summary.by_group
-         accuracy_score
     sensitive_feature_0
-    a               0.8
-    b               0.4
+    a    0.8
+    b    0.4
+    Name: accuracy_score, dtype: object
     >>> erp = ErrorRateParity(difference_bound=0.01)
     >>> erp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> erp.gamma(lambda X: y_pred)
@@ -571,13 +568,12 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     ...                           y_true, y_pred,
     ...                           sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> mae_summary.overall
-    mean_absolute_error    0.275
-    dtype: object
+    0.275
     >>> mae_summary.by_group
-         mean_absolute_error
     SF 0
-    a                   0.05
-    b                    0.5
+    a    0.05
+    b     0.5
+    Name: mean_absolute_error, dtype: object
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
     group_id

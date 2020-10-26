@@ -101,13 +101,12 @@ we can evaluate metrics for subgroups within the data as below:
     >>> y_pred = classifier.predict(X)
     >>> gm = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
     >>> print(gm.overall)
-    accuracy_score    0.844355
-    dtype: object
+    0.8443552680070431
     >>> print(gm.by_group)
-           accuracy_score
     sex
     Female       0.925148
     Male         0.804288
+    Name: accuracy_score, dtype: object
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population which have '1' as
@@ -119,13 +118,12 @@ their label:
     >>> from fairlearn.metrics import selection_rate
     >>> sr = MetricFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
     >>> sr.overall
-    selection_rate    0.163855
-    dtype: object
+    0.16385487899758405
     >>> sr.by_group
-           selection_rate
     sex
     Female      0.0635499
-    Male         0.213599    
+    Male         0.213599 
+    Name: selection_rate, dtype: object   
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
@@ -176,13 +174,12 @@ a vastly reduced difference in selection rate:
     >>> 
     >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
     >>> print(sr_mitigated.overall)
-    selection_rate    0.166148
-    dtype: object
+    0.16614798738790384
     >>> print(sr_mitigated.by_group)
-           selection_rate
     sex
     Female       0.155262
     Male         0.171547
+    Name: selection_rate, dtype: object
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard

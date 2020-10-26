@@ -91,9 +91,9 @@ We then calculate a metric which shows the subgroups:
     >>> grouped_metric = MetricFrame(skm.recall_score, 
     ...                              Y_true, Y_pred,
     ...                              sensitive_features=group_membership_data)
-    >>> print("Overall recall = ", grouped_metric.overall['recall_score'])
+    >>> print("Overall recall = ", grouped_metric.overall)
     Overall recall =  0.5
-    >>> print("recall by groups = ", grouped_metric.by_group['recall_score'].to_dict())
+    >>> print("recall by groups = ", grouped_metric.by_group.to_dict())
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 Note that the overall recall is the same as that calculated above in the
@@ -106,13 +106,13 @@ across groups and also the difference and ratio between the maximum and minimum:
 
 .. doctest:: assessment_metrics
 
-    >>> print("min recall over groups = ", grouped_metric.group_min()['recall_score'])
+    >>> print("min recall over groups = ", grouped_metric.group_min())
     min recall over groups =  0.0
-    >>> print("max recall over groups = ", grouped_metric.group_max()['recall_score'])
+    >>> print("max recall over groups = ", grouped_metric.group_max())
     max recall over groups =  0.75
-    >>> print("difference in recall = ", grouped_metric.difference(method='between_groups')['recall_score'])
+    >>> print("difference in recall = ", grouped_metric.difference(method='between_groups'))
     difference in recall =  0.75
-    >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups')['recall_score'])    
+    >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
@@ -149,16 +149,14 @@ in a dictionary via the ``sample_params`` argument.:
     ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
-    recall_score    0.45
-    dtype: object
+    0.45
     >>> weighted.by_group
-         recall_score
     SF 0
     a               0
     b             0.5
     c        0.714286
     d               0
-
+    Name: recall_score, dtype: object
 If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
@@ -176,15 +174,14 @@ function:
     ...                           Y_true, Y_pred,
     ...                           sensitive_features=group_membership_data)
     >>> metric_beta.overall
-    metric    0.539683
-    dtype: object
+    0.5396825396825397
     >>> metric_beta.by_group
-            metric
     sensitive_feature_0
     a            0
     b     0.790698
     c      0.63354
     d            0
+    Name: metric, dtype: object
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
 holds the intersections of these groups:
@@ -199,19 +196,18 @@ holds the intersections of these groups:
     ...                          Y_true, Y_pred,
     ...                          sensitive_features=s_f_frame)
     >>> metric_2sf.overall  # Same as before
-    recall_score    0.5
-    dtype: object
+    0.5
     >>> metric_2sf.by_group
-              recall_score
-    SF 0 SF 1
-    a    6               0
-         8             NaN
-    b    6             0.5
-         8             0.5
-    c    6               1
-         8             0.5
-    d    6               0
-         8               0
+    SF 0  SF 1
+    a     6         0
+          8       NaN
+    b     6       0.5
+          8       0.5
+    c     6         1
+          8       0.5
+    d     6         0
+          8         0
+    Name: recall_score, dtype: object
 
 With such a small number of samples, we are obviously running into cases where
 there are no members in a particular combination of sensitive features. In this

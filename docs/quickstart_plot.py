@@ -17,7 +17,7 @@ selection_rates = MetricFrame(selection_rate,
                               sensitive_features=sex)
 
 xs = list(selection_rates.by_group.index)
-ys = [selection_rates.by_group['selection_rate'][s] for s in xs]
+ys = [selection_rates.by_group[s] for s in xs]
 
 p = figure(x_range=xs,
            plot_height=480,
