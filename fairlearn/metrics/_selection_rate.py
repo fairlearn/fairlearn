@@ -17,7 +17,8 @@ def selection_rate(y_true,
                    sample_weight=None) -> float:
     """Calculate the fraction of predicted labels matching the 'good' outcome.
 
-    The argument `pos_label` specifies the 'good' outcome.
+    The argument `pos_label` specifies the 'good' outcome. For consistency with
+    other metric functions, the ``y_true`` argument is required, but ignored.
 
 
     Parameters
