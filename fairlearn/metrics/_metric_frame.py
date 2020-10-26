@@ -228,7 +228,10 @@ class MetricFrame:
             are specified), then the corresponding entry in the DataFrame will
             be NaN.
         """
-        return self._by_group
+        if self._user_supplied_callable:
+            return self._by_group.iloc[:, 0]
+        else:
+            return self._by_group
 
     @property
     def control_levels(self) -> List[str]:
