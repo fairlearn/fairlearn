@@ -32,8 +32,8 @@ class MetricFrame:
     This data structure stores and manipulates disaggregated values for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
     to split the data into subgroups. The underlying metric(s) is(are) calculated
-    across the entire dataset (made available by the ``overall`` property) and
-    for each identified subgroup (made available by the ``by_group`` property).
+    across the entire dataset (made available by the :attr:`.overall` property) and
+    for each identified subgroup (made available by the :attr:`.by_group` property).
 
     The only limitations placed on the metric functions are that:
 
@@ -68,6 +68,11 @@ class MetricFrame:
         :func:`sklearn.metrics.fbeta_score`) then
         :func:`functools.partial` must be used.
 
+        **Note** that the values returned by various members of the class change
+        based on whether this argument is a callable or a dictionary of
+        callables. This distinction remains *even if* the dictionary only
+        contains a single entry.
+
     y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
         The true values.
 
@@ -79,7 +84,7 @@ class MetricFrame:
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
         We also forbid DataFrames with column names of ``None``.
-        For cases where no names are provided we generate names `sensitive_feature_[n]`.
+        For cases where no names are provided we generate names ``sensitive_feature_[n]``.
 
     control_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         Control features are similar to sensitive features, in that they
@@ -91,6 +96,9 @@ class MetricFrame:
         Control features can be specified similarly to the sensitive features.
         However, their default names (if none can be identified in the
         input values) are of the format ``control_feature_[n]``.
+
+        **Note** the types returned by members of the class vary based on whether
+        control features are present.
 
     sample_params : dict
         Parameters for the metric function(s). If there is only one metric function,
@@ -191,14 +199,30 @@ class MetricFrame:
 
         Returns
         -------
-        pandas.Series or pandas.DataFrame
-            If no ``control_levels`` were specified, then this is
-            a :class:`pandas.Series` with one row for each underlying metric.
+        typing.Any or pandas.Series or pandas.DataFrame
+            The exact type varies based on whether control featuers were
+            provided and how the metric functions were specified.
 
-            If ``control_levels`` were specified, then this is a
-            :class:`pandas.DataFrame`, with columns corresponding to the
-            underling metric(s) and the rows indexed by the subgroups of
-            the control features.
+            ======== ================  =================================
+            Metrics  Control Features  Result Type
+            ======== ================  =================================
+            Callable None              Return type of callable
+            -------- ----------------  ---------------------------------
+            Callable Provided          Series, indexed by the subgroups
+                                       of the conditional feature(s)
+            -------- ----------------  ---------------------------------
+            Dict     None              Series, indexed by the metric
+                                       names
+            -------- ----------------  ---------------------------------
+            Dict     Provided          DataFrame. Columns are
+                                       metric names, rows are subgroups
+                                       of conditional feature(s)
+            ======== ================  =================================
+
+            The distinction applies even if the dictionary contains a
+            single metric function. This is to allow for a consistent
+            interface when calling programatically, while also reducing
+            typing for those using Fairlearn interactively.
         """
         if self._user_supplied_callable:
             if self.control_levels:
@@ -212,21 +236,26 @@ class MetricFrame:
     def by_group(self) -> pd.DataFrame:
         """Return the collection of metrics evaluated for each subgroup.
 
+        The collection is defined by the combination of classes in the
+        sensitive and control features. The exact type depends on
+        the specification of the metric function.
+
         Returns
         -------
-        pandas.DataFrame
-            The result of evaluating
-            each underlying metric for each combination of classes in the
-            sensitive and control features. The columns identify
-            the underlying metric, while the rows are indexed by the unique
-            combinations of classes found in the sensitive and control
-            features. If control features are present, they are in the
-            'outer' layer of the row indexing.
+        pandas.Series or pandas.DataFrame
+            When a callable is supplied to the constructor, the result is
+            a :class:`pandas.Series`, indexed by the combinations of subgroups
+            in the sensitive and control features.
 
-            If a particular combination of classes was not present in the dataset
+            When the metric functions were specified with a dictionary (even
+            if the dictionary only has a single entry), then the result is
+            a :class:`pandas.DataFrame` with columns named after the metric
+            functions, and rows indexed by the combinations of subgroups
+            in the sensitive and control features.
+
+            If a particular combination of subgroups was not present in the dataset
             (likely to occur as more sensitive and control features
-            are specified), then the corresponding entry in the DataFrame will
-            be NaN.
+            are specified), then the corresponding entry will be NaN.
         """
         if self._user_supplied_callable:
             return self._by_group.iloc[:, 0]
@@ -237,13 +266,13 @@ class MetricFrame:
     def control_levels(self) -> List[str]:
         """Return a list of feature names which are produced by control features.
 
-        If control features are present, then the rows of the ``by_group``
-        property have a :class:`pd.MultiIndex` index. This property
+        If control features are present, then the rows of the :attr:`.by_group`
+        property have a :class:`pandas.MultiIndex` index. This property
         identifies which elements of that index are control features.
 
         Returns
         -------
-        List[str]
+        List[str] or None
             List of names, which can be used in calls to
             :meth:`pandas.DataFrame.groupby` etc.
         """
@@ -253,7 +282,7 @@ class MetricFrame:
     def sensitive_levels(self) -> List[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
-        In cases where the ``by_group`` property has a :class:`pd.MultiIndex`
+        In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
         index, this identifies which elements of the index are sensitive features.
 
         Returns
@@ -268,20 +297,17 @@ class MetricFrame:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
-        sensitive features for each underlying metric function in the ``by_groups``
+        sensitive features for each underlying metric function in the :attr:`.by_group`
         property (it will only succeed if all the underlying metric
-        functions return scalar values). If there are no control
-        features, then the result will be a :class:`pandas.Series`,
-        with rows corresponding to the underying metrics.
+        functions return scalar values). The exact return type depends on
+        whether control features are present, and whether the metric functions
+        were specified as a single callable or a dictionary.
 
         Returns
         -------
-        pandas.Series or pandas.DataFrame
-            If there are control features, then the result is a
-            :class:`pandas.DataFrame` with columns corresponding to the
-            underlying metrics, and rows indexed by the classes identified
-            by the control features. Otherwise, a :class:`pandas.Series`
-            indexed by the names of the underlying metrics.
+        typing.Any or pandas.Series or pandas.DataFrame
+            The maximum value over sensitive features. The exact type
+            follows the table in :attr:`.MetricFrame.overall`.
         """
         if not self.control_levels:
             result = pd.Series(index=self._by_group.columns, dtype='object')
@@ -303,20 +329,17 @@ class MetricFrame:
         """Return the minimum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
-        sensitive features for each underlying metric function in the ``by_groups``
+        sensitive features for each underlying metric function in the :attr:`.by_group`
         property (it will only succeed if all the underlying metric
-        functions return scalar values). If there are no control
-        features, then the result will be a :class:`pandas.Series`,
-        with rows corresponding to the underying metrics.
+        functions return scalar values). The exact return type depends on
+        whether control features are present, and whether the metric functions
+        were specified as a single callable or a dictionary.
 
         Returns
         -------
-        pandas.Series or pandas.DataFrame
-            If there are control features, then the result is a
-            :class:`pandas.DataFrame` with columns corresponding to the
-            underlying metrics, and rows indexed by the classes identified
-            by the control features. Otherwise, a :class:`pandas.Series`
-            indexed by the names of the underlying metrics.
+        typing.Any pandas.Series or pandas.DataFrame
+            The minimum value over sensitive features. The exact type
+            follows the table in :attr:`.MetricFrame.overall`.
         """
         if not self.control_levels:
             result = pd.Series(index=self._by_group.columns, dtype='object')
@@ -340,32 +363,25 @@ class MetricFrame:
 
         This method calculates a scalar value for each underlying metric by
         finding the maximum absolute difference between the entries in each
-        column of the ``by_groups`` DataFrame.
+        combination of sensitive features in the :attr:`.by_group` property.
 
-        Similar to other methods, the result will be a :class:`pandas.Series`
-        if there are no control features, with rows corresponding
-        to each underlying metric. If there are control features,
-        then the result will be a :class:`pandas.DataFrame` with a column
-        for each underlying metric, and rows corresponding to the subgroups
-        identified by the control feature(s).
+        Similar to other methods, the result type varies with the
+        specification of the metric functions, and whether control features
+        are present or not.
 
         There are two allowed values for the ``method=`` parameter. The
         value ``between_groups`` computes the maximum difference between
-        any two pairs of groups in the ``by_groups`` DataFrame (i.e.
+        any two pairs of groups in the :attr:`.by_group` property (i.e.
         ``group_max() - group_min()``). Alternatively, ``to_overall``
         computes the difference between each subgroup and the
-        corresponding value from ``overall`` (if there are control
-        features, then ``overall`` is multivalued for each metric).
+        corresponding value from :attr:`.overall` (if there are control
+        features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
 
         Returns
         -------
-        pandas.Series or pandas.DataFrame
-            If there are control features, then the result is a
-            :class:`pandas.DataFrame` with columns corresponding to the
-            underlying metrics, and rows indexed by the classes identified
-            by the control features. Otherwise, a :class:`pandas.Series`
-            indexed by the names of the underlying metrics.
+        typing.Any or pandas.Series or pandas.DataFrame
+            The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
         subtrahend = np.nan
         if method == 'between_groups':
@@ -384,33 +400,26 @@ class MetricFrame:
         This method calculates a scalar value for each underlying metric by
         finding the minimum ratio (that is, the ratio is forced to be
         less than unity) between the entries in each
-        column of the ``by_groups`` DataFrame.
+        column of the :attr:`.by_group` property.
 
-        Similar to other methods, the result will be a :class:`pandas.Series`
-        if there are no control features, with rows corresponding
-        to each underlying metric. If there are control features,
-        then the result will be a :class:`pandas.DataFrame` with a column
-        for each underlying metric, and rows corresponding to the subgroups
-        identified by the control feature(s).
+        Similar to other methods, the result type varies with the
+        specification of the metric functions, and whether control features
+        are present or not.
 
         There are two allowed values for the ``method=`` parameter. The
         value ``between_groups`` computes the minimum ratio between
-        any two pairs of groups in the ``by_groups`` DataFrame (i.e.
+        any two pairs of groups in the :attr:`.by_group` property (i.e.
         ``group_min() / group_max()``). Alternatively, ``to_overall``
         computes the ratio between each subgroup and the
-        corresponding value from ``overall`` (if there are control
-        features, then ``overall`` is multivalued for each metric),
+        corresponding value from :attr:`.overall` (if there are control
+        features, then :attr:`.overall` is multivalued for each metric),
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
 
         Returns
         -------
-        pandas.Series or pandas.DataFrame
-            If there are control features, then the result is a
-            :class:`pandas.DataFrame` with columns corresponding to the
-            underlying metrics, and rows indexed by the classes identified
-            by the control features. Otherwise, a :class:`pandas.Series`
-            indexed by the names of the underlying metrics.
+        typing.Any or pandas.Series or pandas.DataFrame
+            The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
         result = None
         if method == 'between_groups':
