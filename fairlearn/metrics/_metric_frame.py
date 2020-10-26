@@ -200,7 +200,13 @@ class MetricFrame:
             underling metric(s) and the rows indexed by the subgroups of
             the control features.
         """
-        return self._overall
+        if self._user_supplied_callable:
+            if self.control_levels:
+                return self._overall.iloc[:, 0]
+            else:
+                return self._overall.iloc[0]
+        else:
+            return self._overall
 
     @property
     def by_group(self) -> pd.DataFrame:

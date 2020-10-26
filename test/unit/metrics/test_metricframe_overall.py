@@ -6,8 +6,9 @@ import pandas as pd
 import pytest
 import sklearn.metrics as skm
 
-from .data_for_test import y_t, y_p, s_w, g_1, g_2
-from .utils import _get_raw_MetricFrame
+from fairlearn.metrics import MetricFrame
+
+from .data_for_test import y_t, y_p, s_w, g_1, g_2, g_3
 
 
 metric = [skm.recall_score,
@@ -18,152 +19,146 @@ metric = [skm.recall_score,
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf(metric_fn):
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions(metric_fn, None)
+    target = MetricFrame(metric_fn,
+                         y_t, y_p,
+                         sensitive_features=g_1)  # Sensitive features actually unused
     assert target._user_supplied_callable is True
-    result = target._compute_overall(func_dict, y_t, y_p, None)
 
-    assert isinstance(result, pd.Series)
-    assert len(result) == 1
+    # Check user-visible
     expected = metric_fn(y_t, y_p)
-    assert result[metric_fn.__name__] == expected
+    assert isinstance(target.overall, float)
+    assert target.overall == expected
 
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf_metric_dict(metric_fn):
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions({metric_fn.__name__: metric_fn}, None)
-
+    target = MetricFrame({metric_fn.__name__: metric_fn},
+                         y_t, y_p,
+                         sensitive_features=g_1)  # Sensitive features actually unusedle is False
     assert target._user_supplied_callable is False
 
-    result = target._compute_overall(func_dict, y_t, y_p, None)
-
-    assert isinstance(result, pd.Series)
-    assert len(result) == 1
+    # Check user visible
     expected = metric_fn(y_t, y_p)
-    assert result[metric_fn.__name__] == expected
+    assert isinstance(target.overall, pd.Series)
+    assert len(target.overall) == 1
+    assert target.overall[metric_fn.__name__] == expected
 
 
-@pytest.mark.parametrize("metric_fn", metric)
+@ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf_wgt(metric_fn):
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions(metric_fn,
-                                          {'sample_weight': s_w})
+    target = MetricFrame(metric_fn,
+                         y_t, y_p,
+                         sensitive_features=g_1,  # Unused for overall
+                         sample_params={'sample_weight': s_w})
 
     assert target._user_supplied_callable is True
 
-    result = target._compute_overall(func_dict, y_t, y_p, None)
-
-    assert isinstance(result, pd.Series)
-    assert len(result) == 1
+    # Check user visible
     expected = metric_fn(y_t, y_p, sample_weight=s_w)
-    assert result[metric_fn.__name__] == expected
+    assert isinstance(target.overall, float)
+    assert target.overall == expected
 
 
-@pytest.mark.parametrize("metric_fn", metric)
+@ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf_wgt_metric_dict(metric_fn):
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions({metric_fn.__name__: metric_fn},
-                                          {metric_fn.__name__: {'sample_weight': s_w}})
-
+    target = MetricFrame({metric_fn.__name__: metric_fn},
+                         y_t, y_p,
+                         sensitive_features=g_1,  # Unused for overall
+                         sample_params={metric_fn.__name__: {'sample_weight': s_w}})
     assert target._user_supplied_callable is False
 
-    result = target._compute_overall(func_dict, y_t, y_p, None)
-
-    assert isinstance(result, pd.Series)
-    assert len(result) == 1
+    # Check user visible
     expected = metric_fn(y_t, y_p, sample_weight=s_w)
-    assert result[metric_fn.__name__] == expected
+    assert isinstance(target.overall, pd.Series)
+    assert len(target.overall) == 1
+    assert target.overall[metric_fn.__name__] == expected
 
 
 def test_2m_0cf():
-    target = _get_raw_MetricFrame()
     funcs = {'recall': skm.recall_score, 'prec': skm.precision_score}
-    func_container_dict = target._process_functions(funcs, None)
+    target = MetricFrame(funcs,
+                         y_t, y_p,
+                         sensitive_features=g_1)  # Irrelevant for this test
     assert target._user_supplied_callable is False
-    result = target._compute_overall(func_container_dict, y_t, y_p, None)
 
-    assert isinstance(result, pd.Series)
-    assert len(result) == 2
+    assert isinstance(target.overall, pd.Series)
+    assert len(target.overall) == 2
     exp_recall = skm.recall_score(y_t, y_p)
     exp_prec = skm.precision_score(y_t, y_p)
-    assert result['recall'] == exp_recall
-    assert result['prec'] == exp_prec
+    assert target.overall['recall'] == exp_recall
+    assert target.overall['prec'] == exp_prec
 
 
-@pytest.mark.parametrize("metric_fn", metric)
+@ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1cf(metric_fn):
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions(metric_fn, None)
+    target = MetricFrame(metric_fn,
+                         y_t, y_p,
+                         sensitive_features=g_2,  # Unused here
+                         control_features=g_1)
     assert target._user_supplied_callable is True
-    cf_list = target._process_features("CF", g_1, y_t)
 
-    result = target._compute_overall(func_dict, y_t, y_p, cf_list)
-
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (2, 1)
-    assert np.array_equal(result.index.names, ['CF0'])
     mask_a = (g_1 == 'aa')
     mask_b = (g_1 == 'ba')
     exp_metric_a = metric_fn(y_t[mask_a], y_p[mask_a])
     exp_metric_b = metric_fn(y_t[mask_b], y_p[mask_b])
-    assert result[metric_fn.__name__]['aa'] == exp_metric_a
-    assert result[metric_fn.__name__]['ba'] == exp_metric_b
+
+    # User visible features
+    assert isinstance(target.overall, pd.Series)
+    assert len(target.overall) == 2
+    assert target.overall['aa'] == exp_metric_a
+    assert target.overall['ba'] == exp_metric_b
 
 
-@pytest.mark.parametrize("metric_fn", metric)
+@ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1cf_metric_dict(metric_fn):
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions({metric_fn.__name__: metric_fn}, None)
+    target = MetricFrame({metric_fn.__name__: metric_fn},
+                         y_t, y_p,
+                         sensitive_features=g_2,
+                         control_features=g_1)
     assert target._user_supplied_callable is False
-    cf_list = target._process_features("CF", g_1, y_t)
 
-    result = target._compute_overall(func_dict, y_t, y_p, cf_list)
-
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (2, 1)
-    assert np.array_equal(result.index.names, ['CF0'])
+    assert isinstance(target.overall, pd.DataFrame)
+    assert target.overall.shape == (2, 1)
+    assert np.array_equal(target.overall.index.names, ['control_feature_0'])
     mask_a = (g_1 == 'aa')
     mask_b = (g_1 == 'ba')
     exp_metric_a = metric_fn(y_t[mask_a], y_p[mask_a])
     exp_metric_b = metric_fn(y_t[mask_b], y_p[mask_b])
-    assert result[metric_fn.__name__]['aa'] == exp_metric_a
-    assert result[metric_fn.__name__]['ba'] == exp_metric_b
+    assert target.overall[metric_fn.__name__]['aa'] == exp_metric_a
+    assert target.overall[metric_fn.__name__]['ba'] == exp_metric_b
 
 
 def test_1m_1cf_wgt():
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions(skm.recall_score,
-                                          {'sample_weight': s_w})
-    cf_list = target._process_features("CondF", g_1, y_t)
+    target = MetricFrame(skm.recall_score,
+                         y_t, y_p,
+                         sensitive_features=g_2,  # Unused
+                         control_features=g_1,
+                         sample_params={'sample_weight': s_w})
+    assert target._user_supplied_callable is True
 
-    result = target._compute_overall(func_dict, y_t, y_p, cf_list)
-
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (2, 1)
-    assert np.array_equal(result.index.names, ['CondF0'])
+    assert isinstance(target.overall, pd.Series)
+    assert len(target.overall) == 2
     mask_a = (g_1 == 'aa')
     mask_b = (g_1 == 'ba')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a],
                                     sample_weight=s_w[mask_a])
     exp_recall_b = skm.recall_score(y_t[mask_b], y_p[mask_b],
                                     sample_weight=s_w[mask_b])
-    assert result['recall_score']['aa'] == exp_recall_a
-    assert result['recall_score']['ba'] == exp_recall_b
+    assert target.overall['aa'] == exp_recall_a
+    assert target.overall['ba'] == exp_recall_b
 
 
 def test_1m_1cf_wgt_metric_dict():
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions({'recall': skm.recall_score},
-                                          {'recall':{'sample_weight': s_w}})
+    target = MetricFrame({'recall': skm.recall_score},
+                         y_t, y_p,
+                         sensitive_features=g_2,  # Unused
+                         control_features=g_1,
+                         sample_params={'recall': {'sample_weight': s_w}})
     assert target._user_supplied_callable is False
-    cf_list = target._process_features("CondF", g_1, y_t)
 
-    result = target._compute_overall(func_dict, y_t, y_p, cf_list)
-
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (2, 1)
-    assert np.array_equal(result.index.names, ['CondF0'])
+    assert isinstance(target.overall, pd.DataFrame)
+    assert target.overall.shape == (2, 1)
+    assert np.array_equal(target.overall.index.names, ['control_feature_0'])
     mask_a = (g_1 == 'aa')
     mask_b = (g_1 == 'ba')
     exp_recall_a = skm.recall_score(y_t[mask_a], y_p[mask_a],
@@ -171,24 +166,20 @@ def test_1m_1cf_wgt_metric_dict():
                                     sample_weight=s_w[mask_a])
     exp_recall_b = skm.recall_score(y_t[mask_b], y_p[mask_b],
                                     sample_weight=s_w[mask_b])
-    assert result['recall']['aa'] == exp_recall_a
-    assert result['recall']['ba'] == exp_recall_b
+    assert target.overall['recall']['aa'] == exp_recall_a
+    assert target.overall['recall']['ba'] == exp_recall_b
 
 
 def test_1m_2cf():
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions(skm.recall_score, None)
-
+    target = MetricFrame(skm.recall_score,
+                         y_t, y_p,
+                         sensitive_features=g_3,
+                         control_features=np.stack((g_1, g_2), axis=1))
     assert target._user_supplied_callable is True
 
-    two_groups = np.stack((g_1, g_2), axis=1)
-    cf_list = target._process_features("CF", two_groups, y_t)
-
-    result = target._compute_overall(func_dict, y_t, y_p, cf_list)
-
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (4, 1)
-    assert np.array_equal(result.index.names, ['CF0', 'CF1'])
+    assert isinstance(target.overall, pd.Series)
+    assert len(target.overall) == 4
+    assert np.array_equal(target.overall.index.names, ['control_feature_0', 'control_feature_1'])
     mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))
     mask_a_g = np.logical_and((g_1 == 'aa'), (g_2 == 'g'))
     mask_b_f = np.logical_and((g_1 == 'ba'), (g_2 == 'f'))
@@ -199,26 +190,22 @@ def test_1m_2cf():
     exp_b_f = skm.recall_score(y_t[mask_b_f], y_p[mask_b_f])
     exp_b_g = skm.recall_score(y_t[mask_b_g], y_p[mask_b_g])
 
-    assert result['recall_score'][('aa', 'f')] == exp_a_f
-    assert result['recall_score'][('aa', 'g')] == exp_a_g
-    assert result['recall_score'][('ba', 'f')] == exp_b_f
-    assert result['recall_score'][('ba', 'g')] == exp_b_g
+    assert target.overall[('aa', 'f')] == exp_a_f
+    assert target.overall[('aa', 'g')] == exp_a_g
+    assert target.overall[('ba', 'f')] == exp_b_f
+    assert target.overall[('ba', 'g')] == exp_b_g
 
 
 def test_1m_2cf_metric_dict():
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions({'recall_score': skm.recall_score}, None)
-
+    target = MetricFrame({'recall_score': skm.recall_score},
+                         y_t, y_p,
+                         sensitive_features=g_3,
+                         control_features=np.stack((g_1, g_2), axis=1))
     assert target._user_supplied_callable is False
 
-    two_groups = np.stack((g_1, g_2), axis=1)
-    cf_list = target._process_features("CF", two_groups, y_t)
-
-    result = target._compute_overall(func_dict, y_t, y_p, cf_list)
-
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (4, 1)
-    assert np.array_equal(result.index.names, ['CF0', 'CF1'])
+    assert isinstance(target.overall, pd.DataFrame)
+    assert target.overall.shape == (4, 1)
+    assert np.array_equal(target.overall.index.names, ['control_feature_0', 'control_feature_1'])
     mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))
     mask_a_g = np.logical_and((g_1 == 'aa'), (g_2 == 'g'))
     mask_b_f = np.logical_and((g_1 == 'ba'), (g_2 == 'f'))
@@ -229,26 +216,22 @@ def test_1m_2cf_metric_dict():
     exp_b_f = skm.recall_score(y_t[mask_b_f], y_p[mask_b_f])
     exp_b_g = skm.recall_score(y_t[mask_b_g], y_p[mask_b_g])
 
-    assert result['recall_score'][('aa', 'f')] == exp_a_f
-    assert result['recall_score'][('aa', 'g')] == exp_a_g
-    assert result['recall_score'][('ba', 'f')] == exp_b_f
-    assert result['recall_score'][('ba', 'g')] == exp_b_g
+    assert target.overall['recall_score'][('aa', 'f')] == exp_a_f
+    assert target.overall['recall_score'][('aa', 'g')] == exp_a_g
+    assert target.overall['recall_score'][('ba', 'f')] == exp_b_f
+    assert target.overall['recall_score'][('ba', 'g')] == exp_b_g
 
 
 def test_2m_2cf():
-    target = _get_raw_MetricFrame()
-    func_dict = target._process_functions(
-        {'recall': skm.recall_score, 'prec': skm.precision_score},
-        None)
-
     two_group = pd.DataFrame(data=np.stack((g_1, g_2), axis=1), columns=['g_1', 'g_2'])
-    cf_list = target._process_features("CF", two_group, y_t)
+    target = MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
+                         y_t, y_p,
+                         sensitive_features=g_3,  # Unused
+                         control_features=two_group)
 
-    result = target._compute_overall(func_dict, y_t, y_p, cf_list)
-
-    assert isinstance(result, pd.DataFrame)
-    assert result.shape == (4, 2)
-    assert result.index.names == ['g_1', 'g_2']
+    assert isinstance(target.overall, pd.DataFrame)
+    assert target.overall.shape == (4, 2)
+    assert target.overall.index.names == ['g_1', 'g_2']
     mask_a_f = np.logical_and((g_1 == 'aa'), (g_2 == 'f'))
     mask_a_g = np.logical_and((g_1 == 'aa'), (g_2 == 'g'))
     mask_b_f = np.logical_and((g_1 == 'ba'), (g_2 == 'f'))
@@ -258,16 +241,16 @@ def test_2m_2cf():
     recall_a_g = skm.recall_score(y_t[mask_a_g], y_p[mask_a_g])
     recall_b_f = skm.recall_score(y_t[mask_b_f], y_p[mask_b_f])
     recall_b_g = skm.recall_score(y_t[mask_b_g], y_p[mask_b_g])
-    assert result['recall'][('aa', 'f')] == recall_a_f
-    assert result['recall'][('aa', 'g')] == recall_a_g
-    assert result['recall'][('ba', 'f')] == recall_b_f
-    assert result['recall'][('ba', 'g')] == recall_b_g
+    assert target.overall['recall'][('aa', 'f')] == recall_a_f
+    assert target.overall['recall'][('aa', 'g')] == recall_a_g
+    assert target.overall['recall'][('ba', 'f')] == recall_b_f
+    assert target.overall['recall'][('ba', 'g')] == recall_b_g
 
     prec_a_f = skm.precision_score(y_t[mask_a_f], y_p[mask_a_f])
     prec_a_g = skm.precision_score(y_t[mask_a_g], y_p[mask_a_g])
     prec_b_f = skm.precision_score(y_t[mask_b_f], y_p[mask_b_f])
     prec_b_g = skm.precision_score(y_t[mask_b_g], y_p[mask_b_g])
-    assert result['prec'][('aa', 'f')] == prec_a_f
-    assert result['prec'][('aa', 'g')] == prec_a_g
-    assert result['prec'][('ba', 'f')] == prec_b_f
-    assert result['prec'][('ba', 'g')] == prec_b_g
+    assert target.overall['prec'][('aa', 'f')] == prec_a_f
+    assert target.overall['prec'][('aa', 'g')] == prec_a_g
+    assert target.overall['prec'][('ba', 'f')] == prec_b_f
+    assert target.overall['prec'][('ba', 'g')] == prec_b_g
