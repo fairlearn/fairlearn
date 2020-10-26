@@ -31,10 +31,10 @@ def test_roc_auc():
                                  sensitive_features=s_f)
 
     overall = ras(y_true, y_pred)
-    assert target.overall['metric'] == overall
+    assert target.overall == overall
 
     for g in np.unique(s_f):
         mask = s_f == g
         expected = ras(y_true[mask], y_pred[mask])
-        actual = target.by_group['metric'][g]
+        actual = target.by_group[g]
         assert expected == actual

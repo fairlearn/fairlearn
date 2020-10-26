@@ -11,7 +11,7 @@ from .data_for_test import y_t, y_p, g_1, g_2
 
 
 def test_1m_1sf_0cf():
-    target = metrics.MetricFrame(skm.confusion_matrix,
+    target = metrics.MetricFrame({'confusion_matrix': skm.confusion_matrix},
                                  y_t,
                                  y_p,
                                  sensitive_features=g_1)
@@ -36,14 +36,14 @@ def test_1m_1sf_1cf():
     for cf in np.unique(g_2):
         mask_c = g_2 == cf
         overall = skm.confusion_matrix(y_t[mask_c], y_p[mask_c])
-        actual = target.overall['confusion_matrix'][cf]
+        actual = target.overall[cf]
         assert np.array_equal(overall, actual)
 
         for sf in np.unique(g_1):
             mask_s = g_1 == sf
             mask = np.logical_and(mask_c, mask_s)
             expected = skm.confusion_matrix(y_t[mask], y_p[mask])
-            actual = target.by_group['confusion_matrix'][(cf, sf)]
+            actual = target.by_group[(cf, sf)]
             assert np.array_equal(expected, actual)
 
 
@@ -80,10 +80,10 @@ def test_multid_input_output():
     target = metrics.MetricFrame(metric_fn, y_t_2, y_p_2, sensitive_features=g_1)
 
     expected_overall = skm.r2_score(y_t_2, y_p_2, multioutput='raw_values')
-    assert np.array_equal(target.overall['metric'], expected_overall)
+    assert np.array_equal(target.overall, expected_overall)
     for g in np.unique(g_1):
         mask = g_1 == g
 
         expected = skm.r2_score(y_t_2[mask], y_p_2[mask], multioutput='raw_values')
-        actual = target.by_group['metric'][g]
+        actual = target.by_group[g]
         assert np.array_equal(actual, expected)
