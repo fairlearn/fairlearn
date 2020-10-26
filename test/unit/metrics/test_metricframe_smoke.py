@@ -23,8 +23,7 @@ def test_basic(transform_y_t, transform_y_p):
                                  sensitive_features=g_f)
 
     # Check on the indices properties
-    assert isinstance(target.control_levels, list)
-    assert (target.control_levels == [])
+    assert target.control_levels is None
     assert isinstance(target.sensitive_levels, list)
     assert (target.sensitive_levels == ['My feature'])
 

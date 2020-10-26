@@ -122,14 +122,17 @@ class MetricFrame:
         # Prepare the control features
         # Adjust _sf_indices if needed
         cf_list = None
-        self._cf_names = []
+        self._cf_names = None
         if control_features is not None:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
         # Check for duplicate feature names
         nameset = set()
-        for name in (self._sf_names + self._cf_names):
+        namelist = self._sf_names
+        if self._cf_names:
+            namelist = namelist + self._cf_names
+        for name in namelist:
             if name in nameset:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
@@ -399,9 +402,13 @@ class MetricFrame:
         if method == 'between_groups':
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
-            # It's easiest to give in to the DataFrame columns preference
-            ratios = self.by_group.unstack(level=self.control_levels) /  \
-                self.overall.unstack(level=self.control_levels)
+            ratios = None
+            if self.control_levels:
+                # It's easiest to give in to the DataFrame columns preference
+                ratios = self.by_group.unstack(level=self.control_levels) /  \
+                    self.overall.unstack(level=self.control_levels)
+            else:
+                ratios = self.by_group / self.overall
 
             def ratio_sub_one(x):
                 if x > 1:

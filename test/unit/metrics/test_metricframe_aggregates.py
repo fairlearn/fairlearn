@@ -23,8 +23,7 @@ class Test1m1sf0cf:
                                           y_t, y_p,
                                           sensitive_features=g_4)
 
-        assert isinstance(self.target.control_levels, list)
-        assert (self.target.control_levels == [])
+        assert self.target.control_levels is None
         assert isinstance(self.target.sensitive_levels, list)
         assert (self.target.sensitive_levels == ['sensitive_feature_0'])
 
@@ -109,8 +108,7 @@ class Test2m1sf0cf:
                                           y_t, y_p,
                                           sensitive_features=pd.Series(data=g_4))
 
-        assert isinstance(self.target.control_levels, list)
-        assert (self.target.control_levels == [])
+        assert self.target.control_levels is None
         assert isinstance(self.target.sensitive_levels, list)
         assert (self.target.sensitive_levels == ['sensitive_feature_0'])
 
