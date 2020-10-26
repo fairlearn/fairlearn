@@ -12,9 +12,9 @@ from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
 
 
 metric = [skm.recall_score,
-          skm.precision_score,
-          skm.accuracy_score,
-          skm.balanced_accuracy_score]
+          # skm.precision_score,
+          # skm.accuracy_score,
+          ]  # skm.balanced_accuracy_score]
 
 
 class Test1m1sf0cf:
@@ -325,52 +325,52 @@ class Test1m1cf1sf:
         self._prepare(metric_fn)
 
         target_diff = self.target.difference(method='between_groups')
-        assert isinstance(target_diff, pd.DataFrame)
-        assert target_diff.shape == (2, 1)
-        assert target_diff[self.mfn]['kk'] == max(self.metric_k_arr)-min(self.metric_k_arr)
-        assert target_diff[self.mfn]['m'] == max(self.metric_m_arr)-min(self.metric_m_arr)
+        assert isinstance(target_diff, pd.Series)
+        assert len(target_diff) == 2
+        assert target_diff['kk'] == max(self.metric_k_arr)-min(self.metric_k_arr)
+        assert target_diff['m'] == max(self.metric_m_arr)-min(self.metric_m_arr)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_difference_to_overall(self, metric_fn):
         self._prepare(metric_fn)
 
         target_diff_overall = self.target.difference(method='to_overall')
-        assert isinstance(target_diff_overall, pd.DataFrame)
-        assert target_diff_overall.shape == (2, 1)
+        assert isinstance(target_diff_overall, pd.Series)
+        assert len(target_diff_overall) == 2
         k_diffs_overall = [abs(self.metric_k_f-self.metric_k),
                            abs(self.metric_k_g-self.metric_k)]
         m_diffs_overall = [abs(self.metric_m_f-self.metric_m),
                            abs(self.metric_m_g-self.metric_m)]
-        assert target_diff_overall[self.mfn]['kk'] == max(k_diffs_overall)
-        assert target_diff_overall[self.mfn]['m'] == max(m_diffs_overall)
+        assert target_diff_overall['kk'] == max(k_diffs_overall)
+        assert target_diff_overall['m'] == max(m_diffs_overall)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_ratio_between_groups(self, metric_fn):
         self._prepare(metric_fn)
 
         target_ratio = self.target.ratio(method='between_groups')
-        assert isinstance(target_ratio, pd.DataFrame)
-        assert target_ratio.shape == (2, 1)
-        assert target_ratio[self.mfn]['kk'] == min(self.metric_k_arr)/max(self.metric_k_arr)
-        assert target_ratio[self.mfn]['m'] == min(self.metric_m_arr)/max(self.metric_m_arr)
+        assert isinstance(target_ratio, pd.Series)
+        assert len(target_ratio) == 2
+        assert target_ratio['kk'] == min(self.metric_k_arr)/max(self.metric_k_arr)
+        assert target_ratio['m'] == min(self.metric_m_arr)/max(self.metric_m_arr)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_ratio_to_overall(self, metric_fn):
         self._prepare(metric_fn)
 
         target_ratio_overall = self.target.ratio(method='to_overall')
-        assert isinstance(target_ratio_overall, pd.DataFrame)
-        assert target_ratio_overall.shape == (2, 1)
+        assert isinstance(target_ratio_overall, pd.Series)
+        assert len(target_ratio_overall) == 2
         k_ratios_overall = [x/self.metric_k for x in self.metric_k_arr] + \
             [self.metric_k/x for x in self.metric_k_arr]
         m_ratios_overall = [x/self.metric_m for x in self.metric_m_arr] + \
             [self.metric_m/x for x in self.metric_m_arr]
         # Ratio to overall is forced to be <1 in a slightly different way
         # internally, so have to use pytest.approx
-        assert target_ratio_overall[self.mfn]['kk'] == pytest.approx(min(k_ratios_overall),
-                                                                     rel=1e-10, abs=1e-16)
-        assert target_ratio_overall[self.mfn]['m'] == pytest.approx(min(m_ratios_overall),
-                                                                    rel=1e-10, abs=1e-16)
+        assert target_ratio_overall['kk'] == pytest.approx(min(k_ratios_overall),
+                                                           rel=1e-10, abs=1e-16)
+        assert target_ratio_overall['m'] == pytest.approx(min(m_ratios_overall),
+                                                          rel=1e-10, abs=1e-16)
 
 
 class Test1m1cf1sfFnDict:
