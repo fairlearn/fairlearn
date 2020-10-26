@@ -284,13 +284,20 @@ class MetricFrame:
             indexed by the names of the underlying metrics.
         """
         if not self.control_levels:
-            result = pd.Series(index=self.by_group.columns, dtype='object')
+            result = pd.Series(index=self._by_group.columns, dtype='object')
             for m in result.index:
-                max_val = self.by_group[m].max()
+                max_val = self._by_group[m].max()
                 result[m] = max_val
         else:
-            result = self.by_group.groupby(level=self.control_levels).max()
-        return result
+            result = self._by_group.groupby(level=self.control_levels).max()
+
+        if self._user_supplied_callable:
+            if self.control_levels:
+                return result.iloc[:, 0]
+            else:
+                return result.iloc[0]
+        else:
+            return result
 
     def group_min(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the minimum value of the metric over the sensitive features.
@@ -312,13 +319,20 @@ class MetricFrame:
             indexed by the names of the underlying metrics.
         """
         if not self.control_levels:
-            result = pd.Series(index=self.by_group.columns, dtype='object')
+            result = pd.Series(index=self._by_group.columns, dtype='object')
             for m in result.index:
-                min_val = self.by_group[m].min()
+                min_val = self._by_group[m].min()
                 result[m] = min_val
         else:
-            result = self.by_group.groupby(level=self.control_levels).min()
-        return result
+            result = self._by_group.groupby(level=self.control_levels).min()
+        
+        if self._user_supplied_callable:
+            if self.control_levels:
+                return result.iloc[:, 0]
+            else:
+                return result.iloc[0]
+        else:
+            return result
 
     def difference(self,
                    method: str) -> Union[pd.Series, pd.DataFrame]:
@@ -369,7 +383,6 @@ class MetricFrame:
             diffs = (self.by_group.unstack(level=self.control_levels) -
                      subtrahend.unstack(level=self.control_levels)).abs()
             result = diffs.max().unstack(0)
-
         return result
 
     def ratio(self,
