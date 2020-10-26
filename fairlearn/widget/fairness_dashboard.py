@@ -178,8 +178,8 @@ class FairlearnDashboard(object):
                                          data['predicted_ys'][data["modelIndex"]],
                                          sensitive_features=data["binVector"])
                 return jsonify({"data": {
-                    "global": prediction.overall[method.__name__],
-                    "bins": list(prediction.by_group[method.__name__])
+                    "global": prediction.overall,
+                    "bins": list(prediction.by_group)
                 }})
         except Exception as ex:
             # debug only
