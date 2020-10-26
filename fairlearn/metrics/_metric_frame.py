@@ -416,25 +416,30 @@ class MetricFrame:
         if method == 'between_groups':
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
-            ratios = None
-            if self.control_levels:
-                # It's easiest to give in to the DataFrame columns preference
-                ratios = self.by_group.unstack(level=self.control_levels) /  \
-                    self.overall.unstack(level=self.control_levels)
+            if self._user_supplied_callable:
+                tmp = self.by_group / self.overall
+                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
             else:
-                ratios = self.by_group / self.overall
+                ratios = None
 
-            def ratio_sub_one(x):
-                if x > 1:
-                    return 1/x
+                if self.control_levels:
+                    # It's easiest to give in to the DataFrame columns preference
+                    ratios = self.by_group.unstack(level=self.control_levels) /  \
+                        self.overall.unstack(level=self.control_levels)
                 else:
-                    return x
+                    ratios = self.by_group / self.overall
 
-            ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-            if not self.control_levels:
-                result = ratios.min()
-            else:
-                result = ratios.min().unstack(0)
+                def ratio_sub_one(x):
+                    if x > 1:
+                        return 1/x
+                    else:
+                        return x
+
+                ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
+                if not self.control_levels:
+                    result = ratios.min()
+                else:
+                    result = ratios.min().unstack(0)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
