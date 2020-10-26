@@ -428,8 +428,10 @@ class MetricFrame:
 
     def _process_functions(self, metric, sample_params) -> Dict[str, FunctionContainer]:
         """Get the underlying metrics into :class:`fairlearn.metrics.FunctionContainer` objects."""
+        self._user_supplied_callable = True
         func_dict = dict()
         if isinstance(metric, dict):
+            self._user_supplied_callable = False
             s_p = dict()
             if sample_params is not None:
                 if not isinstance(sample_params, dict):
