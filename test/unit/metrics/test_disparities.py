@@ -23,7 +23,7 @@ def test_demographic_parity_difference(agg_method):
 
     gm = MetricFrame(selection_rate, y_t, y_p, sensitive_features=g_1)
 
-    assert actual == gm.difference(method=agg_method)['selection_rate']
+    assert actual == gm.difference(method=agg_method)
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
@@ -37,7 +37,7 @@ def test_demographic_parity_difference_weighted(agg_method):
                      sensitive_features=g_1,
                      sample_params={'sample_weight': s_w})
 
-    assert actual == gm.difference(method=agg_method)['selection_rate']
+    assert actual == gm.difference(method=agg_method)
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
@@ -48,7 +48,7 @@ def test_demographic_parity_ratio(agg_method):
 
     gm = MetricFrame(selection_rate, y_t, y_p, sensitive_features=g_1)
 
-    assert actual == gm.ratio(method=agg_method)['selection_rate']
+    assert actual == gm.ratio(method=agg_method)
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
@@ -62,7 +62,7 @@ def test_demographic_parity_ratio_weighted(agg_method):
                      sensitive_features=g_1,
                      sample_params={'sample_weight': s_w})
 
-    assert actual == gm.ratio(method=agg_method)['selection_rate']
+    assert actual == gm.ratio(method=agg_method)
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)

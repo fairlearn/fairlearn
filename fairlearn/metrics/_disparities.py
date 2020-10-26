@@ -48,7 +48,7 @@ def demographic_parity_difference(
                            y_true, y_pred,
                            sensitive_features=sensitive_features,
                            sample_params={'sample_weight': sample_weight})
-    result = sel_rate.difference(method=method)['selection_rate']
+    result = sel_rate.difference(method=method)
     return result
 
 
@@ -93,7 +93,7 @@ def demographic_parity_ratio(
                            y_true, y_pred,
                            sensitive_features=sensitive_features,
                            sample_params={'sample_weight': sample_weight})
-    result = sel_rate.ratio(method=method)['selection_rate']
+    result = sel_rate.ratio(method=method)
     return result
 
 
