@@ -325,7 +325,7 @@ class MetricFrame:
                 result[m] = min_val
         else:
             result = self._by_group.groupby(level=self.control_levels).min()
-        
+
         if self._user_supplied_callable:
             if self.control_levels:
                 return result.iloc[:, 0]
@@ -375,15 +375,7 @@ class MetricFrame:
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        result = None
-        if not self.control_levels:
-            result = (self.by_group - subtrahend).abs().max()
-        else:
-            # It's easiest to give in to the DataFrame columns preference
-            diffs = (self.by_group.unstack(level=self.control_levels) -
-                     subtrahend.unstack(level=self.control_levels)).abs()
-            result = diffs.max().unstack(0)
-        return result
+        return (self.by_group - subtrahend).abs().max(level=self.control_levels)
 
     def ratio(self,
               method: str) -> Union[pd.Series, pd.DataFrame]:
