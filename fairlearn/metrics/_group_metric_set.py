@@ -163,8 +163,8 @@ def _create_group_metric_set(y_true,
                 gmr = MetricFrame(metric_func,
                                   result[_Y_TRUE], prediction, sensitive_features=g[_BIN_VECTOR])
                 curr_dict = dict()
-                curr_dict[_GLOBAL] = gmr.overall[0]
-                curr_dict[_BINS] = list(gmr.by_group[metric_func.__name__])
+                curr_dict[_GLOBAL] = gmr.overall
+                curr_dict[_BINS] = list(gmr.by_group)
                 metric_dict[metric_key] = curr_dict
             by_prediction_list.append(metric_dict)
         result[_PRECOMPUTED_METRICS].append(by_prediction_list)

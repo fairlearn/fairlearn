@@ -12,9 +12,9 @@ from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
 
 
 metric = [skm.recall_score,
-          # skm.precision_score,
-          # skm.accuracy_score,
-          ]  # skm.balanced_accuracy_score]
+          skm.precision_score,
+          skm.accuracy_score,
+          skm.balanced_accuracy_score]
 
 
 class Test1m1sf0cf:
