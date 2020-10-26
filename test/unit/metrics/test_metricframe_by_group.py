@@ -9,7 +9,6 @@ import sklearn.metrics as skm
 from fairlearn.metrics import MetricFrame
 
 from .data_for_test import y_t, y_p, s_w, g_1, g_2, g_3, g_4
-from .utils import _get_raw_MetricFrame
 
 
 metric = [skm.recall_score,
