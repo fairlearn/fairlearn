@@ -5,7 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 from sklearn.utils import check_consistent_length
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
@@ -112,12 +112,12 @@ class MetricFrame:
     """
 
     def __init__(self,
-                 metric: Union[Callable, dict[str, Callable]],
+                 metric: Union[Callable, Dict[str, Callable]],
                  y_true,
                  y_pred, *,
                  sensitive_features,
                  control_features: Optional = None,
-                 sample_params: Optional[Union[dict[str, Any], dict[str, dict[str, Any]]]] = None):
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
         y_t = _convert_to_ndarray_and_squeeze(y_true)
@@ -265,7 +265,7 @@ class MetricFrame:
             return self._by_group
 
     @property
-    def control_levels(self) -> list[str]:
+    def control_levels(self) -> List[str]:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the :attr:`.by_group`
@@ -281,7 +281,7 @@ class MetricFrame:
         return self._cf_names
 
     @property
-    def sensitive_levels(self) -> list[str]:
+    def sensitive_levels(self) -> List[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
         In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
@@ -456,7 +456,7 @@ class MetricFrame:
 
         return result
 
-    def _process_functions(self, metric, sample_params) -> dict[str, FunctionContainer]:
+    def _process_functions(self, metric, sample_params) -> Dict[str, FunctionContainer]:
         """Get the underlying metrics into :class:`fairlearn.metrics.FunctionContainer` objects."""
         self._user_supplied_callable = True
         func_dict = dict()
@@ -484,7 +484,7 @@ class MetricFrame:
             func_dict[fc.name_] = fc
         return func_dict
 
-    def _process_features(self, base_name, features, sample_array) -> list[GroupFeature]:
+    def _process_features(self, base_name, features, sample_array) -> List[GroupFeature]:
         """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
         result = []
 
