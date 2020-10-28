@@ -23,6 +23,9 @@ This extends to multiple grouping columns, calculating the metric
 for each combination of subgroups.
 """
 
+
+from ._metrics_engine import _derived_metric_dict
+
 from ._disparities import (  # noqa: F401
     demographic_parity_difference,
     demographic_parity_ratio,
@@ -42,6 +45,10 @@ from ._extra_metrics import (  # noqa: F401
     _mean_underprediction,
     )
 
+
+# Add the generated metrics of the form and
+# `<metric>_{difference,ratio,group_min,group_max`
+globals().update(_derived_metric_dict)
 
 # ============================================
 # Build list of items to be listed in the docs
@@ -66,4 +73,4 @@ _extra_metrics = [
     "selection_rate",
 ]
 
-__all__ = _core + _disparities + _extra_metrics
+__all__ = _core + _disparities + _extra_metrics + list(_derived_metric_dict.keys())
