@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 import logging
 import numpy as np
 
@@ -35,7 +35,7 @@ class FunctionContainer:
     def __init__(self,
                  func: Callable,
                  name: Optional[str],
-                 sample_params: Optional[Dict[str, Any]]):
+                 sample_params: Optional[dict[str, Any]]):
         """Read a placeholder comment."""
         if func is None:
             raise ValueError(_METRIC_FUNCTION_NONE)
@@ -72,12 +72,12 @@ class FunctionContainer:
         return self._name
 
     @property
-    def sample_params_(self) -> Dict[str, np.ndarray]:
+    def sample_params_(self) -> dict[str, np.ndarray]:
         """Return the dictionary of sample parameters (as ndarray)."""
         return self._sample_params
 
     def generate_sample_params_for_mask(self,
-                                        mask: np.ndarray) -> Dict[str, np.ndarray]:
+                                        mask: np.ndarray) -> dict[str, np.ndarray]:
         """Return the sample parameters selected by the given mask."""
         curr_sample_params = dict()
         for name, value in self.sample_params_.items():

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 import numpy as np
 import pandas as pd
 
@@ -86,6 +86,6 @@ class GroupFeature:
         return self._name
 
     @property
-    def classes(self) -> List:
+    def classes(self) -> list:
         """Return list of unique classes."""
         return list(self._encoder.classes_)
