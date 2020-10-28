@@ -1,31 +1,19 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import sklearn.metrics as skm
 from sklearn import preprocessing
 
-from . import (
-    true_negative_rate_group_summary,
-    false_positive_rate_group_summary,
-    false_negative_rate_group_summary,
-    _root_mean_squared_error_group_summary,
-    _balanced_root_mean_squared_error_group_summary,
-    mean_prediction_group_summary,
-    selection_rate_group_summary,
-    _mean_overprediction_group_summary,
-    _mean_underprediction_group_summary,
-
-    accuracy_score_group_summary,
-    precision_score_group_summary,
-    recall_score_group_summary,
-    roc_auc_score_group_summary,
-    zero_one_loss_group_summary,
-    mean_absolute_error_group_summary,
-    mean_squared_error_group_summary,
-    r2_score_group_summary,
-    f1_score_group_summary,
-    log_loss_group_summary,
-    )
-
+from ._extra_metrics import (_balanced_root_mean_squared_error,
+                             _mean_overprediction,
+                             _mean_underprediction,
+                             _root_mean_squared_error,
+                             false_negative_rate,
+                             false_positive_rate,
+                             mean_prediction,
+                             selection_rate,
+                             true_negative_rate)
+from ._metric_frame import MetricFrame
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _Y_TRUE = 'trueY'
@@ -73,29 +61,29 @@ SPECIFICITY_SCORE_GROUP_SUMMARY = "specificity_score"
 ZERO_ONE_LOSS_GROUP_SUMMARY = "zero_one_loss"
 
 BINARY_CLASSIFICATION_METRICS = {}
-BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE_GROUP_SUMMARY] = accuracy_score_group_summary
-BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE_GROUP_SUMMARY] = false_positive_rate_group_summary
-BINARY_CLASSIFICATION_METRICS[F1_SCORE_GROUP_SUMMARY] = f1_score_group_summary
-BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction_group_summary  # noqa:E501
-BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction_group_summary  # noqa:E501
-BINARY_CLASSIFICATION_METRICS[MISS_RATE_GROUP_SUMMARY] = false_negative_rate_group_summary
-BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE_GROUP_SUMMARY] = precision_score_group_summary
-BINARY_CLASSIFICATION_METRICS[RECALL_SCORE_GROUP_SUMMARY] = recall_score_group_summary
-BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE_GROUP_SUMMARY] = roc_auc_score_group_summary
-BINARY_CLASSIFICATION_METRICS[SELECTION_RATE_GROUP_SUMMARY] = selection_rate_group_summary
-BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE_GROUP_SUMMARY] = true_negative_rate_group_summary
+BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE_GROUP_SUMMARY] = skm.accuracy_score
+BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE_GROUP_SUMMARY] = false_positive_rate
+BINARY_CLASSIFICATION_METRICS[F1_SCORE_GROUP_SUMMARY] = skm.f1_score
+BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction
+BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction
+BINARY_CLASSIFICATION_METRICS[MISS_RATE_GROUP_SUMMARY] = false_negative_rate
+BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE_GROUP_SUMMARY] = skm.precision_score
+BINARY_CLASSIFICATION_METRICS[RECALL_SCORE_GROUP_SUMMARY] = skm.recall_score
+BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE_GROUP_SUMMARY] = skm.roc_auc_score
+BINARY_CLASSIFICATION_METRICS[SELECTION_RATE_GROUP_SUMMARY] = selection_rate
+BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE_GROUP_SUMMARY] = true_negative_rate
 
 REGRESSION_METRICS = {}
-REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _balanced_root_mean_squared_error_group_summary  # noqa:E501
-REGRESSION_METRICS[LOG_LOSS_GROUP_SUMMARY] = log_loss_group_summary
-REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY] = mean_absolute_error_group_summary
-REGRESSION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction_group_summary
-REGRESSION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction_group_summary
-REGRESSION_METRICS[MEAN_PREDICTION_GROUP_SUMMARY] = mean_prediction_group_summary
-REGRESSION_METRICS[MEAN_SQUARED_ERROR_GROUP_SUMMARY] = mean_squared_error_group_summary
-REGRESSION_METRICS[R2_SCORE_GROUP_SUMMARY] = r2_score_group_summary
-REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _root_mean_squared_error_group_summary
-REGRESSION_METRICS[ZERO_ONE_LOSS_GROUP_SUMMARY] = zero_one_loss_group_summary
+REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _balanced_root_mean_squared_error  # noqa: E501
+REGRESSION_METRICS[LOG_LOSS_GROUP_SUMMARY] = skm.log_loss
+REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY] = skm.mean_absolute_error
+REGRESSION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction
+REGRESSION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction
+REGRESSION_METRICS[MEAN_PREDICTION_GROUP_SUMMARY] = mean_prediction
+REGRESSION_METRICS[MEAN_SQUARED_ERROR_GROUP_SUMMARY] = skm.mean_squared_error
+REGRESSION_METRICS[R2_SCORE_GROUP_SUMMARY] = skm.r2_score
+REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _root_mean_squared_error
+REGRESSION_METRICS[ZERO_ONE_LOSS_GROUP_SUMMARY] = skm.zero_one_loss
 
 
 def _process_sensitive_features(sensitive_features):
@@ -172,10 +160,11 @@ def _create_group_metric_set(y_true,
         for prediction in result[_Y_PRED]:
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
-                gmr = metric_func(result[_Y_TRUE], prediction, sensitive_features=g[_BIN_VECTOR])
+                gmr = MetricFrame(metric_func,
+                                  result[_Y_TRUE], prediction, sensitive_features=g[_BIN_VECTOR])
                 curr_dict = dict()
                 curr_dict[_GLOBAL] = gmr.overall
-                curr_dict[_BINS] = list(gmr.by_group.values())
+                curr_dict[_BINS] = list(gmr.by_group)
                 metric_dict[metric_key] = curr_dict
             by_prediction_list.append(metric_dict)
         result[_PRECOMPUTED_METRICS].append(by_prediction_list)

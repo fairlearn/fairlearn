@@ -24,10 +24,10 @@ _MESSAGE_SIZE_MISMATCH = "Array {0} is not the same size as {1}"
 _DEFAULT_INDEXED_PARAMS = {"sample_weight"}
 
 
-def group_summary(metric_function, y_true, y_pred, *,
-                  sensitive_features,
-                  indexed_params=None,
-                  **metric_params):
+def _group_summary(metric_function, y_true, y_pred, *,
+                   sensitive_features,
+                   indexed_params=None,
+                   **metric_params):
     r"""Apply a metric to each subgroup of a set of data.
 
     :param metric_function: Function with signature
@@ -129,11 +129,11 @@ class _MetricGroupSummaryCallable:
             args_string)
 
     def __call__(self, y_true, y_pred, *, sensitive_features, **metric_params):
-        return group_summary(self._metric_function,
-                             y_true, y_pred,
-                             sensitive_features=sensitive_features,
-                             indexed_params=self._indexed_params,
-                             **metric_params)
+        return _group_summary(self._metric_function,
+                              y_true, y_pred,
+                              sensitive_features=sensitive_features,
+                              indexed_params=self._indexed_params,
+                              **metric_params)
 
 
 class _DerivedMetricCallable:
@@ -168,7 +168,7 @@ class _DerivedMetricCallable:
             **metric_params))
 
 
-def make_metric_group_summary(metric_function, indexed_params=None, name=None):
+def _make_metric_group_summary(metric_function, indexed_params=None, name=None):
     """Make a callable that calculates the group summary of a metric.
 
     :param metric_function: A metric function with the signature
@@ -187,7 +187,7 @@ def make_metric_group_summary(metric_function, indexed_params=None, name=None):
         metric_function, indexed_params=indexed_params, name=name)
 
 
-def make_derived_metric(transformation_function, summary_function, name=None):
+def _make_derived_metric(transformation_function, summary_function, name=None):
     """Make a callable that calculates a derived metric from the group summary.
 
     :param transformation_function: A transformation function with the signature
@@ -206,7 +206,7 @@ def make_derived_metric(transformation_function, summary_function, name=None):
         transformation_function, summary_function, name=name)
 
 
-def difference_from_summary(summary):
+def _difference_from_summary(summary):
     """Calculate the difference between the maximum and minimum metric value across groups.
 
     :param summary: A group metric summary
@@ -215,10 +215,10 @@ def difference_from_summary(summary):
         metrics described in ``summary``.
     :rtype: float
     """
-    return group_max_from_summary(summary) - group_min_from_summary(summary)
+    return _group_max_from_summary(summary) - _group_min_from_summary(summary)
 
 
-def ratio_from_summary(summary):
+def _ratio_from_summary(summary):
     """Calculate the ratio between the maximum and minimum metric value across groups.
 
     :param summary: A group metric summary
@@ -227,8 +227,8 @@ def ratio_from_summary(summary):
         metrics described in ``summary``.
     :rtype: float
     """
-    group_min = group_min_from_summary(summary)
-    group_max = group_max_from_summary(summary)
+    group_min = _group_min_from_summary(summary)
+    group_max = _group_max_from_summary(summary)
     if group_min < 0.0:
         return np.nan
     elif group_max == 0.0:
@@ -237,7 +237,7 @@ def ratio_from_summary(summary):
         return group_min / group_max
 
 
-def group_min_from_summary(summary):
+def _group_min_from_summary(summary):
     """Retrieve the minimum group-level metric value from group summary.
 
     :param summary: A group metric summary
@@ -248,7 +248,7 @@ def group_min_from_summary(summary):
     return min(summary.by_group.values())
 
 
-def group_max_from_summary(summary):
+def _group_max_from_summary(summary):
     """Retrieve the minimum group-level metric value from group summary.
 
     :param summary: A group metric summary
@@ -265,10 +265,10 @@ def _check_array_sizes(a, b, a_name, b_name):
 
 
 TRANSFORMATIONS = {
-    "difference": difference_from_summary,
-    "ratio": ratio_from_summary,
-    "group_min": group_min_from_summary,
-    "group_max": group_max_from_summary,
+    "difference": _difference_from_summary,
+    "ratio": _ratio_from_summary,
+    "group_min": _group_min_from_summary,
+    "group_max": _group_max_from_summary,
 }
 
 # Base metrics and the variants that are implemented by the metrics engine
@@ -307,14 +307,14 @@ def _derive_metrics(metrics_spec):
 
     for base_metric, variants in metrics_spec:
         metric_group_summary_name = "{0}_group_summary".format(base_metric.__name__)
-        metric_group_summary = make_metric_group_summary(
+        metric_group_summary = _make_metric_group_summary(
             base_metric,
             name=metric_group_summary_name)
         metric_group_summary_dict[metric_group_summary_name] = metric_group_summary
 
         for variant in variants:
             derived_metric_name = "{0}_{1}".format(base_metric.__name__, variant)
-            derived_metric = make_derived_metric(
+            derived_metric = _make_derived_metric(
                 TRANSFORMATIONS[variant],
                 metric_group_summary,
                 name=derived_metric_name)
@@ -325,5 +325,4 @@ def _derive_metrics(metrics_spec):
 
 _metric_group_summary_dict, _derived_metric_dict = _derive_metrics(METRICS_SPEC)
 
-globals().update(_metric_group_summary_dict)
 globals().update(_derived_metric_dict)
