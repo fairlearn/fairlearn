@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""Functionality for computing metrics, with a particular focus on group metrics.
+"""Functionality for computing metrics, with a particular focus on disaggregated metrics.
 
 For our purpose, a metric is a function with signature
 ``f(y_true, y_pred, ....)``
@@ -10,12 +10,12 @@ values predicted by a machine learning algorithm. Other
 arguments may be present (most often sample weights), which will
 affect how the metric is calculated.
 
-This module provides the concept of a *grouped metric*.
+This module provides the concept of a *disaggregated metric*.
 This is a metric where in addition to ``y_true`` and ``y_pred``
 values, the user provides information about group membership
 for each sample.
 For example, a user could provide a 'Gender' column, and the
-grouped metric would contain separate results for the subgroups
+disaggregated metric would contain separate results for the subgroups
 'male', 'female' and 'nonbinary' indicated by that column.
 The underlying metric function is evaluated for each of these three
 subgroups.
