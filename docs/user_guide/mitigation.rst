@@ -564,12 +564,12 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> y_true             = np.array([0.3, 0.5, 0.1, 1.0])
     >>> y_pred             = np.array([0.3, 0.6, 0.6, 0.5])
     >>> sensitive_features = np.array(["a", "a", "b", "b"])
-    >>> mae_summary = MetricFrame(mean_absolute_error,
-    ...                           y_true, y_pred,
-    ...                           sensitive_features=pd.Series(sensitive_features, name="SF 0"))
-    >>> mae_summary.overall
+    >>> mae_frame = MetricFrame(mean_absolute_error,
+    ...                         y_true, y_pred,
+    ...                         sensitive_features=pd.Series(sensitive_features, name="SF 0"))
+    >>> mae_frame.overall
     0.275
-    >>> mae_summary.by_group
+    >>> mae_frame.by_group
     SF 0
     a    0.05
     b     0.5
