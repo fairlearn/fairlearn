@@ -5,7 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Optional, Union
 from sklearn.utils import check_consistent_length
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
@@ -27,7 +27,7 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
 
 
 class MetricFrame:
-    """Contains a collection of group fairness metrics.
+    """Collection of disaggregated metric values.
 
     This data structure stores and manipulates disaggregated values for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
@@ -38,17 +38,19 @@ class MetricFrame:
     The only limitations placed on the metric functions are that:
 
     * The first two arguments they take must be ``y_true`` and ``y_pred`` arrays
-    * Any other arguments must be *sample* based, and will be split up along with
-      the ``y_true`` and ``y_pred`` arrays
+    * Any other arguments must correspond to sample properties (such as sample weights),
+      meaning that their first dimension is the same as that of y_true and y_pred. These
+      arguments will be split up along with the ``y_true`` and ``y_pred`` arrays
 
     The interpretation of the ``y_true`` and ``y_pred`` arrays is up to the
     underlying metric - it is perfectly possible to pass in lists of class
-    probability tuples. The return value of the metric is also very flexible;
-    there is no problem around returning confusion matrices.
+    probability tuples. We also support non-scalar return types for the
+    metric function (such as confusion matrices) at the current time. However,
+    the aggregation functions will not be well defined in this case.
 
-    Once calculated, scalar group fairness metrics can be aggregated over
-    sensitive features, by taking differences or ratios,
-    and then reporting the maximum or minimum respectively.
+    Group fairness metrics are obtained by methods that implement
+    various aggregators over group-level metrics, such such as the
+    maximum, minimum, or the worst-case difference or ratio.
 
     This data structure also supports the concept of 'control features.' Like the sensitive
     features, control features identify subgroups within the data, but
@@ -74,10 +76,10 @@ class MetricFrame:
         contains a single entry.
 
     y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
-        The true values.
+        The ground-truth labels (for classification) or target values (for regression).
 
     y_pred : List, pandas.Series, numpy.ndarray, pandas.DataFrame
-        The predicted values.
+        The predictions.
 
     sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         The sensitive features which should be used to create the subgroups.
@@ -102,20 +104,20 @@ class MetricFrame:
 
     sample_params : dict
         Parameters for the metric function(s). If there is only one metric function,
-        then this is a dictionary of strings and array_likes, which are split
+        then this is a dictionary of strings and array-like objects, which are split
         alongside the ``y_true`` and ``y_pred`` arrays, and passed to the metric function.
         If there are multiple metric functions (passed as a dictionary), then this is
         a nested dictionary, with the first set of string keys identifying the
-        metric function name, with the values being the string-to-array_like dictionaries.
+        metric function name, with the values being the string-to-array-like dictionaries.
     """
 
     def __init__(self,
-                 metric: Union[Callable, Dict[str, Callable]],
+                 metric: Union[Callable, dict[str, Callable]],
                  y_true,
                  y_pred, *,
                  sensitive_features,
                  control_features: Optional = None,
-                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
+                 sample_params: Optional[Union[dict[str, Any], dict[str, dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
         y_t = _convert_to_ndarray_and_squeeze(y_true)
@@ -194,7 +196,7 @@ class MetricFrame:
         return result
 
     @property
-    def overall(self) -> Union[pd.Series, pd.DataFrame]:
+    def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
         Returns
@@ -233,7 +235,7 @@ class MetricFrame:
             return self._overall
 
     @property
-    def by_group(self) -> pd.DataFrame:
+    def by_group(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the collection of metrics evaluated for each subgroup.
 
         The collection is defined by the combination of classes in the
@@ -263,7 +265,7 @@ class MetricFrame:
             return self._by_group
 
     @property
-    def control_levels(self) -> List[str]:
+    def control_levels(self) -> list[str]:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the :attr:`.by_group`
@@ -279,7 +281,7 @@ class MetricFrame:
         return self._cf_names
 
     @property
-    def sensitive_levels(self) -> List[str]:
+    def sensitive_levels(self) -> list[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
         In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
@@ -293,7 +295,7 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def group_max(self) -> Union[pd.Series, pd.DataFrame]:
+    def group_max(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -325,7 +327,7 @@ class MetricFrame:
         else:
             return result
 
-    def group_min(self) -> Union[pd.Series, pd.DataFrame]:
+    def group_min(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
@@ -358,7 +360,7 @@ class MetricFrame:
             return result
 
     def difference(self,
-                   method: str) -> Union[pd.Series, pd.DataFrame]:
+                   method: str) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -394,7 +396,7 @@ class MetricFrame:
         return (self.by_group - subtrahend).abs().max(level=self.control_levels)
 
     def ratio(self,
-              method: str) -> Union[pd.Series, pd.DataFrame]:
+              method: str) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -454,7 +456,7 @@ class MetricFrame:
 
         return result
 
-    def _process_functions(self, metric, sample_params) -> Dict[str, FunctionContainer]:
+    def _process_functions(self, metric, sample_params) -> dict[str, FunctionContainer]:
         """Get the underlying metrics into :class:`fairlearn.metrics.FunctionContainer` objects."""
         self._user_supplied_callable = True
         func_dict = dict()
@@ -482,7 +484,7 @@ class MetricFrame:
             func_dict[fc.name_] = fc
         return func_dict
 
-    def _process_features(self, base_name, features, sample_array) -> List[GroupFeature]:
+    def _process_features(self, base_name, features, sample_array) -> list[GroupFeature]:
         """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
         result = []
 
