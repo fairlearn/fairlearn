@@ -44,6 +44,7 @@
 * Change the method to make copies of the estimator in `ExponentiatedGradient` from `pickle.dump` to `sklearn.clone`. 
 * Add an argument to GridSearch and ExponentialGradient `sample_weight_name` to control
   how `sample_weight` is supplied to `estimator.fit`.
+* Large changes to the metrics API. A new class `MetricFrame` has been introduced, and `make_group_summary()` removed (along with related functions). Please see the documentation and examples for more information.
 
 ### v0.4.6
 
