@@ -10,7 +10,7 @@
           <li><a href="{{ item.url }}">{{ item.name }}</a></li>
         {% endif %}
       {% else %}
-      <li>Renamed or removed in {{item.name}}</li>
+        <li>{{item.name}}: Missing or moved</li>
       {% endif %}
     {%- endfor %}
   </ul>
