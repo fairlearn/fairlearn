@@ -23,6 +23,17 @@ Fairlearn is also available on
 For checking out the latest version in our repository check out our
 :ref:`advanced_install`.
 
+.. note::
+
+    The Fairlearn API is not completely stable, so example code in 
+    this documentation may not work with every version of Fairlearn.
+    In particular, it may be necessary to install Fairlearn directly
+    from GitHub via:
+
+    .. code-block:: bash
+
+        pip install git+https://github.com/fairlearn/fairlearn.git
+
 Overview of Fairlearn
 ---------------------
 
