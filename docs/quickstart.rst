@@ -34,6 +34,13 @@ For checking out the latest version in our repository check out our
 
         pip install git+https://github.com/fairlearn/fairlearn.git
 
+    If you have already cloned the Fairlearn repository, you
+    can run `pip` directly on the clone instead:
+
+    .. code-block:: bash
+
+        pip install local/path/to/fairlearn/
+
 Overview of Fairlearn
 ---------------------
 
