@@ -80,6 +80,10 @@ The ``to_overall`` alternative will evaluate the differences (or ratios)
 relative to the overall value, rather than just between the groups identified
 by the sensitive feature.
 
+The ``make_derived_metric()`` function has been removed, but will be reintroduced
+in a future release. The pregenerated functions such as ``accuracy_score_group_min()``
+and ``precision_score_difference()`` remain.
+
 For an introduction to all the new features, see the 
 :ref:`sphx_glr_auto_examples_plot_new_metrics.py` example in
 :ref:`sphx_glr_auto_examples`.
