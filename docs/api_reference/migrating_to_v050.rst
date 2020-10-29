@@ -81,4 +81,5 @@ relative to the overall value, rather than just between the groups identified
 by the sensitive feature.
 
 For an introduction to all the new features, see the 
-:ref:`sphx_glr_auto_examples_plot_new_metrics.py` in :ref:`sphx_glr_auto_examples`.
+:ref:`sphx_glr_auto_examples_plot_new_metrics.py` example in
+:ref:`sphx_glr_auto_examples`.
