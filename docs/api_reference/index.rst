@@ -11,5 +11,3 @@ API Reference
    fairlearn.reductions
    fairlearn.widget
    fairlearn.datasets
-
-   migrating_to_v050
