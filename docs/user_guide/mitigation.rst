@@ -70,14 +70,14 @@ Postprocessing
 
 Fairlearn currently supports one postprocessing technique that is based on the
 paper *Equality of Opportunity in Supervised Learning* [#3]_. Unlike other
-mitigation techniques :code:`ThresholdOptimizer` is built to satisfy the
+mitigation techniques :class:`ThresholdOptimizer` is built to satisfy the
 specified fairness criteria exactly and with no remaining disparity.
 In many cases this comes at the expense of performance, for example, with
 significantly lower accuracy. Regardless, it is a useful data point to compare
 results with.
 
-:code:`ThresholdOptimizer` expects an estimator that provides it with scores.
-While the output of :code:`ThresholdOptimizer` is binary, the input need not
+:class:`ThresholdOptimizer` expects an estimator that provides it with scores.
+While the output of :class:`ThresholdOptimizer` is binary, the input need not
 be. In fact, real valued input, e.g. from a regressor, provides it with many
 more options to create thresholds. For :math:`n` input data points with
 :math:`m \leq n` different score values it has :math:`m+1` different
@@ -156,19 +156,21 @@ dictionary above.
 
 .. math::
 
-    p_{ignore} \cdot c + (1-p_{ignore}) \cdot \left(p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})\right)
+    p_{\text{ignore}} \cdot c + (1-p_{\text{ignore}}) \cdot \left(p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})\right)
 
 In other words, we create a linear combination of the binary thresholding rule
 outputs. :math:`p_0` and :math:`p_1` indicate how close we are to the points
-representing the two thresholding rules, and :math:`p_0+p_1=1`. `p_ignore` is
-:math:`0` if the curve does not need to be "pulled" towards the diagonal,
-i.e., when the selected solution lies on the curve itself as opposed to below.
+representing the two thresholding rules, and :math:`p_0+p_1=1`.
+:math:`p_{\text{ignore}}` is :math:`0` if the curve does not need to be "pulled"
+towards the diagonal, i.e., when the selected solution lies on the curve
+itself as opposed to below.
 Above, the curve for "Male" is strictly below the curve for "Female", so
-:math:`p_{ignore}=0` for "Male" and non-zero for "Female".
+:math:`p_{\text{ignore}}=0` for "Male" and non-zero for "Female".
 
-Importantly, :math:`p_{ignore}` is only required for equalized odds. Equalized
-odds is somewhat more complex than demographic parity or others in that it
-requires equality between two metrics, namely true and false positive rates.
+Importantly, :math:`p_{\text{ignore}}` is only required for equalized odds.
+Equalized odds is somewhat more complex than demographic parity or others in
+that it requires equality between two metrics, namely true and false positive
+rates.
 We want to stress on the fact that it is crucial to understand the
 implications of such a result.
 Predictions of the resulting `ThresholdOptimizer` model are determined
@@ -183,11 +185,11 @@ For "Male" that means
   :math:`0.5`. This means there is a very low probability of getting label 1
   regardless of the features.
 
-For "Female" the result includes the :math:`p_{ignore}` term, but one of the
+For "Female" the result includes the :math:`p_{\text{ignore}}` term, but one of the
 thresholds is set to always be true
 
 - predict 1 with probability
-  :math:`0.13186 \cdot 0.035 + (1-0.13186) * 0.00563 = 0.0095` if the score is
+  :math:`0.13186 \cdot 0.035 + (1-0.13186) \cdot 0.00563 = 0.0095` if the score is
   less or equal to :math:`0.5`. This means a 1% chance of getting label 1
   regardless of the features.
 - predict 1 if the score is greater than :math:`0.5`
@@ -238,7 +240,7 @@ with the otherwise exact same example:
     }
     >>> plot_threshold_optimizer(threshold_optimizer)
 
-Notice that the thresholding rules do not include :math:`p_{ignore}` which is
+Notice that the thresholding rules do not include :math:`p_{\text{ignore}}` which is
 only relevant for :code:`equalized_odds`. The results can be interpreted as
 follows:
 
