@@ -42,6 +42,7 @@ release = fairlearn.__version__
 # ones.
 extensions = [
     'bokeh.sphinxext.bokeh_plot',
+    'matplotlib.sphinxext.plot_directive',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',

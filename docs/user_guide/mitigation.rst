@@ -68,6 +68,216 @@ Postprocessing
 
 .. currentmodule:: fairlearn.postprocessing
 
+Fairlearn currently supports one postprocessing technique that is based on the
+paper *Equality of Opportunity in Supervised Learning* [#3]_. Unlike other
+mitigation techniques :code:`ThresholdOptimizer` is built to satisfy the
+specified fairness criteria exactly and with no remaining disparity.
+In many cases this comes at the expense of performance, for example, with
+significantly lower accuracy. Regardless, it is a useful data point to compare
+results with.
+
+:code:`ThresholdOptimizer` expects an estimator that provides it with scores.
+While the output of :code:`ThresholdOptimizer` is binary, the input need not
+be. In fact, real valued input, e.g. from a regressor, provides it with many
+more options to create thresholds. For :math:`n` input data points with
+:math:`m \leq n` different score values it has :math:`m+1` different
+thresholds. At each threshold one can create one of two thresholding rules,
+i.e. functions that indicate which data points get label :code:`1` based on
+their score.
+
+We can think of each thresholding rule as a binary classifier and determine
+their true positive rate and false positive rate.
+The code below also visualizes the threshold selection process with an ROC
+curve. The ROC curves consists of the true and false positive rates for each
+of the thresholding rules, with separate ones per sensitive feature value.
+Note that the plot omits points that are within the convex hull of points.
+
+.. plot::
+    :include-source:
+
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
+    >>> from sklearn.datasets import fetch_openml
+    >>> import pandas as pd
+    >>> data = fetch_openml(data_id=1590, as_frame=True)
+    >>> X = pd.get_dummies(data.data)
+    >>> y = (data.target == '>50K') * 1
+    >>> sex = data.data['sex']
+    >>> logistic_regression = LogisticRegression()
+    >>> threshold_optimizer = ThresholdOptimizer(estimator=logistic_regression, constraints="equalized_odds", objective="accuracy_score")
+    >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
+    ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
+    >>> threshold_optimizer.interpolated_thresholder_._print_thresholds()
+    {
+        "Female": {
+            "p_ignore": 0.13186000824177083,
+            "prediction_constant": 0.035,
+            "p0": 0.9943698649710652,
+            "operation0": "[>0.5]",
+            "p1": 0.005630135028934835,
+            "operation1": "[>-inf]"
+        },
+        "Male": {
+            "p_ignore": 0.0,
+            "prediction_constant": 0.035,
+            "p0": 0.9999261555292187,
+            "operation0": "[>0.5]",
+            "p1": 7.384447078129242e-05,
+            "operation1": "[>-inf]"
+        }
+    }
+    >>> plot_threshold_optimizer(threshold_optimizer)
+
+The printed thresholding rules influence the predictions, so we need to first
+understand the formula that puts all the parts together.
+Instead of selecting a particular thresholding rule we can actually select
+any point between any two thresholding rules.
+This is a very important insight and occurs in almost every case.
+To reach such a point we will have to create the linear combination of the two
+rules as
+:math:`p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})`.
+The goal in this case with equalized odds is to reach equal true and false
+positive rates, which are conveniently plotted on the y- and x-axes.
+It follows that they'd be equal at any spot where the two curves intersect.
+We can relax this a little bit since in many cases one lies strictly above
+the other, just like in this example.
+Imagine the diagonal of the ROC plot from :math:`(0,0)` to :math:`(1,1)`.
+It is usually not considered as useful since we could achieve the same result
+with random classifiers with probabilities to get label 1 ranging from 0 to 1.
+If we have one curve strictly below the other, we can still get their true and
+false positive rates to match by "pulling" the higher one towards the
+diagonal. In reality we consider the overlap, so only the points on the lower
+curve are available to us. From those points we choose the one with the best
+value in terms of the overall objective (not per group).
+
+Mathematically, the following formula represents this interpretation of the
+chart, where :math:`c` represents the `prediction_constant` from the printed
+dictionary above.
+
+.. math::
+
+    p_{ignore} \cdot c + (1-p_{ignore}) \cdot \left(p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})\right)
+
+In other words, we create a linear combination of the binary thresholding rule
+outputs. :math:`p_0` and :math:`p_1` indicate how close we are to the points
+representing the two thresholding rules, and :math:`p_0+p_1=1`. `p_ignore` is
+:math:`0` if the curve does not need to be "pulled" towards the diagonal,
+i.e., when the selected solution lies on the curve itself as opposed to below.
+Above, the curve for "Male" is strictly below the curve for "Female", so
+:math:`p_{ignore}=0` for "Male" and non-zero for "Female".
+
+Importantly, :math:`p_{ignore}` is only required for equalized odds. Equalized
+odds is somewhat more complex than demographic parity or others in that it
+requires equality between two metrics, namely true and false positive rates.
+We want to stress on the fact that it is crucial to understand the
+implications of such a result.
+Predictions of the resulting `ThresholdOptimizer` model are determined
+randomly based on the probabilities to predict label 1 that the formula
+produces.
+In this particular example :code:`operation1` will always be true since every
+score is larger than negative infinity.
+For "Male" that means
+
+- predict 1 if the score is greater than :math:`0.5`.
+- predict 0 with probability :math:`0.999926` if the score is less or equal to
+  :math:`0.5`. This means there is a very low probability of getting label 1
+  regardless of the features.
+
+For "Female" the result includes the :math:`p_{ignore}` term, but one of the
+thresholds is set to always be true
+
+- predict 1 with probability
+  :math:`0.13186 \cdot 0.035 + (1-0.13186) * 0.00563 = 0.0095` if the score is
+  less or equal to :math:`0.5`. This means a 1% chance of getting label 1
+  regardless of the features.
+- predict 1 if the score is greater than :math:`0.5`
+
+We want to emphasize that a non-zero probability to get label 1 is not
+acceptable in some application contexts, so it needs to be carefully evaluated
+whether :class:`ThresholdOptimizer` should be used. Additionally, it requires
+the `sensitive_features` not only at training time, but also at deployment
+time, i.e., when calling :code:`predict()`.
+
+Due to the separate thresholding rules per sensitive feature value, one might
+argue that this constitutes
+`disparate treatment <https://en.wikipedia.org/wiki/Disparate_treatment>`_ in
+certain contexts where this is legally relevant.
+
+For comparison, let's also examine what this looks like for demographic parity
+with the otherwise exact same example:
+
+.. plot::
+    :include-source:
+
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
+    >>> from sklearn.datasets import fetch_openml
+    >>> import pandas as pd
+    >>> data = fetch_openml(data_id=1590, as_frame=True)
+    >>> X = pd.get_dummies(data.data)
+    >>> y = (data.target == '>50K') * 1
+    >>> sex = data.data['sex']
+    >>> logistic_regression = LogisticRegression()
+    >>> threshold_optimizer = ThresholdOptimizer(estimator=logistic_regression, constraints="demographic_parity", objective="accuracy_score")
+    >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
+    ThresholdOptimizer(estimator=LogisticRegression())
+    >>> threshold_optimizer.interpolated_thresholder_._print_thresholds()
+    {
+        "Female": {
+            "p0": 0.9527202201546324,
+            "operation0": "[>0.5]",
+            "p1": 0.047279779845367575,
+            "operation1": "[>-inf]"
+        },
+        "Male": {
+            "p0": 0.9998874603553525,
+            "operation0": "[>0.5]",
+            "p1": 0.00011253964464752464,
+            "operation1": "[>-inf]"
+        }
+    }
+    >>> plot_threshold_optimizer(threshold_optimizer)
+
+Notice that the thresholding rules do not include :math:`p_{ignore}` which is
+only relevant for :code:`equalized_odds`. The results can be interpreted as
+follows:
+
+- "Male":
+
+  - if the score is less or equal to :math:`0.5` predict 1 with probability
+    :math:`0.00011`
+  - if the score is above :math:`0.5` predict 1
+
+- "Female:
+
+  - if the score is less or equal to :math:`0.5` predict 1 with probability
+    :math:`0.04728`
+  - if the score is above :math:`0.5` predict 1
+
+The thresholds are actually the same for both groups here, which
+does not always have to be true. As a consequence, the only difference is
+the probability to predict label 1 in the case where the score is below
+:math:`0.5`.
+
+Note that the chart is different from the chart for :code:`equalized_odds`.
+It shows :code:`selection_rate` (which is the basis for our fairness
+criterion) on the x-axis :code:`demographic_parity`, and
+:code:`accuracy_score` (which is the basis for the implicit performance
+objective) on the y-axis.
+
+The following combinations of fairness criteria and objectives are available:
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   *  - fairness criteria
+      - objectives
+   *  - :code:`equalized_odds`
+      - :code:`accuracy_score`, :code:`balanced_accuracy_score`
+   *  - :code:`demographic_parity`, :code:`false_positive_rate_parity`, :code:`false_negative_rate_parity`, :code:`true_positive_rate_parity`, :code:`true_negative_rate_parity`
+      - :code:`selection_rate`, :code:`true_positive_rate`, :code:`true_negative_rate`, :code:`accuracy_score`, :code:`balanced_accuracy_score`
+
 .. _reductions:
 
 Reductions

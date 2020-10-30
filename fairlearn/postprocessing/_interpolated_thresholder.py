@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from copy import deepcopy
+import json
 import numpy as np
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
@@ -129,3 +131,13 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         positive_probs = self._pmf_predict(
             X, sensitive_features=sensitive_features)[:, 1]
         return (positive_probs >= random_state.rand(len(positive_probs))) * 1
+    
+    def _print_thresholds(self):
+        check_is_fitted(self)
+        interpolation_dict_copy = deepcopy(self.interpolation_dict)
+        for sensitive_feature, interpolation_description in self.interpolation_dict.items():
+            interpolation_dict_copy[sensitive_feature].operation0 = \
+                repr(interpolation_description.operation0)
+            interpolation_dict_copy[sensitive_feature].operation1 = \
+                repr(interpolation_description.operation1)
+        print(json.dumps(interpolation_dict_copy, indent=4))
