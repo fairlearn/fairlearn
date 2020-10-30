@@ -43,20 +43,20 @@ class _DerivedMetric:
         dispatch_fn = functools.partial(self._metric_fn, **params)
         dispatch_fn.__name__ = metric_name
 
-        all_metrics = MetricFrame({metric_name: dispatch_fn},
+        all_metrics = MetricFrame(dispatch_fn,
                                   y_true, y_pred,
                                   sensitive_features=sensitive_features,
                                   sample_params=sample_params)
 
         result = np.nan
         if self._aggregate == 'difference':
-            result = all_metrics.difference(method=method)[metric_name]
+            result = all_metrics.difference(method=method)
         elif self._aggregate == 'ratio':
-            result = all_metrics.ratio(method=method)[metric_name]
+            result = all_metrics.ratio(method=method)
         elif self._aggregate == 'group_min':
-            result = all_metrics.group_min()[metric_name]
+            result = all_metrics.group_min()
         elif self._aggregate == 'group_max':
-            result = all_metrics.group_max()[metric_name]
+            result = all_metrics.group_max()
         else:
             raise ValueError("Cannot get here")
 

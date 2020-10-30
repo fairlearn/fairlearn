@@ -111,7 +111,7 @@ def test_derived_ratio_between_groups():
     grouped = metrics.MetricFrame(skm.precision_score,
                                   y_t, y_p,
                                   sensitive_features=gid)
-    actual = my_fn(y_t, y_p, sensitive_features=gid, method='betwee_groups')
+    actual = my_fn(y_t, y_p, sensitive_features=gid, method='between_groups')
     assert actual == grouped.ratio(method='between_groups')
 
 
