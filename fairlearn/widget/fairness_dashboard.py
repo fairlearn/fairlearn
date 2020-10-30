@@ -32,16 +32,16 @@ class FairlearnDashboard(object):
 
     Parameters
     ----------
-    sensitive_features : {:class:`numpy.ndarray`, list[][], :class:`pandas.DataFrame`, :class:`pandas.Series`}  # noqa: E501
+    sensitive_features : numpy.ndarray, list[][], pandas.DataFrame, pandas.Series
         A matrix of feature vector examples (# examples x # features),
         these can be from the initial dataset, or reserved from training.
-    y_true : {:class:`numpy.ndarray`, list[]}
+    y_true : numpy.ndarray, list[]
         The true labels or values for the provided dataset.
-    y_pred : {:class:`numpy.ndarray`, list[][], list[], dict {string: list[]}}
+    y_pred : numpy.ndarray, list[][], list[], dict {string: list[]}
         Array of output predictions from models to be evaluated. Can be a single
         array of predictions, or a 2D list over multiple models. Can be a dictionary
         of named model predictions.
-    sensitive_feature_names : {:class:`numpy.ndarray`, list[]}
+    sensitive_feature_names : numpy.ndarray, list[]
         Feature names
     """
 
