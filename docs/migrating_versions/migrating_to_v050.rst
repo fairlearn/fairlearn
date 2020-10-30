@@ -87,3 +87,18 @@ and ``precision_score_difference()`` remain.
 For an introduction to all the new features, see the 
 :ref:`sphx_glr_auto_examples_plot_new_metrics.py` example in
 :ref:`sphx_glr_auto_examples`.
+
+Moments
+-------
+
+Coming...
+
+
+Renaming of members
+-------------------
+
+We have renamed a number of class members from ``_<name>`` to ``<name>_``.
+For example in both :class:`.ExponentiatedGradient` and :class:`.GridSearch`,
+the ``_predictors`` member is now called ``predictors_``.
+Some other members (particularly in :class:`.ExponentiatedGradient`) also now
+have more descriptive names.
