@@ -28,26 +28,28 @@ from scipy.sparse import issparse
 
 
 class FairlearnDashboard(object):
-    """The dashboard class, wraps the dashboard component.
+    r"""The dashboard class, wraps the dashboard component.
 
-    :param sensitive_features: A matrix of feature vector examples (# examples x # features),
+    Parameters
+    ----------
+    sensitive_features : {:class:`numpy.ndarray`, list[][], :class:`pandas.DataFrame`, :class:`pandas.Series`}  # noqa: E501
+        A matrix of feature vector examples (# examples x # features),
         these can be from the initial dataset, or reserved from training.
-    :type sensitive_features: numpy.ndarray or list[][] or pandas.DataFrame or pandas.Series
-    :param y_true: The true labels or values for the provided dataset.
-    :type y_true: numpy.ndarray or list[]
-    :param y_pred: Array of output predictions from models to be evaluated. Can be a single
+    y_true : {:class:`numpy.ndarray`, list[]}
+        The true labels or values for the provided dataset.
+    y_pred : {:class:`numpy.ndarray`, list[][], list[], dict {string: list[]}}
+        Array of output predictions from models to be evaluated. Can be a single
         array of predictions, or a 2D list over multiple models. Can be a dictionary
         of named model predictions.
-    :type y_pred: numpy.ndarray or list[][] or list[] or dict {string: list[]}
-    :param sensitive_feature_names: Feature names
-    :type sensitive_feature_names: numpy.ndarray or list[]
+    sensitive_feature_names : {:class:`numpy.ndarray`, list[]}
+        Feature names
     """
 
-    env = Environment(loader=PackageLoader(__name__, 'templates'))
-    default_template = env.get_template("inlineDashboard.html")
+    _env = Environment(loader=PackageLoader(__name__, 'templates'))
+    _default_template = _env.get_template("inlineDashboard.html")
     _dashboard_js = None
-    fairness_inputs = {}
-    model_count = 0
+    _fairness_inputs = {}
+    _model_count = 0
     _service = None
 
     # The following mappings should match those in the GroupMetricSet
@@ -143,30 +145,30 @@ class FairlearnDashboard(object):
         }
     }
 
-    classification_methods = [method[0] for method in _metric_methods.items()
-                              if "classification" in method[1]["model_type"]]
-    regression_methods = [method[0] for method in _metric_methods.items()
-                          if "regression" in method[1]["model_type"]]
-    probability_methods = [method[0] for method in _metric_methods.items()
-                           if "probability" in method[1]["model_type"]]
+    _classification_methods = [method[0] for method in _metric_methods.items()
+                               if "classification" in method[1]["model_type"]]
+    _regression_methods = [method[0] for method in _metric_methods.items()
+                           if "regression" in method[1]["model_type"]]
+    _probability_methods = [method[0] for method in _metric_methods.items()
+                            if "probability" in method[1]["model_type"]]
 
     @FlaskHelper.app.route('/')
-    def list_view():  # noqa: D102
+    def _list_view():  # noqa: D102
         return "No global list view supported at this time."
 
     @FlaskHelper.app.route('/<id>')
-    def fairness_visual_view(id):  # noqa: D102, A002
-        if id in FairlearnDashboard.fairness_inputs:
-            return generate_inline_html(FairlearnDashboard.fairness_inputs[id], None)
+    def _fairness_visual_view(id):  # noqa: D102, A002
+        if id in FairlearnDashboard._fairness_inputs:
+            return generate_inline_html(FairlearnDashboard._fairness_inputs[id], None)
         else:
             return "Unknown model id."
 
     @FlaskHelper.app.route('/<id>/metrics', methods=['POST'])
-    def fairness_metrics_calc(id):  # noqa: D102, A002
+    def _fairness_metrics_calc(id):  # noqa: D102, A002
         try:
             data = request.get_json(force=True)
-            if id in FairlearnDashboard.fairness_inputs:
-                data.update(FairlearnDashboard.fairness_inputs[id])
+            if id in FairlearnDashboard._fairness_inputs:
+                data.update(FairlearnDashboard._fairness_inputs[id])
 
                 if type(data["binVector"][0]) == np.int32:
                     data['binVector'] = [str(bin_) for bin_ in data['binVector']]
@@ -231,9 +233,9 @@ class FairlearnDashboard(object):
             "true_y": self._y_true,
             "predicted_ys": self._y_pred,
             "dataset": dataset,
-            "classification_methods": FairlearnDashboard.classification_methods,
-            "regression_methods": FairlearnDashboard.regression_methods,
-            "probability_methods": FairlearnDashboard.probability_methods,
+            "classification_methods": FairlearnDashboard._classification_methods,
+            "regression_methods": FairlearnDashboard._regression_methods,
+            "probability_methods": FairlearnDashboard._probability_methods,
         }
 
         if model_names is not None:
@@ -259,8 +261,8 @@ class FairlearnDashboard(object):
                 FairlearnDashboard._service = None
                 raise e
 
-        FairlearnDashboard.model_count += 1
-        model_count = FairlearnDashboard.model_count
+        FairlearnDashboard._model_count += 1
+        model_count = FairlearnDashboard._model_count
 
         local_url = f"{FairlearnDashboard._service.env.base_url}/{model_count}"
         metrics_url = f"{local_url}/metrics"
@@ -270,7 +272,7 @@ class FairlearnDashboard(object):
         # TODO
         fairness_input['withCredentials'] = False
 
-        FairlearnDashboard.fairness_inputs[str(model_count)] = fairness_input
+        FairlearnDashboard._fairness_inputs[str(model_count)] = fairness_input
 
         html = generate_inline_html(fairness_input, local_url)
         # TODO
@@ -305,7 +307,7 @@ class FairlearnDashboard(object):
 
 
 def generate_inline_html(fairness_input, local_url):  # noqa: D102, D103
-    return FairlearnDashboard.default_template.render(
+    return FairlearnDashboard._default_template.render(
         fairness_input=json.dumps(fairness_input),
         main_js=FairlearnDashboard._dashboard_js,
         app_id='app_fairness',
