@@ -88,11 +88,6 @@ For an introduction to all the new features, see the
 :ref:`sphx_glr_auto_examples_plot_new_metrics.py` example in
 :ref:`sphx_glr_auto_examples`.
 
-Moments
--------
-
-Coming...
-
 
 Renaming of members
 -------------------
@@ -100,5 +95,20 @@ Renaming of members
 We have renamed a number of class members from ``_<name>`` to ``<name>_``.
 For example in both :class:`.ExponentiatedGradient` and :class:`.GridSearch`,
 the ``_predictors`` member is now called ``predictors_``.
-Some other members (particularly in :class:`.ExponentiatedGradient`) also now
-have more descriptive names.
+
+
+Exponentiated Gradient and Moments
+----------------------------------
+
+In addition to the trailing underscore change mentioned above, several
+adjustments have been made to :class:`ExponentiatedGradient`.
+The ``T`` argument has been renamed to ``max_iter``, and the ``eta_mul``
+argument to ``eta0``.
+
+Furthermore, the ``eps`` argument was previously being used for two
+different purposes, and this has now been refined.
+The ``eps`` argument itself is now solely used to setting the L1 norm
+bound used to control the excess constraint violation (beyond that
+allowed by the constraint object itself).
+The usage of ``eps`` as the righthand side of the constraints
+has now been moved to the :class:`.Moment` classes.
