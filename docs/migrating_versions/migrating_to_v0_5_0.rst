@@ -101,7 +101,7 @@ Exponentiated Gradient and Moments
 ----------------------------------
 
 In addition to the trailing underscore change mentioned above, several
-adjustments have been made to :class:`ExponentiatedGradient`.
+adjustments have been made to :class:`.ExponentiatedGradient`.
 The ``T`` argument has been renamed to ``max_iter``, and the ``eta_mul``
 argument to ``eta0``.
 
@@ -118,7 +118,7 @@ renamed to :class:`.UtilityParity`, and there are three new
 constructor arguments: ``difference_bound``, ``ratio_bound`` (which
 replaces ``ratio``) and ``ratio_bound_slack``.
 
-For regression moments, :class::`.ConditionalLossMoment` and its
+For regression moments, :class:`.ConditionalLossMoment` and its
 subclasses have gained a new argument ``upper_bound`` to serve as
 the righthand side of the constraints.
 
