@@ -9,4 +9,4 @@ changes to the Fairlearn API.
 .. toctree::
    :maxdepth: 1
 
-   migrating_to_v050
+   migrating_to_v0_5_0
