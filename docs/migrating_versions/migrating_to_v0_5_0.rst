@@ -107,7 +107,7 @@ argument to ``eta0``.
 
 Furthermore, the ``eps`` argument was previously being used for two
 different purposes, and this has now been refined.
-The ``eps`` argument itself is now solely used to setting the L1 norm
+The ``eps`` argument itself is now solely used to set the L1 norm
 bound used to control the excess constraint violation (beyond that
 allowed by the constraint object itself).
 The usage of ``eps`` as the righthand side of the constraints
@@ -126,7 +126,7 @@ Several :class:`.Moment` objects have also been renamed in an effort
 to improve consistency:
 
     - ``ErrorRateRatio`` has become :class:`.ErrorRateParity` (when used
-      with the ``ratio_bound`` arguments)
+      with the ``ratio_bound`` and ``ratio_bound_slack`` arguments)
     - ``TruePositiveRateDifference`` has become :class:`.TruePositiveRateParity`
       (when used with the ``difference_bound`` argument)
     - ``ConditionalSelectionRate`` has become :class:`.UtilityParity`
