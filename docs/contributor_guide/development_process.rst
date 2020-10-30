@@ -7,6 +7,20 @@ Contributors should use their own forks of the repository. In their fork, they
 create feature branches off of :code:`master`, and their pull requests should
 target the :code:`master` branch. Maintainers are responsible for prompt
 review of pull requests.
+The `CODEOWNERS.md <https://github.com/fairlearn/fairlearn/blob/master/CODEOWNERS.md>`_
+file lists the subject matter experts for all parts of the repository
+including the documentation and examples.
+Every change requires approval from at least one of the listed subject matter
+experts, and a total of two approvals from current maintainers.
+All changes to APIs should be reviewed by
+`Miro Dudik <https://github.com/MiroDudik>`_.
+
+.. _maintainers:
+The current maintainers are
+
+- `Miro Dudik <https://github.com/MiroDudik>`_
+- `Richard Edgar <https://github.com/riedgar-ms>`_
+- `Roman Lutz <https://github.com/romanlutz>`_
 
 Pull requests against :code:`master` trigger automated tests that are run
 through Azure DevOps, GitHub Actions, and CircleCI. Additional test suites are
@@ -28,6 +42,10 @@ Docstrings should follow
 This is a `recent decision by the community <https://github.com/fairlearn/fairlearn/issues/314>`_.
 The new policy is to update docstrings that a PR touches, as opposed to
 changing all the docstrings in one PR.
+
+Pull requests should be completed by somebody other than the author once
+all the listed criteria are fulfilled and the author indicates that the PR
+should be completed.
 
 Developer certificate of origin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

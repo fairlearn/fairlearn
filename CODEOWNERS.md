@@ -1,15 +1,14 @@
 # Each line is a file pattern followed by one or more owners
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence, @romanlutz and @riedgar-ms will be
+# requested for review when someone opens a pull request.
+* @romanlutz @riedgar-ms
 
-/devops @riedgar-ms @romanlutz
-/docs @riedgar-ms
-/fairlearn/metrics/ @riedgar-ms @rihorn2
-/fairlearn/postprocessing/ @romanlutz
+/examples/ @mmadaio @MiroDudik
+/fairlearn/metrics/ @riedgar-ms @MiroDudik
+/fairlearn/postprocessing/ @romanlutz @MiroDudik
 /fairlearn/reductions/ @riedgar-ms @romanlutz @MiroDudik
-/fairlearn/widget/ @rihorn2
-/jupyter-config @rihorn2
-/notebooks @romanlutz @riedgar-ms @rihorn2 @MiroDudik
-/scripts @riedgar-ms @romanlutz
-/test/unit/metrics @riedgar-ms @rihorn2
-/test/unit/postprocessing/ @romanlutz
-/test/unit/reductions/ @riedgar-ms @romanlutz @MiroDudik
-/visualization @rihorn2
+/fairlearn/widget/ @romanlutz
+/notebooks/ @mmadaio @MiroDudik
+
+# Every API change should be reviewed by @MiroDudik.

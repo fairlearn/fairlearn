@@ -81,7 +81,6 @@ The Fairlearn project is maintained by:
 
 - **@MiroDudik**
 - **@riedgar-ms**
-- **@rihorn2**
 - **@romanlutz**
 
 For a full list of contributors refer to the [authors page](./AUTHORS.md)
