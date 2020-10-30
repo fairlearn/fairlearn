@@ -23,6 +23,8 @@ This extends to multiple grouping columns, calculating the metric
 for each combination of subgroups.
 """
 
+from ._metric_frame import MetricFrame  # noqa: F401
+from ._make_derived_metric import make_derived_metric  # noqa: F401
 
 from ._metrics_engine import _derived_metric_dict
 
@@ -31,7 +33,6 @@ from ._disparities import (  # noqa: F401
     demographic_parity_ratio,
     equalized_odds_difference,
     equalized_odds_ratio)
-from ._metric_frame import MetricFrame  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
@@ -54,7 +55,8 @@ globals().update(_derived_metric_dict)
 # Build list of items to be listed in the docs
 
 _core = [
-    "MetricFrame"
+    "MetricFrame",
+    "make_derived_metric"
 ]
 
 _disparities = [
