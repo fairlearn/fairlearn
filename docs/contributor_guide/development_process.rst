@@ -72,7 +72,7 @@ message:
 .. code-block::
 
     git commit -m “Your message
-    Signed-off-by: Your Name <your.email@example.com>
+    Signed-off-by: Your Name <your.email@example.com>"
 
 or
 
