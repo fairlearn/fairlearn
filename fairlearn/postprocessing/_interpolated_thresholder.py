@@ -131,7 +131,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         positive_probs = self._pmf_predict(
             X, sensitive_features=sensitive_features)[:, 1]
         return (positive_probs >= random_state.rand(len(positive_probs))) * 1
-    
+
     def _print_thresholds(self):
         check_is_fitted(self)
         interpolation_dict_copy = deepcopy(self.interpolation_dict)
