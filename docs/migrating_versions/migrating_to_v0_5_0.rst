@@ -1,4 +1,4 @@
-.. _migrate_to_050:
+.. _migrating_to_v0_5_0:
 
 Migrating to v0.5.0 from v0.4.6
 ===============================
@@ -105,7 +105,7 @@ adjustments have been made to :class:`.ExponentiatedGradient`.
 The ``T`` argument has been renamed to ``max_iter``, and the ``eta_mul``
 argument to ``eta0``.
 
-Furthermore, the ``eps`` argument was previo.usly being used for two
+Furthermore, the ``eps`` argument was previously being used for two
 different purposes, and this has now been refined.
 The ``eps`` argument itself is now solely used to setting the L1 norm
 bound used to control the excess constraint violation (beyond that
@@ -125,8 +125,10 @@ the righthand side of the constraints.
 Several :class:`.Moment` objects have also been renamed in an effort
 to improve consistency:
 
-    - ``ErrorRateRatio`` has become :class:`.ErrorRateParity`
+    - ``ErrorRateRatio`` has become :class:`.ErrorRateParity` (when used
+      with the ``ratio_bound`` arguments)
     - ``TruePositiveRateDifference`` has become :class:`.TruePositiveRateParity`
+      (when used with the ``difference_bound`` argument)
     - ``ConditionalSelectionRate`` has become :class:`.UtilityParity`
     - ``GroupLossMoment`` has become :class:`.BoundedGroupLoss`
     - ``AverageLossMoment`` has become :class:`.MeanLoss`
