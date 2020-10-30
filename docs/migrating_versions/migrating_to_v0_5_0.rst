@@ -105,10 +105,28 @@ adjustments have been made to :class:`ExponentiatedGradient`.
 The ``T`` argument has been renamed to ``max_iter``, and the ``eta_mul``
 argument to ``eta0``.
 
-Furthermore, the ``eps`` argument was previously being used for two
+Furthermore, the ``eps`` argument was previo.usly being used for two
 different purposes, and this has now been refined.
 The ``eps`` argument itself is now solely used to setting the L1 norm
 bound used to control the excess constraint violation (beyond that
 allowed by the constraint object itself).
 The usage of ``eps`` as the righthand side of the constraints
 has now been moved to the :class:`.Moment` classes.
+
+For classification moments, ``ConditionalSelectionRate`` has been
+renamed to :class:`.UtilityParity`, and there are three new
+constructor arguments: ``difference_bound``, ``ratio_bound`` (which
+replaces ``ratio``) and ``ratio_bound_slack``.
+
+For regression moments, :class::`.ConditionalLossMoment` and its
+subclasses have gained a new argument ``upper_bound`` to serve as
+the righthand side of the constraints.
+
+Several :class:`.Moment` objects have also been renamed in an effort
+to improve consistency:
+
+    - ``ErrorRateRatio`` has become :class:`.ErrorRateParity`
+    - ``TruePositiveRateDifference`` has become :class:`.TruePositiveRateParity`
+    - ``ConditionalSelectionRate`` has become :class:`.UtilityParity`
+    - ``GroupLossMoment`` has become :class:`.BoundedGroupLoss`
+    - ``AverageLossMoment`` has become :class:`.MeanLoss`
