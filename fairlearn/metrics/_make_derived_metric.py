@@ -3,7 +3,7 @@
 
 import functools
 import numpy as np
-from typing import Callable, List
+from typing import Callable, List, Union
 
 from ._metric_frame import MetricFrame
 
@@ -18,7 +18,7 @@ aggregate_options = [
 class _DerivedMetric:
     def __init__(self,
                  aggregate: str,
-                 metric_fn: Callable,
+                 metric_fn: Callable[..., Union[float, int]],
                  sample_param_names: List[str]):
         assert aggregate in aggregate_options
         self._aggregate = aggregate
@@ -30,7 +30,13 @@ class _DerivedMetric:
         if sample_param_names is not None:
             self._sample_param_names = sample_param_names
 
-    def __call__(self, y_true, y_pred, *, sensitive_features, method=None, **other_params):
+    def __call__(self,
+                 y_true,
+                 y_pred,
+                 *,
+                 sensitive_features,
+                 method=None,
+                 **other_params) -> Union[float, int]:
         metric_name = 'computed_metric'
         sample_params = dict()
         params = dict()
@@ -64,7 +70,12 @@ class _DerivedMetric:
 
 
 def make_derived_metric(aggregate: str,
-                        metric_fn: Callable,
-                        sample_param_names: List[str]) -> Callable:
-    """Read a placeholder comment."""
+                        metric_fn: Callable[..., Union[float, int]],
+                        sample_param_names: List[str]) -> Callable[..., Union[float, int]]:
+    """Create a scalar returning metric function based on aggregation of a disaggregated metric.
+
+    Many higher order machine learning operations (such as hyperparameter tuning)
+    make use of functions which return scalar metrics. We can create such a function
+    for our disaggregated metrics with this function.
+    """
     return _DerivedMetric(aggregate, metric_fn, sample_param_names)
