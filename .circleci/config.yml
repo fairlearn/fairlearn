@@ -29,8 +29,8 @@ jobs:
           command: sudo python scripts/install_requirements.py --pinned False
 
       - run:
-          name: 'Build html'
-          command: python -m sphinx -b html -n -j auto docs docs/_build/html
+          name: "Build Documentation"
+          command: python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
 
       - persist_to_workspace:
           root: docs/_build

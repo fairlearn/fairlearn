@@ -1,0 +1,18 @@
+<div class="sidebar-message">
+  {% if versions %}
+  <h4>{{ _('Versions') }}</h4>
+  <ul>
+    {%- for item in versions %}
+      {% if vhasdoc(item.name) %}
+        {% if current_version == item %}
+          <li><strong><a href="{{ item.url }}">{{ item.name }}</a></strong></li>
+        {% else %}
+          <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+        {% endif %}
+      {% else %}
+        <li>{{item.name}}: Documentation page not present</li>
+      {% endif %}
+    {%- endfor %}
+  </ul>
+  {% endif %}
+</div>

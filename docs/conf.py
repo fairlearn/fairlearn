@@ -16,7 +16,8 @@
 import os
 import sys
 import inspect
-sys.path.insert(0, os.path.abspath('../'))
+rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
+sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 [print(p) for p in sys.path]
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -35,6 +36,24 @@ author = 'Microsoft and Fairlearn contributors'
 release = fairlearn.__version__
 
 
+def check_if_v046():
+    """Check to see if current version being built is v0.4.6."""
+    result = False
+
+    if fairlearn.__version__ == "0.4.6":
+        print("Detected 0.4.6 in fairlearn.__version__")
+        result = True
+
+    smv_name = os.getenv("SPHINX_MULTIVERSION_NAME")
+    if smv_name is not None:
+        print("Found SPHINX_MULTIVERSION_NAME: ", smv_name)
+        result = smv_name == "v0.4.6"
+    else:
+        print("SPHINX_MULTIVERSION_NAME not in environment")
+
+    return result
+
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -50,7 +69,8 @@ extensions = [
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx_multiversion'
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -67,6 +87,15 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 master_doc = 'contents'
+
+# Multiversion settings
+
+smv_tag_whitelist = r'^v0\.4\.6$'
+smv_branch_whitelist = r'^master$|^riedgar-ms/versioned-docs-alternate-01$'
+
+if check_if_v046():
+    print("Current version is v0.4.6, will apply overrides")
+    master_doc = 'index'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -96,7 +125,6 @@ html_logo = "_static/images/fairlearn_full_color.png"
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 html_additional_pages = {
-    'index': 'index.html'
 }
 
 # If false, no index is generated.
@@ -122,9 +150,14 @@ sphinx_gallery_conf = {
     'pypandoc': True,
 }
 
+html_sidebars = {
+    "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
+}
 
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
+
+
 def linkcode_resolve(domain, info):
     """Determine the URL corresponding to Python object."""
     if domain != "py":
@@ -161,8 +194,9 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
+    tag_or_branch = os.getenv("SPHINX_MULTIVERSION_NAME", default="master")
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, '/')
-    return f"http://github.com/fairlearn/fairlearn/blob/master/fairlearn/{fn}{linespec}"
+    return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
 
 
 # -- LaTeX macros ------------------------------------------------------------

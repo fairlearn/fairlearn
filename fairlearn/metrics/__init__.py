@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""Functionality for computing metrics, with a particular focus on group metrics.
+"""Functionality for computing metrics, with a particular focus on disaggregated metrics.
 
 For our purpose, a metric is a function with signature
 ``f(y_true, y_pred, ....)``
@@ -10,13 +10,28 @@ values predicted by a machine learning algorithm. Other
 arguments may be present (most often sample weights), which will
 affect how the metric is calculated.
 
-The group metrics in this module have signatures
-``g(y_true, y_pred, group_membership, ...)``
-where ``group_membership`` is an array of values indicating
-a group to which each pair of true and predicted values belong.
-The metric is evaluated for the entire set of data, and also
-for each subgroup identified in ``group_membership``.
+This module provides the concept of a *disaggregated metric*.
+This is a metric where in addition to ``y_true`` and ``y_pred``
+values, the user provides information about group membership
+for each sample.
+For example, a user could provide a 'Gender' column, and the
+disaggregated metric would contain separate results for the subgroups
+'male', 'female' and 'nonbinary' indicated by that column.
+The underlying metric function is evaluated for each of these three
+subgroups.
+This extends to multiple grouping columns, calculating the metric
+for each combination of subgroups.
 """
+
+
+from ._metrics_engine import _derived_metric_dict
+
+from ._disparities import (  # noqa: F401
+    demographic_parity_difference,
+    demographic_parity_ratio,
+    equalized_odds_difference,
+    equalized_odds_ratio)
+from ._metric_frame import MetricFrame  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
@@ -30,62 +45,32 @@ from ._extra_metrics import (  # noqa: F401
     _mean_underprediction,
     )
 
-from ._metrics_engine import (  # noqa: F401
-    make_metric_group_summary, group_summary,
-    make_derived_metric,
-    group_min_from_summary, group_max_from_summary,
-    difference_from_summary, ratio_from_summary,
-    _metric_group_summary_dict, _derived_metric_dict)
 
-from ._disparities import (  # noqa: F401
-    demographic_parity_difference,
-    demographic_parity_ratio,
-    equalized_odds_difference,
-    equalized_odds_ratio,
-)
+# Add the generated metrics of the form and
+# `<metric>_{difference,ratio,group_min,group_max`
+globals().update(_derived_metric_dict)
 
+# ============================================
+# Build list of items to be listed in the docs
+
+_core = [
+    "MetricFrame"
+]
+
+_disparities = [
+    "demographic_parity_difference",
+    "demographic_parity_ratio",
+    "equalized_odds_difference",
+    "equalized_odds_ratio"
+]
 
 _extra_metrics = [
     "true_positive_rate",
     "true_negative_rate",
     "false_positive_rate",
     "false_negative_rate",
-    "balanced_root_mean_squared_error",
     "mean_prediction",
     "selection_rate",
-    "_mean_overprediction",
-    "_mean_underprediction",
 ]
 
-
-_metrics_engine = [
-    "make_metric_group_summary",
-    "group_summary",
-    "make_derived_metric",
-    "group_min_from_summary",
-    "group_max_from_summary",
-    "difference_from_summary",
-    "ratio_from_summary"
-]
-
-
-# Add the generated metrics of the form `<metric>_group summary` and
-# `<metric>_{difference,ratio,group_min,group_max`
-globals().update(_metric_group_summary_dict)
-globals().update(_derived_metric_dict)
-
-
-_disparities = [
-    "demographic_parity_difference",
-    "demographic_parity_ratio",
-    "equalized_odds_difference",
-    "equalized_odds_ratio",
-]
-
-
-__all__ = (
-    _extra_metrics +
-    _metrics_engine +
-    list(_metric_group_summary_dict.keys()) +
-    list(_derived_metric_dict.keys()) +
-    _disparities)
+__all__ = _core + _disparities + _extra_metrics + list(_derived_metric_dict.keys())
