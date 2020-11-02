@@ -6,11 +6,7 @@ import sklearn.metrics as skm
 from ._extra_metrics import (
     true_positive_rate, true_negative_rate,
     false_positive_rate, false_negative_rate,
-    _root_mean_squared_error, _balanced_root_mean_squared_error,
-    mean_prediction,
     selection_rate,
-    _mean_overprediction,
-    _mean_underprediction,
 )
 from ._make_derived_metric import make_derived_metric
 
