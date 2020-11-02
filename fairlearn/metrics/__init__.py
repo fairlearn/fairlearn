@@ -26,7 +26,7 @@ for each combination of subgroups.
 from ._metric_frame import MetricFrame  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 
-from ._metrics_engine import _derived_metric_dict
+from ._generated_metrics import _derived_metric_dict
 
 from ._disparities import (  # noqa: F401
     demographic_parity_difference,
