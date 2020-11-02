@@ -90,7 +90,6 @@ def make_derived_metric(*,
     make use of functions which return scalar metrics. We can create such a function
     for our disaggregated metrics with this function.
     """
-
     dm = _DerivedMetric(metric=metric,
                         transform=transform,
                         sample_param_names=sample_param_names)
