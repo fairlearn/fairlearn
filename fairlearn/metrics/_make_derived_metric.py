@@ -95,7 +95,7 @@ def make_derived_metric(*,
     parameter names to treat as sample parameters.
 
     The result is a callable object which has the same signature as the original
-    function, with two arguments added. These are :code:`sensitive_features=`, to 
+    function, with two arguments added. These are :code:`sensitive_features=`, to
     specify the subgroups in the dataset, and :code:`method=`, if required by the
     selected aggregation transform. The result of this function is identical to
     creating a :class:`.MetricFrame` object, and then calling the method specified
