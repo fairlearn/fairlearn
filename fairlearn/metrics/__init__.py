@@ -79,4 +79,4 @@ _extra_metrics = [
     "selection_rate",
 ]
 
-__all__ = _core + _disparities + _extra_metrics + list(_generated_metric_dict.keys())
+__all__ = _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys()))
