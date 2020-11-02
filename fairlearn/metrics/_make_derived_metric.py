@@ -89,6 +89,38 @@ def make_derived_metric(*,
     Many higher order machine learning operations (such as hyperparameter tuning)
     make use of functions which return scalar metrics. We can create such a function
     for our disaggregated metrics with this function.
+
+    This function takes a metric function, a string to specify the desired aggregation
+    transform (matching the methods on :class:`.MetricFrame`), and a list of
+    parameter names to treat as sample parameters.
+
+    The result is a callable object which has the same signature as the original
+    function, with two arguments added. These are :code:`sensitive_features=`, to 
+    specify the subgroups in the dataset, and :code:`method=`, if required by the
+    selected aggregation transform. The result of this function is identical to
+    creating a :class:`.MetricFrame` object, and then calling the method specified
+    by the :code:`transform=` argument (with the :code:`method=` argument, if
+    required).
+
+    Parameters
+    ----------
+    metric : callable
+        The metric function from which the new function should be derived
+
+    transform : str
+        Selects the transformation aggregation the resultant function should use
+
+    sample_param_names : List[str]
+        A list of parameters names of the underlying :code:`metric` which should
+        be treated as sample parameters (i.e. the same leading dimension as the
+        :code:`y_true` and :code:`y_pred` parameters)
+
+    Returns
+    -------
+    callable
+        Function with the same signature as the :code:`metric` but with additional
+        :code:`sensitive_feature=` and :code:`method=` arguments, to enable the
+        required computation
     """
     dm = _DerivedMetric(metric=metric,
                         transform=transform,
