@@ -3,6 +3,7 @@
 
 import functools
 import numpy as np
+import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
@@ -63,7 +64,8 @@ def test_derived_difference_broadcast_arg():
                                   y_t, y_p,
                                   sensitive_features=gid)
 
-    actual = my_fn(y_t, y_p, sensitive_features=gid, beta=my_beta, method='between_groups')
+    actual = my_fn(y_t, y_p, sensitive_features=gid,
+                   beta=my_beta, method='between_groups')
     assert actual == grouped.difference(method='between_groups')
 
 
@@ -78,7 +80,8 @@ def test_derived_difference_sample_arg():
                                   y_t, y_p,
                                   sensitive_features=gid,
                                   sample_params={'sample_weight': wgt})
-    actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt, method='between_groups')
+    actual = my_fn(y_t, y_p, sensitive_features=gid,
+                   sample_weight=wgt, method='between_groups')
     assert actual == grouped.difference(method='between_groups')
 
 
@@ -149,3 +152,32 @@ def test_group_max():
                                   sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid)
     assert actual == grouped.group_max()
+
+
+def test_noncallable_rejected():
+    expected = "Supplied metric object must be callable"
+    with pytest.raises(ValueError) as context:
+        _ = metrics.make_derived_metric(metric="random", transform='group_max')
+    assert context.value.args[0] == expected
+
+
+def test_function_method_arg_rejected():
+
+    def bad_fn(y_p, y_t, method):
+        print(method)
+        return skm.accuracy_score(y_p, y_t)
+
+    expected = "Callables which accept a 'method' argument" \
+        " may not be passed to make_derived_metric()"
+    with pytest.raises(ValueError) as context:
+        _ = metrics.make_derived_metric(metric=bad_fn, transform='group_max')
+    assert context.value.args[0] == expected
+
+
+def test_bad_transform_rejected():
+    expected = "Transform must be one of ['difference', 'group_min', 'group_max', 'ratio']"
+
+    with pytest.raises(ValueError) as context:
+        _ = metrics.make_derived_metric(metric=skm.accuracy_score,
+                                        transform="something rotten")
+    assert context.value.args[0] == expected

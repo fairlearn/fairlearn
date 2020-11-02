@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import functools
+import inspect
 import numpy as np
 from typing import Callable, List, Union
 
@@ -14,6 +15,11 @@ transform_options = [
     'ratio',
 ]
 
+_METRIC_CALLABLE_ERROR = "Supplied metric object must be callable"
+_METHOD_ARG_ERROR = "Callables which accept a 'method' argument " \
+    "may not be passed to make_derived_metric()"
+_INVALID_TRANSFORM = "Transform must be one of {0}".format(transform_options)
+
 
 class _DerivedMetric:
     def __init__(self,
@@ -21,11 +27,17 @@ class _DerivedMetric:
                  metric: Callable[..., Union[float, int]],
                  transform: str,
                  sample_param_names: List[str]):
-        assert transform in transform_options
-        self._transform = transform
 
-        assert callable(metric)
+        if not callable(metric):
+            raise ValueError(_METRIC_CALLABLE_ERROR)
+        sig = inspect.signature(metric)
+        if 'method' in sig.parameters:
+            raise ValueError(_METHOD_ARG_ERROR)
         self._metric_fn = metric
+
+        if transform not in transform_options:
+            raise ValueError(_INVALID_TRANSFORM)
+        self._transform = transform
 
         self._sample_param_names = []
         if sample_param_names is not None:
@@ -71,13 +83,14 @@ class _DerivedMetric:
 def make_derived_metric(*,
                         metric: Callable[..., Union[float, int]],
                         transform: str,
-                        sample_param_names: List[str]) -> Callable[..., Union[float, int]]:
+                        sample_param_names: List[str] = None) -> Callable[..., Union[float, int]]:
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
     Many higher order machine learning operations (such as hyperparameter tuning)
     make use of functions which return scalar metrics. We can create such a function
     for our disaggregated metrics with this function.
     """
+
     dm = _DerivedMetric(metric=metric,
                         transform=transform,
                         sample_param_names=sample_param_names)
