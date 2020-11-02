@@ -168,7 +168,8 @@ def test_function_method_arg_rejected():
         return skm.accuracy_score(y_p, y_t)
 
     expected = "Callables which accept a 'method' argument" \
-        " may not be passed to make_derived_metric()"
+        " may not be passed to make_derived_metric()." \
+        " Please use functools.partial()"
     with pytest.raises(ValueError) as context:
         _ = metrics.make_derived_metric(metric=bad_fn, transform='group_max')
     assert context.value.args[0] == expected

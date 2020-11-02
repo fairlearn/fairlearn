@@ -17,7 +17,7 @@ transform_options = [
 
 _METRIC_CALLABLE_ERROR = "Supplied metric object must be callable"
 _METHOD_ARG_ERROR = "Callables which accept a 'method' argument " \
-    "may not be passed to make_derived_metric()"
+    "may not be passed to make_derived_metric(). Please use functools.partial()"
 _INVALID_TRANSFORM = "Transform must be one of {0}".format(transform_options)
 
 
