@@ -23,6 +23,8 @@ This extends to multiple grouping columns, calculating the metric
 for each combination of subgroups.
 """
 
+import sys
+
 from ._metric_frame import MetricFrame  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 
@@ -49,7 +51,9 @@ from ._extra_metrics import (  # noqa: F401
 
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
-globals().update(_derived_metric_dict)
+_module_obj = sys.modules[__name__]
+for name, func in _derived_metric_dict.items():
+    setattr(_module_obj, name, func)
 
 # ============================================
 # Build list of items to be listed in the docs
