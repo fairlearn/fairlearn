@@ -43,7 +43,7 @@ derived_metric_results = {
 # =======================================================
 
 def test_dict_sizes():
-    assert len(metrics._derived_metric_dict) == 25
+    assert len(metrics._generated_metric_dict) == 25
 
 
 @pytest.mark.parametrize("func_name", derived_metric_results.keys())

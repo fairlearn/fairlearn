@@ -28,7 +28,7 @@ import sys
 from ._metric_frame import MetricFrame  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 
-from ._generated_metrics import _derived_metric_dict
+from ._generated_metrics import _generated_metric_dict
 
 from ._disparities import (  # noqa: F401
     demographic_parity_difference,
@@ -52,7 +52,7 @@ from ._extra_metrics import (  # noqa: F401
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
 _module_obj = sys.modules[__name__]
-for name, func in _derived_metric_dict.items():
+for name, func in _generated_metric_dict.items():
     setattr(_module_obj, name, func)
 
 # ============================================
@@ -79,4 +79,4 @@ _extra_metrics = [
     "selection_rate",
 ]
 
-__all__ = _core + _disparities + _extra_metrics + list(_derived_metric_dict.keys())
+__all__ = _core + _disparities + _extra_metrics + list(_generated_metric_dict.keys())
