@@ -7,7 +7,7 @@ from typing import Callable, List, Union
 
 from ._metric_frame import MetricFrame
 
-aggregate_options = [
+transform_options = [
     'difference',
     'group_min',
     'group_max',
@@ -17,14 +17,15 @@ aggregate_options = [
 
 class _DerivedMetric:
     def __init__(self,
-                 aggregate: str,
-                 metric_fn: Callable[..., Union[float, int]],
+                 *,
+                 metric: Callable[..., Union[float, int]],
+                 transform: str,
                  sample_param_names: List[str]):
-        assert aggregate in aggregate_options
-        self._aggregate = aggregate
+        assert transform in transform_options
+        self._transform = transform
 
-        assert callable(metric_fn)
-        self._metric_fn = metric_fn
+        assert callable(metric)
+        self._metric_fn = metric
 
         self._sample_param_names = []
         if sample_param_names is not None:
@@ -37,7 +38,6 @@ class _DerivedMetric:
                  sensitive_features,
                  method=None,
                  **other_params) -> Union[float, int]:
-        metric_name = 'computed_metric'
         sample_params = dict()
         params = dict()
         for k, v in other_params.items():
@@ -47,7 +47,6 @@ class _DerivedMetric:
                 params[k] = v
 
         dispatch_fn = functools.partial(self._metric_fn, **params)
-        dispatch_fn.__name__ = metric_name
 
         all_metrics = MetricFrame(dispatch_fn,
                                   y_true, y_pred,
@@ -55,13 +54,13 @@ class _DerivedMetric:
                                   sample_params=sample_params)
 
         result = np.nan
-        if self._aggregate == 'difference':
+        if self._transform == 'difference':
             result = all_metrics.difference(method=method)
-        elif self._aggregate == 'ratio':
+        elif self._transform == 'ratio':
             result = all_metrics.ratio(method=method)
-        elif self._aggregate == 'group_min':
+        elif self._transform == 'group_min':
             result = all_metrics.group_min()
-        elif self._aggregate == 'group_max':
+        elif self._transform == 'group_max':
             result = all_metrics.group_max()
         else:
             raise ValueError("Cannot get here")
@@ -69,8 +68,9 @@ class _DerivedMetric:
         return result
 
 
-def make_derived_metric(aggregate: str,
-                        metric_fn: Callable[..., Union[float, int]],
+def make_derived_metric(*,
+                        metric: Callable[..., Union[float, int]],
+                        transform: str,
                         sample_param_names: List[str]) -> Callable[..., Union[float, int]]:
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
@@ -78,4 +78,7 @@ def make_derived_metric(aggregate: str,
     make use of functions which return scalar metrics. We can create such a function
     for our disaggregated metrics with this function.
     """
-    return _DerivedMetric(aggregate, metric_fn, sample_param_names)
+    dm = _DerivedMetric(metric=metric,
+                        transform=transform,
+                        sample_param_names=sample_param_names)
+    return dm

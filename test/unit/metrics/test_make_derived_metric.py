@@ -26,8 +26,8 @@ gid = np.concatenate((As, Bs))
 
 
 def test_derived_difference_between_groups():
-    my_fn = metrics.make_derived_metric('difference',
-                                        skm.accuracy_score,
+    my_fn = metrics.make_derived_metric(metric=skm.accuracy_score,
+                                        transform='difference',
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.MetricFrame(skm.accuracy_score,
@@ -39,8 +39,8 @@ def test_derived_difference_between_groups():
 
 
 def test_derived_difference_to_overall():
-    my_fn = metrics.make_derived_metric('difference',
-                                        skm.accuracy_score,
+    my_fn = metrics.make_derived_metric(metric=skm.accuracy_score,
+                                        transform='difference',
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.MetricFrame(skm.accuracy_score,
@@ -53,8 +53,8 @@ def test_derived_difference_to_overall():
 
 def test_derived_difference_broadcast_arg():
     my_beta = 0.6
-    my_fn = metrics.make_derived_metric('difference',
-                                        skm.fbeta_score,
+    my_fn = metrics.make_derived_metric(metric=skm.fbeta_score,
+                                        transform='difference',
                                         sample_param_names=['sample_weight'])
 
     my_fbeta = functools.partial(skm.fbeta_score, beta=my_beta)
@@ -70,8 +70,8 @@ def test_derived_difference_broadcast_arg():
 def test_derived_difference_sample_arg():
     my_fbeta = functools.partial(skm.fbeta_score, beta=0.6)
     my_fbeta.__name__ = "my_fbeta"
-    my_fn = metrics.make_derived_metric('difference',
-                                        my_fbeta,
+    my_fn = metrics.make_derived_metric(metric=my_fbeta,
+                                        transform='difference',
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.MetricFrame(my_fbeta,
@@ -84,8 +84,8 @@ def test_derived_difference_sample_arg():
 
 def test_derived_difference_both_arg_types():
     my_beta = 0.5
-    my_fn = metrics.make_derived_metric('difference',
-                                        skm.fbeta_score,
+    my_fn = metrics.make_derived_metric(metric=skm.fbeta_score,
+                                        transform='difference',
                                         sample_param_names=['sample_weight'])
 
     my_fbeta = functools.partial(skm.fbeta_score, beta=my_beta)
@@ -104,8 +104,8 @@ def test_derived_difference_both_arg_types():
 
 
 def test_derived_ratio_between_groups():
-    my_fn = metrics.make_derived_metric('ratio',
-                                        skm.precision_score,
+    my_fn = metrics.make_derived_metric(metric=skm.precision_score,
+                                        transform='ratio',
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.MetricFrame(skm.precision_score,
@@ -116,8 +116,8 @@ def test_derived_ratio_between_groups():
 
 
 def test_derived_ratio_to_overall():
-    my_fn = metrics.make_derived_metric('ratio',
-                                        skm.precision_score,
+    my_fn = metrics.make_derived_metric(metric=skm.precision_score,
+                                        transform='ratio',
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.MetricFrame(skm.precision_score,
@@ -128,8 +128,8 @@ def test_derived_ratio_to_overall():
 
 
 def test_group_min():
-    my_fn = metrics.make_derived_metric('group_min',
-                                        skm.precision_score,
+    my_fn = metrics.make_derived_metric(metric=skm.precision_score,
+                                        transform='group_min',
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.MetricFrame(skm.precision_score,
@@ -140,8 +140,8 @@ def test_group_min():
 
 
 def test_group_max():
-    my_fn = metrics.make_derived_metric('group_max',
-                                        skm.precision_score,
+    my_fn = metrics.make_derived_metric(metric=skm.precision_score,
+                                        transform='group_max',
                                         sample_param_names=['sample_weight'])
 
     grouped = metrics.MetricFrame(skm.precision_score,
