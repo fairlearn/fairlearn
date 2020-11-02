@@ -10,7 +10,7 @@ adding new ones please consult the guide on
 
 .. note::
 
-    The Fairlearn API is not completely stable, so if you want to run these
+    The Fairlearn API is still evolving, so if you want to run these
     on your locally Fairlearn installation, make sure to match versions.
 
 .. toctree::

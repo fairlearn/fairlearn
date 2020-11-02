@@ -25,7 +25,7 @@ For checking out the latest version in our repository check out our
 
 .. note::
 
-    The Fairlearn API is not completely stable, so example code in 
+    The Fairlearn API is still evolving, so example code in 
     this documentation may not work with every version of Fairlearn.
     Please use the version selector to get to the instructions for
     the appropriate version (unfortunately there are no instructions
