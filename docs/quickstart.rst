@@ -27,19 +27,11 @@ For checking out the latest version in our repository check out our
 
     The Fairlearn API is not completely stable, so example code in 
     this documentation may not work with every version of Fairlearn.
-    In particular, it may be necessary to install Fairlearn directly
-    from GitHub via:
-
-    .. code-block:: bash
-
-        pip install git+https://github.com/fairlearn/fairlearn.git
-
-    If you have already cloned the Fairlearn repository, you
-    can run `pip` directly on the clone instead:
-
-    .. code-block:: bash
-
-        pip install local/path/to/fairlearn/
+    Please use the version selector to get to the instructions for
+    the appropriate version (unfortunately there are no instructions
+    for ``v0.4.6``). The instructions for the :code:`master` branch
+    require Fairlearn to be installed from a clone of the repository.
+    See :ref:`advanced_install` for the required steps.
 
 Overview of Fairlearn
 ---------------------
