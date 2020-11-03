@@ -9,8 +9,8 @@ document goes through the adjustments required.
 Metrics
 -------
 
-We have substantially altered the ``fairlearn.metrics`` module.
-In place of calling ``group_summary()`` to produce a :class:`sklearn.utils.Bunch`
+We have substantially altered the :mod:`fairlearn.metrics` module.
+In place of calling ``group_summary()`` to produce a :py:class:`sklearn.utils.Bunch`
 containing the disaggregated metrics, we have a new class, :class:`.MetricFrame`.
 The key advantages of the new API are:
 

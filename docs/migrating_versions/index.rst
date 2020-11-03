@@ -1,4 +1,4 @@
-.. _migrating_versions:
+.. _version_migration_guide:
 
 Version Migration Guide
 =======================
