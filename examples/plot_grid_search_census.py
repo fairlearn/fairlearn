@@ -30,7 +30,7 @@ GridSearch with Census Data
 # --------------------------------
 # We download the data set using `fetch_adult` function in `fairlearn.datasets`.
 # We start by importing the various modules we're going to use:
-# 
+#
 # .. note::
 #
 #     The :code:`FairlearnDashboard` will move from Fairlearn to the
