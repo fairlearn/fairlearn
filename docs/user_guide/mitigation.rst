@@ -86,9 +86,9 @@ i.e. functions that indicate which data points get label :code:`1` based on
 their score.
 
 We can think of each thresholding rule as a binary classifier and determine
-their true positive rate and false positive rate.
-The code below also visualizes the threshold selection process with an ROC
-curve. The ROC curves consists of the true and false positive rates for each
+its true positive rate and false positive rate.
+The code below visualizes the threshold selection process with an ROC curve.
+The ROC curves consist of the true and false positive rates for each
 of the thresholding rules, with separate ones per sensitive feature value.
 Note that the plot omits points that are within the convex hull of points.
 
@@ -132,7 +132,6 @@ The printed thresholding rules influence the predictions, so we need to first
 understand the formula that puts all the parts together.
 Instead of selecting a particular thresholding rule we can actually select
 any point between any two thresholding rules.
-This is a very important insight and occurs in almost every case.
 To reach such a point we will have to create the linear combination of the two
 rules as
 :math:`p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})`.
@@ -279,6 +278,42 @@ The following combinations of fairness criteria and objectives are available:
       - :code:`accuracy_score`, :code:`balanced_accuracy_score`
    *  - :code:`demographic_parity`, :code:`false_positive_rate_parity`, :code:`false_negative_rate_parity`, :code:`true_positive_rate_parity`, :code:`true_negative_rate_parity`
       - :code:`selection_rate`, :code:`true_positive_rate`, :code:`true_negative_rate`, :code:`accuracy_score`, :code:`balanced_accuracy_score`
+
+Using a pre-trained estimator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, :class:`ThresholdOptimizer` trains the passed estimator using its
+:code:`fit()` method. In some cases we already have a trained estimator, for
+example if we want to compare it with others. For this use case
+:class:`ThresholdOptimizer` has the :code:`prefit` argument. If set to
+:code:`True` :class:`ThresholdOptimizer` does not call :code:`fit()` on the
+estimator and assumes it is already trained.
+
+.. doctest:: mitigation
+
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
+    >>> X = [[0], [1], [2], [3]]
+    >>> y = [0, 1, 0, 1]
+    >>> A = ['A', 'A', 'B', 'B']
+    >>> prefit_logistic_regression = LogisticRegression()
+    >>> prefit_logistic_regression.fit(X, y)
+    LogisticRegression()
+    >>> threshold_optimizer = ThresholdOptimizer(
+    ...     estimator=prefit_logistic_regression,
+    ...     constraints="demographic_parity",
+    ...     objective="accuracy_score",
+    ...     prefit=True)
+    >>> threshold_optimizer.fit(X, y, sensitive_features=A)
+    ThresholdOptimizer(estimator=LogisticRegression(), prefit=True)
+
+If it detects that the estimator
+may not be fitted as defined by
+`scikit-learn's check <https://scikit-learn.org/stable/modules/generated/sklearn.utils.validation.check_is_fitted.html>`_
+it prints a warning, but still proceeds with the assumption that the user
+knows what they are doing. Not every machine learning package adheres to
+scikit-learn's convention of setting all members with trailing underscore
+during :code:`fit()`, so this is unfortunately an imperfect check.
 
 .. _reductions:
 
