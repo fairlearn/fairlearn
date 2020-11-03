@@ -131,8 +131,8 @@ While this page shows only screenshots, the actual dashboard is interactive.
 .. note::
 
     The :code:`FairlearnDashboard` will move from Fairlearn to the
-    `raiwidgets` package after the v0.5.0 release. Instead, Fairlearn will
-    provide some of the existing functionality through
+    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
+    will provide some of the existing functionality through
     :code:`matplotlib`-based visualizations.
 
 .. doctest:: quickstart
