@@ -11,7 +11,7 @@ adding new ones please consult the guide on
 .. note::
 
     The Fairlearn API is still evolving, so if you want to run these
-    on your locally Fairlearn installation, make sure to match versions.
+    on your local Fairlearn installation, make sure to match versions.
 
 .. toctree::
    :maxdepth: 2
