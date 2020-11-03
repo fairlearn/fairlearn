@@ -157,6 +157,7 @@ in a dictionary via the ``sample_params`` argument.:
     c        0.714286
     d               0
     Name: recall_score, dtype: object
+
 If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
