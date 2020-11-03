@@ -10,12 +10,12 @@ Metrics
 -------
 
 We have substantially altered the ``fairlearn.metrics`` module.
-In place of calling ``group_summary()`` to produce a ``Bunch`` containing
-the disaggregated metrics, we have a new object :class:`.MetricFrame`.
+In place of calling ``group_summary()`` to produce a :class:`sklearn.utils.Bunch``
+containing the disaggregated metrics, we have a new class, :class:`.MetricFrame`.
 The key advantages of the new API are:
 
     - Support for evalulating multiple metric functions at once
-    - Support for multiple sensitive featuresk
+    - Support for multiple sensitive features
     - Support for control features
 
 The :class:`MetricFrame` class has a constructor similar to ``group_summary()``.
