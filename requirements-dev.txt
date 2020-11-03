@@ -32,5 +32,6 @@ nbval
 bokeh
 pypandoc
 sphinx
-sphinx-gallery>=0.8.1
+sphinx-gallery
+git+https://github.com/Holzhaus/sphinx-multiversion.git
 pydata-sphinx-theme

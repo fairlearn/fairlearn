@@ -20,4 +20,4 @@ test-unit:
 	$(PYTEST) ./test/unit
 
 doc:
-	$(SPHINX) -b html -j auto docs docs/_build/html
+	python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
