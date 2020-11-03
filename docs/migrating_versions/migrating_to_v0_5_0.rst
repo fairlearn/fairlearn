@@ -10,7 +10,7 @@ Metrics
 -------
 
 We have substantially altered the ``fairlearn.metrics`` module.
-In place of calling ``group_summary()`` to produce a :class:`sklearn.utils.Bunch``
+In place of calling ``group_summary()`` to produce a :class:`sklearn.utils.Bunch`
 containing the disaggregated metrics, we have a new class, :class:`.MetricFrame`.
 The key advantages of the new API are:
 
