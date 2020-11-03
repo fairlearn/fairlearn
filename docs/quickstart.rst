@@ -23,6 +23,16 @@ Fairlearn is also available on
 For checking out the latest version in our repository check out our
 :ref:`advanced_install`.
 
+.. note::
+
+    The Fairlearn API is still evolving, so example code in 
+    this documentation may not work with every version of Fairlearn.
+    Please use the version selector to get to the instructions for
+    the appropriate version (unfortunately there are no instructions
+    for ``v0.4.6``). The instructions for the :code:`master` branch
+    require Fairlearn to be installed from a clone of the repository.
+    See :ref:`advanced_install` for the required steps.
+
 Overview of Fairlearn
 ---------------------
 
