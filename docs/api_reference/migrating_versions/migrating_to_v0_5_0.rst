@@ -3,7 +3,7 @@
 Migrating to v0.5.0 from v0.4.6
 ===============================
 
-The update from v0.4.6 of Fairlearn has brought some major changes. This
+The update from v0.4.6 to v0.5.0 of Fairlearn has brought some major changes. This
 document goes through the adjustments required.
 
 Metrics
