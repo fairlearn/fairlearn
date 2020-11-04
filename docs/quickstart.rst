@@ -22,6 +22,8 @@ Fairlearn is also available on
 
 For checking out the latest version in our repository check out our
 :ref:`advanced_install`.
+If you are updating from a previous version of Fairlearn, please
+see our :ref:`version_migration_guide`.
 
 .. note::
 
