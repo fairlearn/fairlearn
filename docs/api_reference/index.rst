@@ -11,3 +11,5 @@ API Reference
    fairlearn.reductions
    fairlearn.widget
    fairlearn.datasets
+
+   version_migration_guide
