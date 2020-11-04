@@ -11,3 +11,5 @@ User Guide
    assessment
    mitigation
    further_resources
+
+   migrating_versions/index
