@@ -31,7 +31,7 @@ Migrating from Previous Versions
 --------------------------------
 
 If you are migrating from an older version of Fairlearn, please see our
-:ref:`_migrating_versions` section for help in moving to the current version
+:ref:`version_migration_guide` for help in moving to the current version
 of Fairlearn.
 
 
