@@ -12,4 +12,4 @@ API Reference
    fairlearn.widget
    fairlearn.datasets
 
-   version_migration_guide
+   migrating_versions/index
