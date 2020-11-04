@@ -62,26 +62,8 @@ Now, one can write:
 
     min_by_group = mf.group_min()
 
-There is a ``method=`` argument to :meth:`.MetricFrame.difference`
-and :meth:`.MetricFrame.ratio` which can be set to ``between_groups``
-and ``to_overall``. To obtain behaviour similar to:
-
-.. code-block::
-
-    diff = difference_from_summary(gs)
-
-use
-
-.. code-block::
-
-    diff = mf.difference(method='between_groups')
-
-The ``to_overall`` alternative will evaluate the differences (or ratios)
-relative to the overall value, rather than just between the groups identified
-by the sensitive feature.
-
 The ``make_derived_metric()`` function has been removed, but will be reintroduced
-in a future release. The pregenerated functions such as ``accuracy_score_group_min()``
+in a future release. The predefined convenience functions such as ``accuracy_score_group_min()``
 and ``precision_score_difference()`` remain.
 
 For an introduction to all the new features, see the 
@@ -89,36 +71,37 @@ For an introduction to all the new features, see the
 :ref:`sphx_glr_auto_examples`.
 
 
-Renaming of members
--------------------
+Renamed object attributes
+-------------------------
 
-We have renamed a number of class members from ``_<name>`` to ``<name>_``.
+Some of the object attributes have been renamed from ``_<name>`` to ``<name>_``.
 For example in both :class:`.ExponentiatedGradient` and :class:`.GridSearch`,
-the ``_predictors`` member is now called ``predictors_``.
+the ``_predictors`` attribute is now called ``predictors_``.
 
 
 Exponentiated Gradient and Moments
 ----------------------------------
 
 In addition to the trailing underscore change mentioned above, several
-adjustments have been made to :class:`.ExponentiatedGradient`.
+adjustments have been made to the constructor arguments of
+:class:`.ExponentiatedGradient`.
 The ``T`` argument has been renamed to ``max_iter``, and the ``eta_mul``
 argument to ``eta0``.
 
-Furthermore, the ``eps`` argument was previously being used for two
-different purposes, and this has now been refined.
-The ``eps`` argument itself is now solely used to set the L1 norm
-bound used to control the excess constraint violation (beyond that
-allowed by the constraint object itself).
-The usage of ``eps`` as the righthand side of the constraints
+Furthermore, the ``eps`` argument was previously used for two
+different purposes, and these two uses have now been separated.
+The use of ``eps`` as the righthand side of the constraints
 has now been moved to the :class:`.Moment` classes.
+The only remaining use of the ``eps`` argument
+is to control the optimality requirements for the optimization
+algorithm in :class:`.ExponentiatedGradient`.
 
 For classification moments, ``ConditionalSelectionRate`` has been
 renamed to :class:`.UtilityParity`, and there are three new
 constructor arguments: ``difference_bound``, ``ratio_bound`` (which
 replaces ``ratio``) and ``ratio_bound_slack``.
 
-For regression moments, :class:`.ConditionalLossMoment` and its
+For regression moments, :class:`.BoundedGroupLoss` and its
 subclasses have gained a new argument ``upper_bound`` to serve as
 the righthand side of the constraints.
 
@@ -131,4 +114,3 @@ to improve consistency:
       (when used with the ``difference_bound`` argument)
     - ``ConditionalSelectionRate`` has become :class:`.UtilityParity`
     - ``GroupLossMoment`` has become :class:`.BoundedGroupLoss`
-    - ``AverageLossMoment`` has become :class:`.MeanLoss`

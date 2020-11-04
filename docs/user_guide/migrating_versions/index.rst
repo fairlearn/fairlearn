@@ -1,7 +1,7 @@
 .. _version_migration_guide:
 
-Version Migration Guide
-=======================
+Migrating from Prior Versions
+=============================
 
 This section contains pages designed to help navigate major
 changes to the Fairlearn API.
