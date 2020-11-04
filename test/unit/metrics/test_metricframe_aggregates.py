@@ -61,6 +61,14 @@ class Test1m1sf0cf:
         assert target_diff == abs(self.metric_p - self.metric_q)
 
     @pytest.mark.parametrize("metric_fn", metric)
+    def test_difference_defaults_to_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_diff = self.target.difference()
+        assert isinstance(target_diff, float)
+        assert target_diff == abs(self.metric_p - self.metric_q)
+
+    @pytest.mark.parametrize("metric_fn", metric)
     def test_difference_to_overall(self, metric_fn):
         self._prepare(metric_fn)
 
@@ -75,6 +83,15 @@ class Test1m1sf0cf:
         self._prepare(metric_fn)
 
         target_ratio = self.target.ratio(method='between_groups')
+        assert isinstance(target_ratio, float)
+        assert target_ratio == min(self.metric_p, self.metric_q) / \
+            max(self.metric_p, self.metric_q)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_ratio_defaults_to_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_ratio = self.target.ratio()
         assert isinstance(target_ratio, float)
         assert target_ratio == min(self.metric_p, self.metric_q) / \
             max(self.metric_p, self.metric_q)
@@ -142,6 +159,14 @@ class Test1m1sf0cfFnDict:
         assert target_diff[self.mfn] == abs(self.metric_p - self.metric_q)
 
     @pytest.mark.parametrize("metric_fn", metric)
+    def test_difference_defaults_to_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_diff = self.target.difference()
+        assert isinstance(target_diff, float)
+        assert target_diff[self.mfn] == abs(self.metric_p - self.metric_q)
+
+    @pytest.mark.parametrize("metric_fn", metric)
     def test_difference_to_overall(self, metric_fn):
         self._prepare(metric_fn)
 
@@ -159,6 +184,15 @@ class Test1m1sf0cfFnDict:
         target_ratio = self.target.ratio(method='between_groups')
         assert isinstance(target_ratio, pd.Series)
         assert len(target_ratio) == 1
+        assert target_ratio[self.mfn] == min(self.metric_p, self.metric_q) / \
+            max(self.metric_p, self.metric_q)
+
+    @pytest.mark.parametrize("metric_fn", metric)
+    def test_ratio_defaults_to_between_groups(self, metric_fn):
+        self._prepare(metric_fn)
+
+        target_ratio = self.target.ratio()
+        assert isinstance(target_ratio, float)
         assert target_ratio[self.mfn] == min(self.metric_p, self.metric_q) / \
             max(self.metric_p, self.metric_q)
 
