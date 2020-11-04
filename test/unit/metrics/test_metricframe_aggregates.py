@@ -163,7 +163,8 @@ class Test1m1sf0cfFnDict:
         self._prepare(metric_fn)
 
         target_diff = self.target.difference()
-        assert isinstance(target_diff, float)
+        assert isinstance(target_diff, pd.Series)
+        assert len(target_diff) == 1
         assert target_diff[self.mfn] == abs(self.metric_p - self.metric_q)
 
     @pytest.mark.parametrize("metric_fn", metric)
@@ -192,7 +193,8 @@ class Test1m1sf0cfFnDict:
         self._prepare(metric_fn)
 
         target_ratio = self.target.ratio()
-        assert isinstance(target_ratio, float)
+        assert isinstance(target_ratio, pd.Series)
+        assert len(target_ratio) == 1
         assert target_ratio[self.mfn] == min(self.metric_p, self.metric_q) / \
             max(self.metric_p, self.metric_q)
 
