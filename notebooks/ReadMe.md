@@ -10,7 +10,7 @@ If you encounter compatibility problems with notebooks, go to your terminal and 
 ```
 pip show fairlearn
 ```
-to show the version of Fairlean which you currently have
+to show the version of Fairlearn which you currently have
 installed.
 Then, on the GitHub page, navigate to that version
 (e.g. [v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5) or
