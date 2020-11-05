@@ -138,6 +138,13 @@ their label:
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
 
+.. note::
+
+    The :code:`FairlearnDashboard` will move from Fairlearn to the
+    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
+    will provide some of the existing functionality through
+    :code:`matplotlib`-based visualizations.
+
 .. doctest:: quickstart
 
     >>> from fairlearn.widget import FairlearnDashboard
