@@ -39,6 +39,19 @@ def test_derived_difference_between_groups():
     assert actual == grouped.difference(method='between_groups')
 
 
+def test_derived_difference_default_is_between_groups():
+    my_fn = metrics.make_derived_metric(metric=skm.accuracy_score,
+                                        transform='difference',
+                                        sample_param_names=['sample_weight'])
+
+    grouped = metrics.MetricFrame(skm.accuracy_score,
+                                  y_t, y_p,
+                                  sensitive_features=gid)
+
+    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    assert actual == grouped.difference()
+
+
 def test_derived_difference_to_overall():
     my_fn = metrics.make_derived_metric(metric=skm.accuracy_score,
                                         transform='difference',
@@ -116,6 +129,18 @@ def test_derived_ratio_between_groups():
                                   sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid, method='between_groups')
     assert actual == grouped.ratio(method='between_groups')
+
+
+def test_derived_ratio_default_is_between_groups():
+    my_fn = metrics.make_derived_metric(metric=skm.precision_score,
+                                        transform='ratio',
+                                        sample_param_names=['sample_weight'])
+
+    grouped = metrics.MetricFrame(skm.precision_score,
+                                  y_t, y_p,
+                                  sensitive_features=gid)
+    actual = my_fn(y_t, y_p, sensitive_features=gid)
+    assert actual == grouped.ratio()
 
 
 def test_derived_ratio_to_overall():
