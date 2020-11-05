@@ -48,7 +48,7 @@ class _DerivedMetric:
                  y_pred,
                  *,
                  sensitive_features,
-                 method=None,
+                 method='between_groups',
                  **other_params) -> Union[float, int]:
         sample_params = dict()
         params = dict()
