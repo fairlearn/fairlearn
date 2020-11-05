@@ -228,6 +228,13 @@ model's predictions impact different groups (e.g., different ethnicities), and
 also for comparing multiple models along different fairness and performance
 metrics.
 
+.. note::
+
+    The :code:`FairlearnDashboard` will move from Fairlearn to the
+    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
+    will provide some of the existing functionality through
+    :code:`matplotlib`-based visualizations.
+
 Setup and a single-model assessment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
