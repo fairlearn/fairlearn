@@ -1,6 +1,6 @@
 .. _version_migration_guide:
 
-Migrating from Prior Versions
+Migrating from prior versions
 =============================
 
 This section contains pages designed to help navigate major
