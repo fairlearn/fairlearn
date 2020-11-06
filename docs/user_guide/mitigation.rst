@@ -104,7 +104,10 @@ Note that the plot omits points that are within the convex hull of points.
     >>> y = (data.target == '>50K') * 1
     >>> sex = data.data['sex']
     >>> logistic_regression = LogisticRegression()
-    >>> threshold_optimizer = ThresholdOptimizer(estimator=logistic_regression, constraints="equalized_odds", objective="accuracy_score")
+    >>> threshold_optimizer = ThresholdOptimizer(
+    ...     estimator=logistic_regression,
+    ...     constraints="equalized_odds",
+    ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
     >>> threshold_optimizer.interpolated_thresholder_._print_thresholds()
@@ -219,7 +222,10 @@ with the otherwise exact same example:
     >>> y = (data.target == '>50K') * 1
     >>> sex = data.data['sex']
     >>> logistic_regression = LogisticRegression()
-    >>> threshold_optimizer = ThresholdOptimizer(estimator=logistic_regression, constraints="demographic_parity", objective="accuracy_score")
+    >>> threshold_optimizer = ThresholdOptimizer(
+    ...     estimator=logistic_regression,
+    ...     constraints="demographic_parity",
+    ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(estimator=LogisticRegression())
     >>> threshold_optimizer.interpolated_thresholder_._print_thresholds()
