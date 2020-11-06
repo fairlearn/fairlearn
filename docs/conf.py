@@ -86,12 +86,12 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-master_doc = 'contents'
+master_doc = 'index'
 
 # Multiversion settings
 
 smv_tag_whitelist = r'^v0\.4\.6$'
-smv_branch_whitelist = r'^master$|^riedgar-ms/versioned-docs-alternate-01$'
+smv_branch_whitelist = r'^master$|^release/v0\.5\.\d+$'
 
 if check_if_v046():
     print("Current version is v0.4.6, will apply overrides")

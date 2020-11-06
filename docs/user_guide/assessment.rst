@@ -157,6 +157,7 @@ in a dictionary via the ``sample_params`` argument.:
     c        0.714286
     d               0
     Name: recall_score, dtype: object
+
 If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
@@ -226,6 +227,13 @@ The Fairlearn dashboard is a Jupyter notebook widget for assessing how a
 model's predictions impact different groups (e.g., different ethnicities), and
 also for comparing multiple models along different fairness and performance
 metrics.
+
+.. note::
+
+    The :code:`FairlearnDashboard` will move from Fairlearn to the
+    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
+    will provide some of the existing functionality through
+    :code:`matplotlib`-based visualizations.
 
 Setup and a single-model assessment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
