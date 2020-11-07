@@ -1,11 +1,18 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-"""Package for the fairness dashboard widget."""
+"""Package for the fairlearn Dashboard widget."""
 
-from .fairness_dashboard import FairlearnDashboard
+from ._fairlearn_dashboard import FairlearnDashboard
 
-
-__version__ = "0.1.0-dev"
 
 __all__ = ['FairlearnDashboard']
+
+
+def _jupyter_nbextension_paths():
+    return [{
+        'section': 'notebook',
+        'src': 'static',
+        'dest': 'fairlearn-widget',
+        'require': 'fairlearn-widget/extension'
+    }]
