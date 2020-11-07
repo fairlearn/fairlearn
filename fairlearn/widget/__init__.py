@@ -1,7 +1,7 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""Package for the fairlearn Dashboard widget."""
+"""Package for the Fairlearn Dashboard widget."""
 
 from ._fairlearn_dashboard import FairlearnDashboard
 

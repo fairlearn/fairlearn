@@ -1,7 +1,7 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""Defines the fairlearn dashboard class."""
+"""Defines the Fairlearn dashboard class."""
 
 from ._fairlearn_widget import FairlearnWidget
 from fairlearn.metrics._extra_metrics import (
@@ -9,6 +9,7 @@ from fairlearn.metrics._extra_metrics import (
     _mean_underprediction, _root_mean_squared_error, false_negative_rate,
     false_positive_rate, mean_prediction, selection_rate, true_negative_rate)
 from fairlearn.metrics import MetricFrame
+from warnings import warn
 
 
 from IPython.display import display
@@ -42,7 +43,12 @@ class FairlearnDashboard(object):
             sensitive_features,
             y_true, y_pred,
             sensitive_feature_names=None):
-        """Initialize the fairlearn Dashboard."""
+        """Initialize the Fairlearn Dashboard."""
+        warn("The FairlearnDashboard will move from Fairlearn to the "
+             "raiwidgets package after the v0.5.0 release. Instead, Fairlearn "
+             "will provide some of the existing functionality through "
+             "matplotlib-based visualizations.")
+
         self._widget_instance = FairlearnWidget()
         if sensitive_features is None or y_true is None or y_pred is None:
             raise ValueError("Required parameters not provided")
