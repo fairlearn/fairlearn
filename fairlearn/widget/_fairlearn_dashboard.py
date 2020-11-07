@@ -159,6 +159,7 @@ class FairlearnDashboard(object):
             self._y_pred = self._convert_to_list(y_pred)
         if len(np.shape(self._y_pred)) == 1:
             self._y_pred = [self._y_pred]
+
         self._y_true = self._convert_to_list(y_true)
 
         if np.shape(self._y_true)[0] != np.shape(self._y_pred)[1]:
@@ -198,12 +199,12 @@ class FairlearnDashboard(object):
                         data = new[id]
                         method = self._metric_methods.get(data["metricKey"]).get("function")
                         prediction = MetricFrame(method,
-                                                 data['true_y'],
-                                                 data['predicted_ys'][data["modelIndex"]],
+                                                 self._y_true,
+                                                 self._y_pred[data["modelIndex"]],
                                                  sensitive_features=data["binVector"])
                         response[id] = {
                             "global": prediction.overall,
-                            "bins": prediction.by_group
+                            "bins": prediction.by_group.to_dict()
                         }
                 except Exception as ed:
                     response[id] = {
