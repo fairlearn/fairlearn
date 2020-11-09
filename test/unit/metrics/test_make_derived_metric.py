@@ -119,6 +119,25 @@ def test_derived_difference_both_arg_types():
     assert actual == grouped.difference(method='between_groups')
 
 
+def test_derived_difference_both_arg_types_default_sample_param_names():
+    my_beta = 0.5
+    my_fn = metrics.make_derived_metric(metric=skm.fbeta_score,
+                                        transform='difference')
+
+    my_fbeta = functools.partial(skm.fbeta_score, beta=my_beta)
+    my_fbeta.__name__ = "my_fbeta"
+    grouped = metrics.MetricFrame(my_fbeta,
+                                  y_t, y_p,
+                                  sensitive_features=gid,
+                                  sample_params={'sample_weight': wgt})
+
+    actual = my_fn(y_t, y_p,
+                   sensitive_features=gid,
+                   beta=my_beta,
+                   sample_weight=wgt)
+    assert actual == grouped.difference()
+
+
 def test_derived_ratio_between_groups():
     my_fn = metrics.make_derived_metric(metric=skm.precision_score,
                                         transform='ratio',

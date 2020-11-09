@@ -83,7 +83,7 @@ class _DerivedMetric:
 def make_derived_metric(*,
                         metric: Callable[..., Union[float, int]],
                         transform: str,
-                        sample_param_names: List[str] = None) -> Callable[..., Union[float, int]]:
+                        sample_param_names: List[str] = ['sample_weight']) -> Callable[..., Union[float, int]]:  # noqa: E501
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
     Many higher order machine learning operations (such as hyperparameter tuning)
@@ -113,7 +113,10 @@ def make_derived_metric(*,
     sample_param_names : List[str]
         A list of parameters names of the underlying :code:`metric` which should
         be treated as sample parameters (i.e. the same leading dimension as the
-        :code:`y_true` and :code:`y_pred` parameters)
+        :code:`y_true` and :code:`y_pred` parameters). This defaults to a list with
+        a single entry of :code:`sample_weight` (as used by many SciKit-Learn
+        metrics). If :code:`None` or an empty list is supplied, then no parameters
+        will be treated as sample parameters.
 
     Returns
     -------
