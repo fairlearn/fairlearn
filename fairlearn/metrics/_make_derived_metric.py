@@ -75,7 +75,7 @@ class _DerivedMetric:
         elif self._transform == 'group_max':
             result = all_metrics.group_max()
         else:
-            raise ValueError("Cannot get here")
+            raise ValueError(_INVALID_TRANSFORM)
 
         return result
 
