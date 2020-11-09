@@ -8,7 +8,7 @@ from ._extra_metrics import (
     false_positive_rate, false_negative_rate,
     selection_rate,
 )
-from ._make_derived_metric import make_derived_metric
+from . import make_derived_metric
 
 METRICS_SPEC = [
     # base metrics from _extra_metrics
