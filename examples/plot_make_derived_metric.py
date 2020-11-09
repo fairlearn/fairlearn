@@ -30,6 +30,7 @@ Making Derived Metrics
 # We start with some uncontroversial `import` statements:
 
 from fairlearn.metrics import MetricFrame, make_derived_metric
+from fairlearn.metrics import accuracy_score_group_min
 import sklearn.metrics as skm
 import functools
 import numpy as np
@@ -179,3 +180,24 @@ beta_from_func = beta_func(Y_test, Y_pred,
 
 print("From function:", beta_from_func)
 assert beta_from_func == beta_from_frame
+
+
+# %%
+# Pregenerated Metrics
+# ====================
+#
+# We provide a number of pregenerated metrics, to cover
+# common use cases. For example, we provide a
+# :code:`accuracy_score_group_min()` function to
+# find the minimum over the accuracy scores:
+
+
+from_myacc = my_acc(Y_test, Y_pred,
+                    sensitive_features=A_test['race'])
+
+from_pregen = accuracy_score_group_min(Y_test, Y_pred,
+                                       sensitive_features=A_test['race'])
+
+print("From my function :", from_myacc)
+print("From pregenerated:", from_pregen)
+assert from_myacc == from_pregen
