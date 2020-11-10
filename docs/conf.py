@@ -89,8 +89,8 @@ master_doc = 'index'
 
 # Multiversion settings
 
-smv_tag_whitelist = r'^v0\.4\.6$'
-smv_branch_whitelist = r'^master$|^release/v0\.5\.\d+$'
+smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d+$'
+smv_branch_whitelist = r'^master$'
 
 if check_if_v046():
     print("Current version is v0.4.6, will apply overrides")
