@@ -3,10 +3,15 @@
 
 import pandas as pd
 import numpy as np
+from sklearn.utils.validation import check_consistent_length, check_array
+
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
 from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
+from fairlearn._input_validation import _compress_multiple_sensitive_features_into_single_column
 from .error_rate import ErrorRate
+
+_KW_CONTROL_FEATURES = "control_features"
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
@@ -245,7 +250,19 @@ class DemographicParity(UtilityParity):
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
-        super().load_data(X, y, event=_ALL, **kwargs)
+        control_features = kwargs.get(_KW_CONTROL_FEATURES)
+        if control_features is None:
+            super().load_data(X, y, event=_ALL, **kwargs)
+        else:
+            check_consistent_length(X, control_features)
+            control_features = check_array(control_features, ensure_2d=False, dtype=None)
+
+            # compress multiple sensitive features into a single column
+            if len(control_features.shape) > 1 and control_features.shape[1] > 1:
+                control_features = \
+                    _compress_multiple_sensitive_features_into_single_column(control_features)
+
+            super().load_data(X, y, event=control_features, **kwargs)
 
 
 class TruePositiveRateParity(UtilityParity):
