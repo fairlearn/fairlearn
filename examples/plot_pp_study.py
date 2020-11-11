@@ -3,26 +3,20 @@
 
 """
 ================================
-Predictive Policing - Case Study
+Predictive Policing Case Study
 ================================
 """
 # %%
-#.. role:: raw-html-m2r(raw)
-#   :format: html
 #
-#
-#:raw-html-m2r:`<center> **Fairlearn Sociotechnical Case Study**</center>`
-#=============================================================================
 #
 #Contents
 #========
 #
-#
-#. Overview
-#. Background
-#. Fairlearn Results
-#. Problem area & Sociotechnical context
-#. Conclusion
+#1. Overview
+#2. Background
+#3. Fairlearn Results
+#4. Problem area & Sociotechnical context
+#5. Conclusion
 #
 #Overview
 #--------
@@ -56,86 +50,179 @@ Predictive Policing - Case Study
 #
 #
 #* Stakeholders: police officers, members of the community (especially
-#people who may be more affected by predictive policing than others),
-#contractor / data scientist
+#  people who may be more affected by predictive policing than others),
+#  contractor / data scientist
+#
 #* Harms: overpolicing of neighborhoods can
-#lead to disproportionate effect on communities in these neighborhoods
-#(perhaps exacerbated by feedback loop)
+#  lead to disproportionate effect on communities in these neighborhoods
+#  (perhaps exacerbated by feedback loop)
+#
 #* Notes: Feedback loops!
-#Prediction on behavior based on circumstances; perhaps useful for
-#aggregate observations about behavior but less so for individual
-#predictions
+#  Prediction on behavior based on circumstances; perhaps useful for
+#  aggregate observations about behavior but less so for individual
+#  predictions
+#
 #* Dangerous to assume that ‘crime’ is a single phenomenon.
-#There are different kinds of crime, so also need to make sure that data
-#match the crime being predicted.
+#  There are different kinds of crime, so also need to make sure that data
+#  match the crime being predicted.
 #
 #For this case study, we are utilizing the Boston housing value dataset
 #(described here). Originally, this dataset includes the following variables:
 #
 #.. list-table::
 #   :header-rows: 1
+#   :widths: 5 20
+#   :stub-columns: 1
 #
-#   * - Variable
-#     - Description
-#   * - 
-#
-#
-#:raw-html-m2r:`<font color='blue'> CRIM |  per capita crime rate by town </font>`
-#ZN  | proportion of residential land zoned for lots over 25,000 sq.ft.
-#INDUS | proportion of non-retail business acres per town CHAS  | Charles
-#River dummy variable (= 1 if tract bounds river; 0 otherwise) NOX |
-#nitric oxides concentration (parts per 10 million) RM  | average number
-#of rooms per dwelling AGE | proportion of owner-occupied units built
-#prior to 1940 DIS | weighted distances to five Boston employment centres
-#RAD|  index of accessibility to radial highways TAX | full-value
-#property-tax rate per \$10,000 PTRATIO | pupil-teacher ratio by town B
-#| 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
-#:raw-html-m2r:`<font color='blue'> LSTAT  |% lower status of the
-#population </font>` :raw-html-m2r:`<font color='green'> MEDV|  Median
-#value of owner-occupied homes in $1000's </font>`
-#
+#   *  - Variable
+#      - Description
+#   *  - CRIM (BLUE)
+#      - per capita crime rate by town
+#   *  - ZN
+#      - proportion of residential land zoned for lots over 25,000 sq.ft.
+#   *  - INDUS
+#      - proportion of non-retail business acres per town
+#   *  - CHAS
+#      - Charles River dummy variable (= 1 if tract bounds river; 0 otherwise)
+#   *  - NOX
+#      - nitric oxides concentration (parts per 10 million)
+#   *  - RM
+#      - average number of rooms per dwelling
+#   *  - AGE
+#      - proportion of owner-occupied units built prior to 1940
+#   *  - DIS
+#      - weighted distances to five Boston employment centres
+#   *  - RAD	
+#      - index of accessibility to radial highways
+#   *  - TAX	
+#      - full-value property-tax rate per $10,000
+#   *  - PTRATIO
+#      - pupil-teacher ratio by town
+#   *  - B
+#      - 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+#   *  - LSTAT (BLUE)
+#      - % lower status of the population
+#   *  - MEDV (GREEN)
+#      - Median value of owner-occupied homes in $1000's
 #*Figure A: Dataset variables*
 #
 #Where MEDV (colored green in Figure A above) is the target variable
 #(that a model built on this dataset is intended to predict). We make
 #modifications below with the understanding that LSTAT is a parameter of
-#concern.
-# %%
+#concern. 
+#
+#**Import and install relevant packages**
+#
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_openml
+from fairlearn.metrics import *
+from fairlearn.postprocessing import * 
+from fairlearn.reductions import *
+from fairlearn.datasets import *
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
+from statistics import *
+import matplotlib.pyplot as plt
 
-# %%
-#Import and install relevant packages
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#%%
+# 
+#**1. We devise a new target column based on CRIM (colored blue in Figure A above), indicating whether a certain per capita crime rate threshold is met.**
 #
-# %%
-#1. We devise a new target column based on CRIM (colored blue in Figure A
-#above), indicating whether a certain per capita crime rate threshold is
-#met.
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#While we calculate and print Mean, Median, Mode, Max, and Min crime
-#rates below, the analysis to follow is specifically for the mean crime
-#rate as the chosen threshold. Similar results are observed for median
-#crime rate as the chosen threshold as well (which one can observe by
-#changing the index of threshold_crime_rates to 1).
+#   While we calculate and print Mean, Median, Mode, Max, and Min crime
+#   rates below, the analysis to follow is specifically for the mean crime
+#   rate as the chosen threshold. Similar results are observed for median
+#   crime rate as the chosen threshold as well (which one can observe by
+#   changing the index of threshold_crime_rates to 1).
 #
-# %%
-#2. We build a classifier using CRIM as the target value that the model
-#ultimately predicts, and also removing CRIM in the data used to train
-#the model
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# %%
-#3. We create bins for LSTAT (colored blue in Figure A above), to
-#understand the models performance on different LSTAT value intervals.
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bostonDS = fetch_boston(as_frame=True)
+crimerate_data = bostonDS.data['CRIM']
+
+mean_crimerate = mean(crimerate_data)
+median_crimerate = median(crimerate_data)
+threshold_crime_rates = [mean_crimerate, median_crimerate]
+mode_crimerate = mode(crimerate_data)
+min_crimerate = min(crimerate_data)
+max_crimerate = max(crimerate_data)
+"""
+[0] = Mean
+[1] = Median 
+"""
+
+y_true = (crimerate_data > threshold_crime_rates[0]) * 1
+
+rawData = bostonDS.data
+print(rawData)
+print('Min crime rate', min_crimerate)
+print('Max crime rate', max_crimerate)
+print('Mean crime rate', mean_crimerate)
+print('Median crime rate', median_crimerate)
+print('Mode crime rate', mode_crimerate)
+#%%
 #
-# %%
-#While we calculate and print Mean, Median, Mode, Max, and Min LSTAT
-#values, the chosen bins are based on the observe Min and Max LSTAT
-#values.
+#**2. We build a classifier using CRIM as the target value that the model ultimately predicts, and also removing CRIM in the data used to train the model.**
 #
-# %%
-#4. We treat lstat_binned (defined in step 3 above) as the sensitive
-#feature on which to assess fairness metrics.
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+
+data_without_crimerate = rawData.drop('CRIM',1)
+
+print(data_without_crimerate)
+
+#%%
+#
+
+classifier.fit(data_without_crimerate, y_true)
+
+y_pred = classifier.predict(data_without_crimerate)
+#%%
+#
+#**3. We create bins for LSTAT (colored blue in Figure A above), to understand the models performance on different LSTAT value intervals.**
+#
+#  While we calculate and print Mean, Median, Mode, Max, and Min LSTAT
+#  values, the chosen bins are based on the observe Min and Max LSTAT
+#  values.
+#
+lstat = bostonDS.data['LSTAT']
+mean_lstat = mean(lstat)
+median_lstat = median(lstat)
+mode_lstat = mode(lstat)
+max_lstat = max(lstat)
+min_lstat = min(lstat)
+
+print('Mean LSTAT ', mean_lstat)
+print('Median LSTAT ', median_lstat)
+print('Mode LSTAT ', mode_lstat)
+print('Max LSTAT ', max_lstat)
+print('Min LSTAT ', min_lstat)
+
+bins = [0, 10,20,30,40]
+print(bins)
+labels =[1,2,3,4]
+
+lstat_binned = pd.cut(lstat, bins,labels=labels)
+#%%
+# 
+#**4. We treat lstat_binned (defined in step 3 above) as the sensitive feature on which to assess fairness metrics.**
+#
+accuracy_frame = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features = lstat_binned)
+accuracy_by_group = accuracy_frame.by_group
+
+selection_frame = MetricFrame(selection_rate, y_true, y_pred, sensitive_features = lstat_binned)
+selection_by_group = selection_frame.by_group
+
+print('Selection rate statistics')
+print(selection_frame.overall)
+print(selection_by_group)
+
+print('Accuracy rate statistics')
+print(accuracy_frame.overall)
+print(accuracy_by_group)
+#%%
+#
+from fairlearn.widget import FairlearnDashboard
+FairlearnDashboard(sensitive_features=lstat_binned, sensitive_feature_names=['lstat'],y_true=y_true,y_pred={"initial model": y_pred}) 
+#%%
 #
 #Fairlearn Results
 #-----------------
@@ -177,12 +264,11 @@ Predictive Policing - Case Study
 #Another important question to consider: should the described problem
 #(policing) be framed as an ML task at all?
 #
-#Exploration: What if we attempt to apply Fairlearn's mitigation functionality?
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#**Exploration: What if we attempt to apply Fairlearn's mitigation functionality?**
 #
-# %%
-#Quickstart - Mitigating Disparity
-#"""""""""""""""""""""""""""""""""
+# 
+#*Quickstart - Mitigating Disparity*
+#
 #
 #If we observe disparities between groups we may want to create a new
 #model while specifying an appropriate fairness constraint. Note that the
@@ -196,20 +282,36 @@ Predictive Policing - Case Study
 #classifier using Demographic Parity as the objective, leading to a
 #vastly reduced difference in selection rate.
 #
-#Hypothesis
-#""""""""""
+#*Hypothesis*
+#
 #
 #In this sociotechnical context, the disparity is inherent in the data
 #itself, and thus an attempt at mitigation will fail.
 #
+np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
+constraint = DemographicParity()
+classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+mitigator = ExponentiatedGradient(classifier, constraint)
+mitigator.fit(data_without_crimerate, y_true, sensitive_features=lstat_binned)
+y_pred_mitigated = mitigator.predict(data_without_crimerate)
+
+sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=lstat_binned)
+print(sr_mitigated.overall)
+print(sr_mitigated.by_group)
+
+as_mitigated = MetricFrame(accuracy_score, y_true, y_pred_mitigated, sensitive_features=lstat_binned)
+print(as_mitigated.overall)
+print(as_mitigated.by_group)
+#%%
+#
 #By constraining selection rate disparity across LSTAT groups, we notice
 #a significant difference in the accuracy for the 3rd and 4th bins:
 #
-#Before Mitigation - 95%+ accuracy on both bins
-#""""""""""""""""""""""""""""""""""""""""""""""
+#**Before Mitigation - 95%+ accuracy on both bins**
 #
-#After Mitigation - 74% and 42% respectively
-#"""""""""""""""""""""""""""""""""""""""""""
+#
+#**After Mitigation - 74% and 42% respectively**
+#
 #
 #The significant drop in accuracy indicates that the underlying issue may
 #not be at the model level but rather a reflection of the data (and
