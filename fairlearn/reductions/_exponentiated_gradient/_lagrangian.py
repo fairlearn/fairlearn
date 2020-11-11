@@ -44,12 +44,15 @@ class _Lagrangian:
     """
 
     def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True,
-                 sample_weight_name='sample_weight'):
+                 sample_weight_name='sample_weight',
+                 control_features=None):
         self.X = X
         self.n = self.X.shape[0]
         self.y = y
         self.constraints = constraints
-        self.constraints.load_data(X, y, sensitive_features=sensitive_features)
+        self.constraints.load_data(X, y,
+                                   sensitive_features=sensitive_features,
+                                   control_features=control_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
         self.estimator = estimator

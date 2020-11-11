@@ -90,7 +90,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        _, y_train, sensitive_features = _validate_and_reformat_input(
+        _, y_train, sensitive_features, control_features = _validate_and_reformat_input(
             X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
 
         n = y_train.shape[0]
@@ -100,7 +100,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         B = 1 / self.eps
         lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
                                  self.constraints, B,
-                                 sample_weight_name=self.sample_weight_name)
+                                 sample_weight_name=self.sample_weight_name,
+                                 control_features=control_features)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
