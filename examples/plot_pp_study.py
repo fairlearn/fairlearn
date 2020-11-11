@@ -142,7 +142,6 @@ crimerate_data = bostonDS.data['CRIM']
 mean_crimerate = mean(crimerate_data)
 median_crimerate = median(crimerate_data)
 threshold_crime_rates = [mean_crimerate, median_crimerate]
-mode_crimerate = mode(crimerate_data)
 min_crimerate = min(crimerate_data)
 max_crimerate = max(crimerate_data)
 """
@@ -158,7 +157,6 @@ print('Min crime rate', min_crimerate)
 print('Max crime rate', max_crimerate)
 print('Mean crime rate', mean_crimerate)
 print('Median crime rate', median_crimerate)
-print('Mode crime rate', mode_crimerate)
 #%%
 #
 #**2. We build a classifier using CRIM as the target value that the model ultimately predicts, and also removing CRIM in the data used to train the model.**
