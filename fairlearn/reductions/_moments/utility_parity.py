@@ -391,4 +391,9 @@ class ErrorRateParity(UtilityParity):
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
-        super().load_data(X, y, event=_ALL, utilities=np.vstack([y, 1-y]).T, **kwargs)
+        control_features = kwargs.get(_KW_CONTROL_FEATURES)
+        if control_features is None:
+            event = _ALL
+        else:
+            event = control_features
+        super().load_data(X, y, event=event, utilities=np.vstack([y, 1-y]).T, **kwargs)
