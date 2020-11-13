@@ -62,9 +62,8 @@ def test_demographic_parity_controlfeatures():
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
 
-    print(mf_input.overall)
-    print(mf_input.by_group)
-    print(mf_input.difference(method='to_overall'))
+    print("Selection rates for input:\n", mf_input.by_group)
+    print("Input selection rate differences:\n", mf_input.difference(method='to_overall'), "\n")
 
     unmitigated = LogisticRegression()
     unmitigated.fit(X_dummy, y)
@@ -73,8 +72,9 @@ def test_demographic_parity_controlfeatures():
                                  y, y_pred,
                                  sensitive_features=X['sens'],
                                  control_features=X['ctrl'])
-    print(mf_unmitigated.overall)
-    print(mf_unmitigated.by_group)
+    print("Unmitigated selection rates:\n", mf_unmitigated.by_group)
+    print("Unmitigated selection rate differences:\n",
+          mf_unmitigated.difference(method='to_overall'), "\n")
 
     expgrad_basic = ExponentiatedGradient(
         LogisticRegression(),
@@ -85,8 +85,9 @@ def test_demographic_parity_controlfeatures():
     mf_basic = MetricFrame(selection_rate, y, y_pred_basic,
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
-    print(mf_basic.by_group)
-    print(mf_basic.difference(method='to_overall'))
+    print("Basic expgrad selection rates:\n", mf_basic.by_group)
+    print("Basic expgrad selection rate differences:\n",
+          mf_basic.difference(method='to_overall'), "\n")
 
     expgrad_control = ExponentiatedGradient(
         LogisticRegression(),
@@ -99,5 +100,15 @@ def test_demographic_parity_controlfeatures():
     mf_control = MetricFrame(selection_rate, y, y_pred_control,
                              sensitive_features=X['sens'],
                              control_features=X['ctrl'])
-    print(mf_control.by_group)
-    print(mf_control.difference(method='to_overall'))
+    print("expgrad_control selection rates:\n", mf_control.by_group)
+    print("expgrad_control selection rate differences:\n",
+          mf_control.difference(method='to_overall'))
+
+    assert (mf_control.difference(method='to_overall') <
+            mf_input.difference(method='to_overall')).all()
+
+    assert (mf_control.difference(method='to_overall') <
+            mf_unmitigated.difference(method='to_overall')).all()
+
+    assert (mf_control.difference(method='to_overall') <
+            mf_basic.difference(method='to_overall')).all()
