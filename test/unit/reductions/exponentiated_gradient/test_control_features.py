@@ -9,10 +9,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
 from fairlearn.metrics import MetricFrame
-from fairlearn.metrics import selection_rate, true_positive_rate
+from fairlearn.metrics import selection_rate, true_positive_rate, false_positive_rate
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity, ErrorRateParity,\
-    TruePositiveRateParity
+    TruePositiveRateParity, FalsePositiveRateParity
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G
@@ -125,3 +125,6 @@ def test_error_rate_parity():
 
 def test_true_positive_rate_parity():
     run_comparisons(TruePositiveRateParity, true_positive_rate)
+
+def test_false_positive_rate_parity():
+    run_comparisons(FalsePositiveRateParity, false_positive_rate)

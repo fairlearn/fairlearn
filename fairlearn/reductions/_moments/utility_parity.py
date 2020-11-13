@@ -340,9 +340,13 @@ class FalsePositiveRateParity(UtilityParity):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        super().load_data(X, pd.Series(y),
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0),
-                          **kwargs)
+        base_event = pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0)
+        control_features = kwargs.get(_KW_CONTROL_FEATURES)
+        if control_features is not None:
+            event = base_event.combine(pd.Series(control_features), _combine_event_and_control)
+        else:
+            event = base_event
+        super().load_data(X, pd.Series(y), event=event, **kwargs)
 
 
 class EqualizedOdds(UtilityParity):
