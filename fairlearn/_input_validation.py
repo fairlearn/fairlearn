@@ -103,7 +103,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
 
 
 def _merge_columns(feature_columns):
-    """Merge multiple columns into a single new column
+    """Merge multiple columns into a single new column.
 
     Compresses multiple columns into a single column by concatenating the
     stringified values. For example, given two columns

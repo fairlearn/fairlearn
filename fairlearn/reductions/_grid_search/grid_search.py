@@ -128,7 +128,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             is_classification_reduction = False
 
         _, y_train, sensitive_features_train, control_features_train = \
-            _validate_and_reformat_input(X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=is_classification_reduction,
+                                         **kwargs)
 
         kwargs[_KW_SENSITIVE_FEATURES] = sensitive_features_train
         if control_features_train is not None:
