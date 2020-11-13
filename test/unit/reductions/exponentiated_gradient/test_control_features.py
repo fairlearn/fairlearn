@@ -126,5 +126,6 @@ def test_error_rate_parity():
 def test_true_positive_rate_parity():
     run_comparisons(TruePositiveRateParity, true_positive_rate)
 
+
 def test_false_positive_rate_parity():
     run_comparisons(FalsePositiveRateParity, false_positive_rate)
