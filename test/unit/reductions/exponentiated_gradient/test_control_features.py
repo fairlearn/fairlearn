@@ -18,7 +18,7 @@ sfs = ["F", "G"]
 
 # Numbers for each intersection
 n = {
-    "A": {"F": 60, "G": 90},
+    "A": {"F": 80, "G": 120},
     "B": {"F": 300, "G": 350},
     "C": {"F": 800, "G": 650},
 }
@@ -64,6 +64,7 @@ def test_demographic_parity_controlfeatures():
 
     print(mf_input.overall)
     print(mf_input.by_group)
+    print(mf_input.difference(method='to_overall'))
 
     unmitigated = LogisticRegression()
     unmitigated.fit(X_dummy, y)
@@ -85,6 +86,7 @@ def test_demographic_parity_controlfeatures():
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
     print(mf_basic.by_group)
+    print(mf_basic.difference(method='to_overall'))
 
     expgrad_control = ExponentiatedGradient(
         LogisticRegression(),
@@ -98,3 +100,4 @@ def test_demographic_parity_controlfeatures():
                              sensitive_features=X['sens'],
                              control_features=X['ctrl'])
     print(mf_control.by_group)
+    print(mf_control.difference(method='to_overall'))
