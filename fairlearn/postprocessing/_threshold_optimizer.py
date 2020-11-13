@@ -188,7 +188,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        _, _, sensitive_feature_vector = _validate_and_reformat_input(
+        _, _, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X, y, sensitive_features=sensitive_features, enforce_binary_labels=True)
 
         # postprocessing can't handle 0/1 as floating point numbers, so this converts it to int

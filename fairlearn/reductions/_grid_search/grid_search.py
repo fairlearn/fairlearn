@@ -10,7 +10,8 @@ from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
 from time import time
 
-from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
+from fairlearn._input_validation import _validate_and_reformat_input
+from fairlearn._input_validation import _KW_SENSITIVE_FEATURES, _KW_CONTROL_FEATURES
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from ._grid_generator import _GridGenerator
 
@@ -126,10 +127,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        _, y_train, sensitive_features_train = _validate_and_reformat_input(
-            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
+        _, y_train, sensitive_features_train, control_features_train = \
+            _validate_and_reformat_input(X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
 
         kwargs[_KW_SENSITIVE_FEATURES] = sensitive_features_train
+        if control_features_train is not None:
+            kwargs[_KW_CONTROL_FEATURES] = control_features_train
 
         # Prep the parity constraints and objective
         logger.debug("Preparing constraints and objective")
