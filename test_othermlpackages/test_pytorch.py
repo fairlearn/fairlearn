@@ -13,15 +13,6 @@ from . import package_test_common as ptc
 
 def create_model():
     # create model
-    class BCECriterion(nn.Module):
-        def __init__(self, **kwargs):
-            super().__init__()
-            self.crit = nn.BCELoss(**kwargs)
-
-        def forward(self, input, target):
-            target = target.view(-1, 1)
-            return self.crit(input, target.float())
-
     class ClassificationModel(nn.Module):
         def __init__(self):
             super().__init__()
@@ -47,6 +38,7 @@ def create_model():
                 X = X.to_numpy().astype('float32')
             if sample_weight is not None and isinstance(sample_weight, (pd.DataFrame, pd.Series)):
                 sample_weight = sample_weight.to_numpy()
+            y = y.reshape([-1, 1])
 
             sample_weight = sample_weight if sample_weight is not None else np.ones_like(y)
             X = {'X': X, 'sample_weight': sample_weight}
@@ -55,14 +47,17 @@ def create_model():
         def predict(self, X):
             if isinstance(X, (pd.DataFrame, pd.Series)):
                 X = X.to_numpy().astype('float32')
-            return super().predict(X)
+            # The base implementation uses np.argmax which works
+            # for multiclass classification only.
+            return (super().predict_proba(X) > 0.5).astype(np.float)
 
         def get_loss(self, y_pred, y_true, X, *args, **kwargs):
             # override get_loss to use the sample_weight from X
-            loss_unreduced = super().get_loss(y_pred, y_true, X, *args, **kwargs)
+            loss_unreduced = super().get_loss(y_pred, y_true.float(), X, *args, **kwargs)
             sample_weight = X['sample_weight']
-            # Need to put the sample weights on GPu
-            loss_reduced = (sample_weight.to(loss_unreduced.device).unsqueeze(-1) * loss_unreduced).mean()
+            sample_weight = sample_weight.to(loss_unreduced.device).unsqueeze(-1)
+            # Need to put the sample weights on GPU
+            loss_reduced = (sample_weight * loss_unreduced).mean()
             return loss_reduced
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -71,11 +66,12 @@ def create_model():
         max_epochs=10,
         optimizer=optim.Adam,
         lr=0.001,
+        batch_size=512,
         # No validation
         train_split=None,
         # Shuffle training data on each epoch
-        iterator_train__shuffle=False,
-        criterion=BCECriterion,
+        iterator_train__shuffle=True,
+        criterion=nn.BCELoss,
         device=device
     )
     return net
