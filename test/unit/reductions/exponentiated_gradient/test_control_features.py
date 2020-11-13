@@ -6,9 +6,11 @@ import pandas as pd
 import random
 
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
 from fairlearn.metrics import MetricFrame, selection_rate
-from fairlearn.reductions import ExponentiatedGradient, DemographicParity
+from fairlearn.reductions import ExponentiatedGradient
+from fairlearn.reductions import DemographicParity, ErrorRateParity
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G
@@ -54,61 +56,66 @@ def _generate_data():
     return X, Y
 
 
-def test_demographic_parity_controlfeatures():
+def run_comparisons(moment, metric_fn):
     X, y = _generate_data()
     X_dummy = pd.get_dummies(X)
 
-    mf_input = MetricFrame(selection_rate, y, y,
+    mf_input = MetricFrame(metric_fn, y, y,
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
 
-    print("Selection rates for input:\n", mf_input.by_group)
-    print("Input selection rate differences:\n", mf_input.difference(method='to_overall'), "\n")
+    print("Metric for input:\n", mf_input.by_group)
+    print("Input Metric differences:\n", mf_input.difference(method='to_overall'), "\n")
 
     unmitigated = LogisticRegression()
     unmitigated.fit(X_dummy, y)
     y_pred = unmitigated.predict(X_dummy)
-    mf_unmitigated = MetricFrame(selection_rate,
+    mf_unmitigated = MetricFrame(metric_fn,
                                  y, y_pred,
                                  sensitive_features=X['sens'],
                                  control_features=X['ctrl'])
-    print("Unmitigated selection rates:\n", mf_unmitigated.by_group)
-    print("Unmitigated selection rate differences:\n",
+    print("Unmitigated metric:\n", mf_unmitigated.by_group)
+    print("Unmitigated metric differences:\n",
           mf_unmitigated.difference(method='to_overall'), "\n")
 
     expgrad_basic = ExponentiatedGradient(
         LogisticRegression(),
-        constraints=DemographicParity(),
+        constraints=moment(),
         eps=0.01)
     expgrad_basic.fit(X_dummy, y, sensitive_features=X['sens'])
     y_pred_basic = expgrad_basic.predict(X_dummy)
-    mf_basic = MetricFrame(selection_rate, y, y_pred_basic,
+    mf_basic = MetricFrame(metric_fn, y, y_pred_basic,
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
-    print("Basic expgrad selection rates:\n", mf_basic.by_group)
-    print("Basic expgrad selection rate differences:\n",
+    print("Basic expgrad metric:\n", mf_basic.by_group)
+    print("Basic expgrad metric differences:\n",
           mf_basic.difference(method='to_overall'), "\n")
 
     expgrad_control = ExponentiatedGradient(
         LogisticRegression(),
-        constraints=DemographicParity(),
+        constraints=moment(),
         eps=0.01)
     expgrad_control.fit(X_dummy, y,
                         sensitive_features=X['sens'],
                         control_features=X['ctrl'])
     y_pred_control = expgrad_control.predict(X_dummy)
-    mf_control = MetricFrame(selection_rate, y, y_pred_control,
+    mf_control = MetricFrame(metric_fn, y, y_pred_control,
                              sensitive_features=X['sens'],
                              control_features=X['ctrl'])
-    print("expgrad_control selection rates:\n", mf_control.by_group)
-    print("expgrad_control selection rate differences:\n",
+    print("expgrad_control metric:\n", mf_control.by_group)
+    print("expgrad_control metric differences:\n",
           mf_control.difference(method='to_overall'))
-
-    assert (mf_control.difference(method='to_overall') <
-            mf_input.difference(method='to_overall')).all()
 
     assert (mf_control.difference(method='to_overall') <
             mf_unmitigated.difference(method='to_overall')).all()
 
     assert (mf_control.difference(method='to_overall') <
             mf_basic.difference(method='to_overall')).all()
+
+
+def test_demographic_parity():
+    run_comparisons(DemographicParity, selection_rate)
+
+
+def test_error_rate_parity():
+    run_comparisons(ErrorRateParity, accuracy_score)
