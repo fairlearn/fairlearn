@@ -31,7 +31,7 @@ _ALLOWED_INPUT_TYPES_X = [np.ndarray, pd.DataFrame]
 _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES = [np.ndarray, pd.DataFrame, pd.Series, list]
 _ALLOWED_INPUT_TYPES_Y = [np.ndarray, pd.DataFrame, pd.Series, list]
 
-_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR = ","
+_MERGE_COLUMN_SEPARATOR = ","
 
 
 def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels=False, **kwargs):
@@ -78,7 +78,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     # compress multiple sensitive features into a single column
     if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
         sensitive_features = \
-            _compress_multiple_sensitive_features_into_single_column(sensitive_features)
+            _merge_columns(sensitive_features)
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
@@ -89,7 +89,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
         # compress multiple control features into a single column
         if len(control_features.shape) > 1 and control_features.shape[1] > 1:
             control_features = \
-                _compress_multiple_sensitive_features_into_single_column(control_features)
+                _merge_columns(control_features)
 
         control_features = pd.Series(control_features.squeeze())
 
@@ -103,25 +103,28 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     return pd.DataFrame(X), result_y, pd.Series(sensitive_features.squeeze()), control_features
 
 
-def _compress_multiple_sensitive_features_into_single_column(sensitive_features):
-    """Compress multiple sensitive features into a single column.
+def _merge_columns(feature_columns):
+    """Merge multiple columns into a single new column
 
-    The resulting mapping converts multiple dimensions into the Cartesian product of the
-    individual columns.
+    Compresses multiple columns into a single column by concatenating the
+    stringified values. For example, given two columns
+    :code:`['A', 'A', 'B', 'B']` and :code:`[4, 5, 4, 5]` the resultant
+    column will be
+    :code:`['A,4', 'A,5', 'B,4', 'B,5']`.
 
     :param sensitive_features: multi-dimensional array of sensitive features
     :type sensitive_features: `numpy.ndarray`
     :return: one-dimensional array of mapped sensitive features
     """
-    if not isinstance(sensitive_features, np.ndarray):
+    if not isinstance(feature_columns, np.ndarray):
         raise ValueError("Received argument of type {} instead of expected numpy.ndarray"
-                         .format(type(sensitive_features).__name__))
+                         .format(type(feature_columns).__name__))
     return np.apply_along_axis(
-        lambda row: _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR.join(
+        lambda row: _MERGE_COLUMN_SEPARATOR.join(
             [str(row[i])
                 .replace("\\", "\\\\")  # escape backslash and separator
-                .replace(_SENSITIVE_FEATURE_COMPRESSION_SEPARATOR,
-                         "\\" + _SENSITIVE_FEATURE_COMPRESSION_SEPARATOR)
+                .replace(_MERGE_COLUMN_SEPARATOR,
+                         "\\" + _MERGE_COLUMN_SEPARATOR)
                 for i in range(len(row))]),
         axis=1,
-        arr=sensitive_features)
+        arr=feature_columns)
