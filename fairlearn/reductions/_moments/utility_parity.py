@@ -15,6 +15,15 @@ _LOWER_BOUND_DIFF = "lower_bound_diff"
 _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be used."
 _DEFAULT_DIFFERENCE_BOUND = 0.01
 
+_CTRL_EVENT_FORMAT = "control={0},{1}"
+
+
+def _combine_event_and_control(event: str, control: str) -> str:
+    if pd.notnull(event):
+        return _CTRL_EVENT_FORMAT.format(control, event)
+    else:
+        return event
+
 
 class UtilityParity(ClassificationMoment):
     r"""A generic moment for parity in utilities (or costs) under classification.
@@ -291,9 +300,13 @@ class TruePositiveRateParity(UtilityParity):
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object."""
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
-        super().load_data(X, pd.Series(y),
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
-                          **kwargs)
+        base_event = pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1)
+        control_features = kwargs.get(_KW_CONTROL_FEATURES)
+        if control_features is not None:
+            event = base_event.combine(pd.Series(control_features), _combine_event_and_control)
+        else:
+            event = base_event
+        super().load_data(X, pd.Series(y), event=event, **kwargs)
 
 
 class FalsePositiveRateParity(UtilityParity):

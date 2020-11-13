@@ -8,9 +8,11 @@ import random
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-from fairlearn.metrics import MetricFrame, selection_rate
+from fairlearn.metrics import MetricFrame
+from fairlearn.metrics import selection_rate, true_positive_rate
 from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import DemographicParity, ErrorRateParity
+from fairlearn.reductions import DemographicParity, ErrorRateParity,\
+    TruePositiveRateParity
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G
@@ -106,10 +108,10 @@ def run_comparisons(moment, metric_fn):
     print("expgrad_control metric differences:\n",
           mf_control.difference(method='to_overall'))
 
-    assert (mf_control.difference(method='to_overall') <
+    assert (mf_control.difference(method='to_overall') <=
             mf_unmitigated.difference(method='to_overall')).all()
 
-    assert (mf_control.difference(method='to_overall') <
+    assert (mf_control.difference(method='to_overall') <=
             mf_basic.difference(method='to_overall')).all()
 
 
@@ -119,3 +121,7 @@ def test_demographic_parity():
 
 def test_error_rate_parity():
     run_comparisons(ErrorRateParity, accuracy_score)
+
+
+def test_true_positive_rate_parity():
+    run_comparisons(TruePositiveRateParity, true_positive_rate)
