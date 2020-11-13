@@ -46,10 +46,11 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     :param enforce_binary_labels: if True raise exception if there are more than two distinct
         values in the `y` data; default False
     :type enforce_binary_labels: bool
-    :return: the validated and reformatted X, y, and sensitive_features; note that certain
-        estimators rely on metadata encoded in X which may be stripped during the reformatting
-        process, so mitigation methods should ideally use the input X instead of the returned X
-        for training estimators and leave potential reformatting of X to the estimator.
+    :return: the validated and reformatted X, y, sensitive_features and control_features; note
+        that certain estimators rely on metadata encoded in X which may be stripped during
+        the reformatting process, so mitigation methods should ideally use the input X instead
+        of the returned X for training estimators and leave potential reformatting of X to the
+        estimator.
     :rtype: (pandas.DataFrame, pandas.Series, pandas.Series)
     """
     if y is not None:
@@ -77,8 +78,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
 
     # compress multiple sensitive features into a single column
     if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-        sensitive_features = \
-            _merge_columns(sensitive_features)
+        sensitive_features = _merge_columns(sensitive_features)
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
@@ -88,8 +88,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
 
         # compress multiple control features into a single column
         if len(control_features.shape) > 1 and control_features.shape[1] > 1:
-            control_features = \
-                _merge_columns(control_features)
+            control_features = _merge_columns(control_features)
 
         control_features = pd.Series(control_features.squeeze())
 

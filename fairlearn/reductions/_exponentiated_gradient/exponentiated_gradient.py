@@ -90,8 +90,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        _, y_train, sensitive_features, control_features = _validate_and_reformat_input(
-            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
+        _, y_train, sensitive_features, control_features = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=is_classification_reduction,
+                                         **kwargs)
 
         n = y_train.shape[0]
 
