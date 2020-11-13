@@ -6,7 +6,7 @@ import numpy as np
 
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _KW_CONTROL_FEATURES
 from .error_rate import ErrorRate
 
 
@@ -14,8 +14,6 @@ _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
 _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be used."
 _DEFAULT_DIFFERENCE_BOUND = 0.01
-
-_KW_CONTROL_FEATURES = "control_features"
 
 
 class UtilityParity(ClassificationMoment):
