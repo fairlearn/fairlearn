@@ -277,7 +277,7 @@ class FairlearnDashboard(object):
         html = generate_inline_html(fairness_input, local_url)
         # TODO
         # FairlearnDashboard._service.env.display(html)
-        display(HTML(html))
+        display(HTML(html), metadata=dict(isolated=True))
 
     def _load_local_js(self):
         script_path = os.path.dirname(os.path.abspath(__file__))
