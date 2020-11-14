@@ -134,35 +134,9 @@ their label:
     sex
     Female      0.0635499
     Male         0.213599 
-    Name: selection_rate, dtype: object   
+    Name: selection_rate, dtype: object  
 
-For a visual representation of the metrics try out the Fairlearn dashboard.
-While this page shows only screenshots, the actual dashboard is interactive.
-
-.. note::
-
-    The :code:`FairlearnDashboard` will move from Fairlearn to the
-    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
-    will provide some of the existing functionality through
-    :code:`matplotlib`-based visualizations.
-
-.. doctest:: quickstart
-
-    >>> from fairlearn.widget import FairlearnDashboard
-    >>> FairlearnDashboard(sensitive_features=sex,
-    ...                    sensitive_feature_names=['sex'],
-    ...                    y_true=y_true,
-    ...                    y_pred={"initial model": y_pred}) # doctest: +SKIP
-
-.. image:: ../img/fairlearn-dashboard-start.png
-
-.. image:: ../img/fairlearn-dashboard-sensitive-features.png
-
-.. image:: ../img/fairlearn-dashboard-performance.png
-
-.. image:: ../img/fairlearn-dashboard-disparity-performance.png
-
-.. image:: ../img/fairlearn-dashboard-disparity-predictions.png
+.. TODO add new matplotlib based visualizations 
 
 Mitigating disparity
 ^^^^^^^^^^^^^^^^^^^^
@@ -199,19 +173,7 @@ a vastly reduced difference in selection rate:
     Male         0.171547
     Name: selection_rate, dtype: object
 
-Similarly, we can explore the difference between the initial model and the
-mitigated model with respect to selection rate and accuracy in the dashboard
-through a multi-model comparison:
-
-.. doctest:: quickstart
-
-    >>> FairlearnDashboard(sensitive_features=sex,
-    ...                    sensitive_feature_names=['sex'],
-    ...                    y_true=y_true,
-    ...                    y_pred={"initial model": y_pred, "mitigated model": y_pred_mitigated}) # doctest: +SKIP
-
-.. image:: ../img/fairlearn-dashboard-comparison.png
-
+.. TODO add new matplotlib based visualizations
 
 What's next?
 ------------
