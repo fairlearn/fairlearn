@@ -36,6 +36,8 @@ def create_model():
         def fit(self, X, y, sample_weight=None):
             if isinstance(X, (pd.DataFrame, pd.Series)):
                 X = X.to_numpy().astype('float32')
+            if isinstance(y, (pd.DataFrame, pd.Series)):
+                y = y.to_numpy()
             if sample_weight is not None and isinstance(sample_weight, (pd.DataFrame, pd.Series)):
                 sample_weight = sample_weight.to_numpy()
             y = y.reshape([-1, 1])
