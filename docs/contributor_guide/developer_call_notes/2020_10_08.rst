@@ -1,5 +1,5 @@
-Developer Call 8th October 2020
--------------------------------
+Developer Call 8 October 2020
+-----------------------------
 
 Scribbler: `Richard Edgar <https://github.com/riedgar-ms>`_
 
