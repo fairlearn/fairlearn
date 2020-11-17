@@ -1,9 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import numpy as np
 import pandas as pd
-import random
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -13,6 +11,8 @@ from fairlearn.metrics import selection_rate, true_positive_rate, false_positive
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity, ErrorRateParity,\
     TruePositiveRateParity, FalsePositiveRateParity
+
+from test.unit.reductions.data_generators import loan_scenario_generator
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G
@@ -35,32 +35,8 @@ f = {
 }
 
 
-def _generate_data(seed=1632753):
-    random.seed(seed)
-    IB = []
-    SF = []
-    PLOAN = []
-    Y = []
-
-    for ib in ibs:
-        for sf in sfs:
-            n_curr = n[ib][sf]
-            f_curr = f[ib][sf]
-
-            for i in range(n_curr):
-                IB.append(ib)
-                SF.append(sf)
-                flip = random.random()
-                PLOAN.append(flip)
-                Y.append(1 if flip < f_curr else 0)
-
-    X = pd.DataFrame(data=np.transpose([IB, SF, PLOAN]), columns=["ctrl", "sens", "ploan"])
-
-    return X, Y
-
-
 def run_comparisons(moment, metric_fn):
-    X, y = _generate_data()
+    X, y = loan_scenario_generator(n, f, sfs, ibs, seed=1632753)
     X_dummy = pd.get_dummies(X)
 
     mf_input = MetricFrame(metric_fn, y, y,
