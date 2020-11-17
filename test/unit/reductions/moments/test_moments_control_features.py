@@ -71,13 +71,16 @@ def _simple_compare(moment, metric):
                      sensitive_features=X['sens'],
                      control_features=X['ctrl'])
 
+    # gamma measures the constraint violation relative to the overall value
     results = target.gamma(est.predict)
 
+    # Compute the constraint violation using the metrics
     mf_pred = MetricFrame(metric, y, y_pred,
                           sensitive_features=X['sens'],
                           control_features=X['ctrl'])
     diffs = mf_pred.by_group - mf_pred.overall
 
+    # Compare (with a very small amount of wriggle room)
     for ib in ibs:
         for sf in sfs:
             assert diffs[(ib, sf)] == pytest.approx(results[('+', ib, sf)], rel=1e-10, abs=1e-12)
@@ -88,8 +91,59 @@ def test_demographic_parity():
     _simple_compare(DemographicParity, selection_rate)
 
 
-def test_error_rate():
+def test_error_rate_parity():
     def err_rate(y_true, y_pred):
         return 1 - accuracy_score(y_true, y_pred)
 
     _simple_compare(ErrorRateParity, err_rate)
+
+
+def _selected_label_compare(moment, metric, selected_label):
+    # Similar to _simple_compare, but we need to worry about the y label
+    X, y = _generate_data()
+    X_dummy = pd.get_dummies(X)
+
+    est = LogisticRegression()
+    est.fit(X_dummy, y)
+    y_pred = est.predict(X_dummy)
+
+    target = moment()
+    target.load_data(np.asarray(X_dummy), np.asarray(y),
+                     sensitive_features=X['sens'],
+                     control_features=X['ctrl'])
+
+    # gamma measures the constraint violation relative to the overall value
+    results = target.gamma(est.predict)
+
+    # Compute the constraint violation using the metrics
+    mf_pred = MetricFrame(metric, y, y_pred,
+                          sensitive_features=X['sens'],
+                          control_features=X['ctrl'])
+    diffs = mf_pred.by_group - mf_pred.overall
+
+    # Compare (with a very small amount of wriggle room)
+    for ib in ibs:
+        for sf in sfs:
+            # Format defined within utility_parity._combine_event_and_control
+            label_format = "control={0},label={1}"
+            label = label_format.format(ib, selected_label)
+            assert diffs[(ib, sf)] == pytest.approx(results[('+', label, sf)],
+                                                    rel=1e-10, abs=1e-12)
+            assert diffs[(ib, sf)] == pytest.approx(-results[('-', label, sf)],
+                                                    rel=1e-10, abs=1e-12)
+
+
+def test_true_positive_parity():
+    moment = TruePositiveRateParity
+    metric = true_positive_rate
+    selected_label = 1
+
+    _selected_label_compare(moment, metric, selected_label)
+
+
+def test_false_positive_parity():
+    moment = FalsePositiveRateParity
+    metric = false_positive_rate
+    selected_label = 0
+
+    _selected_label_compare(moment, metric, selected_label)
