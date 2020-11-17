@@ -4,7 +4,6 @@
 import numpy as np
 import pandas as pd
 import pytest
-import random
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -13,6 +12,8 @@ from fairlearn.metrics import MetricFrame
 from fairlearn.metrics import selection_rate, true_positive_rate, false_positive_rate
 from fairlearn.reductions import DemographicParity, ErrorRateParity,\
     TruePositiveRateParity, FalsePositiveRateParity
+
+from test.unit.reductions.data_generators import loan_scenario_generator
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G
@@ -35,32 +36,8 @@ f = {
 }
 
 
-def _generate_data(seed=1632753):
-    random.seed(seed)
-    IB = []
-    SF = []
-    PLOAN = []
-    Y = []
-
-    for ib in ibs:
-        for sf in sfs:
-            n_curr = n[ib][sf]
-            f_curr = f[ib][sf]
-
-            for i in range(n_curr):
-                IB.append(ib)
-                SF.append(sf)
-                flip = random.random()
-                PLOAN.append(flip)
-                Y.append(1 if flip < f_curr else 0)
-
-    X = pd.DataFrame(data=np.transpose([IB, SF, PLOAN]), columns=["ctrl", "sens", "ploan"])
-
-    return X, Y
-
-
 def _simple_compare(moment, metric):
-    X, y = _generate_data()
+    X, y = loan_scenario_generator(n, f, sfs, ibs, seed=7632752)
     X_dummy = pd.get_dummies(X)
 
     est = LogisticRegression()
@@ -101,7 +78,7 @@ def test_error_rate_parity():
 
 def _selected_label_compare(moment, metric, selected_label):
     # Similar to _simple_compare, but we need to worry about the y label
-    X, y = _generate_data()
+    X, y = loan_scenario_generator(n, f, sfs, ibs, seed=7132752)
     X_dummy = pd.get_dummies(X)
 
     est = LogisticRegression()
