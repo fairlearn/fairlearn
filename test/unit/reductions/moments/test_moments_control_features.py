@@ -35,7 +35,8 @@ f = {
 }
 
 
-def _generate_data():
+def _generate_data(seed=1632753):
+    random.seed(seed)
     IB = []
     SF = []
     PLOAN = []

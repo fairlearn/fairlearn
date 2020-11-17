@@ -35,7 +35,8 @@ f = {
 }
 
 
-def _generate_data():
+def _generate_data(seed=1632753):
+    random.seed(seed)
     IB = []
     SF = []
     PLOAN = []
@@ -85,7 +86,7 @@ def run_comparisons(moment, metric_fn):
         constraints=moment(),
         eps=0.01)
     expgrad_basic.fit(X_dummy, y, sensitive_features=X['sens'])
-    y_pred_basic = expgrad_basic.predict(X_dummy)
+    y_pred_basic = expgrad_basic.predict(X_dummy, random_state=8235)
     mf_basic = MetricFrame(metric_fn, y, y_pred_basic,
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
@@ -100,7 +101,7 @@ def run_comparisons(moment, metric_fn):
     expgrad_control.fit(X_dummy, y,
                         sensitive_features=X['sens'],
                         control_features=X['ctrl'])
-    y_pred_control = expgrad_control.predict(X_dummy)
+    y_pred_control = expgrad_control.predict(X_dummy, random_state=8352)
     mf_control = MetricFrame(metric_fn, y, y_pred_control,
                              sensitive_features=X['sens'],
                              control_features=X['ctrl'])
