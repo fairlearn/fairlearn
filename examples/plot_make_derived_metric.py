@@ -106,14 +106,15 @@ print("Minimum accuracy_score: ", acc_frame.group_min())
 #
 # - :code:`metric=`, the base metric function
 # - :code:`transform=`, the name of the aggregation
-#   transformation to perform
+#   transformation to perform. For this demonstration, we
+#   want this to be :code:`'group_min'`
 # - :code:`sample_param_names=`, a list of parameter names
 #   which should be treated as sample
 #   parameters. This is optional, and defaults to
 #   :code:`['sample_weight']` which is appropriate for many
 #   metrics in SciKit-Learn.
 #
-# It returns a new function with the same signature as the
+# The result is a new function with the same signature as the
 # base metric, which accepts two extra arguments:
 #
 #  - :code:`sensitive_features=` to specify the sensitive features
@@ -123,7 +124,8 @@ print("Minimum accuracy_score: ", acc_frame.group_min())
 #    :meth:`fairlearn.metrics.MetricFrame.difference` and
 #    :meth:`fairlearn.metrics.MetricFrame.ratio`
 #
-# For the current case, we do not need the latter:
+# For the current case, we do not need the :code:`method=`
+# argument, since we are taking the minimum value.
 
 my_acc = make_derived_metric(metric=skm.accuracy_score,
                              transform='group_min')
@@ -153,7 +155,7 @@ assert from_frame == from_func
 # The returned function can also handle parameters which are not sample
 # parameters. Consider :func:`sklearn.metrics.fbeta_score`, which
 # has a required :code:`beta=` argument (and suppose that this time
-# we are most interested in the maximum difference to the overal value).
+# we are most interested in the maximum difference to the overall value).
 # First we evaluate this with a :class:`fairlearn.metrics.MetricFrame`:
 
 fbeta_03 = functools.partial(skm.fbeta_score, beta=0.3)
@@ -167,7 +169,9 @@ beta_from_frame = beta_frame.difference(method='to_overall')
 print("From frame:", beta_from_frame)
 
 # %%
-# And next, we create a function to evaluate the same:
+# And next, we create a function to evaluate the same. Note that
+# we do not need to use :func:`functools.partial` to bind the
+# :code:`beta=` argument:
 
 beta_func = make_derived_metric(metric=skm.fbeta_score,
                                 transform='difference')
