@@ -255,15 +255,16 @@ of such functions which will be commonly used:
 =============================================== ================= ================= ================== =============
 Base metric                                     :code:`group_min` :code:`group_max` :code:`difference` :code:`ratio`
 =============================================== ================= ================= ================== =============
+:func:`fairlearn.metrics.true_positive_rate`    N                 N                 Y                  Y
 :func:`sklearn.metrics.accuracy_score`          Y                 N                 Y                  Y
 :func:`sklearn.metrics.balanced_accuracy_score` Y                 N                 N                  N
 :func:`sklearn.metrics.precision_score`         Y                 N                 N                  N
 =============================================== ================= ================= ================== =============
 
 The names of the generated functions are of the form
-:code`<base_metric>_<transformation>`.
-For example :code:`accuracy_score_difference` and
-:code:`precision_score_group_min`.
+:code:`fairlearn.metrics.<base_metric>_<transformation>`.
+For example :code:`fairlearn.metrics.accuracy_score_difference` and
+:code:`fairlearn.metrics.precision_score_group_min`.
 
 .. _dashboard:
 
