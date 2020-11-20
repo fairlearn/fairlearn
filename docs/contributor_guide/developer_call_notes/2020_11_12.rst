@@ -16,43 +16,41 @@ Attendees:
 - `Viola Zhong <https://github.com/violazhong>`_
 
 Agenda
-======
 
-v0.5.0 Release
---------------
 
-The v0.5.0 release was finally sent to PyPI earlier this week.
-This has the new metrics API, various other enhancements and deprecates
-the widget. Our documentation should now match the version on PyPI
-as well.
+- v0.5.0 Release
 
-Governance
-----------
+  The v0.5.0 release was finally sent to PyPI earlier this week.
+  This has the new metrics API, various other enhancements and deprecates
+  the widget. Our documentation should now match the version on PyPI
+  as well.
 
-Miro summarised a governance proposal based on those for InterpretML.
-Basically, there would be a steering committee, and maintainers for
-the various projects which make up Fairlearn.
-This lead to a lively discussion, with particular concerns being raised
-by Adrin and Hilde.
+- Governance
 
-Hilde was concerned the the proposal still looked very Microsoft
-dominated, and that there would be little change in how things worked.
-Would the community at least be asked to nominate people to the
-steering committee?
+  Miro summarised a governance proposal based on those for InterpretML.
+  Basically, there would be a steering committee, and maintainers for
+  the various projects which make up Fairlearn.
+  This lead to a lively discussion, with particular concerns being raised
+  by Adrin and Hilde.
 
-Adrin brought perspectives from SciKit-Learn. Some key points were:
+  Hilde was concerned the the proposal still looked very Microsoft
+  dominated, and that there would be little change in how things worked.
+  Would the community at least be asked to nominate people to the
+  steering committee?
 
-- The technical committee for SciKit-Learn is a subset of the
-  maintainers. Adrin feels that this helps build community
-- Although the technical committee formally owns the trademarks etc.
-  it is subordinate to the maintainers
+  Adrin brought perspectives from SciKit-Learn. Some key points were:
 
-Adrin also raised the point that the process for changing the governance
-documents needs to be clear - although it may mechanically be a
-pull request, the bar is going to be higher.
-It was also unclear how the concepts discussed would map onto the
-facilities provided by GitHub.
+  - The technical committee for SciKit-Learn is a subset of the
+    maintainers. Adrin feels that this helps build community
+  - Although the technical committee formally owns the trademarks etc.
+    it is subordinate to the maintainers
 
-Miro is going to work on formal governance documents, and put out a PR.
-Feedback is *really* encouraged for this - whether as PR comments, or
-emailing Miro directly.
+  Adrin also raised the point that the process for changing the governance
+  documents needs to be clear - although it may mechanically be a
+  pull request, the bar is going to be higher.
+  It was also unclear how the concepts discussed would map onto the
+  facilities provided by GitHub.
+
+  Miro is going to work on formal governance documents, and put out a PR.
+  Feedback is *really* encouraged for this - whether as PR comments, or
+  emailing Miro directly.
