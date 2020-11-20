@@ -35,8 +35,8 @@ derived_metric_results = {
     "mean_absolute_error_group_max": {'method': None, 'expected': 0.33333333},
     "mean_squared_error_group_max": {'method': None, 'expected': 0.33333333},
     "r2_score_group_min": {'method': None, 'expected': -0.35},
-    "f1_score_group_max": {'method': None, 'expected': 0.75},
-    "log_loss_group_min": {'method': None, 'expected': 7.67546133},
+    "f1_score_group_min": {'method': None, 'expected': 0.66666666667},
+    "log_loss_group_max": {'method': None, 'expected': 11.5130143},
 }
 
 
