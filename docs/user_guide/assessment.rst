@@ -255,10 +255,22 @@ of such functions which will be commonly used:
 =============================================== ================= ================= ================== =============
 Base metric                                     :code:`group_min` :code:`group_max` :code:`difference` :code:`ratio`
 =============================================== ================= ================= ================== =============
-:func:`fairlearn.metrics.true_positive_rate`    N                 N                 Y                  Y
-:func:`sklearn.metrics.accuracy_score`          Y                 N                 Y                  Y
-:func:`sklearn.metrics.balanced_accuracy_score` Y                 N                 N                  N
-:func:`sklearn.metrics.precision_score`         Y                 N                 N                  N
+:func:`.false_negative_rate`                    .                 .                 Y                  Y
+:func:`.false_positive_rate`                    .                 .                 Y                  Y
+:func:`.selection_rate`                         .                 .                 Y                  Y
+:func:`.true_negative_rate`                     .                 .                 Y                  Y
+:func:`.true_positive_rate`                     .                 .                 Y                  Y
+:func:`sklearn.metrics.accuracy_score`          Y                 .                 Y                  Y
+:func:`sklearn.metrics.balanced_accuracy_score` Y                 .                 .                  .
+:func:`sklearn.metrics.f1_score`                Y                 .                 .                  .
+:func:`sklearn.metrics.log_loss`                .                 Y                 .                  .
+:func:`sklearn.metrics.mean_absolute_error`     .                 Y                 .                  .
+:func:`sklearn.metrics.mean_squared_error`      .                 Y                 .                  .
+:func:`sklearn.metrics.precision_score`         Y                 .                 .                  .
+:func:`sklearn.metrics.r2_score`                Y                 .                 .                  .
+:func:`sklearn.metrics.recall_score`            Y                 .                 .                  .
+:func:`sklearn.metrics.roc_auc_score`           Y                 .                 .                  .
+:func:`sklearn.metrics.zero_one_loss`           .                 Y                 Y                  Y
 =============================================== ================= ================= ================== =============
 
 The names of the generated functions are of the form
