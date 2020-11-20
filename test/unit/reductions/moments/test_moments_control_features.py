@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score
 from fairlearn.metrics import MetricFrame
 from fairlearn.metrics import selection_rate, true_positive_rate, false_positive_rate
 from fairlearn.reductions import DemographicParity, ErrorRateParity,\
-    TruePositiveRateParity, FalsePositiveRateParity
+    TruePositiveRateParity, FalsePositiveRateParity, EqualizedOdds
 
 from test.unit.reductions.data_generators import loan_scenario_generator
 
@@ -124,4 +124,16 @@ def test_false_positive_parity():
     metric = false_positive_rate
     selected_label = 0
 
+    _selected_label_compare(moment, metric, selected_label)
+
+
+def test_equalized_odds():
+    moment = EqualizedOdds
+
+    metric = true_positive_rate
+    selected_label = 1
+    _selected_label_compare(moment, metric, selected_label)
+
+    metric = false_positive_rate
+    selected_label = 0
     _selected_label_compare(moment, metric, selected_label)
