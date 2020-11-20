@@ -59,6 +59,9 @@ class _DerivedMetric:
                 params[k] = v
 
         dispatch_fn = functools.partial(self._metric_fn, **params)
+        # Make sure there isn't a subsequent log message about
+        # a nameless metric
+        dispatch_fn.__name__ = self._metric_fn.__name__
 
         all_metrics = MetricFrame(dispatch_fn,
                                   y_true, y_pred,
