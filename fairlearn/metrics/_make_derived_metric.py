@@ -108,7 +108,7 @@ def make_derived_metric(*,
     parameter names to treat as sample parameters.
 
     The result is a callable object which has the same signature as the original
-    function, with a :code:`sensitive_features=`parameter added.
+    function, with a :code:`sensitive_features=` parameter added.
     If the chosen aggregation transform accepts parameters (currently only
     :code:`method=` is supported), these can also be given when invoking the
     callable object.
