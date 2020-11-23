@@ -31,7 +31,7 @@ Governance
 Citing Fairlearn
 ----------------
 
-If you wish to add a citation to Fairlearn, please use the following:
+If you wish to cite Fairlearn in your work, please use the following:
 
 .. code ::
 
@@ -44,6 +44,8 @@ If you wish to add a citation to Fairlearn, please use the following:
         url = "https://www.microsoft.com/en-us/research/publication/fairlearn-a-toolkit-for-assessing-and-improving-fairness-in-ai/",
         number = {MSR-TR-2020-32},
     }
+
+As we shift to a more open governance model, we expect to update this citation.
 
 Frequently asked questions
 --------------------------
