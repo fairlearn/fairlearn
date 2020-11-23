@@ -10,7 +10,6 @@ from fairlearn.preprocessing import LinearDependenceRemover
     "test_fn",
     [
         # transformer checks
-        # estimator_checks.check_transformer_data_not_an_array, we much check input type before check_array
         estimator_checks.check_transformer_general,
         estimator_checks.check_transformers_unfitted,
         # general estimator checks
@@ -18,7 +17,6 @@ from fairlearn.preprocessing import LinearDependenceRemover
         estimator_checks.check_methods_subset_invariance,
         estimator_checks.check_fit2d_1sample,
         estimator_checks.check_fit2d_1feature,
-        # estimator_checks.check_fit1d, method won't make sense without 2+ columns
         estimator_checks.check_get_params_invariance,
         estimator_checks.check_set_params,
         estimator_checks.check_dict_unchanged,
