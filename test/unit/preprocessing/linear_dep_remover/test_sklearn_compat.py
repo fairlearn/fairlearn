@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import pandas as pd
 from sklearn.utils import estimator_checks
 
 from fairlearn.preprocessing import LinearDependenceRemover
@@ -9,7 +10,7 @@ from fairlearn.preprocessing import LinearDependenceRemover
     "test_fn",
     [
         # transformer checks
-        estimator_checks.check_transformer_data_not_an_array,
+        # estimator_checks.check_transformer_data_not_an_array, we much check input type before check_array
         estimator_checks.check_transformer_general,
         estimator_checks.check_transformers_unfitted,
         # general estimator checks
@@ -17,7 +18,7 @@ from fairlearn.preprocessing import LinearDependenceRemover
         estimator_checks.check_methods_subset_invariance,
         estimator_checks.check_fit2d_1sample,
         estimator_checks.check_fit2d_1feature,
-        estimator_checks.check_fit1d,
+        # estimator_checks.check_fit1d, method won't make sense without 2+ columns
         estimator_checks.check_get_params_invariance,
         estimator_checks.check_set_params,
         estimator_checks.check_dict_unchanged,
@@ -50,5 +51,17 @@ def test_linear_dependence():
                   [0.1, 0.2, 1.2, 1.1, ]]).T
 
     X_tfm = LinearDependenceRemover(sensitive_feature_ids=[0]).fit(X).transform(X)
+    assert X_tfm.shape[1] == 2
+    assert np.allclose(X_tfm[:, 0], 1.5)
+
+
+def test_linear_dependence_pd():
+    X = np.array([[0, 0, 1, 1, ],
+                  [1, 1, 2, 2, ],
+                  [0.1, 0.2, 1.2, 1.1, ]]).T
+
+    df = pd.DataFrame(X, columns=['a', 'b', 'c'])
+
+    X_tfm = LinearDependenceRemover(sensitive_feature_ids=['a']).fit(df).transform(df)
     assert X_tfm.shape[1] == 2
     assert np.allclose(X_tfm[:, 0], 1.5)
