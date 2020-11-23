@@ -2,12 +2,13 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 
-class CorrelationRemover(BaseEstimator, TransformerMixin):
+class LinearDependenceRemover(BaseEstimator, TransformerMixin):
     r"""
      A component that filters out sensitive correlations in a dataset.
 
@@ -48,21 +49,33 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
      .. math::
 
        X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
+
+     Note that the lack of correlation does not imply anything about statistical dependence. Therefore,
+     we expect this to be most appropriate as a preprocessing step for (generalized) linear models.
     """
 
-    def __init__(self, sensitive_feature_ids, alpha=1, center=True):
+    def __init__(self, *, sensitive_feature_ids, alpha=1):
         self.sensitive_feature_ids = sensitive_feature_ids
         self.alpha = alpha
-        self.center = center
 
     def _split_X(self, X):
         """Split up X into a sensitive and non-sensitive group."""
-        sensitive = self.sensitive_feature_ids
+        sensitive = [self.lookup_[i] for i in self.sensitive_feature_ids]
         non_sensitive = [i for i in range(X.shape[1]) if i not in sensitive]
         return X[:, non_sensitive], X[:, sensitive]
 
+    def _create_lookup(self, X):
+        """This method makes sure we select the correct columns even if input is pandas"""
+        if isinstance(X, pd.DataFrame):
+            self.lookup_ = {c: i for i, c in enumerate(X.columns)}
+            print(self.lookup_)
+            return X.values
+        self.lookup_ = {i: i for i in range(X.shape[1])}
+        return X
+
     def fit(self, X, y=None):
         """Learn the projection required to make the dataset orthogonal to sensitive columns."""
+        self._create_lookup(X)
         X = check_array(X, estimator=self)
         X_use, X_sensitive = self._split_X(X)
         self.sensitive_mean_ = X_sensitive.mean()
@@ -74,7 +87,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     def transform(self, X):
         """Transform X by applying the information filter."""
         X = check_array(X, estimator=self)
-        check_is_fitted(self, ["beta_", "X_shape_"])
+        check_is_fitted(self, ["beta_", "X_shape_", "lookup_"])
         if self.X_shape_[1] != X.shape[1]:
             raise ValueError(f"The trained data has {self.X_shape_[1]} while this dataset has {X.shape[1]}.")
         X_use, X_sensitive = self._split_X(X)

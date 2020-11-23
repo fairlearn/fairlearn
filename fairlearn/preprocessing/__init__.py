@@ -1,3 +1,3 @@
-from ._correlation_remover import CorrelationRemover
+from ._correlation_remover import LinearDependenceRemover
 
-__all__ = ["CorrelationRemover"]
+__all__ = ["LinearDependenceRemover"]
