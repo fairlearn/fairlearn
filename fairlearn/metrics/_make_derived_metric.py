@@ -15,8 +15,12 @@ transform_options = [
     'ratio',
 ]
 
+parameters_for_transforms = [
+    'method'
+]
+
 _METRIC_CALLABLE_ERROR = "Supplied metric object must be callable"
-_METHOD_ARG_ERROR = "Callables which accept a 'method' argument " \
+_METHOD_ARG_ERROR = "Callables which accept a '{0}' argument " \
     "may not be passed to make_derived_metric(). Please use functools.partial()"
 _INVALID_TRANSFORM = "Transform must be one of {0}".format(transform_options)
 
@@ -31,8 +35,10 @@ class _DerivedMetric:
         if not callable(metric):
             raise ValueError(_METRIC_CALLABLE_ERROR)
         sig = inspect.signature(metric)
-        if 'method' in sig.parameters:
-            raise ValueError(_METHOD_ARG_ERROR)
+
+        for param_name in parameters_for_transforms:
+            if param_name in sig.parameters:
+                raise ValueError(_METHOD_ARG_ERROR.format(param_name))
         self._metric_fn = metric
 
         if transform not in transform_options:
@@ -48,13 +54,15 @@ class _DerivedMetric:
                  y_pred,
                  *,
                  sensitive_features,
-                 method='between_groups',
                  **other_params) -> Union[float, int]:
         sample_params = dict()
         params = dict()
+        transform_parameters = dict()
         for k, v in other_params.items():
             if k in self._sample_param_names:
                 sample_params[k] = v
+            elif k in parameters_for_transforms:
+                transform_parameters[k] = v
             else:
                 params[k] = v
 
@@ -70,9 +78,9 @@ class _DerivedMetric:
 
         result = np.nan
         if self._transform == 'difference':
-            result = all_metrics.difference(method=method)
+            result = all_metrics.difference(**transform_parameters)
         elif self._transform == 'ratio':
-            result = all_metrics.ratio(method=method)
+            result = all_metrics.ratio(**transform_parameters)
         elif self._transform == 'group_min':
             result = all_metrics.group_min()
         elif self._transform == 'group_max':
@@ -100,9 +108,11 @@ def make_derived_metric(*,
     parameter names to treat as sample parameters.
 
     The result is a callable object which has the same signature as the original
-    function, with two arguments added. These are :code:`sensitive_features=`, to
-    specify the subgroups in the dataset, and :code:`method=`, if required by the
-    selected aggregation transform. The result of this function is identical to
+    function, with a :code:`sensitive_features=`parameter added.
+    If the chosen aggregation transform accepts parameters (currently only
+    :code:`method=` is supported), these can also be given when invoking the
+    callable object.
+    The result of this function is identical to
     creating a :class:`.MetricFrame` object, and then calling the method specified
     by the :code:`transform=` argument (with the :code:`method=` argument, if
     required).
