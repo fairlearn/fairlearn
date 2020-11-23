@@ -45,8 +45,6 @@ If you wish to cite Fairlearn in your work, please use the following:
         number = {MSR-TR-2020-32},
     }
 
-As we shift to a more open governance model, we expect to update this citation.
-
 Frequently asked questions
 --------------------------
 
