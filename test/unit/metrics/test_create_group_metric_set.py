@@ -212,3 +212,18 @@ class TestCreateGroupMetricSet:
         actual_roc = actual['precomputedMetrics'][0][0]['balanced_accuracy_score']
         assert actual_roc['global'] == expected.overall['roc_auc_score']
         assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])
+
+
+    def test_regression_prediction_type(self):
+        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+
+        predictions = {"some model": y_p}
+        sensitive_feature = {"my sf": s_f}
+
+        # Using the `regression` prediction type should not crash
+        _create_group_metric_set(y_t,
+                                          predictions,
+                                          sensitive_feature,
+                                          'regression')
