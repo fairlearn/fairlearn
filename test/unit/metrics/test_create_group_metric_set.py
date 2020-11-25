@@ -166,7 +166,7 @@ class TestCreateGroupMetricSet:
             y_pred[name] = y_p_ts[i](expected['predictedY'][i])
 
         sensitive_features = {}
-        t_sfs = [lambda x: x, t_sf, lambda x:x]  # Only transform one sf
+        t_sfs = [lambda x: x, t_sf, lambda x: x]  # Only transform one sf
         for i, sf_file in enumerate(expected['precomputedFeatureBins']):
             sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
             sensitive_features[sf_file['featureBinName']] = t_sfs[i](sf)
@@ -213,7 +213,6 @@ class TestCreateGroupMetricSet:
         assert actual_roc['global'] == expected.overall['roc_auc_score']
         assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])
 
-
     def test_regression_prediction_type(self):
         y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
         y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
@@ -224,6 +223,6 @@ class TestCreateGroupMetricSet:
 
         # Using the `regression` prediction type should not crash
         _create_group_metric_set(y_t,
-                                          predictions,
-                                          sensitive_feature,
-                                          'regression')
+                                 predictions,
+                                 sensitive_feature,
+                                 'regression')
