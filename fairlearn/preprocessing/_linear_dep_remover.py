@@ -12,18 +12,18 @@ class LinearDependenceRemover(BaseEstimator, TransformerMixin):
     r"""
     A component that filters out sensitive correlations in a dataset.
 
-    CorrelationRemover applies a linear transformation to the non-sensitive feature columns
+    LinearDependenceRemover applies a linear transformation to the non-sensitive feature columns
     in order to remove their correlation with the sensitive feature columns while retaining
     as much information as possible (as measured by the least-squares error).
 
     Parameters
     ----------
-    sensitive_feature_ids : list of columns to filter out this can be a sequence of
-    either int ,in the case of numpy, or string, in the case of pandas.
-    alpha : parameter to control how much to filter, for alpha=1.0 we filter out
-    all information while for alpha=0.0 we don't apply any.
-    center : setting to tell if this preprocessing step should center the data for
-    numerical stability
+        sensitive_feature_ids : list
+            list of columns to filter out this can be a sequence of
+            either int ,in the case of numpy, or string, in the case of pandas.
+        alpha : float
+            parameter to control how much to filter, for alpha=1.0 we filter out
+            all information while for alpha=0.0 we don't apply any.
 
     Notes
     -----
