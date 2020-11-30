@@ -89,10 +89,12 @@ class _DerivedMetric:
         return result
 
 
-def make_derived_metric(*,
-                        metric: Callable[..., Union[float, int]],
-                        transform: str,
-                        sample_param_names: List[str] = ['sample_weight']) -> Callable[..., Union[float, int]]:  # noqa: E501
+def make_derived_metric(
+    *,
+    metric: Callable[..., Union[float, int]],
+    transform: str,
+    sample_param_names: List[str] = ['sample_weight']
+) -> Callable[..., Union[float, int]]:
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
     Many higher order machine learning operations (such as hyperparameter tuning)
