@@ -117,6 +117,8 @@ def make_derived_metric(*,
 
     See the :ref:`scalar_metric_results` section in the :ref:`user_guide` for more
     details.
+    A :ref:`sample notebook <sphx_glr_auto_examples_plot_make_derived_metric.py>` is
+    also available.
 
     Parameters
     ----------
