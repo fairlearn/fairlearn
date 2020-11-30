@@ -37,21 +37,29 @@ _MERGE_COLUMN_SEPARATOR = ","
 def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels=False, **kwargs):
     """Validate input data and return the data in an appropriate format.
 
-    :param X: The feature matrix
-    :type X: numpy.ndarray or pandas.DataFrame
-    :param y: The label vector
-    :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
-    :param expect_y: if True y needs to be provided, otherwise ignores the argument; default True
-    :type expect_y: bool
-    :param enforce_binary_labels: if True raise exception if there are more than two distinct
+    The :code:`**kwargs` can contain :code:`sensitive_features=` and :code:`control_features=`
+    parameters.
+
+    Parameters
+    ----------
+    X : numpy.ndarray, pandas.DataFrame
+        The feature matrix
+    y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        The label vector
+    expect_y : bool
+        If True y needs to be provided, otherwise ignores the argument; default True
+    enforce_binary_labels : bool
+        If True raise exception if there are more than two distinct
         values in the `y` data; default False
-    :type enforce_binary_labels: bool
-    :return: the validated and reformatted X, y, sensitive_features and control_features; note
+
+    Returns
+    -------
+    Tuple(pandas.DataFrame, pandas.Series, pandas.Series, pandas.Series)
+        The validated and reformatted X, y, sensitive_features and control_features; note
         that certain estimators rely on metadata encoded in X which may be stripped during
         the reformatting process, so mitigation methods should ideally use the input X instead
         of the returned X for training estimators and leave potential reformatting of X to the
         estimator.
-    :rtype: (pandas.DataFrame, pandas.Series, pandas.Series)
     """
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
