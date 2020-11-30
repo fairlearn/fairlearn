@@ -230,8 +230,9 @@ to generate scalar-producing metric functions based on the aggregation methods
 mentioned above (:meth:`MetricFrame.group_min`, :meth:`MetricFrame.group_max`,
 :meth:`MetricFrame.difference`, and :meth:`MetricFrame.ratio`).
 This takes an underlying metric function, the name of the desired transformation, and
-optionally a list of parameter names which should be treated as sample parameters.
-The result is a function internally builds the :class:`MetricFrame` and performs
+optionally a list of parameter names which should be treated as sample aligned parameters
+(such as `sample_weight`).
+The result is a function which builds the :class:`MetricFrame` internally and performs
 the requested aggregation. For example:
 
 .. doctest:: assessment_metrics
