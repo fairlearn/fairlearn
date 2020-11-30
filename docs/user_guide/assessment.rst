@@ -223,15 +223,15 @@ Higher level machine learning algorithms (such as hyperparameter tuners) often
 make use of metric functions to guide their optimisations.
 Such algorithms generally work with scalar results, so if we want the tuning
 to be done on the basis of our fairness metrics, we need to perform aggregations
-over the :class:`.MetricFrame`.
+over the :class:`MetricFrame`.
 
 We provide a convenience function, :func:`fairlearn.metrics.make_derived_metric`
 to generate scalar-producing metric functions based on the aggregation methods
-mentioned above (:meth:`.MetricFrame.group_min`, :meth:`.MetricFrame.group_max`,
-:meth:`.MetricFrame.difference`, and :meth:`.MetricFrame.ratio`).
+mentioned above (:meth:`MetricFrame.group_min`, :meth:`MetricFrame.group_max`,
+:meth:`MetricFrame.difference`, and :meth:`MetricFrame.ratio`).
 This takes an underlying metric function, the name of the desired transformation, and
 optionally a list of parameter names which should be treated as sample parameters.
-The result is a function internally builds the :class:`.MetricFrame` and performs
+The result is a function internally builds the :class:`MetricFrame` and performs
 the requested aggregation. For example:
 
 .. doctest:: assessment_metrics
@@ -242,12 +242,12 @@ the requested aggregation. For example:
     ...                                        transform='difference')
     >>> fbeta_difference(Y_true, Y_pred, beta=0.7,
     ...                  sensitive_features=group_membership_data)
-    0.7525252525...
+    0.752525...
     >>> fbeta_07 = functools.partial(skm.fbeta_score, beta=0.7)
     >>> MetricFrame(fbeta_07,
     ...             Y_true, Y_pred,
     ...             sensitive_features=group_membership_data).difference()
-    0.7525252525...
+    0.752525...
 
 We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
 of such functions which will be commonly used:

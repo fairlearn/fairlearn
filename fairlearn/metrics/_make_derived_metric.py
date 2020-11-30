@@ -102,9 +102,9 @@ def make_derived_metric(*,
     for our disaggregated metrics with this function.
 
     This function takes a metric function, a string to specify the desired aggregation
-    transform (matching the methods :meth:`.MetricFrame.group_min`,
-    :meth:`.MetricFrame.group_max`, :meth:`.MetricFrame.difference` and
-    :meth:`.MetricFrame.ratio`), and a list of
+    transform (matching the methods :meth:`MetricFrame.group_min`,
+    :meth:`MetricFrame.group_max`, :meth:`MetricFrame.difference` and
+    :meth:`MetricFrame.ratio`), and a list of
     parameter names to treat as sample parameters.
 
     The result is a callable object which has the same signature as the original
@@ -113,7 +113,7 @@ def make_derived_metric(*,
     :code:`method=` is supported), these can also be given when invoking the
     callable object.
     The result of this function is identical to
-    creating a :class:`.MetricFrame` object, and then calling the method specified
+    creating a :class:`MetricFrame` object, and then calling the method specified
     by the :code:`transform=` argument (with the :code:`method=` argument, if
     required).
 
