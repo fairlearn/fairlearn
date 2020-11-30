@@ -264,7 +264,7 @@ class DemographicParity(UtilityParity):
 
     def load_data(self, X, y, **kwargs):
         """Load the specified data into the object.
-        
+
         The arguments may include a `control_features=` to specify
         one or more columns which are to be used as control features.
         """

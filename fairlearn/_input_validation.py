@@ -110,7 +110,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     return pd.DataFrame(X), result_y, pd.Series(sensitive_features.squeeze()), control_features
 
 
-def _merge_columns(feature_columns):
+def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
     """Merge multiple columns into a single new column.
 
     Compresses multiple columns into a single column by concatenating the
@@ -119,9 +119,15 @@ def _merge_columns(feature_columns):
     column will be
     :code:`['A,4', 'A,5', 'B,4', 'B,5']`.
 
-    :param sensitive_features: multi-dimensional array of sensitive features
-    :type sensitive_features: `numpy.ndarray`
-    :return: one-dimensional array of mapped sensitive features
+    Parameters
+    ----------
+    feature_column : numpy.ndarray
+        Multi-dimensional array of columns to be merged
+
+    Returns
+    -------
+    numpy.ndarray
+        One-dimensional array of merged columns
     """
     if not isinstance(feature_columns, np.ndarray):
         raise ValueError("Received argument of type {} instead of expected numpy.ndarray"
