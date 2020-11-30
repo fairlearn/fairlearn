@@ -215,6 +215,7 @@ there are no members in a particular combination of sensitive features. In this
 case we see that the subgroup ``(a, 8)`` has a result of ``NaN``, indicating
 that there were no samples in it.
 
+.. _scalar_metric_results:
 
 Scalar Results from :code:`MetricFrame`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -3,7 +3,6 @@
 
 import functools
 import inspect
-import numpy as np
 from typing import Callable, List, Union
 
 from ._metric_frame import MetricFrame
@@ -76,7 +75,6 @@ class _DerivedMetric:
                                   sensitive_features=sensitive_features,
                                   sample_params=sample_params)
 
-        result = np.nan
         if self._transform == 'difference':
             result = all_metrics.difference(**transform_parameters)
         elif self._transform == 'ratio':
@@ -116,6 +114,9 @@ def make_derived_metric(*,
     creating a :class:`MetricFrame` object, and then calling the method specified
     by the :code:`transform=` argument (with the :code:`method=` argument, if
     required).
+
+    See the :ref:`scalar_metric_results` section in the :ref:`user_guide` for more
+    details.
 
     Parameters
     ----------
