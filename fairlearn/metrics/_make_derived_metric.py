@@ -69,7 +69,7 @@ class _DerivedMetric:
         # Make sure there isn't a subsequent log message about
         # a nameless metric
         bound_fn_name = self._metric_fn.__name__
-        for k, v in params.items():
+        for k, v in sorted(params.items()):
             bound_fn_name = bound_fn_name + '_' + k + '_' + str(v)
         dispatch_fn.__name__ = bound_fn_name
 
