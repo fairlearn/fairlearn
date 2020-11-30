@@ -250,12 +250,24 @@ class DemographicParity(UtilityParity):
     The :meth:`signed_weights` method will compute the costs according
     to Example 3 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    This Moment also supports control features, which can be used to
+    stratify the data, with the Demographic Parity applied within
+    each stratum, but not between strata. If the control feature groups
+    are :math:`c \in \mathcal{C}` then the above equation will become
+
+    .. math::
+      P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
     """
 
     short_name = "DemographicParity"
 
     def load_data(self, X, y, **kwargs):
-        """Load the specified data into the object."""
+        """Load the specified data into the object.
+        
+        The arguments may include a `control_features=` to specify
+        one or more columns which are to be used as control features.
+        """
         control_features = kwargs.get(_KW_CONTROL_FEATURES)
         if control_features is None:
             super().load_data(X, y, event=_ALL, **kwargs)
