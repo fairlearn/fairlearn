@@ -226,8 +226,55 @@ data into subgroups. The difference is that aggregations (such as
 :code:`MetricFrame.group_max`) are performed for each subgroup in the conditional
 feature(s), rather than across them (as happens with the sensitive features).
 
-To make this more concrete, consider a loan scenario.
+To make this more concrete, consider a loan scenario. In addition to sensitive
+features such as gender and race, applicants can be placed into income bands.
+In this scenario, disparity based on income band is to be expected, but within
+each income band we would want to ensure that there is no disparity across the
+sensitive features. To do this, we make the income band into a control feature
+(in the statistical sense of 'controlling for a variable').
 
+The :class:`MetricFrame` constructor allows us to specify control features in
+a manner similar to sensitive features, using a :code:`conditional_features=`
+parameter:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> income_band = ['l','l','l','h','h','h','l','h','h','l','l','h','h','l','l','h']
+    >>> metric_c_f = MetricFrame(skm.recall_score,
+    ...                          Y_true, Y_pred,
+    ...                          sensitive_features=group_membership_data,
+    ...                          control_features=income_band)
+    >>> metric_c_f.overall
+    control_feature_0
+    h    0.6
+    l    0.4
+    Name: recall_score, dtype: object
+    >>> metric_c_f.by_group
+    control_feature_0  sensitive_feature_0
+    h                  a                             0
+                       b                           0.5
+                       c                             1
+                       d                           NaN
+    l                  a                             0
+                       b                           NaN
+                       c                      0.666667
+                       d                             0
+    Name: recall_score, dtype: object
+
+Note how the :attr:`MetricFrame.overall` property is stratified based on the
+supplied control feature. We can then perform aggregations:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> metric_c_f.group_max()
+    Something
+    >>> metric_c_f.difference(method='between_groups')
+    Something
+
+In each case, rather than a single scalar, we receive one results for each
+subgroup identified by the conditional feature.
 
 
 .. _dashboard:
