@@ -240,27 +240,23 @@ parameter:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> income_band = ['l','l','l','h','h','h','l','h','h','l','l','h','h','l','l','h']
-    >>> metric_c_f = MetricFrame(skm.recall_score,
+    >>> income_band = ['l','l','h','l','h','l','l','h','h','l','l','h','h','l','l','h']
+    >>> metric_c_f = MetricFrame(skm.precision_score,
     ...                          Y_true, Y_pred,
-    ...                          sensitive_features=group_membership_data,
+    ...                          sensitive_features=g_2,
     ...                          control_features=income_band)
     >>> metric_c_f.overall
     control_feature_0
-    h    0.6
-    l    0.4
-    Name: recall_score, dtype: object
+    h     0.8
+    l    0.25
+    Name: precision_score, dtype: object
     >>> metric_c_f.by_group
     control_feature_0  sensitive_feature_0
-    h                  a                             0
-                       b                           0.5
-                       c                             1
-                       d                           NaN
-    l                  a                             0
-                       b                           NaN
-                       c                      0.666667
-                       d                             0
-    Name: recall_score, dtype: object
+    h                  6                      0.666667
+                       8                             1
+    l                  6                           0.5
+                       8                             0
+    Name: precision_score, dtype: object
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
 supplied control feature. We can then perform aggregations:
@@ -269,9 +265,15 @@ supplied control feature. We can then perform aggregations:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> metric_c_f.group_max()
-    Something
+    control_feature_0
+    h    1.0
+    l    0.5
+    Name: precision_score, dtype: float64
     >>> metric_c_f.difference(method='between_groups')
-    Something
+    control_feature_0
+    h    0.333333
+    l    0.500000
+    Name: precision_score, dtype: float64
 
 In each case, rather than a single scalar, we receive one results for each
 subgroup identified by the conditional feature.
