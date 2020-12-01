@@ -277,7 +277,9 @@ perform aggregations:
     Name: precision_score, dtype: float64
 
 In each case, rather than a single scalar, we receive one result for each
-subgroup identified by the conditional feature.
+subgroup identified by the conditional feature. For more examples, please
+see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
+:ref:`examples`.
 
 
 .. _dashboard:
