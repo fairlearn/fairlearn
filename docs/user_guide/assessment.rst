@@ -216,6 +216,20 @@ case we see that the subgroup ``(a, 8)`` has a result of ``NaN``, indicating
 that there were no samples in it.
 
 
+.. _control_features_metrics:
+
+Control features for grouped metrics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Control features (sometimes called 'conditional' features) also divide the input
+data into subgroups. The difference is that aggregations (such as
+:code:`MetricFrame.group_max`) are performed for each subgroup in the conditional
+feature(s), rather than across them (as happens with the sensitive features).
+
+To make this more concrete, consider a loan scenario.
+
+
+
 .. _dashboard:
 
 Fairlearn dashboard
