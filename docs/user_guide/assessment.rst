@@ -259,7 +259,8 @@ parameter:
     Name: precision_score, dtype: object
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
-supplied control feature. We can then perform aggregations:
+supplied control feature. With the :class:`MetricFrame` computed, we can
+perform aggregations:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -275,7 +276,7 @@ supplied control feature. We can then perform aggregations:
     l    0.500000
     Name: precision_score, dtype: float64
 
-In each case, rather than a single scalar, we receive one results for each
+In each case, rather than a single scalar, we receive one result for each
 subgroup identified by the conditional feature.
 
 
