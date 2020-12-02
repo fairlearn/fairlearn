@@ -235,10 +235,11 @@ them (as happens with the sensitive features).
 Control features are useful for cases where there is some expected variation with
 a feature, so we need to compute disparities while controlling for that feature.
 For example, in a loan scenario we would expect people of differing incomes to
-be approved at different rates. However, within each income band we would still
-want to measure disparities between different sensitive features (although it
+be approved at different rates, but within each income band we would still
+want to measure disparities between different sensitive features. However, it
 should be borne in mind that due to historic discrimination, the income band
-might be correlated with various sensitive features).
+might be correlated with various sensitive features. Because of this, control
+features should be used with particular caution.
 
 The :class:`MetricFrame` constructor allows us to specify control features in
 a manner similar to sensitive features, using a :code:`conditional_features=`
