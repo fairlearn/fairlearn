@@ -272,7 +272,6 @@ parameter:
     Name: accuracy_score, dtype: object
     >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
     >>> metric_c_f.by_group
-    income_band  gender
     CF  SF
     H   A          0.2
         B          0.4
