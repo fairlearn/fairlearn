@@ -263,7 +263,7 @@ parameter:
     >>> metric_c_f = MetricFrame(skm.accuracy_score,
     ...                          decision, prediction,
     ...                          sensitive_features={'SF' : sensitive_feature},
-    ...                          control_features={'CF' : control_feature })
+    ...                          control_features={'CF' : control_feature})
     >>> # The 'overall' property is now split based on the control feature
     >>> metric_c_f.overall
     CF
