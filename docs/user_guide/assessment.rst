@@ -221,16 +221,22 @@ that there were no samples in it.
 Control features for grouped metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Control features (sometimes called 'conditional' features) also divide the input
-data into subgroups. The difference is that aggregations (such as
-:code:`MetricFrame.group_max`) are performed for each subgroup in the conditional
-feature(s), rather than across them (as happens with the sensitive features).
+Control features (sometimes called 'conditional' feature) enable more detailed
+fairness insights by allowing further providing a further means of splitting
+the data into subgroups.
+When the data are split into subgroups, control features (if provided) act
+similarly to sensitive features.
+However, the aggregation functions (such as :code:`MetricFrame.group_max`) are
+performed for each subgroup in the conditional feature(s), rather than across
+them (as happens with the sensitive features).
 
 To make this more concrete, consider a loan scenario. In addition to sensitive
 features such as gender and race, applicants can be placed into income bands.
 In this scenario, disparity based on income band is to be expected, but within
 each income band we would want to ensure that there is no disparity across the
-sensitive features. To do this, we make the income band into a control feature
+sensitive features. For example, high income females should be treated similarly
+to high income males and low income females should be treated similarly to low
+income males. To do this, we make the income band into a control feature
 (in the statistical sense of 'controlling for a variable').
 
 The :class:`MetricFrame` constructor allows us to specify control features in
@@ -240,44 +246,71 @@ parameter:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> income_band = ['l','l','h','l','h','l','l','h','h','l','l','h','h','l','l','h']
-    >>> metric_c_f = MetricFrame(skm.precision_score,
-    ...                          Y_true, Y_pred,
-    ...                          sensitive_features=g_2,
-    ...                          control_features=income_band)
+    >>> decision = [ 0,0,0,1,1,0,1,1,0,1,\
+    ...              0,1,0,1,0,1,0,1,0,1,\
+    ...              0,1,1,0,1,1,1,1,1,0]
+    >>> prediction = [ 1,1,0,1,1,0,1,0,1,0,\
+    ...                1,0,1,0,1,1,1,0,0,0,\
+    ...                1,1,1,0,0,1,1,0,0,1]
+    >>> income_band = ['h','l','h','l','h','l','l','h','h','l',\
+    ...                'l','h','h','l','l','h','l','l','h','h',\
+    ...                'l','h','l','l','h','h','l','l','h','l']
+    >>> gender = ['f','nb','nb','m','m','nb','f','f','nb',\
+    ...           'f','m','nb','m','f','m','m','nb','nb','m',\
+    ...           'f','nb','nb','m','f','nb','f','nb','nb','f','f',]
+    >>> metric_c_f = MetricFrame(skm.accuracy_score,
+    ...                          decision, prediction,
+    ...                          sensitive_features={'gender' : gender},
+    ...                          control_features={'income_band' : income_band })
+    >>> # The 'overall' property is now split based on the control feature
     >>> metric_c_f.overall
-    control_feature_0
-    h     0.8
-    l    0.25
-    Name: precision_score, dtype: object
+    income_band
+    h    0.428571
+    l       0.375
+    Name: accuracy_score, dtype: object
+    >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
     >>> metric_c_f.by_group
-    control_feature_0  sensitive_feature_0
-    h                  6                      0.666667
-                       8                             1
-    l                  6                           0.5
-                       8                             0
-    Name: precision_score, dtype: object
+    income_band  gender
+    h            f              0.2
+                 m             0.75
+                 nb             0.4
+    l            f              0.4
+                 m              0.5
+                 nb        0.285714
+    Name: accuracy_score, dtype: object
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
-supplied control feature. With the :class:`MetricFrame` computed, we can
-perform aggregations:
+supplied control feature. The :attr:`MetricFrame.by_group` property allows
+us to see disparities between the genders for each value of the income band.
+It looks similar to how it would if we had specified two sensitive
+ features.
+
+With the :class:`MetricFrame` computed, we can perform aggregations:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> # See the maximum accuracy across gender for each income band
     >>> metric_c_f.group_max()
-    control_feature_0
-    h    1.0
-    l    0.5
-    Name: precision_score, dtype: float64
+    income_band
+    h    0.75
+    l    0.50
+    Name: accuracy_score, dtype: float64
+    >>> # See the maximum difference in accuracy across gender for each income band
     >>> metric_c_f.difference(method='between_groups')
-    control_feature_0
-    h    0.333333
-    l    0.500000
-    Name: precision_score, dtype: float64
+    income_band
+    h    0.550000
+    l    0.214286
+    Name: accuracy_score, dtype: float64
 
 In each case, rather than a single scalar, we receive one result for each
-subgroup identified by the conditional feature. For more examples, please
+subgroup identified by the conditional feature. The call
+:code:`metric_c_f.group_max()` shows the maximum value of the metric across
+the subgroups of the sensitive feature within each value of the control feature.
+Similarly, :code:`metric_c_f.difference(method='between_groups')` shows the
+maximum difference between the subgroups of the sensitive feature within
+each value of the control feature.
+For more examples, please
 see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
 
