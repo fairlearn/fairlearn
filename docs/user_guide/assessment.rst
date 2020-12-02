@@ -294,13 +294,13 @@ With the :class:`MetricFrame` computed, we can perform aggregations:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> # See the maximum accuracy across gender for each income band
+    >>> # See the maximum accuracy for each value of the control feature
     >>> metric_c_f.group_max()
     CF
     H    0.75
     L    0.50
     Name: accuracy_score, dtype: float64
-    >>> # See the maximum difference in accuracy across gender for each income band
+    >>> # See the maximum difference in accuracy for each value of the control feature
     >>> metric_c_f.difference(method='between_groups')
     CF
     H    0.550000
