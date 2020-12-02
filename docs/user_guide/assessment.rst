@@ -221,12 +221,14 @@ that there were no samples in it.
 Control features for grouped metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Control features (sometimes called 'conditional' feature) enable more detailed
-fairness insights by allowing further providing a further means of splitting
-the data into subgroups.
+Control features (sometimes called 'conditional' features) enable more detailed
+fairness insights by providing a further means of splitting the data into
+subgroups.
 When the data are split into subgroups, control features (if provided) act
 similarly to sensitive features.
-However, the aggregation functions (such as :code:`MetricFrame.group_max`) are
+However, the 'overall' value for the metric is now computed for each subgroup
+of the control feature(s).
+Similarly, the aggregation functions (such as :code:`MetricFrame.group_max`) are
 performed for each subgroup in the conditional feature(s), rather than across
 them (as happens with the sensitive features).
 
@@ -237,7 +239,9 @@ each income band we would want to ensure that there is no disparity across the
 sensitive features. For example, high income females should be treated similarly
 to high income males and low income females should be treated similarly to low
 income males. To do this, we make the income band into a control feature
-(in the statistical sense of 'controlling for a variable').
+(in the statistical sense of 'controlling for a variable'). When we perform
+aggregations such as finding the maximum value of a metric across genders, the
+result will be computed separately for the high and low income bands.
 
 The :class:`MetricFrame` constructor allows us to specify control features in
 a manner similar to sensitive features, using a :code:`conditional_features=`
@@ -283,7 +287,8 @@ Note how the :attr:`MetricFrame.overall` property is stratified based on the
 supplied control feature. The :attr:`MetricFrame.by_group` property allows
 us to see disparities between the genders for each value of the income band.
 It looks similar to how it would if we had specified two sensitive
- features.
+features (although the control features will always be at the top level of
+the hierarchy).
 
 With the :class:`MetricFrame` computed, we can perform aggregations:
 
@@ -305,9 +310,9 @@ With the :class:`MetricFrame` computed, we can perform aggregations:
 
 In each case, rather than a single scalar, we receive one result for each
 subgroup identified by the conditional feature. The call
-:code:`metric_c_f.group_max()` shows the maximum value of the metric across
+:code:`metric_c_f.group_max()` call shows the maximum value of the metric across
 the subgroups of the sensitive feature within each value of the control feature.
-Similarly, :code:`metric_c_f.difference(method='between_groups')` shows the
+Similarly, :code:`metric_c_f.difference(method='between_groups')` call shows the
 maximum difference between the subgroups of the sensitive feature within
 each value of the control feature.
 For more examples, please
