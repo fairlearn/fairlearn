@@ -76,7 +76,7 @@ class LinearDependenceRemover(BaseEstimator, TransformerMixin):
         return X
 
     def fit(self, X, y=None):
-        """Learn the projection required to make the dataset orthogonal to sensitive columns."""
+        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""
         self._create_lookup(X)
         X = check_array(X, estimator=self)
         X_use, X_sensitive = self._split_X(X)
@@ -87,12 +87,12 @@ class LinearDependenceRemover(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        """Transform X by applying the information filter."""
+        """Transform X by applying the correlation remover."""
         X = check_array(X, estimator=self)
-        check_is_fitted(self, ["beta_", "X_shape_", "lookup_"])
+        check_is_fitted(self, ["beta_", "X_shape_", "lookup_", "sensitive_mean_"])
         if self.X_shape_[1] != X.shape[1]:
             raise ValueError(
-                f"The trained data has {self.X_shape_[1]} while this dataset has {X.shape[1]}."
+                f"The trained data has {self.X_shape_[1]} features while this dataset has {X.shape[1]}."
             )
         X_use, X_sensitive = self._split_X(X)
         X_s_center = X_sensitive - self.sensitive_mean_
