@@ -70,7 +70,6 @@ class LinearDependenceRemover(BaseEstimator, TransformerMixin):
         """Create a lookup to handle column names correctly."""
         if isinstance(X, pd.DataFrame):
             self.lookup_ = {c: i for i, c in enumerate(X.columns)}
-            print(self.lookup_)
             return X.values
         self.lookup_ = {i: i for i in range(X.shape[1])}
         return X
