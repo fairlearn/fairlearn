@@ -67,7 +67,9 @@ X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_scaled, Y
                                                                      random_state=12345,
                                                                      stratify=Y)
 
-# Ensure indices are aligned
+# Ensure indices are aligned between X, y and A,
+# since the test_train_split operation works slightly
+# differently between Pandas (X and A) and numpy (y) objects
 X_train = X_train.reset_index(drop=True)
 X_test = X_test.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
