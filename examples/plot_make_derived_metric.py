@@ -53,7 +53,7 @@ A = X_raw[['race', 'sex']]
 # %%
 # With the data imported, we perform some standard processing, and a test/train split:
 le = LabelEncoder()
-y = le.fit_transform(Y)
+y = le.fit_transform(y)
 
 le = LabelEncoder()
 
@@ -62,10 +62,10 @@ X_dummies = pd.get_dummies(X_raw)
 X_scaled = sc.fit_transform(X_dummies)
 X_scaled = pd.DataFrame(X_scaled, columns=X_dummies.columns)
 
-X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_scaled, Y, A,
+X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_scaled, y, A,
                                                                      test_size=0.3,
                                                                      random_state=12345,
-                                                                     stratify=Y)
+                                                                     stratify=y)
 
 # Ensure indices are aligned between X, y and A,
 # since the test_train_split operation works slightly
@@ -114,7 +114,7 @@ print("Minimum accuracy_score: ", acc_frame.group_min())
 #   which should be treated as sample
 #   parameters. This is optional, and defaults to
 #   :code:`['sample_weight']` which is appropriate for many
-#   metrics in SciKit-Learn.
+#   metrics in `scikit-learn`.
 #
 # The result is a new function with the same signature as the
 # base metric, which accepts two extra arguments:
