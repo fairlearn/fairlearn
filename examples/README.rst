@@ -19,3 +19,5 @@ adding new ones please consult the guide on
    plot_grid_search_census
 
    plot_new_metrics
+
+   plot_make_derived_metric
