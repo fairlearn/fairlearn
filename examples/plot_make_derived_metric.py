@@ -14,7 +14,7 @@ Making Derived Metrics
 # While the :class:`fairlearn.metrics.MetricFrame` has the ability to produce such
 # scalars through its aggregation functions, its API does not conform to that usually
 # expected by these algorithms.
-# The :func:`fairlearn.metrics.make_derived_metric` function exists to bridge this gap.
+# The :func:`~fairlearn.metrics.make_derived_metric` function exists to bridge this gap.
 #
 # Getting the Data
 # ================
@@ -92,7 +92,7 @@ y_pred = unmitigated_predictor.predict(X_test)
 #
 # Suppose our key metric is the accuracy score, and we are most interested in
 # ensuring that it exceeds some threshold for all subgroups
-# We might use the :class:`fairlearn.metrics.MetricFrame` as
+# We might use the :class:`~fairlearn.metrics.MetricFrame` as
 # follows:
 
 acc_frame = MetricFrame(skm.accuracy_score,
@@ -102,7 +102,7 @@ print("Minimum accuracy_score: ", acc_frame.group_min())
 
 # %%
 # We can create a function to perform this in a single call
-# using :func:`fairlearn.metrics.make_derived_metric`.
+# using :func:`~fairlearn.metrics.make_derived_metric`.
 # This takes the following arguments (which must always be
 # supplied as keyword arguments):
 #
