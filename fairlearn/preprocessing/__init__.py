@@ -3,6 +3,6 @@
 
 """Preprocessing tools to help deal with sensitive attributes."""
 
-from ._linear_dep_remover import LinearDependenceRemover
+from ._correlation_remover import CorrelationRemover
 
-__all__ = ["LinearDependenceRemover"]
+__all__ = ["CorrelationRemover"]

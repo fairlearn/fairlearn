@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import estimator_checks
 
-from fairlearn.preprocessing import LinearDependenceRemover
+from fairlearn.preprocessing import CorrelationRemover
 
 
 @pytest.mark.parametrize(
@@ -42,8 +42,8 @@ from fairlearn.preprocessing import LinearDependenceRemover
     ]
 )
 def test_estimator_checks(test_fn):
-    test_fn(LinearDependenceRemover.__name__, LinearDependenceRemover(sensitive_feature_ids=[]))
-    test_fn(LinearDependenceRemover.__name__, LinearDependenceRemover(sensitive_feature_ids=[0]))
+    test_fn(CorrelationRemover.__name__, CorrelationRemover(sensitive_feature_ids=[]))
+    test_fn(CorrelationRemover.__name__, CorrelationRemover(sensitive_feature_ids=[0]))
 
 
 def test_linear_dependence():
@@ -51,7 +51,7 @@ def test_linear_dependence():
                   [1, 1, 2, 2, ],
                   [0.1, 0.2, 1.2, 1.1, ]]).T
 
-    X_tfm = LinearDependenceRemover(sensitive_feature_ids=[0]).fit(X).transform(X)
+    X_tfm = CorrelationRemover(sensitive_feature_ids=[0]).fit(X).transform(X)
     assert X_tfm.shape[1] == 2
     assert np.allclose(X_tfm[:, 0], 1.5)
 
@@ -63,6 +63,6 @@ def test_linear_dependence_pd():
 
     df = pd.DataFrame(X, columns=['a', 'b', 'c'])
 
-    X_tfm = LinearDependenceRemover(sensitive_feature_ids=['a']).fit(df).transform(df)
+    X_tfm = CorrelationRemover(sensitive_feature_ids=['a']).fit(df).transform(df)
     assert X_tfm.shape[1] == 2
     assert np.allclose(X_tfm[:, 0], 1.5)

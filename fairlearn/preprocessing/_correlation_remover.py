@@ -8,11 +8,11 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 
-class LinearDependenceRemover(BaseEstimator, TransformerMixin):
+class CorrelationRemover(BaseEstimator, TransformerMixin):
     r"""
     A component that filters out sensitive correlations in a dataset.
 
-    LinearDependenceRemover applies a linear transformation to the non-sensitive feature columns
+    CorrelationRemover applies a linear transformation to the non-sensitive feature columns
     in order to remove their correlation with the sensitive feature columns while retaining
     as much information as possible (as measured by the least-squares error).
 
@@ -75,7 +75,7 @@ class LinearDependenceRemover(BaseEstimator, TransformerMixin):
         return X
 
     def fit(self, X, y=None):
-        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""
+        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""  # noqa: E501
         self._create_lookup(X)
         X = check_array(X, estimator=self)
         X_use, X_sensitive = self._split_X(X)
@@ -91,7 +91,8 @@ class LinearDependenceRemover(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ["beta_", "X_shape_", "lookup_", "sensitive_mean_"])
         if self.X_shape_[1] != X.shape[1]:
             raise ValueError(
-                f"The trained data has {self.X_shape_[1]} features while this dataset has {X.shape[1]}."
+                f"The trained data has {self.X_shape_[1]} features while this dataset has "
+                f"{X.shape[1]}."
             )
         X_use, X_sensitive = self._split_X(X)
         X_s_center = X_sensitive - self.sensitive_mean_
