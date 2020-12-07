@@ -103,7 +103,14 @@ X_train_unscaled = ct.fit_transform(X_train_raw)
 X_test_unscaled = ct.transform(X_test_raw)
 
 # %%
-# Rescale the input data, following a similar pattern:
+# Rescale the input data, following a similar pattern. This is the most
+# critical step for data leakage. For the one-hot encoding, so long as each
+# class appears at least once in each dataset, the columns produced will be
+# the same. In contrast, the :class:`StandardScaler` attempts to fit the
+# data to a normal distribution. If the training and test data are from
+# different distributions, then the parameters of the fit will be different
+# dependent on whether the fit is computed for all the data, or just the
+# training set.
 
 sc = StandardScaler()
 X_train = sc.fit_transform(X_train_unscaled)
