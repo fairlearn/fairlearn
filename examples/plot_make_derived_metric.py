@@ -31,55 +31,87 @@ Making Derived Metrics
 
 import functools
 import numpy as np
-import pandas as pd
 
 import sklearn.metrics as skm
+from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 from fairlearn.metrics import MetricFrame, make_derived_metric
 from fairlearn.metrics import accuracy_score_group_min
 
 # %%
-# Next, we import the data:
+# Next, we import the data, dropping any rows which are missing data:
 
 data = fetch_openml(data_id=1590, as_frame=True)
-X_raw = data.data
-y = (data.target == '>50K') * 1
+X_raw = data.data.dropna()
+# Figure out which rows were dropped
+mask = data.data.notna().all(axis=1)
+y = (data.target.loc[mask] == '>50K') * 1
 A = X_raw[['race', 'sex']]
 
 # %%
-# With the data imported, we perform some standard processing, and a test/train split:
-le = LabelEncoder()
-y = le.fit_transform(y)
+# We are now going to preprocess the data. Before applying any transforms,
+# we first split the data into train and test sets. All the transforms we
+# apply will be trained on the training set, and then applied to the test
+# set. This ensures that data doesn't leak between the two sets (this is
+# a serious but subtle
+# `problem in machine learning <https://en.wikipedia.org/wiki/Leakage_(machine_learning)>`_).
+# So, split the data:
 
-le = LabelEncoder()
-
-sc = StandardScaler()
-X_dummies = pd.get_dummies(X_raw)
-X_scaled = sc.fit_transform(X_dummies)
-X_scaled = pd.DataFrame(X_scaled, columns=X_dummies.columns)
-
-X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_scaled, y, A,
-                                                                     test_size=0.3,
-                                                                     random_state=12345,
-                                                                     stratify=y)
+X_train_raw, X_test_raw, \
+    y_train, y_test, \
+    A_train, A_test = train_test_split(X_raw, y, A,
+                                       test_size=0.3,
+                                       random_state=12345,
+                                       stratify=y)
 
 # Ensure indices are aligned between X, y and A,
-# since the test_train_split operation works slightly
-# differently between Pandas (X and A) and numpy (y) objects
-X_train = X_train.reset_index(drop=True)
-X_test = X_test.reset_index(drop=True)
+# after all the slicing and splitting of DataFrames
+# and Series
+
+X_train_raw = X_train_raw.reset_index(drop=True)
+X_test_raw = X_test_raw.reset_index(drop=True)
+y_train = y_train.reset_index(drop=True)
+y_test = y_test.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
 
+# %%
+# Define how we wish to encode the data:
+
+pass_through_columns = ["age", "fnlwgt", "capital-gain",
+                        "capital-loss", "hours-per-week"]
+ohe_columns = ["workclass", "education-num", "marital-status",
+               "occupation", "relationship", "race", "sex",
+               "native-country"]
+
+ct = ColumnTransformer(
+    [
+        ("keep_cols", "passthrough", pass_through_columns),
+        ("ohe_cols", OneHotEncoder(sparse=False, handle_unknown='ignore'), ohe_columns)
+    ]
+)
+
+# %%
+# Fit the transformation to the training set, and then apply it
+# to the test set:
+
+X_train_unscaled = ct.fit_transform(X_train_raw)
+X_test_unscaled = ct.transform(X_test_raw)
+
+# %%
+# Rescale the input data, following a similar pattern:
+
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train_unscaled)
+X_test = sc.transform(X_test_unscaled)
 
 # %%
 # Finally, we train a simple model on the data, and generate
 # some predictions:
-
 
 unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
 unmitigated_predictor.fit(X_train, y_train)
