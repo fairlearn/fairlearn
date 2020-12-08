@@ -248,18 +248,26 @@ parameter:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> decision = [0,0,0,1,1,0,1,1,0,1,\
-    ...             0,1,0,1,0,1,0,1,0,1,\
-    ...             0,1,1,0,1,1,1,1,1,0]
-    >>> prediction = [1,1,0,1,1,0,1,0,1,0,\
-    ...               1,0,1,0,1,1,1,0,0,0,\
-    ...               1,1,1,0,0,1,1,0,0,1]
-    >>> control_feature = ['H','L','H','L','H','L','L','H','H','L',\
-    ...                    'L','H','H','L','L','H','L','L','H','H',\
-    ...                    'L','H','L','L','H','H','L','L','H','L']
-    >>> sensitive_feature = ['A','B','B','C','C','B','A','A','B','A',\
-    ...                      'C','B','C','A','C','C','B','B','C','A',\
-    ...                      'B','B','C','A','B','A','B','B','A','A',]
+    >>> decision = [
+    ...    0,0,0,1,1,0,1,1,0,1,
+    ...    0,1,0,1,0,1,0,1,0,1,
+    ...    0,1,1,0,1,1,1,1,1,0
+    ... ]
+    >>> prediction = [
+    ...    1,1,0,1,1,0,1,0,1,0,
+    ...    1,0,1,0,1,1,1,0,0,0,
+    ...    1,1,1,0,0,1,1,0,0,1
+    ... ]
+    >>> control_feature = [
+    ...    'H','L','H','L','H','L','L','H','H','L',
+    ...    'L','H','H','L','L','H','L','L','H','H',
+    ...    'L','H','L','L','H','H','L','L','H','L'
+    ... ]
+    >>> sensitive_feature = [
+    ...    'A','B','B','C','C','B','A','A','B','A',
+    ...    'C','B','C','A','C','C','B','B','C','A',
+    ...    'B','B','C','A','B','A','B','B','A','A'
+    ... ]
     >>> metric_c_f = MetricFrame(skm.accuracy_score,
     ...                          decision, prediction,
     ...                          sensitive_features={'SF' : sensitive_feature},
