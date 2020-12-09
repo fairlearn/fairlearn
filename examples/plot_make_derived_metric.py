@@ -59,7 +59,7 @@ A = X_raw[["race", "sex"]]
 # set. This ensures that data doesn't leak between the two sets (this is
 # a serious but subtle
 # `problem in machine learning <https://en.wikipedia.org/wiki/Leakage_(machine_learning)>`_).
-# So, split the data:
+# So, first we split the data:
 
 (X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y
@@ -77,7 +77,15 @@ A_train = A_train.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
 
 # %%
-# Define how we wish to encode the data:
+# Next, we build two :class:`~sklearn.pipeline.Pipeline` objects
+# to process the columns, one for numeric data, and the other
+# for categorical data. Both impute missing values; the difference
+# is whether the data are scaled (numeric columns) or
+# one-hot encoded (categorical columns). Imputation of missing
+# values should generally be done with care, since it could
+# potentially introduce biases. Of course, removing rows with
+# missing data could also cause trouble, if particular subgroups
+# have poorer data quality.
 
 numeric_transformer = Pipeline(
     steps=[
@@ -97,6 +105,11 @@ preprocessor = ColumnTransformer(
         ("cat", categorical_transformer, selector(dtype_include="category")),
     ]
 )
+
+# %%
+# With our preprocessor defined, we can now build a
+# new pipeline which includes an Estimator:
+
 unmitigated_predictor = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
@@ -108,6 +121,10 @@ unmitigated_predictor = Pipeline(
 )
 
 # %%
+# With the pipeline fully defined, we can first train it
+# with the training data, and then generate predictions
+# from the test data.
+
 unmitigated_predictor.fit(X_train, y_train)
 y_pred = unmitigated_predictor.predict(X_test)
 
