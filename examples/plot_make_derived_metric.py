@@ -35,10 +35,12 @@ import numpy as np
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_openml
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-
+from sklearn.compose import make_column_selector as selector
+from sklearn.pipeline import Pipeline
 from fairlearn.metrics import MetricFrame, make_derived_metric
 from fairlearn.metrics import accuracy_score_group_min
 
@@ -46,11 +48,9 @@ from fairlearn.metrics import accuracy_score_group_min
 # Next, we import the data, dropping any rows which are missing data:
 
 data = fetch_openml(data_id=1590, as_frame=True)
-X_raw = data.data.dropna()
-# Figure out which rows were dropped
-mask = data.data.notna().all(axis=1)
-y = (data.target.loc[mask] == '>50K') * 1
-A = X_raw[['race', 'sex']]
+X_raw = data.data
+y = (data.target == ">50K") * 1
+A = X_raw[["race", "sex"]]
 
 # %%
 # We are now going to preprocess the data. Before applying any transforms,
@@ -61,19 +61,16 @@ A = X_raw[['race', 'sex']]
 # `problem in machine learning <https://en.wikipedia.org/wiki/Leakage_(machine_learning)>`_).
 # So, split the data:
 
-X_train_raw, X_test_raw, \
-    y_train, y_test, \
-    A_train, A_test = train_test_split(X_raw, y, A,
-                                       test_size=0.3,
-                                       random_state=12345,
-                                       stratify=y)
+(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+    X_raw, y, A, test_size=0.3, random_state=12345, stratify=y
+)
 
 # Ensure indices are aligned between X, y and A,
 # after all the slicing and splitting of DataFrames
 # and Series
 
-X_train_raw = X_train_raw.reset_index(drop=True)
-X_test_raw = X_test_raw.reset_index(drop=True)
+X_train = X_train.reset_index(drop=True)
+X_test = X_test.reset_index(drop=True)
 y_train = y_train.reset_index(drop=True)
 y_test = y_test.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
@@ -82,47 +79,36 @@ A_test = A_test.reset_index(drop=True)
 # %%
 # Define how we wish to encode the data:
 
-pass_through_columns = ["age", "fnlwgt", "capital-gain",
-                        "capital-loss", "hours-per-week"]
-ohe_columns = ["workclass", "education-num", "marital-status",
-               "occupation", "relationship", "race", "sex",
-               "native-country"]
-
-ct = ColumnTransformer(
+numeric_transformer = Pipeline(
+    steps=[
+        ("impute", SimpleImputer()),
+        ("scaler", StandardScaler()),
+    ]
+)
+categorical_transformer = Pipeline(
     [
-        ("keep_cols", "passthrough", pass_through_columns),
-        ("ohe_cols", OneHotEncoder(sparse=False, handle_unknown='ignore'), ohe_columns)
+        ("impute", SimpleImputer(strategy="most_frequent")),
+        ("ohe", OneHotEncoder(handle_unknown="ignore")),
+    ]
+)
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", numeric_transformer, selector(dtype_exclude="category")),
+        ("cat", categorical_transformer, selector(dtype_include="category")),
+    ]
+)
+unmitigated_predictor = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        (
+            "classifier",
+            LogisticRegression(solver="liblinear", fit_intercept=True),
+        ),
     ]
 )
 
 # %%
-# Fit the transformation to the training set, and then apply it
-# to the test set:
-
-X_train_unscaled = ct.fit_transform(X_train_raw)
-X_test_unscaled = ct.transform(X_test_raw)
-
-# %%
-# Rescale the input data, following a similar pattern. This is the most
-# critical step for data leakage. For the one-hot encoding, so long as each
-# class appears at least once in each dataset, the columns produced will be
-# the same. In contrast, the :class:`StandardScaler` attempts to fit the
-# data to a normal distribution. If the training and test data are from
-# different distributions, then the parameters of the fit will be different
-# dependent on whether the fit is computed for all the data, or just the
-# training set.
-
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train_unscaled)
-X_test = sc.transform(X_test_unscaled)
-
-# %%
-# Finally, we train a simple model on the data, and generate
-# some predictions:
-
-unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
 unmitigated_predictor.fit(X_train, y_train)
-
 y_pred = unmitigated_predictor.predict(X_test)
 
 # %%
@@ -134,9 +120,9 @@ y_pred = unmitigated_predictor.predict(X_test)
 # We might use the :class:`~fairlearn.metrics.MetricFrame` as
 # follows:
 
-acc_frame = MetricFrame(skm.accuracy_score,
-                        y_test, y_pred,
-                        sensitive_features=A_test['sex'])
+acc_frame = MetricFrame(
+    skm.accuracy_score, y_test, y_pred, sensitive_features=A_test["sex"]
+)
 print("Minimum accuracy_score: ", acc_frame.group_min())
 
 # %%
@@ -168,29 +154,32 @@ print("Minimum accuracy_score: ", acc_frame.group_min())
 # For the current case, we do not need the :code:`method=`
 # argument, since we are taking the minimum value.
 
-my_acc = make_derived_metric(metric=skm.accuracy_score,
-                             transform='group_min')
-my_acc_min = my_acc(y_test, y_pred,
-                    sensitive_features=A_test['sex'])
+my_acc = make_derived_metric(metric=skm.accuracy_score, transform="group_min")
+my_acc_min = my_acc(y_test, y_pred, sensitive_features=A_test["sex"])
 print("Minimum accuracy_score: ", my_acc_min)
 
 # %%
 # To show that the returned function also works with sample weights:
 random_weights = np.random.rand(len(y_test))
 
-acc_frame_sw = MetricFrame(skm.accuracy_score,
-                           y_test, y_pred,
-                           sensitive_features=A_test['sex'],
-                           sample_params={'sample_weight': random_weights})
+acc_frame_sw = MetricFrame(
+    skm.accuracy_score,
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    sample_params={"sample_weight": random_weights},
+)
 
 from_frame = acc_frame_sw.group_min()
-from_func = my_acc(y_test, y_pred,
-                   sensitive_features=A_test['sex'],
-                   sample_weight=random_weights)
+from_func = my_acc(
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    sample_weight=random_weights,
+)
 
-print('From MetricFrame:', from_frame)
-print('From function   :', from_func)
-assert from_frame == from_func
+print("From MetricFrame:", from_frame)
+print("From function   :", from_func)
 
 # %%
 # The returned function can also handle parameters which are not sample
@@ -200,12 +189,16 @@ assert from_frame == from_func
 # First we evaluate this with a :class:`fairlearn.metrics.MetricFrame`:
 
 fbeta_03 = functools.partial(skm.fbeta_score, beta=0.3)
+fbeta_03.__name__ = "fbeta_score__beta_0.3"
 
-beta_frame = MetricFrame(fbeta_03,
-                         y_test, y_pred,
-                         sensitive_features=A_test['sex'],
-                         sample_params={'sample_weight': random_weights})
-beta_from_frame = beta_frame.difference(method='to_overall')
+beta_frame = MetricFrame(
+    fbeta_03,
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    sample_params={"sample_weight": random_weights},
+)
+beta_from_frame = beta_frame.difference(method="to_overall")
 
 print("From frame:", beta_from_frame)
 
@@ -214,17 +207,18 @@ print("From frame:", beta_from_frame)
 # we do not need to use :func:`functools.partial` to bind the
 # :code:`beta=` argument:
 
-beta_func = make_derived_metric(metric=skm.fbeta_score,
-                                transform='difference')
+beta_func = make_derived_metric(metric=skm.fbeta_score, transform="difference")
 
-beta_from_func = beta_func(y_test, y_pred,
-                           sensitive_features=A_test['sex'],
-                           beta=0.3,
-                           sample_weight=random_weights,
-                           method='to_overall')
+beta_from_func = beta_func(
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    beta=0.3,
+    sample_weight=random_weights,
+    method="to_overall",
+)
 
 print("From function:", beta_from_func)
-assert beta_from_func == beta_from_frame
 
 
 # %%
@@ -237,11 +231,11 @@ assert beta_from_func == beta_from_frame
 # find the minimum over the accuracy scores:
 
 
-from_myacc = my_acc(y_test, y_pred,
-                    sensitive_features=A_test['race'])
+from_myacc = my_acc(y_test, y_pred, sensitive_features=A_test["race"])
 
-from_pregen = accuracy_score_group_min(y_test, y_pred,
-                                       sensitive_features=A_test['race'])
+from_pregen = accuracy_score_group_min(
+    y_test, y_pred, sensitive_features=A_test["race"]
+)
 
 print("From my function :", from_myacc)
 print("From pregenerated:", from_pregen)
