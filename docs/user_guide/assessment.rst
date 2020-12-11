@@ -35,9 +35,9 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 .. doctest:: assessment_metrics
 
     >>> import sklearn.metrics as skm
-    >>> Y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
-    >>> Y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
-    >>> skm.recall_score(Y_true, Y_pred)
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
+    >>> skm.recall_score(y_true, y_pred)
     0.5
 
 Metrics with Grouping
@@ -61,10 +61,10 @@ the following set of labels:
     ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
     >>> pd.set_option('display.max_columns', 20)
     >>> pd.set_option('display.width', 80)
-    >>> pd.DataFrame({ 'Y_true': Y_true,
-    ...                'Y_pred': Y_pred,
+    >>> pd.DataFrame({ 'y_true': y_true,
+    ...                'y_pred': y_pred,
     ...                'group_membership_data': group_membership_data})
-        Y_true  Y_pred group_membership_data
+        y_true  y_pred group_membership_data
     0        0       0                     d
     1        1       0                     a
     2        1       1                     c
@@ -89,7 +89,7 @@ We then calculate a metric which shows the subgroups:
 
     >>> from fairlearn.metrics import MetricFrame
     >>> grouped_metric = MetricFrame(skm.recall_score, 
-    ...                              Y_true, Y_pred,
+    ...                              y_true, y_pred,
     ...                              sensitive_features=group_membership_data)
     >>> print("Overall recall = ", grouped_metric.overall)
     Overall recall =  0.5
@@ -122,7 +122,7 @@ metrics simultaneously:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> multi_metric = MetricFrame({'precision':skm.precision_score, 'recall':skm.recall_score},
-    ...                             Y_true, Y_pred,
+    ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
     precision    0.555556
@@ -145,7 +145,7 @@ in a dictionary via the ``sample_params`` argument.:
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(skm.recall_score,
-    ...                        Y_true, Y_pred,
+    ...                        y_true, y_pred,
     ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
@@ -172,7 +172,7 @@ function:
     >>> import functools
     >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
     >>> metric_beta = MetricFrame(fbeta_06,
-    ...                           Y_true, Y_pred,
+    ...                           y_true, y_pred,
     ...                           sensitive_features=group_membership_data)
     >>> metric_beta.overall
     0.5396825396825397
@@ -194,7 +194,7 @@ holds the intersections of these groups:
     >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
     ...                          columns=['SF 0', 'SF 1'])
     >>> metric_2sf = MetricFrame(skm.recall_score,
-    ...                          Y_true, Y_pred,
+    ...                          y_true, y_pred,
     ...                          sensitive_features=s_f_frame)
     >>> metric_2sf.overall  # Same as before
     0.5
@@ -226,13 +226,15 @@ Such algorithms generally work with scalar results, so if we want the tuning
 to be done on the basis of our fairness metrics, we need to perform aggregations
 over the :class:`MetricFrame`.
 
-We provide a convenience function, :func:`fairlearn.metrics.make_derived_metric`
+We provide a convenience function, :func:`fairlearn.metrics.make_derived_metric`,
 to generate scalar-producing metric functions based on the aggregation methods
 mentioned above (:meth:`MetricFrame.group_min`, :meth:`MetricFrame.group_max`,
 :meth:`MetricFrame.difference`, and :meth:`MetricFrame.ratio`).
 This takes an underlying metric function, the name of the desired transformation, and
 optionally a list of parameter names which should be treated as sample aligned parameters
 (such as `sample_weight`).
+Other parameters will be passed to the underlying metric function normally (unlike
+:class:`MetricFrame` where :func:`functools.partial` must be used, as noted above).
 The result is a function which builds the :class:`MetricFrame` internally and performs
 the requested aggregation. For example:
 
@@ -242,12 +244,14 @@ the requested aggregation. For example:
     >>> from fairlearn.metrics import make_derived_metric
     >>> fbeta_difference = make_derived_metric(metric=skm.fbeta_score,
     ...                                        transform='difference')
-    >>> fbeta_difference(Y_true, Y_pred, beta=0.7,
+    >>> # Don't need functools.partial for make_derived_metric
+    >>> fbeta_difference(y_true, y_pred, beta=0.7,
     ...                  sensitive_features=group_membership_data)
     0.752525...
+    >>> # But as noted above, functools.partial is needed for MetricFrame
     >>> fbeta_07 = functools.partial(skm.fbeta_score, beta=0.7)
     >>> MetricFrame(fbeta_07,
-    ...             Y_true, Y_pred,
+    ...             y_true, y_pred,
     ...             sensitive_features=group_membership_data).difference()
     0.752525...
 
