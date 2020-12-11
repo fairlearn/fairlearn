@@ -14,7 +14,7 @@ Making Derived Metrics
 # While the :class:`fairlearn.metrics.MetricFrame` has the ability to produce such
 # scalars through its aggregation functions, its API does not conform to that usually
 # expected by these algorithms.
-# The :func:`fairlearn.metrics.make_derived_metric` function exists to bridge this gap.
+# The :func:`~fairlearn.metrics.make_derived_metric` function exists to bridge this gap.
 #
 # Getting the Data
 # ================
@@ -29,60 +29,104 @@ Making Derived Metrics
 # and manufacture credit score bands and loan sizes from other columns.
 # We start with some uncontroversial `import` statements:
 
-from fairlearn.metrics import MetricFrame, make_derived_metric
-from fairlearn.metrics import accuracy_score_group_min
-import sklearn.metrics as skm
 import functools
 import numpy as np
-import pandas as pd
 
+import sklearn.metrics as skm
+from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_openml
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import make_column_selector as selector
+from sklearn.pipeline import Pipeline
+from fairlearn.metrics import MetricFrame, make_derived_metric
+from fairlearn.metrics import accuracy_score_group_min
 
 # %%
-# Next, we import the data:
+# Next, we import the data, dropping any rows which are missing data:
 
 data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
-Y = (data.target == '>50K') * 1
-A = X_raw[['race', 'sex']]
+y = (data.target == ">50K") * 1
+A = X_raw[["race", "sex"]]
 
 # %%
-# With the data imported, we perform some standard processing, and a test/train split:
-le = LabelEncoder()
-Y = le.fit_transform(Y)
+# We are now going to preprocess the data. Before applying any transforms,
+# we first split the data into train and test sets. All the transforms we
+# apply will be trained on the training set, and then applied to the test
+# set. This ensures that data doesn't leak between the two sets (this is
+# a serious but subtle
+# `problem in machine learning <https://en.wikipedia.org/wiki/Leakage_(machine_learning)>`_).
+# So, first we split the data:
 
-le = LabelEncoder()
+(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+    X_raw, y, A, test_size=0.3, random_state=12345, stratify=y
+)
 
-sc = StandardScaler()
-X_dummies = pd.get_dummies(X_raw)
-X_scaled = sc.fit_transform(X_dummies)
-X_scaled = pd.DataFrame(X_scaled, columns=X_dummies.columns)
+# Ensure indices are aligned between X, y and A,
+# after all the slicing and splitting of DataFrames
+# and Series
 
-X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(X_scaled, Y, A,
-                                                                     test_size=0.3,
-                                                                     random_state=12345,
-                                                                     stratify=Y)
-
-# Ensure indices are aligned
 X_train = X_train.reset_index(drop=True)
 X_test = X_test.reset_index(drop=True)
+y_train = y_train.reset_index(drop=True)
+y_test = y_test.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
 
+# %%
+# Next, we build two :class:`~sklearn.pipeline.Pipeline` objects
+# to process the columns, one for numeric data, and the other
+# for categorical data. Both impute missing values; the difference
+# is whether the data are scaled (numeric columns) or
+# one-hot encoded (categorical columns). Imputation of missing
+# values should generally be done with care, since it could
+# potentially introduce biases. Of course, removing rows with
+# missing data could also cause trouble, if particular subgroups
+# have poorer data quality.
+
+numeric_transformer = Pipeline(
+    steps=[
+        ("impute", SimpleImputer()),
+        ("scaler", StandardScaler()),
+    ]
+)
+categorical_transformer = Pipeline(
+    [
+        ("impute", SimpleImputer(strategy="most_frequent")),
+        ("ohe", OneHotEncoder(handle_unknown="ignore")),
+    ]
+)
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", numeric_transformer, selector(dtype_exclude="category")),
+        ("cat", categorical_transformer, selector(dtype_include="category")),
+    ]
+)
 
 # %%
-# Finally, we train a simple model on the data, and generate
-# some predictions:
+# With our preprocessor defined, we can now build a
+# new pipeline which includes an Estimator:
 
+unmitigated_predictor = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        (
+            "classifier",
+            LogisticRegression(solver="liblinear", fit_intercept=True),
+        ),
+    ]
+)
 
-unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
-unmitigated_predictor.fit(X_train, Y_train)
+# %%
+# With the pipeline fully defined, we can first train it
+# with the training data, and then generate predictions
+# from the test data.
 
-Y_pred = unmitigated_predictor.predict(X_test)
+unmitigated_predictor.fit(X_train, y_train)
+y_pred = unmitigated_predictor.predict(X_test)
 
 # %%
 # Creating a derived metric
@@ -90,17 +134,17 @@ Y_pred = unmitigated_predictor.predict(X_test)
 #
 # Suppose our key metric is the accuracy score, and we are most interested in
 # ensuring that it exceeds some threshold for all subgroups
-# We might use the :class:`fairlearn.metrics.MetricFrame` as
+# We might use the :class:`~fairlearn.metrics.MetricFrame` as
 # follows:
 
-acc_frame = MetricFrame(skm.accuracy_score,
-                        Y_test, Y_pred,
-                        sensitive_features=A_test['sex'])
+acc_frame = MetricFrame(
+    skm.accuracy_score, y_test, y_pred, sensitive_features=A_test["sex"]
+)
 print("Minimum accuracy_score: ", acc_frame.group_min())
 
 # %%
 # We can create a function to perform this in a single call
-# using :func:`fairlearn.metrics.make_derived_metric`.
+# using :func:`~fairlearn.metrics.make_derived_metric`.
 # This takes the following arguments (which must always be
 # supplied as keyword arguments):
 #
@@ -112,7 +156,7 @@ print("Minimum accuracy_score: ", acc_frame.group_min())
 #   which should be treated as sample
 #   parameters. This is optional, and defaults to
 #   :code:`['sample_weight']` which is appropriate for many
-#   metrics in SciKit-Learn.
+#   metrics in `scikit-learn`.
 #
 # The result is a new function with the same signature as the
 # base metric, which accepts two extra arguments:
@@ -127,29 +171,32 @@ print("Minimum accuracy_score: ", acc_frame.group_min())
 # For the current case, we do not need the :code:`method=`
 # argument, since we are taking the minimum value.
 
-my_acc = make_derived_metric(metric=skm.accuracy_score,
-                             transform='group_min')
-my_acc_min = my_acc(Y_test, Y_pred,
-                    sensitive_features=A_test['sex'])
+my_acc = make_derived_metric(metric=skm.accuracy_score, transform="group_min")
+my_acc_min = my_acc(y_test, y_pred, sensitive_features=A_test["sex"])
 print("Minimum accuracy_score: ", my_acc_min)
 
 # %%
 # To show that the returned function also works with sample weights:
-random_weights = np.random.rand(len(Y_test))
+random_weights = np.random.rand(len(y_test))
 
-acc_frame_sw = MetricFrame(skm.accuracy_score,
-                           Y_test, Y_pred,
-                           sensitive_features=A_test['sex'],
-                           sample_params={'sample_weight': random_weights})
+acc_frame_sw = MetricFrame(
+    skm.accuracy_score,
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    sample_params={"sample_weight": random_weights},
+)
 
 from_frame = acc_frame_sw.group_min()
-from_func = my_acc(Y_test, Y_pred,
-                   sensitive_features=A_test['sex'],
-                   sample_weight=random_weights)
+from_func = my_acc(
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    sample_weight=random_weights,
+)
 
-print('From MetricFrame:', from_frame)
-print('From function   :', from_func)
-assert from_frame == from_func
+print("From MetricFrame:", from_frame)
+print("From function   :", from_func)
 
 # %%
 # The returned function can also handle parameters which are not sample
@@ -159,12 +206,16 @@ assert from_frame == from_func
 # First we evaluate this with a :class:`fairlearn.metrics.MetricFrame`:
 
 fbeta_03 = functools.partial(skm.fbeta_score, beta=0.3)
+fbeta_03.__name__ = "fbeta_score__beta_0.3"
 
-beta_frame = MetricFrame(fbeta_03,
-                         Y_test, Y_pred,
-                         sensitive_features=A_test['sex'],
-                         sample_params={'sample_weight': random_weights})
-beta_from_frame = beta_frame.difference(method='to_overall')
+beta_frame = MetricFrame(
+    fbeta_03,
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    sample_params={"sample_weight": random_weights},
+)
+beta_from_frame = beta_frame.difference(method="to_overall")
 
 print("From frame:", beta_from_frame)
 
@@ -173,17 +224,18 @@ print("From frame:", beta_from_frame)
 # we do not need to use :func:`functools.partial` to bind the
 # :code:`beta=` argument:
 
-beta_func = make_derived_metric(metric=skm.fbeta_score,
-                                transform='difference')
+beta_func = make_derived_metric(metric=skm.fbeta_score, transform="difference")
 
-beta_from_func = beta_func(Y_test, Y_pred,
-                           sensitive_features=A_test['sex'],
-                           beta=0.3,
-                           sample_weight=random_weights,
-                           method='to_overall')
+beta_from_func = beta_func(
+    y_test,
+    y_pred,
+    sensitive_features=A_test["sex"],
+    beta=0.3,
+    sample_weight=random_weights,
+    method="to_overall",
+)
 
 print("From function:", beta_from_func)
-assert beta_from_func == beta_from_frame
 
 
 # %%
@@ -196,11 +248,11 @@ assert beta_from_func == beta_from_frame
 # find the minimum over the accuracy scores:
 
 
-from_myacc = my_acc(Y_test, Y_pred,
-                    sensitive_features=A_test['race'])
+from_myacc = my_acc(y_test, y_pred, sensitive_features=A_test["race"])
 
-from_pregen = accuracy_score_group_min(Y_test, Y_pred,
-                                       sensitive_features=A_test['race'])
+from_pregen = accuracy_score_group_min(
+    y_test, y_pred, sensitive_features=A_test["race"]
+)
 
 print("From my function :", from_myacc)
 print("From pregenerated:", from_pregen)
