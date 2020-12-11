@@ -6,6 +6,8 @@ import numpy as np
 from .moment import LossMoment
 from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
 
+from fairlearn._input_validation import _validate_and_reformat_input
+
 
 class ConditionalLossMoment(LossMoment):
     r"""A moment for constraining the mean loss or the worst-case loss by a group.
@@ -35,6 +37,10 @@ class ConditionalLossMoment(LossMoment):
 
     def load_data(self, X, y, *, sensitive_features):
         """Load data into the moment object."""
+        _, y_train, sensitive_features, _ = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=False,
+                                         sensitive_features=sensitive_features)
         if self.no_groups:
             sensitive_features = pd.Series(y).apply(lambda y: _ALL)
         super().load_data(X, y, sensitive_features=sensitive_features)

@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
@@ -25,7 +24,11 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self,
+                  X: pd.DataFrame,
+                  y: pd.Series,
+                  *,
+                  sensitive_features: pd.Series = None):
         """Load a set of data for use by this object.
 
         The keyword arguments can contain a :code:`sensitive_features` array.
@@ -38,10 +41,15 @@ class Moment:
         """
         assert self.data_loaded is False, \
             "data can be loaded only once"
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+        if sensitive_features is not None:
+            assert isinstance(sensitive_features, pd.Series)
         self.X = X
+        self._y = y
         self.tags = pd.DataFrame({_LABEL: y})
-        if _KW_SENSITIVE_FEATURES in kwargs:
-            self.tags[_GROUP_ID] = kwargs[_KW_SENSITIVE_FEATURES]
+        if sensitive_features is not None:
+            self.tags[_GROUP_ID] = sensitive_features
         self.data_loaded = True
         self._gamma_descr = None
 
@@ -49,6 +57,11 @@ class Moment:
     def total_samples(self):
         """Return the number of samples in the data."""
         return self.X.shape[0]
+
+    @property
+    def y_reformat(self):
+        """Return the y array as a :class:`~pandas.Series`."""
+        return self._y
 
     def gamma(self, predictor):  # noqa: D102
         """Calculate the degree to which constraints are currently violated by the predictor."""

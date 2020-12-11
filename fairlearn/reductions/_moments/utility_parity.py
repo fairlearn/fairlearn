@@ -6,7 +6,7 @@ import numpy as np
 
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _KW_CONTROL_FEATURES
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _validate_and_reformat_input
 from .error_rate import ErrorRate
 
 
@@ -99,7 +99,13 @@ class UtilityParity(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, utilities=None, **kwargs):
+    def load_data(self,
+                  X: pd.DataFrame,
+                  y: pd.Series,
+                  event=None,
+                  utilities=None,
+                  *,
+                  sensitive_features: pd.Series = None):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
@@ -113,7 +119,11 @@ class UtilityParity(ClassificationMoment):
         .. math::
         utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
-        super().load_data(X, y, **kwargs)
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+        if sensitive_features is not None:
+            assert isinstance(sensitive_features, pd.Series)
+        super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
         if utilities is None:
             utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
@@ -262,17 +272,23 @@ class DemographicParity(UtilityParity):
 
     short_name = "DemographicParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object.
 
         The arguments may include a `control_features=` to specify
         one or more columns which are to be used as control features.
         """
-        control_features = kwargs.get(_KW_CONTROL_FEATURES)
+        X_train, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
         if control_features is None:
-            super().load_data(X, y, event=_ALL, **kwargs)
+            super().load_data(X_train, y_train, event=_ALL, sensitive_features=sf_train)
         else:
-            super().load_data(X, y, event=control_features, **kwargs)
+            super().load_data(X_train, y_train,
+                              event=control_features,
+                              sensitive_features=sf_train)
 
 
 class TruePositiveRateParity(UtilityParity):
@@ -309,16 +325,21 @@ class TruePositiveRateParity(UtilityParity):
 
     short_name = "TruePositiveRateParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y,  *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
+        X_train, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
-        base_event = pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1)
-        control_features = kwargs.get(_KW_CONTROL_FEATURES)
-        if control_features is not None:
-            event = base_event.combine(pd.Series(control_features), _combine_event_and_control)
+        base_event = pd.Series(y_train).apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 1)
+        if cf_train is not None:
+            event = base_event.combine(cf_train, _combine_event_and_control)
         else:
             event = base_event
-        super().load_data(X, pd.Series(y), event=event, **kwargs)
+        super().load_data(X_train, y_train, event=event, sensitive_features=sf_train)
 
 
 class FalsePositiveRateParity(UtilityParity):
@@ -349,16 +370,22 @@ class FalsePositiveRateParity(UtilityParity):
 
     short_name = "FalsePositiveRateParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
+
+        X_train, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        base_event = pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0)
-        control_features = kwargs.get(_KW_CONTROL_FEATURES)
-        if control_features is not None:
-            event = base_event.combine(pd.Series(control_features), _combine_event_and_control)
+        base_event = pd.Series(y_train).apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 0)
+        if cf_train is not None:
+            event = base_event.combine(cf_train, _combine_event_and_control)
         else:
             event = base_event
-        super().load_data(X, pd.Series(y), event=event, **kwargs)
+        super().load_data(X_train, y_train, event=event, sensitive_features=sf_train)
 
 
 class EqualizedOdds(UtilityParity):
@@ -388,16 +415,21 @@ class EqualizedOdds(UtilityParity):
 
     short_name = "EqualizedOdds"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        base_event = pd.Series(y).apply(lambda y: _LABEL + "=" + str(y))
-        control_features = kwargs.get(_KW_CONTROL_FEATURES)
-        if control_features is not None:
-            event = base_event.combine(pd.Series(control_features), _combine_event_and_control)
+
+        X_train, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v))
+        if cf_train is not None:
+            event = base_event.combine(cf_train, _combine_event_and_control)
         else:
             event = base_event
-        super().load_data(X, y, event=event, **kwargs)
+        super().load_data(X_train, y_train, event=event, sensitive_features=sensitive_features)
 
 
 class ErrorRateParity(UtilityParity):
@@ -423,11 +455,19 @@ class ErrorRateParity(UtilityParity):
 
     short_name = "ErrorRateParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        control_features = kwargs.get(_KW_CONTROL_FEATURES)
+        X_train, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
         if control_features is None:
             event = _ALL
         else:
             event = control_features
-        super().load_data(X, y, event=event, utilities=np.vstack([y, 1-y]).T, **kwargs)
+        super().load_data(X_train, y_train,
+                          event=event,
+                          utilities=np.vstack([y_train, 1-y_train]).T,
+                          sensitive_features=sensitive_features)

@@ -83,28 +83,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.lambda_vecs_LP_ = pd.DataFrame()
         self.lambda_vecs_ = pd.DataFrame()
 
-        if isinstance(self.constraints, ClassificationMoment):
-            logger.debug("Classification problem detected")
-            is_classification_reduction = True
-        else:
-            logger.debug("Regression problem detected")
-            is_classification_reduction = False
-
-        _, y_train, sensitive_features, control_features = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=is_classification_reduction,
-                                         **kwargs)
-
-        n = y_train.shape[0]
-
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self.eps
-        lagrangian = _Lagrangian(X, y_train, self.estimator,
+        lagrangian = _Lagrangian(X, y, self.estimator,
                                  self.constraints, B,
                                  sample_weight_name=self.sample_weight_name,
-                                 sensitive_features=sensitive_features,
-                                 control_features=control_features)
+                                 **kwargs)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
@@ -127,7 +112,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             if t == 0:
                 if self.nu is None:
-                    self.nu = _ACCURACY_MUL * (h(X) - y_train).abs().std() / np.sqrt(n)
+                    self.nu = _ACCURACY_MUL * (h(X) - self.constraints.y_reformat).abs().std() / \
+                        np.sqrt(self.constraints.total_samples)
                 eta = self.eta0 / B
                 logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
                              self.eps, B, self.nu, self.max_iter)

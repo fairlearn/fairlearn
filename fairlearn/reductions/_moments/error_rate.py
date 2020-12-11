@@ -12,9 +12,9 @@ class ErrorRate(ClassificationMoment):
 
     short_name = "Err"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        super().load_data(X, y, **kwargs)
+        super().load_data(X, y, sensitive_features=sensitive_features)
         self.index = [_ALL]
 
     def gamma(self, predictor):
