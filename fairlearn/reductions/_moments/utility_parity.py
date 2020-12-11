@@ -19,8 +19,11 @@ _CTRL_EVENT_FORMAT = "control={0},{1}"
 
 
 def _combine_event_and_control(event: str, control: str) -> str:
-    if pd.notnull(event):
-        return _CTRL_EVENT_FORMAT.format(control, event)
+    if pd.notnull(control):
+        if event != _ALL:
+            return _CTRL_EVENT_FORMAT.format(control, event)
+        else:
+            return control
     else:
         return event
 
@@ -99,13 +102,21 @@ class UtilityParity(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
+    def compute_base_event(self, X: pd.DataFrame, y: pd.Series):
+        raise NotImplementedError()
+
+    def compute_utilities(self, X: pd.DataFrame, y: pd.Series):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+
+        utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
+                               np.ones(y.shape, dtype=np.float64)]).T
+        return utilities
+
     def load_data(self,
                   X: pd.DataFrame,
                   y: pd.Series,
-                  event=None,
-                  utilities=None,
-                  *,
-                  sensitive_features: pd.Series = None):
+                  **kwargs):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
@@ -119,16 +130,22 @@ class UtilityParity(ClassificationMoment):
         .. math::
         utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
-        if sensitive_features is not None:
-            assert isinstance(sensitive_features, pd.Series)
-        super().load_data(X, y, sensitive_features=sensitive_features)
+
+        X_train, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         **kwargs)
+
+        base_event = self.compute_base_event(X_train, y_train)
+        if cf_train is not None:
+            event = base_event.combine(cf_train, _combine_event_and_control)
+        else:
+            event = base_event
+
+        self.utilities = self.compute_utilities(X_train, y_train)
+
+        super().load_data(X_train, y_train, sensitive_features=sf_train)
         self.tags[_EVENT] = event
-        if utilities is None:
-            utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
-                                   np.ones(y.shape, dtype=np.float64)]).T
-        self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -272,23 +289,11 @@ class DemographicParity(UtilityParity):
 
     short_name = "DemographicParity"
 
-    def load_data(self, X, y, *, sensitive_features, control_features=None):
-        """Load the specified data into the object.
+    def compute_base_event(self, X, y):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
 
-        The arguments may include a `control_features=` to specify
-        one or more columns which are to be used as control features.
-        """
-        X_train, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
-        if control_features is None:
-            super().load_data(X_train, y_train, event=_ALL, sensitive_features=sf_train)
-        else:
-            super().load_data(X_train, y_train,
-                              event=control_features,
-                              sensitive_features=sf_train)
+        return pd.Series(data=_ALL, index=range(y.shape[0]))
 
 
 class TruePositiveRateParity(UtilityParity):
@@ -325,21 +330,13 @@ class TruePositiveRateParity(UtilityParity):
 
     short_name = "TruePositiveRateParity"
 
-    def load_data(self, X, y,  *, sensitive_features, control_features=None):
-        """Load the specified data into the object."""
-        X_train, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
-
+    def compute_base_event(self, X, y):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
-        base_event = pd.Series(y_train).apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 1)
-        if cf_train is not None:
-            event = base_event.combine(cf_train, _combine_event_and_control)
-        else:
-            event = base_event
-        super().load_data(X_train, y_train, event=event, sensitive_features=sf_train)
+        base_event = y.apply(lambda v: _LABEL + "=" + str(v)).where(y == 1)
+
+        return base_event
 
 
 class FalsePositiveRateParity(UtilityParity):
@@ -370,22 +367,13 @@ class FalsePositiveRateParity(UtilityParity):
 
     short_name = "FalsePositiveRateParity"
 
-    def load_data(self, X, y, *, sensitive_features, control_features=None):
-        """Load the specified data into the object."""
-
-        X_train, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
-
+    def compute_base_event(self, X, y):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        base_event = pd.Series(y_train).apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 0)
-        if cf_train is not None:
-            event = base_event.combine(cf_train, _combine_event_and_control)
-        else:
-            event = base_event
-        super().load_data(X_train, y_train, event=event, sensitive_features=sf_train)
+        base_event = y.apply(lambda v: _LABEL + "=" + str(v)).where(y == 0)
+
+        return base_event
 
 
 class EqualizedOdds(UtilityParity):
@@ -415,21 +403,13 @@ class EqualizedOdds(UtilityParity):
 
     short_name = "EqualizedOdds"
 
-    def load_data(self, X, y, *, sensitive_features, control_features=None):
-        """Load the specified data into the object."""
+    def compute_base_event(self, X, y):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+        # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
+        base_event = y.apply(lambda v: _LABEL + "=" + str(v))
 
-        X_train, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
-
-        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v))
-        if cf_train is not None:
-            event = base_event.combine(cf_train, _combine_event_and_control)
-        else:
-            event = base_event
-        super().load_data(X_train, y_train, event=event, sensitive_features=sensitive_features)
+        return base_event
 
 
 class ErrorRateParity(UtilityParity):
@@ -455,19 +435,14 @@ class ErrorRateParity(UtilityParity):
 
     short_name = "ErrorRateParity"
 
-    def load_data(self, X, y, *, sensitive_features, control_features=None):
-        """Load the specified data into the object."""
-        X_train, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+    def compute_base_event(self, X, y):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
 
-        if control_features is None:
-            event = _ALL
-        else:
-            event = control_features
-        super().load_data(X_train, y_train,
-                          event=event,
-                          utilities=np.vstack([y_train, 1-y_train]).T,
-                          sensitive_features=sensitive_features)
+        return pd.Series(data=_ALL, index=range(y.shape[0]))
+
+    def compute_utilities(self, X: pd.DataFrame, y: pd.Series):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+
+        return np.vstack([y, 1-y]).T

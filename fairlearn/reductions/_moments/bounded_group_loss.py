@@ -37,13 +37,13 @@ class ConditionalLossMoment(LossMoment):
 
     def load_data(self, X, y, *, sensitive_features):
         """Load data into the moment object."""
-        _, y_train, sensitive_features, _ = \
+        X_train, y_train, sf_train, _ = \
             _validate_and_reformat_input(X, y,
                                          enforce_binary_labels=False,
                                          sensitive_features=sensitive_features)
         if self.no_groups:
-            sensitive_features = pd.Series(y).apply(lambda y: _ALL)
-        super().load_data(X, y, sensitive_features=sensitive_features)
+            sensitive_features = y_train.apply(lambda v: _ALL)
+        super().load_data(X_train, y_train, sensitive_features=sf_train)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr
