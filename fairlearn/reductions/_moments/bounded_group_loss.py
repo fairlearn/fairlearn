@@ -5,9 +5,6 @@ import pandas as pd
 import numpy as np
 from .moment import LossMoment
 from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
-from fairlearn._input_validation import _KW_SENSITIVE_FEATURES, _KW_CONTROL_FEATURES
-
-_NO_CONDITIONAL_FEATURES = "Conditional features are not supported for regression moments"
 
 
 class ConditionalLossMoment(LossMoment):
@@ -36,14 +33,11 @@ class ConditionalLossMoment(LossMoment):
         """Return a default objective."""
         return MeanLoss(self.reduction_loss)
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features):
         """Load data into the moment object."""
-        if kwargs.get(_KW_CONTROL_FEATURES) is not None:
-            raise ValueError(_NO_CONDITIONAL_FEATURES)
-        kwargs_mod = kwargs.copy()
         if self.no_groups:
-            kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
-        super().load_data(X, y, **kwargs_mod)
+            sensitive_features = pd.Series(y).apply(lambda y: _ALL)
+        super().load_data(X, y, sensitive_features=sensitive_features)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr
