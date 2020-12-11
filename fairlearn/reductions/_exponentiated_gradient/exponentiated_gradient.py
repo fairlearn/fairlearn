@@ -100,9 +100,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self.eps
-        lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
+        lagrangian = _Lagrangian(X, y_train, self.estimator,
                                  self.constraints, B,
                                  sample_weight_name=self.sample_weight_name,
+                                 sensitive_features=sensitive_features,
                                  control_features=control_features)
 
         theta = pd.Series(0, lagrangian.constraints.index)
