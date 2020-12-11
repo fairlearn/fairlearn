@@ -9,7 +9,7 @@ trigger: none # No CI build
 pr: none # Not for pull requests
 
 schedules:
-- cron: "0 6 * * *" # Time is UTC
+- cron: "0 10 * * *" # Time is UTC
   displayName: Nightly Build
   branches:
     include:
