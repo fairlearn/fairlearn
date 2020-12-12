@@ -43,7 +43,7 @@ class ConditionalLossMoment(LossMoment):
                                          sensitive_features=sensitive_features)
         if self.no_groups:
             sf_train = y_train.apply(lambda v: _ALL)
-            
+
         # The following uses X and not X_train so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples

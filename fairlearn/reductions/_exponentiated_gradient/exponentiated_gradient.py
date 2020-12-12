@@ -12,7 +12,6 @@ from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCR
 from ._lagrangian import _Lagrangian
 
 from fairlearn.reductions._moments import ClassificationMoment
-from fairlearn._input_validation import _validate_and_reformat_input
 
 logger = logging.getLogger(__name__)
 

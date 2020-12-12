@@ -130,7 +130,6 @@ class UtilityParity(ClassificationMoment):
         .. math::
         utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
-
         X_train, y_train, sf_train, cf_train = \
             _validate_and_reformat_input(X, y,
                                          enforce_binary_labels=True,
