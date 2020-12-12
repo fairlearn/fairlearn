@@ -127,20 +127,11 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        _, y_train, sensitive_features_train, control_features_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=is_classification_reduction,
-                                         **kwargs)
-
-        kwargs[_KW_SENSITIVE_FEATURES] = sensitive_features_train
-        if control_features_train is not None:
-            kwargs[_KW_CONTROL_FEATURES] = control_features_train
-
         # Prep the parity constraints and objective
         logger.debug("Preparing constraints and objective")
-        self.constraints.load_data(X, y_train, **kwargs)
+        self.constraints.load_data(X, y, **kwargs)
         objective = self.constraints.default_objective()
-        objective.load_data(X, y_train, **kwargs)
+        objective.load_data(X, y, **kwargs)
 
         # Basis information
         pos_basis = self.constraints.pos_basis
@@ -175,7 +166,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
-                y_reduction = y_train
+                y_reduction = self.constraints.y_reformat
 
             y_reduction_unique = np.unique(y_reduction)
             if len(y_reduction_unique) == 1:
