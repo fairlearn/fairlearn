@@ -109,6 +109,16 @@ class UtilityParity(ClassificationMoment):
     def compute_utilities(self, X: pd.DataFrame, y: pd.Series) -> np.ndarray:
         """Compute the utility for this moment.
 
+        The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
+        mentioned in the paper
+        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`.
+        The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
+        The first column is G^0 and the second is G^1.
+        Assumes binary classification with labels 0/1.
+
+        .. math::
+            utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+
         Parameters
         ----------
         X : pd.DataFrame
@@ -134,16 +144,18 @@ class UtilityParity(ClassificationMoment):
                   **kwargs):
         """Load the specified data into this object.
 
-        This adds a column `event` to the `tags` field.
+        In addition to the X array and y vector, sensitive and control
+        features may be passed to this method via arguments
+        :code:`sensitive_features=` and :code:`control_features=`.
+        If control features are present, they are prepended to the
+        events returned by :meth:`compute_base_event`.
 
-        The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
-        mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`.
-        The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
-        The first column is G^0 and the second is G^1.
-        Assumes binary classification with labels 0/1.
-        .. math::
-        utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
         """
         X_train, y_train, sf_train, cf_train = \
             _validate_and_reformat_input(X, y,
