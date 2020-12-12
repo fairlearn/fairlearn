@@ -102,10 +102,12 @@ class UtilityParity(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def compute_base_event(self, X: pd.DataFrame, y: pd.Series):
+    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
+        """Compute the base event (i.e. without control features) for the Moment."""
         raise NotImplementedError()
 
-    def compute_utilities(self, X: pd.DataFrame, y: pd.Series):
+    def compute_utilities(self, X: pd.DataFrame, y: pd.Series) -> np.ndarray:
+        """Compute the utility for this moment."""
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
 
@@ -289,7 +291,12 @@ class DemographicParity(UtilityParity):
 
     short_name = "DemographicParity"
 
-    def compute_base_event(self, X, y):
+    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
+        """Compute the base event for demographic parity.
+
+        This is an array filled with a constant string, since
+        demographic parity is measured across all samples.
+        """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
 
@@ -330,7 +337,12 @@ class TruePositiveRateParity(UtilityParity):
 
     short_name = "TruePositiveRateParity"
 
-    def compute_base_event(self, X, y):
+    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
+        """Compute the basic event for false positive parity.
+
+        This is an array with the string :code:`LABEL=1` where :code:`y` is
+        one.
+        """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
@@ -367,7 +379,12 @@ class FalsePositiveRateParity(UtilityParity):
 
     short_name = "FalsePositiveRateParity"
 
-    def compute_base_event(self, X, y):
+    def compute_base_event(self, X: pd.DataFrame, y: pd.DataFrame) -> pd.Series:
+        """Compute the basic event for false positive parity.
+
+        This is an array with the string :code:`LABEL=0` where :code:`y` is
+        zero.
+        """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
@@ -404,6 +421,11 @@ class EqualizedOdds(UtilityParity):
     short_name = "EqualizedOdds"
 
     def compute_base_event(self, X, y):
+        """Compute the basic event for equalized odds.
+
+        This is an array with the string :code:`LABEL=[y]` for
+        each :code:`y` value (i.e. 0 or 1).
+        """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
         base_event = y.apply(lambda v: _LABEL + "=" + str(v))
@@ -434,13 +456,19 @@ class ErrorRateParity(UtilityParity):
 
     short_name = "ErrorRateParity"
 
-    def compute_base_event(self, X, y):
+    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
+        """Compute the base event for error rate parity.
+
+        Since this applies to all samples, the result is an array filled
+        with a constant string.
+        """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
 
         return pd.Series(data=_ALL, index=range(y.shape[0]))
 
-    def compute_utilities(self, X: pd.DataFrame, y: pd.Series):
+    def compute_utilities(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
+        """Compute the utility for error rate parity."""
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
 
