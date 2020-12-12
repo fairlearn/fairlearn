@@ -42,7 +42,7 @@ class ConditionalLossMoment(LossMoment):
                                          enforce_binary_labels=False,
                                          sensitive_features=sensitive_features)
         if self.no_groups:
-            sensitive_features = y_train.apply(lambda v: _ALL)
+            sf_train = y_train.apply(lambda v: _ALL)
         super().load_data(X_train, y_train, sensitive_features=sf_train)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples
         self.index = self.prob_attr.index
