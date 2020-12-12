@@ -31,26 +31,32 @@ class Moment:
                   sensitive_features: pd.Series = None):
         """Load a set of data for use by this object.
 
-        The keyword arguments can contain a :code:`sensitive_features` array.
-
-        :param X: The feature data
-        :type X: array
-
-        :param y: The true label data
-        :type y: array
+        Parameters
+        ----------
+        X : array
+            The feature array
+        y : pandas.Series
+            The label vector
+        sensitive_features : pandas.Series
+            The sensitive feature vector (default None)
         """
         assert self.data_loaded is False, \
             "data can be loaded only once"
         assert isinstance(y, pd.Series)
         if sensitive_features is not None:
             assert isinstance(sensitive_features, pd.Series)
-        self.X = X
+        self._X = X
         self._y = y
         self.tags = pd.DataFrame({_LABEL: y})
         if sensitive_features is not None:
             self.tags[_GROUP_ID] = sensitive_features
         self.data_loaded = True
         self._gamma_descr = None
+
+    @property
+    def X(self):
+        """Return the feature array as supplied to :meth:`load_data`."""
+        return self._X
 
     @property
     def total_samples(self):

@@ -107,7 +107,20 @@ class UtilityParity(ClassificationMoment):
         raise NotImplementedError()
 
     def compute_utilities(self, X: pd.DataFrame, y: pd.Series) -> np.ndarray:
-        """Compute the utility for this moment."""
+        """Compute the utility for this moment.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
+
+        Returns
+        -------
+        pandas.Series
+            The utility vector
+        """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
 
@@ -296,6 +309,18 @@ class DemographicParity(UtilityParity):
 
         This is an array filled with a constant string, since
         demographic parity is measured across all samples.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
+
+        Returns
+        -------
+        pandas.Series
+            The event vector
         """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
@@ -342,6 +367,18 @@ class TruePositiveRateParity(UtilityParity):
 
         This is an array with the string :code:`LABEL=1` where :code:`y` is
         one.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
+
+        Returns
+        -------
+        pandas.Series
+            The event vector
         """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
@@ -384,6 +421,18 @@ class FalsePositiveRateParity(UtilityParity):
 
         This is an array with the string :code:`LABEL=0` where :code:`y` is
         zero.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
+
+        Returns
+        -------
+        pandas.Series
+            The event vector
         """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
@@ -425,6 +474,18 @@ class EqualizedOdds(UtilityParity):
 
         This is an array with the string :code:`LABEL=[y]` for
         each :code:`y` value (i.e. 0 or 1).
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
+
+        Returns
+        -------
+        pandas.Series
+            The event vector
         """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
@@ -461,6 +522,18 @@ class ErrorRateParity(UtilityParity):
 
         Since this applies to all samples, the result is an array filled
         with a constant string.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
+
+        Returns
+        -------
+        pandas.Series
+            The event vector
         """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
@@ -468,7 +541,20 @@ class ErrorRateParity(UtilityParity):
         return pd.Series(data=_ALL, index=range(y.shape[0]))
 
     def compute_utilities(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
-        """Compute the utility for error rate parity."""
+        """Compute the utility for error rate parity.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The feature array as a :class:`pandas.DataFrame`
+        y : pd.Series
+            The label vector as a :class:`pandas.Series`
+
+        Returns
+        -------
+        pandas.Series
+            The utility vector
+        """
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
 
