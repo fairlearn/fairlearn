@@ -10,8 +10,6 @@ from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
 from time import time
 
-from fairlearn._input_validation import _validate_and_reformat_input
-from fairlearn._input_validation import _KW_SENSITIVE_FEATURES, _KW_CONTROL_FEATURES
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from ._grid_generator import _GridGenerator
 
