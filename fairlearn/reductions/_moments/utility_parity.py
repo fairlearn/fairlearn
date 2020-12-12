@@ -406,7 +406,6 @@ class EqualizedOdds(UtilityParity):
     def compute_base_event(self, X, y):
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
-        # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
         base_event = y.apply(lambda v: _LABEL + "=" + str(v))
 
         return base_event
