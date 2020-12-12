@@ -22,9 +22,9 @@ sfs = ["F", "G"]
 
 # Numbers for each intersection
 n = {
-    "A": {"F": 80, "G": 120},
-    "B": {"F": 300, "G": 350},
-    "C": {"F": 800, "G": 650},
+    "A": {"F": 80, "G": 100},
+    "B": {"F": 200, "G": 50},
+    "C": {"F": 400, "G": 350},
 }
 
 # Approval rates for each intersection
@@ -36,7 +36,7 @@ f = {
 
 
 def run_comparisons(moment, metric_fn):
-    X, y = loan_scenario_generator(n, f, sfs, ibs, seed=1632753)
+    X, y = loan_scenario_generator(n, f, sfs, ibs, seed=163)
     X_dummy = pd.get_dummies(X)
 
     mf_input = MetricFrame(metric_fn, y, y,
@@ -60,7 +60,7 @@ def run_comparisons(moment, metric_fn):
     expgrad_basic = ExponentiatedGradient(
         LogisticRegression(),
         constraints=moment(),
-        eps=0.01)
+        eps=0.005)
     expgrad_basic.fit(X_dummy, y, sensitive_features=X['sens'])
     y_pred_basic = expgrad_basic.predict(X_dummy, random_state=8235)
     mf_basic = MetricFrame(metric_fn, y, y_pred_basic,
@@ -73,11 +73,11 @@ def run_comparisons(moment, metric_fn):
     expgrad_control = ExponentiatedGradient(
         LogisticRegression(),
         constraints=moment(),
-        eps=0.01)
+        eps=0.005)
     expgrad_control.fit(X_dummy, y,
                         sensitive_features=X['sens'],
                         control_features=X['ctrl'])
-    y_pred_control = expgrad_control.predict(X_dummy, random_state=8352)
+    y_pred_control = expgrad_control.predict(X_dummy, random_state=852)
     mf_control = MetricFrame(metric_fn, y, y_pred_control,
                              sensitive_features=X['sens'],
                              control_features=X['ctrl'])
