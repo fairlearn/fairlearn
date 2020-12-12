@@ -25,7 +25,7 @@ class Moment:
         self.data_loaded = False
 
     def load_data(self,
-                  X: pd.DataFrame,
+                  X,
                   y: pd.Series,
                   *,
                   sensitive_features: pd.Series = None):
@@ -41,7 +41,6 @@ class Moment:
         """
         assert self.data_loaded is False, \
             "data can be loaded only once"
-        assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
         if sensitive_features is not None:
             assert isinstance(sensitive_features, pd.Series)

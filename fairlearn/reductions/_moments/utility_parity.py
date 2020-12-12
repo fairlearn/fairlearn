@@ -144,7 +144,8 @@ class UtilityParity(ClassificationMoment):
 
         self.utilities = self.compute_utilities(X_train, y_train)
 
-        super().load_data(X_train, y_train, sensitive_features=sf_train)
+        # The following uses X and not X_train so that the estimators get X untouched
+        super().load_data(X, y_train, sensitive_features=sf_train)
         self.tags[_EVENT] = event
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
