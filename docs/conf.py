@@ -153,6 +153,10 @@ html_sidebars = {
     "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
 }
 
+# Change the ordering of the member documentation
+
+autodoc_member_order = 'groupwise'
+
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
 
