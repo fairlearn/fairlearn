@@ -503,7 +503,8 @@ of *control features*.
 A control feature stratifies the dataset, and applies the fairness constraint
 within each stratum, but not between strata.
 An example were this might be useful is a loan scenario, where we might want
-to apply a mitigation for the sensitive features while controlling for another.
+to apply a mitigation for the sensitive features while controlling for some
+other feature(s).
 This should be done with caution, since the control features may have a
 correlation with the sensitive features due to historical biases.
 In the loan scenario, we might choose to control for income level, on the
