@@ -17,6 +17,7 @@ from ._moments import (DemographicParity, EqualizedOdds,  # noqa: F401
                        FalsePositiveRateParity)   # noqa: F401
 from ._moments import BoundedGroupLoss, SquareLoss, ZeroOneLoss  # noqa: F401
 from ._moments import ClassificationMoment, LossMoment  # noqa: F401
+from ._moments import CDF_DemographicParity, WeightedErrorRate
 
 _exponentiated_gradient = [
     "ExponentiatedGradient",
@@ -40,7 +41,9 @@ _moments = [
     "BoundedGroupLoss",
     "LossMoment",
     "SquareLoss",
-    "ZeroOneLoss"
+    "ZeroOneLoss",
+    "CDF_DemographicParity",
+    "WeightedErrorRate"
 ]
 
 __all__ = [] + _exponentiated_gradient + _grid_search + _moments
