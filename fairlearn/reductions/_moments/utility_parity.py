@@ -20,12 +20,16 @@ _CTRL_EVENT_FORMAT = "control={0},{1}"
 
 def _combine_event_and_control(event: str, control: str) -> str:
     if pd.notnull(control):
-        if event != _ALL:
-            return _CTRL_EVENT_FORMAT.format(control, event)
-        else:
-            return control
+        return _CTRL_EVENT_FORMAT.format(control, event)
     else:
         return event
+
+
+def _merge_event_and_control_columns(event_col, control_col):
+    if control_col is None:
+        return event_col
+    else:
+        return event_col.combine(control_col, _combine_event_and_control)
 
 
 class UtilityParity(ClassificationMoment):

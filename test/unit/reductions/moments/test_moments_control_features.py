@@ -61,8 +61,11 @@ def _simple_compare(moment, metric):
     # Compare (with a very small amount of wriggle room)
     for ib in ibs:
         for sf in sfs:
-            assert diffs[(ib, sf)] == pytest.approx(results[('+', ib, sf)], rel=1e-10, abs=1e-12)
-            assert diffs[(ib, sf)] == pytest.approx(-results[('-', ib, sf)], rel=1e-10, abs=1e-12)
+            event_format = "control={0},all"
+            assert diffs[(ib, sf)] == pytest.approx(results[('+', event_format.format(ib), sf)],
+                                                    rel=1e-10, abs=1e-12)
+            assert diffs[(ib, sf)] == pytest.approx(-results[('-', event_format.format(ib), sf)],
+                                                    rel=1e-10, abs=1e-12)
 
 
 def test_demographic_parity():
