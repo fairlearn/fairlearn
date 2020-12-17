@@ -106,12 +106,16 @@ class UtilityParity(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
-        """Compute the base event (i.e. without control features) for the Moment."""
-        raise NotImplementedError()
+    def load_data(self,
+                  X,
+                  y: pd.Series,
+                  *,
+                  sensitive_features: pd.Series,
+                  event: pd.Series = None,
+                  utilities=None):
+        """Load the specified data into this object.
 
-    def compute_utilities(self, X: pd.DataFrame, y: pd.Series) -> np.ndarray:
-        """Compute the utility for this moment.
+        This adds a column `event` to the `tags` field.
 
         The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
         mentioned in the paper
@@ -122,61 +126,13 @@ class UtilityParity(ClassificationMoment):
 
         .. math::
             utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-
-        Returns
-        -------
-        pandas.Series
-            The utility vector
         """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
-
-        utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
-                               np.ones(y.shape, dtype=np.float64)]).T
-        return utilities
-
-    def load_data(self,
-                  X: pd.DataFrame,
-                  y: pd.Series,
-                  **kwargs):
-        """Load the specified data into this object.
-
-        In addition to the X array and y vector, sensitive and control
-        features may be passed to this method via arguments
-        :code:`sensitive_features=` and :code:`control_features=`.
-        If control features are present, they are prepended to the
-        events returned by :meth:`compute_base_event`.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-        """
-        X_train, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         **kwargs)
-
-        base_event = self.compute_base_event(X_train, y_train)
-        if cf_train is not None:
-            event = base_event.combine(cf_train, _combine_event_and_control)
-        else:
-            event = base_event
-
-        self.utilities = self.compute_utilities(X_train, y_train)
-
-        # The following uses X and not X_train so that the estimators get X untouched
-        super().load_data(X, y_train, sensitive_features=sf_train)
+        super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
+        if utilities is None:
+            utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
+                                   np.ones(y.shape, dtype=np.float64)]).T
+        self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = self.tags.groupby(
             [_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -320,28 +276,17 @@ class DemographicParity(UtilityParity):
 
     short_name = "DemographicParity"
 
-    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
-        """Compute the base event for demographic parity.
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
+        """Load the specified data into the object."""
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
 
-        This is an array filled with a constant string, since
-        demographic parity is measured across all samples.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-
-        Returns
-        -------
-        pandas.Series
-            The event vector
-        """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
-
-        return pd.Series(data=_ALL, index=range(y.shape[0]))
+        base_event = pd.Series(data=_ALL, index=range(y_train.shape[0]))
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class TruePositiveRateParity(UtilityParity):
@@ -378,30 +323,18 @@ class TruePositiveRateParity(UtilityParity):
 
     short_name = "TruePositiveRateParity"
 
-    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
-        """Compute the basic event for false positive parity.
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
+        """Load the specified data into the object."""
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
 
-        This is an array with the string :code:`LABEL=1` where :code:`y` is
-        one.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-
-        Returns
-        -------
-        pandas.Series
-            The event vector
-        """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
-        base_event = y.apply(lambda v: _LABEL + "=" + str(v)).where(y == 1)
-
-        return base_event
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 1)
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class FalsePositiveRateParity(UtilityParity):
@@ -432,30 +365,18 @@ class FalsePositiveRateParity(UtilityParity):
 
     short_name = "FalsePositiveRateParity"
 
-    def compute_base_event(self, X: pd.DataFrame, y: pd.DataFrame) -> pd.Series:
-        """Compute the basic event for false positive parity.
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
+        """Load the specified data into the object."""
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
 
-        This is an array with the string :code:`LABEL=0` where :code:`y` is
-        zero.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-
-        Returns
-        -------
-        pandas.Series
-            The event vector
-        """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        base_event = y.apply(lambda v: _LABEL + "=" + str(v)).where(y == 0)
-
-        return base_event
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 0)
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class EqualizedOdds(UtilityParity):
@@ -485,29 +406,17 @@ class EqualizedOdds(UtilityParity):
 
     short_name = "EqualizedOdds"
 
-    def compute_base_event(self, X, y):
-        """Compute the basic event for equalized odds.
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
+        """Load the specified data into the object."""
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
 
-        This is an array with the string :code:`LABEL=[y]` for
-        each :code:`y` value (i.e. 0 or 1).
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-
-        Returns
-        -------
-        pandas.Series
-            The event vector
-        """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
-        base_event = y.apply(lambda v: _LABEL + "=" + str(v))
-
-        return base_event
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(y_train))
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class ErrorRateParity(UtilityParity):
@@ -533,45 +442,18 @@ class ErrorRateParity(UtilityParity):
 
     short_name = "ErrorRateParity"
 
-    def compute_base_event(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
-        """Compute the base event for error rate parity.
-
-        Since this applies to all samples, the result is an array filled
-        with a constant string.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-
-        Returns
-        -------
-        pandas.Series
-            The event vector
-        """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
-
-        return pd.Series(data=_ALL, index=range(y.shape[0]))
-
-    def compute_utilities(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:
-        """Compute the utility for error rate parity.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            The feature array as a :class:`pandas.DataFrame`
-        y : pd.Series
-            The label vector as a :class:`pandas.Series`
-
-        Returns
-        -------
-        pandas.Series
-            The utility vector
-        """
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
-
-        return np.vstack([y, 1-y]).T
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
+        """Load the specified data into the object."""
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+        utilities = np.vstack([y_train, 1-y_train]).T
+        base_event = pd.Series(data=_ALL, index=range(y_train.shape[0]))
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(
+            X, y_train,
+            event=event,
+            utilities=utilities,
+            sensitive_features=sf_train)
