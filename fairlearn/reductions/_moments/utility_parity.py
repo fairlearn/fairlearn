@@ -414,7 +414,7 @@ class EqualizedOdds(UtilityParity):
                                          sensitive_features=sensitive_features,
                                          control_features=control_features)
 
-        base_event = y_train.apply(lambda v: _LABEL + "=" + str(y_train))
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v))
         event = _merge_event_and_control_columns(base_event, cf_train)
         super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
