@@ -15,7 +15,7 @@ _LOWER_BOUND_DIFF = "lower_bound_diff"
 _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be used."
 _DEFAULT_DIFFERENCE_BOUND = 0.01
 
-_CTRL_EVENT_FORMAT = "control={0},{1}"
+_CTRL_EVENT_FORMAT = "control={0},event={1}"
 
 
 def _combine_event_and_control(event: str, control: str) -> str:
@@ -305,8 +305,8 @@ class DemographicParity(UtilityParity):
     to Example 3 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    This Moment also supports control features, which can be used to
-    stratify the data, with the Demographic Parity applied within
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the Demographic Parity constraint applied within
     each stratum, but not between strata. If the control feature groups
     are :math:`c \in \mathcal{C}` then the above equation will become
 
