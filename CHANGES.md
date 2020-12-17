@@ -1,5 +1,10 @@
 # Changes
 
+### v0.5.1
+
+* Add `control_features` to the classification moments
+* Update `make_derived_metric()` to use `MetricFrame`
+
 ### v0.5.0
 
 * Adjust classes to abide by naming conventions for attributes.
