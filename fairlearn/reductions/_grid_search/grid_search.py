@@ -164,7 +164,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
-                y_reduction = self.constraints.y_reformat
+                y_reduction = self.constraints._y_as_series
 
             y_reduction_unique = np.unique(y_reduction)
             if len(y_reduction_unique) == 1:

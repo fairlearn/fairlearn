@@ -151,7 +151,7 @@ class _Lagrangian:
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
         else:
-            redY = self.constraints.y_reformat
+            redY = self.constraints._y_as_series
         redW = signed_weights.abs()
         redW = self.constraints.total_samples * redW / redW.sum()
 

@@ -59,7 +59,7 @@ class Moment:
         return self.X.shape[0]
 
     @property
-    def y_reformat(self):
+    def _y_as_series(self):
         """Return the y array as a :class:`~pandas.Series`."""
         return self._y
 

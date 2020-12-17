@@ -111,7 +111,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
             if t == 0:
                 if self.nu is None:
-                    self.nu = _ACCURACY_MUL * (h(X) - self.constraints.y_reformat).abs().std() / \
+                    self.nu = _ACCURACY_MUL * (h(X) - self.constraints._y_as_series).abs().std() / \
                         np.sqrt(self.constraints.total_samples)
                 eta = self.eta0 / B
                 logger.debug("...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
