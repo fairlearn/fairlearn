@@ -284,7 +284,7 @@ class DemographicParity(UtilityParity):
                                          sensitive_features=sensitive_features,
                                          control_features=control_features)
 
-        base_event = pd.Series(data=_ALL, index=range(y_train.shape[0]))
+        base_event = pd.Series(data=_ALL, index=y_train.index)
         event = _merge_event_and_control_columns(base_event, cf_train)
         super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
@@ -450,7 +450,7 @@ class ErrorRateParity(UtilityParity):
                                          sensitive_features=sensitive_features,
                                          control_features=control_features)
         utilities = np.vstack([y_train, 1-y_train]).T
-        base_event = pd.Series(data=_ALL, index=range(y_train.shape[0]))
+        base_event = pd.Series(data=_ALL, index=y_train.index)
         event = _merge_event_and_control_columns(base_event, cf_train)
         super().load_data(
             X, y_train,
