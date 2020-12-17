@@ -496,10 +496,10 @@ constraints:
 Control features
 ^^^^^^^^^^^^^^^^
 
-The above moments (:ref:`demographic_parity`,
+The above :class:`Moment`s (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
 :ref:`equalized_odds` and :ref:`error_rate_parity`) all support the concept
-of *control features*.
+of *control features* when applying their fairness constraints.
 A control feature stratifies the dataset, and applies the fairness constraint
 within each stratum, but not between strata.
 One case this might be useful is a loan scenario, where we might want
