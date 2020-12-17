@@ -15,7 +15,7 @@ _LOWER_BOUND_DIFF = "lower_bound_diff"
 _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be used."
 _DEFAULT_DIFFERENCE_BOUND = 0.01
 
-_CTRL_EVENT_FORMAT = "control={0},event={1}"
+_CTRL_EVENT_FORMAT = "control={0},{1}"
 
 
 def _combine_event_and_control(event: str, control: str) -> str:
