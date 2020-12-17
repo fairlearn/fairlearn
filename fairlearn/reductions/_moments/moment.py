@@ -45,18 +45,13 @@ class Moment:
         assert isinstance(y, pd.Series)
         if sensitive_features is not None:
             assert isinstance(sensitive_features, pd.Series)
-        self._X = X
+        self.X = X
         self._y = y
         self.tags = pd.DataFrame({_LABEL: y})
         if sensitive_features is not None:
             self.tags[_GROUP_ID] = sensitive_features
         self.data_loaded = True
         self._gamma_descr = None
-
-    @property
-    def X(self):
-        """Return the feature array as supplied to :meth:`load_data`."""
-        return self._X
 
     @property
     def total_samples(self):
