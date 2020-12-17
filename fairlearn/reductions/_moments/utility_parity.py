@@ -319,6 +319,10 @@ class TruePositiveRateParity(UtilityParity):
     the costs for `Y=1` as they are calculated in Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`, but will use
     the weights equal to zero for `Y=0`.
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "TruePositiveRateParity"
@@ -361,6 +365,10 @@ class FalsePositiveRateParity(UtilityParity):
     the costs for `Y=0` as they are calculated in Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
     but will use the weights equal to zero for `Y=1`.
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "FalsePositiveRateParity"
@@ -402,6 +410,10 @@ class EqualizedOdds(UtilityParity):
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "EqualizedOdds"
@@ -438,6 +450,10 @@ class ErrorRateParity(UtilityParity):
     The :meth:`signed_weights` method will compute the costs according to Example 3 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "ErrorRateParity"
