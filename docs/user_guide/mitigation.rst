@@ -502,7 +502,7 @@ The above moments (:ref:`demographic_parity`,
 of *control features*.
 A control feature stratifies the dataset, and applies the fairness constraint
 within each stratum, but not between strata.
-An example were this might be useful is a loan scenario, where we might want
+One case this might be useful is a loan scenario, where we might want
 to apply a mitigation for the sensitive features while controlling for some
 other feature(s).
 This should be done with caution, since the control features may have a
@@ -510,12 +510,13 @@ correlation with the sensitive features due to historical biases.
 In the loan scenario, we might choose to control for income level, on the
 grounds that higher income individuals are more likely to be able to repay
 a loan.
-However, due to historic bias, there is a correlation between the income level
+However, due to historical bias, there is a correlation between the income level
 of individuals and their race and gender.
 
 
 Control features modify the above equations.
-Consider a control feature :math:`c \in \mathcal{C}`.
+Consider a control feature value, drawn from a set of valid values
+(that is, :math:`c \in \mathcal{C}`).
 The equation given above for Demographic Parity will become:
 
 
