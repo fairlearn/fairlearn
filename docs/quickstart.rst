@@ -22,6 +22,17 @@ Fairlearn is also available on
 
 For checking out the latest version in our repository check out our
 :ref:`advanced_install`.
+If you are updating from a previous version of Fairlearn, please
+see :ref:`version_migration_guide`.
+
+.. note::
+
+    The Fairlearn API is still evolving, so example code in 
+    this documentation may not work with every version of Fairlearn.
+    Please use the version selector to get to the instructions for
+    the appropriate version. The instructions for the :code:`master`
+    branch require Fairlearn to be installed from a clone of the
+    repository. See :ref:`advanced_install` for the required steps.
 
 Overview of Fairlearn
 ---------------------
@@ -76,10 +87,8 @@ than $50,000 a year.
     Female    16192
     Name: sex, dtype: int64
 
-.. figure:: auto_examples/quickstart/images/sphx_glr_plot_adult_dataset_001.png
-   :target: auto_examples/quickstart/plot_adult_dataset.html
-   :align: center
-   :scale: 70%
+.. bokeh-plot:: quickstart_plot.py
+    :source-position: none
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -88,11 +97,12 @@ Firstly, Fairlearn provides fairness-related metrics that can be compared
 between groups and for the overall population. Using existing metric
 definitions from
 `scikit-learn <https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics>`_
-we can evaluate metrics to get a group summary as below:
+we can evaluate metrics for subgroups within the data as below:
 
 .. doctest:: quickstart
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import group_summary
+    >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> 
@@ -100,20 +110,41 @@ we can evaluate metrics to get a group summary as below:
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.844..., 'by_group': {'Female': 0.925..., 'Male': 0.804...}}
+    >>> gm = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
+    >>> print(gm.overall)
+    0.8443552680070431
+    >>> print(gm.by_group)
+    sex
+    Female       0.925148
+    Male         0.804288
+    Name: accuracy_score, dtype: object
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
-selection rate, i.e., the percentage of the population with label 1:
+selection rate, i.e., the percentage of the population which have '1' as
+their label:
 
 .. doctest:: quickstart
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import selection_rate_group_summary
-    >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.163..., 'by_group': {'Female': 0.063..., 'Male': 0.213...}}
+    >>> from fairlearn.metrics import selection_rate
+    >>> sr = MetricFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
+    >>> sr.overall
+    0.16385487899758405
+    >>> sr.by_group
+    sex
+    Female      0.0635499
+    Male         0.213599 
+    Name: selection_rate, dtype: object   
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
+
+.. note::
+
+    The :code:`FairlearnDashboard` will move from Fairlearn to the
+    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
+    will provide some of the existing functionality through
+    :code:`matplotlib`-based visualizations.
 
 .. doctest:: quickstart
 
@@ -147,7 +178,8 @@ such decisions. The Exponentiated Gradient mitigation technique used fits the
 provided classifier using Demographic Parity as the objective, leading to
 a vastly reduced difference in selection rate:
 
-.. doctest:: quickstart
+.. doctest:: quickstart 
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import ExponentiatedGradient, DemographicParity
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
@@ -158,8 +190,14 @@ a vastly reduced difference in selection rate:
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
-    >>> selection_rate_group_summary(y_true, y_pred_mitigated, sensitive_features=sex)
-    {'overall': 0.166..., 'by_group': {'Female': 0.155..., 'Male': 0.171...}}
+    >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
+    >>> print(sr_mitigated.overall)
+    0.16614798738790384
+    >>> print(sr_mitigated.by_group)
+    sex
+    Female       0.155262
+    Male         0.171547
+    Name: selection_rate, dtype: object
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard

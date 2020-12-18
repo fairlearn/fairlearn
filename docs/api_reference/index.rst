@@ -12,3 +12,4 @@ API Reference
    fairlearn.reductions
    fairlearn.widget
    fairlearn.datasets
+   fairlearn.preprocessing

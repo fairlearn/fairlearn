@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 """Tools for analyzing and mitigating disparity in Machine Learning models."""
@@ -9,8 +9,8 @@ import os
 from .show_versions import show_versions  # noqa: F401
 
 __name__ = "fairlearn"
-__version__ = "0.4.7.dev0"
-
+__version__ = "0.5.1.dev0"
+_base_version = __version__  # To enable the v0.4.6 docs
 
 # Setup logging infrastructure
 # Only log to disk if environment variable FAIRLEARN_LOGS specified

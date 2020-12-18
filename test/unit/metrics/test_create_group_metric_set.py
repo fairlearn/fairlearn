@@ -1,9 +1,11 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import pytest
 
-from fairlearn.metrics import accuracy_score_group_summary, roc_auc_score_group_summary
+import sklearn.metrics as skm
+
+from fairlearn.metrics import MetricFrame
 from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
 from fairlearn.metrics._group_metric_set import _create_group_metric_set
@@ -164,7 +166,7 @@ class TestCreateGroupMetricSet:
             y_pred[name] = y_p_ts[i](expected['predictedY'][i])
 
         sensitive_features = {}
-        t_sfs = [lambda x: x, t_sf, lambda x:x]  # Only transform one sf
+        t_sfs = [lambda x: x, t_sf, lambda x: x]  # Only transform one sf
         for i, sf_file in enumerate(expected['precomputedFeatureBins']):
             sf = [sf_file['binLabels'][x] for x in sf_file['binVector']]
             sensitive_features[sf_file['featureBinName']] = t_sfs[i](sf)
@@ -181,8 +183,10 @@ class TestCreateGroupMetricSet:
         y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
         s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
 
-        exp_acc = accuracy_score_group_summary(y_t, y_p, sensitive_features=s_f)
-        exp_roc = roc_auc_score_group_summary(y_t, y_p, sensitive_features=s_f)
+        expected = MetricFrame({'accuracy_score': skm.accuracy_score,
+                                'roc_auc_score': skm.roc_auc_score},
+                               y_t, y_p,
+                               sensitive_features=s_f)
 
         predictions = {"some model": y_p}
         sensitive_feature = {"my sf": s_f}
@@ -202,9 +206,23 @@ class TestCreateGroupMetricSet:
         # Cross check the two metrics we computed
         # Comparisons simplified because s_f was already {0,1}
         actual_acc = actual['precomputedMetrics'][0][0]['accuracy_score']
-        assert actual_acc['global'] == exp_acc.overall
-        assert actual_acc['bins'] == list(exp_acc.by_group.values())
+        assert actual_acc['global'] == expected.overall['accuracy_score']
+        assert actual_acc['bins'] == list(expected.by_group['accuracy_score'])
 
         actual_roc = actual['precomputedMetrics'][0][0]['balanced_accuracy_score']
-        assert actual_roc['global'] == exp_roc.overall
-        assert actual_roc['bins'] == list(exp_roc.by_group.values())
+        assert actual_roc['global'] == expected.overall['roc_auc_score']
+        assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])
+
+    def test_regression_prediction_type(self):
+        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+
+        predictions = {"some model": y_p}
+        sensitive_feature = {"my sf": s_f}
+
+        # Using the `regression` prediction type should not crash
+        _create_group_metric_set(y_t,
+                                 predictions,
+                                 sensitive_feature,
+                                 'regression')

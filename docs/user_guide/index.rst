@@ -10,4 +10,5 @@ User Guide
    fairness_in_machine_learning
    assessment
    mitigation
+   migrating_versions/index
    further_resources

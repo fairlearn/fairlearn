@@ -1,9 +1,7 @@
 Developer call July 9, 2020
 ---------------------------
 
-These are collaborative notes. Please feel free to add points to the agenda that you wish to discuss. If the notes are missing things that you consider important, please add your thoughts. Thank you!
-
-What's here will be transferred to the Fairlearn repo.
+These are collaborative notes.
 
 Attendees:
 

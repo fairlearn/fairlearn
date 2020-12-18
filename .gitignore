@@ -118,3 +118,6 @@ docbuild/
 
 # OSX directory info files
 .DS_Store
+
+# widget files
+fairlearn/widget/js/node_modules/*

@@ -1,0 +1,13 @@
+name: fairlearn-xgboost
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python==3.8
+- pip>=19.1.1
+- pytest
+- xgboost
+
+# Note xgboost not available for Windows on conda-forge
+# See
+# https://stackoverflow.com/questions/62241123/unable-to-install-xgboost-on-conda-forge

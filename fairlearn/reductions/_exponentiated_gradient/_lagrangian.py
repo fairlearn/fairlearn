@@ -1,11 +1,11 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import logging
 import numpy as np
 import pandas as pd
-import pickle
 import scipy.optimize as opt
+from sklearn import clone
 from sklearn.dummy import DummyClassifier
 from time import time
 
@@ -38,9 +38,13 @@ class _Lagrangian:
     opt_lambda : bool
         indicates whether to optimize lambda during the calculation of the
         Lagrangian; optional with default value True
+    sample_weight_name : str
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
-    def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True):
+    def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True,
+                 sample_weight_name='sample_weight'):
         self.X = X
         self.n = self.X.shape[0]
         self.y = y
@@ -48,7 +52,7 @@ class _Lagrangian:
         self.constraints.load_data(X, y, sensitive_features=sensitive_features)
         self.obj = self.constraints.default_objective()
         self.obj.load_data(X, y, sensitive_features=sensitive_features)
-        self.pickled_estimator = pickle.dumps(estimator)
+        self.estimator = estimator
         self.B = B
         self.opt_lambda = opt_lambda
         self.hs = pd.Series(dtype="float64")
@@ -61,6 +65,7 @@ class _Lagrangian:
         self.n_oracle_calls_dummy_returned = 0
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
+        self.sample_weight_name = sample_weight_name
 
     def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
@@ -155,21 +160,26 @@ class _Lagrangian:
 
         redY_unique = np.unique(redY)
 
-        classifier = None
+        estimator = None
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
-            classifier = DummyClassifier(strategy='constant',
-                                         constant=redY_unique[0])
+            estimator = DummyClassifier(strategy='constant',
+                                        constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
-            classifier = pickle.loads(self.pickled_estimator)
+            # use sklearn.base.clone to clone the estimator.
+            # It is the same as copy.deepcopy for non-sklearn estimators (By using safe=False).
+            # For sklearn estimators, it is more efficient as it would not
+            # do a copy.deepcopy. Rather, instantiate a new estimator using the
+            # get_params() internally.
+            estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        classifier.fit(self.X, redY, sample_weight=redW)
+        estimator.fit(self.X, redY, **{self.sample_weight_name: redW})
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
-        return classifier
+        return estimator
 
     def best_h(self, lambda_vec):
         """Solve the best-response problem.
@@ -178,7 +188,15 @@ class _Lagrangian:
         the vector of Lagrange multipliers `lambda_vec`.
         """
         classifier = self._call_oracle(lambda_vec)
-        def h(X): return classifier.predict(X)
+
+        def h(X):
+            pred = classifier.predict(X)
+            # Some estimators return an output of the shape (num_preds, 1) - flatten such
+            # results
+            if getattr(pred, "flatten", None) is not None:
+                pred = pred.flatten()
+            return pred
+
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)

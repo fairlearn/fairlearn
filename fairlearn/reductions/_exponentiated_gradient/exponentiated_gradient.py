@@ -1,10 +1,11 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import logging
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_ITER, _PRECISION, _INDENTATION
@@ -27,9 +28,11 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     estimator : estimator
         An estimator implementing methods :code:`fit(X, y, sample_weight)` and
         :code:`predict(X)`, where `X` is the matrix of features, `y` is the
-        vector of labels, and `sample_weight` is a vector of weights;
-        labels `y` and predictions returned by :code:`predict(X)` are either
-        0 or 1.
+        vector of labels (binary classification) or continuous values
+        (regression), and `sample_weight` is a vector of weights.
+        In binary classification labels `y` and predictions returned by
+        :code:`predict(X)` are either 0 or 1.
+        In regression values `y` and predictions are continuous.
     constraints : fairlearn.reductions.Moment
         The disparity constraints expressed as moments
     eps : float
@@ -49,10 +52,14 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         if True each step of exponentiated gradient is followed by the saddle
         point optimization over the convex hull of classifiers returned so
         far; default True
+    sample_weight_name : str
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
     def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
-                 eta0=2.0, run_linprog_step=True):  # noqa: D103
+                 eta0=2.0, run_linprog_step=True,
+                 sample_weight_name='sample_weight'):  # noqa: D103
         self.estimator = estimator
         self.constraints = constraints
         self.eps = eps
@@ -60,6 +67,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.nu = nu
         self.eta0 = eta0
         self.run_linprog_step = run_linprog_step
+        self.sample_weight_name = sample_weight_name
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -91,7 +99,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         B = 1 / self.eps
         lagrangian = _Lagrangian(X, sensitive_features, y_train, self.estimator,
-                                 self.constraints, B)
+                                 self.constraints, B,
+                                 sample_weight_name=self.sample_weight_name)
 
         theta = pd.Series(0, lagrangian.constraints.index)
         Qsum = pd.Series(dtype="float64")
@@ -189,7 +198,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                      self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
                      len(lagrangian.predictors))
 
-    def predict(self, X):
+    def predict(self, X, random_state=None):
         """Provide predictions for the given input data.
 
         Predictions are randomized, i.e., repeatedly calling `predict` with
@@ -211,6 +220,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         ----------
         X : numpy.ndarray or pandas.DataFrame
             Feature data
+        random_state : int or RandomState instance, default=None
+            Controls random numbers used for randomized predictions. Pass an
+            int for reproducible output across multiple function calls.
 
         Returns
         -------
@@ -219,15 +231,16 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             the result will be a scalar. Otherwise the result will be a vector
         """
         check_is_fitted(self)
+        random_state = check_random_state(random_state)
 
         if isinstance(self.constraints, ClassificationMoment):
             positive_probs = self._pmf_predict(X)[:, 1]
-            return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+            return (positive_probs >= random_state.rand(len(positive_probs))) * 1
         else:
             pred = self._pmf_predict(X)
             randomized_pred = np.zeros(pred.shape[0])
             for i in range(pred.shape[0]):
-                randomized_pred[i] = np.random.choice(pred.iloc[i, :], p=self.weights_)
+                randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=self.weights_)
             return randomized_pred
 
     def _pmf_predict(self, X):
