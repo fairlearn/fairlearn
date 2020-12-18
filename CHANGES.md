@@ -2,7 +2,9 @@
 
 ### v0.5.1
 
-* Add `control_features` to the classification moments
+* Add `control_features` to the classification moments. These allow for data
+  stratification, with fairness constraints enforced within each stratum, but
+  not between strata
 * Update `make_derived_metric()` to use `MetricFrame`
 
 ### v0.5.0
