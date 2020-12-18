@@ -42,7 +42,6 @@ class Moment:
         """
         assert self.data_loaded is False, \
             "data can be loaded only once"
-        assert isinstance(y, pd.Series)
         if sensitive_features is not None:
             assert isinstance(sensitive_features, pd.Series)
         self.X = X
