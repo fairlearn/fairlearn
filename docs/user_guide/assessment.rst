@@ -146,23 +146,24 @@ is called :py:func:`fairlearn.metrics.make_metric_group_summary`:
     >>> print("recall by groups = ", results.by_group)
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
-.. _dashboard:
+.. _metrics_plots:
 
 Metrics plots
 -------------
 
 .. currentmodule:: fairlearn.metrics_plots
 
-The :py:mod:`fairlearn.metrics_plots` module visualizes fairness metrics from different perspectives.
+The :py:mod:`fairlearn.metrics_plots` module visualizes fairness metrics from
+different perspectives.
 
 The examples below illustrate a scenario where *binary gender* is
 a sensitive feature and *accuracy rate* is the performance metric.
 
 Disparity in performance
 ^^^^^^^^^^^^^^^^^^^^^^^^
-`plot_disparities_in_performance` shows: (1) the performance of your model with respect to
-your selected performance metric (e.g., *accuracy rate*) overall as
-well as on different subgroups based on your selected sensitive
+`plot_disparities_in_performance` shows: (1) the performance of your model
+with respect to your selected performance metric (e.g., *accuracy rate*)
+overall as well as on different subgroups based on your selected sensitive
 feature (e.g., *accuracy rate* for females, *accuracy rate* for
 males); (2) the disparity (difference) in the values of the selected
 performance metric across different subgroups; (3) the distribution of
@@ -183,7 +184,10 @@ classification, the errors are further split into overprediction
 
 Disparity in selection rate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`plot_disparities_in_selection_rate` shows a bar chart that contains the selection rate in each group, meaning the fraction of data classified as 1 (in binary classification) or distribution of prediction values (in regression).
+`plot_disparities_in_selection_rate` shows a bar chart that contains the
+selection rate in each group, meaning the fraction of data classified as 1
+(in binary classification) or distribution of prediction values (in
+regression).
 
 .. code-block::
     from fairlearn.metrics_plots import plot_disparities_in_selection_rate
@@ -195,6 +199,7 @@ Disparity in selection rate
 
 .. image:: ../../img/plot_disparities_in_selection_rate.png
 
+.. _dashboard:
 
 Fairlearn dashboard
 -------------------

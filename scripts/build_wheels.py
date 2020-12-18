@@ -28,7 +28,7 @@ def main(argv):
     args = parser.parse_args(argv)
 
     with _LogWrapper("installation of fairlearn"):
-        subprocess.check_call(["pip", "install", "-e", "."])
+        subprocess.check_call(["pip", "install", "-e", ".[customplots]"])
 
     with _LogWrapper("processing README.md"):
         process_readme("README.md", "README.md")

@@ -61,6 +61,8 @@ stages:
 
   - template: templates/build-widget-job-template.yml
 
+  - template: templates/limited-installation-job-template.yml
+
 # ==================================================================================================
 
 - stage: CreateWheel
