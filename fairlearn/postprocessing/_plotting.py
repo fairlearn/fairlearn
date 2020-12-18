@@ -4,9 +4,6 @@
 """Utilities for plotting curves."""
 
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.colors
 from ._threshold_optimizer import ThresholdOptimizer
 from sklearn.utils.validation import check_is_fitted
 
