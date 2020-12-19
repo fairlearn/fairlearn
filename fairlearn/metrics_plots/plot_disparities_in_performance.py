@@ -5,7 +5,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from sklearn.metrics import accuracy_score
-from fairlearn.metrics import group_summary, false_positive_rate, false_negative_rate
+from fairlearn.metrics import MetricFrame, false_positive_rate, false_negative_rate
 
 
 def plot_disparities_in_performance(y_true, y_pred, sensitive_features):
@@ -32,103 +32,96 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features):
         The function renders a matplotlib plot
     """
     # compute
-    accuracy_summary = group_summary(
+    accuracy_frame = MetricFrame(
         accuracy_score,
         y_true,
         y_pred,
         sensitive_features=sensitive_features)
-    fp_summary = group_summary(
+    fp_frame = MetricFrame(
         false_positive_rate,
         y_true,
         y_pred,
         sensitive_features=sensitive_features)
-    fn_summary = group_summary(
+    fn_frame = MetricFrame(
         false_negative_rate,
         y_true,
         y_pred,
         sensitive_features=sensitive_features)
-    sensitive_values = sensitive_features.unique()
-    overpredictions = []
-    underpredictions = []
-    for sensitive_value in sensitive_values:
-        overpredictions.append(fp_summary['by_group'][sensitive_value])
-        underpredictions.append(fn_summary['by_group'][sensitive_value])
-    disparity = abs(
-        accuracy_summary['by_group'][sensitive_values[0]]
-        - accuracy_summary['by_group'][sensitive_values[1]])
 
     # chart text for localization
     title_text = 'Disparity in performance'
-    xlabel_text = 'Prediction error rate'
     ylabel_text = 'By group'
     overall_performance_text = 'Overall performance'
     accuracy_text = 'accuracy'
-    disparity_text = 'disparity'
-    underprediction_legend_text = "Underprediction\n  predicted=0\n  true=1"
-    overprediction_legend_text = "Overprediction\n  predicted=1\n  true=0"
+    diff_text = 'min-max difference'
+    ratio_text = 'min-max ratio'
+    fn_legend_text = "False negative rate"
+    fp_legend_text = "False positive rate"
 
     # chart styles
     figsize = (12, 4)
     plt.rc('font', size=12)
     height = 0.4
     zero_vertical_line_color = '#333'
-    underprediction_color = '#FF7F0E'  # orange
-    overprediction_color = '#2077B4'  # blue
+    fnr_color = '#FF7F0E'  # orange
+    fpr_color = '#2077B4'  # blue
     label_padding = 2
 
     # bars
     labels = []
-    for sensitive_value in sensitive_values:
-        labels.append("{}\n{:.1%}\n{}".format(
-            sensitive_value,
-            accuracy_summary['by_group'][sensitive_value],
-            accuracy_text))
+    for sensitive_feature_value in accuracy_frame.by_group.index:
+        labels.append(f"{sensitive_feature_value}\n"
+                      f"{accuracy_frame.by_group[sensitive_feature_value]:.1%}"
+                      f"\n{accuracy_text}")
     fig, ax = plt.subplots(figsize=figsize)
     ax.barh(
         labels,
-        underpredictions,
+        fn_frame.by_group,
         height,
-        color=[underprediction_color],
-        left=list(-1*p for p in underpredictions),
-        label=underprediction_legend_text)
+        color=[fnr_color],
+        left=fn_frame.by_group.map(lambda fn: -1 * fn),
+        label=fn_legend_text)
     ax.barh(
         labels,
-        overpredictions,
+        fp_frame.by_group,
         height,
-        color=[overprediction_color],
+        color=[fpr_color],
         left=0,
-        label=overprediction_legend_text)
+        label=fp_legend_text)
 
     # labels
-    for index, overprediction in enumerate(overpredictions):
+    for index, fp_rate in enumerate(fp_frame.by_group):
         plt.annotate(
-            "{:.1%}".format(overprediction),
-            (overprediction, index),
+            f"{fp_rate:.1%}",
+            (fp_rate, index),
             textcoords="offset points",
             xytext=(label_padding, 0),
             ha="left")
-    for index, underprediction in enumerate(underpredictions):
+    for index, fn_rate in enumerate(fn_frame.by_group):
         plt.annotate(
-            "{:.1%}".format(underprediction),
-            (-1*underprediction, index),
+            f"{fn_rate:.1%}",
+            (-1*fn_rate, index),
             textcoords="offset points",
             xytext=(-1*label_padding, 0),
             ha="right")
 
     # axes, titles, legend, etc
     plt.title("\n{}\n".format(title_text), fontsize=24, loc="left")
-    right_title = "{}:\n{:.1%} {}\n{:.1%} {}\n".format(
-        overall_performance_text,
-        accuracy_summary['overall'],
-        accuracy_text,
-        disparity,
-        disparity_text)
+    right_title = f"{overall_performance_text}:\n" \
+        f"{accuracy_frame.overall:.1%} {accuracy_text}\n" \
+        f"{accuracy_frame.difference():.1%} {diff_text}\n" \
+        f"{accuracy_frame.ratio():.1%} {ratio_text}\n"
     plt.title(right_title, fontsize=12, loc="right")
     ax.set_ylabel(ylabel_text)
-    ax.set_xlabel(xlabel_text)
     ax.xaxis.set_major_formatter(mtick.PercentFormatter(xmax=1, decimals=None))
     ax.axvline(linewidth=1, color=zero_vertical_line_color)
     plt.gca().set_xlim(-1, 1)
-    ax.legend(loc='upper right', labelspacing=2, fontsize=10)
 
+    # position legend at the horizontally below the chart
+    ax.legend(bbox_to_anchor=(0.5, -0.12), loc="upper center", ncol=2, fontsize=10)
+
+    # ensure everything is within the boundaries of the plot using tight layout
+    plt.tight_layout()
+
+    plt.show()
     return None

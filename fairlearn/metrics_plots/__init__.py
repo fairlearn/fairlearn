@@ -9,9 +9,9 @@ fairlearn.metrics module
 
 
 from .plot_disparities_in_performance import plot_disparities_in_performance
-from .plot_disparities_in_selection_rate import plot_disparities_in_selection_rate
+from .plot_disparities_in_metric import plot_disparities_in_metric
 
 __all__ = [
     "plot_disparities_in_performance",
-    "plot_disparities_in_selection_rate"
+    "plot_disparities_in_metric"
 ]
