@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-from fairlearn._input_validation import _compress_multiple_sensitive_features_into_single_column
+from fairlearn._input_validation import _merge_columns
 
 
 def ensure_list(X):
@@ -98,4 +98,4 @@ def _map_into_single_column(matrix):
     if len(np.array(matrix).shape) == 1:
         return np.array(matrix)
 
-    return _compress_multiple_sensitive_features_into_single_column(matrix)
+    return _merge_columns(matrix)

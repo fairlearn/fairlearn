@@ -6,15 +6,23 @@ import pandas as pd
 from .moment import ClassificationMoment
 from .moment import _ALL, _LABEL
 
+from fairlearn._input_validation import _validate_and_reformat_input
+
 
 class ErrorRate(ClassificationMoment):
     """Misclassification error."""
 
     short_name = "Err"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        super().load_data(X, y, **kwargs)
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+        # The following uses X  so that the estimators get X untouched
+        super().load_data(X, y_train, sensitive_features=sf_train)
         self.index = [_ALL]
 
     def gamma(self, predictor):

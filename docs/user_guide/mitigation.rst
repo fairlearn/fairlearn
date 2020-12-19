@@ -492,6 +492,40 @@ constraints:
                  b          -0.24
     dtype: float64
 
+
+Control features
+^^^^^^^^^^^^^^^^
+
+The above :class:`Moment`s (:ref:`demographic_parity`,
+:ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
+:ref:`equalized_odds` and :ref:`error_rate_parity`) all support the concept
+of *control features* when applying their fairness constraints.
+A control feature stratifies the dataset, and applies the fairness constraint
+within each stratum, but not between strata.
+One case this might be useful is a loan scenario, where we might want
+to apply a mitigation for the sensitive features while controlling for some
+other feature(s).
+This should be done with caution, since the control features may have a
+correlation with the sensitive features due to historical biases.
+In the loan scenario, we might choose to control for income level, on the
+grounds that higher income individuals are more likely to be able to repay
+a loan.
+However, due to historical bias, there is a correlation between the income level
+of individuals and their race and gender.
+
+
+Control features modify the above equations.
+Consider a control feature value, drawn from a set of valid values
+(that is, :math:`c \in \mathcal{C}`).
+The equation given above for Demographic Parity will become:
+
+
+.. math::
+    P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
+
+The other constraints acquire similar modifications.
+
+
 .. _constraints_multi_class_classification:
 
 Fairness constraints for multi-class classification
