@@ -12,4 +12,4 @@ import pytest
 @pytest.mark.parametrize("metric", BINARY_CLASSIFICATION_METRICS.values())
 def test_plot_disparities_in_metric(metric):
     (y_true, y_pred, sensitive_features) = quickstart_setup()
-    plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features)
+    plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_plot=False)

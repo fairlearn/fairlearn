@@ -7,7 +7,7 @@ import matplotlib.ticker as mtick
 from fairlearn.metrics import MetricFrame
 
 
-def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features):
+def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_plot=True):
     """Plot disparities in a metric for a binary classifier.
 
     This method visualizes the metric values for all groups as identified
@@ -84,6 +84,7 @@ def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features):
     # ensure everything is within the boundaries of the plot using tight layout
     plt.tight_layout()
 
-    plt.show()
+    if show_plot:
+        plt.show()
 
     return None

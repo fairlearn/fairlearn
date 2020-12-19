@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from fairlearn.metrics import MetricFrame, false_positive_rate, false_negative_rate
 
 
-def plot_disparities_in_performance(y_true, y_pred, sensitive_features):
+def plot_disparities_in_performance(y_true, y_pred, sensitive_features, show_plot=True):
     """Plot disparities in performance for a binary classifier across a single sensitive feature.
 
     This helps visualize differences in overall prediction error, as well as false positive
@@ -123,5 +123,7 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features):
     # ensure everything is within the boundaries of the plot using tight layout
     plt.tight_layout()
 
-    plt.show()
+    if show_plot:
+        plt.show()
+
     return None
