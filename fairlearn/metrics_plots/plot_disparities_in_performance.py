@@ -25,11 +25,6 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features, show_plo
 
     sensitive_features : array-like
         the sensitive attributes
-
-    Returns
-    -------
-    None
-        The function renders a matplotlib plot
     """
     # compute
     accuracy_frame = MetricFrame(

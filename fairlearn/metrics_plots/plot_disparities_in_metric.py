@@ -8,7 +8,7 @@ from fairlearn.metrics import MetricFrame
 
 
 def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_plot=True):
-    """Plot disparities in a metric for a binary classifier.
+    """Plot disparities in a metric between groups defined by sensitive features.
 
     This method visualizes the metric values for all groups as identified
     by sensitive features.
@@ -23,11 +23,6 @@ def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_
         The list of predicted values
     sensitive_features : array-like
         the sensitive attributes
-
-    Returns
-    -------
-    None
-        The function renders a matplotlib plot
     """
     # compute
     metric_frame = MetricFrame(metric, y_true, y_pred,
