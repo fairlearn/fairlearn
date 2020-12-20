@@ -406,47 +406,63 @@ The :py:mod:`fairlearn.metrics_plots` module visualizes fairness metrics from
 different perspectives.
 
 The examples below illustrate a scenario where *binary gender* is
-a sensitive feature and *accuracy rate* is the performance metric.
+a sensitive feature and *accuracy score* is the performance metric.
 
 Disparity in performance
 ^^^^^^^^^^^^^^^^^^^^^^^^
-`plot_disparities_in_performance` shows: (1) the performance of your model
-with respect to your selected performance metric (e.g., *accuracy rate*)
-overall as well as on different subgroups based on your selected sensitive
-feature (e.g., *accuracy rate* for females, *accuracy rate* for
-males); (2) the disparity (difference) in the values of the selected
-performance metric across different subgroups; (3) the distribution of
-errors in each subgroup (e.g., female, male). For binary
-classification, the errors are further split into overprediction
-(predicting 1 when the true label is 0), and underprediction
-(predicting 0 when the true label is 1).
+For a binary classifier :code:`plot_disparities_in_performance` shows:
 
-.. code-block::
+#. the performance of your model in terms of *accuracy score* overall as well
+   as on different subgroups based on your selected sensitive feature
+   (e.g., *accuracy score* for females, *accuracy score* for males);
+#. the difference and ratio between minimum and maximum of all groups'
+   *accuracy score* values;
+#. the false positive and negative rates in each subgroup (e.g., female,
+   male).
+
+.. plot::
+    :include-source:
+
     from fairlearn.metrics_plots import plot_disparities_in_performance
-    
-    # y_true contains ground truth labels
-    # y_pred contains labels predicted by binary classifier
-    # sensitive_features contains sensitive feature values
-    plot_disparities_in_performance(y_true, y_pred, sensitive_features)
+    from fairlearn.datasets import fetch_adult
+    from sklearn.tree import DecisionTreeClassifier
+    import pandas as pd
 
-.. image:: ../../img/plot_disparities_in_performance.png
+    data = fetch_adult(as_frame=True)
+    X = pd.get_dummies(data.data)
+    y_true = (data.target == '>50K') * 1
+    sex = data.data['sex']
+    classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+    classifier.fit(X, y_true)
+    y_pred = classifier.predict(X)
 
-Disparity in selection rate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`plot_disparities_in_selection_rate` shows a bar chart that contains the
-selection rate in each group, meaning the fraction of data classified as 1
-(in binary classification) or distribution of prediction values (in
-regression).
+    plot_disparities_in_performance(y_true, y_pred, sensitive_features=sex)
 
-.. code-block::
-    from fairlearn.metrics_plots import plot_disparities_in_selection_rate
+Disparity in metric
+^^^^^^^^^^^^^^^^^^^
+:code:`plot_disparities_in_metric` shows a bar chart that contains the
+specified metric in each group.
 
-    # y_true contains ground truth labels
-    # y_pred contains labels predicted by binary classifier
-    # sensitive_features contains sensitive feature values
-    plot_disparities_in_selection_rate(y_true, y_pred, sensitive_features)
+.. plot::
+    :include-source:
 
-.. image:: ../../img/plot_disparities_in_selection_rate.png
+    from fairlearn.metrics_plots import plot_disparities_in_metric
+    from fairlearn.datasets import fetch_adult
+    from fairlearn.metrics import selection_rate
+    from sklearn.metrics import accuracy_score
+    from sklearn.tree import DecisionTreeClassifier
+    import pandas as pd
+
+    data = fetch_adult(as_frame=True)
+    X = pd.get_dummies(data.data)
+    y_true = (data.target == '>50K') * 1
+    sex = data.data['sex']
+    classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+    classifier.fit(X, y_true)
+    y_pred = classifier.predict(X)
+
+    plot_disparities_in_metric(accuracy_score, y_true, y_pred, sensitive_features=sex)
+    plot_disparities_in_metric(selection_rate, y_true, y_pred, sensitive_features=sex)
 
 .. _dashboard:
 

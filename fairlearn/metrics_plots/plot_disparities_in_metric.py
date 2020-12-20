@@ -23,6 +23,7 @@ def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_
         The list of predicted values
     sensitive_features : array-like
         the sensitive attributes
+
     """
     # compute
     metric_frame = MetricFrame(metric, y_true, y_pred,

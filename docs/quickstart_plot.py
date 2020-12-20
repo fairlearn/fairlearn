@@ -22,7 +22,7 @@ ys = [selection_rates.by_group[s] for s in xs]
 p = figure(x_range=xs,
            plot_height=480,
            plot_width=640,
-           title="Fraction earning over $50,0000",
+           title="Fraction earning over $50,000",
            toolbar_location=None,
            tools="")
 
