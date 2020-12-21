@@ -61,6 +61,10 @@ fairness definitions, please open a
    :code:`predict` method on identical data. For each of our algorithms, we provide
    explicit access to the probability distribution used for randomization.
 
+
+.. include:: reductions.inc
+.. include:: postprocessing.inc
+
 .. topic:: References:
 
    .. [#1] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
