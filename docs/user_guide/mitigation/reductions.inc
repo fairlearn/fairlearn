@@ -426,7 +426,7 @@ constraints:
 Control features
 ^^^^^^^^^^^^^^^^
 
-The above :class:`Moment`s (:ref:`demographic_parity`,
+The above :class:`Moment` classes (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
 :ref:`equalized_odds` and :ref:`error_rate_parity`) all support the concept
 of *control features* when applying their fairness constraints.
@@ -447,7 +447,7 @@ of individuals and their race and gender.
 Control features modify the above equations.
 Consider a control feature value, drawn from a set of valid values
 (that is, :math:`c \in \mathcal{C}`).
-The equation given above for Demographic Parity will become:
+The equation given above for demographic parity will become:
 
 
 .. math::

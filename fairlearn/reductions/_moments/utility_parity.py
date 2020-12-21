@@ -266,7 +266,7 @@ class DemographicParity(UtilityParity):
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
     This :class:`~Moment` also supports control features, which can be used to
-    stratify the data, with the Demographic Parity constraint applied within
+    stratify the data, with the demographic parity constraint applied within
     each stratum, but not between strata. If the control feature groups
     are :math:`c \in \mathcal{C}` then the above equation will become
 

@@ -172,10 +172,10 @@ while specifying an appropriate fairness constraint. Note that the choice of
 fairness constraints is crucial for the resulting model, and varies based on
 application context. If selection rate is highly relevant for fairness in this
 contrived example, we can attempt to mitigate the observed disparity using the
-corresponding fairness constraint called Demographic Parity. In real world
+corresponding fairness constraint called demographic parity. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
-provided classifier using Demographic Parity as the objective, leading to
+provided classifier using demographic parity as the objective, leading to
 a vastly reduced difference in selection rate:
 
 .. doctest:: quickstart 

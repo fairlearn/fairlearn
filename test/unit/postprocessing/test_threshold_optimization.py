@@ -183,7 +183,7 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
         return estimator._pmf_predict(
             pd.DataFrame(scores), sensitive_features=sensitive_features)[0, 1]
 
-    # For Demographic Parity we can ignore p_ignore since it's always 0.
+    # For demographic parity we can ignore p_ignore since it's always 0.
 
     # sensitive feature value A
     value_for_less_than_2_5 = 0.8008
@@ -217,7 +217,7 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
     assert 1 == prob_pred([sensitive_feature_names_ex1[2]], [1.51])
     assert 1 == prob_pred([sensitive_feature_names_ex1[2]], [100])
 
-    # Assert Demographic Parity actually holds
+    # Assert demographic parity actually holds
     predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(
         prob_pred, sensitive_features_ex1, scores_ex, labels_ex)
 
@@ -252,7 +252,7 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
         return estimator._pmf_predict(
             pd.DataFrame(scores), sensitive_features=sensitive_features)[0, 1]
 
-    # For Equalized Odds we need to factor in that the output is calculated by
+    # For equalized odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
     # with p_ignore != 0 and prediction_constant != 0 for at least some sensitive feature values.
     prediction_constant = 0.334
@@ -304,7 +304,7 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
     assert base_value + 1 - \
         p_ignore == prob_pred([sensitive_feature_names_ex1[2]], [100])
 
-    # Assert Equalized Odds actually holds
+    # Assert equalized odds actually holds
     predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(
         prob_pred, sensitive_features_ex1, scores_ex, labels_ex)
 
