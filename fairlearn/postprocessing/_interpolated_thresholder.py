@@ -85,7 +85,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
         base_predictions = np.array(self.estimator_.predict(X))
-        _, base_predictions_vector, sensitive_feature_vector = _validate_and_reformat_input(
+        _, base_predictions_vector, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X, y=base_predictions, sensitive_features=sensitive_features, expect_y=True,
             enforce_binary_labels=False)
 

@@ -360,7 +360,7 @@ class MetricFrame:
             return result
 
     def difference(self,
-                   method: str) -> Union[Any, pd.Series, pd.DataFrame]:
+                   method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -380,6 +380,11 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
 
+        Parameters
+        ----------
+        method : str
+            How to compute the aggregate. Default is :code:`between_groups`
+
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
@@ -396,7 +401,7 @@ class MetricFrame:
         return (self.by_group - subtrahend).abs().max(level=self.control_levels)
 
     def ratio(self,
-              method: str) -> Union[Any, pd.Series, pd.DataFrame]:
+              method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -417,6 +422,11 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric),
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
+
+        Parameters
+        ----------
+        method : str
+            How to compute the aggregate. Default is :code:`between_groups`
 
         Returns
         -------
@@ -502,7 +512,7 @@ class MetricFrame:
                 result.append(GroupFeature(base_name, column, i, None))
         elif isinstance(features, list):
             if np.isscalar(features[0]):
-                f_arr = np.squeeze(np.asarray(features))
+                f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))

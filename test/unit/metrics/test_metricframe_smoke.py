@@ -260,3 +260,9 @@ def test_duplicate_cf_sf_names():
                                 sensitive_features=sf,
                                 control_features=cf)
     assert execInfo.value.args[0] == msg
+
+
+def test_single_element_lists():
+    mf = metrics.MetricFrame(skm.balanced_accuracy_score,
+                             [1], [1], sensitive_features=[0])
+    assert mf.overall == 1

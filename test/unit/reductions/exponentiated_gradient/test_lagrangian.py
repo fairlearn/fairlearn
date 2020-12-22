@@ -51,8 +51,9 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     # epsilon (and thereby also B) only affects L_high and L
     B = 1 / eps
 
-    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), B,
-                             opt_lambda=opt_lambda)
+    lagrangian = _Lagrangian(X, y, estimator, deepcopy(constraints), B,
+                             opt_lambda=opt_lambda,
+                             sensitive_features=A)
 
     lambda_vec = get_lambda_vec(constraints, X, y, A)
 
@@ -114,7 +115,9 @@ def test_call_oracle(Constraints, eps, estimator, mocker):
     else:
         constraints = Constraints()
 
-    lagrangian = _Lagrangian(X, A, y, estimator, deepcopy(constraints), 1/eps)
+    lagrangian = _Lagrangian(X, y, estimator,
+                             deepcopy(constraints), 1/eps,
+                             sensitive_features=A)
 
     # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
     # object for it to avoid the dependence on the lagrangian object.
@@ -158,9 +161,9 @@ def test_call_oracle_single_y_value(Constraints, eps, y_value, mocker):
     else:
         constraints = Constraints(difference_bound=eps)
 
-    lagrangian_args = [X, A, y, estimator, deepcopy(constraints), 1/eps]
-
-    lagrangian = _Lagrangian(*lagrangian_args)
+    lagrangian = _Lagrangian(X, y, estimator,
+                             deepcopy(constraints), 1/eps,
+                             sensitive_features=A)
 
     # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
     # object for it to avoid the dependence on the lagrangian object.

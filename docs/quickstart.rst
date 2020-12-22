@@ -22,6 +22,17 @@ Fairlearn is also available on
 
 For checking out the latest version in our repository check out our
 :ref:`advanced_install`.
+If you are updating from a previous version of Fairlearn, please
+see :ref:`version_migration_guide`.
+
+.. note::
+
+    The Fairlearn API is still evolving, so example code in 
+    this documentation may not work with every version of Fairlearn.
+    Please use the version selector to get to the instructions for
+    the appropriate version. The instructions for the :code:`master`
+    branch require Fairlearn to be installed from a clone of the
+    repository. See :ref:`advanced_install` for the required steps.
 
 Overview of Fairlearn
 ---------------------
@@ -127,6 +138,13 @@ their label:
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
+
+.. note::
+
+    The :code:`FairlearnDashboard` will move from Fairlearn to the
+    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
+    will provide some of the existing functionality through
+    :code:`matplotlib`-based visualizations.
 
 .. doctest:: quickstart
 

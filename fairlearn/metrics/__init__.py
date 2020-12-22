@@ -23,15 +23,18 @@ This extends to multiple grouping columns, calculating the metric
 for each combination of subgroups.
 """
 
+import sys as _sys
 
-from ._metrics_engine import _derived_metric_dict
+from ._metric_frame import MetricFrame  # noqa: F401
+from ._make_derived_metric import make_derived_metric  # noqa: F401
+
+from ._generated_metrics import _generated_metric_dict
 
 from ._disparities import (  # noqa: F401
     demographic_parity_difference,
     demographic_parity_ratio,
     equalized_odds_difference,
     equalized_odds_ratio)
-from ._metric_frame import MetricFrame  # noqa: F401
 
 from ._extra_metrics import (  # noqa: F401
     true_positive_rate,
@@ -48,13 +51,16 @@ from ._extra_metrics import (  # noqa: F401
 
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
-globals().update(_derived_metric_dict)
+_module_obj = _sys.modules[__name__]
+for _name, _func in _generated_metric_dict.items():
+    setattr(_module_obj, _name, _func)
 
 # ============================================
 # Build list of items to be listed in the docs
 
 _core = [
-    "MetricFrame"
+    "MetricFrame",
+    "make_derived_metric"
 ]
 
 _disparities = [
@@ -73,4 +79,4 @@ _extra_metrics = [
     "selection_rate",
 ]
 
-__all__ = _core + _disparities + _extra_metrics + list(_derived_metric_dict.keys())
+__all__ = _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys()))

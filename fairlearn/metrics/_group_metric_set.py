@@ -138,7 +138,7 @@ def _create_group_metric_set(y_true,
         result[_PREDICTION_TYPE] = _PREDICTION_BINARY_CLASSIFICATION
         function_dict = BINARY_CLASSIFICATION_METRICS
     elif prediction_type == REGRESSION:
-        result[_PREDICTION_TYPE] == _PREDICTION_REGRESSION
+        result[_PREDICTION_TYPE] = _PREDICTION_REGRESSION
         function_dict = REGRESSION_METRICS
     else:
         raise NotImplementedError(
