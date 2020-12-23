@@ -14,8 +14,6 @@ file lists the subject matter experts for all parts of the repository
 including the documentation and examples.
 Every change requires approval from at least one of the listed subject matter
 experts, and a total of two approvals from current maintainers.
-All changes to APIs should be reviewed by
-`Miro Dudik <https://github.com/MiroDudik>`_.
 
 .. _maintainers:
 

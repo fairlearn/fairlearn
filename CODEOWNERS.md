@@ -10,5 +10,3 @@
 /fairlearn/reductions/ @riedgar-ms @romanlutz @MiroDudik
 /fairlearn/widget/ @romanlutz
 /notebooks/ @mmadaio @MiroDudik
-
-# Every API change should be reviewed by @MiroDudik.
