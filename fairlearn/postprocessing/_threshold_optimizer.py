@@ -102,7 +102,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
     Parameters
     ----------
-    estimator :
+    estimator : object
         An estimator whose output is postprocessed. The estimator should be
         implementing a :code:`predict` method. If :code:`prefit=False`, it
         also needs to implement a :code:`fit` method.
