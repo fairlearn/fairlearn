@@ -77,11 +77,9 @@ To contribute please check our
 
 ## Maintainers
 
-The Fairlearn project is maintained by:
-
-- **@MiroDudik**
-- **@riedgar-ms**
-- **@romanlutz**
+The current maintainers of this repository are listed in the
+[maintainers file](MAINTAINERS.md). For org-level information please refer to
+the [governance repository](https://github.com/fairlearn/governance).
 
 For a full list of contributors refer to the [authors page](./AUTHORS.md)
 
@@ -92,6 +90,9 @@ For a full list of contributors refer to the [authors page](./AUTHORS.md)
 Pose questions and help answer them on [Stack
 Overflow](https://stackoverflow.com/questions/tagged/fairlearn) with the tag
 `fairlearn` or on [Gitter](https://gitter.im/fairlearn/community#).
+If you think your question is broadly applicable and may be useful to other
+users you can open a
+[GitHub Discussion](https://github.com/fairlearn/fairlearn/discussions/new).
 
 ### Regular (non-security) issues
 
