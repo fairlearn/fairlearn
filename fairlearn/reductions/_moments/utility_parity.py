@@ -195,7 +195,7 @@ class UtilityParity(ClassificationMoment):
         -------
         pandas.Series
             a vector of bound values corresponding to all constraints
- 
+
         """
         return pd.Series(self.eps, index=self.index)
 
