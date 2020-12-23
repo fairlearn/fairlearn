@@ -61,7 +61,6 @@ def check_if_v046():
 # ones.
 extensions = [
     'bokeh.sphinxext.bokeh_plot',
-    'm2r2',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
