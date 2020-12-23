@@ -1,5 +1,12 @@
 # Changes
 
+### v0.5.1
+
+* Add `control_features` to the classification moments. These allow for data
+  stratification, with fairness constraints enforced within each stratum, but
+  not between strata
+* Update `make_derived_metric()` to use `MetricFrame`
+
 ### v0.5.0
 
 * Adjust classes to abide by naming conventions for attributes.
@@ -13,8 +20,8 @@
   now captured directly in the moment classes as follows:
   * Classification moments: `ConditionalSelectionRate` renamed to
     `UtilityParity` and its subclasses have new arguments on the constructor:
-    * `difference_bound` - for difference-based constraints such as demographic
-      parity difference
+    * `difference_bound` - for difference-based constraints such as
+      demographic parity difference
     * `ratio_bound_slack` - for ratio-based constraints such as demographic
       parity ratio
     * Additionally, there's a `ratio_bound` argument which represents the
@@ -39,12 +46,17 @@
 * Added `TrueNegativeRateParity` to provide the opposite constraint of
   `TruePositiveRateParity` to be used with reductions techniques.
 * Add new constraints and objectives in `ThresholdOptimizer`
-* Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
+* Add class `InterpolatedThresholder` to represent the fitted
+  `ThresholdOptimizer`
 * Add `fairlearn.datasets` module.
-* Change the method to make copies of the estimator in `ExponentiatedGradient` from `pickle.dump` to `sklearn.clone`. 
-* Add an argument to GridSearch and ExponentialGradient `sample_weight_name` to control
-  how `sample_weight` is supplied to `estimator.fit`.
-* Large changes to the metrics API. A new class `MetricFrame` has been introduced, and `make_group_summary()` removed (along with related functions). Please see the documentation and examples for more information.
+* Change the method to make copies of the estimator in `ExponentiatedGradient`
+  from `pickle.dump` to `sklearn.clone`. 
+* Add an argument `sample_weight_name` to `GridSearch` and
+  `ExponentiatedGradient` to control how `sample_weight` is supplied to
+  `estimator.fit`.
+* Large changes to the metrics API. A new class `MetricFrame` has been
+  introduced, and `make_group_summary()` removed (along with related
+  functions). Please see the documentation and examples for more information.
 
 ### v0.4.6
 

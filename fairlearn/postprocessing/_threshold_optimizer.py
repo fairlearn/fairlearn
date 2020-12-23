@@ -21,7 +21,9 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import Bunch
 
-from fairlearn._input_validation import _validate_and_reformat_input
+from fairlearn._input_validation import (
+    _validate_and_reformat_input,
+    _KW_CONTROL_FEATURES)
 from ._constants import (
     LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY,
     OUTPUT_SEPARATOR,
@@ -79,6 +81,7 @@ OBJECTIVES_FOR_EQUALIZED_ODDS = {
     'balanced_accuracy_score',
 }
 
+NO_CONTROL_FEATURES = "Control features are not supported by ThresholdOptimizer"
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = (
     "Currently only the following constraints are supported: {}.".format(
         ", ".join(sorted(ALL_CONSTRAINTS))))
@@ -188,7 +191,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        _, _, sensitive_feature_vector = _validate_and_reformat_input(
+        if kwargs.get(_KW_CONTROL_FEATURES) is not None:
+            raise ValueError(NO_CONTROL_FEATURES)
+
+        _, _, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X, y, sensitive_features=sensitive_features, enforce_binary_labels=True)
 
         # postprocessing can't handle 0/1 as floating point numbers, so this converts it to int

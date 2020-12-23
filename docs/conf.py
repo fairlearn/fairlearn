@@ -90,8 +90,8 @@ master_doc = 'index'
 
 # Multiversion settings
 
-smv_tag_whitelist = r'^v0\.4\.6$'
-smv_branch_whitelist = r'^master$|^release/v0\.5\.\d+$'
+smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d+$'
+smv_branch_whitelist = r'^master$'
 
 if check_if_v046():
     print("Current version is v0.4.6, will apply overrides")
@@ -154,10 +154,18 @@ html_sidebars = {
     "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
 }
 
+# Auto-Doc Options
+# ----------------
+
+# Change the ordering of the member documentation
+autodoc_member_order = 'groupwise'
+
+
+# Linking Code
+# ------------
+
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
-
-
 def linkcode_resolve(domain, info):
     """Determine the URL corresponding to Python object."""
     if domain != "py":

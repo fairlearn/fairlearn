@@ -3,15 +3,33 @@
 
 import pandas as pd
 import numpy as np
+
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE
+from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _validate_and_reformat_input
 from .error_rate import ErrorRate
+
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
 _MESSAGE_INVALID_BOUNDS = "Only one of difference_bound and ratio_bound can be used."
 _DEFAULT_DIFFERENCE_BOUND = 0.01
+
+_CTRL_EVENT_FORMAT = "control={0},{1}"
+
+
+def _combine_event_and_control(event: str, control: str) -> str:
+    if pd.notnull(control):
+        return _CTRL_EVENT_FORMAT.format(control, event)
+    else:
+        return event
+
+
+def _merge_event_and_control_columns(event_col, control_col):
+    if control_col is None:
+        return event_col
+    else:
+        return event_col.combine(control_col, _combine_event_and_control)
 
 
 class UtilityParity(ClassificationMoment):
@@ -88,7 +106,13 @@ class UtilityParity(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self, X, y, event=None, utilities=None, **kwargs):
+    def load_data(self,
+                  X,
+                  y: pd.Series,
+                  *,
+                  sensitive_features: pd.Series,
+                  event: pd.Series = None,
+                  utilities=None):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
@@ -99,10 +123,11 @@ class UtilityParity(ClassificationMoment):
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
+
         .. math::
-        utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+            utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
         """
-        super().load_data(X, y, **kwargs)
+        super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
         if utilities is None:
             utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
@@ -239,13 +264,29 @@ class DemographicParity(UtilityParity):
     The :meth:`signed_weights` method will compute the costs according
     to Example 3 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the Demographic Parity constraint applied within
+    each stratum, but not between strata. If the control feature groups
+    are :math:`c \in \mathcal{C}` then the above equation will become
+
+    .. math::
+      P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
     """
 
     short_name = "DemographicParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        super().load_data(X, y, event=_ALL, **kwargs)
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
+        base_event = pd.Series(data=_ALL, index=y_train.index)
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class TruePositiveRateParity(UtilityParity):
@@ -278,16 +319,26 @@ class TruePositiveRateParity(UtilityParity):
     the costs for `Y=1` as they are calculated in Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`, but will use
     the weights equal to zero for `Y=0`.
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "TruePositiveRateParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
-        super().load_data(X, pd.Series(y),
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 1),
-                          **kwargs)
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 1)
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class FalsePositiveRateParity(UtilityParity):
@@ -314,16 +365,26 @@ class FalsePositiveRateParity(UtilityParity):
     the costs for `Y=0` as they are calculated in Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
     but will use the weights equal to zero for `Y=1`.
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "FalsePositiveRateParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
-        super().load_data(X, pd.Series(y),
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)).where(y == 0),
-                          **kwargs)
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 0)
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class EqualizedOdds(UtilityParity):
@@ -349,15 +410,25 @@ class EqualizedOdds(UtilityParity):
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "EqualizedOdds"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        super().load_data(X, y,
-                          event=pd.Series(y).apply(lambda y: _LABEL + "=" + str(y)),
-                          **kwargs)
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+
+        base_event = y_train.apply(lambda v: _LABEL + "=" + str(v))
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(X, y_train, event=event, sensitive_features=sf_train)
 
 
 class ErrorRateParity(UtilityParity):
@@ -379,10 +450,26 @@ class ErrorRateParity(UtilityParity):
     The :meth:`signed_weights` method will compute the costs according to Example 3 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
     However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
+
+    This :class:`~Moment` also supports control features, which can be used to
+    stratify the data, with the constraint applied within
+    each stratum, but not between strata.
     """
 
     short_name = "ErrorRateParity"
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        super().load_data(X, y, event=_ALL, utilities=np.vstack([y, 1-y]).T, **kwargs)
+        _, y_train, sf_train, cf_train = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=True,
+                                         sensitive_features=sensitive_features,
+                                         control_features=control_features)
+        utilities = np.vstack([y_train, 1-y_train]).T
+        base_event = pd.Series(data=_ALL, index=y_train.index)
+        event = _merge_event_and_control_columns(base_event, cf_train)
+        super().load_data(
+            X, y_train,
+            event=event,
+            utilities=utilities,
+            sensitive_features=sf_train)

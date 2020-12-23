@@ -512,7 +512,7 @@ class MetricFrame:
                 result.append(GroupFeature(base_name, column, i, None))
         elif isinstance(features, list):
             if np.isscalar(features[0]):
-                f_arr = np.squeeze(np.asarray(features))
+                f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
