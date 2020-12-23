@@ -37,7 +37,7 @@ To report bugs, request features, or ask usage questions please use the
 Community calls
 ---------------
 
-We have a weekly community call every Thursday at 11am Eastern time.
+We have a weekly community call every Thursday at 11am US Eastern time (ET).
 Check what this means in your time zone with
 `Time.is <https://time.is/New_York>`_.
 All are welcome! Please reach out via

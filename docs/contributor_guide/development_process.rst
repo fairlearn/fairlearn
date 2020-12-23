@@ -41,9 +41,9 @@ This is a `recent decision by the community <https://github.com/fairlearn/fairle
 The new policy is to update docstrings that a PR touches, as opposed to
 changing all the docstrings in one PR.
 
-Pull requests should be completed by somebody other than the author once
+Pull requests should be merged by somebody other than the author once
 all the listed criteria are fulfilled and the author indicates that the PR
-should be completed.
+should be merged.
 
 Developer certificate of origin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -32,9 +32,10 @@ Process
 
 All current efforts are tracked through items in the corresponding
 `Project Board <https://github.com/fairlearn/fairlearn/projects/3>`_.
-If you'd like to suggest a different kind of project, please
+If you'd like to suggest a different kind of use case, please
 `open a new issue <https://github.com/fairlearn/fairlearn/issues/new/choose>`_
-if you cannot find a similar one that is already tracked in the project board.
+if you cannot find a similar one that is already tracked in the
+`issue tracker <https://github.com/fairlearn/fairlearn/issues>`_.
 If you'd like to collaborate with others from the community, please
 :ref:`reach out <communication>` to share your idea.
 
@@ -46,9 +47,8 @@ technical system, so a textual explanation is perfectly acceptable.
 All contributions should abide by the guidelines outlined above, though.
 
 Once the issue is on GitHub, members from the community can respond with
-questions, comments, and perhaps express their interest in joining the
-project. Once the preliminary questions are sorted out, the participants of
-the project can
+questions, comments, and perhaps express their interest in fixing the
+issue. Once the preliminary questions are sorted out, somebody can
 `open a pull request <https://github.com/fairlearn/fairlearn/compare>`_.
 Everyone from the community is encouraged to review the pull request and
 provide feedback. The acceptance process is identical to all other
@@ -56,20 +56,22 @@ contributions as outlined :ref:`here <development_process>`, except that
 the additional criteria at the top of this page apply additionally.
 
 Whether and how project members communicate is up to the members themselves.
+We especially encourage asynchronous means of communication to be inclusive
+of people in all time zones.
 This could include any of the following:
 
+- a GitHub `discussion <https://github.com/fairlearn/fairlearn/discussions>`_
+  or `issue <https://github.com/fairlearn/fairlearn/issues>`_
 - a dedicated channel on [Gitter](https://gitter.im/fairlearn) in the
   Fairlearn community
-- a Slack channel or Teams team
 - email
 - recurring or ad-hoc meetings
 
 If the project group would like to discuss their project with the community
 we can use one of our
-:ref:`community calls <community_calls>` for this
-purpose.
+:ref:`community calls <community_calls>` for this purpose.
 
-If you have problems with any parts of this process or feedback please
+If you think we can improve any parts of this process or for feedback please
 :ref:`reach out <communication>`.
 
 Formatting of example notebooks
