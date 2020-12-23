@@ -102,8 +102,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
     Parameters
     ----------
-    estimator : estimator object implementing 'predict' and possibly 'fit'
-        An estimator whose output is postprocessed.
+    estimator : 
+        An estimator whose output is postprocessed. The estimator should be
+        implementing a :code:`predict` method. If :code:`prefit=False`, it
+        also needs to implement a :code:`fit` method.
 
     constraints : str, default='demographic_parity'
         Fairness constraints under which threshold optimization is performed.
@@ -237,15 +239,16 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             feature matrix
         sensitive_features : numpy.ndarray, list, pandas.DataFrame, pandas.Series
             sensitive features to identify groups by
-        random_state : int or RandomState instance, default=None
+        random_state : int or :class:`numpy.random.RandomState` instance, default=None
             Controls random numbers used for randomized predictions. Pass an
             int for reproducible output across multiple function calls.
 
         Returns
         -------
-        Scalar or vector as numpy.ndarray
-            The prediction. If `X` represents the data for a single example
-            the result will be a scalar. Otherwise the result will be a vector
+        numpy.ndarray
+            The prediction in the form of a scalar or vector.
+            If `X` represents the data for a single example the result will be
+            a scalar. Otherwise the result will be a vector.
         """
         check_is_fitted(self)
         return self.interpolated_thresholder_.predict(

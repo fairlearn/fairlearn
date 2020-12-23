@@ -47,7 +47,7 @@ class UtilityParity(ClassificationMoment):
     Constraint violation for difference-based constraints starts if the
     difference between a group and the overall population with regard to a
     utility exceeds `difference_bound`. For ratio-based constraints, the ratio
-    between the group-level and overal mean utility needs to be bounded
+    between the group-level and overall mean utility needs to be bounded
     between `ratio_bound` and its inverse (plus an additional additive
     `ratio_bound_slack`).
 
@@ -119,7 +119,7 @@ class UtilityParity(ClassificationMoment):
 
         The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
         mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`.
+        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
@@ -191,8 +191,11 @@ class UtilityParity(ClassificationMoment):
     def bound(self):
         """Return bound vector.
 
-        :return: a vector of bound values corresponding to all constraints
-        :rtype: pandas.Series
+        Returns
+        -------
+        pandas.Series
+            a vector of bound values corresponding to all constraints
+ 
         """
         return pd.Series(self.eps, index=self.index)
 
