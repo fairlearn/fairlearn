@@ -1,3 +1,5 @@
+.. _development_process:
+
 Development process
 -------------------
 
@@ -16,6 +18,7 @@ All changes to APIs should be reviewed by
 `Miro Dudik <https://github.com/MiroDudik>`_.
 
 .. _maintainers:
+
 The current maintainers are
 
 - `Miro Dudik <https://github.com/MiroDudik>`_

@@ -61,6 +61,7 @@ def check_if_v046():
 # ones.
 extensions = [
     'bokeh.sphinxext.bokeh_plot',
+    'm2r2',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
@@ -71,6 +72,8 @@ extensions = [
     'sphinx_gallery.gen_gallery',
     'sphinx_multiversion'
 ]
+
+source_suffix = ['.rst', '.md']
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),

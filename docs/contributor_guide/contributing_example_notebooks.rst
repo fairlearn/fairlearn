@@ -66,7 +66,7 @@ This could include any of the following:
 
 If the project group would like to discuss their project with the community
 we can use one of our
-:ref:`sociotechnical deep dive sessions <sociotechnical_deep_dive>` for this
+:ref:`community calls <community_calls>` for this
 purpose.
 
 If you have problems with any parts of this process or feedback please

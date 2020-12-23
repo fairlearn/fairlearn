@@ -32,27 +32,16 @@ All are welcome!
 To report bugs, request features, or ask usage questions please use the
 `appropriate channels as outlined on GitHub <https://github.com/fairlearn/fairlearn/issues/new/choose>`_.
 
-.. _developer_calls:
+.. _community_calls:
 
-Developer calls
+Community calls
 ---------------
 
-We have a monthly contributor meeting every second Thursday of the month at
-11am New York City time. Check what this means in your time zone with
+We have a weekly community call every Thursday at 11am Eastern time.
+Check what this means in your time zone with
 `Time.is <https://time.is/New_York>`_.
 All are welcome! Please reach out via
 `Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
 invitation to you.
-We keep notes from each meeting in the :ref:`developer_call_notes`.
-
-.. _sociotechnical_deep_dive:
-
-Sociotechnical deep dives
--------------------------
-
-We are currently experimenting with weekly sociotechnical deep dives.
-They take place on Thursday at 11am New York City time whenever there is no
-:ref:`developer call <developer_calls>`.
-Please reach out via
-`Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
-invitation to you.
+We keep notes from each meeting in a
+`HackMD document <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g?view>`_.
