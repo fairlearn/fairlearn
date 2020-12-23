@@ -289,11 +289,9 @@ Using a pre-trained estimator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, :class:`ThresholdOptimizer` trains the passed estimator using its
-:code:`fit()` method. In some cases we already have a trained estimator, for
-example if we want to compare it with others. For this use case
-:class:`ThresholdOptimizer` has the :code:`prefit` argument. If set to
-:code:`True` :class:`ThresholdOptimizer` does not call :code:`fit()` on the
-estimator and assumes it is already trained.
+:code:`fit()` method. If :code:`prefit` is set to :code:`True`,
+:class:`ThresholdOptimizer` does not call :code:`fit()` on the estimator and
+assumes that it is already trained.
 
 .. doctest:: mitigation
 
@@ -313,8 +311,7 @@ estimator and assumes it is already trained.
     >>> threshold_optimizer.fit(X, y, sensitive_features=A)
     ThresholdOptimizer(estimator=LogisticRegression(), prefit=True)
 
-If it detects that the estimator
-may not be fitted as defined by
+If it detects that the estimator may not be fitted as defined by
 `scikit-learn's check <https://scikit-learn.org/stable/modules/generated/sklearn.utils.validation.check_is_fitted.html>`_
 it prints a warning, but still proceeds with the assumption that the user
 knows what they are doing. Not every machine learning package adheres to
