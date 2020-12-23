@@ -19,11 +19,8 @@ All changes to APIs should be reviewed by
 
 .. _maintainers:
 
-The current maintainers are
-
-- `Miro Dudik <https://github.com/MiroDudik>`_
-- `Richard Edgar <https://github.com/riedgar-ms>`_
-- `Roman Lutz <https://github.com/romanlutz>`_
+The current maintainers are listed in the
+`maintainers file <https://github.com/fairlearn/fairlearn/blob/master/MAINTAINERS.md>`_
 
 Pull requests against :code:`master` trigger automated tests that are run
 through Azure DevOps, GitHub Actions, and CircleCI. Additional test suites are
