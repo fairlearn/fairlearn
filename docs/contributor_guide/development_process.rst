@@ -205,7 +205,7 @@ Onboarding guide for users of version 0.2 or earlier
 Up to version 0.2, Fairlearn contained only the exponentiated gradient method.
 The Fairlearn repository now has a more comprehensive scope and aims to
 incorporate other methods. The same exponentiated gradient technique is now
-the class :code:`fairlearn.reductions.ExponentiatedGradient`. While in the past
+the class :class:`fairlearn.reductions.ExponentiatedGradient`. While in the past
 exponentiated gradient was invoked via
 
 .. code-block::

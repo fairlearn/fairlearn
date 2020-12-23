@@ -23,8 +23,8 @@ Reductions
 Reduction constructors require a parameter corresponding to an estimator that
 implements the :code:`fit` method with the :code:`sample_weight` argument.
 Parity constraints for reductions are expressed via instances of various
-subclasses of the class :code:`fairlearn.reductions.Moment`. Formally,
-instances of the class :code:`Moment` implement vector-valued random variables
+subclasses of the class :class:`fairlearn.reductions.Moment`. Formally,
+instances of the class :class:`.Moment` implement vector-valued random variables
 whose sample averages over the data are required to be bounded (above and/or
 below).
 
@@ -42,7 +42,7 @@ signatures:
     reduction.predict(X)
 
 All of the currently supported parity constraints (subclasses of
-:code:`Moment`) are based on sensitive features that need to be provided to
+:class:`.Moment`) are based on sensitive features that need to be provided to
 :code:`fit` as a keyword argument :code:`sensitive_features`. In the future,
 it will also be possible to provide sensitive features as columns of
 :code:`X`.
@@ -60,7 +60,7 @@ is provided as a string.
     postprocessor = PostProcessing(estimator=estimator, constraints=constraints)
 
 Post-processing algorithms (such as the ones under
-:code:`fairlearn.postprocessing`) provide the same functions as the reductions
+:py:mod:`fairlearn.postprocessing`) provide the same functions as the reductions
 above albeit with :code:`sensitive_features` as a required argument for
 :code:`predict`. In the future, we will make :code:`sensitive_features`
 optional if the sensitive features are already provided through :code:`X`.

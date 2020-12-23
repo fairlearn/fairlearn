@@ -409,7 +409,7 @@ metrics.
 
 .. note::
 
-    The :code:`FairlearnDashboard` will move from Fairlearn to the
+    The :class:`.FairlearnDashboard` will move from Fairlearn to the
     :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
     will provide some of the existing functionality through
     :code:`matplotlib`-based visualizations.
@@ -486,9 +486,9 @@ Comparing multiple models
 
 The dashboard also enables comparison of multiple models, such as the models
 produced by different learning algorithms and different mitigation approaches,
-including :code:`fairlearn.reductions.GridSearch`,
-:code:`fairlearn.reductions.ExponentiatedGradient`, and
-:code:`fairlearn.postprocessing.ThresholdOptimizer`.
+including :class:`fairlearn.reductions.GridSearch`,
+:class:`fairlearn.reductions.ExponentiatedGradient`, and
+:class:`fairlearn.postprocessing.ThresholdOptimizer`.
 
 As before, the user is first asked to select the sensitive feature and the
 performance metric. The *model comparison* view then depicts the performance

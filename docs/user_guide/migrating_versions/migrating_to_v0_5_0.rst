@@ -10,7 +10,7 @@ Metrics
 -------
 
 We have substantially altered the :mod:`fairlearn.metrics` module.
-In place of calling ``group_summary()`` to produce a :py:class:`sklearn.utils.Bunch`
+In place of calling ``group_summary()`` to produce a :obj:`sklearn.utils.Bunch`
 containing the disaggregated metrics, we have a new class, :class:`.MetricFrame`.
 The key advantages of the new API are:
 
@@ -18,7 +18,7 @@ The key advantages of the new API are:
     - Support for multiple sensitive features
     - Support for control features
 
-The :class:`MetricFrame` class has a constructor similar to ``group_summary()``.
+The :class:`.MetricFrame` class has a constructor similar to ``group_summary()``.
 In v0.4.6, one would write
 
 .. code-block::

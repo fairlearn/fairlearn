@@ -139,7 +139,7 @@ are evaluated on the entire data set and also on each group individually.
 Additionally, group metrics yield the minimum and maximum metric value and for
 which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
-subpackage :code:`fairlearn.metrics`.
+subpackage :mod:`fairlearn.metrics`.
 
 
 .. topic:: References:

@@ -15,13 +15,13 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - binary classification
       - regression
       - supported fairness definitions
-   *  - :code:`fairlearn.` :code:`reductions.` :code:`ExponentiatedGradient`
+   *  - :class:`fairlearn. reductions. ExponentiatedGradient <fairlearn.reductions.ExponentiatedGradient>`
       - A wrapper (reduction) approach to fair classification described in *A Reductions*
         *Approach to Fair Classification* [#2]_.
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :code:`fairlearn.` :code:`reductions.` :code:`GridSearch`
+   *  - :class:`fairlearn. reductions. GridSearch <fairlearn.reductions.GridSearch>`
       - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
         *Approach to Fair Classification* [#2]_. For regression it acts as a
         grid-search variant of the algorithm described in Section 5 of
@@ -30,7 +30,7 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :code:`fairlearn.` :code:`postprocessing.` :code:`ThresholdOptimizer`
+   *  - :class:`fairlearn. postprocessing. ThresholdOptimizer <fairlearn.postprocessing.ThresholdOptimizer>`
       - Postprocessing algorithm based on the paper *Equality of Opportunity*
         *in Supervised Learning* [#3]_. This technique takes as input an
         existing classifier and the sensitive feature, and derives a monotone
@@ -496,7 +496,7 @@ constraints:
 Control features
 ^^^^^^^^^^^^^^^^
 
-The above :class:`Moment`s (:ref:`demographic_parity`,
+The above :class:`Moment` classes (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
 :ref:`equalized_odds` and :ref:`error_rate_parity`) all support the concept
 of *control features* when applying their fairness constraints.

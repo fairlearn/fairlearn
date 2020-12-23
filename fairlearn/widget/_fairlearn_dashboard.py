@@ -30,7 +30,7 @@ class FairlearnDashboard(object):
         these can be from the initial dataset, or reserved from training.
     y_true : numpy.ndarray, list[]
         The true labels or values for the provided dataset.
-    y_pred : numpy.ndarray, list[][], list[], dict {string: list[]}
+    y_pred : numpy.ndarray, list[][], list[], dict(list[])
         Array of output predictions from models to be evaluated. Can be a single
         array of predictions, or a 2D list over multiple models. Can be a dictionary
         of named model predictions.

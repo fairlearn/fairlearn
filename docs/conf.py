@@ -77,7 +77,8 @@ source_suffix = ['.rst', '.md']
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None), }
+                       'sklearn': ('https://scikit-learn.org/stable/', None),
+                       'matplotlib': ('http://matplotlib.sourceforge.net/', None) }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -85,7 +86,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.md']
 
 master_doc = 'index'
 
@@ -115,7 +116,7 @@ html_theme_options = {
         {"name": "StackOverflow", "url": "https://stackoverflow.com/questions/tagged/fairlearn"}
     ],
     "github_url": "https://github.com/fairlearn/fairlearn",
-    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this
+    "twitter_url": "https://twitter.com/fairlearn",
     "show_prev_next": False
 }
 
