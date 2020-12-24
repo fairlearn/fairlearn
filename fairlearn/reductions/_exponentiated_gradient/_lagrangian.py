@@ -2,12 +2,15 @@
 # Licensed under the MIT License.
 
 import logging
+import math
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
 from sklearn import clone
 from sklearn.dummy import DummyClassifier
 from time import time
+import inspect
+import resampling
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
@@ -62,7 +65,6 @@ class _Lagrangian:
         self.n_oracle_calls_dummy_returned = 0
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
-        self.sample_weight_name = sample_weight_name
 
     def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
@@ -172,7 +174,31 @@ class _Lagrangian:
             estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
+
+        # The line that is being replaced
+        # estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
+
+        # ------- change made starting from here -------- #
+
+        # historical version: try and except, downside: too expensive
+        # try:
+        #     estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
+        # except TypeError:
+        #     resampled_X, resampled_Y = self.resampling_method(self.constraints.X, redY, redW)
+        #     estimator.fit(resampled_X, resampled_Y)
+
+        # proposing version: if check args
+        if estimator.fit() and 'sample_weight' in inspect.getfullargspec(estimator.fit).args:
+            estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
+        # To do 1: add other resampling methods in fairlearn.reductions.resampling
+        # To do 2: let users pass their own resampling methods, and we orchestrate here
+        # now we only consider this resampling method：fixed_size_deterministic
+        else:
+            resampled_X, resampled_y = resampling.resample_fixed_size_deterministic(self.constraints.X, redY, redW)
+            estimator.fit(resampled_X, resampled_y)
+
+        # ------- change made ending from here -------- #
+
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
