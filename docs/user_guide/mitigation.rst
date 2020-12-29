@@ -92,6 +92,8 @@ The ROC curves consist of the true and false positive rates for each
 of the thresholding rules, with separate ones per sensitive feature value.
 Note that the plot omits points that are within the convex hull of points.
 
+.. _printed_thresholds:
+
 .. plot::
     :include-source:
 
