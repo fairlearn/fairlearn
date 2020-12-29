@@ -184,18 +184,19 @@ In this particular example :code:`operation1` will always be true since every
 score is larger than negative infinity.
 For "Male" that means
 
+- predict 1 with probability :math:`1-0.999926=0.000074` if the score is less
+  or equal to :math:`0.5`. This means that there is a very low probability
+  (less than a hundredth of a percent) of getting label 1 regardless of the
+  features.
 - predict 1 if the score is greater than :math:`0.5`.
-- predict 0 with probability :math:`0.999926` if the score is less or equal to
-  :math:`0.5`. This means there is a very low probability of getting label 1
-  regardless of the features.
 
-For "Female" the result includes the :math:`p_{\text{ignore}}` term, but one of the
-thresholds is set to always be true
+For "Female" the result includes the :math:`p_{\text{ignore}}` term, but one
+of the thresholds is set to always be true
 
 - predict 1 with probability
-  :math:`0.13186 \cdot 0.035 + (1-0.13186) \cdot 0.00563 = 0.0095` if the score is
-  less or equal to :math:`0.5`. This means a 1% chance of getting label 1
-  regardless of the features.
+  :math:`0.13186 \cdot 0.035 + (1-0.13186) \cdot 0.00563 = 0.0095` if the
+  score is less or equal to :math:`0.5`. This represents a 1% chance of
+  getting label 1 regardless of the features.
 - predict 1 if the score is greater than :math:`0.5`
 
 We want to emphasize that a non-zero probability to get label 1 is not
