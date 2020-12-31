@@ -7,7 +7,6 @@ API Reference
    :maxdepth: 1
 
    fairlearn.metrics
-   fairlearn.metrics_plots
    fairlearn.postprocessing
    fairlearn.reductions
    fairlearn.widget

@@ -398,18 +398,16 @@ see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 .. _metrics_plots:
 
 Metrics plots
--------------
+^^^^^^^^^^^^^
 
-.. currentmodule:: fairlearn.metrics_plots
-
-The :py:mod:`fairlearn.metrics_plots` module visualizes fairness metrics from
-different perspectives.
+The :py:mod:`fairlearn.metrics` module also provides functions to visualize
+fairness metrics.
 
 The examples below illustrate a scenario where *binary gender* is
 a sensitive feature and *accuracy score* is the performance metric.
 
 Disparity in performance
-^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~
 For a binary classifier :code:`plot_disparities_in_performance` shows:
 
 #. the performance of your model in terms of *accuracy score* overall as well
@@ -423,7 +421,7 @@ For a binary classifier :code:`plot_disparities_in_performance` shows:
 .. plot::
     :include-source:
 
-    from fairlearn.metrics_plots import plot_disparities_in_performance
+    from fairlearn.metrics import plot_disparities_in_performance
     from fairlearn.datasets import fetch_adult
     from sklearn.tree import DecisionTreeClassifier
     import pandas as pd
@@ -439,14 +437,14 @@ For a binary classifier :code:`plot_disparities_in_performance` shows:
     plot_disparities_in_performance(y_true, y_pred, sensitive_features=sex)
 
 Disparity in metric
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 :code:`plot_disparities_in_metric` shows a bar chart that contains the
 specified metric in each group.
 
 .. plot::
     :include-source:
 
-    from fairlearn.metrics_plots import plot_disparities_in_metric
+    from fairlearn.metrics import plot_disparities_in_metric
     from fairlearn.datasets import fetch_adult
     from fairlearn.metrics import selection_rate
     from sklearn.metrics import accuracy_score

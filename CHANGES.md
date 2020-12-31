@@ -6,8 +6,8 @@
   stratification, with fairness constraints enforced within each stratum, but
   not between strata
 * Update `make_derived_metric()` to use `MetricFrame`
-* Add `fairlearn.metrics_plots` module, with `plot_disparities_in_performance`
-  and `plot_disparities_in_metric` functions
+* Add plotting functionality to `fairlearn.metrics` module, with
+  `plot_disparities_in_performance` and `plot_disparities_in_metric` functions
 
 ### v0.5.0
 
