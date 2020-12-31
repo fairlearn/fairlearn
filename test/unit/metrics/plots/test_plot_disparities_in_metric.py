@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from .conftest import quickstart_setup
-from fairlearn.metrics_plots import plot_disparities_in_metric
+from fairlearn.metrics import plot_disparities_in_metric
 from fairlearn.metrics._group_metric_set import BINARY_CLASSIFICATION_METRICS, \
     REGRESSION_METRICS
 import pytest

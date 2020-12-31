@@ -48,6 +48,11 @@ from ._extra_metrics import (  # noqa: F401
     _mean_underprediction,
     )
 
+from ._plots import (  # noqa: F401
+    plot_disparities_in_metric,
+    plot_disparities_in_performance,
+)
+
 
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
@@ -79,4 +84,10 @@ _extra_metrics = [
     "selection_rate",
 ]
 
-__all__ = _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys()))
+_plots = [
+    "plot_disparities_in_metric",
+    "plot_disparities_in_performance",
+]
+
+__all__ = _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys())) + \
+    _plots

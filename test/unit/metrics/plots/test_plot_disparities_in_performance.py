@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from fairlearn.metrics_plots import plot_disparities_in_performance
+from fairlearn.metrics import plot_disparities_in_performance
 from .conftest import quickstart_setup
 
 

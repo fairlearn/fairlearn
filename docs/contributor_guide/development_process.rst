@@ -145,7 +145,7 @@ The prerequisites for Fairlearn are split between three separate files:
 
     -  `requirements.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements.txt>`_
        contains the prerequisites for the core Fairlearn package
-    
+
     -  `requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-customplots.txt>`_
        contains additional prerequisites for the :code:`[customplots]` extension for Fairlearn
 

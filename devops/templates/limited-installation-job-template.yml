@@ -47,4 +47,4 @@ jobs:
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results **/TEST-*.xml'
-    condition: succeededOrFailed() 
+    condition: succeededOrFailed()
