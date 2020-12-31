@@ -227,6 +227,30 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self.interpolated_thresholder_ = threshold_optimization_method(
             sensitive_feature_vector, y, scores)
         return self
+    
+    def thresholds(self):
+        r"""Get the calculated thresholds for each sensitive feature group.
+
+        The formula below describes how the individual values are used in the
+        thresholding function.
+
+        .. math::
+
+            p_{\text{ignore}} \cdot c + (1-p_{\text{ignore}}) \cdot \left(p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})\right)
+
+        For a more thorough interpretation of printed thresholding rules refer
+        to the corresponding :ref:`user guide section <printed_thresholds>`.
+
+        Returns
+        -------
+        dict
+            A dictionary of :obj:`sklearn.utils.Bunch` indexed by the
+            sensitive feature values. Each :obj:`sklearn.utils.Bunch` contains
+            the threshold information.
+        """
+        check_is_fitted(self)
+        return self.interpolated_thresholder_.interpolation_dict
+
 
     def predict(self, X, *, sensitive_features, random_state=None):
         """Predict label for each sample in X while taking into account sensitive features.

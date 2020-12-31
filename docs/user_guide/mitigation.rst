@@ -101,6 +101,7 @@ Note that the plot omits points that are within the convex hull of points.
     >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
     >>> from sklearn.datasets import fetch_openml
     >>> import pandas as pd
+    >>> import json
     >>> data = fetch_openml(data_id=1590, as_frame=True)
     >>> X = pd.get_dummies(data.data)
     >>> y = (data.target == '>50K') * 1
@@ -112,7 +113,7 @@ Note that the plot omits points that are within the convex hull of points.
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
-    >>> threshold_optimizer.interpolated_thresholder_._print_thresholds()
+    >>> print(json.dumps(threshold_optimizer.thresholds(), default=str, indent=4))
     {
         "Female": {
             "p_ignore": 0.13186000824177083,
@@ -220,6 +221,7 @@ with the otherwise exact same example:
     >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
     >>> from sklearn.datasets import fetch_openml
     >>> import pandas as pd
+    >>> import json
     >>> data = fetch_openml(data_id=1590, as_frame=True)
     >>> X = pd.get_dummies(data.data)
     >>> y = (data.target == '>50K') * 1
@@ -231,7 +233,7 @@ with the otherwise exact same example:
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(estimator=LogisticRegression())
-    >>> threshold_optimizer.interpolated_thresholder_._print_thresholds()
+    >>> print(json.dumps(threshold_optimizer.thresholds(), default=str, indent=4))
     {
         "Female": {
             "p0": 0.9527202201546324,

@@ -131,28 +131,3 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         positive_probs = self._pmf_predict(
             X, sensitive_features=sensitive_features)[:, 1]
         return (positive_probs >= random_state.rand(len(positive_probs))) * 1
-
-    def print_thresholds(self):
-        r"""Print the calculated thresholds for each sensitive feature group.
-
-        The printed text is formatted as a dictionary with the sensitive
-        features as keys and their corresponding thresholds described through
-        a dictionary. The formula below described how the individual values
-        are used in the thresholding function.
-
-        .. math::
-
-            p_{\text{ignore}} \cdot c + (1-p_{\text{ignore}}) \cdot \left(p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})\right)
-
-        For a more thorough interpretation of printed thresholding rules refer
-        to the corresponding :ref:`user guide section <printed_thresholds>`.
-
-        """
-        check_is_fitted(self)
-        interpolation_dict_copy = deepcopy(self.interpolation_dict)
-        for sensitive_feature, interpolation_description in self.interpolation_dict.items():
-            interpolation_dict_copy[sensitive_feature].operation0 = \
-                repr(interpolation_description.operation0)
-            interpolation_dict_copy[sensitive_feature].operation1 = \
-                repr(interpolation_description.operation1)
-        print(json.dumps(interpolation_dict_copy, indent=4))
