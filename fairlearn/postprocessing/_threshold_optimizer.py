@@ -236,7 +236,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         .. math::
 
-            p_{\text{ignore}} \cdot c + (1-p_{\text{ignore}}) \cdot 
+            p_{\text{ignore}} \cdot c + (1-p_{\text{ignore}}) \cdot
             \left(
                 p_0 \cdot \text{operation}_0(\text{score}) +
                 p_1 \cdot \text{operation}_1(\text{score})
