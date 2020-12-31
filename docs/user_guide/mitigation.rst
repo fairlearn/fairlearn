@@ -264,7 +264,7 @@ the probability to predict label 1 in the case where the score is below
 
 Note that the chart is different from the chart for :code:`equalized_odds`.
 It shows :code:`selection_rate` (which is the basis for our fairness
-criterion) on the x-axis :code:`demographic_parity`, and
+criterion :code:`demographic_parity`) on the x-axis, and
 :code:`accuracy_score` (which is the basis for the implicit performance
 objective) on the y-axis.
 
