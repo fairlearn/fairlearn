@@ -35,7 +35,7 @@ The example notebooks in Fairlearn are surfaced through the website's
 :ref:`example notebook page <examples>`.
 This allows them to be rendered properly with output from all cells.
 
-.. note:
+.. note::
 
     Rendering the Fairlearn dashboard is still an outstanding issue.
 
@@ -70,7 +70,7 @@ opens a *Python Interactive* tab to show the output.
 If you prefer working with Jupyter simply open the `.py` file with Jupyter.
 Changes made in Jupyter automatically show up in the `.py` file.
 
-.. note:
+.. note::
 
     The Fairlearn dashboard does not render in VS Code yet.
     Jupyter will be required for examples that use the dashboard.
@@ -80,6 +80,6 @@ restructured text (ReST), not markdown, so that the sphinx documentation build
 can render it nicely for the website. When downloading the `.ipynb` file through
 the website the text portions will be in markdown due to automatic conversion from
 ReST to markdown by sphinx-gallery. This currently only works for basic ReST
-functionality, so try to limit use of ReST directives (e.g., `.. note:`),
+functionality, so try to limit use of ReST directives (e.g., `.. note::`),
 internal links (e.g., `:ref:`), and other functionality that won't render well
 in markdown.

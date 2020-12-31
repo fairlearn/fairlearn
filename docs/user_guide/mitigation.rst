@@ -268,7 +268,7 @@ criterion :code:`demographic_parity`) on the x-axis, and
 :code:`accuracy_score` (which is the basis for the implicit performance
 objective) on the y-axis.
 
-.. note:
+.. note::
 
     :class:`ThresholdOptimizer` expects an estimator that provides it with
     scores. While the output of :class:`ThresholdOptimizer` is binary, the
