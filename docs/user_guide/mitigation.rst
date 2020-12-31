@@ -76,15 +76,6 @@ In many cases this comes at the expense of performance, for example, with
 significantly lower accuracy. Regardless, it is a useful data point to compare
 results with.
 
-:class:`ThresholdOptimizer` expects an estimator that provides it with scores.
-While the output of :class:`ThresholdOptimizer` is binary, the input need not
-be. In fact, real valued input, e.g. from a regressor, provides it with many
-more options to create thresholds. For :math:`n` input data points with
-:math:`m \leq n` different score values it has :math:`m+1` different
-thresholds. At each threshold one can create one of two thresholding rules,
-i.e. functions that indicate which data points get label :code:`1` based on
-their score.
-
 We can think of each thresholding rule as a binary classifier and determine
 its true positive rate and false positive rate.
 The code below visualizes the threshold selection process with an ROC curve.
@@ -276,6 +267,17 @@ It shows :code:`selection_rate` (which is the basis for our fairness
 criterion) on the x-axis :code:`demographic_parity`, and
 :code:`accuracy_score` (which is the basis for the implicit performance
 objective) on the y-axis.
+
+.. note:
+
+    :class:`ThresholdOptimizer` expects an estimator that provides it with
+    scores. While the output of :class:`ThresholdOptimizer` is binary, the
+    input need not be. In fact, real valued input, e.g. from a regressor,
+    provides it with many more options to create thresholds. For :math:`n`
+    input data points with :math:`m \leq n` different score values it has
+    :math:`m+1` different thresholds. At each threshold one can create one of
+    two thresholding rules, i.e. functions that indicate which data points
+    get label :code:`1` based on their score.
 
 The following combinations of fairness criteria and objectives are available:
 
