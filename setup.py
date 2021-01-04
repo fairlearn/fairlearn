@@ -32,6 +32,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires='>=3.6',
     install_requires=install_requires,
+    extras_require=extras_require,
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
@@ -41,7 +42,6 @@ setuptools.setup(
         "Development Status :: 3 - Alpha"
     ],
     include_package_data=True,
-    extras_require=extras_require,
     data_files=[
         ('share/jupyter/nbextensions/fairlearn-widget', [
             'fairlearn/widget/static/extension.js',
