@@ -7,7 +7,8 @@ import matplotlib.ticker as mtick
 from fairlearn.metrics import MetricFrame
 
 
-def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_plot=True):
+def plot_disparities_in_metric(metric, *, y_true, y_pred, sensitive_features, show_plot=True,
+                               ax=None, metric_name=None):
     """Plot disparities in a metric between groups defined by sensitive features.
 
     This method visualizes the metric values for all groups as identified
@@ -17,12 +18,32 @@ def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_
     ----------
     metric : callable
         A metric function that takes arguments `y_true` and `y_pred`
+
     y_true : array-like
         The list of true values
+
     y_pred : array-like
         The list of predicted values
+
     sensitive_features : array-like
-        the sensitive attributes
+        The sensitive features
+
+    show_plot : bool, default=True
+        Whether to show the plot. By default, the plot is shown using the
+        :func:`matplotlib.pyplot.show` function.
+
+    ax : :class:`matplotlib.axes.Axes`, default=None
+        :class:`matplotlib.axes.Axes` object to plot on. If `None`, a new
+        figure and axes is created.
+
+    metric_name : str
+        The metric name to display on the plot's axis. If `None`, the `metric`
+        argument's `__name__` property will be used.
+
+    Returns
+    -------
+    :class:`matplotlib.axes.Axes`
+        axes object to configure further if desired
 
     """
     # compute
@@ -30,22 +51,25 @@ def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_
                                sensitive_features=sensitive_features)
 
     # chart text for localization
-    metric_text = metric.__name__.replace('_', ' ')
-    title_text = f'Disparity in {metric_text}'
     ylabel_text = 'By group'
     overall_performance_text = 'Overall'
     diff_text = 'min-max difference'
     ratio_text = 'min-max ratio'
     # chart styles
-    figsize = (12, 4)
     plt.rc('font', size=12)
     height = 0.4
     bar_color = '#666'  # grey
     overall_vertical_line_color = '#333'
     label_padding = 2
 
+    if not metric_name:
+        metric_name = metric.__name__.replace('_', ' ')
+    title_text = f'Disparity in {metric_name}'
+
     # bars
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        _, ax = plt.subplots()
+
     n_groups = len(metric_frame.by_group)
     ax.barh(list(range(n_groups)[::-1]),
             metric_frame.by_group,
@@ -67,12 +91,12 @@ def plot_disparities_in_metric(metric, y_true, y_pred, sensitive_features, show_
     # axes, titles, legend, etc
     plt.title(f"\n{title_text}\n", fontsize=24, loc="left")
     right_title = f"{overall_performance_text}:\n" \
-        f"{metric_frame.overall:.1%} {metric_text}\n" \
+        f"{metric_frame.overall:.1%} {metric_name}\n" \
         f"{metric_frame.difference():.1%} {diff_text}\n" \
         f"{metric_frame.ratio():.1%} {ratio_text}\n"
     plt.title(right_title, fontsize=12, loc="right")
     ax.set_ylabel(ylabel_text)
-    ax.set_xlabel(metric_text)
+    ax.set_xlabel(metric_name)
     ax.xaxis.set_major_formatter(mtick.PercentFormatter(xmax=1, decimals=None))
     ax.axvline(linewidth=1, color=overall_vertical_line_color, x=metric_frame.overall)
     plt.gca().set_xlim(0, 1)

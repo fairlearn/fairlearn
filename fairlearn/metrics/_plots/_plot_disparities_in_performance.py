@@ -8,7 +8,8 @@ from sklearn.metrics import accuracy_score
 from fairlearn.metrics import MetricFrame, false_positive_rate, false_negative_rate
 
 
-def plot_disparities_in_performance(y_true, y_pred, sensitive_features, show_plot=True):
+def plot_disparities_in_performance(*, y_true, y_pred, sensitive_features, show_plot=True,
+                                    ax=None):
     """Plot disparities in performance for a binary classifier across a single sensitive feature.
 
     This helps visualize differences in overall prediction error, as well as false positive
@@ -24,7 +25,21 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features, show_plo
         The list of predicted values
 
     sensitive_features : array-like
-        the sensitive attributes
+        The sensitive features
+
+    show_plot : bool, default=True
+        Whether to show the plot. By default, the plot is shown using the
+        :func:`matplotlib.pyplot.show` function.
+
+    ax : :class:`matplotlib.axes.Axes`, default=None
+        :class:`matplotlib.axes.Axes` object to plot on. If `None`, a new
+        figure and axes is created.
+
+    Returns
+    -------
+    :class:`matplotlib.axes.Axes`
+        axes object to configure further if desired
+
     """
     # compute
     accuracy_frame = MetricFrame(
@@ -54,7 +69,6 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features, show_plo
     fp_legend_text = "False positive rate"
 
     # chart styles
-    figsize = (12, 4)
     plt.rc('font', size=12)
     height = 0.4
     zero_vertical_line_color = '#333'
@@ -68,7 +82,10 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features, show_plo
         labels.append(f"{sensitive_feature_value}\n"
                       f"{accuracy_frame.by_group[sensitive_feature_value]:.1%}"
                       f"\n{accuracy_text}")
-    fig, ax = plt.subplots(figsize=figsize)
+
+    if ax is None:
+        _, ax = plt.subplots()
+
     ax.barh(
         labels,
         fn_frame.by_group,
@@ -121,4 +138,4 @@ def plot_disparities_in_performance(y_true, y_pred, sensitive_features, show_plo
     if show_plot:
         plt.show()
 
-    return None
+    return ax
