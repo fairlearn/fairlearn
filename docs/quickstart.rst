@@ -76,6 +76,7 @@ than $50,000 a year.
 
     >>> import numpy as np 
     >>> import pandas as pd
+    >>> pd.set_option('display.precision', 4)
     >>> import matplotlib.pyplot as plt 
     >>> from sklearn.datasets import fetch_openml
     >>> data = fetch_openml(data_id=1590, as_frame=True)
@@ -115,8 +116,8 @@ we can evaluate metrics for subgroups within the data as below:
     0.8443552680070431
     >>> print(gm.by_group)
     sex
-    Female       0.925148
-    Male         0.804288
+    Female    0.9251
+    Male      0.8043
     Name: accuracy_score, dtype: object
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
@@ -132,8 +133,8 @@ their label:
     0.16385487899758405
     >>> sr.by_group
     sex
-    Female      0.0635499
-    Male         0.213599 
+    Female    0.0635
+    Male      0.2136
     Name: selection_rate, dtype: object   
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
@@ -195,8 +196,8 @@ a vastly reduced difference in selection rate:
     0.16614798738790384
     >>> print(sr_mitigated.by_group)
     sex
-    Female       0.155262
-    Male         0.171547
+    Female    0.1553
+    Male      0.1715
     Name: selection_rate, dtype: object
 
 Similarly, we can explore the difference between the initial model and the
