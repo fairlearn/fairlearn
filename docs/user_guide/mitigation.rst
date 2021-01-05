@@ -254,7 +254,6 @@ the predicted labels.
     >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> import numpy as np
     >>> import pandas as pd
-    >>> pd.set_option('display.precision', 4)
     >>> dp = DemographicParity(difference_bound=0.01)
     >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])

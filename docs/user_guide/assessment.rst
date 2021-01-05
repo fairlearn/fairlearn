@@ -61,7 +61,6 @@ the following set of labels:
     ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
     >>> pd.set_option('display.max_columns', 20)
     >>> pd.set_option('display.width', 80)
-    >>> pd.set_option('display.precision', 4)
     >>> pd.DataFrame({ 'y_true': y_true,
     ...                'y_pred': y_pred,
     ...                'group_membership_data': group_membership_data})

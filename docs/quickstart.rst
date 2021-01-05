@@ -76,7 +76,6 @@ than $50,000 a year.
 
     >>> import numpy as np 
     >>> import pandas as pd
-    >>> pd.set_option('display.precision', 4)
     >>> import matplotlib.pyplot as plt 
     >>> from sklearn.datasets import fetch_openml
     >>> data = fetch_openml(data_id=1590, as_frame=True)
