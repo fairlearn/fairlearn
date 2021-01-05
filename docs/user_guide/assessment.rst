@@ -125,8 +125,8 @@ metrics simultaneously:
     ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
-    precision    0.5556
-    recall       0.5000
+    precision    0.5555...
+    recall       0.5000...
     dtype: object
     >>> multi_metric.by_group
                         precision recall
@@ -152,10 +152,10 @@ in a dictionary via the ``sample_params`` argument.:
     0.45
     >>> weighted.by_group
     SF 0
-    a    0.0000
-    b    0.5000
-    c    0.7143
-    d    0.0000
+    a    0.0000...
+    b    0.5000...
+    c    0.7142...
+    d    0.0000...
     Name: recall_score, dtype: object
 
 If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
@@ -178,10 +178,10 @@ function:
     0.5396825396825397
     >>> metric_beta.by_group
     sensitive_feature_0
-    a    0.0000
-    b    0.7907
-    c    0.6335
-    d    0.0000
+    a    0.0000...
+    b    0.7906...
+    c    0.6335...
+    d    0.0000...
     Name: metric, dtype: object
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
@@ -343,18 +343,18 @@ parameter:
     >>> # The 'overall' property is now split based on the control feature
     >>> metric_c_f.overall
     CF
-    H    0.4286
-    L    0.3750
+    H    0.4285...
+    L    0.3750...
     Name: accuracy_score, dtype: object
     >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
     >>> metric_c_f.by_group
     CF  SF
-    H   A     0.2000
-        B     0.4000
-        C     0.7500
-    L   A     0.4000
-        B     0.2857
-        C     0.5000
+    H   A     0.2000...
+        B     0.4000...
+        C     0.7500...
+    L   A     0.4000...
+        B     0.2857...
+        C     0.5000...
     Name: accuracy_score, dtype: object
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
@@ -379,8 +379,8 @@ With the :class:`MetricFrame` computed, we can perform aggregations:
     >>> # See the maximum difference in accuracy for each value of the control feature
     >>> metric_c_f.difference(method='between_groups')
     CF
-    H    0.5500
-    L    0.2143
+    H    0.5500...
+    L    0.2142...
     Name: accuracy_score, dtype: float64
 
 In each case, rather than a single scalar, we receive one result for each
