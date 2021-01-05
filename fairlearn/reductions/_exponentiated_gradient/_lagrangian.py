@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import logging
-import math
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
@@ -10,11 +9,11 @@ from sklearn import clone
 from sklearn.dummy import DummyClassifier
 from time import time
 import inspect
-import .resampling
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
 from fairlearn.reductions._moments import ClassificationMoment
+from fairlearn.reductions import resampling
 
 logger = logging.getLogger(__name__)
 
