@@ -174,29 +174,15 @@ class _Lagrangian:
 
         oracle_call_start_time = time()
 
-        # The line that is being replaced
-        # estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
-
-        # ------- change made starting from here -------- #
-
-        # historical version: try and except, downside: too expensive
-        # try:
-        #     estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
-        # except TypeError:
-        #     resampled_X, resampled_Y = self.resampling_method(self.constraints.X, redY, redW)
-        #     estimator.fit(resampled_X, resampled_Y)
-
         # proposing version: if check args
-        if estimator.fit() and 'sample_weight' in inspect.getfullargspec(estimator.fit).args:
-            estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
         # To do 1: add other resampling methods in fairlearn.reductions.resampling
         # To do 2: let users pass their own resampling methods, and we orchestrate here
         # now we only consider this resampling method：fixed_size_deterministic
+        if estimator.fit() and 'sample_weight' in inspect.getfullargspec(estimator.fit).args:
+            estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
         else:
             resampled_X, resampled_y = resampling.resample_fixed_size_deterministic(self.constraints.X, redY, redW)
             estimator.fit(resampled_X, resampled_y)
-
-        # ------- change made ending from here -------- #
 
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
