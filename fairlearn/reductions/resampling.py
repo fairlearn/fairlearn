@@ -30,6 +30,12 @@ def resample_fixed_size_deterministic(X, y, weights):
         the training labels
     weight : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
         the resampling weights
+   Return
+   ----------
+   resampled_X : {numpy.ndarray, pandas.DataFrame}
+        the resampled training features
+   resampled_y : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the resampled training labels
    """
 
     factor = len(X) / sum(weights)
