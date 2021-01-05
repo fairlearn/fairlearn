@@ -353,16 +353,16 @@ In practice this can be used in a difference-based relaxation as follows:
     0.5714285714285714
     >>> tpr_summary.by_group
     sensitive_feature_0
-    a    0.7500
-    b    0.3333
+    a    0.7500...
+    b    0.3333...
     Name: true_positive_rate, dtype: object
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.1786
-                   b          -0.2381
-    -     label=1  a          -0.1786
-                   b           0.2381
+    +     label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. note::
@@ -381,10 +381,10 @@ Alternatively, a ratio-based relaxation is also available:
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.1036
-                   b          -0.2714
-    -     label=1  a          -0.2357
-                   b           0.1810
+    +     label=1  a           0.1035...
+                   b          -0.2714...
+    -     label=1  a          -0.2357...
+                   b           0.1809...
     dtype: float64
 
 .. _equalized_odds:
@@ -409,14 +409,14 @@ and false positive rate.
     >>> eo.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> eo.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=0  a          -0.3333
-                   b           0.1667
-          label=1  a           0.1786
-                   b          -0.2381
-    -     label=0  a           0.3333
-                   b          -0.1667
-          label=1  a          -0.1786
-                   b           0.2381
+    +     label=0  a          -0.3333...
+                   b           0.1666...
+          label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=0  a           0.3333...
+                   b          -0.1666...
+          label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. _error_rate_parity:
