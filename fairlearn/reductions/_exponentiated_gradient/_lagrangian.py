@@ -10,7 +10,7 @@ from sklearn import clone
 from sklearn.dummy import DummyClassifier
 from time import time
 import inspect
-import resampling
+import .resampling
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
