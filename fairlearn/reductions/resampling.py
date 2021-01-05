@@ -17,19 +17,20 @@ logger = logging.getLogger(__name__)
 
 
 def resample_fixed_size_deterministic(X, y, weights):
-    """ Resampling methods: Deterministic and keep the sample size.
+    """ 
+    Resampling methods: Deterministic and keep the sample size.
 
-        Parameters
-        ----------
-        X : {numpy.ndarray, pandas.DataFrame}
-            the training features
-        sensitive_features : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
-            the sensitive features to use for constraints
-        y : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
-            the training labels
-        weight : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
-            the resampling weights
-        """
+    Parameters
+    ----------
+    X : {numpy.ndarray, pandas.DataFrame}
+        the training features
+    sensitive_features : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the sensitive features to use for constraints
+    y : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the training labels
+    weight : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the resampling weights
+   """
 
     factor = len(X) / sum(weights)
     resampled_X, resampled_y = [], []
