@@ -124,7 +124,7 @@ demographic parity as the fairness constraint:
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(estimator=LogisticRegression())
-    >>> print(json.dumps(threshold_optimizer.thresholds(), default=str, indent=4))
+    >>> print(json.dumps(threshold_optimizer.interpolated_thresholder_.threshold_info_, default=str, indent=4))
     {
         "Female": {
             "p0": 0.9527202201546324,
@@ -232,7 +232,7 @@ Note that the plot omits points that are within the convex hull of points.
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
-    >>> print(json.dumps(threshold_optimizer.thresholds(), default=str, indent=4))
+    >>> print(json.dumps(threshold_optimizer.interpolated_thresholder_.threshold_info_, default=str, indent=4))
     {
         "Female": {
             "p_ignore": 0.13186000824177083,
@@ -425,7 +425,7 @@ provide :code:`signed_weights` that are used to relabel and reweight samples.
 .. _constraints_binary_classification:
 
 Fairness constraints for binary classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 All supported fairness constraints for binary classification inherit from
 :code:`UtilityParity`. They are based on some underlying metric called
@@ -514,7 +514,7 @@ bound the ratio between the pairs of groups, but such a bound is implied.
 .. _demographic_parity:
 
 Demographic Parity
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *demographic parity* if
 
@@ -614,7 +614,7 @@ of the constraints, we obtain
 .. _false_positive_rate_parity:
 
 True Positive Rate Parity and False Positive Rate Parity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *true positive rate parity* if
 
@@ -691,7 +691,7 @@ Alternatively, a ratio-based relaxation is also available:
 .. _equalized_odds:
     
 Equalized Odds
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
 *true positive rate parity* and *false positive rate parity*, i.e.,
@@ -723,7 +723,7 @@ and false positive rate.
 .. _error_rate_parity:
 
 Error Rate Parity
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 The *error rate parity* requires that the error rates should be
 the same across all groups. For a classifier :math:`h(X)`
@@ -795,7 +795,7 @@ constraints:
 
 
 Control features
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
 The above :class:`Moment`s (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
@@ -830,7 +830,7 @@ The other constraints acquire similar modifications.
 .. _constraints_multi_class_classification:
 
 Fairness constraints for multi-class classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Reductions approaches do not support multi-class classification yet at this
 point. If this is an important scenario for you please let us know!
@@ -838,7 +838,7 @@ point. If this is an important scenario for you please let us know!
 .. _constraints_regression:
 
 Fairness constraints for regression
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The performance objective in the regression scenario is to minimize the
 loss of our regressor :math:`h`. The loss can be expressed as
@@ -872,7 +872,7 @@ supported type of constraint at this point is :class:`BoundedGroupLoss`.
 .. _bounded_group_loss:
 
 Bounded Group Loss
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 *Bounded group loss* requires the loss of each group to be below a
 user-specified amount :math:`\zeta`. If :math:`\zeta` is chosen reasonably
@@ -926,12 +926,12 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
 .. _exponentiated_gradient:
 
 Exponentiated Gradient
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. _grid_search:
 
 Grid Search
-~~~~~~~~~~~
+^^^^^^^^^^^
 
 .. topic:: References:
 

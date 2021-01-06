@@ -228,33 +228,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             sensitive_feature_vector, y, scores)
         return self
 
-    def thresholds(self):
-        r"""Get the calculated thresholds for each sensitive feature group.
-
-        The formula below describes how the individual values are used in the
-        thresholding function.
-
-        .. math::
-
-            p_{\text{ignore}} \cdot c + (1-p_{\text{ignore}}) \cdot
-            \left(
-                p_0 \cdot \text{operation}_0(\text{score}) +
-                p_1 \cdot \text{operation}_1(\text{score})
-            \right)
-
-        For a more thorough interpretation of printed thresholding rules refer
-        to the corresponding :ref:`user guide section <printed_thresholds>`.
-
-        Returns
-        -------
-        dict
-            A dictionary of :obj:`sklearn.utils.Bunch` indexed by the
-            sensitive feature values. Each :obj:`sklearn.utils.Bunch` contains
-            the threshold information.
-        """
-        check_is_fitted(self)
-        return self.interpolated_thresholder_.interpolation_dict
-
     def predict(self, X, *, sensitive_features, random_state=None):
         """Predict label for each sample in X while taking into account sensitive features.
 
@@ -366,11 +339,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         # Create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature value.
-        interpolation_dict = {}
+        threshold_info = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
             best_interpolation = self._tradeoff_curve[sensitive_feature_value] \
                 .transpose()[i_best]
-            interpolation_dict[sensitive_feature_value] = \
+            threshold_info[sensitive_feature_value] = \
                 Bunch(p0=best_interpolation.p0,
                       operation0=best_interpolation.operation0,
                       p1=best_interpolation.p1,
@@ -383,7 +356,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         logger.debug(OUTPUT_SEPARATOR)
 
         return InterpolatedThresholder(
-            self.estimator_, interpolation_dict, prefit=True).fit(None, None)
+            self.estimator_, threshold_info, prefit=True).fit(None, None)
 
     def _threshold_optimization_for_equalized_odds(self, sensitive_features, labels, scores):
         """Calculate the ROC curve of every sensitive feature value at different thresholds.
@@ -463,7 +436,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         # create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature
-        interpolation_dict = {}
+        threshold_info = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
             roc_result = self._tradeoff_curve[sensitive_feature_value].transpose()[i_best_EO]
             # p_ignore * x_best represent the diagonal of the ROC plot.
@@ -478,7 +451,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 p_ignore = difference_from_best_predictor_for_sensitive_feature / \
                     vertical_distance_from_diagonal
 
-            interpolation_dict[sensitive_feature_value] = \
+            threshold_info[sensitive_feature_value] = \
                 Bunch(p_ignore=p_ignore,
                       prediction_constant=self._x_best,
                       p0=roc_result.p0,
@@ -493,7 +466,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         logger.debug(OUTPUT_SEPARATOR)
 
         return InterpolatedThresholder(
-            self.estimator_, interpolation_dict, prefit=True).fit(None, None)
+            self.estimator_, threshold_info, prefit=True).fit(None, None)
 
 
 def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_feature_names=None):
