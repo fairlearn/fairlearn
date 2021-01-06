@@ -112,11 +112,11 @@ we can evaluate metrics for subgroups within the data as below:
     >>> y_pred = classifier.predict(X)
     >>> gm = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
     >>> print(gm.overall)
-    0.8443552680070431
+    0.8443...
     >>> print(gm.by_group)
     sex
-    Female       0.925148
-    Male         0.804288
+    Female    0.9251...
+    Male      0.8042...
     Name: accuracy_score, dtype: object
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
@@ -129,11 +129,11 @@ their label:
     >>> from fairlearn.metrics import selection_rate
     >>> sr = MetricFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
     >>> sr.overall
-    0.16385487899758405
+    0.1638...
     >>> sr.by_group
     sex
-    Female      0.0635499
-    Male         0.213599 
+    Female    0.0635...
+    Male      0.2135...
     Name: selection_rate, dtype: object   
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
@@ -192,11 +192,11 @@ a vastly reduced difference in selection rate:
     >>> 
     >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
     >>> print(sr_mitigated.overall)
-    0.16614798738790384
+    0.1661...
     >>> print(sr_mitigated.by_group)
     sex
-    Female       0.155262
-    Male         0.171547
+    Female    0.1552...
+    Male      0.1715...
     Name: selection_rate, dtype: object
 
 Similarly, we can explore the difference between the initial model and the

@@ -353,16 +353,16 @@ In practice this can be used in a difference-based relaxation as follows:
     0.5714285714285714
     >>> tpr_summary.by_group
     sensitive_feature_0
-    a        0.75
-    b    0.333333
+    a    0.7500...
+    b    0.3333...
     Name: true_positive_rate, dtype: object
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.178571
-                   b          -0.238095
-    -     label=1  a          -0.178571
-                   b           0.238095
+    +     label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. note::
@@ -381,10 +381,10 @@ Alternatively, a ratio-based relaxation is also available:
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.103571
-                   b          -0.271429
-    -     label=1  a          -0.235714
-                   b           0.180952
+    +     label=1  a           0.1035...
+                   b          -0.2714...
+    -     label=1  a          -0.2357...
+                   b           0.1809...
     dtype: float64
 
 .. _equalized_odds:
@@ -409,14 +409,14 @@ and false positive rate.
     >>> eo.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> eo.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=0  a          -0.333333
-                   b           0.166667
-          label=1  a           0.178571
-                   b          -0.238095
-    -     label=0  a           0.333333
-                   b          -0.166667
-          label=1  a          -0.178571
-                   b           0.238095
+    +     label=0  a          -0.3333...
+                   b           0.1666...
+          label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=0  a           0.3333...
+                   b          -0.1666...
+          label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. _error_rate_parity:
@@ -606,7 +606,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b     0.5
+    b    0.50
     Name: mean_absolute_error, dtype: object
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
