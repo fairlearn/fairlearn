@@ -45,8 +45,9 @@ def resample_fixed_size_deterministic(X, y, weights):
     for i in range(len(X)):
         if scaled_weight[i] >= 1 and len(resampled_X) < len(X):
             add_num = math.floor(scaled_weight[i])
-        resampled_X += [X[i]] * add_num
-        resampled_y += [y[i]] * add_num
+        else: 
+            resampled_X += [X[i]] * add_num
+            resampled_y += [y[i]] * add_num
     scaled_weight[i] -= add_num
 
     remain_slots = len(X) - len(resampled_X)
