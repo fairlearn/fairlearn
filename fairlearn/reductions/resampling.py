@@ -59,4 +59,4 @@ def resample_fixed_size_deterministic(X, y, weights):
             resampled_X += [X[index]]
             resampled_y += [y[index]]
 
-        return resampled_X, resampled_y
+    return resampled_X, resampled_y
