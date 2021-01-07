@@ -434,7 +434,7 @@ For a binary classifier :code:`plot_disparities_in_performance` shows:
     classifier.fit(X, y_true)
     y_pred = classifier.predict(X)
 
-    plot_disparities_in_performance(y_true, y_pred, sensitive_features=sex)
+    plot_disparities_in_performance(y_true=y_true, y_pred=y_pred, sensitive_features=sex)
 
 Disparity in metric
 ~~~~~~~~~~~~~~~~~~~
@@ -459,8 +459,8 @@ specified metric in each group.
     classifier.fit(X, y_true)
     y_pred = classifier.predict(X)
 
-    plot_disparities_in_metric(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    plot_disparities_in_metric(selection_rate, y_true, y_pred, sensitive_features=sex)
+    plot_disparities_in_metric(accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
+    plot_disparities_in_metric(selection_rate, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
 
 .. _dashboard:
 
