@@ -125,16 +125,16 @@ metrics simultaneously:
     ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
-    precision    0.555556
-    recall            0.5
+    precision    0.5555...
+    recall       0.5000...
     dtype: object
     >>> multi_metric.by_group
-         precision recall
+                        precision recall
     sensitive_feature_0
-    a            0      0
-    b            1    0.5
-    c          0.6   0.75
-    d            0      0
+    a                         0.0   0.00
+    b                         1.0   0.50
+    c                         0.6   0.75
+    d                         0.0   0.00
 
 If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
@@ -152,10 +152,10 @@ in a dictionary via the ``sample_params`` argument.:
     0.45
     >>> weighted.by_group
     SF 0
-    a               0
-    b             0.5
-    c        0.714286
-    d               0
+    a    0.0000...
+    b    0.5000...
+    c    0.7142...
+    d    0.0000...
     Name: recall_score, dtype: object
 
 If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
@@ -178,10 +178,10 @@ function:
     0.5396825396825397
     >>> metric_beta.by_group
     sensitive_feature_0
-    a            0
-    b     0.790698
-    c      0.63354
-    d            0
+    a    0.0000...
+    b    0.7906...
+    c    0.6335...
+    d    0.0000...
     Name: metric, dtype: object
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
@@ -200,14 +200,14 @@ holds the intersections of these groups:
     0.5
     >>> metric_2sf.by_group
     SF 0  SF 1
-    a     6         0
+    a     6       0.0
           8       NaN
     b     6       0.5
           8       0.5
-    c     6         1
+    c     6       1.0
           8       0.5
-    d     6         0
-          8         0
+    d     6       0.0
+          8       0.0
     Name: recall_score, dtype: object
 
 With such a small number of samples, we are obviously running into cases where
@@ -343,18 +343,18 @@ parameter:
     >>> # The 'overall' property is now split based on the control feature
     >>> metric_c_f.overall
     CF
-    H    0.428571
-    L       0.375
+    H    0.4285...
+    L    0.3750...
     Name: accuracy_score, dtype: object
     >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
     >>> metric_c_f.by_group
     CF  SF
-    H   A          0.2
-        B          0.4
-        C         0.75
-    L   A          0.4
-        B     0.285714
-        C          0.5
+    H   A     0.2000...
+        B     0.4000...
+        C     0.7500...
+    L   A     0.4000...
+        B     0.2857...
+        C     0.5000...
     Name: accuracy_score, dtype: object
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
@@ -379,8 +379,8 @@ With the :class:`MetricFrame` computed, we can perform aggregations:
     >>> # See the maximum difference in accuracy for each value of the control feature
     >>> metric_c_f.difference(method='between_groups')
     CF
-    H    0.550000
-    L    0.214286
+    H    0.5500...
+    L    0.2142...
     Name: accuracy_score, dtype: float64
 
 In each case, rather than a single scalar, we receive one result for each
