@@ -117,24 +117,77 @@ class MetricFrame:
                  y_pred, *,
                  sensitive_features,
                  control_features: Optional = None,
-                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
+                 streaming=False):
         """Read a placeholder comment."""
+        check_consistent_length(y_true, y_pred)
+        if len(y_true) == 0 and not streaming:
+            raise ValueError('Something bad')
+
+        self._y_t = _convert_to_ndarray_and_squeeze(y_true)
+        self._y_p = _convert_to_ndarray_and_squeeze(y_pred)
+        self._s_f = sensitive_features
+        self._c_f = control_features
+        self._streaming = streaming
+        self.func_dict = self._process_functions(metric, sample_params)
+
+        self._cf_names = None
+        self._sf_names = None
+
+        if not streaming:
+            # Since we are not streaming, we can compute the metrics already.
+            # This keeps the existing behavior.
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+        else:
+            # If we are streaming, we wait.
+            self._overall = None
+            self._by_group = None
+
+    def add_data(self,
+                 y_true,
+                 y_pred, *,
+                 sensitive_features,
+                 control_features: Optional = None,
+                 ):
+        if not self._streaming:
+            raise Exception("This MetricFrame does not support adding data.")
         check_consistent_length(y_true, y_pred)
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        func_dict = self._process_functions(metric, sample_params)
+        self._y_t = self._add_data(self._y_t, y_t)
+        self._y_p = self._add_data(self._y_p, y_p)
+        self._s_f = self._add_data(self._s_f, sensitive_features)
+        if control_features:
+            self._c_f = self._add_data(self._c_f, control_features)
+        # Reset metric
+        self._overall = None
+        self._by_group = None
 
+    def _add_data(self, arr1, arr2):
+        """Concatenate two iterables.
+        """
+        if type(arr1) != type(arr2):
+            raise ValueError("Can't concatenate arrays of different types.")
+        if type(arr1) is np.ndarray:
+            result = np.concatenate(arr1, arr2)
+        elif type(arr1) is list:
+            result = arr1 + arr2
+        else:
+            raise ValueError(f"Can't concatenate {type(arr1)}")
+        return result
+
+    def _compute_metric(self, y_t, y_p, s_f, c_f):
         # Now, prepare the sensitive features
-        sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
+        sf_list = self._process_features("sensitive_feature_", s_f, y_t)
         self._sf_names = [x.name for x in sf_list]
 
         # Prepare the control features
         # Adjust _sf_indices if needed
         cf_list = None
         self._cf_names = None
-        if control_features is not None:
-            cf_list = self._process_features("control_feature_", control_features, y_t)
+        if c_f is not None:
+            cf_list = self._process_features("control_feature_", c_f, y_t)
             self._cf_names = [x.name for x in cf_list]
 
         # Check for duplicate feature names
@@ -147,8 +200,8 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
-        self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
+        self._overall = self._compute_overall(self.func_dict, y_t, y_p, cf_list)
+        self._by_group = self._compute_by_group(self.func_dict, y_t, y_p, sf_list, cf_list)
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
         if cf_list is None:
@@ -226,6 +279,9 @@ class MetricFrame:
             interface when calling programatically, while also reducing
             typing for those using Fairlearn interactively.
         """
+        if self._overall is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+
         if self._user_supplied_callable:
             if self.control_levels:
                 return self._overall.iloc[:, 0]
@@ -259,6 +315,9 @@ class MetricFrame:
             (likely to occur as more sensitive and control features
             are specified), then the corresponding entry will be NaN.
         """
+        if self._by_group is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+
         if self._user_supplied_callable:
             return self._by_group.iloc[:, 0]
         else:
@@ -278,6 +337,8 @@ class MetricFrame:
             List of names, which can be used in calls to
             :meth:`pandas.DataFrame.groupby` etc.
         """
+        if self._cf_names is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
         return self._cf_names
 
     @property
@@ -293,6 +354,8 @@ class MetricFrame:
             List of names, which can be used in calls to
             :meth:`pandas.DataFrame.groupby` etc.
         """
+        if self._sf_names is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
         return self._sf_names
 
     def group_max(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -311,6 +374,8 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
+        if self._by_group is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
         if not self.control_levels:
             result = pd.Series(index=self._by_group.columns, dtype='object')
             for m in result.index:
@@ -343,6 +408,8 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
+        if self._by_group is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
         if not self.control_levels:
             result = pd.Series(index=self._by_group.columns, dtype='object')
             for m in result.index:
@@ -390,6 +457,8 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
+        if self._overall is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
         subtrahend = np.nan
         if method == 'between_groups':
             subtrahend = self.group_min()
@@ -433,26 +502,28 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
+        if self._by_group is None:
+            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
         result = None
         if method == 'between_groups':
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
+                result = tmp.transform(lambda x: min(x, 1 / x)).min(level=self.control_levels)
             else:
                 ratios = None
 
                 if self.control_levels:
                     # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(level=self.control_levels) /  \
-                        self.overall.unstack(level=self.control_levels)
+                    ratios = self.by_group.unstack(level=self.control_levels) / \
+                             self.overall.unstack(level=self.control_levels)
                 else:
                     ratios = self.by_group / self.overall
 
                 def ratio_sub_one(x):
                     if x > 1:
-                        return 1/x
+                        return 1 / x
                     else:
                         return x
 
