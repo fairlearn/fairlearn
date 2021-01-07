@@ -129,7 +129,6 @@ class MetricFrame:
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
                  streaming=False):
         """Read a placeholder comment."""
-
         if len(y_true) == 0 and not streaming:
             raise ValueError(_BAD_INIT_ERROR)
 
@@ -165,6 +164,38 @@ class MetricFrame:
                  sensitive_features,
                  control_features: Optional = None,
                  ):
+        """Add data to the MetricFrame.
+
+        Parameters
+        ----------
+        y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+        The ground-truth labels (for classification) or target values (for regression).
+
+        y_pred : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+                The predictions.
+
+        sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray,
+         pandas.DataFrame
+            The sensitive features which should be used to create the subgroups.
+            At least one sensitive feature must be provided.
+            All names (whether on pandas objects or dictionary keys) must be strings.
+            We also forbid DataFrames with column names of ``None``.
+            For cases where no names are provided we generate names ``sensitive_feature_[n]``.
+
+        control_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
+            Control features are similar to sensitive features, in that they
+            divide the input data into subgroups.
+            Unlike the sensitive features, aggregations are not performed
+            across the control features - for example, the ``overall`` property
+            will have one value for each subgroup in the control feature(s),
+            rather than a single value for the entire data set.
+            Control features can be specified similarly to the sensitive features.
+            However, their default names (if none can be identified in the
+            input values) are of the format ``control_feature_[n]``.
+
+            **Note** the types returned by members of the class vary based on whether
+            control features are present.
+        """
         if not self._streaming:
             raise Exception("This MetricFrame does not support adding data.")
         check_consistent_length(y_true, y_pred)
@@ -184,8 +215,7 @@ class MetricFrame:
         self._by_group = None
 
     def _concat_batches(self, batches):
-        """Concatenate a list of items together..
-        """
+        """Concatenate a list of items together."""
         if len(batches) == 0:
             raise ValueError('No data to process.')
         batch_type = type(batches[0])
