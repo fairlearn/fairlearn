@@ -194,9 +194,18 @@ The following combinations of fairness criteria and objectives are available:
    *  - fairness criteria
       - objectives
    *  - :code:`equalized_odds`
-      - :code:`accuracy_score`, :code:`balanced_accuracy_score`
-   *  - :code:`demographic_parity`, :code:`false_positive_rate_parity`, :code:`false_negative_rate_parity`, :code:`true_positive_rate_parity`, :code:`true_negative_rate_parity`
-      - :code:`selection_rate`, :code:`true_positive_rate`, :code:`true_negative_rate`, :code:`accuracy_score`, :code:`balanced_accuracy_score`
+      - :code:`accuracy_score`,
+        :code:`balanced_accuracy_score`
+   *  - :code:`demographic_parity`,
+        :code:`false_positive_rate_parity`,
+        :code:`false_negative_rate_parity`,
+        :code:`true_positive_rate_parity`,
+        :code:`true_negative_rate_parity`
+      - :code:`selection_rate`,
+        :code:`true_positive_rate`,
+        :code:`true_negative_rate`,
+        :code:`accuracy_score`,
+        :code:`balanced_accuracy_score`
 
 
 .. _threshold_optimizer_equalized_odds:
