@@ -47,3 +47,6 @@ def test_thresholdoptimizer_classification():
     estimator = lgb.LGBMClassifier(**lgb_params)
 
     ptc.run_thresholdoptimizer_classification(estimator)
+
+def test_funny_types():
+    ptc.run_type_test()
