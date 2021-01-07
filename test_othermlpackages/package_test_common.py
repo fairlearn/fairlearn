@@ -118,9 +118,3 @@ def run_thresholdoptimizer_classification(estimator):
                                                       mitigated_predictions,
                                                       sensitive_features=A_test)
     assert dp_diff_mitigated <= dp_diff_unmitigated
-
-def run_type_test():
-    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_adult()
-
-    le = LabelEncoder()
-    le.fit_transform(A_test)
