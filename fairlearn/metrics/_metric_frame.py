@@ -120,12 +120,12 @@ class MetricFrame:
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
                  streaming=False):
         """Read a placeholder comment."""
-        check_consistent_length(y_true, y_pred)
+
         if len(y_true) == 0 and not streaming:
             raise ValueError('Something bad')
 
-        self._y_t = _convert_to_ndarray_and_squeeze(y_true)
-        self._y_p = _convert_to_ndarray_and_squeeze(y_pred)
+        self._y_t = None
+        self._y_p = None
         self._s_f = sensitive_features
         self._c_f = control_features
         self._streaming = streaming
@@ -137,9 +137,15 @@ class MetricFrame:
         if not streaming:
             # Since we are not streaming, we can compute the metrics already.
             # This keeps the existing behavior.
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            check_consistent_length(y_true, y_pred)
+            y_t = _convert_to_ndarray_and_squeeze(y_true)
+            y_p = _convert_to_ndarray_and_squeeze(y_pred)
+            self._compute_metric(y_t, y_p, sensitive_features, control_features)
         else:
-            # If we are streaming, we wait.
+            # If we are streaming, we wait, but initialize accumulators.
+            assert y_true == [] and y_pred == [] and sensitive_features == [], "TODO, exception"
+            self._y_t = []
+            self._y_p = []
             self._overall = None
             self._by_group = None
 
@@ -152,29 +158,34 @@ class MetricFrame:
         if not self._streaming:
             raise Exception("This MetricFrame does not support adding data.")
         check_consistent_length(y_true, y_pred)
+        check_consistent_length(y_true, sensitive_features)
+
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        self._y_t = self._add_data(self._y_t, y_t)
-        self._y_p = self._add_data(self._y_p, y_p)
-        self._s_f = self._add_data(self._s_f, sensitive_features)
-        if control_features:
-            self._c_f = self._add_data(self._c_f, control_features)
+        self._y_t.append(y_t)
+        self._y_p.append(y_p)
+        self._s_f.append(sensitive_features)
+        if self._c_f:
+            self._c_f.append(control_features)
         # Reset metric
         self._overall = None
         self._by_group = None
 
-    def _add_data(self, arr1, arr2):
+    def _concat_batches(self, batches):
         """Concatenate two iterables.
         """
-        if type(arr1) != type(arr2):
+        if len(batches) == 0:
+            raise ValueError('No data to process.')
+        batch_type = type(batches[0])
+        if not all([type(arr) is batch_type for arr in batches]):
             raise ValueError("Can't concatenate arrays of different types.")
-        if type(arr1) is np.ndarray:
-            result = np.concatenate(arr1, arr2)
-        elif type(arr1) is list:
-            result = arr1 + arr2
+        if batch_type is np.ndarray:
+            result = np.concatenate(batches)
+        elif batch_type is list:
+            result = sum(batches, [])
         else:
-            raise ValueError(f"Can't concatenate {type(arr1)}")
+            raise ValueError(f"Can't concatenate {batches}")
         return result
 
     def _compute_metric(self, y_t, y_p, s_f, c_f):
@@ -280,7 +291,10 @@ class MetricFrame:
             typing for those using Fairlearn interactively.
         """
         if self._overall is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_metric(self._concat_batches(self._y_t),
+                                 self._concat_batches(self._y_p),
+                                 self._concat_batches(self._s_f),
+                                 self._concat_batches(self._c_f) if self._c_f else None)
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -337,7 +351,7 @@ class MetricFrame:
             List of names, which can be used in calls to
             :meth:`pandas.DataFrame.groupby` etc.
         """
-        if self._cf_names is None:
+        if self._overall is None:
             self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
         return self._cf_names
 
