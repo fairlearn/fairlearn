@@ -24,6 +24,9 @@ _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
+_BAD_INIT_ERROR = """Non streaming metrics require data to process.
+ Set streaming=True for streaming metrics"""
+_NON_EMPTY_INIT_STR = "Streaming metrics must be initialized with empty lists."
 
 
 class MetricFrame:
@@ -109,6 +112,12 @@ class MetricFrame:
         If there are multiple metric functions (passed as a dictionary), then this is
         a nested dictionary, with the first set of string keys identifying the
         metric function name, with the values being the string-to-array-like dictionaries.
+
+    streaming : bool
+        If True, will modify the behavior to accept the accumulation of values before computing
+        the score. One can append data with ``add_data``.
+
+        **Note** currently, it only stores the values before computing the metric.
     """
 
     def __init__(self,
@@ -122,7 +131,7 @@ class MetricFrame:
         """Read a placeholder comment."""
 
         if len(y_true) == 0 and not streaming:
-            raise ValueError('Something bad')
+            raise ValueError(_BAD_INIT_ERROR)
 
         self._y_t = None
         self._y_p = None
@@ -136,14 +145,15 @@ class MetricFrame:
 
         if not streaming:
             # Since we are not streaming, we can compute the metrics already.
-            # This keeps the existing behavior.
+            # This keeps the existing behavior where we compute the metrics in the
+            # constructor.
             check_consistent_length(y_true, y_pred)
             y_t = _convert_to_ndarray_and_squeeze(y_true)
             y_p = _convert_to_ndarray_and_squeeze(y_pred)
             self._compute_metric(y_t, y_p, sensitive_features, control_features)
         else:
             # If we are streaming, we wait, but initialize accumulators.
-            assert y_true == [] and y_pred == [] and sensitive_features == [], "TODO, exception"
+            assert y_true == [] and y_pred == [] and sensitive_features == [], _NON_EMPTY_INIT_STR
             self._y_t = []
             self._y_p = []
             self._overall = None
@@ -168,12 +178,13 @@ class MetricFrame:
         self._s_f.append(sensitive_features)
         if self._c_f:
             self._c_f.append(control_features)
+
         # Reset metric
         self._overall = None
         self._by_group = None
 
     def _concat_batches(self, batches):
-        """Concatenate two iterables.
+        """Concatenate a list of items together..
         """
         if len(batches) == 0:
             raise ValueError('No data to process.')
@@ -187,6 +198,13 @@ class MetricFrame:
         else:
             raise ValueError(f"Can't concatenate {batches}")
         return result
+
+    def _compute_streaming_metric(self):
+        # Concat all the information before computing the metric.
+        self._compute_metric(self._concat_batches(self._y_t),
+                             self._concat_batches(self._y_p),
+                             self._concat_batches(self._s_f),
+                             self._concat_batches(self._c_f) if self._c_f else None)
 
     def _compute_metric(self, y_t, y_p, s_f, c_f):
         # Now, prepare the sensitive features
@@ -291,10 +309,7 @@ class MetricFrame:
             typing for those using Fairlearn interactively.
         """
         if self._overall is None:
-            self._compute_metric(self._concat_batches(self._y_t),
-                                 self._concat_batches(self._y_p),
-                                 self._concat_batches(self._s_f),
-                                 self._concat_batches(self._c_f) if self._c_f else None)
+            self._compute_streaming_metric()
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -330,7 +345,7 @@ class MetricFrame:
             are specified), then the corresponding entry will be NaN.
         """
         if self._by_group is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_streaming_metric()
 
         if self._user_supplied_callable:
             return self._by_group.iloc[:, 0]
@@ -352,7 +367,7 @@ class MetricFrame:
             :meth:`pandas.DataFrame.groupby` etc.
         """
         if self._overall is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_streaming_metric()
         return self._cf_names
 
     @property
@@ -369,7 +384,7 @@ class MetricFrame:
             :meth:`pandas.DataFrame.groupby` etc.
         """
         if self._sf_names is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_streaming_metric()
         return self._sf_names
 
     def group_max(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -389,7 +404,7 @@ class MetricFrame:
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if self._by_group is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_streaming_metric()
         if not self.control_levels:
             result = pd.Series(index=self._by_group.columns, dtype='object')
             for m in result.index:
@@ -423,7 +438,7 @@ class MetricFrame:
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if self._by_group is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_streaming_metric()
         if not self.control_levels:
             result = pd.Series(index=self._by_group.columns, dtype='object')
             for m in result.index:
@@ -472,7 +487,7 @@ class MetricFrame:
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
         if self._overall is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_streaming_metric()
         subtrahend = np.nan
         if method == 'between_groups':
             subtrahend = self.group_min()
@@ -517,27 +532,27 @@ class MetricFrame:
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
         if self._by_group is None:
-            self._compute_metric(self._y_t, self._y_p, self._s_f, self._c_f)
+            self._compute_streaming_metric()
         result = None
         if method == 'between_groups':
             result = self.group_min() / self.group_max()
         elif method == 'to_overall':
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1 / x)).min(level=self.control_levels)
+                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
             else:
                 ratios = None
 
                 if self.control_levels:
                     # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(level=self.control_levels) / \
-                             self.overall.unstack(level=self.control_levels)
+                    ratios = self.by_group.unstack(level=self.control_levels) /  \
+                        self.overall.unstack(level=self.control_levels)
                 else:
                     ratios = self.by_group / self.overall
 
                 def ratio_sub_one(x):
                     if x > 1:
-                        return 1 / x
+                        return 1/x
                     else:
                         return x
 
