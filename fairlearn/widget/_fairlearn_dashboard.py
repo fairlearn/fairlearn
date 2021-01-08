@@ -212,13 +212,13 @@ class FairlearnDashboard(object):
                             "global": prediction.overall,
                             "bins": prediction.by_group.to_dict()
                         }
-                except Exception as ed:
+                except Exception as ed:  # noqa: B902
                     response[id] = {
                         "error": ed,
                         "global": 0,
                         "bins": []}
             self._widget_instance.response = response
-        except Exception:
+        except Exception:  # noqa: B902
             raise ValueError("Error while making request")
 
     def _show(self):
