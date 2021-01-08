@@ -219,6 +219,7 @@ class FairlearnDashboard(object):
                         "bins": []}
             self._widget_instance.response = response
         except Exception:  # noqa: B902
+            # Not sure why we're masking the exception here
             raise ValueError("Error while making request")
 
     def _show(self):
