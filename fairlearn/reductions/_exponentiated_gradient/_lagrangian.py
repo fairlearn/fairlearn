@@ -43,15 +43,12 @@ class _Lagrangian:
         (defaults to `sample_weight`)
     """
 
-    def __init__(self, X, sensitive_features, y, estimator, constraints, B, opt_lambda=True,
-                 sample_weight_name='sample_weight'):
-        self.X = X
-        self.n = self.X.shape[0]
-        self.y = y
+    def __init__(self, X, y, estimator, constraints, B, opt_lambda=True,
+                 sample_weight_name='sample_weight', **kwargs):
         self.constraints = constraints
-        self.constraints.load_data(X, y, sensitive_features=sensitive_features)
+        self.constraints.load_data(X, y, **kwargs)
         self.obj = self.constraints.default_objective()
-        self.obj.load_data(X, y, sensitive_features=sensitive_features)
+        self.obj.load_data(X, y, **kwargs)
         self.estimator = estimator
         self.B = B
         self.opt_lambda = opt_lambda
@@ -154,9 +151,9 @@ class _Lagrangian:
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
         else:
-            redY = self.y
+            redY = self.constraints._y_as_series
         redW = signed_weights.abs()
-        redW = self.n * redW / redW.sum()
+        redW = self.constraints.total_samples * redW / redW.sum()
 
         redY_unique = np.unique(redY)
 
@@ -175,7 +172,7 @@ class _Lagrangian:
             estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        estimator.fit(self.X, redY, **{self.sample_weight_name: redW})
+        estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 

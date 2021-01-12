@@ -153,10 +153,18 @@ html_sidebars = {
     "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
 }
 
+# Auto-Doc Options
+# ----------------
+
+# Change the ordering of the member documentation
+autodoc_member_order = 'groupwise'
+
+
+# Linking Code
+# ------------
+
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
-
-
 def linkcode_resolve(domain, info):
     """Determine the URL corresponding to Python object."""
     if domain != "py":
