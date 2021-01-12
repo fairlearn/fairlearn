@@ -124,7 +124,11 @@ demographic parity as the fairness constraint:
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(estimator=LogisticRegression())
-    >>> print(json.dumps(threshold_optimizer.interpolated_thresholder_.threshold_info_, default=str, indent=4))
+    >>> print(json.dumps(
+    ...     threshold_optimizer.interpolated_thresholder_.threshold_info_,
+    ...     default=str,
+    ...     indent=4
+    ... ))
     {
         "Female": {
             "p0": 0.9527202201546324,
