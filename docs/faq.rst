@@ -54,6 +54,8 @@ Why am I seeing fairness issues, even though my data are reflective of the gener
     Machine learning models often perform poorly for subgroups which are poorly
     represented.
     For this reason, balanced sampling is generally better for ML than population sampling.
+    On a related point, this is why it is important to consider multiple fairness metrics,
+    and how they vary across different subgroups.
 
 Won't making a model fairer reduce its accuracy?
     There are often many machine learning models that achieve similar levels of accuracy
