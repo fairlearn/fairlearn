@@ -50,6 +50,11 @@ The model is unfair because the data are biased. Isn't it better to get better d
     each. In some of these cases, obtaining 'better data' may not be practical, but it
     might still be possible to use some mitigation algorithms.
 
+Why am I seeing fairness issues, even though my data are reflective of the general population?
+    Machine learning models often perform poorly for subgroups which are poorly
+    represented.
+    For this reason, balanced sampling is generally better for ML than population sampling.
+
 Won't making a model fairer reduce its accuracy?
     There are often many machine learning models that achieve similar levels of accuracy
     or other performance metrics, but that dramatically differ in how they affect
