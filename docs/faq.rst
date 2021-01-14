@@ -70,6 +70,18 @@ Can the mitigation algorithms in Fairlearn make my model fair?
     However, to assess whether the new model is fairer, it is important to consider
     not only the fairness metrics, but also the societal and technical context in which
     the model is applied.
+
+I've got improved data, trained and mitigated new models, checked all the metrics... am I done?
+    The ML lifecycle doesn't end when a model is deployed.
+    Models need to be monitored in production.
+    On a technical level, this means checking for data drift within the vulnerable
+    subgroups identified during the fairness analysis.
+    However the societal aspects need to be considered as well, for example:
+    
+    - Are the actual harms as expected, both in the nature of the harms and their
+      distribution?
+    - Have the users of the model (who may not be the subjects of the model)
+      adjusted their usage patterns?
     
 What sort of fairness-related harms can the Fairlearn library address?
     We currently focus on two kinds of harms:
