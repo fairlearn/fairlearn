@@ -3,9 +3,10 @@
 
 import copy
 import logging
+from typing import Any, Callable, Dict, List, Optional, Union
+
 import numpy as np
 import pandas as pd
-from typing import Any, Callable, Dict, List, Optional, Union
 from sklearn.utils import check_consistent_length
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
@@ -26,7 +27,7 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
 _BAD_INIT_ERROR = """Non streaming metrics require data to process.
  Set streaming=True for streaming metrics"""
-_NON_EMPTY_INIT_STR = "Streaming metrics must be initialized with empty lists."
+_NON_EMPTY_INIT_ERR = "Streaming metrics must be initialized with empty lists."
 
 
 class MetricFrame:
@@ -115,7 +116,8 @@ class MetricFrame:
 
     streaming : bool
         If True, will modify the behavior to accept the accumulation of values before computing
-        the score. One can append data with ``add_data``.
+        the score. One can append data with ``add_data``. The user can't supply data in the
+        constructor if ``streaming=True``.
 
         **Note** currently, it only stores the values before computing the metric.
     """
@@ -127,17 +129,18 @@ class MetricFrame:
                  sensitive_features,
                  control_features: Optional = None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
-                 streaming=False):
+                 streaming: bool = False):
         """Read a placeholder comment."""
-        if len(y_true) == 0 and not streaming:
+        if (y_true is None or len(y_true) == 0) and not streaming:
             raise ValueError(_BAD_INIT_ERROR)
 
         self._y_t = None
         self._y_p = None
         self._s_f = sensitive_features
         self._c_f = control_features
+        self._s_p = sample_params
         self._streaming = streaming
-        self.func_dict = self._process_functions(metric, sample_params)
+        self.metric = metric
 
         self._cf_names = None
         self._sf_names = None
@@ -149,10 +152,10 @@ class MetricFrame:
             check_consistent_length(y_true, y_pred)
             y_t = _convert_to_ndarray_and_squeeze(y_true)
             y_p = _convert_to_ndarray_and_squeeze(y_pred)
-            self._compute_metric(y_t, y_p, sensitive_features, control_features)
+            self._compute_metric(y_t, y_p, sensitive_features, control_features, sample_params)
         else:
             # If we are streaming, we wait, but initialize accumulators.
-            assert y_true == [] and y_pred == [] and sensitive_features == [], _NON_EMPTY_INIT_STR
+            assert y_true == [] and y_pred == [] and sensitive_features == [], _NON_EMPTY_INIT_ERR
             self._y_t = []
             self._y_p = []
             self._overall = None
@@ -163,6 +166,7 @@ class MetricFrame:
                  y_pred, *,
                  sensitive_features,
                  control_features: Optional = None,
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None
                  ):
         """Add data to the MetricFrame.
 
@@ -182,7 +186,7 @@ class MetricFrame:
             We also forbid DataFrames with column names of ``None``.
             For cases where no names are provided we generate names ``sensitive_feature_[n]``.
 
-        control_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
+        control_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, DataFrame
             Control features are similar to sensitive features, in that they
             divide the input data into subgroups.
             Unlike the sensitive features, aggregations are not performed
@@ -195,11 +199,18 @@ class MetricFrame:
 
             **Note** the types returned by members of the class vary based on whether
             control features are present.
+
+        sample_params : dict
+            Parameters for the metric function(s). If there is only one metric function,
+            then this is a dictionary of strings and array-like objects, which are split
+            alongside the ``y_true`` and ``y_pred`` arrays, and passed to the metric function.
+            If there are multiple metric functions (passed as a dictionary), then this is
+            a nested dictionary, with the first set of string keys identifying the
+            metric function name, with the values being the string-to-array-like dictionaries.
         """
         if not self._streaming:
             raise Exception("This MetricFrame does not support adding data.")
-        check_consistent_length(y_true, y_pred)
-        check_consistent_length(y_true, sensitive_features)
+        check_consistent_length(y_true, y_pred, sensitive_features)
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
@@ -209,6 +220,14 @@ class MetricFrame:
         self._s_f.append(sensitive_features)
         if self._c_f:
             self._c_f.append(control_features)
+
+        if sample_params:
+            if self._s_p is None:
+                self._s_p = [sample_params]
+            elif isinstance(self._s_p, list):
+                self._s_p.append(sample_params)
+            else:
+                raise ValueError("MetricFrame was initialized with `sample_params` already set.")
 
         # Reset metric
         self._overall = None
@@ -225,18 +244,28 @@ class MetricFrame:
             result = np.concatenate(batches)
         elif batch_type is list:
             result = sum(batches, [])
+        elif batch_type is pd.DataFrame:
+            col_nums = batches[0].columns
+            assert all([col_nums == df.columns for df in batches]), 'Need same columns'
+            result = pd.concat(batches)
+        elif batch_type is dict:
+            # This concats dict together
+            return {k: self._concat_batches([batch[k] for batch in batches])
+                    for k in batches[0].keys()}
         else:
             raise ValueError(f"Can't concatenate {batches}")
         return result
 
     def _compute_streaming_metric(self):
         # Concat all the information before computing the metric.
+        metric_s_p = isinstance(self._s_p, dict) or self._s_p is None
         self._compute_metric(self._concat_batches(self._y_t),
                              self._concat_batches(self._y_p),
                              self._concat_batches(self._s_f),
-                             self._concat_batches(self._c_f) if self._c_f else None)
+                             self._concat_batches(self._c_f) if self._c_f else None,
+                             self._s_p if metric_s_p else self._concat_batches(self._s_p))
 
-    def _compute_metric(self, y_t, y_p, s_f, c_f):
+    def _compute_metric(self, y_t, y_p, s_f, c_f, s_p):
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", s_f, y_t)
         self._sf_names = [x.name for x in sf_list]
@@ -259,6 +288,7 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
+        self.func_dict = self._process_functions(self.metric, s_p)
         self._overall = self._compute_overall(self.func_dict, y_t, y_p, cf_list)
         self._by_group = self._compute_by_group(self.func_dict, y_t, y_p, sf_list, cf_list)
 
@@ -569,20 +599,20 @@ class MetricFrame:
         elif method == 'to_overall':
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
+                result = tmp.transform(lambda x: min(x, 1 / x)).min(level=self.control_levels)
             else:
                 ratios = None
 
                 if self.control_levels:
                     # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(level=self.control_levels) /  \
-                        self.overall.unstack(level=self.control_levels)
+                    ratios = self.by_group.unstack(level=self.control_levels) / \
+                             self.overall.unstack(level=self.control_levels)
                 else:
                     ratios = self.by_group / self.overall
 
                 def ratio_sub_one(x):
                     if x > 1:
-                        return 1/x
+                        return 1 / x
                     else:
                         return x
 
