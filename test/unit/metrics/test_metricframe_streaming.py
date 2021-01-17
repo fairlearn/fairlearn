@@ -73,7 +73,6 @@ def test_sample_params(transform_y_t, transform_y_p, num_batches):
     assert target._by_group is None
 
 
-
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
 @pytest.mark.parametrize("num_batches", [1, 3, 5])
