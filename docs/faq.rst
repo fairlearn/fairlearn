@@ -53,6 +53,9 @@ The model is unfair because the data are biased. Isn't it better to get better d
 Why am I seeing fairness issues, even though my data are reflective of the general population?
     Machine learning models often perform poorly for subgroups which are poorly
     represented.
+    What constitutes poor representation is context specific, and may well be affected by
+    historical misrepresentation (consider the example above, of a company which had previously
+    hired few women).
     For this reason, balanced sampling is generally better for ML than population sampling.
     On a related point, this is why it is important to consider multiple fairness metrics,
     and how they vary across different subgroups.
@@ -74,7 +77,10 @@ Can the mitigation algorithms in Fairlearn make my model fair?
     the model is applied.
 
 I've got improved data, trained and mitigated new models, checked all the metrics... am I done?
-    The ML lifecycle doesn't end when a model is deployed.
+    Firstly, always remember that there is more to fairness than technical details such as
+    metrics - fairness is a *sociotechnical* problem.
+    Even if these are all considered at training time, the ML lifecycle doesn't end when a
+    model is deployed.
     Models need to be monitored in production.
     On a technical level, this means checking for data drift within the vulnerable
     subgroups identified during the fairness analysis.
@@ -83,7 +89,8 @@ I've got improved data, trained and mitigated new models, checked all the metric
     - Are the actual harms as expected, both in the nature of the harms and their
       distribution?
     - Have the users of the model (who may not be the subjects of the model)
-      adjusted their usage patterns?
+      adjusted their usage patterns? This is sometimes called 'strategic
+      behavior.'
     
 What sort of fairness-related harms can the Fairlearn library address?
     We currently focus on two kinds of harms:
