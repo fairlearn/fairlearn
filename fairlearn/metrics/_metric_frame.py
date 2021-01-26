@@ -28,6 +28,7 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
 _BAD_INIT_ERROR = """Non streaming metrics require data to process.
  Set streaming=True for streaming metrics"""
 _NON_EMPTY_INIT_ERR = "Streaming metrics must be initialized with empty lists."
+_EMPTY_BATCHES_ERR = "No data to process, please add batches with `add_data`."
 
 
 class MetricFrame:
@@ -131,11 +132,10 @@ class MetricFrame:
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
                  streaming: bool = False):
         """Read a placeholder comment."""
-        if (y_true is None or len(y_true) == 0) and not streaming:
+        if any(arg is None or len(arg) == 0 for arg in
+               (y_true, y_pred, sensitive_features)) and not streaming:
             raise ValueError(_BAD_INIT_ERROR)
 
-        self._y_t = None
-        self._y_p = None
         self._s_f = sensitive_features
         self._c_f = control_features
         self._s_p = sample_params
@@ -149,6 +149,8 @@ class MetricFrame:
             # Since we are not streaming, we can compute the metrics already.
             # This keeps the existing behavior where we compute the metrics in the
             # constructor.
+            self._y_true = None
+            self._y_pred = None
             check_consistent_length(y_true, y_pred)
             y_t = _convert_to_ndarray_and_squeeze(y_true)
             y_p = _convert_to_ndarray_and_squeeze(y_pred)
@@ -156,8 +158,8 @@ class MetricFrame:
         else:
             # If we are streaming, we wait, but initialize accumulators.
             assert y_true == [] and y_pred == [] and sensitive_features == [], _NON_EMPTY_INIT_ERR
-            self._y_t = []
-            self._y_p = []
+            self._y_true = []
+            self._y_pred = []
             self._overall = None
             self._by_group = None
 
@@ -215,8 +217,8 @@ class MetricFrame:
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        self._y_t.append(y_t)
-        self._y_p.append(y_p)
+        self._y_true.append(y_t)
+        self._y_pred.append(y_p)
         self._s_f.append(sensitive_features)
         if self._c_f:
             self._c_f.append(control_features)
@@ -236,7 +238,7 @@ class MetricFrame:
     def _concat_batches(self, batches):
         """Concatenate a list of items together."""
         if len(batches) == 0:
-            raise ValueError('No data to process.')
+            raise ValueError(_EMPTY_BATCHES_ERR)
         batch_type = type(batches[0])
         if not all([type(arr) is batch_type for arr in batches]):
             raise ValueError("Can't concatenate arrays of different types.")
@@ -258,9 +260,10 @@ class MetricFrame:
 
     def _compute_streaming_metric(self):
         # Concat all the information before computing the metric.
+        # If True, this is a metric-wide args so we won't concat it.
         metric_s_p = isinstance(self._s_p, dict) or self._s_p is None
-        self._compute_metric(self._concat_batches(self._y_t),
-                             self._concat_batches(self._y_p),
+        self._compute_metric(self._concat_batches(self._y_true),
+                             self._concat_batches(self._y_pred),
                              self._concat_batches(self._s_f),
                              self._concat_batches(self._c_f) if self._c_f else None,
                              self._s_p if metric_s_p else self._concat_batches(self._s_p))
