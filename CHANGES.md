@@ -2,6 +2,9 @@
 
 ### v0.5.1
 
+* Add `CorrelationRemover` preprocessing technique. This removes correlations
+  between sensitive and non-sensitive features while retaining as much information
+  as possible
 * Add `control_features` to the classification moments. These allow for data
   stratification, with fairness constraints enforced within each stratum, but
   not between strata
