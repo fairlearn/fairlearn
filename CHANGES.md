@@ -9,7 +9,7 @@
   stratification, with fairness constraints enforced within each stratum, but
   not between strata
 * Update `make_derived_metric()` to use `MetricFrame`
-* Assorted small documentaiton fixes
+* Assorted small documentation fixes
 
 ### v0.5.0
 
