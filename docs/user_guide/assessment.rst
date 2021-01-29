@@ -410,7 +410,7 @@ metrics.
 .. note::
 
     The :code:`FairlearnDashboard` will move from Fairlearn to the
-    :code:`raiwidgets` package in the near future. Instead, Fairlearn
+    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
     will provide some of the existing functionality through
     :code:`matplotlib`-based visualizations.
 
