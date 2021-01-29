@@ -79,9 +79,11 @@ To contribute please check our
 
 The Fairlearn project is maintained by:
 
+- **@adrinjalali**
+- **@hildeweerts**
 - **@MiroDudik**
+- **@mmadaio**
 - **@riedgar-ms**
-- **@rihorn2**
 - **@romanlutz**
 
 For a full list of contributors refer to the [authors page](./AUTHORS.md)
