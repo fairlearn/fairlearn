@@ -353,8 +353,8 @@ In practice this can be used in a difference-based relaxation as follows:
     0.5714285714285714
     >>> tpr_summary.by_group
     sensitive_feature_0
-    a    0.7500...
-    b    0.3333...
+    a    0.75...
+    b    0.33...
     Name: true_positive_rate, dtype: object
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
@@ -606,7 +606,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b    0.50
+    b    0.5
     Name: mean_absolute_error, dtype: object
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
