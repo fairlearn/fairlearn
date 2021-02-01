@@ -78,7 +78,7 @@ def demographic_parity_ratio(
         The sensitive features over which demographic parity should be assessed
 
     method : str
-        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
     sample_weight : array-like
@@ -171,7 +171,7 @@ def equalized_odds_ratio(
         The sensitive features over which demographic parity should be assessed
 
     method : str
-        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
     sample_weight : array-like
