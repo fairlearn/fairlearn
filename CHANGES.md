@@ -1,6 +1,6 @@
 # Changes
 
-### v0.5.1
+### v0.6.0
 
 * Add `CorrelationRemover` preprocessing technique. This removes correlations
   between sensitive and non-sensitive features while retaining as much information
