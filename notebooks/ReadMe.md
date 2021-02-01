@@ -17,5 +17,5 @@ Then, on the GitHub page, navigate to that version
 [v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6)),
 and download the notebooks from there.
 
-Alternatively, [install Fairlearn from a cloned repository](https://fairlearn.github.io/contributor_guide/development_process.html#advanced-installation-instructions)
+Alternatively, [install Fairlearn from a cloned repository](https://fairlearn.github.io/main/contributor_guide/development_process.html#advanced-installation-instructions)
 in order to use the notebooks from `main`.
