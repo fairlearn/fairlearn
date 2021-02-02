@@ -496,7 +496,7 @@ constraints:
 Control features
 ^^^^^^^^^^^^^^^^
 
-The above :class:`Moment`s (:ref:`demographic_parity`,
+The above examples of :class:`Moment` (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
 :ref:`equalized_odds` and :ref:`error_rate_parity`) all support the concept
 of *control features* when applying their fairness constraints.

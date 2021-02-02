@@ -409,10 +409,12 @@ metrics.
 
 .. note::
 
-    The :code:`FairlearnDashboard` will move from Fairlearn to the
-    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
-    will provide some of the existing functionality through
-    :code:`matplotlib`-based visualizations.
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn.
+    The widget itself has been moved to
+    `the raiwidgets package <https://pypi.org/project/raiwidgets/>`_.
+    Fairlearn will provide some of the existing functionality
+    through :code:`matplotlib`-based visualizations.
 
 Setup and a single-model assessment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
