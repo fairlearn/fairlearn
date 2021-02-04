@@ -1,5 +1,7 @@
 # Changes
 
+### v0.6.1
+
 ### v0.6.0
 
 * Add `CorrelationRemover` preprocessing technique. This removes correlations
