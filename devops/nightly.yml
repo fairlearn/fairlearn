@@ -13,7 +13,7 @@ schedules:
   displayName: Nightly Build
   branches:
     include:
-      - master
+      - main
   always: true
 
 pool:

@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=master)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=master) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![StackOverflow](https://img.shields.io/badge/StackOverflow-questions-blueviolet)](https://stackoverflow.com/questions/tagged/fairlearn)
+[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=main)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=main) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![StackOverflow](https://img.shields.io/badge/StackOverflow-questions-blueviolet)](https://stackoverflow.com/questions/tagged/fairlearn)
 
 # Fairlearn
 
@@ -21,7 +21,7 @@ Website: https://fairlearn.github.io/
 
 - The current stable release is available at [Fairlearn v0.6.0](https://github.com/fairlearn/fairlearn/tree/release/v0.6.0).
 
-- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://fairlearn.github.io/master/contributor_guide/development_process.html#onboarding-guide).
+- Our current version differs substantially from version 0.2 or earlier. Users of these older versions should visit our [onboarding guide](https://fairlearn.github.io/main/contributor_guide/development_process.html#onboarding-guide).
 
 ## What we mean by _fairness_
 
@@ -35,7 +35,7 @@ We follow the approach known as **group fairness**, which asks: _Which groups of
 
 Group fairness is formalized by a set of constraints, which require that some aspect (or aspects) of the AI system's behavior be comparable across the groups. The Fairlearn package enables assessment and mitigation of unfairness under several common definitions.
 To learn more about our definitions of fairness, please visit our
-[user guide on Fairness of AI Systems](https://fairlearn.github.io/master/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems).
+[user guide on Fairness of AI Systems](https://fairlearn.github.io/main/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems).
 
 >_Note_:
 > Fairness is fundamentally a sociotechnical challenge. Many aspects of fairness, such as justice and due process, are not captured by quantitative fairness metrics. Furthermore, there are many quantitative fairness metrics which cannot all be satisfied simultaneously. Our goal is to enable humans to assess different mitigation strategies and then make trade-offs appropriate to their scenario.
@@ -50,22 +50,22 @@ The Fairlearn Python package has two components:
 
 ### Fairlearn algorithms
 
-For an overview of our algorithms please refer to our [website](https://fairlearn.github.io/master/user_guide/mitigation.html).
+For an overview of our algorithms please refer to our [website](https://fairlearn.github.io/main/user_guide/mitigation.html).
 
 ### Fairlearn dashboard
 
-Check out our in-depth [guide on the Fairlearn dashboard](https://fairlearn.github.io/master/user_guide/assessment.html#fairlearn-dashboard).
+Check out our in-depth [guide on the Fairlearn dashboard](https://fairlearn.github.io/main/user_guide/assessment.html#fairlearn-dashboard).
 
 ## Install Fairlearn
 
-For instructions on how to install Fairlearn check out our [Quickstart guide](https://fairlearn.github.io/master/quickstart.html).
+For instructions on how to install Fairlearn check out our [Quickstart guide](https://fairlearn.github.io/main/quickstart.html).
 
 ## Usage
 
 For common usage refer to the [Jupyter notebooks](./notebooks) and our
-[user guide](https://fairlearn.github.io/master/user_guide/index.html).
+[user guide](https://fairlearn.github.io/main/user_guide/index.html).
 Please note that our APIs are subject to change, so notebooks downloaded
-from `master` may not be compatible with Fairlearn installed with `pip`.
+from `main` may not be compatible with Fairlearn installed with `pip`.
 In this case, please navigate the tags in the repository
 (e.g. [v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5))
 to locate the appropriate version of the notebook.
@@ -73,7 +73,7 @@ to locate the appropriate version of the notebook.
 ## Contributing
 
 To contribute please check our
-[contributor guide](https://fairlearn.github.io/master/contributor_guide/index.html).
+[contributor guide](https://fairlearn.github.io/main/contributor_guide/index.html).
 
 ## Maintainers
 
