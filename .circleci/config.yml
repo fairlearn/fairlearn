@@ -31,6 +31,7 @@ jobs:
       - run:
           name: "Build Documentation"
           command: python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
+          no_output_timeout: 30m
 
       - persist_to_workspace:
           root: docs/_build
@@ -64,6 +65,7 @@ jobs:
       - run:
           name: 'Build doctest'
           command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
+          no_output_timeout: 30m
       
   deploy-doc:
     docker:
@@ -115,4 +117,4 @@ workflows:
             - build-doc
           filters:
             branches:
-              only: master  # don't deploy to GitHub pages from other branches
+              only: main  # don't deploy to GitHub pages from other branches
