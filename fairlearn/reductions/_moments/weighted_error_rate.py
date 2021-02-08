@@ -21,9 +21,13 @@ class WeightedErrorRate(ClassificationMoment):
     def __init__(self):
         super(WeightedErrorRate, self).__init__()
 
-    # for what we need here is augmented data. Hence to avoid unnecessary calculation, here we use
-    # augmented data having been calculated in cdf_demographic_parity_moment and directly return in
-    # the function load_data to suit the interface of _lagrangian.
+    # We need to augment data here. Hence to avoid unnecessary calculation, 
+    # in this function, we use augmented data that have been calculated 
+    # in the function load_data in cdf_demographic_parity_moment.py
+    # that is, X and y. And meanwhile, we choose to directly return 
+    # in the following function load_data to adapt to the call 
+    # self.obj.load_data(X, y, sensitive_features=sensitive_features)
+    # in the file _lagrangian.py
     def load_augmented_data(self, X, y, **kwargs):
         # Load the specified data into the object
         super().load_data(X, y, **kwargs)

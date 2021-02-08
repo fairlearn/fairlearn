@@ -18,16 +18,18 @@ class CDF_DemographicParity(Moment):
         A loss object with an `eval` method, e.g. `SquareLoss` or
         `AbsoluteLoss`.
     y_range : (float,float)
-        A tiple that specifies the range of y labels of the data.
-    differece_bound : bool
+        A tuple that specifies the range of y labels of the data.
+    difference_bound : float
         The constraints' difference bound for constraints that are expressed
         as differences, also referred to as :math:`\\epsilon` in documentation.
         Default None
     grids: list of floats
         Instead of supplying a number for the grid, users may specify the exact
-        set of grids they desire using this argument.
+        set of grids they desire using this argument. 
+        As explained in section 4.1 of 'Agarwal et al. (2019) <https://arxiv.org/abs/1905.12843v1>'
+        continuous predictions are discretized to this set of grids.
     grid_num: int
-        If use does not specify grids, then grid_num and y_range is used to calculate the grids
+        If the user does not specify `grids`, then `grid_num` and `y_range` is used to calculate the grids
         used as thresholds.
     """
     short_name = "CDF_DemographicParity"
@@ -48,55 +50,62 @@ class CDF_DemographicParity(Moment):
         # determine the grids
         if self.grids == None:
             self.grids = np.linspace(self.y_range[0], self.y_range[1], self.grid_num)
-        else:
+        elif (self.grids <= self.y_range[1]).all() and (self.grids >= self.y_range[0]).all():
             # check whether all grids fall into the empirical range of y
-            assert (self.grids <= self.y_range[1]).all()\
-                    and (self.grids >= self.y_range[0]).all(),\
-                    "Some of the grids do not fall into the range of y"
             self.grids = np.unique(self.grids)
             # ensure grids are listed in an increasing order and are unique
-
-        # in case the grids have already included the two endpoints of the range
-        # prepare for the calculation of optimal labels
+        else:
+            raise Exception("Some of the grids do not fall into the range of y")
+            
+        
+        # The following variables will be used in the function optimal_label,
+        # where a heuristic is used to calculate the optimal y by choosing from 
+        # the set of `self.pred_grid` the grid that leads to the lowesr cost
+        # This calculation is placed in the __init__ function to avoid unnecessarily 
+        # repetious calcutations for the function optimal_label will be called for
+        # multiple times.
         self.pred_grid = [self.y_range[0]] +\
-            list([self.next_grid(grid) for grid in self.grids]) + [self.y_range[1]]
+            list([self._next_grid(grid) for grid in self.grids]) + [self.y_range[1]]
+        # filter grids that are lower than the `self.y_range[0]`
+        # this will be necessary in cases the specified grids have already included two endpoints of the range
         self.pred_grid = list(filter(lambda x: x >= self.y_range[0], self.pred_grid))
+        # filter grids that are higher than the `self.y_range[1]`
         self.pred_grid = list(filter(lambda x: x <= self.y_range[1], self.pred_grid))
         self.pred_vec = {}
         for pred in self.pred_grid:
             self.pred_vec[pred] = (1 * (pred >= pd.Series(self.grids)))
 
-    def prev_grid(self, theta):
-        index = np.where(self.grids == theta)[0][0]
+    def _prev_grid(self, cur_grid):
+        index = np.where(self.grids == cur_grid)[0][0]
         if index == 0:
             return self.grids[index] - (self.grids[1]-self.grids[0])/2
         else:
             return (self.grids[index] + self.grids[index-1])/2
 
-    def next_grid(self, theta):
-        index = np.where(self.grids == theta)[0][0]
+    def _next_grid(self, cur_grid):
+        index = np.where(self.grids == cur_grid)[0][0]
         if index + 1 == self.grids.size:
             return self.grids[index] + (self.grids[1]-self.grids[0])/2
         else:
             return (self.grids[index+1] + self.grids[index])/2
 
-    def augment_data(self, x, a, y):
+    def augment_data(self, X, sensitive_features, y):
         """For each x, we create self.grid_num copies and add a new column named 
-        "theta" for each copy. The values of this columns for copies is the chose 
-        grids. 
+        "theta" for each copy. The values of this column is the chosen grids. 
 
         The weight for each new data point is calculated in the section 4.1 of 
         'Agarwal et al. (2019) <https://arxiv.org/abs/1905.12843v1>', but consider
         the more general case where the grids are not equally spaced.
 
         The binary label for each new data point is determined by whether the 
-        corresponding weight is positve or not.
+        corresponding weight is positive or not.
 
 
         Parameters
         ----------
         X : numpy.ndarray or pandas.DataFrame
             Feature data
+        sensitive features: numpy.ndarray or pandas.DataFrame
         y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
             Label vector
 
@@ -104,13 +113,13 @@ class CDF_DemographicParity(Moment):
         Returns
         -------
         pandas.DataFrame, pandas.DataFrame, pandas.DataFrame, pandas.DataFrame
-            Represent the augmented features, sensitive features, labels, and weights.
+            the augmented features, sensitive features, labels, and weights.
         """
-        self.n = np.shape(x)[0]
+        self.n = np.shape(X)[0]
         self.width = self.grids[1] - self.grids[0]
 
-        X_aug = pd.concat(repeat(x, self.grid_num))
-        A_aug = pd.concat(repeat(a, self.grid_num))
+        X_aug = pd.concat(repeat(X, self.grid_num))
+        A_aug = pd.concat(repeat(sensitive_features, self.grid_num))
         Y_values = pd.concat(repeat(y, self.grid_num))
 
         theta_list = [s for theta in self.grids for s in repeat(theta, self.n)]
@@ -120,10 +129,8 @@ class CDF_DemographicParity(Moment):
         A_aug.index = range(self.n * self.grid_num)
         Y_values.index = range(self.n * self.grid_num)
 
-        def weight_assign(theta, y):
-            return (self.loss.eval([self.next_grid(_theta) for _theta in theta], y) -
-                    self.loss.eval([self.prev_grid(_theta) for _theta in theta], y))
-        W = weight_assign(X_aug['theta'], Y_values)
+        W = (self.loss.eval([self._next_grid(_theta) for _theta in X_aug["theta"]], Y_values) -
+                self.loss.eval([self._prev_grid(_theta) for _theta in X_aug["theta"]], Y_values))
         Y_aug = 1*(W < 0)
         W = abs(W)
         return X_aug, A_aug, Y_aug, W
@@ -158,10 +165,7 @@ class CDF_DemographicParity(Moment):
             pred = pd.Series(predictor(x))
             pred_binary = pd.concat(repeat(pred, self.grid_num))
             pred_binary.index = range(self.n * self.grid_num)
-            return 1*(pred_binary - X['theta'] >= 0)
-            # made improvements in constrast to the original line
-            # return 1*( predictor(X.drop(['theta'], axis=1)) - X['theta'] >= 0)
-            # noting that,after dropping the theta column, the data are repeated for grid_num times
+            return 1 * ((pred_binary - X['theta']) >= 0)
         return self.utility_parity.gamma(classifier)
 
     def signed_weights(self, lambda_vec):
@@ -184,7 +188,7 @@ class CDF_DemographicParity(Moment):
         redY = 1 * (signed_weights > 0)
         redW = signed_weights.abs()
         redW = self.n * self.grid_num * redW / redW.sum()
-        minimizer = {}
+        minimum = list()
         for i in range(self.n):
             index_set = [i + j * self.n for j in range(self.grid_num)]
             W_i = redW.iloc[index_set]
@@ -194,5 +198,5 @@ class CDF_DemographicParity(Moment):
             cost_i = {}
             for pred in self.pred_grid:
                 cost_i[pred] = abs(Y_i - self.pred_vec[pred]).dot(W_i)
-            minimizer[i] = min(cost_i, key=cost_i.get)
-        return pd.Series(minimizer)
+            minimum[i] = min(cost_i, key=cost_i.get)
+        return pd.Series(minimum)
