@@ -55,6 +55,10 @@ setuptools.setup(
         ('share/jupyter/lab/extensions', [
             'fairlearn/widget/js/'
             'fairlearn_widget/labextension/fairlearn-widget-0.1.0.tgz'
+        ]),
+        ('.', [
+            'requirements.txt',
+            'requirements-customplots.txt'
         ])],
     zip_safe=False,
 )
