@@ -56,8 +56,10 @@ setuptools.setup(
             'fairlearn/widget/js/'
             'fairlearn_widget/labextension/fairlearn-widget-0.1.0.tgz'
         ]),
-        ('.', [
-            'requirements.txt',
+        ('./requirements.txt', [
+            'requirements.txt'
+        ]),
+        ('./requirements-customplots.txt', [
             'requirements-customplots.txt'
         ])],
     zip_safe=False,
