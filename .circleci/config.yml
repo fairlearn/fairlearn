@@ -115,4 +115,4 @@ workflows:
             - build-doc
           filters:
             branches:
-              only: master  # don't deploy to GitHub pages from other branches
+              only: main  # don't deploy to GitHub pages from other branches
