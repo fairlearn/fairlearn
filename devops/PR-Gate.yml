@@ -3,7 +3,7 @@ variables:
   FreezeFileStem: 'requirements-freeze'
 
 pr:
-- master
+- main
 - release/*
 
 trigger: none # No CI build
