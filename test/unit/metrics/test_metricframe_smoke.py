@@ -8,7 +8,7 @@ import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
 
-from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
+from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4, s_w
 
 from test.unit.input_convertors import conversions_for_1d
 
@@ -224,6 +224,62 @@ def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
     assert target_maxs.shape == (2, 1)
     assert target_maxs['recall']['kk'] == max(recall_k_arr)
     assert target_maxs['recall']['m'] == max(recall_m_arr)
+
+
+def test_2m_1sf_sample_weights():
+
+    def sp_is_sum(y_t, y_p, some_param_name):
+        assert len(y_t) == len(y_p)
+        assert len(y_t) == len(some_param_name)
+        for i in range(len(y_t)):
+            assert some_param_name[i] == y_t[i] + y_p[i]
+        return sum(some_param_name)
+
+    def sp_is_diff(y_t, y_p, some_other):
+        assert len(y_t) == len(y_p)
+        assert len(y_t) == len(some_other)
+        for i in range(len(y_t)):
+            assert some_other[i] == y_t[i] - y_p[i]
+        return sum(some_other)
+
+    m1 = r'! # \ | $'
+    m2 = r'& % ^'
+    metrics_dict = {
+        m1: sp_is_sum,
+        m2: sp_is_diff
+    }
+
+    sums = s_w + y_p
+    diffs = s_w - y_p
+
+    sample_params = {
+        m1: {'some_param_name': sums},
+        m2: {'some_other': diffs}
+    }
+
+    target = metrics.MetricFrame(metrics_dict,
+                                 s_w,
+                                 y_p,
+                                 sensitive_features=g_2,
+                                 sample_params=sample_params)
+
+    # Check we have correct return types
+    assert isinstance(target.overall, pd.Series)
+    assert isinstance(target.by_group, pd.DataFrame)
+
+    # Check we have expected number of elements
+    assert len(target.overall) == 2
+    assert target.by_group.shape == (2, 2)
+
+    # Check overall values
+    assert target.overall[m1] == sum(sums)
+    assert target.overall[m2] == sum(diffs)
+
+    # Check by group values
+    for group in g_2:
+        mask = g_2 == group
+        assert target.by_group[m1][group] == sum(sums[mask])
+        assert target.by_group[m2][group] == sum(diffs[mask])
 
 
 def test_duplicate_sf_names():
