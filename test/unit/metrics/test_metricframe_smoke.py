@@ -226,6 +226,35 @@ def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
     assert target_maxs['recall']['m'] == max(recall_m_arr)
 
 
+def test_1m_1_sf_sample_weights():
+
+    def multi_sp(y_t, y_p, p1, p2):
+        assert len(y_t) == len(y_p)
+        assert len(y_t) == len(p1)
+        assert len(y_t) == len(p2)
+        assert np.array_equal(p2, y_t + y_p + p1)
+        return sum(p2)
+
+    rng = np.random.default_rng(seed=42)
+    param1 = rng.random(len(y_t))
+    param2 = s_w + y_p + param1
+
+    target = metrics.MetricFrame(multi_sp,
+                                 s_w, y_p,
+                                 sensitive_features=g_1,
+                                 sample_params={'p1': param1, 'p2': param2})
+
+    # Sanity check types
+    assert isinstance(target.overall, float)
+    assert isinstance(target.by_group, pd.Series)
+    assert target.by_group.shape == (2,)
+
+    assert target.overall == sum(param2)
+    for g in g_1:
+        mask = g_1 == g
+        assert target.by_group[g] == sum(param2[mask])
+
+
 def test_2m_1sf_sample_weights():
 
     def sp_is_sum(y_t, y_p, some_param_name):
