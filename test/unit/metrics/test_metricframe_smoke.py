@@ -264,31 +264,35 @@ def test_2m_1sf_sample_weights():
             assert some_param_name[i] == y_t[i] + y_p[i]
         return sum(some_param_name)
 
-    def sp_is_diff(y_t, y_p, some_other):
+    def multi_sp(y_t, y_p, some_param_name, some_other):
         assert len(y_t) == len(y_p)
+        assert len(y_t) == len(some_param_name)
         assert len(y_t) == len(some_other)
-        for i in range(len(y_t)):
-            assert some_other[i] == y_t[i] - y_p[i]
+        assert np.array_equal(some_other, y_t + y_p*some_param_name)
         return sum(some_other)
 
     m1 = r'! # \ | $'
     m2 = r'& % ^'
     metrics_dict = {
         m1: sp_is_sum,
-        m2: sp_is_diff
+        m2: multi_sp
     }
 
-    sums = s_w + y_p
-    diffs = s_w - y_p
+    rng = np.random.default_rng(seed=6*9)
+    param1 = rng.random(len(y_t))
+
+    sums = y_t + s_w
+    multis = y_t + s_w * param1
 
     sample_params = {
         m1: {'some_param_name': sums},
-        m2: {'some_other': diffs}
+        m2: {'some_param_name': param1,
+             'some_other': multis}
     }
 
     target = metrics.MetricFrame(metrics_dict,
+                                 y_t,
                                  s_w,
-                                 y_p,
                                  sensitive_features=g_2,
                                  sample_params=sample_params)
 
@@ -302,13 +306,13 @@ def test_2m_1sf_sample_weights():
 
     # Check overall values
     assert target.overall[m1] == sum(sums)
-    assert target.overall[m2] == sum(diffs)
+    assert target.overall[m2] == sum(multis)
 
     # Check by group values
     for group in g_2:
         mask = g_2 == group
         assert target.by_group[m1][group] == sum(sums[mask])
-        assert target.by_group[m2][group] == sum(diffs[mask])
+        assert target.by_group[m2][group] == sum(multis[mask])
 
 
 def test_duplicate_sf_names():
