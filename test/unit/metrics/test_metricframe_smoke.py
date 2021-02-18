@@ -228,10 +228,10 @@ def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
 
 
 def test_1m_1_sf_sample_weights():
-    """Check that sample weights are passed correctly to a single metric"""
+    """Check that sample weights are passed correctly to a single metric."""
 
     def multi_sp(y_t, y_p, p1, p2):
-        """Simple metric to check passing of sample parameters
+        """Metric to check passing of sample parameters.
 
         Verifies that p2 == y_t + y_p + p1 for all elements
         """
@@ -272,7 +272,7 @@ def test_2m_1sf_sample_weights():
     """Check that sample weights are passed correctly to two metrics."""
 
     def sp_is_sum(y_t, y_p, some_param_name):
-        """Metric accepting a single sample parameter
+        """Metric accepting a single sample parameter.
 
         Checks that the sample parameter stores the sum of
         y_t and y_p for all elements
@@ -284,7 +284,7 @@ def test_2m_1sf_sample_weights():
         return sum(some_param_name)
 
     def multi_sp(y_t, y_p, some_param_name, some_other):
-        """Metric accepting multiple sample parameters
+        """Metric accepting multiple sample parameters.
 
         Checks that
         some_other == y_t + y_p * some_param_name
