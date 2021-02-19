@@ -92,6 +92,11 @@ jobs:
           # Instead, we want the webpage to just point at index.html
           name: Disable jekyll builds
           command: touch docs/_build/html/.nojekyll
+      
+      - run:
+          # Create CNAME file for fairlearn.org
+          name: Create CNAME file
+          command: echo "fairlearn.org" > docs/_build/html/CNAME
 
       - run:
           name: 'Install gh-pages and configure dependencies'
