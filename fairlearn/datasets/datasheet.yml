@@ -1,0 +1,56 @@
+title: Datasheet for Datasets
+sections:
+  - title: Motivation
+    section_id: A
+    lines:
+      line_id: A.1
+      line_summary: For what purpose was the dataset created?
+      line: Was there a specific task in mind> Was there a specific ap that need to be filled? 
+      line_id: A.2
+      line_summary: Who created the dataset and on behalf of whom?
+      line: Which team or research group created the dataset and on behalf of which entity(e.g. company, institution, organization)?
+      line_id: A.3
+      line_summary: Who funded the creation of the dataset?
+      line: If there is an associated grant, please provide name of grantor and grant name/number.
+  - title: Composition
+    section_id: B
+    lines:
+      line_id: B.1
+      line_summary: What do the instances that comprise the dataset represent?
+      line: Are there multiple typs of instances (e.g movie, user, ratings; nodes and edges)
+      line_id: B.2
+      line_summary:
+      line:
+      line_id: B.3
+      line_summary:
+      line:
+  - title: Collection Process
+    section_id: C
+    lines:
+      line_id:
+      line_summary:
+      line:
+  - title: Pre-Processing
+    section_id: D
+    lines:
+      line_id: D.1
+      line_summary:
+      line:
+  - title: Uses
+    section_id: E
+    lines:
+      line_id: E.1
+      line_summary:
+      line:
+  - title: Distribution
+    section_id: F
+    lines:
+      line_id: F.1
+      line_summary:
+      line:
+  - title: Maintenance
+    section_id: G
+    lines:
+      line_id: G.1
+      line_summary:
+      line:
