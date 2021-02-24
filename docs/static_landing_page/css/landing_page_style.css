@@ -192,7 +192,7 @@ li {
 	background-color: white;
 }
 .gradient {
-	background: linear-gradient(270deg, #2fbcdb 10.56%, #188aca 92.14%);
+	background: linear-gradient(90deg, #2fbcdb 10.56%, #188aca 92.14%);
 }
 .masthead-btn {
 	font-family: 'TT Commons Bold', Arial, sans-serif;
@@ -455,7 +455,7 @@ li.check-icon {
 	background-color: #2364d2;
 	padding: 14px 0px 10px 0px;
 	margin: 0px 9px;
-	width: 120px;
+	width: 150px;
 	border-radius: 100px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
