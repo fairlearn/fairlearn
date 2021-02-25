@@ -103,7 +103,8 @@ li {
 
 /****UNIVERSAL****/
 .dark {
-	color: #061058;
+	/* color: #061058; */
+	color: #000000
 }
 .gray {
 	color: #979797;
@@ -186,13 +187,17 @@ li {
 
 /****MASTHEAD****/
 .masthead {
+	height: 400px;
 }
 .masthead-tabs {
 	border-radius: 20px;
 	background-color: white;
 }
 .gradient {
-	background: linear-gradient(90deg, #2fbcdb 10.56%, #188aca 92.14%);
+	background: linear-gradient(75deg, #2fbcdb 10.56%, #188aca 92.14%);
+}
+.gradient-reverse {
+	background: linear-gradient(90deg, #188aca 92.14%, #2fbcdb 10.56%,);
 }
 .masthead-btn {
 	font-family: 'TT Commons Bold', Arial, sans-serif;
@@ -399,6 +404,9 @@ li.check-icon {
 /****SECTION 4****/
 
 /****SECTION 5****/
+.section-5 {
+	background: #F2F2f2;
+}
 .benefits-icons {
 	width: 26px;
 	height: auto;
@@ -475,8 +483,9 @@ li.check-icon {
 	padding: 8px 0px 8px 0px;
 }
 .page-footer {
-	padding-top: 20px;
-	background-color: #061058;
+	padding-top: 1px;
+	background-color: #FFFFFF;
+	height: 80px;
 }
 .footer-btn-transparent {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
@@ -496,7 +505,7 @@ li.check-icon {
 	color: #ffffff;
 }
 .footer-logo {
-	width: 121px;
+	width: 45px;
 	height: auto;
 }
 .footer-custom-margin {
@@ -527,10 +536,10 @@ li.check-icon {
 	-webkit-font-smoothing: antialiased;
 }
 .footer-line {
-	width: 100%;
-	height: 1px;
-	background-color: #ffffff;
-	opacity: 0.2;
+	width: 95%;
+	height: 2px;
+	background-color: #3772CE;
+	opacity: 0.9;
 }
 .copyright-text {
 	padding-top: 11px;
