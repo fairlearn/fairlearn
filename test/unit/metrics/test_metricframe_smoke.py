@@ -8,7 +8,8 @@ import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
 
-from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
+# Bring in some pre-prepared input arrays
+from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4, s_w
 
 from test.unit.input_convertors import conversions_for_1d
 
@@ -224,6 +225,128 @@ def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
     assert target_maxs.shape == (2, 1)
     assert target_maxs['recall']['kk'] == max(recall_k_arr)
     assert target_maxs['recall']['m'] == max(recall_m_arr)
+
+
+def test_1m_1_sf_sample_weights():
+    """Check that sample weights are passed correctly to a single metric."""
+
+    def multi_sp(y_t, y_p, p1, p2):
+        """Metric to check passing of sample parameters.
+
+        Verifies that p2 == y_t + y_p + p1 for all elements
+        """
+        assert len(y_t) == len(y_p)
+        assert len(y_t) == len(p1)
+        assert len(y_t) == len(p2)
+        assert np.array_equal(p2, y_t + y_p + p1)
+        return sum(p2)
+
+    # Generate some random input data
+    rng = np.random.default_rng(seed=42)
+    param1 = rng.random(len(y_t))
+    # Compute the expected sum
+    param2 = s_w + y_p + param1
+
+    # Note that we pass in the s_w array for y_true, to get
+    # a little more variety in the results
+    target = metrics.MetricFrame(multi_sp,
+                                 s_w, y_p,
+                                 sensitive_features=g_1,
+                                 sample_params={'p1': param1, 'p2': param2})
+
+    # Sanity check types
+    assert isinstance(target.overall, float)
+    assert isinstance(target.by_group, pd.Series)
+    assert target.by_group.shape == (2,)
+
+    # Check the overall value
+    assert target.overall == sum(param2)
+
+    # Look at the by_group values for each subgroup identified by g_1
+    for g in g_1:
+        mask = g_1 == g
+        assert target.by_group[g] == sum(param2[mask])
+
+
+def test_2m_1sf_sample_weights():
+    """Check that sample weights are passed correctly to two metrics."""
+
+    def sp_is_sum(y_t, y_p, some_param_name):
+        """Metric accepting a single sample parameter.
+
+        Checks that the sample parameter stores the sum of
+        y_t and y_p for all elements
+        """
+        assert len(y_t) == len(y_p)
+        assert len(y_t) == len(some_param_name)
+        for i in range(len(y_t)):
+            assert some_param_name[i] == y_t[i] + y_p[i]
+        return sum(some_param_name)
+
+    def multi_sp(y_t, y_p, some_param_name, some_other):
+        """Metric accepting multiple sample parameters.
+
+        Checks that
+        some_other == y_t + y_p * some_param_name
+        for all elements
+        """
+        assert len(y_t) == len(y_p)
+        assert len(y_t) == len(some_param_name)
+        assert len(y_t) == len(some_other)
+        assert np.array_equal(some_other, y_t + y_p*some_param_name)
+        return sum(some_other)
+
+    # Give the metrics some unusual names
+    m1 = r'! # \ | $'
+    m2 = r'& % ^'
+    metrics_dict = {
+        m1: sp_is_sum,
+        m2: multi_sp
+    }
+
+    # Generate some random inputs for multi_sp
+    rng = np.random.default_rng(seed=6*9)
+    param1 = rng.random(len(y_t))
+
+    # Generate the columns of expected values for the two metrics
+    sums = y_t + s_w
+    multis = y_t + s_w * param1
+
+    # Set up the sample parameter dictionary
+    # Note that although the metric functions have one parameter
+    # with the same name, each one gets a different input array
+    sample_params = {
+        m1: {'some_param_name': sums},
+        m2: {'some_param_name': param1,
+             'some_other': multis}
+    }
+
+    # Compute the metrics. Note that we pass in the
+    # s_w array for y_pred, in the interests of having some
+    # more variety in the results
+    target = metrics.MetricFrame(metrics_dict,
+                                 y_t,
+                                 s_w,
+                                 sensitive_features=g_2,
+                                 sample_params=sample_params)
+
+    # Check we have correct return types
+    assert isinstance(target.overall, pd.Series)
+    assert isinstance(target.by_group, pd.DataFrame)
+
+    # Check we have expected number of elements
+    assert len(target.overall) == 2
+    assert target.by_group.shape == (2, 2)
+
+    # Check overall values
+    assert target.overall[m1] == sum(sums)
+    assert target.overall[m2] == sum(multis)
+
+    # Check by group values for each subgroup identified by g_2
+    for group in g_2:
+        mask = g_2 == group
+        assert target.by_group[m1][group] == sum(sums[mask])
+        assert target.by_group[m2][group] == sum(multis[mask])
 
 
 def test_duplicate_sf_names():
