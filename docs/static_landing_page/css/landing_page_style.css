@@ -23,7 +23,7 @@ h1 {
 	font-style: normal;
 	font-weight: bold;
 	font-size: 85px;
-	line-height: 47px;
+	line-height: 88px;
 	color: #ffffff;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
@@ -99,6 +99,9 @@ li {
 	letter-spacing: 0.015em;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
+}
+code {
+	background-color: #e1e1e1
 }
 
 /****UNIVERSAL****/
