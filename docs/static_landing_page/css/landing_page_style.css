@@ -101,7 +101,11 @@ li {
 	-webkit-font-smoothing: antialiased;
 }
 code {
-	background-color: #e1e1e1
+	background-color: rgba(204, 204, 204, 0.1);
+	border: 1px;
+	border-style: groove;
+	border-color: #f2f2f2;
+	text-align: right;
 }
 
 /****UNIVERSAL****/
