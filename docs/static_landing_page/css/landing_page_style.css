@@ -160,7 +160,7 @@ code {
 }
 .navbar li {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
-	font-size: 16px;
+	font-size: 15px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
@@ -171,7 +171,7 @@ code {
 	font-family: 'TT Commons Bold', Arial, sans-serif;
 	font-style: normal;
 	font-weight: bold;
-	font-size: 16px;
+	font-size: 15px;
 	display: inline-block;
 	color: white !important;
 	background-color: #2364d2;
@@ -350,6 +350,10 @@ code {
 }
 .section-3 .nav-tabs .active h6 {
 	color: #061058;
+}
+
+.installation {
+	font-size: 14px;
 }
 /****SECTION 3****/
 
