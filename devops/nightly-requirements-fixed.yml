@@ -1,5 +1,6 @@
 # Nightly build pipeline with requirements pinned to lower bounds (if any)
 # This does not run on MacOS due to issues with the pinned requirements
+# There are also issues with running on Python 3.9
 
 variables:
   FreezeArtifactStem: 'freeze'
@@ -14,7 +15,7 @@ schedules:
   displayName: Nightly Build
   branches:
     include:
-      - master
+      - main
   always: true
 
 pool:
