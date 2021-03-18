@@ -105,22 +105,28 @@
 						not just the mitigation algorithms in our library.
 					</p>
 					<p class="text-left pl-3 pb-5 mr-3 pr-4">
-						You can find resources throughout this website on how to think about fairness as sociotechnical,
+						Throughout this website, you can find resources on how to think about fairness as sociotechnical,
 						and how to use Fairlearn's metrics and algorithms
 						while considering the AI system's broader societal context.
 					</p>
   				</div>
 				<!-- Use Case -->
 				<div class="col-6 col-lg-6 pl-3">
-					<h6 class="text-left pl-3 pb-1">USE CASE | FINANCIAL SERVICES</h6>
+					<h6 class="text-left pl-3 pb-1">USE CASE&ensp;|&ensp;CREDIT-CARD DEFAULT MODELS</h6>
 					<h3 class="text-left pl-3 mr-5 pr-4 dark">Assessment and mitigation of fairness issues in credit-card default models</h3>
 					<p class="text-left pl-3 mr-5 pr-4">
-						In work done with EY, we used Fairlearn to mitigate the disparities in various credit lending models.
-						Due to data privacy reasons, we cannot share the original dataset. However, we have replicated the workflow
-						used in this work using a publically available dataset.
+						When making a decision to approve or decline a loan, financial services organizations
+						use a variety of models, including a model that predicts the applicant's probability of default. If it is above a
+						certain threshold, the application might be automatically rejected, and if it is below, it might be automatically
+						accepted.
+					</p>
+					<p class="text-left pl-3 mr-5 pr-4">
+						Two kinds of harms may arise: false positives, when qualified applicants are rejected, and false
+						negatives, when accepted applicants default on their loan. We assess how different groups defined
+						in terms of the "sex" feature are affected, and then mitigate the observed disparities.
 					</p>
 					<div class="col-3 pt-2 col-lg-3">
-						<a class="contribute-btn mb-5 pl-3 text-center" href=./v0.6.0/quickstart.html>Read More →</a>
+						<a class="contribute-btn mb-5 pl-3 text-center" href="https://github.com/fairlearn/fairlearn/blob/main/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb">Notebook →</a>
 					</div>
 				</div>
   			</div>
