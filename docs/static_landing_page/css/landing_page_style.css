@@ -21,8 +21,8 @@ body {
 h1 {
 	font-family: 'TT Commons Bold', Arial, sans-serif;
 	font-style: normal;
-	font-weight: bold;
-	font-size: 85px;
+	font-weight: 600;
+	font-size: 84px;
 	line-height: 88px;
 	color: #ffffff;
 	-moz-osx-font-smoothing: grayscale;
@@ -32,8 +32,8 @@ h2 {
 	font-family: 'TT Commons Bold', Arial, sans-serif;
 	font-style: normal;
 	font-weight: bold;
-	font-size: 44px;
-	line-height: 44px;
+	font-size: 64px;
+	line-height: 68px;
 	color: #ffffff;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
@@ -42,8 +42,8 @@ h3 {
 	font-family: 'TT Commons Regular', Arial, sans-serif;
 	font-style: normal;
 	font-weight: normal;
-	font-size: 28px;
-	line-height: 34px;
+	font-size: 48px;
+	line-height: 52Spx;
 	color: #ffffff;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
@@ -51,9 +51,9 @@ h3 {
 h4 {
 	font-family: 'TT Commons Bold', Arial, sans-serif;
 	font-style: normal;
-	font-weight: bold;
-	font-size: 28px;
-	line-height: 30px;
+	font-weight: normal;
+	font-size: 32px;
+	line-height: 34px;
 	color: #061058;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
@@ -100,12 +100,9 @@ li {
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
-code {
-	background-color: rgba(204, 204, 204, 0.1);
-	border: 1px;
-	border-style: groove;
-	border-color: #f2f2f2;
-	text-align: right;
+.code {
+	font-size: 12px;
+	line-height: 15px;
 }
 
 /****UNIVERSAL****/
@@ -355,6 +352,25 @@ code {
 .installation {
 	font-size: 14px;
 }
+
+.quickstart-btn {
+	font-family: 'TT Commons Bold', Arial, sans-serif;
+	font-size: 14px;
+	display: inline-block;
+	color: #ffffff;
+	background-color: #2364D2;
+	padding: 14px 0px 10px 0px;
+	margin: 0px 9px;
+	width: 150px;
+	border-radius: 100px;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+}
+
+.quickstart-btn:hover {
+	text-decoration: underline;
+	color: #ffffff;
+}
 /****SECTION 3****/
 
 /****SECTION 4****/
@@ -423,10 +439,15 @@ li.check-icon {
 	height: auto;
 }
 .benefit-card {
-	border-radius: 20px;
+	border-radius: 1px;
 	box-shadow: 0px 40px 80px rgba(0, 0, 0, 0.05);
-	border: 0;
+	border: 2px;
 }
+
+.benefit-text:hover {
+	text-decoration:none;
+}
+
 .blue-card {
 	background-color: #2364d2;
 }
@@ -471,7 +492,8 @@ li.check-icon {
 	font-size: 16px;
 	display: inline-block;
 	color: #ffffff;
-	background-color: #2364d2;
+	background-color: #ffffff;
+	color: #2364D2;
 	padding: 14px 0px 10px 0px;
 	margin: 0px 9px;
 	width: 150px;
@@ -479,9 +501,10 @@ li.check-icon {
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
+
 .contribute-btn:hover {
 	text-decoration: underline;
-	color: #ffffff;
+	color: #2364d2;
 }
 /***SECTION 6****/
 

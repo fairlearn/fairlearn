@@ -19,7 +19,7 @@
 
   	<!-- NAVIGATION -->
 	<nav class="navbar navbar-expand-lg fixed-top">
-    	<div class="container ml-5 pl-5 py-3">
+    	<div class="container align-items-center ml-5 pl-5 py-3">
       		<img class="img-fluid nav-logo" src="./images/fairlearn_logo.svg" alt="">
       		<button class="navbar-toggler navbar-light" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         	<span class="navbar-toggler-icon icon-bar"></span>
@@ -68,9 +68,9 @@
 	<div class="container-fluid gradient masthead pt-5 mb-5 pb-3">
 	    <div class="container pt-lg-5 pb-lg-5 ">
 	      	<div class="row align-items-center justify-content-center">
-		        <div class="col-11 col-lg-10 order-lg-0">
+		        <div class="col-10 col-lg-10 order-lg-0">
 		        	<div class="row">
-		        		<div class="col-12">
+		        		<div class="col-8">
 		          			<h1 class="text-left text-md-left pb-2">
 							Improve fairness<br>
 							of AI systems
@@ -113,20 +113,17 @@
 				<!-- Use Case -->
 				<div class="col-6 col-lg-6 pl-3">
 					<h6 class="text-left pl-3 pb-1">USE CASE&ensp;|&ensp;CREDIT-CARD DEFAULT MODELS</h6>
-					<h3 class="text-left pl-3 mr-5 pr-4 dark">Assessment and mitigation of fairness issues in credit-card default models</h3>
+					<h4 class="text-left pl-3 mr-5 pr-4 dark">Assessment and mitigation of fairness issues in credit-card default models</h4>
 					<p class="text-left pl-3 mr-5 pr-4">
-						When making a decision to approve or decline a loan, financial services organizations
-						use a variety of models, including a model that predicts the applicant's probability of default. If it is above a
-						certain threshold, the application might be automatically rejected, and if it is below, it might be automatically
-						accepted.
+						When making a decision to approve or decline a loan, financial services organizations use a variety of models, including a model that predicts the applicant's probability of default.
+						These predictions are sometimes used to automatically reject or accept an application, directly impacting both the applicant and the organization.
 					</p>
 					<p class="text-left pl-3 mr-5 pr-4">
-						Two kinds of harms may arise: false positives, when qualified applicants are rejected, and false
-						negatives, when accepted applicants default on their loan. We assess how different groups defined
-						in terms of the "sex" feature are affected, and then mitigate the observed disparities.
+						In this scenario, fairness-related harms may arise when the model makes more mistakes for some groups of applicants compared to others.
+						In this use case example, we use Fairlearn to assess how different groups, defined in terms of their sex, are affected and how the observed disparities may be mitigated.
 					</p>
 					<div class="col-3 pt-2 col-lg-3">
-						<a class="contribute-btn mb-5 pl-3 text-center" href="https://github.com/fairlearn/fairlearn/blob/main/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb">Notebook →</a>
+						<a class="quickstart-btn mb-5 px-3 text-center" href="https://github.com/fairlearn/fairlearn/blob/main/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb">Jupyter Notebook</a>
 					</div>
 				</div>
   			</div>
@@ -152,7 +149,7 @@
 		<div class="container">
 			<div class="row pb-5">
 		    <div class="col-6 col-lg-6 pr-5 text-left">
-		      <h2 class="pt-2 pb-2 pl-5 text-left dark">Get started with Fairlearn</h2>
+		      <h3 class="pt-2 pb-2 pl-5 text-left dark">Get started with Fairlearn</h3>
 			    <p class="pl-5 pr-4 text-left">
 				    To get started, install the Fairlearn package.
 				    But the process does not end there!
@@ -167,12 +164,12 @@
 						pip install fairlearn
 				</div>
 			    <div class="col-3 pt-4 pl-5 col-lg-3">
-				    <a class="contribute-btn mb-5 pl-2" href=./v0.6.0/quickstart.html>Quickstart Guide →</a>
+				    <a class="quickstart-btn mb-5 px-4" href=./v0.6.0/quickstart.html>Quickstart Guide</a>
 			    </div>
 		    </div>
 
 		    <div class="col-6 col-lg-6 pl-3">
-			   <h2 class="pt-2 pb-2 px-2 dark">Resources</h2>
+			   <h3 class="pt-2 pb-2 px-2 dark">Resources</h3>
 			   <div class="row justify-content-left">
 				   <div class="col-10 pl-3 ml-2">
 					<a href="./v0.6.0/user_guide/index.html" target="_blank">
@@ -237,7 +234,7 @@
 						<div class="card h-100 benefit-card py-4 px-3">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Gitter_Color.svg">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Gitter_White.png">
-							<h4 class="dark pb-2 benefit-text">Gitter</h4>
+							<h6 class="dark pb-2 benefit-text">Gitter</h4>
 							<p class="benefit-text">Join the community and ask usage questions.</p>
 						</div>
 					</a>
@@ -247,7 +244,7 @@
 						<div class="card h-100 benefit-card py-4 px-3">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Stack_Overflow_Color.svg">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Stack_Overflow_White.svg">
-							<h4 class="dark pb-2 benefit-text">StackOverflow</h4>
+							<h6 class="dark pb-2 benefit-text">StackOverflow</h4>
 							<p class="benefit-text">Ask usage questions.</p>
 						</div>
 					</a>
@@ -258,7 +255,7 @@
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Github_Color.svg">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Github_White.svg">
 							<h4 class="dark pb-2 benefit-text">GitHub</h4>
-							<p class="benefit-text">Contribute code, documentation, use cases. Submit bug reports and feature requests.</p>
+							<p class="benefit-text card-tezt">Contribute code, documentation, use cases. Submit bug reports and feature requests.</p>
 						</div>
 					</a>
 				</div>
@@ -296,34 +293,34 @@
 	<!-- SECTION 7 -->
 
 	<!-- FOOTER -->
-	<footer class="container-fluid navbar navbar-expand-lg">
-	    <div class="container navbar-collapse pt-1">
-				<ul class="navbar-nav ml-4 pt-1 text-left">
-					<li class="nav-item pl-lg-4 pr-2 pr-lg-3">
+	<footer class="container-fluid navbar page-footer">
+	    <div class="container d-flex flex-column flex-md-row align-items-center pt-1">
+				<ul class="navbar-nav d-flex flex-sm-row ml-4 pt-1 py-sm-3 text-left">
+					<li class="nav-item pl-lg-4 pr-2 pr-lg-3 pr-sm-3">
 						<a href="https://twitter.com/fairlearn" target="_blank">
 							<img class="img-fluid" src="./images/Twitter_Color.svg" alt="">
 						</a>
 					</li>
-					<li class="nav-item pl-lg-1 pr-2 pr-lg-3">
+					<li class="nav-item pl-lg-1 pr-2 pr-lg-3 px-sm-3">
 						<a href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank">
 							<img class="img-fluid" src="./images/Stack_Overflow_Color.svg" alt="">
 						</a>
 					</li>
-					<li class="nav-item pl-lg-1 pr-2 pr-lg-3">
+					<li class="nav-item pl-lg-1 pr-2 pr-lg-3 px-sm-3">
 						<a href="https://gitter.im/Fairlearn/community?source=orgpage" target="_blank">
 							<img class="img-fluid" src="./images/Gitter_Color.svg" alt="">
 						</a>
 					</li>
-					<li class="nav-item pl-lg-1 pr-2 pr-lg-3">
+					<li class="nav-item pl-lg-1 pr-2 pr-lg-3 px-sm-3">
 						<a href="https://github.com/fairlearn/fairlearn" target="_blank">
 							<img class="img-fluid" src="./images/Github_Color.svg" alt="">
 						</a>
 					</li>
-					<li class="nav-item pl-lg-3 pr-2 pr-lg-3">
+					<li class="nav-item pl-lg-3 pr-2 pr-lg-3 pl-sm-3 pt-sm-1">
 						<p>#fairlearn</p>
 					</li>
 				</ul>
-				<ul class="navbar-nav text-right">
+				<ul class="navbar-nav d-flex flex-sm-row text-right">
 					<li class="nav-item pl-lg-3 pr-2 pr-lg-3">
 						<p>Copyright © 2021 Fairlearn Contributors</p>
 					</li>
