@@ -570,11 +570,19 @@ li.check-icon {
 	-webkit-font-smoothing: antialiased;
 }
 .footer-line {
-	width: 95%;
+	width: 90%;
 	height: 2px;
 	background-color: #3772CE;
 	opacity: 0.9;
 }
+.second-line {
+	width: 90%;
+	height: 2px;
+	background-color: #3772CE;
+	opacity: 0.9;
+}
+
+
 .copyright-text {
 	padding-top: 11px;
 	margin-bottom: 0px;
@@ -583,6 +591,12 @@ li.check-icon {
 .page-footer a:hover {
 	text-decoration: underline;
 	color: #ffffff;
+}
+
+@media (max-width: 768px) {
+	.footer-line .second-line {
+		display: none;
+	}
 }
 
 @media (min-width: 768px) {

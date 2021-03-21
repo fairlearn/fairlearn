@@ -68,14 +68,14 @@
 	<div class="container-fluid gradient masthead pt-5 mb-5 pb-3">
 	    <div class="container pt-lg-5 pb-lg-5 ">
 	      	<div class="row align-items-center justify-content-center">
-		        <div class="col-10 col-lg-10 order-lg-0">
+		        <div class="col-12 col-lg-10 order-lg-0">
 		        	<div class="row">
-		        		<div class="col-8">
+		        		<div class="col-12 col-lg-8">
 		          			<h1 class="text-left text-md-left pb-2">
 							Improve fairness<br>
 							of AI systems
 							</h1>
-							<h5 class="white text-left text-md-left pb-3">
+							<h5 class="white text-left text-md-left pb-3 d-none d-md-block">
 							Fairlearn is an open-source, community-driven project to help
 							data scientists improve fairness of AI systems.
 							Learn about AI fairness from our guides and use cases.
@@ -95,7 +95,7 @@
   		<div class="container">
   			<div class="row justify-content-lg-left pb-4">
 				<!-- Sociotechnical Aspect-->
-  				<div class="col-6 col-lg-6 pr-5 pl-5">
+  				<div class="col-12 col-lg-6 pr-5 pl-5">
   					<h6 class="text-left pl-3 pb-1">FAIRNESS IS SOCIOTECHNICAL</h2>
   					<p class="text-left pl-3 pb-1 mr-3 pr-4">
 						Fairness of AI systems is about more than simply running lines of code.
@@ -111,7 +111,7 @@
 					</p>
   				</div>
 				<!-- Use Case -->
-				<div class="col-6 col-lg-6 pl-3">
+				<div class="col-12 col-lg-6 pl-3">
 					<h6 class="text-left pl-3 pb-1">USE CASE&ensp;|&ensp;CREDIT-CARD DEFAULT MODELS</h6>
 					<h4 class="text-left pl-3 mr-5 pr-4 dark">Assessment and mitigation of fairness issues in credit-card default models</h4>
 					<p class="text-left pl-3 mr-5 pr-4">
@@ -122,7 +122,7 @@
 						In this scenario, fairness-related harms may arise when the model makes more mistakes for some groups of applicants compared to others.
 						In this use case example, we use Fairlearn to assess how different groups, defined in terms of their sex, are affected and how the observed disparities may be mitigated.
 					</p>
-					<div class="col-3 pt-2 col-lg-3">
+					<div class="col-10 pt-2 col-lg-4 d-flex justify-content-sm-center">
 						<a class="quickstart-btn mb-5 px-3 text-center" href="https://github.com/fairlearn/fairlearn/blob/main/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb">Jupyter Notebook</a>
 					</div>
 				</div>
@@ -133,12 +133,12 @@
 
 	<div class="container-fluid extra-white">
 		<div class="container">
-			<div class="row pt-5 ml-4">
-				<div class="col pr-4 ml-5">
-					<div class="footer-line"></div>
+			<div class="row pt-5 ml-lg-4">
+				<div class="col-12 col-lg-6">
+					<div class="footer-line mx-lg-5 d-none d-md-block"></div>
 				</div>
-				<div class="col pl-3 pr-4 ml-4">
-					<div class="footer-line"></div>
+				<div class="col-12 col-lg-6">
+					<div class="second-line mx-lg-5 d-none d-md-block"></div>
 				</div>
 			</div>
 		</div>
@@ -146,9 +146,9 @@
 
   	<!-- SECTION 3 -->
 	<div class="container-fluid section-3 ml-5 pb-5">
-		<div class="container">
+		<div class="container justify-content-sm-center">
 			<div class="row pb-5">
-		    <div class="col-6 col-lg-6 pr-5 text-left">
+		    <div class="col-12 col-lg-6 pr-5 text-left">
 		      <h3 class="pt-2 pb-2 pl-5 text-left dark">Get started with Fairlearn</h3>
 			    <p class="pl-5 pr-4 text-left">
 				    To get started, install the Fairlearn package.
@@ -160,21 +160,20 @@
 			    <p class="installation ml-1 pl-5 pr-4 pt-4 text-left">
 				    Fairlearn can be installed with pip from PyPI as follows
 			    </p>
-			    <div class="ml-5 pl-4 pr-1 py-2 text-dark bg-light text-left">
+			    <div class="col-8 col-lg-10 ml-5 pl-4 pr-1 py-2 text-dark bg-light text-left">
 						pip install fairlearn
 				</div>
-			    <div class="col-3 pt-4 pl-5 col-lg-3">
+			    <div class="col-10 pt-4 pl-5 col-lg-5 d-flex justify-content-sm-center">
 				    <a class="quickstart-btn mb-5 px-4" href=./v0.6.0/quickstart.html>Quickstart Guide</a>
 			    </div>
 		    </div>
 
-		    <div class="col-6 col-lg-6 pl-3">
-			   <h3 class="pt-2 pb-2 px-2 dark">Resources</h3>
-			   <div class="row justify-content-left">
-				   <div class="col-10 pl-3 ml-2">
+		    <div class="col-12 col-lg-6 pl-3">
+			   <div class="row justify-content-lg-left">
+					<h3 class="col-10 py-2 px-4 dark text-center text-lg-left">Resources</h3>
+				   <div class="col-10 pl-4">
 					<a href="./v0.6.0/user_guide/index.html" target="_blank">
 						<h4 class="text-center text-lg-left dark">
-								<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-1 pr-1" src="./images/Flask.svg">
 							User Guide
 						</h4>
 					</a>
@@ -183,7 +182,6 @@
 					</p>
 					<a href="./v0.6.0/api_reference/index.html" target="_blank">
 						<h4 class="text-center text-lg-left dark">
-								<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-1 pr-1" src="./images/Shield.svg">
 							API Documentation
 						</h4>
 					</a>
@@ -192,7 +190,6 @@
 					</p>
 					<a href="./v0.6.0/contributor_guide/index.html" target="_blank">
 						<h4 class="text-center text-lg-left dark">
-								<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-1 pr-1" src="./images/Person.svg">
 							Contributor Guide
 						</h4>
 					</a>
@@ -234,7 +231,7 @@
 						<div class="card h-100 benefit-card py-4 px-3">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Gitter_Color.svg">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Gitter_White.png">
-							<h6 class="dark pb-2 benefit-text">Gitter</h4>
+							<h6 class="dark py-1 benefit-text">Gitter</h6>
 							<p class="benefit-text">Join the community and ask usage questions.</p>
 						</div>
 					</a>
@@ -254,7 +251,7 @@
 						<div class="card h-100 benefit-card py-4 px-3">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Github_Color.svg">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Github_White.svg">
-							<h4 class="dark pb-2 benefit-text">GitHub</h4>
+							<h6 class="dark pb-2 benefit-text">GitHub</h6>
 							<p class="benefit-text card-tezt">Contribute code, documentation, use cases. Submit bug reports and feature requests.</p>
 						</div>
 					</a>
@@ -264,7 +261,7 @@
 						<div class="card h-100 benefit-card py-4 px-3">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Twitter_Color.svg">
 							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Twitter_White.svg">
-							<h4 class="dark pb-2 benefit-text">Twitter</h4>
+							<h6 class="dark pb-2 benefit-text">Twitter</h6>
 							<p class="benefit-text">Follow us for the latest updates.</p>
 						</div>
 					</a>
@@ -279,7 +276,7 @@
 		<div class="container">
 			<div class="row justify-content-lg-center">
 				<div class="col-12 col-lg-6 text-center">
-					<h2 class="white pt-5 pb-3">Contribute to Fairlearn</h2>
+					<h3 class="white pt-5 pb-3">Contribute to Fairlearn</h3>
 					<p class="white pb-3">
 						Fairlearn is built and maintained by open source contributors with a variety of backgrounds and expertise.
 						Join the effort and contribute feedback, metrics, algorithms, visualizations, ideas and more, so we can evolve the toolkit together!
