@@ -191,7 +191,7 @@ li {
 
 /****MASTHEAD****/
 .masthead {
-	height: 400px;
+	height: 100%;
 }
 .masthead-tabs {
 	border-radius: 20px;
