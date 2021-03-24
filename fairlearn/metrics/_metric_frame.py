@@ -29,6 +29,8 @@ _BAD_INIT_ERROR = """Non streaming metrics require data to process.
  Set streaming=True for streaming metrics"""
 _NON_EMPTY_INIT_ERR = "Streaming metrics must be initialized with empty lists."
 _EMPTY_BATCHES_ERR = "No data to process, please add batches with `add_data`."
+_CF_BAD_STATE_ERR = "MetricFrame expected `control_features=None`" \
+                    " because it was initialized as such."
 
 
 class MetricFrame:
@@ -157,7 +159,11 @@ class MetricFrame:
             self._compute_metric(y_t, y_p, sensitive_features, control_features, sample_params)
         else:
             # If we are streaming, we wait, but initialize accumulators.
-            assert y_true == [] and y_pred == [] and sensitive_features == [], _NON_EMPTY_INIT_ERR
+            accumulators = [y_true, y_pred, sensitive_features]
+            # CF must be None or an empty list.
+            cf_validated = control_features in (None, [])
+            if any(acc != [] for acc in accumulators) or not cf_validated:
+                raise ValueError(_NON_EMPTY_INIT_ERR)
             self._y_true = []
             self._y_pred = []
             self._overall = None
@@ -220,16 +226,23 @@ class MetricFrame:
         self._y_true.append(y_t)
         self._y_pred.append(y_p)
         self._s_f.append(sensitive_features)
-        if self._c_f:
+        if self._c_f is not None:
+            check_consistent_length(y_true, control_features)
             self._c_f.append(control_features)
+        elif control_features is not None:
+            raise ValueError(_CF_BAD_STATE_ERR)
 
-        if sample_params:
+        if sample_params is not None:
+            # All arrays should be of equal length
+            check_consistent_length(y_true, *sample_params.values())
             if self._s_p is None:
                 self._s_p = [sample_params]
             elif isinstance(self._s_p, list):
                 self._s_p.append(sample_params)
             else:
                 raise ValueError("MetricFrame was initialized with `sample_params` already set.")
+        elif isinstance(self._s_p, list):
+            raise ValueError("MetricFrame expected `sample_params` to be supplied.")
 
         # Reset metric
         self._overall = None
