@@ -107,6 +107,7 @@ html_theme = 'pydata_sphinx_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
+    "logo_link": "https://fairlearn.org",
     # TODO: fork the pydata-sphinx-theme to integrate these with logo
     "external_links": [
         {"name": "Gitter", "url": "https://gitter.im/fairlearn/community"},
