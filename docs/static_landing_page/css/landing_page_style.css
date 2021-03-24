@@ -447,11 +447,11 @@ li.check-icon {
 	border: 2px;
 }
 
-.benefit-text:hover {
-	text-decoration:none;
+.benefit-card:hover {
+	text-decoration: underline #2364d2;
 }
 
-.blue-card {
+.section-5 .blue-card {
 	background-color: #2364d2;
 }
 /****SECTION 5****/
