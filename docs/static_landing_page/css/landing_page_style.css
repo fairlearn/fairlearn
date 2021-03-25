@@ -20,8 +20,8 @@ body {
 	font-family: 'TT Commons Regular', Arial, sans-serif;
 	font-style: normal;
 	font-weight: normal;
-	font-size: 15px;
-	line-height: 18px;
+	font-size: 18px;
+	line-height: 22px;
 	color: #757575;
 	letter-spacing: 0.015em;
 	-moz-osx-font-smoothing: grayscale;
@@ -54,21 +54,26 @@ h3 {
 h5 {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
 	font-weight: 500;
-	font-size: 15px;
-	line-height: 18px;
+	font-size: 18px;
+	line-height: 22px;
 	color: #333333;
+}
+/* Labels */
+.benefit-card h5 {
+	font-size: 22px;
+	line-height: 26px;
 }
 /* TITLE */
 h6 {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
 	font-weight: 500;
-	font-size: 15px;
-	line-height: 18px;
+	font-size: 18px;
+	line-height: 22px;
 	color: #1F3598;
 }
 .card p, footer, footer p {
-	font-size: 15px;
-	line-height: 18px;
+	font-size: 18px;
+	line-height: 22px;
 }
 footer {
 	color: #333333;
@@ -90,8 +95,8 @@ li {
 	-webkit-font-smoothing: antialiased;
 }
 .code {
-	font-size: 12px;
-	line-height: 15px;
+	font-size: 18px;
+	line-height: 22px;
 }
 
 /****UNIVERSAL****/
@@ -146,7 +151,7 @@ li {
 }
 .navbar li {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
-	font-size: 15px;
+	font-size: 18px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
@@ -300,20 +305,20 @@ li {
 
 .quickstart-btn {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
-	font-size: 15px;
+	font-size: 18px;
 	display: inline-block;
 	color: #ffffff;
 	background-color: #2364D2;
-	padding: 14px 0px 10px 0px;
+	padding: 20px 0px 16px 0px;
 	margin: 0px 0px;
-	width: 170px;
+	width: 200px;
 	border-radius: 100px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
 
 .masthead .quickstart-btn {
-	width: 130px;
+	width: 155px;
 }
 
 .quickstart-btn:hover {
@@ -408,14 +413,14 @@ li.check-icon {
 /***SECTION 7****/
 .contribute-btn {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
-	font-size: 15px;
+	font-size: 18px;
 	display: inline-block;
 	color: #ffffff;
 	background-color: #ffffff;
 	color: #2364D2;
-	padding: 14px 0px 10px 0px;
+	padding: 20px 0px 16px 0px;
 	margin: 0px 9px;
-	width: 170px;
+	width: 200px;
 	border-radius: 100px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
