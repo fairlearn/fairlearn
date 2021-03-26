@@ -106,11 +106,11 @@ def test_binary_classification_with_the_uci_credit_card_default_dataset():
     nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
     test_values = {}
     test_values["Contains_Unmitigated"] = ScrapSpec(
-        "'Unmitigated' in model_sweep_dict",
+        "'Unmitigated' in models_dict",
         True
     )
     test_values["Contains_ThresholdOptimizer"] = ScrapSpec(
-        "'ThresholdOptimizer' in model_sweep_dict",
+        "'ThresholdOptimizer' in models_dict",
         True
     )
     assay_one_notebook(nb_name, test_values)
