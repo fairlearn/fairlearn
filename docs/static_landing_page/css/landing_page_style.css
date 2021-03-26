@@ -486,21 +486,3 @@ li.check-icon {
 	text-decoration: underline;
 	color: #ffffff;
 }
-
-@media (min-width: 768px) {
-	.section-1-cards .card {
-		box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.1);
-	}
-	.extra-gradient {
-		display: block;
-	}
-}
-
-@media (min-width: 992px) {
-}
-
-@media (min-width: 1200px) {
-	.container {
-		max-width: 1280px;
-	}
-}
