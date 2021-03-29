@@ -35,9 +35,9 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 .. doctest:: assessment_metrics
 
     >>> import sklearn.metrics as skm
-    >>> Y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
-    >>> Y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
-    >>> skm.recall_score(Y_true, Y_pred)
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
+    >>> skm.recall_score(y_true, y_pred)
     0.5
 
 Metrics with Grouping
@@ -61,10 +61,10 @@ the following set of labels:
     ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
     >>> pd.set_option('display.max_columns', 20)
     >>> pd.set_option('display.width', 80)
-    >>> pd.DataFrame({ 'Y_true': Y_true,
-    ...                'Y_pred': Y_pred,
+    >>> pd.DataFrame({ 'y_true': y_true,
+    ...                'y_pred': y_pred,
     ...                'group_membership_data': group_membership_data})
-        Y_true  Y_pred group_membership_data
+        y_true  y_pred group_membership_data
     0        0       0                     d
     1        1       0                     a
     2        1       1                     c
@@ -89,7 +89,7 @@ We then calculate a metric which shows the subgroups:
 
     >>> from fairlearn.metrics import MetricFrame
     >>> grouped_metric = MetricFrame(skm.recall_score, 
-    ...                              Y_true, Y_pred,
+    ...                              y_true, y_pred,
     ...                              sensitive_features=group_membership_data)
     >>> print("Overall recall = ", grouped_metric.overall)
     Overall recall =  0.5
@@ -122,19 +122,19 @@ metrics simultaneously:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> multi_metric = MetricFrame({'precision':skm.precision_score, 'recall':skm.recall_score},
-    ...                             Y_true, Y_pred,
+    ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
-    precision    0.555556
-    recall            0.5
+    precision    0.5555...
+    recall       0.5...
     dtype: object
     >>> multi_metric.by_group
-         precision recall
+                        precision recall
     sensitive_feature_0
-    a            0      0
-    b            1    0.5
-    c          0.6   0.75
-    d            0      0
+    a                         0.0   0.0
+    b                         1.0   0.5
+    c                         0.6   0.75
+    d                         0.0   0.0
 
 If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
@@ -145,17 +145,17 @@ in a dictionary via the ``sample_params`` argument.:
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(skm.recall_score,
-    ...                        Y_true, Y_pred,
+    ...                        y_true, y_pred,
     ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
     0.45
     >>> weighted.by_group
     SF 0
-    a               0
-    b             0.5
-    c        0.714286
-    d               0
+    a    0...
+    b    0.5...
+    c    0.7142...
+    d    0...
     Name: recall_score, dtype: object
 
 If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
@@ -172,16 +172,16 @@ function:
     >>> import functools
     >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
     >>> metric_beta = MetricFrame(fbeta_06,
-    ...                           Y_true, Y_pred,
+    ...                           y_true, y_pred,
     ...                           sensitive_features=group_membership_data)
     >>> metric_beta.overall
     0.5396825396825397
     >>> metric_beta.by_group
     sensitive_feature_0
-    a            0
-    b     0.790698
-    c      0.63354
-    d            0
+    a    0...
+    b    0.7906...
+    c    0.6335...
+    d    0...
     Name: metric, dtype: object
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
@@ -194,26 +194,205 @@ holds the intersections of these groups:
     >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
     ...                          columns=['SF 0', 'SF 1'])
     >>> metric_2sf = MetricFrame(skm.recall_score,
-    ...                          Y_true, Y_pred,
+    ...                          y_true, y_pred,
     ...                          sensitive_features=s_f_frame)
     >>> metric_2sf.overall  # Same as before
     0.5
     >>> metric_2sf.by_group
     SF 0  SF 1
-    a     6         0
+    a     6       0.0
           8       NaN
     b     6       0.5
           8       0.5
-    c     6         1
+    c     6       1.0
           8       0.5
-    d     6         0
-          8         0
+    d     6       0.0
+          8       0.0
     Name: recall_score, dtype: object
 
 With such a small number of samples, we are obviously running into cases where
 there are no members in a particular combination of sensitive features. In this
 case we see that the subgroup ``(a, 8)`` has a result of ``NaN``, indicating
 that there were no samples in it.
+
+.. _scalar_metric_results:
+
+Scalar Results from :code:`MetricFrame`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Higher level machine learning algorithms (such as hyperparameter tuners) often
+make use of metric functions to guide their optimisations.
+Such algorithms generally work with scalar results, so if we want the tuning
+to be done on the basis of our fairness metrics, we need to perform aggregations
+over the :class:`MetricFrame`.
+
+We provide a convenience function, :func:`fairlearn.metrics.make_derived_metric`,
+to generate scalar-producing metric functions based on the aggregation methods
+mentioned above (:meth:`MetricFrame.group_min`, :meth:`MetricFrame.group_max`,
+:meth:`MetricFrame.difference`, and :meth:`MetricFrame.ratio`).
+This takes an underlying metric function, the name of the desired transformation, and
+optionally a list of parameter names which should be treated as sample aligned parameters
+(such as `sample_weight`).
+Other parameters will be passed to the underlying metric function normally (unlike
+:class:`MetricFrame` where :func:`functools.partial` must be used, as noted above).
+The result is a function which builds the :class:`MetricFrame` internally and performs
+the requested aggregation. For example:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import make_derived_metric
+    >>> fbeta_difference = make_derived_metric(metric=skm.fbeta_score,
+    ...                                        transform='difference')
+    >>> # Don't need functools.partial for make_derived_metric
+    >>> fbeta_difference(y_true, y_pred, beta=0.7,
+    ...                  sensitive_features=group_membership_data)
+    0.752525...
+    >>> # But as noted above, functools.partial is needed for MetricFrame
+    >>> fbeta_07 = functools.partial(skm.fbeta_score, beta=0.7)
+    >>> MetricFrame(fbeta_07,
+    ...             y_true, y_pred,
+    ...             sensitive_features=group_membership_data).difference()
+    0.752525...
+
+We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
+of such functions which will be commonly used:
+
+=============================================== ================= ================= ================== =============
+Base metric                                     :code:`group_min` :code:`group_max` :code:`difference` :code:`ratio`
+=============================================== ================= ================= ================== =============
+:func:`.false_negative_rate`                    .                 .                 Y                  Y
+:func:`.false_positive_rate`                    .                 .                 Y                  Y
+:func:`.selection_rate`                         .                 .                 Y                  Y
+:func:`.true_negative_rate`                     .                 .                 Y                  Y
+:func:`.true_positive_rate`                     .                 .                 Y                  Y
+:func:`sklearn.metrics.accuracy_score`          Y                 .                 Y                  Y
+:func:`sklearn.metrics.balanced_accuracy_score` Y                 .                 .                  .
+:func:`sklearn.metrics.f1_score`                Y                 .                 .                  .
+:func:`sklearn.metrics.log_loss`                .                 Y                 .                  .
+:func:`sklearn.metrics.mean_absolute_error`     .                 Y                 .                  .
+:func:`sklearn.metrics.mean_squared_error`      .                 Y                 .                  .
+:func:`sklearn.metrics.precision_score`         Y                 .                 .                  .
+:func:`sklearn.metrics.r2_score`                Y                 .                 .                  .
+:func:`sklearn.metrics.recall_score`            Y                 .                 .                  .
+:func:`sklearn.metrics.roc_auc_score`           Y                 .                 .                  .
+:func:`sklearn.metrics.zero_one_loss`           .                 Y                 Y                  Y
+=============================================== ================= ================= ================== =============
+
+The names of the generated functions are of the form
+:code:`fairlearn.metrics.<base_metric>_<transformation>`.
+For example :code:`fairlearn.metrics.accuracy_score_difference` and
+:code:`fairlearn.metrics.precision_score_group_min`.
+
+.. _control_features_metrics:
+
+Control features for grouped metrics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Control features (sometimes called 'conditional' features) enable more detailed
+fairness insights by providing a further means of splitting the data into
+subgroups.
+When the data are split into subgroups, control features (if provided) act
+similarly to sensitive features.
+However, the 'overall' value for the metric is now computed for each subgroup
+of the control feature(s).
+Similarly, the aggregation functions (such as :code:`MetricFrame.group_max`) are
+performed for each subgroup in the conditional feature(s), rather than across
+them (as happens with the sensitive features).
+
+Control features are useful for cases where there is some expected variation with
+a feature, so we need to compute disparities while controlling for that feature.
+For example, in a loan scenario we would expect people of differing incomes to
+be approved at different rates, but within each income band we would still
+want to measure disparities between different sensitive features. However, it
+should be borne in mind that due to historic discrimination, the income band
+might be correlated with various sensitive features. Because of this, control
+features should be used with particular caution.
+
+The :class:`MetricFrame` constructor allows us to specify control features in
+a manner similar to sensitive features, using a :code:`conditional_features=`
+parameter:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> decision = [
+    ...    0,0,0,1,1,0,1,1,0,1,
+    ...    0,1,0,1,0,1,0,1,0,1,
+    ...    0,1,1,0,1,1,1,1,1,0
+    ... ]
+    >>> prediction = [
+    ...    1,1,0,1,1,0,1,0,1,0,
+    ...    1,0,1,0,1,1,1,0,0,0,
+    ...    1,1,1,0,0,1,1,0,0,1
+    ... ]
+    >>> control_feature = [
+    ...    'H','L','H','L','H','L','L','H','H','L',
+    ...    'L','H','H','L','L','H','L','L','H','H',
+    ...    'L','H','L','L','H','H','L','L','H','L'
+    ... ]
+    >>> sensitive_feature = [
+    ...    'A','B','B','C','C','B','A','A','B','A',
+    ...    'C','B','C','A','C','C','B','B','C','A',
+    ...    'B','B','C','A','B','A','B','B','A','A'
+    ... ]
+    >>> metric_c_f = MetricFrame(skm.accuracy_score,
+    ...                          decision, prediction,
+    ...                          sensitive_features={'SF' : sensitive_feature},
+    ...                          control_features={'CF' : control_feature})
+    >>> # The 'overall' property is now split based on the control feature
+    >>> metric_c_f.overall
+    CF
+    H    0.4285...
+    L    0.375...
+    Name: accuracy_score, dtype: object
+    >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
+    >>> metric_c_f.by_group
+    CF  SF
+    H   A     0.2...
+        B     0.4...
+        C     0.75...
+    L   A     0.4...
+        B     0.2857...
+        C     0.5...
+    Name: accuracy_score, dtype: object
+
+Note how the :attr:`MetricFrame.overall` property is stratified based on the
+supplied control feature. The :attr:`MetricFrame.by_group` property allows
+us to see disparities between the groups in the sensitive feature for each
+group in the control feature.
+When displayed like this, :attr:`MetricFrame.by_group` looks similar to
+how it would if we had specified two sensitive features (although the
+control features will always be at the top level of the hierarchy).
+
+With the :class:`MetricFrame` computed, we can perform aggregations:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> # See the maximum accuracy for each value of the control feature
+    >>> metric_c_f.group_max()
+    CF
+    H    0.75
+    L    0.50
+    Name: accuracy_score, dtype: float64
+    >>> # See the maximum difference in accuracy for each value of the control feature
+    >>> metric_c_f.difference(method='between_groups')
+    CF
+    H    0.55...
+    L    0.2142...
+    Name: accuracy_score, dtype: float64
+
+In each case, rather than a single scalar, we receive one result for each
+subgroup identified by the conditional feature. The call
+:code:`metric_c_f.group_max()` call shows the maximum value of the metric across
+the subgroups of the sensitive feature within each value of the control feature.
+Similarly, :code:`metric_c_f.difference(method='between_groups')` call shows the
+maximum difference between the subgroups of the sensitive feature within
+each value of the control feature.
+For more examples, please
+see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
+:ref:`examples`.
 
 
 .. _dashboard:
@@ -228,12 +407,12 @@ metrics.
 
 .. note::
 
-    The :code:`FairlearnDashboard` has moved from Fairlearn to the
-    :code:`raiwidgets` package after the v0.5.0 release.
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn.
     For more information on how to use it refer to
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
-    Fairlearn now provides some of the existing functionality through
-    :code:`matplotlib`-based visualizations.
+    Fairlearn will provide some of the existing functionality
+    through :code:`matplotlib`-based visualizations.
 
 
 Matplotlib-based visualizations

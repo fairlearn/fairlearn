@@ -13,7 +13,7 @@ class FairlearnDashboard(object):
             y_true, y_pred,
             sensitive_feature_names=None):
         warn("The FairlearnDashboard has moved from Fairlearn to the "
-             "raiwidgets package after the v0.5.0 release. "
+             "raiwidgets package. "
              "For more information on how to use it refer to "
              "https://github.com/microsoft/responsible-ai-widgets. "
              "Instead, Fairlearn now provides some of the existing "

@@ -1,14 +1,14 @@
 Development process
 -------------------
 
-Development happens against the :code:`master` branch following the
+Development happens against the :code:`main` branch following the
 `GitHub flow model <https://guides.github.com/introduction/flow/>`_.
 Contributors should use their own forks of the repository. In their fork, they
-create feature branches off of :code:`master`, and their pull requests should
-target the :code:`master` branch. Maintainers are responsible for prompt
+create feature branches off of :code:`main`, and their pull requests should
+target the :code:`main` branch. Maintainers are responsible for prompt
 review of pull requests.
 
-Pull requests against :code:`master` trigger automated tests that are run
+Pull requests against :code:`main` trigger automated tests that are run
 through Azure DevOps, GitHub Actions, and CircleCI. Additional test suites are
 run periodically. When adding new code paths or features, tests are a
 requirement to complete a pull request. They should be added in the
@@ -136,30 +136,30 @@ command
 Note that the Fairlearn dashboard is built using nodejs and requires
 additional steps. To build the Fairlearn dashboard after making changes to it,
 `install Yarn <https://yarnpkg.com/lang/en/docs/install>`_, and then run the
-`widget build script <https://github.com/fairlearn/fairlearn/tree/master/scripts/build_widget.py>`_.
+`widget build script <https://github.com/fairlearn/fairlearn/tree/main/scripts/build_widget.py>`_.
 
 The Requirements Files
 """"""""""""""""""""""
 
 The prerequisites for Fairlearn are split between three separate files:
 
-    -  `requirements.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements.txt>`_
+    -  `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
        contains the prerequisites for the core Fairlearn package
 
-    -  `requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-customplots.txt>`_
+    -  `requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-customplots.txt>`_
        contains additional prerequisites for the :code:`[customplots]` extension for Fairlearn
 
-    -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-dev.txt>`_ contains
+    -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_ contains
        the prerequisites for Fairlearn development (such as flake8 and pytest)
 
-The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements.txt>`_
+The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
 and
-`requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/master/requirements-customplots.txt>`_
+`requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-customplots.txt>`_
 files are consumed
-by `setup.py <https://github.com/fairlearn/fairlearn/blob/master/setup.py>`_ to specify the dependencies to be
+by `setup.py <https://github.com/fairlearn/fairlearn/blob/main/setup.py>`_ to specify the dependencies to be
 documented in the wheel files.
 To help simplify installation of the prerequisites, we have the
-`install_requirements.py <https://github.com/fairlearn/fairlearn/blob/master/scripts/install_requirements.py>`_
+`install_requirements.py <https://github.com/fairlearn/fairlearn/blob/main/scripts/install_requirements.py>`_
 script which runs :code:`pip install` on all three of the above files.
 This script will also optionally pin the requirements to any lower bound specified (by changing any
 occurrences of :code:`>=` to :code:`==` in each file).
@@ -220,7 +220,7 @@ you encounter any problems.
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For every pull request to :code:`master` with automated tests, you can check
+For every pull request to :code:`main` with automated tests, you can check
 the logs of the tests to find the root cause of failures. Our tests currently
 run through Azure Pipelines with steps for setup, testing, and teardown. The
 :code:`Checks` tab of a pull request contains a link to the

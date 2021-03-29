@@ -51,17 +51,21 @@ Metrics with Multiple Features
 # and manufacture credit score bands and loan sizes from other columns.
 # We start with some uncontroversial `import` statements:
 
-from fairlearn.metrics import MetricFrame
-from fairlearn.metrics import selection_rate
 import functools
-import sklearn.metrics as skm
 import numpy as np
-import pandas as pd
 
+import sklearn.metrics as skm
+from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_openml
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import make_column_selector as selector
+from sklearn.pipeline import Pipeline
+
+from fairlearn.metrics import MetricFrame
+from fairlearn.metrics import selection_rate
 
 
 # %%
@@ -69,7 +73,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
-Y = (data.target == '>50K') * 1
+y = (data.target == '>50K') * 1
 
 # %%
 # For purposes of clarity, we consolidate the 'race' column to have
@@ -84,7 +88,7 @@ def race_transform(input_str):
     return result
 
 
-X_raw['race'] = X_raw['race'].map(race_transform).fillna('Other')
+X_raw['race'] = X_raw['race'].map(race_transform).fillna('Other').astype('category')
 print(np.unique(X_raw['race']))
 
 # %%
@@ -123,37 +127,80 @@ A['Loan Size'] = col_loan_size
 A
 
 # %%
-# With the data imported, we perform some standard processing, and a test/train split:
-le = LabelEncoder()
-Y = le.fit_transform(Y)
+# Now that we have imported our dataset and manufactured a few features, we
+# can perform some more conventional processing. To avoid the problem of
+# `data leakage <https://en.wikipedia.org/wiki/Leakage_(machine_learning)>`_,
+# we need to split the data into training and test sets before applying
+# any transforms or scaling:
 
-le = LabelEncoder()
 
-sc = StandardScaler()
-X_dummies = pd.get_dummies(X_raw)
-X_scaled = sc.fit_transform(X_dummies)
-X_scaled = pd.DataFrame(X_scaled, columns=X_dummies.columns)
+(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+    X_raw, y, A, test_size=0.3, random_state=54321, stratify=y
+)
 
-X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(X_scaled, Y, A,
-                                                                     test_size=0.3,
-                                                                     random_state=12345,
-                                                                     stratify=Y)
+# Ensure indices are aligned between X, y and A,
+# after all the slicing and splitting of DataFrames
+# and Series
 
-# Ensure indices are aligned
 X_train = X_train.reset_index(drop=True)
 X_test = X_test.reset_index(drop=True)
+y_train = y_train.reset_index(drop=True)
+y_test = y_test.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
 
 # %%
-# Finally, we train a simple model on the data, and generate
-# some predictions:
+# Next, we build two :class:`~sklearn.pipeline.Pipeline` objects
+# to process the columns, one for numeric data, and the other
+# for categorical data. Both impute missing values; the difference
+# is whether the data are scaled (numeric columns) or
+# one-hot encoded (categorical columns). Imputation of missing
+# values should generally be done with care, since it could
+# potentially introduce biases. Of course, removing rows with
+# missing data could also cause trouble, if particular subgroups
+# have poorer data quality.
 
+numeric_transformer = Pipeline(
+    steps=[
+        ("impute", SimpleImputer()),
+        ("scaler", StandardScaler()),
+    ]
+)
+categorical_transformer = Pipeline(
+    [
+        ("impute", SimpleImputer(strategy="most_frequent")),
+        ("ohe", OneHotEncoder(handle_unknown="ignore")),
+    ]
+)
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", numeric_transformer, selector(dtype_exclude="category")),
+        ("cat", categorical_transformer, selector(dtype_include="category")),
+    ]
+)
 
-unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
-unmitigated_predictor.fit(X_train, Y_train)
+# %%
+# With our preprocessor defined, we can now build a
+# new pipeline which includes an Estimator:
 
-Y_pred = unmitigated_predictor.predict(X_test)
+unmitigated_predictor = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        (
+            "classifier",
+            LogisticRegression(solver="liblinear", fit_intercept=True),
+        ),
+    ]
+)
+
+# %%
+# With the pipeline fully defined, we can first train it
+# with the training data, and then generate predictions
+# from the test data.
+
+unmitigated_predictor.fit(X_train, y_train)
+y_pred = unmitigated_predictor.predict(X_test)
+
 
 # %%
 # Analysing the Model with Metrics
@@ -162,8 +209,8 @@ Y_pred = unmitigated_predictor.predict(X_test)
 # After our data manipulations and model training, we have the following
 # from our test set:
 #
-# - A vector of true values called ``Y_test``
-# - A vector of model predictions called ``Y_pred``
+# - A vector of true values called ``y_test``
+# - A vector of model predictions called ``y_pred``
 # - A DataFrame of categorical features relevant to fairness called ``A_test``
 #
 # In a traditional model analysis, we would now look at some metrics
@@ -173,8 +220,8 @@ Y_pred = unmitigated_predictor.predict(X_test)
 # ``beta=0.6``).
 # We can evaluate these metrics directly:
 
-print("Selection Rate:", selection_rate(Y_test, Y_pred))
-print("fbeta:", skm.fbeta_score(Y_test, Y_pred, beta=0.6))
+print("Selection Rate:", selection_rate(y_test, y_pred))
+print("fbeta:", skm.fbeta_score(y_test, y_pred, beta=0.6))
 
 # %%
 # We know that there are sensitive features in our data, and we want to
@@ -189,7 +236,7 @@ fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06}
 
 grouped_on_sex = MetricFrame(metric_fns,
-                             Y_test, Y_pred,
+                             y_test, y_pred,
                              sensitive_features=A_test['sex'])
 
 # %%
@@ -215,8 +262,8 @@ grouped_on_sex = MetricFrame(metric_fns,
 # the metrics evaluated on the entire dataset. We see that this contains the
 # same values calculated above:
 
-assert grouped_on_sex.overall['selection_rate'] == selection_rate(Y_test, Y_pred)
-assert grouped_on_sex.overall['fbeta_06'] == skm.fbeta_score(Y_test, Y_pred, beta=0.6)
+assert grouped_on_sex.overall['selection_rate'] == selection_rate(y_test, y_pred)
+assert grouped_on_sex.overall['fbeta_06'] == skm.fbeta_score(y_test, y_pred, beta=0.6)
 print(grouped_on_sex.overall)
 
 # %%
@@ -235,7 +282,7 @@ grouped_on_sex.by_group
 # using race as the sensitive feature:
 
 grouped_on_race = MetricFrame(metric_fns,
-                              Y_test, Y_pred,
+                              y_test, y_pred,
                               sensitive_features=A_test['race'])
 
 # %%
@@ -270,7 +317,7 @@ grouped_on_race.by_group
 # argument of the constructor. Let us generate some random weights, and
 # pass these along:
 
-random_weights = np.random.rand(len(Y_test))
+random_weights = np.random.rand(len(y_test))
 
 example_sample_params = {
     'selection_rate': {'sample_weight': random_weights},
@@ -279,16 +326,16 @@ example_sample_params = {
 
 
 grouped_with_weights = MetricFrame(metric_fns,
-                                   Y_test, Y_pred,
+                                   y_test, y_pred,
                                    sensitive_features=A_test['sex'],
                                    sample_params=example_sample_params)
 
 # %%
 # We can inspect the overall values, and check they are as expected:
 assert grouped_with_weights.overall['selection_rate'] == \
-    selection_rate(Y_test, Y_pred, sample_weight=random_weights)
+    selection_rate(y_test, y_pred, sample_weight=random_weights)
 assert grouped_with_weights.overall['fbeta_06'] == \
-    skm.fbeta_score(Y_test, Y_pred, beta=0.6, sample_weight=random_weights)
+    skm.fbeta_score(y_test, y_pred, beta=0.6, sample_weight=random_weights)
 print(grouped_with_weights.overall)
 
 # %%
@@ -357,7 +404,7 @@ grouped_on_race.ratio(method='to_overall')
 # constructor:
 
 grouped_on_race_and_sex = MetricFrame(metric_fns,
-                                      Y_test, Y_pred,
+                                      y_test, y_pred,
                                       sensitive_features=A_test[['race', 'sex']])
 
 # %%
@@ -396,7 +443,7 @@ grouped_on_race_and_sex.ratio(method='between_groups')
 # Control features are introduced by the ``control_features=``
 # argument to the :class:`fairlearn.metrics.MetricFrame` object:
 cond_credit_score = MetricFrame(metric_fns,
-                                Y_test, Y_pred,
+                                y_test, y_pred,
                                 sensitive_features=A_test[['race', 'sex']],
                                 control_features=A_test['Credit Score'])
 
@@ -426,7 +473,7 @@ cond_credit_score.ratio(method='between_groups')
 #
 # We can continue adding more control features:
 cond_both = MetricFrame(metric_fns,
-                        Y_test, Y_pred,
+                        y_test, y_pred,
                         sensitive_features=A_test[['race', 'sex']],
                         control_features=A_test[['Loan Size', 'Credit Score']])
 
@@ -450,7 +497,7 @@ def member_counts(y_true, y_pred):
 
 
 counts = MetricFrame(member_counts,
-                     Y_test, Y_pred,
+                     y_test, y_pred,
                      sensitive_features=A_test[['race', 'sex']],
                      control_features=A_test[['Loan Size', 'Credit Score']])
 
