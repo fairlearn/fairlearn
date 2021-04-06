@@ -34,8 +34,9 @@ _DASHBOARD_DICTIONARY = 'dashboardDictionary'
 _VERSION = 'schemaVersion'
 
 BINARY_CLASSIFICATION = 'binary_classification'
+PROBABILITY = 'probability'
 REGRESSION = 'regression'
-_allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
+_allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, PROBABILITY, REGRESSION])
 
 # The following keys need to match those of _metric_methods in
 # _fairlearn_dashboard.py
@@ -80,12 +81,12 @@ REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR] = _root_mean_squared_error
 REGRESSION_METRICS[R2_SCORE] = skm.r2_score
 
 PROBABILITY_METRICS = {}
+PROBABILITY_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR] = _balanced_root_mean_squared_error
+PROBABILITY_METRICS[LOG_LOSS] = skm.log_loss
+PROBABILITY_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
+PROBABILITY_METRICS[MEAN_SQUARED_ERROR] = skm.mean_squared_error
 PROBABILITY_METRICS[ROC_AUC_SCORE] = skm.roc_auc_score
 PROBABILITY_METRICS[ROOT_MEAN_SQUARED_ERROR] = _root_mean_squared_error
-PROBABILITY_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR] = _balanced_root_mean_squared_error
-PROBABILITY_METRICS[MEAN_SQUARED_ERROR] = skm.mean_squared_error
-PROBABILITY_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
-PROBABILITY_METRICS[LOG_LOSS] = skm.log_loss
 
 
 def _process_sensitive_features(sensitive_features):
