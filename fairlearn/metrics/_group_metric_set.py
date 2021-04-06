@@ -27,6 +27,7 @@ _BIN_LABELS = 'binLabels'
 _FEATURE_BIN_NAME = 'featureBinName'
 _PREDICTION_TYPE = 'predictionType'
 _PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
+_PREDICTION_PROBABILITY = 'probability'
 _PREDICTION_REGRESSION = 'regression'
 _MODEL_NAMES = 'modelNames'
 _SCHEMA = 'schemaType'
@@ -143,6 +144,9 @@ def _create_group_metric_set(y_true,
     elif prediction_type == REGRESSION:
         result[_PREDICTION_TYPE] = _PREDICTION_REGRESSION
         function_dict = REGRESSION_METRICS
+    elif prediction_type == PROBABILITY:
+        result[_PREDICTION_TYPE] = _PREDICTION_PROBABILITY
+        function_dict = PROBABILITY_METRICS
     else:
         raise NotImplementedError(
             "No support yet for {0}".format(prediction_type))
