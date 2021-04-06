@@ -126,6 +126,13 @@ class UtilityParity(ClassificationMoment):
 
         .. math::
             utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+        
+        References
+        ----------
+        .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+           and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+           [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+                       
         """
         super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
@@ -227,6 +234,13 @@ class UtilityParity(ClassificationMoment):
         ----------
         lambda_vec : :class:`pandas:pandas.Series`
             The vector of Lagrange multipliers indexed by `index`
+                
+        References
+        ----------
+        .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+           and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+           [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+           
         """
         lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
             self.prob_event
@@ -272,8 +286,15 @@ class DemographicParity(UtilityParity):
 
     .. math::
       P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
+        
+     References
+     ----------
+     .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+        and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+        [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+           
     """
-
+           
     short_name = "DemographicParity"
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
@@ -369,6 +390,13 @@ class FalsePositiveRateParity(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+      
+    References
+    ----------
+    .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+       and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+       [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+           
     """
 
     short_name = "FalsePositiveRateParity"
@@ -414,6 +442,13 @@ class EqualizedOdds(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+      
+    References
+    ----------
+    .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+       and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+       [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+           
     """
 
     short_name = "EqualizedOdds"
@@ -454,6 +489,13 @@ class ErrorRateParity(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+      
+    References
+    ----------
+    .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+       and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+       [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+           
     """
 
     short_name = "ErrorRateParity"
