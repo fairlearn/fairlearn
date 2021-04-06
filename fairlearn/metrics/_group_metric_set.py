@@ -10,7 +10,6 @@ from ._extra_metrics import (_balanced_root_mean_squared_error,
                              _root_mean_squared_error,
                              false_negative_rate,
                              false_positive_rate,
-                             mean_prediction,
                              selection_rate,
                              true_negative_rate)
 from ._metric_frame import MetricFrame
