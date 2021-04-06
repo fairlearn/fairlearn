@@ -214,8 +214,8 @@ class TestCreateGroupMetricSet:
         assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])
 
     def test_regression_prediction_type(self):
-        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
-        y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        y_t = [0, 1, 1, 0, 1, 1, 1.5, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [1, 1, 1, 0, 1, 1, 1.5, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
         s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
 
         predictions = {"some model": y_p}
