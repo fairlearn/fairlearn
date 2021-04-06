@@ -10,6 +10,7 @@ from ._extra_metrics import (_balanced_root_mean_squared_error,
                              _root_mean_squared_error,
                              false_negative_rate,
                              false_positive_rate,
+                             mean_prediction,
                              selection_rate,
                              true_negative_rate)
 from ._metric_frame import MetricFrame
@@ -76,6 +77,7 @@ BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE] = true_negative_rate
 
 REGRESSION_METRICS = {}
 REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
+REGRESSION_METRICS[MEAN_PREDICTION] = mean_prediction
 REGRESSION_METRICS[MEAN_SQUARED_ERROR] = skm.mean_squared_error
 REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR] = _root_mean_squared_error
 REGRESSION_METRICS[R2_SCORE] = skm.r2_score
@@ -84,7 +86,10 @@ PROBABILITY_METRICS = {}
 PROBABILITY_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR] = _balanced_root_mean_squared_error
 PROBABILITY_METRICS[LOG_LOSS] = skm.log_loss
 PROBABILITY_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
+PROBABILITY_METRICS[MEAN_OVERPREDICTION] = _mean_overprediction
+PROBABILITY_METRICS[MEAN_PREDICTION] = mean_prediction
 PROBABILITY_METRICS[MEAN_SQUARED_ERROR] = skm.mean_squared_error
+PROBABILITY_METRICS[MEAN_UNDERPREDICTION] = _mean_underprediction
 PROBABILITY_METRICS[ROC_AUC_SCORE] = skm.roc_auc_score
 PROBABILITY_METRICS[ROOT_MEAN_SQUARED_ERROR] = _root_mean_squared_error
 

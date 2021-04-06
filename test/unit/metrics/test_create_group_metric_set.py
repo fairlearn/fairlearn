@@ -228,7 +228,7 @@ class TestCreateGroupMetricSet:
                                           sensitive_feature,
                                           'regression')
         assert result['predictionType'] == 'regression'
-        assert len(result['precomputedMetrics'][0][0]) == 4
+        assert len(result['precomputedMetrics'][0][0]) == 5
 
     def test_probability_prediction_type(self):
         # For probability, y_p can have real values [0, 1]
@@ -245,4 +245,4 @@ class TestCreateGroupMetricSet:
                                           sensitive_feature,
                                           'probability')
         assert result['predictionType'] == 'probability'
-        assert len(result['precomputedMetrics'][0][0]) == 6
+        assert len(result['precomputedMetrics'][0][0]) == 9
