@@ -16,7 +16,7 @@ from fairlearn.reductions._moments import ClassificationMoment
 logger = logging.getLogger(__name__)
 
 
-class _h:
+class _FlatteningPredictor:
     def __init__(self, classifier):
         self._classifier = classifier
 
@@ -199,7 +199,7 @@ class _Lagrangian:
         """
         classifier = self._call_oracle(lambda_vec)
 
-        h = _h(classifier)
+        h = _FlatteningPredictor(classifier)
 
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
