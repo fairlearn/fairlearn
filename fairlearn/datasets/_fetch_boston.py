@@ -105,9 +105,12 @@ def fetch_boston(*, cache=True, data_home=None,
 
     References
     ----------
-    https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8
-    https://github.com/scikit-learn/scikit-learn/issues/16155
+    .. [1] M. Carlisle, “racist data destruction?,” Medium, 13-Jun-2019. [Online].
+       Available: https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8. [Accessed: 07-Apr-2021].
 
+    .. [2] J. Sykes, “- B 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town · Issue #16155 · scikit-learn/scikit-learn,”
+       GitHub, 18-Jan-2020. [Online]. Available: https://github.com/scikit-learn/scikit-learn/issues/16155. [Accessed: 07-Apr-2021].
+       
     """
     if warn:
         msg = "You are about to use a dataset with known fairness issues."

@@ -72,6 +72,11 @@ def fetch_adult(*, cache=True, data_home=None,
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
         if ``return_X_y`` is True and ``as_frame`` is True
 
+    References
+    ----------
+    .. [1] R. Kohavi and B. Becker, UCI Machine Learning Repository: Adult Data Set,
+       01-May-1996. [Online]. Available: https://archive.ics.uci.edu/ml/datasets/adult. [Accessed: 07-Apr-2021].
+
     """
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME

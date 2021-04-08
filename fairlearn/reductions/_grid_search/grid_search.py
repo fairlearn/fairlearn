@@ -62,6 +62,13 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     sample_weight_name : str
         Name of the argument to `estimator.fit()` which supplies the sample weights
         (defaults to `sample_weight`)
+        
+    References
+    ----------
+    .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+       and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+       [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+
     """
 
     def __init__(self,

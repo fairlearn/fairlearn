@@ -7,6 +7,12 @@ This is based on M. Hardt, E. Price, N. Srebro's paper
 "`Equality of Opportunity in Supervised Learning
 <https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
 classification with one categorical sensitive feature.
+
+References
+----------
+.. [1] M. Hardt, E. Price, and N. Srebro, “Equality of Opportunity in Supervised Learning,” arXiv.org, 07-Oct-2016.
+   [Online]. Available: https://arxiv.org/abs/1610.02413. [Accessed: 05-Apr-2021]. 
+
 """
 
 import logging
@@ -148,6 +154,12 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     -----
     The procedure is based on the algorithm of
     `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_.
+
+    References
+    ----------
+    .. [1] M. Hardt, E. Price, and N. Srebro, “Equality of Opportunity in Supervised Learning,” arXiv.org, 07-Oct-2016.
+       [Online]. Available: https://arxiv.org/abs/1610.02413. [Accessed: 05-Apr-2021]. 
+
     """
 
     def __init__(self, *, estimator=None,

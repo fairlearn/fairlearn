@@ -126,13 +126,21 @@ class UtilityParity(ClassificationMoment):
 
         .. math::
             utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+<<<<<<< Updated upstream
         
+=======
+
+>>>>>>> Stashed changes
         References
         ----------
         .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
            and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
            [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+<<<<<<< Updated upstream
                        
+=======
+
+>>>>>>> Stashed changes
         """
         super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
@@ -234,13 +242,21 @@ class UtilityParity(ClassificationMoment):
         ----------
         lambda_vec : :class:`pandas:pandas.Series`
             The vector of Lagrange multipliers indexed by `index`
+<<<<<<< Updated upstream
                 
+=======
+
+>>>>>>> Stashed changes
         References
         ----------
         .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
            and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
            [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+<<<<<<< Updated upstream
            
+=======
+
+>>>>>>> Stashed changes
         """
         lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
             self.prob_event
@@ -286,6 +302,7 @@ class DemographicParity(UtilityParity):
 
     .. math::
       P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
+<<<<<<< Updated upstream
         
      References
      ----------
@@ -293,6 +310,15 @@ class DemographicParity(UtilityParity):
         and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
         [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
            
+=======
+    
+    References
+    ----------
+    .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+       and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
+       [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+
+>>>>>>> Stashed changes
     """
            
     short_name = "DemographicParity"
@@ -390,13 +416,21 @@ class FalsePositiveRateParity(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+<<<<<<< Updated upstream
       
+=======
+
+>>>>>>> Stashed changes
     References
     ----------
     .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
        and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
        [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+<<<<<<< Updated upstream
            
+=======
+
+>>>>>>> Stashed changes
     """
 
     short_name = "FalsePositiveRateParity"
@@ -442,13 +476,21 @@ class EqualizedOdds(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+<<<<<<< Updated upstream
       
+=======
+
+>>>>>>> Stashed changes
     References
     ----------
     .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
        and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
        [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+<<<<<<< Updated upstream
            
+=======
+
+>>>>>>> Stashed changes
     """
 
     short_name = "EqualizedOdds"
@@ -489,13 +531,20 @@ class ErrorRateParity(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+<<<<<<< Updated upstream
       
+=======
+
+>>>>>>> Stashed changes
     References
     ----------
     .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
        and H. Wallach, “A Reductions Approach to Fair Classification,” arXiv.org, 16-Jul-2018.
        [Online]. Available: https://arxiv.org/abs/1803.02453. [Accessed: 05-Apr-2021].
+<<<<<<< Updated upstream
            
+=======
+>>>>>>> Stashed changes
     """
 
     short_name = "ErrorRateParity"
