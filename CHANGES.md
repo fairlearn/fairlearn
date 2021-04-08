@@ -2,6 +2,9 @@
 
 ### v0.6.1
 
+* Bugfix for `_create_group_metric_set()`. Fixes the list of metrics computed for regression
+  and adds a set of metrics for 'probability' problems
+
 ### v0.6.0
 
 * Add `CorrelationRemover` preprocessing technique. This removes correlations
