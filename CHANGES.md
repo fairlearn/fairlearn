@@ -4,6 +4,9 @@
 
 * Bugfix for `_create_group_metric_set()`. Fixes the list of metrics computed for regression
   and adds a set of metrics for 'probability' problems
+* Updated 'Credit Card' notebook
+* Added some overlooked `MetricFrame` tests
+* Various documentation tweaks and enhancements
 
 ### v0.6.0
 
