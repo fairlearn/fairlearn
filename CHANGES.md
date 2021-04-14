@@ -54,7 +54,7 @@
     descriptive name and for consistency with the paper. Similarly,
     `AverageLossMoment` renamed to `MeanLoss`.
   For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.org/user_guide/mitigation.html#reductions).
+  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
 * Added `TrueNegativeRateParity` to provide the opposite constraint of
   `TruePositiveRateParity` to be used with reductions techniques.
 * Add new constraints and objectives in `ThresholdOptimizer`
