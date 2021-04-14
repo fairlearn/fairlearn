@@ -122,7 +122,7 @@ class TestTwoFeatures():
     def test_2d_array(self):
         a, b, y_true = self._get_raw_data()
         # Specify dtype to avoid unwanted string conversion
-        rf = np.asarray([a, b], dtype=np.object).transpose()
+        rf = np.asarray([a, b], dtype=object).transpose()
 
         target = _get_raw_MetricFrame()
         result = target._process_features('CF', rf, y_true)
