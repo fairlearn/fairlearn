@@ -21,7 +21,7 @@ Attendees:
 
 Agenda:
 
-- new website at https://fairlearn.org/
+- new website at https://fairlearn.github.io/
 
     - please provide feedback and feel free to submit PRs to update/edit/add
       content or styling
