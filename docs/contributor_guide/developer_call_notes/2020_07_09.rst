@@ -46,7 +46,7 @@ Agenda:
 - Outreach: So far the philosophy was to wait for project to stablize before
   major outreach efforts. Most of the participants felt like it's time to do
   more on this (while ensuring we
-  `speak about fairness in the right way <https://fairlearn.github.io/contributor_guide/how_to_talk_about_fairness.html>`_).
+  `speak about fairness in the right way <https://fairlearn.org/contributor_guide/how_to_talk_about_fairness.html>`_).
   
   - It's important to be clear on project values before outreach. For that
     reason we'll double down on efforts for the mission/roadmap PR.
