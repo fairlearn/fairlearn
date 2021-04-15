@@ -34,7 +34,7 @@ To report bugs, request features, or ask usage questions please use the
 
 .. _developer_calls:
 
-Developer calls
+Community calls
 ---------------
 
 We have a monthly contributor meeting every second Thursday of the month at
