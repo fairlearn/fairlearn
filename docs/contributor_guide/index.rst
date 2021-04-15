@@ -43,4 +43,4 @@ We have a monthly contributor meeting every second Thursday of the month at
 All are welcome! Please reach out via
 `Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
 invitation to you.
-We keep notes from each meeting in the :ref:`developer_call_notes`.
+We keep notes from each meeting in our `HackMD <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>`_.
