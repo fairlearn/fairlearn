@@ -43,4 +43,4 @@ _moments = [
     "ZeroOneLoss"
 ]
 
-__all__ = [] + _exponentiated_gradient + _grid_search + _moments  # noqa: RST902
+__all__ = _exponentiated_gradient + _grid_search + _moments
