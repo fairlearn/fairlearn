@@ -107,4 +107,5 @@ Maintainers will try to link duplicate issues when possible.
 
 ### Reporting security issues
 
-Please take a look at our guidelines for reporting [security issues](./SECURITY.md).
+To report security issues please send an email to
+`fairlearn-internal@python.org`.
