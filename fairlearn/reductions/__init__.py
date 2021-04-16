@@ -19,6 +19,8 @@ from ._moments import BoundedGroupLoss, SquareLoss, ZeroOneLoss  # noqa: F401
 from ._moments import ClassificationMoment, LossMoment  # noqa: F401
 
 __all__ = [
+    "ExponentiatedGradient",
+    "GridSearch",
     "AbsoluteLoss",
     "Moment",
     "ClassificationMoment",
@@ -32,7 +34,5 @@ __all__ = [
     "BoundedGroupLoss",
     "LossMoment",
     "SquareLoss",
-    "ZeroOneLoss",
-    "GridSearch",
-    "ExponentiatedGradient"
+    "ZeroOneLoss"
 ]
