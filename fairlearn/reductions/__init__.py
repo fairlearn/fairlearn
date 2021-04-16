@@ -18,15 +18,7 @@ from ._moments import (DemographicParity, EqualizedOdds,  # noqa: F401
 from ._moments import BoundedGroupLoss, SquareLoss, ZeroOneLoss  # noqa: F401
 from ._moments import ClassificationMoment, LossMoment  # noqa: F401
 
-_exponentiated_gradient = [
-    "ExponentiatedGradient",
-]
-
-_grid_search = [
-    "GridSearch",
-]
-
-_moments = [
+__all__ = [
     "AbsoluteLoss",
     "Moment",
     "ClassificationMoment",
@@ -40,7 +32,7 @@ _moments = [
     "BoundedGroupLoss",
     "LossMoment",
     "SquareLoss",
-    "ZeroOneLoss"
+    "ZeroOneLoss",
+    "GridSearch",
+    "ExponentiatedGradient"
 ]
-
-__all__ = _exponentiated_gradient + _grid_search + _moments
