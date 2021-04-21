@@ -20,11 +20,8 @@ def fetch_adult(*, cache=True, data_home=None,
     Classes                       2
     ==============   ==============
 
-    Source: https://archive.ics.uci.edu/ml/datasets/Adult
-    Ronny Kohavi and Barry Becker, "Scaling Up the Accuracy of Naive-Bayes
-    Classifiers: a Decision-Tree Hybrid", Proceedings of the Second
-    International Conference on Knowledge Discovery and Data Mining, 1996
-
+    Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
+    
     Prediction task is to determine whether a person makes over $50,000 a
     year.
 
@@ -74,8 +71,14 @@ def fetch_adult(*, cache=True, data_home=None,
 
     References
     ----------
-    .. [1] R. Kohavi and B. Becker, UCI Machine Learning Repository: Adult Data Set,
-       01-May-1996. [Online]. Available: https://archive.ics.uci.edu/ml/datasets/adult. [Accessed: 07-Apr-2021].
+    .. [1] R. Kohavi and B. Becker, UCI Machine Learning Repository:
+       Adult Data Set, 01-May-1996. [Online]. Available:
+       https://archive.ics.uci.edu/ml/datasets/adult.
+
+    .. [2] R. Kohavi, "Scaling Up the Accuracy of Naive-Bayes Classifiers:
+       a Decision-Tree Hybrid," in *Second International Conference on knowledge
+       discovery and data mining: proceedings: August 2-4, 1996, Portland,
+       Oregon*, 1996, pp. 202–207.
 
     """
     if not data_home:

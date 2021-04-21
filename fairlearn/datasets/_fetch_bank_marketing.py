@@ -20,7 +20,8 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
     Classes                             2
     ==============   ====================
 
-    Source: http://archive.ics.uci.edu/ml/datasets/Bank+Marketing
+    Source: UCI Repository [1]_ Paper: Moro et al., 2014 [2]_
+
     The data is related with direct marketing campaigns of a Portuguese
     banking institution. The marketing campaigns were based on phone calls.
     Often, more than one contact to the same client was required,
@@ -74,6 +75,16 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
 
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
         if ``return_X_y`` is True and ``as_frame`` is True
+
+    References
+    ----------
+    .. [1] S. Moro, P. Cortez, and P. Rita, UCI Machine Learning Repository:
+       Bank Marketing Data Set, 14-Feb-2014. [Online]. Available:
+       https://archive.ics.uci.edu/ml/datasets/Bank+Marketing. 
+
+    .. [2] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict
+       the Success of Bank Telemarketing. Decision Support Systems,
+       Elsevier, 62:22-31, June 2014
 
     """
     if not data_home:
