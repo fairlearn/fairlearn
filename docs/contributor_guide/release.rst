@@ -5,7 +5,8 @@ Release Process
 
 This page outlines the process for creating a new Fairlearn release.
 The following steps assume git remote's `origin` points to
-`fairlearn/fairlearn`.
+`fairlearn/fairlearn` (in practical terms, that the work is being
+done on a clone of `fairlearn/fairlearn` and not on a fork).
 
 #. Create the branch for the release:
 
