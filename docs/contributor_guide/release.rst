@@ -11,11 +11,14 @@ The following steps assume git remote's `origin` points to
 
     :code:`git checkout -b release/v<x.y.z>`
 
-#. On the release branch:
+#. Push the branch to GitHub:
+
+    :code:`git push -u origin release/v<x.y.z>`
+
+#. On the release branch, create a PR to:
 
     #. Update the version in `__init__.py` to `x.y.z`
     #. Update the version in the ReadMe
-    #. Publish the branch to GitHub
 
 #. Run the `release pipeline <https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=60>`_
 
