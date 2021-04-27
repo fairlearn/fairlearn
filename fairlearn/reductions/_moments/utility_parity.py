@@ -118,7 +118,7 @@ class UtilityParity(ClassificationMoment):
         This adds a column `event` to the `tags` field.
 
         The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
-        mentioned in the paper `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>` [1]_. #noqua: E501
+        mentioned in the paper `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>` [1]_. # noqa: E501
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
@@ -275,7 +275,7 @@ class DemographicParity(UtilityParity):
     (corresponding to the Lagrange multipliers for positive and negative constraints)
     as there are unique values for the sensitive feature.
     The :meth:`signed_weights` method will compute the costs according
-    to Example 3 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_. #noqua: E501
+    to Example 3 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_. #noqa: E501
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the Demographic Parity constraint applied within
@@ -292,7 +292,7 @@ class DemographicParity(UtilityParity):
        16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
 
     """
-           
+
     short_name = "DemographicParity"
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):

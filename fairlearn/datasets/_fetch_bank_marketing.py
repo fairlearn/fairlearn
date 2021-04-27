@@ -80,7 +80,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
     ----------
     .. [1] S. Moro, P. Cortez, and P. Rita, UCI Machine Learning Repository:
        Bank Marketing Data Set, 14-Feb-2014. [Online]. Available:
-       https://archive.ics.uci.edu/ml/datasets/Bank+Marketing. 
+       https://archive.ics.uci.edu/ml/datasets/Bank+Marketing.
 
     .. [2] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict
        the Success of Bank Telemarketing. Decision Support Systems,

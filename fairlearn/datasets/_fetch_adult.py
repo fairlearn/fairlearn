@@ -21,7 +21,7 @@ def fetch_adult(*, cache=True, data_home=None,
     ==============   ==============
 
     Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
-    
+
     Prediction task is to determine whether a person makes over $50,000 a
     year.
 
