@@ -19,6 +19,7 @@ The contribution guide explains how to structure your contributions. Please
    contributing_code
    contributing_example_notebooks
    fairlearn_proposals
+   release
 
 .. _communication:
 
