@@ -84,9 +84,11 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     check_consistent_length(X, sensitive_features)
     sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
 
+    print(np.unique(sensitive_features))
     # compress multiple sensitive features into a single column
     if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
         sensitive_features = _merge_columns(sensitive_features)
+    print(np.unique(sensitive_features))
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
