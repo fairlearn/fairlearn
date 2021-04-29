@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import pandas as pd
-import numpy as np
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -66,7 +65,7 @@ def _get_test_data():
     data = fetch_openml(data_id=42193)
     X = pd.DataFrame(data['data'], columns=data['feature_names']) \
         .drop(columns=['race_Caucasian', 'c_charge_degree_F'])
-    y = data['target'].astype(np.int)
+    y = data['target'].astype(int)
 
     # split the data in train-validation-test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)

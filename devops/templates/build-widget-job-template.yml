@@ -17,5 +17,5 @@ jobs:
       cd ../..
     displayName: "Run visualization linter"
 
-  - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+  - script: python ./scripts/build_widget.py --yarn-path /usr/local/bin/yarn
     displayName: 'Build widget'

@@ -101,7 +101,7 @@ stages:
         freezeArtifact: $(freezeArtifactName)
         freezeFile: $(freezeFile)
 
-    - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+    - script: python ./scripts/build_widget.py --yarn-path /usr/local/bin/yarn
       displayName: 'Build widget'
 
     - script: python ./scripts/build_wheels.py --version-filename $(versionFilename) 
