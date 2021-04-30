@@ -125,13 +125,20 @@ Which ML libraries does Fairlearn support?
     algorithm can be evaluated using our metrics.
 
 Does Fairlearn support multi-class classification?
-    Certain metrics will still work for multi-class classification, e.g.,
-    accuracy score. For others it is more complicated since they rely on
-    binary classes, e.g., true positive rate.
+    Fairlearn's assessment capabilities support multi-class classification
+    since the `MetricFrame` does not care about the nature of the ML problem;
+    if the supplied metric function supports multi-class classification,
+    then the `MetricFrame` can use it, producing a result for each of the
+    groups identified by the sensitive feature(s).
+    For example, it is perfectly acceptable to pass
+    `sklearn.metrics.accuracy_score` or `sklearn.metrics.confusion_matrix`
+    as the metric function, and supply multi-class data for y_true and y_pred.
     There are
     `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
     to add more extensive support to Fairlearn's assessment capabilities.
-    If you have specific thoughts feel free to add them to the discussion.
+    If you have thoughts feel free to add them to the discussion.
+    The existing mitigation techniques do not support multi-class
+    classification.
 
 Does Fairlearn support multiple and non-binary sensitive features?
     Fairlearn's assessment capabilities support sensitive features with more
