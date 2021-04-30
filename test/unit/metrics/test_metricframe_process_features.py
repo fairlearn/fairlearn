@@ -94,7 +94,9 @@ class TestSingleFeature():
         r_f, y_true = self._get_raw_data()
         raw_feature = {'Mine!': np.asarray(r_f).reshape(-1, 1)}
         target = _get_raw_MetricFrame()
-        _ = target._process_features("Unused", raw_feature, y_true)
+        with pytest.raises(ValueError) as ve:
+            _ = target._process_features("Unused", raw_feature, y_true)
+        assert ve is not None
 
 
 class TestTwoFeatures():

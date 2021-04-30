@@ -519,7 +519,10 @@ class MetricFrame:
             else:
                 raise ValueError(_FEATURE_LIST_NONSCALAR)
         elif isinstance(features, dict):
-            df = pd.DataFrame.from_dict(features)
+            try:
+                df = pd.DataFrame.from_dict(features)
+            except ValueError as ve:
+                raise ValueError("DataFrame.from_dict failed") from ve
             for i in range(len(df.columns)):
                 col_name = df.columns[i]
                 if not isinstance(col_name, str):
