@@ -196,8 +196,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         _, _, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X, y, sensitive_features=sensitive_features, enforce_binary_labels=True)
-        
-        print(sensitive_feature_vector)
 
         # postprocessing can't handle 0/1 as floating point numbers, so this converts it to int
         if type(y) in [np.ndarray, pd.DataFrame, pd.Series]:
