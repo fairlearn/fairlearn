@@ -37,7 +37,7 @@ def test_threshold_optimizer_multiple_sensitive_features():
     a1 = "a"
     a2 = "a very very very very very very very long group name"
     a3 = "a group name with commas ,, in , it"
-    a4 = "b"
+    a4 = "a group name with backslashes \\ in \\\\ it"
     A = pd.DataFrame([[a1, a3, a1 + a3], [a1, a3, a1 + a3],
                       [a2, a3, a2 + a3], [a2, a3, a2 + a3], [a2, a3, a2 + a3], [a2, a3, a2 + a3],
                       [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4],
@@ -97,10 +97,11 @@ def test_threshold_optimizer_multiple_sensitive_features():
 
     # multi - names after escaping
     a3_escaped = a3.replace(',', '\\,')
+    a4_escaped = a4.replace('\\', '\\\\')
     a13 = f"{a1},{a3_escaped}"
-    a14 = f"{a1},{a4}"
+    a14 = f"{a1},{a4_escaped}"
     a23 = f"{a2},{a3_escaped}"
-    a24 = f"{a2},{a4}"
+    a24 = f"{a2},{a4_escaped}"
 
     assert (metricframe_combined.overall == metricframe_multi.overall).all()
 
