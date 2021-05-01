@@ -39,11 +39,11 @@ def test_threshold_optimizer_multiple_sensitive_features():
     a3 = "a group name with commas ,, in , it"
     a4 = "b"
     A = pd.DataFrame([[a1, a3, a1 + a3], [a1, a3, a1 + a3],
-                    [a2, a3, a2 + a3], [a2, a3, a2 + a3], [a2, a3, a2 + a3], [a2, a3, a2 + a3],
-                    [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4],
-                    [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4],
-                    [a1, a4, a1 + a4], [a1, a4, a1 + a4]],
-                    columns=['SF1', 'SF2', 'SF1+2'])
+                      [a2, a3, a2 + a3], [a2, a3, a2 + a3], [a2, a3, a2 + a3], [a2, a3, a2 + a3],
+                      [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4],
+                      [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4], [a2, a4, a2 + a4],
+                      [a1, a4, a1 + a4], [a1, a4, a1 + a4]],
+                     columns=['SF1', 'SF2', 'SF1+2'])
 
     estimator = LinearRegression()
     estimator.fit(X, y)
@@ -69,10 +69,10 @@ def test_threshold_optimizer_multiple_sensitive_features():
         X])
     A_test = pd.concat([
         pd.DataFrame([[a1, a3, a1 + a3], [a1, a3, a1 + a3],
-                    [a2, a3, a2 + a3], [a2, a3, a2 + a3],
-                    [a2, a4, a2 + a4], [a2, a4, a2 + a4],
-                    [a1, a4, a1 + a4], [a1, a4, a1 + a4]],
-                    columns=['SF1', 'SF2', 'SF1+2']),
+                      [a2, a3, a2 + a3], [a2, a3, a2 + a3],
+                      [a2, a4, a2 + a4], [a2, a4, a2 + a4],
+                      [a1, a4, a1 + a4], [a1, a4, a1 + a4]],
+                     columns=['SF1', 'SF2', 'SF1+2']),
         A])
     y_test = pd.concat([pd.Series([0, 1, 0, 1, 0, 1, 0, 1]), y])
 
