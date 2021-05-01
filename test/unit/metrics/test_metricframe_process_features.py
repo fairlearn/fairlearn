@@ -94,7 +94,8 @@ class TestSingleFeature():
         r_f, y_true = self._get_raw_data()
         raw_feature = {'Mine!': np.asarray(r_f).reshape(-1, 1)}
         target = _get_raw_MetricFrame()
-        msg = "DataFrame.from_dict() failed on sensitive features. Please ensure each array is strictly 1-D."
+        msg = "DataFrame.from_dict() failed on sensitive features. "\
+            "Please ensure each array is strictly 1-D."
         with pytest.raises(ValueError) as ve:
             _ = target._process_features("Unused", raw_feature, y_true)
         assert msg == ve.value.args[0]
