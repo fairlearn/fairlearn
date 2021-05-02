@@ -530,7 +530,7 @@ class MetricFrame:
                 result.append(GroupFeature(base_name, column, i, None))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
-            f_arr = np.squeeze(np.asarray(features, dtype=np.object))
+            f_arr = np.squeeze(np.asarray(features, dtype=object))
             if len(f_arr.shape) == 1:
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))

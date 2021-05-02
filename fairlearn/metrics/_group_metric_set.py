@@ -27,6 +27,7 @@ _BIN_LABELS = 'binLabels'
 _FEATURE_BIN_NAME = 'featureBinName'
 _PREDICTION_TYPE = 'predictionType'
 _PREDICTION_BINARY_CLASSIFICATION = 'binaryClassification'
+_PREDICTION_PROBABILITY = 'probability'
 _PREDICTION_REGRESSION = 'regression'
 _MODEL_NAMES = 'modelNames'
 _SCHEMA = 'schemaType'
@@ -34,56 +35,63 @@ _DASHBOARD_DICTIONARY = 'dashboardDictionary'
 _VERSION = 'schemaVersion'
 
 BINARY_CLASSIFICATION = 'binary_classification'
+PROBABILITY = 'probability'
 REGRESSION = 'regression'
-_allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, REGRESSION])
+_allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, PROBABILITY, REGRESSION])
 
 # The following keys need to match those of _metric_methods in
 # _fairlearn_dashboard.py
 # Issue 269 is about unifying the two sets
-ACCURACY_SCORE_GROUP_SUMMARY = "accuracy_score"
-BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY = "balanced_root_mean_squared_error"
-F1_SCORE_GROUP_SUMMARY = "f1_score"
-FALLOUT_RATE_GROUP_SUMMARY = "fallout_rate"
-LOG_LOSS_GROUP_SUMMARY = "log_loss"
-MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY = "mean_absolute_error"
-MEAN_OVERPREDICTION_GROUP_SUMMARY = "overprediction"
-MEAN_PREDICTION_GROUP_SUMMARY = "average"
-MEAN_SQUARED_ERROR_GROUP_SUMMARY = "mean_squared_error"
-MEAN_UNDERPREDICTION_GROUP_SUMMARY = "underprediction"
-MISS_RATE_GROUP_SUMMARY = "miss_rate"
-PRECISION_SCORE_GROUP_SUMMARY = "precision_score"
-R2_SCORE_GROUP_SUMMARY = "r2_score"
-RECALL_SCORE_GROUP_SUMMARY = "recall_score"
-ROC_AUC_SCORE_GROUP_SUMMARY = "balanced_accuracy_score"
-ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY = "root_mean_squared_error"
-SELECTION_RATE_GROUP_SUMMARY = "selection_rate"
-SPECIFICITY_SCORE_GROUP_SUMMARY = "specificity_score"
-ZERO_ONE_LOSS_GROUP_SUMMARY = "zero_one_loss"
+ACCURACY_SCORE = "accuracy_score"
+BALANCED_ROOT_MEAN_SQUARED_ERROR = "balanced_root_mean_squared_error"
+F1_SCORE = "f1_score"
+FALLOUT_RATE = "fallout_rate"
+LOG_LOSS = "log_loss"
+MEAN_ABSOLUTE_ERROR = "mean_absolute_error"
+MEAN_OVERPREDICTION = "overprediction"
+MEAN_PREDICTION = "average"
+MEAN_SQUARED_ERROR = "mean_squared_error"
+MEAN_UNDERPREDICTION = "underprediction"
+MISS_RATE = "miss_rate"
+PRECISION_SCORE = "precision_score"
+R2_SCORE = "r2_score"
+RECALL_SCORE = "recall_score"
+ROC_AUC_SCORE = "balanced_accuracy_score"
+ROOT_MEAN_SQUARED_ERROR = "root_mean_squared_error"
+SELECTION_RATE = "selection_rate"
+SPECIFICITY_SCORE = "specificity_score"
+ZERO_ONE_LOSS = "zero_one_loss"
 
 BINARY_CLASSIFICATION_METRICS = {}
-BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE_GROUP_SUMMARY] = skm.accuracy_score
-BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE_GROUP_SUMMARY] = false_positive_rate
-BINARY_CLASSIFICATION_METRICS[F1_SCORE_GROUP_SUMMARY] = skm.f1_score
-BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction
-BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction
-BINARY_CLASSIFICATION_METRICS[MISS_RATE_GROUP_SUMMARY] = false_negative_rate
-BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE_GROUP_SUMMARY] = skm.precision_score
-BINARY_CLASSIFICATION_METRICS[RECALL_SCORE_GROUP_SUMMARY] = skm.recall_score
-BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE_GROUP_SUMMARY] = skm.roc_auc_score
-BINARY_CLASSIFICATION_METRICS[SELECTION_RATE_GROUP_SUMMARY] = selection_rate
-BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE_GROUP_SUMMARY] = true_negative_rate
+BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE] = skm.accuracy_score
+BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE] = false_positive_rate
+BINARY_CLASSIFICATION_METRICS[F1_SCORE] = skm.f1_score
+BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION] = _mean_overprediction
+BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION] = _mean_underprediction
+BINARY_CLASSIFICATION_METRICS[MISS_RATE] = false_negative_rate
+BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE] = skm.precision_score
+BINARY_CLASSIFICATION_METRICS[RECALL_SCORE] = skm.recall_score
+BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE] = skm.roc_auc_score
+BINARY_CLASSIFICATION_METRICS[SELECTION_RATE] = selection_rate
+BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE] = true_negative_rate
 
 REGRESSION_METRICS = {}
-REGRESSION_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _balanced_root_mean_squared_error  # noqa: E501
-REGRESSION_METRICS[LOG_LOSS_GROUP_SUMMARY] = skm.log_loss
-REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR_GROUP_SUMMARY] = skm.mean_absolute_error
-REGRESSION_METRICS[MEAN_OVERPREDICTION_GROUP_SUMMARY] = _mean_overprediction
-REGRESSION_METRICS[MEAN_UNDERPREDICTION_GROUP_SUMMARY] = _mean_underprediction
-REGRESSION_METRICS[MEAN_PREDICTION_GROUP_SUMMARY] = mean_prediction
-REGRESSION_METRICS[MEAN_SQUARED_ERROR_GROUP_SUMMARY] = skm.mean_squared_error
-REGRESSION_METRICS[R2_SCORE_GROUP_SUMMARY] = skm.r2_score
-REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR_GROUP_SUMMARY] = _root_mean_squared_error
-REGRESSION_METRICS[ZERO_ONE_LOSS_GROUP_SUMMARY] = skm.zero_one_loss
+REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
+REGRESSION_METRICS[MEAN_PREDICTION] = mean_prediction
+REGRESSION_METRICS[MEAN_SQUARED_ERROR] = skm.mean_squared_error
+REGRESSION_METRICS[ROOT_MEAN_SQUARED_ERROR] = _root_mean_squared_error
+REGRESSION_METRICS[R2_SCORE] = skm.r2_score
+
+PROBABILITY_METRICS = {}
+PROBABILITY_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR] = _balanced_root_mean_squared_error
+PROBABILITY_METRICS[LOG_LOSS] = skm.log_loss
+PROBABILITY_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
+PROBABILITY_METRICS[MEAN_OVERPREDICTION] = _mean_overprediction
+PROBABILITY_METRICS[MEAN_PREDICTION] = mean_prediction
+PROBABILITY_METRICS[MEAN_SQUARED_ERROR] = skm.mean_squared_error
+PROBABILITY_METRICS[MEAN_UNDERPREDICTION] = _mean_underprediction
+PROBABILITY_METRICS[ROC_AUC_SCORE] = skm.roc_auc_score
+PROBABILITY_METRICS[ROOT_MEAN_SQUARED_ERROR] = _root_mean_squared_error
 
 
 def _process_sensitive_features(sensitive_features):
@@ -140,6 +148,9 @@ def _create_group_metric_set(y_true,
     elif prediction_type == REGRESSION:
         result[_PREDICTION_TYPE] = _PREDICTION_REGRESSION
         function_dict = REGRESSION_METRICS
+    elif prediction_type == PROBABILITY:
+        result[_PREDICTION_TYPE] = _PREDICTION_PROBABILITY
+        function_dict = PROBABILITY_METRICS
     else:
         raise NotImplementedError(
             "No support yet for {0}".format(prediction_type))
