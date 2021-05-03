@@ -394,13 +394,41 @@ For more examples, please
 see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
 
+.. _plot:
+
+Plotting grouped metrics
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The simplest way to visualize grouped metrics from the :class:`MetricFrame` is
+to take advantage of the inherent plotting capabilities of
+:class:`pandas.DataFrame`:
+
+.. code-block:: python
+
+    metrics = {
+        'accuracy': accuracy_score,
+        'precision': precision_score,
+        'recall': recall_score,
+        'false positive rate': false_positive_rate,
+        'true positive rate': true_positive_rate,
+        'selection rate': selection_rate,
+        'count': lambda y_true, y_pred: y_true.shape[0]}
+    metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
+    metric_frame.by_group.plot.bar(
+        subplots=True, layout=[3,3], legend=False, figsize=[12,8],
+        title='Show all metrics');
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
+    :target: auto_examples/plot_quickstart.html
+    :align: center 
+
 
 .. _dashboard:
 
 Fairlearn dashboard
 -------------------
 
-The Fairlearn dashboard is a Jupyter notebook widget for assessing how a
+The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
 model's predictions impact different groups (e.g., different ethnicities), and
 also for comparing multiple models along different fairness and performance
 metrics.
@@ -411,30 +439,5 @@ metrics.
     part of Fairlearn.
     For more information on how to use it refer to
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
-    Fairlearn will provide some of the existing functionality
-    through :code:`matplotlib`-based visualizations.
-
-
-Matplotlib-based visualizations
--------------------------------
-
-.. TODO add .. currentmodule:: fairlearn.plots when available
-
-To assess a single model's fairness and performance, the visualizations can
-be launched as follows:
-
-.. TODO make code-block:: or plot::
-
-    # from fairlearn.plots import TODO
-
-    # A_test containts your sensitive features (e.g., age, binary gender)
-    # sensitive_feature_names contains your sensitive feature names
-    # y_true contains ground truth labels
-    # y_pred contains prediction labels
-
-    # TODO(sensitive_features=A_test,
-    #      sensitive_feature_names=['BinaryGender', 'Age'],
-    #      y_true=Y_test.tolist(),
-    #      y_pred=[y_pred.tolist()])
-
-.. TODO explain how to use plots for assessment
+    Fairlearn provide some of the existing functionality through
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.

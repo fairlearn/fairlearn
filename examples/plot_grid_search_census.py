@@ -32,14 +32,6 @@ GridSearch with Census Data
 # We download the data set using `fetch_adult` function in `fairlearn.datasets`.
 # We start by importing the various modules we're going to use:
 #
-# .. note::
-#
-#    The :code:`FairlearnDashboard` is no longer being developed as
-#    part of Fairlearn.
-#    The widget itself has been moved to
-#    `the raiwidgets package <https://pypi.org/project/raiwidgets/>`_.
-#    Fairlearn will provide some of the existing functionality
-#    through :code:`matplotlib`-based visualizations.
 
 from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch

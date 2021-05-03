@@ -20,8 +20,6 @@ Fairlearn is also available on
 
     conda install -c conda-forge fairlearn
 
-For checking out the latest version in our repository check out our
-:ref:`advanced_install`.
 If you are updating from a previous version of Fairlearn, please
 see :ref:`version_migration_guide`.
 
@@ -32,7 +30,7 @@ see :ref:`version_migration_guide`.
     Please use the version selector to get to the instructions for
     the appropriate version. The instructions for the :code:`main`
     branch require Fairlearn to be installed from a clone of the
-    repository. See :ref:`advanced_install` for the required steps.
+    repository.
 
 Overview of Fairlearn
 ---------------------
@@ -136,7 +134,44 @@ their label:
     Male      0.2135...
     Name: selection_rate, dtype: object
 
-.. TODO add new matplotlib based visualizations 
+Fairlearn also allows us to quickly plot these metrics from the
+:class:`fairlearn.metrics.MetricFrame`
+
+.. Below the doctest contains the code shown on the website.
+   The plot directive is not able to use the context from previous doctest blocks,
+   so we hide the code from the plot directive and "duplicate" it using doctest.
+
+.. doctest:: quickstart
+
+    >>> from sklearn.metrics import precision_score, recall_score
+    >>> from fairlearn.metrics import false_positive_rate, true_positive_rate
+    >>> metrics = {
+    ...     'accuracy': accuracy_score,
+    ...     'precision': precision_score,
+    ...     'recall': recall_score,
+    ...     'false positive rate': false_positive_rate,
+    ...     'true positive rate': true_positive_rate,
+    ...     'selection rate': selection_rate,
+    ...     'count': lambda y_true, y_pred: y_true.shape[0]}
+    >>> metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
+    >>> metric_frame.by_group.plot.bar(
+    ...     subplots=True, layout=[3,3], legend=False, figsize=[12,8],
+    ...     title='Show all metrics');
+    array([[<matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
+            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
+            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>],
+           [<matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
+            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
+            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>],
+           [<matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
+            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
+            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>]],
+          dtype=object)
+
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
+    :target: auto_examples/plot_quickstart.html
+    :align: center 
+
 
 Mitigating disparity
 ^^^^^^^^^^^^^^^^^^^^
@@ -173,7 +208,6 @@ a vastly reduced difference in selection rate:
     Male      0.1715...
     Name: selection_rate, dtype: object
 
-.. TODO add new matplotlib based visualizations
 
 What's next?
 ------------
