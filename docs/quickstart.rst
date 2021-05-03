@@ -37,7 +37,7 @@ Overview of Fairlearn
 
 The Fairlearn package has two components:
 
-- A *dashboard* for assessing which groups are negatively impacted by a model,
+- *Metrics* for assessing which groups are negatively impacted by a model,
   and for comparing multiple models in terms of various fairness and accuracy
   metrics.
 
@@ -138,8 +138,7 @@ Fairlearn also allows us to quickly plot these metrics from the
 :class:`fairlearn.metrics.MetricFrame`
 
 .. Below the doctest contains the code shown on the website.
-   The plot directive is not able to use the context from previous doctest blocks,
-   so we hide the code from the plot directive and "duplicate" it using doctest.
+   It should be kept in sync with the plot_quickstart.py example.
 
 .. doctest:: quickstart
 

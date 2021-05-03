@@ -403,6 +403,10 @@ The simplest way to visualize grouped metrics from the :class:`MetricFrame` is
 to take advantage of the inherent plotting capabilities of
 :class:`pandas.DataFrame`:
 
+
+.. Below the code-block contains the code shown on the website.
+   It should be kept in sync with the plot_quickstart.py example.
+
 .. code-block:: python
 
     metrics = {

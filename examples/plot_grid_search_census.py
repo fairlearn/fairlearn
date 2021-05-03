@@ -8,8 +8,7 @@ GridSearch with Census Data
 ===========================
 """
 # %%
-# This notebook shows how to use Fairlearn and the Fairness dashboard to generate predictors
-# for the Census dataset.
+# This notebook shows how to use Fairlearn to generate predictors for the Census dataset.
 # This dataset is a classification problem - given a range of data about 32,000 individuals,
 # predict whether their annual income is above or below fifty thousand dollars per year.
 #
@@ -106,7 +105,10 @@ metric_frame = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_ra
                            y_true=Y_test,
                            y_pred=unmitigated_predictor.predict(X_test))
 print(metric_frame.overall)
-metric_frame.by_group
+print(metric_frame.by_group)
+metric_frame.by_group.plot.bar(
+        subplots=True, layout=[2,1], legend=False, figsize=[12,8],
+        title='Accuracy and selection rate by group');
 
 # %%
 # Looking at the disparity in accuracy, we see that males have an error
@@ -158,7 +160,7 @@ sweep.fit(X_train, Y_train,
 predictors = sweep.predictors_
 
 # %%
-# We could load these predictors into the Fairness dashboard now.
+# We could plot performance and fairness metrics of these predictors now.
 # However, the plot would be somewhat confusing due to their number.
 # In this case, we are going to remove the predictors which are dominated in the
 # error-disparity space by others from the sweep (note that the disparity will only be

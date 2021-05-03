@@ -33,7 +33,7 @@ extra_png_src_path = os.path.join("_static", "images", "fairlearn_full_color.png
 
 
 def _build_argument_parser():
-    desc = "Build widget for fairlearn dashboard"
+    desc = "Build documentation for Fairlearn"
 
     parser = argparse.ArgumentParser(description=desc)
 
