@@ -156,15 +156,14 @@ Fairlearn also allows us to quickly plot these metrics from the
     >>> metric_frame.by_group.plot.bar(
     ...     subplots=True, layout=[3,3], legend=False, figsize=[12,8],
     ...     title='Show all metrics')
-    array([[<matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
-            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
-            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>],
-           [<matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
-            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
-            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>],
-           [<matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
-            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
-            <matplotlib.axes._subplots.AxesSubplot object at 0x0...>]],
+    array([[<AxesSubplot:title={'center':'accuracy'}, xlabel='sex'>,
+            <AxesSubplot:title={'center':'precision'}, xlabel='sex'>,
+            <AxesSubplot:title={'center':'recall'}, xlabel='sex'>],
+           [<AxesSubplot:title={'center':'false positive rate'}, xlabel='sex'>,
+            <AxesSubplot:title={'center':'true positive rate'}, xlabel='sex'>,
+            <AxesSubplot:title={'center':'selection rate'}, xlabel='sex'>],
+           [<AxesSubplot:title={'center':'count'}, xlabel='sex'>,
+            <AxesSubplot:xlabel='sex'>, <AxesSubplot:xlabel='sex'>]],
           dtype=object)
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
