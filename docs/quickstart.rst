@@ -87,7 +87,7 @@ than $50,000 a year.
     Female    16192
     Name: sex, dtype: int64
 
-.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
     :target: auto_examples/plot_quickstart_selection_rate.html
     :align: center
 

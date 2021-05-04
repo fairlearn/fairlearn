@@ -19,4 +19,6 @@ selection_rates = MetricFrame(selection_rate,
                               y_true, y_true,
                               sensitive_features=sex)
 
-selection_rates.by_group.plot(legend=False, title='Fraction earning over $50,000')
+fig = selection_rates.by_group.plot.bar(
+    legend=False, rot=0,
+    title='Fraction earning over $50,000')
