@@ -131,10 +131,10 @@ metrics simultaneously:
     >>> multi_metric.by_group
                         precision recall
     sensitive_feature_0
-    a                         0.0   0.0
-    b                         1.0   0.5
+    a                           0      0
+    b                           1    0.5
     c                         0.6   0.75
-    d                         0.0   0.0
+    d                           0      0
 
 If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
@@ -200,14 +200,14 @@ holds the intersections of these groups:
     0.5
     >>> metric_2sf.by_group
     SF 0  SF 1
-    a     6       0.0
+    a     6         0
           8       NaN
     b     6       0.5
           8       0.5
-    c     6       1.0
+    c     6         1
           8       0.5
-    d     6       0.0
-          8       0.0
+    d     6         0
+          8         0
     Name: recall_score, dtype: object
 
 With such a small number of samples, we are obviously running into cases where
