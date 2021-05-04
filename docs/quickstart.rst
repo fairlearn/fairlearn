@@ -155,16 +155,7 @@ Fairlearn also allows us to quickly plot these metrics from the
     >>> metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
     >>> metric_frame.by_group.plot.bar(
     ...     subplots=True, layout=[3,3], legend=False, figsize=[12,8],
-    ...     title='Show all metrics')
-    array([[<AxesSubplot:title={'center':'accuracy'}, xlabel='sex'>,
-            <AxesSubplot:title={'center':'precision'}, xlabel='sex'>,
-            <AxesSubplot:title={'center':'recall'}, xlabel='sex'>],
-           [<AxesSubplot:title={'center':'false positive rate'}, xlabel='sex'>,
-            <AxesSubplot:title={'center':'true positive rate'}, xlabel='sex'>,
-            <AxesSubplot:title={'center':'selection rate'}, xlabel='sex'>],
-           [<AxesSubplot:title={'center':'count'}, xlabel='sex'>,
-            <AxesSubplot:xlabel='sex'>, <AxesSubplot:xlabel='sex'>]],
-          dtype=object)
+    ...     title='Show all metrics')  # doctest: +SKIP
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
