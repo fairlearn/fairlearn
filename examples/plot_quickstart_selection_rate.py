@@ -1,11 +1,15 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""Produce plot of selection rates for the quickstart guide."""
+"""
+=================================
+Selection rates in census dataset
+=================================
+"""
+# %%
 from bokeh.plotting import figure, show
 from fairlearn.metrics import MetricFrame, selection_rate
 from fairlearn.datasets import fetch_adult
-
 
 data = fetch_adult(as_frame=True)
 X = data.data

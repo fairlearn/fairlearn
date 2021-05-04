@@ -29,7 +29,6 @@ jupyter
 nbval
 
 # Required for documentation
-bokeh
 pypandoc
 sphinx
 sphinx-gallery
