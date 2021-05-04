@@ -107,8 +107,8 @@ metric_frame = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_ra
 print(metric_frame.overall)
 print(metric_frame.by_group)
 metric_frame.by_group.plot.bar(
-        subplots=True, layout=[2,1], legend=False, figsize=[12,8],
-        title='Accuracy and selection rate by group');
+        subplots=True, layout=[2, 1], legend=False, figsize=[12, 8],
+        title='Accuracy and selection rate by group')
 
 # %%
 # Looking at the disparity in accuracy, we see that males have an error

@@ -155,7 +155,7 @@ Fairlearn also allows us to quickly plot these metrics from the
     >>> metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
     >>> metric_frame.by_group.plot.bar(
     ...     subplots=True, layout=[3,3], legend=False, figsize=[12,8],
-    ...     title='Show all metrics');
+    ...     title='Show all metrics')
     array([[<matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
             <matplotlib.axes._subplots.AxesSubplot object at 0x0...>,
             <matplotlib.axes._subplots.AxesSubplot object at 0x0...>],

@@ -420,7 +420,7 @@ to take advantage of the inherent plotting capabilities of
     metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
     metric_frame.by_group.plot.bar(
         subplots=True, layout=[3,3], legend=False, figsize=[12,8],
-        title='Show all metrics');
+        title='Show all metrics')
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
