@@ -130,11 +130,11 @@ metrics simultaneously:
     dtype: object
     >>> multi_metric.by_group
                         precision recall
-    sensitive_feature_0
-    a                         0.0   0.0
-    b                         1.0   0.5
+    sensitive_feature_0                 
+    a                         0.0    0.0
+    b                         1.0    0.5
     c                         0.6   0.75
-    d                         0.0   0.0
+    d                         0.0    0.0
 
 If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
@@ -394,15 +394,45 @@ For more examples, please
 see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
 
+.. _plot:
+
+Plotting grouped metrics
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The simplest way to visualize grouped metrics from the :class:`MetricFrame` is
+to take advantage of the inherent plotting capabilities of
+:class:`pandas.DataFrame`:
+
+
+.. Below the code-block contains the code shown on the website.
+   It should be kept in sync with the plot_quickstart.py example.
+
+.. code-block:: python
+
+    metrics = {
+        'accuracy': accuracy_score,
+        'precision': precision_score,
+        'recall': recall_score,
+        'false positive rate': false_positive_rate,
+        'true positive rate': true_positive_rate,
+        'selection rate': selection_rate,
+        'count': lambda y_true, y_pred: y_true.shape[0]}
+    metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
+    metric_frame.by_group.plot.bar(
+        subplots=True, layout=[3,3], legend=False, figsize=[12,8],
+        title='Show all metrics')
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
+    :target: auto_examples/plot_quickstart.html
+    :align: center 
+
 
 .. _dashboard:
 
 Fairlearn dashboard
 -------------------
 
-.. currentmodule:: fairlearn.widget
-
-The Fairlearn dashboard is a Jupyter notebook widget for assessing how a
+The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
 model's predictions impact different groups (e.g., different ethnicities), and
 also for comparing multiple models along different fairness and performance
 metrics.
@@ -411,93 +441,7 @@ metrics.
 
     The :code:`FairlearnDashboard` is no longer being developed as
     part of Fairlearn.
-    The widget itself has been moved to
-    `the raiwidgets package <https://pypi.org/project/raiwidgets/>`_.
-    Fairlearn will provide some of the existing functionality
-    through :code:`matplotlib`-based visualizations.
-
-Setup and a single-model assessment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To assess a single model's fairness and performance, the dashboard widget can
-be launched within a Jupyter notebook as follows:
-
-.. code-block::
-
-    from fairlearn.widget import FairlearnDashboard
-
-    # A_test containts your sensitive features (e.g., age, binary gender)
-    # sensitive_feature_names contains your sensitive feature names
-    # y_true contains ground truth labels
-    # y_pred contains prediction labels
-
-    FairlearnDashboard(sensitive_features=A_test,
-                       sensitive_feature_names=['BinaryGender', 'Age'],
-                       y_true=Y_test.tolist(),
-                       y_pred=[y_pred.tolist()])
-
-After the launch, the widget walks the user through the assessment setup,
-where the user is asked to select
-
-#. the sensitive feature of interest (e.g., binary gender or age), and
-#. the performance metric (e.g., model precision) along which to evaluate the
-   overall model performance as well as any disparities across groups. These
-   selections are then used to obtain the visualization of the model's impact
-   on the subgroups (e.g., model precision for females and model precision for
-   males).
-
-The following figures illustrate the setup steps, where *binary gender* is
-selected as a sensitive feature and *accuracy rate* is selected as the
-performance metric.
-
-.. image:: ../../img/fairlearn-dashboard-start.png
-
-.. image:: ../../img/fairlearn-dashboard-multiple-sensitive-features.png
-
-.. image:: ../../img/fairlearn-dashboard-performance-multiple-sensitive-features.png
-
-After the setup, the dashboard presents the model assessment in two panels:
-
-.. list-table::
-   :header-rows: 0
-   :widths: 10 30
-   :stub-columns: 1
-
-   *  - Disparity in performance
-      - This panel shows: (1) the performance of your model with respect to
-        your selected performance metric (e.g., *accuracy rate*) overall as
-        well as on different subgroups based on your selected sensitive
-        feature (e.g., *accuracy rate* for females, *accuracy rate* for
-        males); (2) the disparity (difference) in the values of the selected
-        performance metric across different subgroups; (3) the distribution of
-        errors in each subgroup (e.g., female, male). For binary
-        classification, the errors are further split into overprediction
-        (predicting 1 when the true label is 0), and underprediction
-        (predicting 0 when the true label is 1).
-   *  - Disparity in predictions
-      - This panel shows a bar chart that contains the selection rate in each
-        group, meaning the fraction of data classified as 1 (in binary
-        classification) or distribution of prediction values (in regression).
-
-.. image:: ../../img/fairlearn-dashboard-disparity-performance-multiple-sensitive-features.png
-
-.. image:: ../../img/fairlearn-dashboard-disparity-predictions-multiple-sensitive-features.png
-
-Comparing multiple models
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The dashboard also enables comparison of multiple models, such as the models
-produced by different learning algorithms and different mitigation approaches,
-including :code:`fairlearn.reductions.GridSearch`,
-:code:`fairlearn.reductions.ExponentiatedGradient`, and
-:code:`fairlearn.postprocessing.ThresholdOptimizer`.
-
-As before, the user is first asked to select the sensitive feature and the
-performance metric. The *model comparison* view then depicts the performance
-and disparity of all the provided models in a scatter plot. This allows the
-user to examine trade-offs between performance and fairness. Each of the dots
-can be clicked to open the assessment of the corresponding model. The figure
-below shows the model comparison view with *binary gender* selected as a
-sensitive feature and *accuracy rate* selected as the performance metric.
-
-.. image:: ../../img/fairlearn-dashboard-models.png
+    For more information on how to use it refer to
+    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
+    Fairlearn provide some of the existing functionality through
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
