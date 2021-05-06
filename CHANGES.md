@@ -1,5 +1,30 @@
 # Changes
 
+### v0.6.2
+
+* Bugfix for `_merge_columns()` when using multiple sensitive features with
+  long names. This previously caused groups to get merged if the concatenation
+  of their string representations was identical until the cutoff limit.
+
+### v0.6.1
+
+* Bugfix for `_create_group_metric_set()`. Fixes the list of metrics computed for regression
+  and adds a set of metrics for 'probability' problems [PR](https://github.com/fairlearn/fairlearn/pull/727)
+* Updated 'Credit Card' notebook [PR](https://github.com/fairlearn/fairlearn/pull/713)
+* Added some overlooked `MetricFrame` tests [PR](https://github.com/fairlearn/fairlearn/pull/701)
+* Various documentation tweaks and enhancements
+
+### v0.6.0
+
+* Add `CorrelationRemover` preprocessing technique. This removes correlations
+  between sensitive and non-sensitive features while retaining as much information
+  as possible
+* Add `control_features` to the classification moments. These allow for data
+  stratification, with fairness constraints enforced within each stratum, but
+  not between strata
+* Update `make_derived_metric()` to use `MetricFrame`
+* Assorted small documentation fixes
+
 ### v0.5.0
 
 * Adjust classes to abide by naming conventions for attributes.

@@ -1,0 +1,17 @@
+name: fairlearn-pytorch
+channels:
+- defaults
+- conda-forge
+- pytorch
+dependencies:
+- python==3.7
+- pip>=19.1.1
+- pytest
+- pytorch
+- cpuonly
+- skorch
+
+# Note pytorch will not install cuda. If you do not want that, please
+# use conda install pytorch -c pytorch
+# See
+# https://pytorch.org/get-started/locally/

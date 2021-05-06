@@ -34,4 +34,4 @@ pypandoc
 sphinx
 sphinx-gallery
 git+https://github.com/Holzhaus/sphinx-multiversion.git
-pydata-sphinx-theme
+pydata-sphinx-theme==0.5.2

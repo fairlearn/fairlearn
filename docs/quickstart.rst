@@ -30,7 +30,7 @@ see :ref:`version_migration_guide`.
     The Fairlearn API is still evolving, so example code in 
     this documentation may not work with every version of Fairlearn.
     Please use the version selector to get to the instructions for
-    the appropriate version. The instructions for the :code:`master`
+    the appropriate version. The instructions for the :code:`main`
     branch require Fairlearn to be installed from a clone of the
     repository. See :ref:`advanced_install` for the required steps.
 
@@ -87,8 +87,9 @@ than $50,000 a year.
     Female    16192
     Name: sex, dtype: int64
 
-.. bokeh-plot:: quickstart_plot.py
-    :source-position: none
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
+    :target: auto_examples/plot_quickstart_selection_rate.html
+    :align: center
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -112,11 +113,11 @@ we can evaluate metrics for subgroups within the data as below:
     >>> y_pred = classifier.predict(X)
     >>> gm = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
     >>> print(gm.overall)
-    0.8443552680070431
+    0.8443...
     >>> print(gm.by_group)
     sex
-    Female       0.925148
-    Male         0.804288
+    Female    0.9251...
+    Male      0.8042...
     Name: accuracy_score, dtype: object
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
@@ -129,11 +130,11 @@ their label:
     >>> from fairlearn.metrics import selection_rate
     >>> sr = MetricFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
     >>> sr.overall
-    0.16385487899758405
+    0.1638...
     >>> sr.by_group
     sex
-    Female      0.0635499
-    Male         0.213599 
+    Female    0.0635...
+    Male      0.2135...
     Name: selection_rate, dtype: object   
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
@@ -141,10 +142,12 @@ While this page shows only screenshots, the actual dashboard is interactive.
 
 .. note::
 
-    The :code:`FairlearnDashboard` will move from Fairlearn to the
-    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
-    will provide some of the existing functionality through
-    :code:`matplotlib`-based visualizations.
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn.
+    The widget itself has been moved to
+    `the raiwidgets package <https://pypi.org/project/raiwidgets/>`_.
+    Fairlearn will provide some of the existing functionality
+    through :code:`matplotlib`-based visualizations.
 
 .. doctest:: quickstart
 
@@ -192,11 +195,11 @@ a vastly reduced difference in selection rate:
     >>> 
     >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
     >>> print(sr_mitigated.overall)
-    0.16614798738790384
+    0.1661...
     >>> print(sr_mitigated.by_group)
     sex
-    Female       0.155262
-    Male         0.171547
+    Female    0.1552...
+    Male      0.1715...
     Name: selection_rate, dtype: object
 
 Similarly, we can explore the difference between the initial model and the

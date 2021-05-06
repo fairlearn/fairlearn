@@ -9,11 +9,11 @@ trigger: none
 pr: none
 
 schedules:
-- cron: "30 5 * * *" # Time is UTC
+- cron: "30 7 * * *" # Time is UTC
   displayName: Nightly Code Coverage Build
   branches:
     include:
-      - master
+      - main
   always: true
 
 jobs:

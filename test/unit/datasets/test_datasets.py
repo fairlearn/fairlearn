@@ -5,7 +5,11 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from fairlearn.datasets import fetch_adult, fetch_boston, fetch_bank_marketing
+from fairlearn.datasets import (
+    fetch_adult,
+    fetch_boston,
+    fetch_bank_marketing
+)
 
 # =============================================
 

@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 
 _SUBGROUP_COUNT_WARNING_THRESHOLD = 20
 
+_SF_DICT_CONVERSION_FAILURE = "DataFrame.from_dict() failed on sensitive features. " \
+    "Please ensure each array is strictly 1-D."
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
@@ -512,14 +514,17 @@ class MetricFrame:
                 result.append(GroupFeature(base_name, column, i, None))
         elif isinstance(features, list):
             if np.isscalar(features[0]):
-                f_arr = np.squeeze(np.asarray(features))
+                f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
             else:
                 raise ValueError(_FEATURE_LIST_NONSCALAR)
         elif isinstance(features, dict):
-            df = pd.DataFrame.from_dict(features)
+            try:
+                df = pd.DataFrame.from_dict(features)
+            except ValueError as ve:
+                raise ValueError(_SF_DICT_CONVERSION_FAILURE) from ve
             for i in range(len(df.columns)):
                 col_name = df.columns[i]
                 if not isinstance(col_name, str):
@@ -530,7 +535,7 @@ class MetricFrame:
                 result.append(GroupFeature(base_name, column, i, None))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
-            f_arr = np.squeeze(np.asarray(features, dtype=np.object))
+            f_arr = np.squeeze(np.asarray(features, dtype=object))
             if len(f_arr.shape) == 1:
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))

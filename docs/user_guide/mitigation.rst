@@ -39,6 +39,12 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✘
       - DP, EO, TPRP, FPRP
+   *  - :code:`fairlearn.` :code:`preprocessing.` :code:`CorrelationRemover`
+      - Preprocessing algorithm that removes correlation between sensitive
+        features and non-sensitive features through linear transformations.
+      - ✔
+      - ✔
+      - ✘
 
 DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
 rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
@@ -60,6 +66,13 @@ fairness definitions, please open a
    randomization, it is possible to get different outputs from the predictor's
    :code:`predict` method on identical data. For each of our algorithms, we provide
    explicit access to the probability distribution used for randomization.
+
+.. _preprocessing:
+
+Preprocessing
+--------------
+   
+.. currentmodule:: fairlearn.preprocessing
 
 .. _postprocessing:
 
@@ -353,16 +366,16 @@ In practice this can be used in a difference-based relaxation as follows:
     0.5714285714285714
     >>> tpr_summary.by_group
     sensitive_feature_0
-    a        0.75
-    b    0.333333
+    a    0.75...
+    b    0.33...
     Name: true_positive_rate, dtype: object
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.178571
-                   b          -0.238095
-    -     label=1  a          -0.178571
-                   b           0.238095
+    +     label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. note::
@@ -381,10 +394,10 @@ Alternatively, a ratio-based relaxation is also available:
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.103571
-                   b          -0.271429
-    -     label=1  a          -0.235714
-                   b           0.180952
+    +     label=1  a           0.1035...
+                   b          -0.2714...
+    -     label=1  a          -0.2357...
+                   b           0.1809...
     dtype: float64
 
 .. _equalized_odds:
@@ -409,14 +422,14 @@ and false positive rate.
     >>> eo.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> eo.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=0  a          -0.333333
-                   b           0.166667
-          label=1  a           0.178571
-                   b          -0.238095
-    -     label=0  a           0.333333
-                   b          -0.166667
-          label=1  a          -0.178571
-                   b           0.238095
+    +     label=0  a          -0.3333...
+                   b           0.1666...
+          label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=0  a           0.3333...
+                   b          -0.1666...
+          label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. _error_rate_parity:
@@ -491,6 +504,40 @@ constraints:
     -     all    a           0.16
                  b          -0.24
     dtype: float64
+
+
+Control features
+^^^^^^^^^^^^^^^^
+
+The above examples of :class:`Moment` (:ref:`demographic_parity`,
+:ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
+:ref:`equalized_odds` and :ref:`error_rate_parity`) all support the concept
+of *control features* when applying their fairness constraints.
+A control feature stratifies the dataset, and applies the fairness constraint
+within each stratum, but not between strata.
+One case this might be useful is a loan scenario, where we might want
+to apply a mitigation for the sensitive features while controlling for some
+other feature(s).
+This should be done with caution, since the control features may have a
+correlation with the sensitive features due to historical biases.
+In the loan scenario, we might choose to control for income level, on the
+grounds that higher income individuals are more likely to be able to repay
+a loan.
+However, due to historical bias, there is a correlation between the income level
+of individuals and their race and gender.
+
+
+Control features modify the above equations.
+Consider a control feature value, drawn from a set of valid values
+(that is, :math:`c \in \mathcal{C}`).
+The equation given above for Demographic Parity will become:
+
+
+.. math::
+    P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
+
+The other constraints acquire similar modifications.
+
 
 .. _constraints_multi_class_classification:
 
@@ -572,7 +619,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b     0.5
+    b    0.5
     Name: mean_absolute_error, dtype: object
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)

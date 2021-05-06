@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 from .moment import LossMoment
 from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
-from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
+
+from fairlearn._input_validation import _validate_and_reformat_input
 
 
 class ConditionalLossMoment(LossMoment):
@@ -34,12 +35,17 @@ class ConditionalLossMoment(LossMoment):
         """Return a default objective."""
         return MeanLoss(self.reduction_loss)
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features):
         """Load data into the moment object."""
-        kwargs_mod = kwargs.copy()
+        X_train, y_train, sf_train, _ = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=False,
+                                         sensitive_features=sensitive_features)
         if self.no_groups:
-            kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
-        super().load_data(X, y, **kwargs_mod)
+            sf_train = y_train.apply(lambda v: _ALL)
+
+        # The following uses X and not X_train so that the estimators get X untouched
+        super().load_data(X, y_train, sensitive_features=sf_train)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr

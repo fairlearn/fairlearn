@@ -5,6 +5,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Sarah Bird](https://github.com/slbird)
 - [Frederic Branchaud-Charron](https://github.com/Dref360)
 - [Rishit Dagli](https://github.com/Rishit-dagli)
+- [Vamsi Desu](https://github.com/vamsidesu5)
 - [Miro Dudik](https://github.com/MiroDudik)
 - [Richard Edgar](https://github.com/riedgar-ms)
 - [Andra Fehmiu](https://github.com/afehmiu)
@@ -28,3 +29,4 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Hilde Weerts](https://github.com/hildeweerts)
 - [Vincent Xu](https://github.com/vingu)
 - [Beth Zeranski](https://github.com/bethz)
+- [Vlad Iliescu](https://vladiliescu.net)

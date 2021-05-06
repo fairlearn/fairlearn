@@ -46,7 +46,7 @@ stages:
     parameters:
       platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
       installationType: 'PipLocal'
-      pyVersions: [3.6, 3.7, 3.8]
+      pyVersions: [3.6, 3.7, 3.8, 3.9]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
       
@@ -55,7 +55,7 @@ stages:
       platforms: { MacOS: macos-latest }
       testRunTypes: ['Unit']
       installationType: 'None'
-      pyVersions: [3.6, 3.7, 3.8]
+      pyVersions: [3.6, 3.7, 3.8, 3.9]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
 
@@ -101,7 +101,7 @@ stages:
         freezeArtifact: $(freezeArtifactName)
         freezeFile: $(freezeFile)
 
-    - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
+    - script: python ./scripts/build_widget.py --yarn-path /usr/local/bin/yarn
       displayName: 'Build widget'
 
     - script: python ./scripts/build_wheels.py --version-filename $(versionFilename) 
@@ -136,7 +136,7 @@ stages:
       parameters:
         platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
         installationType: 'WheelArtifact'
-        pyVersions: [3.6, 3.7, 3.8]
+        pyVersions: [3.6, 3.7, 3.8, 3.9]
         freezeArtifactStem: $(freezeArtifactStem)
         freezeFileStem: $(freezeFileStem)
         wheelArtifactName: $(packageArtifactName)
@@ -146,7 +146,7 @@ stages:
         platforms: { MacOS: macos-latest }
         testRunTypes: ['Unit']
         installationType: 'WheelArtifact'
-        pyVersions: [3.6, 3.7, 3.8]
+        pyVersions: [3.6, 3.7, 3.8, 3.9]
         freezeArtifactStem: $(freezeArtifactStem)
         freezeFileStem: $(freezeFileStem)
         wheelArtifactName: $(packageArtifactName)
@@ -226,7 +226,7 @@ stages:
   - template: templates/all-tests-job-template.yml
     parameters:
       platforms:  { Linux: ubuntu-latest, Windows: vs2017-win2016 }
-      pyVersions: [3.6, 3.7, 3.8]
+      pyVersions: [3.6, 3.7, 3.8, 3.9]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
       installationType: 'PyPI'
@@ -237,6 +237,7 @@ stages:
   - template: templates/all-tests-job-template.yml
     parameters:
       platforms: { MacOS: macos-latest }
+      pyVersions: [3.6, 3.7, 3.8, 3.9]
       testRunTypes: ['Unit']
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
