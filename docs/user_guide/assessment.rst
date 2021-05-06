@@ -405,7 +405,7 @@ The simplest way to visualize grouped metrics from the :class:`MetricFrame` is
 to take advantage of the inherent plotting capabilities of
 :class:`pandas.DataFrame`:
 
-.. literalinclude:: auto_examples/plot_quickstart.py
+.. literalinclude:: ../auto_examples/plot_quickstart.py
     :lines: 26-37
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
@@ -418,7 +418,7 @@ to take advantage of the inherent plotting capabilities of
 Fairlearn dashboard
 -------------------
 
-The Fairlearn dashboard is a Jupyter notebook widget for assessing how a
+The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
 model's predictions impact different groups (e.g., different ethnicities), and
 also for comparing multiple models along different fairness and performance
 metrics.
