@@ -43,7 +43,7 @@ Concept Glossary
 ----------------------------
 
 The concepts outlined in this glossary can be leveraged to help navigate and 
-understand the sociotechnical contexts in Fairlearn is used. 
+understand the sociotechnical contexts. 
 
 Construct Validity
 ^^^^^^^^^^^^^^^^^^
