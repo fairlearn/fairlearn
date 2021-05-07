@@ -59,6 +59,17 @@ directory:
 Rerunning this after making changes to individual files only rebuilds the
 changed pages, so the build time should be a lot shorter.
 
+If this runs successfully, this will do two things: 
+	1. Build the current .py file as html 
+        2. Save the html in docs/_build/html/auto_examples
+
+You can check that the notebook renders properly 
+by launching the HTML with the following command: 
+
+.. code::
+
+    start docs/_build/html/auto_examples/plot_*.html
+
 To edit the notebook we recommend using 
 `Visual Studio Code <https://code.visualstudio.com/docs/python/jupyter-support>`_.
 VS Code recognizes the lines starting with :code:`# %%` as new cells.
