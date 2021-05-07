@@ -85,31 +85,29 @@ contexts. With that said, Measurement and Fairness offers a fairness-oriented co
 is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
 can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
-1) **Face validity** – On the surface, how plausible does the measurements produced by the measurement model look?
+1. **Face validity** – On the surface, how plausible does the measurements produced by the measurement model look?
 
-2) **Content validity** – This has three subcomponents:
+2. **Content validity** – This has three subcomponents:
 
-	a) **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context-dependent).
+   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context        dependent).
+   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable 			   theoretical constructs related to the construct of interest (and only those)?
+   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured           observable properties and other unobservable theoretical constructs?
 
-	b) **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable theoretical constructs related to the construct of interest (and only those)?
+3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
+   measurement models for which construct validity has been established? 
+ 
+4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with 
+   related constructs as appropriate?  
 
-	c) **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured observable properties and other unobservable theoretical constructs?
+5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements 
+   of any relevant observable properties or other unobservable theoretical constructs?
 
-3) **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
-measurement models for which construct validity has been established?  
+6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements 
+   produced by the measurement model, and whether those are “substantively interesting”.
 
-4) **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with 
-related constructs as appropriate?  
-
-5) **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements 
-of any relevant observable properties or other unobservable theoretical constructs?
-
-6) **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements 
-produced by the measurement model, and whether those are “substantively interesting”.
-
-7) **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the 
-measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
-measurements, and what world do we wish to live in?
+7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the 
+   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
+   measurements, and what world do we wish to live in?
 
 **Note:** The order in which the parts above are explored may vary depending on the specific 
 sociotechnical context. This is only intended to explain the key concepts that could be used in a 
