@@ -1,6 +1,18 @@
 # Changes
 
+### v0.6.2
+
+* Bugfix for `_merge_columns()` when using multiple sensitive features with
+  long names. This previously caused groups to get merged if the concatenation
+  of their string representations was identical until the cutoff limit.
+
 ### v0.6.1
+
+* Bugfix for `_create_group_metric_set()`. Fixes the list of metrics computed for regression
+  and adds a set of metrics for 'probability' problems [PR](https://github.com/fairlearn/fairlearn/pull/727)
+* Updated 'Credit Card' notebook [PR](https://github.com/fairlearn/fairlearn/pull/713)
+* Added some overlooked `MetricFrame` tests [PR](https://github.com/fairlearn/fairlearn/pull/701)
+* Various documentation tweaks and enhancements
 
 ### v0.6.0
 

@@ -29,74 +29,6 @@ This is a `recent decision by the community <https://github.com/fairlearn/fairle
 The new policy is to update docstrings that a PR touches, as opposed to
 changing all the docstrings in one PR.
 
-Developer certificate of origin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-All contributions require you to sign the *developer certificate of origin
-(DCO)*. This is a developer's certification in which you declare that you have
-the right to, and actually do, grant us the rights to use your contribution.
-We use the exact same one created and used by the Linux kernel developers. You
-can read it at https://developercertificate.org.
-
-You sign the DCO by *signing off* every commit comment with your name and email
-address: *Signed-off-by: Your Name <your.email@example.com>*
-
-When you submit a pull request, a DCO-bot will automatically determine whether
-you need to provide a DCO and indicate how you can decorate the PR
-appropriately (e.g., label, comment).
-
-Manually
-""""""""
-
-You can manually sign-off by adding a separate paragraph to your commit
-message:
-
-.. code-block::
-
-    git commit -m “Your message
-    Signed-off-by: Your Name <your.email@example.com>
-
-or
-
-.. code-block::
-
-    git commit -m “Your message" -m “Signed-off-by: Your Name <your.email@example.com>”
-
-If this feels like a lot of typing, you can configure your name and e-mail in
-git to sign-off:
-
-.. code-block::
-
-    git config --global user.name “Your Name”
-    git config --global user.email “your.email@example.com”
-
-
-Now, you can sign off using :code:`-s` or :code:`--signoff`:
-
-.. code-block::
-
-    git commit -s -m "Your message"
-
-If you find :code:`-s` too much typing as well, you can also add an alias:
-
-.. code-block::
-
-    git config --global alias.c "commit --signoff"
-
-
-Which allows you to commit including a signoff as :code:`git c -m "Your
-Message"`.
-
-These instructions were adapted from `this blog post <https://kauri.io/dco-signoff-commiting-code-to-hyperledger-besu/f58190e5e3bc4b1a9ed902bfccfe58b9/a>`_.
-
-Automatically
-"""""""""""""
-
-You can also fully automate signing off using git hooks, by following the
-instructions of `this stack overflow post <https://stackoverflow.com/questions/15015894/git-add-signed-off-by-line-using-format-signoff-not-working/46536244#46536244>`_.
-
-.. _advanced_install:
-
 Advanced installation instructions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -234,41 +166,46 @@ To run the same tests locally, find the corresponding pipeline definition (a
 the command to execute the tests (usually starting with
 :code:`python -m pytest`) or it refers to a template file with the command.
 
-Creating new releases
-^^^^^^^^^^^^^^^^^^^^^
+Building the website
+^^^^^^^^^^^^^^^^^^^^
 
-First add a description of the changes introduced in the package version you
-want to release to `CHANGES.md <https://github.com/fairlearn/fairlearn/CHANGES.md>`_.
+The website is built using `Sphinx <https://www.sphinx-doc.org/en/master/>`_
+and some of its extensions. Specifically, the website is available for all our
+releases to allow users to check the documentation of the version of the
+package that they are using.
 
-It is also best to verify that the Fairlearn dashboard loads correctly. This
-is slightly involved:
+To be able to build the documentation you need to install all the
+requirements using :code:`pip install -r requirements-dev.txt`.
 
-#. Install the :code:`wheel` package by running :code:`pip install wheel`
-#. Create a wheel by running :code:`python setup.py sdist bdist_wheel` from
-   the repository root. This will create a :code:`dist` directory which
-   contains a :code:`.whl` file.
-#. Create a new conda environment for the test
-#. In this new environment, install this wheel by running
-   :code:`pip install dist/<FILENAME>.whl`
-#. Install any pip packages required for the notebooks using
-   :code:`python ./scripts/install_requirements.py --pinned false`
-#. Check that the dashboard loads in the notebooks
+When making changes to the documentation at least run the following command
+to build the website using your changes:
 
-We have an
-`Azure DevOps Pipeline <https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=60&_a=summary>`_
-which takes care of building wheels and pushing to PyPI. Validations are also
-performed prior to any deployments, and also following the uploads to Test-PyPI
-and PyPI. To use it:
+.. code-block::
 
-#. Ensure that `fairlearn/__init__.py` has the correct version set.
-#. Put down a tag corresponding to this version but preprended with :code:`v`.
-   For example, version :code:`0.5.0` should be tagged with :code:`v0.5.0`.
+    python -m sphinx -v -b html -n -j auto docs docs/_build/html
 
-At queue time, select Test or Production PyPI as appropriate.
+or use the shortcut
 
-As part of the release process, the :code:`build_wheels.py` script uses
-:code:`process_readme.py` to turn all the relative links in the ReadMe file
-into absolute ones (this is the reason why the applied tag has be of the form
-:code:`v[__version__]`). The :code:`process_readme.py` script is slightly
-fragile with respect to the contents of the ReadMe, so after significant
-changes its output should be verified.
+.. code-block::
+
+    make doc
+
+This will generate the website in the directory mentioned at the end of the
+command. Navigate to that directory and find the corresponding files where
+you made changes, open them in the browser and verify that your changes
+render properly and links are working as expected.
+
+To fully build the website for all versions use the following script:
+
+.. code-block::
+
+    python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
+
+or the shortcut
+
+.. code-block::
+
+    make doc-multiversion
+
+The comprehensive set of commands to build the website is in our CircleCI
+configuration file in the `.circleci` directory of the repository.

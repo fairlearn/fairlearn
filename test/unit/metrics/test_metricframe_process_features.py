@@ -90,6 +90,20 @@ class TestSingleFeature():
             _ = target._process_features("Unused", raw_feature, y_true)
         assert execInfo.value.args[0] == msg
 
+    def test_from_dict_failure(self):
+        r_f, y_true = self._get_raw_data()
+        raw_feature = {'Mine!': np.asarray(r_f).reshape(-1, 1)}
+        target = _get_raw_MetricFrame()
+        msg = "DataFrame.from_dict() failed on sensitive features. "\
+            "Please ensure each array is strictly 1-D."
+        with pytest.raises(ValueError) as ve:
+            _ = target._process_features("Unused", raw_feature, y_true)
+        assert msg == ve.value.args[0]
+        assert ve.value.__cause__ is not None
+        assert isinstance(ve.value.__cause__, ValueError)
+        # Ensure we got the gnomic pandas message
+        assert ve.value.__cause__.args[0] == 'If using all scalar values, you must pass an index'
+
 
 class TestTwoFeatures():
     def _get_raw_data(self):
@@ -122,7 +136,7 @@ class TestTwoFeatures():
     def test_2d_array(self):
         a, b, y_true = self._get_raw_data()
         # Specify dtype to avoid unwanted string conversion
-        rf = np.asarray([a, b], dtype=np.object).transpose()
+        rf = np.asarray([a, b], dtype=object).transpose()
 
         target = _get_raw_MetricFrame()
         result = target._process_features('CF', rf, y_true)

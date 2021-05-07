@@ -40,6 +40,8 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
     >>> skm.recall_score(y_true, y_pred)
     0.5
 
+.. _metrics_with_grouping:
+
 Metrics with Grouping
 ^^^^^^^^^^^^^^^^^^^^^
 
