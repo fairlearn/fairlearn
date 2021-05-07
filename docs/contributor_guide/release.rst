@@ -47,3 +47,5 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
     #. Ensure that `smv_tag_whitelist` in `docs/conf.py` will pick up the
        new release
     #. Update `docs/static_landing_page/` so that all the links point to the new release
+
+#. Merge that PR.
