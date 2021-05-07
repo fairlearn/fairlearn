@@ -39,6 +39,12 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✘
       - DP, EO, TPRP, FPRP
+   *  - :code:`fairlearn.` :code:`preprocessing.` :code:`CorrelationRemover`
+      - Preprocessing algorithm that removes correlation between sensitive
+        features and non-sensitive features through linear transformations.
+      - ✔
+      - ✔
+      - ✘
 
 DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
 rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
@@ -60,6 +66,13 @@ fairness definitions, please open a
    randomization, it is possible to get different outputs from the predictor's
    :code:`predict` method on identical data. For each of our algorithms, we provide
    explicit access to the probability distribution used for randomization.
+
+.. _preprocessing:
+
+Preprocessing
+--------------
+   
+.. currentmodule:: fairlearn.preprocessing
 
 .. _postprocessing:
 
