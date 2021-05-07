@@ -1,7 +1,5 @@
 # Changes
 
-### v0.7.0
-
 ### v0.6.2
 
 * Bugfix for `_merge_columns()` when using multiple sensitive features with
