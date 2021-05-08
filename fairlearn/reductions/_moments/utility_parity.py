@@ -275,7 +275,7 @@ class DemographicParity(UtilityParity):
     (corresponding to the Lagrange multipliers for positive and negative constraints)
     as there are unique values for the sensitive feature.
     The :meth:`signed_weights` method will compute the costs according
-    to Example 3 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_. #noqa: E501
+    to Example 3 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_. # noqa: E501
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the Demographic Parity constraint applied within
