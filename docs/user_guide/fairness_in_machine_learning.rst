@@ -42,8 +42,7 @@ The Fairlearn package is most applicable to two kinds of harms:
 Concept Glossary
 ----------------------------
 
-The concepts outlined in this glossary can be leveraged to help navigate and 
-understand the sociotechnical contexts. 
+The concepts outlined in this glossary are relevant to sociotechnical contexts. 
 
 Construct Validity
 ^^^^^^^^^^^^^^^^^^
