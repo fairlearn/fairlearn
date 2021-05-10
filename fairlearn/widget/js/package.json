@@ -38,7 +38,7 @@
     "@types/node": "^10.11.6",
     "@types/react-dom": "^16.8.4",
     "elliptic": "6.5.3",
-    "lodash": "4.17.20",
+    "lodash": "4.17.21",
     "mkdirp": "^0.5.1",
     "node-fetch": "2.6.1",
     "rimraf": "^2.6.1",
