@@ -39,80 +39,6 @@ The Fairlearn package is most applicable to two kinds of harms:
   information are extended or withheld. Examples include varying accuracy in
   face recognition, document search, or product recommendation.
 
-Concept Glossary
-----------------------------
-
-The concepts outlined in this glossary can be leveraged to help navigate and 
-understand the sociotechnical contexts. 
-
-Construct Validity
-^^^^^^^^^^^^^^^^^^
-
-We explore the concept of construct validity, as described in in Measurement and Fairness [#4]_ , and as it relates to sociotechnical contexts. This in intended to illuminate the concept to readers who are working on solutions in sociotechnical contexts and may also be referenced in explorations that detail how to apply the concept to specific scenarios.
-
-Key Terms 
-~~~~~~~~~
-
-- **Sociotechnical context** – A context in which both societal and technical aspects shape who might be harmed by AI systems and how (see fairlearn.ai for more detailed definition).
-
-- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model. 
-
-- **Measurement model** – The method and approach used to measure the unobservable theoretical construct.
-
-- **Construct reliability** – This is closely related to construct validity (detailed below) and can be thought of as the extent to which the measurements of an unobservable theoretical construct remain the same when measured at different points in time. A lack of construct reliability can either be due to a misalignment between the understanding of the unobservable theoretical construct and the methods being used to measure that construct, or to changes to the construct itself.
-
-- **Construct validity** – This can be thought of as the extent to which the measurement model can be used to produce meaningful and useful results.
-
-Key Term Examples  - Unobservable theoretical constructs and Measurement models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- **Fairness** is an example of an unobservable theoretical construct. Several measurement models exist for measuring fairness, including demographic parity. See Fairlearn Metrics for more examples of measurement models for measuring fairness. 
-
-- **Teacher effectiveness** is an example of an unobservable theoretical construct. Common measurement models include student performance on standardized exams and qualitative feedback for the teacher’s students.
-
-- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
-
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs.
-
-**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness for more detailed examples.
- 
-What is Construct Validity? 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Though the Measurement and Fairness paper explores both Construct reliability and Construct validity, we focus our 
-exploration below on Construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
-contexts. With that said, Measurement and Fairness offers a fairness-oriented conceptualization of construct validity, that 
-is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
-can serve as a framework for analyzing an AI task and attempting to establish construct validity:
-
-1. **Face validity** – On the surface, how plausible does the measurements produced by the measurement model look?
-
-2. **Content validity** – This has three subcomponents:
-
-   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context        dependent).
-   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable 			   theoretical constructs related to the construct of interest (and only those)?
-   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured           observable properties and other unobservable theoretical constructs?
-
-3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
-   measurement models for which construct validity has been established? 
- 
-4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with 
-   related constructs as appropriate?  
-
-5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements 
-   of any relevant observable properties or other unobservable theoretical constructs?
-
-6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements 
-   produced by the measurement model, and whether those are “substantively interesting”.
-
-7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the 
-   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
-   measurements, and what world do we wish to live in?
-
-**Note:** The order in which the parts above are explored may vary depending on the specific 
-sociotechnical context. This is only intended to explain the key concepts that could be used in a 
-framework for analyzing a task.
-
 Fairness assessment and unfairness mitigation
 ---------------------------------------------
 
@@ -230,6 +156,3 @@ subpackage :code:`fairlearn.metrics`.
    .. [#3] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
       Approach to Fair Classification"
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
-
-   .. [#4] Jacobs, Wallach `"Measurement and Fairness"
-      <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
