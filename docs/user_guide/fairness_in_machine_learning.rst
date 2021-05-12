@@ -60,7 +60,7 @@ Key Terms
 
 - **Construct reliability** – This is closely related to construct validity (detailed below) and can be thought of as the extent to which the measurements of an unobservable theoretical construct remain the same when measured at different points in time. A lack of construct reliability can either be due to a misalignment between the understanding of the unobservable theoretical construct and the methods being used to measure that construct, or to changes to the construct itself.
 
-- **Construct validity** – This can be thought of as the extent to which the measurement model can be used to produce meaningful and useful results.
+- **Construct validity** – This can be thought of as the extent to which the measurement model measures the intended construct in way that is meaningful and useful.
 
 Key Term Examples  - Unobservable theoretical constructs and Measurement models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
