@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import nbformat as nbf
@@ -91,27 +91,6 @@ def test_grid_search_for_binary_classification():
 
 
 @pytest.mark.notebooks
-def test_binary_classification_on_compas_dataset():
-    nb_name = "Binary Classification on COMPAS dataset"
-
-    test_values = {}
-    test_values["pp_eo_aa_pignore"] = ScrapSpec(
-        "postprocessed_predictor_EO.interpolated_thresholder_.interpolation_dict['African-American'].p_ignore",  # noqa: E501
-        pytest.approx(0.2320703126)
-    )
-
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_grid_search_with_census_data():
-    nb_name = "Grid Search with Census Data"
-    test_values = {}
-    test_values["len_nondominated"] = ScrapSpec("len(non_dominated)", 13)
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
 def test_mitigating_disparities_in_ranking_from_binary_data():
     nb_name = "Mitigating Disparities in Ranking from Binary Data"
     test_values = {}
@@ -126,12 +105,12 @@ def test_mitigating_disparities_in_ranking_from_binary_data():
 def test_binary_classification_with_the_uci_credit_card_default_dataset():
     nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
     test_values = {}
-    test_values["GridSearch_17"] = ScrapSpec(
-        "int(sum(model_sweep_dict['GridSearch_17']))",
-        2533
+    test_values["Contains_Unmitigated"] = ScrapSpec(
+        "'Unmitigated' in models_dict",
+        True
     )
-    test_values["GridSearch_31"] = ScrapSpec(
-        "int(sum(model_sweep_dict['GridSearch_31']))",
-        2775
+    test_values["Contains_ThresholdOptimizer"] = ScrapSpec(
+        "'ThresholdOptimizer' in models_dict",
+        True
     )
     assay_one_notebook(nb_name, test_values)

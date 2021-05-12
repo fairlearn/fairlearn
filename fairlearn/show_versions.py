@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 """Utility methods to print system info for debugging.
@@ -34,7 +34,7 @@ def _get_deps_info():
     :return: version information on relevant Python libraries
     :rtype: dict
     """
-    deps = [
+    deps = sorted([
         "pip",
         "setuptools",
         "sklearn",
@@ -44,7 +44,7 @@ def _get_deps_info():
         "pandas",
         "matplotlib",
         "tempeh"
-        ]
+        ])
 
     def get_version(module):
         return module.__version__

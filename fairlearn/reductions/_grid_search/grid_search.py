@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import copy
@@ -10,7 +10,6 @@ from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
 from time import time
 
-from fairlearn._input_validation import _validate_and_reformat_input, _KW_SENSITIVE_FEATURES
 from fairlearn.reductions._moments import Moment, ClassificationMoment
 from ._grid_generator import _GridGenerator
 
@@ -26,38 +25,43 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     The approach used is taken from section 3.4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
-    :param estimator: An estimator implementing methods :code:`fit(X, y, sample_weight)` and
-        :code:`predict(X)`, where `X` is the matrix of features, `y` is the vector of labels, and
-        `sample_weight` is a vector of weights; labels `y` and predictions returned by
+    Parameters
+    ----------
+    estimator : estimator
+        An estimator implementing methods :code:`fit(X, y, sample_weight)` and
+        :code:`predict(X)`, where `X` is the matrix of features, `y` is the
+        vector of labels (binary classification) or continuous values
+        (regression), and `sample_weight` is a vector of weights.
+        In binary classification labels `y` and predictions returned by
         :code:`predict(X)` are either 0 or 1.
-    :type estimator: estimator
-
-    :param constraints: The disparity constraints expressed as moments.
-    :type constraints: fairlearn.reductions.Moment
-
-    :param selection_rule: Specifies the procedure for selecting the best model found by the
-        grid search. At the present time, the only valid value is "tradeoff_optimization" which
-        minimises a weighted sum of the error rate and constraint violation.
-    :type selection_rule: str
-
-    :param constraint_weight: When the `selection_rule` is "tradeoff_optimization" this specifies
-        the relative weight put on the constraint violation when selecting the best model.
-        The weight placed on the error rate will be :code:`1-constraint_weight`
-    :type constraint_weight: float
-
-    :param grid_size: The number of Lagrange multipliers to generate in the grid
-    :type grid_size: int
-
-    :param grid_limit: The largest Lagrange multiplier to generate. The grid will contain values
-        distributed between :code:`-grid_limit` and :code:`grid_limit` by default
-    :type grid_limit: float
-
-    :param grid_offset: shifts the grid of Lagrangian multiplier by that value
-         It is '0' by default
-    :type grid_offset: :class:`pandas:pandas.DataFrame`
-
-    :param grid: Instead of supplying a size and limit for the grid, users may specify the exact
-        set of Lagrange multipliers they desire using this argument.
+        In regression values `y` and predictions are continuous.
+    constraints : fairlearn.reductions.Moment
+        The disparity constraints expressed as moments
+    selection_rule : str
+        Specifies the procedure for selecting the best model found by the grid
+        search. At the present time, the only valid value is
+        "tradeoff_optimization" which minimizes a weighted sum of the error
+        rate and constraint violation.
+    constraint_weight : float
+        When the `selection_rule` is "tradeoff_optimization" this specifies
+        the relative weight put on the constraint violation when selecting the
+        best model. The weight placed on the error rate will be
+        :code:`1-constraint_weight`
+    grid_size : int
+        The number of Lagrange multipliers to generate in the grid
+    grid_limit : float
+        The largest Lagrange multiplier to generate. The grid will contain
+        values distributed between :code:`-grid_limit` and :code:`grid_limit`
+        by default
+    grid_offset : :class:`pandas:pandas.DataFrame`
+        Shifts the grid of Lagrangian multiplier by that value.
+        It is '0' by default
+    grid :
+        Instead of supplying a size and limit for the grid, users may specify
+        the exact set of Lagrange multipliers they desire using this argument.
+    sample_weight_name : str
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
     def __init__(self,
@@ -68,7 +72,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                  grid_size=10,
                  grid_limit=2.0,
                  grid_offset=None,
-                 grid=None):
+                 grid=None,
+                 sample_weight_name="sample_weight"):
         """Construct a GridSearch object."""
         self.estimator = estimator
         if not isinstance(constraints, Moment):
@@ -88,6 +93,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         self.grid_limit = float(grid_limit)
         self.grid_offset = grid_offset
         self.grid = grid
+        self.sample_weight_name = sample_weight_name
 
     def fit(self, X, y, **kwargs):
         """Run the grid search.
@@ -119,16 +125,11 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Regression problem detected")
             is_classification_reduction = False
 
-        _, y_train, sensitive_features_train = _validate_and_reformat_input(
-            X, y, enforce_binary_labels=is_classification_reduction, **kwargs)
-
-        kwargs[_KW_SENSITIVE_FEATURES] = sensitive_features_train
-
         # Prep the parity constraints and objective
         logger.debug("Preparing constraints and objective")
-        self.constraints.load_data(X, y_train, **kwargs)
+        self.constraints.load_data(X, y, **kwargs)
         objective = self.constraints.default_objective()
-        objective.load_data(X, y_train, **kwargs)
+        objective.load_data(X, y, **kwargs)
 
         # Basis information
         pos_basis = self.constraints.pos_basis
@@ -163,7 +164,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
-                y_reduction = y_train
+                y_reduction = self.constraints._y_as_series
 
             y_reduction_unique = np.unique(y_reduction)
             if len(y_reduction_unique) == 1:
@@ -175,7 +176,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 current_estimator = copy.deepcopy(self.estimator)
 
             oracle_call_start_time = time()
-            current_estimator.fit(X, y_reduction, sample_weight=weights)
+            current_estimator.fit(X, y_reduction, **{self.sample_weight_name: weights})
             oracle_call_execution_time = time() - oracle_call_start_time
             logger.debug("Call to estimator complete")
 

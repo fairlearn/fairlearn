@@ -1,10 +1,12 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 import numpy as np
 
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity
@@ -48,7 +50,7 @@ class TestExponentiatedGradientArguments:
 
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
-            constraints=DemographicParity(),
+            constraints=DemographicParity(difference_bound=eps),
             eps=eps)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
@@ -132,30 +134,24 @@ class TestExponentiatedGradientArguments:
 
         # Using a mocked estimator here since we don't actually want to fit one, but rather care
         # about having that object's fit method called exactly twice through the best_h calls.
-        estimator = mocker.MagicMock()
-        estimator.predict = mocker.MagicMock(return_value=y)
-        # ExponentiatedGradient pickles and unpickles the estimator, which isn't possible for the
-        # mock object, so we patch import of pickle as well. It sets the result from pickle.loads
-        # as the estimator, so we can simply overwrite the return value to be our mocked estimator
-        # object.
-        mocker.patch('pickle.dumps')
-        mocker.patch('pickle.loads', return_value=estimator)
-
+        estimator = LeastSquaresBinaryClassifierLearner()
+        estimator.predict = mocker.Mock(return_value=y)
+        estimator.fit = mocker.MagicMock()
         # restrict ExponentiatedGradient to a single iteration
         expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(),
                                         max_iter=1)
+        mocker.patch('copy.deepcopy', return_value=estimator)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
         # underlying estimator
         assert estimator.fit.call_count == 2
-        for name, args, kwargs in estimator.method_calls:
-            if name == 'fit':
-                assert len(args) == 2  # X and y
-                assert len(kwargs) == 1  # sample_weight
-                assert isinstance(args[0], type(transformed_X))
-                assert isinstance(args[1], pd.Series)
-                assert isinstance(kwargs['sample_weight'], pd.Series)
+        args, kwargs = estimator.fit.call_args
+        assert len(args) == 2  # X and y
+        assert len(kwargs) == 1  # sample_weight
+        assert isinstance(args[0], type(transformed_X))
+        assert isinstance(args[1], pd.Series)
+        assert isinstance(kwargs['sample_weight'], pd.Series)
 
     def test_binary_classifier_0_1_required(self):
         X, y, A = _get_data()
@@ -167,3 +163,24 @@ class TestExponentiatedGradientArguments:
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
         assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+
+    def test_sample_weights_argument(self):
+        estimator = Pipeline(
+            [('scaler', StandardScaler()),
+             ('logistic', LogisticRegression(solver='liblinear'))])
+
+        X, y, A = _get_data()
+
+        expgrad = ExponentiatedGradient(estimator,
+                                        constraints=DemographicParity(),
+                                        max_iter=1)
+
+        with pytest.raises(ValueError) as execInfo:
+            expgrad.fit(X, y, sensitive_features=(A))
+        assert 'Pipeline.fit does not accept the sample_weight parameter' in execInfo.value.args[0]
+
+        expgrad = ExponentiatedGradient(estimator,
+                                        constraints=DemographicParity(),
+                                        max_iter=1,
+                                        sample_weight_name='logistic__sample_weight')
+        expgrad.fit(X, y, sensitive_features=(A))

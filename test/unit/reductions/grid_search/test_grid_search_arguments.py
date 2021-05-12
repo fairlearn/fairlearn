@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import logging
@@ -9,10 +9,13 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 
 
 from sklearn.exceptions import NotFittedError
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
 from fairlearn._input_validation import \
     (_MESSAGE_Y_NONE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
-from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, GroupLossMoment, \
+from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, BoundedGroupLoss, \
     ZeroOneLoss
 from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
     GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
@@ -46,7 +49,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_valid_inputs(self, transformX, transformY, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=2)
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=2,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)
         gs.fit(transformX(X),
                transformY(Y),
@@ -60,7 +64,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_X_is_None(self, transformY, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=3)
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=3,
+                        sample_weight_name=self.sample_weight_name)
         _, Y, A = _quick_data(A_two_dim)
 
         with pytest.raises(ValueError) as execInfo:
@@ -75,7 +80,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_is_None(self, transformX, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, _, A = _quick_data()
 
         with pytest.raises(ValueError) as execInfo:
@@ -93,7 +99,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_X_Y_different_rows(self, transformX, transformY, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, _, A = _quick_data()
         Y = np.random.randint(2, size=len(A)+1)
 
@@ -111,7 +118,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_X_A_different_rows(self, transformX, transformY, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, _ = _quick_data(A_two_dim)
         A = np.random.randint(2, size=len(Y)+1)
         if A_two_dim:
@@ -137,7 +145,8 @@ class ArgumentTests:
         # The purpose of this test case is to create enough groups to trigger certain expected
         # warnings. The scenario should still work and succeed.
         grid_size = 10
-        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size)
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)
 
         if A_two_dim:
@@ -198,7 +207,8 @@ class ArgumentTests:
                         'dimensionality.')
 
         grid_size = 10
-        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size)
+        gs = GridSearch(self.estimator, self.disparity_criterion, grid_size=grid_size,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim, n_groups=n_groups)
 
         caplog.set_level(logging.WARNING)
@@ -228,7 +238,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_df_bad_columns(self, transformX, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
@@ -243,7 +254,8 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_ndarray_bad_columns(self, transformX, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
@@ -256,7 +268,8 @@ class ArgumentTests:
     # ----------------------------
 
     def test_no_predict_before_fit(self):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, _, _ = _quick_data()
 
         with pytest.raises(NotFittedError) as execInfo:
@@ -265,7 +278,8 @@ class ArgumentTests:
         assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
     def test_no_predict_proba_before_fit(self):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, _, _ = _quick_data()
 
         with pytest.raises(NotFittedError) as execInfo:
@@ -282,7 +296,8 @@ class ConditionalOpportunityTests(ArgumentTests):
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_ternary(self, transformX, transformY, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)
         Y[0] = 0
         Y[1] = 1
@@ -301,7 +316,8 @@ class ConditionalOpportunityTests(ArgumentTests):
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_not_0_1(self, transformX, transformY, transformA, A_two_dim):
-        gs = GridSearch(self.estimator, self.disparity_criterion)
+        gs = GridSearch(self.estimator, self.disparity_criterion,
+                        sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)
         Y = Y + 1
 
@@ -313,11 +329,21 @@ class ConditionalOpportunityTests(ArgumentTests):
         assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
 
 
+# Set up Pipeline estimator
+class TestPipelineEstimator(ConditionalOpportunityTests):
+    def setup_method(self, method):
+        self.estimator = Pipeline([('scaler', StandardScaler()),
+                                   ('logistic', LogisticRegression(solver='liblinear'))])
+        self.disparity_criterion = DemographicParity()
+        self.sample_weight_name = 'logistic__sample_weight'
+
+
 # Set up DemographicParity
 class TestDemographicParity(ConditionalOpportunityTests):
     def setup_method(self, method):
         self.estimator = LogisticRegression(solver='liblinear')
         self.disparity_criterion = DemographicParity()
+        self.sample_weight_name = 'sample_weight'
 
 
 # Test EqualizedOdds
@@ -325,6 +351,7 @@ class TestEqualizedOdds(ConditionalOpportunityTests):
     def setup_method(self, method):
         self.estimator = LogisticRegression(solver='liblinear')
         self.disparity_criterion = EqualizedOdds()
+        self.sample_weight_name = 'sample_weight'
 
 
 # Tests specific to BoundedGroupLoss
@@ -332,4 +359,5 @@ class TestBoundedGroupLoss(ArgumentTests):
     def setup_method(self, method):
         self.estimator = LinearRegression()
         eps = 0.01
-        self.disparity_criterion = GroupLossMoment(ZeroOneLoss(), upper_bound=eps)
+        self.disparity_criterion = BoundedGroupLoss(ZeroOneLoss(), upper_bound=eps)
+        self.sample_weight_name = 'sample_weight'

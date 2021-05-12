@@ -22,6 +22,17 @@ Fairlearn is also available on
 
 For checking out the latest version in our repository check out our
 :ref:`advanced_install`.
+If you are updating from a previous version of Fairlearn, please
+see :ref:`version_migration_guide`.
+
+.. note::
+
+    The Fairlearn API is still evolving, so example code in 
+    this documentation may not work with every version of Fairlearn.
+    Please use the version selector to get to the instructions for
+    the appropriate version. The instructions for the :code:`main`
+    branch require Fairlearn to be installed from a clone of the
+    repository. See :ref:`advanced_install` for the required steps.
 
 Overview of Fairlearn
 ---------------------
@@ -64,20 +75,21 @@ than $50,000 a year.
 .. doctest:: quickstart
 
     >>> import numpy as np 
+    >>> import pandas as pd
     >>> import matplotlib.pyplot as plt 
-    >>> from shap.datasets import adult  # shap is only used its dataset utility
-    >>> X, y_true = adult()
-    >>> y_true = y_true * 1
-    >>> sex = X['Sex'].apply(lambda sex: "female" if sex == 0 else "male")
+    >>> from sklearn.datasets import fetch_openml
+    >>> data = fetch_openml(data_id=1590, as_frame=True)
+    >>> X = pd.get_dummies(data.data)
+    >>> y_true = (data.target == '>50K') * 1
+    >>> sex = data.data['sex']
     >>> sex.value_counts()
-    male      21790
-    female    10771
-    Name: Sex, dtype: int64
+    Male      32650
+    Female    16192
+    Name: sex, dtype: int64
 
-.. figure:: auto_examples/quickstart/images/sphx_glr_plot_adult_dataset_001.png
-   :target: auto_examples/quickstart/plot_adult_dataset.html
-   :align: center
-   :scale: 70%
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
+    :target: auto_examples/plot_quickstart_selection_rate.html
+    :align: center
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -86,11 +98,12 @@ Firstly, Fairlearn provides fairness-related metrics that can be compared
 between groups and for the overall population. Using existing metric
 definitions from
 `scikit-learn <https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics>`_
-we can evaluate metrics to get a group summary as below:
+we can evaluate metrics for subgroups within the data as below:
 
 .. doctest:: quickstart
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import group_summary
+    >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> 
@@ -98,20 +111,43 @@ we can evaluate metrics to get a group summary as below:
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.844..., 'by_group': {'female': 0.925..., 'male': 0.804...}}
+    >>> gm = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
+    >>> print(gm.overall)
+    0.8443...
+    >>> print(gm.by_group)
+    sex
+    Female    0.9251...
+    Male      0.8042...
+    Name: accuracy_score, dtype: object
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
-selection rate, i.e., the percentage of the population with label 1:
+selection rate, i.e., the percentage of the population which have '1' as
+their label:
 
 .. doctest:: quickstart
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import selection_rate_group_summary
-    >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.161..., 'by_group': {'female': 0.059..., 'male': 0.212...}}
+    >>> from fairlearn.metrics import selection_rate
+    >>> sr = MetricFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
+    >>> sr.overall
+    0.1638...
+    >>> sr.by_group
+    sex
+    Female    0.0635...
+    Male      0.2135...
+    Name: selection_rate, dtype: object   
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
+
+.. note::
+
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn.
+    The widget itself has been moved to
+    `the raiwidgets package <https://pypi.org/project/raiwidgets/>`_.
+    Fairlearn will provide some of the existing functionality
+    through :code:`matplotlib`-based visualizations.
 
 .. doctest:: quickstart
 
@@ -145,7 +181,8 @@ such decisions. The Exponentiated Gradient mitigation technique used fits the
 provided classifier using Demographic Parity as the objective, leading to
 a vastly reduced difference in selection rate:
 
-.. doctest:: quickstart
+.. doctest:: quickstart 
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import ExponentiatedGradient, DemographicParity
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
@@ -156,8 +193,14 @@ a vastly reduced difference in selection rate:
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
-    >>> selection_rate_group_summary(y_true, y_pred_mitigated, sensitive_features=sex)
-    {'overall': 0.155..., 'by_group': {'female': 0.142..., 'male': 0.160...}}
+    >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
+    >>> print(sr_mitigated.overall)
+    0.1661...
+    >>> print(sr_mitigated.by_group)
+    sex
+    Female    0.1552...
+    Male      0.1715...
+    Name: selection_rate, dtype: object
 
 Similarly, we can explore the difference between the initial model and the
 mitigated model with respect to selection rate and accuracy in the dashboard
@@ -179,4 +222,5 @@ What's next?
 Please refer to our :ref:`user_guide` for a comprehensive view on Fairness in
 Machine Learning and how Fairlearn fits in, as well as an exhaustive guide on
 all parts of the toolkit. For concrete examples check out the
-:ref:`sphx_glr_auto_examples` section.
+:ref:`sphx_glr_auto_examples` section. Finally, we also have a collection
+of :ref:`faq`.

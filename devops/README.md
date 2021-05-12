@@ -14,7 +14,7 @@ Some of the templates in turn include other templates.
 `code-coverage.yml` defines our code coverage build.
 It is slightly different to the others, due to the need to instrument the test run and process and present the results afterwards.
 
-`nightly-requirements-fixed.yml` runs an extra script on the `requirements.txt` file, which pins versions specified by a lower bound (i.e. it converts `>=` into `==` in the file).
+`nightly-requirements-fixed.yml` runs an extra script on the `requirements` files, which pins versions specified by a lower bound (i.e. it converts `>=` into `==` in the file).
 This provides some measure of backwards compatibility checking.
 
 `nightly.yml` runs tests against multiple Python versions on multiple platforms.

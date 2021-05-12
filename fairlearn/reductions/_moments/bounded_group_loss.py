@@ -1,15 +1,30 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import pandas as pd
 import numpy as np
 from .moment import LossMoment
 from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
-from fairlearn._input_validation import _KW_SENSITIVE_FEATURES
+
+from fairlearn._input_validation import _validate_and_reformat_input
 
 
 class ConditionalLossMoment(LossMoment):
-    """A moment that quantifies a loss by group."""
+    r"""A moment for constraining the mean loss or the worst-case loss by a group.
+
+    Parameters
+    ----------
+    loss : {SquareLoss, AbsoluteLoss}
+        A loss object with an `eval` method, e.g. `SquareLoss` or
+        `AbsoluteLoss`.
+    upper_bound : float
+        An upper bound on the loss, also referred to as :math:`\\zeta`;
+        `upper_bound` is an optional argument that is not always
+        required; default None
+    no_groups : bool
+        indicates whether to calculate the mean loss or group-level losses,
+        default False, i.e., group-level losses are the default behavior
+    """
 
     def __init__(self, loss, *, upper_bound=None, no_groups=False):
         super().__init__(loss)
@@ -18,14 +33,19 @@ class ConditionalLossMoment(LossMoment):
 
     def default_objective(self):
         """Return a default objective."""
-        return AverageLossMoment(self.reduction_loss)
+        return MeanLoss(self.reduction_loss)
 
-    def load_data(self, X, y, **kwargs):
+    def load_data(self, X, y, *, sensitive_features):
         """Load data into the moment object."""
-        kwargs_mod = kwargs.copy()
+        X_train, y_train, sf_train, _ = \
+            _validate_and_reformat_input(X, y,
+                                         enforce_binary_labels=False,
+                                         sensitive_features=sensitive_features)
         if self.no_groups:
-            kwargs_mod[_KW_SENSITIVE_FEATURES] = pd.Series(y).apply(lambda y: _ALL)
-        super().load_data(X, y, **kwargs_mod)
+            sf_train = y_train.apply(lambda v: _ALL)
+
+        # The following uses X and not X_train so that the estimators get X untouched
+        super().load_data(X, y_train, sensitive_features=sf_train)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples
         self.index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr
@@ -53,10 +73,12 @@ class ConditionalLossMoment(LossMoment):
         return expect_attr[_LOSS]
 
     def bound(self):
-        """Return bound vector.
+        """Return the vector of bounds.
 
-        :return: a vector of bound values corresponding to all constraints
-        :rtype: pandas.Series
+        Returns
+        -------
+        pandas.Series
+            A vector of bounds on group-level losses
         """
         if self.upper_bound is None:
             raise ValueError("No Upper Bound")
@@ -66,13 +88,13 @@ class ConditionalLossMoment(LossMoment):
         """Return the lambda values."""
         return lambda_vec
 
-    def signed_weights(self, lambda_vec):
+    def signed_weights(self, lambda_vec=None):
         """Return the signed weights."""
-        adjust = lambda_vec / self.prob_attr
-        signed_weights = self.tags.apply(
-            lambda row: adjust[row[_GROUP_ID]], axis=1
-        )
-        return signed_weights
+        if lambda_vec is None:
+            adjust = pd.Series(1.0, index=self.index)
+        else:
+            adjust = lambda_vec / self.prob_attr
+        return self.tags.apply(lambda row: adjust[row[_GROUP_ID]], axis=1)
 
 
 # Ensure that ConditionalLossMoment shows up in correct place in documentation
@@ -80,15 +102,18 @@ class ConditionalLossMoment(LossMoment):
 ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
-class AverageLossMoment(ConditionalLossMoment):
-    """Moment for Average Loss."""
+class MeanLoss(ConditionalLossMoment):
+    """Moment for evaluating the mean loss."""
 
     def __init__(self, loss):
         super().__init__(loss, upper_bound=None, no_groups=True)
 
 
-class GroupLossMoment(ConditionalLossMoment):
-    """Moment for Group Loss."""
+class BoundedGroupLoss(ConditionalLossMoment):
+    """Moment for constraining the worst-case loss by a group.
+
+    For more information refer to the :ref:`user guide <bounded_group_loss>`.
+    """
 
     def __init__(self, loss, *, upper_bound=None):
         super().__init__(loss, upper_bound=upper_bound, no_groups=False)

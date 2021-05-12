@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Script to dynamically update the ReadMe file for a particular release
 
 Since PyPI and GitHub have slightly different ideas about markdown, we have to update

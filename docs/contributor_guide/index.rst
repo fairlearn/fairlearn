@@ -19,6 +19,7 @@ The contribution guide explains how to structure your contributions. Please
    contributing_code
    contributing_example_notebooks
    fairlearn_proposals
+   release
 
 .. _communication:
 
@@ -34,7 +35,7 @@ To report bugs, request features, or ask usage questions please use the
 
 .. _developer_calls:
 
-Developer calls
+Community calls
 ---------------
 
 We have a monthly contributor meeting every second Thursday of the month at
@@ -43,16 +44,4 @@ We have a monthly contributor meeting every second Thursday of the month at
 All are welcome! Please reach out via
 `Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
 invitation to you.
-We keep notes from each meeting in the :ref:`developer_call_notes`.
-
-.. _notebook_deep_dive:
-
-Notebook deep dives
--------------------
-
-We are currently experimenting with weekly notebook deep dives.
-They take place on Thursday at 11am New York City time whenever there is no
-:ref:`developer call <developer_calls>`.
-Please reach out via
-`Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
-invitation to you.
+We keep notes from each meeting in our `HackMD <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>`_.

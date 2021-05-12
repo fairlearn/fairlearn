@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 """This module contains algorithms implementing the reductions approach to disparity mitigation.
@@ -10,33 +10,29 @@ learning training.
 
 from ._exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from ._grid_search import GridSearch  # noqa: F401
-from ._moments import AbsoluteLoss, Moment, ConditionalSelectionRate  # noqa: F401
-from ._moments import DemographicParity, EqualizedOdds, ErrorRateRatio, ErrorRate, TruePositiveRateDifference   # noqa: F401,E501
-from ._moments import GroupLossMoment, SquareLoss, ZeroOneLoss  # noqa: F401
+from ._moments import AbsoluteLoss, Moment, UtilityParity  # noqa: F401
+from ._moments import (DemographicParity, EqualizedOdds,  # noqa: F401
+                       ErrorRateParity, ErrorRate,  # noqa: F401
+                       TruePositiveRateParity,   # noqa: F401
+                       FalsePositiveRateParity)   # noqa: F401
+from ._moments import BoundedGroupLoss, SquareLoss, ZeroOneLoss  # noqa: F401
 from ._moments import ClassificationMoment, LossMoment  # noqa: F401
 
-_exponentiated_gradient = [
+__all__ = [
     "ExponentiatedGradient",
-]
-
-_grid_search = [
     "GridSearch",
-]
-
-_moments = [
     "AbsoluteLoss",
     "Moment",
     "ClassificationMoment",
-    "ConditionalSelectionRate",
+    "UtilityParity",
     "DemographicParity",
     "EqualizedOdds",
-    "TruePositiveRateDifference",
-    "ErrorRateRatio",
+    "TruePositiveRateParity",
+    "FalsePositiveRateParity",
+    "ErrorRateParity",
     "ErrorRate",
-    "GroupLossMoment",
+    "BoundedGroupLoss",
     "LossMoment",
     "SquareLoss",
     "ZeroOneLoss"
 ]
-
-__all__ = [] + _exponentiated_gradient + _grid_search + _moments

@@ -1,0 +1,27 @@
+# Pipeline for smoke testing other ML packages
+
+trigger: none # No CI build
+
+pr:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - test_othermlpackages/*
+
+schedules:
+- cron: "0 8 * * *" # Time is UTC
+  displayName: Nightly Build
+  branches:
+    include:
+      - main
+  always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- template: templates/other-ml-job-template.yml
+  parameters:
+    poolImage: ubuntu-latest

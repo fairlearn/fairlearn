@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 # Validates that the checked in files required for the widget are up to date.
 # Specifically, this means that they were regenerated after changes
 

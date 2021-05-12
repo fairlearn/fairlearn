@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 """A variety of extra metrics useful for assessing fairness.
@@ -76,7 +76,10 @@ def _get_labels_for_confusion_matrix(labels, pos_label):
     return unique_labels
 
 
-def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def true_positive_rate(y_true,
+                       y_pred,
+                       sample_weight=None,
+                       pos_label=None) -> float:
     r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
 
     Parameters
@@ -107,7 +110,10 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     return tpr
 
 
-def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def true_negative_rate(y_true,
+                       y_pred,
+                       sample_weight=None,
+                       pos_label=None) -> float:
     r"""Calculate the true negative rate (also called specificity or selectivity).
 
     Parameters
@@ -138,7 +144,10 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     return tnr
 
 
-def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def false_positive_rate(y_true,
+                        y_pred,
+                        sample_weight=None,
+                        pos_label=None) -> float:
     r"""Calculate the false positive rate (also called fall-out).
 
     Parameters
@@ -169,7 +178,10 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None):
     return fpr
 
 
-def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None):
+def false_negative_rate(y_true,
+                        y_pred,
+                        sample_weight=None,
+                        pos_label=None) -> float:
     r"""Calculate the false negative rate (also called miss rate).
 
     Parameters

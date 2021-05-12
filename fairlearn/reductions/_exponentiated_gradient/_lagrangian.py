@@ -1,16 +1,17 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import logging
 import numpy as np
 import pandas as pd
-import pickle
 import scipy.optimize as opt
+from sklearn import clone
 from sklearn.dummy import DummyClassifier
 from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
+from fairlearn.reductions._moments import ClassificationMoment
 
 logger = logging.getLogger(__name__)
 
@@ -18,35 +19,37 @@ logger = logging.getLogger(__name__)
 class _Lagrangian:
     """Operations related to the Lagrangian.
 
-    :param X: the training features
-    :type X: Array
-    :param sensitive_features: the sensitive features to use for constraints
-    :type sensitive_features: Array
-    :param y: the training labels
-    :type y: Array
-    :param estimator: the estimator to fit in every iteration of best_h
-    :type estimator: an estimator that has a `fit` method with arguments X, y, and sample_weight
-    :param constraints: Object describing the parity constraints. This provides the reweighting
-        and relabelling
-    :type constraints: `fairlearn.reductions.Moment`
-    :param eps: allowed constraint violation
-    :type eps: float
-    :param B:
-    :type B:
-    :param opt_lambda: indicates whether to optimize lambda during the calculation of the
+    Parameters
+    ----------
+    X : {numpy.ndarray, pandas.DataFrame}
+        the training features
+    sensitive_features : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the sensitive features to use for constraints
+    y : {numpy.ndarray, pandas.Series, pandas.DataFrame, list}
+        the training labels
+    estimator :
+        the estimator to fit in every iteration of :meth:`best_h` using a
+        :meth:`fit` method with arguments `X`, `y`, and `sample_weight`
+    constraints : fairlearn.reductions.Moment
+        Object describing the parity constraints. This provides the reweighting
+        and relabelling.
+    B : float
+        bound on the L1-norm of the lambda vector
+    opt_lambda : bool
+        indicates whether to optimize lambda during the calculation of the
         Lagrangian; optional with default value True
-    :type opt_lambda: bool
+    sample_weight_name : str
+        Name of the argument to `estimator.fit()` which supplies the sample weights
+        (defaults to `sample_weight`)
     """
 
-    def __init__(self, X, sensitive_features, y, estimator, constraints, eps, B, opt_lambda=True):
-        self.X = X
-        self.n = self.X.shape[0]
+    def __init__(self, X, y, estimator, constraints, B, opt_lambda=True,
+                 sample_weight_name='sample_weight', **kwargs):
         self.constraints = constraints
-        self.constraints.load_data(X, y, sensitive_features=sensitive_features)
+        self.constraints.load_data(X, y, **kwargs)
         self.obj = self.constraints.default_objective()
-        self.obj.load_data(X, y, sensitive_features=sensitive_features)
-        self.pickled_estimator = pickle.dumps(estimator)
-        self.eps = eps
+        self.obj.load_data(X, y, **kwargs)
+        self.estimator = estimator
         self.B = B
         self.opt_lambda = opt_lambda
         self.hs = pd.Series(dtype="float64")
@@ -59,20 +62,28 @@ class _Lagrangian:
         self.n_oracle_calls_dummy_returned = 0
         self.last_linprog_n_hs = 0
         self.last_linprog_result = None
+        self.sample_weight_name = sample_weight_name
 
     def _eval(self, Q, lambda_vec):
         """Return the value of the Lagrangian.
 
-        :param Q: `Q` is either a series of weights summing up to 1 that indicate the weight of
-            each `h` in contributing to the randomized classifier, or a callable corresponding to
-            a deterministic predict function.
-        :type Q: pandas.Series or callable
-        :param lambda_vec: lambda vector
-        :type lambda_vec: pandas.Series
+        Parameters
+        ----------
+        Q : {pandas.Series, callable}
+            `Q` is either a series of weights summing up to 1 that indicate
+            the weight of each `h` in contributing to the randomized
+            predictor, or a callable corresponding to a deterministic
+            `predict` function.
+        lambda_vec : pandas.Series
+            lambda vector
 
-        :return: tuple `(L, L_high, gamma, error)` where `L` is the value of the Lagrangian,
-            `L_high` is the value of the Lagrangian under the best response of the lambda player,
-            `gamma` is the vector of constraint violations, and `error` is the empirical error
+        Returns
+        -------
+        tuple
+            tuple `(L, L_high, gamma, error)` where `L` is the value of the
+            Lagrangian, `L_high` is the value of the Lagrangian under the best
+            response of the lambda player, `gamma` is the vector of constraint
+            violations, and `error` is the empirical error
         """
         if callable(Q):
             error = self.obj.gamma(Q)[0]
@@ -83,15 +94,15 @@ class _Lagrangian:
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
-            L = error + np.sum(lambda_projected * gamma) - self.eps * np.sum(lambda_projected)
+            L = error + np.sum(lambda_projected * (gamma - self.constraints.bound()))
         else:
-            L = error + np.sum(lambda_vec * gamma) - self.eps * np.sum(lambda_vec)
+            L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
-        max_gamma = gamma.max()
-        if max_gamma < self.eps:
+        max_constraint = (gamma - self.constraints.bound()).max()
+        if max_constraint <= 0:
             L_high = error
         else:
-            L_high = error + self.B * (max_gamma - self.eps)
+            L_high = error + self.B * max_constraint
         return L, L_high, gamma, error
 
     def eval_gap(self, Q, lambda_hat, nu):
@@ -114,7 +125,8 @@ class _Lagrangian:
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
-        A_ub = np.concatenate((self.gammas - self.eps, -np.ones((n_constraints, 1))), axis=1)
+        A_ub = np.concatenate((self.gammas.sub(self.constraints.bound(), axis=0),
+                               -np.ones((n_constraints, 1))), axis=1)
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
@@ -136,27 +148,35 @@ class _Lagrangian:
 
     def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
-        redY = 1 * (signed_weights > 0)
+        if isinstance(self.constraints, ClassificationMoment):
+            redY = 1 * (signed_weights > 0)
+        else:
+            redY = self.constraints._y_as_series
         redW = signed_weights.abs()
-        redW = self.n * redW / redW.sum()
+        redW = self.constraints.total_samples * redW / redW.sum()
 
         redY_unique = np.unique(redY)
 
-        classifier = None
+        estimator = None
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
-            classifier = DummyClassifier(strategy='constant',
-                                         constant=redY_unique[0])
+            estimator = DummyClassifier(strategy='constant',
+                                        constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
-            classifier = pickle.loads(self.pickled_estimator)
+            # use sklearn.base.clone to clone the estimator.
+            # It is the same as copy.deepcopy for non-sklearn estimators (By using safe=False).
+            # For sklearn estimators, it is more efficient as it would not
+            # do a copy.deepcopy. Rather, instantiate a new estimator using the
+            # get_params() internally.
+            estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        classifier.fit(self.X, redY, sample_weight=redW)
+        estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
-        return classifier
+        return estimator
 
     def best_h(self, lambda_vec):
         """Solve the best-response problem.
@@ -165,7 +185,15 @@ class _Lagrangian:
         the vector of Lagrange multipliers `lambda_vec`.
         """
         classifier = self._call_oracle(lambda_vec)
-        def h(X): return classifier.predict(X)
+
+        def h(X):
+            pred = classifier.predict(X)
+            # Some estimators return an output of the shape (num_preds, 1) - flatten such
+            # results
+            if getattr(pred, "flatten", None) is not None:
+                pred = pred.flatten()
+            return pred
+
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)

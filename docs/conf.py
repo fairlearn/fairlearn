@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -13,7 +16,8 @@
 import os
 import sys
 import inspect
-sys.path.insert(0, os.path.abspath('../'))
+rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
+sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 [print(p) for p in sys.path]
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -32,12 +36,31 @@ author = 'Microsoft and Fairlearn contributors'
 release = fairlearn.__version__
 
 
+def check_if_v046():
+    """Check to see if current version being built is v0.4.6."""
+    result = False
+
+    if fairlearn.__version__ == "0.4.6":
+        print("Detected 0.4.6 in fairlearn.__version__")
+        result = True
+
+    smv_name = os.getenv("SPHINX_MULTIVERSION_NAME")
+    if smv_name is not None:
+        print("Found SPHINX_MULTIVERSION_NAME: ", smv_name)
+        result = smv_name == "v0.4.6"
+    else:
+        print("SPHINX_MULTIVERSION_NAME not in environment")
+
+    return result
+
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'bokeh.sphinxext.bokeh_plot',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
@@ -45,12 +68,14 @@ extensions = [
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx_multiversion'
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)}
+                       'numpy': ('https://numpy.org/doc/stable/', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+                       'sklearn': ('https://scikit-learn.org/stable/', None), }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -60,7 +85,16 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-master_doc = 'contents'
+master_doc = 'index'
+
+# Multiversion settings
+
+smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d|^v0\.6\.\d+$'
+smv_branch_whitelist = r'^main$'
+
+if check_if_v046():
+    print("Current version is v0.4.6, will apply overrides")
+    master_doc = 'index'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -73,6 +107,7 @@ html_theme = 'pydata_sphinx_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
+    "logo_link": "https://fairlearn.org",
     # TODO: fork the pydata-sphinx-theme to integrate these with logo
     "external_links": [
         {"name": "Gitter", "url": "https://gitter.im/fairlearn/community"},
@@ -90,7 +125,6 @@ html_logo = "_static/images/fairlearn_full_color.png"
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 html_additional_pages = {
-    'index': 'index.html'
 }
 
 # If false, no index is generated.
@@ -106,13 +140,29 @@ html_css_files = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-# quickstart examples are only generated, but not shown in the gallery
-# since they are only needed for the quickstart page itself.
+# Use filename_pattern so that plot_adult_dataset is not
+# included in the gallery, but its plot is available for
+# the quickstart
 sphinx_gallery_conf = {
-    'examples_dirs': ['../examples/quickstart', '../examples/notebooks'],
-    'gallery_dirs': ['auto_examples/quickstart', 'auto_examples/notebooks'],
+    'examples_dirs': '../examples',
+    'gallery_dirs': 'auto_examples',
+    # pypandoc enables rst to md conversion in downloadable notebooks
+    'pypandoc': True,
 }
 
+html_sidebars = {
+    "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
+}
+
+# Auto-Doc Options
+# ----------------
+
+# Change the ordering of the member documentation
+autodoc_member_order = 'groupwise'
+
+
+# Linking Code
+# ------------
 
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
@@ -152,8 +202,9 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
+    tag_or_branch = os.getenv("SPHINX_MULTIVERSION_NAME", default="main")
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, '/')
-    return f"http://github.com/fairlearn/fairlearn/blob/master/fairlearn/{fn}{linespec}"
+    return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
 
 
 # -- LaTeX macros ------------------------------------------------------------

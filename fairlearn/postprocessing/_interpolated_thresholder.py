@@ -1,15 +1,14 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
-import random
-
-from warnings import warn
-
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
+from warnings import warn
+
 from fairlearn._input_validation import _validate_and_reformat_input
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
@@ -23,8 +22,12 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
     Based on the values of sensitive features, it then applies a randomized thresholding
     transformation according to the provided `interpolation_dict`.
 
-    :param estimator: base estimator
-    :param dict interpolation_dict: maps sensitive feature values to `Bunch` that describes the
+    Parameters
+    ----------
+    estimator :
+        base estimator
+    interpolation_dict : dict
+        maps sensitive feature values to `Bunch` that describes the
         interpolation transformation via the following fields:
 
         - p0, operation0: with probability p0, operation0 is executed
@@ -36,7 +39,8 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         The numbers p0 and p1 must be non-negative and add up to 1, operation0 and
         operation1 must be instances of :class:`ThresholdOperation`, and p_ignore must be
         between 0 and 1.
-    :param bool prefit: if `True` then the base estimator is not fitted in :meth:`fit`.
+    prefit : bool
+        if `True` then the base estimator is not fitted in :meth:`fit`.
     """
 
     def __init__(self, estimator, interpolation_dict, prefit=False):
@@ -66,19 +70,22 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
     def _pmf_predict(self, X, *, sensitive_features):
         """Probabilistic mass function.
 
-        :param X: Feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
-        :param sensitive_features: Sensitive features to identify groups by, currently allows
-            only a single column
-        :type sensitive_features: Currently 1D array as numpy.ndarray, list, pandas.DataFrame,
-            or pandas.Series
-        :return: array of tuples with probabilities for predicting 0 or 1, respectively. The sum
-            of the two numbers in each tuple needs to add up to 1.
-        :rtype: numpy.ndarray
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature matrix
+        sensitive_features : numpy.ndarray, list, pandas.DataFrame, pandas.Series
+            Sensitive features to identify groups by
+
+        Returns
+        -------
+        numpy.ndarray
+            array of tuples with probabilities for predicting 0 or 1, respectively.
+            The sum of the two numbers in each tuple needs to add up to 1.
         """
         check_is_fitted(self)
         base_predictions = np.array(self.estimator_.predict(X))
-        _, base_predictions_vector, sensitive_feature_vector = _validate_and_reformat_input(
+        _, base_predictions_vector, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X, y=base_predictions, sensitive_features=sensitive_features, expect_y=True,
             enforce_binary_labels=False)
 
@@ -101,16 +108,24 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         Note that this is non-deterministic, due to the nature of the
         interpolation.
 
-        :param X: Feature data
-        :type X: numpy.ndarray or pandas.DataFrame
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            Feature data
+        sensitive_features : numpy.ndarray or pandas.DataFrame
+            Sensitive features to identify groups by
+        random_state : int or RandomState instance, default=None
+            Controls random numbers used for randomized predictions. Pass an
+            int for reproducible output across multiple function calls.
 
-        :return: The prediction. If `X` represents the data for a single example
+        Returns
+        -------
+        Scalar or vector as numpy.ndarray
+            The prediction. If `X` represents the data for a single example
             the result will be a scalar. Otherwise the result will be a vector
-        :rtype: Scalar or vector
         """
         check_is_fitted(self)
-        if random_state:
-            random.seed(random_state)
+        random_state = check_random_state(random_state)
         positive_probs = self._pmf_predict(
             X, sensitive_features=sensitive_features)[:, 1]
-        return (positive_probs >= np.random.rand(len(positive_probs))) * 1
+        return (positive_probs >= random_state.rand(len(positive_probs))) * 1

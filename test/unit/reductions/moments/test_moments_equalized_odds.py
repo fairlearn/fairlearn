@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -22,8 +22,8 @@ def test_construct_and_load():
     a0_threshold = 0.2
     a1_threshold = 0.7
 
-    a0_label = "a0"
-    a1_label = "a1"
+    a0_label = 0xBEEF
+    a1_label = 0xDEAD
 
     X, Y, A = simple_binary_threshold_data(num_samples_a0, num_samples_a1,
                                            a0_threshold, a1_threshold,
@@ -155,8 +155,8 @@ def test_signed_weights():
     a0_threshold = 0.2
     a1_threshold = 0.7
 
-    a0_label = "OneThing"
-    a1_label = "AnotherThing"
+    a0_label = 0xDEAD
+    a1_label = 0xBEEF
 
     X, Y, A = simple_binary_threshold_data(num_samples_a0, num_samples_a1,
                                            a0_threshold, a1_threshold,

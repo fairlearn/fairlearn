@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and contributors.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -34,3 +34,11 @@ class LeastSquaresRegressor:
 
     def predict(self, X):
         return X.dot(self.weights)
+
+
+class MockEstimator:
+    def fit(self, X, y, sample_weight):
+        pass
+
+    def predict(self, X):
+        return np.ones(X.shape[0])

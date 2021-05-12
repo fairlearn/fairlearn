@@ -1,14 +1,85 @@
 # Changes
 
+### v0.7.0
+
+### v0.6.2
+
+* Bugfix for `_merge_columns()` when using multiple sensitive features with
+  long names. This previously caused groups to get merged if the concatenation
+  of their string representations was identical until the cutoff limit.
+
+### v0.6.1
+
+* Bugfix for `_create_group_metric_set()`. Fixes the list of metrics computed for regression
+  and adds a set of metrics for 'probability' problems [PR](https://github.com/fairlearn/fairlearn/pull/727)
+* Updated 'Credit Card' notebook [PR](https://github.com/fairlearn/fairlearn/pull/713)
+* Added some overlooked `MetricFrame` tests [PR](https://github.com/fairlearn/fairlearn/pull/701)
+* Various documentation tweaks and enhancements
+
+### v0.6.0
+
+* Add `CorrelationRemover` preprocessing technique. This removes correlations
+  between sensitive and non-sensitive features while retaining as much information
+  as possible
+* Add `control_features` to the classification moments. These allow for data
+  stratification, with fairness constraints enforced within each stratum, but
+  not between strata
+* Update `make_derived_metric()` to use `MetricFrame`
+* Assorted small documentation fixes
+
 ### v0.5.0
 
 * Adjust classes to abide by naming conventions for attributes.
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
   `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.
+* API refactoring to separate out different uses of `eps` within
+  `ExponentiatedGradient`. It is now solely responsible for setting the L1
+  norm bound in the optimization (which controls the excess constraint
+  violation beyond what is allowed by the `constraints` object).
+  The other usage of `eps` as the right-hand side of constraints is
+  now captured directly in the moment classes as follows:
+  * Classification moments: `ConditionalSelectionRate` renamed to
+    `UtilityParity` and its subclasses have new arguments on the constructor:
+    * `difference_bound` - for difference-based constraints such as
+      demographic parity difference
+    * `ratio_bound_slack` - for ratio-based constraints such as demographic
+      parity ratio
+    * Additionally, there's a `ratio_bound` argument which represents the
+      argument previously called `ratio`.
+  * Regression moments: `ConditionalLossMoment` and its subclasses have a new
+    argument `upper_bound` with the same purpose for newly enabled regression
+    scenarios on `ExponentiatedGradient`.
+  For a comprehensive overview of available constraints refer to the new [user
+  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+* Renamed several constraints to create a uniform naming convention according
+  to the accepted [metric harmonization proposal](https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md):
+  * `ErrorRateRatio` renamed to `ErrorRateParity`, and
+    `TruePositiveRateDifference` renamed to `TruePositiveRateParity` since the
+    desired pattern is `<metric name>Parity` with the exception of
+    `EqualizedOdds` and `DemographicParity`.
+  * `ConditionalSelectionRate` renamed to `UtilityParity`.
+  * `GroupLossMoment` renamed to `BoundedGroupLoss` in order to have a
+    descriptive name and for consistency with the paper. Similarly,
+    `AverageLossMoment` renamed to `MeanLoss`.
+  For a comprehensive overview of available constraints refer to the new [user
+  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+* Added `TrueNegativeRateParity` to provide the opposite constraint of
+  `TruePositiveRateParity` to be used with reductions techniques.
 * Add new constraints and objectives in `ThresholdOptimizer`
-* Add class `InterpolatedThresholder` to represent the fitted `ThresholdOptimizer`
+* Add class `InterpolatedThresholder` to represent the fitted
+  `ThresholdOptimizer`
+* Add `fairlearn.datasets` module.
+* Change the method to make copies of the estimator in `ExponentiatedGradient`
+  from `pickle.dump` to `sklearn.clone`. 
+* Add an argument `sample_weight_name` to `GridSearch` and
+  `ExponentiatedGradient` to control how `sample_weight` is supplied to
+  `estimator.fit`.
+* Large changes to the metrics API. A new class `MetricFrame` has been
+  introduced, and `make_group_summary()` removed (along with related
+  functions). Please see the documentation and examples for more information.
 
 ### v0.4.6
+
 * Handle case where reductions relabeling results in a single class
 * Refactor metrics:
   * Remove `GroupMetricResult` type in favor of a `Bunch`.

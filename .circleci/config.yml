@@ -17,16 +17,21 @@ jobs:
       - checkout
 
       - run:
+          name: Install pandoc
+          command: sudo apt-get install pandoc pandoc-citeproc
+
+      - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
           command: sudo python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
-          command: sudo pip install -r requirements.txt
+          command: sudo python scripts/install_requirements.py --pinned False
 
       - run:
-          name: 'Build html'
-          command: python -m sphinx -b html -n -j auto docs docs/_build/html
+          name: "Build Documentation"
+          command: python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
+          no_output_timeout: 30m
 
       - persist_to_workspace:
           root: docs/_build
@@ -44,6 +49,10 @@ jobs:
     steps:
       # check out PR branch
       - checkout
+      
+      - run:
+          name: Install pandoc
+          command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
@@ -51,11 +60,12 @@ jobs:
       
       - run:
           name: 'Install required packages'
-          command: sudo pip install -r requirements.txt
+          command: sudo python scripts/install_requirements.py --pinned False
       
       - run:
           name: 'Build doctest'
           command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
+          no_output_timeout: 30m
       
   deploy-doc:
     docker:
@@ -82,6 +92,11 @@ jobs:
           # Instead, we want the webpage to just point at index.html
           name: Disable jekyll builds
           command: touch docs/_build/html/.nojekyll
+      
+      - run:
+          # Create CNAME file for fairlearn.org
+          name: Create CNAME file
+          command: echo "fairlearn.org" > docs/_build/html/CNAME
 
       - run:
           name: 'Install gh-pages and configure dependencies'
@@ -107,4 +122,4 @@ workflows:
             - build-doc
           filters:
             branches:
-              only: master  # don't deploy to GitHub pages from other branches
+              only: main  # don't deploy to GitHub pages from other branches

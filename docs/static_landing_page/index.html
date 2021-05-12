@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  	<head>
+	    <!-- Required meta tags -->
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	    <title>Fairlearn</title>
+		<meta property="og:title" content="Fairlearn">
+		<meta property="og:type" content="website"/>
+		<meta property="og:description" content="An open source toolkit for assessing and improving fairness in AI">
+		<meta property="og:image" content="./images/fairlearn-meta-image.jpg">
+		<meta property="og:url" content="http://fairlearn.github.io">
+		<link rel="shortcut icon" type="./images/x-icon" href="./images/fairlearn-favicon.ico"/>
+	    <!-- Bootstrap CSS -->
+	    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	    <link rel="stylesheet" type="text/css" href="./css/landing_page_style.css">
+  	</head>
+  <body>
+
+  	<!-- NAVIGATION -->
+	<nav class="navbar navbar-expand-xl fixed-top">
+		<div class="container py-3 my-xl-n2 px-0">
+			<img class="img-fluid nav-logo ml-3" src="./images/fairlearn_logo.svg" alt="">
+      		<button class="navbar-toggler navbar-light text-right px-2 mr-2" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        	<span class="navbar-toggler-icon icon-bar"></span>
+      		</button>
+      		<div class="collapse navbar-collapse" id="navbarResponsive">
+		        <ul class="navbar-nav pt-2 mt-1 mr-xl-auto ml-xl-2 pl-xl-1 text-center text-nowrap">
+				  <li class="nav-item px-1">
+					  <a class="nav-link" href=./v0.6.2/quickstart.html>Getting Started</a>
+				  </li>
+		          <li class="nav-item px-1">
+					  <!-- Versioned Link -->
+		            <a class="nav-link" href="./v0.6.2/user_guide/index.html">User Guide</a>
+		          </li>
+		          <li class="nav-item px-1">
+					<!-- Versioned Link -->
+		            <a class="nav-link" href="./v0.6.2/api_reference/index.html">API Docs</a>
+		          </li>
+				  <li class="nav-item px-1">
+					<!-- Versioned Link -->
+		            <a class="nav-link" href="./v0.6.2/auto_examples/index.html">Example Notebooks</a>
+		          </li>
+		          <li class="nav-item px-1">
+		            <a class="nav-link" href="#contribute">Contributor Guide</a>
+		          </li>
+				  <li class="nav-item px-1">
+					<!-- Versioned Link -->
+		            <a class="nav-link" href="./v0.6.2/faq.html">FAQ</a>
+		          </li>
+				  <li class="nav-item px-1">
+					<!-- Versioned Link -->
+		            <a class="nav-link" href="./v0.6.2/about/index.html">About Us</a>
+		          </li>
+				</ul>
+		        <span class="nav-item card benefit-card mr-xl-3 pt-1 mt-1">
+		            <a href="https://github.com/fairlearn/fairlearn">
+						<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Button_GH_Default.svg">
+						<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Button_GH_Hover.svg">
+					</a>
+		        </span>
+	</div>
+  	</nav>
+  	<!-- NAVIGATION -->
+
+  	<!-- MASTHEAD -->
+	<div class="container-fluid gradient masthead white">
+	    <div class="container pt-5">
+		<div class="mx-0">
+	      	<div class="row align-items-left justify-content-left">
+		        <div class="col-12 col-lg-8">
+		          			<h1 class="text-left text-md-left pb-2">
+							Improve fairness<br>
+							of AI systems
+							</h1>
+							<h3 class="white text-left text-md-left pb-3 d-md-block">
+							Fairlearn is an open-source, community-driven project to help
+							data scientists improve fairness of AI systems.
+							</h3>
+							<p class="white text-left text-md-left pb-3 d-md-block">
+							Learn about AI fairness from our guides and use cases.
+							Assess and mitigate fairness issues using our Python toolkit.
+							Join our community and contribute metrics, algorithms, and other resources.	
+							</p>
+							<a class="quickstart-btn mt-2 mb-5 px-4 text-center width=80px" href=./v0.6.2/quickstart.html>Get Started</a>
+				</div>
+			</div>
+		</div>
+		</div>
+  	</div>
+  	<!-- MASTHEAD -->
+
+	<!-- SECTION 1 -->
+  	<div class="container-fluid section-2 pt-5 pb-0">
+  		<div class="container">
+			<div class="mx-0">
+				<div class="row justify-content-lg-left pb-4 pt-3">
+				<!-- Sociotechnical Aspect-->
+  				<div class="col-12 col-lg-6 pr-lg-4">
+  					<h6 class="text-left pb-1">FAIRNESS IS SOCIOTECHNICAL</h6>
+  					<p class="text-left pb-1 pt-2">
+						Fairness of AI systems is about more than simply running lines of code.
+						In each use case, both societal and technical aspects
+						shape who might be harmed by AI systems and how.
+						There are many complex sources of unfairness and a variety of societal and technical processes for mitigation,
+						not just the mitigation algorithms in our library.
+					</p>
+					<p class="text-left pb-5">
+						Throughout this website, you can find resources on how to think about fairness as sociotechnical,
+						and how to use Fairlearn's metrics and algorithms
+						while considering the AI system's broader societal context.
+					</p>
+  				</div>
+				<!-- Use Case -->
+				<div class="col-12 col-lg-6 pl-lg-4">
+					<h6 class="text-left pb-1">USE CASE&ensp;|&ensp;CREDIT-CARD LOANS</h6>
+					<h2 class="text-left pt-2 pb-3 dark">Assessment and mitigation of fairness issues in credit-card default models</h2>
+					<p class="text-left">
+						When making a decision to approve or decline a loan, financial services organizations use a variety of models, including a model that predicts the applicant's probability of default.
+						These predictions are sometimes used to automatically reject or accept an application, directly impacting both the applicant and the organization.
+					</p>
+					<p class="text-left">
+						In this scenario, fairness-related harms may arise when the model makes more mistakes for some groups of applicants compared to others.
+						We use Fairlearn to assess how different groups, defined in terms of their sex, are affected and how the observed disparities may be mitigated.
+					</p>
+					<div class="pt-2">
+						<a class="quickstart-btn mb-5 px-3 text-center" href="https://github.com/fairlearn/fairlearn/blob/main/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb">Jupyter Notebook</a>
+					</div>
+				</div>
+			</div>
+  			</div>
+  		</div>
+  	</div>
+
+	<!-- SECTION 3 -->
+	<div class="container-fluid section-3 pb-5">
+		<div class="container">
+			<div class="mx-0">
+			<div class="row pb-5">
+			<div class="col-12 col-lg-6 text-left pr-lg-4">
+			    <div class="line mx-0 my-5"></div>	
+		    	<h2 class="pt-3 pb-3 text-left dark">Get started with Fairlearn</h2>
+			    <p class="text-left">
+				    To get started, install the Fairlearn package.
+				    But the process does not end there!
+				    See our user guide and other resources to understand what fairness means for your use case.
+			    </p>
+			    <p class="text-left">
+				    If you run into any issues, reach out on <a href="https://gitter.im/fairlearn/community">Gitter</a>.</p>
+			    <div class="pt-4 pb-2 text-dark text-left">
+				    Fairlearn can be installed with pip from PyPI as follows
+				</div>
+			    <div class="code col-8 col-lg-10 pl-4 pr-1 py-2 text-dark bg-light text-left">
+						pip install fairlearn
+				</div>
+			    <div class="pt-4">
+				    <a class="quickstart-btn mb-5 px-4 text-center" href=./v0.6.2/quickstart.html>Quickstart Guide</a>
+			    </div>
+		    </div>
+		    <div class="col-12 col-lg-6 text-left pl-lg-4">
+				<div class="line mx-0 my-5"></div>
+				<h2 class="pt-3 pb-3 text-center text-lg-left dark">Resources</h2>
+					<a href="./v0.6.2/user_guide/index.html" target="_blank">
+						<h3 class="text-center text-lg-left dark my-0">
+							User Guide
+						</h3>
+					</a>
+					<p class="text-center text-lg-left pt-2 pb-3">
+						Learn more about fairness in AI, fairness metrics, and mitigation algorithms.
+					</p>
+					<a href="./v0.6.2/api_reference/index.html" target="_blank">
+						<h3 class="text-center text-lg-left dark my-0">
+							API Documentation
+						</h3>
+					</a>
+					<p class="text-center text-lg-left pt-2 pb-3">
+						Library reference with examples.
+					</p>
+					<a href="./v0.6.2/contributor_guide/index.html" target="_blank">
+						<h3 class="text-center text-lg-left dark my-0">
+							Contributor Guide
+						</h3>
+					</a>
+					<p class="text-center text-lg-left py-2">
+						Help us with case studies, documentation, or code.
+						There are many ways to contribute, regardless of your background or expertise.
+					</p>
+		    </div>
+			</div>
+			</div>
+		</div>
+	</div>
+
+  <!-- SECTION 5 -->
+	<div class="container-fluid section-5 py-5">
+		<div class="container">
+			<div class="mx-0">
+				<div class="row justify-content-lg-center pt-3 pb-4">
+				<div class="col-12 col-lg-8 text-center">
+					<h2 class="pb-3">Join the community</h2>
+					<p>
+						Fairlearn community consists of open source contributors, data science practitioners, and responsible AI enthusiasts
+						across many disciplines and locations.
+						Join the latest conversation, ask usage questions, learn about the most recent updates, and find out how to get involved.
+					</p>
+				</div>
+			</div>
+			<div class="row justify-content-lg-center pb-0">
+				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
+					<!-- Card -->
+					<a href="https://gitter.im/Fairlearn/community?source=orgpage" target="_blank">
+						<div class="card h-100 benefit-card py-4 px-3">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Gitter_Color.svg">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Gitter_Inverse.svg">
+							<h5 class="dark py-1 benefit-text">Gitter</h5>
+							<p class="benefit-text mb-0">Join the community and ask usage questions.</p>
+						</div>
+					</a>
+				</div>
+				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
+					<a href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank">
+						<div class="card h-100 benefit-card py-4 px-3">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Stack_Overflow_Color.svg">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Stack_Overflow_Inverse.svg">
+							<h5 class="dark pb-2 benefit-text">StackOverflow</h5>
+							<p class="benefit-text mb-0">Ask usage questions.</p>
+						</div>
+					</a>
+				</div>
+				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
+					<a href="https://github.com/Fairlearn/Fairlearn/" target="_blank">
+						<div class="card h-100 benefit-card py-4 px-3">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Github_Color.svg">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Github_Inverse.svg">
+							<h5 class="dark pb-2 benefit-text">GitHub</h5>
+							<p class="benefit-text mb-0">Contribute code, documentation, use cases. Submit bug reports and feature requests.</p>
+						</div>
+					</a>
+				</div>
+				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
+					<a href="https://twitter.com/fairlearn" target="_blank">
+						<div class="card h-100 benefit-card py-4 px-3">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Twitter_Color.svg">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Twitter_Inverse.svg">
+							<h5 class="dark pb-2 benefit-text">Twitter</h5>
+							<p class="benefit-text mb-0">Follow us for the latest updates.</p>
+						</div>
+					</a>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+
+	<!-- CONTRIBUTE -->
+	<div id="contribute" class="container-fluid gradient section-7 py-5">
+		<div class="container">
+			<div class="mx-0">
+				<div class="row justify-content-lg-center pt-3 pb-5">
+				<div class="col-12 col-lg-8 text-center">
+					<h2 class="white pb-3">Contribute to Fairlearn</h2>
+					<p class="white pb-3">
+						Fairlearn is built and maintained by open source contributors with a variety of backgrounds and expertise.
+						Join the effort and contribute feedback, metrics, algorithms, visualizations, ideas and more, so we can evolve the toolkit together!
+					</p>
+					  <!-- Versioned Link -->
+					  <a class="contribute-btn mb-0 text-center" href="./v0.6.2/contributor_guide/index.html">Contributor Guide</a>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+	<!-- CONTRIBUTE -->
+
+	<!-- FOOTER -->
+	<footer class="container-fluid">
+		<div class="container mt-3">
+			<div class="mx-0">
+				<div class="d-flex flex-column flex-md-row align-items-center">
+				<div class="mb-3 pr-md-3">
+					<a class="pr-3" href="https://twitter.com/fairlearn" target="_blank">
+						<img class="img-fluid" src="./images/Twitter_Color.svg" alt=""></a>
+					<a class="pr-3" href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank">
+						<img class="img-fluid" src="./images/Stack_Overflow_Color.svg" alt=""></a>
+					<a class="pr-3" href="https://gitter.im/Fairlearn/community?source=orgpage" target="_blank">
+						<img class="img-fluid" src="./images/Gitter_Color.svg" alt=""></a>
+					<a class="pr-3" href="https://github.com/fairlearn/fairlearn" target="_blank">
+						<img class="img-fluid" src="./images/Github_Color.svg" alt=""></a>
+					#fairlearn
+				</div>
+				<div class="flex-grow-1 text-md-right text-nowrap mb-3">
+					<p class="my-0">Copyright © 2021 Fairlearn contributors.</p>
+				</div>
+			    </div>
+			</div>
+		</div>
+	</footer>
+	<!-- FOOTER -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="./js/landing_page.js"></script>
+  </body>
+</html>
