@@ -47,7 +47,7 @@ The concepts outlined in this glossary are relevant to sociotechnical contexts.
 Construct Validity
 ^^^^^^^^^^^^^^^^^^
 
-We explore the concept of construct validity, as described in in Measurement and Fairness [#4]_ , and as it relates to sociotechnical contexts. This is intended to illuminate the concept to readers who are working on solutions in sociotechnical contexts and may also be referenced in explorations that detail how to apply the concept to specific scenarios.
+We explore the concept of construct validity, as described in in Measurement and Fairness [#4]_ , and as it relates to sociotechnical contexts. This is intended to illuminate the concept to readers who are trying to build AI systems in sociotechnical contexts and may also be referenced in explorations that detail how to apply the concept to specific scenarios.
 
 Key Terms 
 ~~~~~~~~~
