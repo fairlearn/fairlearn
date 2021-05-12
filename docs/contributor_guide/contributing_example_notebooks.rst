@@ -44,20 +44,10 @@ These notebooks are generated based on `plot_*.py` files in
 in the
 `examples/notebooks directory <https://github.com/fairlearn/fairlearn/tree/main/examples/notebooks>`_
 of the repository.
-To do this yourself make sure to install sphinx and its
-add-ons by running :code:`python scripts/install_requirements.py --pinned False` in the repository
-root directory. You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
 The filename *must* begin with `plot_` for the cell output to be rendered as a webpage.
 
-To build the webpage run the following command from the repository root
-directory:
-
-.. code::
-
-    python -m sphinx -v -b html -n -j auto docs docs/_build/html
-
-Rerunning this after making changes to individual files only rebuilds the
-changed pages, so the build time should be a lot shorter.
+The instructions on how to build the webpage are in the
+:ref:`contributing_documentation` section.
 
 To edit the notebook we recommend using 
 `Visual Studio Code <https://code.visualstudio.com/docs/python/jupyter-support>`_.
