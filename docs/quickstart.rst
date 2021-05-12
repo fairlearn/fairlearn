@@ -139,7 +139,8 @@ Fairlearn also allows us to quickly plot these metrics from the
 :class:`fairlearn.metrics.MetricFrame`
 
 .. literalinclude:: auto_examples/plot_quickstart.py
-    :lines: 26-37
+    :language: python
+    :start-after: # Analyze metrics using MetricFrame
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html

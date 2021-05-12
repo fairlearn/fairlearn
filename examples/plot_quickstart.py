@@ -23,6 +23,7 @@ classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
 classifier.fit(X, y_true)
 y_pred = classifier.predict(X)
 
+# Analyze metrics using MetricFrame
 metrics = {
     'accuracy': accuracy_score,
     'precision': precision_score,

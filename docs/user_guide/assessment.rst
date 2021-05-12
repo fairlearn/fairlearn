@@ -406,7 +406,8 @@ to take advantage of the inherent plotting capabilities of
 :class:`pandas.DataFrame`:
 
 .. literalinclude:: ../auto_examples/plot_quickstart.py
-    :lines: 26-37
+    :language: python
+    :start-after: # Analyze metrics using MetricFrame
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
