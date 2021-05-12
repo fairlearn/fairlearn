@@ -73,14 +73,14 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs.
 
-**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness for more detailed examples.
+**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
  
 What is Construct Validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though the Measurement and Fairness paper explores both Construct reliability and Construct validity, we focus our 
+Though the Measurement and Fairness [#4]_ paper explores both Construct reliability and Construct validity, we focus our 
 exploration below on Construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
-contexts. With that said, Measurement and Fairness offers a fairness-oriented conceptualization of construct validity, that 
+contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-oriented conceptualization of construct validity, that 
 is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
 can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
