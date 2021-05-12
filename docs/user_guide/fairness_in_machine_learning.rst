@@ -52,7 +52,7 @@ We explore the concept of construct validity, as described in in Measurement and
 Key Terms 
 ~~~~~~~~~
 
-- **Sociotechnical context** – A context in which both societal and technical aspects shape who might be harmed by AI systems and how (see fairlearn.ai for more detailed definition).
+- **Sociotechnical context** – The context surrounding a technical system, including both social aspects (e.g., people, institutions, communities) and technical aspects (e.g., algorithms, technical processes). The sociotechnical context of a system shapes who might benefit or is harmed by AI systems.
 
 - **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model. 
 
