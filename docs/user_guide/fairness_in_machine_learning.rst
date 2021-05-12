@@ -84,7 +84,7 @@ contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-orien
 is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
 can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
-1. **Face validity** – On the surface, how plausible does the measurements produced by the measurement model look?
+1. **Face validity** – On the surface, how plausible do the measurements produced by the measurement model look?
 
 2. **Content validity** – This has three subcomponents:
 
