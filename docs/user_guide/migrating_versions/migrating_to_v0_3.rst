@@ -1,10 +1,5 @@
-.. raw:: html
-
-    <summary>
-    <strong>
-    <em>
-
-Onboarding guide for users of version 0.2 or earlier
+Migrating to v0.3 from v0.2
+===========================
 
 .. raw:: html
 
@@ -41,7 +36,3 @@ the equivalent operation is now
     randomized_predictions = exponentiated_gradient.predict(X)
 
 
-Please open a `new issue <https://github.com/fairlearn/fairlearn/issues>`_ if
-you encounter any problems.
-
-.. raw:: html
