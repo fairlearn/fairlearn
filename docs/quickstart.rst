@@ -190,6 +190,10 @@ a vastly reduced difference in selection rate:
     >>> constraint = DemographicParity()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
+    ExponentiatedGradient(constraints=<fairlearn.reductions._moments.utility_parity.DemographicParity object at 0x...>,
+                          estimator=DecisionTreeClassifier(max_depth=4,
+                                                           min_samples_leaf=10),
+                          nu=0.00...)
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
