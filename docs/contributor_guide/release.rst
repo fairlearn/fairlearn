@@ -37,8 +37,9 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
     :code:`git push origin v<x.y.z>`
 
-#. On [GitHub's release page](https://github.com/fairlearn/fairlearn/releases)
-   create a new release and post the changes from CHANGES.md into the description.
+#. On `GitHub's release page <https://github.com/fairlearn/fairlearn/releases>`_
+   there should be a new release named `v<x.y.z>`.
+   Open it and post the changes from CHANGES.md into the description, then hit "publish".
 
 #. On the `main` branch, create a PR to:
 
@@ -47,5 +48,10 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
     #. Ensure that `smv_tag_whitelist` in `docs/conf.py` will pick up the
        new release
     #. Update `docs/static_landing_page/` so that all the links point to the new release
+   
+.. note::
+    Make sure to add a note to this second PR:
+    "Do not merge until the release is completed. Otherwise a new website will
+    be published that points to the new version which doesn't exist yet." 
 
 #. Merge that PR.
