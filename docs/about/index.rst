@@ -60,7 +60,7 @@ if they are aligned with the mission of Fairlearn and there is enough commitment
 from the contributors. If you want to get involved, please
 :ref:`reach out <communication>`. For concrete opportunities and
 work in progress please review our
-`issues <https://github.com/fairlearn/fairlearn/issuess>`_.
+`issues <https://github.com/fairlearn/fairlearn/issues>`_.
 
 Short and medium-term focus areas
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
