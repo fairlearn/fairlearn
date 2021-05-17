@@ -49,6 +49,14 @@ the following commands:
     ...
     start docs/_build/html/auto_examples/plot_*.html
 
+The above code block works for WindowsOS.
+For MacOS users, use :code: `open docs/_build/html/index.html`
+For Linux users, use :code: `xdg-open docs/_build/html/index.html`
+
+.. note::
+
+    The rendered html files can be explored in any file explorer (e.g. chrome/safari)
+
 :code:`plot_*` can be replaced with any of the notebooks in the
 :code:`auto_examples` folder. To view your changes, simply navigate to the
 relevant part of the website and check that your updates render properly
