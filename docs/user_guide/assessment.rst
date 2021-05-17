@@ -418,6 +418,61 @@ to take advantage of the inherent plotting capabilities of
     :align: center
 
 
+Plotting with MetricFrame
+-------------------------
+MetricFrame pd.DataFrame properties can be plotted using matplotlib. Here is an example,
+referencing the same `metric_c_f` object above.
+
+.. code-block::
+
+    metric_c_f.by_group.plot(kind="bar",
+                             title='Show accuracy_score metric')
+
+It is possible to customize the plots. Here are some common examples:
+
+Customize Plots: `ylim`
+^^^^^^^^^^^^^^^^^^^^^^^
+The yaxis range is automatically set, which sometimes can be misleading, hence it is
+sometimes useful to set the `ylim` argument to define the yaxis range.
+
+.. code-block::
+
+    metric_c_f.by_group.plot(kind="bar",
+                             ylim=[0,1],
+                             title='Show accuracy_score metric')
+
+Customize Plots: `kind`
+^^^^^^^^^^^^^^^^^^^^^^^
+There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
+argument. Some metrics are better represented as a pie chart, some as a bar chart. Here
+is an example of a pie chart representing the `count` metric.
+
+.. code-block::
+
+    count_metric = MetricFrame(lambda y_true, y_pred: y_true.shape[0],
+                               y_true, y_pred,
+                               sensitive_features=group_membership_data)
+
+    count_metric.by_group.plot(kind="pie",
+                               title='Show count metric')
+
+
+Customize Plots: `colormap`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To change the color scheme, we can use the `colormap` argument. A list of colorschemes
+can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_.
+
+.. code-block::
+
+    metric_c_f.by_group.plot(kind="bar",
+                             colormap="Accent",
+                             title='Show accuracy_score metric')
+
+There are many other customisations that can be done. More information can be found
+`here <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.html>`_ in this
+documentation.
+
+
 .. _dashboard:
 
 Fairlearn dashboard
