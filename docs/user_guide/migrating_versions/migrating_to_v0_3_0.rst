@@ -1,3 +1,5 @@
+.. _migrating_to_v0_3_0:
+
 Migrating to v0.3 from v0.2
 ===========================
 
