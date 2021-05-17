@@ -20,8 +20,6 @@ Fairlearn is also available on
 
     conda install -c conda-forge fairlearn
 
-For checking out the latest version in our repository check out our
-:ref:`advanced_install`.
 If you are updating from a previous version of Fairlearn, please
 see :ref:`version_migration_guide`.
 
@@ -32,14 +30,14 @@ see :ref:`version_migration_guide`.
     Please use the version selector to get to the instructions for
     the appropriate version. The instructions for the :code:`main`
     branch require Fairlearn to be installed from a clone of the
-    repository. See :ref:`advanced_install` for the required steps.
+    repository.
 
 Overview of Fairlearn
 ---------------------
 
 The Fairlearn package has two components:
 
-- A *dashboard* for assessing which groups are negatively impacted by a model,
+- *Metrics* for assessing which groups are negatively impacted by a model,
   and for comparing multiple models in terms of various fairness and accuracy
   metrics.
 
@@ -135,37 +133,19 @@ their label:
     sex
     Female    0.0635...
     Male      0.2135...
-    Name: selection_rate, dtype: object   
+    Name: selection_rate, dtype: object
 
-For a visual representation of the metrics try out the Fairlearn dashboard.
-While this page shows only screenshots, the actual dashboard is interactive.
+Fairlearn also allows us to quickly plot these metrics from the
+:class:`fairlearn.metrics.MetricFrame`
 
-.. note::
+.. literalinclude:: auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Analyze metrics using MetricFrame
 
-    The :code:`FairlearnDashboard` is no longer being developed as
-    part of Fairlearn.
-    The widget itself has been moved to
-    `the raiwidgets package <https://pypi.org/project/raiwidgets/>`_.
-    Fairlearn will provide some of the existing functionality
-    through :code:`matplotlib`-based visualizations.
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
+    :target: auto_examples/plot_quickstart.html
+    :align: center 
 
-.. doctest:: quickstart
-
-    >>> from fairlearn.widget import FairlearnDashboard
-    >>> FairlearnDashboard(sensitive_features=sex,
-    ...                    sensitive_feature_names=['sex'],
-    ...                    y_true=y_true,
-    ...                    y_pred={"initial model": y_pred}) # doctest: +SKIP
-
-.. image:: ../img/fairlearn-dashboard-start.png
-
-.. image:: ../img/fairlearn-dashboard-sensitive-features.png
-
-.. image:: ../img/fairlearn-dashboard-performance.png
-
-.. image:: ../img/fairlearn-dashboard-disparity-performance.png
-
-.. image:: ../img/fairlearn-dashboard-disparity-predictions.png
 
 Mitigating disparity
 ^^^^^^^^^^^^^^^^^^^^
@@ -202,19 +182,6 @@ a vastly reduced difference in selection rate:
     Female    0.1552...
     Male      0.1715...
     Name: selection_rate, dtype: object
-
-Similarly, we can explore the difference between the initial model and the
-mitigated model with respect to selection rate and accuracy in the dashboard
-through a multi-model comparison:
-
-.. doctest:: quickstart
-
-    >>> FairlearnDashboard(sensitive_features=sex,
-    ...                    sensitive_feature_names=['sex'],
-    ...                    y_true=y_true,
-    ...                    y_pred={"initial model": y_pred, "mitigated model": y_pred_mitigated}) # doctest: +SKIP
-
-.. image:: ../img/fairlearn-dashboard-comparison.png
 
 
 What's next?

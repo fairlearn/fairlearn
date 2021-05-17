@@ -2,15 +2,15 @@
 
 # Fairlearn
 
-Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. Fairlearn contains mitigation algorithms as well as a Jupyter widget for model assessment. Besides the source code, this repository also contains Jupyter notebooks with examples of Fairlearn usage.
+Fairlearn is a Python package that empowers developers of artificial intelligence (AI) systems to assess their system's fairness and mitigate any observed unfairness issues. Fairlearn contains mitigation algorithms as well as metrics for model assessment. Besides the source code, this repository also contains Jupyter notebooks with examples of Fairlearn usage.
 
 Website: https://fairlearn.github.io/
 
 - [Current release](#current-release)
 - [What we mean by _fairness_](#what-we-mean-by-fairness)
 - [Overview of Fairlearn](#overview-of-fairlearn)
+  - [Fairlearn metrics](#fairlearn-metrics)
   - [Fairlearn algorithms](#fairlearn-algorithms)
-  - [Fairlearn dashboard](#fairlearn-dashboard)
 - [Install Fairlearn](#install-fairlearn)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -44,17 +44,17 @@ To learn more about our definitions of fairness, please visit our
 
 The Fairlearn Python package has two components:
 
-- A _dashboard_ for assessing which groups are negatively impacted by a model, and for comparing multiple models in terms of various fairness and accuracy metrics.
+- _Metrics_ for assessing which groups are negatively impacted by a model, and for comparing multiple models in terms of various fairness and accuracy metrics.
 
 - _Algorithms_ for mitigating unfairness in a variety of AI tasks and along a variety of fairness definitions.
+
+### Fairlearn metrics
+
+Check out our in-depth [guide on the Fairlearn metrics](https://fairlearn.github.io/main/user_guide/assessment.html).
 
 ### Fairlearn algorithms
 
 For an overview of our algorithms please refer to our [website](https://fairlearn.github.io/main/user_guide/mitigation.html).
-
-### Fairlearn dashboard
-
-Check out our in-depth [guide on the Fairlearn dashboard](https://fairlearn.github.io/main/user_guide/assessment.html#fairlearn-dashboard).
 
 ## Install Fairlearn
 
