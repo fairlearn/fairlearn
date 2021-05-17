@@ -191,6 +191,7 @@ a vastly reduced difference in selection rate:
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
+    ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
     >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
