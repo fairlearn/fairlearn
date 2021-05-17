@@ -11,4 +11,4 @@ changes to the Fairlearn API.
 
    migrating_to_v0_5_0
    
-   migration_to_v0_3
+   migrating_to_v0_3_0
