@@ -91,58 +91,7 @@ script which runs :code:`pip install` on all three of the above files.
 This script will also optionally pin the requirements to any lower bound specified (by changing any
 occurrences of :code:`>=` to :code:`==` in each file).
 
-.. _onboarding-guide:
 
-.. raw:: html
-
-    <details id="onboarding-guide">
-    <summary>
-    <strong>
-    <em>
-
-Onboarding guide for users of version 0.2 or earlier
-
-.. raw:: html
-
-    </em>
-    </strong>
-    </summary>
-
-Up to version 0.2, Fairlearn contained only the exponentiated gradient method.
-The Fairlearn repository now has a more comprehensive scope and aims to
-incorporate other methods. The same exponentiated gradient technique is now
-the class :code:`fairlearn.reductions.ExponentiatedGradient`. While in the past
-exponentiated gradient was invoked via
-
-.. code-block::
-
-    import numpy as np
-    from fairlearn.classred import expgrad
-    from fairlearn.moments import DP
-
-    estimator = LogisticRegression()  # or any other estimator
-    exponentiated_gradient_result = expgrad(X, sensitive_features, y, estimator, constraints=DP())
-    positive_probabilities = exponentiated_gradient_result.best_classifier(X)
-    randomized_predictions = (positive_probabilities >= np.random.rand(len(positive_probabilities))) * 1
-
-the equivalent operation is now
-
-.. code-block::
-
-    from fairlearn.reductions import ExponentiatedGradient, DemographicParity
-
-    estimator = LogisticRegression()  # or any other estimator
-    exponentiated_gradient = ExponentiatedGradient(estimator, constraints=DemographicParity())
-    exponentiated_gradient.fit(X, y, sensitive_features=sensitive_features)
-    randomized_predictions = exponentiated_gradient.predict(X)
-
-
-Please open a `new issue <https://github.com/fairlearn/fairlearn/issues>`_ if
-you encounter any problems.
-
-.. raw:: html
-
-    </details>
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -160,47 +109,3 @@ To run the same tests locally, find the corresponding pipeline definition (a
 :code:`yml` file) in the :code:`devops` directory. It either directly contains
 the command to execute the tests (usually starting with
 :code:`python -m pytest`) or it refers to a template file with the command.
-
-Building the website
-^^^^^^^^^^^^^^^^^^^^
-
-The website is built using `Sphinx <https://www.sphinx-doc.org/en/master/>`_
-and some of its extensions. Specifically, the website is available for all our
-releases to allow users to check the documentation of the version of the
-package that they are using.
-
-To be able to build the documentation you need to install all the
-requirements using :code:`pip install -r requirements-dev.txt`.
-
-When making changes to the documentation at least run the following command
-to build the website using your changes:
-
-.. code-block::
-
-    python -m sphinx -v -b html -n -j auto docs docs/_build/html
-
-or use the shortcut
-
-.. code-block::
-
-    make doc
-
-This will generate the website in the directory mentioned at the end of the
-command. Navigate to that directory and find the corresponding files where
-you made changes, open them in the browser and verify that your changes
-render properly and links are working as expected.
-
-To fully build the website for all versions use the following script:
-
-.. code-block::
-
-    python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
-
-or the shortcut
-
-.. code-block::
-
-    make doc-multiversion
-
-The comprehensive set of commands to build the website is in our CircleCI
-configuration file in the `.circleci` directory of the repository.

@@ -161,7 +161,7 @@ predictors = sweep.predictors_
 
 # %%
 # We could plot performance and fairness metrics of these predictors now.
-# However, the plot would be somewhat confusing due to their number.
+# However, the plot would be somewhat confusing due to the number of models.
 # In this case, we are going to remove the predictors which are dominated in the
 # error-disparity space by others from the sweep (note that the disparity will only be
 # calculated for the sensitive feature; other potentially sensitive features will

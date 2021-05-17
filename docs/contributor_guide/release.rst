@@ -21,6 +21,8 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
     #. Update the version in `__init__.py` to `x.y.z`
     #. Update the version in the ReadMe
 
+#. Merge that PR.
+
 #. Run the `release pipeline <https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=60>`_
 
     #. Ensure that you have selected the correct release branch
@@ -35,10 +37,21 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
     :code:`git push origin v<x.y.z>`
 
+#. On `GitHub's release page <https://github.com/fairlearn/fairlearn/releases>`_
+   there should be a new release named `v<x.y.z>`.
+   Open it and post the changes from CHANGES.md into the description, then hit "publish".
+
 #. On the `main` branch, create a PR to:
 
-    #. Update the version in `__init__.py` to `xy.z+1.dev0`
+    #. Update the version in `__init__.py` to `x.y.z+1.dev0`
     #. Update the 'current stable release' sentence in the ReadMe to link to `v<x.y.z>`
     #. Ensure that `smv_tag_whitelist` in `docs/conf.py` will pick up the
        new release
     #. Update `docs/static_landing_page/` so that all the links point to the new release
+   
+.. note::
+    Make sure to add a note to this second PR:
+    "Do not merge until the release is completed. Otherwise a new website will
+    be published that points to the new version which doesn't exist yet." 
+
+#. Merge that PR.

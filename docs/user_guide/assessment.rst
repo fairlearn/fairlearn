@@ -40,6 +40,8 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
     >>> skm.recall_score(y_true, y_pred)
     0.5
 
+.. _metrics_with_grouping:
+
 Metrics with Grouping
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -130,7 +132,7 @@ metrics simultaneously:
     dtype: object
     >>> multi_metric.by_group
                         precision recall
-    sensitive_feature_0                 
+    sensitive_feature_0
     a                         0.0    0.0
     b                         1.0    0.5
     c                         0.6   0.75
@@ -158,7 +160,7 @@ in a dictionary via the ``sample_params`` argument.:
     d    0...
     Name: recall_score, dtype: object
 
-If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
+If multiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
 
@@ -403,24 +405,9 @@ The simplest way to visualize grouped metrics from the :class:`MetricFrame` is
 to take advantage of the inherent plotting capabilities of
 :class:`pandas.DataFrame`:
 
-
-.. Below the code-block contains the code shown on the website.
-   It should be kept in sync with the plot_quickstart.py example.
-
-.. code-block:: python
-
-    metrics = {
-        'accuracy': accuracy_score,
-        'precision': precision_score,
-        'recall': recall_score,
-        'false positive rate': false_positive_rate,
-        'true positive rate': true_positive_rate,
-        'selection rate': selection_rate,
-        'count': lambda y_true, y_pred: y_true.shape[0]}
-    metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
-    metric_frame.by_group.plot.bar(
-        subplots=True, layout=[3,3], legend=False, figsize=[12,8],
-        title='Show all metrics')
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Analyze metrics using MetricFrame
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
@@ -443,5 +430,5 @@ metrics.
     part of Fairlearn.
     For more information on how to use it refer to
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
-    Fairlearn provide some of the existing functionality through
+    Fairlearn provides some of the existing functionality through
     :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.

@@ -60,6 +60,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
         the reformatting process, so mitigation methods should ideally use the input X instead
         of the returned X for training estimators and leave potential reformatting of X to the
         estimator.
+
     """
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
@@ -128,16 +129,14 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
     -------
     numpy.ndarray
         One-dimensional array of merged columns
+
     """
     if not isinstance(feature_columns, np.ndarray):
         raise ValueError("Received argument of type {} instead of expected numpy.ndarray"
                          .format(type(feature_columns).__name__))
-    return np.apply_along_axis(
-        lambda row: _MERGE_COLUMN_SEPARATOR.join(
-            [str(row[i])
-                .replace("\\", "\\\\")  # escape backslash and separator
-                .replace(_MERGE_COLUMN_SEPARATOR,
-                         "\\" + _MERGE_COLUMN_SEPARATOR)
-                for i in range(len(row))]),
-        axis=1,
-        arr=feature_columns)
+    return pd.DataFrame(feature_columns) \
+        .apply(lambda row: _MERGE_COLUMN_SEPARATOR.join([str(row[i])
+               .replace("\\", "\\\\")  # escape backslash and separator
+               .replace(_MERGE_COLUMN_SEPARATOR,
+                        "\\" + _MERGE_COLUMN_SEPARATOR)
+               for i in range(len(row))]), axis=1).values

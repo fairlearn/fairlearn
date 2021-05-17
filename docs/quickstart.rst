@@ -85,8 +85,9 @@ than $50,000 a year.
     Female    16192
     Name: sex, dtype: int64
 
-.. bokeh-plot:: quickstart_plot.py
-    :source-position: none
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
+    :target: auto_examples/plot_quickstart_selection_rate.html
+    :align: center
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -137,25 +138,9 @@ their label:
 Fairlearn also allows us to quickly plot these metrics from the
 :class:`fairlearn.metrics.MetricFrame`
 
-.. Below the doctest contains the code shown on the website.
-   It should be kept in sync with the plot_quickstart.py example.
-
-.. doctest:: quickstart
-
-    >>> from sklearn.metrics import precision_score, recall_score
-    >>> from fairlearn.metrics import false_positive_rate, true_positive_rate
-    >>> metrics = {
-    ...     'accuracy': accuracy_score,
-    ...     'precision': precision_score,
-    ...     'recall': recall_score,
-    ...     'false positive rate': false_positive_rate,
-    ...     'true positive rate': true_positive_rate,
-    ...     'selection rate': selection_rate,
-    ...     'count': lambda y_true, y_pred: y_true.shape[0]}
-    >>> metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
-    >>> metric_frame.by_group.plot.bar(
-    ...     subplots=True, layout=[3,3], legend=False, figsize=[12,8],
-    ...     title='Show all metrics')  # doctest: +SKIP
+.. literalinclude:: auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Analyze metrics using MetricFrame
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
@@ -186,6 +171,7 @@ a vastly reduced difference in selection rate:
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
+    ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
     >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
