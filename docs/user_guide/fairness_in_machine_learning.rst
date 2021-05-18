@@ -141,6 +141,22 @@ which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
 subpackage :code:`fairlearn.metrics`.
 
+Failure modes encountered when abstracting
+--------------------------------------------------
+
+In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_ identify failure modes that arise the applying abstraction. They identify them as:
+
+* *The Framing Trap*
+
+* *The Portability Trap*
+
+* *The Formalism Trap*
+
+* *The Ripple Effect Trap*
+
+* *The Solutionism Trap*
+
+These traps are inspired by the observation that each of these traps are the result of failing to consider the way in with social context and technology are interrelated, as well as a deeper understanding of "the social" in order to solve problems Ackerman [#5]_.  s
 
 .. topic:: References:
 
@@ -156,3 +172,7 @@ subpackage :code:`fairlearn.metrics`.
    .. [#3] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
       Approach to Fair Classification"
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
+	  
+   .. [#4] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian, Suresh and Vertesi, Janet, "Fairness and Abstraction in     	  		Sociotechnical Systems" (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency (FAT*), 59-68, Available at `SSRN: 		<https://ssrn.com/abstract=3265913>`_, 
+   .. [#5] Mark S. Ackerman. 2000. The intellectual challenge of CSCW: The gap between social requirements and technical
+		feasibility. Human-Computer Interaction 15, 2-3 (2000), 179–203.
