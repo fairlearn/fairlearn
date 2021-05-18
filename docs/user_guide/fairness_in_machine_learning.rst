@@ -145,7 +145,7 @@ Failure modes encountered when abstracting
 --------------------------------------------------
 
 In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_
-identify failure modes that arise the applying abstraction. They identify
+identify failure modes that arise from applying abstraction. They identify
 them as:
 
 * *The Framing Trap*
