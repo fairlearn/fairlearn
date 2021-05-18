@@ -170,6 +170,7 @@ Selbst et al. [#5]_ define this as a "failure to model the entire system over
 which a social criterion, such as fairness, will be enforced".
 
 It is the practice of failing to consider the full picture surrounding sources of
+bias.
 
 Labelling in a risk assessment setting. Risk assessment may be used as a predictive
 model whose goal is to assess the risk of an individual to ease the decision-making
