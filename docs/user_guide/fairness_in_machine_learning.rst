@@ -186,7 +186,7 @@ Risk assessment tools may be used as recommendations towards an outcome. However
 guarantee that they will be used consistently and thus bias is introduced. For example, a
 party responsible for choosing the outcome decides to ignore the recommendation as a result
 of personal bias, even when the model takes into account demographic data. In this example
-a model that fails to take into account bias present in those judging in a biased result.
+a model that fails to take into account bias present in those judging culminates in a biased result.
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
