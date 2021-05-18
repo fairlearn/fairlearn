@@ -166,7 +166,7 @@ solve problems Ackerman [#5]_.
 The Framing Trap
 ^^^^^^^^^^^^^^^^
 
-Selbst et al. [#5]_ define this as a "failure to model the entire system over
+Selbst et al. [#4]_ define this as a "failure to model the entire system over
 which a social criterion, such as fairness, will be enforced".
 
 It is the practice of failing to consider the full picture surrounding sources of
@@ -193,7 +193,7 @@ biased result.
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#5]_ define this as a "failure to understand how repurposing algorithmic
+Selbst et al. [#4]_ define this as a "failure to understand how repurposing algorithmic
 solutions designed for one social context may be misleading, inaccurate, or otherwise
 do harm when applied to a different context".
 
@@ -203,7 +203,7 @@ transferability to a given social situation, resulting in harmful consequences.
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#5]_ define this as a "failure to account for the full meaning of social concepts
+Selbst et al. [#4]_ define this as a "failure to account for the full meaning of social concepts
 such as fairness, which can be procedural, contextual, and contestable, and cannot be resolved
 through mathematical formalisms".
 
@@ -214,14 +214,14 @@ economic, or otherwise non-technical aspect that make up the phenomenon being st
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#5]_ define this as a "failure to understand how the insertion of technology into
+Selbst et al. [#4]_ define this as a "failure to understand how the insertion of technology into
 an existing social system changes the behaviors and embedded values of the pre-existing system".
 
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#5]_ define this as a "failure to recognize the possibility that the best solution
+Selbst et al. [#4]_ define this as a "failure to recognize the possibility that the best solution
 to a problem may not involve technology".
 
 It is the practice of assuming that a machine learning algorithm is the best solution to a problem.
