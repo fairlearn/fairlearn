@@ -194,8 +194,11 @@ The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
 Selbst et al. [#5]_ define this as a "failure to understand how repurposing algorithmic
-solutions designed for one social context
-may be misleading, inaccurate, or otherwise do harm when applied to a different context".
+solutions designed for one social context may be misleading, inaccurate, or otherwise
+do harm when applied to a different context".
+
+It is the practice of reusing others work without taking into account lack of
+transferability to a given social situation, resulting in harmful consequences.
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
@@ -204,11 +207,16 @@ Selbst et al. [#5]_ define this as a "failure to account for the full meaning of
 such as fairness, which can be procedural, contextual, and contestable, and cannot be resolved
 through mathematical formalisms".
 
+It is the practice of implementing mathematical and statistical models, along with
+corresponding assumptions, that fail to take into consideration the social, demographic,
+economic, or otherwise non-technical aspect that make up the phenomenon being studied.
+
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Selbst et al. [#5]_ define this as a "failure to understand how the insertion of technology into
 an existing social system changes the behaviors and embedded values of the pre-existing system".
+
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
