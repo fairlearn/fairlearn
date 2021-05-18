@@ -171,10 +171,6 @@ html_sidebars = {
     "**": ["version-sidebar.html", "search-field.html", "sidebar-nav-bs.html"],
 }
 
-# html_sidebars = {
-#     "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
-# }
-
 # Auto-Doc Options
 # ----------------
 
