@@ -169,7 +169,7 @@ The Framing Trap
 Selbst et al. [#5]_ define this as a "failure to model the entire system over
 which a social criterion, such as fairness, will be enforced".
 
-Example:
+It is the practice of failing to consider the full picture surrounding sources of
 
 Labelling in a risk assessment setting. Risk assessment may be used as a predictive
 model whose goal is to assess the risk of an individual to ease the decision-making
@@ -188,8 +188,6 @@ party responsible for choosing the outcome decides to ignore the recommendation 
 of personal bias, even when the model takes into account demographic data. In this example
 a model that fails to take into account bias present in those judging in a biased result.
 
-
-
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -197,18 +195,30 @@ Selbst et al. [#5]_ define this as a "failure to understand how repurposing algo
 solutions designed for one social context
 may be misleading, inaccurate, or otherwise do harm when applied to a different context".
 
-Examples include 
-
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
+
+Selbst et al. [#5]_ define this as a "failure to account for the full meaning of social concepts
+such as fairness, which can be procedural, contextual, and contestable, and cannot be resolved
+through mathematical formalisms".
 
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
+Selbst et al. [#5]_ define this as a "failure to understand how the insertion of technology into
+an existing social system changes the behaviors and embedded values of the pre-existing system".
+
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
+Selbst et al. [#5]_ define this as a "failure to recognize the possibility that the best solution
+to a problem may not involve technology".
 
+It is the practice of assuming that a machine learning algorithm is the best solution to a problem.
+
+One area where this manifests in contexts in which the definition "fairness" changes or is dependent
+on a political context. When this happens, models become obsolete. Another area where this manifests
+is when the question at hand requires a computationally intractable solution.
 
 .. topic:: References:
 
@@ -225,7 +235,10 @@ The Solutionism Trap
       Approach to Fair Classification"
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
 	  
-   .. [#4] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian, Suresh and Vertesi, Janet, "Fairness and Abstraction in     	  		Sociotechnical Systems" (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency (FAT*), 59-68, Available at `SSRN: 		<https://ssrn.com/abstract=3265913>`_, 
+   .. [#4] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
+        Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems" (August 23, 2018).
+        2019 ACM Conference on Fairness, Accountability, and Transparency (FAT*), 59-68, Available at
+        `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
    
-   .. [#5] Mark S. Ackerman. 2000. The intellectual challenge of CSCW: The gap between social requirements and technical
-		feasibility. Human-Computer Interaction 15, 2-3 (2000), 179–203.
+   .. [#5] Mark S. Ackerman. 2000. The intellectual challenge of CSCW: The gap between social requirements
+        and technical feasibility. Human-Computer Interaction 15, 2-3 (2000), 179–203.
