@@ -144,7 +144,9 @@ subpackage :code:`fairlearn.metrics`.
 Failure modes encountered when abstracting
 --------------------------------------------------
 
-In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_ identify failure modes that arise the applying abstraction. They identify them as:
+In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_
+identify failure modes that arise the applying abstraction. They identify
+them as:
 
 * *The Framing Trap*
 
@@ -156,35 +158,52 @@ In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_ iden
 
 * *The Solutionism Trap*
 
-These traps are inspired by the observation that each of these traps are the result of failing to consider the way in with social context and technology are interrelated, as well as a deeper understanding of "the social" in order to solve problems Ackerman [#5]_. 
+These traps are inspired by the observation that each of these traps are the
+result of failing to consider the way in with social context and technology
+are interrelated, as well as a deeper understanding of "the social" in order to
+solve problems Ackerman [#5]_.
 
 The Framing Trap
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
-Selbst et al. [#5]_ define this as a "failure to model the entire system over which a social criterion, such as fairness, will be enforced".
+Selbst et al. [#5]_ define this as a "failure to model the entire system over
+which a social criterion, such as fairness, will be enforced".
 
-Examples include:
+Example:
 
-Labelling in a risk assessment setting. Risk assessment may be used as a predictive model whose goal is to assess the risk of an individual to ease the decision-making process. For example, using risk assessment to decide whether a person is eligible for morgtage approval. Another example is using risk assessment to decide whether a person is likely to re-engage in criminal behaviour as they move through the criminal justice pipeline. 
+Labelling in a risk assessment setting. Risk assessment may be used as a predictive
+model whose goal is to assess the risk of an individual to ease the decision-making
+process. For example, using risk assessment to decide whether a person is eligible
+for mortgage approval. Another example is using risk assessment to decide whether a
+person is likely to re-engage in criminal behaviour as they move through the criminal
+justice pipeline.
 
-As far as the outcomes of these decisions, in the first scenario an individual may be approved or not to get a mortgage which then impacts their ability to have housing security, gain wealth and social status. In the second scenario and an individual may be released pretrial, or bail may be required. This assessment may also include sentencing and parole hearing. 
+As far as the outcomes of these decisions, in the first scenario an individual may be
+approved or not to get a mortgage which then impacts their ability to have housing security,
+gain wealth and social status. In the second scenario an individual may be released pretrial,
+or bail may be required. This assessment may also include sentencing and parole hearing.
+Risk assessment tools may be used as recommendations towards an outcome. However there is no
+guarantee that they will be used consistently and thus bias is introduced. For example, a
+party responsible for choosing the outcome decides to ignore the recommendation as a result
+of personal bias, even when the model takes into account demographic data. In this example
+a model that fails to take into account bias present in those judging in a biased result.
 
-Risk assessment tools may be used as recommendations towards an outcome. However there is no guarantee that they will be used consistently and thus bias is introduced. For example, a party responsible for choosing the outcome decides to ignore the recommendation as a result of personal bias, even when the model takes into account demographic data. In this example a model that fails to take into account bias present in those judging in a biased result.
 
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#5]_ define this as a "failure to understand how repurposing algorithmic solutions designed for one social context
+Selbst et al. [#5]_ define this as a "failure to understand how repurposing algorithmic
+solutions designed for one social context
 may be misleading, inaccurate, or otherwise do harm when applied to a different context".
 
 Examples include 
 
 The Formalism Trap
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 The Ripple Effect Trap
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
