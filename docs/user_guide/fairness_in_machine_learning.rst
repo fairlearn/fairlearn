@@ -172,14 +172,14 @@ which a social criterion, such as fairness, will be enforced".
 It is the practice of failing to consider the full picture surrounding sources of
 bias.
 
-Labelling in a risk assessment setting. Risk assessment may be used as a predictive
+Labelling is a risk assessment setting. Risk assessment may be used as a predictive
 model whose goal is to assess the risk of an individual to ease the decision-making
 process. For example, using risk assessment to decide whether a person is eligible
 for mortgage approval. Another example is using risk assessment to decide whether a
 person is likely to re-engage in criminal behaviour as they move through the criminal
 justice pipeline.
 
-As far as the outcomes of these decisions, in the first scenario an individual may be
+As far as the outcomes of these decisions go, in the first scenario an individual may be
 approved or not to get a mortgage which then impacts their ability to have housing security,
 gain wealth and social status. In the second scenario an individual may be released pretrial,
 or bail may be required. This assessment may also include sentencing and parole hearing.
@@ -187,7 +187,8 @@ Risk assessment tools may be used as recommendations towards an outcome. However
 guarantee that they will be used consistently and thus bias is introduced. For example, a
 party responsible for choosing the outcome decides to ignore the recommendation as a result
 of personal bias, even when the model takes into account demographic data. In this example
-a model that fails to take into account bias present in those judging culminates in a biased result.
+a model that fails to take into account bias present in those judging culminates in a
+biased result.
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
