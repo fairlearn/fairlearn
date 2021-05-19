@@ -408,65 +408,55 @@ to take advantage of the inherent plotting capabilities of
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Analyze metrics using MetricFrame
+    :end-before: # Customize plots with `ylim`
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
     :align: center 
 
-
-Plotting with MetricFrame
--------------------------
-MetricFrame pd.DataFrame properties can be plotted using matplotlib. Here is an example,
-referencing the same `metric_c_f` object above.
-
-.. code-block::
-
-    metric_c_f.by_group.plot(kind="bar",
-                             title='Show accuracy_score metric')
-
 It is possible to customize the plots. Here are some common examples:
 
-Customize Plots: `ylim`
-^^^^^^^^^^^^^^^^^^^^^^^
-The yaxis range is automatically set, which sometimes can be misleading, hence it is
+Customize Plots: :code:`ylim`
+'''''''''''''''''''''''''''''
+The y-axis range is automatically set, which can be misleading, therefore it is
 sometimes useful to set the `ylim` argument to define the yaxis range.
 
-.. code-block::
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Customize plots with `ylim`
+    :end-before: # Customize plots with `colormap`
 
-    metric_c_f.by_group.plot(kind="bar",
-                             ylim=[0,1],
-                             title='Show accuracy_score metric')
-
-Customize Plots: `kind`
-^^^^^^^^^^^^^^^^^^^^^^^
-There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
-argument. Some metrics are better represented as a pie chart, some as a bar chart. Here
-is an example of a pie chart representing the `count` metric.
-
-.. code-block::
-
-    count_metric = MetricFrame(lambda y_true, y_pred: y_true.shape[0],
-                               y_true, y_pred,
-                               sensitive_features=group_membership_data)
-
-    count_metric.by_group.plot(kind="pie",
-                               title='Show count metric')
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_002.png
+    :align: center
 
 
-Customize Plots: `colormap`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Customize Plots: :code:`colormap`
+''''''''''''''''''''''''''''''''
 To change the color scheme, we can use the `colormap` argument. A list of colorschemes
 can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_.
 
-.. code-block::
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Customize plots with `colormap`
+    :end-before: # Customize plots with `kind`
 
-    metric_c_f.by_group.plot(kind="bar",
-                             colormap="Accent",
-                             title='Show accuracy_score metric')
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_003.png
+    :align: center
 
-There are many other customisations that can be done. More information can be found
-`here <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.html>`_ in this
-documentation.
+Customize Plots: :code:`kind`
+'''''''''''''''''''''''''''''
+There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
+argument. Here is an example of a bar chart.
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Customize plots with `kind`
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_004.png
+    :align: center
+
+There are many other customizations that can be done. More information can be found in
+:meth:`pandas.DataFrame.plot`.
 
 
 .. _dashboard:
