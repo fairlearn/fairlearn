@@ -201,7 +201,7 @@ class TestCreateGroupMetricSet:
         assert actual['trueY'] == y_t
         assert actual['predictedY'][0] == y_p
         assert actual['precomputedFeatureBins'][0]['binVector'] == s_f
-        assert len(actual['precomputedMetrics'][0][0]) == 11
+        assert len(actual['precomputedMetrics'][0][0]) == 12
 
         # Cross check the two metrics we computed
         # Comparisons simplified because s_f was already {0,1}
@@ -228,7 +228,7 @@ class TestCreateGroupMetricSet:
                                           sensitive_feature,
                                           'regression')
         assert result['predictionType'] == 'regression'
-        assert len(result['precomputedMetrics'][0][0]) == 5
+        assert len(result['precomputedMetrics'][0][0]) == 6
 
     def test_probability_prediction_type(self):
         # For probability, y_p can have real values [0, 1]
@@ -245,4 +245,4 @@ class TestCreateGroupMetricSet:
                                           sensitive_feature,
                                           'probability')
         assert result['predictionType'] == 'probability'
-        assert len(result['precomputedMetrics'][0][0]) == 9
+        assert len(result['precomputedMetrics'][0][0]) == 10
