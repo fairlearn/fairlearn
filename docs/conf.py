@@ -113,12 +113,12 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/fairlearn/fairlearn",
-            "icon": "fab fa-github-square",
+            "icon": "fab fa-github",
         },
         {
             "name": "Twitter",
             "url": "https://twitter.com/fairlearn",
-            "icon": "fab fa-twitter-square",
+            "icon": "fab fa-twitter",
         },
         {
             "name": "StackOverflow",

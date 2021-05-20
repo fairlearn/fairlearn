@@ -1,7 +1,15 @@
-i.fa-gitter:before {
+i.fa-github:hover {
+   color: black;
+}
+
+i.fa-twitter:hover {
+   color: #1da1f2;
+}
+
+i.fa-gitter:hover {
    color: #46bc99;
 }
 
-i.fa-stack-overflow:before {
+i.fa-stack-overflow:hover {
    color: #f48024;
-}
+} 
