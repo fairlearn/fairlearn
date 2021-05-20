@@ -209,9 +209,9 @@ def linkcode_resolve(domain, info):
 
 # -- LaTeX macros ------------------------------------------------------------
 
-mathjax_config = {
-    "TeX": {
-        "Macros": {
+mathjax3_config = {
+    "tex": {
+        "macros": {
             "E": '{\\mathbb{E}}',
             "P": '{\\mathbb{P}}',
             "given": '\\mathbin{\\vert}'
