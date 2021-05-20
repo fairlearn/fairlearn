@@ -107,7 +107,7 @@ jobs:
 
       - run:
           name: 'Push to GitHub Pages repository'
-          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.git --branch master
 
 # This workflow defines the ordering, in this case build-doc needs to happen
 # before deploy-doc.
