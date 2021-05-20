@@ -71,7 +71,7 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs.
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See [#5]_ for a related example. 
 
 **Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
  
@@ -232,3 +232,6 @@ subpackage :code:`fairlearn.metrics`.
 
    .. [#4] Jacobs, Wallach `"Measurement and Fairness"
       <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
+
+   .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
+      <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
