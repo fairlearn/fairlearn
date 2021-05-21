@@ -151,7 +151,7 @@ sphinx_gallery_conf = {
 }
 
 html_sidebars = {
-    "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
+    "**": ["version-sidebar.html", "search-field.html", "sidebar-nav-bs.html"],
 }
 
 # Auto-Doc Options
@@ -209,9 +209,9 @@ def linkcode_resolve(domain, info):
 
 # -- LaTeX macros ------------------------------------------------------------
 
-mathjax_config = {
-    "TeX": {
-        "Macros": {
+mathjax3_config = {
+    "tex": {
+        "macros": {
             "E": '{\\mathbb{E}}',
             "P": '{\\mathbb{P}}',
             "given": '\\mathbin{\\vert}'
