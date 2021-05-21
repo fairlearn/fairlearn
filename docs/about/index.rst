@@ -18,9 +18,10 @@ improve fairness of AI systems.
 
 The project aspires to include:
 
-- A Python library of fairness metrics and mitigation algorithms
-- Tools for fairness assessment (e.g., plotting, dashboards, etc.)
-- Educational materials (comprehensive user guide, detailed case studies,
+- A Python library for fairness assessment and improvement (fairness metrics, 
+  mitigation algorithms, plotting, etc.)
+- Educational resources covering societal and technical processes for 
+  unfairness mitigation (comprehensive user guide, detailed case studies, 
   Jupyter notebooks, white papers, etc.)
 
 Development of Fairlearn is firmly grounded in the understanding that fairness
