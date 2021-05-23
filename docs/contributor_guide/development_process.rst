@@ -65,11 +65,6 @@ command
 
     pip install -e .[customplots]
 
-Note that the Fairlearn dashboard is built using nodejs and requires
-additional steps. To build the Fairlearn dashboard after making changes to it,
-`install Yarn <https://yarnpkg.com/lang/en/docs/install>`_, and then run the
-`widget build script <https://github.com/fairlearn/fairlearn/tree/main/scripts/build_widget.py>`_.
-
 The Requirements Files
 """"""""""""""""""""""
 

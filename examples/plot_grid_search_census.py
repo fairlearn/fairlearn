@@ -1,3 +1,4 @@
+# %%
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
@@ -7,8 +8,7 @@ GridSearch with Census Data
 ===========================
 """
 # %%
-# This notebook shows how to use Fairlearn and the Fairness dashboard to generate predictors
-# for the Census dataset.
+# This notebook shows how to use Fairlearn to generate predictors for the Census dataset.
 # This dataset is a classification problem - given a range of data about 32,000 individuals,
 # predict whether their annual income is above or below fifty thousand dollars per year.
 #
@@ -31,22 +31,14 @@ GridSearch with Census Data
 # We download the data set using `fetch_adult` function in `fairlearn.datasets`.
 # We start by importing the various modules we're going to use:
 #
-# .. note::
-#
-#    The :code:`FairlearnDashboard` is no longer being developed as
-#    part of Fairlearn.
-#    The widget itself has been moved to
-#    `the raiwidgets package <https://pypi.org/project/raiwidgets/>`_.
-#    Fairlearn will provide some of the existing functionality
-#    through :code:`matplotlib`-based visualizations.
 
-from fairlearn.widget import FairlearnDashboard
 from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, ErrorRate
-
+from fairlearn.metrics import MetricFrame, selection_rate
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
+from sklearn import metrics as skm
 import pandas as pd
 
 # %%
@@ -107,11 +99,16 @@ unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=Tru
 unmitigated_predictor.fit(X_train, Y_train)
 
 # %%
-# We can load this predictor into the Fairness dashboard, and assess its fairness:
-
-FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
-                   y_true=Y_test,
-                   y_pred={"unmitigated": unmitigated_predictor.predict(X_test)})
+# We can start to assess the predictor's fairness using the `MetricFrame`:
+metric_frame = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
+                           sensitive_features=A_test,
+                           y_true=Y_test,
+                           y_pred=unmitigated_predictor.predict(X_test))
+print(metric_frame.overall)
+print(metric_frame.by_group)
+metric_frame.by_group.plot.bar(
+        subplots=True, layout=[2, 1], legend=False, figsize=[12, 8],
+        title='Accuracy and selection rate by group')
 
 # %%
 # Looking at the disparity in accuracy, we see that males have an error
@@ -163,8 +160,8 @@ sweep.fit(X_train, Y_train,
 predictors = sweep.predictors_
 
 # %%
-# We could load these predictors into the Fairness dashboard now.
-# However, the plot would be somewhat confusing due to their number.
+# We could plot performance and fairness metrics of these predictors now.
+# However, the plot would be somewhat confusing due to the number of models.
 # In this case, we are going to remove the predictors which are dominated in the
 # error-disparity space by others from the sweep (note that the disparity will only be
 # calculated for the sensitive feature; other potentially sensitive features will
@@ -193,19 +190,28 @@ for row in all_results.itertuples():
         non_dominated.append(row.predictor)
 
 # %%
-# Finally, we can put the dominant models into the Fairness dashboard, along with the
-# unmitigated model.
+# Finally, we can evaluate the dominant models along with the unmitigated model.
 
-dashboard_predicted = {"unmitigated": unmitigated_predictor.predict(X_test)}
+predictions = {"unmitigated": unmitigated_predictor.predict(X_test)}
+metric_frames = {"unmitigated": metric_frame}
 for i in range(len(non_dominated)):
     key = "dominant_model_{0}".format(i)
-    value = non_dominated[i].predict(X_test)
-    dashboard_predicted[key] = value
+    predictions[key] = non_dominated[i].predict(X_test)
 
+    metric_frames[key] = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
+                                     sensitive_features=A_test,
+                                     y_true=Y_test,
+                                     y_pred=predictions[key])
 
-FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
-                   y_true=Y_test,
-                   y_pred=dashboard_predicted)
+import matplotlib.pyplot as plt
+x = [metric_frame.overall['accuracy'] for metric_frame in metric_frames.values()]
+y = [metric_frame.difference()['selection_rate'] for metric_frame in metric_frames.values()]
+keys = list(metric_frames.keys())
+plt.scatter(x, y)
+for i in range(len(x)):
+    plt.annotate(keys[i], (x[i] + 0.0003, y[i]))
+plt.xlabel("accuracy")
+plt.ylabel("selection rate difference")
 
 # %%
 # We see a Pareto front forming - the set of predictors which represent optimal tradeoffs
@@ -217,7 +223,5 @@ FairlearnDashboard(sensitive_features=A_test, sensitive_feature_names=['sex'],
 # Note the range of the axes - the disparity axis covers more values than the accuracy,
 # so we can reduce disparity substantially for a small loss in accuracy.
 #
-# By clicking on individual models on the plot, we can inspect their metrics for disparity
-# and accuracy in greater detail.
-# In a real example, we would then pick the model which represented the best trade-off
+# In a real example, we would pick the model which represented the best trade-off
 # between accuracy and disparity given the relevant business constraints.
