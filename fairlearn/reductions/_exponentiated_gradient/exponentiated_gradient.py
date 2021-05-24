@@ -189,6 +189,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         logger.debug("...last_iter=%d, best_iter=%d, best_gap=%.6f, n_oracle_calls=%d, n_hs=%d",
                      self.last_iter_, self.best_iter_, self.best_gap_, lagrangian.n_oracle_calls,
                      len(lagrangian.predictors))
+        return self
 
     def predict(self, X, random_state=None):
         """Provide predictions for the given input data.
