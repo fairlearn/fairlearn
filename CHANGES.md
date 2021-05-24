@@ -50,7 +50,7 @@
     argument `upper_bound` with the same purpose for newly enabled regression
     scenarios on `ExponentiatedGradient`.
   For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.org/user_guide/mitigation.html#reductions).
+  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
 * Renamed several constraints to create a uniform naming convention according
   to the accepted [metric harmonization proposal](https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md):
   * `ErrorRateRatio` renamed to `ErrorRateParity`, and
