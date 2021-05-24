@@ -50,11 +50,12 @@ The Fairlearn Python package has two components:
 
 ### Fairlearn metrics
 
-For an overview of our algorithms please refer to our [website](https://fairlearn.org/main/user_guide/mitigation.html).
+Check out our in-depth
+[guide on the Fairlearn metrics](https://fairlearn.org/main/user_guide/assessment.html).
 
 ### Fairlearn algorithms
 
-Check out our in-depth [guide on the Fairlearn dashboard](https://fairlearn.org/main/user_guide/assessment.html#fairlearn-dashboard).
+For an overview of our algorithms please refer to our [website](https://fairlearn.org/main/user_guide/mitigation.html).
 
 ## Install Fairlearn
 
