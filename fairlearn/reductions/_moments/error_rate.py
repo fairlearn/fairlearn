@@ -14,7 +14,30 @@ _MESSAGE_BAD_COSTS = "costs needs to be a dictionary with keys " \
 
 
 class ErrorRate(ClassificationMoment):
-    """Misclassification error."""
+    r"""Misclassification error as a moment.
+
+    A classifier :math:`h(X)` has the misclassification error equal to
+
+    .. math::
+      P[h(X) \ne Y]
+
+    It is also possible to specify costs for false positives and false
+    negatives. The error then evaluates to
+
+    .. math::
+      c_{FP} P[h(X)=1, Y=0] + c_{FN} P[h(X)=0, Y=1]
+
+    where :math:`c_{FP}` and `c_{FN}` are the costs of false positive
+    and false negative errors respectively. The standard misclassification
+    error corresponds to :math:`c_{FP}=c_{FN}=1.0`.
+
+    Parameters
+    ----------
+    costs : dict
+        The dictionary with keys ``"fp"`` and ``"fn"`` containing the
+        costs of false positives and false negatives. If none are provided
+        costs of 1.0 are assumed.
+    """
 
     short_name = "Err"
 
