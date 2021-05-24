@@ -34,8 +34,11 @@ class _Lagrangian:
         the estimator to fit in every iteration of :meth:`best_h` using a
         :meth:`fit` method with arguments `X`, `y`, and `sample_weight`
     constraints : fairlearn.reductions.Moment
-        Object describing the parity constraints. This provides the reweighting
+        Object describing the fairness constraints. This provides the reweighting
         and relabelling.
+    objective : fairlearn.reductions.Moment
+        Object describing the optimization objective. The default is :code:`ErrorRate()` for
+        binary classification and :code:`MeanLoss(...)` for regression.
     B : float
         bound on the L1-norm of the lambda vector
     opt_lambda : bool
