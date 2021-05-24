@@ -11,9 +11,12 @@ from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
-from fairlearn.reductions._moments import ClassificationMoment
+from fairlearn.reductions._moments import ClassificationMoment, LossMoment
 
 logger = logging.getLogger(__name__)
+
+
+_MESSAGE_BAD_OBJECTIVE = "Objective needs to be of the same type as constraints."
 
 
 class _Lagrangian:
@@ -43,11 +46,19 @@ class _Lagrangian:
         (defaults to `sample_weight`)
     """
 
-    def __init__(self, X, y, estimator, constraints, B, opt_lambda=True,
+    def __init__(self, X, y, estimator, constraints, *, B, objective=None, opt_lambda=True,
                  sample_weight_name='sample_weight', **kwargs):
         self.constraints = constraints
         self.constraints.load_data(X, y, **kwargs)
-        self.obj = self.constraints.default_objective()
+        if objective is None:
+            self.obj = self.constraints.default_objective()
+        elif ((isinstance(constraints, ClassificationMoment)
+               and isinstance(objective, ClassificationMoment)) or
+              (isinstance(constraints, LossMoment)
+               and isinstance(objective, LossMoment))):
+            self.obj = objective
+        else:
+            raise ValueError(_MESSAGE_BAD_OBJECTIVE)
         self.obj.load_data(X, y, **kwargs)
         self.estimator = estimator
         self.B = B
@@ -110,7 +121,7 @@ class _Lagrangian:
         L, L_high, gamma, error = self._eval(Q, lambda_hat)
         result = _GapResult(L, L, L_high, gamma, error)
         for mul in [1.0, 2.0, 5.0, 10.0]:
-            h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
+            _, h_hat_idx = self.best_h(mul * lambda_hat)
             logger.debug("%smul=%.0f", _INDENTATION, mul)
             L_low_mul, _, _, _ = self._eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
             if L_low_mul < result.L_low:
