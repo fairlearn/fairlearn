@@ -477,7 +477,6 @@ class TestExponentiatedGradientSmoke:
         assert n_predictors == data["n_predictors"]
         assert len(expgrad.oracle_execution_times_) == expgrad.n_oracle_calls_
 
-
     @pytest.mark.parametrize("eps", [0.05, 0.02])
     @pytest.mark.parametrize("ratio", [None, 0.8])
     @pytest.mark.parametrize("pos_copies", [0, 1, 2])
@@ -494,7 +493,7 @@ class TestExponentiatedGradientSmoke:
 
             if method == 'sampling':
                 select = y==1
-                X = pd.concat((X,) + (X.loc[select,:],) * pos_copies).values
+                X = pd.concat((X,) + (X.loc[select, :],) * pos_copies).values
                 y = pd.concat((y,) + (y[select],) * pos_copies).values
                 A = pd.concat((A,) + (A[select],) * pos_copies).values
                 objective_moment = ErrorRate()
