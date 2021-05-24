@@ -492,7 +492,7 @@ class TestExponentiatedGradientSmoke:
             X, y, A = _get_data()
 
             if method == 'sampling':
-                select = y==1
+                select = (y == 1)
                 X = pd.concat((X,) + (X.loc[select, :],) * pos_copies).values
                 y = pd.concat((y,) + (y[select],) * pos_copies).values
                 A = pd.concat((A,) + (A[select],) * pos_copies).values
