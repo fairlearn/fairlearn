@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from typing import Any, Callable, Dict, List, Optional, Union
 from sklearn.utils import check_consistent_length
+from sklearn.utils.validation import _deprecate_positional_args
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
@@ -63,7 +64,7 @@ class MetricFrame:
 
     Parameters
     ----------
-    metric : callable or dict
+    metrics : callable or dict
         The underlying metric functions which are to be calculated. This
         can either be a single metric function or a dictionary of functions.
         These functions must be callable as
@@ -113,10 +114,12 @@ class MetricFrame:
         metric function name, with the values being the string-to-array-like dictionaries.
     """
 
+    @_deprecate_positional_args(version="0.8.0")
     def __init__(self,
-                 metric: Union[Callable, Dict[str, Callable]],
+                 *,
+                 metrics: Union[Callable, Dict[str, Callable]],
                  y_true,
-                 y_pred, *,
+                 y_pred,
                  sensitive_features,
                  control_features: Optional = None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
@@ -125,7 +128,7 @@ class MetricFrame:
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        func_dict = self._process_functions(metric, sample_params)
+        func_dict = self._process_functions(metrics, sample_params)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
