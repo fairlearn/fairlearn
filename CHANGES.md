@@ -2,6 +2,9 @@
 
 ### v0.7.0
 
+* Added new `count()` metric, so that the number of data points in each
+  group is noted when using `MetricFrame`
+
 ### v0.6.2
 
 * Bugfix for `_merge_columns()` when using multiple sensitive features with

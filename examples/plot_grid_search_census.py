@@ -35,7 +35,7 @@ GridSearch with Census Data
 from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, ErrorRate
-from fairlearn.metrics import MetricFrame, selection_rate
+from fairlearn.metrics import MetricFrame, selection_rate, count
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics as skm
@@ -100,14 +100,16 @@ unmitigated_predictor.fit(X_train, Y_train)
 
 # %%
 # We can start to assess the predictor's fairness using the `MetricFrame`:
-metric_frame = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
+metric_frame = MetricFrame(metric={"accuracy": skm.accuracy_score,
+                                   "selection_rate": selection_rate,
+                                   "count": count},
                            sensitive_features=A_test,
                            y_true=Y_test,
                            y_pred=unmitigated_predictor.predict(X_test))
 print(metric_frame.overall)
 print(metric_frame.by_group)
 metric_frame.by_group.plot.bar(
-        subplots=True, layout=[2, 1], legend=False, figsize=[12, 8],
+        subplots=True, layout=[3, 1], legend=False, figsize=[12, 8],
         title='Accuracy and selection rate by group')
 
 # %%
@@ -198,7 +200,9 @@ for i in range(len(non_dominated)):
     key = "dominant_model_{0}".format(i)
     predictions[key] = non_dominated[i].predict(X_test)
 
-    metric_frames[key] = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
+    metric_frames[key] = MetricFrame(metric={"accuracy": skm.accuracy_score,
+                                             "selection_rate": selection_rate,
+                                             "count": count},
                                      sensitive_features=A_test,
                                      y_true=Y_test,
                                      y_pred=predictions[key])

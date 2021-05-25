@@ -12,6 +12,7 @@ import sklearn.metrics as skm
 from ._balanced_root_mean_squared_error import _balanced_root_mean_squared_error  # noqa: F401
 from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_underprediction  # noqa: F401,E501
 from ._selection_rate import selection_rate  # noqa: F401,E501
+from ._metric_frame import check_consistent_length
 
 _TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
 _RESTRICTED_VALS_IF_POS_LABEL_NONE = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"  # noqa: E501
@@ -215,3 +216,26 @@ def false_negative_rate(y_true,
 def _root_mean_squared_error(y_true, y_pred, **kwargs):
     r"""Calculate the root mean squared error."""
     return skm.mean_squared_error(y_true, y_pred, squared=False, **kwargs)
+
+
+def count(y_true, y_pred) -> int:
+    r"""Calculate the number of data points in each group when working with `MetricFrame`.
+
+    The ``y_true`` argument is used to make this calculation. For consistency with
+    other metric functions, the ``y_pred`` argument is required, but ignored.
+
+    Parameters
+    ----------
+    y_true : array_like
+        The list of true labels
+
+    y_pred : array_like
+        The predicted labels (ignored)
+
+    Returns
+    -------
+    int
+        The number of data points in each group.
+    """
+    check_consistent_length(y_true, y_pred)
+    return len(y_true)
