@@ -10,7 +10,7 @@ from fairlearn._input_validation import _validate_and_reformat_input
 
 
 _MESSAGE_BAD_COSTS = "costs needs to be a dictionary with keys " \
-    "'fp' and 'fn' and non-negative values"
+    "'fp' and 'fn' containing non-negative values, which are not both zero"
 
 
 class ErrorRate(ClassificationMoment):
@@ -50,7 +50,8 @@ class ErrorRate(ClassificationMoment):
         elif (type(costs) is dict
               and costs.keys() == {'fp', 'fn'}
               and costs['fp'] >= 0.0
-              and costs['fn'] >= 0.0):
+              and costs['fn'] >= 0.0
+              and costs['fp'] + costs['fn'] > 0.0):
             self.fp_cost = costs['fp']
             self.fn_cost = costs['fn']
         else:
