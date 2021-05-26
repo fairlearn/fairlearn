@@ -65,7 +65,7 @@ from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
 
 from fairlearn.metrics import MetricFrame
-from fairlearn.metrics import selection_rate
+from fairlearn.metrics import selection_rate, count
 
 
 # %%
@@ -233,7 +233,7 @@ print("fbeta:", skm.fbeta_score(y_test, y_pred, beta=0.6))
 
 fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 
-metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06}
+metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06, 'count': count}
 
 grouped_on_sex = MetricFrame(metric_fns,
                              y_test, y_pred,
@@ -269,8 +269,9 @@ print(grouped_on_sex.overall)
 # %%
 # The other property in the :class:`fairlearn.metrics.MetricFrame` object
 # is ``by_group``. This contains the metrics evaluated on each subgroup defined
-# by the categories in the ``sensitive_features=`` argument. In this case, we
-# have results for males and females:
+# by the categories in the ``sensitive_features=`` argument. Note that
+# :func:`fairlearn.metrics.count` can be used to display the number of
+# data points in each subgroup. In this case, we have results for males and females:
 
 grouped_on_sex.by_group
 

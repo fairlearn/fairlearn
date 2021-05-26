@@ -118,12 +118,16 @@ across groups and also the difference and ratio between the maximum and minimum:
     ratio in recall =  0.0
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
-metrics simultaneously:
+metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
+show each group's size):
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> multi_metric = MetricFrame({'precision':skm.precision_score, 'recall':skm.recall_score},
+    >>> from fairlearn.metrics import count
+    >>> multi_metric = MetricFrame({'precision':skm.precision_score,
+    ...                             'recall':skm.recall_score,
+    ...                             'count': count},
     ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
@@ -131,12 +135,12 @@ metrics simultaneously:
     recall       0.5...
     dtype: object
     >>> multi_metric.by_group
-                        precision recall
+                        precision recall count
     sensitive_feature_0
-    a                         0.0    0.0
-    b                         1.0    0.5
-    c                         0.6   0.75
-    d                         0.0    0.0
+    a                         0.0    0.0     2
+    b                         1.0    0.5     4
+    c                         0.6   0.75     7
+    d                         0.0    0.0     3
 
 If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
@@ -411,7 +415,7 @@ to take advantage of the inherent plotting capabilities of
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
-    :align: center 
+    :align: center
 
 
 .. _dashboard:
