@@ -100,7 +100,7 @@ unmitigated_predictor.fit(X_train, Y_train)
 
 # %%
 # We can start to assess the predictor's fairness using the `MetricFrame`:
-metric_frame = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
+metric_frame = MetricFrame(metrics={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
                            sensitive_features=A_test,
                            y_true=Y_test,
                            y_pred=unmitigated_predictor.predict(X_test))
@@ -198,7 +198,7 @@ for i in range(len(non_dominated)):
     key = "dominant_model_{0}".format(i)
     predictions[key] = non_dominated[i].predict(X_test)
 
-    metric_frames[key] = MetricFrame(metric={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
+    metric_frames[key] = MetricFrame(metrics={"accuracy": skm.accuracy_score, "selection_rate": selection_rate},
                                      sensitive_features=A_test,
                                      y_true=Y_test,
                                      y_pred=predictions[key])
