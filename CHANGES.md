@@ -4,6 +4,7 @@
 
 * Added new `count()` metric, so that the number of data points in each
   group is noted when using `MetricFrame`
+* Changed `MetricFrame` constructor API and added a deprecation warning
 
 ### v0.6.2
 

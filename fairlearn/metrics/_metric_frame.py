@@ -7,11 +7,13 @@ import numpy as np
 import pandas as pd
 from typing import Any, Callable, Dict, List, Optional, Union
 from sklearn.utils import check_consistent_length
-from sklearn.utils.validation import _deprecate_positional_args
+import warnings
+from functools import wraps
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
 from ._group_feature import GroupFeature
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,61 @@ _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
+
+
+def _deprecate_metric_frame_init(new_metric_frame_init):
+    """Issue deprecation warnings for the `MetricFrame` constructor.
+
+    Decorator to issue warnings if called with positional arguments
+    or with the keyword argument `metric` instead of `metrics`.
+
+    Parameters
+    ----------
+    new_metric_frame_init : callable
+        New MetricFrame constructor.
+    """
+
+    @wraps(new_metric_frame_init)
+    def compatible_metric_frame_init(self, *args, metric=None, **kwargs):
+        positional_names = ["metrics", "y_true", "y_pred"]
+        version = "0.8.0"
+
+        positional_dict = dict(zip(positional_names, args))
+
+        # If more than 3 positional arguments are provided (apart from self), show
+        # the error message applicable to the new constructor implementation (with `self`
+        # being the only positional argument).
+        if len(args) > 3:
+            raise TypeError(f"{new_metric_frame_init.__name__}() takes 1 positional "
+                            f"argument but {1+len(args)} positional arguments "
+                            f"were given")
+
+        # If 1-3 positional arguments are provided (apart fom self), issue warning.
+        if len(args) > 0:
+            args_msg = ", ".join([f"{name}={value}" for name, value in positional_dict.items()])
+            warnings.warn(f"Pass {args_msg} as keyword args. From version "
+                          f"{version} passing these as positional arguments "
+                          f"will result in an error",
+                          FutureWarning)
+
+        # If a keyword argument `metric` is provided, issue warning.
+        metric_arg_dict = {}
+        if metric is not None:
+            metric_arg_dict = {"metrics": metric}
+            warnings.warn(f"The positional argument 'metric' has been replaced "
+                          f"by a keyword argument 'metrics'. "
+                          f"From version {version} passing it as a positional argument "
+                          f"or as a keyword argument 'metric' will result in an error",
+                          FutureWarning)
+
+        # Call the new constructor with positional arguments passed as keyword arguments
+        # and with the `metric` keyword argument renamed to `metrics`.
+        new_metric_frame_init(self,
+                              **metric_arg_dict,
+                              **positional_dict,
+                              **kwargs)
+
+    return compatible_metric_frame_init
 
 
 class MetricFrame:
@@ -114,7 +171,7 @@ class MetricFrame:
         metric function name, with the values being the string-to-array-like dictionaries.
     """
 
-    @_deprecate_positional_args(version="0.8.0")
+    @_deprecate_metric_frame_init
     def __init__(self,
                  *,
                  metrics: Union[Callable, Dict[str, Callable]],
