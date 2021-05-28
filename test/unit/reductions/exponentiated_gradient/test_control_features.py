@@ -39,7 +39,7 @@ def run_comparisons(moment, metric_fn):
     X, y = loan_scenario_generator(n, f, sfs, ibs, seed=163)
     X_dummy = pd.get_dummies(X)
 
-    mf_input = MetricFrame(metric_fn, y, y,
+    mf_input = MetricFrame(metrics=metric_fn, y_true=y, y_pred=y,
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
 
@@ -49,8 +49,7 @@ def run_comparisons(moment, metric_fn):
     unmitigated = LogisticRegression()
     unmitigated.fit(X_dummy, y)
     y_pred = unmitigated.predict(X_dummy)
-    mf_unmitigated = MetricFrame(metric_fn,
-                                 y, y_pred,
+    mf_unmitigated = MetricFrame(metrics=metric_fn, y_true=y, y_pred=y_pred,
                                  sensitive_features=X['sens'],
                                  control_features=X['ctrl'])
     print("Unmitigated metric:\n", mf_unmitigated.by_group)
@@ -63,7 +62,7 @@ def run_comparisons(moment, metric_fn):
         eps=0.005)
     expgrad_basic.fit(X_dummy, y, sensitive_features=X['sens'])
     y_pred_basic = expgrad_basic.predict(X_dummy, random_state=8235)
-    mf_basic = MetricFrame(metric_fn, y, y_pred_basic,
+    mf_basic = MetricFrame(metrics=metric_fn, y_true=y, y_pred=y_pred_basic,
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
     print("Basic expgrad metric:\n", mf_basic.by_group)
@@ -78,7 +77,7 @@ def run_comparisons(moment, metric_fn):
                         sensitive_features=X['sens'],
                         control_features=X['ctrl'])
     y_pred_control = expgrad_control.predict(X_dummy, random_state=852)
-    mf_control = MetricFrame(metric_fn, y, y_pred_control,
+    mf_control = MetricFrame(metrics=metric_fn, y_true=y, y_pred=y_pred_control,
                              sensitive_features=X['sens'],
                              control_features=X['ctrl'])
     print("expgrad_control metric:\n", mf_control.by_group)
@@ -118,8 +117,7 @@ def test_equalized_odds():
     unmitigated = LogisticRegression()
     unmitigated.fit(X_dummy, y)
     y_pred = unmitigated.predict(X_dummy)
-    mf_unmitigated = MetricFrame(metrics,
-                                 y, y_pred,
+    mf_unmitigated = MetricFrame(metrics=metrics, y_true=y, y_pred=y_pred,
                                  sensitive_features=X['sens'],
                                  control_features=X['ctrl'])
 
@@ -129,7 +127,7 @@ def test_equalized_odds():
         eps=0.01)
     expgrad_basic.fit(X_dummy, y, sensitive_features=X['sens'])
     y_pred_basic = expgrad_basic.predict(X_dummy, random_state=9235)
-    mf_basic = MetricFrame(metrics, y, y_pred_basic,
+    mf_basic = MetricFrame(metrics=metrics, y_true=y, y_pred=y_pred_basic,
                            sensitive_features=X['sens'],
                            control_features=X['ctrl'])
 
@@ -141,7 +139,7 @@ def test_equalized_odds():
                         sensitive_features=X['sens'],
                         control_features=X['ctrl'])
     y_pred_control = expgrad_control.predict(X_dummy, random_state=8152)
-    mf_control = MetricFrame(metrics, y, y_pred_control,
+    mf_control = MetricFrame(metrics=metrics, y_true=y, y_pred=y_pred_control,
                              sensitive_features=X['sens'],
                              control_features=X['ctrl'])
 
