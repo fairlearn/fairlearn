@@ -213,8 +213,9 @@ def test_1m_2cf_metric_dict():
 
 def test_2m_2cf():
     two_group = pd.DataFrame(data=np.stack((g_1, g_2), axis=1), columns=['g_1', 'g_2'])
-    target = MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
-                         y_t, y_p,
+    target = MetricFrame(metrics={'recall': skm.recall_score, 'prec': skm.precision_score},
+                         y_true=y_t,
+                         y_pred=y_p,
                          sensitive_features=g_3,  # Unused
                          control_features=two_group)
 

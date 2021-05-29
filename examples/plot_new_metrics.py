@@ -478,8 +478,9 @@ cond_credit_score.ratio(method='between_groups')
 # aggregates.
 #
 # We can continue adding more control features:
-cond_both = MetricFrame(metric_fns,
-                        y_test, y_pred,
+cond_both = MetricFrame(metrics=metric_fns,
+                        y_true=y_test,
+                        y_pred=y_pred,
                         sensitive_features=A_test[['race', 'sex']],
                         control_features=A_test[['Loan Size', 'Credit Score']])
 
@@ -502,8 +503,9 @@ def member_counts(y_true, y_pred):
     return len(y_true)
 
 
-counts = MetricFrame(member_counts,
-                     y_test, y_pred,
+counts = MetricFrame(metrics=member_counts,
+                     y_true=y_test,
+                     y_pred=y_pred,
                      sensitive_features=A_test[['race', 'sex']],
                      control_features=A_test[['Loan Size', 'Credit Score']])
 
