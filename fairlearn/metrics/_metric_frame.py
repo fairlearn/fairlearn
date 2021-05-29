@@ -65,7 +65,7 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
                           f"{version} passing these as positional arguments "
                           f"will result in an error",
                           FutureWarning)
- 
+
         # If a keyword argument `metric` is provided, issue warning.
         metric_arg_dict = {}
         if metric is not None:
