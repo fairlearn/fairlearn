@@ -13,7 +13,7 @@ def _ensure_cwd_is_fairlearn_root_dir():
     # current working directory as well as the presence of a README.md file.
     if not os.path.exists(os.path.join(os.getcwd(), "fairlearn")) or \
             not os.path.exists(os.path.join(os.getcwd(), "README.md")):
-        raise NotImplementedError("Please run this from the fairlearn root directory. "
+        raise Exception("Please run this from the fairlearn root directory. "
                         "Current directory: {}".format(os.getcwd()))
 
 
