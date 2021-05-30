@@ -201,7 +201,7 @@ class TestCreateGroupMetricSet:
         assert actual['trueY'] == y_t
         assert actual['predictedY'][0] == y_p
         assert actual['precomputedFeatureBins'][0]['binVector'] == s_f
-        assert len(actual['precomputedMetrics'][0][0]) == 11
+        assert len(actual['precomputedMetrics'][0][0]) == 12
 
         # Cross check the two metrics we computed
         # Comparisons simplified because s_f was already {0,1}
@@ -214,15 +214,35 @@ class TestCreateGroupMetricSet:
         assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])
 
     def test_regression_prediction_type(self):
-        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
-        y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        # For regression, both y_t and y_p can have floating point values
+        y_t = [0, 1, 1, 0, 1, 1, 1.5, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [1, 1, 1, 0, 1, 1, 1.5, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
         s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
 
         predictions = {"some model": y_p}
         sensitive_feature = {"my sf": s_f}
 
         # Using the `regression` prediction type should not crash
-        _create_group_metric_set(y_t,
-                                 predictions,
-                                 sensitive_feature,
-                                 'regression')
+        result = _create_group_metric_set(y_t,
+                                          predictions,
+                                          sensitive_feature,
+                                          'regression')
+        assert result['predictionType'] == 'regression'
+        assert len(result['precomputedMetrics'][0][0]) == 6
+
+    def test_probability_prediction_type(self):
+        # For probability, y_p can have real values [0, 1]
+        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [0.9, 1, 1, 0.1, 1, 1, 0.8, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+
+        predictions = {"some model": y_p}
+        sensitive_feature = {"my sf": s_f}
+
+        # Using the `probability` prediction type should not crash
+        result = _create_group_metric_set(y_t,
+                                          predictions,
+                                          sensitive_feature,
+                                          'probability')
+        assert result['predictionType'] == 'probability'
+        assert len(result['precomputedMetrics'][0][0]) == 10

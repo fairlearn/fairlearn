@@ -5,7 +5,7 @@ trigger: none # No CI build
 pr:
   branches:
     include:
-    - master
+    - main
   paths:
     include:
     - test_othermlpackages/*
@@ -15,7 +15,7 @@ schedules:
   displayName: Nightly Build
   branches:
     include:
-      - master
+      - main
   always: true
 
 pool:

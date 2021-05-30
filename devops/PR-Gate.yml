@@ -3,7 +3,7 @@ variables:
   FreezeFileStem: 'requirements-freeze'
 
 pr:
-- master
+- main
 - release/*
 
 trigger: none # No CI build
@@ -16,7 +16,7 @@ jobs:
   parameters:
     platforms:  { Linux: ubuntu-latest }
     installationType: 'PipLocal'
-    pyVersions: [3.6]
+    pyVersions: [3.9]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
@@ -36,7 +36,5 @@ jobs:
     pyVersions: [3.7, 3.8]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
-
-- template: templates/build-widget-job-template.yml
 
 - template: templates/limited-installation-job-template.yml

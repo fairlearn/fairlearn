@@ -50,6 +50,16 @@ The model is unfair because the data are biased. Isn't it better to get better d
     each. In some of these cases, obtaining 'better data' may not be practical, but it
     might still be possible to use some mitigation algorithms.
 
+Why am I seeing fairness issues, even though my data are reflective of the general population?
+    Machine learning models often perform poorly for subgroups which are poorly
+    represented.
+    What constitutes poor representation is context specific, and may well be affected by
+    historical misrepresentation (consider the example above, of a company which had previously
+    hired few women).
+    For this reason, balanced sampling is generally better for ML than population sampling.
+    On a related point, this is why it is important to consider multiple fairness metrics,
+    and how they vary across different subgroups.
+
 Won't making a model fairer reduce its accuracy?
     There are often many machine learning models that achieve similar levels of accuracy
     or other performance metrics, but that dramatically differ in how they affect
@@ -65,6 +75,22 @@ Can the mitigation algorithms in Fairlearn make my model fair?
     However, to assess whether the new model is fairer, it is important to consider
     not only the fairness metrics, but also the societal and technical context in which
     the model is applied.
+
+I've got improved data, trained and mitigated new models, checked all the metrics... am I done?
+    Firstly, always remember that there is more to fairness than technical details such as
+    metrics - fairness is a *sociotechnical* problem.
+    Even if these are all considered at training time, the ML lifecycle doesn't end when a
+    model is deployed.
+    Models need to be monitored in production.
+    On a technical level, this means checking for data drift within the vulnerable
+    subgroups identified during the fairness analysis.
+    However the societal aspects need to be considered as well, for example:
+    
+    - Are the actual harms as expected, both in the nature of the harms and their
+      distribution?
+    - Have the users of the model (who may not be the subjects of the model)
+      adjusted their usage patterns? This is sometimes called 'strategic
+      behavior.'
     
 What sort of fairness-related harms can the Fairlearn library address?
     We currently focus on two kinds of harms:
@@ -81,7 +107,7 @@ Can the Fairlearn library be used to detect bias in datasets?
 
 Can the Fairlearn library recommend ways to make my model fairer?
     Right now we do not have an automated tool that would help you decide
-    which mitigation algorithm to use. Our focus is on expanding the documantation
+    which mitigation algorithm to use. Our focus is on expanding the documentation
     and examples to highlight when each of the algorithms might be more applicable.
     Note that model training is just one step in the AI development and
     deployment lifecycle, and other steps, such as data gathering and curation,
@@ -98,10 +124,34 @@ Which ML libraries does Fairlearn support?
     `predict()` methods. Also, any classification or regression
     algorithm can be evaluated using our metrics.
 
+Does Fairlearn support multi-class classification?
+    On the assessment side, Fairlearn's :class:`MetricFrame` can be used with
+    any metrics for supervised learning, including those for multi-class classification.
+    For example, it is possible to pass
+    :py:func:`sklearn.metrics.accuracy_score` or :py:func:`sklearn.metrics.confusion_matrix`
+    as the metric functions, and supply multi-class data for :code:`y_true` and :code:`y_pred`.
+    There are
+    `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
+    to add more extensive support to Fairlearn's assessment capabilities.
+    If you have thoughts feel free to add them to the discussion.
+    
+    On the mitigation side, our algorithms :class:`ExponentiatedGradient` and :class:`GridSearch`
+    support :ref:`bounded group loss <_bounded_group_loss>` constraints, which are applicable
+    to any supervised learning setting, including multi-class classification.
+
+Does Fairlearn support multiple and non-binary sensitive features?
+    Fairlearn's assessment capabilities support sensitive features with more
+    than two values as well as multiple sensitive features.
+    Our :ref:`user guide <metrics_with_grouping>` has examples for both of
+    these cases.
+    The mitigation techniques all support mitigation with non-binary and
+    multiple sensitive features as well. For a full list of techniques
+    please refer to the :ref:`user guide section on mitigation <mitigation>`.
+
 Does Fairlearn work for image and text data?
     We have not (yet) looked at using Fairlearn on image or text data.
     However, so long as the image or text classifier provide
-    `fit()` and `predict()` methods
+    :code:`fit()` and :code:`predict()` methods
     as required by Fairlearn, it should be possible to use them
     with Fairlearn mitigation algorithms. Also, any classification or regression
     algorithm can be evaluated using our metrics (regardless of the

@@ -40,6 +40,8 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
     >>> skm.recall_score(y_true, y_pred)
     0.5
 
+.. _metrics_with_grouping:
+
 Metrics with Grouping
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -116,25 +118,29 @@ across groups and also the difference and ratio between the maximum and minimum:
     ratio in recall =  0.0
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
-metrics simultaneously:
+metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
+show each group's size):
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> multi_metric = MetricFrame({'precision':skm.precision_score, 'recall':skm.recall_score},
+    >>> from fairlearn.metrics import count
+    >>> multi_metric = MetricFrame({'precision':skm.precision_score,
+    ...                             'recall':skm.recall_score,
+    ...                             'count': count},
     ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
-    precision    0.555556
-    recall            0.5
+    precision    0.5555...
+    recall       0.5...
     dtype: object
     >>> multi_metric.by_group
-         precision recall
+                        precision recall count
     sensitive_feature_0
-    a            0      0
-    b            1    0.5
-    c          0.6   0.75
-    d            0      0
+    a                         0.0    0.0     2
+    b                         1.0    0.5     4
+    c                         0.6   0.75     7
+    d                         0.0    0.0     3
 
 If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
@@ -152,13 +158,13 @@ in a dictionary via the ``sample_params`` argument.:
     0.45
     >>> weighted.by_group
     SF 0
-    a               0
-    b             0.5
-    c        0.714286
-    d               0
+    a    0...
+    b    0.5...
+    c    0.7142...
+    d    0...
     Name: recall_score, dtype: object
 
-If mutiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
+If multiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
 
@@ -178,10 +184,10 @@ function:
     0.5396825396825397
     >>> metric_beta.by_group
     sensitive_feature_0
-    a            0
-    b     0.790698
-    c      0.63354
-    d            0
+    a    0...
+    b    0.7906...
+    c    0.6335...
+    d    0...
     Name: metric, dtype: object
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
@@ -200,14 +206,14 @@ holds the intersections of these groups:
     0.5
     >>> metric_2sf.by_group
     SF 0  SF 1
-    a     6         0
+    a     6       0.0
           8       NaN
     b     6       0.5
           8       0.5
-    c     6         1
+    c     6       1.0
           8       0.5
-    d     6         0
-          8         0
+    d     6       0.0
+          8       0.0
     Name: recall_score, dtype: object
 
 With such a small number of samples, we are obviously running into cases where
@@ -343,18 +349,18 @@ parameter:
     >>> # The 'overall' property is now split based on the control feature
     >>> metric_c_f.overall
     CF
-    H    0.428571
-    L       0.375
+    H    0.4285...
+    L    0.375...
     Name: accuracy_score, dtype: object
     >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
     >>> metric_c_f.by_group
     CF  SF
-    H   A          0.2
-        B          0.4
-        C         0.75
-    L   A          0.4
-        B     0.285714
-        C          0.5
+    H   A     0.2...
+        B     0.4...
+        C     0.75...
+    L   A     0.4...
+        B     0.2857...
+        C     0.5...
     Name: accuracy_score, dtype: object
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
@@ -379,8 +385,8 @@ With the :class:`MetricFrame` computed, we can perform aggregations:
     >>> # See the maximum difference in accuracy for each value of the control feature
     >>> metric_c_f.difference(method='between_groups')
     CF
-    H    0.550000
-    L    0.214286
+    H    0.55...
+    L    0.2142...
     Name: accuracy_score, dtype: float64
 
 In each case, rather than a single scalar, we receive one result for each
@@ -394,108 +400,39 @@ For more examples, please
 see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
 
+.. _plot:
+
+Plotting grouped metrics
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The simplest way to visualize grouped metrics from the :class:`MetricFrame` is
+to take advantage of the inherent plotting capabilities of
+:class:`pandas.DataFrame`:
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Analyze metrics using MetricFrame
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
+    :target: auto_examples/plot_quickstart.html
+    :align: center
+
 
 .. _dashboard:
 
 Fairlearn dashboard
 -------------------
 
-.. currentmodule:: fairlearn.widget
-
-The Fairlearn dashboard is a Jupyter notebook widget for assessing how a
+The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
 model's predictions impact different groups (e.g., different ethnicities), and
 also for comparing multiple models along different fairness and performance
 metrics.
 
 .. note::
 
-    The :code:`FairlearnDashboard` will move from Fairlearn to the
-    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
-    will provide some of the existing functionality through
-    :code:`matplotlib`-based visualizations.
-
-Setup and a single-model assessment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To assess a single model's fairness and performance, the dashboard widget can
-be launched within a Jupyter notebook as follows:
-
-.. code-block::
-
-    from fairlearn.widget import FairlearnDashboard
-
-    # A_test containts your sensitive features (e.g., age, binary gender)
-    # sensitive_feature_names contains your sensitive feature names
-    # y_true contains ground truth labels
-    # y_pred contains prediction labels
-
-    FairlearnDashboard(sensitive_features=A_test,
-                       sensitive_feature_names=['BinaryGender', 'Age'],
-                       y_true=Y_test.tolist(),
-                       y_pred=[y_pred.tolist()])
-
-After the launch, the widget walks the user through the assessment setup,
-where the user is asked to select
-
-#. the sensitive feature of interest (e.g., binary gender or age), and
-#. the performance metric (e.g., model precision) along which to evaluate the
-   overall model performance as well as any disparities across groups. These
-   selections are then used to obtain the visualization of the model's impact
-   on the subgroups (e.g., model precision for females and model precision for
-   males).
-
-The following figures illustrate the setup steps, where *binary gender* is
-selected as a sensitive feature and *accuracy rate* is selected as the
-performance metric.
-
-.. image:: ../../img/fairlearn-dashboard-start.png
-
-.. image:: ../../img/fairlearn-dashboard-multiple-sensitive-features.png
-
-.. image:: ../../img/fairlearn-dashboard-performance-multiple-sensitive-features.png
-
-After the setup, the dashboard presents the model assessment in two panels:
-
-.. list-table::
-   :header-rows: 0
-   :widths: 10 30
-   :stub-columns: 1
-
-   *  - Disparity in performance
-      - This panel shows: (1) the performance of your model with respect to
-        your selected performance metric (e.g., *accuracy rate*) overall as
-        well as on different subgroups based on your selected sensitive
-        feature (e.g., *accuracy rate* for females, *accuracy rate* for
-        males); (2) the disparity (difference) in the values of the selected
-        performance metric across different subgroups; (3) the distribution of
-        errors in each subgroup (e.g., female, male). For binary
-        classification, the errors are further split into overprediction
-        (predicting 1 when the true label is 0), and underprediction
-        (predicting 0 when the true label is 1).
-   *  - Disparity in predictions
-      - This panel shows a bar chart that contains the selection rate in each
-        group, meaning the fraction of data classified as 1 (in binary
-        classification) or distribution of prediction values (in regression).
-
-.. image:: ../../img/fairlearn-dashboard-disparity-performance-multiple-sensitive-features.png
-
-.. image:: ../../img/fairlearn-dashboard-disparity-predictions-multiple-sensitive-features.png
-
-Comparing multiple models
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The dashboard also enables comparison of multiple models, such as the models
-produced by different learning algorithms and different mitigation approaches,
-including :code:`fairlearn.reductions.GridSearch`,
-:code:`fairlearn.reductions.ExponentiatedGradient`, and
-:code:`fairlearn.postprocessing.ThresholdOptimizer`.
-
-As before, the user is first asked to select the sensitive feature and the
-performance metric. The *model comparison* view then depicts the performance
-and disparity of all the provided models in a scatter plot. This allows the
-user to examine trade-offs between performance and fairness. Each of the dots
-can be clicked to open the assessment of the corresponding model. The figure
-below shows the model comparison view with *binary gender* selected as a
-sensitive feature and *accuracy rate* selected as the performance metric.
-
-.. image:: ../../img/fairlearn-dashboard-models.png
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn.
+    For more information on how to use it refer to
+    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
+    Fairlearn provides some of the existing functionality through
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
