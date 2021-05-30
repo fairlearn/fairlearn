@@ -50,7 +50,7 @@ def test_sample_params(transform_y_t, transform_y_p, num_batches):
     sample_weights = np.random.rand(len(y_t))
     batch_generator = batchify(num_batches, y_t, y_p, g_4, sample_weights)
     target = metrics.MetricFrame(skm.recall_score, [], [], sensitive_features=[],
-                                 sample_params=None, streaming=True)
+                                 sample_params={}, streaming=True)
 
     for y_t_batches, y_p_batches, g_4_batches, sw_batches in batch_generator:
         g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
@@ -174,6 +174,11 @@ def test_cf_argument_mismatch(transform_y_t, transform_y_p, num_batches):
                         sensitive_features=g_f,
                         control_features=g_f)
 
+
+@pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+@pytest.mark.parametrize("transform_y_t", conversions_for_1d)
+@pytest.mark.parametrize("num_batches", [1, 3, 5])
+def test_cf_argument_success(transform_y_t, transform_y_p, num_batches):
     batch_generator = batchify(num_batches, y_t, y_p, g_4)
     # We initialize with CF
     target = metrics.MetricFrame(skm.recall_score, [], [], sensitive_features=[],
@@ -194,7 +199,7 @@ def test_sp_argument_mismatch(transform_y_t, transform_y_p):
     sample_weights = np.random.rand(len(y_t))
     batch_generator = batchify(num_batches, y_t, y_p, g_4, sample_weights)
     target = metrics.MetricFrame(skm.recall_score, [], [], sensitive_features=[],
-                                 sample_params=None, streaming=True)
+                                 sample_params={}, streaming=True)
 
     y_t_batches, y_p_batches, g_4_batches, sw_batches = next(batch_generator)
     g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
@@ -208,18 +213,3 @@ def test_sp_argument_mismatch(transform_y_t, transform_y_p):
         target.add_data(transform_y_t(y_t_batches),
                         transform_y_p(y_p_batches),
                         sensitive_features=g_f)
-
-    # Version with sample_weights supplied at the start.
-    target = metrics.MetricFrame(skm.recall_score, [], [], sensitive_features=[],
-                                 sample_params={'sample_weight': sample_weights},
-                                 streaming=True)
-    # We can't supply sample_weight
-    with pytest.raises(ValueError):
-        target.add_data(transform_y_t(y_t_batches),
-                        transform_y_p(y_p_batches),
-                        sensitive_features=g_f,
-                        sample_params={'sample_weight': sw_batches})
-    # If we do not supply it, it works!
-    target.add_data(transform_y_t(y_t_batches),
-                    transform_y_p(y_p_batches),
-                    sensitive_features=g_f)

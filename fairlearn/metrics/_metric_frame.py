@@ -162,7 +162,9 @@ class MetricFrame:
             accumulators = [y_true, y_pred, sensitive_features]
             # CF must be None or an empty list.
             cf_validated = control_features in (None, [])
-            if any(acc != [] for acc in accumulators) or not cf_validated:
+            # Same for SP
+            sp_validator = sample_params in (None, {})
+            if any(acc != [] for acc in accumulators) or not cf_validated or not sp_validator:
                 raise ValueError(_NON_EMPTY_INIT_ERR)
             self._y_true = []
             self._y_pred = []
@@ -217,7 +219,7 @@ class MetricFrame:
             metric function name, with the values being the string-to-array-like dictionaries.
         """
         if not self._streaming:
-            raise Exception("This MetricFrame does not support adding data.")
+            raise NotImplementedError("This MetricFrame does not support adding data.")
         check_consistent_length(y_true, y_pred, sensitive_features)
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
@@ -232,17 +234,13 @@ class MetricFrame:
         elif control_features is not None:
             raise ValueError(_CF_BAD_STATE_ERR)
 
-        if sample_params is not None:
-            # All arrays should be of equal length
-            check_consistent_length(y_true, *sample_params.values())
-            if self._s_p is None:
-                self._s_p = [sample_params]
-            elif isinstance(self._s_p, list):
-                self._s_p.append(sample_params)
+        if self._s_p is not None:
+            if sample_params is not None:
+                # All arrays should be of equal length
+                check_consistent_length(y_true, *sample_params.values())
+                self._s_p = self._concat_batches([self._s_p, sample_params])
             else:
-                raise ValueError("MetricFrame was initialized with `sample_params` already set.")
-        elif isinstance(self._s_p, list):
-            raise ValueError("MetricFrame expected `sample_params` to be supplied.")
+                raise ValueError("MetricFrame expected `sample_params` to be supplied.")
 
         # Reset metric
         self._overall = None
@@ -265,21 +263,18 @@ class MetricFrame:
             result = pd.concat(batches)
         elif batch_type is dict:
             # This concats dict together
-            return {k: self._concat_batches([batch[k] for batch in batches])
-                    for k in batches[0].keys()}
+            return {k: self._concat_batches([b[k]for b in batches if k in b])
+                    for k in set(sum((list(b.keys()) for b in batches), []))}
         else:
             raise ValueError(f"Can't concatenate {batches}")
         return result
 
     def _compute_streaming_metric(self):
-        # Concat all the information before computing the metric.
-        # If True, this is a metric-wide args so we won't concat it.
-        metric_s_p = isinstance(self._s_p, dict) or self._s_p is None
         self._compute_metric(self._concat_batches(self._y_true),
                              self._concat_batches(self._y_pred),
                              self._concat_batches(self._s_f),
                              self._concat_batches(self._c_f) if self._c_f else None,
-                             self._s_p if metric_s_p else self._concat_batches(self._s_p))
+                             self._s_p)
 
     def _compute_metric(self, y_t, y_p, s_f, c_f, s_p):
         # Now, prepare the sensitive features
