@@ -20,7 +20,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
     Classes                             2
     ==============   ====================
 
-    Source: UCI Repository [1]_ Paper: Moro et al., 2014 [2]_
+    Source: UCI Repository [3]_ Paper: Moro et al., 2014 [4]_
 
     The data is related with direct marketing campaigns of a Portuguese
     banking institution. The marketing campaigns were based on phone calls.
@@ -78,11 +78,11 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
 
     References
     ----------
-    .. [1] S. Moro, P. Cortez, and P. Rita, UCI Machine Learning Repository:
+    .. [3] S. Moro, P. Cortez, and P. Rita, UCI Machine Learning Repository:
        Bank Marketing Data Set, 14-Feb-2014. [Online]. Available:
        https://archive.ics.uci.edu/ml/datasets/Bank+Marketing.
 
-    .. [2] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict
+    .. [4] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict
        the Success of Bank Telemarketing. Decision Support Systems,
        Elsevier, 62:22-31, June 2014
 

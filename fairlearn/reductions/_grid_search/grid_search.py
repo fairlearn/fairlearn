@@ -66,8 +66,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     References
     ----------
     .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
-       and H. Wallach, “A Reductions Approach to Fair Classification,”
-       arXiv.org, 16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453. # noqa: E501
+       and H. Wallach, "A Reductions Approach to Fair Classification,"
+       arXiv.org, 16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
 
     """
 
@@ -89,7 +89,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
-                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")   # noqa: E501
+                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
         else:
             raise RuntimeError("Unsupported selection rule")
         self.selection_rule = selection_rule
