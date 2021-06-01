@@ -10,8 +10,8 @@ classification with one categorical sensitive feature [1]_.
 
 References
 ----------
-.. [1] M. Hardt, E. Price, and N. Srebro, “Equality of Opportunity in
-   Supervised Learning,” arXiv.org, 07-Oct-2016. [Online]. Available:
+.. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
+   Supervised Learning," arXiv.org, 07-Oct-2016. [Online]. Available:
    https://arxiv.org/abs/1610.02413.
 
 """
@@ -158,8 +158,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
     References
     ----------
-    .. [1] M. Hardt, E. Price, and N. Srebro, “Equality of Opportunity in
-       Supervised Learning,” arXiv.org, 07-Oct-2016.
+    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
+       Supervised Learning," arXiv.org, 07-Oct-2016.
        [Online]. Available: https://arxiv.org/abs/1610.02413.
 
     """

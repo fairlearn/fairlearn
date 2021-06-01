@@ -23,17 +23,17 @@ def fetch_boston(*, cache=True, data_home=None,
     Target           real 5. - 50.
     ==============   ==============
 
-    Source: OpenML [1]_ Paper: D. Harrison (1978) [2]_
+    Source: OpenML [5]_ Paper: D. Harrison (1978) [6]_
 
-    The Boston house-price data of D. Harrison, and D.L. Rubinfeld [2]_.
+    The Boston house-price data of D. Harrison, and D.L. Rubinfeld [6]_.
 
     Referenced in Belsley, Kuh & Welsch, 'Regression diagnostics...', Wiley,
-    1980. N.B. [3]_.
+    1980. N.B. [7]_.
 
-    This dataset has known fairness issues [4]_. There's a "lower status of
+    This dataset has known fairness issues [8]_. There's a "lower status of
     population" (LSTAT) parameter that you need to look out for and a column
     that is a derived from the proportion of people with a black skin color
-    that live in a neighborhood (B) [5]_. See the references at the bottom for
+    that live in a neighborhood (B) [9]_. See the references at the bottom for
     more detailed information.
 
     Here's a table of all the variables in order:
@@ -112,22 +112,22 @@ def fetch_boston(*, cache=True, data_home=None,
 
     References
     ----------
-    .. [1] J. Vanschoren, “boston,” OpenML, 29-Sep-2014. [Online]. Available:
+    .. [5] J. Vanschoren, "boston," OpenML, 29-Sep-2014. [Online]. Available:
        https://www.openml.org/d/531.
 
-    .. [2] D. Harrison and D. L. Rubinfeld, “Hedonic housing prices and the
-       demand for clean air,” Journal of Environmental Economics and Management,
+    .. [6] D. Harrison and D. L. Rubinfeld, "Hedonic housing prices and the
+       demand for clean air," Journal of Environmental Economics and Management,
        vol. 5, no. 1, pp. 81–102, Mar. 1978.
 
-    .. [3] D. A. Belsley, E. Kuh, and R. E. Welsch, Regression diagnostics
+    .. [7] D. A. Belsley, E. Kuh, and R. E. Welsch, Regression diagnostics
        identifying influential data and sources of collinearity. Hoboken, NJ,
        NJ: Wiley-Interscience, 1980.
 
-    .. [4] J. Sykes, “- B 1000(Bk - 0.63)^2 where Bk is the proportion of blacks
-       by town · Issue #16155 · scikit-learn/scikit-learn,” GitHub, 18-Jan-2020.
+    .. [8] J. Sykes, "- B 1000(Bk - 0.63)^2 where Bk is the proportion of blacks
+       by town · Issue #16155 · scikit-learn/scikit-learn," GitHub, 18-Jan-2020.
        [Online]. Available: https://github.com/scikit-learn/scikit-learn/issues/16155. # noqa: E501
 
-    .. [5] M. Carlisle, “racist data destruction?,” Medium, 13-Jun-2019.
+    .. [9] M. Carlisle, "racist data destruction?," Medium, 13-Jun-2019.
        [Online]. Available: https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8. # noqa: E501
 
     """
