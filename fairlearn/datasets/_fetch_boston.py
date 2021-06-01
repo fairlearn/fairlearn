@@ -125,10 +125,12 @@ def fetch_boston(*, cache=True, data_home=None,
 
     .. [8] J. Sykes, "- B 1000(Bk - 0.63)^2 where Bk is the proportion of blacks
        by town · Issue #16155 · scikit-learn/scikit-learn," GitHub, 18-Jan-2020.
-       [Online]. Available: https://github.com/scikit-learn/scikit-learn/issues/16155. # noqa: E501
+       [Online]. Available:
+       https://github.com/scikit-learn/scikit-learn/issues/16155.
 
     .. [9] M. Carlisle, "racist data destruction?," Medium, 13-Jun-2019.
-       [Online]. Available: https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8. # noqa: E501
+       [Online]. Available:
+       https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8.
 
     """
     if warn:
