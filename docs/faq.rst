@@ -107,7 +107,7 @@ Can the Fairlearn library be used to detect bias in datasets?
 
 Can the Fairlearn library recommend ways to make my model fairer?
     Right now we do not have an automated tool that would help you decide
-    which mitigation algorithm to use. Our focus is on expanding the documantation
+    which mitigation algorithm to use. Our focus is on expanding the documentation
     and examples to highlight when each of the algorithms might be more applicable.
     Note that model training is just one step in the AI development and
     deployment lifecycle, and other steps, such as data gathering and curation,
@@ -124,10 +124,34 @@ Which ML libraries does Fairlearn support?
     `predict()` methods. Also, any classification or regression
     algorithm can be evaluated using our metrics.
 
+Does Fairlearn support multi-class classification?
+    On the assessment side, Fairlearn's :class:`MetricFrame` can be used with
+    any metrics for supervised learning, including those for multi-class classification.
+    For example, it is possible to pass
+    :py:func:`sklearn.metrics.accuracy_score` or :py:func:`sklearn.metrics.confusion_matrix`
+    as the metric functions, and supply multi-class data for :code:`y_true` and :code:`y_pred`.
+    There are
+    `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
+    to add more extensive support to Fairlearn's assessment capabilities.
+    If you have thoughts feel free to add them to the discussion.
+    
+    On the mitigation side, our algorithms :class:`ExponentiatedGradient` and :class:`GridSearch`
+    support :ref:`bounded group loss <_bounded_group_loss>` constraints, which are applicable
+    to any supervised learning setting, including multi-class classification.
+
+Does Fairlearn support multiple and non-binary sensitive features?
+    Fairlearn's assessment capabilities support sensitive features with more
+    than two values as well as multiple sensitive features.
+    Our :ref:`user guide <metrics_with_grouping>` has examples for both of
+    these cases.
+    The mitigation techniques all support mitigation with non-binary and
+    multiple sensitive features as well. For a full list of techniques
+    please refer to the :ref:`user guide section on mitigation <mitigation>`.
+
 Does Fairlearn work for image and text data?
     We have not (yet) looked at using Fairlearn on image or text data.
     However, so long as the image or text classifier provide
-    `fit()` and `predict()` methods
+    :code:`fit()` and :code:`predict()` methods
     as required by Fairlearn, it should be possible to use them
     with Fairlearn mitigation algorithms. Also, any classification or regression
     algorithm can be evaluated using our metrics (regardless of the

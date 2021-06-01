@@ -1,0 +1,19 @@
+i.fa-github:hover {
+   color: black;
+}
+
+i.fa-twitter:hover {
+   color: #1da1f2;
+}
+
+i.fa-stack-overflow:hover {
+   color: #f48024;
+} 
+
+i.fa-gitter:hover {
+   color: #D6044E;
+}
+
+#navbar-icon-links > li.nav-item > a.nav-link:hover {
+   color: rgba(77, 77, 77, 1) !important
+}  

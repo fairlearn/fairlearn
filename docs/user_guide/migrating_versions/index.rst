@@ -10,3 +10,5 @@ changes to the Fairlearn API.
    :maxdepth: 1
 
    migrating_to_v0_5_0
+   
+   migrating_to_v0_3_0

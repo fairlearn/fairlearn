@@ -59,8 +59,6 @@ stages:
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
 
-  - template: templates/build-widget-job-template.yml
-
   - template: templates/limited-installation-job-template.yml
 
 # ==================================================================================================
@@ -100,9 +98,6 @@ stages:
       parameters:
         freezeArtifact: $(freezeArtifactName)
         freezeFile: $(freezeFile)
-
-    - script: python ./scripts/build_widget.py --yarn-path /usr/local/bin/yarn
-      displayName: 'Build widget'
 
     - script: python ./scripts/build_wheels.py --version-filename $(versionFilename) 
       displayName: 'Build wheels'
