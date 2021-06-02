@@ -184,6 +184,9 @@ class MetricFrame:
             `metric` will be removed in version 0.8.0, use `metrics` instead.
     """
 
+    # The deprecation decorator does two things:
+    # (1) turns first three positional arguments into keyword arguments
+    # (2) renames the 'metric' keyword argument into 'metrics'
     @_deprecate_metric_frame_init
     def __init__(self,
                  *,
@@ -192,8 +195,7 @@ class MetricFrame:
                  y_pred,
                  sensitive_features,
                  control_features: Optional = None,
-                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
-                 metric=None):
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
         y_t = _convert_to_ndarray_and_squeeze(y_true)
