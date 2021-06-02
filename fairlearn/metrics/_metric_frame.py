@@ -60,10 +60,11 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
 
         # If 1-3 positional arguments are provided (apart fom self), issue warning.
         if len(args) > 0:
-            args_msg = ", ".join([f"{name}={value}" for name, value in positional_dict.items()])
-            warnings.warn(f"Pass {args_msg} as keyword args. From version "
-                          f"{version} passing these as positional arguments "
-                          f"will result in an error",
+            args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
+            warnings.warn(f"You have provided {args_msg} as positional arguments. "
+                          f"Please pass them as keyword arguments. From version "
+                          f"{version} passing them as positional arguments "
+                          f"will result in an error.",
                           FutureWarning)
 
         # If a keyword argument `metric` is provided, issue warning.
@@ -169,6 +170,18 @@ class MetricFrame:
         If there are multiple metric functions (passed as a dictionary), then this is
         a nested dictionary, with the first set of string keys identifying the
         metric function name, with the values being the string-to-array-like dictionaries.
+
+    metric : callable or dict
+        The underlying metric functions which are to be calculated. This
+        can either be a single metric function or a dictionary of functions.
+        These functions must be callable as
+        ``fn(y_true, y_pred, **sample_params)``.
+        If there are any other arguments required (such as ``beta`` for
+        :func:`sklearn.metrics.fbeta_score`) then
+        :func:`functools.partial` must be used.
+
+        .. deprecated:: 0.7.0
+            `metric` will be removed in version 0.8.0, use `metrics` instead.
     """
 
     @_deprecate_metric_frame_init
@@ -179,7 +192,8 @@ class MetricFrame:
                  y_pred,
                  sensitive_features,
                  control_features: Optional = None,
-                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
+                 metric=None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
         y_t = _convert_to_ndarray_and_squeeze(y_true)

@@ -376,5 +376,7 @@ def test_duplicate_cf_sf_names():
 
 def test_single_element_lists():
     mf = metrics.MetricFrame(metrics=skm.balanced_accuracy_score,
-                             y_true=[1], y_pred=[1], sensitive_features=[0])
+                             y_true=[1],
+                             y_pred=[1],
+                             sensitive_features=[0])
     assert mf.overall == 1
