@@ -18,8 +18,32 @@
     src: url('fonts/CodePro/SourceCodePro-Regular.ttf')format('truetype');
 }
 
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1180px;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+    .container {
+        max-width: 900px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .container {
+        max-width: 600px;
+    }
+}
+
+@media (min-width: 320px) and (max-width: 768px) {
+    .container {
+        max-width: 375px;
+    }
+}
+
 body {
-    font-family: "TT Commons-regular", sans-serif;
+    font-family: "TT Commons", sans-serif;
     color: #444444;
 }
 
@@ -43,7 +67,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: "TT Commons", sans-serif;
+    font-family: "TT Commons-regular", sans-serif;
 }
 
 
@@ -59,8 +83,8 @@ h6 {
 #header {
     transition: all 0.5s;
     z-index: 997;
-    padding: 16px 0;
     background: #fff;
+    height: 80px;
 }
 
 #header.header-scrolled,
@@ -87,6 +111,10 @@ h6 {
     max-height: 40px;
 }
 
+.header-content {
+    height: 100%;
+}
+
 @media (max-width: 992px) {
     #header {
         padding: 12px 0;
@@ -103,6 +131,7 @@ h6 {
 
 .nav-menu {
     margin-left: -170px;
+    height: 100%;
 }
 
 .nav-menu ul {
@@ -113,12 +142,16 @@ h6 {
 
 .nav-menu>ul {
     display: flex;
+    height: 100%;
 }
 
 .nav-menu>ul>li {
     position: relative;
     white-space: nowrap;
-    padding: 10px 0 10px 28px;
+}
+
+.nav-menu>ul>li:hover {
+    background: #F2F2F2;
 }
 
 .nav-menu a {
@@ -130,6 +163,7 @@ h6 {
     font-family: "TT Commons", sans-serif;
     font-style: normal;
     font-weight: 600;
+    padding: 30px 18px 10px 18px;
 }
 
 .nav-menu a:hover,
@@ -141,15 +175,12 @@ h6 {
 .nav-menu .drop-down ul {
     display: block;
     position: absolute;
-    left: 14px;
     top: calc(100% + 30px);
     z-index: 99;
     opacity: 0;
     visibility: hidden;
     padding: 10px 0;
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0px 0px 30px rgba(127, 137, 161, 0.25);
     transition: 0.3s;
 }
 
@@ -164,23 +195,29 @@ h6 {
     position: relative;
 }
 
+
+/* .nav-menu .drop-down li:hover {
+    background-color: #cccccc;
+} */
+
 .nav-menu .drop-down ul a {
     padding: 10px 20px;
     font-size: 15px;
-    font-weight: 500;
+    font-family: "TT Commons-light", sans-serif;
     text-transform: none;
-    color: #434175;
+    color: #333333;
 }
 
 .nav-menu .drop-down ul a:hover,
 .nav-menu .drop-down ul .active>a,
 .nav-menu .drop-down ul li:hover>a {
-    color: #666666;
+    color: #000000;
+    font-weight: bold;
 }
 
 .nav-menu .drop-down>a:after {
-    /* content: "\ea10"; */
-    font-family: 'uxwing-iconsfont';
+    /* content: "\ea99"; */
+    font-family: ' Code Pro';
     padding-left: 5px;
 }
 
@@ -206,6 +243,18 @@ h6 {
     right: 15px;
 }
 
+@media (max-width: 1200px) {
+    .nav-menu {
+        margin-left: 0px !important;
+    }
+}
+
+@media (max-width:1024px) and (min-width:900px) {
+    .nav-menu {
+        display: none !important;
+    }
+}
+
 @media (max-width: 1366px) {
     .nav-menu .drop-down .drop-down ul {
         left: -90%;
@@ -219,7 +268,7 @@ h6 {
 }
 
 
-/* Get Startet Button */
+/* GitHub Button */
 
 .get-started-btn {
     background: #F2F2F2;
@@ -229,13 +278,56 @@ h6 {
     height: 44px;
     transition: 0.3s;
     font-size: 13px;
+    font-family: "TT Commons", sans-serif;
     display: inline-block;
-    font-weight: 600;
     margin-right: 20px;
+    display: inline-block;
 }
 
 .get-started-btn:hover {
-    color: #333333;
+    background-color: #333333;
+    color: #ffffff;
+}
+
+.spyglass-image {
+    margin-right: 8px;
+}
+
+.spyglass-image-black {
+    margin-right: 8px;
+    display: none;
+}
+
+.get-started-btn:hover .spyglass-image-black {
+    display: inline;
+}
+
+.get-started-btn:hover .spyglass-image {
+    display: none;
+}
+
+.search-btn {
+    display: inline-block;
+    padding: 10px 12px;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+}
+
+.search-btn:hover {
+    background-color: #333333;
+}
+
+.search-image-black {
+    display: none;
+}
+
+.search-btn:hover .search-image-black {
+    display: inline;
+}
+
+.search-btn:hover .search-image {
+    display: none;
 }
 
 @media (max-width: 768px) {
@@ -247,13 +339,19 @@ h6 {
     }
 }
 
+@media (max-width: 1200px) {
+    .get-started-btn {
+        display: none;
+    }
+}
+
 
 /* Mobile Navigation */
 
 .mobile-nav-toggle {
     position: fixed;
     right: 15px;
-    top: 15px;
+    top: 25px;
     z-index: 9998;
     border: 0;
     background: none;
@@ -281,7 +379,6 @@ h6 {
     transition: ease-in-out 0.2s;
     opacity: 0;
     visibility: hidden;
-    border-radius: 10px;
     padding: 10px 0;
 }
 
@@ -294,7 +391,7 @@ h6 {
 .mobile-nav a {
     display: block;
     position: relative;
-    color: #434175;
+    color: #666666;
     padding: 10px 20px;
     font-weight: 500;
     outline: none;
@@ -339,7 +436,7 @@ h6 {
     top: 0;
     left: 0;
     position: fixed;
-    background: rgba(48, 47, 84, 0.6);
+    background: rgba(112, 111, 121, 0.6);
     overflow: hidden;
     display: none;
     transition: ease-in-out 0.2s;
@@ -356,10 +453,6 @@ h6 {
 
 .mobile-nav-active .mobile-nav-toggle i {
     color: #fff;
-}
-
-.spyglass-image {
-    margin-right: 8px;
 }
 
 
@@ -379,11 +472,13 @@ h6 {
 
 #hero h1 {
     margin: 0;
+    padding: 0px 75px 0px 0px;
     font-weight: 500;
-    font-size: 84px;
+    font-size: 80px;
     line-height: 88px;
     color: #FFFFFF;
     font-family: "TT Commons", sans-serif;
+    letter-spacing: 2px;
 }
 
 #hero h2 {
@@ -485,6 +580,12 @@ h6 {
     }
 }
 
+@media (max-width: 1024px) {
+    #hero h1 {
+        padding: 0px;
+    }
+}
+
 
 /*--------------------------------------------------------------
 # Sections General
@@ -531,10 +632,6 @@ section p {
     left: calc(50% - 25px);
 }
 
-.section-title p {
-    margin-bottom: 0;
-}
-
 
 /*--------------------------------------------------------------
 # About
@@ -550,6 +647,10 @@ section p {
     background: #F2F2F2;
 }
 
+#about .section-title {
+    margin-bottom: 100px;
+}
+
 
 /*--------------------------------------------------------------
 # Usecase
@@ -563,6 +664,12 @@ section p {
 
 .usecase-title>* {
     text-align: center;
+}
+
+.usecase .section-title p {
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.06em;
 }
 
 .usecase-img {
@@ -660,6 +767,10 @@ section p {
     font-size: 18px;
 }
 
+.getstarted-install p {
+    font-size: 17px;
+}
+
 
 /*--------------------------------------------------------------
 # Community
@@ -675,6 +786,10 @@ section p {
     margin-top: 7px;
     background: #FFFFFF;
     border-radius: 5px;
+}
+
+.community .section-title P {
+    margin-bottom: 20px;
 }
 
 .community .title-box {
@@ -727,8 +842,7 @@ section p {
     padding: 13px 30px;
     margin-top: 20px;
     font-size: 15px !important;
-    font-family: 'TT Commons-regular', sans-serif;
-    line-height: 17px;
+    font-family: 'TT Commons', sans-serif;
     color: #333333;
     background: #FFFFFF;
     border-radius: 30px;
@@ -740,6 +854,7 @@ section p {
 --------------------------------------------------------------*/
 
 #footer {
+    font-family: 'TT Commons-regular', sans-serif;
     border: 1px solid #F2F2F2;
     box-sizing: border-box;
     background: linear-gradient(0deg, rgba(204, 204, 204, 0.05), rgba(204, 204, 204, 0.05)), #FFFFFF;
@@ -767,7 +882,7 @@ footer .signup-btn {
     color: #ffffff;
     font-weight: normal;
     margin-top: 18px;
-    font-family: 'TT Commons-light', sans-serif;
+    font-family: 'TT Commons', sans-serif;
     font-size: 13px;
     letter-spacing: 0.5px;
 }
@@ -777,7 +892,6 @@ footer .signup-btn {
 }
 
 footer h1 {
-    font-family: 'TT Commons-regular', sans-serif;
     font-style: normal;
     font-weight: normal;
     font-size: 22px;

@@ -36,7 +36,7 @@ Add jQuery via the "webpack.ProvidePlugin" to your webpack configuration:
 Load the required stylesheet and JS:
 
 ```js
-import 'owl.carousel/dist/_static/owl.carousel.css';
+import 'owl.carousel/dist/assets/owl.carousel.css';
 import 'owl.carousel';
 ```
 
@@ -45,11 +45,11 @@ import 'owl.carousel';
 Put the required stylesheet at the [top](https://developer.yahoo.com/performance/rules.html#css_top) of your markup:
 
 ```html
-<link rel="stylesheet" href="/node_modules/owl.carousel/dist/_static/owl.carousel.min.css" />
+<link rel="stylesheet" href="/node_modules/owl.carousel/dist/assets/owl.carousel.min.css" />
 ```
 
 ```html
-<link rel="stylesheet" href="/bower_components/owl.carousel/dist/_static/owl.carousel.min.css" />
+<link rel="stylesheet" href="/bower_components/owl.carousel/dist/assets/owl.carousel.min.css" />
 ```
 
 **NOTE:** If you want to use the default navigation styles, you will also need to include `owl.theme.default.css`.
