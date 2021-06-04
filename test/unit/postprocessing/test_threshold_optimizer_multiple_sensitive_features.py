@@ -52,13 +52,15 @@ def test_threshold_optimizer_multiple_sensitive_features():
         estimator=estimator,
         constraints="demographic_parity",
         objective="accuracy_score",
-        prefit=True
+        prefit=True,
+        predict_method='predict'
     )
     postprocess_est_combined = ThresholdOptimizer(
         estimator=estimator,
         constraints="demographic_parity",
         objective="accuracy_score",
-        prefit=True
+        prefit=True,
+        predict_method='predict'
     )
 
     postprocess_est_multi.fit(X, y, sensitive_features=A.loc[:, ['SF1', 'SF2']])
