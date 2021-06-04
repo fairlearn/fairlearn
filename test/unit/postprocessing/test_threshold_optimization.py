@@ -38,7 +38,8 @@ def test_predict_before_fit_error(X_transform, sensitive_features_transform, pre
     adjusted_predictor = ThresholdOptimizer(
         estimator=ExamplePredictor(scores_ex),
         constraints=constraints,
-        prefit=False)
+        prefit=False,
+        predict_method='predict')
 
     with pytest.raises(ValueError, match='instance is not fitted yet'):
         getattr(adjusted_predictor, predict_method_name)(X, sensitive_features=sensitive_features)
@@ -54,7 +55,8 @@ def test_no_estimator_error(constraints):
 def test_constraints_not_supported():
     with pytest.raises(ValueError, match=NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE):
         ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                           constraints="UnsupportedConstraints").fit(
+                           constraints="UnsupportedConstraints",
+                           predict_method='predict').fit(
                                X_ex, labels_ex,
                                sensitive_features=sensitive_features_ex1
                            )
@@ -66,7 +68,8 @@ def test_constraints_not_supported():
 @pytest.mark.parametrize("constraints", ['demographic_parity', 'equalized_odds'])
 def test_none_input_data(X, y, sensitive_features, constraints):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=constraints)
+                                            constraints=constraints,
+                                            predict_method='predict')
 
     if y is None:
         with pytest.raises(ValueError) as exception:
@@ -92,7 +95,8 @@ def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
     non_binary_y[0] = 2
 
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=constraints)
+                                            constraints=constraints,
+                                            predict_method='predict')
 
     with pytest.raises(ValueError, match=_LABELS_NOT_0_1_ERROR_MESSAGE):
         adjusted_predictor.fit(data_X_y_sf.X, non_binary_y,
@@ -113,7 +117,8 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
     y = y_transform(degenerate_labels_ex)
 
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=constraints)
+                                            constraints=constraints,
+                                            predict_method='predict')
 
     feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
     with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)):
@@ -134,7 +139,8 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
                            .format("X, sensitive_features, and y")):
             adjusted_predictor = ThresholdOptimizer(
                 estimator=ExamplePredictor(scores_ex),
-                constraints=constraints)
+                constraints=constraints,
+                predict_method='predict')
             adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
                                    data_X_y_sf.y[:n - permutation[1]],
                                    sensitive_features=data_X_y_sf.sensitive_features)
@@ -143,7 +149,8 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     for permutation in [(0, n, 'inconsistent'), (n, 0, 'empty')]:
         adjusted_predictor = ThresholdOptimizer(
             estimator=ExamplePredictor(scores_ex),
-            constraints=constraints)
+            constraints=constraints,
+            predict_method='predict')
         with pytest.raises(ValueError, match=expected_exception_messages[permutation[2]]):
             adjusted_predictor.fit(data_X_y_sf.X[:n - permutation[0]],
                                    data_X_y_sf.y[:n - permutation[1]],
@@ -176,7 +183,8 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
     # returns score_transform(scores_ex) as output
     estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
                                    constraints='demographic_parity',
-                                   flip=True)
+                                   flip=True,
+                                   predict_method='predict')
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
@@ -245,7 +253,8 @@ def test_threshold_optimization_equalized_odds(score_transform, y_transform,
     # returns score_transform(scores_ex) as output
     estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
                                    constraints='equalized_odds',
-                                   flip=True)
+                                   flip=True,
+                                   predict_method='predict')
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
@@ -351,7 +360,8 @@ _expected_ps_demographic_parity = {
 def test_threshold_optimization_demographic_parity_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints='demographic_parity',
-                                            flip=True)
+                                            flip=True,
+                                            predict_method='predict')
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
     predictions = adjusted_predictor._pmf_predict(
@@ -399,7 +409,8 @@ _expected_ps_equalized_odds = {
 def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
                                             constraints='equalized_odds',
-                                            flip=True)
+                                            flip=True,
+                                            predict_method='predict')
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
 
@@ -425,7 +436,8 @@ def test_threshold_optimization_equalized_odds_e2e(data_X_y_sf):
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_predict_output_0_or_1(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=constraints)
+                                            constraints=constraints,
+                                            predict_method='predict')
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
 
@@ -439,7 +451,8 @@ def test_predict_output_0_or_1(data_X_y_sf, constraints):
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_predict_different_argument_lengths(data_X_y_sf, constraints):
     adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=constraints)
+                                            constraints=constraints,
+                                            predict_method='predict')
     adjusted_predictor.fit(data_X_y_sf.X, data_X_y_sf.y,
                            sensitive_features=data_X_y_sf.sensitive_features)
 
@@ -626,7 +639,8 @@ def test_constraints_objective_pairs(constraints, objective):
         estimator=PassThroughPredictor(),
         constraints=constraints,
         objective=objective,
-        grid_size=20)
+        grid_size=20,
+        predict_method='predict')
     expected = results[constraints+", "+objective]
     if type(expected) is str:
         with pytest.raises(ValueError) as error_info:

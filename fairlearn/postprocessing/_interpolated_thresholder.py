@@ -9,7 +9,8 @@ from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 from warnings import warn
 
-from fairlearn._input_validation import _validate_and_reformat_input
+from ..utils._common import _get_soft_predictions
+from .._input_validation import _validate_and_reformat_input
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING)
@@ -41,12 +42,35 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         between 0 and 1.
     prefit : bool
         if `True` then the base estimator is not fitted in :meth:`fit`.
+    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
+            }, default='auto'
+        Defines which method of the ``estimator`` is used to get the output
+        values.
+        - 'auto': use one of ``predict_proba``, ``decision_function``, or
+          ``predict``, in that order.
+        - 'predict_proba': use the second column from the putput of
+          `predict_proba`. It is assumed that the second column represents the
+          positive outcome.
+        - 'decision_function': use the raw values given by the
+          `decision_function`.
+        - 'predict': use the hard values reported by the `predict` method.
+          This is equivalent to what is done in [1]_.
+
+        .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+
+        .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
     """
 
-    def __init__(self, estimator, interpolation_dict, prefit=False):
+    def __init__(self, estimator, interpolation_dict, prefit=False,
+                 predict_method='deprecated'):
         self.estimator = estimator
         self.interpolation_dict = interpolation_dict
         self.prefit = prefit
+        self.predict_method = predict_method
 
     def fit(self, X, y, **kwargs):
         """Fit the estimator.
@@ -56,6 +80,18 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         """
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
+
+        if self.predict_method == "deprecated":
+            warn(
+                "'predict_method' is changed from 'predict' to 'auto'. "
+                "Explicitly pass `predict_method='predict' to replicate the "
+                "old behavior, or pass `predict_method='auto' to silence "
+                "this warning.",
+                FutureWarning,
+            )
+            self._predict_method = "predict"
+        else:
+            self._predict_method = self.predict_method
 
         if not self.prefit:
             self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
@@ -84,7 +120,9 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             The sum of the two numbers in each tuple needs to add up to 1.
         """
         check_is_fitted(self)
-        base_predictions = np.array(self.estimator_.predict(X))
+        base_predictions = np.array(
+            _get_soft_predictions(self.estimator_, X, self._predict_method)
+        )
         _, base_predictions_vector, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X, y=base_predictions, sensitive_features=sensitive_features, expect_y=True,
             enforce_binary_labels=False)
