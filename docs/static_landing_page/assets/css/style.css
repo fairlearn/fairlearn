@@ -190,11 +190,6 @@ h6 {
     position: relative;
 }
 
-
-/* .nav-menu .drop-down li:hover {
-    background-color: #cccccc;
-} */
-
 .nav-menu .drop-down ul a {
     padding: 10px 20px;
     font-size: 15px;
@@ -690,7 +685,7 @@ section p {
 
 
 /*--------------------------------------------------------------
-# Getstart
+# Getting started
 --------------------------------------------------------------*/
 
 .getstarted {
