@@ -108,4 +108,4 @@ def test_metric_and_metrics():
 
     assert len(warn_record) == 1
     assert str(warn_record[0].message) == warn_msg
-    assert error_execInfo.value.args[0] == error_msg
+    assert error_execInfo.value.args[0].endswith(error_msg)
