@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import pytest
 import numpy as np
 import pandas as pd
-import torch
+torch = pytest.importorskip("torch")
 from skorch import NeuralNetClassifier
 from torch import nn, optim
 
