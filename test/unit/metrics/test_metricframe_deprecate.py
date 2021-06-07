@@ -12,10 +12,13 @@ y_pred = [0, 1, 1, 0, 1]
 sf = ['a', 'a', 'b', 'b', 'b']
 accuracy_score_difference = 1.0/3.0
 
+# Removed in version:
+version = "0.9.0"
+
 
 def test_all_positional_arguments():
     msg = ("You have provided 'metrics', 'y_true', 'y_pred' as positional arguments. "
-           "Please pass them as keyword arguments. From version 0.8.0 passing them as "
+           f"Please pass them as keyword arguments. From version {version} passing them as "
            "positional arguments will result in an error.")
 
     with pytest.warns(FutureWarning) as record:
@@ -32,7 +35,7 @@ def test_all_positional_arguments():
 
 def test_one_positional_argument():
     msg = ("You have provided 'metrics' as positional arguments. "
-           "Please pass them as keyword arguments. From version 0.8.0 passing them as "
+           f"Please pass them as keyword arguments. From version {version} passing them as "
            "positional arguments will result in an error.")
 
     with pytest.warns(FutureWarning) as record:
@@ -62,7 +65,7 @@ def test_four_positional_arguments():
 
 def test_keyword_metric():
     msg = ("The positional argument 'metric' has been replaced by "
-           "a keyword argument 'metrics'. From version 0.8.0 passing "
+           f"a keyword argument 'metrics'. From version {version} passing "
            "it as a positional argument or as a keyword argument "
            "'metric' will result in an error")
 
@@ -92,7 +95,7 @@ def test_no_warnings():
 
 def test_metric_and_metrics():
     warn_msg = ("The positional argument 'metric' has been replaced by "
-                "a keyword argument 'metrics'. From version 0.8.0 passing "
+                f"a keyword argument 'metrics'. From version {version} passing "
                 "it as a positional argument or as a keyword argument "
                 "'metric' will result in an error")
     error_msg = "__init__() got multiple values for keyword argument 'metrics'"
