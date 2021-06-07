@@ -26,7 +26,7 @@ class LeastSquaresRegressor:
         self.weights = None
 
     def fit(self, X, Y, sample_weight):
-        sqrtW = np.sqrt(sample_weight)
+        sqrtW = np.array(np.sqrt(sample_weight))
         matX = np.array(X) * sqrtW[:, np.newaxis]
         vecY = Y * sqrtW
         self.lsqinfo = np.linalg.lstsq(matX, vecY, rcond=-1)
