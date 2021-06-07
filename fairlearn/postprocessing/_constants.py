@@ -7,7 +7,7 @@ SENSITIVE_FEATURE_KEY = "sensitive_feature"
 P0_KEY = "p0"
 P1_KEY = "p1"
 
-OUTPUT_SEPARATOR = "-"*65
+OUTPUT_SEPARATOR = "-" * 65
 
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install fairlearn[customplots] to use " \
                                    "the postprocessing plots."

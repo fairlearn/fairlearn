@@ -115,8 +115,9 @@ NOT_SUPPORTED_OBJECTIVES_FOR_SIMPLE_CONSTRAINTS_ERROR_MESSAGE = (
         ", ".join(sorted(OBJECTIVES_FOR_SIMPLE_CONSTRAINTS))
     )
 )
-NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = "For equalized_odds only the following objectives are supported: {}.".format(
-    ", ".join(sorted(OBJECTIVES_FOR_EQUALIZED_ODDS))
+NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
+    "For equalized_odds only the following objectives are supported: "
+    "{}.".format(", ".join(sorted(OBJECTIVES_FOR_EQUALIZED_ODDS)))
 )
 
 
@@ -171,11 +172,13 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         :func:`sklearn.model_selection.cross_val_score`,
         :class:`sklearn.model_selection.GridSearchCV`, this will result in an
         error. In that case, please use ``prefit=False``.
-        
+
     predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
             }, default='auto'
+
         Defines which method of the ``estimator`` is used to get the output
         values.
+
         - 'auto': use one of ``predict_proba``, ``decision_function``, or
           ``predict``, in that order.
         - 'predict_proba': use the second column from the putput of
@@ -434,8 +437,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             # Add up objective for the current group multiplied by the probability of the current
             # group. This will help us in identifying the maximum overall objective.
             overall_tradeoff_curve += (
-                p_sensitive_feature_value
-                * self._tradeoff_curve[sensitive_feature_value]["y"]
+                p_sensitive_feature_value # noqa
+                * self._tradeoff_curve[sensitive_feature_value]["y"] # noqa
             )
 
             logger.debug(OUTPUT_SEPARATOR)
@@ -589,8 +592,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 )
                 vertical_distance_from_diagonal = roc_result.y - roc_result.x
                 p_ignore = (
-                    difference_from_best_predictor_for_sensitive_feature
-                    / vertical_distance_from_diagonal
+                    difference_from_best_predictor_for_sensitive_feature # noqa
+                    / vertical_distance_from_diagonal # noqa
                 )
 
             interpolation_dict[sensitive_feature_value] = Bunch(

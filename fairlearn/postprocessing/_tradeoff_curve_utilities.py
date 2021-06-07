@@ -182,7 +182,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
         # Calculate the y value at x based on the slope between data points i and i + 1
         x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
         x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
-        p0 = x_distance_from_next_data_point/x_distance_between_data_points
+        p0 = x_distance_from_next_data_point / x_distance_between_data_points
         p1 = 1 - p0
         y = p0 * data_transpose[i][y_col] + p1 * data_transpose[i + 1][y_col]
         dict_list.append({

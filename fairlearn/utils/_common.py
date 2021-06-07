@@ -1,5 +1,8 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 def _get_soft_predictions(estimator, X, predict_method):
-    """Returns soft predictions of a classifier using either `predict_proba`
+    """Return soft predictions of a classifier using either `predict_proba` \
     or `decision_function` methods.
 
     Parameters
@@ -8,10 +11,12 @@ def _get_soft_predictions(estimator, X, predict_method):
         A scikit-learn compatible estimator
     X : array-like
         The intput for which the output is desired
-    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
+    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict' \
             }, default='auto'
+
         Defines which method of the ``estimator`` is used to get the output
         values.
+
         - 'auto': use one of ``predict_proba``, ``decision_function``, or
           ``predict``, in that order.
         - 'predict_proba': use the second column from the putput of
@@ -26,6 +31,12 @@ def _get_soft_predictions(estimator, X, predict_method):
     -------
     predictions : ndarray
         The output from estimator's desired predict method.
+
+    References
+    ----------
+    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
+       Supervised Learning," arXiv.org, 07-Oct-2016.
+       [Online]. Available: https://arxiv.org/abs/1610.02413.
     """
     if predict_method == "auto":
         if hasattr(estimator, "predict_proba"):

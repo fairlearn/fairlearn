@@ -44,8 +44,10 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         if `True` then the base estimator is not fitted in :meth:`fit`.
     predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
             }, default='auto'
+
         Defines which method of the ``estimator`` is used to get the output
         values.
+
         - 'auto': use one of ``predict_proba``, ``decision_function``, or
           ``predict``, in that order.
         - 'predict_proba': use the second column from the putput of
@@ -63,6 +65,12 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         .. versionchanged:: 0.7
             From version 0.7, 'predict' is deprecated and the default will
             change to 'auto' from v0.10.
+
+    References
+    ----------
+    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
+       Supervised Learning," arXiv.org, 07-Oct-2016.
+       [Online]. Available: https://arxiv.org/abs/1610.02413.
     """
 
     def __init__(self, estimator, interpolation_dict, prefit=False,
@@ -127,7 +135,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             X, y=base_predictions, sensitive_features=sensitive_features, expect_y=True,
             enforce_binary_labels=False)
 
-        positive_probs = 0.0*base_predictions_vector
+        positive_probs = 0.0 * base_predictions_vector
         for a, interpolation in self.interpolation_dict.items():
             interpolated_predictions = \
                 interpolation.p0 * interpolation.operation0(base_predictions_vector) + \
