@@ -29,7 +29,7 @@ def _get_soft_predictions(estimator, X, predict_method):
 
     Returns
     -------
-    predictions : ndarray
+    predictions : numpy.ndarray
         The output from estimator's desired predict method.
 
     References
