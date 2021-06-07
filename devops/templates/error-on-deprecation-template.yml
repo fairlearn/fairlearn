@@ -1,0 +1,30 @@
+# Template for running tests and erroring on Deprecation and Future Warning.
+
+parameters:
+  platforms: { Linux: ubuntu-latest }
+  testRunTypes: ['Unit-Deprecation', 'Notebooks-Deprecation']
+  installationType:
+  pyVersions: [3.9]
+  pinRequirements: False
+  freezeArtifactStem: 
+  freezeFileStem:
+
+jobs:
+  - ${{ each plat in parameters.platforms }}:
+    - ${{ each testRunType in parameters.testRunTypes }}:
+      - ${{ each pyVer in parameters.pyVersions }}:
+        - job:
+          displayName: ${{ format('"deprecation tests:" {0} {1} {2}', plat.Key , testRunType, pyVer) }}
+          pool:
+            vmImage: ${{ plat.value }}
+
+          steps:
+          - template: test-run-step-template.yml
+            parameters:
+              testRunType: ${{testRunType}}
+              installationType: ${{parameters.installationType}}
+              pythonVersion: ${{pyVer}}
+              pinRequirements: ${{parameters.pinRequirements}}
+              requirementsFile: $(RequirementsFile)
+              freezeArtifact: $(FreezeArtifact)
+              freezeFile: $(FreezeFile)

@@ -12,6 +12,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
+- template: templates/error-on-deprecation-template.yml
+  parameters:
+    platforms:  { Linux: ubuntu-latest }
+    installationType: 'PipLocal'
+    pyVersions: [3.9]
+    freezeArtifactStem: $(FreezeArtifactStem)
+    freezeFileStem: $(FreezeFileStem)
+
 - template: templates/all-tests-job-template.yml
   parameters:
     platforms:  { Linux: ubuntu-latest }
