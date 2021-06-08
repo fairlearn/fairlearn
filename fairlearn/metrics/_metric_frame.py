@@ -46,7 +46,7 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
     @wraps(new_metric_frame_init)
     def compatible_metric_frame_init(self, *args, metric=None, **kwargs):
         positional_names = ["metrics", "y_true", "y_pred"]
-        version = "0.9.0"
+        version = "0.10.0"
 
         positional_dict = dict(zip(positional_names, args))
 
@@ -181,7 +181,7 @@ class MetricFrame:
         :func:`functools.partial` must be used.
 
         .. deprecated:: 0.7.0
-            `metric` will be removed in version 0.9.0, use `metrics` instead.
+            `metric` will be removed in version 0.10.0, use `metrics` instead.
     """
 
     # The deprecation decorator does two things:

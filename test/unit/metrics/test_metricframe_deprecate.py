@@ -13,7 +13,7 @@ sf = ['a', 'a', 'b', 'b', 'b']
 accuracy_score_difference = 1.0/3.0
 
 # Removed in version:
-version = "0.9.0"
+version = "0.10.0"
 
 
 def test_all_positional_arguments():
