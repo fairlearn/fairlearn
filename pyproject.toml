@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error::DeprecationWarning",
+    "error::FutureWarning",
+    'ignore:the imp module is deprecated:DeprecationWarning',
+]
