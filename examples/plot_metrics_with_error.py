@@ -13,12 +13,16 @@ Plotting Metrics with Error Bars
 # We download the data set using `fetch_adult` function in `fairlearn.datasets`.
 # We start by importing the various modules we're going to use:
 #
+import os
+import sys
+nb_dir = os.path.split(os.getcwd())[0]
+if nb_dir not in sys.path:
+    sys.path.append(nb_dir)
 
-
-from fairlearn.metrics import MetricFrame, ErrorPlotter, true_positive_rate, false_positive_rate, false_negative_rate, true_negative_rate, selection_rate, count
+from fairlearn.metrics import MetricFrame, ErrorPlotter
 from sklearn.metrics import confusion_matrix
 from sklearn.datasets import fetch_openml
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import recall_score
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 import numpy as np
@@ -31,13 +35,25 @@ sex = data.data['sex']
 # %%
 # Error Metrics 
 # -------------
-# Now we define wilson bounds (asymmetric) and a symmetric error metric
+# We have many different choices for error metrics. In this notebook we'll just be using a 
+# Normal approximation interval (symmetric) and a Wilson score interval (asymmetric). 
 #
+# https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval
+# https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval
+#
+# 
 
 z_score = 1.959964
 digits = 4
 
+def recall_normal_err(y_t, y_p):
+    assert len(y_t)==len(y_p)
+    tn, fp, fn, tp  = confusion_matrix(y_t, y_p).ravel()
+    error = compute_error_metric(tp/(tp+fn), tp + fn, z_score= z_score)
+    return error
+
 def wilson(p, n, digits= digits, z = z_score):
+    """ Returns lower and upper bound """
     denominator = 1 + z**2/n
     centre_adjusted_probability = p + z*z / (2*n)
     adjusted_standard_deviation = np.sqrt((p*(1 - p) + z*z / (4*n)))/np.sqrt(n)
@@ -47,7 +63,6 @@ def wilson(p, n, digits= digits, z = z_score):
 
 def compute_error_metric(metric_value, sample_size, z_score):
     return z_score*np.sqrt(metric_value*(1.0-metric_value))/np.sqrt(sample_size)
-
 
 def recall_wilson_lower_bound(y_t, y_p):
     assert len(y_t)==len(y_p)
@@ -61,23 +76,6 @@ def recall_wilson_upper_bound(y_t, y_p):
     bounds = wilson(tp/(tp+fn), tp + fn, digits, z_score)
     return bounds[1]
 
-def recall_wilson_lower_error(y_t, y_p):
-    assert len(y_t)==len(y_p)
-    tn, fp, fn, tp  = confusion_matrix(y_t, y_p).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits, z_score)
-    return true_positive_rate(y_t, y_p) - bounds[0]
-
-def recall_wilson_upper_error(y_t, y_p):
-    assert len(y_t)==len(y_p)
-    tn, fp, fn, tp  = confusion_matrix(y_t, y_p).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits, z_score)
-    return bounds[1] - true_positive_rate(y_t, y_p)
-
-def recall_err(y_t, y_p):
-    assert len(y_t)==len(y_p)
-    tn, fp, fn, tp  = confusion_matrix(y_t, y_p).ravel()
-    error = compute_error_metric(tp/(tp+fn), tp + fn, z_score= z_score)
-    return error
 
 # %%
 # Classifier
@@ -91,31 +89,36 @@ y_pred = classifier.predict(X)
 
 # %%
 # MetricFrame
-# ----------
-# Now we create a metric frame
+# -----------
+# Now we create a MetricFrame to generate the Recall wilson bounds and Recall normal error
 #
 
 # Analyze metrics using MetricFrame
 metrics = {
-    # 'accuracy': accuracy_score,
-    # 'precision': precision_score,
     'Recall': recall_score,
     'Recall lower bound': recall_wilson_lower_bound, 
     'Recall upper bound': recall_wilson_upper_bound, 
-    'Recall lower error': recall_wilson_lower_error, 
-    'Recall upper error': recall_wilson_upper_error, 
-    'Recall Error': recall_err,
-    # 'false positive rate': false_positive_rate,
-    # 'true positive rate': true_positive_rate,
-    'selection rate': selection_rate,
-    'count': count}
+    'Recall Error': recall_normal_err
+    }
 metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
 
 # %%
 # Error Plotting
-# ----------
-# Finally we plot the Recall metric with its error bounds
+# --------------
+# Finally we use the ErrorPlotter class to plot the Recall metric with its error bounds
 #
+# 1. We plot with the symmetric Normal Error Interval
+error_mapping = {
+    "Recall": {
+        "symmetric_error": "Recall Error",
+    }
+}
+
+ep = ErrorPlotter(metric_frame, error_mapping)
+ep.plot_with_error("bar", metric="Recall", title="(Symmetric) Normal Error Intervals", capsize=10, colormap="Pastel1")
+
+# %%
+# 2. We plot wiuth the asymmetric Wilson Bounds
 error_mapping = {
     "Recall": {
         "upper_bound": "Recall upper bound",
@@ -124,4 +127,31 @@ error_mapping = {
 }
 
 ep = ErrorPlotter(metric_frame, error_mapping)
-ep.plot_with_error("bar", metric="Recall", title="(Asymmetric) Absolute Bounds", capsize=10, colormap="Pastel1")
+ep.plot_with_error("bar", metric="Recall", title="(Asymmetric) Wilson Bounds", capsize=10, colormap="Pastel2")
+
+# %%
+# Creating Custom Error Metrics
+# -----------------------------
+# In this tutorial we used Normal intervals and Wilson bounds to demonstrate how to plot symmetric and asymmetric metrics, respectively. 
+#
+# However, in order to support many different metrics, we reuse the MetricFrame functionality by writing a function
+# that takes in y_true and y_pred, and returns the error metric:
+
+def error_metric_function(y_true, y_pred):
+    assert len(y_true)==len(y_pred)
+    # compute error metric
+    tn, fp, fn, tp  = confusion_matrix(y_true, y_pred).ravel()  # compute custom metric function here
+    bounds = wilson(tp/(tp+fn), tp + fn, digits, z_score)   # compute custom metric function here
+    # returns the lower bound
+    return bounds[0]
+
+# Then when creating the ErrorPlotter we pass in the mapping of the form:
+error_mapping = {
+    "Recall": { # `Recall` is the Metric Name
+        "upper_bound": "Recall upper bound", # `upper_bound` is a predefined type of error metric
+                                             # `Recall upper bound` is the column name of the metric defined in the MetricFrame
+        "lower_bound": "Recall lower bound"  # `lower_bound` is another predefined type of error metric
+                                             # `Recall lower bound` is the column name of the metric defined in the MetricFrame
+    }
+}
+# %%
