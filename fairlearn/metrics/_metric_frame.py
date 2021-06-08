@@ -441,7 +441,9 @@ class MetricFrame:
         elif method == 'to_overall':
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
+                result = tmp.transform(
+                    lambda x: min(x, 1 / x)
+                ).min(level=self.control_levels)
             else:
                 ratios = None
 
@@ -454,7 +456,7 @@ class MetricFrame:
 
                 def ratio_sub_one(x):
                     if x > 1:
-                        return 1/x
+                        return 1 / x
                     else:
                         return x
 

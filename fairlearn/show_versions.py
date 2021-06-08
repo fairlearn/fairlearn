@@ -17,11 +17,11 @@ def _get_sys_info():
     :returns: system and Python version information
     :rtype: dict
     """
-    python = sys.version.replace('\n', ' ')
+    python = sys.version.replace("\n", " ")
 
     blob = [
         ("python", python),
-        ('executable', sys.executable),
+        ("executable", sys.executable),
         ("machine", platform.platform()),
     ]
 
@@ -34,17 +34,19 @@ def _get_deps_info():
     :return: version information on relevant Python libraries
     :rtype: dict
     """
-    deps = sorted([
-        "pip",
-        "setuptools",
-        "sklearn",
-        "numpy",
-        "scipy",
-        "Cython",
-        "pandas",
-        "matplotlib",
-        "tempeh"
-        ])
+    deps = sorted(
+        [
+            "pip",
+            "setuptools",
+            "sklearn",
+            "numpy",
+            "scipy",
+            "Cython",
+            "pandas",
+            "matplotlib",
+            "tempeh",
+        ]
+    )
 
     def get_version(module):
         return module.__version__
@@ -70,10 +72,10 @@ def show_versions():
     sys_info = _get_sys_info()
     deps_info = _get_deps_info()
 
-    print('\nSystem:')
+    print("\nSystem:")
     for k, stat in sys_info.items():
         print("{k:>10}: {stat}".format(k=k, stat=stat))
 
-    print('\nPython dependencies:')
+    print("\nPython dependencies:")
     for k, stat in deps_info.items():
         print("{k:>10}: {stat}".format(k=k, stat=stat))

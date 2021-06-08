@@ -6,7 +6,10 @@ import numpy as np
 
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _validate_and_reformat_input
+from fairlearn._input_validation import (
+    _MESSAGE_RATIO_NOT_IN_RANGE,
+    _validate_and_reformat_input,
+)
 from .error_rate import ErrorRate
 
 
@@ -84,7 +87,9 @@ class UtilityParity(ClassificationMoment):
         Default 0.0
     """
 
-    def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
+    def __init__(
+        self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0
+    ):
         """Initialize with the ratio value."""
         super(UtilityParity, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
@@ -106,13 +111,15 @@ class UtilityParity(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self,
-                  X,
-                  y: pd.Series,
-                  *,
-                  sensitive_features: pd.Series,
-                  event: pd.Series = None,
-                  utilities=None):
+    def load_data(
+        self,
+        X,
+        y: pd.Series,
+        *,
+        sensitive_features: pd.Series,
+        event: pd.Series = None,
+        utilities=None
+    ):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
@@ -136,15 +143,22 @@ class UtilityParity(ClassificationMoment):
         super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
         if utilities is None:
-            utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
-                                   np.ones(y.shape, dtype=np.float64)]).T
+            utilities = np.vstack(
+                [
+                    np.zeros(y.shape, dtype=np.float64),
+                    np.ones(y.shape, dtype=np.float64),
+                ]
+            ).T
         self.utilities = utilities
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
-        self.prob_group_event = self.tags.groupby(
-            [_EVENT, _GROUP_ID]).size() / self.total_samples
-        signed = pd.concat([self.prob_group_event, self.prob_group_event],
-                           keys=["+", "-"],
-                           names=[_SIGN, _EVENT, _GROUP_ID])
+        self.prob_group_event = (
+            self.tags.groupby([_EVENT, _GROUP_ID]).size() / self.total_samples
+        )
+        signed = pd.concat(
+            [self.prob_group_event, self.prob_group_event],
+            keys=["+", "-"],
+            names=[_SIGN, _EVENT, _GROUP_ID],
+        )
         self.index = signed.index
         self.default_objective_lambda_vec = None
 
@@ -157,7 +171,7 @@ class UtilityParity(ClassificationMoment):
         # speed up GridSearch.
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
-        self.neg_basis_present = pd.Series(dtype='float64')
+        self.neg_basis_present = pd.Series(dtype="float64")
         zero_vec = pd.Series(0.0, self.index)
         i = 0
         for event_val in event_vals:
@@ -180,18 +194,24 @@ class UtilityParity(ClassificationMoment):
         pred = utility_diff.T * predictions + self.utilities[:, 0]
         self.tags[_PREDICTION] = pred
         expect_event = self.tags.groupby(_EVENT).mean()
-        expect_group_event = self.tags.groupby(
-            [_EVENT, _GROUP_ID]).mean()
-        expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * expect_group_event[_PREDICTION] - \
-            expect_event[_PREDICTION]
-        expect_group_event[_LOWER_BOUND_DIFF] = - expect_group_event[_PREDICTION] \
-            + self.ratio * expect_event[_PREDICTION]
-        g_signed = pd.concat([expect_group_event[_UPPER_BOUND_DIFF],
-                              expect_group_event[_LOWER_BOUND_DIFF]],
-                             keys=["+", "-"],
-                             names=[_SIGN, _EVENT, _GROUP_ID])
-        self._gamma_descr = str(expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF,
-                                                    _LOWER_BOUND_DIFF]])
+        expect_group_event = self.tags.groupby([_EVENT, _GROUP_ID]).mean()
+        expect_group_event[_UPPER_BOUND_DIFF] = (
+            self.ratio * expect_group_event[_PREDICTION] - expect_event[_PREDICTION]
+        )
+        expect_group_event[_LOWER_BOUND_DIFF] = (
+            -expect_group_event[_PREDICTION] + self.ratio * expect_event[_PREDICTION]
+        )
+        g_signed = pd.concat(
+            [
+                expect_group_event[_UPPER_BOUND_DIFF],
+                expect_group_event[_LOWER_BOUND_DIFF],
+            ],
+            keys=["+", "-"],
+            names=[_SIGN, _EVENT, _GROUP_ID],
+        )
+        self._gamma_descr = str(
+            expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF, _LOWER_BOUND_DIFF]]
+        )
         return g_signed
 
     def bound(self):
@@ -214,9 +234,11 @@ class UtilityParity(ClassificationMoment):
             lambda_neg = -lambda_pos
             lambda_pos[lambda_pos < 0.0] = 0.0
             lambda_neg[lambda_neg < 0.0] = 0.0
-            lambda_projected = pd.concat([lambda_pos, lambda_neg],
-                                         keys=["+", "-"],
-                                         names=[_SIGN, _EVENT, _GROUP_ID])
+            lambda_projected = pd.concat(
+                [lambda_pos, lambda_neg],
+                keys=["+", "-"],
+                names=[_SIGN, _EVENT, _GROUP_ID],
+            )
             return lambda_projected
         return lambda_vec
 
@@ -241,13 +263,18 @@ class UtilityParity(ClassificationMoment):
            16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
 
         """
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
-            self.prob_event
-        lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
-            self.prob_group_event
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(
+            level=_EVENT
+        ) / self.prob_event
+        lambda_group_event = (
+            self.ratio * lambda_vec["+"] - lambda_vec["-"]
+        ) / self.prob_group_event
         adjust = lambda_event - lambda_group_event
         signed_weights = self.tags.apply(
-            lambda row: 0 if pd.isna(row[_EVENT]) else adjust[row[_EVENT], row[_GROUP_ID]], axis=1
+            lambda row: 0
+            if pd.isna(row[_EVENT])
+            else adjust[row[_EVENT], row[_GROUP_ID]],
+            axis=1,
         )
         utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         signed_weights = utility_diff.T * signed_weights
@@ -297,11 +324,13 @@ class DemographicParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         base_event = pd.Series(data=_ALL, index=y_train.index)
         event = _merge_event_and_control_columns(base_event, cf_train)
@@ -355,11 +384,13 @@ class TruePositiveRateParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
         base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 1)
@@ -408,11 +439,13 @@ class FalsePositiveRateParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
         base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 0)
@@ -460,11 +493,13 @@ class EqualizedOdds(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         base_event = y_train.apply(lambda v: _LABEL + "=" + str(v))
         event = _merge_event_and_control_columns(base_event, cf_train)
@@ -507,16 +542,16 @@ class ErrorRateParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
-        utilities = np.vstack([y_train, 1-y_train]).T
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
+        utilities = np.vstack([y_train, 1 - y_train]).T
         base_event = pd.Series(data=_ALL, index=y_train.index)
         event = _merge_event_and_control_columns(base_event, cf_train)
         super().load_data(
-            X, y_train,
-            event=event,
-            utilities=utilities,
-            sensitive_features=sf_train)
+            X, y_train, event=event, utilities=utilities, sensitive_features=sf_train
+        )
