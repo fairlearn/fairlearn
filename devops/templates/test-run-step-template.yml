@@ -72,7 +72,7 @@ steps:
 # =================================================
 - ${{ if eq(parameters.testRunType, 'Unit')}}:
   # The imp warning comes from papermill's usage of ansiwrap
-  - script: python -m pytest test/ -Werror::DeprecationWarning -Werror::FutureWarning -Wignore:importlib:DeprecationWarning --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
+  - script: python -m pytest test/ --ignore=test/install -m "not notebooks" --junitxml=./TEST--TEST.xml -o junit_suite_name="$(Agent.JobName)"
     displayName: 'Run unit tests'
 
 - ${{ if eq(parameters.testRunType, 'Notebooks')}}:
