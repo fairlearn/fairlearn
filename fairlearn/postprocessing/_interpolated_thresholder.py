@@ -27,6 +27,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
     ----------
     estimator :
         base estimator
+
     interpolation_dict : dict
         maps sensitive feature values to `Bunch` that describes the
         interpolation transformation via the following fields:
@@ -40,8 +41,10 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         The numbers p0 and p1 must be non-negative and add up to 1, operation0 and
         operation1 must be instances of :class:`ThresholdOperation`, and p_ignore must be
         between 0 and 1.
+
     prefit : bool
         if `True` then the base estimator is not fitted in :meth:`fit`.
+
     predict_method : {'auto', 'predict_proba', 'decision_function', 'predict' \
             }, default='auto'
 
