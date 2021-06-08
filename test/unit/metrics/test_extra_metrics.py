@@ -25,10 +25,10 @@ class TestGetLabelsForConfusionMatrix:
         assert np.array_equal(r1, [2, 0])
 
     def test_smoke_alpha_pos_label(self):
-        r0 = _get_labels_for_confusion_matrix(['a', 'b'], 'b')
-        assert np.array_equal(r0, ['a', 'b'])
-        r1 = _get_labels_for_confusion_matrix(['a', 'b'], 'a')
-        assert np.array_equal(r1, ['b', 'a'])
+        r0 = _get_labels_for_confusion_matrix(["a", "b"], "b")
+        assert np.array_equal(r0, ["a", "b"])
+        r1 = _get_labels_for_confusion_matrix(["a", "b"], "a")
+        assert np.array_equal(r1, ["b", "a"])
 
     def test_single_value_numeric_no_pos_label(self):
         r0 = _get_labels_for_confusion_matrix([0], None)
@@ -45,15 +45,16 @@ class TestGetLabelsForConfusionMatrix:
         assert np.array_equal(r1, [None, 0])
 
     def test_single_value_alpha_pos_label(self):
-        r0 = _get_labels_for_confusion_matrix(['a'], 'a')
-        assert np.array_equal(r0, [None, 'a'])
-        r1 = _get_labels_for_confusion_matrix(['a'], 0)
-        assert np.array_equal(r1, ['a', 0])
+        r0 = _get_labels_for_confusion_matrix(["a"], "a")
+        assert np.array_equal(r0, [None, "a"])
+        r1 = _get_labels_for_confusion_matrix(["a"], 0)
+        assert np.array_equal(r1, ["a", 0])
 
     def test_too_many_values(self):
         expected_msg = "Must have no more than two unique y values"
-        expected_msg_no_pos = \
+        expected_msg_no_pos = (
             "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
+        )
         with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 1, 2], None)
         # Note that while the following error message should be deterministic
@@ -61,11 +62,13 @@ class TestGetLabelsForConfusionMatrix:
         assert str(e0.value) in {expected_msg, expected_msg_no_pos}
         # In the following, only one error is possible
         with pytest.raises(ValueError) as e1:
-            _get_labels_for_confusion_matrix(['a', 'b', 'c'], 'a')
+            _get_labels_for_confusion_matrix(["a", "b", "c"], "a")
         assert str(e1.value) == expected_msg
 
     def test_need_pos_label(self):
-        expected_msg = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
+        expected_msg = (
+            "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
+        )
         with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 2], None)
         assert str(e0.value) == expected_msg
@@ -134,15 +137,15 @@ class TestTPR:
         result_skm = skm.recall_score(y_true, y_pred, sample_weight=weight)
         assert result == pytest.approx(result_skm)
 
-        result = metrics.true_positive_rate(y_true, y_pred,
-                                            pos_label=0, sample_weight=weight)
-        result_skm = skm.recall_score(y_true, y_pred,
-                                      pos_label=0, sample_weight=weight)
+        result = metrics.true_positive_rate(
+            y_true, y_pred, pos_label=0, sample_weight=weight
+        )
+        result_skm = skm.recall_score(y_true, y_pred, pos_label=0, sample_weight=weight)
         assert result == pytest.approx(result_skm)
 
     def test_tpr_values_alpha(self):
-        a = 'a'
-        b = 'b'
+        a = "a"
+        b = "b"
         y_true = [a, b, a, b, b, b, b, b, a, a, a, a, b, b, a, b]
         y_pred = [a, b, b, a, a, b, a, a, b, b, a, b, a, b, a, a]
 
@@ -190,12 +193,12 @@ class TestTNR:
         assert result == 1
 
     def test_some_correct_other_labels(self):
-        y_true = ['b', 'b', 'b', 'b', 'a']
-        y_pred = ['b', 'b', 'b', 'a', 'a']
+        y_true = ["b", "b", "b", "b", "a"]
+        y_pred = ["b", "b", "b", "a", "a"]
 
-        result = metrics.true_negative_rate(y_true, y_pred, pos_label='b')
+        result = metrics.true_negative_rate(y_true, y_pred, pos_label="b")
         assert result == 1
-        result = metrics.true_negative_rate(y_true, y_pred, pos_label='a')
+        result = metrics.true_negative_rate(y_true, y_pred, pos_label="a")
         assert result == 0.75
 
     def test_tnr_some_correct_with_false_negative(self):
@@ -206,39 +209,191 @@ class TestTNR:
         assert result == 0.75
 
     def test_against_sklearn(self):
-        y_true = [0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1,
-                  0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0]
-        y_pred = [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0,
-                  1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1]
+        y_true = [
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+        ]
+        y_pred = [
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+        ]
 
         actual = metrics.true_negative_rate(y_true, y_pred)
         tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred).ravel()
-        assert (tn/(tn+fp)) == actual
+        assert (tn / (tn + fp)) == actual
         actual = metrics.true_negative_rate(y_true, y_pred, pos_label=0)
         tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, labels=[1, 0]).ravel()
-        assert (tn/(tn+fp)) == actual
+        assert (tn / (tn + fp)) == actual
 
     def test_against_sklearn_weighted(self):
-        y_true = [0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1,
-                  0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0]
-        y_pred = [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0,
-                  1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1]
-        weights = [1, 2, 3, 5, 3, 2, 5, 3, 5, 1, 5, 3, 5, 2, 3,
-                   2, 5, 2, 3, 1, 5, 3, 2, 1, 1, 5, 2, 3, 5, 1]
+        y_true = [
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+        ]
+        y_pred = [
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+        ]
+        weights = [
+            1,
+            2,
+            3,
+            5,
+            3,
+            2,
+            5,
+            3,
+            5,
+            1,
+            5,
+            3,
+            5,
+            2,
+            3,
+            2,
+            5,
+            2,
+            3,
+            1,
+            5,
+            3,
+            2,
+            1,
+            1,
+            5,
+            2,
+            3,
+            5,
+            1,
+        ]
 
         actual = metrics.true_negative_rate(y_true, y_pred, sample_weight=weights)
-        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, sample_weight=weights).ravel()
-        assert (tn/(tn+fp)) == actual
-        actual = metrics.true_negative_rate(y_true, y_pred, pos_label=0, sample_weight=weights)
         tn, fp, fn, tp = skm.confusion_matrix(
-            y_true, y_pred,
-            labels=[1, 0],
-            sample_weight=weights).ravel()
-        assert (tn/(tn+fp)) == actual
+            y_true, y_pred, sample_weight=weights
+        ).ravel()
+        assert (tn / (tn + fp)) == actual
+        actual = metrics.true_negative_rate(
+            y_true, y_pred, pos_label=0, sample_weight=weights
+        )
+        tn, fp, fn, tp = skm.confusion_matrix(
+            y_true, y_pred, labels=[1, 0], sample_weight=weights
+        ).ravel()
+        assert (tn / (tn + fp)) == actual
 
 
 class TestFNR:
-
     def test_all_correct(self):
         y_true = [0, 0, 0, 0, 1]
         y_pred = [0, 0, 0, 0, 1]
@@ -272,12 +427,12 @@ class TestFNR:
         assert result == 0.5
 
     def test_some_correct_other_labels(self):
-        y_true = ['a', 'a', 'a', 'a', 'b', 'b']
-        y_pred = ['b', 'b', 'a', 'b', 'b', 'a']
+        y_true = ["a", "a", "a", "a", "b", "b"]
+        y_pred = ["b", "b", "a", "b", "b", "a"]
 
-        result = metrics.false_negative_rate(y_true, y_pred, pos_label='a')
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label="a")
         assert result == 0.75
-        result = metrics.false_negative_rate(y_true, y_pred, pos_label='b')
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label="b")
         assert result == 0.5
 
     def test_against_sklearn(self):
@@ -301,15 +456,16 @@ class TestFNR:
         result_skm = 1 - skm.recall_score(y_true, y_pred, sample_weight=weight)
         assert result == pytest.approx(result_skm)
 
-        result = metrics.false_negative_rate(y_true, y_pred,
-                                             pos_label=0, sample_weight=weight)
-        result_skm = 1 - skm.recall_score(y_true, y_pred,
-                                          pos_label=0, sample_weight=weight)
+        result = metrics.false_negative_rate(
+            y_true, y_pred, pos_label=0, sample_weight=weight
+        )
+        result_skm = 1 - skm.recall_score(
+            y_true, y_pred, pos_label=0, sample_weight=weight
+        )
         assert result == pytest.approx(result_skm)
 
 
 class TestFPR:
-
     def test_all_correct(self):
         y_true = [0, 0, 0, 0, 1]
         y_pred = [0, 0, 0, 0, 1]
@@ -336,29 +492,168 @@ class TestFPR:
         assert result == pytest.approx(0.6666667)
 
     def test_against_sklearn(self):
-        y_true = [0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0]
-        y_pred = [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0]
+        y_true = [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+        ]
+        y_pred = [
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+        ]
 
         actual = metrics.false_positive_rate(y_true, y_pred)
         tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred).ravel()
-        assert (fp/(fp+tn)) == actual
+        assert (fp / (fp + tn)) == actual
         actual = metrics.false_positive_rate(y_true, y_pred, pos_label=0)
         tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, labels=[1, 0]).ravel()
-        assert (fp/(fp+tn)) == actual
+        assert (fp / (fp + tn)) == actual
 
     def test_against_sklearn_weighted(self):
-        y_true = [0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0]
-        y_pred = [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0]
-        weight = [1, 2, 1, 1, 1, 3, 1, 4, 1, 2, 3, 4, 2, 3, 1, 2, 3, 1, 3, 2, 4, 2, 3, 1, 1, 5]
+        y_true = [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+        ]
+        y_pred = [
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+        ]
+        weight = [
+            1,
+            2,
+            1,
+            1,
+            1,
+            3,
+            1,
+            4,
+            1,
+            2,
+            3,
+            4,
+            2,
+            3,
+            1,
+            2,
+            3,
+            1,
+            3,
+            2,
+            4,
+            2,
+            3,
+            1,
+            1,
+            5,
+        ]
 
         actual = metrics.false_positive_rate(y_true, y_pred, sample_weight=weight)
-        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, sample_weight=weight).ravel()
-        assert (fp/(fp+tn)) == actual
-        actual = metrics.false_positive_rate(y_true, y_pred,
-                                             pos_label=0, sample_weight=weight)
-        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred,
-                                              labels=[1, 0], sample_weight=weight).ravel()
-        assert (fp/(fp+tn)) == actual
+        tn, fp, fn, tp = skm.confusion_matrix(
+            y_true, y_pred, sample_weight=weight
+        ).ravel()
+        assert (fp / (fp + tn)) == actual
+        actual = metrics.false_positive_rate(
+            y_true, y_pred, pos_label=0, sample_weight=weight
+        )
+        tn, fp, fn, tp = skm.confusion_matrix(
+            y_true, y_pred, labels=[1, 0], sample_weight=weight
+        ).ravel()
+        assert (fp / (fp + tn)) == actual
 
 
 class TestSingleValueArrays:
@@ -434,15 +729,71 @@ class TestCount:
         assert 1 == metrics.count(y_true, y_pred)
 
     def test_multi_group(self):
-        y_true = [0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0]
-        y_pred = [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0]
+        y_true = [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+        ]
+        y_pred = [
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+        ]
 
         assert 26 == metrics.count(y_true, y_pred)
 
     def test_unequal_y_sizes(self):
         y_true = [0, 1, 0, 1, 0, 1, 1]
         y_pred = [0, 0, 1, 1]
-        expected_msg = "Found input variables with inconsistent numbers of samples: [7, 4]"
+        expected_msg = (
+            "Found input variables with inconsistent numbers of samples: [7, 4]"
+        )
 
         with pytest.raises(ValueError) as error:
             metrics.count(y_true, y_pred)
