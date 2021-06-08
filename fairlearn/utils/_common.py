@@ -10,8 +10,8 @@ def _get_soft_predictions(estimator, X, predict_method):
     estimator : estimator
         A scikit-learn compatible estimator
     X : array-like
-        The intput for which the output is desired
-    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict' \
+        The intput for which the output is desired predict_method : {'auto', \
+            'predict_proba', 'decision_function', 'predict' \
             }, default='auto'
 
         Defines which method of the ``estimator`` is used to get the output
