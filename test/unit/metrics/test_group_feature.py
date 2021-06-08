@@ -8,18 +8,18 @@ import pytest
 import fairlearn.metrics as metrics
 
 
-raw_feature = ['a', 'b', 'c', 'a']
-expected_classes = ['a', 'b', 'c']
+raw_feature = ["a", "b", "c", "a"]
+expected_classes = ["a", "b", "c"]
 
 
 def common_validations(sf):
     assert np.array_equal(expected_classes, sf.classes)
 
-    mask = sf.get_mask_for_class('a')
-    assert np.array_equal(mask,  [True, False, False, True])
-    mask_b = sf.get_mask_for_class('b')
+    mask = sf.get_mask_for_class("a")
+    assert np.array_equal(mask, [True, False, False, True])
+    mask_b = sf.get_mask_for_class("b")
     assert np.array_equal(mask_b, [False, True, False, False])
-    mask_c = sf.get_mask_for_class('c')
+    mask_c = sf.get_mask_for_class("c")
     assert np.array_equal(mask_c, [False, False, True, False])
 
 
@@ -32,7 +32,9 @@ def test_list():
 
 def test_named_list():
     expected_name = "My Named List"
-    target = metrics._group_feature.GroupFeature("Ignored", raw_feature, 2, expected_name)
+    target = metrics._group_feature.GroupFeature(
+        "Ignored", raw_feature, 2, expected_name
+    )
 
     assert target.name == expected_name
     common_validations(target)

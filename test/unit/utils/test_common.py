@@ -22,9 +22,9 @@ class DummyClassifier(BaseEstimator, ClassifierMixin):
                 [0.3, 0.7],
             ]
         )
-        
+
     def decision_function(self, X):
-        return np.array([.5, -.7, .9])
+        return np.array([0.5, -0.7, 0.9])
 
 
 @pytest.mark.parametrize(

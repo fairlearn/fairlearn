@@ -32,10 +32,10 @@ def test_weighted():
 
     result = metrics._balanced_root_mean_squared_error(y_true, y_pred, weight)
 
-    expected_0 = math.sqrt(4.0/10)
-    expected_1 = math.sqrt(18.0/26)
+    expected_0 = math.sqrt(4.0 / 10)
+    expected_1 = math.sqrt(18.0 / 26)
 
-    assert (expected_0+expected_1)/2 == result
+    assert (expected_0 + expected_1) / 2 == result
 
 
 def test_probability_predict():
@@ -47,10 +47,12 @@ def test_probability_predict():
     expected_0 = 0.5
     expected_1 = 0.25
 
-    assert (expected_0+expected_1)/2 == result
+    assert (expected_0 + expected_1) / 2 == result
 
 
-@pytest.mark.parametrize("y_true", [[0, 0, 0], [1, 1, 1], [0, 0, 2], [1, 1, 2], [0, 1, 2]])
+@pytest.mark.parametrize(
+    "y_true", [[0, 0, 0], [1, 1, 1], [0, 0, 2], [1, 1, 2], [0, 1, 2]]
+)
 def test_y_true_not_0_1(y_true):
     y_pred = [0.5, 0.5, 0.5]
 

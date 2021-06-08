@@ -28,7 +28,7 @@ s_w = np.asarray(
 
 def group_gen(x, runs, groups):
     # For producing arrays such as ['a', 'a', 'b', 'b', 'a', 'a', ... ]
-    return groups[(x//runs) % len(groups)]
+    return groups[(x // runs) % len(groups)]
 
 
 def array_gen(groups, run_length, num_samples):
