@@ -10,11 +10,7 @@ class LeastSquaresBinaryClassifierLearner:
         self.weights = None
 
     def fit(self, X, Y, sample_weight):
-<<<<<<< HEAD
         sqrtW = np.sqrt(np.array(sample_weight))
-=======
-        sqrtW = np.array(np.sqrt(sample_weight))
->>>>>>> main
         matX = np.array(X) * sqrtW[:, np.newaxis]
         vecY = Y * sqrtW
         self.lsqinfo = np.linalg.lstsq(matX, vecY, rcond=-1)
@@ -30,11 +26,7 @@ class LeastSquaresRegressor:
         self.weights = None
 
     def fit(self, X, Y, sample_weight):
-<<<<<<< HEAD
         sqrtW = np.sqrt(np.array(sample_weight))
-=======
-        sqrtW = np.array(np.sqrt(sample_weight))
->>>>>>> main
         matX = np.array(X) * sqrtW[:, np.newaxis]
         vecY = Y * sqrtW
         self.lsqinfo = np.linalg.lstsq(matX, vecY, rcond=-1)
