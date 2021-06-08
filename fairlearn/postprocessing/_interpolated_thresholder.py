@@ -42,7 +42,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         between 0 and 1.
     prefit : bool
         if `True` then the base estimator is not fitted in :meth:`fit`.
-    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
+    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict' \
             }, default='auto'
 
         Defines which method of the ``estimator`` is used to get the output
