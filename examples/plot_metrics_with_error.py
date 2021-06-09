@@ -10,9 +10,15 @@ Plotting Metrics with Error Bars
 # %%
 # Load and preprocess the data set
 # --------------------------------
-# We download the data set using `fetch_adult` function in `fairlearn.datasets`.
+# We download the data set using `fetch_openml` function in `sklearn.datasets`.
+# The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
 # We start by importing the various modules we're going to use:
 #
+import os
+import sys
+nb_dir = os.path.split(os.getcwd())[0]
+if nb_dir not in sys.path:
+    sys.path.append(nb_dir)
 
 import numpy as np
 import pandas as pd
@@ -37,10 +43,9 @@ sex = data.data['sex']
 # https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval
 # https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval
 #
-#
-
+# We aim to create a 95% confidence interval, so we a `z_score` of 1.959964
 z_score = 1.959964
-digits = 4
+digits_of_precision = 4
 
 
 def recall_normal_err(y_t, y_p):
@@ -50,7 +55,7 @@ def recall_normal_err(y_t, y_p):
     return error
 
 
-def wilson(p, n, digits=digits, z=z_score):
+def wilson(p, n, digits=digits_of_precision, z=z_score):
     """ Returns lower and upper bound """
     denominator = 1 + z**2/n
     centre_adjusted_probability = p + z*z / (2*n)
@@ -64,17 +69,17 @@ def compute_error_metric(metric_value, sample_size, z_score):
     return z_score*np.sqrt(metric_value*(1.0-metric_value))/np.sqrt(sample_size)
 
 
-def recall_wilson_lower_bound(y_t, y_p):
-    assert len(y_t) == len(y_p)
-    tn, fp, fn, tp = confusion_matrix(y_t, y_p).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits, z_score)
+def recall_wilson_lower_bound(y_true, y_pred):
+    assert len(y_true) == len(y_pred)
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)
     return bounds[0]
 
 
-def recall_wilson_upper_bound(y_t, y_p):
-    assert len(y_t) == len(y_p)
-    tn, fp, fn, tp = confusion_matrix(y_t, y_p).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits, z_score)
+def recall_wilson_upper_bound(y_true, y_pred):
+    assert len(y_true) == len(y_pred)
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)
     return bounds[1]
 
 
@@ -110,8 +115,9 @@ metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
 #
 # 1. We plot with the symmetric Normal Error Interval
 error_mapping = {
-    "Recall": {
-        "symmetric_error": "Recall Error",
+    "Recall": {                             # `Recall` is the Metric Name
+        "symmetric_error": "Recall Error",  # `symmetric_error` is a predefined type of error metric
+                                            # `Recall Error` is the column name of the metric defined in the MetricFrame
     }
 }
 
@@ -122,9 +128,11 @@ ep.plot_with_error("bar", metric="Recall",
 # %%
 # 2. We plot wiuth the asymmetric Wilson Bounds
 error_mapping = {
-    "Recall": {
-        "upper_bound": "Recall upper bound",
-        "lower_bound": "Recall lower bound"
+    "Recall": {                               # `Recall` is the Metric Name
+        "upper_bound": "Recall upper bound",  # `upper_bound` is a predefined type of error metric
+                                              # `Recall upper bound` is the column name of the metric defined in the MetricFrame
+        "lower_bound": "Recall lower bound"   # `lower_bound` is another predefined type of error metric
+                                              # `Recall lower bound` is the column name of the metric defined in the MetricFrame
     }
 }
 
@@ -143,10 +151,10 @@ ep.plot_with_error("bar", metric="Recall", title="(Asymmetric) Wilson Bounds",
 
 def error_metric_function(y_true, y_pred):
     assert len(y_true) == len(y_pred)
-    # compute error metric
+
     # compute custom metric function here
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits, z_score)   # compute custom metric function here
+    bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)   # compute custom metric function here
     # returns the lower bound
     return bounds[0]
 
@@ -160,4 +168,3 @@ error_mapping = {
                                              # `Recall lower bound` is the column name of the metric defined in the MetricFrame
     }
 }
-# %%
