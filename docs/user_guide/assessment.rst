@@ -90,8 +90,9 @@ We then calculate a metric which shows the subgroups:
 .. doctest:: assessment_metrics
 
     >>> from fairlearn.metrics import MetricFrame
-    >>> grouped_metric = MetricFrame(skm.recall_score, 
-    ...                              y_true, y_pred,
+    >>> grouped_metric = MetricFrame(metrics=skm.recall_score,
+    ...                              y_true=y_true,
+    ...                              y_pred=y_pred,
     ...                              sensitive_features=group_membership_data)
     >>> print("Overall recall = ", grouped_metric.overall)
     Overall recall =  0.5
@@ -150,8 +151,9 @@ in a dictionary via the ``sample_params`` argument.:
 
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
     >>> s_p = { 'sample_weight':s_w }
-    >>> weighted = MetricFrame(skm.recall_score,
-    ...                        y_true, y_pred,
+    >>> weighted = MetricFrame(metrics=skm.recall_score,
+    ...                        y_true=y_true,
+    ...                        y_pred=y_pred,
     ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
@@ -177,8 +179,9 @@ function:
 
     >>> import functools
     >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
-    >>> metric_beta = MetricFrame(fbeta_06,
-    ...                           y_true, y_pred,
+    >>> metric_beta = MetricFrame(metrics=fbeta_06,
+    ...                           y_true=y_true,
+    ...                           y_pred=y_pred,
     ...                           sensitive_features=group_membership_data)
     >>> metric_beta.overall
     0.5396825396825397
@@ -199,8 +202,9 @@ holds the intersections of these groups:
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6]
     >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
     ...                          columns=['SF 0', 'SF 1'])
-    >>> metric_2sf = MetricFrame(skm.recall_score,
-    ...                          y_true, y_pred,
+    >>> metric_2sf = MetricFrame(metrics=skm.recall_score,
+    ...                          y_true=y_true,
+    ...                          y_pred=y_pred,
     ...                          sensitive_features=s_f_frame)
     >>> metric_2sf.overall  # Same as before
     0.5
@@ -256,8 +260,9 @@ the requested aggregation. For example:
     0.752525...
     >>> # But as noted above, functools.partial is needed for MetricFrame
     >>> fbeta_07 = functools.partial(skm.fbeta_score, beta=0.7)
-    >>> MetricFrame(fbeta_07,
-    ...             y_true, y_pred,
+    >>> MetricFrame(metrics=fbeta_07,
+    ...             y_true=y_true,
+    ...             y_pred=y_pred,
     ...             sensitive_features=group_membership_data).difference()
     0.752525...
 
@@ -342,8 +347,9 @@ parameter:
     ...    'C','B','C','A','C','C','B','B','C','A',
     ...    'B','B','C','A','B','A','B','B','A','A'
     ... ]
-    >>> metric_c_f = MetricFrame(skm.accuracy_score,
-    ...                          decision, prediction,
+    >>> metric_c_f = MetricFrame(metrics=skm.accuracy_score,
+    ...                          y_true=decision,
+    ...                          y_pred=prediction,
     ...                          sensitive_features={'SF' : sensitive_feature},
     ...                          control_features={'CF' : control_feature})
     >>> # The 'overall' property is now split based on the control feature

@@ -20,8 +20,7 @@ metric = [skm.recall_score,
 class Test1m1sf0cf:
     # Single metric supplied as callable
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(metric_fn,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_4)
 
         assert self.target.control_levels is None
@@ -117,8 +116,7 @@ class Test1m1sf0cfFnDict:
     # Key difference is that the function is supplied as a dict
     def _prepare(self, metric_fn):
         self.mfn = "Random name"
-        self.target = metrics.MetricFrame({self.mfn: metric_fn},
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics={self.mfn: metric_fn}, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_4)
 
         assert self.target.control_levels is None
@@ -219,8 +217,7 @@ class Test1m1sf0cfFnDict:
 class Test2m1sf0cf:
     def _prepare(self):
         fns = {'recall': skm.recall_score, 'prec': skm.precision_score}
-        self.target = metrics.MetricFrame(fns,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=pd.Series(data=g_4))
 
         assert self.target.control_levels is None
@@ -306,8 +303,7 @@ class Test2m1sf0cf:
 class Test1m1cf1sf:
     # Metric function supplied in callable
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(metric_fn,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                                           sensitive_features=pd.Series(data=g_2, name='sf0'),
                                           control_features=pd.Series(data=g_3, name='cf0'))
 
@@ -413,8 +409,7 @@ class Test1m1cf1sfFnDict:
     # Key difference is that the metric function is supplied in a dict
     def _prepare(self, metric_fn):
         self.mfn = "Some name"
-        self.target = metrics.MetricFrame({self.mfn: metric_fn},
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics={self.mfn: metric_fn}, y_true=y_t, y_pred=y_p,
                                           sensitive_features=pd.Series(data=g_2, name='sf0'),
                                           control_features=pd.Series(data=g_3, name='cf0'))
 
@@ -517,8 +512,7 @@ class Test1m1cf1sfFnDict:
 class Test1m1sf2cf:
     # Single metric, supplied as callable
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(metric_fn,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                                           sensitive_features=list(g_2),
                                           control_features=np.stack([g_3, g_1], axis=1))
 
@@ -666,8 +660,7 @@ class Test1m1sf2cfFnDict:
     # Single metric, supplied as dict
     def _prepare(self, metric_fn):
         self.mfn = "Random name"
-        self.target = metrics.MetricFrame({self.mfn: metric_fn},
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics={self.mfn: metric_fn}, y_true=y_t, y_pred=y_p,
                                           sensitive_features=list(g_2),
                                           control_features=np.stack([g_3, g_1], axis=1))
 
@@ -812,8 +805,7 @@ class Test1m1sf2cfFnDict:
 class Test2m1sf1cf:
     def _prepare(self):
         fns = {'recall': skm.recall_score, 'prec': skm.precision_score}
-        self.target = metrics.MetricFrame(fns,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2,
                                           control_features=g_3)
 
@@ -935,8 +927,7 @@ class Test2m1sf1cf:
 def test_2m_1sf_2cf():
     # This test is structured differently, and hence not written as a class
     func_dict = {'recall': skm.recall_score, 'prec': skm.precision_score}
-    target = metrics.MetricFrame(func_dict,
-                                 y_t, y_p,
+    target = metrics.MetricFrame(metrics=func_dict, y_true=y_t, y_pred=y_p,
                                  sensitive_features=list(g_2),
                                  control_features={'cf0': g_3, 'cf1': g_1})
 
