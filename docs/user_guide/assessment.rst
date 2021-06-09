@@ -418,7 +418,7 @@ to take advantage of the inherent plotting capabilities of
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Analyze metrics using MetricFrame
-    :end-before: # Customize plots with `ylim`
+    :end-before: # Customize plots with ylim
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
@@ -433,8 +433,8 @@ sometimes useful to set the `ylim` argument to define the yaxis range.
 
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
-    :start-after: # Customize plots with `ylim`
-    :end-before: # Customize plots with `colormap`
+    :start-after: # Customize plots with ylim
+    :end-before: # Customize plots with colormap
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_002.png
     :align: center
@@ -447,8 +447,8 @@ can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.htm
 
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
-    :start-after: # Customize plots with `colormap`
-    :end-before: # Customize plots with `kind`
+    :start-after: # Customize plots with colormap
+    :end-before: # Customize plots with kind
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_003.png
     :align: center
@@ -460,7 +460,7 @@ argument. Here is an example of a bar chart.
 
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
-    :start-after: # Customize plots with `kind`
+    :start-after: # Customize plots with kind
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_004.png
     :align: center

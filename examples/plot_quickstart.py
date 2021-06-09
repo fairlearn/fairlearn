@@ -50,7 +50,7 @@ metric_frame.by_group.plot.bar(
     title="Show all metrics",
 )
 
-# Customize plots with `ylim`
+# Customize plots with ylim
 metric_frame.by_group.plot(
     kind="bar",
     ylim=[0, 1],
@@ -61,7 +61,7 @@ metric_frame.by_group.plot(
     title="Show all metrics with assigned y-axis range",
 )
 
-# Customize plots with `colormap`
+# Customize plots with colormap
 metric_frame.by_group.plot(
     kind="bar",
     subplots=True,
@@ -72,7 +72,7 @@ metric_frame.by_group.plot(
     title="Show all metrics in Accent colormap",
 )
 
-# Customize plots with `kind`
+# Customize plots with kind
 metric_frame.by_group.plot(
     kind="pie",
     subplots=True,
