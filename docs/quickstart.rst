@@ -109,7 +109,7 @@ we can evaluate metrics for subgroups within the data as below:
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> gm = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
+    >>> gm = MetricFrame(metrics=accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
     >>> print(gm.overall)
     0.8443...
     >>> print(gm.by_group)
@@ -126,7 +126,7 @@ their label:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import selection_rate
-    >>> sr = MetricFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
+    >>> sr = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
     >>> sr.overall
     0.1638...
     >>> sr.by_group
@@ -174,7 +174,7 @@ a vastly reduced difference in selection rate:
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
-    >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
+    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred_mitigated, sensitive_features=sex)
     >>> print(sr_mitigated.overall)
     0.1661...
     >>> print(sr_mitigated.by_group)
