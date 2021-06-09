@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 import pytest
