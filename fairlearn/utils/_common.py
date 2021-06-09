@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 def _get_soft_predictions(estimator, X, predict_method):
