@@ -424,7 +424,7 @@ to take advantage of the inherent plotting capabilities of
     :target: auto_examples/plot_quickstart.html
     :align: center
 
-It is possible to customize the plots. Here are some common examples:
+It is possible to customize the plots. Here are some common examples.
 
 Customize Plots: :code:`ylim`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
