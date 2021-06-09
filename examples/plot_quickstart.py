@@ -32,7 +32,10 @@ metrics = {
     'true positive rate': true_positive_rate,
     'selection rate': selection_rate,
     'count': count}
-metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
+metric_frame = MetricFrame(metrics=metrics,
+                           y_true=y_true,
+                           y_pred=y_pred,
+                           sensitive_features=sex)
 metric_frame.by_group.plot.bar(
     subplots=True, layout=[3, 3], legend=False, figsize=[12, 8],
     title='Show all metrics')
