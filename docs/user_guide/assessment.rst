@@ -456,7 +456,7 @@ can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.htm
 Customize Plots: :code:`kind`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
-argument. Here is an example of a bar chart.
+argument. Here is an example of a pie chart.
 
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
