@@ -29,7 +29,7 @@ With the new API, this becomes
 
 .. code-block::
 
-    mf = MetricFrame(metric_func, y_true, y_pred, sensitive_features=A_col)
+    mf = MetricFrame(metrics=metric_func, y_true=y_true, y_pred=y_pred, sensitive_features=A_col)
 
 The new object has :attr:`.MetricFrame.overall` and :attr:`.MetricFrame.by_group`
 properties, to access the metric evaluated on the entire dataset, and the metric

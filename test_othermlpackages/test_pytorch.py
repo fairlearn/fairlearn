@@ -1,14 +1,15 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import pytest
 import numpy as np
 import pandas as pd
-import torch
-from skorch import NeuralNetClassifier
-from torch import nn, optim
+torch = pytest.importorskip("torch")
+from skorch import NeuralNetClassifier # noqa
+from torch import nn, optim # noqa
 
-from fairlearn.reductions import DemographicParity
-from . import package_test_common as ptc
+from fairlearn.reductions import DemographicParity # noqa
+from . import package_test_common as ptc # noqa
 
 
 def create_model():

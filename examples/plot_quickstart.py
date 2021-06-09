@@ -31,16 +31,17 @@ y_pred = classifier.predict(X)
 
 # Analyze metrics using MetricFrame
 metrics = {
-    "accuracy": accuracy_score,
-    "precision": precision_score,
-    "recall": recall_score,
-    "false positive rate": false_positive_rate,
-    "true positive rate": true_positive_rate,
-    "selection rate": selection_rate,
-    "count": count,
-}
-metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
-
+    'accuracy': accuracy_score,
+    'precision': precision_score,
+    'recall': recall_score,
+    'false positive rate': false_positive_rate,
+    'true positive rate': true_positive_rate,
+    'selection rate': selection_rate,
+    'count': count}
+metric_frame = MetricFrame(metrics=metrics,
+                           y_true=y_true,
+                           y_pred=y_pred,
+                           sensitive_features=sex)
 metric_frame.by_group.plot.bar(
     subplots=True,
     layout=[3, 3],
