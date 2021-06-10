@@ -3,11 +3,6 @@
 About Fairlearn
 ===============
 
-Fairlearn is a project of the
-`Fairlearn Organization <https://github.com/fairlearn/governance/blob/main/ORG-GOVERNANCE.md>`_
-and follows the
-`Fairlearn Organization's Project Governance <https://github.com/fairlearn/governance/blob/main/PROJECT-GOVERNANCE.md>`_.
-
 .. _mission:
 
 Mission
@@ -142,7 +137,9 @@ work in progress please review our
 Governance
 ----------
 
-Fairlearn follows the
+Fairlearn is a project of the
+`Fairlearn Organization <https://github.com/fairlearn/governance/blob/main/ORG-GOVERNANCE.md>`_
+and follows the
 `Fairlearn Organization's Project Governance <https://github.com/fairlearn/governance/blob/main/PROJECT-GOVERNANCE.md>`_.
 
 .. _maintainers:
