@@ -1,11 +1,38 @@
 # Changes
 
-### v0.5.1
+### v0.7.0
 
+* Added new `count()` metric, so that the number of data points in each
+  group is noted when using `MetricFrame`
+* Changed `MetricFrame` constructor API, so `metric` argument is now `metrics` and
+  all positional arguments are now keyword arguments. Previous call format still works
+  (until v0.10.0), but issues a deprecation warning.
+
+
+### v0.6.2
+
+* Bugfix for `_merge_columns()` when using multiple sensitive features with
+  long names. This previously caused groups to get merged if the concatenation
+  of their string representations was identical until the cutoff limit.
+
+### v0.6.1
+
+* Bugfix for `_create_group_metric_set()`. Fixes the list of metrics computed for regression
+  and adds a set of metrics for 'probability' problems [PR](https://github.com/fairlearn/fairlearn/pull/727)
+* Updated 'Credit Card' notebook [PR](https://github.com/fairlearn/fairlearn/pull/713)
+* Added some overlooked `MetricFrame` tests [PR](https://github.com/fairlearn/fairlearn/pull/701)
+* Various documentation tweaks and enhancements
+
+### v0.6.0
+
+* Add `CorrelationRemover` preprocessing technique. This removes correlations
+  between sensitive and non-sensitive features while retaining as much information
+  as possible
 * Add `control_features` to the classification moments. These allow for data
   stratification, with fairness constraints enforced within each stratum, but
   not between strata
 * Update `make_derived_metric()` to use `MetricFrame`
+* Assorted small documentation fixes
 
 ### v0.5.0
 
@@ -30,7 +57,7 @@
     argument `upper_bound` with the same purpose for newly enabled regression
     scenarios on `ExponentiatedGradient`.
   For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
 * Renamed several constraints to create a uniform naming convention according
   to the accepted [metric harmonization proposal](https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md):
   * `ErrorRateRatio` renamed to `ErrorRateParity`, and
@@ -42,7 +69,7 @@
     descriptive name and for consistency with the paper. Similarly,
     `AverageLossMoment` renamed to `MeanLoss`.
   For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
 * Added `TrueNegativeRateParity` to provide the opposite constraint of
   `TruePositiveRateParity` to be used with reductions techniques.
 * Add new constraints and objectives in `ThresholdOptimizer`

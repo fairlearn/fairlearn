@@ -39,6 +39,12 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✘
       - DP, EO, TPRP, FPRP
+   *  - :code:`fairlearn.` :code:`preprocessing.` :code:`CorrelationRemover`
+      - Preprocessing algorithm that removes correlation between sensitive
+        features and non-sensitive features through linear transformations.
+      - ✔
+      - ✔
+      - ✘
 
 DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
 rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
@@ -60,6 +66,13 @@ fairness definitions, please open a
    randomization, it is possible to get different outputs from the predictor's
    :code:`predict` method on identical data. For each of our algorithms, we provide
    explicit access to the probability distribution used for randomization.
+
+.. _preprocessing:
+
+Preprocessing
+--------------
+   
+.. currentmodule:: fairlearn.preprocessing
 
 .. _postprocessing:
 
@@ -259,8 +272,9 @@ the predicted labels.
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> selection_rate_summary = MetricFrame(selection_rate,
-    ...                                      y_true, y_pred,
+    >>> selection_rate_summary = MetricFrame(metrics=selection_rate,
+    ...                                      y_true=y_true,
+    ...                                      y_pred=y_pred,
     ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> selection_rate_summary.overall
         0.4
@@ -346,23 +360,24 @@ In practice this can be used in a difference-based relaxation as follows:
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> tpr_summary = MetricFrame(true_positive_rate,
-    ...                           y_true, y_pred,
+    >>> tpr_summary = MetricFrame(metrics=true_positive_rate,
+    ...                           y_true=y_true,
+    ...                           y_pred=y_pred,
     ...                           sensitive_features=sensitive_features)
     >>> tpr_summary.overall
     0.5714285714285714
     >>> tpr_summary.by_group
     sensitive_feature_0
-    a        0.75
-    b    0.333333
+    a    0.75...
+    b    0.33...
     Name: true_positive_rate, dtype: object
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.178571
-                   b          -0.238095
-    -     label=1  a          -0.178571
-                   b           0.238095
+    +     label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. note::
@@ -381,10 +396,10 @@ Alternatively, a ratio-based relaxation is also available:
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=1  a           0.103571
-                   b          -0.271429
-    -     label=1  a          -0.235714
-                   b           0.180952
+    +     label=1  a           0.1035...
+                   b          -0.2714...
+    -     label=1  a          -0.2357...
+                   b           0.1809...
     dtype: float64
 
 .. _equalized_odds:
@@ -409,14 +424,14 @@ and false positive rate.
     >>> eo.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> eo.gamma(lambda X: y_pred)
     sign  event    group_id
-    +     label=0  a          -0.333333
-                   b           0.166667
-          label=1  a           0.178571
-                   b          -0.238095
-    -     label=0  a           0.333333
-                   b          -0.166667
-          label=1  a          -0.178571
-                   b           0.238095
+    +     label=0  a          -0.3333...
+                   b           0.1666...
+          label=1  a           0.1785...
+                   b          -0.2380...
+    -     label=0  a           0.3333...
+                   b          -0.1666...
+          label=1  a          -0.1785...
+                   b           0.2380...
     dtype: float64
 
 .. _error_rate_parity:
@@ -443,8 +458,9 @@ the overall error rate by more than the value of :code:`difference_bound`.
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> from sklearn.metrics import accuracy_score
-    >>> accuracy_summary = MetricFrame(accuracy_score,
-    ...                                y_true, y_pred,
+    >>> accuracy_summary = MetricFrame(metrics=accuracy_score,
+    ...                                y_true=y_true,
+    ...                                y_pred=y_pred,
     ...                                sensitive_features=sensitive_features)
     >>> accuracy_summary.overall
     0.6
@@ -496,7 +512,7 @@ constraints:
 Control features
 ^^^^^^^^^^^^^^^^
 
-The above :class:`Moment` classes (:ref:`demographic_parity`,
+The above examples of :class:`Moment` (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
 :ref:`equalized_odds` and :ref:`error_rate_parity`) all support the concept
 of *control features* when applying their fairness constraints.
@@ -598,15 +614,16 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> y_true             = np.array([0.3, 0.5, 0.1, 1.0])
     >>> y_pred             = np.array([0.3, 0.6, 0.6, 0.5])
     >>> sensitive_features = np.array(["a", "a", "b", "b"])
-    >>> mae_frame = MetricFrame(mean_absolute_error,
-    ...                         y_true, y_pred,
+    >>> mae_frame = MetricFrame(metrics=mean_absolute_error,
+    ...                         y_true=y_true,
+    ...                         y_pred=y_pred,
     ...                         sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> mae_frame.overall
     0.275
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b     0.5
+    b    0.5
     Name: mean_absolute_error, dtype: object
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)

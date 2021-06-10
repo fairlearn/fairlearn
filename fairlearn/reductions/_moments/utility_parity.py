@@ -117,15 +117,22 @@ class UtilityParity(ClassificationMoment):
 
         This adds a column `event` to the `tags` field.
 
-        The `utilities` is a 2-d array which correspond to g(X,A,Y,h(X)) as
+        The `utilities` is a 2-d array which corresponds to g(X,A,Y,h(X)) as
         mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>` [2]_.
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
 
         .. math::
             utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
+
+        References
+        ----------
+        .. [2] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
+           H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
+           16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
         """
         super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
@@ -224,12 +231,19 @@ class UtilityParity(ClassificationMoment):
         in Section 3.2 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_
         in the 'best response of the Q-player' subsection to compute the
         signed weights to be applied to the data by the next call to the underlying
-        estimator.
+        estimator [3]_.
 
         Parameters
         ----------
         lambda_vec : :class:`pandas:pandas.Series`
             The vector of Lagrange multipliers indexed by `index`
+
+        References
+        ----------
+        .. [3] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
+           H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
+           16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
         """
         lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
             self.prob_event
@@ -265,8 +279,7 @@ class DemographicParity(UtilityParity):
     (corresponding to the Lagrange multipliers for positive and negative constraints)
     as there are unique values for the sensitive feature.
     The :meth:`signed_weights` method will compute the costs according
-    to Example 3 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    to Example 3 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [4]_.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the Demographic Parity constraint applied within
@@ -275,6 +288,13 @@ class DemographicParity(UtilityParity):
 
     .. math::
       P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
+
+    References
+    ----------
+    .. [4] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
+       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
+       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
     """
 
     short_name = "DemographicParity"
@@ -321,11 +341,18 @@ class TruePositiveRateParity(UtilityParity):
     With these definitions, the :meth:`signed_weights` method will calculate
     the costs for `Y=1` as they are calculated in Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`, but will use
-    the weights equal to zero for `Y=0`.
+    the weights equal to zero for `Y=0` [5]_.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+
+    References
+    ----------
+    .. [5] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
+       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
+       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
     """
 
     short_name = "TruePositiveRateParity"
@@ -366,12 +393,19 @@ class FalsePositiveRateParity(UtilityParity):
 
     With these definitions, the :meth:`signed_weights` method will calculate
     the costs for `Y=0` as they are calculated in Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`,
-    but will use the weights equal to zero for `Y=1`.
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_,
+    but will use the weights equal to zero for `Y=1` [6]_.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+
+    References
+    ----------
+    .. [6] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
+       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
+       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
     """
 
     short_name = "FalsePositiveRateParity"
@@ -412,11 +446,18 @@ class EqualizedOdds(UtilityParity):
 
     With these definitions, the :meth:`signed_weights` method
     will calculate the costs according to Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [7]_.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+
+    References
+    ----------
+    .. [7] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
+       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
+       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
     """
 
     short_name = "EqualizedOdds"
@@ -451,12 +492,19 @@ class ErrorRateParity(UtilityParity):
     for positive and negative constraints) as there are unique values for the sensitive feature.
 
     The :meth:`signed_weights` method will compute the costs according to Example 3 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [8]_.
     However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+
+    References
+    ----------
+    .. [8] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
+       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
+       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
     """
 
     short_name = "ErrorRateParity"

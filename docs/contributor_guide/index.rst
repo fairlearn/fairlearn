@@ -18,7 +18,9 @@ The contribution guide explains how to structure your contributions. Please
    development_process
    contributing_code
    contributing_example_notebooks
+   contributing_documentation
    fairlearn_proposals
+   release
 
 .. _communication:
 
@@ -43,5 +45,5 @@ Check what this means in your time zone with
 All are welcome! Please reach out via
 `Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
 invitation to you.
-We keep notes from each meeting in a
-`HackMD document <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g?view>`_.
+We keep notes from each meeting in our
+`HackMD <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>`_.

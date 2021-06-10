@@ -13,7 +13,8 @@ There are many different ways to contribute to Fairlearn, for example:
 
     - case studies in new application domains
     - usage of Fairlearn components
-- Improve documentation, including:
+
+- :doc:`Improve documentation <contributing_documentation>`, including:
 
     - docstrings
     - website content

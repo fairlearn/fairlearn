@@ -13,7 +13,7 @@ schedules:
   displayName: Nightly Code Coverage Build
   branches:
     include:
-      - master
+      - main
   always: true
 
 jobs:
