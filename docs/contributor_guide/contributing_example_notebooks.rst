@@ -35,10 +35,6 @@ The example notebooks in Fairlearn are surfaced through the website's
 :ref:`example notebook page <examples>`.
 This allows them to be rendered properly with output from all cells.
 
-.. note:
-
-    Rendering the Fairlearn dashboard is still an outstanding issue.
-
 These notebooks are generated based on `plot_*.py` files in
 `percent format <https://jupytext.readthedocs.io/en/latest/formats.html#the-percent-format>`_
 in the
@@ -59,11 +55,6 @@ opens a *Python Interactive* tab to show the output.
 
 If you prefer working with Jupyter simply open the `.py` file with Jupyter.
 Changes made in Jupyter automatically show up in the `.py` file.
-
-.. note:
-
-    The Fairlearn dashboard does not render in VS Code yet.
-    Jupyter will be required for examples that use the dashboard.
 
 Note that the text portion of these notebooks should be written in
 restructured text (ReST), not markdown, so that the sphinx documentation build

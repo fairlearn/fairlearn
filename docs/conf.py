@@ -29,8 +29,8 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = 'Fairlearn'
-copyright = '2019, Microsoft Corporation and contributors.'
-author = 'Microsoft and Fairlearn contributors'
+copyright = '2021, Fairlearn contributors'
+author = 'Fairlearn contributors'
 
 # The full version, including alpha/beta/rc tags
 release = fairlearn.__version__
@@ -108,13 +108,30 @@ html_theme = 'pydata_sphinx_theme'
 # documentation.
 html_theme_options = {
     "logo_link": "https://fairlearn.org",
-    # TODO: fork the pydata-sphinx-theme to integrate these with logo
-    "external_links": [
-        {"name": "Gitter", "url": "https://gitter.im/fairlearn/community"},
-        {"name": "StackOverflow", "url": "https://stackoverflow.com/questions/tagged/fairlearn"}
+
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/fairlearn/fairlearn",
+            "icon": "fab fa-github",
+        },
+        {
+            "name": "Twitter",
+            "url": "https://twitter.com/fairlearn",
+            "icon": "fab fa-twitter",
+        },
+        {
+            "name": "StackOverflow",
+            "url": "https://stackoverflow.com/questions/tagged/fairlearn",
+            "icon": "fab fa-stack-overflow",
+        },
+        {
+            "name": "Gitter",
+            "url": "https://gitter.im/fairlearn/community",
+            "icon": "fab fa-gitter",
+        },
     ],
-    "github_url": "https://github.com/fairlearn/fairlearn",
-    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this
+
     "show_prev_next": False
 }
 
@@ -135,7 +152,7 @@ html_use_index = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_css_files = []
+html_css_files = ['css/custom.css']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -151,7 +168,7 @@ sphinx_gallery_conf = {
 }
 
 html_sidebars = {
-    "**": ["version-sidebar.html", "sidebar-search-bs.html", "sidebar-nav-bs.html"],
+    "**": ["version-sidebar.html", "search-field.html", "sidebar-nav-bs.html"],
 }
 
 # Auto-Doc Options
@@ -209,9 +226,9 @@ def linkcode_resolve(domain, info):
 
 # -- LaTeX macros ------------------------------------------------------------
 
-mathjax_config = {
-    "TeX": {
-        "Macros": {
+mathjax3_config = {
+    "tex": {
+        "macros": {
             "E": '{\\mathbb{E}}',
             "P": '{\\mathbb{P}}',
             "given": '\\mathbin{\\vert}'

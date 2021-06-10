@@ -272,8 +272,9 @@ the predicted labels.
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> selection_rate_summary = MetricFrame(selection_rate,
-    ...                                      y_true, y_pred,
+    >>> selection_rate_summary = MetricFrame(metrics=selection_rate,
+    ...                                      y_true=y_true,
+    ...                                      y_pred=y_pred,
     ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> selection_rate_summary.overall
         0.4
@@ -359,8 +360,9 @@ In practice this can be used in a difference-based relaxation as follows:
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> tpr_summary = MetricFrame(true_positive_rate,
-    ...                           y_true, y_pred,
+    >>> tpr_summary = MetricFrame(metrics=true_positive_rate,
+    ...                           y_true=y_true,
+    ...                           y_pred=y_pred,
     ...                           sensitive_features=sensitive_features)
     >>> tpr_summary.overall
     0.5714285714285714
@@ -456,8 +458,9 @@ the overall error rate by more than the value of :code:`difference_bound`.
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> from sklearn.metrics import accuracy_score
-    >>> accuracy_summary = MetricFrame(accuracy_score,
-    ...                                y_true, y_pred,
+    >>> accuracy_summary = MetricFrame(metrics=accuracy_score,
+    ...                                y_true=y_true,
+    ...                                y_pred=y_pred,
     ...                                sensitive_features=sensitive_features)
     >>> accuracy_summary.overall
     0.6
@@ -611,8 +614,9 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> y_true             = np.array([0.3, 0.5, 0.1, 1.0])
     >>> y_pred             = np.array([0.3, 0.6, 0.6, 0.5])
     >>> sensitive_features = np.array(["a", "a", "b", "b"])
-    >>> mae_frame = MetricFrame(mean_absolute_error,
-    ...                         y_true, y_pred,
+    >>> mae_frame = MetricFrame(metrics=mean_absolute_error,
+    ...                         y_true=y_true,
+    ...                         y_pred=y_pred,
     ...                         sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> mae_frame.overall
     0.275

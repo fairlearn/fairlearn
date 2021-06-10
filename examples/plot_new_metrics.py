@@ -65,7 +65,7 @@ from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
 
 from fairlearn.metrics import MetricFrame
-from fairlearn.metrics import selection_rate
+from fairlearn.metrics import selection_rate, count
 
 
 # %%
@@ -233,10 +233,11 @@ print("fbeta:", skm.fbeta_score(y_test, y_pred, beta=0.6))
 
 fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
 
-metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06}
+metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06, 'count': count}
 
-grouped_on_sex = MetricFrame(metric_fns,
-                             y_test, y_pred,
+grouped_on_sex = MetricFrame(metrics=metric_fns,
+                             y_true=y_test,
+                             y_pred=y_pred,
                              sensitive_features=A_test['sex'])
 
 # %%
@@ -269,8 +270,9 @@ print(grouped_on_sex.overall)
 # %%
 # The other property in the :class:`fairlearn.metrics.MetricFrame` object
 # is ``by_group``. This contains the metrics evaluated on each subgroup defined
-# by the categories in the ``sensitive_features=`` argument. In this case, we
-# have results for males and females:
+# by the categories in the ``sensitive_features=`` argument. Note that
+# :func:`fairlearn.metrics.count` can be used to display the number of
+# data points in each subgroup. In this case, we have results for males and females:
 
 grouped_on_sex.by_group
 
@@ -281,8 +283,9 @@ grouped_on_sex.by_group
 # We can also create another :class:`fairlearn.metrics.MetricFrame` object
 # using race as the sensitive feature:
 
-grouped_on_race = MetricFrame(metric_fns,
-                              y_test, y_pred,
+grouped_on_race = MetricFrame(metrics=metric_fns,
+                              y_true=y_test,
+                              y_pred=y_pred,
                               sensitive_features=A_test['race'])
 
 # %%
@@ -325,8 +328,9 @@ example_sample_params = {
 }
 
 
-grouped_with_weights = MetricFrame(metric_fns,
-                                   y_test, y_pred,
+grouped_with_weights = MetricFrame(metrics=metric_fns,
+                                   y_true=y_test,
+                                   y_pred=y_pred,
                                    sensitive_features=A_test['sex'],
                                    sample_params=example_sample_params)
 
@@ -403,8 +407,9 @@ grouped_on_race.ratio(method='to_overall')
 # multiple columns to the :class:`fairlearn.metrics.MetricFrame`
 # constructor:
 
-grouped_on_race_and_sex = MetricFrame(metric_fns,
-                                      y_test, y_pred,
+grouped_on_race_and_sex = MetricFrame(metrics=metric_fns,
+                                      y_true=y_test,
+                                      y_pred=y_pred,
                                       sensitive_features=A_test[['race', 'sex']])
 
 # %%
@@ -442,8 +447,9 @@ grouped_on_race_and_sex.ratio(method='between_groups')
 #
 # Control features are introduced by the ``control_features=``
 # argument to the :class:`fairlearn.metrics.MetricFrame` object:
-cond_credit_score = MetricFrame(metric_fns,
-                                y_test, y_pred,
+cond_credit_score = MetricFrame(metrics=metric_fns,
+                                y_true=y_test,
+                                y_pred=y_pred,
                                 sensitive_features=A_test[['race', 'sex']],
                                 control_features=A_test['Credit Score'])
 
@@ -472,8 +478,9 @@ cond_credit_score.ratio(method='between_groups')
 # aggregates.
 #
 # We can continue adding more control features:
-cond_both = MetricFrame(metric_fns,
-                        y_test, y_pred,
+cond_both = MetricFrame(metrics=metric_fns,
+                        y_true=y_test,
+                        y_pred=y_pred,
                         sensitive_features=A_test[['race', 'sex']],
                         control_features=A_test[['Loan Size', 'Credit Score']])
 
@@ -496,8 +503,9 @@ def member_counts(y_true, y_pred):
     return len(y_true)
 
 
-counts = MetricFrame(member_counts,
-                     y_test, y_pred,
+counts = MetricFrame(metrics=member_counts,
+                     y_true=y_test,
+                     y_pred=y_pred,
                      sensitive_features=A_test[['race', 'sex']],
                      control_features=A_test[['Loan Size', 'Credit Score']])
 
