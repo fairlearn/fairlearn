@@ -39,7 +39,7 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✘
       - DP, EO, TPRP, FPRP
-   *  - :code:`fairlearn.` :code:`preprocessing.` :code:`CorrelationRemover`
+   *  - :class:`fairlearn. preprocessing. CorrelationRemover <fairlearn.preprocessing.CorrelationRemover>`
       - Preprocessing algorithm that removes correlation between sensitive
         features and non-sensitive features through linear transformations.
       - ✔
