@@ -20,7 +20,7 @@ The project aspires to include:
 
 - A Python library for fairness assessment and improvement (fairness metrics, 
   mitigation algorithms, plotting, etc.)
-- Educational resources covering societal and technical processes for 
+- Educational resources covering organizational and technical processes for
   unfairness mitigation (comprehensive user guide, detailed case studies, 
   Jupyter notebooks, white papers, etc.)
 
