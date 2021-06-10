@@ -8,13 +8,15 @@ About Fairlearn
 Mission
 -------
 
-Fairlearn is an open source project that seeks to empower data scientists and
-developers to assess and improve fairness of AI systems.
+Fairlearn is an open-source, community-driven project to help data scientists
+improve fairness of AI systems.
+
 The project aspires to include:
 
-- A Python library of fairness metrics and mitigation algorithms
-- Tools for fairness assessment (e.g., plotting, dashboards, etc.)
-- Educational materials (comprehensive user guide, detailed case studies,
+- A Python library for fairness assessment and improvement (fairness metrics, 
+  mitigation algorithms, plotting, etc.)
+- Educational resources covering organizational and technical processes for
+  unfairness mitigation (comprehensive user guide, detailed case studies, 
   Jupyter notebooks, white papers, etc.)
 
 Development of Fairlearn is firmly grounded in the understanding that fairness
@@ -38,13 +40,15 @@ of AI systems.
 Code of conduct
 ---------------
 
-This project follows the
-`GitHub community guidelines <https://help.github.com/en/github/site-policy/github-community-guidelines>`_.
+Fairlearn follows the
+`Fairlearn Organization's Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`_.
 
 .. _roadmap:
 
 Project focus areas
 -------------------
+
+*Last update: May 16, 2021*
 
 As an open-source project, Fairlearn strives to incorporate the best of
 research and practice.
@@ -61,11 +65,6 @@ from the contributors. If you want to get involved, please
 :ref:`reach out <communication>`. For concrete opportunities and
 work in progress please review our
 `issues <https://github.com/fairlearn/fairlearn/issues>`_.
-
-Short and medium-term focus areas
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-*Last update: May 16, 2021*
 
 #. *Decrease adoption barriers for the current assessment and mitigation tools in Fairlearn*
 
@@ -138,10 +137,17 @@ Short and medium-term focus areas
 Governance
 ----------
 
-The Fairlearn project governance is captured in
-`the governance repository <https://github.com/fairlearn/governance>`_.
+Fairlearn is a project of the
+`Fairlearn Organization <https://github.com/fairlearn/governance/blob/main/ORG-GOVERNANCE.md>`_
+and follows the
+`Fairlearn Organization's Project Governance <https://github.com/fairlearn/governance/blob/main/PROJECT-GOVERNANCE.md>`_.
 
-The maintainers of this repository are
+.. _maintainers:
+
+Maintainers
+^^^^^^^^^^^
+
+The maintainers of the Fairlearn project are
 
 - `Adrin Jalali <https://github.com/adrinjalali>`_
 - `Hilde Weerts <https://github.com/hildeweerts>`_
@@ -181,9 +187,9 @@ The project was greatly expanded in the second half of 2019 thanks to the
 involvement of many contributors from Azure ML and Microsoft Research.
 At that time, the project started to have regular releases.
 
-Since 2021 Fairlearn is completely community-driven. The project governance
-is captured in
-`the governance repository <https://github.com/fairlearn/governance>`_.
+In 2021 Fairlearn adopted
+`neutral governance <https://github.com/fairlearn/governance>`_
+and since then the project is completely community-driven.
 
 Citing Fairlearn
 ----------------
