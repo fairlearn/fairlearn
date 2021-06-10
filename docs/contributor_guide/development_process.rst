@@ -1,5 +1,3 @@
-.. _development_process:
-
 Development process
 -------------------
 
@@ -9,16 +7,6 @@ Contributors should use their own forks of the repository. In their fork, they
 create feature branches off of :code:`main`, and their pull requests should
 target the :code:`main` branch. Maintainers are responsible for prompt
 review of pull requests.
-The `CODEOWNERS.md <https://github.com/fairlearn/fairlearn/blob/master/CODEOWNERS.md>`_
-file lists the subject matter experts for all parts of the repository
-including the documentation and examples.
-Every change requires approval from at least one of the listed subject matter
-experts, and a total of two approvals from current maintainers.
-
-.. _maintainers:
-
-The current maintainers are listed in the
-`maintainers file <https://github.com/fairlearn/fairlearn/blob/master/MAINTAINERS.md>`_
 
 Pull requests against :code:`main` trigger automated tests that are run
 through Azure DevOps, GitHub Actions, and CircleCI. Additional test suites are
@@ -102,6 +90,8 @@ To help simplify installation of the prerequisites, we have the
 script which runs :code:`pip install` on all three of the above files.
 This script will also optionally pin the requirements to any lower bound specified (by changing any
 occurrences of :code:`>=` to :code:`==` in each file).
+
+
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

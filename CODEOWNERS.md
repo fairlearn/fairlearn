@@ -1,12 +1,9 @@
 # Each line is a file pattern followed by one or more owners
-# These owners will be the default owners for everything in the repo.
-# Unless a later match takes precedence, @romanlutz and @riedgar-ms will be
-# requested for review when someone opens a pull request.
-* @romanlutz @riedgar-ms
 
-/examples/ @mmadaio @MiroDudik
-/fairlearn/metrics/ @riedgar-ms @MiroDudik
-/fairlearn/postprocessing/ @romanlutz @MiroDudik
+/devops @riedgar-ms @romanlutz
+/docs @riedgar-ms
+/fairlearn/metrics/ @riedgar-ms @rihorn2
+/fairlearn/postprocessing/ @romanlutz
 /fairlearn/reductions/ @riedgar-ms @romanlutz @MiroDudik
 /jupyter-config @rihorn2
 /notebooks @romanlutz @riedgar-ms @rihorn2 @MiroDudik

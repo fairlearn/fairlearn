@@ -96,9 +96,6 @@ For a full list of contributors refer to the [authors page](./AUTHORS.md)
 Pose questions and help answer them on [Stack
 Overflow](https://stackoverflow.com/questions/tagged/fairlearn) with the tag
 `fairlearn` or on [Gitter](https://gitter.im/fairlearn/community#).
-If you think your question is broadly applicable and may be useful to other
-users you can open a
-[GitHub Discussion](https://github.com/fairlearn/fairlearn/discussions/new).
 
 ### Regular (non-security) issues
 
