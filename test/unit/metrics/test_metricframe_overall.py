@@ -19,8 +19,7 @@ metric = [skm.recall_score,
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf(metric_fn):
-    target = MetricFrame(metric_fn,
-                         y_t, y_p,
+    target = MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1)  # Sensitive features actually unused
     assert target._user_supplied_callable is True
 
@@ -32,8 +31,7 @@ def test_1m_0cf(metric_fn):
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf_metric_dict(metric_fn):
-    target = MetricFrame({metric_fn.__name__: metric_fn},
-                         y_t, y_p,
+    target = MetricFrame(metrics={metric_fn.__name__: metric_fn}, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1)  # Sensitive features actually unusedle is False
     assert target._user_supplied_callable is False
 
@@ -46,8 +44,7 @@ def test_1m_0cf_metric_dict(metric_fn):
 
 @ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf_wgt(metric_fn):
-    target = MetricFrame(metric_fn,
-                         y_t, y_p,
+    target = MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1,  # Unused for overall
                          sample_params={'sample_weight': s_w})
 
@@ -61,8 +58,7 @@ def test_1m_0cf_wgt(metric_fn):
 
 @ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_0cf_wgt_metric_dict(metric_fn):
-    target = MetricFrame({metric_fn.__name__: metric_fn},
-                         y_t, y_p,
+    target = MetricFrame(metrics={metric_fn.__name__: metric_fn}, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1,  # Unused for overall
                          sample_params={metric_fn.__name__: {'sample_weight': s_w}})
     assert target._user_supplied_callable is False
@@ -76,8 +72,7 @@ def test_1m_0cf_wgt_metric_dict(metric_fn):
 
 def test_2m_0cf():
     funcs = {'recall': skm.recall_score, 'prec': skm.precision_score}
-    target = MetricFrame(funcs,
-                         y_t, y_p,
+    target = MetricFrame(metrics=funcs, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1)  # Irrelevant for this test
     assert target._user_supplied_callable is False
 
@@ -91,8 +86,7 @@ def test_2m_0cf():
 
 @ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1cf(metric_fn):
-    target = MetricFrame(metric_fn,
-                         y_t, y_p,
+    target = MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_2,  # Unused here
                          control_features=g_1)
     assert target._user_supplied_callable is True
@@ -111,8 +105,7 @@ def test_1m_1cf(metric_fn):
 
 @ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1cf_metric_dict(metric_fn):
-    target = MetricFrame({metric_fn.__name__: metric_fn},
-                         y_t, y_p,
+    target = MetricFrame(metrics={metric_fn.__name__: metric_fn}, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_2,
                          control_features=g_1)
     assert target._user_supplied_callable is False
@@ -129,8 +122,7 @@ def test_1m_1cf_metric_dict(metric_fn):
 
 
 def test_1m_1cf_wgt():
-    target = MetricFrame(skm.recall_score,
-                         y_t, y_p,
+    target = MetricFrame(metrics=skm.recall_score, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_2,  # Unused
                          control_features=g_1,
                          sample_params={'sample_weight': s_w})
@@ -149,8 +141,7 @@ def test_1m_1cf_wgt():
 
 
 def test_1m_1cf_wgt_metric_dict():
-    target = MetricFrame({'recall': skm.recall_score},
-                         y_t, y_p,
+    target = MetricFrame(metrics={'recall': skm.recall_score}, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_2,  # Unused
                          control_features=g_1,
                          sample_params={'recall': {'sample_weight': s_w}})
@@ -171,8 +162,7 @@ def test_1m_1cf_wgt_metric_dict():
 
 
 def test_1m_2cf():
-    target = MetricFrame(skm.recall_score,
-                         y_t, y_p,
+    target = MetricFrame(metrics=skm.recall_score, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_3,
                          control_features=np.stack((g_1, g_2), axis=1))
     assert target._user_supplied_callable is True
@@ -197,8 +187,7 @@ def test_1m_2cf():
 
 
 def test_1m_2cf_metric_dict():
-    target = MetricFrame({'recall_score': skm.recall_score},
-                         y_t, y_p,
+    target = MetricFrame(metrics={'recall_score': skm.recall_score}, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_3,
                          control_features=np.stack((g_1, g_2), axis=1))
     assert target._user_supplied_callable is False
@@ -224,8 +213,9 @@ def test_1m_2cf_metric_dict():
 
 def test_2m_2cf():
     two_group = pd.DataFrame(data=np.stack((g_1, g_2), axis=1), columns=['g_1', 'g_2'])
-    target = MetricFrame({'recall': skm.recall_score, 'prec': skm.precision_score},
-                         y_t, y_p,
+    target = MetricFrame(metrics={'recall': skm.recall_score, 'prec': skm.precision_score},
+                         y_true=y_t,
+                         y_pred=y_p,
                          sensitive_features=g_3,  # Unused
                          control_features=two_group)
 

@@ -183,9 +183,10 @@ class TestCreateGroupMetricSet:
         y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
         s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
 
-        expected = MetricFrame({'accuracy_score': skm.accuracy_score,
-                                'roc_auc_score': skm.roc_auc_score},
-                               y_t, y_p,
+        expected = MetricFrame(metrics={'accuracy_score': skm.accuracy_score,
+                                        'roc_auc_score': skm.roc_auc_score},
+                               y_true=y_t,
+                               y_pred=y_p,
                                sensitive_features=s_f)
 
         predictions = {"some model": y_p}

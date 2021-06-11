@@ -8,10 +8,13 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 from sklearn.utils import check_consistent_length
+import warnings
+from functools import wraps
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
 from ._group_feature import GroupFeature
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +36,62 @@ _NON_EMPTY_INIT_ERR = "Streaming metrics must be initialized with empty lists."
 _EMPTY_BATCHES_ERR = "No data to process, please add batches with `add_data`."
 _CF_BAD_STATE_ERR = "MetricFrame expected `control_features=None`" \
                     " because it was initialized as such."
+
+
+def _deprecate_metric_frame_init(new_metric_frame_init):
+    """Issue deprecation warnings for the `MetricFrame` constructor.
+
+    Decorator to issue warnings if called with positional arguments
+    or with the keyword argument `metric` instead of `metrics`.
+
+    Parameters
+    ----------
+    new_metric_frame_init : callable
+        New MetricFrame constructor.
+    """
+
+    @wraps(new_metric_frame_init)
+    def compatible_metric_frame_init(self, *args, metric=None, **kwargs):
+        positional_names = ["metrics", "y_true", "y_pred"]
+        version = "0.10.0"
+
+        positional_dict = dict(zip(positional_names, args))
+
+        # If more than 3 positional arguments are provided (apart from self), show
+        # the error message applicable to the new constructor implementation (with `self`
+        # being the only positional argument).
+        if len(args) > 3:
+            raise TypeError(f"{new_metric_frame_init.__name__}() takes 1 positional "
+                            f"argument but {1+len(args)} positional arguments "
+                            f"were given")
+
+        # If 1-3 positional arguments are provided (apart fom self), issue warning.
+        if len(args) > 0:
+            args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
+            warnings.warn(f"You have provided {args_msg} as positional arguments. "
+                          f"Please pass them as keyword arguments. From version "
+                          f"{version} passing them as positional arguments "
+                          f"will result in an error.",
+                          FutureWarning)
+
+        # If a keyword argument `metric` is provided, issue warning.
+        metric_arg_dict = {}
+        if metric is not None:
+            metric_arg_dict = {"metrics": metric}
+            warnings.warn(f"The positional argument 'metric' has been replaced "
+                          f"by a keyword argument 'metrics'. "
+                          f"From version {version} passing it as a positional argument "
+                          f"or as a keyword argument 'metric' will result in an error",
+                          FutureWarning)
+
+        # Call the new constructor with positional arguments passed as keyword arguments
+        # and with the `metric` keyword argument renamed to `metrics`.
+        new_metric_frame_init(self,
+                              **metric_arg_dict,
+                              **positional_dict,
+                              **kwargs)
+
+    return compatible_metric_frame_init
 
 
 class MetricFrame:
@@ -70,7 +129,7 @@ class MetricFrame:
 
     Parameters
     ----------
-    metric : callable or dict
+    metrics : callable or dict
         The underlying metric functions which are to be calculated. This
         can either be a single metric function or a dictionary of functions.
         These functions must be callable as
@@ -125,12 +184,29 @@ class MetricFrame:
         constructor if ``streaming=True``.
 
         **Note** currently, it only stores the values before computing the metric.
+
+    metric : callable or dict
+        The underlying metric functions which are to be calculated. This
+        can either be a single metric function or a dictionary of functions.
+        These functions must be callable as
+        ``fn(y_true, y_pred, **sample_params)``.
+        If there are any other arguments required (such as ``beta`` for
+        :func:`sklearn.metrics.fbeta_score`) then
+        :func:`functools.partial` must be used.
+
+        .. deprecated:: 0.7.0
+            `metric` will be removed in version 0.10.0, use `metrics` instead.
     """
 
+    # The deprecation decorator does two things:
+    # (1) turns first three positional arguments into keyword arguments
+    # (2) renames the 'metric' keyword argument into 'metrics'
+    @_deprecate_metric_frame_init
     def __init__(self,
-                 metric: Union[Callable, Dict[str, Callable]],
+                 *,
+                 metrics: Union[Callable, Dict[str, Callable]],
                  y_true,
-                 y_pred, *,
+                 y_pred,
                  sensitive_features,
                  control_features: Optional = None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
@@ -144,7 +220,7 @@ class MetricFrame:
         self._c_f = control_features
         self._s_p = sample_params
         self._streaming = streaming
-        self.metric = metric
+        self.metrics = metrics
 
         self._cf_names = None
         self._sf_names = None
@@ -163,7 +239,7 @@ class MetricFrame:
             # If we are streaming, we wait, but initialize accumulators.
             accumulators = [y_true, y_pred, sensitive_features]
             # CF must be None or an empty list.
-            cf_validated = control_features in (None, [])
+            cf_validated = control_features is None or len(control_features) == 0
             # Same for SP
             sp_validator = sample_params in (None, {})
             if any(acc != [] for acc in accumulators) or not cf_validated or not sp_validator:
@@ -305,7 +381,7 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        self.func_dict = self._process_functions(self.metric, s_p)
+        self.func_dict = self._process_functions(self.metrics, s_p)
         self._overall = self._compute_overall(self.func_dict, y_t, y_p, cf_list)
         self._by_group = self._compute_by_group(self.func_dict, y_t, y_p, sf_list, cf_list)
 

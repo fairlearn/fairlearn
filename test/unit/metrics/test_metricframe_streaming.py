@@ -77,7 +77,8 @@ def test_sample_params(transform_y_t, transform_y_p, num_batches):
 
     # Compare to the non-batched version.
     g4 = pd.DataFrame(data=g_4, columns=['My feature'])
-    met_regular = metrics.MetricFrame(skm.recall_score, y_t, y_p, sensitive_features=g4,
+    met_regular = metrics.MetricFrame(metrics=skm.recall_score, y_true=y_t,
+                                      y_pred=y_p, sensitive_features=g4,
                                       sample_params={'sample_weight': sample_weights})
     assert target.overall == met_regular.overall
 
@@ -126,7 +127,9 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
 
     # Compare to the non-batched version.
     g4 = pd.DataFrame(data=g_4, columns=['My feature'])
-    met_regular = metrics.MetricFrame(skm.recall_score, y_t, y_p, sensitive_features=g4)
+    met_regular = metrics.MetricFrame(metrics=skm.recall_score,
+                                      y_true=y_t, y_pred=y_p,
+                                      sensitive_features=g4)
     assert target.overall == met_regular.overall
 
     for k, v in met_regular.by_group.items():
@@ -145,7 +148,7 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
 
     # We can't initialize streaming metrics with data
     with pytest.raises(ValueError) as excinfo:
-        _ = metrics.MetricFrame(skm.recall_score, y_t, y_p,
+        _ = metrics.MetricFrame(metrics=skm.recall_score, y_true=y_t, y_pred=y_p,
                                 sensitive_features=g4, control_features=g4,
                                 streaming=True)
     assert "Streaming metrics must be initialized with empty lists" in str(excinfo.value)
@@ -218,7 +221,7 @@ def test_sp_argument_mismatch(transform_y_t, transform_y_p):
         target.add_data(transform_y_t(y_t_batches),
                         transform_y_p(y_p_batches),
                         sensitive_features=g_f)
-    assert "MetricFrame expected `control_features=None`" in str(excinfo.value)
+    assert "MetricFrame expected `sample_params` to be supplied" in str(excinfo.value)
 
 
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)

@@ -44,8 +44,9 @@ def demographic_parity_difference(
     float
         The demographic parity difference
     """
-    sel_rate = MetricFrame(selection_rate,
-                           y_true, y_pred,
+    sel_rate = MetricFrame(metrics=selection_rate,
+                           y_true=y_true,
+                           y_pred=y_pred,
                            sensitive_features=sensitive_features,
                            sample_params={'sample_weight': sample_weight})
     result = sel_rate.difference(method=method)
@@ -89,8 +90,9 @@ def demographic_parity_ratio(
     float
         The demographic parity ratio
     """
-    sel_rate = MetricFrame(selection_rate,
-                           y_true, y_pred,
+    sel_rate = MetricFrame(metrics=selection_rate,
+                           y_true=y_true,
+                           y_pred=y_pred,
                            sensitive_features=sensitive_features,
                            sample_params={'sample_weight': sample_weight})
     result = sel_rate.ratio(method=method)
@@ -191,8 +193,9 @@ def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFr
     fns = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
     sw_dict = {'sample_weight': sample_weight}
     sp = {'tpr': sw_dict, 'fpr': sw_dict}
-    eo = MetricFrame(fns,
-                     y_true, y_pred,
+    eo = MetricFrame(metrics=fns,
+                     y_true=y_true,
+                     y_pred=y_pred,
                      sensitive_features=sensitive_features,
                      sample_params=sp)
     return eo

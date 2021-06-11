@@ -4,6 +4,10 @@
 
 * Added new `count()` metric, so that the number of data points in each
   group is noted when using `MetricFrame`
+* Changed `MetricFrame` constructor API, so `metric` argument is now `metrics` and
+  all positional arguments are now keyword arguments. Previous call format still works
+  (until v0.10.0), but issues a deprecation warning.
+
 
 ### v0.6.2
 

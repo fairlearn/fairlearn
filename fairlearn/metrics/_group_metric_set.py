@@ -176,8 +176,10 @@ def _create_group_metric_set(y_true,
         for prediction in result[_Y_PRED]:
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
-                gmr = MetricFrame(metric_func,
-                                  result[_Y_TRUE], prediction, sensitive_features=g[_BIN_VECTOR])
+                gmr = MetricFrame(metrics=metric_func,
+                                  y_true=result[_Y_TRUE],
+                                  y_pred=prediction,
+                                  sensitive_features=g[_BIN_VECTOR])
                 curr_dict = dict()
                 curr_dict[_GLOBAL] = gmr.overall
                 curr_dict[_BINS] = list(gmr.by_group)
