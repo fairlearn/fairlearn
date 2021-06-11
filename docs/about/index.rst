@@ -1,7 +1,7 @@
 .. _about:
 
-About Fairlearn
-===============
+About Us
+========
 
 .. _mission:
 
