@@ -26,7 +26,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import recall_score
 from sklearn.datasets import fetch_openml
 from sklearn.metrics import confusion_matrix
-from fairlearn.metrics import MetricFrame, ErrorPlotter
+from fairlearn.metrics import MetricFrame
+from fairlearn.experimental import enable_metric_frame_plotting
 
 
 data = fetch_openml(data_id=1590, as_frame=True)
@@ -43,7 +44,7 @@ sex = data.data['sex']
 # https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval
 # https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval
 #
-# We aim to create a 95% confidence interval, so we a `z_score` of 1.959964
+# We aim to create a 95% confidence interval, so we use a `z_score` of 1.959964
 z_score = 1.959964
 digits_of_precision = 4
 
@@ -111,9 +112,6 @@ metric_frame = MetricFrame(metrics, y_true, y_pred, sensitive_features=sex)
 # %%
 # Error Plotting
 # --------------
-# Finally we use the ErrorPlotter class to plot the Recall metric with its error bounds
-#
-# 1. We plot with the symmetric Normal Error Interval
 error_mapping = {
     "Recall": {                             # `Recall` is the Metric Name
         "symmetric_error": "Recall Error",  # `symmetric_error` is a predefined type of error metric
@@ -121,9 +119,11 @@ error_mapping = {
     }
 }
 
-ep = ErrorPlotter(metric_frame, error_mapping)
-ep.plot_with_error("bar", metric="Recall",
-                   title="(Symmetric) Normal Error Intervals", capsize=10, colormap="Pastel1")
+MetricFrame.plot_metric_frame("bar", metric_frame, metric="Recall", error_mapping=error_mapping,
+title="(Symmetric) Normal Error Intervals", capsize=10, colormap="Pastel1"                   ,
+                   TMP_plot_with_df=False)
+
+
 
 # %%
 # 2. We plot wiuth the asymmetric Wilson Bounds
@@ -136,9 +136,8 @@ error_mapping = {
     }
 }
 
-ep = ErrorPlotter(metric_frame, error_mapping)
-ep.plot_with_error("bar", metric="Recall", title="(Asymmetric) Wilson Bounds",
-                   capsize=10, colormap="Pastel2")
+MetricFrame.plot_metric_frame("bar", metric_frame, metric="Recall", error_mapping=error_mapping,
+                   title="(Symmetric) Normal Error Intervals", capsize=10, colormap="Pastel2")
 
 # %%
 # Creating Custom Error Metrics

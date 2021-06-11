@@ -28,7 +28,6 @@ import sys as _sys
 from ._metric_frame import MetricFrame  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 
-from ._error_plotter import ErrorPlotter   # noqa: F401
 from ._generated_metrics import _generated_metric_dict
 
 from ._disparities import (  # noqa: F401
