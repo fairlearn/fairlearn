@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 _SUBGROUP_COUNT_WARNING_THRESHOLD = 20
 
 _SF_DICT_CONVERSION_FAILURE = "DataFrame.from_dict() failed on sensitive features. " \
-    "Please ensure each array is strictly 1-D."
+                              "Please ensure each array is strictly 1-D."
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
@@ -261,11 +261,15 @@ class MetricFrame:
             result = sum(batches, [])
         elif batch_type is pd.DataFrame:
             col_nums = batches[0].columns
-            assert all([col_nums == df.columns for df in batches]), 'Need same columns'
+            if any([col_nums != df.columns for df in batches]):
+                raise ValueError(f"Column mismatch expected {col_nums},"
+                                 f" got {[df.columns for df in batches]}")
+            result = pd.concat(batches)
+        elif batch_type is pd.Series:
             result = pd.concat(batches)
         elif batch_type is dict:
             # This concats dict together
-            return {k: self._concat_batches([b[k]for b in batches if k in b])
+            return {k: self._concat_batches([b[k] for b in batches if k in b])
                     for k in set(sum((list(b.keys()) for b in batches), []))}
         else:
             raise ValueError(f"Can't concatenate {batches}")

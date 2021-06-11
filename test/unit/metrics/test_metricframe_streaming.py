@@ -7,7 +7,10 @@ import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
-from test.unit.input_convertors import conversions_for_1d
+from test.unit.input_convertors import (conversions_for_1d,
+                                        ensure_ndarray,
+                                        ensure_list,
+                                        ensure_dataframe)
 from .data_for_test import y_t, y_p, g_4
 from .utils import batchify
 
@@ -141,10 +144,11 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
     assert target._by_group is None
 
     # We can't initialize streaming metrics with data
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as excinfo:
         _ = metrics.MetricFrame(skm.recall_score, y_t, y_p,
                                 sensitive_features=g4, control_features=g4,
                                 streaming=True)
+    assert "Streaming metrics must be initialized with empty lists" in str(excinfo.value)
 
 
 def test_exception_on_no_data():
@@ -166,13 +170,14 @@ def test_cf_argument_mismatch(transform_y_t, transform_y_p, num_batches):
     target = metrics.MetricFrame(skm.recall_score, [], [], sensitive_features=[],
                                  streaming=True)
     # We supply CF in the call, it should fail.
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as excinfo:
         y_t_batches, y_p_batches, g_4_batches = next(batch_generator)
         g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
         target.add_data(transform_y_t(y_t_batches),
                         transform_y_p(y_p_batches),
                         sensitive_features=g_f,
                         control_features=g_f)
+    assert "MetricFrame expected `control_features=None`" in str(excinfo.value)
 
 
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
@@ -209,7 +214,39 @@ def test_sp_argument_mismatch(transform_y_t, transform_y_p):
                     sample_params={'sample_weight': sw_batches})
 
     # We forget to supply it the next time, it should raise.
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as excinfo:
         target.add_data(transform_y_t(y_t_batches),
                         transform_y_p(y_p_batches),
                         sensitive_features=g_f)
+    assert "MetricFrame expected `control_features=None`" in str(excinfo.value)
+
+
+@pytest.mark.parametrize("transform_y_p", conversions_for_1d)
+def test_concat_batches(transform_y_p):
+    num_batches = 5
+    metric_frame = metrics.MetricFrame(skm.recall_score, [], [], sensitive_features=[],
+                                       sample_params={}, streaming=True)
+    # Get y_p from the batch to make a list of batch.
+    batches = [b for [b] in batchify(num_batches, transform_y_p(y_p))]
+    concatenated = metric_frame._concat_batches(batches)
+    assert len(concatenated) == len(y_p)
+
+
+def test_concat_batches_error():
+    metric_frame = metrics.MetricFrame(skm.recall_score, [], [], sensitive_features=[],
+                                       sample_params={}, streaming=True)
+    with pytest.raises(ValueError) as excinfo:
+        metric_frame._concat_batches([])
+    assert "No data to process" in str(excinfo.value)
+
+    lst_input, arr_input = ensure_list(y_t), ensure_ndarray(y_t)
+    with pytest.raises(ValueError) as excinfo:
+        metric_frame._concat_batches([lst_input, arr_input])
+    assert "Can't concatenate arrays of different types" in str(excinfo.value)
+
+    df1, df2 = ensure_dataframe(y_t), ensure_dataframe(y_t)
+    # Edit column name
+    df1.columns = [f"{c}_" for c in df1.columns]
+    with pytest.raises(ValueError) as excinfo:
+        metric_frame._concat_batches([df1, df2])
+    assert "Column mismatch" in str(excinfo.value)
