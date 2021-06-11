@@ -1,19 +1,315 @@
 i.fa-github:hover {
-   color: black;
+    color: black;
 }
 
 i.fa-twitter:hover {
-   color: #1da1f2;
+    color: #1da1f2;
 }
 
 i.fa-stack-overflow:hover {
-   color: #f48024;
-} 
-
-i.fa-gitter:hover {
-   color: #D6044E;
+    color: #f48024;
 }
 
-#navbar-icon-links > li.nav-item > a.nav-link:hover {
-   color: rgba(77, 77, 77, 1) !important
-}  
+i.fa-gitter:hover {
+    color: #D6044E;
+}
+
+@font-face {
+    font-family: TT Commons;
+    src: url('fonts/TTCommons/TTCommons-DemiBold.ttf')format('truetype');
+}
+
+@font-face {
+    font-family: TT Commons-light;
+    src: url('fonts/TTCommons/TTCommons-Light.ttf')format('truetype');
+}
+
+@font-face {
+    font-family: TT Commons-regular;
+    src: url('fonts/TTCommons/TTCommons-Regular.ttf')format('truetype');
+}
+
+@font-face {
+    font-family: Code Pro;
+    src: url('fonts/CodePro/SourceCodePro-Regular.ttf')format('truetype');
+}
+
+@media (min-width:1200px) {
+    .container-xl {
+        max-width: 1180px;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+    .container-xl {
+        max-width: 900px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .container-xl {
+        max-width: 600px;
+    }
+}
+
+@media (min-width: 320px) and (max-width: 768px) {
+    .container-xl {
+        max-width: 375px;
+    }
+}
+
+body {
+    font-family: "TT Commons", sans-serif;
+    color: #444444;
+}
+
+
+/*--------------------------------------------------------------
+# Header
+--------------------------------------------------------------*/
+
+#navbar-icon-links>li.nav-item>a.nav-link:hover {
+    color: rgba(77, 77, 77, 1) !important
+}
+
+#navbar-main {
+    height: 80px !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid #ccc;
+}
+
+#navbar-main .logo {
+    margin-top: -5px;
+}
+
+#navbar-main .col-lg-9 {
+    padding: 0px !important;
+}
+
+
+/*--------------------------------------------------------------
+# Navigation Menu
+--------------------------------------------------------------*/
+
+
+/* Desktop Navigation */
+
+#navbar-collapsible {
+    margin-left: -150px;
+    height: 100%;
+}
+
+#navbar-collapsible ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#navbar-collapsible>ul {
+    display: flex;
+    height: 100%;
+}
+
+#navbar-collapsible>ul>li {
+    position: relative;
+    white-space: nowrap;
+}
+
+#navbar-collapsible>ul>li:hover {
+    background: #F2F2F2;
+}
+
+#navbar-collapsible a {
+    display: block;
+    position: relative;
+    color: #666666;
+    transition: 0.3s;
+    font-size: 14px;
+    font-family: "TT Commons", sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    padding: 30px 17px 10px 17px;
+}
+
+#navbar-collapsible a:hover,
+#navbar-collapsible .active>a,
+#navbar-collapsible li:hover>a {
+    color: #000;
+}
+
+#navbar-collapsible ul {
+    display: flex;
+}
+
+#navbar-collapsible .drop-down ul {
+    display: block;
+    position: absolute;
+    top: calc(100% + 30px);
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    padding: 10px 0;
+    background: #fff;
+    transition: 0.3s;
+    filter: drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.12));
+}
+
+#navbar-collapsible .drop-down:hover>ul {
+    opacity: 1;
+    top: 100%;
+    visibility: visible;
+}
+
+#navbar-collapsible .drop-down ul a {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-family: "TT Commons-light", sans-serif;
+    text-transform: none;
+    color: #333333;
+}
+
+#navbar-center {
+    margin-left: -165px;
+    height: 100%;
+}
+
+#navbar-center-item {
+    height: 100% !important;
+}
+
+#navbar-collapsible .drop-down ul a:hover,
+#navbar-collapsible .drop-down ul .active>a,
+#navbar-collapsible .drop-down ul li:hover>a {
+    color: #000000;
+    font-weight: bold;
+}
+
+#navbar-collapsible .drop-down>a:after {
+    content: "\ea99";
+    font-family: 'IcoFont';
+    padding-left: 5px;
+}
+
+#navbar-collapsible .drop-down .drop-down ul {
+    top: 0;
+    left: calc(100% - 30px);
+}
+
+#navbar-collapsible .drop-down .drop-down:hover>ul {
+    opacity: 1;
+    top: 0;
+    left: 100%;
+}
+
+#navbar-collapsible .drop-down .drop-down>a {
+    padding-right: 35px;
+}
+
+#navbar-collapsible .drop-down .drop-down>a:after {
+    content: "\eaa0";
+    font-family: 'IcoFont';
+    position: absolute;
+    right: 15px;
+}
+
+@media (max-width: 1200px) {
+    #navbar-collapsible {
+        margin-left: 0px !important;
+    }
+}
+
+@media (max-width:1024px) and (min-width:900px) {
+    #navbar-collapsible {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1366px) {
+    #navbar-collapsible .drop-down .drop-down ul {
+        left: -90%;
+    }
+    #navbar-collapsible .drop-down .drop-down:hover>ul {
+        left: -100%;
+    }
+    #navbar-collapsible .drop-down .drop-down>a:after {
+        content: "\ea9d";
+    }
+}
+
+
+/* GitHub Button */
+
+.get-started-btn {
+    background: #F2F2F2;
+    border-radius: 30px;
+    padding: 10px 20px !important;
+    width: 117px;
+    height: 44px;
+    transition: 0.3s !important;
+    font-size: 13px !important;
+    font-family: "TT Commons", sans-serif;
+    display: inline-block !important;
+    margin-right: 20px;
+    text-decoration: none !important;
+}
+
+.get-started-btn:hover {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+}
+
+.spyglass-image {
+    margin-right: 8px;
+}
+
+.spyglass-image-black {
+    margin-right: 8px;
+    display: none;
+}
+
+.get-started-btn:hover .spyglass-image-black {
+    display: inline;
+}
+
+.get-started-btn:hover .spyglass-image {
+    display: none;
+}
+
+.search-btn {
+    display: inline-block!important;
+    padding: 10px 12px !important;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+}
+
+.search-btn:hover {
+    background-color: #333333;
+}
+
+.search-image-black {
+    display: none;
+}
+
+.search-btn:hover .search-image-black {
+    display: inline;
+}
+
+.search-btn:hover .search-image {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .get-started-btn {
+        margin-right: 10px;
+    }
+    .search-link {
+        margin-right: 40px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .get-started-btn {
+        display: none;
+    }
+}

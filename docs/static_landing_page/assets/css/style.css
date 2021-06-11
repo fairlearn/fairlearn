@@ -80,6 +80,7 @@ h6 {
     z-index: 997;
     background: #fff;
     height: 80px;
+    border-bottom: 1px solid #ccc;
 }
 
 #header.header-scrolled,

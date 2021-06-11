@@ -132,7 +132,11 @@ html_theme_options = {
         },
     ],
 
-    "show_prev_next": False
+    "show_prev_next": False,
+
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["navbar-icon-links"]
 }
 
 # The name of an image file (relative to this directory) to place at the top
@@ -152,7 +156,9 @@ html_use_index = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_css_files = ['css/custom.css']
+html_css_files = [
+    'css/custom.css',
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
