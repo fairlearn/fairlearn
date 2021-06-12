@@ -79,7 +79,7 @@ body {
 }
 
 #navbar-main .logo {
-    margin-top: -5px;
+    margin-top: -3px;
 }
 
 #navbar-main .col-lg-9 {
@@ -128,7 +128,7 @@ body {
     font-family: "TT Commons", sans-serif;
     font-style: normal;
     font-weight: 600;
-    padding: 30px 17px 10px 17px;
+    padding: 29px 17px 10px 17px;
 }
 
 #navbar-collapsible a:hover,
@@ -173,8 +173,21 @@ body {
     height: 100%;
 }
 
-#navbar-center-item {
+.navbar-center-item {
     height: 100% !important;
+}
+
+.navbar-center-item>ul {
+    height: 100%;
+}
+
+.navbar-center-item>ul a {
+    height: 100%;
+    text-decoration: none;
+}
+
+.navbar-center-item>ul a:hover {
+    background-color: #F2F2F2;
 }
 
 #navbar-collapsible .drop-down ul a:hover,
@@ -210,6 +223,11 @@ body {
     font-family: 'IcoFont';
     position: absolute;
     right: 15px;
+}
+
+#navbar-collapsible .drop-down li {
+    min-width: 180px;
+    position: relative;
 }
 
 @media (max-width: 1200px) {
@@ -312,4 +330,96 @@ body {
     .get-started-btn {
         display: none;
     }
+}
+
+
+/*--------------------------------------------------------------
+# footer
+--------------------------------------------------------------*/
+
+.footer {
+    font-family: 'TT Commons-regular', sans-serif!important;
+    border: 1px solid #F2F2F2!important;
+    box-sizing: border-box !important;
+    background: linear-gradient(0deg, rgba(204, 204, 204, 0.05), rgba(204, 204, 204, 0.05)), #FFFFFF !important;
+    padding: 18px 0px 0px 0px !important;
+}
+
+.footer ul {
+    padding: initial !important;
+}
+
+.footer li {
+    list-style-type: none !important;
+    padding: 0px 0px 8px 0px !important;
+    font-size: 15px !important;
+    color: #757575 !important;
+}
+
+.footer a {
+    color: #666666 !important;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #2a2af0;
+}
+
+.footer .signup-btn {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 8px 20px !important;
+    background: #666666 !important;
+    border-radius: 30px !important;
+    color: #ffffff !important;
+    font-weight: normal;
+    margin-top: 18px !important;
+    font-family: 'TT Commons', sans-serif !important;
+    font-size: 13px !important;
+    letter-spacing: 0.5px !important;
+}
+
+.footer-top {
+    border-bottom: 0.5px solid #CCCCCC !important;
+}
+
+.footer h1 {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 22px !important;
+    line-height: 26px !important;
+    color: #000 !important;
+}
+
+.footer input {
+    border: none !important;
+    border-bottom: 0.5px solid #CCCCCC !important;
+    width: 100% !important;
+}
+
+.footer input:focus {
+    outline: none !important;
+}
+
+.footer input::placeholder {
+    color: #999999 !important;
+}
+
+.footer .py-4 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+}
+
+.footer .py-4 a {
+    margin-right: 30px !important;
+}
+
+.footer .py-4 a img {
+    padding-bottom: 5px !important;
+}
+
+.footer .footer-copyright a,
+.copyright {
+    color: #757575 !important;
 }

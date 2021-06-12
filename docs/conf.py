@@ -136,7 +136,8 @@ html_theme_options = {
 
     "navbar_start": ["navbar-logo"],
     "navbar_center": ["navbar-nav"],
-    "navbar_end": ["navbar-icon-links"]
+    "navbar_end": ["navbar-icon-links"],
+    "footer_items": ["footer-copyright"],
 }
 
 # The name of an image file (relative to this directory) to place at the top
