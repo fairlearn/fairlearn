@@ -3,6 +3,8 @@
 Frequently asked questions
 ==========================
 
+.. currentmodule:: fairlearn
+
 Where can I learn more about fairness in machine learning?
     Please review :ref:`further resources <further_resources>`,
     where we provide links to various materials that we have found helpful.
@@ -131,7 +133,7 @@ Which ML libraries does Fairlearn support?
     algorithm can be evaluated using our metrics.
 
 Does Fairlearn support multi-class classification?
-    On the assessment side, Fairlearn's :class:`fairlearn.metrics.MetricFrame`
+    On the assessment side, Fairlearn's :class:`metrics.MetricFrame`
     can be used with any metrics for supervised learning, including those for
     multi-class classification.
     For example, it is possible to pass
@@ -144,8 +146,8 @@ Does Fairlearn support multi-class classification?
     If you have thoughts feel free to add them to the discussion.
     
     On the mitigation side, our algorithms
-    :class:`fairlearn.reductions.ExponentiatedGradient` and
-    :class:`fairlearn.reductions.GridSearch`
+    :class:`reductions.ExponentiatedGradient` and
+    :class:`reductions.GridSearch`
     support :ref:`bounded group loss <bounded_group_loss>` constraints, which
     are applicable to any supervised learning setting, including multi-class
     classification.
