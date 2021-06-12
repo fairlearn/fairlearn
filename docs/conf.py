@@ -72,7 +72,7 @@ extensions = [
     'sphinx_multiversion'
 ]
 
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
