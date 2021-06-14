@@ -20,7 +20,7 @@ def _get_soft_predictions(estimator, X, predict_method):
 
         - 'auto': use one of ``predict_proba``, ``decision_function``, or
           ``predict``, in that order.
-        - 'predict_proba': use the second column from the putput of
+        - 'predict_proba': use the second column from the output of
           `predict_proba`. It is assumed that the second column represents the
           positive outcome.
         - 'decision_function': use the raw values given by the
