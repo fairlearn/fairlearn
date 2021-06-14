@@ -4,42 +4,27 @@
 """Utility class for plotting metrics with error ranges."""
 
 from logging import error
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
+import pandas as pd
 
 from matplotlib.axes._axes import Axes
 
 from ._metric_frame import MetricFrame
 
-_ALLOWED_ERROR_KEY_TYPES = ["symmetric_error", "lower_error", "upper_error", "lower_bound", "upper_bound"]
-
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install matplotlib to use " \
                                    "the plotting for MetricFrame."
 
-_ERROR_MAPPING_DICT_ERROR = "error_mapping should be a dictionary"
-_ERROR_MAPPING_ZERO_ITEMS_ERROR = "error_mapping should have non-zero amount of items"
-_ERROR_MAPPING_METRIC_NOT_IN_MF_ERROR = "Metric name {0} should be a valid metric in provided MetricFrame"
-_ERROR_MAPPING_KEY_TYPE_NOT_VALID_ERROR = "Received metric key_type of {0}, but should be one of: {1}"
-_ERROR_MAPPING_KEY_TYPE_VALUE_NOT_IN_MF_ERROR = "Error metric value indexed by key {0} for Metric {1} should be a valid metric in provided MetricFrame"
+_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = "Ambiguous Error Metric. Please only provide one of: error_bars and conf_intervals."
 
-_METRIC_NOT_STRING_ERROR = "Metric should be string of the metric in provided MetricFrame, but {0} was provided"
+_METRICS_NOT_LIST_OR_STR_ERROR = "Metric should be a string of a single metric or a list of the metrics in provided MetricFrame, but {0} was provided"
 _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR = "upper_error, lower_error, and symmetric_error must be positive and upper_bound must be greater than lower_bound"
 _INVALID_ERROR_MAPPING = "Invalid error mapping, each metric must have all the key-value pairs that make up an Error Format"
 
-def check_valid_error_mapping(error_mapping: Dict[str, Dict[str, Any]],
-                              metric_frame: MetricFrame):
-    """Verify valid `error_mapping`."""
-    assert isinstance(error_mapping, dict), _ERROR_MAPPING_DICT_ERROR
-    assert len(error_mapping) > 0, _ERROR_MAPPING_ZERO_ITEMS_ERROR
-    for metric_name in error_mapping.keys():
-        assert metric_name in metric_frame.by_group, _ERROR_MAPPING_METRIC_NOT_IN_MF_ERROR.format(metric_name)
-        for key_type in error_mapping[metric_name].keys():
-            assert key_type in _ALLOWED_ERROR_KEY_TYPES, _ERROR_MAPPING_KEY_TYPE_NOT_VALID_ERROR.format(key_type, _ALLOWED_ERROR_KEY_TYPES)
-            assert error_mapping[metric_name][key_type] in metric_frame.by_group, _ERROR_MAPPING_KEY_TYPE_VALUE_NOT_IN_MF_ERROR.format(key_type, metric_name)
-
-def plot_metric_frame(plot_type: str, metric_frame: MetricFrame, metric: str, error_mapping: dict, ax=None, show_plot=True,
-                    plot_error_labels: bool=True, text_precision_digits: int=4, text_fontsize: int=8,
-                    text_color: str="black", text_ha: str="center",
-                    title=None, capsize=10, colormap="Pastel1", TMP_plot_with_df=True):
+def plot_metric_frame(plot_type: str, metric_frame: MetricFrame, 
+                    metrics: Union[List[str], str]=None, error_bars: Union[List[str], str]=None, conf_intervals: Union[List[str], str]=None,
+                    ax=None, show_plot=True, plot_error_labels: bool=True,
+                    text_precision_digits: int=4, text_fontsize: int=8, text_color: str="black", text_ha: str="center",
+                    title=None, capsize=10, colormap="Pastel1", TEMP_plot_with_df=True):
     """Visualization for metrics with statistical error bounds.
 
     Plots a given metric and its given error (as described by the `error_mapping`)
@@ -86,29 +71,6 @@ def plot_metric_frame(plot_type: str, metric_frame: MetricFrame, metric: str, er
         |                    |  upper_bound      | 0.815    |                   |
         +--------------------+-------------------+----------+-------------------+
 
-        The format for `error_mapping` is:
-            {
-                "Metric Name A": {
-                    "Key_Type 1": "Metric Error Name"
-                    "Key_Type 2": "Metric Error Name"
-                },
-                "Metric Name B": {
-                    "Key_Type 1": "Metric Error Name"
-                    "Key_Type 2": "Metric Error Name"
-                },
-            }
-
-        Example:
-            {
-                "Recall": {
-                    "upper_bound": "Recall upper bound",
-                    "lower_bound": "Recall lower bound"
-                },
-                "Accuracy": {
-                    "symmetric_error": "Accuracy error"
-                }
-            }
-
     ax : matplotlib.axes._axes.Axes, optional
         Custom Matplotlib axes to which this function can plot
 
@@ -140,79 +102,83 @@ def plot_metric_frame(plot_type: str, metric_frame: MetricFrame, metric: str, er
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    check_valid_error_mapping(error_mapping, metric_frame)
+    # ambiguous error metric
+    if error_bars is not None and conf_intervals is not None:
+        raise RuntimeError(_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR)
 
     if ax is None:
         ax = plt.axes(title=title)
-
-    assert isinstance(metric, str), _METRIC_NOT_STRING_ERROR.format(type(metric))
-    assert metric in error_mapping.keys()
-
     df = metric_frame.by_group
 
-    if "upper_bound" in error_mapping[metric].keys() and \
-        "lower_bound" in error_mapping[metric].keys():
-        lower_bound = error_mapping[metric]["lower_bound"]
-        upper_bound = error_mapping[metric]["upper_bound"]
+    assert isinstance(metrics, list) or isinstance(metrics, str) or metrics is None, _METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics))
+    
+    metrics = [metrics] if isinstance(metrics, str) else metrics
+    conf_intervals = [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
+    error_bars = [error_bars] if isinstance(error_bars, str) else error_bars
 
-        df_lower_error = df[metric] - df[lower_bound]
-        df_upper_error = df[upper_bound] - df[metric]
-        df_error = [df_lower_error, df_upper_error]
+    # plotting without error
+    if error_bars is None and conf_intervals is None:
+        # ax.bar(x=df[metrics].index, height=df[metrics])
+        ax = df.plot(kind=plot_type, y=metrics, ax=ax, colormap=colormap, capsize=capsize, 
+                 title=title)
+        return ax
 
-        assert (df_lower_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
-        assert (df_upper_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
+    df_all_errors = pd.DataFrame([])
+    df_all_bounds = pd.DataFrame([])
+    # plotting with confidence intervals:
+    if conf_intervals is not None:
+        for metric, conf_interval in zip(metrics, conf_intervals):
+            df_all_errors[metric] = abs(df[metric] - df[conf_interval])
 
-        if plot_error_labels:
-            df_lower_bound = df[lower_bound]
-            df_upper_bound = df[upper_bound]
-    elif "upper_error" in error_mapping[metric].keys() and \
-            "lower_error" in error_mapping[metric].keys():
-        lower_error = error_mapping[metric]["lower_error"]
-        upper_error = error_mapping[metric]["upper_error"]
+            # assert bounds are valid
+            #assert (df_lower_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
 
-        df_lower_error = df[lower_error]
-        df_upper_error = df[upper_error]
-        df_error = [df_lower_error, df_upper_error]
+            if plot_error_labels:
+                df_all_bounds[metric] = df[conf_interval]
+    # plotting with relative errors
+    elif error_bars is not None:
+        for metric, error_bar in zip(metrics, error_bars):
+            df_all_errors[metric] = df[error_bar]
 
-        assert (df_lower_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
-        assert (df_upper_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
+            # assert bounds are valid
+            #assert (df_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
 
-        if plot_error_labels:
-            df_lower_bound = df[metric] - df_lower_error
-            df_upper_bound = df[metric] + df_upper_error
-    elif "symmetric_error" in error_mapping[metric].keys():
-        symmetric_error = error_mapping[metric]["symmetric_error"]
-        df_error = df[symmetric_error]
-
-        assert (df_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
-
-        if plot_error_labels:
-            df_lower_bound = df[metric] - df_error
-            df_upper_bound = df[metric] + df_error
+            if plot_error_labels:
+                df_error = pd.DataFrame([])
+                df_error[['lower', 'upper']] = pd.DataFrame(df[error_bar].tolist(), index=df.index)
+                df_error['error'] = list(zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
+                df_all_bounds[metric] = df_error['error']
     else:
         raise AssertionError(_INVALID_ERROR_MAPPING)
     
-    # External API work with axes (sci-kit learn compatible)
-    # array of axes
-    if TMP_plot_with_df:
-        ax = df.plot(kind=plot_type, y=metric, yerr=df_error, ax=ax, colormap=colormap, capsize=capsize, 
-                     title=title)
-    else:
-        ax.bar(x=df[metric].index, height=df[metric])
-        ax.errorbar(x=df[metric].index, y=df[metric], yerr=df["Recall Error"], ecolor="black", capsize=capsize)
+    ax = df.plot(kind=plot_type, y=metrics, yerr=df_all_errors, ax=ax, colormap=colormap, capsize=capsize, 
+                     title=title, subplots=True)
+
+    # # External API work with axes (sci-kit learn compatible)
+    # # array of axes
+    # if TEMP_plot_with_df:
+    #     ax = df.plot(kind=plot_type, y=metric, yerr=df_error, ax=ax, colormap=colormap, capsize=capsize, 
+    #                  title=title)
+    # else:
+    #     ax.bar(x=df[metric].index, height=df[metric])
+    #     ax.errorbar(x=df[metric].index, y=df[metric], yerr=df["Recall Error"], ecolor="black", capsize=capsize)
 
     # TODO: Check assumption of plotting items in the vertical direction
-    y_min, y_max = ax.get_ylim()
-    y_range = y_max - y_min
+
+    print(df_all_bounds)
 
     if plot_error_labels:
-        for i, item in enumerate(ax.patches):
-            ax.text(i, df_lower_bound[i] - 0.05 * y_range, round(df_lower_bound[i],
-                    text_precision_digits), fontsize=text_fontsize, color=text_color,
-                    ha=text_ha)
-            ax.text(i, df_upper_bound[i] + 0.01 * y_range, round(df_upper_bound[i],
-                    text_precision_digits), fontsize=text_fontsize, color=text_color,
-                    ha=text_ha)
+        for j, metric in enumerate(metrics):
+            y_min, y_max = ax[j].get_ylim()
+            y_range = y_max - y_min
+
+            for i in range(len(ax[j].patches)):
+                ax[j].text(i, df_all_bounds[metric][i][0] - 0.05 * y_range, round(df_all_bounds[metric][i][0],
+                        text_precision_digits), fontsize=text_fontsize, color=text_color,
+                        ha=text_ha)
+                ax[j].text(i, df_all_bounds[metric][i][1] + 0.01 * y_range, round(df_all_bounds[metric][i][1],
+                        text_precision_digits), fontsize=text_fontsize, color=text_color,
+                        ha=text_ha)
 
     if show_plot:
         plt.show()
