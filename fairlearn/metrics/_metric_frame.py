@@ -42,7 +42,6 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
     new_metric_frame_init : callable
         New MetricFrame constructor.
     """
-
     @wraps(new_metric_frame_init)
     def compatible_metric_frame_init(self, *args, metric=None, **kwargs):
         positional_names = ["metrics", "y_true", "y_pred"]

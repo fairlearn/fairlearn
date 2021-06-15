@@ -110,9 +110,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Parameters
     ----------
     estimator : object
-        An estimator whose output is postprocessed. The estimator should be
-        implementing a :code:`predict` method. If :code:`prefit=False`, it
-        also needs to implement a :code:`fit` method.
+        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
+        whose output is postprocessed.
 
     constraints : str, default='demographic_parity'
         Fairness constraints under which threshold optimization is performed.
