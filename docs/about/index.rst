@@ -72,7 +72,7 @@ work in progress please review our
      `make fairness issues concrete <https://fairlearn.github.io/contributor_guide/contributing_example_notebooks.html>`_.
      These use cases may or may not use the Fairlearn package.
      To accelerate this process, we are experimenting with
-     :ref:`weekly sessions <developer_calls>` where people can discuss ideas,
+     :ref:`weekly sessions <community_calls>` where people can discuss ideas,
      ongoing projects, and individual example notebooks in detail.
      
    - **Improve the project documentation**: critique the current content,
@@ -85,7 +85,7 @@ work in progress please review our
    - **Improve the usability, relevance, and look of Fairlearn website**
      with the audience of practitioners in mind.
      Engage by participating in the discussions on
-     `community calls <developer_calls>`_ or in the corresponding
+     `community calls <community_calls>`_ or in the corresponding
      `discussions <https://github.com/fairlearn/fairlearn/discussions>`_.
      You can also give us feedback by filing a new issue.
 
@@ -108,7 +108,7 @@ work in progress please review our
      documentation, our processes or any other aspect of the projects create
      barriers of entry.
 
-   - **Participate** in our :ref:`weekly community calls <developer_calls>`.
+   - **Participate** in our :ref:`weekly community calls <community_calls>`.
      We also work with universities to engage student contributors
      through course projects and are also open to other forms of
      collaboration --- let us know if you are interested.

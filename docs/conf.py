@@ -69,13 +69,17 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx_gallery.gen_gallery',
-    'sphinx_multiversion'
+    'sphinx_multiversion',
+    'sphinx_autodoc_typehints',  # needs to be AFTER napoleon
 ]
+
+source_suffix = ['.rst']
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None), }
+                       'sklearn': ('https://scikit-learn.org/stable/', None),
+                       'matplotlib': ('http://matplotlib.sourceforge.net/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -83,7 +87,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.md']
 
 master_doc = 'index'
 
@@ -131,7 +135,6 @@ html_theme_options = {
             "icon": "fab fa-gitter",
         },
     ],
-
     "show_prev_next": False
 }
 

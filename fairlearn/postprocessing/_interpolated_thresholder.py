@@ -114,7 +114,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             Feature data
         sensitive_features : numpy.ndarray or pandas.DataFrame
             Sensitive features to identify groups by
-        random_state : int or RandomState instance, default=None
+        random_state : int or :class:`numpy.random.RandomState` instance, default=None
             Controls random numbers used for randomized predictions. Pass an
             int for reproducible output across multiple function calls.
 
