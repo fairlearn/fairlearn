@@ -154,20 +154,77 @@ In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_
 identify failure modes that arise from applying abstraction. They identify
 them as:
 
-* *The Framing Trap*
-
-* *The Portability Trap*
-
-* *The Formalism Trap*
+* *The Solutionism Trap*
 
 * *The Ripple Effect Trap*
 
-* *The Solutionism Trap*
+* *The Formalism Trap*
+
+* *The Portability Trap*
+
+* *The Framing Trap*
 
 These traps are inspired by the observation that each of these traps are the
 result of failing to consider the way in with social context and technology
 are interrelated, as well as a deeper understanding of "the social" in order to
 solve problems Ackerman [#5]_.
+
+The Solutionism Trap
+^^^^^^^^^^^^^^^^^^^^
+
+Selbst et al. [#4]_ define this as a "failure to recognize the possibility that the best solution
+to a problem may not involve technology".
+
+It is the practice of assuming that a machine learning algorithm is the best solution to a problem.
+
+Example 1:
+
+Example 2:
+
+One area where this manifests in contexts in which the definition "fairness" changes or is dependent
+on a political context. When this happens, models become obsolete. Another area where this manifests
+is when the question at hand requires a computationally intractable solution.
+
+The Ripple Effect Trap
+^^^^^^^^^^^^^^^^^^^^^^
+
+Selbst et al. [#4]_ define this as a "failure to understand how the insertion of technology into
+an existing social system changes the behaviors and embedded values of the pre-existing system".
+
+Example 1:
+
+Example 2:
+
+The Formalism Trap
+^^^^^^^^^^^^^^^^^^
+
+Selbst et al. [#4]_ define this as a "failure to account for the full meaning of social concepts
+such as fairness, which can be procedural, contextual, and contestable, and cannot be resolved
+through mathematical formalisms".
+
+It is the practice of implementing mathematical and statistical models, along with
+corresponding assumptions, that fail to take into consideration the social, demographic,
+economic, or otherwise non-technical aspect that make up the phenomenon being studied.
+
+Example 1:
+
+Example 2:
+
+The Portability Trap
+^^^^^^^^^^^^^^^^^^^^
+
+This trap occurs when data scientists fail to understand how reusing a model or algorithm
+that is designed for one specific social context, may not necessarily apply to a different social
+context. Reusing an algorithmic solution and failing to take into account differences in
+involved social contexts can result in misleading results and potentially harmful consequences
+if the algorithm is used to determine the fate of an individual.
+
+Example 1: Reusing a machine learning algorithm used to screen job applications in the nursing
+industry, for job applications in the information technology sector. An intuitive yet important
+difference between both context is the difference in skills required to succeed in both industries.
+A slightly more subtle difference is the demographic differences in genders attracted to each
+context, resulting from wording in job postings, social constructs and the male-female ratio
+of successful applicants in each field.
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
@@ -186,64 +243,6 @@ charged with an offense, and appropriate measures to prevent relapse, and failin
 to consider factors such as race, socio-economic status, mental health, along with
 biases present in judges, police officers, or any actors responsible for recommending
 a course of action.
-
-The Portability Trap
-^^^^^^^^^^^^^^^^^^^^
-
-This trap occurs when data scientists fail to understand how reusing a model or algorithm
-that is designed for one specific social context, may not necessarily apply to a different social
-context. Reusing an algorithmic solution and failing to take into account differences in
-involved social contexts can result in misleading results and potentially harmful consequences
-if the algorithm is used to determine the fate of an individual.
-
-Example 1: Reusing a machine learning algorithm used to screen job applications in the nursing
-industry, for job applications in the information technology sector. An intuitive yet important
-difference between both context is the difference in skills required to succeed in both industries.
-A slightly more subtle difference is the demographic differences in genders attracted to each
-context, resulting from wording in job postings, social constructs and the male-female ratio
-of successful applicants in each field.
-
-The Formalism Trap
-^^^^^^^^^^^^^^^^^^
-
-Selbst et al. [#4]_ define this as a "failure to account for the full meaning of social concepts
-such as fairness, which can be procedural, contextual, and contestable, and cannot be resolved
-through mathematical formalisms".
-
-It is the practice of implementing mathematical and statistical models, along with
-corresponding assumptions, that fail to take into consideration the social, demographic,
-economic, or otherwise non-technical aspect that make up the phenomenon being studied.
-
-Example 1:
-
-Example 2:
-
-The Ripple Effect Trap
-^^^^^^^^^^^^^^^^^^^^^^
-
-Selbst et al. [#4]_ define this as a "failure to understand how the insertion of technology into
-an existing social system changes the behaviors and embedded values of the pre-existing system".
-
-Example 1:
-
-Example 2:
-
-
-The Solutionism Trap
-^^^^^^^^^^^^^^^^^^^^
-
-Selbst et al. [#4]_ define this as a "failure to recognize the possibility that the best solution
-to a problem may not involve technology".
-
-It is the practice of assuming that a machine learning algorithm is the best solution to a problem.
-
-Example 1:
-
-Example 2:
-
-One area where this manifests in contexts in which the definition "fairness" changes or is dependent
-on a political context. When this happens, models become obsolete. Another area where this manifests
-is when the question at hand requires a computationally intractable solution.
 
 .. topic:: References:
 
