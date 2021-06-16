@@ -166,39 +166,33 @@ solve problems Ackerman [#5]_.
 The Framing Trap
 ^^^^^^^^^^^^^^^^
 
-Selbst et al. [#4]_ define this as a "failure to model the entire system over
-which a social criterion, such as fairness, will be enforced".
+This trap occurs when data scientists fail to consider the full picture surrounding
+sources of bias when designing and implementing a machine learning model in which the
+outcome involves enforcing decisions that will impact a person or group of people.
 
-It is the practice of failing to consider the full picture surrounding sources of
-bias.
+Example 1: assessing and recommending eligibility for mortgage approval based on
+factors such as income, credit score, employment and education, and failing to consider
+factors such as race, socio-economic status, as well as any biases present in actors
+responsible for creating means necessary for people to apply for mortgages.
 
-Labelling is a risk assessment setting. Risk assessment may be used as a predictive
-model whose goal is to assess the risk of an individual to ease the decision-making
-process. For example, using risk assessment to decide whether a person is eligible
-for mortgage approval. Another example is using risk assessment to decide whether a
-person is likely to re-engage in criminal behaviour as they move through the criminal
-justice pipeline.
-
-As far as the outcomes of these decisions go, in the first scenario an individual may be
-approved or not to get a mortgage which then impacts their ability to have housing security,
-gain wealth and social status. In the second scenario an individual may be released pretrial,
-or bail may be required. This assessment may also include sentencing and parole hearing.
-Risk assessment tools may be used as recommendations towards an outcome. However there is no
-guarantee that they will be used consistently and thus bias is introduced. For example, a
-party responsible for choosing the outcome decides to ignore the recommendation as a result
-of personal bias, even when the model takes into account demographic data. In this example
-a model that fails to take into account bias present in those judging culminates in a
-biased result.
+Example 2: assessing risk of re-engagement in criminal behaviour in an individual
+charged with an offense, and appropriate measures to prevent relapse, and failing
+to consider factors such as race, socio-economic status, mental health, along with
+biases present in judges, police officers, or any actors responsible for recommending
+a course of action.
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#4]_ define this as a "failure to understand how repurposing algorithmic
-solutions designed for one social context may be misleading, inaccurate, or otherwise
-do harm when applied to a different context".
+This trap occurs when data scientists fail to understand how reusing a model or algorithm
+that is designed for one specific social context, may not necessarily apply to a different social
+context. Reusing an algorithmic solution and failing to take into account differences in
+differing social contexts can result in misleading results and potentially harmful consequences
+if the algorithm is used to determine the fate of an individual.
 
-It is the practice of reusing others work without taking into account lack of
-transferability to a given social situation, resulting in harmful consequences.
+Example 1:
+
+Example 2:
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
@@ -211,11 +205,19 @@ It is the practice of implementing mathematical and statistical models, along wi
 corresponding assumptions, that fail to take into consideration the social, demographic,
 economic, or otherwise non-technical aspect that make up the phenomenon being studied.
 
+Example 1:
+
+Example 2:
+
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Selbst et al. [#4]_ define this as a "failure to understand how the insertion of technology into
 an existing social system changes the behaviors and embedded values of the pre-existing system".
+
+Example 1:
+
+Example 2:
 
 
 The Solutionism Trap
@@ -225,6 +227,10 @@ Selbst et al. [#4]_ define this as a "failure to recognize the possibility that 
 to a problem may not involve technology".
 
 It is the practice of assuming that a machine learning algorithm is the best solution to a problem.
+
+Example 1:
+
+Example 2:
 
 One area where this manifests in contexts in which the definition "fairness" changes or is dependent
 on a political context. When this happens, models become obsolete. Another area where this manifests
