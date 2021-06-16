@@ -20,7 +20,7 @@ Website: https://fairlearn.org/
 ## Current release
 
 - The current stable release is available at
-  [Fairlearn v0.6.2](https://github.com/fairlearn/fairlearn/tree/release/v0.6.2).
+  [Fairlearn v0.7.0](https://github.com/fairlearn/fairlearn/tree/release/v0.7.0).
 
 - Our current version may differ substantially from earlier versions.
   Users of earlier versions should visit our
