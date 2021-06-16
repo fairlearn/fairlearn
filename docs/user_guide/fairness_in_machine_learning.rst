@@ -255,9 +255,9 @@ is when the question at hand requires a computationally intractable solution.
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
 	  
    .. [#4] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
-        Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems" (August 23, 2018).
-        2019 ACM Conference on Fairness, Accountability, and Transparency (FAT*), 59-68, Available at
-        `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
+      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems" (August 23, 2018).
+      2019 ACM Conference on Fairness, Accountability, and Transparency (FAT*), 59-68, Available at
+      `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
    
    .. [#5] Mark S. Ackerman. 2000. The intellectual challenge of CSCW: The gap between social requirements
-        and technical feasibility. Human-Computer Interaction 15, 2-3 (2000), 179–203.
+      and technical feasibility. Human-Computer Interaction 15, 2-3 (2000), 179–203.
