@@ -144,6 +144,12 @@ subpackage :code:`fairlearn.metrics`.
 Failure modes encountered when abstracting
 --------------------------------------------------
 
+Machine learning systems used in the real world are inherently sociotechnical
+systems, which include both technologies and social actors. Designers of machine
+learning systems who fail to consider the way in which social contexts and technologies
+are interrelated are at risk of falling into "abstraction traps". In this section,
+we explain what those traps are, and give some suggestions on how you can avoid them.
+
 In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_
 identify failure modes that arise from applying abstraction. They identify
 them as:
