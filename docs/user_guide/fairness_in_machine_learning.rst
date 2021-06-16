@@ -178,9 +178,9 @@ One area where this manifests in is within contexts in which the definition "fai
 changes or is dependent on a political context.
 
 Example: consider the problem of internet connectivity in rural communities. An example
-of the solutionism trap is assuming that by studying internet speed in these regions,
-policies and deals can be arranged to reduce the price of internet access. However, if
-there are additional socio-economic problems within a community, for example lack of
+of the solutionism trap is assuming that by using data science to study internet speed in
+these regions, policies and deals can be arranged to reduce the price of internet access.
+However, if there are additional socioeconomic problems within a community, for example lack of
 education, infrastructure, information technology and health services, then an
 algorithmic solution purely focused on internet speed will fail to meaningfully address
 the needs of the community.
@@ -196,9 +196,10 @@ Example 1:
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-This trap occurs when data scientists implement mathematical, statistical or alrorithmic solution,
-along with corresponding assumptions, that fail to take into consideration the full picture behind a
-phenomenon, and include any social, demographic, economic, or otherwise non-technical aspect that make up
+This trap occurs when data scientists implement mathematical, statistical or
+algorithmic solution, along with corresponding assumptions, that fail to take
+into consideration the full picture behind a phenomenon, and include any social,
+demographic, economic, or otherwise non-technical aspect that make up
 the phenomenon being studied.
 
 Example 1:
