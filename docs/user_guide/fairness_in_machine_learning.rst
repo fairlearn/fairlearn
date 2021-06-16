@@ -172,18 +172,18 @@ solve problems Ackerman [#5]_.
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#4]_ define this as a "failure to recognize the possibility that the best solution
-to a problem may not involve technology".
+This trap occurs when data scientists assume that the best solution to a problem involves
+technology, and fail to recognize other possible solutions outside of this realm.
+One area where this manifests in is within contexts in which the definition "fairness"
+changes or is dependent on a political context.
 
-It is the practice of assuming that a machine learning algorithm is the best solution to a problem.
-
-Example 1:
-
-Example 2:
-
-One area where this manifests in contexts in which the definition "fairness" changes or is dependent
-on a political context. When this happens, models become obsolete. Another area where this manifests
-is when the question at hand requires a computationally intractable solution.
+Example: consider the problem of internet connectivity in rural communities. An example
+of the solutionism trap is assuming that by studying internet speed in these regions,
+policies and deals can be arranged to reduce the price of internet access. However, if
+there are additional socio-economic problems within a community, for example lack of
+education, infrastructure, information technology and health services, then an
+algorithmic solution purely focused on internet speed will fail to meaningfully address
+the needs of the community.
 
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -193,20 +193,13 @@ an existing social system changes the behaviors and embedded values of the pre-e
 
 Example 1:
 
-Example 2:
-
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#4]_ define this as a "failure to account for the full meaning of social concepts
-such as fairness, which can be procedural, contextual, and contestable, and cannot be resolved
-through mathematical formalisms".
-
-
-
-It is the practice of implementing mathematical and statistical models, along with
-corresponding assumptions, that fail to take into consideration the social, demographic,
-economic, or otherwise non-technical aspect that make up the phenomenon being studied.
+This trap occurs when data scientists implement mathematical, statistical or alrorithmic solution,
+along with corresponding assumptions, that fail to take into consideration the full picture behind a
+phenomenon, and include any social, demographic, economic, or otherwise non-technical aspect that make up
+the phenomenon being studied.
 
 Example 1:
 
@@ -221,7 +214,7 @@ context. Reusing an algorithmic solution and failing to take into account differ
 involved social contexts can result in misleading results and potentially harmful consequences
 if the algorithm is used to determine the fate of an individual.
 
-Example 1: Reusing a machine learning algorithm used to screen job applications in the nursing
+Example: Reusing a machine learning algorithm used to screen job applications in the nursing
 industry, for job applications in the information technology sector. An intuitive yet important
 difference between both context is the difference in skills required to succeed in both industries.
 A slightly more subtle difference is the demographic differences in genders attracted to each
