@@ -7,7 +7,10 @@
 * Changed `MetricFrame` constructor API, so `metric` argument is now `metrics` and
   all positional arguments are now keyword arguments. Previous call format still works
   (until v0.10.0), but issues a deprecation warning.
-
+* :class:`postprocessing.ThresholdOptimizer` now accepts `predict_method` as a
+  parameter which allows users to define which estimator method should be used
+  to get the prediction values: `"predict_proba" and "decision_function"` for
+  soft values and `"predict"` for hard values from classifiers.
 
 ### v0.6.2
 
