@@ -187,12 +187,15 @@ The Portability Trap
 This trap occurs when data scientists fail to understand how reusing a model or algorithm
 that is designed for one specific social context, may not necessarily apply to a different social
 context. Reusing an algorithmic solution and failing to take into account differences in
-differing social contexts can result in misleading results and potentially harmful consequences
+involved social contexts can result in misleading results and potentially harmful consequences
 if the algorithm is used to determine the fate of an individual.
 
-Example 1:
-
-Example 2:
+Example 1: Reusing a machine learning algorithm used to screen job applications in the nursing
+industry, for job applications in the information technology sector. An intuitive yet important
+difference between both context is the difference in skills required to succeed in both industries.
+A slightly more subtle difference is the demographic differences in genders attracted to each
+context, resulting from wording in job postings, social constructs and the male-female ratio
+of successful applicants in each field.
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
