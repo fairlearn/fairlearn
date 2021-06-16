@@ -196,15 +196,14 @@ Example 1:
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-This trap occurs when data scientists implement mathematical, statistical or
-algorithmic solution, along with corresponding assumptions, that fail to take
-into consideration the full picture behind a phenomenon, and include any social,
-demographic, economic, or otherwise non-technical aspect that make up
-the phenomenon being studied.
+This trap occurs when implementing an algorithmic solution failing to account the
+social dimensions associated to a problem. These dimensions include processes involved,
+whether human, political or bureaucratic, as well as cultural and time-bound social
+contexts. Such dimensions can often not be resolved via mathematical means.
+Failure occurs when steps are not taken to eradicate the limitations behind mathematical
+and statistical models.
 
-Example 1:
-
-Example 2:
+Example: 
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
