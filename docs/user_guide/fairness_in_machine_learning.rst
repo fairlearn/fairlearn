@@ -179,7 +179,7 @@ changes or is dependent on a political context.
 
 Example: consider the problem of internet connectivity in rural communities. An example
 of the solutionism trap is assuming that by using data science to study internet speed in
-these regions, policies and deals can be arranged to reduce the price of internet access.
+a given region, policies and deals can be arranged to reduce the price of internet access.
 However, if there are additional socioeconomic problems within a community, for example lack of
 education, infrastructure, information technology and health services, then an
 algorithmic solution purely focused on internet speed will fail to meaningfully address
