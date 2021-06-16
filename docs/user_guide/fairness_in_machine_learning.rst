@@ -202,6 +202,8 @@ Selbst et al. [#4]_ define this as a "failure to account for the full meaning of
 such as fairness, which can be procedural, contextual, and contestable, and cannot be resolved
 through mathematical formalisms".
 
+
+
 It is the practice of implementing mathematical and statistical models, along with
 corresponding assumptions, that fail to take into consideration the social, demographic,
 economic, or otherwise non-technical aspect that make up the phenomenon being studied.
@@ -230,19 +232,19 @@ The Framing Trap
 ^^^^^^^^^^^^^^^^
 
 This trap occurs when data scientists fail to consider the full picture surrounding
-sources of bias when designing and implementing a machine learning model in which the
-outcome involves enforcing decisions that will impact a person or group of people.
+a particular social context when designing and implementing a machine learning model
+in which the outcome involves enforcing decisions that will impact a person or group of people.
 
 Example 1: assessing and recommending eligibility for mortgage approval based on
 factors such as income, credit score, employment and education, and failing to consider
-factors such as race, socio-economic status, as well as any biases present in actors
-responsible for creating means necessary for people to apply for mortgages.
+factors such as race, socio-economic status, as well as any socially-dependent views present
+in actors responsible for creating means necessary for people to apply for mortgages.
 
 Example 2: assessing risk of re-engagement in criminal behaviour in an individual
 charged with an offense, and appropriate measures to prevent relapse, and failing
 to consider factors such as race, socio-economic status, mental health, along with
-biases present in judges, police officers, or any actors responsible for recommending
-a course of action.
+socially-dependent views present in judges, police officers, or any actors responsible
+for recommending a course of action.
 
 .. topic:: References:
 
