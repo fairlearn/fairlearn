@@ -172,59 +172,81 @@ solve problems Ackerman [#5]_.
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-This trap occurs when data scientists assume that the best solution to a problem involves
-technology, and fail to recognize other possible solutions outside of this realm.
-One area where this manifests in is within contexts in which the definition "fairness"
-changes or is dependent on a political context.
+This trap occurs when data scientists assume that the best solution to a problem
+involves technology, and fail to recognize other possible solutions outside of
+this realm.One area where this manifests in is within contexts in which the
+definition "fairness" changes or is dependent on a political context.
 
-Example: consider the problem of internet connectivity in rural communities. An example
-of the solutionism trap is assuming that by using data science to study internet speed in
-a given region, policies and deals can be arranged to reduce the price of internet access.
-However, if there are additional socioeconomic problems within a community, for example lack of
-education, infrastructure, information technology and health services, then an
-algorithmic solution purely focused on internet speed will fail to meaningfully address
-the needs of the community.
+Example: consider the problem of internet connectivity in rural communities.
+An example of the solutionism trap is assuming that by using data science to
+study internet speed in a given region, policies and deals can be arranged to
+reduce the price of internet access. However, if there are additional socioeconomic
+problems within a community, for example lack of education, infrastructure, information
+technology and health services, then an algorithmic solution purely focused on internet
+speed will fail to meaningfully address the needs of the community.
+
+
 
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#4]_ define this as a "failure to understand how the insertion of technology into
-an existing social system changes the behaviors and embedded values of the pre-existing system".
+Selbst et al. [#4]_ define this as a "failure to understand how the insertion of
+technology into an existing social system changes the behaviors and embedded values
+of the pre-existing system".
 
 Example 1:
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-This trap occurs when implementing an algorithmic solution that fails to take into account the
-social dimensions associated to fairness in a situation. These dimensions include "procedurality",
-"contextuality" and "contestability". Such dimensions can often not be resolved via a purely
-mathematical framework.
+This trap occurs when implementing an algorithmic solution that fails to take
+into account the social dimensions associated to fairness in a situation. These
+dimensions include "procedurality", "contextuality" and "contestability". Such
+dimensions can often not be resolved via a purely mathematical framework.
 
 Example:
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-This trap occurs when data scientists fail to understand how reusing a model or algorithm
-that is designed for one specific social context, may not necessarily apply to a different social
-context. Reusing an algorithmic solution and failing to take into account differences in
-involved social contexts can result in misleading results and potentially harmful consequences
-if the algorithm is used to determine the fate of an individual.
+This trap occurs when data scientists fail to understand how reusing a model or
+algorith that is designed for one specific social context, may not necessarily
+apply to a different social context. Reusing an algorithmic solution and failing
+to take into account differences in involved social contexts can result in misleading
+results and potentially harmful consequences if the algorithm is used to determine the
+fate of an individual.
 
-Example: Reusing a machine learning algorithm used to screen job applications in the nursing
-industry, for job applications in the information technology sector. An intuitive yet important
-difference between both context is the difference in skills required to succeed in both industries.
-A slightly more subtle difference is the demographic differences in genders attracted to each
-context, resulting from wording in job postings, social constructs and the male-female ratio
-of successful applicants in each field.
+Example: Reusing a machine learning algorithm used to screen job applications in the
+nursing industry, for job applications in the information technology sector. An intuitive
+yet important difference between both context is the difference in skills required to
+succeed in both industries. A slightly more subtle difference is the demographic differences
+in gender attraction to each of the industries, resulting from wording in job postings,
+social constructs on gender and societal roles, and the male-female ratio of successful
+applicants in each field.
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
 
 This trap occurs when data scientists fail to consider the full picture surrounding
-a particular social context when designing and implementing a machine learning model
-in which the outcome involves enforcing decisions that will impact a person or group of people.
+a particular social context when abstracting a social problem, and implementing an
+algorithm in which the outcome involves enforcing decisions that will impact a person
+or group of people.
+
+The authors define three main frames:
+
+1. The algorithmic frame: these are choices made when abstracting a problem
+in the form of representations (data) and labelling (outcome). In this frame
+an algorithm is evaluated based on properties of output in relation to input.
+Examples of these properties include accuracy and generalizability to data the model
+did not train on. Fairness is typically not evaluated in this frame.
+
+2. The data frame: this frame request to the content of input and output of the
+algorithm ('data') whether in the form of abstractions, or outcomes. This additional
+frame allows us to question the inherent (un)fairness present in input and output data.
+
+3. The sociotechnical frame: this frame recognizes that a machine learning model is part
+of the interaction between people and technology, and thus any social components of this
+interaction need to be modelled accordingly.
 
 Example 1: assessing and recommending eligibility for mortgage approval based on
 factors such as income, credit score, employment and education, and failing to consider
