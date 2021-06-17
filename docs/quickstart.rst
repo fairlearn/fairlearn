@@ -141,6 +141,7 @@ Fairlearn also allows us to quickly plot these metrics from the
 .. literalinclude:: auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Analyze metrics using MetricFrame
+    :end-before: # Customize plots with ylim
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
