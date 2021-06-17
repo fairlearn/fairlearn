@@ -174,7 +174,7 @@ The Solutionism Trap
 
 This trap occurs when data scientists assume that the best solution to a problem
 involves technology, and fail to recognize other possible solutions outside of
-this realm.One area where this manifests in is within contexts in which the
+this realm. One area where this manifests in is within contexts in which the
 definition "fairness" changes or is dependent on a political context.
 
 Example: consider the problem of internet connectivity in rural communities.
@@ -184,7 +184,6 @@ reduce the price of internet access. However, if there are additional socioecono
 problems within a community, for example lack of education, infrastructure, information
 technology and health services, then an algorithmic solution purely focused on internet
 speed will fail to meaningfully address the needs of the community.
-
 
 
 The Ripple Effect Trap
@@ -218,7 +217,7 @@ fate of an individual.
 
 Example: Reusing a machine learning algorithm used to screen job applications in the
 nursing industry, for job applications in the information technology sector. An intuitive
-yet important difference between both context is the difference in skills required to
+yet important difference between both contexts is the difference in skills required to
 succeed in both industries. A slightly more subtle difference is the demographic differences
 in gender attraction to each of the industries, resulting from wording in job postings,
 social constructs on gender and societal roles, and the male-female ratio of successful
@@ -257,7 +256,7 @@ for recommending a course of action.
 In the algorithmic framework, for example, input variables may contain previous criminal history,
 statements taken by the accused, witnesses and police officers. Labels (outcome)
 include recommendations by the algorithm on an appropriate course of action based
-on a computed risk score.
+on a computed risk score. Model is limited in assessing fairness out outcome.
 
 The data framework could attempt to reduce unfairness by studying socio-economic
 information regarding the accused, their upbringing and how it relates to their
@@ -268,7 +267,7 @@ Within the sociotechnical framework the model incorporates not only more nuanced
 data on the history of the case, but also the social context in which judging and
 charging people with offenses take place. This model incorporates the processes
 associated with crime reporting, the offense-trial pipeline, and identifies areas
-in which different people interact with one another as outcomes are recommended. 
+in which different people interact with one another as outcomes are recommended.
 
 .. topic:: References:
 
