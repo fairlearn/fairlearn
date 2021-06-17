@@ -141,8 +141,8 @@ which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
 subpackage :code:`fairlearn.metrics`.
 
-Failure modes encountered when abstracting
---------------------------------------------------
+What traps can we fall into when abstracting a social problem?
+--------------------------------------------------------------
 
 Machine learning systems used in the real world are inherently sociotechnical
 systems, which include both technologies and social actors. Designers of machine
@@ -196,14 +196,12 @@ Example 1:
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-This trap occurs when implementing an algorithmic solution failing to account the
-social dimensions associated to a problem. These dimensions include processes involved,
-whether human, political or bureaucratic, as well as cultural and time-bound social
-contexts. Such dimensions can often not be resolved via mathematical means.
-Failure occurs when steps are not taken to eradicate the limitations behind mathematical
-and statistical models.
+This trap occurs when implementing an algorithmic solution that fails to take into account the
+social dimensions associated to fairness in a situation. These dimensions include "procedurality",
+"contextuality" and "contestability". Such dimensions can often not be resolved via a purely
+mathematical framework.
 
-Example: 
+Example:
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
@@ -230,7 +228,7 @@ in which the outcome involves enforcing decisions that will impact a person or g
 
 Example 1: assessing and recommending eligibility for mortgage approval based on
 factors such as income, credit score, employment and education, and failing to consider
-factors such as race, socio-economic status, as well as any socially-dependent views present
+factors such as race, socioeconomic status, as well as any socially-dependent views present
 in actors responsible for creating means necessary for people to apply for mortgages.
 
 Example 2: assessing risk of re-engagement in criminal behaviour in an individual
