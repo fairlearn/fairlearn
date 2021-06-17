@@ -246,18 +246,29 @@ frame allows us to question the inherent (un)fairness present in input and outpu
 
 3. The sociotechnical frame: this frame recognizes that a machine learning model is part
 of the interaction between people and technology, and thus any social components of this
-interaction need to be modelled accordingly.
+interaction need to be modelled and incorporated accordingly.
 
-Example 1: assessing and recommending eligibility for mortgage approval based on
-factors such as income, credit score, employment and education, and failing to consider
-factors such as race, socioeconomic status, as well as any socially-dependent views present
-in actors responsible for creating means necessary for people to apply for mortgages.
-
-Example 2: assessing risk of re-engagement in criminal behaviour in an individual
+Example 1: assessing risk of re-engagement in criminal behaviour in an individual
 charged with an offense, and appropriate measures to prevent relapse, and failing
 to consider factors such as race, socio-economic status, mental health, along with
 socially-dependent views present in judges, police officers, or any actors responsible
 for recommending a course of action.
+
+In the algorithmic framework, for example, input variables may contain previous criminal history,
+statements taken by the accused, witnesses and police officers. Labels (outcome)
+include recommendations by the algorithm on an appropriate course of action based
+on a computed risk score.
+
+The data framework could attempt to reduce unfairness by studying socio-economic
+information regarding the accused, their upbringing and how it relates to their
+current status, along with a recommendation that incorporates these factors into their
+recovery.
+
+Within the sociotechnical framework the model incorporates not only more nuanced
+data on the history of the case, but also the social context in which judging and
+charging people with offenses take place. This model incorporates the processes
+associated with crime reporting, the offense-trial pipeline, and identifies areas
+in which different people interact with one another as outcomes are recommended. 
 
 .. topic:: References:
 
