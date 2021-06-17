@@ -164,15 +164,14 @@ them as:
 
 * *The Framing Trap*
 
-These traps are inspired by the observation that each of these traps are the
-result of failing to consider the way in with social context and technology
-are interrelated, as well as a deeper understanding of "the social" in order to
-solve problems Ackerman [#5]_.
+Each of these traps are the result of failing to consider the way in
+with social context and technology are interrelated, as well as a deeper understanding of
+"the social" in order to solve problems Ackerman [#5]_.
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-This trap occurs when data scientists assume that the best solution to a problem
+This trap occurs when we assume that the best solution to a problem
 involves technology, and fail to recognize other possible solutions outside of
 this realm. One area where this manifests in is within contexts in which the
 definition "fairness" changes or is dependent on a political context.
@@ -208,8 +207,8 @@ Example:
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
-This trap occurs when data scientists fail to understand how reusing a model or
-algorith that is designed for one specific social context, may not necessarily
+This trap occurs when we fail to understand how reusing a model or
+algorithm that is designed for one specific social context, may not necessarily
 apply to a different social context. Reusing an algorithmic solution and failing
 to take into account differences in involved social contexts can result in misleading
 results and potentially harmful consequences if the algorithm is used to determine the
