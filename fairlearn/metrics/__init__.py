@@ -48,6 +48,8 @@ from ._extra_metrics import (  # noqa: F401
     _mean_underprediction,
     )
 
+from ._roc_auc import RocAuc
+
 
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
