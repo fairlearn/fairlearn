@@ -3,39 +3,40 @@
 
 import copy
 import logging
+import warnings
+from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
 from sklearn.utils import check_consistent_length
-import warnings
-from functools import wraps
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
 from ._group_feature import GroupFeature
 
-
 logger = logging.getLogger(__name__)
 
 _SUBGROUP_COUNT_WARNING_THRESHOLD = 20
 
-_SF_DICT_CONVERSION_FAILURE = "DataFrame.from_dict() failed on sensitive features. " \
-                              "Please ensure each array is strictly 1-D."
+_SF_DICT_CONVERSION_FAILURE = ("DataFrame.from_dict() failed on sensitive features. "
+                               "Please ensure each array is strictly 1-D.")
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
 _FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}' is of type {1}"
 _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
-_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
-    "Keys in 'sample_params' do not match those in 'metric'"
+_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = ("Keys in 'sample_params'"
+                                       " do not match those in 'metric'")
 _BAD_INIT_ERROR = """Non streaming metrics require data to process.
  Set streaming=True for streaming metrics"""
 _NON_EMPTY_INIT_ERR = "Streaming metrics must be initialized with empty lists."
 _EMPTY_BATCHES_ERR = "No data to process, please add batches with `add_data`."
-_CF_BAD_STATE_ERR = "MetricFrame expected `control_features=None`" \
-                    " because it was initialized as such."
+_CF_BAD_STATE_ERR = ("MetricFrame expected `control_features=None`"
+                     " because it was initialized as such.")
+_NOT_STREAMING_ERR = ("This MetricFrame does not support adding data."
+                      " To add data, please use MetricFrame(..., streaming=True)")
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -62,7 +63,7 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         # being the only positional argument).
         if len(args) > 3:
             raise TypeError(f"{new_metric_frame_init.__name__}() takes 1 positional "
-                            f"argument but {1+len(args)} positional arguments "
+                            f"argument but {1 + len(args)} positional arguments "
                             f"were given")
 
         # If 1-3 positional arguments are provided (apart fom self), issue warning.
@@ -216,9 +217,9 @@ class MetricFrame:
                (y_true, y_pred, sensitive_features)) and not streaming:
             raise ValueError(_BAD_INIT_ERROR)
 
-        self._s_f = sensitive_features
-        self._c_f = control_features
-        self._s_p = sample_params
+        self._sensitive_features = sensitive_features
+        self._control_features = control_features
+        self._sample_params = sample_params
         self._streaming = streaming
         self.metrics = metrics
 
@@ -229,12 +230,11 @@ class MetricFrame:
             # Since we are not streaming, we can compute the metrics already.
             # This keeps the existing behavior where we compute the metrics in the
             # constructor.
-            self._y_true = None
-            self._y_pred = None
             check_consistent_length(y_true, y_pred)
-            y_t = _convert_to_ndarray_and_squeeze(y_true)
-            y_p = _convert_to_ndarray_and_squeeze(y_pred)
-            self._compute_metric(y_t, y_p, sensitive_features, control_features, sample_params)
+            y_true_processed = _convert_to_ndarray_and_squeeze(y_true)
+            y_pred_processed = _convert_to_ndarray_and_squeeze(y_pred)
+            self._compute_metric(y_true_processed, y_pred_processed,
+                                 sensitive_features, control_features, sample_params)
         else:
             # If we are streaming, we wait, but initialize accumulators.
             accumulators = [y_true, y_pred, sensitive_features]
@@ -249,13 +249,8 @@ class MetricFrame:
             self._overall = None
             self._by_group = None
 
-    def add_data(self,
-                 y_true,
-                 y_pred, *,
-                 sensitive_features,
-                 control_features: Optional = None,
-                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None
-                 ):
+    def add_data(self, *, y_true, y_pred, sensitive_features, control_features: Optional = None,
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Add data to the MetricFrame.
 
         Parameters
@@ -297,7 +292,7 @@ class MetricFrame:
             metric function name, with the values being the string-to-array-like dictionaries.
         """
         if not self._streaming:
-            raise NotImplementedError("This MetricFrame does not support adding data.")
+            raise NotImplementedError(_NOT_STREAMING_ERR)
         check_consistent_length(y_true, y_pred, sensitive_features)
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
@@ -305,18 +300,18 @@ class MetricFrame:
 
         self._y_true.append(y_t)
         self._y_pred.append(y_p)
-        self._s_f.append(sensitive_features)
-        if self._c_f is not None:
+        self._sensitive_features.append(sensitive_features)
+        if self._control_features is not None:
             check_consistent_length(y_true, control_features)
-            self._c_f.append(control_features)
+            self._control_features.append(control_features)
         elif control_features is not None:
             raise ValueError(_CF_BAD_STATE_ERR)
 
-        if self._s_p is not None:
+        if self._sample_params is not None:
             if sample_params is not None:
                 # All arrays should be of equal length
                 check_consistent_length(y_true, *sample_params.values())
-                self._s_p = self._concat_batches([self._s_p, sample_params])
+                self._sample_params = self._concat_batches([self._sample_params, sample_params])
             else:
                 raise ValueError("MetricFrame expected `sample_params` to be supplied.")
 
@@ -325,38 +320,54 @@ class MetricFrame:
         self._by_group = None
 
     def _concat_batches(self, batches):
-        """Concatenate a list of items together."""
+        """Concatenate a list of items together.
+
+        When merging Dicts, the values will be merged and a new dict will be created.
+        DataFrames' columns need to match to be concatenated.
+        Arrays, list and Series can be merged using simple functions.
+
+        Parameters
+        ----------
+        batches : List[Union[Dict, nd.array, List, Serie, DataFrame]]
+            A list of batch to concat together. The batches must be of the same type.
+
+        """
         if len(batches) == 0:
             raise ValueError(_EMPTY_BATCHES_ERR)
         batch_type = type(batches[0])
         if not all([type(arr) is batch_type for arr in batches]):
             raise ValueError("Can't concatenate arrays of different types.")
+        # Simple cases, array, Series and list can be concat easily.
         if batch_type is np.ndarray:
             result = np.concatenate(batches)
         elif batch_type is list:
             result = sum(batches, [])
+        elif batch_type is pd.Series:
+            result = pd.concat(batches)
         elif batch_type is pd.DataFrame:
+            # To concat dataframe, we check if the columns match.
             col_nums = batches[0].columns
             if any([col_nums != df.columns for df in batches]):
                 raise ValueError(f"Column mismatch expected {col_nums},"
                                  f" got {[df.columns for df in batches]}")
             result = pd.concat(batches)
-        elif batch_type is pd.Series:
-            result = pd.concat(batches)
         elif batch_type is dict:
-            # This concats dict together
+            # Create a new dict that merges values of all keys.
+            all_keys = set(sum((list(b.keys()) for b in batches), []))
             return {k: self._concat_batches([b[k] for b in batches if k in b])
-                    for k in set(sum((list(b.keys()) for b in batches), []))}
+                    for k in all_keys}
         else:
             raise ValueError(f"Can't concatenate {batches}")
         return result
 
     def _compute_streaming_metric(self):
+        _control_features = (self._concat_batches(self._control_features)
+                             if self._control_features else None)
         self._compute_metric(self._concat_batches(self._y_true),
                              self._concat_batches(self._y_pred),
-                             self._concat_batches(self._s_f),
-                             self._concat_batches(self._c_f) if self._c_f else None,
-                             self._s_p)
+                             self._concat_batches(self._sensitive_features),
+                             _control_features,
+                             self._sample_params)
 
     def _compute_metric(self, y_t, y_p, s_f, c_f, s_p):
         # Now, prepare the sensitive features

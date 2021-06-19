@@ -25,8 +25,8 @@ def test_alternate_compute(transform_y_t, transform_y_p, num_batches):
     batch_generator = batchify(num_batches, y_t, y_p, g_4)
     for y_t_batches, y_p_batches, g_4_batches in batch_generator:
         g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-        target.add_data(transform_y_t(y_t_batches),
-                        transform_y_p(y_p_batches),
+        target.add_data(y_true=transform_y_t(y_t_batches),
+                        y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f)
 
     assert len(target._y_true) == num_batches
@@ -35,8 +35,8 @@ def test_alternate_compute(transform_y_t, transform_y_p, num_batches):
     batch_generator = batchify(num_batches, y_t, y_p, g_4)
     for y_t_batches, y_p_batches, g_4_batches in batch_generator:
         g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-        target.add_data(transform_y_t(y_t_batches),
-                        transform_y_p(y_p_batches),
+        target.add_data(y_true=transform_y_t(y_t_batches),
+                        y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f)
     assert len(target._y_true) == 2 * num_batches
     assert target._overall is None  # has been reset
@@ -57,8 +57,8 @@ def test_sample_params(transform_y_t, transform_y_p, num_batches):
 
     for y_t_batches, y_p_batches, g_4_batches, sw_batches in batch_generator:
         g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-        target.add_data(transform_y_t(y_t_batches),
-                        transform_y_p(y_p_batches),
+        target.add_data(y_true=transform_y_t(y_t_batches),
+                        y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f,
                         sample_params={'sample_weight': sw_batches})
 
@@ -90,8 +90,8 @@ def test_sample_params(transform_y_t, transform_y_p, num_batches):
 
     # If we continue to add data, it resets the metrics
     g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-    target.add_data(transform_y_t(y_t_batches),
-                    transform_y_p(y_p_batches),
+    target.add_data(y_true=transform_y_t(y_t_batches),
+                    y_pred=transform_y_p(y_p_batches),
                     sensitive_features=g_f,
                     sample_params={'sample_weight': sw_batches})
     assert target._overall is None
@@ -108,8 +108,8 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
 
     for y_t_batches, y_p_batches, g_4_batches in batch_generator:
         g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-        target.add_data(transform_y_t(y_t_batches),
-                        transform_y_p(y_p_batches),
+        target.add_data(y_true=transform_y_t(y_t_batches),
+                        y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f)
 
     # Check on the indices properties
@@ -140,8 +140,8 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
 
     # If we continue to add data, it resets the metrics
     g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-    target.add_data(transform_y_t(y_t_batches),
-                    transform_y_p(y_p_batches),
+    target.add_data(y_true=transform_y_t(y_t_batches),
+                    y_pred=transform_y_p(y_p_batches),
                     sensitive_features=g_f)
     assert target._overall is None
     assert target._by_group is None
@@ -176,8 +176,8 @@ def test_cf_argument_mismatch(transform_y_t, transform_y_p, num_batches):
     with pytest.raises(ValueError) as excinfo:
         y_t_batches, y_p_batches, g_4_batches = next(batch_generator)
         g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-        target.add_data(transform_y_t(y_t_batches),
-                        transform_y_p(y_p_batches),
+        target.add_data(y_true=transform_y_t(y_t_batches),
+                        y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f,
                         control_features=g_f)
     assert "MetricFrame expected `control_features=None`" in str(excinfo.value)
@@ -194,8 +194,8 @@ def test_cf_argument_success(transform_y_t, transform_y_p, num_batches):
     # We supply CF in the call.
     y_t_batches, y_p_batches, g_4_batches = next(batch_generator)
     g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-    target.add_data(transform_y_t(y_t_batches),
-                    transform_y_p(y_p_batches),
+    target.add_data(y_true=transform_y_t(y_t_batches),
+                    y_pred=transform_y_p(y_p_batches),
                     sensitive_features=g_f,
                     control_features=g_f)
 
@@ -211,15 +211,15 @@ def test_sp_argument_mismatch(transform_y_t, transform_y_p):
 
     y_t_batches, y_p_batches, g_4_batches, sw_batches = next(batch_generator)
     g_f = pd.DataFrame(data=g_4_batches, columns=['My feature'])
-    target.add_data(transform_y_t(y_t_batches),
-                    transform_y_p(y_p_batches),
+    target.add_data(y_true=transform_y_t(y_t_batches),
+                    y_pred=transform_y_p(y_p_batches),
                     sensitive_features=g_f,
                     sample_params={'sample_weight': sw_batches})
 
     # We forget to supply it the next time, it should raise.
     with pytest.raises(ValueError) as excinfo:
-        target.add_data(transform_y_t(y_t_batches),
-                        transform_y_p(y_p_batches),
+        target.add_data(y_true=transform_y_t(y_t_batches),
+                        y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f)
     assert "MetricFrame expected `sample_params` to be supplied" in str(excinfo.value)
 
