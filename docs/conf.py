@@ -168,6 +168,16 @@ sphinx_gallery_conf = {
     'gallery_dirs': 'auto_examples',
     # pypandoc enables rst to md conversion in downloadable notebooks
     'pypandoc': True,
+    # binder configuration is used to ru
+    'binder': {
+        'org': 'fairlearn',
+        'repo': 'fairlearn', 
+        'binderhub_url': 'https://mybinder.org', 
+        'branch': 'main', 
+        'dependencies': ['../requirements.txt'],
+        'notebooks_dir': 'examples',
+        'use_jupyter_lab': False  
+    }
 }
 
 html_sidebars = {
