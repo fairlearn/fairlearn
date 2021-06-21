@@ -12,7 +12,8 @@ from ._extra_metrics import (_balanced_root_mean_squared_error,
                              false_positive_rate,
                              mean_prediction,
                              selection_rate,
-                             true_negative_rate)
+                             true_negative_rate,
+                             count)
 from ._metric_frame import MetricFrame
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
 
@@ -44,6 +45,7 @@ _allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, PROBABILITY, REGRE
 # Issue 269 is about unifying the two sets
 ACCURACY_SCORE = "accuracy_score"
 BALANCED_ROOT_MEAN_SQUARED_ERROR = "balanced_root_mean_squared_error"
+COUNT = "count"
 F1_SCORE = "f1_score"
 FALLOUT_RATE = "fallout_rate"
 LOG_LOSS = "log_loss"
@@ -64,6 +66,7 @@ ZERO_ONE_LOSS = "zero_one_loss"
 
 BINARY_CLASSIFICATION_METRICS = {}
 BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE] = skm.accuracy_score
+BINARY_CLASSIFICATION_METRICS[COUNT] = count
 BINARY_CLASSIFICATION_METRICS[FALLOUT_RATE] = false_positive_rate
 BINARY_CLASSIFICATION_METRICS[F1_SCORE] = skm.f1_score
 BINARY_CLASSIFICATION_METRICS[MEAN_OVERPREDICTION] = _mean_overprediction
@@ -76,6 +79,7 @@ BINARY_CLASSIFICATION_METRICS[SELECTION_RATE] = selection_rate
 BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE] = true_negative_rate
 
 REGRESSION_METRICS = {}
+REGRESSION_METRICS[COUNT] = count
 REGRESSION_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
 REGRESSION_METRICS[MEAN_PREDICTION] = mean_prediction
 REGRESSION_METRICS[MEAN_SQUARED_ERROR] = skm.mean_squared_error
@@ -84,6 +88,7 @@ REGRESSION_METRICS[R2_SCORE] = skm.r2_score
 
 PROBABILITY_METRICS = {}
 PROBABILITY_METRICS[BALANCED_ROOT_MEAN_SQUARED_ERROR] = _balanced_root_mean_squared_error
+PROBABILITY_METRICS[COUNT] = count
 PROBABILITY_METRICS[LOG_LOSS] = skm.log_loss
 PROBABILITY_METRICS[MEAN_ABSOLUTE_ERROR] = skm.mean_absolute_error
 PROBABILITY_METRICS[MEAN_OVERPREDICTION] = _mean_overprediction
@@ -171,8 +176,10 @@ def _create_group_metric_set(y_true,
         for prediction in result[_Y_PRED]:
             metric_dict = dict()
             for metric_key, metric_func in function_dict.items():
-                gmr = MetricFrame(metric_func,
-                                  result[_Y_TRUE], prediction, sensitive_features=g[_BIN_VECTOR])
+                gmr = MetricFrame(metrics=metric_func,
+                                  y_true=result[_Y_TRUE],
+                                  y_pred=prediction,
+                                  sensitive_features=g[_BIN_VECTOR])
                 curr_dict = dict()
                 curr_dict[_GLOBAL] = gmr.overall
                 curr_dict[_BINS] = list(gmr.by_group)

@@ -67,7 +67,7 @@ Sample code to reproduce the problem
 <!--
 Please provide the following information:
 - OS: [e.g. Windows]
-- Browser (if you're reporting a dashboard bug in jupyter): [e.g. Edge, Firefox, Chrome, Safari]
+- Browser (if you're reporting a bug in jupyter): [e.g. Edge, Firefox, Chrome, Safari]
 - Python version: [e.g. 3.7.4]
 - Fairlearn version: [e.g. 0.4.5 or installed from main branch in editable mode]
 - version of Python packages: please run the following snippet and paste the output:

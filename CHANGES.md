@@ -2,6 +2,21 @@
 
 ### v0.7.0
 
+* Added new `count()` metric, so that the number of data points in each
+  group is noted when using `MetricFrame`
+* Changed `MetricFrame` constructor API, so `metric` argument is now `metrics` and
+  all positional arguments are now keyword arguments. Previous call format still works
+  (until v0.10.0), but issues a deprecation warning.
+* `postprocessing.ThresholdOptimizer` now accepts `predict_method` as a
+  parameter which allows users to define which estimator method should be used
+  to get the prediction values: `"predict_proba" and "decision_function"` for
+  soft values and `"predict"` for hard values from classifiers.
+* Removed `fairlearn.widgets` module including the `FairlearnDashboard`.
+  Instead, the `fairlearn.metrics.MetricFrame` supports plotting as explained
+  in the corresponding
+  [user guide section](https://fairlearn.org/main/user_guide/assessment.html#plotting-grouped-metrics).
+* Added return value (`self`) to `fairlearn.reductions.ExponentiatedGradient`.
+
 ### v0.6.2
 
 * Bugfix for `_merge_columns()` when using multiple sensitive features with
@@ -50,7 +65,7 @@
     argument `upper_bound` with the same purpose for newly enabled regression
     scenarios on `ExponentiatedGradient`.
   For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
 * Renamed several constraints to create a uniform naming convention according
   to the accepted [metric harmonization proposal](https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md):
   * `ErrorRateRatio` renamed to `ErrorRateParity`, and
@@ -62,7 +77,7 @@
     descriptive name and for consistency with the paper. Similarly,
     `AverageLossMoment` renamed to `MeanLoss`.
   For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.github.io/user_guide/mitigation.html#reductions).
+  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
 * Added `TrueNegativeRateParity` to provide the opposite constraint of
   `TruePositiveRateParity` to be used with reductions techniques.
 * Add new constraints and objectives in `ThresholdOptimizer`

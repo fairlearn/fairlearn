@@ -73,8 +73,9 @@ class _DerivedMetric:
             bound_fn_name = bound_fn_name + '_' + k + '_' + str(v)
         dispatch_fn.__name__ = bound_fn_name
 
-        all_metrics = MetricFrame(dispatch_fn,
-                                  y_true, y_pred,
+        all_metrics = MetricFrame(metrics=dispatch_fn,
+                                  y_true=y_true,
+                                  y_pred=y_pred,
                                   sensitive_features=sensitive_features,
                                   sample_params=sample_params)
 

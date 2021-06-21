@@ -50,6 +50,12 @@
                     ],
                     "global": 0.5
                 },
+                "count": {
+                    "bins": [
+                        10, 10
+                    ],
+                    "global": 20
+                    },
                 "fallout_rate": {
                     "bins": [
                         0.5,
