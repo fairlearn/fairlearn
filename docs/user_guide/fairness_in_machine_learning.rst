@@ -39,12 +39,12 @@ The Fairlearn package is most applicable to two kinds of harms:
   information are extended or withheld. Examples include varying accuracy in
   face recognition, document search, or product recommendation.
 
-Concept Glossary
+Concept glossary
 ----------------------------
 
 The concepts outlined in this glossary are relevant to sociotechnical contexts. 
 
-Construct Validity
+Construct validity
 ^^^^^^^^^^^^^^^^^^
 
 We explore the concept of construct validity, as described in in Measurement and Fairness [#4]_ , and as it relates to sociotechnical contexts. This is intended to illuminate the concept to readers who are trying to build AI systems in sociotechnical contexts and may also be referenced in explorations that detail how to apply the concept to specific scenarios.
@@ -58,7 +58,7 @@ Key Terms
 
 - **Measurement model** – The method and approach used to measure the unobservable theoretical construct.
 
-- **Construct reliability** – This is closely related to construct validity (detailed below) and can be thought of as the extent to which the measurements of an unobservable theoretical construct remain the same when measured at different points in time. A lack of construct reliability can either be due to a misalignment between the understanding of the unobservable theoretical construct and the methods being used to measure that construct, or to changes to the construct itself.
+- **Construct reliability** – This can be thought of as the extent to which the measurements of an unobservable theoretical construct remain the same when measured at different points in time. A lack of construct reliability can either be due to a misalignment between the understanding of the unobservable theoretical construct and the methods being used to measure that construct, or to changes to the construct itself. Construct validity and construct reliability are complementary.
 
 - **Construct validity** – This can be thought of as the extent to which the measurement model measures the intended construct in way that is meaningful and useful.
 
@@ -75,11 +75,11 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 **Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
  
-What is Construct Validity? 
+What is construct validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though the Measurement and Fairness [#4]_ paper explores both Construct reliability and Construct validity, we focus our 
-exploration below on Construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
+Though the Measurement and Fairness [#4]_ paper explores both construct reliability and construct validity, we focus our 
+exploration below on construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
 contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-oriented conceptualization of construct validity, that 
 is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
 can serve as a framework for analyzing an AI task and attempting to establish construct validity:
@@ -108,7 +108,7 @@ can serve as a framework for analyzing an AI task and attempting to establish co
    measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
    measurements, and what world do we wish to live in?
 
-**Note:** The order in which the parts above are explored may vary depending on the specific 
+**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific 
 sociotechnical context. This is only intended to explain the key concepts that could be used in a 
 framework for analyzing a task.
 
