@@ -16,6 +16,7 @@
 import os
 import sys
 import inspect
+from datetime import datetime
 
 rootdir = os.path.join(
     os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), ".."
@@ -33,7 +34,7 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = "Fairlearn"
-copyright = "2021, Fairlearn contributors"
+copyright = f"2018 - {datetime.now().year}, Fairlearn contributors"
 author = "Fairlearn contributors"
 
 # The full version, including alpha/beta/rc tags
