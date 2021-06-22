@@ -2,6 +2,7 @@
 
 All names are sorted alphabetically by last name. Contributors, please add your name to the list when you submit a patch to the project.
 
+- [Kurian Benoy](https://github.com/kurianbenoy)
 - [Sarah Bird](https://github.com/slbird)
 - [Frederic Branchaud-Charron](https://github.com/Dref360)
 - [Rishit Dagli](https://github.com/Rishit-dagli)
