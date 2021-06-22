@@ -179,9 +179,8 @@ sphinx_gallery_conf = {
         "repo": "fairlearn",
         "binderhub_url": "https://mybinder.org",
         "branch": "main",
-        "dependencies": ["../requirements.txt"],
-        "notebooks_dir": "examples",
-        "use_jupyter_lab": False,
+        "dependencies": ["../.binder/requirements.txt"],
+        "use_jupyter_lab": True,
     },
 }
 
