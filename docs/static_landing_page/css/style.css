@@ -1,23 +1,3 @@
-@font-face {
-    font-family: TT Commons;
-    src: url('fonts/TTCommons/TTCommons-DemiBold.ttf')format('truetype');
-}
-
-@font-face {
-    font-family: TT Commons-light;
-    src: url('fonts/TTCommons/TTCommons-Light.ttf')format('truetype');
-}
-
-@font-face {
-    font-family: TT Commons-regular;
-    src: url('fonts/TTCommons/TTCommons-Regular.ttf')format('truetype');
-}
-
-@font-face {
-    font-family: Code Pro;
-    src: url('fonts/CodePro/SourceCodePro-Regular.ttf')format('truetype');
-}
-
 @media (min-width: 1200px) {
     .container {
         max-width: 1180px;
@@ -43,7 +23,7 @@
 }
 
 body {
-    font-family: "TT Commons", sans-serif;
+    font-family: 'Open Sans', sans-serif;
     color: #444444;
 }
 
@@ -53,7 +33,7 @@ a {
 
 p {
     font-size: 15px;
-    color: #757575;
+    color: #333333;
 }
 
 a:hover {
@@ -67,7 +47,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: "TT Commons-regular", sans-serif;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 
@@ -126,7 +106,7 @@ h6 {
 /* Desktop Navigation */
 
 .nav-menu {
-    margin-left: -150px;
+    margin-left: -80px;
     height: 100%;
 }
 
@@ -153,13 +133,13 @@ h6 {
 .nav-menu a {
     display: block;
     position: relative;
-    color: #666666;
+    color: #333333;
     transition: 0.3s;
     font-size: 14px;
-    font-family: "TT Commons", sans-serif;
+    font-family: "Open Sans", sans-serif;
     font-style: normal;
     font-weight: 600;
-    padding: 30px 17px 10px 17px;
+    padding: 28px 17px 10px 17px;
 }
 
 .nav-menu a:hover,
@@ -195,7 +175,7 @@ h6 {
 .nav-menu .drop-down ul a {
     padding: 10px 20px;
     font-size: 15px;
-    font-family: "TT Commons-light", sans-serif;
+    font-family: "Open Sans", sans-serif;
     text-transform: none;
     color: #333333;
 }
@@ -270,10 +250,12 @@ h6 {
     height: 44px;
     transition: 0.3s;
     font-size: 13px;
-    font-family: "TT Commons", sans-serif;
+    font-family: "Open Sans", sans-serif;
+    font-weight: 600;
     display: inline-block;
     margin-right: 20px;
     display: inline-block;
+    color: #000000;
 }
 
 .get-started-btn:hover {
@@ -300,7 +282,7 @@ h6 {
 
 .search-btn {
     display: inline-block;
-    padding: 10px 12px;
+    padding: 7px 12px;
     border-radius: 50%;
     height: 44px;
 }
@@ -452,7 +434,7 @@ h6 {
 --------------------------------------------------------------*/
 
 #hero {
-    background: radial-gradient(64.67% 64.67% at 50% 50%, #777777 0%, #5F5F5F 100%);
+    background: linear-gradient(233.43deg, #2FBCDB 0%, #2364D2 58.32%, #1F3598 109.22%);
     padding: 90px 0px;
     margin-top: 80px;
 }
@@ -464,12 +446,10 @@ h6 {
 
 #hero h1 {
     margin: 0;
-    padding: 0px 75px 0px 0px;
-    font-weight: 500;
     font-size: 80px;
-    line-height: 88px;
+    line-height: 86px;
     color: #FFFFFF;
-    font-family: "TT Commons", sans-serif;
+    font-family: 'Ubuntu', sans-serif;
     letter-spacing: 2px;
 }
 
@@ -486,9 +466,9 @@ h6 {
 
 #hero p {
     padding: 10px 130px 0px 0px;
-    font-size: 22px;
+    font-size: 18px;
     line-height: 26px;
-    font-family: 'TT Commons-light', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-style: normal;
     font-weight: normal;
     position: relative;
@@ -498,12 +478,12 @@ h6 {
 #hero .btn-get-started {
     display: inline-block;
     background: #FFFFFF;
-    font-family: 'TT Commons-light', sans-serif;
+    font-family: 'Ubuntu', sans-serif;
     font-weight: 600;
     border-radius: 30px;
     width: 129px;
     height: 43px;
-    color: #333333;
+    color: #2364D2;
     font-size: 15px;
     margin-bottom: 15px;
     padding: 11px 10px 10px 10px;
@@ -582,19 +562,19 @@ h6 {
 }
 
 .section-title h1 {
-    font-family: 'TT Commons-regular', sans-serif;
-    font-size: 48px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 44px;
     line-height: 52px;
     letter-spacing: 0.015em;
     color: #333333;
 }
 
 section p {
-    font-family: 'TT Commons-regular', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-style: normal;
     font-weight: normal;
-    font-size: 20px;
-    line-height: 26px;
+    font-size: 16px;
+    line-height: 24px;
 }
 
 .section-title h2 {
@@ -636,6 +616,17 @@ section p {
     margin-bottom: 100px;
 }
 
+#about .wrapper-title {
+    font-size: 15px;
+    line-height: 16px;
+    color: #2364D2;
+    margin-bottom: 20px;
+}
+
+#about .wrapper-content {
+    padding-right: 180px
+}
+
 
 /*--------------------------------------------------------------
 # Usecase
@@ -654,6 +645,7 @@ section p {
     font-size: 15px;
     font-weight: bold;
     letter-spacing: 0.06em;
+    color: #2364D2;
 }
 
 .usecase-img {
@@ -670,8 +662,10 @@ section p {
 }
 
 .usecase-content button {
+    font-size: 14px;
+    font-weight: 600;
     padding: 13px 30px;
-    background: #757575;
+    background: #3772CE;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
     border-radius: 30px;
     color: #ffffff;
@@ -695,13 +689,16 @@ section p {
 }
 
 .getstarted a {
-    text-decoration: underline;
-    color: #000000;
+    color: #2364D2;
 }
 
 .install-content {
     padding-bottom: 52px;
     border-bottom: 1px solid #F2F2F2;
+}
+
+.install-content>.section-title>p {
+    font-size: 18px;
 }
 
 .install-code {
@@ -716,23 +713,22 @@ section p {
 
 .getstarted button {
     margin: 30px 0px;
-    padding: 13px 30px;
+    padding: 11px 25px 15px 25px;
     color: #ffffff;
-    font-size: 15px;
-    background: #757575;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
+    font-size: 14px;
+    font-weight: 600;
+    background: #3772CE;
     border-radius: 30px;
 }
 
 .getstarted-img {
     margin-top: 67px;
-    /* width: 500px; */
     height: 350px;
     background: #F2F2F2;
 }
 
 .resources-title {
-    margin-top: 30px;
+    margin: 30px 0px;
 }
 
 .resource-img {
@@ -745,8 +741,15 @@ section p {
     margin-top: 20px;
 }
 
+.resource-content>h5 {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 700;
+    color: #000000;
+}
+
 .getstarted .resource-content p {
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .getstarted-install p {
@@ -771,7 +774,7 @@ section p {
 }
 
 .community .section-title P {
-    margin-bottom: 20px;
+    margin-bottom: 41px;
 }
 
 .community .title-box {
@@ -783,11 +786,15 @@ section p {
 }
 
 .title-box h6 {
-    margin: 5px 0px 0px 0px;
+    margin: 6px 0px 0px 0px;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: #000000;
 }
 
 .title-content p {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 22px;
     margin-bottom: 12px;
 }
@@ -810,7 +817,7 @@ section p {
 
 .contribute {
     padding: 60px 0px 81px 0px;
-    background: #747171;
+    background: linear-gradient(233.43deg, #2FBCDB 0%, #2364D2 58.32%, #1F3598 109.22%);
     text-align: center;
 }
 
@@ -821,11 +828,12 @@ section p {
 
 .contribute button {
     align-items: center;
-    padding: 13px 30px;
+    padding: 11px 25px 15px 25px;
     margin-top: 20px;
     font-size: 15px !important;
-    font-family: 'TT Commons', sans-serif;
-    color: #333333;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 700;
+    color: #2364D2;
     background: #FFFFFF;
     border-radius: 30px;
 }
@@ -836,7 +844,6 @@ section p {
 --------------------------------------------------------------*/
 
 #footer {
-    font-family: 'TT Commons-regular', sans-serif;
     border: 1px solid #F2F2F2;
     box-sizing: border-box;
     background: linear-gradient(0deg, rgba(204, 204, 204, 0.05), rgba(204, 204, 204, 0.05)), #FFFFFF;
@@ -849,24 +856,13 @@ section p {
 
 #footer li {
     list-style-type: none;
-    padding: 0px 0px 8px 0px;
-    font-size: 15px;
-    color: #757575;
+    padding: 0px 0px 12px 0px;
+    font-size: 13px;
+    color: #333333;
 }
 
-footer .signup-btn {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 8px 20px;
-    background: #666666;
-    border-radius: 30px;
-    color: #ffffff;
-    font-weight: normal;
-    margin-top: 18px;
-    font-family: 'TT Commons', sans-serif;
-    font-size: 13px;
-    letter-spacing: 0.5px;
+#footer li>a {
+    color: #333333;
 }
 
 .footer-top {
@@ -874,30 +870,31 @@ footer .signup-btn {
 }
 
 footer h1 {
+    font-family: 'Ubuntu', sans-serif;
     font-style: normal;
-    font-weight: normal;
-    font-size: 22px;
-    line-height: 26px;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
     color: #000;
 }
 
 footer input {
     border: none;
-    border-bottom: 0.5px solid #CCCCCC;
-    width: 100%;
+    background: #F2F2F2;
 }
 
 footer input:focus {
-    outline: none;
+    outline: none !important;
 }
 
 footer input::placeholder {
     color: #999999;
+    font-size: 13px;
 }
 
 footer .py-4 {
-    padding-top: 1rem !important;
-    padding-bottom: 1rem !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
 }
 
 footer .py-4 a {
@@ -910,5 +907,81 @@ footer .py-4 a img {
 
 footer .footer-copyright a,
 .copyright {
-    color: #757575 !important;
+    font-size: 13px;
+    color: #333333 !important;
+}
+
+.footer-contact>p {
+    font-size: 13px;
+    line-height: 16px;
+}
+
+.textbox {
+    width: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    -webkit-animation: turnaround 20s infinite;
+    animation: turnaround 20s infinite;
+}
+
+.textbox-box {
+    background-color: #F2F2F2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    -webkit-animation: hover 2s alternate infinite;
+    animation: hover 2s alternate infinite;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: all 0.2s ease;
+    border-radius: 20px;
+}
+
+.textbox-field {
+    display: flex;
+    flex-direction: column;
+    padding: 0px 15px;
+    align-self: stretch;
+    border-radius: 5px;
+}
+
+.textbox-action {
+    height: 44px;
+    width: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -border-radius: 100px;
+    transform-style: preserve-3d;
+    -webkit-animation: hover 2s -0.4s alternate infinite;
+    animation: hover 2s -0.4s alternate infinite;
+    background-color: #CCCCCC;
+    position: relative;
+    transition: all 0.2s ease;
+    border-radius: 50%;
+}
+
+.textbox-action svg {
+    fill: #272343;
+    width: 65%;
+    height: 65%;
+    -webkit-animation: hover 2s -0.6s alternate infinite;
+    animation: hover 2s -0.6s alternate infinite;
+}
+
+.textbox-action:hover {
+    cursor: pointer;
+}
+
+.textbox-text {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    -webkit-animation: hover 2s -0.4s alternate infinite;
+    animation: hover 2s -0.4s alternate infinite;
+    display: block;
+    color: #272343;
 }

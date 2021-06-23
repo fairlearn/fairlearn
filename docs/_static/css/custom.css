@@ -14,7 +14,8 @@ i.fa-gitter:hover {
     color: #D6044E;
 }
 
-@font-face {
+
+/* @font-face {
     font-family: TT Commons;
     src: url('fonts/TTCommons/TTCommons-DemiBold.ttf')format('truetype');
 }
@@ -32,7 +33,7 @@ i.fa-gitter:hover {
 @font-face {
     font-family: Code Pro;
     src: url('fonts/CodePro/SourceCodePro-Regular.ttf')format('truetype');
-}
+} */
 
 @media (min-width:1200px) {
     .container-xl {
@@ -59,7 +60,7 @@ i.fa-gitter:hover {
 }
 
 body {
-    font-family: "TT Commons", sans-serif;
+    font-family: "Open Sans", sans-serif;
     color: #444444;
 }
 
@@ -122,10 +123,10 @@ body {
 #navbar-collapsible a {
     display: block;
     position: relative;
-    color: #666666;
+    color: #333333;
     transition: 0.3s;
     font-size: 14px;
-    font-family: "TT Commons", sans-serif;
+    font-family: "Open Sans", sans-serif;
     font-style: normal;
     font-weight: 600;
     padding: 29px 17px 10px 17px;
@@ -163,7 +164,7 @@ body {
 #navbar-collapsible .drop-down ul a {
     padding: 10px 20px;
     font-size: 15px;
-    font-family: "TT Commons-light", sans-serif;
+    font-family: "Open Sans", sans-serif;
     text-transform: none;
     color: #333333;
 }
@@ -265,10 +266,11 @@ body {
     height: 44px;
     transition: 0.3s !important;
     font-size: 13px !important;
-    font-family: "TT Commons", sans-serif;
+    font-family: "Open Sans", sans-serif;
     display: inline-block !important;
     margin-right: 20px;
     text-decoration: none !important;
+    color: #000000;
 }
 
 .get-started-btn:hover {
@@ -295,7 +297,7 @@ body {
 
 .search-btn {
     display: inline-block!important;
-    padding: 10px 12px !important;
+    padding: 7px 12px !important;
     border-radius: 50%;
     width: 44px;
     height: 44px;
@@ -338,7 +340,7 @@ body {
 --------------------------------------------------------------*/
 
 .footer {
-    font-family: 'TT Commons-regular', sans-serif!important;
+    font-family: 'Open Sans', sans-serif!important;
     border: 1px solid #F2F2F2!important;
     box-sizing: border-box !important;
     background: linear-gradient(0deg, rgba(204, 204, 204, 0.05), rgba(204, 204, 204, 0.05)), #FFFFFF !important;
@@ -351,13 +353,13 @@ body {
 
 .footer li {
     list-style-type: none !important;
-    padding: 0px 0px 8px 0px !important;
-    font-size: 15px !important;
-    color: #757575 !important;
+    padding: 0px 0px 12px 0px !important;
+    font-size: 13px !important;
+    color: #333333 !important;
 }
 
 .footer a {
-    color: #666666 !important;
+    color: #333333 !important;
     text-decoration: none;
 }
 
@@ -365,37 +367,23 @@ body {
     color: #2a2af0;
 }
 
-.footer .signup-btn {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    padding: 8px 20px !important;
-    background: #666666 !important;
-    border-radius: 30px !important;
-    color: #ffffff !important;
-    font-weight: normal;
-    margin-top: 18px !important;
-    font-family: 'TT Commons', sans-serif !important;
-    font-size: 13px !important;
-    letter-spacing: 0.5px !important;
-}
-
 .footer-top {
     border-bottom: 0.5px solid #CCCCCC !important;
 }
 
 .footer h1 {
+    font-family: 'Ubuntu', sans-serif;
     font-style: normal;
-    font-weight: normal;
-    font-size: 22px !important;
-    line-height: 26px !important;
+    font-weight: 700;
+    font-size: 20px !important;
+    line-height: 24px !important;
     color: #000 !important;
 }
 
 .footer input {
     border: none !important;
-    border-bottom: 0.5px solid #CCCCCC !important;
     width: 100% !important;
+    background-color: #F2F2F2;
 }
 
 .footer input:focus {
@@ -404,6 +392,7 @@ body {
 
 .footer input::placeholder {
     color: #999999 !important;
+    font-size: 13px !important;
 }
 
 .footer .py-4 {
@@ -421,5 +410,81 @@ body {
 
 .footer .footer-copyright a,
 .copyright {
-    color: #757575 !important;
+    font-size: 13px;
+    color: #333333 !important;
+}
+
+.footer-contact>p {
+    font-size: 13px;
+    line-height: 16px;
+}
+
+.textbox {
+    width: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    -webkit-animation: turnaround 20s infinite;
+    animation: turnaround 20s infinite;
+}
+
+.textbox-box {
+    background-color: #F2F2F2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    -webkit-animation: hover 2s alternate infinite;
+    animation: hover 2s alternate infinite;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: all 0.2s ease;
+    border-radius: 20px;
+}
+
+.textbox-field {
+    display: flex;
+    flex-direction: column;
+    padding: 0px 15px;
+    align-self: stretch;
+    border-radius: 5px;
+}
+
+.textbox-action {
+    height: 44px;
+    width: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -border-radius: 100px;
+    transform-style: preserve-3d;
+    -webkit-animation: hover 2s -0.4s alternate infinite;
+    animation: hover 2s -0.4s alternate infinite;
+    background-color: #CCCCCC;
+    position: relative;
+    transition: all 0.2s ease;
+    border-radius: 50%;
+}
+
+.textbox-action svg {
+    fill: #272343;
+    width: 65%;
+    height: 65%;
+    -webkit-animation: hover 2s -0.6s alternate infinite;
+    animation: hover 2s -0.6s alternate infinite;
+}
+
+.textbox-action:hover {
+    cursor: pointer;
+}
+
+.textbox-text {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    -webkit-animation: hover 2s -0.4s alternate infinite;
+    animation: hover 2s -0.4s alternate infinite;
+    display: block;
+    color: #272343;
 }
