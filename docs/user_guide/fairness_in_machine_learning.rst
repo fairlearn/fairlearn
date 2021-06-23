@@ -46,8 +46,9 @@ The concepts outlined in this glossary are relevant to sociotechnical contexts.
 
 Construct validity
 ^^^^^^^^^^^^^^^^^^
+In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task. Which target variable do we intend to predict? What features will be included? What (fairness) constraints do we consider? Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
 
-We explore the concept of construct validity, as described in in Measurement and Fairness [#4]_ , and as it relates to sociotechnical contexts. This is intended to illuminate the concept to readers who are trying to build AI systems in sociotechnical contexts and may also be referenced in explorations that detail how to apply the concept to specific scenarios.
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness [#4]_ . This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
 Key Terms 
 ~~~~~~~~~
