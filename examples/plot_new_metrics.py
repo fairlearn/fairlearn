@@ -514,3 +514,23 @@ counts.by_group
 # %%
 # Recall that ``NaN`` indicates that there were no individuals
 # in a cell - ``member_counts()`` will not even have been called.
+
+# %%
+# Exporting from MetricFrame
+# ==========================
+#
+# Sometimes, we need to extract our data for use in other tools.
+# For this, we can use the :py:meth:`pandas.DataFrame.to_csv` method,
+# since the :py:meth:`~fairlearn.metrics.MetricFrame.by_group` property will be a
+# :class:`pandas.DataFrame` (or :class:`pandas.Series` in a few
+# cases):
+
+csv_output = cond_credit_score.by_group.to_csv()
+print(csv_output)
+
+# %%
+# The :py:meth:`pandas.DataFrame.to_csv` method has a large number of
+# arguments to control the exported CSV.
+#
+# The :meth:`~fairlearn.metrics.MetricFrame.overall` property can
+# be handled similarly, in the cases that it is not a scalar.
