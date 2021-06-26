@@ -7,7 +7,7 @@ from sklearn.datasets import make_classification
 from copy import deepcopy
 import numpy as np
 import pytest
-from fairlearn._input_validation import \
+from fairlearn.utils._input_validation import \
     (_MESSAGE_Y_NONE,
      _MESSAGE_SENSITIVE_FEATURES_NONE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
