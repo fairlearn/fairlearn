@@ -5,7 +5,10 @@
 
 from logging import error
 from typing import Any, Dict, List, Union
+from matplotlib.pyplot import subplot
+from numpy.lib.arraysetops import isin
 import pandas as pd
+import numpy as np
 
 from matplotlib.axes._axes import Axes
 
@@ -20,58 +23,40 @@ _METRICS_NOT_LIST_OR_STR_ERROR = "Metric should be a string of a single metric o
 _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR = "upper_error, lower_error, and symmetric_error must be positive and upper_bound must be greater than lower_bound"
 _INVALID_ERROR_MAPPING = "Invalid error mapping, each metric must have all the key-value pairs that make up an Error Format"
 
-def plot_metric_frame(plot_type: str, metric_frame: MetricFrame, 
-                    metrics: Union[List[str], str]=None, error_bars: Union[List[str], str]=None, conf_intervals: Union[List[str], str]=None,
-                    ax=None, show_plot=True, plot_error_labels: bool=True,
-                    text_precision_digits: int=4, text_fontsize: int=8, text_color: str="black", text_ha: str="center",
-                    title=None, capsize=10, colormap="Pastel1", TEMP_plot_with_df=True):
+def plot_metric_frame(metric_frame: MetricFrame,
+                     plot_type: str="scatter",
+                     metrics: Union[List[str], str]=None,
+                     error_bars: Union[List[str], str]=None,
+                     conf_intervals: Union[List[str], str]=None,
+                     axs=None,
+                     show_plot=True,
+                     plot_error_labels: bool=True,
+                     text_precision_digits: int=4,
+                     text_fontsize: int=8,
+                     text_color: str="black",
+                     text_ha: str="center",
+                     capsize=10,
+                     subplot_shape=None,
+                     figsize=None):
     """Visualization for metrics with statistical error bounds.
 
     Plots a given metric and its given error (as described by the `error_mapping`)
 
     This function takes in a :class:`fairlearn.metrics.MetricFrame` with precomputed metrics and metric errors
     and a `error_mapping` dict to interpret the columns (??) of the `MetricFrame`.
-
-    Note:
-        If multiple valid error_mappings are provided, this function will prioritize in the following order:
-        1. upper_bound and lower_bound
-        2. upper_error and lower_error
-        3. symmetric_error
     
     Parameters
     ----------
-    plot_type : str
-        The type of plot to display. i.e. "bar", "line", etc
-
     metric_frame : fairlearn.metrics.MetricFrame
         The collection fo disaggregated metric values, along with the metric errors.
 
-    metric : str
-        The name of the metric to plot. Should match a column from the given `MetricFrame`
+    plot_type : str
+        The type of plot to display. i.e. "bar", "line", etc
 
-    error_mapping : dict
-        The mapping between metrics and their corresponding metric errors.
-        
-        Note:
-            This class references columns from the `fairlearn.metrics.MetricFrame`
-            by their column (??) name.
+    metrics : str
+        The name of the metrics to plot. Should match columns from the given `MetricFrame`
 
-        The supported formats of errors are below:
-        +--------------------+-------------------+----------+-------------------+
-        | Error Format       |  Key_Type         | Example  | Resulting Bounds  |
-        +====================+===================+==========+===================+
-        | Symmetric Error (±)|  symmetric_error  | 0.01     | [X-0.01, X+0.01]  |
-        +--------------------+-------------------+----------+-------------------+
-        | Asymmetric Error   |  lower_error      | 0.02     | [X-0.02, X+0.03]  |
-        |                    +-------------------+----------+                   |
-        |                    |  upper_error      | 0.03     |                   |
-        +--------------------+-------------------+----------+-------------------+
-        | Bounds (symmetric  |  lower_bound      | 0.805    | [0.805, 0.815]    |
-        | or asymmetric)     +-------------------+----------+                   |
-        |                    |  upper_bound      | 0.815    |                   |
-        +--------------------+-------------------+----------+-------------------+
-
-    ax : matplotlib.axes._axes.Axes, optional
+    axs : matplotlib.axes._axes.Axes, optional
         Custom Matplotlib axes to which this function can plot
 
     show_plot : bool, optional
@@ -102,26 +87,39 @@ def plot_metric_frame(plot_type: str, metric_frame: MetricFrame,
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    # ambiguous error metric
+    # ambiguous error metric if both are provided
     if error_bars is not None and conf_intervals is not None:
-        raise RuntimeError(_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR)
+        raise ValueError(_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR)
+    # TODO: Check if metrics and error_bars/conf_intervals same length 
 
-    if ax is None:
-        ax = plt.axes(title=title)
-    df = metric_frame.by_group
-
-    assert isinstance(metrics, list) or isinstance(metrics, str) or metrics is None, _METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics))
+    if not (isinstance(metrics, list) or isinstance(metrics, str) or metrics is None):
+        raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
     
     metrics = [metrics] if isinstance(metrics, str) else metrics
     conf_intervals = [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
     error_bars = [error_bars] if isinstance(error_bars, str) else error_bars
 
+    df = metric_frame.by_group
+    if metrics is None:
+        metrics = []
+        for metric in list(df):
+            if not isinstance(df[metric][0], tuple):
+                metrics.append(metric)
+
+    if axs is None:
+        if subplot_shape is None:
+            subplot_shape = (1, len(metrics))
+        fig, axs = plt.subplots(*subplot_shape, squeeze=False, figsize=figsize)
+        axs = axs.flatten()
+        
+
+
     # plotting without error
     if error_bars is None and conf_intervals is None:
-        # ax.bar(x=df[metrics].index, height=df[metrics])
-        ax = df.plot(kind=plot_type, y=metrics, ax=ax, colormap=colormap, capsize=capsize, 
-                 title=title)
-        return ax
+        for ax, metric in zip(axs, metrics):
+            plot_func = getattr(ax, plot_type)
+            ax = plot_func(df.index, df[metric])
+        return axs
 
     df_all_errors = pd.DataFrame([])
     df_all_bounds = pd.DataFrame([])
@@ -148,40 +146,35 @@ def plot_metric_frame(plot_type: str, metric_frame: MetricFrame,
                 df_error[['lower', 'upper']] = pd.DataFrame(df[error_bar].tolist(), index=df.index)
                 df_error['error'] = list(zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
                 df_all_bounds[metric] = df_error['error']
-    else:
-        raise AssertionError(_INVALID_ERROR_MAPPING)
     
-    ax = df.plot(kind=plot_type, y=metrics, yerr=df_all_errors, ax=ax, colormap=colormap, capsize=capsize, 
-                     title=title, subplots=True)
+    for ax, metric in zip(axs, metrics):
+        plot_func = getattr(ax, plot_type)
+        plot_func(df.index, df[metric])
+        ax.set_title(metric)
 
-    # # External API work with axes (sci-kit learn compatible)
-    # # array of axes
-    # if TEMP_plot_with_df:
-    #     ax = df.plot(kind=plot_type, y=metric, yerr=df_error, ax=ax, colormap=colormap, capsize=capsize, 
-    #                  title=title)
-    # else:
-    #     ax.bar(x=df[metric].index, height=df[metric])
-    #     ax.errorbar(x=df[metric].index, y=df[metric], yerr=df["Recall Error"], ecolor="black", capsize=capsize)
+        dt = np.dtype('float, float')
+        temp_np = np.array(df['Recall Error'], dtype=dt)
+        yerr = ([list(temp_np['f0']), list(temp_np['f1'])])
+        ax.errorbar(df.index, y=df[metric], yerr=yerr, fmt="none", ecolor="black", capsize=capsize)
 
     # TODO: Check assumption of plotting items in the vertical direction
 
-    print(df_all_bounds)
 
     if plot_error_labels:
         for j, metric in enumerate(metrics):
-            y_min, y_max = ax[j].get_ylim()
+            y_min, y_max = axs[j].get_ylim()
             y_range = y_max - y_min
 
-            for i in range(len(ax[j].patches)):
-                ax[j].text(i, df_all_bounds[metric][i][0] - 0.05 * y_range, round(df_all_bounds[metric][i][0],
+            for i in range(len(axs[j].patches)):
+                axs[j].text(i, df_all_bounds[metric][i][0] - 0.05 * y_range, round(df_all_bounds[metric][i][0],
                         text_precision_digits), fontsize=text_fontsize, color=text_color,
                         ha=text_ha)
-                ax[j].text(i, df_all_bounds[metric][i][1] + 0.01 * y_range, round(df_all_bounds[metric][i][1],
+                axs[j].text(i, df_all_bounds[metric][i][1] + 0.01 * y_range, round(df_all_bounds[metric][i][1],
                         text_precision_digits), fontsize=text_fontsize, color=text_color,
                         ha=text_ha)
 
     if show_plot:
         plt.show()
 
-    return ax
+    return axs
 

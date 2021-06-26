@@ -26,7 +26,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
 from sklearn.datasets import fetch_openml
 from fairlearn.metrics import MetricFrame
-from fairlearn.experimental import enable_metric_frame_plotting
+from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 
 
 data = fetch_openml(data_id=1590, as_frame=True)
@@ -59,6 +59,16 @@ def wilson(p, n, digits=digits_of_precision, z=z_score):
 
 
 def compute_error_metric(metric_value, sample_size, z_score):
+    """ Standard Error Calculation (Binary Classification)
+
+    Assumes infinitely large population,
+    Should be used when the sampling fraction is small.
+    For sampling fraction > 5%, may want to use finite population correction
+    https://en.wikipedia.org/wiki/Margin_of_error
+
+    Note: 
+        Returns absolute error (%)
+    """
     return z_score*np.sqrt(metric_value*(1.0-metric_value))/np.sqrt(sample_size)
 
 
@@ -80,8 +90,8 @@ def accuracy_wilson(y_true, y_pred):
     bounds = wilson(score, len(y_true), digits_of_precision, z_score)
     return bounds
 
-def accuracy_normal_err(y_t, y_p):
-    assert len(y_t) == len(y_p)
+def accuracy_normal_err(y_true, y_pred):
+    assert len(y_true) == len(y_pred)
     score = accuracy_score(y_true, y_pred)
     error = compute_error_metric(score, len(y_true), z_score)
     return (error, error)
@@ -116,21 +126,21 @@ metric_frame = MetricFrame(metrics_dict, y_true, y_pred, sensitive_features=sex)
 
 # %%
 # plot metrics with (symmetric) error bars
-MetricFrame.plot_metric_frame("bar", metric_frame, metrics=['Recall', 'Accuracy'], error_bars=['Recall Error', 'Accuracy Error'])
-MetricFrame.plot_metric_frame("bar", metric_frame, metrics='Recall', error_bars='Recall Error')
+plot_metric_frame(metric_frame, plot_type="scatter", metrics=['Recall', 'Accuracy'], error_bars=['Recall Error', 'Accuracy Error'])
+plot_metric_frame(metric_frame, plot_type="bar", metrics='Recall', error_bars='Recall Error')
 
 # %%
 # plot metrics with confidence intervals (possibly asymmetric)
-MetricFrame.plot_metric_frame("bar", metric_frame, metrics=['Recall', 'Accuracy'], conf_intervals=['Recall Bounds', 'Accuracy Bounds'])
-MetricFrame.plot_metric_frame("bar", metric_frame, metrics='Recall', conf_intervals='Recall Bounds')
+plot_metric_frame(metric_frame, plot_type="bar", metrics=['Recall', 'Accuracy'], conf_intervals=['Recall Bounds', 'Accuracy Bounds'])
+plot_metric_frame(metric_frame, plot_type="scatter", metrics='Recall', conf_intervals='Recall Bounds')
 
 # %%
 # plot metrics without error bars
-MetricFrame.plot_metric_frame("bar", metric_frame, metrics=['Recall', 'Accuracy'])
+plot_metric_frame(metric_frame, plot_type="scatter", metrics=['Recall', 'Accuracy'])
 
 # %%
 # plots all columns and treats them as metrics without error bars
-MetricFrame.plot_metric_frame("bar", metric_frame) 
+plot_metric_frame(metric_frame, plot_type="bar")
 
 # %%
 # Creating Custom Error Metrics
@@ -148,15 +158,5 @@ def error_metric_function(y_true, y_pred):
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)   # compute custom metric function here
     # returns the lower bound
-    return bounds[0]
+    return bounds
 
-
-# Then when creating the ErrorPlotter we pass in the mapping of the form:
-error_mapping = {
-    "Recall": {  # `Recall` is the Metric Name
-        "upper_bound": "Recall upper bound",  # `upper_bound` is a predefined type of error metric
-        # `Recall upper bound` is the column name of the metric defined in the MetricFrame
-        "lower_bound": "Recall lower bound"  # `lower_bound` is another predefined type of error metric
-                                             # `Recall lower bound` is the column name of the metric defined in the MetricFrame
-    }
-}

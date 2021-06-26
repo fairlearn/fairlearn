@@ -15,9 +15,3 @@ Importing this file dynamically sets the
 from ..metrics._plotter import (
     plot_metric_frame
 )
-
-from ..metrics import MetricFrame
-
-# use settattr to avoid mypy errors when monkeypatching
-setattr(MetricFrame, "plot_metric_frame",
-        plot_metric_frame)
