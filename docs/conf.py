@@ -16,6 +16,7 @@
 import os
 import sys
 import inspect
+from datetime import datetime
 rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
 sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -29,7 +30,7 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = 'Fairlearn'
-copyright = '2021, Fairlearn contributors'
+copyright = f'2018 - {datetime.now().year}, Fairlearn contributors'
 author = 'Fairlearn contributors'
 
 # The full version, including alpha/beta/rc tags
@@ -69,10 +70,11 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx_gallery.gen_gallery',
-    'sphinx_multiversion'
+    'sphinx_multiversion',
+    'sphinx_autodoc_typehints',  # needs to be AFTER napoleon
 ]
 
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
