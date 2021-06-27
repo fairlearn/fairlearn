@@ -1,5 +1,9 @@
 # Changes
 
+### v0.7.1
+
+
+
 ### v0.7.0
 
 * Added new `count()` metric, so that the number of data points in each
