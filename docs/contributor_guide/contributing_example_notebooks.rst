@@ -3,8 +3,22 @@
 Contributing example notebooks
 ------------------------------
 
-We'd love to collaborate with anyone interested in describing scenarios for
-using Fairlearn!
+There are various kinds of examples in our documentation including
+
+- **API docs** - short examples in the source code documentation for
+  individual classes or functions
+- **User guide** - tutorial with explanations. This can include multiple
+  subsections that focus on various aspects. Additionally, user guide sections
+  can cover several parts of Fairlearn (unlike the API docs which are
+  restricted to a single class or function), e.g., comparisons of mitigation
+  algorithms or fairness concepts that are broadly applicable.
+- **Example notebooks** - use cases
+
+This section only covers the last point. For the first two
+:ref:`contributing_documentation` should be sufficient.
+
+Criteria
+^^^^^^^^
 
 A good example notebook exhibits the following attributes:
 
@@ -17,8 +31,8 @@ A good example notebook exhibits the following attributes:
    Avoids abstraction traps.
    See `Selbst et al. (2020) <https://andrewselbst.files.wordpress.com/2019/10/selbst-et-al-fairness-and-abstraction-in-sociotechnical-systems.pdf>`_.
 4. **Substantiated**: Discusses trade-offs and compares alternatives.
-   Describes why using particular Fairlearn functionalities makes sense if
-   Fairlearn is used.
+   Describes why using particular Fairlearn functionalities makes sense.
+   This applies only if Fairlearn is used which is not mandatory.
 5. **For developers**: Speaks the language of developers and data scientists.
    Considers real practitioner needs.
    Fits within the lifecycle of real practitioner work.
@@ -30,8 +44,8 @@ Please keep these in mind when creating, discussing, and critiquing examples.
 Process
 ^^^^^^^
 
-All current efforts are tracked through items in the corresponding
-`Project Board <https://github.com/fairlearn/fairlearn/projects/3>`_.
+All current efforts are tracked through
+`GitHub issues <https://github.com/fairlearn/fairlearn/issues>`_.
 If you'd like to suggest a different kind of use case, please
 `open a new issue <https://github.com/fairlearn/fairlearn/issues/new/choose>`_
 if you cannot find a similar one that is already tracked in the
