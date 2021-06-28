@@ -6,7 +6,7 @@ import numpy as np
 from .moment import LossMoment
 from .moment import _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _ALL
 
-from fairlearn._input_validation import _validate_and_reformat_input
+from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 
 class ConditionalLossMoment(LossMoment):
