@@ -29,7 +29,7 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import Bunch
 
 from ..utils._common import _get_soft_predictions
-from .._input_validation import (
+from ..utils._input_validation import (
     _validate_and_reformat_input,
     _KW_CONTROL_FEATURES,
 )
