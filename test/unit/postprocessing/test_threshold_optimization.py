@@ -9,12 +9,12 @@ import numpy as np
 import pytest
 from fairlearn.utils._input_validation import (
     _MESSAGE_Y_NONE,
-     _MESSAGE_SENSITIVE_FEATURES_NONE,
-     _LABELS_NOT_0_1_ERROR_MESSAGE)
+    _MESSAGE_SENSITIVE_FEATURES_NONE,
+    _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.postprocessing import ThresholdOptimizer
-from fairlearn.postprocessing._threshold_optimizer import \
-    (NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
-     BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
+from fairlearn.postprocessing._threshold_optimizer import (
+    NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
+    BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
 from fairlearn.postprocessing._tradeoff_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
 from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
