@@ -5,7 +5,7 @@
 
 from logging import error
 from typing import Any, Dict, List, Union
-from matplotlib.pyplot import subplot
+from matplotlib.pyplot import subplot, title
 from numpy.lib.arraysetops import isin
 import pandas as pd
 import numpy as np
@@ -36,8 +36,10 @@ def plot_metric_frame(metric_frame: MetricFrame,
                      text_color: str="black",
                      text_ha: str="center",
                      capsize=10,
+                     colormap="Pastel1",
                      subplot_shape=None,
-                     figsize=None):
+                     figsize=None
+                     ):
     """Visualization for metrics with statistical error bounds.
 
     Plots a given metric and its given error (as described by the `error_mapping`)
@@ -53,7 +55,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
     plot_type : str
         The type of plot to display. i.e. "bar", "line", etc
 
-    metrics : str
+    metrics : str or list of str
         The name of the metrics to plot. Should match columns from the given `MetricFrame`
 
     axs : matplotlib.axes._axes.Axes, optional
@@ -81,7 +83,6 @@ def plot_metric_frame(metric_frame: MetricFrame,
     -------
     matplotlib.axes._axes.Axes
     """
-
     try:
         import matplotlib.pyplot as plt
     except ImportError:
@@ -100,25 +101,29 @@ def plot_metric_frame(metric_frame: MetricFrame,
     error_bars = [error_bars] if isinstance(error_bars, str) else error_bars
 
     df = metric_frame.by_group
+
+    # only plot metrics that aren't tuples
     if metrics is None:
         metrics = []
         for metric in list(df):
-            if not isinstance(df[metric][0], tuple):
+            if not isinstance(df[metric][0], tuple) and metric != "_index":
                 metrics.append(metric)
+
 
     if axs is None:
         if subplot_shape is None:
             subplot_shape = (1, len(metrics))
         fig, axs = plt.subplots(*subplot_shape, squeeze=False, figsize=figsize)
         axs = axs.flatten()
-        
-
 
     # plotting without error
+    df['_index'] = df.index
     if error_bars is None and conf_intervals is None:
-        for ax, metric in zip(axs, metrics):
-            plot_func = getattr(ax, plot_type)
-            ax = plot_func(df.index, df[metric])
+        for metric, ax in zip(metrics, axs):
+            previous_xlabel = ax.get_xlabel()
+            ax = df.plot(x="_index", y=metric, kind=plot_type, ax=ax, colormap=colormap)
+            ax.set_xlabel(previous_xlabel)
+        del df['_index']
         return axs
 
     df_all_errors = pd.DataFrame([])
@@ -147,24 +152,18 @@ def plot_metric_frame(metric_frame: MetricFrame,
                 df_error['error'] = list(zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
                 df_all_bounds[metric] = df_error['error']
     
-    for ax, metric in zip(axs, metrics):
-        plot_func = getattr(ax, plot_type)
-        plot_func(df.index, df[metric])
-        ax.set_title(metric)
-
-        dt = np.dtype('float, float')
-        temp_np = np.array(df['Recall Error'], dtype=dt)
-        yerr = ([list(temp_np['f0']), list(temp_np['f1'])])
-        ax.errorbar(df.index, y=df[metric], yerr=yerr, fmt="none", ecolor="black", capsize=capsize)
-
+    for metric, ax in zip(metrics, axs):
+        previous_xlabel = ax.get_xlabel()
+        ax = df.plot(x="_index", y=metric, kind=plot_type, yerr=df_all_errors, ax=ax, colormap=colormap)
+        ax.set_xlabel(previous_xlabel)
     # TODO: Check assumption of plotting items in the vertical direction
-
 
     if plot_error_labels:
         for j, metric in enumerate(metrics):
             y_min, y_max = axs[j].get_ylim()
             y_range = y_max - y_min
 
+            # TODO: Figure out if works for other plotting modes (besides bar)
             for i in range(len(axs[j].patches)):
                 axs[j].text(i, df_all_bounds[metric][i][0] - 0.05 * y_range, round(df_all_bounds[metric][i][0],
                         text_precision_digits), fontsize=text_fontsize, color=text_color,
@@ -176,5 +175,6 @@ def plot_metric_frame(metric_frame: MetricFrame,
     if show_plot:
         plt.show()
 
+    del df['_index']
     return axs
 

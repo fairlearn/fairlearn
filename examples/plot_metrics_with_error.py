@@ -126,7 +126,9 @@ metric_frame = MetricFrame(metrics_dict, y_true, y_pred, sensitive_features=sex)
 
 # %%
 # plot metrics with (symmetric) error bars
-plot_metric_frame(metric_frame, plot_type="scatter", metrics=['Recall', 'Accuracy'], error_bars=['Recall Error', 'Accuracy Error'])
+axs = plot_metric_frame(metric_frame, plot_type="scatter", 
+    metrics=['Recall', 'Accuracy'], 
+    error_bars=['Recall Error', 'Accuracy Error'])
 plot_metric_frame(metric_frame, plot_type="bar", metrics='Recall', error_bars='Recall Error')
 
 # %%
@@ -140,7 +142,19 @@ plot_metric_frame(metric_frame, plot_type="scatter", metrics=['Recall', 'Accurac
 
 # %%
 # plots all columns and treats them as metrics without error bars
-plot_metric_frame(metric_frame, plot_type="bar")
+axs = plot_metric_frame(metric_frame, plot_type="bar")
+
+# %%
+# Custom Plot 
+import matplotlib.pyplot as plt
+fig, axs = plt.subplots(*(1, 2), squeeze=False)
+axs = axs.flatten()
+axs[0].set_title("Custom Recall")
+axs[1].set_title("Custom Accuracy")
+axs[0].set_xlabel("Sensitive Feature")
+axs[1].set_xlabel("Sensitive Feature")
+
+axs = plot_metric_frame(metric_frame, axs=axs, plot_type="bar")
 
 # %%
 # Creating Custom Error Metrics
