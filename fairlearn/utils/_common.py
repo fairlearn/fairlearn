@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 def _get_soft_predictions(estimator, X, predict_method):
-    """Return soft predictions of a classifier.
+    r"""Return soft predictions of a classifier.
 
     Parameters
     ----------
