@@ -3,25 +3,59 @@
 
 """Utility class for plotting metrics with error ranges."""
 
-from logging import error
-from typing import Any, Dict, List, Union
-from matplotlib.pyplot import subplot, title
-from numpy.lib.arraysetops import isin
+from typing import List, Union
+from matplotlib.pyplot import errorbar
 import pandas as pd
 import numpy as np
-
-from matplotlib.axes._axes import Axes
 
 from ._metric_frame import MetricFrame
 
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install matplotlib to use " \
                                    "the plotting for MetricFrame."
 
-_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = "Ambiguous Error Metric. Please only provide one of: error_bars and conf_intervals."
+_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = "Ambiguous Error Metric. Please only provide one of: error_bars or conf_intervals."
+_METRIC_AND_ERROR_BARS_NOT_SAME_LENGTH_ERROR = "The list of metrics and list of error_bars are not the same length."
+_METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR = "The list of metrics and list of conf_intervals are not the same length."
 
 _METRICS_NOT_LIST_OR_STR_ERROR = "Metric should be a string of a single metric or a list of the metrics in provided MetricFrame, but {0} was provided"
-_NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR = "upper_error, lower_error, and symmetric_error must be positive and upper_bound must be greater than lower_bound"
-_INVALID_ERROR_MAPPING = "Invalid error mapping, each metric must have all the key-value pairs that make up an Error Format"
+_ERROR_BARS_MUST_BE_TUPLE = "Calculated error_bars must be tuple of length 2"
+_CONF_INTERVALS_MUST_BE_TUPLE = "Calculated conf_intervals must be tuple of length 2"
+_ERROR_BARS_NEGATIVE_VALUE_ERROR = "Calculated relative errors from error_bars must be positive"
+_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = "Calculated conf_intervals' upper bound cannot be less than lower bound"
+
+
+
+def _check_if_metrics_and_error_metrics_same_length(metrics, error_bars, conf_intervals):
+    if error_bars is not None:
+        if len(error_bars) != len(metrics):
+            raise ValueError(_METRIC_AND_ERROR_BARS_NOT_SAME_LENGTH_ERROR)
+    elif conf_intervals is not None:
+        if len(conf_intervals) != len(metrics):
+            raise ValueError(_METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR)
+
+def _check_for_ambiguous_error_metric(error_bars, conf_intervals):
+    # ambiguous error metric if both are provided
+    if error_bars is not None and conf_intervals is not None:
+        raise ValueError(_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR)
+
+def _check_for_valid_metrics_format(metrics):
+    # ensure metrics is either list, str, or None
+    if not (isinstance(metrics, list) or isinstance(metrics, str) or metrics is None):
+        raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
+
+def _check_valid_error_bars(df_error_bars):
+    for tup in df_error_bars:
+        if not isinstance(tup, tuple) or len(tup) != 2:
+            raise ValueError(_ERROR_BARS_MUST_BE_TUPLE)
+        if not all(ele >= 0 for ele in tup):
+            raise ValueError(_ERROR_BARS_NEGATIVE_VALUE_ERROR)
+
+def _check_valid_conf_interval(df_conf_intervals):
+    for tup in df_conf_intervals:
+        if not isinstance(tup, tuple) or len(tup) != 2:
+            raise ValueError(_CONF_INTERVALS_MUST_BE_TUPLE)
+        if tup[0] > tup[1]:
+            raise ValueError(_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR)
 
 def plot_metric_frame(metric_frame: MetricFrame,
                      plot_type: str="scatter",
@@ -42,23 +76,47 @@ def plot_metric_frame(metric_frame: MetricFrame,
                      ):
     """Visualization for metrics with statistical error bounds.
 
-    Plots a given metric and its given error (as described by the `error_mapping`)
+    Plots a given metric and its given error (as described by the `error_bars` or `conf_intervals`)
 
     This function takes in a :class:`fairlearn.metrics.MetricFrame` with precomputed metrics and metric errors
-    and a `error_mapping` dict to interpret the columns (??) of the `MetricFrame`.
+    and a `error_bars` or `conf_intervals` array to interpret the columns of the `MetricFrame`.
+
+    The items at each index of the given `metrics` array and given `error_bars` or `conf_intervals` array should
+    correspond to a pair of the same metric and metric error, respectively. 
     
     Parameters
     ----------
     metric_frame : fairlearn.metrics.MetricFrame
         The collection fo disaggregated metric values, along with the metric errors.
 
-    plot_type : str
-        The type of plot to display. i.e. "bar", "line", etc
+    plot_type : str, optional
+        The type of plot to display. i.e. "bar", "line", etc.
+        List of options is detailed in `pandas.DataFrame.plot`
 
     metrics : str or list of str
-        The name of the metrics to plot. Should match columns from the given `MetricFrame`
+        The name of the metrics to plot. Should match columns from the given `MetricFrame`.
+    
+    error_bars : str or list of str
+        The name of the error metrics to plot. Should match columns from the given `MetricFrame`.
+        Error bars quantify the bounds relative to the base metric.
+        
+        Example:
+            If the error bar for a certain column is [0.01, 0.02]
+            and the metric is 0.6
+            Then the plotted bounds will be [0.59, 0.62]
 
-    axs : matplotlib.axes._axes.Axes, optional
+        Note:
+            The return of the error bar function should be a tuple of the lower
+            and upper errors
+    
+    conf_intervals : str or list of str
+        The name of the confidence intervals to plot. Should match columns from the given `MetricFrame`.
+
+        Note:
+            The return of the error bar function should be a tuple of the lower
+            and upper bounds
+
+    axs : matplotlib.axes._axes.Axes or list of matplotlib.axes._axes.Axes, optional
         Custom Matplotlib axes to which this function can plot
 
     show_plot : bool, optional
@@ -88,13 +146,8 @@ def plot_metric_frame(metric_frame: MetricFrame,
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    # ambiguous error metric if both are provided
-    if error_bars is not None and conf_intervals is not None:
-        raise ValueError(_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR)
-    # TODO: Check if metrics and error_bars/conf_intervals same length 
-
-    if not (isinstance(metrics, list) or isinstance(metrics, str) or metrics is None):
-        raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
+    _check_for_ambiguous_error_metric(error_bars, conf_intervals)
+    _check_for_valid_metrics_format(metrics)
     
     metrics = [metrics] if isinstance(metrics, str) else metrics
     conf_intervals = [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
@@ -102,27 +155,35 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     df = metric_frame.by_group
 
-    # only plot metrics that aren't tuples
+    # only plot metrics that aren't tuples (filters out metric errors)
     if metrics is None:
         metrics = []
         for metric in list(df):
-            if not isinstance(df[metric][0], tuple) and metric != "_index":
+            if not isinstance(df[metric][0], tuple):
                 metrics.append(metric)
 
+    _check_if_metrics_and_error_metrics_same_length(metrics, error_bars, conf_intervals)
 
     if axs is None:
         if subplot_shape is None:
-            subplot_shape = (1, len(metrics))
+            if len(metrics) > 0:
+                subplot_shape = (1, len(metrics))
+            else:
+                subplot_shape = (1, 1)
         fig, axs = plt.subplots(*subplot_shape, squeeze=False, figsize=figsize)
         axs = axs.flatten()
 
-    # plotting without error
+    # plotting without error bars or confidence intervals
     df['_index'] = df.index
     if error_bars is None and conf_intervals is None:
         for metric, ax in zip(metrics, axs):
             previous_xlabel = ax.get_xlabel()
             ax = df.plot(x="_index", y=metric, kind=plot_type, ax=ax, colormap=colormap)
             ax.set_xlabel(previous_xlabel)
+
+        if show_plot:
+            plt.show()
+        
         del df['_index']
         return axs
 
@@ -131,20 +192,16 @@ def plot_metric_frame(metric_frame: MetricFrame,
     # plotting with confidence intervals:
     if conf_intervals is not None:
         for metric, conf_interval in zip(metrics, conf_intervals):
+            _check_valid_conf_interval(df[conf_interval])
             df_all_errors[metric] = abs(df[metric] - df[conf_interval])
-
-            # assert bounds are valid
-            #assert (df_lower_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
 
             if plot_error_labels:
                 df_all_bounds[metric] = df[conf_interval]
     # plotting with relative errors
     elif error_bars is not None:
         for metric, error_bar in zip(metrics, error_bars):
+            _check_valid_error_bars(df[error_bar])
             df_all_errors[metric] = df[error_bar]
-
-            # assert bounds are valid
-            #assert (df_error >= 0).all(), _NEG_ERROR_OR_FLIPPED_BOUNDS_ERROR
 
             if plot_error_labels:
                 df_error = pd.DataFrame([])
@@ -156,8 +213,8 @@ def plot_metric_frame(metric_frame: MetricFrame,
         previous_xlabel = ax.get_xlabel()
         ax = df.plot(x="_index", y=metric, kind=plot_type, yerr=df_all_errors, ax=ax, colormap=colormap)
         ax.set_xlabel(previous_xlabel)
-    # TODO: Check assumption of plotting items in the vertical direction
 
+    # TODO: Check assumption of plotting items in the vertical direction
     if plot_error_labels:
         for j, metric in enumerate(metrics):
             y_min, y_max = axs[j].get_ylim()

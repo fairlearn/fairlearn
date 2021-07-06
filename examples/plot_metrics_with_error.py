@@ -126,7 +126,7 @@ metric_frame = MetricFrame(metrics_dict, y_true, y_pred, sensitive_features=sex)
 
 # %%
 # plot metrics with (symmetric) error bars
-axs = plot_metric_frame(metric_frame, plot_type="scatter", 
+plot_metric_frame(metric_frame, plot_type="scatter", 
     metrics=['Recall', 'Accuracy'], 
     error_bars=['Recall Error', 'Accuracy Error'])
 plot_metric_frame(metric_frame, plot_type="bar", metrics='Recall', error_bars='Recall Error')
@@ -142,7 +142,11 @@ plot_metric_frame(metric_frame, plot_type="scatter", metrics=['Recall', 'Accurac
 
 # %%
 # plots all columns and treats them as metrics without error bars
-axs = plot_metric_frame(metric_frame, plot_type="bar")
+plot_metric_frame(metric_frame, plot_type="bar")
+
+# %%
+# plots no metrics
+plot_metric_frame(metric_frame, plot_type="bar", metrics=[])
 
 # %%
 # Custom Plot 
