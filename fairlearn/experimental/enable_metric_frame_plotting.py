@@ -1,15 +1,13 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Enables Metric Frame Plotting
 
 The API and results of these estimators might change without any deprecation
 cycle.
 
-Importing this file dynamically sets the
-:class:`~metrics._error_plotter.plot_metric_frame` as an attribute of the
-`MetricFrame` module::
-    >>> # explicitly require this experimental feature
-    >>> from fairlearn.experimental import enable_metric_frame_plotting # noqa
-    >>> # now you can import normally from metrics
-    >>> from fairlearn.metrics import MetricFrame
+Importing this file imports the standalone function `plot_metric_frame`
+that visualizes metrics and their statistical metric errors from MetricFrames.
 """
 
 from ..metrics._plotter import (

@@ -1,10 +1,9 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 """Utility class for plotting metrics with error ranges."""
 
 from typing import List, Union
-from matplotlib.pyplot import errorbar
 import pandas as pd
 import numpy as np
 
@@ -83,6 +82,10 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     The items at each index of the given `metrics` array and given `error_bars` or `conf_intervals` array should
     correspond to a pair of the same metric and metric error, respectively. 
+
+    Note:
+        If given many metrics to plot, this function plots them in only 1 row
+        with the number of subplot columns matching the number of metrics
     
     Parameters
     ----------

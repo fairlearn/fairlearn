@@ -1,5 +1,5 @@
 # %%
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 """
@@ -12,8 +12,12 @@ Plotting Metrics with Error Bars
 # --------------------------------
 # We download the data set using `fetch_openml` function in `sklearn.datasets`.
 # The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
-# We start by importing the various modules we're going to use:
+# There are some caveats to using this dataset, but we will use it solely as an example
+# to demonstrate the plotting metrics with error bars functionality
 #
+# We start by importing the various modules we're going to use:
+
+# TODO: Remove in final version (helps run with local packages)
 import os
 import sys
 nb_dir = os.path.split(os.getcwd())[0]
@@ -38,11 +42,9 @@ sex = data.data['sex']
 # Error Metrics
 # -------------
 # We have many different choices for error metrics. In this notebook we'll just be using a
-# Normal approximation interval (symmetric) and a Wilson score interval (asymmetric).
-#
-# https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval
-# https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval
-#
+# `Normal approximation interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval>` (symmetric)
+# and a `Wilson score interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval>` (asymmetric).
+
 # We aim to create a 95% confidence interval, so we use a `z_score` of 1.959964
 z_score = 1.959964
 digits_of_precision = 4
@@ -110,7 +112,7 @@ y_pred = classifier.predict(X)
 # %%
 # MetricFrame
 # -----------
-# Now we create a MetricFrame to generate the Recall wilson bounds and Recall normal error
+# Now we create a MetricFrame to generate the recall Wilson bounds and recall normal error
 #
 
 # Analyze metrics using MetricFrame
@@ -145,14 +147,19 @@ plot_metric_frame(metric_frame, plot_type="scatter", metrics=['Recall', 'Accurac
 plot_metric_frame(metric_frame, plot_type="bar")
 
 # %%
-# plots no metrics
+# plots no metrics (or should it return an error)
+# TODO: remove later, but something we should determine how to handle
 plot_metric_frame(metric_frame, plot_type="bar", metrics=[])
 
 # %%
 # Custom Plot 
+#
+# Demonstrates how to customize the axes and then pass into `plot_metric_frame` 
 import matplotlib.pyplot as plt
+
 fig, axs = plt.subplots(*(1, 2), squeeze=False)
 axs = axs.flatten()
+
 axs[0].set_title("Custom Recall")
 axs[1].set_title("Custom Accuracy")
 axs[0].set_xlabel("Sensitive Feature")
@@ -175,6 +182,7 @@ def error_metric_function(y_true, y_pred):
     # compute custom metric function here
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)   # compute custom metric function here
-    # returns the lower bound
+    
+    # returns the bounds in the format (lower_bound, upper_bound)
     return bounds
 
