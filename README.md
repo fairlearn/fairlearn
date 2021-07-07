@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=main)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=main) ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg) ![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![StackOverflow](https://img.shields.io/badge/StackOverflow-questions-blueviolet)](https://stackoverflow.com/questions/tagged/fairlearn)
+[![Build Status](https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=main)](https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=main) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/fairlearn/fairlearn/blob/main/LICENSE) [![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)](https://badge.fury.io/py/fairlearn) [![Gitter](https://badges.gitter.im/fairlearn/community.svg)](https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![StackOverflow](https://img.shields.io/badge/StackOverflow-questions-blueviolet)](https://stackoverflow.com/questions/tagged/fairlearn)
 
 # Fairlearn
 
@@ -19,8 +19,8 @@ Website: https://fairlearn.org/
 
 ## Current release
 
-- The current stable release is available at
-  [Fairlearn v0.7.0](https://github.com/fairlearn/fairlearn/tree/release/v0.7.0).
+- The current stable release is available on PyPI
+  [![PyPI](https://img.shields.io/pypi/v/fairlearn?color=blue)](https://badge.fury.io/py/fairlearn).
 
 - Our current version may differ substantially from earlier versions.
   Users of earlier versions should visit our
@@ -71,7 +71,7 @@ For common usage refer to the [Jupyter notebooks](./notebooks) and our
 Please note that our APIs are subject to change, so notebooks downloaded
 from `main` may not be compatible with Fairlearn installed with `pip`.
 In this case, please navigate the tags in the repository
-(e.g. [v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5))
+(e.g. [v0.7.0](https://github.com/fairlearn/fairlearn/tree/v0.7.0))
 to locate the appropriate version of the notebook.
 
 ## Contributing

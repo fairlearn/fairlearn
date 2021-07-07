@@ -44,10 +44,10 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 #. On the `main` branch, create a PR to:
 
     #. Update the version in `__init__.py` to `x.y.z+1.dev0`
-    #. Update the 'current stable release' sentence in the ReadMe to link to `v<x.y.z>`
     #. Ensure that `smv_tag_whitelist` in `docs/conf.py` will pick up the
        new release
-    #. Update `docs/static_landing_page/` so that all the links point to the new release
+    #. Update the version in `docs/static_landing_page/js/landing_page.js`
+       so that all the links point to the new release
    
 .. note::
     Make sure to add a note to this second PR:
