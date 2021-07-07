@@ -13,7 +13,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+from git import Repo
 import os
+import re
 import sys
 import inspect
 from datetime import datetime
@@ -93,8 +95,42 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.md']
 master_doc = 'index'
 
 # Multiversion settings
+# Show only the highest patch versions of each minor version.
+# Example: include 0.4.6, but not 0.4.0 to 0.4.5
+repo = Repo('.', search_parent_directories=True)
+all_tags = [tag.path.strip('refs/tags') for tag in repo.tags]
+all_tags = [tag for tag in all_tags if tag[0] == "v"]
+version_dict = {}
+for tag in all_tags:
+    split_tag = tag.split('.')
+    if len(split_tag) != 3:
+        print(f'ignoring version {tag}')
+        continue
+    major, minor, patch = split_tag
+    minor = int(minor)
+    patch = int(patch)
 
-smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d|^v0\.6\.2|^v0\.7\.\d+$'
+    if major == 'v0' and minor < 4:
+        # ignore versions below 0.4
+        continue
+
+    if major in version_dict:
+        if minor in version_dict:
+            if patch > version_dict[major][minor]:
+                # enter new highest patch version
+                print(f'ignoring version {major}.{minor}.{version_dict[major][minor]}')
+                version_dict[major][minor] = patch
+        else:
+            # first time encountering this minor version
+            version_dict[major][minor] = patch
+    else:
+        version_dict[major] = {minor: patch}
+    
+smv_tag_whitelist = r'|'.join([
+    fr'^{major}\.{minor}\.{version_dict[major][minor]}'
+    for major in version_dict
+    for minor in version_dict[major]]) + r'+$'
+
 smv_branch_whitelist = r'^main$'
 
 if check_if_v046():
