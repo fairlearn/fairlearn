@@ -53,7 +53,7 @@ def _simple_compare(moment, metric):
     results = target.gamma(est.predict)
 
     # Compute the constraint violation using the metrics
-    mf_pred = MetricFrame(metric, y, y_pred,
+    mf_pred = MetricFrame(metrics=metric, y_true=y, y_pred=y_pred,
                           sensitive_features=X['sens'],
                           control_features=X['ctrl'])
     diffs = mf_pred.by_group - mf_pred.overall
@@ -97,7 +97,7 @@ def _selected_label_compare(moment, metric, selected_label):
     results = target.gamma(est.predict)
 
     # Compute the constraint violation using the metrics
-    mf_pred = MetricFrame(metric, y, y_pred,
+    mf_pred = MetricFrame(metrics=metric, y_true=y, y_pred=y_pred,
                           sensitive_features=X['sens'],
                           control_features=X['ctrl'])
     diffs = mf_pred.by_group - mf_pred.overall

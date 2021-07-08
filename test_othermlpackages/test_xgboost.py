@@ -1,11 +1,12 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import pytest
 from . import package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
 
-import xgboost as xgb
+xgb = pytest.importorskip("xgboost")
 
 
 def test_expgrad_classification():
