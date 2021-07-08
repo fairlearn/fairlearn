@@ -15,7 +15,6 @@
 #
 from git import Repo
 import os
-import re
 import sys
 import inspect
 from datetime import datetime
@@ -125,7 +124,7 @@ for tag in all_tags:
             version_dict[major][minor] = patch
     else:
         version_dict[major] = {minor: patch}
-    
+
 smv_tag_whitelist = r'|'.join([
     fr'^{major}\.{minor}\.{version_dict[major][minor]}'
     for major in version_dict
