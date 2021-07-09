@@ -43,7 +43,7 @@ We have a weekly community call every Thursday at 11am US Eastern time (ET).
 Check what this means in your time zone with
 `Time.is <https://time.is/New_York>`_.
 All are welcome! Please reach out via
-`Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
+`Discord <https://discord.gg/R22yCfgsRn>`_ and we will forward the
 invitation to you.
 We keep notes from each meeting in our
 `HackMD <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>`_.
