@@ -62,27 +62,47 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
         estimator.
 
     """
+    result_y, result_sf, result_cf = _validate_and_reformat_labels_and_sf(y, expect_y, enforce_binary_labels, **kwargs)
     if y is not None:
-        # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
-        if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
-            y = y.reshape(-1)
-        elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
-            y = y.to_numpy().reshape(-1)
-
-        X, y = check_X_y(X, y)
-        y = check_array(y, ensure_2d=False, dtype='numeric')
-        if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
-            raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
+        X, _ = check_X_y(X, result_y)
     elif expect_y:
         raise ValueError(_MESSAGE_Y_NONE)
     else:
         X = check_array(X)
 
+    check_consistent_length(X, result_sf)
+
+    return pd.DataFrame(X), result_y, result_sf, result_cf
+
+def _validate_and_reformat_labels_and_sf(y=None, expect_y=True, enforce_binary_labels=False, **kwargs):
+    """Validate labels and sensitive features data and return the data in an appropriate format.
+
+    The :code:`**kwargs` can contain :code:`sensitive_features=` and :code:`control_features=`
+    parameters.
+
+    Parameters
+    ----------
+    y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        The label vector
+    expect_y : bool
+        If True y needs to be provided, otherwise ignores the argument; default True
+    enforce_binary_labels : bool
+        If True raise exception if there are more than two distinct
+        values in the `y` data; default False
+
+    Returns
+    -------
+    Tuple(pandas.Series, pandas.Series, pandas.Series)
+        The validated and reformatted y, sensitive_features and control_features.
+
+    """
+    result_y = _validate_and_reformat_labels(y, expect_y, enforce_binary_labels)
+
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is None:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
-    check_consistent_length(X, sensitive_features)
+    check_consistent_length(y, sensitive_features)
     sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
 
     # compress multiple sensitive features into a single column
@@ -92,7 +112,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
     if control_features is not None:
-        check_consistent_length(X, control_features)
+        check_consistent_length(y, control_features)
         control_features = check_array(control_features, ensure_2d=False, dtype=None)
 
         # compress multiple control features into a single column
@@ -101,6 +121,43 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
 
         control_features = pd.Series(control_features.squeeze())
 
+    return result_y, pd.Series(sensitive_features.squeeze()), control_features
+
+def _validate_and_reformat_labels(y=None, expect_y=True, enforce_binary_labels=False, **kwargs):
+    """Validate labels and sensitive features data and return the data in an appropriate format.
+
+    The :code:`**kwargs` can contain :code:`sensitive_features=` and :code:`control_features=`
+    parameters.
+
+    Parameters
+    ----------
+    y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        The label vector
+    expect_y : bool
+        If True y needs to be provided, otherwise ignores the argument; default True
+    enforce_binary_labels : bool
+        If True raise exception if there are more than two distinct
+        values in the `y` data; default False
+
+    Returns
+    -------
+    pandas.Series
+        The validated and reformatted y.
+
+    """
+    if y is not None:
+        # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
+        if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
+            y = y.reshape(-1)
+        elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
+            y = y.to_numpy().reshape(-1)
+
+        y = check_array(y, ensure_2d=False, dtype='numeric')
+        if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
+            raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
+    elif expect_y:
+        raise ValueError(_MESSAGE_Y_NONE)
+
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas
     if y is not None:
@@ -108,8 +165,7 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
     else:
         result_y = pd.Series(dtype="float64")
 
-    return pd.DataFrame(X), result_y, pd.Series(sensitive_features.squeeze()), control_features
-
+    return result_y
 
 def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
     """Merge multiple columns into a single new column.
