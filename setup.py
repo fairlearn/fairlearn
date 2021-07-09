@@ -5,7 +5,7 @@ import setuptools
 import fairlearn
 
 # Fetch ReadMe
-with open("README.md", "r") as fh:
+with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 # Use requirements.txt to set the install_requires
