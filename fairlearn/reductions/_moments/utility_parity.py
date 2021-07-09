@@ -6,7 +6,10 @@ import numpy as np
 
 from .moment import ClassificationMoment
 from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
-from fairlearn._input_validation import _MESSAGE_RATIO_NOT_IN_RANGE, _validate_and_reformat_input
+from fairlearn.utils._input_validation import (
+    _MESSAGE_RATIO_NOT_IN_RANGE,
+    _validate_and_reformat_input
+)
 from .error_rate import ErrorRate
 
 
