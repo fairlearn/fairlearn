@@ -131,9 +131,9 @@ html_theme_options = {
             "icon": "fab fa-stack-overflow",
         },
         {
-            "name": "Gitter",
-            "url": "https://gitter.im/fairlearn/community",
-            "icon": "fab fa-gitter",
+            "name": "Discord",
+            "url": "https://discord.gg/R22yCfgsRn",
+            "icon": "fab fa-discord",
         },
     ],
     "show_prev_next": False

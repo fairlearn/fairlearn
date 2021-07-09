@@ -28,7 +28,7 @@ Real-time communication
 -----------------------
 
 For real time communication please join us on
-`Gitter <https://gitter.im/fairlearn/community>`_.
+`Discord <https://discord.gg/R22yCfgsRn>`_.
 All are welcome!
 
 To report bugs, request features, or ask usage questions please use the
