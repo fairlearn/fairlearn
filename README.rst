@@ -1,4 +1,4 @@
-|Build Status| |MIT license| |PyPI| |Gitter| |StackOverflow|
+|Build Status| |MIT license| |PyPI| |Discord| |StackOverflow|
 
 Fairlearn
 =========
@@ -26,12 +26,12 @@ Website: https://fairlearn.org/
 Current release
 ---------------
 
--  The current stable release is available at `Fairlearn
-   v0.6.2 <https://github.com/fairlearn/fairlearn/tree/release/v0.6.2>`__.
+-  The current stable release is available at
+   `Fairlearn v0.6.2 <https://github.com/fairlearn/fairlearn/tree/release/v0.6.2>`__.
 
 -  Our current version may differ substantially from earlier versions.
-   Users of earlier versions should visit our `migration
-   guide <https://fairlearn.org/main/user_guide/mitigation.html>`__.
+   Users of earlier versions should visit our
+   `migration guide <https://fairlearn.org/main/user_guide/mitigation.html>`__.
 
 What we mean by *fairness*
 --------------------------
@@ -58,9 +58,8 @@ Group fairness is formalized by a set of constraints, which require that
 some aspect (or aspects) of the AI system's behavior be comparable
 across the groups. The Fairlearn package enables assessment and
 mitigation of unfairness under several common definitions. To learn more
-about our definitions of fairness, please visit our `user guide on
-Fairness of AI
-Systems <https://fairlearn.org/main/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems>`__.
+about our definitions of fairness, please visit our
+`user guide on Fairness of AI Systems <https://fairlearn.org/main/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems>`__.
 
     *Note*: Fairness is fundamentally a sociotechnical challenge. Many
     aspects of fairness, such as justice and due process, are not
@@ -141,15 +140,15 @@ Usage Questions
 Pose questions and help answer them on `Stack
 Overflow <https://stackoverflow.com/questions/tagged/fairlearn>`__ with
 the tag ``fairlearn`` or on
-`Gitter <https://gitter.im/fairlearn/community#>`__.
+`Discord <https://discord.gg/R22yCfgsRn>`__.
 
 Regular (non-security) issues
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Issues are meant for bugs, feature requests, and documentation
-improvements. Please submit a report through `GitHub
-issues <https://github.com/fairlearn/fairlearn/issues>`__. A maintainer
-will respond promptly as appropriate.
+improvements. Please submit a report through
+`GitHub issues <https://github.com/fairlearn/fairlearn/issues>`__.
+A maintainer will respond promptly as appropriate.
 
 Maintainers will try to link duplicate issues when possible.
 
@@ -163,7 +162,7 @@ To report security issues please send an email to
    :target: https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=main
 .. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
 .. |PyPI| image:: https://img.shields.io/pypi/v/fairlearn?color=blue
-.. |Gitter| image:: https://badges.gitter.im/fairlearn/community.svg
-   :target: https://gitter.im/fairlearn/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+.. |Discord| image:: https://img.shields.io/discord/840099830160031744
+   :target: https://discord.gg/R22yCfgsRn
 .. |StackOverflow| image:: https://img.shields.io/badge/StackOverflow-questions-blueviolet
    :target: https://stackoverflow.com/questions/tagged/fairlearn
