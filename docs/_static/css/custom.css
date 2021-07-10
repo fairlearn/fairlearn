@@ -16,4 +16,25 @@ i.fa-discord:hover {
 
 #navbar-icon-links > li.nav-item > a.nav-link:hover {
    color: rgba(77, 77, 77, 1) !important
-}  
+}
+
+/* sponsors - copied from scikit-learn/scikit-learn */
+
+div.sponsor-div {
+   display: flex;
+   flex-wrap: wrap;
+   -webkit-flex-align: center;
+   -ms-flex-align: center;
+   -webkit-align-items: center;
+   align-items: center;
+}
+ 
+div.sponsor-div-box {
+   width: 100%;
+}
+ 
+@media screen and (min-width: 500px) {
+   div.sponsor-div-box {
+      width: 50%;
+   }
+}
