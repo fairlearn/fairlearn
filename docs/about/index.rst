@@ -245,7 +245,7 @@ since the start of the project.
    <div class="sponsor-div">
    <div class="sponsor-div-box">
 
-`TU Eindhoven <https://www.tue.nl/en/>`_ funds Hilde Weerts since March 2020.
+`Eindhoven University of Technology <https://www.tue.nl/en/>`_ funds Hilde Weerts since March 2020.
 
 .. raw:: html
 
