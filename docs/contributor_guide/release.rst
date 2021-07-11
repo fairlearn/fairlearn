@@ -16,10 +16,7 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
     :code:`git push -u origin release/v<x.y.z>`
 
-#. On the release branch, create a PR to:
-
-    #. Update the version in `__init__.py` to `x.y.z`
-    #. Update the version in the ReadMe
+#. On the release branch, create a PR to update the version in `__init__.py` to `x.y.z`
 
 #. Merge that PR.
 
@@ -44,8 +41,6 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 #. On the `main` branch, create a PR to:
 
     #. Update the version in `__init__.py` to `x.y.z+1.dev0`
-    #. Ensure that `smv_tag_whitelist` in `docs/conf.py` will pick up the
-       new release
     #. Update the version in `docs/static_landing_page/js/landing_page.js`
        so that all the links point to the new release
    
