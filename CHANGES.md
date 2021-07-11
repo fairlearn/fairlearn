@@ -193,7 +193,8 @@
 
 * Major changes to the API. In particular the `expgrad` function is now
   implemented by the `ExponentiatedGradient` class. Please refer to the
-  [ReadMe](readme.md) file for information on how to upgrade
+  [upgrade guide](https://fairlearn.org/main/user_guide/migrating_versions/index.html)
+  for information on how to upgrade.
 
 * Added new algorithms
   * Threshold Optimization
