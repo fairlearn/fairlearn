@@ -21,7 +21,7 @@ from .simple_learners import LeastSquaresBinaryClassifierLearner, \
 from .test_utilities import _get_data
 
 
-_PRECISION = 1e-6
+_PRECISION = 1e-5
 
 
 class TestExponentiatedGradientSmoke:

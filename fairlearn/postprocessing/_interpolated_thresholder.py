@@ -10,14 +10,14 @@ from sklearn.utils.validation import check_is_fitted
 from warnings import warn
 
 from ..utils._common import _get_soft_predictions
-from .._input_validation import _validate_and_reformat_input
+from ..utils._input_validation import _validate_and_reformat_input
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING)
 
 
 class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
-    """Binary predictor that thresholds continuous predictions of a base estimator.
+    r"""Binary predictor that thresholds continuous predictions of a base estimator.
 
     At prediction time, the predictor takes as input both standard and sensitive features.
     Based on the values of sensitive features, it then applies a randomized thresholding

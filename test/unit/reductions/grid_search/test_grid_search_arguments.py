@@ -12,7 +12,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from fairlearn._input_validation import \
+from fairlearn.utils._input_validation import \
     (_MESSAGE_Y_NONE,
      _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, BoundedGroupLoss, \

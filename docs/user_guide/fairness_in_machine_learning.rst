@@ -39,6 +39,80 @@ The Fairlearn package is most applicable to two kinds of harms:
   information are extended or withheld. Examples include varying accuracy in
   face recognition, document search, or product recommendation.
 
+Concept glossary
+----------------------------
+
+The concepts outlined in this glossary are relevant to sociotechnical contexts. 
+
+Construct validity
+^^^^^^^^^^^^^^^^^^
+In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task. Which target variable do we intend to predict? What features will be included? What (fairness) constraints do we consider? Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
+
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness [#4]_ . This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
+
+Key Terms 
+~~~~~~~~~
+
+- **Sociotechnical context** – The context surrounding a technical system, including both social aspects (e.g., people, institutions, communities) and technical aspects (e.g., algorithms, technical processes). The sociotechnical context of a system shapes who might benefit or is harmed by AI systems.
+
+- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model. 
+
+- **Measurement model** – The method and approach used to measure the unobservable theoretical construct.
+
+- **Construct reliability** – This can be thought of as the extent to which the measurements of an unobservable theoretical construct remain the same when measured at different points in time. A lack of construct reliability can either be due to a misalignment between the understanding of the unobservable theoretical construct and the methods being used to measure that construct, or to changes to the construct itself. Construct validity and construct reliability are complementary.
+
+- **Construct validity** – This can be thought of as the extent to which the measurement model measures the intended construct in way that is meaningful and useful.
+
+Key Term Examples  - Unobservable theoretical constructs and Measurement models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Fairness** is an example of an unobservable theoretical construct. Several measurement models exist for measuring fairness, including demographic parity. These measurements may come together to form a measurement model, where several measurements are combined to ultimately measure fairness.See :code:`fairlearn.metrics` for more examples of measurement models for measuring fairness.
+
+- **Teacher effectiveness** is an example of an unobservable theoretical construct. Common measurement models include student performance on standardized exams and qualitative feedback for the teacher’s students.
+
+- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
+
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See [#5]_ for a related example. 
+
+**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
+ 
+What is construct validity? 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Though the Measurement and Fairness [#4]_ paper explores both construct reliability and construct validity, we focus our 
+exploration below on construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
+contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-oriented conceptualization of construct validity, that 
+is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
+can serve as a framework for analyzing an AI task and attempting to establish construct validity:
+
+1. **Face validity** – On the surface, how plausible do the measurements produced by the measurement model look?
+
+2. **Content validity** – This has three subcomponents:
+
+   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context        dependent).
+   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable 			   theoretical constructs related to the construct of interest (and only those)?
+   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured           observable properties and other unobservable theoretical constructs?
+
+3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
+   measurement models for which construct validity has been established? 
+ 
+4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with 
+   related constructs as appropriate?  
+
+5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements 
+   of any relevant observable properties or other unobservable theoretical constructs?
+
+6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements 
+   produced by the measurement model, and whether those are “substantively interesting”.
+
+7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the 
+   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
+   measurements, and what world do we wish to live in?
+
+**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific 
+sociotechnical context. This is only intended to explain the key concepts that could be used in a 
+framework for analyzing a task.
+
 Fairness assessment and unfairness mitigation
 ---------------------------------------------
 
@@ -156,3 +230,9 @@ subpackage :mod:`fairlearn.metrics`.
    .. [#3] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
       Approach to Fair Classification"
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
+
+   .. [#4] Jacobs, Wallach `"Measurement and Fairness"
+      <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
+
+   .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
+      <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
