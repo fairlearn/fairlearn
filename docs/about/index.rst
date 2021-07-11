@@ -226,7 +226,8 @@ We would like to thank the following funders.
    <div class="sponsor-div-box">
 
 `Microsoft <https://www.microsoft.com/>`_ has been funding various people
-since the start of the project.
+including several maintainers (Miro Dudik, Richard Edgar, Roman Lutz, Michael
+Madaio) since the start of the project.
 
 .. raw:: html
 
@@ -253,7 +254,7 @@ since the start of the project.
   <div class="sponsor-div-box">
 
 .. image:: ../_static/images/tu_eindhoven.png
-  :width: 65pt
+  :width: 100pt
   :align: center
   :target: https://www.tue.nl/en/
 
