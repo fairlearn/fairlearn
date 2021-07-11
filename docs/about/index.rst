@@ -226,7 +226,7 @@ We would like to thank the following funders.
    <div class="sponsor-div-box">
 
 `Microsoft <https://www.microsoft.com/>`_ has been funding various people
-since the start of the project.
+since the start of the project in 2018.
 
 .. raw:: html
 
