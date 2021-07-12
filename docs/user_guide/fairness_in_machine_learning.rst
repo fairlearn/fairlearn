@@ -183,6 +183,11 @@ reduce the price of internet access. However, if there are additional socioecono
 problems within a community, for example lack of education, infrastructure, information
 technology and health services, then an algorithmic solution purely focused on internet
 speed will fail to meaningfully address the needs of the community.
+As an example, the Federation of Canadian municipalities released a report
+ tackling both connectivity and infrastructure needs of rural communities to
+more meaningfully address this social issue
+https://fcm.ca/sites/default/files/documents/resources/report/broadband-access-rural-canada.pdf.
+
 
 
 The Ripple Effect Trap
@@ -218,14 +223,14 @@ Example: Reusing a machine learning algorithm used to screen job applications in
 nursing industry, for job applications in the information technology sector. An intuitive
 yet important difference between both contexts is the difference in skills required to
 succeed in both industries. A slightly more subtle difference is the demographic differences
-in gender attraction to each of the industries, resulting from wording in job postings,
+in number of genders who typically work in each of these industries, resulting from wording in job postings,
 social constructs on gender and societal roles, and the male-female ratio of successful
 applicants in each field.
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
 
-This trap occurs when data scientists fail to consider the full picture surrounding
+This trap occurs when we fail to consider the full picture surrounding
 a particular social context when abstracting a social problem, and implementing an
 algorithm in which the outcome involves enforcing decisions that will impact a person
 or group of people.
