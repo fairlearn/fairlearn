@@ -172,7 +172,7 @@ The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
 This trap occurs when we assume that the best solution to a problem
-involves technology, and fail to recognize other possible solutions outside of
+may involve technology, and fail to recognize other possible solutions outside of
 this realm. One area where this manifests in is within contexts in which the
 definition "fairness" changes or is dependent on a political context.
 
@@ -183,6 +183,7 @@ reduce the price of internet access. However, if there are additional socioecono
 problems within a community, for example lack of education, infrastructure, information
 technology and health services, then an algorithmic solution purely focused on internet
 speed will fail to meaningfully address the needs of the community.
+
 As an example, the Federation of Canadian municipalities released a report
  tackling both connectivity and infrastructure needs of rural communities to
 more meaningfully address this social issue
