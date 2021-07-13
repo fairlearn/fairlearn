@@ -27,7 +27,7 @@ Current release
 ---------------
 
 -  The current stable release is available on
-   `PyPI <https://badge.fury.io/py/fairlearn>`__.
+   `PyPI <https://pypi.org/project/fairlearn/>`__.
 
 -  Our current version may differ substantially from earlier versions.
    Users of earlier versions should visit our
@@ -163,7 +163,7 @@ To report security issues please send an email to
 .. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: https://github.com/fairlearn/fairlearn/blob/main/LICENSE
 .. |PyPI| image:: https://img.shields.io/pypi/v/fairlearn?color=blue
-   :target: https://badge.fury.io/py/fairlearn
+   :target: https://pypi.org/project/fairlearn/
 .. |Discord| image:: https://img.shields.io/discord/840099830160031744
    :target: https://discord.gg/R22yCfgsRn
 .. |StackOverflow| image:: https://img.shields.io/badge/StackOverflow-questions-blueviolet

@@ -14,7 +14,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from git import Repo
+from packaging import version
 import os
+import pandas as pd
 import sys
 import inspect
 from datetime import datetime
@@ -98,37 +100,18 @@ master_doc = 'index'
 # Example: include 0.4.6, but not 0.4.0 to 0.4.5
 repo = Repo('.', search_parent_directories=True)
 all_tags = [tag.path.strip('refs/tags') for tag in repo.tags]
-all_tags = [tag for tag in all_tags if tag[0] == "v"]
-version_dict = {}
-for tag in all_tags:
-    split_tag = tag.split('.')
-    if len(split_tag) != 3:
-        print(f'ignoring version {tag}')
-        continue
-    major, minor, patch = split_tag
-    minor = int(minor)
-    patch = int(patch)
-
-    if major == 'v0' and minor < 4:
-        # ignore versions below 0.4
-        continue
-
-    if major in version_dict:
-        if minor in version_dict:
-            if patch > version_dict[major][minor]:
-                # enter new highest patch version
-                print(f'ignoring version {major}.{minor}.{version_dict[major][minor]}')
-                version_dict[major][minor] = patch
-        else:
-            # first time encountering this minor version
-            version_dict[major][minor] = patch
-    else:
-        version_dict[major] = {minor: patch}
+all_tags = [version.parse(tag) for tag in all_tags if tag[0] == "v"]
+version_df = pd.DataFrame(
+    [(v.major, v.minor, v.micro) for v in all_tags],
+    columns=['major', 'minor', 'micro'])
+max_versions_df = version_df.groupby(['major', 'minor']).max()
+# major and minor are in the index, values contain micro 
+majors = max_versions_df.index.get_level_values('major').tolist()
+minors = max_versions_df.index.get_level_values('minor').tolist()
+micros = max_versions_df.values.tolist()
 
 smv_tag_whitelist = r'|'.join([
-    fr'^{major}\.{minor}\.{version_dict[major][minor]}'
-    for major in version_dict
-    for minor in version_dict[major]]) + r'+$'
+    fr'^{major}\.{minor}\.{micro}' for (major, minor, micro) in zip(majors, minors, micros)]) + r'+$'
 
 smv_branch_whitelist = r'^main$'
 
