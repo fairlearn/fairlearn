@@ -203,9 +203,12 @@ The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
 This trap occurs when implementing abstraction results in failure to take
-into account the full picture behind fairness in a situation. Elements behind
-fairness that cannot be abstracted through a purely mathematical framework include
-procedurality, contextuality and contestability.
+into account the full picture behind fairness in a situation. Many tasks of a data
+scientist involve some form of formalization: from measuring real-world phenomena as
+data to translating business KPI's and constraints into metrics, loss functions, or parameters.
+We fall into the formalism trap when this translation fails to account the social dimensions
+associated to the problem. Social dimensions that cannot be abstracted through a purely mathematical
+framework include procedurality, contextuality and contestability.
 
 Example: Consider the use of "risk scores" to decide the outcomes individuals
 will experience. Risk scores may be used to determine risk of recidivism in crime,
