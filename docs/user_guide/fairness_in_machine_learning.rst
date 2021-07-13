@@ -214,6 +214,9 @@ patient's chosen treatment. A key element within these algorithms is the
 ratio of false and true positives, as well as and false and true negatives.
 That is, how successful an algorithm is to correctly asses risk in an individual.
 
+A more important distinction is the impact of a wrongful assignment (is an individual
+incarcerated, vs is an individual hired).
+
 Take the following risk assessment formula from Kleinberg et al. [#6]_. The problem
 of risk assessment can be abstracted as follows:
 
