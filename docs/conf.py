@@ -101,6 +101,9 @@ master_doc = 'index'
 repo = Repo('.', search_parent_directories=True)
 all_tags = [tag.path.strip('refs/tags') for tag in repo.tags]
 all_tags = [version.parse(tag) for tag in all_tags if tag[0] == "v"]
+# filter out versions below 0.4
+all_tags = [version for version in all_tags
+            if version.major > 0 or version.minor >= 4]
 version_df = pd.DataFrame(
     [(v.major, v.minor, v.micro) for v in all_tags],
     columns=['major', 'minor', 'micro'])
@@ -108,10 +111,12 @@ max_versions_df = version_df.groupby(['major', 'minor']).max()
 # major and minor are in the index, values contain micro 
 majors = max_versions_df.index.get_level_values('major').tolist()
 minors = max_versions_df.index.get_level_values('minor').tolist()
-micros = max_versions_df.values.tolist()
+micros = max_versions_df.values.reshape(-1).tolist()
 
 smv_tag_whitelist = r'|'.join([
-    fr'^{major}\.{minor}\.{micro}' for (major, minor, micro) in zip(majors, minors, micros)]) + r'+$'
+    fr'^v{major}\.{minor}\.{micro}' for (major, minor, micro) in zip(majors, minors, micros)]) + r'+$'
+
+print(smv_tag_whitelist)
 
 smv_branch_whitelist = r'^main$'
 
