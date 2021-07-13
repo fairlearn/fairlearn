@@ -190,7 +190,6 @@ more meaningfully address this social issue
 https://fcm.ca/sites/default/files/documents/resources/report/broadband-access-rural-canada.pdf.
 
 
-
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -203,12 +202,44 @@ Example 1:
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-This trap occurs when implementing an algorithmic solution that fails to take
-into account the social dimensions associated to fairness in a situation. These
-dimensions include "procedurality", "contextuality" and "contestability". Such
-dimensions can often not be resolved via a purely mathematical framework.
+This trap occurs when implementing abstraction results in failure to take
+into account the full picture behind fairness in a situation. Elements behind
+fairness that cannot be abstracted through a purely mathematical framework include
+procedurality, contextuality and contestability.
 
-Example:
+Example: Consider the use of "risk scores" to decide the outcomes individuals
+will experience. Risk scores may be used to determine risk of recidivism in crime,
+risk of failure within a new role during recruitment, or risk of failure in a
+patient's chosen treatment. A key element within these algorithms is the
+ratio of false and true positives, as well as and false and true negatives.
+That is, how successful an algorithm is to correctly asses risk in an individual.
+
+Take the following risk assessment formula from Kleinberg et al. [#6]_. The problem
+of risk assessment can be abstracted as follows:
+
+1. Feature vectors: this represent data we know about a given person.
+
+2. Groups: this represents information regarding belonging of a person. Ideally our
+algorithm does not display preference with respect to the group a person
+belongs to. Example of groups include gender, race, age, etc.
+
+3. Risk assignment: this represents the probability that a person with given
+features, belonging to a given group, possesses a risk to engage in
+well defined behaviour, and that the risk calculated accurately depicts reality for
+that given person. In other words, the algorithm has low false positive rates and low false
+negative rates.
+
+From a mathematical point of view, it is possible to represent each of these
+through the use of vectors, booleans (true or false) and probability values.
+Where mathematical abstraction encounters a limitation is when capturing
+information regarding procedurality (for example, how  do judges and police officers
+determine whether bail, counselling, probation, or incarceration is appropriate);
+contextuality (different societies determine what constitutes an "unfair" outcome, furthermore
+different groups determine what constitutes immoral discrimination, i.e. is it immoral
+to hire an applicant whose primary language is not English, for a non-English speaking role, over
+an applicant whose only spoken language is English?); and contestability (the definitions
+of discrimination and unfairness are politically contested and change over time).
+
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
@@ -296,3 +327,6 @@ in which different people interact with one another as outcomes are recommended.
    
    .. [#5] Mark S. Ackerman. 2000. The intellectual challenge of CSCW: The gap between social requirements
       and technical feasibility. Human-Computer Interaction 15, 2-3 (2000), 179–203.
+
+   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. Inherent trade-offs in the fair
+      determination of risk scores. In Proc. of ITCS.
