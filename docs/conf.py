@@ -108,13 +108,14 @@ version_df = pd.DataFrame(
     [(v.major, v.minor, v.micro) for v in all_tags],
     columns=['major', 'minor', 'micro'])
 max_versions_df = version_df.groupby(['major', 'minor']).max()
-# major and minor are in the index, values contain micro 
+# major and minor are in the index, values contain micro
 majors = max_versions_df.index.get_level_values('major').tolist()
 minors = max_versions_df.index.get_level_values('minor').tolist()
 micros = max_versions_df.values.reshape(-1).tolist()
 
-smv_tag_whitelist = r'|'.join([
-    fr'^v{major}\.{minor}\.{micro}' for (major, minor, micro) in zip(majors, minors, micros)]) + r'+$'
+smv_tag_whitelist = r'|'.join(
+    [fr'^v{major}\.{minor}\.{micro}'
+     for (major, minor, micro) in zip(majors, minors, micros)]) + r'+$'
 
 print(smv_tag_whitelist)
 
