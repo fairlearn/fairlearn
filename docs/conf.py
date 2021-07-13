@@ -14,7 +14,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from git import Repo
-from packaging import version
+from packaging import version as packaging_version
 import os
 import pandas as pd
 import sys
@@ -83,7 +83,7 @@ intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
                        'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net/', None)}
+                       'matplotlib': ('https://matplotlib.org/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -100,7 +100,7 @@ master_doc = 'index'
 # Example: include 0.4.6, but not 0.4.0 to 0.4.5
 repo = Repo('.', search_parent_directories=True)
 all_tags = [tag.path.strip('refs/tags') for tag in repo.tags]
-all_tags = [version.parse(tag) for tag in all_tags if tag[0] == "v"]
+all_tags = [packaging_version.parse(tag) for tag in all_tags if tag[0] == "v"]
 # filter out versions below 0.4
 all_tags = [version for version in all_tags
             if version.major > 0 or version.minor >= 4]
