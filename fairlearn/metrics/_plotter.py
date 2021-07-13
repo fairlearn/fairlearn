@@ -5,23 +5,27 @@
 
 from typing import List, Union
 import pandas as pd
-import numpy as np
 
 from ._metric_frame import MetricFrame
 
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install matplotlib to use " \
                                    "the plotting for MetricFrame."
 
-_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = "Ambiguous Error Metric. Please only provide one of: error_bars or conf_intervals."
-_METRIC_AND_ERROR_BARS_NOT_SAME_LENGTH_ERROR = "The list of metrics and list of error_bars are not the same length."
-_METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR = "The list of metrics and list of conf_intervals are not the same length."
+_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = \
+    "Ambiguous Error Metric. Please only provide one of: error_bars or conf_intervals."
+_METRIC_AND_ERROR_BARS_NOT_SAME_LENGTH_ERROR = \
+    "The list of metrics and list of error_bars are not the same length."
+_METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR = \
+    "The list of metrics and list of conf_intervals are not the same length."
 
-_METRICS_NOT_LIST_OR_STR_ERROR = "Metric should be a string of a single metric or a list of the metrics in provided MetricFrame, but {0} was provided"
+_METRICS_NOT_LIST_OR_STR_ERROR = \
+    """Metric should be a string of a single metric or a list of the metrics
+     in provided MetricFrame, but {0} was provided"""
 _ERROR_BARS_MUST_BE_TUPLE = "Calculated error_bars must be tuple of length 2"
 _CONF_INTERVALS_MUST_BE_TUPLE = "Calculated conf_intervals must be tuple of length 2"
 _ERROR_BARS_NEGATIVE_VALUE_ERROR = "Calculated relative errors from error_bars must be positive"
-_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = "Calculated conf_intervals' upper bound cannot be less than lower bound"
-
+_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = \
+    "Calculated conf_intervals' upper bound cannot be less than lower bound"
 
 
 def _check_if_metrics_and_error_metrics_same_length(metrics, error_bars, conf_intervals):
@@ -32,15 +36,18 @@ def _check_if_metrics_and_error_metrics_same_length(metrics, error_bars, conf_in
         if len(conf_intervals) != len(metrics):
             raise ValueError(_METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR)
 
+
 def _check_for_ambiguous_error_metric(error_bars, conf_intervals):
     # ambiguous error metric if both are provided
     if error_bars is not None and conf_intervals is not None:
         raise ValueError(_GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR)
 
+
 def _check_for_valid_metrics_format(metrics):
     # ensure metrics is either list, str, or None
     if not (isinstance(metrics, list) or isinstance(metrics, str) or metrics is None):
         raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
+
 
 def _check_valid_error_bars(df_error_bars):
     for tup in df_error_bars:
@@ -49,6 +56,7 @@ def _check_valid_error_bars(df_error_bars):
         if not all(ele >= 0 for ele in tup):
             raise ValueError(_ERROR_BARS_NEGATIVE_VALUE_ERROR)
 
+
 def _check_valid_conf_interval(df_conf_intervals):
     for tup in df_conf_intervals:
         if not isinstance(tup, tuple) or len(tup) != 2:
@@ -56,37 +64,39 @@ def _check_valid_conf_interval(df_conf_intervals):
         if tup[0] > tup[1]:
             raise ValueError(_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR)
 
+
 def plot_metric_frame(metric_frame: MetricFrame,
-                     plot_type: str="scatter",
-                     metrics: Union[List[str], str]=None,
-                     error_bars: Union[List[str], str]=None,
-                     conf_intervals: Union[List[str], str]=None,
-                     axs=None,
-                     show_plot=True,
-                     plot_error_labels: bool=True,
-                     text_precision_digits: int=4,
-                     text_fontsize: int=8,
-                     text_color: str="black",
-                     text_ha: str="center",
-                     capsize=10,
-                     colormap="Pastel1",
-                     subplot_shape=None,
-                     figsize=None
-                     ):
+                      plot_type: str = "scatter",
+                      metrics: Union[List[str], str] = None,
+                      error_bars: Union[List[str], str] = None,
+                      conf_intervals: Union[List[str], str] = None,
+                      axs=None,
+                      show_plot=True,
+                      plot_error_labels: bool = True,
+                      text_precision_digits: int = 4,
+                      text_fontsize: int = 8,
+                      text_color: str = "black",
+                      text_ha: str = "center",
+                      capsize=10,
+                      colormap="Pastel1",
+                      subplot_shape=None,
+                      figsize=None
+                      ):
     """Visualization for metrics with statistical error bounds.
 
     Plots a given metric and its given error (as described by the `error_bars` or `conf_intervals`)
 
-    This function takes in a :class:`fairlearn.metrics.MetricFrame` with precomputed metrics and metric errors
-    and a `error_bars` or `conf_intervals` array to interpret the columns of the `MetricFrame`.
+    This function takes in a :class:`fairlearn.metrics.MetricFrame` with precomputed metrics
+    and metric errors and a `error_bars` or `conf_intervals` array to interpret the columns
+    of the `MetricFrame`.
 
-    The items at each index of the given `metrics` array and given `error_bars` or `conf_intervals` array should
-    correspond to a pair of the same metric and metric error, respectively. 
+    The items at each index of the given `metrics` array and given `error_bars` or `conf_intervals`
+    array should correspond to a pair of the same metric and metric error, respectively.
 
     Note:
         If given many metrics to plot, this function plots them in only 1 row
         with the number of subplot columns matching the number of metrics
-    
+
     Parameters
     ----------
     metric_frame : fairlearn.metrics.MetricFrame
@@ -98,11 +108,11 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     metrics : str or list of str
         The name of the metrics to plot. Should match columns from the given `MetricFrame`.
-    
+
     error_bars : str or list of str
         The name of the error metrics to plot. Should match columns from the given `MetricFrame`.
         Error bars quantify the bounds relative to the base metric.
-        
+
         Example:
             If the error bar for a certain column is [0.01, 0.02]
             and the metric is 0.6
@@ -111,9 +121,10 @@ def plot_metric_frame(metric_frame: MetricFrame,
         Note:
             The return of the error bar function should be a tuple of the lower
             and upper errors
-    
+
     conf_intervals : str or list of str
-        The name of the confidence intervals to plot. Should match columns from the given `MetricFrame`.
+        The name of the confidence intervals to plot.
+        Should match columns from the given `MetricFrame`.
 
         Note:
             The return of the error bar function should be a tuple of the lower
@@ -151,7 +162,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     _check_for_ambiguous_error_metric(error_bars, conf_intervals)
     _check_for_valid_metrics_format(metrics)
-    
+
     metrics = [metrics] if isinstance(metrics, str) else metrics
     conf_intervals = [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
     error_bars = [error_bars] if isinstance(error_bars, str) else error_bars
@@ -177,6 +188,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
         axs = axs.flatten()
 
     # plotting without error bars or confidence intervals
+    # Note: Returns early
     df['_index'] = df.index
     if error_bars is None and conf_intervals is None:
         for metric, ax in zip(metrics, axs):
@@ -186,7 +198,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
         if show_plot:
             plt.show()
-        
+
         del df['_index']
         return axs
 
@@ -209,12 +221,14 @@ def plot_metric_frame(metric_frame: MetricFrame,
             if plot_error_labels:
                 df_error = pd.DataFrame([])
                 df_error[['lower', 'upper']] = pd.DataFrame(df[error_bar].tolist(), index=df.index)
-                df_error['error'] = list(zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
+                df_error['error'] = list(
+                    zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
                 df_all_bounds[metric] = df_error['error']
-    
+
     for metric, ax in zip(metrics, axs):
         previous_xlabel = ax.get_xlabel()
-        ax = df.plot(x="_index", y=metric, kind=plot_type, yerr=df_all_errors, ax=ax, colormap=colormap)
+        ax = df.plot(x="_index", y=metric, kind=plot_type,
+                     yerr=df_all_errors, ax=ax, colormap=colormap)
         ax.set_xlabel(previous_xlabel)
 
     # TODO: Check assumption of plotting items in the vertical direction
@@ -225,16 +239,21 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
             # TODO: Figure out if works for other plotting modes (besides bar)
             for i in range(len(axs[j].patches)):
-                axs[j].text(i, df_all_bounds[metric][i][0] - 0.05 * y_range, round(df_all_bounds[metric][i][0],
-                        text_precision_digits), fontsize=text_fontsize, color=text_color,
-                        ha=text_ha)
-                axs[j].text(i, df_all_bounds[metric][i][1] + 0.01 * y_range, round(df_all_bounds[metric][i][1],
-                        text_precision_digits), fontsize=text_fontsize, color=text_color,
-                        ha=text_ha)
+                axs[j].text(i,
+                            df_all_bounds[metric][i][0] - 0.05 * y_range,
+                            round(df_all_bounds[metric][i][0], text_precision_digits),
+                            fontsize=text_fontsize,
+                            color=text_color,
+                            ha=text_ha)
+                axs[j].text(i,
+                            df_all_bounds[metric][i][1] + 0.01 * y_range,
+                            round(df_all_bounds[metric][i][1], text_precision_digits),
+                            fontsize=text_fontsize,
+                            color=text_color,
+                            ha=text_ha)
 
     if show_plot:
         plt.show()
 
     del df['_index']
     return axs
-

@@ -1,5 +1,8 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+"""
+Enables the experimental function for plotting metric frames.
 
-# Warning: This is an experimental model for plotting metric frames.
-# Anything can break from version to version without further warning.
+Warning:
+    Anything can break from version to version without further warning.
+"""

@@ -1,4 +1,3 @@
-# %%
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
@@ -18,19 +17,19 @@ Plotting Metrics with Error Bars
 # We start by importing the various modules we're going to use:
 
 # TODO: Remove in final version (helps run with local packages)
+import matplotlib.pyplot as plt
+from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
+from fairlearn.metrics import MetricFrame
+from sklearn.datasets import fetch_openml
+from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
+from sklearn.tree import DecisionTreeClassifier
+import pandas as pd
+import numpy as np
 import os
 import sys
 nb_dir = os.path.split(os.getcwd())[0]
 if nb_dir not in sys.path:
     sys.path.append(nb_dir)
-
-import numpy as np
-import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
-from sklearn.datasets import fetch_openml
-from fairlearn.metrics import MetricFrame
-from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 
 
 data = fetch_openml(data_id=1590, as_frame=True)
@@ -51,7 +50,7 @@ digits_of_precision = 4
 
 
 def wilson(p, n, digits=digits_of_precision, z=z_score):
-    """ Returns lower and upper bound """
+    """Return lower and upper bound"""
     denominator = 1 + z**2/n
     centre_adjusted_probability = p + z*z / (2*n)
     adjusted_standard_deviation = np.sqrt((p*(1 - p) + z*z / (4*n)))/np.sqrt(n)
@@ -61,14 +60,14 @@ def wilson(p, n, digits=digits_of_precision, z=z_score):
 
 
 def compute_error_metric(metric_value, sample_size, z_score):
-    """ Standard Error Calculation (Binary Classification)
+    """Compute Standard Error Calculation (for Binary Classification)
 
     Assumes infinitely large population,
     Should be used when the sampling fraction is small.
     For sampling fraction > 5%, may want to use finite population correction
     https://en.wikipedia.org/wiki/Margin_of_error
 
-    Note: 
+    Note:
         Returns absolute error (%)
     """
     return z_score*np.sqrt(metric_value*(1.0-metric_value))/np.sqrt(sample_size)
@@ -80,17 +79,20 @@ def recall_wilson(y_true, y_pred):
     bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)
     return bounds
 
+
 def recall_normal_err(y_t, y_p):
     assert len(y_t) == len(y_p)
     tn, fp, fn, tp = confusion_matrix(y_t, y_p).ravel()
     error = compute_error_metric(tp/(tp+fn), tp + fn, z_score=z_score)
     return (error, error)
 
+
 def accuracy_wilson(y_true, y_pred):
     assert len(y_true) == len(y_pred)
     score = accuracy_score(y_true, y_pred)
     bounds = wilson(score, len(y_true), digits_of_precision, z_score)
     return bounds
+
 
 def accuracy_normal_err(y_true, y_pred):
     assert len(y_true) == len(y_pred)
@@ -128,15 +130,17 @@ metric_frame = MetricFrame(metrics_dict, y_true, y_pred, sensitive_features=sex)
 
 # %%
 # plot metrics with (symmetric) error bars
-plot_metric_frame(metric_frame, plot_type="scatter", 
-    metrics=['Recall', 'Accuracy'], 
-    error_bars=['Recall Error', 'Accuracy Error'])
+plot_metric_frame(metric_frame, plot_type="scatter",
+                  metrics=['Recall', 'Accuracy'],
+                  error_bars=['Recall Error', 'Accuracy Error'])
 plot_metric_frame(metric_frame, plot_type="bar", metrics='Recall', error_bars='Recall Error')
 
 # %%
 # plot metrics with confidence intervals (possibly asymmetric)
-plot_metric_frame(metric_frame, plot_type="bar", metrics=['Recall', 'Accuracy'], conf_intervals=['Recall Bounds', 'Accuracy Bounds'])
-plot_metric_frame(metric_frame, plot_type="scatter", metrics='Recall', conf_intervals='Recall Bounds')
+plot_metric_frame(metric_frame, plot_type="bar", metrics=[
+                  'Recall', 'Accuracy'], conf_intervals=['Recall Bounds', 'Accuracy Bounds'])
+plot_metric_frame(metric_frame, plot_type="scatter",
+                  metrics='Recall', conf_intervals='Recall Bounds')
 
 # %%
 # plot metrics without error bars
@@ -152,10 +156,9 @@ plot_metric_frame(metric_frame, plot_type="bar")
 plot_metric_frame(metric_frame, plot_type="bar", metrics=[])
 
 # %%
-# Custom Plot 
+# Custom Plot
 #
-# Demonstrates how to customize the axes and then pass into `plot_metric_frame` 
-import matplotlib.pyplot as plt
+# Demonstrates how to customize the axes and then pass into `plot_metric_frame`
 
 fig, axs = plt.subplots(*(1, 2), squeeze=False)
 axs = axs.flatten()
@@ -181,8 +184,8 @@ def error_metric_function(y_true, y_pred):
 
     # compute custom metric function here
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)   # compute custom metric function here
-    
+    bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision,
+                    z_score)   # compute custom metric function here
+
     # returns the bounds in the format (lower_bound, upper_bound)
     return bounds
-
