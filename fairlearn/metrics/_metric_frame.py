@@ -372,7 +372,7 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def group_max(self) -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_max(self, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -382,19 +382,41 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        Parameters
+        ----------
+        errors: {'ignore, 'raise', 'coerce'}, default 'raise'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+            if 'ignore', then invalid parsing will return the input
+
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if not self.control_levels:
-            result = pd.Series(index=self._by_group.columns, dtype='object')
-            for m in result.index:
-                max_val = self._by_group[m].max()
-                result[m] = max_val
-        else:
-            result = self._by_group.groupby(level=self.control_levels).max()
+        if errors not in ("ignore", "raise", "coerce"):
+            raise ValueError("invalid error value specified")
+
+        try:
+            if not self.control_levels:
+                result = pd.Series(index=self._by_group.columns, dtype='object')
+                for m in result.index:
+                    max_val = self._by_group[m].max()
+                    result[m] = max_val
+            else:
+                result = self._by_group.groupby(level=self.control_levels).max()
+        # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
+        except ValueError:
+            warnings.warn(f"Metric frame contains non-scalar cells. "
+                          f"Please remove non-scalar columns from your metric frame and try again",
+                          SyntaxWarning)
+            if errors == "raise":
+                raise
+            elif errors == 'coerce':
+                return np.nan
+            else:
+                return self._by_group
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -404,7 +426,7 @@ class MetricFrame:
         else:
             return result
 
-    def group_min(self) -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_min(self, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
@@ -414,19 +436,42 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        Parameters
+        ----------
+        errors: {'ignore, 'raise', 'coerce'}, default 'raise'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+            if 'ignore', then invalid parsing will return the input
+
         Returns
         -------
         typing.Any pandas.Series or pandas.DataFrame
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if not self.control_levels:
-            result = pd.Series(index=self._by_group.columns, dtype='object')
-            for m in result.index:
-                min_val = self._by_group[m].min()
-                result[m] = min_val
-        else:
-            result = self._by_group.groupby(level=self.control_levels).min()
+        if errors not in ("ignore", "raise", "coerce"):
+            raise ValueError("invalid error value specified")
+
+        try:
+            if not self.control_levels:
+                result = pd.Series(index=self._by_group.columns, dtype='object')
+
+                for m in result.index:
+                    min_val = self._by_group[m].min()
+                    result[m] = min_val
+            else:
+                result = self._by_group.groupby(level=self.control_levels).min()
+        # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
+        except ValueError:
+            warnings.warn(f"Metric frame contains non-scalar cells. "
+                          f"Please remove non-scalar columns from your metric frame and try again",
+                          SyntaxWarning)
+            if errors == "raise":
+                raise
+            elif errors == 'coerce':
+                return np.nan
+            else:
+                return self._by_group
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -437,7 +482,8 @@ class MetricFrame:
             return result
 
     def difference(self,
-                   method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
+                   method: str = 'between_groups',
+                   errors: str = 'ignore') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -461,24 +507,40 @@ class MetricFrame:
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'ignore, 'raise', 'coerce'}, default 'ignore'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+            if 'ignore', then invalid parsing will return the input
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
+        if errors not in ("ignore", "raise", "coerce"):
+            raise ValueError("invalid error value specified")
+
         subtrahend = np.nan
         if method == 'between_groups':
-            subtrahend = self.group_min()
+            subtrahend = self.group_min(errors=errors)
         elif method == 'to_overall':
             subtrahend = self.overall
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        return (self.by_group - subtrahend).abs().max(level=self.control_levels)
+        try:
+            return (self.by_group - subtrahend).abs().max(level=self.control_levels)
+        except ValueError:
+            if errors == 'raise':
+                raise
+            elif errors == 'coerce':
+                return np.nan
+            else:
+                return self._by_group
 
     def ratio(self,
-              method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
+              method: str = 'between_groups',
+              errors: str = 'ignore') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -504,40 +566,59 @@ class MetricFrame:
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'ignore, 'raise', 'coerce'}, default 'ignore'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+            if 'ignore', then invalid parsing will return the input
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
+        if errors not in ("ignore", "raise", "coerce"):
+            raise ValueError("invalid error value specified")
+
         result = None
         if method == 'between_groups':
-            result = self.group_min() / self.group_max()
+            result = self.group_min(errors=errors) / self.group_max(errors=errors)
         elif method == 'to_overall':
-            if self._user_supplied_callable:
-                tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
-            else:
-                ratios = None
-
-                if self.control_levels:
-                    # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(level=self.control_levels) /  \
-                        self.overall.unstack(level=self.control_levels)
+            try:
+                if self._user_supplied_callable:
+                    tmp = self.by_group / self.overall
+                    result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
                 else:
-                    ratios = self.by_group / self.overall
+                    ratios = None
 
-                def ratio_sub_one(x):
-                    if x > 1:
-                        return 1/x
+                    if self.control_levels:
+                        # It's easiest to give in to the DataFrame columns preference
+                        ratios = self.by_group.unstack(level=self.control_levels) /  \
+                            self.overall.unstack(level=self.control_levels)
                     else:
-                        return x
+                        ratios = self.by_group / self.overall
 
-                ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-                if not self.control_levels:
-                    result = ratios.min()
+                    def ratio_sub_one(x):
+                        if x > 1:
+                            return 1/x
+                        else:
+                            return x
+
+                    ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
+                    if not self.control_levels:
+                        result = ratios.min()
+                    else:
+                        result = ratios.min().unstack(0)
+            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
+            except ValueError:
+                warnings.warn(f"Metric frame contains non-scalar cells. "
+                              f"Please remove non-scalar columns from your metric frame and try again",
+                              SyntaxWarning)
+                if errors == "raise":
+                    raise
+                elif errors == 'coerce':
+                    return np.nan
                 else:
-                    result = ratios.min().unstack(0)
+                    return self._by_group
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
