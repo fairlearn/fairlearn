@@ -80,9 +80,9 @@ def recall_wilson(y_true, y_pred):
     return bounds
 
 
-def recall_normal_err(y_t, y_p):
-    assert len(y_t) == len(y_p)
-    tn, fp, fn, tp = confusion_matrix(y_t, y_p).ravel()
+def recall_normal_err(y_true, y_pred):
+    assert len(y_true) == len(y_pred)
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     error = compute_error_metric(tp/(tp+fn), tp + fn, z_score=z_score)
     return (error, error)
 
