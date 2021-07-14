@@ -169,9 +169,8 @@ them as:
 
 * *The Framing Trap*
 
-Each of these traps are the result of failing to consider the way in
-with social context and technology are interrelated, as well as a deeper understanding of
-"the social" in order to solve problems Ackerman [#5]_.
+We provide some definitions and examples of these traps to help Fairlearn
+users think about how choices they make in their work can avoid these common pitfalls.
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
