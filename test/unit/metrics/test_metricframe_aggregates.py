@@ -1040,3 +1040,105 @@ def test_2m_1sf_2cf():
         assert ratios_overall[mfn][('m', 'aa')] == min(ratio_overall_m_a)
         assert ratios_overall[mfn][('m', 'ba')] == pytest.approx(min(ratio_overall_m_b),
                                                                  rel=1e-10, abs=1e-16)
+
+
+class Test2m1sf1cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2,
+                                          control_features=g_3)
+
+        assert isinstance(self.target.control_levels, list)
+        assert (self.target.control_levels == ['control_feature_0'])
+        assert isinstance(self.target.sensitive_levels, list)
+        assert (self.target.sensitive_levels == ['sensitive_feature_0'])
+
+        # Check we have correct return types
+        assert isinstance(self.target.overall, pd.DataFrame)
+        assert isinstance(self.target.by_group, pd.DataFrame)
+
+    @pytest.mark.parametrize("errors", ["raise", "coerce"])
+    def test_min(self, errors):
+        self._prepare()
+        if errors == 'raise':
+            with pytest.raises(ValueError):
+                self.target.group_min(errors=errors)
+        else:
+            target_mins = self.target.group_min(errors=errors)
+            assert np.isnan(target_mins)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.group_min(errors="wrong")
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.group_min()
+
+    @pytest.mark.parametrize("errors", ["raise", "coerce"])
+    def test_max(self, errors):
+        self._prepare()
+        if errors == "raise":
+            with pytest.raises(ValueError):
+                self.target.group_max(errors=errors)
+        else: # test coerce
+            target_maxs = self.target.group_max(errors=errors)
+            assert np.isnan(target_maxs)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.group_max(errors="wrong")
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.group_max()
+
+    @pytest.mark.parametrize("errors", ["raise", "coerce"])
+    def test_difference(self, errors):
+        self._prepare()
+        if errors == "raise":
+            with pytest.raises(ValueError):
+                self.target.difference(errors=errors)
+        else:
+            target_difference = self.target.difference(errors=errors)
+            assert np.isnan(target_difference)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.difference(errors="wrong")
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_difference = self.target.difference()
+        assert np.isnan(target_difference)
+
+    @pytest.mark.parametrize("errors", ["raise", "coerce"])
+    def test_ratio(self, errors):
+        self._prepare()
+        if errors == "raise":
+            with pytest.raises(ValueError):
+                self.target.ratio(errors=errors)
+        else:
+            target_ratio = self.target.ratio(errors=errors)
+            assert np.isnan(target_ratio)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.ratio(errors="wrong")
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        assert np.isnan(target_ratio)
