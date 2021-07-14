@@ -290,9 +290,9 @@ The Framing Trap
 
 This trap occurs when we fail to consider the full picture surrounding
 a particular social context when abstracting a social problem. Elements
-involved include but are not limited to: the social landscape that is being
-studied, characteristics of individuals or circumstances of the chosen
- situation, third parties involved along with their circumstances,
+involved include but are not limited to: the social landscape that the
+chosen phenomenon exists in, characteristics of individuals or circumstances
+of the chosen situation, third parties involved along with their circumstances,
 and the task that is being set out to abstract (i.e. calculating a risk score,
 choosing between a pool of candidates, selecting an appropriate treatment, etc).
 
