@@ -1045,31 +1045,26 @@ def test_2m_1sf_2cf():
 class Test2m1sf1cfErrorHandlingCM:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
     def _prepare(self):
-        fns = {'confusion_matrix': skm.confusion_matrix}
+        fns = {'recall': skm.recall_score, 'confusion_matrix': skm.confusion_matrix}
         self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2,
                                           control_features=g_3)
 
-        assert isinstance(self.target.control_levels, list)
-        assert (self.target.control_levels == ['control_feature_0'])
-        assert isinstance(self.target.sensitive_levels, list)
-        assert (self.target.sensitive_levels == ['sensitive_feature_0'])
+        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score}, y_true=y_t, y_pred=y_p,
+                                            sensitive_features=g_2,
+                                            control_features=g_3)
 
-        # Check we have correct return types
-        assert isinstance(self.target.overall, pd.DataFrame)
-        assert isinstance(self.target.by_group, pd.DataFrame)
-
-    @pytest.mark.parametrize("errors", ["raise", "coerce"])
-    def test_min(self, errors):
+    def test_min_raise(self):
         self._prepare()
-        if errors == 'raise':
-            with pytest.raises(ValueError):
-                self.target.group_min(errors=errors)
-        else:
-            target_mins = self.target.group_min(errors=errors)
-            assert np.isnan(target_mins)
+        with pytest.raises(ValueError):
+            self.target.group_min(errors='raise')
 
-    def test_ratio_wrong_input(self):
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        assert target_mins.equals(self.expected.group_min())
+
+    def test_min_wrong_input(self):
         self._prepare()
         with pytest.raises(ValueError, match="invalid error value specified"):
             self.target.group_min(errors="wrong")
@@ -1080,17 +1075,17 @@ class Test2m1sf1cfErrorHandlingCM:
         with pytest.raises(ValueError):
             self.target.group_min()
 
-    @pytest.mark.parametrize("errors", ["raise", "coerce"])
-    def test_max(self, errors):
+    def test_max_raise(self):
         self._prepare()
-        if errors == "raise":
-            with pytest.raises(ValueError):
-                self.target.group_max(errors=errors)
-        else: # test coerce
-            target_maxs = self.target.group_max(errors=errors)
-            assert np.isnan(target_maxs)
+        with pytest.raises(ValueError):
+            self.target.group_max(errors='raise')
 
-    def test_ratio_wrong_input(self):
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        assert target_maxs.equals(self.expected.group_max())
+
+    def test_max_wrong_input(self):
         self._prepare()
         with pytest.raises(ValueError, match="invalid error value specified"):
             self.target.group_max(errors="wrong")
@@ -1101,17 +1096,17 @@ class Test2m1sf1cfErrorHandlingCM:
         with pytest.raises(ValueError):
             self.target.group_max()
 
-    @pytest.mark.parametrize("errors", ["raise", "coerce"])
-    def test_difference(self, errors):
+    def test_difference_raise(self):
         self._prepare()
-        if errors == "raise":
-            with pytest.raises(ValueError):
-                self.target.difference(errors=errors)
-        else:
-            target_difference = self.target.difference(errors=errors)
-            assert np.isnan(target_difference)
+        with pytest.raises(ValueError):
+            self.target.difference(errors='raise')
 
-    def test_ratio_wrong_input(self):
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        assert target_differences.equals(self.expected.difference())
+
+    def test_difference_wrong_input(self):
         self._prepare()
         with pytest.raises(ValueError, match="invalid error value specified"):
             self.target.difference(errors="wrong")
@@ -1119,18 +1114,18 @@ class Test2m1sf1cfErrorHandlingCM:
     def test_difference_default(self):
         # default is 'coerce'
         self._prepare()
-        target_difference = self.target.difference()
-        assert np.isnan(target_difference)
+        target_differences = self.target.difference()
+        assert target_differences.equals(self.expected.difference())
 
-    @pytest.mark.parametrize("errors", ["raise", "coerce"])
-    def test_ratio(self, errors):
+    def test_ratio_raise(self):
         self._prepare()
-        if errors == "raise":
-            with pytest.raises(ValueError):
-                self.target.ratio(errors=errors)
-        else:
-            target_ratio = self.target.ratio(errors=errors)
-            assert np.isnan(target_ratio)
+        with pytest.raises(ValueError):
+            self.target.ratio(errors='raise')
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        assert target_ratio.equals(self.expected.ratio())
 
     def test_ratio_wrong_input(self):
         self._prepare()
@@ -1141,4 +1136,99 @@ class Test2m1sf1cfErrorHandlingCM:
         # default is 'coerce'
         self._prepare()
         target_ratio = self.target.ratio()
-        assert np.isnan(target_ratio)
+        assert target_ratio.equals(self.expected.ratio())
+
+
+class Test2m1sf0cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'recall': skm.recall_score, 'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2)
+
+        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score}, y_true=y_t, y_pred=y_p,
+                                            sensitive_features=g_2)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.group_min(errors='raise')
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        assert target_mins.equals(self.expected.group_min())
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.group_min(errors="wrong")
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.group_min()
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.group_max(errors='raise')
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        assert target_maxs.equals(self.expected.group_max())
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.group_max(errors="wrong")
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.group_max()
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.difference(errors='raise')
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        assert target_differences.equals(self.expected.difference())
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.difference(errors="wrong")
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        assert target_differences.equals(self.expected.difference())
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError):
+            self.target.ratio(errors='raise')
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        assert target_ratio.equals(self.expected.ratio())
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError, match="invalid error value specified"):
+            self.target.ratio(errors="wrong")
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        assert target_ratio.equals(self.expected.ratio())
