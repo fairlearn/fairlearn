@@ -189,7 +189,6 @@ As an example, the Federation of Canadian municipalities released a report
 more meaningfully address this social issue
 https://fcm.ca/sites/default/files/documents/resources/report/broadband-access-rural-canada.pdf.
 
-
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -215,8 +214,6 @@ into a social context, new groups may reinterpret it and potentially use this
 information for outside purposes which include nefarious ones. To
 solve for this issue, we must incorporate "what if" scenarios into testing
 of the model.
-
-
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
@@ -265,7 +262,6 @@ to hire an applicant whose primary language is not English, for a non-English sp
 an applicant whose only spoken language is English?); and contestability (the definitions
 of discrimination and unfairness are politically contested and change over time, how
 to mathematically represent definitions of unfairness that are contested over time?).
-
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
