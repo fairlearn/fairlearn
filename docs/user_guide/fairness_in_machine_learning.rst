@@ -218,7 +218,7 @@ of the model.
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-This trap occurs when implementing abstraction results in failure to take
+This trap occurs when abstraction results in failure to take
 into account the full picture behind fairness in a situation. Many tasks of a data
 scientist involve some form of formalization: from measuring real-world phenomena as
 data to translating business KPI's and constraints into metrics, loss functions, or parameters.
