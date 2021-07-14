@@ -384,10 +384,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'ignore, 'raise', 'coerce'}, default 'raise'
+        errors: {'raise', 'coerce'}, default 'raise'
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
-            if 'ignore', then invalid parsing will return the input
 
         Returns
         -------
@@ -395,7 +394,7 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("ignore", "raise", "coerce"):
+        if errors not in ("raise", "coerce"):
             raise ValueError("invalid error value specified")
 
         try:
@@ -415,8 +414,6 @@ class MetricFrame:
                 raise
             elif errors == 'coerce':
                 return np.nan
-            else:
-                return self._by_group
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -438,10 +435,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'ignore, 'raise', 'coerce'}, default 'raise'
+        errors: {'raise', 'coerce'}, default 'raise'
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
-            if 'ignore', then invalid parsing will return the input
 
         Returns
         -------
@@ -449,7 +445,7 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("ignore", "raise", "coerce"):
+        if errors not in ("raise", "coerce"):
             raise ValueError("invalid error value specified")
 
         try:
@@ -470,8 +466,6 @@ class MetricFrame:
                 raise
             elif errors == 'coerce':
                 return np.nan
-            else:
-                return self._by_group
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -483,7 +477,7 @@ class MetricFrame:
 
     def difference(self,
                    method: str = 'between_groups',
-                   errors: str = 'ignore') -> Union[Any, pd.Series, pd.DataFrame]:
+                   errors: str = 'coerce') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -507,17 +501,16 @@ class MetricFrame:
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'ignore, 'raise', 'coerce'}, default 'ignore'
+        errors: {'raise', 'coerce'}, default 'coerce'
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
-            if 'ignore', then invalid parsing will return the input
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("ignore", "raise", "coerce"):
+        if errors not in ("raise", "coerce"):
             raise ValueError("invalid error value specified")
 
         subtrahend = np.nan
@@ -535,12 +528,10 @@ class MetricFrame:
                 raise
             elif errors == 'coerce':
                 return np.nan
-            else:
-                return self._by_group
 
     def ratio(self,
               method: str = 'between_groups',
-              errors: str = 'ignore') -> Union[Any, pd.Series, pd.DataFrame]:
+              errors: str = 'coerce') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -566,17 +557,16 @@ class MetricFrame:
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'ignore, 'raise', 'coerce'}, default 'ignore'
+        errors: {'raise', 'coerce'}, default 'coerce'
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
-            if 'ignore', then invalid parsing will return the input
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("ignore", "raise", "coerce"):
+        if errors not in ("raise", "coerce"):
             raise ValueError("invalid error value specified")
 
         result = None
@@ -617,8 +607,6 @@ class MetricFrame:
                     raise
                 elif errors == 'coerce':
                     return np.nan
-                else:
-                    return self._by_group
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
