@@ -178,8 +178,8 @@ The Solutionism Trap
 
 This trap occurs when we assume that the best solution to a problem
 may involve technology, and fail to recognize other possible solutions outside of
-this realm. One area where this manifests in is within contexts in which the
-definition "fairness" changes or is dependent on a political context.
+this realm. This trap also occurs as definitions of fairness are
+contested and changed and models become obsolete.
 
 Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that by using data science to
