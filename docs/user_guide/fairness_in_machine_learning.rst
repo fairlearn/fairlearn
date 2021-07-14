@@ -204,15 +204,15 @@ and incentives of a given social system, for instance by increasing perceived va
 of quantifiable metrics over non-quantifiable ones.
 
 Example: consider the problem of banks deciding whether an individual should
-be approved for a loan approval. Prior to using machine learning algorithms
+be approved for a loan. Prior to using machine learning algorithms
 to compute a "score", banks might rely on engaging in conversations with
 clients, recommending a plan based on their unique situation, and
 discussing with other team members to obtain feedback. By introducing an
 algorithm, it is possible that banks stop engaging in conversations
 with team members and clients, and assume the algorithm is good enough
 to blindly accept a recommendation. Furthermore, some might use
-information on those the algorithm typically rejects to create a system
-that takes advantage of those who need funds but did not receive them.
+information on people algorithm typically rejects to create a system
+that takes advantage of people who need funds but did not receive them.
 
 To avoid this pitfall, we must be aware that once a technology is incorporated
 into a social context, new groups may reinterpret it and potentially use this
@@ -266,7 +266,7 @@ different groups determine what constitutes immoral discrimination, i.e. is it i
 to hire an applicant whose primary language is not English, for a non-English speaking role, over
 an applicant whose only spoken language is English?); and contestability (the definitions
 of discrimination and unfairness are politically contested and change over time, how
-to mathematically represent definitions of unfairness that are contested over time?).
+to mathematically represent definitions of unfairness as they are contested over time?).
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
@@ -352,8 +352,9 @@ in which different people interact with one another as outcomes are recommended.
       2019 ACM Conference on Fairness, Accountability, and Transparency (FAT*), 59-68, Available at
       `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
    
-   .. [#5] Mark S. Ackerman. 2000. The intellectual challenge of CSCW: The gap between social requirements
-      and technical feasibility. Human-Computer Interaction 15, 2-3 (2000), 179–203.
+   .. [#5] Mark S. Ackerman. 2000. `"The intellectual challenge of CSCW: The gap between social requirements
+      and technical feasibility" https://doi.org/10.1207/S15327051HCI1523_5`.
+Human-Computer Interaction 15, 2-3 (2000), 179–203.
 
-   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. Inherent trade-offs in the fair
-      determination of risk scores. In Proc. of ITCS.
+   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. `"Inherent trade-offs in the fair
+      determination of risk scores" https://arxiv.org/abs/1609.05807`. In Proc. of ITCS.
