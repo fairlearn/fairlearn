@@ -353,8 +353,8 @@ in which different people interact with one another as outcomes are recommended.
       `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
    
    .. [#5] Mark S. Ackerman. 2000. `"The intellectual challenge of CSCW: The gap between social requirements
-      and technical feasibility" https://doi.org/10.1207/S15327051HCI1523_5`.
-Human-Computer Interaction 15, 2-3 (2000), 179–203.
+      and technical feasibility" https://doi.org/10.1207/S15327051HCI1523_5`. Human-Computer
+      Interaction 15, 2-3 (2000), 179–203.
 
    .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. `"Inherent trade-offs in the fair
       determination of risk scores" https://arxiv.org/abs/1609.05807`. In Proc. of ITCS.
