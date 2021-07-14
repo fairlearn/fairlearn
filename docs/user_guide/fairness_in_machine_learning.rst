@@ -296,7 +296,8 @@ studied, characteristics of individuals or circumstances of the chosen
 and the task that is being set out to abstract (i.e. calculating a risk score,
 choosing between a pool of candidates, selecting an appropriate treatment, etc).
 
-The authors define three main frames:
+To help us avoid drawing narrow boundaries of what is considered in scope for
+the problem, we might consider different "frames" to use.
 
 1. The algorithmic frame: these are choices made when abstracting a problem
 in the form of representations (data) and labelling (outcome). In this frame
