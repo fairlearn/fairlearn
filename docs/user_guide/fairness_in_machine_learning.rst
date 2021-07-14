@@ -146,9 +146,14 @@ What traps can we fall into when abstracting a social problem?
 
 Machine learning systems used in the real world are inherently sociotechnical
 systems, which include both technologies and social actors. Designers of machine
-learning systems who fail to consider the way in which social contexts and technologies
-are interrelated are at risk of falling into "abstraction traps". In this section,
-we explain what those traps are, and give some suggestions on how you can avoid them.
+learning systems typically translate a real-world context into a machine learning
+model through abstraction: focussing only on 'relevant' aspects of that context,
+which are typically described by inputs, outputs, and the relationship between them.
+However, by abstracting away the social context they are at risk of falling into
+'abstraction traps': a failure to consider how social context and technology is interrelated.
+
+In this section, we explain what those traps are, and give some suggestions on
+how we can avoid them.
 
 In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_
 identify failure modes that arise from applying abstraction. They identify
