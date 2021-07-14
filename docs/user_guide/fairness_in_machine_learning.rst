@@ -289,9 +289,12 @@ The Framing Trap
 ^^^^^^^^^^^^^^^^
 
 This trap occurs when we fail to consider the full picture surrounding
-a particular social context when abstracting a social problem, and implementing an
-algorithm in which the outcome involves enforcing decisions that will impact a person
-or group of people.
+a particular social context when abstracting a social problem. Elements
+involved include but are not limited to: the social landscape that is being
+studied, characteristics of individuals or circumstances of the chosen
+ situation, third parties involved along with their circumstances,
+and the task that is being set out to abstract (i.e. calculating a risk score,
+choosing between a pool of candidates, selecting an appropriate treatment, etc).
 
 The authors define three main frames:
 
@@ -309,7 +312,7 @@ frame allows us to question the inherent (un)fairness present in input and outpu
 of the interaction between people and technology, and thus any social components of this
 interaction need to be modelled and incorporated accordingly.
 
-Example 1: assessing risk of re-engagement in criminal behaviour in an individual
+Example: assessing risk of re-engagement in criminal behaviour in an individual
 charged with an offense, and appropriate measures to prevent relapse, and failing
 to consider factors such as race, socio-economic status, mental health, along with
 socially-dependent views present in judges, police officers, or any actors responsible
@@ -322,12 +325,12 @@ on a computed risk score. Model is limited in assessing fairness out outcome.
 
 The data framework could attempt to reduce unfairness by studying socio-economic
 information regarding the accused, their upbringing and how it relates to their
-current status, along with a recommendation that incorporates these factors into their
-recovery.
+current status, along with a recommendation that incorporates these factors into the
+recommended outcome.
 
 Within the sociotechnical framework the model incorporates not only more nuanced
 data on the history of the case, but also the social context in which judging and
-charging people with offenses take place. This model incorporates the processes
+recommending an outcome take place. This frame incorporates the processes
 associated with crime reporting, the offense-trial pipeline, and identifies areas
 in which different people interact with one another as outcomes are recommended.
 
