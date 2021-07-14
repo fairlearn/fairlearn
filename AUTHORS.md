@@ -13,6 +13,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Chris Gregory](https://github.com/gregorybchris)
 - [Gaurav Gupta](https://github.com/gaugup)
 - [Parul Gupta](https://github.com/parul100495)
+- [Laura Gutierrez Funderburk](https://github.com/lgfunderburk)
 - [Abdul Hannan](https://github.com/hannanabdul55)
 - [Brandon Horn](https://github.com/rihorn2)
 - [Adrin Jalali](https://github.com/adrinjalali)
