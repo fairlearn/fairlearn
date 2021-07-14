@@ -26,8 +26,8 @@ Website: https://fairlearn.org/
 Current release
 ---------------
 
--  The current stable release is available at
-   `Fairlearn v0.6.2 <https://github.com/fairlearn/fairlearn/tree/release/v0.6.2>`__.
+-  The current stable release is available on
+   `PyPI <https://pypi.org/project/fairlearn/>`__.
 
 -  Our current version may differ substantially from earlier versions.
    Users of earlier versions should visit our
@@ -107,7 +107,7 @@ our `user guide <https://fairlearn.org/main/user_guide/index.html>`__.
 Please note that our APIs are subject to change, so notebooks downloaded
 from ``main`` may not be compatible with Fairlearn installed with
 ``pip``. In this case, please navigate the tags in the repository (e.g.
-`v0.4.5 <https://github.com/fairlearn/fairlearn/tree/v0.4.5>`__) to
+`v0.7.0 <https://github.com/fairlearn/fairlearn/tree/v0.7.0>`__) to
 locate the appropriate version of the notebook.
 
 Contributing
@@ -161,7 +161,9 @@ To report security issues please send an email to
 .. |Build Status| image:: https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=main
    :target: https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=main
 .. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: https://github.com/fairlearn/fairlearn/blob/main/LICENSE
 .. |PyPI| image:: https://img.shields.io/pypi/v/fairlearn?color=blue
+   :target: https://pypi.org/project/fairlearn/
 .. |Discord| image:: https://img.shields.io/discord/840099830160031744
    :target: https://discord.gg/R22yCfgsRn
 .. |StackOverflow| image:: https://img.shields.io/badge/StackOverflow-questions-blueviolet

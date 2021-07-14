@@ -36,3 +36,4 @@ sphinx-gallery
 git+https://github.com/Holzhaus/sphinx-multiversion.git
 pydata-sphinx-theme==0.6.3
 sphinx-autodoc-typehints
+gitpython==3.1.18

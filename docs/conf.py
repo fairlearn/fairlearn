@@ -13,7 +13,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+from git import Repo
+from packaging import version as packaging_version
 import os
+import pandas as pd
 import sys
 import inspect
 from datetime import datetime
@@ -80,7 +83,7 @@ intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
                        'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net/', None)}
+                       'matplotlib': ('https://matplotlib.org/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -93,8 +96,29 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.rst']
 master_doc = 'index'
 
 # Multiversion settings
+# Show only the highest patch versions of each minor version.
+# Example: include 0.4.6, but not 0.4.0 to 0.4.5
+repo = Repo('.', search_parent_directories=True)
+all_tags = [tag.path.strip('refs/tags') for tag in repo.tags]
+all_tags = [packaging_version.parse(tag) for tag in all_tags if tag[0] == "v"]
+# filter out versions below 0.4
+all_tags = [version for version in all_tags
+            if version.major > 0 or version.minor >= 4]
+version_df = pd.DataFrame(
+    [(v.major, v.minor, v.micro) for v in all_tags],
+    columns=['major', 'minor', 'micro'])
+max_versions_df = version_df.groupby(['major', 'minor']).max()
+# major and minor are in the index, values contain micro
+majors = max_versions_df.index.get_level_values('major').tolist()
+minors = max_versions_df.index.get_level_values('minor').tolist()
+micros = max_versions_df.values.reshape(-1).tolist()
 
-smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d|^v0\.6\.\d+$'
+smv_tag_whitelist = r'|'.join(
+    [fr'^v{major}\.{minor}\.{micro}'
+     for (major, minor, micro) in zip(majors, minors, micros)]) + r'+$'
+
+print(smv_tag_whitelist)
+
 smv_branch_whitelist = r'^main$'
 
 if check_if_v046():
