@@ -413,7 +413,15 @@ class MetricFrame:
             if errors == "raise":
                 raise
             elif errors == 'coerce':
-                return np.nan
+                t = self._by_group
+                for m in t.columns:
+                    if not isinstance(t[m].values[0], np.float64):
+                        t = t.drop(columns=[m])
+
+                if not self.control_levels:
+                    return t.max()
+                else:
+                    return t.groupby(level=self.control_levels).max()
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -465,7 +473,15 @@ class MetricFrame:
             if errors == "raise":
                 raise
             elif errors == 'coerce':
-                return np.nan
+                t = self._by_group
+                for m in t.columns:
+                    if not isinstance(t[m].values[0], np.float64):
+                        t = t.drop(columns=[m])
+
+                if not self.control_levels:
+                    return t.min()
+                else:
+                    return t.groupby(level=self.control_levels).min()
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -521,13 +537,18 @@ class MetricFrame:
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        try:
+        # Check if metric frame contains non-scalar columns
+        t = self._by_group
+        non_scalar = False
+        for m in t.columns:
+            if not isinstance(t[m].values[0], np.float64):
+                t = t.drop(columns=[m])
+                non_scalar = True
+
+        if errors == 'coerce' and non_scalar:
+            return (t - subtrahend).abs().max(level=self.control_levels)
+        else:
             return (self.by_group - subtrahend).abs().max(level=self.control_levels)
-        except ValueError:
-            if errors == 'raise':
-                raise
-            elif errors == 'coerce':
-                return np.nan
 
     def ratio(self,
               method: str = 'between_groups',
@@ -573,40 +594,30 @@ class MetricFrame:
         if method == 'between_groups':
             result = self.group_min(errors=errors) / self.group_max(errors=errors)
         elif method == 'to_overall':
-            try:
-                if self._user_supplied_callable:
-                    tmp = self.by_group / self.overall
-                    result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
+            if self._user_supplied_callable:
+                tmp = self.by_group / self.overall
+                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
+            else:
+                ratios = None
+
+                if self.control_levels:
+                    # It's easiest to give in to the DataFrame columns preference
+                    ratios = self.by_group.unstack(level=self.control_levels) /  \
+                        self.overall.unstack(level=self.control_levels)
                 else:
-                    ratios = None
+                    ratios = self.by_group / self.overall
 
-                    if self.control_levels:
-                        # It's easiest to give in to the DataFrame columns preference
-                        ratios = self.by_group.unstack(level=self.control_levels) /  \
-                            self.overall.unstack(level=self.control_levels)
+                def ratio_sub_one(x):
+                    if x > 1:
+                        return 1/x
                     else:
-                        ratios = self.by_group / self.overall
+                        return x
 
-                    def ratio_sub_one(x):
-                        if x > 1:
-                            return 1/x
-                        else:
-                            return x
-
-                    ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-                    if not self.control_levels:
-                        result = ratios.min()
-                    else:
-                        result = ratios.min().unstack(0)
-            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
-            except ValueError:
-                warnings.warn(f"Metric frame contains non-scalar cells. "
-                              f"Please remove non-scalar columns from your metric frame and try again",
-                              SyntaxWarning)
-                if errors == "raise":
-                    raise
-                elif errors == 'coerce':
-                    return np.nan
+                ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
+                if not self.control_levels:
+                    result = ratios.min()
+                else:
+                    result = ratios.min().unstack(0)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
