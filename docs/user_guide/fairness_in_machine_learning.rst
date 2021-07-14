@@ -193,11 +193,30 @@ https://fcm.ca/sites/default/files/documents/resources/report/broadband-access-r
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Selbst et al. [#4]_ define this as a "failure to understand how the insertion of
-technology into an existing social system changes the behaviors and embedded values
-of the pre-existing system".
+This trap occurs when we do not study the unintended consequences of introducing
+technology into an existing social system. Such consequences include change in
+behaviour, outcomes individual experience and a change in underlying social values
+and incentives of a given social system, for instance by increasing perceived value
+of quantifiable metrics over non-quantifiable ones.
 
-Example 1:
+Example: consider the problem of banks deciding whether an individual should
+be approved for a loan approval. Prior to using machine learning algorithms
+to compute a "score", banks might rely on engaging in conversations with
+clients, recommending a plan based on their unique situation, and
+discussing with other team members to obtain feedback. By introducing an
+algorithm, it is possible that banks stop engaging in conversations
+with team members and clients, and assume the algorithm is good enough
+to blindly accept a recommendation. Furthermore, some might use
+information on those the algorithm typically rejects to create a system
+that takes advantage of those who need funds but did not receive them.
+
+To avoid this pitfall, we must be aware that once a technology is incorporated
+into a social context, new groups may reinterpret it and potentially use this
+information for outside purposes which include nefarious ones. To
+solve for this issue, we must incorporate "what if" scenarios into testing
+of the model.
+
+
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
@@ -262,9 +281,9 @@ Example: Reusing a machine learning algorithm used to screen job applications in
 nursing industry, for job applications in the information technology sector. An intuitive
 yet important difference between both contexts is the difference in skills required to
 succeed in both industries. A slightly more subtle difference is the demographic differences
-in number of genders who typically work in each of these industries, resulting from wording in job postings,
-social constructs on gender and societal roles, and the male-female ratio of successful
-applicants in each field.
+in number of genders who typically work in each of these industries, which may result from
+wording in job postings, social constructs on gender and societal roles, and the male-female
+ratio of successful applicants in each field.
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
