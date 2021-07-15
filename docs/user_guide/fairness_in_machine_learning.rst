@@ -227,7 +227,6 @@ into account the full picture behind fairness in a situation. Many tasks of a da
 scientist involve some form of formalization: from measuring real-world phenomena as
 data to translating business KPI's and constraints into metrics, loss functions, or parameters.
 We fall into the formalism trap when we fail to account for the full meaning of social concepts like fairness. This occurs because there is no purely mathematical way to resolve conflicting definitions of fairness. This is also because fairness is complex and contested by social actors, and it cannot only be captured mathematically, but needs to be understood procedurally (i.e., [insert explanation here]) and situated in social contexts.
-associated to the problem. Social dimensions that cannot be abstracted through a purely mathematical
 
 Example: Consider the use of "risk scores" to decide the outcomes individuals
 will experience. Risk scores may be used to determine risk of recidivism in crime,
