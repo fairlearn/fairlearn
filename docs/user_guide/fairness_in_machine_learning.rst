@@ -141,7 +141,7 @@ which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
 subpackage :code:`fairlearn.metrics`.
 
-What traps can we fall into when abstracting a social problem?
+What traps can we fall into when modeling a social problem?
 --------------------------------------------------------------
 
 Machine learning systems used in the real world are inherently sociotechnical
