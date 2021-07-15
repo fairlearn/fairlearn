@@ -28,21 +28,22 @@ Real-time communication
 -----------------------
 
 For real time communication please join us on
-`Gitter <https://gitter.im/fairlearn/community>`_.
+`Discord <https://discord.gg/R22yCfgsRn>`_.
 All are welcome!
 
 To report bugs, request features, or ask usage questions please use the
 `appropriate channels as outlined on GitHub <https://github.com/fairlearn/fairlearn/issues/new/choose>`_.
 
-.. _developer_calls:
+.. _community_calls:
 
 Community calls
 ---------------
 
-We have a monthly contributor meeting every second Thursday of the month at
-11am New York City time. Check what this means in your time zone with
+We have a weekly community call every Thursday at 11am US Eastern time (ET).
+Check what this means in your time zone with
 `Time.is <https://time.is/New_York>`_.
 All are welcome! Please reach out via
-`Gitter <https://gitter.im/fairlearn/community>`_ and we will forward the
+`Discord <https://discord.gg/R22yCfgsRn>`_ and we will forward the
 invitation to you.
-We keep notes from each meeting in our `HackMD <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>`_.
+We keep notes from each meeting in our
+`HackMD <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>`_.

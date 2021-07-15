@@ -15,8 +15,9 @@ X = data.data
 y_true = (data.target == '>50K') * 1
 sex = X['sex']
 
-selection_rates = MetricFrame(selection_rate,
-                              y_true, y_true,
+selection_rates = MetricFrame(metrics=selection_rate,
+                              y_true=y_true,
+                              y_pred=y_true,
                               sensitive_features=sex)
 
 fig = selection_rates.by_group.plot.bar(

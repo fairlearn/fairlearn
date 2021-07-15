@@ -1,9 +1,25 @@
 # Changes
 
+### v0.7.1
+
+
+
 ### v0.7.0
 
 * Added new `count()` metric, so that the number of data points in each
   group is noted when using `MetricFrame`
+* Changed `MetricFrame` constructor API, so `metric` argument is now `metrics` and
+  all positional arguments are now keyword arguments. Previous call format still works
+  (until v0.10.0), but issues a deprecation warning.
+* `postprocessing.ThresholdOptimizer` now accepts `predict_method` as a
+  parameter which allows users to define which estimator method should be used
+  to get the prediction values: `"predict_proba" and "decision_function"` for
+  soft values and `"predict"` for hard values from classifiers.
+* Removed `fairlearn.widgets` module including the `FairlearnDashboard`.
+  Instead, the `fairlearn.metrics.MetricFrame` supports plotting as explained
+  in the corresponding
+  [user guide section](https://fairlearn.org/main/user_guide/assessment.html#plotting-grouped-metrics).
+* Added return value (`self`) to `fairlearn.reductions.ExponentiatedGradient`.
 
 ### v0.6.2
 
@@ -177,7 +193,8 @@
 
 * Major changes to the API. In particular the `expgrad` function is now
   implemented by the `ExponentiatedGradient` class. Please refer to the
-  [ReadMe](readme.md) file for information on how to upgrade
+  [upgrade guide](https://fairlearn.org/main/user_guide/migrating_versions/index.html)
+  for information on how to upgrade.
 
 * Added new algorithms
   * Threshold Optimization

@@ -23,7 +23,8 @@ def test_random_state_threshold_optimizer():
     lr.fit(X_train, y_train)
 
     # Train threshold optimizer
-    to = ThresholdOptimizer(estimator=lr, constraints='equalized_odds', grid_size=1000)
+    to = ThresholdOptimizer(estimator=lr, constraints='equalized_odds',
+                            grid_size=1000, predict_method='predict')
     to.fit(X_train, y_train, sensitive_features=race_train)
 
     # score groups
@@ -41,7 +42,7 @@ def test_random_state_exponentiated_gradient():
     random_state does not work as intended within Exponentiated Gradient.
     https://github.com/fairlearn/fairlearn/issues/588
     """
-    X_train, X_test, y_train, y_test, race_train, race_test = _get_test_data()
+    X_train, X_test, y_train, _, race_train, _ = _get_test_data()
 
     # Train a simple logistic regression model
     lr = LogisticRegression(max_iter=1000, random_state=0)
@@ -64,7 +65,7 @@ def _get_test_data():
     # fetch data from OpenML
     data = fetch_openml(data_id=42193)
     X = pd.DataFrame(data['data'], columns=data['feature_names']) \
-        .drop(columns=['race_Caucasian', 'c_charge_degree_F'])
+        .drop(columns=['race_Caucasian', 'c_charge_degree_F']).astype(float)
     y = data['target'].astype(int)
 
     # split the data in train-validation-test sets
