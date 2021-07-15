@@ -13,10 +13,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-from git import Repo
 from packaging import version as packaging_version
 import os
 import pandas as pd
+import subprocess
 import sys
 import inspect
 from datetime import datetime
@@ -98,9 +98,11 @@ master_doc = 'index'
 # Multiversion settings
 # Show only the highest patch versions of each minor version.
 # Example: include 0.4.6, but not 0.4.0 to 0.4.5
-repo = Repo('.', search_parent_directories=True)
-all_tags = [tag.path.strip('refs/tags') for tag in repo.tags]
-all_tags = [packaging_version.parse(tag) for tag in all_tags if tag[0] == "v"]
+cmd = ("git", "for-each-ref", "--format", "%(refname)")
+output = subprocess.check_output(cmd).decode()
+all_tags = [
+    packaging_version.parse(line.split('/')[2])
+    for line in output.splitlines() if line[:11] == "refs/tags/v"]
 # filter out versions below 0.4
 all_tags = [version for version in all_tags
             if version.major > 0 or version.minor >= 4]
