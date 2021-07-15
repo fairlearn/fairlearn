@@ -228,6 +228,15 @@ conflicting definitions of fairness. This is also because fairness is complex an
 contested by social actors, and it cannot only be captured mathematically, but
 needs to be understood procedurally (i.e., [insert explanation here]) and situated in social contexts.
 
+Because different definitions of fairness cannot be satisfied at the same time,
+we'll need to decide which definition to use. But there's no mathematical way to
+make that decision. And it might be that none of the definitions are appropriate for our situation.
+
+Some reasons why we fall into this trap is because fairness is contextually-dependent,
+open to contestation by different groups of people, and differences between ways of thinking
+about fairness between the legal world (i.e., fairness as procedural)
+and the fair-ML community (i.e., fairness as outcome-based).
+
 Take the following risk assessment formula from Kleinberg et al. [#6]_. The problem
 of risk assessment can be abstracted as follows:
 
@@ -297,7 +306,7 @@ did not train on. Fairness is typically not evaluated in this frame.
 algorithm ('data') whether in the form of abstractions, or outcomes. This additional
 frame allows us to question the inherent (un)fairness present in input and output data.
 In "Datasheets for Datasets", Gebru et al. [#8]_ suggest various ways we
-can account for and improve limitations in data. 
+can account for and improve limitations in data.
 
 3. The sociotechnical frame: this frame recognizes that a machine learning model is part
 of the interaction between people and technology, and thus any social components of this
