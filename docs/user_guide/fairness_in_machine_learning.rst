@@ -196,7 +196,7 @@ https://fcm.ca/sites/default/files/documents/resources/report/broadband-access-r
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
-This trap occurs when we do not study the unintended consequences of introducing
+This trap occurs when we do not consider the unintended consequences of introducing
 technology into an existing social system. Such consequences include change in
 behaviour, outcomes individual experience and a change in underlying social values
 and incentives of a given social system, for instance by increasing perceived value
