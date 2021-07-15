@@ -228,16 +228,6 @@ conflicting definitions of fairness. This is also because fairness is complex an
 contested by social actors, and it cannot only be captured mathematically, but
 needs to be understood procedurally (i.e., [insert explanation here]) and situated in social contexts.
 
-Example: Consider the use of "risk scores" to decide the outcomes individuals
-will experience. Risk scores may be used to determine risk of recidivism in crime,
-risk of failure within a new role during recruitment, or risk of failure in a
-patient's chosen treatment. A key element within these algorithms is the
-ratio of false and true positives, as well as and false and true negatives.
-That is, how successful an algorithm is to correctly asses risk in an individual.
-
-A more important distinction is the impact of a wrongful assignment (is an individual
-incarcerated, vs is an individual hired).
-
 Take the following risk assessment formula from Kleinberg et al. [#6]_. The problem
 of risk assessment can be abstracted as follows:
 
