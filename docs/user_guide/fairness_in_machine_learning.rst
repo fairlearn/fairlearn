@@ -296,6 +296,8 @@ did not train on. Fairness is typically not evaluated in this frame.
 2. The data frame: this frame request to the content of input and output of the
 algorithm ('data') whether in the form of abstractions, or outcomes. This additional
 frame allows us to question the inherent (un)fairness present in input and output data.
+In "Datasheets for Datasets", Gebru et al. [#8]_ suggest various ways we
+can account for and improve limitations in data. 
 
 3. The sociotechnical frame: this frame recognizes that a machine learning model is part
 of the interaction between people and technology, and thus any social components of this
@@ -349,3 +351,8 @@ in which different people interact with one another as outcomes are recommended.
 
    .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. `"Inherent trade-offs in the fair
       determination of risk scores" https://arxiv.org/abs/1609.05807`. In Proc. of ITCS.
+
+   .. [#7] Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer Wortman Vaughan,
+      Hanna Wallach, Hal Daumé III, Kate Crawford. `"Datasheets for Datasets" https://arxiv.org/abs/1803.09010`
+      (2018)
+
