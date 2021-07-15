@@ -226,7 +226,7 @@ This trap occurs when abstraction results in failure to take
 into account the full picture behind fairness in a situation. Many tasks of a data
 scientist involve some form of formalization: from measuring real-world phenomena as
 data to translating business KPI's and constraints into metrics, loss functions, or parameters.
-We fall into the formalism trap when this translation fails to account the social dimensions
+We fall into the formalism trap when we fail to account for the full meaning of social concepts like fairness. This occurs because there is no purely mathematical way to resolve conflicting definitions of fairness. This is also because fairness is complex and contested by social actors, and it cannot only be captured mathematically, but needs to be understood procedurally (i.e., [insert explanation here]) and situated in social contexts.
 associated to the problem. Social dimensions that cannot be abstracted through a purely mathematical
 framework include procedurality, contextuality and contestability.
 
