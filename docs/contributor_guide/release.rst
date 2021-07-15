@@ -43,6 +43,8 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
     #. Update the version in `__init__.py` to `x.y.z+1.dev0`
     #. Update the version in `docs/static_landing_page/js/landing_page.js`
        so that all the links point to the new release
+    #. Update `smv_tag_whitelist` in `docs/conf.py` to show only the latest
+       patch version of every minor release.
    
 .. note::
     Make sure to add a note to this second PR:
