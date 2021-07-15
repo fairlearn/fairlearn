@@ -211,17 +211,22 @@ that takes advantage of people who need funds but did not receive them.
 To avoid this pitfall, we must be aware that once a technology is incorporated
 into a social context, new groups may reinterpret it and potentially use this
 information for outside purposes which include nefarious ones. To
-help address this issue, we should adopt "what if" scenarios to envision how the social context might change after introducing a model, including how it may change the power dynamics of existing groups in that context.
+help address this issue, we should adopt "what if" scenarios to envision how
+the social context might change after introducing a model, including how it may
+change the power dynamics of existing groups in that context.
 of the model.
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
-This trap occurs when abstraction results in failure to take
-into account the full picture behind fairness in a situation. Many tasks of a data
-scientist involve some form of formalization: from measuring real-world phenomena as
-data to translating business KPI's and constraints into metrics, loss functions, or parameters.
-We fall into the formalism trap when we fail to account for the full meaning of social concepts like fairness. This occurs because there is no purely mathematical way to resolve conflicting definitions of fairness. This is also because fairness is complex and contested by social actors, and it cannot only be captured mathematically, but needs to be understood procedurally (i.e., [insert explanation here]) and situated in social contexts.
+Many tasks of a data scientist involve some form of formalization: from
+measuring real-world phenomena as data to translating business KPI's
+and constraints into metrics, loss functions, or parameters. We fall into the
+formalism trap when we fail to account for the full meaning of social
+concepts like fairness. This occurs because there is no purely mathematical way to resolve
+conflicting definitions of fairness. This is also because fairness is complex and
+contested by social actors, and it cannot only be captured mathematically, but
+needs to be understood procedurally (i.e., [insert explanation here]) and situated in social contexts.
 
 Example: Consider the use of "risk scores" to decide the outcomes individuals
 will experience. Risk scores may be used to determine risk of recidivism in crime,
