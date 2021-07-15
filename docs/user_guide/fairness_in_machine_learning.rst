@@ -178,7 +178,8 @@ The Solutionism Trap
 This trap occurs when we assume that the best solution to a problem
 may involve technology, and fail to recognize other possible solutions outside of
 this realm. This trap also occurs as definitions of fairness are
-contested and changed and models become obsolete.
+contested and changed and models become obsolete. See the "Construct
+Validity" section in Fairlearn's user guide.
 
 Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that by using data science to
