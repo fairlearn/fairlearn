@@ -156,7 +156,7 @@ In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
 In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#4]_
-identify failure modes that arise from applying abstraction. They identify
+identify failure modes that can arise from abstracting away the social context when modeling. They identify
 them as:
 
 * *The Solutionism Trap*
