@@ -155,7 +155,7 @@ However, by abstracting away the social context they are at risk of falling into
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems" Selbst et al. [#4]_
+In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#4]_
 identify failure modes that arise from applying abstraction. They identify
 them as:
 
