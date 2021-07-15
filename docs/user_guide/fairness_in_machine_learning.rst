@@ -216,7 +216,7 @@ that takes advantage of people who need funds but did not receive them.
 To avoid this pitfall, we must be aware that once a technology is incorporated
 into a social context, new groups may reinterpret it and potentially use this
 information for outside purposes which include nefarious ones. To
-solve for this issue, we must incorporate "what if" scenarios into testing
+help address this issue, we should adopt "what if" scenarios to envision how the social context might change after introducing a model, including how it may change the power dynamics of existing groups in that context.
 of the model.
 
 The Formalism Trap
