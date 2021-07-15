@@ -188,11 +188,6 @@ problems within a community, for example lack of education, infrastructure, info
 technology and health services, then an algorithmic solution purely focused on internet
 speed will fail to meaningfully address the needs of the community.
 
-As an example, the Federation of Canadian municipalities released a report
- tackling both connectivity and infrastructure needs of rural communities to
-more meaningfully address this social issue
-https://fcm.ca/sites/default/files/documents/resources/report/broadband-access-rural-canada.pdf.
-
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
