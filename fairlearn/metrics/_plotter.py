@@ -66,13 +66,13 @@ def _check_valid_conf_interval(df_conf_intervals):
 
 
 def plot_metric_frame(metric_frame: MetricFrame,
-                      plot_type: str = "scatter",
+                      kind: str = "scatter",
                       metrics: Union[List[str], str] = None,
                       error_bars: Union[List[str], str] = None,
                       conf_intervals: Union[List[str], str] = None,
                       axs=None,
                       show_plot=True,
-                      plot_error_labels: bool = True,
+                      plot_error_labels: bool = False,
                       text_precision_digits: int = 4,
                       text_fontsize: int = 8,
                       text_color: str = "black",
@@ -102,7 +102,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
     metric_frame : fairlearn.metrics.MetricFrame
         The collection fo disaggregated metric values, along with the metric errors.
 
-    plot_type : str, optional
+    kind : str, optional
         The type of plot to display. i.e. "bar", "line", etc.
         List of options is detailed in `pandas.DataFrame.plot`
 
@@ -193,7 +193,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
     if error_bars is None and conf_intervals is None:
         for metric, ax in zip(metrics, axs):
             previous_xlabel = ax.get_xlabel()
-            ax = df.plot(x="_index", y=metric, kind=plot_type, ax=ax, colormap=colormap)
+            ax = df.plot(x="_index", y=metric, kind=kind, ax=ax, colormap=colormap)
             ax.set_xlabel(previous_xlabel)
 
         if show_plot:
@@ -227,7 +227,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     for metric, ax in zip(metrics, axs):
         previous_xlabel = ax.get_xlabel()
-        ax = df.plot(x="_index", y=metric, kind=plot_type,
+        ax = df.plot(x="_index", y=metric, kind=kind,
                      yerr=df_all_errors, ax=ax, colormap=colormap)
         ax.set_xlabel(previous_xlabel)
 

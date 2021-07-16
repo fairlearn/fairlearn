@@ -8,7 +8,7 @@ Plotting Metrics with Error Bars
 """
 # %%
 # Load and preprocess the data set
-# --------------------------------
+# ================================
 # We download the data set using `fetch_openml` function in `sklearn.datasets`.
 # The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
 # There are some caveats to using this dataset, but we will use it solely as an example
@@ -23,6 +23,7 @@ from fairlearn.metrics import MetricFrame
 from sklearn.datasets import fetch_openml
 from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import os
@@ -33,13 +34,17 @@ if nb_dir not in sys.path:
 
 
 data = fetch_openml(data_id=1590, as_frame=True)
-X = pd.get_dummies(data.data)
-y_true = (data.target == '>50K') * 1
-sex = data.data['sex']
+X = data.data
+y = (data.target == '>50K') * 1
+X_train, X_test, y_train_true, y_test_true = train_test_split(X, y, test_size=0.33, random_state=42)
+
+X_train_processed = pd.get_dummies(X_train)
+X_test_processed = pd.get_dummies(X_test)
+test_set_sex = X_test['sex']
 
 # %%
 # Error Metrics
-# -------------
+# =============
 # We have many different choices for error metrics. In this notebook we'll just be using a
 # `Normal approximation interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval>` (symmetric)
 # and a `Wilson score interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval>` (asymmetric).
@@ -103,17 +108,17 @@ def accuracy_normal_err(y_true, y_pred):
 
 # %%
 # Classifier
-# ----------
+# ==========
 # Now we use a Decision Tree to make predictions
 #
 
 classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-classifier.fit(X, y_true)
-y_pred = classifier.predict(X)
+classifier.fit(X_train_processed, y_train_true)
+y_test_pred = classifier.predict(X_test_processed)
 
 # %%
 # MetricFrame
-# -----------
+# ===========
 # Now we create a MetricFrame to generate the recall Wilson bounds and recall normal error
 #
 
@@ -126,38 +131,45 @@ metrics_dict = {
     'Accuracy Bounds': accuracy_wilson,
     'Accuracy Error': accuracy_normal_err,
 }
-metric_frame = MetricFrame(metrics_dict, y_true, y_pred, sensitive_features=sex)
+metric_frame = MetricFrame(metrics_dict, y_test_true, y_test_pred, sensitive_features=test_set_sex)
 
 # %%
-# plot metrics with (symmetric) error bars
-plot_metric_frame(metric_frame, plot_type="scatter",
+# Plotting
+# ========
+# Plot metrics with (symmetric) error bars
+# ----------------------------------------
+plot_metric_frame(metric_frame, kind="scatter",
                   metrics=['Recall', 'Accuracy'],
                   error_bars=['Recall Error', 'Accuracy Error'])
-plot_metric_frame(metric_frame, plot_type="bar", metrics='Recall', error_bars='Recall Error')
+plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error')
 
 # %%
-# plot metrics with confidence intervals (possibly asymmetric)
-plot_metric_frame(metric_frame, plot_type="bar", metrics=[
+# Plot metrics with confidence intervals (possibly asymmetric)
+# ------------------------------------------------------------
+plot_metric_frame(metric_frame, kind="bar", metrics=[
                   'Recall', 'Accuracy'], conf_intervals=['Recall Bounds', 'Accuracy Bounds'])
-plot_metric_frame(metric_frame, plot_type="scatter",
+plot_metric_frame(metric_frame, kind="scatter",
                   metrics='Recall', conf_intervals='Recall Bounds')
 
 # %%
-# plot metrics without error bars
-plot_metric_frame(metric_frame, plot_type="scatter", metrics=['Recall', 'Accuracy'])
+# Plot metrics without error bars
+# -------------------------------
+plot_metric_frame(metric_frame, kind="scatter", metrics=['Recall', 'Accuracy'])
 
 # %%
-# plots all columns and treats them as metrics without error bars
-plot_metric_frame(metric_frame, plot_type="bar")
+# Plots all columns and treats them as metrics without error bars
+# ---------------------------------------------------------------
+plot_metric_frame(metric_frame, kind="bar")
 
 # %%
-# plots no metrics (or should it return an error)
+# Plots no metrics (or should it return an error)
+# -----------------------------------------------
 # TODO: remove later, but something we should determine how to handle
-plot_metric_frame(metric_frame, plot_type="bar", metrics=[])
+plot_metric_frame(metric_frame, kind="bar", metrics=[])
 
 # %%
 # Custom Plot
-#
+# -----------
 # Demonstrates how to customize the axes and then pass into `plot_metric_frame`
 
 fig, axs = plt.subplots(*(1, 2), squeeze=False)
@@ -168,11 +180,17 @@ axs[1].set_title("Custom Accuracy")
 axs[0].set_xlabel("Sensitive Feature")
 axs[1].set_xlabel("Sensitive Feature")
 
-axs = plot_metric_frame(metric_frame, axs=axs, plot_type="bar")
+# import matplotlib
+# from matplotlib import cm
+# sm = cm.ScalarMappable(norm=matplotlib.colors.Normalize(), cmap="Pastel1")
+# cbar = plt.colorbar(sm)
+# cbar.remove()
+axs = plot_metric_frame(metric_frame, axs=axs, kind="scatter")
+
 
 # %%
 # Creating Custom Error Metrics
-# -----------------------------
+# =============================
 # In this tutorial we used Normal intervals and Wilson bounds to demonstrate how to plot symmetric and asymmetric metrics, respectively.
 #
 # However, in order to support many different metrics, we reuse the MetricFrame functionality by writing a function
