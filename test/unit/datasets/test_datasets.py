@@ -4,11 +4,13 @@
 import pandas as pd
 import numpy as np
 import pytest
+from sklearn.model_selection import train_test_split
 
 from fairlearn.datasets import (
     fetch_adult,
     fetch_boston,
-    fetch_bank_marketing
+    fetch_bank_marketing,
+    make_synthetic_dataset,
 )
 
 # =============================================
@@ -38,3 +40,30 @@ class TestFairlearnDataset:
         assert isinstance(X, pd.DataFrame if as_frame else np.ndarray)
         assert y is not None
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
+
+    def test_synthetic_datasets(self):
+        """Ensure that dataset creation is deterministic.
+        """
+        X, y, gender = make_synthetic_dataset()
+        RNG_SEED = 42
+
+        X, y, gender = make_synthetic_dataset(seed=RNG_SEED)
+
+        rng = np.random.RandomState(RNG_SEED)
+        X_train, _, y_train, _, gender_train, _ = train_test_split(
+            X, y, gender, test_size=0.3, random_state=rng
+        )
+
+        assert np.sum(X_train[0] < 0) == 9
+        assert np.sum(y_train) == 700
+
+        counts = {'Man': 0, 'Woman': 0, 'Other': 0, 'Unspecified': 0}
+        for k in gender_train:
+            counts[k] += 1
+        expected_counts = {
+            'Man': 355,
+            'Woman': 343,
+            'Other': 362,
+            'Unspecified': 340
+        }
+        assert counts == expected_counts
