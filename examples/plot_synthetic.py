@@ -21,11 +21,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-RNG_SEED = 42
+rng = np.random.RandomState(42)
 
-X, y, gender = make_synthetic_dataset(seed=RNG_SEED)
+X, y, gender = make_synthetic_dataset(random_state=rng)
 
-rng = np.random.RandomState(RNG_SEED)
 X_train, X_test, y_train, y_test, gender_train, gender_test = train_test_split(
     X, y, gender, test_size=0.3, random_state=rng
 )
@@ -54,3 +53,5 @@ metric_frame.by_group.plot.bar(
     figsize=[12, 8],
     title="Show all metrics",
 )
+
+# %%

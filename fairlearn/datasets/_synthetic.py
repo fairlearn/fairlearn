@@ -2,9 +2,10 @@
 # Licensed under the MIT License.
 import numpy as np
 from sklearn.datasets import make_classification
+from sklearn.utils import check_random_state
 
 
-def make_synthetic_dataset(classes=None, n_features=20, n_informative=4, seed=None):
+def make_synthetic_dataset(classes=None, n_features=20, n_informative=4, random_state=None):
     """Create a synthetic dataset with a single sensitive feature: 'gender'.
 
     Parameters
@@ -27,8 +28,8 @@ def make_synthetic_dataset(classes=None, n_features=20, n_informative=4, seed=No
     n_informative : int, default=4
         The number of informative features.
 
-    seed : int, default=None
-        The random number generator seed to use.
+    random_state : int or RandomState instance, default=None
+        The random number generator seed or RandomState to use.
 
     Returns
     -------
@@ -40,7 +41,7 @@ def make_synthetic_dataset(classes=None, n_features=20, n_informative=4, seed=No
         gender : ndarray
             The sensitive feature label.
     """
-    rng = np.random.RandomState(seed=seed)
+    rng = check_random_state(random_state)
 
     classification_kwargs = {
         'n_features': n_features,
