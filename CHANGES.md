@@ -3,7 +3,7 @@
 ### v0.7.1
 
 * Added new `make_synthetic_dataset()` in `fairlearn.datasets` to allow for
-  creation of a dataset with user-selected numhber of features.
+  creation of a dataset with user-selected number of features.
 
 
 ### v0.7.0
