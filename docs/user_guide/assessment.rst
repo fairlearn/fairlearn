@@ -13,6 +13,8 @@ use, but also for models created with mitigation techniques from the
 compare metrics between models as well as compare metrics for different groups
 on a single model.
 
+
+
 Ungrouped Metrics
 ^^^^^^^^^^^^^^^^^
 
@@ -467,6 +469,21 @@ argument. Here is an example of a pie chart.
 
 There are many other customizations that can be done. More information can be found in
 :meth:`pandas.DataFrame.plot`.
+
+
+.. _objectSavingLoading:
+
+Object Saving & Loading
+-----------------------
+
+Metrics can be saved to and loaded from files using the 'pickle <https://docs.python.org/3/library/pickle.html>' package.
+
+.. doctest:: assessment_metrics
+
+	>>> mf = MetricFram(...)
+	>>> pickle.dump(mf, open(file_name, 'wb'))
+	>>> pickle.load(open(file_name, 'rb'))
+
 
 .. _dashboard:
 
