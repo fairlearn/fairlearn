@@ -22,8 +22,7 @@ def make_synthetic_dataset(seed=12345):
         gender : ndarray
             The sensitive feature label.
     """
-    if rng is None:
-        rng = np.random.RandomState(seed=42)
+    rng = np.random.RandomState(seed=seed)
 
     classification_kwargs = {
         'n_features': 20,
