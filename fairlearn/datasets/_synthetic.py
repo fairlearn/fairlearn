@@ -4,11 +4,23 @@ import numpy as np
 from sklearn.datasets import make_classification
 
 
-def make_synthetic_dataset(n_features=20, n_informative=4, seed=None):
+def make_synthetic_dataset(classes=None, n_features=20, n_informative=4, seed=None):
     """Create a synthetic dataset with a single sensitive feature: 'gender'.
 
     Parameters
     ----------
+    classes : dict, default=None
+        A dict whose keys are the labels for the gender feature, and whose set
+        the `n_samples` and `class_sep` parameters for `make_classification`.
+        If `None`, the following default dict is used::
+
+            {
+                'Man': {'n_samples': 500, 'class_sep': 1},
+                'Other': {'n_samples': 500, 'class_sep': 0.5},
+                'Unspecified': {'n_samples': 500, 'class_sep': 0.5},
+                'Woman': {'n_samples': 500, 'class_sep': 2},
+            }
+
     n_features : int, default=20
         The total number of features.
 
@@ -37,12 +49,13 @@ def make_synthetic_dataset(n_features=20, n_informative=4, seed=None):
         'random_state': rng,
     }
 
-    classes = {
-        'Man': {'n_samples': 500, 'class_sep': 1},
-        'Other': {'n_samples': 500, 'class_sep': 0.5},
-        'Unspecified': {'n_samples': 500, 'class_sep': 0.5},
-        'Woman': {'n_samples': 500, 'class_sep': 2},
-    }
+    if classes is None:
+        classes = {
+            'Man': {'n_samples': 500, 'class_sep': 1},
+            'Other': {'n_samples': 500, 'class_sep': 0.5},
+            'Unspecified': {'n_samples': 500, 'class_sep': 0.5},
+            'Woman': {'n_samples': 500, 'class_sep': 2},
+        }
 
     Xs, ys, genders = [], [], []
 
