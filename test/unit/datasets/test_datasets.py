@@ -44,7 +44,7 @@ class TestFairlearnDataset:
     def test_synthetic_datasets(self):
         """Ensure that dataset creation is deterministic."""
         X, y, gender = make_synthetic_dataset()
-        RNG_SEED = 42
+        RNG_SEED = 12345
 
         X, y, gender = make_synthetic_dataset(seed=RNG_SEED)
 
@@ -53,16 +53,16 @@ class TestFairlearnDataset:
             X, y, gender, test_size=0.3, random_state=rng
         )
 
-        assert np.sum(X_train[0] < 0) == 9
-        assert np.sum(y_train) == 700
+        assert np.sum(X_train[0] < 0) == 13
+        assert np.sum(y_train) == 699
 
         counts = {'Man': 0, 'Woman': 0, 'Other': 0, 'Unspecified': 0}
         for k in gender_train:
             counts[k] += 1
         expected_counts = {
-            'Man': 355,
-            'Woman': 343,
-            'Other': 362,
-            'Unspecified': 340
+            'Man': 352,
+            'Woman': 351,
+            'Other': 336,
+            'Unspecified': 361
         }
         assert counts == expected_counts
