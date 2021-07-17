@@ -480,7 +480,7 @@ Metrics can be saved to and loaded from files using the 'pickle <https://docs.py
 
 .. doctest:: assessment_metrics
 
-	>>> mf = MetricFram(...)
+	>>> mf = MetricFrame(...)
 	>>> pickle.dump(mf, open(file_name, 'wb'))
 	>>> pickle.load(open(file_name, 'rb'))
 
