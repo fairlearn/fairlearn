@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.datasets import make_classification
 
 
-def make_synthetic_dataset(seed=12345):
+def make_synthetic_dataset(seed=None):
     """Create a synthetic dataset.
 
     Parameters
