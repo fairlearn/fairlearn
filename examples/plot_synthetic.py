@@ -21,17 +21,18 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
+RNG_SEED = 42
 
-rng = np.random.RandomState(seed=42)
-X, y, gender = make_synthetic_dataset(rng=rng)
+X, y, gender = make_synthetic_dataset(seed=RNG_SEED)
 
+rng = np.random.RandomState(RNG_SEED)
 X_train, X_test, y_train, y_test, gender_train, gender_test = train_test_split(
     X, y, gender, test_size=0.3, random_state=rng
 )
 
 classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-classifier.fit(X, y)
-y_pred = classifier.predict(X)
+classifier.fit(X_train, y_train)
+y_pred = classifier.predict(X_test)
 
 # Analyze metrics using MetricFrame
 metrics = {
@@ -43,9 +44,9 @@ metrics = {
     'selection rate': selection_rate,
     'count': count}
 metric_frame = MetricFrame(metrics=metrics,
-                           y_true=y,
+                           y_true=y_test,
                            y_pred=y_pred,
-                           sensitive_features=gender)
+                           sensitive_features=gender_test)
 metric_frame.by_group.plot.bar(
     subplots=True,
     layout=[3, 3],
