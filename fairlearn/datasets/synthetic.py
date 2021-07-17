@@ -4,8 +4,23 @@ import numpy as np
 from sklearn.datasets import make_classification
 
 
-def make_synthetic_dataset(rng=None):
+def make_synthetic_dataset(seed=12345):
     """Create a synthetic dataset.
+
+    Parameters
+    ----------
+    seed : int, default=12345
+        The random number generator seed to use.
+
+    Returns
+    -------
+    (X, y, gender) : tuple of numpy.ndarray
+        X : ndarray
+            The generated samples.
+        y : ndarray
+            Labels for the binary classification.
+        gender : ndarray
+            The sensitive feature label.
     """
     if rng is None:
         rng = np.random.RandomState(seed=42)
