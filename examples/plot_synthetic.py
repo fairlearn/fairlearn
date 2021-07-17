@@ -53,13 +53,3 @@ metric_frame.by_group.plot.bar(
     figsize=[12, 8],
     title="Show all metrics",
 )
-
-# Customize plots with kind
-metric_frame.by_group.plot(
-    kind="pie",
-    subplots=True,
-    layout=[3, 3],
-    legend=False,
-    figsize=[12, 8],
-    title="Show all metrics in pie",
-)
