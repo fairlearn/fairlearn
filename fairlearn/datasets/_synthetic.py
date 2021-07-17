@@ -37,36 +37,24 @@ def make_synthetic_dataset(n_features=20, n_informative=4, seed=None):
         'random_state': rng,
     }
 
-    X_women, y_women = make_classification(
-        n_samples=500,
-        class_sep=1,
-        **classification_kwargs,
-    )
+    classes = {
+        'Man': {'n_samples': 500, 'class_sep': 1},
+        'Other': {'n_samples': 500, 'class_sep': 0.5},
+        'Unspecified': {'n_samples': 500, 'class_sep': 0.5},
+        'Woman': {'n_samples': 500, 'class_sep': 2},
+    }
 
-    X_men, y_men = make_classification(
-        n_samples=500,
-        class_sep=2,
-        **classification_kwargs,
-    )
+    Xs, ys, genders = [], [], []
 
-    X_other, y_other = make_classification(
-        n_samples=500,
-        class_sep=0.5,
-        **classification_kwargs,
-    )
+    for label, kwargs in classes.items():
+        kwargs.update(classification_kwargs)
+        X, y = make_classification(**kwargs)
+        genders.append([label] * kwargs['n_samples'])
+        Xs.append(X)
+        ys.append(y)
 
-    X_unspecified, y_unspecified = make_classification(
-        n_samples=500,
-        class_sep=0.5,
-        **classification_kwargs,
-    )
+    X = np.concatenate(Xs)
+    y = np.concatenate(ys)
+    gender = np.concatenate(genders)
 
-    X = np.r_[X_women, X_men, X_other, X_unspecified]
-    y = np.r_[y_women, y_men, y_other, y_unspecified]
-    gender = np.r_[
-        ["Woman"] * 500,
-        ["Man"] * 500,
-        ["Other"] * 500,
-        ["Unspecified"] * 500
-    ].reshape(-1)
     return X, y, gender
