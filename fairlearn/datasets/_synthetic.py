@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 import numpy as np
 from sklearn.datasets import make_classification
