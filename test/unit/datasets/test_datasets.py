@@ -42,8 +42,7 @@ class TestFairlearnDataset:
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
 
     def test_synthetic_datasets(self):
-        """Ensure that dataset creation is deterministic.
-        """
+        """Ensure that dataset creation is deterministic."""
         X, y, gender = make_synthetic_dataset()
         RNG_SEED = 42
 
