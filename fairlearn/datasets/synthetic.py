@@ -4,12 +4,18 @@ import numpy as np
 from sklearn.datasets import make_classification
 
 
-def make_synthetic_dataset(seed=None):
-    """Create a synthetic dataset.
+def make_synthetic_dataset(n_features=20, n_informative=4, seed=None):
+    """Create a synthetic dataset with a single sensitive feature: 'gender'.
 
     Parameters
     ----------
-    seed : int, default=12345
+    n_features : int, default=20
+        The total number of features.
+
+    n_informative : int, default=4
+        The number of informative features.
+
+    seed : int, default=None
         The random number generator seed to use.
 
     Returns
@@ -25,8 +31,8 @@ def make_synthetic_dataset(seed=None):
     rng = np.random.RandomState(seed=seed)
 
     classification_kwargs = {
-        'n_features': 20,
-        'n_informative': 4,
+        'n_features': n_features,
+        'n_informative': n_informative,
         'n_classes': 2,
         'random_state': rng,
     }
