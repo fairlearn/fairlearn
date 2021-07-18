@@ -41,25 +41,16 @@ class TestFairlearnDataset:
         assert y is not None
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
 
-    def test_synthetic_datasets(self):
+    def test_simple_synthetic_dataset(self):
         """Ensure that dataset creation is deterministic."""
-        rng = np.random.RandomState(12345)
+        rng = np.random.RandomState(54321)
         X, y, gender = make_synthetic_dataset(random_state=rng)
 
-        X_train, _, y_train, _, gender_train, _ = train_test_split(
-            X, y, gender, test_size=0.3, random_state=rng
-        )
+        counts = [250, 251, 249, 251]
+        for i in range(4):
+            assert np.sum(y[i*500:(i+1)*500]) == counts[i]
 
-        assert np.sum(X_train[0] < 0) == 8
-        assert np.sum(y_train) == 699
-
-        counts = {'Man': 0, 'Woman': 0, 'Other': 0, 'Unspecified': 0}
-        for k in gender_train:
-            counts[k] += 1
-        expected_counts = {
-            'Man': 340,
-            'Woman': 353,
-            'Other': 350,
-            'Unspecified': 357
-        }
-        assert counts == expected_counts
+        assert np.isclose(np.mean(X), 0.012162)
+        assert X.shape == (2000, 20)
+        assert y.shape == (2000,)
+        assert gender.shape == (2000,)
