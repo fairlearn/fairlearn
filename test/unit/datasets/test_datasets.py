@@ -54,3 +54,23 @@ class TestFairlearnDataset:
         assert X.shape == (2000, 20)
         assert y.shape == (2000,)
         assert gender.shape == (2000,)
+
+    def test_custom_synthetic_dataset(self):
+        """Ensure that custom dataset creation is deterministic."""
+        rng = np.random.RandomState(54321)
+        feature_config = {
+            'Man': {'n_samples': 500, 'class_sep': 1},
+            'Non-binary': {'n_samples': 200, 'class_sep': 3},
+            'Other': {'n_samples': 900, 'class_sep': 0.5},
+            'Unspecified': {'n_samples': 400, 'class_sep': 0.5},
+            'Woman': {'n_samples': 300, 'class_sep': 2},
+        }
+        X, y, gender = make_synthetic_dataset(feature_config=feature_config,
+                                              n_features=25,
+                                              random_state=rng)
+
+        n_samples = np.sum([v['n_samples'] for v in feature_config.values()])
+        assert set(np.unique(gender)) == set(feature_config.keys())
+        assert X.shape == (n_samples, 25)
+        assert y.shape == (n_samples,)
+        assert gender.shape == (n_samples,)
