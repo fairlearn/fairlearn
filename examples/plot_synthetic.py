@@ -53,5 +53,3 @@ metric_frame.by_group.plot.bar(
     figsize=[12, 8],
     title="Show all metrics",
 )
-
-# %%
