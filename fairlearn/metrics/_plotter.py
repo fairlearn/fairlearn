@@ -5,6 +5,7 @@
 
 from typing import List, Union
 import pandas as pd
+import numpy as np
 
 from ._metric_frame import MetricFrame
 from matplotlib.lines import Line2D
@@ -74,12 +75,14 @@ def _check_valid_conf_interval(df_conf_intervals):
             raise ValueError(_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR)
 
 
-def _plot_df(df, metrics, axs, colormap, kind, df_all_errors=None, figsize=None):
+def _plot_df(df, metrics, axs, colormap, kind, df_all_errors=None, figsize=None, **kwargs):
     for metric, ax in zip(metrics, axs):
         if df_all_errors is not None:
             previous_xlabel = ax.get_xlabel()
+
+            yerr = np.array([[*row] for row in df_all_errors[metric]]).T
             ax = df.plot(x="_index", y=metric, kind=kind,
-                         yerr=df_all_errors, ax=ax, colormap=colormap, figsize=figsize)
+                         yerr=yerr, ax=ax, colormap=colormap, figsize=figsize, **kwargs)
             ax.set_xlabel(previous_xlabel)
 
             if kind == "scatter":
@@ -92,7 +95,7 @@ def _plot_df(df, metrics, axs, colormap, kind, df_all_errors=None, figsize=None)
         else:
             previous_xlabel = ax.get_xlabel()
             ax = df.plot(x="_index", y=metric, kind=kind, ax=ax,
-                         colormap=colormap, figsize=figsize)
+                         colormap=colormap, figsize=figsize, **kwargs)
             ax.set_xlabel(previous_xlabel)
 
 
@@ -110,7 +113,8 @@ def plot_metric_frame(metric_frame: MetricFrame,
                       text_ha: str = "center",
                       colormap=None,
                       subplot_shape=None,
-                      figsize=None
+                      figsize=None,
+                      **kwargs
                       ):
     """Visualization for metrics with statistical error bounds.
 
@@ -225,7 +229,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
     # Note: Returns early
     df['_index'] = df.index
     if error_bars is None and conf_intervals is None:
-        _plot_df(df, metrics, axs, colormap, kind, figsize=figsize)
+        _plot_df(df, metrics, axs, colormap, kind, figsize=figsize, **kwargs)
 
         if show_plot:
             plt.show()
@@ -256,7 +260,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
                     zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
                 df_all_bounds[metric] = df_error['error']
 
-    _plot_df(df, metrics, axs, colormap, kind, df_all_errors, figsize=figsize)
+    _plot_df(df, metrics, axs, colormap, kind, df_all_errors, figsize=figsize, **kwargs)
 
     if plot_error_labels:
         for j, metric in enumerate(metrics):

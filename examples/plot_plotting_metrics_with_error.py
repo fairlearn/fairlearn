@@ -41,7 +41,7 @@ X_train, X_test, y_train_true, y_test_true = train_test_split(
 
 X_train_processed = pd.get_dummies(X_train)
 X_test_processed = pd.get_dummies(X_test)
-test_set_sex = X_test['sex']
+test_set_sex = X_test['race']
 
 # %%
 # Error Metrics
@@ -174,8 +174,8 @@ plot_metric_frame(metric_frame, kind="bar")
 fig, axs = plt.subplots(*(1, 2), squeeze=False)
 axs = axs.flatten()
 
-axs[0].set_title("Custom Recall Plot")
-axs[1].set_title("Custom Accuracy Plot")
+axs[0].set_title("Recall Plot")
+axs[1].set_title("Accuracy Plot")
 axs[0].set_xlabel("Sensitive Feature")
 axs[1].set_xlabel("Sensitive Feature")
 axs[0].set_ylabel("Recall")
@@ -191,7 +191,8 @@ axs = plot_metric_frame(metric_frame,
                         figsize=(12, 4),
                         axs=axs,
                         kind="bar",
-                        colormap="Pastel1")
+                        colormap="Pastel1",
+                        rot=45)
 
 # %%
 # Creating Custom Error Metrics
