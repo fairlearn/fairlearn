@@ -46,7 +46,7 @@ class TestFairlearnDataset:
         rng = np.random.RandomState(54321)
         X, y, gender = make_synthetic_dataset(random_state=rng)
 
-        counts = [250, 251, 249, 251]
+        counts = [214, 265, 289, 250]
         for i in range(4):
             assert np.sum(y[i*500:(i+1)*500]) == counts[i]
 

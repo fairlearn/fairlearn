@@ -71,4 +71,12 @@ def make_synthetic_dataset(feature_config=None, n_features=20, n_informative=4, 
     y = np.concatenate(ys)
     gender = np.concatenate(genders)
 
+    # Now generate disparities by randomly flipping classes
+    bias = {group_name: rng.uniform(0.4, 0.6) for group_name in feature_config}
+    for idx in range(y.size):
+        # 1/4 chance we'll overwrite this value
+        if rng.uniform(0, 1) > 0.25:
+            # set new value based on biased coin flip
+            y[idx] = rng.uniform(0, 1) > bias[gender[idx]]
+
     return X, y, gender
