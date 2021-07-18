@@ -7,6 +7,7 @@ from typing import List, Union
 import pandas as pd
 
 from ._metric_frame import MetricFrame
+from matplotlib.lines import Line2D
 
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install matplotlib to use " \
                                    "the plotting for MetricFrame."
@@ -15,6 +16,8 @@ _GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = \
     "Ambiguous Error Metric. Please only provide one of: error_bars or conf_intervals."
 _METRIC_AND_ERROR_BARS_NOT_SAME_LENGTH_ERROR = \
     "The list of metrics and list of error_bars are not the same length."
+_METRIC_LENGTH_ZERO_ERROR = \
+    "No metrics were provided to plot. A nonzero number of metrics is required."
 _METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR = \
     "The list of metrics and list of conf_intervals are not the same length."
 
@@ -35,6 +38,11 @@ def _check_if_metrics_and_error_metrics_same_length(metrics, error_bars, conf_in
     elif conf_intervals is not None:
         if len(conf_intervals) != len(metrics):
             raise ValueError(_METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR)
+
+
+def _check_if_metrics_length_zero(metrics):
+    if len(metrics) == 0:
+        raise ValueError(_METRIC_LENGTH_ZERO_ERROR)
 
 
 def _check_for_ambiguous_error_metric(error_bars, conf_intervals):
@@ -65,6 +73,28 @@ def _check_valid_conf_interval(df_conf_intervals):
             raise ValueError(_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR)
 
 
+def _plot_df(df, metrics, axs, colormap, kind, df_all_errors=None, figsize=None):
+    for metric, ax in zip(metrics, axs):
+        if df_all_errors is not None:
+            previous_xlabel = ax.get_xlabel()
+            ax = df.plot(x="_index", y=metric, kind=kind,
+                         yerr=df_all_errors, ax=ax, colormap=colormap, figsize=figsize)
+            ax.set_xlabel(previous_xlabel)
+
+            if kind == "scatter":
+                color = ax.lines[0].get_color()
+            else:
+                color = "black"
+            custom_line = [Line2D([0], [0], color=color)]
+            ax.legend(custom_line, ["95% CI"])
+
+        else:
+            previous_xlabel = ax.get_xlabel()
+            ax = df.plot(x="_index", y=metric, kind=kind, ax=ax,
+                         colormap=colormap, figsize=figsize)
+            ax.set_xlabel(previous_xlabel)
+
+
 def plot_metric_frame(metric_frame: MetricFrame,
                       kind: str = "scatter",
                       metrics: Union[List[str], str] = None,
@@ -78,7 +108,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
                       text_color: str = "black",
                       text_ha: str = "center",
                       capsize=10,
-                      colormap="Pastel1",
+                      colormap=None,
                       subplot_shape=None,
                       figsize=None
                       ):
@@ -177,6 +207,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
                 metrics.append(metric)
 
     _check_if_metrics_and_error_metrics_same_length(metrics, error_bars, conf_intervals)
+    _check_if_metrics_length_zero(metrics)
 
     if axs is None:
         if subplot_shape is None:
@@ -191,10 +222,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
     # Note: Returns early
     df['_index'] = df.index
     if error_bars is None and conf_intervals is None:
-        for metric, ax in zip(metrics, axs):
-            previous_xlabel = ax.get_xlabel()
-            ax = df.plot(x="_index", y=metric, kind=kind, ax=ax, colormap=colormap)
-            ax.set_xlabel(previous_xlabel)
+        _plot_df(df, metrics, axs, colormap, kind, figsize=figsize)
 
         if show_plot:
             plt.show()
@@ -225,11 +253,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
                     zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
                 df_all_bounds[metric] = df_error['error']
 
-    for metric, ax in zip(metrics, axs):
-        previous_xlabel = ax.get_xlabel()
-        ax = df.plot(x="_index", y=metric, kind=kind,
-                     yerr=df_all_errors, ax=ax, colormap=colormap)
-        ax.set_xlabel(previous_xlabel)
+    _plot_df(df, metrics, axs, colormap, kind, df_all_errors, figsize=figsize)
 
     # TODO: Check assumption of plotting items in the vertical direction
     if plot_error_labels:
