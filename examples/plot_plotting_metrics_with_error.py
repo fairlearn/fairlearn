@@ -69,8 +69,11 @@ def compute_error_metric(metric_value, sample_size, z_score):
 
     Assumes infinitely large population,
     Should be used when the sampling fraction is small.
-    For sampling fraction > 5%, may want to use finite population correction
-    https://en.wikipedia.org/wiki/Margin_of_error
+    For sampling fraction > 5%, may want to use finite population correction [1]
+    
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Margin_of_error
 
     Note:
         Returns absolute error (%)
@@ -132,25 +135,6 @@ metrics_dict = {
     'Accuracy Error': accuracy_normal_err,
 }
 metric_frame = MetricFrame(metrics_dict, y_test_true, y_test_pred, sensitive_features=test_set_sex)
-
-# %%
-# df = metric_frame.by_group
-# metrics=['Accuracy', 'Recall']
-# errors=['Accuracy Error', 'Recall Error']
-# ax = df[metrics].plot(kind="bar", yerr=df[errors].values.T, layout=[1,2], subplots=True, title=metrics, figsize=(12, 4))
-# ax = ax.flatten()
-
-# from matplotlib.lines import Line2D
-# # plt.legend(*ax, ["95", "23"])
-# handles, labels = ax[0].get_legend_handles_labels()
-# print(handles[0][0])
-
-# ax[0]
-
-# color = ax[0].lines[0].get_color()
-# custom_line = [Line2D([0], [0], color=color)]
-# ax[0].legend(custom_line, ["95% LO"])
-# ax[0].legend(custom_line, ["95% CI"])
 
 # %%
 # Plotting
