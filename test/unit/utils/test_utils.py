@@ -27,3 +27,7 @@ class TestValidateAndReformatInput:
         assert isinstance(y_update, pd.Series)
         assert isinstance(y_update, pd.Series)
         assert cf_update is None
+
+        assert np.array_equal(X, X_update)
+        assert np.array_equal(y, y_update)
+        assert np.array_equal(sf, sf_update)
