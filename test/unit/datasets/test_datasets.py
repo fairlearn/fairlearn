@@ -4,7 +4,6 @@
 import pandas as pd
 import numpy as np
 import pytest
-from sklearn.model_selection import train_test_split
 
 from fairlearn.datasets import (
     fetch_adult,
