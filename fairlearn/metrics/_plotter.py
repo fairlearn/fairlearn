@@ -8,6 +8,7 @@ import pandas as pd
 
 from ._metric_frame import MetricFrame
 from matplotlib.lines import Line2D
+from matplotlib.axes._axes import Axes
 
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install matplotlib to use " \
                                    "the plotting for MetricFrame."
@@ -107,7 +108,6 @@ def plot_metric_frame(metric_frame: MetricFrame,
                       text_fontsize: int = 8,
                       text_color: str = "black",
                       text_ha: str = "center",
-                      capsize=10,
                       colormap=None,
                       subplot_shape=None,
                       figsize=None
@@ -118,7 +118,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     This function takes in a :class:`fairlearn.metrics.MetricFrame` with precomputed metrics
     and metric errors and a `error_bars` or `conf_intervals` array to interpret the columns
-    of the `MetricFrame`.
+    of the :class:`MetricFrame`.
 
     The items at each index of the given `metrics` array and given `error_bars` or `conf_intervals`
     array should correspond to a pair of the same metric and metric error, respectively.
@@ -130,37 +130,39 @@ def plot_metric_frame(metric_frame: MetricFrame,
     Parameters
     ----------
     metric_frame : fairlearn.metrics.MetricFrame
-        The collection fo disaggregated metric values, along with the metric errors.
+        The collection of disaggregated metric values, along with the metric errors.
 
     kind : str, optional
         The type of plot to display. i.e. "bar", "line", etc.
-        List of options is detailed in `pandas.DataFrame.plot`
+        List of options is detailed in :meth:`pandas.DataFrame.plot`
 
     metrics : str or list of str
-        The name of the metrics to plot. Should match columns from the given `MetricFrame`.
+        The name of the metrics to plot. Should match columns from the given :class:`MetricFrame`.
 
     error_bars : str or list of str
-        The name of the error metrics to plot. Should match columns from the given `MetricFrame`.
+        The name of the error metrics to plot.
+        Should match columns from the given :class:`MetricFrame`.
         Error bars quantify the bounds relative to the base metric.
 
         Example:
-            If the error bar for a certain column is [0.01, 0.02]
+            If the error bar for a certain column is :code:`[0.01, 0.02]`
             and the metric is 0.6
-            Then the plotted bounds will be [0.59, 0.62]
+            Then the plotted bounds will be :code:`[0.59, 0.62]`
 
         Note:
             The return of the error bar function should be a tuple of the lower
-            and upper errors
+            and upper errors. i.e. :code:`[0.01, 0.02]`
 
     conf_intervals : str or list of str
         The name of the confidence intervals to plot.
-        Should match columns from the given `MetricFrame`.
+        Should match columns from the given :class:`MetricFrame`.
 
         Note:
             The return of the error bar function should be a tuple of the lower
-            and upper bounds
+            and upper bounds. i.e. :code:`[0.59, 0.62]`
 
-    axs : matplotlib.axes._axes.Axes or list of matplotlib.axes._axes.Axes, optional
+    axs : :class:`matplotlib.axes._axes.Axes`\
+        or list of :class:`matplotlib.axes._axes.Axes`, optional
         Custom Matplotlib axes to which this function can plot
 
     show_plot : bool, optional
@@ -183,7 +185,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     Returns
     -------
-    matplotlib.axes._axes.Axes
+    :class:`numpy.ndarray` of :class:`matplotlib.axes._axes.Axes`
     """
     try:
         import matplotlib.pyplot as plt
@@ -196,6 +198,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
     metrics = [metrics] if isinstance(metrics, str) else metrics
     conf_intervals = [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
     error_bars = [error_bars] if isinstance(error_bars, str) else error_bars
+    axs = [axs] if isinstance(axs, Axes) else axs
 
     df = metric_frame.by_group
 
@@ -255,7 +258,6 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     _plot_df(df, metrics, axs, colormap, kind, df_all_errors, figsize=figsize)
 
-    # TODO: Check assumption of plotting items in the vertical direction
     if plot_error_labels:
         for j, metric in enumerate(metrics):
             y_min, y_max = axs[j].get_ylim()

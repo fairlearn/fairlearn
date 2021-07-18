@@ -36,7 +36,8 @@ if nb_dir not in sys.path:
 data = fetch_openml(data_id=1590, as_frame=True)
 X = data.data
 y = (data.target == '>50K') * 1
-X_train, X_test, y_train_true, y_test_true = train_test_split(X, y, test_size=0.33, random_state=42)
+X_train, X_test, y_train_true, y_test_true = train_test_split(
+    X, y, test_size=0.33, random_state=42)
 
 X_train_processed = pd.get_dummies(X_train)
 X_test_processed = pd.get_dummies(X_test)
@@ -46,7 +47,7 @@ test_set_sex = X_test['sex']
 # Error Metrics
 # =============
 # We have many different choices for error metrics. In this notebook we'll just be using a
-# `Normal approximation interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval>` (symmetric)
+# `Normal approximation interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval>` _ (symmetric)
 # and a `Wilson score interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval>` _ (asymmetric).
 
 # We aim to create a 95% confidence interval, so we use a :code:`z_score` of 1.959964
@@ -70,7 +71,7 @@ def compute_error_metric(metric_value, sample_size, z_score):
     Assumes infinitely large population.
     Should be used when the sampling fraction is small.
     For sampling fraction > 5%, may want to use finite population correction [1]
-    
+
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Margin_of_error
@@ -184,14 +185,13 @@ axs[1].set_ylabel("Accuracy")
 axs[0].set_ylim((0, 1))
 axs[1].set_ylim((0, 1))
 
-axs = plot_metric_frame(metric_frame, 
-    metrics=['Recall', 'Accuracy'],
-    error_bars=['Recall Error', 'Accuracy Error'],
-    figsize=(12, 4),
-    axs=axs,
-    kind="bar",
-    colormap="Pastel1")
-
+axs = plot_metric_frame(metric_frame,
+                        metrics=['Recall', 'Accuracy'],
+                        error_bars=['Recall Error', 'Accuracy Error'],
+                        figsize=(12, 4),
+                        axs=axs,
+                        kind="bar",
+                        colormap="Pastel1")
 
 # %%
 # Creating Custom Error Metrics

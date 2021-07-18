@@ -6,6 +6,7 @@ import pytest
 from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
 from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 import matplotlib
+import matplotlib.pyplot as plt
 
 from fairlearn.metrics import MetricFrame
 from fairlearn.metrics._plotter import (
@@ -108,23 +109,23 @@ metrics_dict = {
     'Recall Error Negative': incorrect_negative_recall_normal_err,
     'Recall Error Single': incorrect_single_error_recall_normal_err,
 }
-sample_metric_frame = [
-    MetricFrame(
+
+
+@pytest.fixture()
+def metric_frame():
+    return MetricFrame(
         metrics=metrics_dict,
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1)
-]
 
 
-@pytest.mark.parametrize("metric_frame", sample_metric_frame)
 def test_plotting_output(metric_frame):
     axs = plot_metric_frame(metric_frame)
     assert len(axs) == 4
     assert isinstance(axs[0], matplotlib.axes.Axes)
 
 
-@pytest.mark.parametrize("metric_frame", sample_metric_frame)
 def test_ambiguous_error_metric(metric_frame):
     with pytest.raises(ValueError) as exc:
         plot_metric_frame(metric_frame, metrics=["Recall"], error_bars=[
@@ -132,19 +133,20 @@ def test_ambiguous_error_metric(metric_frame):
         assert str(exc.value) == _GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR
 
 
-@pytest.mark.parametrize("metric_frame", sample_metric_frame)
-def test_unequal_length(metric_frame):
+def test_unequal_error_bars_length(metric_frame):
     with pytest.raises(ValueError) as exc:
         plot_metric_frame(metric_frame, metrics=[
                           "Recall", "Accuracy"], error_bars=["Recall Error"])
         assert str(exc.value) == _METRIC_AND_ERROR_BARS_NOT_SAME_LENGTH_ERROR
+
+
+def test_unequal_conf_intervals_length(metric_frame):
     with pytest.raises(ValueError) as exc:
         plot_metric_frame(metric_frame, metrics=[
                           "Recall", "Accuracy"], conf_intervals=["Recall Bounds"])
         assert str(exc.value) == _METRIC_AND_CONF_INTERVALS_NOT_SAME_LENGTH_ERROR
 
 
-@pytest.mark.parametrize("metric_frame", sample_metric_frame)
 def test_flipped_bounds(metric_frame):
     with pytest.raises(ValueError) as exc:
         plot_metric_frame(metric_frame, metrics=["Recall"],
@@ -152,7 +154,6 @@ def test_flipped_bounds(metric_frame):
         assert str(exc.value) == _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR
 
 
-@pytest.mark.parametrize("metric_frame", sample_metric_frame)
 def test_single_bound(metric_frame):
     with pytest.raises(ValueError) as exc:
         plot_metric_frame(metric_frame, metrics=["Recall"],
@@ -160,7 +161,6 @@ def test_single_bound(metric_frame):
         assert str(exc.value) == _CONF_INTERVALS_MUST_BE_TUPLE
 
 
-@pytest.mark.parametrize("metric_frame", sample_metric_frame)
 def test_negative_error(metric_frame):
     with pytest.raises(ValueError) as exc:
         plot_metric_frame(metric_frame, metrics=["Recall"],
@@ -168,8 +168,18 @@ def test_negative_error(metric_frame):
         assert str(exc.value) == _ERROR_BARS_NEGATIVE_VALUE_ERROR
 
 
-@pytest.mark.parametrize("metric_frame", sample_metric_frame)
-def test_single_error(metric_frame):
+def test_single_error_bar(metric_frame):
     with pytest.raises(ValueError) as exc:
-        plot_metric_frame(metric_frame, metrics=["Recall"], conf_intervals=["Recall Error Single"])
+        plot_metric_frame(metric_frame, metrics=["Recall"],
+                          conf_intervals=["Recall Error Single"])
         assert str(exc.value) == _ERROR_BARS_MUST_BE_TUPLE
+
+
+def test_single_ax_input(metric_frame):
+    axs = plt.subplot()
+    axs = plot_metric_frame(metric_frame,
+                            metrics=['Recall'],
+                            error_bars=['Recall Error'],
+                            axs=axs,
+                            kind="bar",
+                            colormap="Pastel1")
