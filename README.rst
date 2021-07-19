@@ -119,17 +119,8 @@ guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
 Maintainers
 -----------
 
-The Fairlearn project is maintained by:
-
--  **@adrinjalali**
--  **@hildeweerts**
--  **@MiroDudik**
--  **@mmadaio**
--  **@riedgar-ms**
--  **@romanlutz**
-
-For a full list of contributors refer to the `authors
-page <./AUTHORS.md>`__
+A list of current maintainers is
+`on our website <https://fairlearn.org/main/about/index.html>`__.
 
 Issues
 ------
