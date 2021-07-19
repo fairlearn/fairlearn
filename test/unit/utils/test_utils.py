@@ -9,6 +9,7 @@ import fairlearn.utils._input_validation as iv
 
 class TestValidateAndReformatInput:
     def test_smoke(self):
+        # Regression test for Issue #898
         X = pd.DataFrame.from_dict(
             {
                 'alpha': ['a', 'a', 'b'],
