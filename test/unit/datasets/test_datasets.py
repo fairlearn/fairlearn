@@ -40,7 +40,7 @@ class TestFairlearnDataset:
         assert y is not None
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
 
-    def test_simple_synthetic_dataset(self):
+    def test_simple_make_sensitive_classification(self):
         """Ensure that dataset creation is deterministic."""
         rng = np.random.RandomState(54321)
         X, y, gender = make_sensitive_classification(random_state=rng)
@@ -54,7 +54,7 @@ class TestFairlearnDataset:
         assert y.shape == (2000,)
         assert gender.shape == (2000,)
 
-    def test_custom_synthetic_dataset(self):
+    def test_custom_make_sensitive_classification(self):
         """Ensure that custom dataset creation is deterministic."""
         rng = np.random.RandomState(54321)
         feature_config = {
@@ -73,3 +73,11 @@ class TestFairlearnDataset:
         assert X.shape == (n_samples, 25)
         assert y.shape == (n_samples,)
         assert gender.shape == (n_samples,)
+
+    def test_bad_make_sensitive_classification(self):
+        """Test make_sensitive_classification handling of bad inputs."""
+        with pytest.raises(ValueError):
+            make_sensitive_classification(feature_config={})
+
+        with pytest.raises(ValueError):
+            make_sensitive_classification(n_features=0)
