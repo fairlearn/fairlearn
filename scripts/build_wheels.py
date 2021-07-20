@@ -33,8 +33,8 @@ def main(argv):
     with _LogWrapper("installation of fairlearn"):
         subprocess.check_call(["pip", "install", "-e", ".[customplots]"])
 
-    with _LogWrapper("processing README.md"):
-        process_readme("README.md", "README.md")
+    with _LogWrapper("processing README.rst"):
+        process_readme("README.rst", "README.rst")
 
     with _LogWrapper("storing fairlearn version in {}".format(args.version_filename)):
         import fairlearn
