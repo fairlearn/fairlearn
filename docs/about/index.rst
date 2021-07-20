@@ -225,7 +225,7 @@ We would like to thank the following funders.
    <div class="sponsor-div">
    <div class="sponsor-div-box">
 
-`Microsoft <https://www.microsoft.com/>`_ has been funding various people
+`Microsoft <https://www.microsoft.com/>`_ has funded various people
 including several maintainers (Miro Dudik, Richard Edgar, Roman Lutz, Michael
 Madaio) since the start of the project in 2018.
 
@@ -246,7 +246,8 @@ Madaio) since the start of the project in 2018.
    <div class="sponsor-div">
    <div class="sponsor-div-box">
 
-`Eindhoven University of Technology <https://www.tue.nl/en/>`_ funds Hilde Weerts since March 2020.
+`Eindhoven University of Technology <https://www.tue.nl/en/>`_ has funded
+Hilde Weerts since March 2020.
 
 .. raw:: html
 
@@ -265,8 +266,8 @@ Madaio) since the start of the project in 2018.
   <div class="sponsor-div">
   <div class="sponsor-div-box">
 
-`Zalando <https://corporate.zalando.com/en>`_ funds Adrin Jalali since August
-2020.
+`Zalando <https://corporate.zalando.com/en>`_ has funded Adrin Jalali since
+August 2020.
 
 .. raw:: html
 
