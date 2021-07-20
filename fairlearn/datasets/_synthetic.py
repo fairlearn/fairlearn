@@ -6,7 +6,10 @@ from sklearn.utils import check_random_state
 
 
 def make_sensitive_classification(feature_config=None, n_features=20, n_informative=4, random_state=None):
-    """Create a synthetic dataset with a single sensitive feature: 'gender'.
+    """Create a synthetic binary classification dataset with a single sensitive
+    feature: 'gender'. Positive class labels are not fairly assigned, but
+    instead a psuedo-random proportion (uniformly sampled from the interval
+    [0.2, 0.8)) will be labeled positive for each sensitive feature label.
 
     Parameters
     ----------
@@ -62,6 +65,7 @@ def make_sensitive_classification(feature_config=None, n_features=20, n_informat
 
     for label, group_config in feature_config.items():
         group_config.update(classification_kwargs)
+        group_config['weights'] = (rng.uniform(0.2, 0.8), )
         X, y = make_classification(**group_config)
         genders.append([label] * group_config['n_samples'])
         Xs.append(X)
@@ -70,13 +74,5 @@ def make_sensitive_classification(feature_config=None, n_features=20, n_informat
     X = np.concatenate(Xs)
     y = np.concatenate(ys)
     gender = np.concatenate(genders)
-
-    # Now generate disparities by randomly flipping classes
-    bias = {group_name: rng.uniform(0.4, 0.6) for group_name in feature_config}
-    for idx in range(y.size):
-        # 1/4 chance we'll overwrite this value
-        if rng.uniform(0, 1) > 0.25:
-            # set new value based on biased coin flip
-            y[idx] = rng.uniform(0, 1) > bias[gender[idx]]
 
     return X, y, gender

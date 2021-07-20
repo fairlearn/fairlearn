@@ -45,11 +45,11 @@ class TestFairlearnDataset:
         rng = np.random.RandomState(54321)
         X, y, gender = make_sensitive_classification(random_state=rng)
 
-        counts = [214, 265, 289, 250]
+        counts = [127, 370, 324, 210]
         for i in range(4):
             assert np.sum(y[i*500:(i+1)*500]) == counts[i]
 
-        assert np.isclose(np.mean(X), 0.012162)
+        assert np.isclose(np.mean(X), -0.002847)
         assert X.shape == (2000, 20)
         assert y.shape == (2000,)
         assert gender.shape == (2000,)
