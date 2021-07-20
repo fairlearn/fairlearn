@@ -17,11 +17,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <link href="vendor/icofont/icofont.min.css" rel="stylesheet">
-
 
     <!-- Template Main CSS File -->
     <link href="css/style.css" rel="stylesheet">
@@ -30,17 +30,26 @@
 
 
 <body>
+    <!-- ======= Property Search Section ======= -->
+    <div class="container searchbardiv" id="formsearch">
+        <form role="search" method="get" id="searchform">
+            <div class="input-group">
+                <input type="text" id="searchbox" class="form-control" name="s" id="s" placeholder="Search Fairlearn">
+            </div>
+        </form>
+    </div>
+    <!-- End Property Search Section -->
 
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top">
-        <div class="container d-flex align-items-center justify-content-between header-content">
+        <div id="navbar" class="container d-flex align-items-center justify-content-between header-content">
 
             <h1 class="logo">
                 <a href="index.html"><img src="images/logo/Logo.svg" alt="" srcset=""></a>
             </h1>
             <!-- Uncomment below if you prefer to use an image logo -->
 
-            <nav class="nav-menu d-none d-lg-block">
+            <nav class="nav-menu">
                 <ul>
                     <li><a href="#">Get Started</a></li>
                     <li class="drop-down"><a href="#">Learn</a>
@@ -83,8 +92,10 @@
             </nav>
             <!-- .nav-menu -->
             <div class="search-link">
-                <a href="#about" class="get-started-btn scrollto"><img class="spyglass-image" src="images/GitHub.svg" alt="" srcset=""><img class="spyglass-image-black" src="images/GitHub-black.svg" alt="" srcset="">GitHub</a>
-                <a href="#" class="search-btn btn"><img class="search-image" src="images/Search.svg" alt="" srcset=""><img class="search-image-black" src="images/Search-black.svg" alt="" srcset=""></a>
+                <a href="#about" class="get-started-btn scrollto"><img class="spyglass-image" src="images/GitHub.svg" alt="" srcset=""><img class="spyglass-image-black" src="images/Icon_GitHub_30x30.svg" alt="" srcset="">GitHub</a>
+                <a href="#" class="search-btn buttonsearch" id="buttonsearch"><img class="search-image" src="images/Spyglass.svg" alt="" srcset=""><img class="search-image-black" src="images/Spyglass_Hover.svg" alt="" srcset=""></a>
+                <a href="#" class=" buttonclose hidden" id="buttonclose"> <img class="close-img" src="images/Close.svg" alt="" srcset="">  <img class="close-img-hover" src="images/Close_Hover.svg" alt="" srcset=""></a>
+             
             </div>
 
         </div>
@@ -263,7 +274,9 @@
                     <div class="col-lg-3">
                         <div class="link-block">
                             <div class="title-box">
-                                <img src="images/socials/icon_gitter.svg" alt="" srcset="" height="31">
+                                <img class="gitter-icon" src="images/socials/icon_gitter.svg" alt="" srcset="" >
+                                <img class="gitter-icon-hover" src="images/socials/Gitter-White.png" alt="" srcset="" >
+
                                 <h6>Gitter</h6>
                             </div>
                             <div class="title-content">
@@ -276,7 +289,9 @@
                     <div class="col-lg-3">
                         <div class="link-block">
                             <div class="title-box">
-                                <img src="images/socials/icon_stack-overflow.svg" alt="" srcset="" height="31">
+                                <img class="stackoverflow-icon" src="images/socials/icon_stack-overflow.svg" alt="" srcset="" >
+                                <img class="stackoverflow-icon-hover" src="images/socials/Stack-Overflow-White.png" alt="" srcset="" >
+
                                 <h6>Stack Overflow</h6>
                             </div>
                             <div class="title-content">
@@ -290,7 +305,8 @@
                     <div class="col-lg-3">
                         <div class="link-block">
                             <div class="title-box">
-                                <img src="images/socials/icon_github.svg" alt="" srcset="" height="31">
+                                <img class="github-icon" src="images/socials/icon_github.svg" alt="" srcset="" >
+                                <img class="github-icon-hover" src="images/socials/Github-White.png" alt="" srcset="" >
                                 <h6>GitHub</h6>
                             </div>
                             <div class="title-content">
@@ -303,7 +319,9 @@
                     <div class="col-lg-3">
                         <div class="link-block">
                             <div class="title-box">
-                                <img src="images/socials/icon_twitter.svg" alt="" srcset="" height="31">
+                                <img class="twitter-icon" src="images/socials/icon_twitter.svg" alt="" srcset="" >
+                                <img class="twitter-icon-hover" src="images/socials/Twitter-White.png" alt="" srcset="" >
+
                                 <h6>Twitter</h6>
                             </div>
                             <div class="title-content">
@@ -388,13 +406,14 @@
                         </div>
                         <div class="col-lg-3 col-md-6 my-3 footer-contact">
                             <h1>Stay Connected</h1>
-                            <p>Be the first to hear about the latest Fairlearn announcements, new publications, and events.</p>
+                            <p>Be the first to hear about the latest Fairlearn announcements, new publications, and events.
+                            </p>
                             <div class="textbox">
                                 <div class="textbox-box">
                                     <div class="textbox-field">
-                                        <input class="textbox-text" type="text" placeholder="Enter Your Email" />
+                                        <input class="textbox-text" type="text" placeholder="email@gmail.com" />
                                     </div>
-                                    <div class="textbox-action">
+                                    <div class="textbox-action text-action-grey">
                                         <img src="images/Arrow.svg" alt="" srcset="">
                                     </div>
                                 </div>
@@ -403,16 +422,16 @@
                         <div class="col-lg-3 col-md-6 my-3 footer-socials">
                             <div class="d-flex align-items-center justify-content-between">
                                 <li>
-                                    <a href="#"><img src="images/socials/icon_twitter.svg" alt="" srcset=""></a>
+                                    <a href="#"><img src="images/socials/Twitter-transfer.png" alt="" srcset=""></a>
                                 </li>
                                 <li>
-                                    <a href="#"><img src="images/socials/icon_stack-overflow.svg" alt="" srcset=""></a>
+                                    <a href="#"><img src="images/socials/Stack-Overflow-transfer.png" alt="" srcset=""></a>
                                 </li>
                                 <li>
-                                    <a href="#"><img src="images/socials/icon_gitter.svg" alt="" srcset=""></a>
+                                    <a href="#"><img src="images/socials/Gitter-transfer.png" alt="" srcset=""></a>
                                 </li>
                                 <li>
-                                    <a href="#"><img src="images/socials/icon_github.svg " alt="" srcset=""></a>
+                                    <a href="#"><img src="images/socials/Github-transfer.png" alt="" srcset=""></a>
                                 </li>
                                 <li>
                                     <a href="#">#fairlearn</a>

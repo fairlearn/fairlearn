@@ -52,6 +52,133 @@ h6 {
 
 
 /*--------------------------------------------------------------
+# Search Bar
+--------------------------------------------------------------*/
+
+.searchbardiv {
+    display: block;
+    position: fixed;
+    background: #FFFFFF;
+    top: 80px;
+    right: 0px;
+    z-index: 1001;
+    width: 100%;
+    max-width: 100%;
+    padding: 84px 275px 0px 385px;
+    margin: 0px;
+    min-height: 300px;
+}
+
+.buttonsearch {
+    display: inline-block;
+    padding: 0px;
+}
+
+#formsearch {
+    display: none;
+}
+
+.glyphicon.glyphicon-search {
+    font-size: 18px;
+}
+
+#searchbox {
+    box-shadow: none;
+    padding: 24px 0px;
+    border: none;
+    border-bottom: 1px solid #ccc!important;
+    border-radius: 0;
+    font-size: 30px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+#searchbox:hover {
+    box-shadow: none;
+}
+
+.form-control:focus {
+    border-color: #ccc;
+}
+
+.navbar-toggle {
+    margin-right: 35px;
+    border: none;
+    background: transparent !important;
+}
+
+.navbar-toggle:hover {
+    background: transparent !important;
+}
+
+.navbar-toggle .icon-bar {
+    width: 22px;
+    transition: all 0.2s;
+}
+
+.navbar-toggle .top-bar {
+    transform: rotate(45deg);
+    transform-origin: 10% 10%;
+}
+
+.navbar-toggle .middle-bar {
+    opacity: 0;
+}
+
+.navbar-toggle .bottom-bar {
+    transform: rotate(-45deg);
+    transform-origin: 10% 90%;
+}
+
+.navbar-toggle.collapsed .top-bar {
+    transform: rotate(0);
+}
+
+.navbar-toggle.collapsed .middle-bar {
+    opacity: 1;
+}
+
+.navbar-toggle.collapsed .bottom-bar {
+    transform: rotate(0);
+}
+
+.buttonclose {
+    display: inline-block;
+    padding: 0px;
+    border: 0px;
+    outline: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+
+.close-img-hover{
+    display: none;
+}
+.buttonclose:hover .close-img-hover {
+    display: inline;
+}
+
+.buttonclose:hover .close-img {
+    display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .searchbardiv {
+        padding: 84px 175px 0px 185px;
+    }
+}
+
+@media (min-width: 320px) and (max-width: 768px) {
+    .searchbardiv {
+        padding: 84px 75px 0px 85px;
+    }
+}
+
+
+/*--------------------------------------------------------------
 # Header
 --------------------------------------------------------------*/
 
@@ -174,7 +301,9 @@ h6 {
 
 .nav-menu .drop-down ul a {
     padding: 10px 20px;
-    font-size: 15px;
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 100;
     font-family: "Open Sans", sans-serif;
     text-transform: none;
     color: #333333;
@@ -183,8 +312,7 @@ h6 {
 .nav-menu .drop-down ul a:hover,
 .nav-menu .drop-down ul .active>a,
 .nav-menu .drop-down ul li:hover>a {
-    color: #000000;
-    font-weight: bold;
+    background-color: #F2F2F2;
 }
 
 .nav-menu .drop-down>a:after {
@@ -221,7 +349,7 @@ h6 {
     }
 }
 
-@media (max-width:1024px) and (min-width:900px) {
+@media (max-width:1024px) {
     .nav-menu {
         display: none !important;
     }
@@ -259,7 +387,7 @@ h6 {
 }
 
 .get-started-btn:hover {
-    background-color: #333333;
+    background-color: #2364D2;
     color: #ffffff;
 }
 
@@ -278,17 +406,6 @@ h6 {
 
 .get-started-btn:hover .spyglass-image {
     display: none;
-}
-
-.search-btn {
-    display: inline-block;
-    padding: 7px 12px;
-    border-radius: 50%;
-    height: 44px;
-}
-
-.search-btn:hover {
-    background-color: #333333;
 }
 
 .search-image-black {
@@ -322,9 +439,6 @@ h6 {
 /* Mobile Navigation */
 
 .mobile-nav-toggle {
-    position: fixed;
-    right: 15px;
-    top: 25px;
     z-index: 9998;
     border: 0;
     background: none;
@@ -484,10 +598,16 @@ h6 {
     width: 129px;
     height: 43px;
     color: #2364D2;
-    font-size: 15px;
+    font-size: 14px;
     margin-bottom: 15px;
-    padding: 11px 10px 10px 10px;
+    padding: 11px 10px 11px 10px;
     text-align: center;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+#hero .btn-get-started:hover {
+    background: #2364D2;
+    color: #FFFFFF
 }
 
 .hero-img {
@@ -664,11 +784,18 @@ section p {
 .usecase-content button {
     font-size: 14px;
     font-weight: 600;
-    padding: 13px 30px;
+    font-family: 'Ubuntu', sans-serif;
+    padding: 11px 30px;
     background: #3772CE;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
     border-radius: 30px;
     color: #ffffff;
+}
+
+.usecase-content button:hover {
+    background: #1F3598;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
+    color: #FFFFFF;
 }
 
 @media (max-width: 992px) {
@@ -706,19 +833,27 @@ section p {
     font-size: 15px;
     background: rgba(204, 204, 204, 0.1);
     border: 1px solid #F2F2F2;
+    line-height: 18px;
     box-sizing: border-box;
-    font-family: 'Code Pro', sans-serif;
+    font-family: 'Source Code Pro', monospace;
     color: #333333;
 }
 
 .getstarted button {
     margin: 30px 0px;
-    padding: 11px 25px 15px 25px;
+    padding: 11px 30px;
     color: #ffffff;
     font-size: 14px;
     font-weight: 600;
+    font-family: 'Ubuntu', sans-serif;
     background: #3772CE;
     border-radius: 30px;
+}
+
+.getstarted button:hover {
+    background: #1F3598;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
+    color: #FFFFFF;
 }
 
 .getstarted-img {
@@ -798,7 +933,17 @@ section p {
     line-height: 22px;
     margin-bottom: 12px;
 }
+.community .link-block:hover {
+    cursor: pointer;
+    background: #2364D2;
+}
 
+.community .link-block:hover .title-box h6 {
+    color: #FFFFFF;
+}
+.community .link-block:hover .title-content p {
+    color: #FFFFFF;
+}
 .title-content {
     margin-top: 10px;
 }
@@ -810,7 +955,53 @@ section p {
     height: 400px;
 }
 
+.github-icon-hover {
+    display: none;
+}
 
+.community .link-block:hover .github-icon {
+    display: none;
+}
+
+.community .link-block:hover .github-icon-hover {
+    display: inline;
+}
+
+.twitter-icon-hover {
+    display: none;
+}
+
+.community .link-block:hover .twitter-icon {
+    display: none;
+}
+
+.community .link-block:hover .twitter-icon-hover {
+    display: inline;
+}
+
+.stackoverflow-icon-hover {
+    display: none;
+}
+
+.community .link-block:hover .stackoverflow-icon {
+    display: none;
+}
+
+.community .link-block:hover .stackoverflow-icon-hover {
+    display: inline;
+}
+
+.gitter-icon-hover {
+    display: none;
+}
+
+.community .link-block:hover .gitter-icon {
+    display: none;
+}
+
+.community .link-block:hover .gitter-icon-hover {
+    display: inline;
+}
 /*--------------------------------------------------------------
 # Contribute
 --------------------------------------------------------------*/
@@ -828,14 +1019,20 @@ section p {
 
 .contribute button {
     align-items: center;
-    padding: 11px 25px 15px 25px;
+    padding: 11px 30px;
     margin-top: 20px;
-    font-size: 15px !important;
+    font-size: 14px !important;
     font-family: 'Ubuntu', sans-serif;
     font-weight: 700;
     color: #2364D2;
     background: #FFFFFF;
     border-radius: 30px;
+}
+
+.contribute button:hover {
+    background: #1F3598;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.08);
+    color: #FFFFFF;
 }
 
 
@@ -863,6 +1060,14 @@ section p {
 
 #footer li>a {
     color: #333333;
+}
+
+#footer li>a>img {
+    background-color: #2FBCDB;
+}
+
+#footer li>a>img:hover {
+    background-color: #2364D2;
 }
 
 .footer-top {
@@ -957,10 +1162,17 @@ footer .footer-copyright a,
     transform-style: preserve-3d;
     -webkit-animation: hover 2s -0.4s alternate infinite;
     animation: hover 2s -0.4s alternate infinite;
-    background-color: #CCCCCC;
     position: relative;
     transition: all 0.2s ease;
     border-radius: 50%;
+}
+
+.text-action-grey {
+    background-color: #CCCCCC;
+}
+
+.text-action-blue {
+    background-color: #2364D2;
 }
 
 .textbox-action svg {
@@ -973,6 +1185,7 @@ footer .footer-copyright a,
 
 .textbox-action:hover {
     cursor: pointer;
+    background-color: #1F3598;
 }
 
 .textbox-text {
