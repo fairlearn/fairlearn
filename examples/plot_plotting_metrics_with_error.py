@@ -47,9 +47,9 @@ test_set_sex = X_test['sex']
 # =============
 # We have many different choices for error metrics. In this notebook we'll just be using a
 # `Normal approximation interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval>` (symmetric)
-# and a `Wilson score interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval>` (asymmetric).
+# and a `Wilson score interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval>` _ (asymmetric).
 
-# We aim to create a 95% confidence interval, so we use a `z_score` of 1.959964
+# We aim to create a 95% confidence interval, so we use a :code:`z_score` of 1.959964
 z_score = 1.959964
 digits_of_precision = 4
 
@@ -65,9 +65,9 @@ def wilson(p, n, digits=digits_of_precision, z=z_score):
 
 
 def compute_error_metric(metric_value, sample_size, z_score):
-    """Compute Standard Error Calculation (for Binary Classification)
+    """Compute standard error calculation (for binary classification).
 
-    Assumes infinitely large population,
+    Assumes infinitely large population.
     Should be used when the sampling fraction is small.
     For sampling fraction > 5%, may want to use finite population correction
     https://en.wikipedia.org/wiki/Margin_of_error
@@ -109,7 +109,7 @@ def accuracy_normal_err(y_true, y_pred):
 # %%
 # Classifier
 # ==========
-# Now we use a Decision Tree to make predictions
+# Now we use a :py:class:`sklearn.tree.DecisionTreeClassifier` to make predictions
 #
 
 classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
@@ -119,10 +119,10 @@ y_test_pred = classifier.predict(X_test_processed)
 # %%
 # MetricFrame
 # ===========
-# Now we create a MetricFrame to generate the recall Wilson bounds and recall normal error
+# Now we create a :class:`fairlearn.metrics.MetricFrame` to generate the recall Wilson bounds and recall normal error
 #
 
-# Analyze metrics using MetricFrame
+# Analyze metrics using :class:`fairlearn.metrics.MetricFrame`
 metrics_dict = {
     'Recall': recall_score,
     'Recall Bounds': recall_wilson,
