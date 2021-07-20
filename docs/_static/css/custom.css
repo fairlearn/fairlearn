@@ -16,4 +16,18 @@ i.fa-discord:hover {
 
 #navbar-icon-links > li.nav-item > a.nav-link:hover {
    color: rgba(77, 77, 77, 1) !important
-}  
+}
+
+/* maintainers */
+.maintainers-container {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+ }
+ 
+ .maintainers-container > div {
+   width: 100px;
+   margin: 5px;
+   font-size: 0.9rem;
+   text-align: center;
+ }
