@@ -2,7 +2,7 @@
 
 ### v0.7.1
 
-* Added new `make_synthetic_dataset()` in `fairlearn.datasets` to allow for
+* Added new `make_sensitive_classification()` in `fairlearn.datasets` to allow for
   creation of a dataset with user-selected number of features.
 
 

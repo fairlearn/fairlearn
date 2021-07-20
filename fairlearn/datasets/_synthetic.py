@@ -5,7 +5,7 @@ from sklearn.datasets import make_classification
 from sklearn.utils import check_random_state
 
 
-def make_synthetic_dataset(feature_config=None, n_features=20, n_informative=4, random_state=None):
+def make_sensitive_classification(feature_config=None, n_features=20, n_informative=4, random_state=None):
     """Create a synthetic dataset with a single sensitive feature: 'gender'.
 
     Parameters

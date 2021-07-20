@@ -9,7 +9,7 @@ from fairlearn.datasets import (
     fetch_adult,
     fetch_boston,
     fetch_bank_marketing,
-    make_synthetic_dataset,
+    make_sensitive_classification,
 )
 
 # =============================================
@@ -43,7 +43,7 @@ class TestFairlearnDataset:
     def test_simple_synthetic_dataset(self):
         """Ensure that dataset creation is deterministic."""
         rng = np.random.RandomState(54321)
-        X, y, gender = make_synthetic_dataset(random_state=rng)
+        X, y, gender = make_sensitive_classification(random_state=rng)
 
         counts = [214, 265, 289, 250]
         for i in range(4):
@@ -64,9 +64,9 @@ class TestFairlearnDataset:
             'Unspecified': {'n_samples': 400, 'class_sep': 0.5},
             'Woman': {'n_samples': 300, 'class_sep': 2},
         }
-        X, y, gender = make_synthetic_dataset(feature_config=feature_config,
-                                              n_features=25,
-                                              random_state=rng)
+        X, y, gender = make_sensitive_classification(feature_config=feature_config,
+                                                     n_features=25,
+                                                     random_state=rng)
 
         n_samples = np.sum([v['n_samples'] for v in feature_config.values()])
         assert set(np.unique(gender)) == set(feature_config.keys())
