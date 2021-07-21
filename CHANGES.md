@@ -1,5 +1,11 @@
 # Changes
 
+### v0.7.1
+
+* Relaxed checks made on `X` in `_validate_and_reformat_input()` since that
+  is the concern of the underlying estimator and not Fairlearn
+
+
 ### v0.7.0
 
 * Added new `count()` metric, so that the number of data points in each
