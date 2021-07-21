@@ -70,7 +70,7 @@ def main(argv):
                         args.output_path)
 
     with _LogWrapper("generating maintainers table"):
-        subprocess.check_call(["python", "generate_maintainers_table.py"])
+        subprocess.check_call(["python", "scripts/generate_maintainers_table.py"])
 
     with _LogWrapper("running Sphinx-Multiversion"):
         subprocess.check_call(["sphinx-multiversion",
