@@ -29,6 +29,9 @@ _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
+_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified"
+_MF_CONTAINS_NON_SCALAR_WARNING = "Metric frame contains non-scalar cells. Please remove non-scalar columns from " \
+                                  "your metric frame and try again "
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -395,33 +398,44 @@ class MetricFrame:
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in ("raise", "coerce"):
-            raise ValueError("invalid error value specified")
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        try:
-            if not self.control_levels:
+        if not self.control_levels:
+            try:
                 result = pd.Series(index=self._by_group.columns, dtype='object')
+
                 for m in result.index:
                     max_val = self._by_group[m].max()
                     result[m] = max_val
-            else:
-                result = self._by_group.groupby(level=self.control_levels).max()
-        # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
-        except ValueError:
-            warnings.warn(f"Metric frame contains non-scalar cells. "
-                          f"Please remove non-scalar columns from your metric frame and try again",
-                          SyntaxWarning)
-            if errors == "raise":
-                raise
-            elif errors == 'coerce':
-                t = self._by_group
-                for m in t.columns:
-                    if not isinstance(t[m].values[0], np.float64):
-                        t = t.drop(columns=[m])
 
-                if not self.control_levels:
-                    return t.max()
-                else:
-                    return t.groupby(level=self.control_levels).max()
+            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
+            except ValueError:
+                warnings.warn(_MF_CONTAINS_NON_SCALAR_WARNING,
+                              SyntaxWarning)
+                if errors == "raise":
+                    raise
+                elif errors == 'coerce':
+                    if not self.control_levels:
+                        # Make all results NaN
+                        result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
+                        # Fill in the possible columns with their max values
+                        for m in result.index:
+                            if isinstance(self._by_group[m].values[0], np.float64):
+                                result[m] = self._by_group[m].max()
+        else:
+            try:
+                result = self._by_group.groupby(level=self.control_levels).max()
+            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
+            except ValueError:
+                if errors == 'raise':
+                    raise
+                elif errors == 'coerce':
+                    # Fill all impossible columns with NaN before grouping metric frame
+                    mf = self._by_group.copy()
+                    for m in mf.columns:
+                        if not isinstance(mf[m].values[0], np.float64):
+                            mf[m] = np.nan
+                    result = mf.groupby(level=self.control_levels).max()
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -454,34 +468,43 @@ class MetricFrame:
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in ("raise", "coerce"):
-            raise ValueError("invalid error value specified")
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        try:
-            if not self.control_levels:
+        if not self.control_levels:
+            try:
                 result = pd.Series(index=self._by_group.columns, dtype='object')
 
                 for m in result.index:
                     min_val = self._by_group[m].min()
                     result[m] = min_val
-            else:
-                result = self._by_group.groupby(level=self.control_levels).min()
-        # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
-        except ValueError:
-            warnings.warn(f"Metric frame contains non-scalar cells. "
-                          f"Please remove non-scalar columns from your metric frame and try again",
-                          SyntaxWarning)
-            if errors == "raise":
-                raise
-            elif errors == 'coerce':
-                t = self._by_group
-                for m in t.columns:
-                    if not isinstance(t[m].values[0], np.float64):
-                        t = t.drop(columns=[m])
 
-                if not self.control_levels:
-                    return t.min()
-                else:
-                    return t.groupby(level=self.control_levels).min()
+            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
+            except ValueError:
+                warnings.warn(_MF_CONTAINS_NON_SCALAR_WARNING,
+                              SyntaxWarning)
+                if errors == "raise":
+                    raise
+                elif errors == 'coerce':
+                    if not self.control_levels:
+                        # Make all results NaN
+                        result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
+                        # Fill in the possible columns with their min values
+                        for m in result.index:
+                            if isinstance(self._by_group[m].values[0], np.float64):
+                                result[m] = self._by_group[m].min()
+        else:
+            try:
+                result = self._by_group.groupby(level=self.control_levels).min()
+            except ValueError:
+                if errors == 'raise':
+                    raise
+                elif errors == 'coerce':
+                    # Fill all impossible columns with NaN before grouping metric frame
+                    mf = self._by_group.copy()
+                    for m in mf.columns:
+                        if not isinstance(mf[m].values[0], np.float64):
+                            mf[m] = np.nan
+                    result = mf.groupby(level=self.control_levels).min()
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -527,9 +550,8 @@ class MetricFrame:
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in ("raise", "coerce"):
-            raise ValueError("invalid error value specified")
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        subtrahend = np.nan
         if method == 'between_groups':
             subtrahend = self.group_min(errors=errors)
         elif method == 'to_overall':
@@ -537,18 +559,18 @@ class MetricFrame:
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        # Check if metric frame contains non-scalar columns
-        t = self._by_group
-        non_scalar = False
-        for m in t.columns:
-            if not isinstance(t[m].values[0], np.float64):
-                t = t.drop(columns=[m])
-                non_scalar = True
-
-        if errors == 'coerce' and non_scalar:
-            return (t - subtrahend).abs().max(level=self.control_levels)
-        else:
+        try:
             return (self.by_group - subtrahend).abs().max(level=self.control_levels)
+        except ValueError:
+            if errors == 'raise':
+                raise
+            elif errors == 'coerce':
+                # Fill all impossible columns with NaN before grouping metric frame
+                mf = self._by_group.copy()
+                for m in mf.columns:
+                    if not isinstance(mf[m].values[0], np.float64):
+                        mf[m] = np.nan
+                return (mf - subtrahend).abs().max(level=self.control_levels)
 
     def ratio(self,
               method: str = 'between_groups',
@@ -588,7 +610,7 @@ class MetricFrame:
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in ("raise", "coerce"):
-            raise ValueError("invalid error value specified")
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         result = None
         if method == 'between_groups':

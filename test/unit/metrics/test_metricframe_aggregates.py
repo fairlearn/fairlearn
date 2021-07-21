@@ -9,7 +9,10 @@ import sklearn.metrics as skm
 import fairlearn.metrics as metrics
 
 from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
+from fairlearn.metrics._metric_frame import _INVALID_ERRORS_VALUE_ERROR_MESSAGE
 
+_PANDAS_NON_SCALAR_ERROR_MESSAGE = "The truth value of an array with more than one element is ambiguous. Use a.any() " \
+                                   "or a.all()"
 
 metric = [skm.recall_score,
           skm.precision_score,
@@ -1056,87 +1059,228 @@ class Test2m1sf1cfErrorHandlingCM:
 
     def test_min_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
         self._prepare()
         target_mins = self.target.group_min(errors='coerce')
-        assert target_mins.equals(self.expected.group_min())
+        expected_mins = self.expected.group_min()
+        expected_mins['confusion_matrix'] = np.nan
+        assert target_mins.equals(expected_mins)
 
     def test_min_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.group_min(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
         self._prepare()
-        with pytest.raises(ValueError):
-            self.target.group_min()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
         self._prepare()
         target_maxs = self.target.group_max(errors='coerce')
-        assert target_maxs.equals(self.expected.group_max())
+        expected_maxs = self.expected.group_max()
+        expected_maxs['confusion_matrix'] = np.nan
+        assert target_maxs.equals(expected_maxs)
 
     def test_max_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.group_max(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
         self._prepare()
-        with pytest.raises(ValueError):
-            self.target.group_max()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.difference(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
         self._prepare()
         target_differences = self.target.difference(errors='coerce')
-        assert target_differences.equals(self.expected.difference())
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
 
     def test_difference_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.difference(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
         self._prepare()
         target_differences = self.target.difference()
-        assert target_differences.equals(self.expected.difference())
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
 
     def test_ratio_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
         self._prepare()
         target_ratio = self.target.ratio(errors='coerce')
-        assert target_ratio.equals(self.expected.ratio())
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
 
     def test_ratio_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.ratio(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
         self._prepare()
         target_ratio = self.target.ratio()
-        assert target_ratio.equals(self.expected.ratio())
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+
+class Test1m1sf1cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2,
+                                          control_features=g_3)
+
+        self.expected = metrics.MetricFrame(metrics={}, y_true=y_t, y_pred=y_p,
+                                            sensitive_features=g_2,
+                                            control_features=g_3)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        expected_mins = self.expected.group_min()
+        expected_mins['confusion_matrix'] = np.nan
+        assert target_mins.equals(expected_mins)
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        expected_maxs = self.expected.group_max()
+        expected_maxs['confusion_matrix'] = np.nan
+        assert target_maxs.equals(expected_maxs)
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
 
 
 class Test2m1sf0cfErrorHandlingCM:
@@ -1151,84 +1295,211 @@ class Test2m1sf0cfErrorHandlingCM:
 
     def test_min_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
         self._prepare()
         target_mins = self.target.group_min(errors='coerce')
-        assert target_mins.equals(self.expected.group_min())
+        expected_mins = self.expected.group_min()
+        expected_mins['confusion_matrix'] = np.nan
+        assert target_mins.equals(expected_mins)
 
     def test_min_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.group_min(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
         self._prepare()
-        with pytest.raises(ValueError):
-            self.target.group_min()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
         self._prepare()
         target_maxs = self.target.group_max(errors='coerce')
-        assert target_maxs.equals(self.expected.group_max())
+        expected_maxs = self.expected.group_max()
+        expected_maxs['confusion_matrix'] = np.nan
+        assert target_maxs.equals(expected_maxs)
 
     def test_max_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.group_max(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
         self._prepare()
-        with pytest.raises(ValueError):
-            self.target.group_max()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.difference(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
         self._prepare()
         target_differences = self.target.difference(errors='coerce')
-        assert target_differences.equals(self.expected.difference())
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
 
     def test_difference_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.difference(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
         self._prepare()
         target_differences = self.target.difference()
-        assert target_differences.equals(self.expected.difference())
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
 
     def test_ratio_raise(self):
         self._prepare()
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
         self._prepare()
         target_ratio = self.target.ratio(errors='coerce')
-        assert target_ratio.equals(self.expected.ratio())
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
 
     def test_ratio_wrong_input(self):
         self._prepare()
-        with pytest.raises(ValueError, match="invalid error value specified"):
-            self.target.ratio(errors="wrong")
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
         self._prepare()
         target_ratio = self.target.ratio()
-        assert target_ratio.equals(self.expected.ratio())
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+
+class Test1m1sf0cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2)
+
+        self.expected = pd.Series({"confusion_matrix": np.nan}, dtype=object)
+
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        assert target_mins.equals(self.expected)
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        assert target_maxs.equals(self.expected)
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        assert target_differences.equals(self.expected)
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        assert target_differences.equals(self.expected)
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        assert target_ratio.equals(self.expected)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        assert target_ratio.equals(self.expected)
