@@ -1,78 +1,102 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+from itertools import cycle
+
 import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.utils import check_random_state
 
 
-def make_sensitive_classification(feature_config=None, n_features=20, n_informative=4, random_state=None):
-    """Create a synthetic binary classification dataset with a single sensitive
-    feature: 'gender'. Positive class labels are not fairly assigned, but
-    instead a psuedo-random proportion (uniformly sampled from the interval
-    [0.2, 0.8)) will be labeled positive for each sensitive feature label.
+class SensitiveFeatureGroup:
 
-    Parameters
-    ----------
-    feature_config : dict, default=None
-        A dict whose keys are the labels for the gender feature, and whose set
-        the :code:`n_samples` and :code:`class_sep` parameters for :code:`make_classification`.
-        If `None`, the following dictionary is used by default::
+    def __init__(self, group_name, n_samples=500, class_sep=1.0):
+        self.group_name = group_name
+        self.n_samples = n_samples
+        self.class_sep = class_sep
 
-            {
-                'Man': {'n_samples': 500, 'class_sep': 1},
-                'Other': {'n_samples': 500, 'class_sep': 0.5},
-                'Unspecified': {'n_samples': 500, 'class_sep': 0.5},
-                'Woman': {'n_samples': 500, 'class_sep': 2},
-            }
+    def __repr__(self):
+        return f'{self.group_name}={self.as_dict()}'
 
-    n_features : int, default=20
-        The total number of features.
+    def as_dict(self):
+        return {'n_samples': self.n_samples, 'class_sep': self.class_sep}
 
-    n_informative : int, default=4
-        The number of informative features.
 
-    random_state : int or RandomState instance, default=None
-        The random number generator seed or :class:`numpy.random.RandomState` to use.
+class SensitiveFeature:
 
-    Returns
-    -------
-    (X, y, gender) : tuple of numpy.ndarray
-        X : numpy.ndarray
-            The generated samples.
-        y : numpy.ndarray
-            Labels for the binary classification.
-        gender : numpy.ndarray
-            The sensitive feature label.
-    """
-    rng = check_random_state(random_state)
+    def __init__(self, name):
+        self.name = name
+        self.groups = []
 
-    classification_kwargs = {
-        'n_features': n_features,
-        'n_informative': n_informative,
-        'n_classes': 2,
-        'random_state': rng,
-    }
+    def __repr__(self):
+        groups = ', '.join([str(group) for group in self.groups])
+        return f"SensitiveFeature(name='{self.name}', groups=({groups}))"
 
-    if feature_config is None:
-        feature_config = {
-            'Man': {'n_samples': 500, 'class_sep': 1},
-            'Other': {'n_samples': 500, 'class_sep': 0.5},
-            'Unspecified': {'n_samples': 500, 'class_sep': 0.5},
-            'Woman': {'n_samples': 500, 'class_sep': 2},
+    def add_group(self, group_name, **kwargs):
+        self.groups.append(SensitiveFeatureGroup(group_name, **kwargs))
+
+    def add_groups(self, sensitive_feature_groups):
+        self.groups.extend(sensitive_feature_groups)
+
+    @property
+    def total_samples(self):
+        return sum(group.n_samples for group in self.groups)
+
+    @total_samples.setter
+    def total_samples(self, n_samples):
+        ratio = {group: group.n_samples / self.total_samples
+                 for group in self.groups}
+        for group in self.groups:
+            group.n_samples = int(ratio[group] * n_samples)
+
+        missing = n_samples - self.total_samples
+        # Rounding may cause us to be short
+        for group in cycle(self.groups):
+            if missing == 0:
+                break
+            group.n_samples += 1
+            missing -= 1
+
+
+class SensitiveDatasetMaker:
+
+    def __init__(self, sensitive_features=None, random_state=None):
+        self.rng = check_random_state(random_state)
+        self.sensitive_features = sensitive_features or []
+
+    def __repr__(self):
+        features = ', '.join([str(feature) for feature in self.sensitive_features])
+        return f'SensitiveDatasetMaker({features})'
+
+    def make_sensitive_classification(self, n_samples=1000, **kwargs):
+        classification_kwargs = {
+            'n_features': 20,
+            'n_informative': 4,
+            'n_classes': 2,
+            'random_state': self.rng,
         }
+        classification_kwargs.update(kwargs)
 
-    Xs, ys, genders = [], [], []
+        self.set_total_samples(n_samples)
 
-    for label, group_config in feature_config.items():
-        group_config.update(classification_kwargs)
-        group_config['weights'] = (rng.uniform(0.2, 0.8), )
-        X, y = make_classification(**group_config)
-        genders.append([label] * group_config['n_samples'])
-        Xs.append(X)
-        ys.append(y)
+        Xs, ys, sensitive_features = [], [], []
 
-    X = np.concatenate(Xs)
-    y = np.concatenate(ys)
-    gender = np.concatenate(genders)
+        for feature in self.sensitive_features:
+            groups = []
+            for group in feature.groups:
+                group_config = group.as_dict()
+                group_config.update(classification_kwargs)
+                group_config['weights'] = (self.rng.uniform(0.2, 0.8), )
+                X, y = make_classification(**group_config)
+                groups.append([group.group_name] * group.n_samples)
+                Xs.append(X)
+                ys.append(y)
+            sensitive_features.append(np.concatenate(groups))
 
-    return X, y, gender
+        X = np.concatenate(Xs)
+        y = np.concatenate(ys)
+
+        return X, y, sensitive_features
+
+    def set_total_samples(self, n_samples):
+        for feature in self.sensitive_features:
+            feature.total_samples = n_samples

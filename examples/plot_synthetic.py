@@ -8,7 +8,10 @@ Synthetic dataset example with visualization
 """
 
 # %%
-from fairlearn.datasets import make_sensitive_classification
+from fairlearn.datasets._synthetic import (
+    SensitiveDatasetMaker,
+    SensitiveFeature,
+)
 from fairlearn.metrics import (
     MetricFrame,
     false_positive_rate,
@@ -23,7 +26,15 @@ from sklearn.tree import DecisionTreeClassifier
 
 rng = np.random.RandomState(42)
 
-X, y, gender = make_sensitive_classification(random_state=rng)
+feature = SensitiveFeature('Gender')
+feature.add_group('Man', class_sep=1.0)
+feature.add_group('Other', class_sep=0.5)
+feature.add_group('Unspecified', class_sep=0.5)
+feature.add_group('Woman', class_sep=2.0)
+
+dataset = SensitiveDatasetMaker(sensitive_features=[feature], random_state=rng)
+X, y, features = dataset.make_sensitive_classification(n_samples=2500)
+gender = features[0]
 
 X_train, X_test, y_train, y_test, gender_train, gender_test = train_test_split(
     X, y, gender, test_size=0.3, random_state=rng
