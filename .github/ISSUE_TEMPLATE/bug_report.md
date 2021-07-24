@@ -15,7 +15,7 @@ If your issue is a usage question, please submit it in one of these other
 channels instead:
 - StackOverflow with the `fairlearn` tag:
   https://stackoverflow.com/questions/tagged/fairlearn
-- Gitter: https://gitter.im/fairlearn/community#
+- Discord: https://discord.gg/R22yCfgsRn
 The issue tracker is used only to report bugs and feature requests. For
 questions, please use either of the above platforms. Most question issues are
 closed without an answer on this issue tracker. Thanks for your understanding.
@@ -67,9 +67,9 @@ Sample code to reproduce the problem
 <!--
 Please provide the following information:
 - OS: [e.g. Windows]
-- Browser (if you're reporting a dashboard bug in jupyter): [e.g. Edge, Firefox, Chrome, Safari]
+- Browser (if you're reporting a bug in jupyter): [e.g. Edge, Firefox, Chrome, Safari]
 - Python version: [e.g. 3.7.4]
-- Fairlearn version: [e.g. 0.4.5 or installed from master branch in editable mode]
+- Fairlearn version: [e.g. 0.4.5 or installed from main branch in editable mode]
 - version of Python packages: please run the following snippet and paste the output:
   ```python
   import fairlearn

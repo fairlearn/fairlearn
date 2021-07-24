@@ -33,7 +33,7 @@ extra_png_src_path = os.path.join("_static", "images", "fairlearn_full_color.png
 
 
 def _build_argument_parser():
-    desc = "Build widget for fairlearn dashboard"
+    desc = "Build documentation for Fairlearn"
 
     parser = argparse.ArgumentParser(description=desc)
 
@@ -68,6 +68,9 @@ def main(argv):
     with _LogWrapper("copying static files"):
         shutil.copytree(os.path.join(args.documentation_path, landing_page_directory),
                         args.output_path)
+
+    with _LogWrapper("generating maintainers table"):
+        subprocess.check_call(["python", "generate_maintainers_table.py"])
 
     with _LogWrapper("running Sphinx-Multiversion"):
         subprocess.check_call(["sphinx-multiversion",

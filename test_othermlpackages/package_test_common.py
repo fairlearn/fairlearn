@@ -105,7 +105,8 @@ def run_thresholdoptimizer_classification(estimator):
     unmitigated.fit(X_train, Y_train)
     unmitigated_predictions = unmitigated.predict(X_test)
 
-    to = ThresholdOptimizer(estimator=estimator, prefit=False)
+    to = ThresholdOptimizer(estimator=estimator, prefit=False,
+                            predict_method='predict')
     to.fit(X_train, Y_train, sensitive_features=A_train)
 
     mitigated_predictions = to.predict(X_test, sensitive_features=A_test)

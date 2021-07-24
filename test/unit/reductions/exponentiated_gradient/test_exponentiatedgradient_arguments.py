@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity
 from fairlearn.reductions import ErrorRate
-from fairlearn._input_validation import \
+from fairlearn.utils._input_validation import \
     (_LABELS_NOT_0_1_ERROR_MESSAGE)
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data

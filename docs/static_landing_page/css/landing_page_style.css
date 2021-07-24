@@ -16,78 +16,72 @@
 }
 body {
 	background: #ffffff;
-	padding-top: 53px;
-}
-h1 {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 52px;
-	line-height: 47px;
-	color: #ffffff;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-h2 {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 44px;
-	line-height: 44px;
-	color: #ffffff;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-h3 {
-	font-family: 'TT Commons Regular', Arial, sans-serif;
-	font-style: normal;
-	font-weight: normal;
-	font-size: 28px;
-	line-height: 34px;
-	color: #ffffff;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-h4 {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 28px;
-	line-height: 30px;
-	color: #061058;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-h5 {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 18px;
-	line-height: 18px;
-	color: #061058;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-h6 {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 21px;
-	line-height: 20px;
-	color: #061058;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-p {
+	padding: 0px;
 	font-family: 'TT Commons Regular', Arial, sans-serif;
 	font-style: normal;
 	font-weight: normal;
 	font-size: 18px;
-	line-height: 24px;
-	color: #545454;
+	line-height: 22px;
+	color: #757575;
 	letter-spacing: 0.015em;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
+}
+
+.masthead h1 {
+	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-weight: 500;
+	font-size: 84px;
+	line-height: 88px;
+	color: #ffffff;
+}
+h1 {
+	font-size: 64px;
+	line-height: 68px;
+	color: #333333;
+}
+h2 {
+	font-size: 48px;
+	line-height: 52px;
+	color: #333333;
+}
+h3 {
+	font-size: 32px;
+	line-height: 34px;
+	color: #333333;
+}
+/* Labels */
+h5 {
+	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-weight: 500;
+	font-size: 18px;
+	line-height: 22px;
+	color: #333333;
+}
+/* Labels */
+.benefit-card h5 {
+	font-size: 22px;
+	line-height: 26px;
+}
+/* TITLE */
+h6 {
+	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-weight: 500;
+	font-size: 18px;
+	line-height: 22px;
+	color: #1F3598;
+}
+.card p, footer, footer p {
+	font-size: 18px;
+	line-height: 22px;
+}
+footer {
+	color: #333333;
+}
+/* Subhead */
+p {
+	font-size: 22px;
+	line-height: 26px;
 }
 li {
 	font-family: 'TT Commons Regular', Arial, sans-serif;
@@ -100,10 +94,15 @@ li {
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
+.code {
+	font-size: 18px;
+	line-height: 22px;
+}
 
 /****UNIVERSAL****/
 .dark {
-	color: #061058;
+	/* color: #061058; */
+	color: #000000
 }
 .gray {
 	color: #979797;
@@ -152,24 +151,12 @@ li {
 }
 .navbar li {
 	font-family: 'TT Commons Medium', Arial, sans-serif;
-	font-size: 16px;
+	font-size: 18px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
 .navbar li a {
 	color: #212b36;
-}
-.navbar-btn {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 16px;
-	display: inline-block;
-	color: white !important;
-	background-color: #2364d2;
-	padding: 9px 0px 5px 0px;
-	width: 110px;
-	border-radius: 100px;
 }
 .navbar .navbar-toggler .icon-bar {
 	color: pink !important;
@@ -186,47 +173,19 @@ li {
 
 /****MASTHEAD****/
 .masthead {
+	height: 100%;
+	padding-top: 120px;
+	padding-bottom: 30px;
 }
 .masthead-tabs {
 	border-radius: 20px;
 	background-color: white;
 }
 .gradient {
-	background: linear-gradient(270deg, #2fbcdb 10.56%, #188aca 92.14%);
+	background: linear-gradient(75deg, #2fbcdb 10.56%, #188aca 92.14%);
 }
-.masthead-btn {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-size: 16px;
-	display: inline-block;
-	color: #ffffff;
-	background-color: #2364d2;
-	padding: 15px 0px 12px 0px;
-	width: 144px;
-	border-radius: 100px;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	box-shadow: 0px 20px 20px rgba(16, 16, 16, 0.1);
-}
-.masthead-btn:hover {
-	text-decoration: underline;
-	color: #ffffff;
-}
-.masthead-btn-transparent {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-size: 16px;
-	display: inline-block;
-	color: #ffffff;
-	background-color: transparent;
-	padding: 13px 0px 10px 0px;
-	width: 120px;
-	border: 1px solid #fff;
-	border-radius: 100px;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-.masthead-btn-transparent:hover {
-	text-decoration: underline;
-	color: #ffffff;
+.gradient-reverse {
+	background: linear-gradient(90deg, #188aca 92.14%, #2fbcdb 10.56%,);
 }
 .masthead-card {
 	border-radius: 20px;
@@ -339,6 +298,33 @@ li {
 .section-3 .nav-tabs .active h6 {
 	color: #061058;
 }
+
+.installation {
+	font-size: 14px;
+}
+
+.quickstart-btn {
+	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-size: 18px;
+	display: inline-block;
+	color: #ffffff;
+	background-color: #2364D2;
+	padding: 20px 0px 16px 0px;
+	margin: 0px 0px;
+	width: 200px;
+	border-radius: 100px;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+}
+
+.masthead .quickstart-btn {
+	width: 155px;
+}
+
+.quickstart-btn:hover {
+	text-decoration: underline;
+	color: #ffffff;
+}
 /****SECTION 3****/
 
 /****SECTION 4****/
@@ -399,70 +385,50 @@ li.check-icon {
 /****SECTION 4****/
 
 /****SECTION 5****/
+.section-5 {
+	background: #F2F2f2;
+}
 .benefits-icons {
 	width: 26px;
 	height: auto;
 }
 .benefit-card {
-	border-radius: 20px;
-	box-shadow: 0px 40px 80px rgba(0, 0, 0, 0.05);
-	border: 0;
+	color: #757575;
 }
-.blue-card {
+.benefit-card {
+	border-radius: 1px;
+	box-shadow: 0px 40px 80px rgba(0, 0, 0, 0.05);
+	border: 2px;
+}
+
+.benefit-card:hover {
+	text-decoration: underline #2364d2;
+}
+
+.section-5 .blue-card {
 	background-color: #2364d2;
 }
 /****SECTION 5****/
 
-/***SECTION 6****/
-.models-behavior-btn {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-size: 16px;
-	display: inline-block;
-	color: #ffffff;
-	background-color: #2364d2;
-	padding: 14px 20px 10px 20px;
-	margin: 0px 9px;
-	border-radius: 100px;
-	width: 160px;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-.models-behavior-btn:hover {
-	text-decoration: underline;
-	color: #ffffff;
-}
-.models-behavior-btn-transparent {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-size: 16px;
-	display: inline-block;
-	color: #ffffff;
-	background-color: transparent;
-	border: 1px solid #ffffff;
-	padding: 9px 0px;
-	margin: 0px 9px;
-	width: 120px;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-/***SECTION 6****/
-
 /***SECTION 7****/
 .contribute-btn {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
-	font-size: 16px;
+	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-size: 18px;
 	display: inline-block;
 	color: #ffffff;
-	background-color: #2364d2;
-	padding: 14px 0px 10px 0px;
+	background-color: #ffffff;
+	color: #2364D2;
+	padding: 20px 0px 16px 0px;
 	margin: 0px 9px;
-	width: 120px;
+	width: 200px;
 	border-radius: 100px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
+
 .contribute-btn:hover {
 	text-decoration: underline;
-	color: #ffffff;
+	color: #2364d2;
 }
 /***SECTION 6****/
 
@@ -475,28 +441,12 @@ li.check-icon {
 	padding: 8px 0px 8px 0px;
 }
 .page-footer {
-	padding-top: 20px;
-	background-color: #061058;
-}
-.footer-btn-transparent {
-	font-family: 'TT Commons Medium', Arial, sans-serif;
-	font-size: 16px;
-	display: inline-block;
-	color: #ffffff;
-	background-color: transparent;
-	border: 1px solid #ffffff;
-	width: 100px;
-	padding: 9px 0px 5px 0px;
-	border-radius: 100px;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-.footer-btn-transparent:hover {
-	text-decoration: underline;
-	color: #ffffff;
+	padding-top: 1px;
+	background-color: #FFFFFF;
+	height: 80px;
 }
 .footer-logo {
-	width: 121px;
+	width: 45px;
 	height: auto;
 }
 .footer-custom-margin {
@@ -526,36 +476,18 @@ li.check-icon {
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
 }
-.footer-line {
+.line {
 	width: 100%;
-	height: 1px;
-	background-color: #ffffff;
-	opacity: 0.2;
-}
-.copyright-text {
-	padding-top: 11px;
-	margin-bottom: 0px;
-	font-size: 14px;
+	height: 2px;
+	background-color: #3772CE;
+	opacity: 0.9;
 }
 .page-footer a:hover {
 	text-decoration: underline;
 	color: #ffffff;
 }
-
-@media (min-width: 768px) {
-	.section-1-cards .card {
-		box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.1);
-	}
-	.extra-gradient {
-		display: block;
-	}
-}
-
-@media (min-width: 992px) {
-}
-
 @media (min-width: 1200px) {
-	.container {
-		max-width: 1280px;
-	}
+       .container {
+               max-width: 1280px;
+       }
 }

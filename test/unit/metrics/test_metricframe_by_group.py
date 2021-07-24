@@ -19,8 +19,7 @@ metric = [skm.recall_score,
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_0cf(metric_fn):
-    target = MetricFrame(metric_fn,
-                         y_t, y_p,
+    target = MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1)
     assert target._user_supplied_callable is True
 
@@ -37,8 +36,7 @@ def test_1m_1sf_0cf(metric_fn):
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_0cf_metric_dict(metric_fn):
-    target = MetricFrame({metric_fn.__name__: metric_fn},
-                         y_t, y_p,
+    target = MetricFrame(metrics={metric_fn.__name__: metric_fn}, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1)
     assert target._user_supplied_callable is False
 
@@ -55,8 +53,7 @@ def test_1m_1sf_0cf_metric_dict(metric_fn):
 
 @ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_1cf(metric_fn):
-    target = MetricFrame(metric_fn,
-                         y_t, y_p,
+    target = MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1,
                          control_features=g_2)
     assert target._user_supplied_callable is True
@@ -83,8 +80,7 @@ def test_1m_1sf_1cf(metric_fn):
 
 @ pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_1cf_metric_dict(metric_fn):
-    target = MetricFrame({metric_fn.__name__: metric_fn},
-                         y_t, y_p,
+    target = MetricFrame(metrics={metric_fn.__name__: metric_fn}, y_true=y_t, y_pred=y_p,
                          sensitive_features=g_1,
                          control_features=g_2)
     assert target._user_supplied_callable is False
@@ -115,8 +111,7 @@ def test_2m_2sf_2cf():
     sf = np.stack([g_1, g_3], axis=1)
     cf = {'cf1': g_2, 'cf2': g_4}
 
-    target = MetricFrame(funcs,
-                         y_t, y_p,
+    target = MetricFrame(metrics=funcs, y_true=y_t, y_pred=y_p,
                          sensitive_features=sf,
                          control_features=cf,
                          sample_params=s_p)

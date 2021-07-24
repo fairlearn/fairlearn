@@ -20,8 +20,9 @@ Fairlearn is also available on
 
     conda install -c conda-forge fairlearn
 
-For checking out the latest version in our repository check out our
-:ref:`advanced_install`.
+For further information on how to install Fairlearn and its optional
+dependencies, please check out the :ref:`installation_guide`.
+
 If you are updating from a previous version of Fairlearn, please
 see :ref:`version_migration_guide`.
 
@@ -30,16 +31,16 @@ see :ref:`version_migration_guide`.
     The Fairlearn API is still evolving, so example code in 
     this documentation may not work with every version of Fairlearn.
     Please use the version selector to get to the instructions for
-    the appropriate version. The instructions for the :code:`master`
+    the appropriate version. The instructions for the :code:`main`
     branch require Fairlearn to be installed from a clone of the
-    repository. See :ref:`advanced_install` for the required steps.
+    repository.
 
 Overview of Fairlearn
 ---------------------
 
 The Fairlearn package has two components:
 
-- A *dashboard* for assessing which groups are negatively impacted by a model,
+- *Metrics* for assessing which groups are negatively impacted by a model,
   and for comparing multiple models in terms of various fairness and accuracy
   metrics.
 
@@ -87,8 +88,9 @@ than $50,000 a year.
     Female    16192
     Name: sex, dtype: int64
 
-.. bokeh-plot:: quickstart_plot.py
-    :source-position: none
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
+    :target: auto_examples/plot_quickstart_selection_rate.html
+    :align: center
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -110,7 +112,7 @@ we can evaluate metrics for subgroups within the data as below:
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> gm = MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sex)
+    >>> gm = MetricFrame(metrics=accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
     >>> print(gm.overall)
     0.8443...
     >>> print(gm.by_group)
@@ -127,42 +129,27 @@ their label:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import selection_rate
-    >>> sr = MetricFrame(selection_rate, y_true, y_pred, sensitive_features=sex)
+    >>> sr = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
     >>> sr.overall
     0.1638...
     >>> sr.by_group
     sex
     Female    0.0635...
     Male      0.2135...
-    Name: selection_rate, dtype: object   
+    Name: selection_rate, dtype: object
 
-For a visual representation of the metrics try out the Fairlearn dashboard.
-While this page shows only screenshots, the actual dashboard is interactive.
+Fairlearn also allows us to quickly plot these metrics from the
+:class:`fairlearn.metrics.MetricFrame`
 
-.. note::
+.. literalinclude:: auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Analyze metrics using MetricFrame
+    :end-before: # Customize plots with ylim
 
-    The :code:`FairlearnDashboard` will move from Fairlearn to the
-    :code:`raiwidgets` package after the v0.5.0 release. Instead, Fairlearn
-    will provide some of the existing functionality through
-    :code:`matplotlib`-based visualizations.
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
+    :target: auto_examples/plot_quickstart.html
+    :align: center 
 
-.. doctest:: quickstart
-
-    >>> from fairlearn.widget import FairlearnDashboard
-    >>> FairlearnDashboard(sensitive_features=sex,
-    ...                    sensitive_feature_names=['sex'],
-    ...                    y_true=y_true,
-    ...                    y_pred={"initial model": y_pred}) # doctest: +SKIP
-
-.. image:: ../img/fairlearn-dashboard-start.png
-
-.. image:: ../img/fairlearn-dashboard-sensitive-features.png
-
-.. image:: ../img/fairlearn-dashboard-performance.png
-
-.. image:: ../img/fairlearn-dashboard-disparity-performance.png
-
-.. image:: ../img/fairlearn-dashboard-disparity-predictions.png
 
 Mitigating disparity
 ^^^^^^^^^^^^^^^^^^^^
@@ -188,9 +175,10 @@ a vastly reduced difference in selection rate:
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
+    ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X)
     >>> 
-    >>> sr_mitigated = MetricFrame(selection_rate, y_true, y_pred_mitigated, sensitive_features=sex)
+    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred_mitigated, sensitive_features=sex)
     >>> print(sr_mitigated.overall)
     0.1661...
     >>> print(sr_mitigated.by_group)
@@ -198,19 +186,6 @@ a vastly reduced difference in selection rate:
     Female    0.1552...
     Male      0.1715...
     Name: selection_rate, dtype: object
-
-Similarly, we can explore the difference between the initial model and the
-mitigated model with respect to selection rate and accuracy in the dashboard
-through a multi-model comparison:
-
-.. doctest:: quickstart
-
-    >>> FairlearnDashboard(sensitive_features=sex,
-    ...                    sensitive_feature_names=['sex'],
-    ...                    y_true=y_true,
-    ...                    y_pred={"initial model": y_pred, "mitigated model": y_pred_mitigated}) # doctest: +SKIP
-
-.. image:: ../img/fairlearn-dashboard-comparison.png
 
 
 What's next?
