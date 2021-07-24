@@ -233,13 +233,15 @@ class MetricFrame:
             y_true_processed = _convert_to_ndarray_and_squeeze(y_true)
             y_pred_processed = _convert_to_ndarray_and_squeeze(y_pred)
             self._compute_metric(y_true_processed, y_pred_processed,
-                                 sensitive_features, control_features, sample_params)
+                                 sensitive_features,
+                                 control_features,
+                                 sample_params)
         else:
             # If we are streaming, we wait, but initialize accumulators.
             accumulators = [y_true, y_pred, sensitive_features]
-            # CF must be None or an empty list.
+            # control_features must be None or an empty list.
             cf_validated = control_features is None or len(control_features) == 0
-            # Same for SP
+            # Same for sample_params
             sp_validator = sample_params in (None, {})
             if any(acc != [] for acc in accumulators) or not cf_validated or not sp_validator:
                 raise ValueError(_NON_EMPTY_INIT_ERR)
@@ -365,20 +367,23 @@ class MetricFrame:
         self._compute_metric(self._concat_batches(self._y_true),
                              self._concat_batches(self._y_pred),
                              self._concat_batches(self._sensitive_features),
-                             _control_features,
-                             self._sample_params)
+                             _control_features, self._sample_params)
 
-    def _compute_metric(self, y_t, y_p, s_f, c_f, s_p):
+    def _compute_metric(self, y_true, y_pred,
+                        sensitive_features,
+                        control_features, sample_params):
         # Now, prepare the sensitive features
-        sf_list = self._process_features("sensitive_feature_", s_f, y_t)
-        self._sf_names = [x.name for x in sf_list]
+        processed_sensitive = self._process_features("sensitive_feature_",
+                                                     sensitive_features, y_true)
+        self._sf_names = [x.name for x in processed_sensitive]
 
         # Prepare the control features
         # Adjust _sf_indices if needed
         cf_list = None
         self._cf_names = None
-        if c_f is not None:
-            cf_list = self._process_features("control_feature_", c_f, y_t)
+        if control_features is not None:
+            cf_list = self._process_features("control_feature_",
+                                             control_features, y_true)
             self._cf_names = [x.name for x in cf_list]
 
         # Check for duplicate feature names
@@ -391,9 +396,10 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        self.func_dict = self._process_functions(self.metrics, s_p)
-        self._overall = self._compute_overall(self.func_dict, y_t, y_p, cf_list)
-        self._by_group = self._compute_by_group(self.func_dict, y_t, y_p, sf_list, cf_list)
+        self.func_dict = self._process_functions(self.metrics, sample_params)
+        self._overall = self._compute_overall(self.func_dict, y_true, y_pred, cf_list)
+        self._by_group = self._compute_by_group(self.func_dict, y_true, y_pred,
+                                                processed_sensitive, cf_list)
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
         if cf_list is None:

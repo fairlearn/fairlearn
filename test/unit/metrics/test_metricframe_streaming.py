@@ -42,7 +42,7 @@ def test_alternate_compute(transform_y_t, transform_y_p, num_batches):
     assert target._overall is None  # has been reset
     assert target._by_group is None  # has been reset
 
-    # We can recompute it with the new batches.
+    # We check that calling `by_group` will recompute the values.
     assert len(target.by_group) == 2
 
 
@@ -146,6 +146,9 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
     assert target._overall is None
     assert target._by_group is None
 
+
+def test_metric_frame_wrong_initialization():
+    g4 = pd.DataFrame(data=g_4, columns=['My feature'])
     # We can't initialize streaming metrics with data
     with pytest.raises(ValueError) as excinfo:
         _ = metrics.MetricFrame(metrics=skm.recall_score, y_true=y_t, y_pred=y_p,
