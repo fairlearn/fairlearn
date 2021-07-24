@@ -116,47 +116,36 @@ plot. To achieve an exact match between the sensitive feature groups in terms
 of the constraint, one typically needs to randomize between two thresholds.
 
 To illustrate its behavior, let's examine what this looks like with
-demographic parity as the fairness constraint:
+demographic parity as the fairness constraint. Note that this is only an
+excerpt of the
+:ref:`full sample code <sphx_glr_auto_examples_plot_mitigation_pipeline.py>`.
 
-.. plot::
-    :include-source:
+.. literalinclude:: ../auto_examples/plot_mitigation_pipeline.py
+    :language: python
+    :start-after: # starting with :class:`fairlearn.postprocessing.ThresholdOptimizer`:
+    :end-before: # %%
 
-    >>> from sklearn.linear_model import LogisticRegression
-    >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
-    >>> from sklearn.datasets import fetch_openml
-    >>> import pandas as pd
-    >>> import json
-    >>> data = fetch_openml(data_id=1590, as_frame=True)
-    >>> X = pd.get_dummies(data.data)
-    >>> y = (data.target == '>50K') * 1
-    >>> sex = data.data['sex']
-    >>> logistic_regression = LogisticRegression()
-    >>> threshold_optimizer = ThresholdOptimizer(
-    ...     estimator=logistic_regression,
-    ...     constraints="demographic_parity",
-    ...     objective="accuracy_score")
-    >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
-    ThresholdOptimizer(estimator=LogisticRegression())
-    >>> print(json.dumps(
-    ...     threshold_optimizer.interpolated_thresholder_.threshold_info_,
-    ...     default=str,
-    ...     indent=4
-    ... ))
-    {
-        "Female": {
-            "p0": 0.9527202201546324,
-            "operation0": "[>0.5]",
-            "p1": 0.047279779845367575,
-            "operation1": "[>-inf]"
-        },
-        "Male": {
-            "p0": 0.9998874603553525,
-            "operation0": "[>0.5]",
-            "p1": 0.00011253964464752464,
-            "operation1": "[>-inf]"
-        }
-    }
-    >>> plot_threshold_optimizer(threshold_optimizer)
+TODO include output
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_mitigation_pipeline_001.png
+    :target: ../auto_examples/plot_mitigation_pipeline.html
+    :align: center 
+
+TODO remove:
+{
+"Female": {
+"p0": 0.9527202201546324,
+"operation0": "[>0.5]",
+"p1": 0.047279779845367575,
+"operation1": "[>-inf]"
+},
+"Male": {
+"p0": 0.9998874603553525,
+"operation0": "[>0.5]",
+"p1": 0.00011253964464752464,
+"operation1": "[>-inf]"
+}
+}
 
 When calling :code:`predict` :class:`ThresholdOptimizer` uses one of the
 thresholds at random based on the probabilities :math:`p_0` and :math:`p_1`.
@@ -258,7 +247,10 @@ Note that the plot omits points that are within the convex hull of points.
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
-    >>> print(json.dumps(threshold_optimizer.interpolated_thresholder_.threshold_info_, default=str, indent=4))
+    >>> print(json.dumps(
+    ...     threshold_optimizer.interpolated_thresholder_.threshold_interpolation_,
+    ...     default=str,
+    ...     indent=4))
     {
         "Female": {
             "p_ignore": 0.13186000824177083,

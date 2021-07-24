@@ -148,7 +148,7 @@ Fairlearn also allows us to quickly plot these metrics from the
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
-    :align: center 
+    :align: center
 
 
 Mitigating disparity

@@ -21,7 +21,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
     At prediction time, the predictor takes as input both standard and sensitive features.
     Based on the values of sensitive features, it then applies a randomized thresholding
-    transformation according to the provided `threshold_info`.
+    transformation according to the provided `threshold_interpolation`.
 
     Parameters
     ----------
