@@ -23,7 +23,8 @@ def test_random_state_threshold_optimizer():
     lr.fit(X_train, y_train)
 
     # Train threshold optimizer
-    to = ThresholdOptimizer(estimator=lr, constraints='equalized_odds', grid_size=1000)
+    to = ThresholdOptimizer(estimator=lr, constraints='equalized_odds',
+                            grid_size=1000, predict_method='predict')
     to.fit(X_train, y_train, sensitive_features=race_train)
 
     # score groups

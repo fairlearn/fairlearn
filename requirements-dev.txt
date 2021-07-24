@@ -31,7 +31,8 @@ nbval
 # Required for documentation
 bokeh
 pypandoc
-sphinx
+sphinx==4.0.3  # a bug in 4.1.0 prevents the logo from being rendered
 sphinx-gallery
 git+https://github.com/Holzhaus/sphinx-multiversion.git
 pydata-sphinx-theme==0.6.3
+sphinx-autodoc-typehints

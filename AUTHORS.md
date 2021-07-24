@@ -2,6 +2,7 @@
 
 All names are sorted alphabetically by last name. Contributors, please add your name to the list when you submit a patch to the project.
 
+- [Kurian Benoy](https://github.com/kurianbenoy)
 - [Sarah Bird](https://github.com/slbird)
 - [Frederic Branchaud-Charron](https://github.com/Dref360)
 - [Rishit Dagli](https://github.com/Rishit-dagli)
@@ -22,6 +23,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Janhavi Mahajan](https://github.com/janhavi13)
 - [Vanessa Milan](https://www.microsoft.com/en-us/research/people/vmilan/)
 - [Sangeeta Mudnal](https://www.linkedin.com/in/sangeeta-mudnal-36868429/)
+- [Nils Müller](https://www.github.com/shimst3r)
 - [Lauren Pendo](https://github.com/laurenpendo)
 - [Stephen Robicheaux](https://github.com/stephenrobic)
 - [Kevin Robinson](https://github.com/kevinrobinson)

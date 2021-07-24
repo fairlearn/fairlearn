@@ -16,6 +16,7 @@
 import os
 import sys
 import inspect
+from datetime import datetime
 rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
 sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -29,7 +30,7 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = 'Fairlearn'
-copyright = '2021, Fairlearn contributors'
+copyright = f'2018 - {datetime.now().year}, Fairlearn contributors'
 author = 'Fairlearn contributors'
 
 # The full version, including alpha/beta/rc tags
@@ -69,13 +70,17 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx_gallery.gen_gallery',
-    'sphinx_multiversion'
+    'sphinx_multiversion',
+    'sphinx_autodoc_typehints',  # needs to be AFTER napoleon
 ]
+
+source_suffix = ['.rst']
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None), }
+                       'sklearn': ('https://scikit-learn.org/stable/', None),
+                       'matplotlib': ('https://matplotlib.org/', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -83,13 +88,14 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.rst']
 
 master_doc = 'index'
 
 # Multiversion settings
-
-smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d|^v0\.6\.\d+$'
+# Show only the highest patch versions of each minor version.
+# Example: include 0.4.6, but not 0.4.0 to 0.4.5
+smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.0|^v0\.6\.2|^v0\.7\.0+$'
 smv_branch_whitelist = r'^main$'
 
 if check_if_v046():
@@ -126,12 +132,11 @@ html_theme_options = {
             "icon": "fab fa-stack-overflow",
         },
         {
-            "name": "Gitter",
-            "url": "https://gitter.im/fairlearn/community",
-            "icon": "fab fa-gitter",
+            "name": "Discord",
+            "url": "https://discord.gg/R22yCfgsRn",
+            "icon": "fab fa-discord",
         },
     ],
-
     "show_prev_next": False
 }
 
