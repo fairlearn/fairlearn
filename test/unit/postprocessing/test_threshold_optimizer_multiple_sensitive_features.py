@@ -117,11 +117,11 @@ def test_threshold_optimizer_multiple_sensitive_features():
             metricframe_multi.by_group.loc[(a2, a4)]).all()
 
     # comparing string representations of interpolation dicts is sufficient
-    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a1+a3]) == \
-        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a13])
-    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a1+a4]) == \
-        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a14])
-    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a2+a3]) == \
-        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a23])
-    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a2+a4]) == \
-        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a24])
+    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation_[a1+a3]) == \
+        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation_[a13])
+    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation_[a1+a4]) == \
+        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation_[a14])
+    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation_[a2+a3]) == \
+        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation_[a23])
+    assert str(postprocess_est_combined.interpolated_thresholder_.threshold_interpolation_[a2+a4]) == \
+        str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation_[a24])
