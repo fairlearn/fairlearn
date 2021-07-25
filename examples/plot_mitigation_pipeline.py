@@ -26,6 +26,10 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
 
+# %%
+# Below we load the "Adult" census dataset and split its features, sensitive
+# features, and labels into train and test sets.
+
 data = fetch_adult(as_frame=True)
 X_raw = data.data
 y = (data.target == ">50K") * 1
@@ -40,6 +44,13 @@ y_train = y_train.reset_index(drop=True)
 y_test = y_test.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
+
+# %%
+# To illustrate Fairlearn's compatibility with
+# :class:`~sklearn.pipeline.Pipeline` we first need to build our pipeline.
+# In the following we assemble a pipeline by combining preprocessing steps
+# with an estimator. The preprocessing steps include imputing, scaling for
+# numerical features and one-hot encoding for categorical features.
 
 numeric_transformer = Pipeline(
     steps=[
