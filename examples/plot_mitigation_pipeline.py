@@ -70,7 +70,7 @@ pipeline = Pipeline(
     ]
 )
 
-# %% 
+# %%
 # Below we will pass the pipeline to some of our mitigation techniques,
 # starting with :class:`fairlearn.postprocessing.ThresholdOptimizer`:
 
