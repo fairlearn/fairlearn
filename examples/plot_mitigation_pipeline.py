@@ -7,11 +7,11 @@ Passing pipelines to mitigation techniques
 ==========================================
 """
 # %%
-# This notebook shows how to pass :func:`sklearn.pipeline.Pipeline`s to
+# This notebook shows how to pass :class:`sklearn.pipeline.Pipeline` to
 # mitigation techniques from Fairlearn. Note that the notebook is not to be
 # used as an example for how to assess and mitigate fairness. It is merely a
 # demonstration of the technical aspects of passing
-# :func:`sklearn.pipeline.Pipeline`s. For more information around proper
+# :class:`sklearn.pipeline.Pipeline`. For more information around proper
 # fairness assessment and mitigation please refer to the :ref:`user_guide`.
 
 import json
