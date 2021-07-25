@@ -4,7 +4,7 @@
 
 * Relaxed checks made on `X` in `_validate_and_reformat_input()` since that
   is the concern of the underlying estimator and not Fairlearn
-
+* Add support for Python 3.9
 
 ### v0.7.0
 

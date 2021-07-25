@@ -248,8 +248,8 @@ class UtilityParity(ClassificationMoment):
            16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
 
         """
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
-            self.prob_event
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]) \
+            .groupby(level=_EVENT).sum() / self.prob_event
         lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
             self.prob_group_event
         adjust = lambda_event - lambda_group_event
