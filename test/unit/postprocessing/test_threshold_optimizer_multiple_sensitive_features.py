@@ -118,9 +118,9 @@ def test_threshold_optimizer_multiple_sensitive_features():
 
     # comparing string representations of interpolation dicts is sufficient
     combined_interpolation = \
-        postprocess_est_combined.interpolated_thresholder_.threshold_interpolation_
+        postprocess_est_combined.interpolated_thresholder_.threshold_interpolation
     multi_interpolation = \
-        postprocess_est_multi.interpolated_thresholder_.threshold_interpolation_
+        postprocess_est_multi.interpolated_thresholder_.threshold_interpolation
     assert str(combined_interpolation[a1+a3]) == str(multi_interpolation[a13])
     assert str(combined_interpolation[a1+a4]) == str(multi_interpolation[a14])
     assert str(combined_interpolation[a2+a3]) == str(multi_interpolation[a23])

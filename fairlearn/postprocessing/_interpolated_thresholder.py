@@ -80,7 +80,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
     def __init__(self, estimator, threshold_interpolation, prefit=False,
                  predict_method='deprecated'):
         self.estimator = estimator
-        self.threshold_interpolation_ = threshold_interpolation
+        self.threshold_interpolation = threshold_interpolation
         self.prefit = prefit
         self.predict_method = predict_method
 
@@ -140,7 +140,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             enforce_binary_labels=False)
 
         positive_probs = 0.0*base_predictions_vector
-        for a, interpolation in self.threshold_interpolation_.items():
+        for a, interpolation in self.threshold_interpolation.items():
             interpolated_predictions = \
                 interpolation.p0 * interpolation.operation0(base_predictions_vector) + \
                 interpolation.p1 * interpolation.operation1(base_predictions_vector)
