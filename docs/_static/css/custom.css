@@ -38,3 +38,17 @@ div.sponsor-div-box {
       width: 50%;
    }
 }
+
+/* maintainers - copied from scikit-learn/scikit-learn */
+.maintainers-container {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+ }
+ 
+ .maintainers-container > div {
+   width: 100px;
+   margin: 5px;
+   font-size: 0.9rem;
+   text-align: center;
+ }
