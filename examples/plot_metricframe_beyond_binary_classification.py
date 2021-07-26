@@ -98,4 +98,45 @@ mf.by_group
 # This computes the intersection and the union of the two
 # bounding boxes, and returns the ratio of their areas.
 # If the bounding boxes are identical, then the metric will
-# be 1; if disjoint then it will be 0.
+# be 1; if disjoint then it will be 0. A function to do this is:
+
+def bounding_box_iou(box_A_input, box_B_input):
+    # The inputs are array-likes in the form
+    # [x_0, y_0, delta_x,delta_y]
+    # where the deltas are positive
+    
+    boxA = np.array(box_A_input)
+    boxB = np.array(box_B_input)
+
+    assert boxA[2] >= 0, "Bad delta_x for boxA"
+    assert boxA[3] >= 0, "Bad delta y for boxA"
+    assert boxB[2] >= 0, "Bad delta x for boxB"
+    assert boxB[3] >= 0, "Bad delta y for boxB"
+    
+    # Convert deltas to co-ordinates
+    boxA[2:4] = boxA[0:2] + boxA[2:4]
+    boxB[2:4] = boxB[0:2] + boxB[2:4]
+    
+    # Determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+
+    if (xB < xA ) or (yB < yA):
+        return 0
+   
+    # Compute the area of intersection rectangle
+    interArea = (xB - xA) * (yB - yA)
+
+    # Compute the area of both the prediction and ground-truth
+    # rectangles
+    boxAArea = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
+    boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
+
+    # Compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the intersection area
+    iou = interArea / float(boxAArea + boxBArea - interArea)
+
+    return iou
