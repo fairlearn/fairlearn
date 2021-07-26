@@ -3,67 +3,82 @@ v0.5.0
 
 * Adjust classes to abide by naming conventions for attributes.
 
-* Change `ExponentiatedGradient` signature by renaming argument `T` to
-  `max_iter`, `eta_mul` to `eta0`, and by adding `run_linprog_step`.
+* Change :class:`~fairlearn.reductions.ExponentiatedGradient`'s signature by
+  renaming argument :code:`T` to :code:`max_iter`, :code:`eta_mul` to
+  :code:`eta0`, and by adding :code:`run_linprog_step`.
 
-* API refactoring to separate out different uses of `eps` within
-  `ExponentiatedGradient`. It is now solely responsible for setting the L1
-  norm bound in the optimization (which controls the excess constraint
-  violation beyond what is allowed by the `constraints` object).
-  The other usage of `eps` as the right-hand side of constraints is
+* API refactoring to separate out different uses of :code:`eps` within
+  :class:`~fairlearn.reductions.ExponentiatedGradient`. It is now solely
+  responsible for setting the L1 norm bound in the optimization (which
+  controls the excess constraint violation beyond what is allowed by the
+  :code:`constraints` object).
+  The other usage of :code:`eps` as the right-hand side of constraints is
   now captured directly in the moment classes as follows:
 
-  * Classification moments: `ConditionalSelectionRate` renamed to
-    `UtilityParity` and its subclasses have new arguments on the constructor:
+  * Classification moments: :code:`ConditionalSelectionRate` renamed to
+    :class:`fairlearn.reductions.UtilityParity` and its subclasses have new
+    arguments on the constructor:
 
-    * `difference_bound` - for difference-based constraints such as
+    * :code:`difference_bound` - for difference-based constraints such as
       demographic parity difference
-    * `ratio_bound_slack` - for ratio-based constraints such as demographic
-      parity ratio
-    * Additionally, there's a `ratio_bound` argument which represents the
-      argument previously called `ratio`.
+    * :code:`ratio_bound_slack` - for ratio-based constraints such as
+      demographic parity ratio
+    * Additionally, there's a :code:`ratio_bound` argument which represents
+      the argument previously called :code:`ratio`.
 
-  * Regression moments: `ConditionalLossMoment` and its subclasses have a new
-    argument `upper_bound` with the same purpose for newly enabled regression
-    scenarios on `ExponentiatedGradient`.
+  * Regression moments: :code:`ConditionalLossMoment`
+    and its subclasses have a new argument :code:`upper_bound` with the same
+    purpose for newly enabled regression scenarios on
+    :class:`~fairlearn.reductions.ExponentiatedGradient`.
 
-  For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
+  For a comprehensive overview of available constraints refer to the new
+  :ref:`user guide on fairness constraints for reductions methods <reductions>`.
 
 * Renamed several constraints to create a uniform naming convention according
-  to the accepted [metric harmonization proposal](https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md):
+  to the accepted
+  `metric harmonization proposal <https://github.com/fairlearn/fairlearn-proposals/blob/master/api/METRICS.md>`_:
 
-  * `ErrorRateRatio` renamed to `ErrorRateParity`, and
-    `TruePositiveRateDifference` renamed to `TruePositiveRateParity` since the
-    desired pattern is `<metric name>Parity` with the exception of
-    `EqualizedOdds` and `DemographicParity`.
-  * `ConditionalSelectionRate` renamed to `UtilityParity`.
-  * `GroupLossMoment` renamed to `BoundedGroupLoss` in order to have a
+  * :code:`ErrorRateRatio` renamed to
+    :class:`~fairlearn.reductions.ErrorRateParity`, and
+    :code:`TruePositiveRateDifference` renamed to
+    :class:`~fairlearn.reductions.TruePositiveRateParity` since the
+    desired pattern is :code:`<metric name>Parity` with the exception of
+    :class:`~fairlearn.reductions.EqualizedOdds` and
+    :class:`~fairlearn.reductions.DemographicParity`.
+  * :code:`ConditionalSelectionRate` renamed to
+    :class:`~fairlearn.reductions.UtilityParity`.
+  * :code:`GroupLossMoment` renamed to
+    :class:`~fairlearn.reductions.BoundedGroupLoss` in order to have a
     descriptive name and for consistency with the paper. Similarly,
-    `AverageLossMoment` renamed to `MeanLoss`.
+    :code:`AverageLossMoment` renamed to
+    :code:`MeanLoss`.
 
-  For a comprehensive overview of available constraints refer to the new [user
-  guide on fairness constraints for reductions methods](https://fairlearn.org/main/user_guide/mitigation.html#reductions).
+    For a comprehensive overview of available constraints refer to the new
+    :ref:`user guide on fairness constraints for reductions methods <reductions>`.
 
-* Added `TrueNegativeRateParity` to provide the opposite constraint of
-  `TruePositiveRateParity` to be used with reductions techniques.
+* Added :code:`TrueNegativeRateParity` to provide the
+  opposite constraint of :class:`~fairlearn.reductions.TruePositiveRateParity`
+  to be used with reductions techniques.
 
-* Add new constraints and objectives in `ThresholdOptimizer`
+* Add new constraints and objectives in :class:`~fairlearn.postprocessing.ThresholdOptimizer`
 
-* Add class `InterpolatedThresholder` to represent the fitted
-  `ThresholdOptimizer`
+* Add class :code:`InterpolatedThresholder` to represent the fitted
+  :class:`~fairlearn.postprocessing.ThresholdOptimizer`
 
-* Add `fairlearn.datasets` module.
+* Add :py:mod:`fairlearn.datasets` module.
 
-* Change the method to make copies of the estimator in `ExponentiatedGradient`
-  from `pickle.dump` to `sklearn.clone`. 
+* Change the method to make copies of the estimator in
+  :class:`~fairlearn.reductions.ExponentiatedGradient`
+  from :code:`pickle.dump` to :code:`sklearn.clone`. 
 
-* Add an argument `sample_weight_name` to `GridSearch` and
-  `ExponentiatedGradient` to control how `sample_weight` is supplied to
-  `estimator.fit`.
+* Add an argument :code:`sample_weight_name` to
+  :class:`~fairlearn.reductions.GridSearch` and
+  :class:`~fairlearn.reductions.ExponentiatedGradient` to control how
+  :code:`sample_weight` is supplied to :code:`estimator.fit`.
 
-* Large changes to the metrics API. A new class `MetricFrame` has been
-  introduced, and `make_group_summary()` removed (along with related
+* Large changes to the metrics API.
+  A new class :class:`~fairlearn.metrics.MetricFrame` has been
+  introduced, and :code:`make_group_summary()` removed (along with related
   functions). Please see the documentation and examples for more information.
 
 .. _migrating_to_v0_5_0:
@@ -71,22 +86,23 @@ v0.5.0
 Migrating to v0.5.0 from v0.4.6
 -------------------------------
 
-The update from v0.4.6 to v0.5.0 of Fairlearn has brought some major changes. This
-document goes through the adjustments required.
+The update from v0.4.6 to v0.5.0 of Fairlearn has brought some major changes.
+This section goes through the adjustments required.
 
 Metrics
 ^^^^^^^
 
 We have substantially altered the :mod:`fairlearn.metrics` module.
-In place of calling ``group_summary()`` to produce a :obj:`sklearn.utils.Bunch`
-containing the disaggregated metrics, we have a new class, :class:`.MetricFrame`.
-The key advantages of the new API are:
+In place of calling :code:`group_summary()` to produce a
+:obj:`sklearn.utils.Bunch` containing the disaggregated metrics, we have a
+new class, :class:`.MetricFrame`. The key advantages of the new API are:
 
-- Support for evalulating multiple metric functions at once
+- Support for evaluating multiple metric functions at once
 - Support for multiple sensitive features
 - Support for control features
 
-The :class:`.MetricFrame` class has a constructor similar to ``group_summary()``.
+The :class:`.MetricFrame` class has a constructor similar to
+:code:`group_summary()`.
 In v0.4.6, one would write
 
 .. code-block::
@@ -99,17 +115,18 @@ With the new API, this becomes
 
     mf = MetricFrame(metrics=metric_func, y_true=y_true, y_pred=y_pred, sensitive_features=A_col)
 
-The new object has :attr:`.MetricFrame.overall` and :attr:`.MetricFrame.by_group`
-properties, to access the metric evaluated on the entire dataset, and the metric
-evaluated on the subgroups of ``A_col``.
+The new object has :attr:`.MetricFrame.overall` and
+:attr:`.MetricFrame.by_group` properties, to access the metric evaluated on
+the entire dataset, and the metric evaluated on the subgroups of
+:code:`A_col`.
 
-In v0.4.6, we provided the following aggregator functions to compute a single scalar
-from the result of ``group_summary()``.
+In v0.4.6, we provided the following aggregator functions to compute a single
+scalar from the result of :code:`group_summary()`.
 
-- ``group_min_from_summary()``
-- ``group_max_from_summary()``
-- ``difference_from_summary()``
-- ``ratio_from_summary()``
+- :code:`group_min_from_summary()`
+- :code:`group_max_from_summary()`
+- :code:`difference_from_summary()`
+- :code:`ratio_from_summary()`
 
 With :class:`.MetricFrame` these become methods:
 
@@ -130,9 +147,10 @@ Now, one can write:
 
     min_by_group = mf.group_min()
 
-The ``make_derived_metric()`` function has been removed, but will be reintroduced
-in a future release. The predefined convenience functions such as ``accuracy_score_group_min()``
-and ``precision_score_difference()`` remain.
+The :code:`make_derived_metric()` function has been removed, but will be
+reintroduced in a future release. The predefined convenience functions such as
+:code:`accuracy_score_group_min()` and :code:`precision_score_difference()`
+remain.
 
 For an introduction to all the new features, see the 
 :ref:`sphx_glr_auto_examples_plot_new_metrics.py` example in
@@ -142,9 +160,10 @@ For an introduction to all the new features, see the
 Renamed object attributes
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Some of the object attributes have been renamed from ``_<name>`` to ``<name>_``.
+Some of the object attributes have been renamed from :code:`_<name>` to
+:code:`<name>_`.
 For example in both :class:`.ExponentiatedGradient` and :class:`.GridSearch`,
-the ``_predictors`` attribute is now called ``predictors_``.
+the :code:`_predictors` attribute is now called :code:`predictors_`.
 
 
 Exponentiated Gradient and Moments
@@ -153,32 +172,33 @@ Exponentiated Gradient and Moments
 In addition to the trailing underscore change mentioned above, several
 adjustments have been made to the constructor arguments of
 :class:`.ExponentiatedGradient`.
-The ``T`` argument has been renamed to ``max_iter``, and the ``eta_mul``
-argument to ``eta0``.
+The :code:`T` argument has been renamed to :code:`max_iter`, and the
+:code:`eta_mul` argument to :code:`eta0`.
 
-Furthermore, the ``eps`` argument was previously used for two
+Furthermore, the :code:`eps` argument was previously used for two
 different purposes, and these two uses have now been separated.
-The use of ``eps`` as the righthand side of the constraints
+The use of :code:`eps` as the righthand side of the constraints
 has now been moved to the :class:`.Moment` classes.
-The only remaining use of the ``eps`` argument
+The only remaining use of the :code:`eps` argument
 is to control the optimality requirements for the optimization
 algorithm in :class:`.ExponentiatedGradient`.
 
-For classification moments, ``ConditionalSelectionRate`` has been
+For classification moments, :code:`ConditionalSelectionRate` has been
 renamed to :class:`.UtilityParity`, and there are three new
-constructor arguments: ``difference_bound``, ``ratio_bound`` (which
-replaces ``ratio``) and ``ratio_bound_slack``.
+constructor arguments: :code:`difference_bound`, :code:`ratio_bound` (which
+replaces :code:`ratio`) and :code:`ratio_bound_slack`.
 
 For regression moments, :class:`.BoundedGroupLoss` and its
-subclasses have gained a new argument ``upper_bound`` to serve as
+subclasses have gained a new argument :code:`upper_bound` to serve as
 the righthand side of the constraints.
 
 Several :class:`.Moment` objects have also been renamed in an effort
 to improve consistency:
 
-- ``ErrorRateRatio`` has become :class:`.ErrorRateParity` (when used
-  with the ``ratio_bound`` and ``ratio_bound_slack`` arguments)
-- ``TruePositiveRateDifference`` has become :class:`.TruePositiveRateParity`
-  (when used with the ``difference_bound`` argument)
-- ``ConditionalSelectionRate`` has become :class:`.UtilityParity`
-- ``GroupLossMoment`` has become :class:`.BoundedGroupLoss`
+- :code:`ErrorRateRatio` has become :class:`.ErrorRateParity` (when used
+  with the :code:`ratio_bound` and :code:`ratio_bound_slack` arguments)
+- :code:`TruePositiveRateDifference` has become
+  :class:`.TruePositiveRateParity` (when used with the
+  :code:`difference_bound` argument)
+- :code:`ConditionalSelectionRate` has become :class:`.UtilityParity`
+- :code:`GroupLossMoment` has become :class:`.BoundedGroupLoss`
