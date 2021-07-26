@@ -104,7 +104,7 @@ print(mf2.by_group)
 # :class:`~fairlearn.metrics.MetricFrame` does not require
 # its inputs to be scalars either. To demonstrate this, we
 # will use an image recognition example (kindly supplied by
-# Ferdane Bekmezci and Samira Pouyanfar).
+# Ferdane Bekmezci, Hamid Vaezi Joze and Samira Pouyanfar).
 #
 # Image recognition algorithms frequently construct a bounding
 # box around regions where they have found their target features.
