@@ -100,11 +100,12 @@ mf.by_group
 # If the bounding boxes are identical, then the metric will
 # be 1; if disjoint then it will be 0. A function to do this is:
 
+
 def bounding_box_iou(box_A_input, box_B_input):
     # The inputs are array-likes in the form
     # [x_0, y_0, delta_x,delta_y]
     # where the deltas are positive
-    
+
     boxA = np.array(box_A_input)
     boxB = np.array(box_B_input)
 
@@ -112,20 +113,20 @@ def bounding_box_iou(box_A_input, box_B_input):
     assert boxA[3] >= 0, "Bad delta y for boxA"
     assert boxB[2] >= 0, "Bad delta x for boxB"
     assert boxB[3] >= 0, "Bad delta y for boxB"
-    
+
     # Convert deltas to co-ordinates
     boxA[2:4] = boxA[0:2] + boxA[2:4]
     boxB[2:4] = boxB[0:2] + boxB[2:4]
-    
+
     # Determine the (x, y)-coordinates of the intersection rectangle
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
     xB = min(boxA[2], boxB[2])
     yB = min(boxA[3], boxB[3])
 
-    if (xB < xA ) or (yB < yA):
+    if (xB < xA) or (yB < yA):
         return 0
-   
+
     # Compute the area of intersection rectangle
     interArea = (xB - xA) * (yB - yA)
 
@@ -147,12 +148,14 @@ def bounding_box_iou(box_A_input, box_B_input):
 # simplicity, we will return the mean value of 'iou' for the
 # two lists, but this is by no means the only choice:
 
+
 def mean_iou(true_boxes, predicted_boxes):
     assert len(true_boxes) == len(predicted_boxes), "Array size mismatch"
 
-    v_func = np.vectorize(bounding_box_iou)
-
-    all_iou = v_func(true_boxes, predicted_boxes)
+    all_iou =[
+        bounding_box_iou(true_boxes[i], predicted_boxes[i])
+        for i in range(len(true_boxes))
+    ]
 
     return np.mean(all_iou)
 
@@ -169,7 +172,9 @@ def generate_bounding_box(max_coord, max_delta):
     return np.concatenate((corner, delta))
 
 # %%
-# Now use this to create an array of bounding boxes
+# Now use this to create sample `y_true` and `y_pred` arrays of
+# bounding boxes:
+
 
 def many_bounding_boxes(n_rows, max_coord, max_delta):
     return [
@@ -177,8 +182,44 @@ def many_bounding_boxes(n_rows, max_coord, max_delta):
         for _ in range(n_rows)
     ]
 
-true_bounding_boxes = many_bounding_boxes(n_rows, 10, 5)
-pred_bounding_boxes = many_bounding_boxes(n_rows, 10, 5)
+
+true_bounding_boxes = many_bounding_boxes(n_rows, 5, 10)
+pred_bounding_boxes = many_bounding_boxes(n_rows, 5, 10)
 
 # %%
 # Finally, we can use these in a :class:`~fairlearn.metrics.MetricFrame`:
+
+mf_bb = MetricFrame(metrics={'mean_iou': mean_iou},
+                    y_true=true_bounding_boxes,
+                    y_pred=pred_bounding_boxes,
+                    sensitive_features=s_f)
+
+print("Overall metric")
+print(mf_bb.overall)
+print("Metrics by group")
+print(mf_bb.by_group)
+
+# %%
+# The individual entries in the `y_true` and `y_pred` arrays
+# can be arbitrarily complex. It is the metric functions
+# which give meaning to them. Similarly, 
+# :class:`~fairlearn.metrics.MetricFrame` does not impose
+# restrictions on the return type. One can envisage an image
+# recognition task where there are multiple faces in each
+# picture, and the image recognition algorithm produces
+# multiple bounding boxes (not necessarily in a 1-to-1
+# mapping either). The output of such a scenario might
+# well be a matrix of some description.
+
+# %%
+# Conclusion
+# ==========
+#
+# This notebook has given some taste of the flexibility
+# of :class:`~fairlearn.metrics.MetricFrame` when it comes
+# to inputs, outputs and metric functions.
+# The input arrays can have elements of arbitrary types,
+# and the return values from the metric functions can also
+# be of any type (although methods such as
+# :meth:`~fairlearn.metrics.MetricFrame.group_min` may not
+# work).
