@@ -220,7 +220,7 @@ We would like to thank the following funders.
    <div class="sponsor-div">
    <div class="sponsor-div-box">
 
-`Microsoft <https://www.microsoft.com/>`_ has funded various people
+`Microsoft <https://www.microsoft.com/>`_ has funded various contributors
 including several maintainers (Miro Dudik, Richard Edgar, Roman Lutz, Michael
 Madaio) since the start of the project in 2018.
 
