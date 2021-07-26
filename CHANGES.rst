@@ -1,12 +1,15 @@
-# Changes
+Changes
+=======
 
-### v0.7.1
+v0.7.1
+------
 
 * Relaxed checks made on `X` in `_validate_and_reformat_input()` since that
   is the concern of the underlying estimator and not Fairlearn
 * Add support for Python 3.9
 
-### v0.7.0
+v0.7.0
+------
 
 * Added new `count()` metric, so that the number of data points in each
   group is noted when using `MetricFrame`
@@ -23,13 +26,15 @@
   [user guide section](https://fairlearn.org/main/user_guide/assessment.html#plotting-grouped-metrics).
 * Added return value (`self`) to `fairlearn.reductions.ExponentiatedGradient`.
 
-### v0.6.2
+v0.6.2
+------
 
 * Bugfix for `_merge_columns()` when using multiple sensitive features with
   long names. This previously caused groups to get merged if the concatenation
   of their string representations was identical until the cutoff limit.
 
-### v0.6.1
+v0.6.1
+------
 
 * Bugfix for `_create_group_metric_set()`. Fixes the list of metrics computed for regression
   and adds a set of metrics for 'probability' problems [PR](https://github.com/fairlearn/fairlearn/pull/727)
@@ -37,7 +42,8 @@
 * Added some overlooked `MetricFrame` tests [PR](https://github.com/fairlearn/fairlearn/pull/701)
 * Various documentation tweaks and enhancements
 
-### v0.6.0
+v0.6.0
+------
 
 * Add `CorrelationRemover` preprocessing technique. This removes correlations
   between sensitive and non-sensitive features while retaining as much information
@@ -48,7 +54,8 @@
 * Update `make_derived_metric()` to use `MetricFrame`
 * Assorted small documentation fixes
 
-### v0.5.0
+v0.5.0
+------
 
 * Adjust classes to abide by naming conventions for attributes.
 * Change `ExponentiatedGradient` signature by renaming argument `T` to
@@ -99,7 +106,8 @@
   introduced, and `make_group_summary()` removed (along with related
   functions). Please see the documentation and examples for more information.
 
-### v0.4.6
+v0.4.6
+------
 
 * Handle case where reductions relabeling results in a single class
 * Refactor metrics:
@@ -133,7 +141,8 @@
 * Make `ExponentiatedGradient` require 0-1 labels for classification problems,
   pending a better solution for Issue 339.
 
-### v0.4.5
+v0.4.5
+------
 
 * Changes to `ThresholdOptimizer`:
   * Separate plotting for `ThresholdOptimizer` into its own plotting function.
@@ -156,7 +165,8 @@
 * Fix regression in input validation that dropped metadata from `X` if it is
   provided as a `pandas.DataFrame`.
 
-### v0.4.4
+v0.4.4
+------
 
 * Remove `GroupMetricSet` in favour of a `create_group_metric_set` method
 * Add basic support for multiple sensitive features
@@ -164,34 +174,39 @@
 * Adjust `scipy`, `scikit-learn`, and `matplotlib` requirements to support
   python 3.8
 
-### v0.4.3
+v0.4.3
+------
 
 * Various tweaks to `GroupMetricResult` and `GroupMetricSet` for AzureML
   integration
 
-### v0.4.2
+v0.4.2
+------
 
 * If methods such as `predict` are called before `fit`, `sklearn`'s
   `NotFittedError` is raised instead of `NotFittedException`, and the latter
   is now removed.
 
-### v0.4.2, 2020-01-24
+v0.4.2
+------
 
 * Separated out matplotlib dependency into an extension that can be installed
   via `pip install fairlearn[customplots]`.
 * Added a `GroupMetricSet` class to hold collections of `GroupMetricResult`
   objects
 
-### v0.4.1, 2020-01-09
+v0.4.1
+------
 
 * Fix to determine whether operating as binary classifier or regressor in
   dashboard
 
-### v0.4.0, 2019-12-05
+v0.4.0
+------
+* Initial release of the `FairlearnDashboard`
 
-* Initial release of fairlearn dashboard
-
-### v0.3.0, 2019-11-01
+v0.3.0
+------
 
 * Major changes to the API. In particular the `expgrad` function is now
   implemented by the `ExponentiatedGradient` class. Please refer to the
@@ -204,7 +219,8 @@
   
 * Added grouped metrics
 
-### v0.2.0, 2018-06-20
+v0.2.0
+------
 
 * registered the project at [PyPI](https://pypi.org/)
 
@@ -212,6 +228,7 @@
   `fairlearn.moments`), and how they are passed to the fair learning reduction
   `fairlearn.classred.expgrad`
 
-### v0.1, 2018-05-14
+v0.1
+----
 
 * initial release
