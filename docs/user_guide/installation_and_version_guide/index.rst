@@ -1,4 +1,4 @@
-.. _installation_and_migration_guide:
+.. _installation_and_version_guide:
 
 Installation and version guide
 ==============================
