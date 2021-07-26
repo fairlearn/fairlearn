@@ -140,3 +140,45 @@ def bounding_box_iou(box_A_input, box_B_input):
     iou = interArea / float(boxAArea + boxBArea - interArea)
 
     return iou
+
+# %%
+# This is a metric for two bounding boxes, but for :code:`~fairlearn.metrics.MetricFrame`
+# we need to compare two lists of bounding boxes. For the sake of
+# simplicity, we will return the mean value of 'iou' for the
+# two lists, but this is by no means the only choice:
+
+def mean_iou(true_boxes, predicted_boxes):
+    assert len(true_boxes) == len(predicted_boxes), "Array size mismatch"
+
+    v_func = np.vectorize(bounding_box_iou)
+
+    all_iou = v_func(true_boxes, predicted_boxes)
+
+    return np.mean(all_iou)
+
+# %%
+# We need to generate some input data, so first create a function to
+# generate a single random bounding box:
+
+def generate_bounding_box(max_coord, max_delta):
+    rng = np.random.default_rng()
+
+    corner = max_coord * rng.random(size=2)
+    delta = max_delta * rng.random(size=2)
+
+    return np.concatenate((corner, delta))
+
+# %%
+# Now use this to create an array of bounding boxes
+
+def many_bounding_boxes(n_rows, max_coord, max_delta):
+    return [
+        generate_bounding_box(max_coord, max_delta)
+        for _ in range(n_rows)
+    ]
+
+true_bounding_boxes = many_bounding_boxes(n_rows, 10, 5)
+pred_bounding_boxes = many_bounding_boxes(n_rows, 10, 5)
+
+# %%
+# Finally, we can use these in a :class:`~fairlearn.metrics.MetricFrame`:
