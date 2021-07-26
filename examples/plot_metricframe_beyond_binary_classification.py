@@ -78,6 +78,27 @@ mf.by_group
 # are not well defined for matrices.
 
 # %%
+# Metric functions with different return types can also
+# be mixed in a single :class:`~fairlearn.metrics.MetricFrame`.
+# For example:
+
+recall = functools.partial(skm.recall_score, average='macro')
+
+mf2 = MetricFrame(metrics={'conf_mat': conf_mat,
+                           'recall': recall
+                           },
+                  y_true=y_true,
+                  y_pred=y_pred,
+                  sensitive_features=s_f)
+
+print("Overall values")
+print(mf2.overall)
+print("Values by group")
+print(mf2.by_group)
+
+
+
+# %%
 # Non-scalar Inputs
 # =================
 #
@@ -143,7 +164,7 @@ def bounding_box_iou(box_A_input, box_B_input):
     return iou
 
 # %%
-# This is a metric for two bounding boxes, but for :code:`~fairlearn.metrics.MetricFrame`
+# This is a metric for two bounding boxes, but for :class:`~fairlearn.metrics.MetricFrame`
 # we need to compare two lists of bounding boxes. For the sake of
 # simplicity, we will return the mean value of 'iou' for the
 # two lists, but this is by no means the only choice:
@@ -152,7 +173,7 @@ def bounding_box_iou(box_A_input, box_B_input):
 def mean_iou(true_boxes, predicted_boxes):
     assert len(true_boxes) == len(predicted_boxes), "Array size mismatch"
 
-    all_iou =[
+    all_iou = [
         bounding_box_iou(true_boxes[i], predicted_boxes[i])
         for i in range(len(true_boxes))
     ]
@@ -162,6 +183,7 @@ def mean_iou(true_boxes, predicted_boxes):
 # %%
 # We need to generate some input data, so first create a function to
 # generate a single random bounding box:
+
 
 def generate_bounding_box(max_coord, max_delta):
     rng = np.random.default_rng()
@@ -202,7 +224,7 @@ print(mf_bb.by_group)
 # %%
 # The individual entries in the `y_true` and `y_pred` arrays
 # can be arbitrarily complex. It is the metric functions
-# which give meaning to them. Similarly, 
+# which give meaning to them. Similarly,
 # :class:`~fairlearn.metrics.MetricFrame` does not impose
 # restrictions on the return type. One can envisage an image
 # recognition task where there are multiple faces in each
