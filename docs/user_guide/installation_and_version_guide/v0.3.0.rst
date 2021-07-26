@@ -1,0 +1,13 @@
+v0.3.0
+======
+
+* Major changes to the API. In particular the `expgrad` function is now
+  implemented by the `ExponentiatedGradient` class. Please refer to the
+  [upgrade guide](https://fairlearn.org/main/user_guide/migrating_versions/index.html)
+  for information on how to upgrade.
+
+* Added new algorithms
+  * Threshold Optimization
+  * Grid Search
+  
+* Added grouped metrics

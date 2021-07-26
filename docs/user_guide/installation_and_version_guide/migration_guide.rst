@@ -1,10 +1,10 @@
-.. _version_migration_guide:
+.. _version_guide:
 
 Migrating from prior versions
 =============================
 
-This section contains pages designed to help navigate major
-changes to the Fairlearn API.
+This section contains pages designed to help understand and navigate major
+changes to the Fairlearn package and project.
 
 .. toctree::
    :maxdepth: 1

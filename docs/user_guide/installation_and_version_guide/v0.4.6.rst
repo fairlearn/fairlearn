@@ -1,0 +1,34 @@
+v0.4.6
+======
+
+* Handle case where reductions relabeling results in a single class
+* Refactor metrics:
+  * Remove `GroupMetricResult` type in favor of a `Bunch`.
+  * Rename and slightly update signatures:
+    * `metric_by_group` changed to `group_summary`
+    * `make_group_metric` changed to `make_metric_group_summary`
+  * Add group summary transformers
+    `{difference,ratio,group_min,group_max}_from_group_summary`.
+  * Add factory `make_derived_metric`.
+* Add new metrics:
+  * base metrics `{true,false}_{positive,negative}_rate`
+  * group summary metrics `<metric>_group_summary`
+  * derived metrics `<metric>_{difference,ratio,group_min,group_max}`
+  * disparity metrics `{demographic_parity,equalized_odds}_{difference,ratio}`
+* Remove metrics:
+  * `fallout_rate` in favor of `false_positive_rate`
+  * `miss_rate` in favor of `false_negative_rate`
+  * `specificity_score` in favor of `true_negative_rate`
+* Change from public to private:
+  * `mean_{over,under}prediction` and `{balanced_,}root_mean_squared_error`
+    changed to the versions with a leading underscore
+* Fix warning due to changing default `dtype` when creating an empty
+  `pandas.Series`.
+* Enable `GridSearch` for more than two sensitive features values.
+* Add new disparity constraints for reductions methods as moments in
+  `fairlearn.reductions` including:
+  * `TruePositiveRateDifference`
+  * ratio options for all existing constraints in addition to the default,
+    i.e., difference between groups w.r.t. the relevant metric.
+* Make `ExponentiatedGradient` require 0-1 labels for classification problems,
+  pending a better solution for Issue 339.

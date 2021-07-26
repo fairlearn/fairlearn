@@ -1,10 +1,10 @@
 .. _installation_and_migration_guide:
 
-Installation and Migration
-==========================
+Installation and version guide
+==============================
 
 .. toctree::
     :maxdepth: 2
  
     installation_guide
-    migration_guide
+    version_guide
