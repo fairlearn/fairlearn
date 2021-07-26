@@ -1,8 +1,6 @@
 v0.7.1
 ======
 
-TODO add release manager
-
 .. note::
 
   v0.7.1 is not yet released. This page reflects changes on the current
