@@ -97,7 +97,6 @@ print("Values by group")
 print(mf2.by_group)
 
 
-
 # %%
 # Non-scalar Inputs
 # =================
@@ -120,7 +119,6 @@ print(mf2.by_group)
 # bounding boxes, and returns the ratio of their areas.
 # If the bounding boxes are identical, then the metric will
 # be 1; if disjoint then it will be 0. A function to do this is:
-
 
 def bounding_box_iou(box_A_input, box_B_input):
     # The inputs are array-likes in the form
