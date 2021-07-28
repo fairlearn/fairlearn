@@ -17,7 +17,6 @@ Plotting Metrics with Error Bars
 # We start by importing the various modules we're going to use:
 
 # TODO: Remove in final version (helps run with local packages)
-import matplotlib.pyplot as plt
 from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 from fairlearn.metrics import MetricFrame
 from sklearn.datasets import fetch_openml
@@ -145,14 +144,17 @@ metric_frame = MetricFrame(metrics_dict, y_test_true, y_test_pred, sensitive_fea
 plot_metric_frame(metric_frame, kind="scatter",
                   metrics=['Recall', 'Accuracy'],
                   error_bars=['Recall Error', 'Accuracy Error'],
-                  figsize=(12, 4))
-plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error')
+                  figsize=(12, 4), subplots=True, layout=[2, 1])
+plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error', colormap="Pastel1")
+
+# %%
+plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error', colormap="Pastel1", plot_error_labels=True)
 
 # %%
 # Plot metrics with confidence intervals (possibly asymmetric)
 # ------------------------------------------------------------
 plot_metric_frame(metric_frame, kind="bar", metrics=[
-                  'Recall', 'Accuracy'], conf_intervals=['Recall Bounds', 'Accuracy Bounds'])
+                  'Recall', 'Accuracy'], conf_intervals=['Recall Bounds', 'Accuracy Bounds'], plot_error_labels=True, subplots=False)
 plot_metric_frame(metric_frame, kind="scatter",
                   metrics='Recall', conf_intervals='Recall Bounds')
 
@@ -164,35 +166,33 @@ plot_metric_frame(metric_frame, kind="scatter", metrics=['Recall', 'Accuracy'])
 # %%
 # Plots all columns and treats them as metrics without error bars
 # ---------------------------------------------------------------
-plot_metric_frame(metric_frame, kind="bar")
+plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 
 # %%
 # Custom Plot
 # -----------
-# Demonstrates how to customize the axes and then pass into `plot_metric_frame`
-
-fig, axs = plt.subplots(*(1, 2), squeeze=False)
-axs = axs.flatten()
-
-axs[0].set_title("Recall Plot")
-axs[1].set_title("Accuracy Plot")
-axs[0].set_xlabel("Sensitive Feature")
-axs[1].set_xlabel("Sensitive Feature")
-axs[0].set_ylabel("Recall")
-axs[1].set_ylabel("Accuracy")
-
-# Set the y-scale for both metrics to [0, 1]
-axs[0].set_ylim((0, 1))
-axs[1].set_ylim((0, 1))
+# Demonstrates how to customize the axes
 
 axs = plot_metric_frame(metric_frame,
                         metrics=['Recall', 'Accuracy'],
                         error_bars=['Recall Error', 'Accuracy Error'],
                         figsize=(12, 4),
-                        axs=axs,
-                        kind="bar",
-                        colormap="Pastel1",
-                        rot=45)
+                        kind="scatter",
+                        colormap="rainbow",
+                        rot=45,
+                        subplots=True,
+                        layout=[1, 2])
+axs[0][0].set_ylabel("Recall")
+axs[0][0].set_title("Recall Plot")
+axs[0][1].set_title("Accuracy Plot")
+axs[0][0].set_xlabel("Race")
+axs[0][1].set_xlabel("Race")
+axs[0][0].set_ylabel("Recall")
+axs[0][1].set_ylabel("Accuracy")
+
+# Set the y-scale for both metrics to [0, 1]
+axs[0][0].set_ylim((0, 1))
+axs[0][1].set_ylim((0, 1))
 
 # %%
 # Creating Custom Error Metrics

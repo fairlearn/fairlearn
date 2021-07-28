@@ -9,10 +9,7 @@ import numpy as np
 
 from ._metric_frame import MetricFrame
 from matplotlib.lines import Line2D
-from matplotlib.axes._axes import Axes
-
-_MATPLOTLIB_IMPORT_ERROR_MESSAGE = "Please make sure to install matplotlib to use " \
-                                   "the plotting for MetricFrame."
+# from matplotlib.axes._axes import Axes
 
 _GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = \
     "Ambiguous Error Metric. Please only provide one of: error_bars or conf_intervals."
@@ -75,28 +72,48 @@ def _check_valid_conf_interval(df_conf_intervals):
             raise ValueError(_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR)
 
 
-def _plot_df(df, metrics, axs, colormap, kind, df_all_errors=None, figsize=None, **kwargs):
-    for metric, ax in zip(metrics, axs):
-        if df_all_errors is not None:
-            previous_xlabel = ax.get_xlabel()
+def _plot_df(df, metrics, kind, subplots, df_all_errors=None, **kwargs):
+    if df_all_errors is not None:
+        yerr = np.array(
+            [np.array([[*row] for row in df_all_errors[metric]]).T for metric in metrics]
+        )
+        if kind == "scatter":
+            axs = df[metrics].plot(linestyle='', marker='o', yerr=yerr,
+                                   subplots=subplots, **kwargs)
+        else:
+            axs = df[metrics].plot(kind=kind, yerr=yerr, subplots=subplots, **kwargs)
 
-            yerr = np.array([[*row] for row in df_all_errors[metric]]).T
-            ax = df.plot(x="_index", y=metric, kind=kind,
-                         yerr=yerr, ax=ax, colormap=colormap, figsize=figsize, **kwargs)
-            ax.set_xlabel(previous_xlabel)
+        if isinstance(axs, np.ndarray):
+            for ax in axs.flatten():
+                if kind == "scatter":
+                    color = ax.lines[0].get_color()
+                else:
+                    color = "black"
 
+                # extend legend with 95% CI text
+                handles, labels = ax.get_legend_handles_labels()
+                custom_line = [Line2D([0], [0], color=color, label="95% CI")]
+                handles.extend(custom_line)
+                ax.legend(handles=handles)
+        else:
             if kind == "scatter":
-                color = ax.lines[0].get_color()
+                color = axs.lines[0].get_color()
             else:
                 color = "black"
-            custom_line = [Line2D([0], [0], color=color)]
-            ax.legend(custom_line, ["95% CI"])
 
+            # extend legend with 95% CI text
+            handles, labels = axs.get_legend_handles_labels()
+            custom_line = [Line2D([0], [0], color=color, label="95% CI")]
+            handles.extend(custom_line)
+            axs.legend(handles=handles)
+
+    else:
+        if kind == "scatter":
+            axs = df[metrics].plot(linestyle='', marker='o', subplots=subplots, **kwargs)
         else:
-            previous_xlabel = ax.get_xlabel()
-            ax = df.plot(x="_index", y=metric, kind=kind, ax=ax,
-                         colormap=colormap, figsize=figsize, **kwargs)
-            ax.set_xlabel(previous_xlabel)
+            axs = df[metrics].plot(kind=kind, subplots=subplots, **kwargs)
+
+    return axs
 
 
 def plot_metric_frame(metric_frame: MetricFrame,
@@ -104,16 +121,12 @@ def plot_metric_frame(metric_frame: MetricFrame,
                       metrics: Union[List[str], str] = None,
                       error_bars: Union[List[str], str] = None,
                       conf_intervals: Union[List[str], str] = None,
-                      axs=None,
-                      show_plot=True,
+                      subplots: bool = True,
                       plot_error_labels: bool = False,
                       text_precision_digits: int = 4,
                       text_fontsize: int = 8,
                       text_color: str = "black",
                       text_ha: str = "center",
-                      colormap=None,
-                      subplot_shape=None,
-                      figsize=None,
                       **kwargs
                       ):
     """Visualization for metrics with statistical error bounds.
@@ -165,12 +178,8 @@ def plot_metric_frame(metric_frame: MetricFrame,
             The return of the error bar function should be a tuple of the lower
             and upper bounds. i.e. :code:`[0.59, 0.62]`
 
-    axs : :class:`matplotlib.axes._axes.Axes`\
-        or list of :class:`matplotlib.axes._axes.Axes`, optional
-        Custom Matplotlib axes to which this function can plot
-
-    show_plot : bool, optional
-        Whether to show the plot or not
+    subplots : boolean, optional
+        Whether or not to plot metrics on separate subplots
 
     plot_error_labels : bool, optional
         Whether or not to plot numerical labels for the error bounds
@@ -191,18 +200,12 @@ def plot_metric_frame(metric_frame: MetricFrame,
     -------
     :class:`numpy.ndarray` of :class:`matplotlib.axes._axes.Axes`
     """
-    try:
-        import matplotlib.pyplot as plt
-    except ImportError:
-        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
-
     _check_for_ambiguous_error_metric(error_bars, conf_intervals)
     _check_for_valid_metrics_format(metrics)
 
     metrics = [metrics] if isinstance(metrics, str) else metrics
     conf_intervals = [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
     error_bars = [error_bars] if isinstance(error_bars, str) else error_bars
-    axs = [axs] if isinstance(axs, Axes) else axs
 
     df = metric_frame.by_group
 
@@ -216,25 +219,11 @@ def plot_metric_frame(metric_frame: MetricFrame,
     _check_if_metrics_and_error_metrics_same_length(metrics, error_bars, conf_intervals)
     _check_if_metrics_length_zero(metrics)
 
-    if axs is None:
-        if subplot_shape is None:
-            if len(metrics) > 0:
-                subplot_shape = (1, len(metrics))
-            else:
-                subplot_shape = (1, 1)
-        fig, axs = plt.subplots(*subplot_shape, squeeze=False, figsize=figsize)
-        axs = axs.flatten()
-
     # plotting without error bars or confidence intervals
     # Note: Returns early
-    df['_index'] = df.index
     if error_bars is None and conf_intervals is None:
-        _plot_df(df, metrics, axs, colormap, kind, figsize=figsize, **kwargs)
+        axs = _plot_df(df, metrics, kind, subplots, **kwargs)
 
-        if show_plot:
-            plt.show()
-
-        del df['_index']
         return axs
 
     df_all_errors = pd.DataFrame([])
@@ -260,30 +249,27 @@ def plot_metric_frame(metric_frame: MetricFrame,
                     zip(df[metric] - df_error['lower'], df[metric] + df_error['upper']))
                 df_all_bounds[metric] = df_error['error']
 
-    _plot_df(df, metrics, axs, colormap, kind, df_all_errors, figsize=figsize, **kwargs)
+    axs = _plot_df(df, metrics, kind, subplots, df_all_errors, **kwargs)
 
-    if plot_error_labels:
+    # Does not work properly when subplots=False
+    if plot_error_labels and kind == "bar" and subplots:
         for j, metric in enumerate(metrics):
-            y_min, y_max = axs[j].get_ylim()
+            temp_axs = axs.flatten() if isinstance(axs, np.ndarray) else np.array([axs])
+            y_min, y_max = temp_axs[j].get_ylim()
             y_range = y_max - y_min
 
-            # TODO: Figure out if works for other plotting modes (besides bar)
-            for i in range(len(axs[j].patches)):
-                axs[j].text(i,
-                            df_all_bounds[metric][i][0] - 0.05 * y_range,
-                            round(df_all_bounds[metric][i][0], text_precision_digits),
-                            fontsize=text_fontsize,
-                            color=text_color,
-                            ha=text_ha)
-                axs[j].text(i,
-                            df_all_bounds[metric][i][1] + 0.01 * y_range,
-                            round(df_all_bounds[metric][i][1], text_precision_digits),
-                            fontsize=text_fontsize,
-                            color=text_color,
-                            ha=text_ha)
+            for i in range(len(temp_axs[j].patches)):
+                temp_axs[j].text(i,
+                                 df_all_bounds[metric][i][0] - 0.05 * y_range,
+                                 round(df_all_bounds[metric][i][0], text_precision_digits),
+                                 fontsize=text_fontsize,
+                                 color=text_color,
+                                 ha=text_ha)
+                temp_axs[j].text(i,
+                                 df_all_bounds[metric][i][1] + 0.01 * y_range,
+                                 round(df_all_bounds[metric][i][1], text_precision_digits),
+                                 fontsize=text_fontsize,
+                                 color=text_color,
+                                 ha=text_ha)
 
-    if show_plot:
-        plt.show()
-
-    del df['_index']
     return axs
