@@ -256,7 +256,7 @@ negative rates.
 From a mathematical point of view, it is possible to represent each of these
 through the use of vectors, booleans (true or false) and probability values.
 Where mathematical abstraction encounters a limitation is when capturing
-information regarding procedurality (for example, how  do judges and police officers
+information regarding procedurality (for example, how do judges and police officers
 determine whether bail, counselling, probation, or incarceration is appropriate);
 contextuality (different societies determine what constitutes an "unfair" outcome, furthermore
 different groups determine what constitutes immoral discrimination, i.e. is it immoral
