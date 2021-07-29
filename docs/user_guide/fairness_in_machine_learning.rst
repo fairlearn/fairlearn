@@ -211,11 +211,11 @@ information on people the algorithm typically rejects to create a system
 that takes advantage of people who need funds but did not receive them.
 
 To avoid this pitfall, we must be aware that once a technology is incorporated
-into a social context, new groups may reinterpret it differently. To
-help address this issue, we should adopt "what if" scenarios to envision how
-the social context might change after introducing a model, including how it may
-change the power dynamics of existing groups in that context, or how
-actors might change their behaviors to game the model.
+into a social context, new groups may reinterpret it differently. We should
+adopt "what if" scenarios to envision how the social context might change
+after introducing a model, including how it may change the power dynamics of
+existing groups in that context, or how actors might change their behaviors to
+game the model.
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
