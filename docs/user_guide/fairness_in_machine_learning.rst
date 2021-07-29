@@ -294,7 +294,7 @@ and the task that is being set out to abstract (i.e. calculating a risk score,
 choosing between a pool of candidates, selecting an appropriate treatment, etc).
 
 To help us avoid drawing narrow boundaries of what is considered in scope for
-the problem, we might consider different "frames" to use.
+the problem, we might consider using wider "frames" around what is considered to be in scope for the problem, moving from an algorithmic frame to a sociotechnical frame.
 
 1. The algorithmic frame: these are choices made when abstracting a problem
 in the form of representations (data) and labelling (outcome). In this frame
