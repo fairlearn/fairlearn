@@ -156,8 +156,8 @@ In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
 In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#4]_
-identify failure modes that can arise from abstracting away the social context when modeling. They identify
-them as:
+identify failure modes that can arise from abstracting away the social context
+when modeling. They identify them as:
 
 * *The Solutionism Trap*
 
@@ -183,9 +183,10 @@ Validity" section in Fairlearn's user guide.
 
 Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that by using data science to
-study internet speed in a given region, policies and deals can be arranged to
-reduce the price of internet access. However, if there are additional socioeconomic
-problems within a community, for example lack of education, infrastructure, information
+study internet speed in a given region, insights we gain from using data science
+help us in negotiating deals or discovering potential for good policies.
+However, if there are additional socioeconomic problems within a community,
+for example lack of education, infrastructure, information
 technology and health services, then an algorithmic solution purely focused on internet
 speed will fail to meaningfully address the needs of the community.
 
@@ -359,9 +360,11 @@ in which different people interact with one another as outcomes are recommended.
       and technical feasibility" https://doi.org/10.1207/S15327051HCI1523_5`. Human-Computer
       Interaction 15, 2-3 (2000), 179–203.
 
-   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. `"Inherent trade-offs in the fair
-      determination of risk scores" https://arxiv.org/abs/1609.05807`. In Proc. of ITCS.
+   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. `"Inherent trade-offs
+      in the fair determination of risk scores" https://arxiv.org/abs/1609.05807`.
+      In Proc. of ITCS.
 
    .. [#7] Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer Wortman Vaughan,
-      Hanna Wallach, Hal Daumé III, Kate Crawford. "Datasheets for Datasets" `https://arxiv.org/abs/1803.09010 <https://arxiv.org/abs/1803.09010>`_
+      Hanna Wallach, Hal Daumé III, Kate Crawford. "Datasheets for Datasets"
+      `https://arxiv.org/abs/1803.09010 <https://arxiv.org/abs/1803.09010>`_
       (2018)
