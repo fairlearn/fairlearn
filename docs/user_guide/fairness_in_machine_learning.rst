@@ -263,7 +263,7 @@ different groups determine what constitutes immoral discrimination, i.e. is it i
 to hire an applicant whose primary language is not English, for a non-English speaking role, over
 an applicant whose only spoken language is English?); and contestability (the definitions
 of discrimination and unfairness are politically contested and change over time, how
-to mathematically represent definitions of unfairness as they are contested over time?).
+which may pose fundamental challenges for representing them mathematically).
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
