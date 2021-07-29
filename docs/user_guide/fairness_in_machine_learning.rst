@@ -233,7 +233,7 @@ Because different definitions of fairness cannot be satisfied at the same time,
 we'll need to decide which definition to use. But there's no mathematical way to
 make that decision. And it might be that none of the definitions are appropriate for our situation.
 
-Some reasons why we fall into this trap is because fairness is contextually-dependent,
+Some reasons why we fall into this trap is because fairness is context-dependent,
 open to contestation by different groups of people, and differences between ways of thinking
 about fairness between the legal world (i.e., fairness as procedural)
 and the fair-ML community (i.e., fairness as outcome-based).
