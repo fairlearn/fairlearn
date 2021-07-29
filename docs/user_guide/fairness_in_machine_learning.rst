@@ -203,7 +203,7 @@ be approved for a loan. Prior to using machine learning algorithms
 to compute a "score", banks might rely on loan officers engaging in conversations with
 clients, recommending a plan based on their unique situation, and
 discussing with other team members to obtain feedback. By introducing an
-algorithm, it is possible that banks stop engaging in conversations
+algorithm, it is possible that loan officers stop engaging in conversations
 with team members and clients, and assume the algorithm is good enough
 to blindly accept a recommendation. Furthermore, some might use
 information on people algorithm typically rejects to create a system
