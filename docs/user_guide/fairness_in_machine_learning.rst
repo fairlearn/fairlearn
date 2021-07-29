@@ -177,7 +177,7 @@ The Solutionism Trap
 
 This trap occurs when we assume that the best solution to a problem
 may involve technology, and fail to recognize other possible solutions outside of
-this realm. This trap also occurs as definitions of fairness are
+this realm.  Solutionist approaches may also not be appropriate in situations where definitions of fairness are particularly
 contested and changed and models become obsolete. See the "Construct
 Validity" section in Fairlearn's user guide.
 
