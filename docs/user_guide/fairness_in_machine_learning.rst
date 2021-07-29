@@ -278,7 +278,7 @@ Example: Reusing a machine learning algorithm used to screen job applications in
 nursing industry, for job applications in the information technology sector. An intuitive
 yet important difference between both contexts is the difference in skills required to
 succeed in both industries. A slightly more subtle difference is the demographic differences
-in number of genders who typically work in each of these industries, which may result from
+(in terms of gender) of employees in each of these industries, which may result from
 wording in job postings, social constructs on gender and societal roles, and the male-female
 ratio of successful applicants in each field.
 
