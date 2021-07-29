@@ -238,23 +238,10 @@ open to contestation by different groups of people, and differences between ways
 about fairness between the legal world (i.e., fairness as procedural)
 and the fair-ML community (i.e., fairness as outcome-based).
 
-Take the following risk assessment formula from Kleinberg et al. [#6]_. The problem
-of risk assessment can be abstracted as follows:
+Kleinberg et al. [#6]_ abstract the problem risk assessment via the use of
+vectors to represent information about  person, boolean values to
+represent group belonging, and risk assignment scores.
 
-1. Feature vectors: this represent data we know about a given person.
-
-2. Groups: this represents information regarding belonging of a person. Ideally our
-algorithm does not display preference with respect to the group a person
-belongs to. Example of groups include gender, race, age, etc.
-
-3. Risk assignment: this represents the probability that a person with given
-features, belonging to a given group, possesses a risk to engage in
-well defined behaviour, and that the risk calculated accurately depicts reality for
-that given person. In other words, the algorithm has low false positive rates and low false
-negative rates.
-
-From a mathematical point of view, it is possible to represent each of these
-through the use of vectors, booleans (true or false) and probability values.
 Where mathematical abstraction encounters a limitation is when capturing
 information regarding procedurality (for example, how do judges and police officers
 determine whether bail, counselling, probation, or incarceration is appropriate);
