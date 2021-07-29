@@ -273,7 +273,6 @@ algorithm that is designed for one specific social context, may not necessarily
 apply to a different social context. Reusing an algorithmic solution and failing
 to take into account differences in involved social contexts can result in misleading
 results and potentially harmful consequences. 
-fate of an individual.
 
 Example: Reusing a machine learning algorithm used to screen job applications in the
 nursing industry, for job applications in the information technology sector. An intuitive
