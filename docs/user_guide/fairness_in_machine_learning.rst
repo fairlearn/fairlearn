@@ -309,7 +309,7 @@ In "Datasheets for Datasets", Gebru et al. [#8]_ suggest various ways we
 can account for and improve limitations in data.
 
 3. The sociotechnical frame: this frame recognizes that a machine learning model is part
-of the interaction between people and technology, and thus any social components of this
+of social and technical interactions between people and technology, and thus the social components of this
 interaction need to be modelled and incorporated accordingly.
 
 Example: assessing risk of re-engagement in criminal behaviour in an individual
