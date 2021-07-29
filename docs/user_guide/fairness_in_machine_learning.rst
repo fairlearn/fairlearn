@@ -303,7 +303,7 @@ Examples of these properties include accuracy and generalizability to data the m
 did not train on. Fairness is typically not evaluated in this frame.
 
 2. The data frame: this frame applies to the content of input and output of the
-algorithm ('data') whether in the form of abstractions, or outcomes. This additional
+algorithm (i.e., the data), including choices about data representations, features, and labels. This additional
 frame allows us to question the inherent (un)fairness present in input and output data.
 In "Datasheets for Datasets", Gebru et al. [#8]_ suggest various ways we
 can account for and improve limitations in data.
