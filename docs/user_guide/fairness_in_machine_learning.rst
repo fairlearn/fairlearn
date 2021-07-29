@@ -206,7 +206,7 @@ discussing with other team members to obtain feedback. By introducing an
 algorithm, it is possible that loan officers stop engaging in conversations
 with team members and clients, and assume the algorithm is good enough
 to blindly accept a recommendation. Furthermore, some might use
-information on people algorithm typically rejects to create a system
+information on people the algorithm typically rejects to create a system
 that takes advantage of people who need funds but did not receive them.
 
 To avoid this pitfall, we must be aware that once a technology is incorporated
