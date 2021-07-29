@@ -195,7 +195,7 @@ The Ripple Effect Trap
 
 This trap occurs when we do not consider the unintended consequences of introducing
 technology into an existing social system. Such consequences include change in
-behaviour, outcomes individual experience and a change in underlying social values
+behavior, outcomes individual experience and a change in underlying social values
 and incentives of a given social system, for instance by increasing perceived value
 of quantifiable metrics over non-quantifiable ones.
 
@@ -211,8 +211,7 @@ information on people the algorithm typically rejects to create a system
 that takes advantage of people who need funds but did not receive them.
 
 To avoid this pitfall, we must be aware that once a technology is incorporated
-into a social context, new groups may reinterpret it and potentially use this
-information for outside purposes which include nefarious ones. To
+into a social context, new groups may reinterpret it differently. To
 help address this issue, we should adopt "what if" scenarios to envision how
 the social context might change after introducing a model, including how it may
 change the power dynamics of existing groups in that context.
