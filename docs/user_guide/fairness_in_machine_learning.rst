@@ -177,9 +177,9 @@ The Solutionism Trap
 
 This trap occurs when we assume that the best solution to a problem
 may involve technology, and fail to recognize other possible solutions outside of
-this realm.  Solutionist approaches may also not be appropriate in situations where definitions of fairness are particularly
-contested and changed and models become obsolete. See the "Construct
-Validity" section in Fairlearn's user guide.
+this realm.  Solutionist approaches may also not be appropriate in situations
+where definitions of fairness may change over time (see the Formalism Trap below for more).
+See also the "Construct Validity" section in Fairlearn's user guide.
 
 Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that by using data science to
@@ -294,7 +294,8 @@ and the task that is being set out to abstract (i.e. calculating a risk score,
 choosing between a pool of candidates, selecting an appropriate treatment, etc).
 
 To help us avoid drawing narrow boundaries of what is considered in scope for
-the problem, we might consider using wider "frames" around what is considered to be in scope for the problem, moving from an algorithmic frame to a sociotechnical frame.
+the problem, we might consider using wider "frames" around what is considered to be in
+scope for the problem, moving from an algorithmic frame to a sociotechnical frame.
 
 1. The algorithmic frame: these are choices made when abstracting a problem
 in the form of representations (data) and labelling (outcome). In this frame
@@ -303,14 +304,16 @@ Examples of these properties include accuracy and generalizability to data the m
 did not train on. Fairness is typically not evaluated in this frame.
 
 2. The data frame: this frame applies to the content of input and output of the
-algorithm (i.e., the data), including choices about data representations, features, and labels. This additional
-frame allows us to question the inherent (un)fairness present in input and output data.
-In "Datasheets for Datasets", Gebru et al. [#8]_ suggest various ways we
-can account for and improve limitations in data.
+algorithm (i.e., the data), including choices about data representations, features, and labels.
+This additional frame allows us to question the inherent (un)fairness present
+in input and output data. In "Datasheets for Datasets", Gebru et al. [#8]_
+suggest various ways we can account for and improve limitations in data.
 
 3. The sociotechnical frame: this frame recognizes that a machine learning model is part
-of social and technical interactions between people and technology, and thus the social components of this
-within this social context should be included as part of the problem and modeling approach (including local decision-making processes, incentive structures, institutional processes, and more).
+of social and technical interactions between people and technology, and thus the social
+components of this within this social context should be included as part of the problem
+and modeling approach (including local decision-making processes, incentive structures,
+institutional processes, and more).
 
 Example: assessing risk of re-engagement in criminal behaviour in an individual
 charged with an offense, while failing
