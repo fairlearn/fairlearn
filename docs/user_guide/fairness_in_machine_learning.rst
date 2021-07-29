@@ -363,5 +363,5 @@ in which different people interact with one another as outcomes are recommended.
       determination of risk scores" https://arxiv.org/abs/1609.05807`. In Proc. of ITCS.
 
    .. [#7] Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer Wortman Vaughan,
-      Hanna Wallach, Hal Daumé III, Kate Crawford. `"Datasheets for Datasets" https://arxiv.org/abs/1803.09010`
+      Hanna Wallach, Hal Daumé III, Kate Crawford. "Datasheets for Datasets" `https://arxiv.org/abs/1803.09010 <https://arxiv.org/abs/1803.09010>`_
       (2018)
