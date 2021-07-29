@@ -23,14 +23,14 @@ from fairlearn.metrics import MetricFrame
 # and that we wish to generate confusion matrices for each subgroup
 # identified by the sensitive feature :math:`\in { a, b, c, d}`.
 # This is supported readily by
-# :code:`~fairlearn.metrics.MetricFrame`, which does not require
+# :class:`~fairlearn.metrics.MetricFrame`, which does not require
 # the result of a metric to be a scalar.
 #
 # First, let us generate some random input data:
 
 import numpy as np
 
-rng = np.random.default_rng()
+rng = np.random.default_rng(seed=96132)
 
 n_rows = 1000
 n_classes = 3
