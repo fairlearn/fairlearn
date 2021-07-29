@@ -310,7 +310,7 @@ can account for and improve limitations in data.
 
 3. The sociotechnical frame: this frame recognizes that a machine learning model is part
 of social and technical interactions between people and technology, and thus the social components of this
-interaction need to be modelled and incorporated accordingly.
+within this social context should be included as part of the problem and modeling approach (including local decision-making processes, incentive structures, institutional processes, and more).
 
 Example: assessing risk of re-engagement in criminal behaviour in an individual
 charged with an offense, and appropriate measures to prevent relapse, and failing
