@@ -215,7 +215,6 @@ into a social context, new groups may reinterpret it differently. To
 help address this issue, we should adopt "what if" scenarios to envision how
 the social context might change after introducing a model, including how it may
 change the power dynamics of existing groups in that context.
-of the model.
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
