@@ -313,7 +313,7 @@ of social and technical interactions between people and technology, and thus the
 within this social context should be included as part of the problem and modeling approach (including local decision-making processes, incentive structures, institutional processes, and more).
 
 Example: assessing risk of re-engagement in criminal behaviour in an individual
-charged with an offense, and appropriate measures to prevent relapse, and failing
+charged with an offense, while failing
 to consider factors such as race, socio-economic status, mental health, along with
 socially-dependent views present in judges, police officers, or any actors responsible
 for recommending a course of action.
