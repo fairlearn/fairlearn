@@ -200,7 +200,7 @@ of quantifiable metrics over non-quantifiable ones.
 
 Example: consider the problem of banks deciding whether an individual should
 be approved for a loan. Prior to using machine learning algorithms
-to compute a "score", banks might rely on engaging in conversations with
+to compute a "score", banks might rely on loan officers engaging in conversations with
 clients, recommending a plan based on their unique situation, and
 discussing with other team members to obtain feedback. By introducing an
 algorithm, it is possible that banks stop engaging in conversations
@@ -365,4 +365,3 @@ in which different people interact with one another as outcomes are recommended.
    .. [#7] Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer Wortman Vaughan,
       Hanna Wallach, Hal Daumé III, Kate Crawford. `"Datasheets for Datasets" https://arxiv.org/abs/1803.09010`
       (2018)
-
