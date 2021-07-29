@@ -9,7 +9,7 @@ Plotting Metrics with Error Bars
 # %%
 # Load and preprocess the data set
 # ================================
-# We download the data set using `fetch_openml` function in `sklearn.datasets`.
+# We download the data set using :meth:`fetch_openml` function in :class:`sklearn.datasets`.
 # The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
 # There are some caveats to using this dataset, but we will use it solely as an example
 # to demonstrate the plotting metrics with error bars functionality
@@ -43,11 +43,11 @@ X_test_processed = pd.get_dummies(X_test)
 test_set_sex = X_test['race']
 
 # %%
-# Error Metrics
+# Error metric calculations
 # =============
 # We have many different choices for error metrics. In this notebook we'll just be using a
-# `Normal approximation interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval>` _ (symmetric)
-# and a `Wilson score interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval>` _ (asymmetric).
+# `Normal approximation interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval>`_ (symmetric)
+# and a `Wilson score interval <https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval>`_ (asymmetric).
 
 # We aim to create a 95% confidence interval, so we use a :code:`z_score` of 1.959964
 z_score = 1.959964
@@ -74,9 +74,6 @@ def compute_error_metric(metric_value, sample_size, z_score):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Margin_of_error
-
-    Note:
-        Returns absolute error (%)
     """
     return z_score*np.sqrt(metric_value*(1.0-metric_value))/np.sqrt(sample_size)
 
@@ -169,7 +166,7 @@ plot_metric_frame(metric_frame, kind="scatter", metrics=['Recall', 'Accuracy'])
 plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 
 # %%
-# Custom Plot
+# Custom plot
 # -----------
 # Demonstrates how to customize the axes
 
@@ -195,12 +192,12 @@ axs[0][0].set_ylim((0, 1))
 axs[0][1].set_ylim((0, 1))
 
 # %%
-# Creating Custom Error Metrics
+# Creating custom error metrics
 # =============================
 # In this tutorial we used Normal intervals and Wilson bounds to demonstrate how to plot symmetric and asymmetric metrics, respectively.
 #
-# However, in order to support many different metrics, we reuse the MetricFrame functionality by writing a function
-# that takes in y_true and y_pred, and returns the error metric:
+# However, in order to support many different metrics, we reuse the :class:`fairlearn.metrics.MetricFrame` functionality by writing a function
+# that takes in :code:`y_true` and :code:`y_pred`, and returns the error metric:
 
 
 def error_metric_function(y_true, y_pred):
@@ -209,7 +206,7 @@ def error_metric_function(y_true, y_pred):
     # compute custom metric function here
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision,
-                    z_score)   # compute custom metric function here
+                    z_score)
 
     # returns the bounds in the format (lower_bound, upper_bound)
     return bounds

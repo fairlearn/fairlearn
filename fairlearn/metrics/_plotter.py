@@ -9,7 +9,6 @@ import numpy as np
 
 from ._metric_frame import MetricFrame
 from matplotlib.lines import Line2D
-# from matplotlib.axes._axes import Axes
 
 _GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = \
     "Ambiguous Error Metric. Please only provide one of: error_bars or conf_intervals."
@@ -135,14 +134,10 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     This function takes in a :class:`fairlearn.metrics.MetricFrame` with precomputed metrics
     and metric errors and a `error_bars` or `conf_intervals` array to interpret the columns
-    of the :class:`MetricFrame`.
+    of the :class:`fairlearn.metrics.MetricFrame`.
 
     The items at each index of the given `metrics` array and given `error_bars` or `conf_intervals`
     array should correspond to a pair of the same metric and metric error, respectively.
-
-    Note:
-        If given many metrics to plot, this function plots them in only 1 row
-        with the number of subplot columns matching the number of metrics
 
     Parameters
     ----------
@@ -154,17 +149,18 @@ def plot_metric_frame(metric_frame: MetricFrame,
         List of options is detailed in :meth:`pandas.DataFrame.plot`
 
     metrics : str or list of str
-        The name of the metrics to plot. Should match columns from the given :class:`MetricFrame`.
+        The name of the metrics to plot.
+        Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
 
     error_bars : str or list of str
         The name of the error metrics to plot.
-        Should match columns from the given :class:`MetricFrame`.
+        Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
         Error bars quantify the bounds relative to the base metric.
 
         Example:
             If the error bar for a certain column is :code:`[0.01, 0.02]`
-            and the metric is 0.6
-            Then the plotted bounds will be :code:`[0.59, 0.62]`
+            and the metric is 0.6,
+            then the plotted bounds will be :code:`[0.59, 0.62]`
 
         Note:
             The return of the error bar function should be a tuple of the lower
@@ -172,13 +168,13 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     conf_intervals : str or list of str
         The name of the confidence intervals to plot.
-        Should match columns from the given :class:`MetricFrame`.
+        Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
 
         Note:
             The return of the error bar function should be a tuple of the lower
             and upper bounds. i.e. :code:`[0.59, 0.62]`
 
-    subplots : boolean, optional
+    subplots : bool, optional
         Whether or not to plot metrics on separate subplots
 
     plot_error_labels : bool, optional
@@ -198,7 +194,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     Returns
     -------
-    :class:`numpy.ndarray` of :class:`matplotlib.axes._axes.Axes`
+    :class:`matplotlib.axes.Axes` or :class:`numpy.ndarray` of them
     """
     _check_for_ambiguous_error_metric(error_bars, conf_intervals)
     _check_for_valid_metrics_format(metrics)
