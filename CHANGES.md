@@ -4,7 +4,8 @@
 
 * Relaxed checks made on `X` in `_validate_and_reformat_input()` since that
   is the concern of the underlying estimator and not Fairlearn
-
+* Added error handling in `MetricFrame`. `group_min`, `group_min`, `difference` and `ratio`
+  now accept `errors` as a parameter, which could either be `raise` or `coerce`.
 
 ### v0.7.0
 
