@@ -18,6 +18,7 @@ from ._group_feature import GroupFeature
 logger = logging.getLogger(__name__)
 
 _SUBGROUP_COUNT_WARNING_THRESHOLD = 20
+_VALID_ERROR_STRING = ['raise', 'coerce']
 
 _SF_DICT_CONVERSION_FAILURE = "DataFrame.from_dict() failed on sensitive features. " \
     "Please ensure each array is strictly 1-D."
@@ -29,7 +30,7 @@ _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
-_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified"
+_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
 _MF_CONTAINS_NON_SCALAR_WARNING = "Metric frame contains non-scalar cells. Please remove non-scalar columns from " \
                                   "your metric frame and try again "
 
@@ -397,7 +398,7 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("raise", "coerce"):
+        if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         if not self.control_levels:
@@ -467,7 +468,7 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("raise", "coerce"):
+        if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         if not self.control_levels:
@@ -549,7 +550,7 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("raise", "coerce"):
+        if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         if method == 'between_groups':
@@ -609,7 +610,7 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in ("raise", "coerce"):
+        if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         result = None
