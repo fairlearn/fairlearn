@@ -421,7 +421,7 @@ class MetricFrame:
                         result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
                         # Fill in the possible columns with their max values
                         for m in result.index:
-                            if isinstance(self._by_group[m].values[0], np.float64):
+                            if np.isscalar(self._by_group[m].values[0]):
                                 result[m] = self._by_group[m].max()
         else:
             try:
@@ -434,7 +434,7 @@ class MetricFrame:
                     # Fill all impossible columns with NaN before grouping metric frame
                     mf = self._by_group.copy()
                     for m in mf.columns:
-                        if not isinstance(mf[m].values[0], np.float64):
+                        if not np.isscalar(mf[m].values[0]):
                             mf[m] = np.nan
                     result = mf.groupby(level=self.control_levels).max()
 
@@ -491,7 +491,7 @@ class MetricFrame:
                         result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
                         # Fill in the possible columns with their min values
                         for m in result.index:
-                            if isinstance(self._by_group[m].values[0], np.float64):
+                            if np.isscalar(self._by_group[m].values[0]):
                                 result[m] = self._by_group[m].min()
         else:
             try:
@@ -503,7 +503,7 @@ class MetricFrame:
                     # Fill all impossible columns with NaN before grouping metric frame
                     mf = self._by_group.copy()
                     for m in mf.columns:
-                        if not isinstance(mf[m].values[0], np.float64):
+                        if not np.isscalar(mf[m].values[0]):
                             mf[m] = np.nan
                     result = mf.groupby(level=self.control_levels).min()
 
@@ -569,7 +569,7 @@ class MetricFrame:
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self._by_group.copy()
                 for m in mf.columns:
-                    if not isinstance(mf[m].values[0], np.float64):
+                    if not np.isscalar(mf[m].values[0]):
                         mf[m] = np.nan
                 return (mf - subtrahend).abs().max(level=self.control_levels)
 
