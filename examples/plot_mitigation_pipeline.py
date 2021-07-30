@@ -93,7 +93,7 @@ threshold_optimizer = ThresholdOptimizer(
 threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
 print(threshold_optimizer.predict(X_test, sensitive_features=A_test))
 print(json.dumps(
-    threshold_optimizer.interpolated_thresholder_.threshold_interpolation,
+    threshold_optimizer.interpolated_thresholder_.interpolation_dict,
     default=str,
     indent=4))
 plot_threshold_optimizer(threshold_optimizer)
