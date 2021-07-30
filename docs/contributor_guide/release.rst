@@ -8,6 +8,13 @@ The following steps assume git remote's `origin` points to
 `fairlearn/fairlearn` (in practical terms, that the work is being
 done on a clone of `fairlearn/fairlearn` and not on a fork).
 
+#. Ensure the maintainers listed in `scripts/generate_maintainers_table.py`
+   are up to date. Run `python scripts/generate_maintainers_table.py` from the
+   repository root directory. If the generated file
+   `docs/about/maintainers.rst` does not change you can proceed with the next
+   step. Otherwise, create PR to update the generated maintainers file on
+   the `main` branch. Proceed only when the PR is merged.
+
 #. Create the branch for the release:
 
     :code:`git checkout -b release/v<x.y.z>`
