@@ -21,13 +21,14 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
     At prediction time, the predictor takes as input both standard and sensitive features.
     Based on the values of sensitive features, it then applies a randomized thresholding
-    transformation according to the provided `threshold_interpolation`.
+    transformation according to the provided `interpolation_dict`.
 
     Parameters
     ----------
     estimator :
         base estimator
-    threshold_interpolation : dict
+
+    interpolation_dict : dict
         maps sensitive feature values to `Bunch` that describes the
         interpolation transformation via the following fields:
 
@@ -77,10 +78,10 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
        [Online]. Available: https://arxiv.org/abs/1610.02413.
     """
 
-    def __init__(self, estimator, threshold_interpolation, prefit=False,
+    def __init__(self, estimator, interpolation_dict, prefit=False,
                  predict_method='deprecated'):
         self.estimator = estimator
-        self.threshold_interpolation = threshold_interpolation
+        self.interpolation_dict = interpolation_dict
         self.prefit = prefit
         self.predict_method = predict_method
 
@@ -140,7 +141,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             enforce_binary_labels=False)
 
         positive_probs = 0.0*base_predictions_vector
-        for a, interpolation in self.threshold_interpolation.items():
+        for a, interpolation in self.interpolation_dict.items():
             interpolated_predictions = \
                 interpolation.p0 * interpolation.operation0(base_predictions_vector) + \
                 interpolation.p1 * interpolation.operation1(base_predictions_vector)

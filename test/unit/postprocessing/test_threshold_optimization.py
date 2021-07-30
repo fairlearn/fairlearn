@@ -648,7 +648,7 @@ def test_constraints_objective_pairs(constraints, objective):
         assert str(error_info.value).startswith(expected)
     else:
         thr_optimizer.fit(X, y, sensitive_features=sf)
-        res = thr_optimizer.interpolated_thresholder_.threshold_interpolation
+        res = thr_optimizer.interpolated_thresholder_.interpolation_dict
         for key in [0, 1]:
             assert res[key]['p0'] == pytest.approx(expected[key]['p0'], PREC)
             assert res[key]['operation0']._operator == expected[key]['op0']
