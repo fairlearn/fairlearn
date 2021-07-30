@@ -1,15 +1,19 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+
 import pytest
 from . import package_test_common as ptc
+import scikeras
+
 
 from fairlearn.reductions import DemographicParity
+
 
 tf = pytest.importorskip("tensorflow")
 from tensorflow.keras.layers import Dense # noqa
 from tensorflow.keras.models import Sequential # noqa
-from tensorflow.keras.wrappers.scikit_learn import KerasClassifier # noqa
+from scikeras.wrappers import KerasClassifier
 
 
 def create_model():
