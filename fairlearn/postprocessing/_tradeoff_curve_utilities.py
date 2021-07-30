@@ -68,7 +68,7 @@ def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives,
 
 def _tradeoff_curve(data, sensitive_feature_value, flip=False,
                     x_metric="false_positive_rate", y_metric="true_positive_rate"):
-    """Get a convex hull of achievable tradeoffs between the two provided metrics.
+    """Get a convex hull of achievable trade-offs between the two provided metrics.
 
     The metrics are based on considering all possible thresholds of 'score' column of `data` and
     evaluated with respect to 'label' column of `data`.
@@ -89,7 +89,7 @@ def _tradeoff_curve(data, sensitive_feature_value, flip=False,
     Returns
     -------
     result : pandas.DataFrame
-        The convex hull over the achievabale tradeoff points with columns
+        The convex hull over the achievable trade-off points with columns
         'x', 'y', and 'operation'.
     """
     points_sorted = _calculate_tradeoff_points(
@@ -221,7 +221,7 @@ def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
     scores.append(-np.inf)
     labels.append(np.nan)
 
-    # Iterate through all samples which are sorted by increasing scores.
+    # Iterate through all samples which are sorted by decreasing scores.
     # Setting the threshold between two scores means that everything smaller
     # than the threshold gets a label of 0 while everything larger than the
     # threshold gets a label of 1. Flipping labels is an option if flipping
@@ -275,7 +275,7 @@ def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
 def _get_scores_labels_and_counts(data):
     """Order samples by scores, counting number of positive, negative, and overall samples.
 
-    The samples are sorted into ascending order.
+    The samples are sorted into descending order.
 
     :param data: the DataFrame containing scores and labels
     :type data: pandas.DataFrame

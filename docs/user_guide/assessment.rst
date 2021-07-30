@@ -321,7 +321,7 @@ might be correlated with various sensitive features. Because of this, control
 features should be used with particular caution.
 
 The :class:`MetricFrame` constructor allows us to specify control features in
-a manner similar to sensitive features, using a :code:`conditional_features=`
+a manner similar to sensitive features, using a :code:`control_features=`
 parameter:
 
 .. doctest:: assessment_metrics

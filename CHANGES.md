@@ -1,5 +1,11 @@
 # Changes
 
+### v0.7.1
+
+* Relaxed checks made on `X` in `_validate_and_reformat_input()` since that
+  is the concern of the underlying estimator and not Fairlearn
+* Add support for Python 3.9
+
 ### v0.7.0
 
 * Added new `count()` metric, so that the number of data points in each
@@ -189,7 +195,8 @@
 
 * Major changes to the API. In particular the `expgrad` function is now
   implemented by the `ExponentiatedGradient` class. Please refer to the
-  [ReadMe](readme.md) file for information on how to upgrade
+  [upgrade guide](https://fairlearn.org/main/user_guide/migrating_versions/index.html)
+  for information on how to upgrade.
 
 * Added new algorithms
   * Threshold Optimization
