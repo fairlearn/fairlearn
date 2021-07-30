@@ -31,8 +31,8 @@ _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
 _INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
-_MF_CONTAINS_NON_SCALAR_WARNING = "Metric frame contains non-scalar cells. Please remove non-scalar columns from " \
-                                  "your metric frame and try again "
+_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells. Please remove non-scalar columns from " \
+                                  "your metric frame or use parameter errors='coerce'. "
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -402,41 +402,35 @@ class MetricFrame:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         if not self.control_levels:
-            try:
-                result = pd.Series(index=self._by_group.columns, dtype='object')
-
-                for m in result.index:
-                    max_val = self._by_group[m].max()
-                    result[m] = max_val
-
-            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
-            except ValueError:
-                warnings.warn(_MF_CONTAINS_NON_SCALAR_WARNING,
-                              SyntaxWarning)
-                if errors == "raise":
-                    raise
-                elif errors == 'coerce':
-                    if not self.control_levels:
-                        # Make all results NaN
-                        result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
-                        # Fill in the possible columns with their max values
-                        for m in result.index:
-                            if np.isscalar(self._by_group[m].values[0]):
-                                result[m] = self._by_group[m].max()
+            if errors == "raise":
+                try:
+                    result = pd.Series(index=self._by_group.columns, dtype='object')
+                    for m in result.index:
+                        max_val = self._by_group[m].max()
+                        result[m] = max_val
+                except ValueError:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+            elif errors == 'coerce':
+                if not self.control_levels:
+                    # Make all results NaN
+                    result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
+                    # Fill in the possible columns with their max values
+                    for m in result.index:
+                        if np.isscalar(self._by_group[m].values[0]):
+                            result[m] = self._by_group[m].max()
         else:
-            try:
-                result = self._by_group.groupby(level=self.control_levels).max()
-            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
-            except ValueError:
-                if errors == 'raise':
-                    raise
-                elif errors == 'coerce':
-                    # Fill all impossible columns with NaN before grouping metric frame
-                    mf = self._by_group.copy()
-                    for m in mf.columns:
-                        if not np.isscalar(mf[m].values[0]):
-                            mf[m] = np.nan
-                    result = mf.groupby(level=self.control_levels).max()
+            if errors == 'raise':
+                try:
+                    result = self._by_group.groupby(level=self.control_levels).max()
+                except ValueError:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+            elif errors == 'coerce':
+                # Fill all impossible columns with NaN before grouping metric frame
+                mf = self._by_group.copy()
+                for m in mf.columns:
+                    if not np.isscalar(mf[m].values[0]):
+                        mf[m] = np.nan
+                result = mf.groupby(level=self.control_levels).max()
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -472,40 +466,35 @@ class MetricFrame:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         if not self.control_levels:
-            try:
-                result = pd.Series(index=self._by_group.columns, dtype='object')
-
-                for m in result.index:
-                    min_val = self._by_group[m].min()
-                    result[m] = min_val
-
-            # Catch ValueError that is thrown by pandas, if not all columns in metric frame are scalar
-            except ValueError:
-                warnings.warn(_MF_CONTAINS_NON_SCALAR_WARNING,
-                              SyntaxWarning)
-                if errors == "raise":
-                    raise
-                elif errors == 'coerce':
-                    if not self.control_levels:
-                        # Make all results NaN
-                        result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
-                        # Fill in the possible columns with their min values
-                        for m in result.index:
-                            if np.isscalar(self._by_group[m].values[0]):
-                                result[m] = self._by_group[m].min()
+            if errors == "raise":
+                try:
+                    result = pd.Series(index=self._by_group.columns, dtype='object')
+                    for m in result.index:
+                        min_val = self._by_group[m].min()
+                        result[m] = min_val
+                except ValueError:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+            elif errors == 'coerce':
+                if not self.control_levels:
+                    # Make all results NaN
+                    result = pd.Series(np.nan, index=self._by_group.columns, dtype='object')
+                    # Fill in the possible columns with their min values
+                    for m in result.index:
+                        if np.isscalar(self._by_group[m].values[0]):
+                            result[m] = self._by_group[m].min()
         else:
-            try:
-                result = self._by_group.groupby(level=self.control_levels).min()
-            except ValueError:
-                if errors == 'raise':
-                    raise
-                elif errors == 'coerce':
-                    # Fill all impossible columns with NaN before grouping metric frame
-                    mf = self._by_group.copy()
-                    for m in mf.columns:
-                        if not np.isscalar(mf[m].values[0]):
-                            mf[m] = np.nan
-                    result = mf.groupby(level=self.control_levels).min()
+            if errors == 'raise':
+                try:
+                    result = self._by_group.groupby(level=self.control_levels).min()
+                except ValueError:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+            elif errors == 'coerce':
+                # Fill all impossible columns with NaN before grouping metric frame
+                mf = self._by_group.copy()
+                for m in mf.columns:
+                    if not np.isscalar(mf[m].values[0]):
+                        mf[m] = np.nan
+                result = mf.groupby(level=self.control_levels).min()
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -564,10 +553,10 @@ class MetricFrame:
             return (self.by_group - subtrahend).abs().max(level=self.control_levels)
         except ValueError:
             if errors == 'raise':
-                raise
+                raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
             elif errors == 'coerce':
                 # Fill all impossible columns with NaN before grouping metric frame
-                mf = self._by_group.copy()
+                mf = self.by_group.copy()
                 for m in mf.columns:
                     if not np.isscalar(mf[m].values[0]):
                         mf[m] = np.nan

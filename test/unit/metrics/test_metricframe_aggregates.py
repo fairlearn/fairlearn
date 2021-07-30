@@ -9,16 +9,12 @@ import sklearn.metrics as skm
 import fairlearn.metrics as metrics
 
 from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
-from fairlearn.metrics._metric_frame import _INVALID_ERRORS_VALUE_ERROR_MESSAGE
-
-_PANDAS_NON_SCALAR_ERROR_MESSAGE = "The truth value of an array with more than one element is ambiguous. Use a.any() " \
-                                   "or a.all()"
+from fairlearn.metrics._metric_frame import _INVALID_ERRORS_VALUE_ERROR_MESSAGE, _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
 
 metric = [skm.recall_score,
           skm.precision_score,
           skm.accuracy_score,
           skm.balanced_accuracy_score]
-
 
 class Test1m1sf0cf:
     # Single metric supplied as callable
@@ -1061,7 +1057,7 @@ class Test2m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
         self._prepare()
@@ -1074,20 +1070,20 @@ class Test2m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
         self._prepare()
@@ -1100,20 +1096,20 @@ class Test2m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
         self._prepare()
@@ -1126,7 +1122,7 @@ class Test2m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
@@ -1140,7 +1136,7 @@ class Test2m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
         self._prepare()
@@ -1153,7 +1149,7 @@ class Test2m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
@@ -1180,7 +1176,7 @@ class Test1m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
         self._prepare()
@@ -1193,20 +1189,20 @@ class Test1m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
         self._prepare()
@@ -1219,20 +1215,20 @@ class Test1m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
         self._prepare()
@@ -1245,7 +1241,7 @@ class Test1m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
@@ -1259,7 +1255,7 @@ class Test1m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
         self._prepare()
@@ -1272,7 +1268,7 @@ class Test1m1sf1cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
@@ -1297,7 +1293,7 @@ class Test2m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
         self._prepare()
@@ -1310,20 +1306,20 @@ class Test2m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
         self._prepare()
@@ -1336,20 +1332,20 @@ class Test2m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
         self._prepare()
@@ -1362,7 +1358,7 @@ class Test2m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
@@ -1376,7 +1372,7 @@ class Test2m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
         self._prepare()
@@ -1389,7 +1385,7 @@ class Test2m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
@@ -1414,7 +1410,7 @@ class Test1m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
         self._prepare()
@@ -1425,20 +1421,20 @@ class Test1m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
         self._prepare()
@@ -1449,20 +1445,20 @@ class Test1m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
         self._prepare()
@@ -1473,7 +1469,7 @@ class Test1m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
@@ -1485,7 +1481,7 @@ class Test1m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='raise')
-            assert _PANDAS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
         self._prepare()
@@ -1496,7 +1492,7 @@ class Test1m1sf0cfErrorHandlingCM:
         self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors='WRONG')
-            assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
