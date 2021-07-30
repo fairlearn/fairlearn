@@ -230,6 +230,10 @@ print(mf_bb.by_group)
 # multiple bounding boxes (not necessarily in a 1-to-1
 # mapping either). The output of such a scenario might
 # well be a matrix of some description.
+# Another case where both the input data and the metrics
+# will be complex is natural language processing,
+# where each row of the input could be an entire sentence,
+# possibly with complex word embeddings included.
 
 # %%
 # Conclusion
