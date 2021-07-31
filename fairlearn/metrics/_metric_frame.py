@@ -183,8 +183,6 @@ class MetricFrame:
         the score. One can append data with ``add_data``. The user can't supply data in the
         constructor if ``streaming=True``.
 
-        **Note** currently, it only stores the values before computing the metric.
-
     metric : callable or dict
         The underlying metric functions which are to be calculated. This
         can either be a single metric function or a dictionary of functions.
