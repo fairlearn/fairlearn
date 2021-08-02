@@ -125,39 +125,39 @@ def bounding_box_iou(box_A_input, box_B_input):
     # [x_0, y_0, delta_x,delta_y]
     # where the deltas are positive
 
-    boxA = np.array(box_A_input)
-    boxB = np.array(box_B_input)
+    box_A = np.array(box_A_input)
+    box_B = np.array(box_B_input)
 
-    assert boxA[2] >= 0, "Bad delta_x for boxA"
-    assert boxA[3] >= 0, "Bad delta y for boxA"
-    assert boxB[2] >= 0, "Bad delta x for boxB"
-    assert boxB[3] >= 0, "Bad delta y for boxB"
+    assert box_A[2] >= 0, "Bad delta_x for box_A"
+    assert box_A[3] >= 0, "Bad delta y for box_A"
+    assert box_B[2] >= 0, "Bad delta x for box_B"
+    assert box_B[3] >= 0, "Bad delta y for box_B"
 
     # Convert deltas to co-ordinates
-    boxA[2:4] = boxA[0:2] + boxA[2:4]
-    boxB[2:4] = boxB[0:2] + boxB[2:4]
+    box_A[2:4] = box_A[0:2] + box_A[2:4]
+    box_B[2:4] = box_B[0:2] + box_B[2:4]
 
     # Determine the (x, y)-coordinates of the intersection rectangle
-    xA = max(boxA[0], boxB[0])
-    yA = max(boxA[1], boxB[1])
-    xB = min(boxA[2], boxB[2])
-    yB = min(boxA[3], boxB[3])
+    x_A = max(box_A[0], box_B[0])
+    y_A = max(box_A[1], box_B[1])
+    x_B = min(box_A[2], box_B[2])
+    y_B = min(box_A[3], box_B[3])
 
-    if (xB < xA) or (yB < yA):
+    if (x_B < x_A) or (y_B < y_A):
         return 0
 
     # Compute the area of intersection rectangle
-    interArea = (xB - xA) * (yB - yA)
+    interArea = (x_B - x_A) * (y_B - y_A)
 
     # Compute the area of both the prediction and ground-truth
     # rectangles
-    boxAArea = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
-    boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
+    box_A_area = (box_A[2] - box_A[0]) * (box_A[3] - box_A[1])
+    box_B_area = (box_B[2] - box_B[0]) * (box_B[3] - box_B[1])
 
     # Compute the intersection over union by taking the intersection
     # area and dividing it by the sum of prediction + ground-truth
     # areas - the intersection area
-    iou = interArea / float(boxAArea + boxBArea - interArea)
+    iou = interArea / float(box_A_area + box_B_area - interArea)
 
     return iou
 
@@ -230,6 +230,10 @@ print(mf_bb.by_group)
 # multiple bounding boxes (not necessarily in a 1-to-1
 # mapping either). The output of such a scenario might
 # well be a matrix of some description.
+# Another case where both the input data and the metrics
+# will be complex is natural language processing,
+# where each row of the input could be an entire sentence,
+# possibly with complex word embeddings included.
 
 # %%
 # Conclusion
