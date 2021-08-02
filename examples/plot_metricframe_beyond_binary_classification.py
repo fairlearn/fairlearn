@@ -135,7 +135,7 @@ def bounding_box_iou(box_A_input, box_B_input):
     if box_B[2] < 0:
         raise ValueError("Bad delta x for box_B")
     if box_B[3] < 0:
-        raise ValueError("Bad delta y for box_B")   
+        raise ValueError("Bad delta y for box_B")
 
     # Convert deltas to co-ordinates
     box_A[2:4] = box_A[0:2] + box_A[2:4]
@@ -177,8 +177,8 @@ def mean_iou(true_boxes, predicted_boxes):
         raise ValueError("Array size mismatch")
 
     all_iou = [
-        bounding_box_iou(true_boxes[i], predicted_boxes[i])
-        for i in range(len(true_boxes))
+        bounding_box_iou(y_true, y_pred)
+        for y_true, y_pred in zip(true_boxes, predicted_boxes)
     ]
 
     return np.mean(all_iou)
@@ -188,9 +188,7 @@ def mean_iou(true_boxes, predicted_boxes):
 # generate a single random bounding box:
 
 
-def generate_bounding_box(max_coord, max_delta):
-    rng = np.random.default_rng()
-
+def generate_bounding_box(max_coord, max_delta, rng):
     corner = max_coord * rng.random(size=2)
     delta = max_delta * rng.random(size=2)
 
@@ -201,15 +199,15 @@ def generate_bounding_box(max_coord, max_delta):
 # bounding boxes:
 
 
-def many_bounding_boxes(n_rows, max_coord, max_delta):
+def many_bounding_boxes(n_rows, max_coord, max_delta, rng):
     return [
-        generate_bounding_box(max_coord, max_delta)
+        generate_bounding_box(max_coord, max_delta, rng)
         for _ in range(n_rows)
     ]
 
 
-true_bounding_boxes = many_bounding_boxes(n_rows, 5, 10)
-pred_bounding_boxes = many_bounding_boxes(n_rows, 5, 10)
+true_bounding_boxes = many_bounding_boxes(n_rows, 5, 10, rng)
+pred_bounding_boxes = many_bounding_boxes(n_rows, 5, 10, rng)
 
 # %%
 # Finally, we can use these in a :class:`~fairlearn.metrics.MetricFrame`:
@@ -230,7 +228,7 @@ print(mf_bb.by_group)
 # which give meaning to them. Similarly,
 # :class:`~fairlearn.metrics.MetricFrame` does not impose
 # restrictions on the return type. One can envisage an image
-# recognition task where there are multiple faces in each
+# recognition task where there are multiple detectable objects in each
 # picture, and the image recognition algorithm produces
 # multiple bounding boxes (not necessarily in a 1-to-1
 # mapping either). The output of such a scenario might
