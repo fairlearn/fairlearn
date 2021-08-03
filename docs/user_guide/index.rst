@@ -5,10 +5,9 @@ User Guide
 
 .. toctree::
    :maxdepth: 3
-   :numbered:
 
    fairness_in_machine_learning
    assessment
    mitigation
-   installation_and_migration/index
+   installation_and_version_guide/index
    further_resources

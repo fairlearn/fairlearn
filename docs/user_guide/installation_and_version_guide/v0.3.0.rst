@@ -1,7 +1,20 @@
+v0.3.0
+======
+
+* Major changes to the API. In particular the :code:`expgrad` function is now
+  implemented by the :code:`ExponentiatedGradient` class.
+
+* Added new algorithms
+  
+  * Threshold Optimization
+  * Grid Search
+  
+* Added grouped metrics
+
 .. _migrating_to_v0_3_0:
 
 Migrating to v0.3 from v0.2
-===========================
+---------------------------
 
 Up to version 0.2, Fairlearn contained only the exponentiated gradient method.
 The Fairlearn repository now has a more comprehensive scope and aims to
@@ -30,5 +43,4 @@ the equivalent operation is now
     exponentiated_gradient = ExponentiatedGradient(estimator, constraints=DemographicParity())
     exponentiated_gradient.fit(X, y, sensitive_features=sensitive_features)
     randomized_predictions = exponentiated_gradient.predict(X)
-
 

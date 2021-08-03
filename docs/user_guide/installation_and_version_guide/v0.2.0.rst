@@ -1,0 +1,8 @@
+v0.2.0
+======
+
+* registered the project at `PyPI <https://pypi.org/>`_
+
+* changed how the fairness constraints are initialized (in
+  :code:`fairlearn.moments`), and how they are passed to the fair learning
+  reduction :code:`fairlearn.classred.expgrad`
