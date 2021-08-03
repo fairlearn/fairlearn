@@ -459,12 +459,12 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         # Create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature value.
-        interpolation_dict = {}
+        threshold_interpolation = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
             best_interpolation = self._tradeoff_curve[
                 sensitive_feature_value
             ].transpose()[i_best]
-            interpolation_dict[sensitive_feature_value] = Bunch(
+            threshold_interpolation[sensitive_feature_value] = Bunch(
                 p0=best_interpolation.p0,
                 operation0=best_interpolation.operation0,
                 p1=best_interpolation.p1,
@@ -484,7 +484,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         return InterpolatedThresholder(
             self.estimator_,
-            interpolation_dict,
+            threshold_interpolation,
             prefit=True,
             predict_method=self._predict_method,
         ).fit(None, None)
@@ -578,7 +578,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         # create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature
-        interpolation_dict = {}
+        threshold_interpolation = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
             roc_result = self._tradeoff_curve[
                 sensitive_feature_value
@@ -599,7 +599,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                     / vertical_distance_from_diagonal
                 )
 
-            interpolation_dict[sensitive_feature_value] = Bunch(
+            threshold_interpolation[sensitive_feature_value] = Bunch(
                 p_ignore=p_ignore,
                 prediction_constant=self._x_best,
                 p0=roc_result.p0,
@@ -621,7 +621,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         return InterpolatedThresholder(
             self.estimator_,
-            interpolation_dict,
+            threshold_interpolation,
             prefit=True,
             predict_method=self._predict_method,
         ).fit(None, None)

@@ -5,6 +5,9 @@
 * Relaxed checks made on `X` in `_validate_and_reformat_input()` since that
   is the concern of the underlying estimator and not Fairlearn
 * Add support for Python 3.9
+* Make `InterpolatedThresholder` more visible by directly including it in
+  `fairlearn.postprocessing` and rename its `interpolation_dict` argument
+  to `threshold_interpolation`.
 
 ### v0.7.0
 
