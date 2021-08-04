@@ -8,6 +8,18 @@ The following steps assume git remote's `origin` points to
 `fairlearn/fairlearn` (in practical terms, that the work is being
 done on a clone of `fairlearn/fairlearn` and not on a fork).
 
+#. Ensure the maintainers listed in `scripts/generate_maintainers_table.py`
+   are up to date. Run `python scripts/generate_maintainers_table.py` from the
+   repository root directory. If the generated file
+   `docs/about/maintainers.rst` does not change you can proceed with the next
+   step. Otherwise, create PR to update the generated maintainers file on
+   the `main` branch. Proceed only when the PR is merged.
+
+#. Check the `docs/user_guide/installation_and_version_guide` for a file
+   related to the release. Make sure formatting and contents are correct and
+   create a summary of the highlights at the top of the file. Create a PR
+   for this and merge it before proceeding.
+
 #. Create the branch for the release:
 
     :code:`git checkout -b release/v<x.y.z>`
@@ -45,6 +57,7 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
        so that all the links point to the new release
     #. Update `smv_tag_whitelist` in `docs/conf.py` to show only the latest
        patch version of every minor release.
+    #. Create a new file `vx.y.z+1.rst` in `docs/user_guide/installation_and_version_guide`
    
 .. note::
     Make sure to add a note to this second PR:

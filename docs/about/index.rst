@@ -147,7 +147,7 @@ and follows the
 Maintainers
 ^^^^^^^^^^^
 
-The maintainers of the Fairlearn project are
+The current maintainers of the Fairlearn project are
 
 .. include:: maintainers.rst
 
@@ -207,3 +207,109 @@ Frequently asked questions
 --------------------------
 
 See our :ref:`faq` page.
+
+Funding
+-------
+
+Fairlearn is a community-driven project. However, several companies and
+academic institutions help to assure its sustainability.
+We would like to thank the following funders.
+
+.. raw:: html
+
+   <div class="sponsor-div">
+   <div class="sponsor-div-box">
+
+`Microsoft <https://www.microsoft.com/>`_ has funded various contributors
+including several maintainers (Miro Dudik, Richard Edgar, Roman Lutz, Michael
+Madaio) since the start of the project in 2018.
+
+.. raw:: html
+
+   </div>
+   <div class="sponsor-div-box">
+
+.. image:: ../_static/images/microsoft.png
+   :width: 100pt
+   :align: center
+   :target: https://www.microsoft.com/
+
+.. raw:: html
+
+   </div>
+   </div>
+   <div class="sponsor-div">
+   <div class="sponsor-div-box">
+
+`Eindhoven University of Technology <https://www.tue.nl/en/>`_ has funded
+Hilde Weerts since March 2020.
+
+.. raw:: html
+
+  </div>
+  <div class="sponsor-div-box">
+
+.. image:: ../_static/images/tu_eindhoven.png
+  :width: 100pt
+  :align: center
+  :target: https://www.tue.nl/en/
+
+.. raw:: html
+
+  </div>
+  </div>
+  <div class="sponsor-div">
+  <div class="sponsor-div-box">
+
+`Zalando <https://corporate.zalando.com/en>`_ has funded Adrin Jalali since
+August 2020.
+
+.. raw:: html
+
+  </div>
+  <div class="sponsor-div-box">
+
+.. image:: ../_static/images/zalando.png
+  :width: 100pt
+  :align: center
+  :target: https://corporate.zalando.com/en
+
+.. raw:: html
+
+  </div>
+  </div>
+
+Past Sponsors
+^^^^^^^^^^^^^
+
+.. raw:: html
+
+  <div class="sponsor-div">
+  <div class="sponsor-div-box">
+
+`Anaconda <https://www.anaconda.com/>`_ funded Adrin Jalali in 2019.
+
+.. raw:: html
+
+  </div>
+  <div class="sponsor-div-box">
+  
+.. image:: ../_static/images/anaconda.png
+  :width: 100pt
+  :align: center
+  :target: https://www.anaconda.com/
+
+.. raw:: html
+
+  </div>
+  </div>
+
+Infrastructure support
+----------------------
+
+We would also like to thank the following for free CPU time on their
+continuous integration servers:
+
+- `Microsoft Azure <https://azure.microsoft.com/en-us/>`_
+- `GitHub <https://github.com>`_
+- `CircleCI <https://circleci.com/>`_

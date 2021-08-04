@@ -31,7 +31,8 @@ Current release
 
 -  Our current version may differ substantially from earlier versions.
    Users of earlier versions should visit our
-   `migration guide <https://fairlearn.org/main/user_guide/mitigation.html>`__.
+   `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`_
+   to navigate significant changes and find information on how to migrate.
 
 What we mean by *fairness*
 --------------------------
