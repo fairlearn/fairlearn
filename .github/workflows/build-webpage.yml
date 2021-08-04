@@ -1,0 +1,117 @@
+
+name: build-webpage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-doc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Install pandoc
+        run: sudo apt-get install pandoc pandoc-citeproc
+
+      - name: Upgrade pip, setuptools, and wheel before installing other dependencies
+        run: sudo python -m pip install --upgrade pip setuptools wheel
+      
+      - name: Install required packages
+        run: sudo python scripts/install_requirements.py --pinned False
+
+      - name: Build Documentation
+        run: python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: webpage
+          path: docs/_build/html
+
+  build-doctest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Install pandoc
+        run: sudo apt-get install pandoc pandoc-citeproc
+
+      - name: Upgrade pip, setuptools, and wheel before installing other dependencies
+        run: sudo python -m pip install --upgrade pip setuptools wheel
+      
+      - name: Install required packages
+        run: sudo python scripts/install_requirements.py --pinned False
+      
+      - name: Build doctest
+        run: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
+      
+  deploy-doc:
+    runs-on: ubuntu-latest
+    needs: build-doc
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download the built website artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: webpage
+          path: docs/_build/html
+      
+      - # By default GitHub attempts jekyll builds.
+        # Instead, we want the webpage to just point at index.html
+        name: Disable jekyll builds
+        run: touch docs/_build/html/.nojekyll
+      
+      - # Create CNAME file for fairlearn.org
+        name: Create CNAME file
+        run: echo "fairlearn.org" > docs/_build/html/CNAME
+
+      - name: 'Install gh-pages and configure dependencies'
+        run: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@fairlearn.org"
+            git config user.name "ci-build"
+
+      - name: 'Push to GitHub Pages repository'
+        run: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+
+  deploy-doc-preview:  # for PRs only
+    runs-on: ubuntu-latest
+    needs: build-doc
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download the built website artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: webpage
+          path: dist/${{ github.event_name }}
+      
+      - name: 'Install gh-pages and configure dependencies'
+        run: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@fairlearn.org"
+            git config user.name "ci-build"
+
+      - name: 'Push to preview branch'
+        run: gh-pages --dotfiles --message "Add ${{ github.event_name }} preview" --dist dist --repo https://github.com/fairlearn/fairlearn.git --branch webpage_preview
