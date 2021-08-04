@@ -24,7 +24,7 @@ For further information on how to install Fairlearn and its optional
 dependencies, please check out the :ref:`installation_guide`.
 
 If you are updating from a previous version of Fairlearn, please
-see :ref:`version_migration_guide`.
+see :ref:`version_guide`.
 
 .. note::
 

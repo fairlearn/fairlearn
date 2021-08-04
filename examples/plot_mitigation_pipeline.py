@@ -7,11 +7,11 @@ Passing pipelines to mitigation techniques
 ==========================================
 """
 # %%
-# This notebook shows how to pass :func:`sklearn.pipeline.Pipeline`s to
+# This notebook shows how to pass :class:`sklearn.pipeline.Pipeline` to
 # mitigation techniques from Fairlearn. Note that the notebook is not to be
 # used as an example for how to assess and mitigate fairness. It is merely a
 # demonstration of the technical aspects of passing
-# :func:`sklearn.pipeline.Pipeline`s. For more information around proper
+# :class:`sklearn.pipeline.Pipeline`. For more information around proper
 # fairness assessment and mitigation please refer to the :ref:`user_guide`.
 
 import json
@@ -25,6 +25,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
+
+# %%
+# Below we load the "Adult" census dataset and split its features, sensitive
+# features, and labels into train and test sets.
 
 data = fetch_adult(as_frame=True)
 X_raw = data.data
@@ -40,6 +44,13 @@ y_train = y_train.reset_index(drop=True)
 y_test = y_test.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
+
+# %%
+# To illustrate Fairlearn's compatibility with
+# :class:`~sklearn.pipeline.Pipeline` we first need to build our pipeline.
+# In the following we assemble a pipeline by combining preprocessing steps
+# with an estimator. The preprocessing steps include imputing, scaling for
+# numerical features and one-hot encoding for categorical features.
 
 numeric_transformer = Pipeline(
     steps=[
@@ -70,7 +81,7 @@ pipeline = Pipeline(
     ]
 )
 
-# %% 
+# %%
 # Below we will pass the pipeline to some of our mitigation techniques,
 # starting with :class:`fairlearn.postprocessing.ThresholdOptimizer`:
 
@@ -82,7 +93,7 @@ threshold_optimizer = ThresholdOptimizer(
 threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
 print(threshold_optimizer.predict(X_test, sensitive_features=A_test))
 print(json.dumps(
-    threshold_optimizer.interpolated_thresholder_.threshold_interpolation_,
+    threshold_optimizer.interpolated_thresholder_.interpolation_dict,
     default=str,
     indent=4))
 plot_threshold_optimizer(threshold_optimizer)
