@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+
 class ThresholdOperation():
     """Represents the threshold operations that are used in postprocessing approaches.
 
