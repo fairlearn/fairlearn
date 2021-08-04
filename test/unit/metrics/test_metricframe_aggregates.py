@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+import functools
 
 import numpy as np
 import pandas as pd
@@ -1503,8 +1504,10 @@ class Test1m1sf0cfErrorHandlingCM:
 
 class Test2m1sf0cfErrorHandlingCM2:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    # Tests for two non-scalar columns in MetricFrame.
     def _prepare(self):
-        fns = {'confusion_matrix1': skm.confusion_matrix, 'confusion_matrix2': skm.confusion_matrix}
+        fns = {'confusion_matrix1': skm.confusion_matrix,
+               'confusion_matrix2': functools.partial(skm.confusion_matrix, normalize='all')}
         self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2)
 
