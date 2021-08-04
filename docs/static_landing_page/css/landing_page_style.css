@@ -1,23 +1,21 @@
 /*FONTS*/
 @font-face {
-	font-family: 'TT Commons Regular';
-	src: url('../fonts/TypeType-TTCommonsRegular.woff') format('woff'),
-		url('../fonts/TypeType-TTCommonsRegular.otf') format('opentype');
+    font-family: 'Code Pro Regular';
+    src: url('fonts/SourceCodePro-Regular.ttf')format('truetype');
 }
 @font-face {
-	font-family: 'TT Commons Medium';
-	src: url('../fonts/TypeType-TTCommonsMedium.woff') format('woff'),
-		url('../fonts/TypeType-TTCommonsMedium.otf') format('opentype');
+    font-family: 'Code Pro Medium';
+    src: url('fonts/SourceCodePro-Medium.ttf')format('truetype');
 }
 @font-face {
-	font-family: 'TT Commons Bold';
-	src: url('../fonts/TypeType-TTCommonsBold.woff') format('woff'),
-		url('../fonts/TypeType-TTCommonsBold.otf') format('opentype');
+    font-family: 'Code Pro Bold';
+    src: url('fonts/SourceCodePro-Bold.ttf')format('truetype');
 }
+
 body {
 	background: #ffffff;
 	padding: 0px;
-	font-family: 'TT Commons Regular', Arial, sans-serif;
+	font-family: 'Code Pro Regular', Arial, sans-serif;
 	font-style: normal;
 	font-weight: normal;
 	font-size: 18px;
@@ -29,7 +27,7 @@ body {
 }
 
 .masthead h1 {
-	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-weight: 500;
 	font-size: 84px;
 	line-height: 88px;
@@ -52,7 +50,7 @@ h3 {
 }
 /* Labels */
 h5 {
-	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-weight: 500;
 	font-size: 18px;
 	line-height: 22px;
@@ -65,7 +63,7 @@ h5 {
 }
 /* TITLE */
 h6 {
-	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-weight: 500;
 	font-size: 18px;
 	line-height: 22px;
@@ -84,7 +82,7 @@ p {
 	line-height: 26px;
 }
 li {
-	font-family: 'TT Commons Regular', Arial, sans-serif;
+	font-family: 'Code Pro Regular', Arial, sans-serif;
 	font-style: normal;
 	font-weight: normal;
 	font-size: 18px;
@@ -111,7 +109,7 @@ li {
 	color: #ffffff;
 }
 .bold {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
+	font-family: 'Code Pro Bold', Arial, sans-serif;
 	font-style: normal;
 	font-weight: bold;
 }
@@ -150,7 +148,7 @@ li {
 	background-color: white;
 }
 .navbar li {
-	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-size: 18px;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
@@ -304,7 +302,7 @@ li {
 }
 
 .quickstart-btn {
-	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-size: 18px;
 	display: inline-block;
 	color: #ffffff;
@@ -334,7 +332,7 @@ li {
 	height: auto;
 }
 .section-4 li {
-	font-family: 'TT Commons Regular', Arial, sans-serif;
+	font-family: 'Code Pro Regular', Arial, sans-serif;
 	font-style: normal;
 	font-weight: normal;
 	font-size: 18px;
@@ -412,7 +410,7 @@ li.check-icon {
 
 /***SECTION 7****/
 .contribute-btn {
-	font-family: 'TT Commons Medium', Arial, sans-serif;
+	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-size: 18px;
 	display: inline-block;
 	color: #ffffff;
@@ -453,7 +451,7 @@ li.check-icon {
 	margin-bottom: 0px;
 }
 .footer-italic {
-	font-family: 'TT Commons Regular', Arial, sans-serif;
+	font-family: 'Code Pro Regular', Arial, sans-serif;
 	font-size: 18px;
 	font-style: italic;
 	font-weight: bold;
@@ -461,7 +459,7 @@ li.check-icon {
 	-webkit-font-smoothing: antialiased;
 }
 .footer-bold {
-	font-family: 'TT Commons Bold', Arial, sans-serif;
+	font-family: 'Code Pro Bold', Arial, sans-serif;
 	font-size: 16px;
 	font-style: normal;
 	font-weight: bold;
@@ -469,7 +467,7 @@ li.check-icon {
 	-webkit-font-smoothing: antialiased;
 }
 .footer-small {
-	font-family: 'TT Commons Regular', Arial, sans-serif;
+	font-family: 'Code Pro Regular', Arial, sans-serif;
 	font-size: 14px;
 	font-style: normal;
 	font-weight: bold;
