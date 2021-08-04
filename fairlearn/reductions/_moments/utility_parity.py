@@ -318,7 +318,7 @@ class DemographicParity(UtilityParity):
 class TruePositiveRateParity(UtilityParity):
     r"""Implementation of true positive rate parity as a moment.
 
-    .. note::
+    .. note:
 
         The true positive rate parity fairness criterion is also known
         as "equal opportunity".

@@ -24,7 +24,7 @@ For further information on how to install Fairlearn and its optional
 dependencies, please check out the :ref:`installation_guide`.
 
 If you are updating from a previous version of Fairlearn, please
-see :ref:`version_guide`.
+see :ref:`version_migration_guide`.
 
 .. note::
 
@@ -148,7 +148,7 @@ Fairlearn also allows us to quickly plot these metrics from the
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
-    :align: center
+    :align: center 
 
 
 Mitigating disparity
