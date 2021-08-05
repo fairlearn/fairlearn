@@ -1,0 +1,50 @@
+v0.4.6
+======
+
+* Handle case where reductions relabeling results in a single class
+
+* Refactor metrics:
+
+  * Remove :code:`GroupMetricResult` type in favor of a `Bunch`.
+  * Rename and slightly update signatures:
+    * :code:`metric_by_group` changed to :code:`group_summary`
+    * :code:`make_group_metric` changed to :code:`make_metric_group_summary`
+  * Add group summary transformers
+    :code:`{difference,ratio,group_min,group_max}_from_group_summary`.
+  * Add factory :code:`make_derived_metric`.
+
+* Add new metrics:
+  
+  * base metrics :code:`{true,false}_{positive,negative}_rate`
+  * group summary metrics :code:`<metric>_group_summary`
+  * derived metrics :code:`<metric>_{difference,ratio,group_min,group_max}`
+  * disparity metrics
+    :code:`{demographic_parity,equalized_odds}_{difference,ratio}`
+
+* Remove metrics:
+  
+  * :code:`fallout_rate` in favor of :code:`false_positive_rate`
+  * :code:`miss_rate` in favor of :code:`false_negative_rate`
+  * :code:`specificity_score` in favor of :code:`true_negative_rate`
+
+* Change from public to private:
+
+  * :code:`mean_{over,under}prediction` and
+    :code:`{balanced_,}root_mean_squared_error`
+    changed to the versions with a leading underscore
+
+* Fix warning due to changing default :code:`dtype` when creating an empty
+  :class:`pandas.Series`.
+
+* Enable :class:`fairlearn.reductions.GridSearch` for more than two sensitive
+  features values.
+
+* Add new disparity constraints for reductions methods as moments in
+  :py:mod:`fairlearn.reductions` including:
+
+  * :code:`TruePositiveRateDifference`
+  * ratio options for all existing constraints in addition to the default,
+    i.e., difference between groups w.r.t. the relevant metric.
+
+* Make :class:`.ExponentiatedGradient` require 0-1 labels for classification
+  problems, pending a better solution for Issue 339.
