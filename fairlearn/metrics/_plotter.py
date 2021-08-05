@@ -9,6 +9,7 @@ import numpy as np
 
 from ._metric_frame import MetricFrame
 from matplotlib.lines import Line2D
+from matplotlib.axes._axes import Axes
 
 _GIVEN_BOTH_ERROR_BARS_AND_CONF_INT_ERROR = \
     "Ambiguous Error Metric. Please only provide one of: error_bars or conf_intervals."
@@ -127,7 +128,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
                       text_color: str = "black",
                       text_ha: str = "center",
                       **kwargs
-                      ):
+                      ) -> Union[Axes, List[Axes]]:
     """Visualization for metrics with statistical error bounds.
 
     Plots a given metric and its given error (as described by the `error_bars` or `conf_intervals`)
@@ -144,7 +145,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
     metric_frame : fairlearn.metrics.MetricFrame
         The collection of disaggregated metric values, along with the metric errors.
 
-    kind : str, optional
+    kind : str, default="scatter"
         The type of plot to display. i.e. "bar", "line", etc.
         List of options is detailed in :meth:`pandas.DataFrame.plot`
 
@@ -174,22 +175,22 @@ def plot_metric_frame(metric_frame: MetricFrame,
             The return of the error bar function should be a tuple of the lower
             and upper bounds. i.e. :code:`[0.59, 0.62]`
 
-    subplots : bool, optional
+    subplots : bool, default=True
         Whether or not to plot metrics on separate subplots
 
-    plot_error_labels : bool, optional
+    plot_error_labels : bool, default=False
         Whether or not to plot numerical labels for the error bounds
 
-    text_precision_digits : int, optional
+    text_precision_digits : int, default=4
         The number of digits of precision to show for error labels
 
-    text_font_size : int, optional
+    text_font_size : int, default=8
         The font size to use for error labels
 
-    text_color : str, optional
+    text_color : str, default="black"
         The font color to use for error labels
 
-    text_ha : str, optional
+    text_ha : str, default="center"
         The horizontal alignment modifier to use for error labels
 
     Returns
@@ -247,7 +248,7 @@ def plot_metric_frame(metric_frame: MetricFrame,
 
     axs = _plot_df(df, metrics, kind, subplots, df_all_errors, **kwargs)
 
-    # Does not work properly when subplots=False
+    # Error labels don't get plotted when subplots=False
     if plot_error_labels and kind == "bar" and subplots:
         for j, metric in enumerate(metrics):
             temp_axs = axs.flatten() if isinstance(axs, np.ndarray) else np.array([axs])

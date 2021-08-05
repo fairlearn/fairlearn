@@ -15,8 +15,6 @@ Plotting Metrics with Error Bars
 # to demonstrate the plotting metrics with error bars functionality
 #
 # We start by importing the various modules we're going to use:
-
-# TODO: Remove in final version (helps run with local packages)
 from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 from fairlearn.metrics import MetricFrame
 from sklearn.datasets import fetch_openml
@@ -25,11 +23,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
-import os
-import sys
-nb_dir = os.path.split(os.getcwd())[0]
-if nb_dir not in sys.path:
-    sys.path.append(nb_dir)
 
 
 data = fetch_openml(data_id=1590, as_frame=True)
@@ -136,6 +129,11 @@ metric_frame = MetricFrame(metrics_dict, y_test_true, y_test_pred, sensitive_fea
 # %%
 # Plotting
 # ========
+# Plot metrics without error bars
+# -------------------------------
+plot_metric_frame(metric_frame, kind="scatter", metrics=['Recall', 'Accuracy'])
+
+# %%
 # Plot metrics with (symmetric) error bars
 # ----------------------------------------
 plot_metric_frame(metric_frame, kind="scatter",
@@ -144,8 +142,6 @@ plot_metric_frame(metric_frame, kind="scatter",
                   figsize=(12, 4), subplots=True, layout=[2, 1])
 plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error', colormap="Pastel1")
 
-# %%
-plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error', colormap="Pastel1", plot_error_labels=True)
 
 # %%
 # Plot metrics with confidence intervals (possibly asymmetric)
@@ -156,9 +152,9 @@ plot_metric_frame(metric_frame, kind="scatter",
                   metrics='Recall', conf_intervals='Recall Bounds')
 
 # %%
-# Plot metrics without error bars
-# -------------------------------
-plot_metric_frame(metric_frame, kind="scatter", metrics=['Recall', 'Accuracy'])
+# Plot metrics with error labels
+# ------------------------------
+plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error', colormap="Pastel1", plot_error_labels=True)
 
 # %%
 # Plots all columns and treats them as metrics without error bars
@@ -166,9 +162,9 @@ plot_metric_frame(metric_frame, kind="scatter", metrics=['Recall', 'Accuracy'])
 plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 
 # %%
-# Custom plot
-# -----------
-# Demonstrates how to customize the axes
+# Customizing plots
+# -----------------
+# :func:`plot_metric_frame` returns an :class:`Axes` object that we can customize futher.
 
 axs = plot_metric_frame(metric_frame,
                         metrics=['Recall', 'Accuracy'],
@@ -192,7 +188,7 @@ axs[0][0].set_ylim((0, 1))
 axs[0][1].set_ylim((0, 1))
 
 # %%
-# Creating custom error metrics
+# Defining custom error metrics
 # =============================
 # In this tutorial we used Normal intervals and Wilson bounds to demonstrate how to plot symmetric and asymmetric metrics, respectively.
 #
@@ -210,3 +206,5 @@ def error_metric_function(y_true, y_pred):
 
     # returns the bounds in the format (lower_bound, upper_bound)
     return bounds
+
+# %%

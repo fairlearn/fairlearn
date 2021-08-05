@@ -171,11 +171,25 @@ def test_single_error_bar(sample_metric_frame):
         assert str(exc.value) == _ERROR_BARS_MUST_BE_TUPLE
 
 
-# def test_single_ax_input(sample_metric_frame):
-#     axs = plt.subplot()
-#     axs = plot_metric_frame(sample_metric_frame,
-#                             metrics=['Recall'],
-#                             error_bars=['Recall Error'],
-#                             axs=axs,
-#                             kind="bar",
-#                             colormap="Pastel1")
+def test_single_ax_input(sample_metric_frame):
+    ax = matplotlib.pyplot.subplot()
+    ax = plot_metric_frame(sample_metric_frame,
+                           metrics=['Recall'],
+                           error_bars=['Recall Error'],
+                           ax=ax,
+                           kind="bar",
+                           colormap="Pastel1")
+
+
+def test_multi_ax_input(sample_metric_frame):
+    fig, ax = matplotlib.pyplot.subplots(nrows=1, ncols=2)
+    ax[0].set_title("Recall Plot")
+    ax[0].set_ylabel("Recall")
+    ax[0].set_xlabel("Race")
+    ax[0].set_ylim((0, 1))
+    ax = plot_metric_frame(sample_metric_frame,
+                           metrics=['Recall', 'Accuracy'],
+                           error_bars=['Recall Error', 'Accuracy Error'],
+                           ax=ax,
+                           kind="bar",
+                           colormap="Pastel1")
