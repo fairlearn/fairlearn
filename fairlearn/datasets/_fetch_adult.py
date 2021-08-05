@@ -25,6 +25,9 @@ def fetch_adult(*, cache=True, data_home=None,
     Prediction task is to determine whether a person makes over $50,000 a
     year.
 
+    ..versionadded: 0.5.0
+    ..versionchanged: 0.7.1
+
     Parameters
     ----------
     cache : bool, default=True

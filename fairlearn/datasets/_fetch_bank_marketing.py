@@ -30,6 +30,8 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
     The classification goal is to predict if the client will subscribe a
     term deposit (variable y).
 
+    ..versionadded: 0.5.0
+    ..versionchanged: 0.7.1
 
     Parameters
     ----------
