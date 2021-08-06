@@ -125,7 +125,14 @@ excerpt of the
     :start-after: # starting with :class:`fairlearn.postprocessing.ThresholdOptimizer`:
     :end-before: # %%
 
-TODO include output
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. literalinclude:: ../auto_examples/plot_mitigation_pipeline.rst
+    :start-after: .. sphx-glr-output-block-008-start
+    :end-before: .. sphx-glr-output-block-008-end
+    :lines: 3-
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_mitigation_pipeline_001.png
     :target: ../auto_examples/plot_mitigation_pipeline.html
@@ -248,7 +255,7 @@ Note that the plot omits points that are within the convex hull of points.
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
     >>> print(json.dumps(
-    ...     threshold_optimizer.interpolated_thresholder_.threshold_interpolation_,
+    ...     threshold_optimizer.interpolated_thresholder_.interpolation_dict,
     ...     default=str,
     ...     indent=4))
     {
