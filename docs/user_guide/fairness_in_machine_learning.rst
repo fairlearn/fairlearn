@@ -300,7 +300,6 @@ In the algorithmic framework, for example, input variables may contain previous 
 statements taken by the accused, witnesses and police officers. Labels (outcome)
 include recommendations by the algorithm on an appropriate course of action based
 
-information regarding the accused, their upbringing and how it relates to their
 current status, along with a recommendation that incorporates these factors into the
 recommended outcome.
 
