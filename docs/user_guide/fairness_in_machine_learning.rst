@@ -267,7 +267,7 @@ apply to a different social context. Reusing an algorithmic solution and failing
 to take into account differences in involved social contexts can result in misleading
 results and potentially harmful consequences. 
 
-Example: Reusing a machine learning algorithm used to screen job applications in the
+For instance, reusing a machine learning algorithm used to screen job applications in the
 nursing industry, for job applications in the information technology sector. An intuitive
 yet important difference between both contexts is the difference in skills required to
 succeed in both industries. A slightly more subtle difference is the demographic differences
