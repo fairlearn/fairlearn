@@ -301,7 +301,6 @@ statements taken by the accused, witnesses and police officers. Labels (outcome)
 include recommendations by the algorithm on an appropriate course of action based
 on a computed risk score. Model is limited in assessing fairness out outcome.
 
-The data framework could attempt to reduce unfairness by studying socio-economic
 information regarding the accused, their upbringing and how it relates to their
 current status, along with a recommendation that incorporates these factors into the
 recommended outcome.
