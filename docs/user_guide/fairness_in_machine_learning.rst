@@ -222,21 +222,29 @@ Many tasks of a data scientist involve some form of formalization: from
 measuring real-world phenomena as data to translating business KPI's
 and constraints into metrics, loss functions, or parameters. We fall into the
 formalism trap when we fail to account for the full meaning of social
-concepts like fairness. This occurs because there is no purely mathematical way to resolve
-conflicting definitions of fairness. This is also because fairness is complex and
-contested by social actors, and it cannot only be captured mathematically, but
-needs to be understood procedurally (i.e., [insert explanation here]) and situated in social contexts.
+concepts like fairness.
 
-Because different definitions of fairness cannot be satisfied at the same time,
-we'll need to decide which definition to use. But there's no mathematical way to
-make that decision. And it might be that none of the definitions are appropriate for our situation.
+Fairness is a complex construct that is contested: different people may
+have different ideas of what is fair in a particular scenario. While mathematical
+fairness metrics may capture some aspects of fairness, they fail to capture all
+relevant aspects. For example, group fairness metrics do not account
+for differences in individual experiences nor do they account for
+procedural justice.
+
+In some scenarios, fairness metrics such as demographic parity and equalized odds
+cannot be satisfied at the same time. At a first glance, this may appear to be a
+mathematical problem. However, the conflict is actually grounded in different
+understandings of what fairness is. Consequently, there is no mathematical
+approach to solve the conflict. Instead we need to decide which metrics might
+be appropriate for the situation at hand, keeping in mind the limitations of a
+mathematical formalization. In some cases, there may be no suitable metric.
 
 Some reasons why we fall into this trap is because fairness is context-dependent,
 open to contestation by different groups of people, and differences between ways of thinking
 about fairness between the legal world (i.e., fairness as procedural)
 and the fair-ML community (i.e., fairness as outcome-based).
 
-Kleinberg et al. [#6]_ abstract the problem risk assessment via the use of
+Kleinberg et al. [#6]_ abstract the problem of  risk assessment via the use of
 vectors to represent information about  person, boolean values to
 represent group belonging, and risk assignment scores.
 
