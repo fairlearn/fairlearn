@@ -150,7 +150,8 @@ learning systems typically translate a real-world context into a machine learnin
 model through abstraction: focusing only on 'relevant' aspects of that context,
 which are typically described by inputs, outputs, and the relationship between them.
 However, by abstracting away the social context they are at risk of falling into
-'abstraction traps': a failure to consider how social context and technology are interrelated.
+'abstraction traps': a failure to consider how social context and technology
+are interrelated.
 
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
@@ -170,42 +171,46 @@ when modeling. They identify them as:
 * *The Framing Trap*
 
 We provide some definitions and examples of these traps to help Fairlearn
-users think about how choices they make in their work can lead to or avoid these common pitfalls.
+users think about how choices they make in their work can lead to or avoid
+these common pitfalls.
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
 This trap occurs when we assume that the best solution to a problem
-may involve technology, and fail to recognize other possible solutions outside of
-this realm.  Solutionist approaches may also not be appropriate in situations
-where definitions of fairness may change over time (see :ref:`<formalism_tag>`).
+may involve technology, and fail to recognize other possible solutions
+outside of this realm. Solutionist approaches may also not be appropriate
+in situations where definitions of fairness may change over time
+(see :ref:`<formalism_tag>`).
 
 Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that by using data science to
-study internet speed in a given region, insights we gain from using data science
-can help us in negotiating deals or discovering potential for good policies.
-However, if there are additional socioeconomic challenges within a community,
-for example with education, infrastructure, information
-technology, or health services, then an algorithmic solution purely focused on internet
-speed may fail to meaningfully address the needs of the community.
+study internet speed in a given region, insights we gain from using data
+science can help us in negotiating deals or discovering potential for good
+policies. However, if there are additional socioeconomic challenges within
+a community, for example with education, infrastructure, information
+technology, or health services, then an algorithmic solution purely
+focused on internet speed may fail to meaningfully address the needs of
+the community.
 
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
 
-This trap occurs when we do not consider the unintended consequences of introducing
-technology into an existing social system. Such consequences include changes in
-behaviors, outcomes, individual experiences, or changes in underlying social values
-and incentives of a given social system, for instance by increasing perceived value
-of quantifiable metrics over non-quantifiable ones.
+This trap occurs when we do not consider the unintended consequences of
+introducing technology into an existing social system. Such consequences
+include changes in behaviors, outcomes, individual experiences, or changes
+in underlying social values and incentives of a given social system, for
+instance by increasing perceived value of quantifiable metrics over
+non-quantifiable ones.
 
 Example: consider the problem of banks deciding whether an individual should
 be approved for a loan. Prior to using machine learning algorithms
-to compute a "score", banks might rely on loan officers engaging in conversations with
-clients, recommending a plan based on their unique situation, and
-discussing with other team members to obtain feedback. By introducing an
-algorithm, it is possible that loan officers may limit their conversations
-with team members and clients, assuming the algorithm's recommendations are good enough
-without those additional sources of information. 
+to compute a "score", banks might rely on loan officers engaging in
+conversations with clients, recommending a plan based on their unique
+situation, and discussing with other team members to obtain feedback.
+By introducing an algorithm, it is possible that loan officers may limit
+their conversations with team members and clients, assuming the algorithm's
+recommendations are good enough without those additional sources of information.
 
 To avoid this pitfall, we must be aware that once a technology is incorporated
 into a social context, new groups may reinterpret it differently. We should
@@ -225,54 +230,58 @@ formalism trap when we fail to account for the full meaning of social
 concepts like fairness.
 
 Fairness is a complex construct that is contested: different people may
-have different ideas of what is fair in a particular scenario. While mathematical
-fairness metrics may capture some aspects of fairness, they fail to capture all
-relevant aspects. For example, group fairness metrics do not account
-for differences in individual experiences nor do they account for
-procedural justice.
+have different ideas of what is fair in a particular scenario. While
+mathematical fairness metrics may capture some aspects of fairness, they
+fail to capture all relevant aspects. For example, group fairness metrics
+do not account for differences in individual experiences nor do they
+account for procedural justice.
 
-In some scenarios, fairness metrics such as demographic parity and equalized odds
-cannot be satisfied at the same time. At a first glance, this may appear to be a
-mathematical problem. However, the conflict is actually grounded in different
-understandings of what fairness is. Consequently, there is no mathematical
-approach to solve the conflict. Instead we need to decide which metrics might
-be appropriate for the situation at hand, keeping in mind the limitations of a
-mathematical formalization. In some cases, there may be no suitable metric.
+In some scenarios, fairness metrics such as demographic parity and equalized
+odds cannot be satisfied at the same time. At a first glance, this may appear
+to be a mathematical problem. However, the conflict is actually grounded in
+different understandings of what fairness is. Consequently, there is no
+mathematical approach to solve the conflict. Instead we need to decide which
+metrics might be appropriate for the situation at hand, keeping in mind the
+limitations of a mathematical formalization. In some cases, there may be no
+suitable metric.
 
-Some reasons why we fall into this trap are because fairness is context-dependent,
-because it is open to contestation by different groups of people, and because there are
-differences between ways of thinking about fairness between the legal world
-(i.e., fairness as procedural) and the fair-ML community (i.e., fairness as outcome-based).
+Some reasons why we fall into this trap are because fairness is
+context-dependent, because it is open to contestation by different groups
+of people, and because there are differences between ways of thinking about
+fairness between the legal world (i.e., fairness as procedural) and the fair-ML
+community (i.e., fairness as outcome-based).
 
-Kleinberg et al. [#6]_ abstract the problem of  risk assessment via the use of
-
-Where mathematical abstraction encounters a limitation is when capturing
-information regarding procedurality (for example, how do judges and police officers
-determine whether bail, counselling, probation, or incarceration is appropriate);
-contextuality (different communities may have different definitions for what constitutes an
-"unfair" outcome; different groups determine what constitutes immoral discrimination,
-for instance, is it unfair to hire an applicant whose primary language is English,
-for a English speaking role, over an applicant whose only spoken language is not English?);
-and contestability (the definitions of discrimination and unfairness are politically
-contested and change over time, which may pose fundamental challenges for representing
-them mathematically).
+Where mathematical abstraction encounters a limitation is when
+capturing information regarding procedurality (for example, how do judges
+and police officers determine whether bail, counselling, probation, or
+incarceration is appropriate); contextuality (different communities may have
+different definitions for what constitutes an "unfair" outcome; different
+groups determine what constitutes immoral discrimination, for instance, is it
+unfair to hire an applicant whose primary language is English, for an
+English speaking role, over an applicant whose only spoken language is
+not English?); and contestability (the definitions of discrimination and
+unfairness are politically contested and change over time, which may pose
+fundamental challenges for representing them mathematically).
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
 This trap occurs when we fail to understand how reusing a model or
-algorithm that is designed for one specific social context may not necessarily
-apply to a different social context. Reusing an algorithmic solution and failing
-to take into account differences in involved social contexts can result in misleading
-results and potentially harmful consequences. 
+algorithm that is designed for one specific social context may not
+necessarily apply to a different social context. Reusing an algorithmic
+solution and failing to take into account differences in involved social
+contexts can result in misleading results and potentially harmful consequences.
 
-For instance, reusing a machine learning algorithm used to screen job applications in the
-nursing industry, for a system used to screen job applications in the information technology
-sector could fall into the portability trap. One important difference between both contexts is
-the difference in skills required to succeed in both industries. Another key difference
-between these contexts involves the demographic differences (in terms of gender) of employees
-in each of these industries, which may result from wording in job postings, social constructs
-on gender and societal roles, and the male-female ratio of successful applicants in each field.
+For instance, reusing a machine learning algorithm used to screen
+job applications in the nursing industry, for a system used to screen
+job applications in the information technology sector could fall into the
+portability trap. One important difference between both contexts is
+the difference in skills required to succeed in both industries.
+Another key difference between these contexts involves the demographic
+differences (in terms of gender) of employees in each of these industries,
+which may result from wording in job postings, social constructs on gender
+and societal roles, and the male-female ratio of successful applicants in
+each field.
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
@@ -280,36 +289,39 @@ The Framing Trap
 This trap occurs when we fail to consider the full picture surrounding
 a particular social context when abstracting a social problem. Elements
 involved include but are not limited to: the social landscape that the
-chosen phenomenon exists in, characteristics of individuals or circumstances
-of the chosen situation, third parties involved along with their circumstances,
-and the task that is being set out to abstract (i.e. calculating a risk score,
-choosing between a pool of candidates, selecting an appropriate treatment, etc).
+chosen phenomenon exists in, characteristics of individuals or
+circumstances of the chosen situation, third parties involved along with
+their circumstances, and the task that is being set out to abstract
+(i.e. calculating a risk score, choosing between a pool of candidates,
+selecting an appropriate treatment, etc).
 
-To help us avoid drawing narrow boundaries of what is considered in scope for
-the problem, we might consider using wider "frames" around what is considered to be in
-scope for the problem, moving from an algorithmic frame to a sociotechnical frame.
+To help us avoid drawing narrow boundaries of what is considered in scope
+for the problem, we might consider using wider "frames" around what is
+considered to be in scope for the problem, moving from an algorithmic frame
+to a sociotechnical frame.
 
-For instance, adopting a _sociotechnical_ frame (instead of a data-focused, or algorithmic frame)
-allows us to recognize that a machine learning model is part
-of social and technical interactions between people and technology, and thus the social
-components of a given social context should be included as part of the problem formulation
-and modeling approach (including local decision-making processes, incentive structures,
-institutional processes, and more).
+For instance, adopting a _sociotechnical_ frame (instead of a data-focused,
+or algorithmic frame) allows us to recognize that a machine learning model
+is part of social and technical interactions between people and technology,
+and thus the social components of a given social context should be included
+as part of the problem formulation and modeling approach (including local
+decision-making processes, incentive structures, institutional processes,
+and more).
 
-For instance, we might fall into this trap by assessing risk of re-engagement in
-criminal behavior for an individual charged with an offense, while failing
-to consider factors such as the legacy of racial biases in criminal justice systems,
-the relationship of socio-economic status and mental health to the social construction
-of criminality, along with existing societal biases of judges, police officers, or
-other social actors involved in the larger sociotechnical frame around a criminal
-justice algorithm.
+For instance, we might fall into this trap by assessing risk of re-engagement
+in criminal behavior for an individual charged with an offense, while failing
+to consider factors such as the legacy of racial biases in criminal justice
+systems, the relationship of socio-economic status and mental health to the
+social construction of criminality, along with existing societal biases of
+judges, police officers, or other social actors involved in the larger
+sociotechnical frame around a criminal justice algorithm.
 
-Within the sociotechnical framework the model incorporates not only more nuanced
-data on the history of the case, but also the social context in which judging and
-recommending an outcome take place. This frame might incorporate the processes
-associated with crime reporting, the offense-trial pipeline, and identify how
-the relationship between various social actors and the algorithm may impact the
-intended outcomes of a given model.
+Within the sociotechnical framework the model incorporates not only more
+nuanced data on the history of the case, but also the social context in
+which judging and recommending an outcome take place. This frame might
+incorporate the processes associated with crime reporting, the offense-trial
+pipeline, and identify how the relationship between various social actors and
+the algorithm may impact the intended outcomes of a given model.
 
 .. topic:: References:
 
@@ -327,19 +339,20 @@ intended outcomes of a given model.
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
 	  
    .. [#4] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
-      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems" (August 23, 2018).
-      2019 ACM Conference on Fairness, Accountability, and Transparency (FAT*), 59-68, Available at
-      `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
+      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
+      (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
+      (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
    
-   .. [#5] Mark S. Ackerman. 2000. `"The intellectual challenge of CSCW: The gap between social requirements
-      and technical feasibility" https://doi.org/10.1207/S15327051HCI1523_5`. Human-Computer
-      Interaction 15, 2-3 (2000), 179–203.
+   .. [#5] Mark S. Ackerman. 2000. `"The intellectual challenge of CSCW: The gap between
+      social requirements and technical feasibility"
+      https://doi.org/10.1207/S15327051HCI1523_5`. Human-Computer Interaction 15,
+      2-3 (2000), 179–203.
 
-   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017. `"Inherent trade-offs
-      in the fair determination of risk scores" https://arxiv.org/abs/1609.05807`.
-      In Proc. of ITCS.
+   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017.
+      `"Inherent trade-offs in the fair determination of risk scores"
+      https://arxiv.org/abs/1609.05807`. In Proc. of ITCS.
 
-   .. [#7] Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer Wortman Vaughan,
-      Hanna Wallach, Hal Daumé III, Kate Crawford. "Datasheets for Datasets"
-      `https://arxiv.org/abs/1803.09010 <https://arxiv.org/abs/1803.09010>`_
-      (2018)
+   .. [#7] Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer
+      Wortman Vaughan, Hanna Wallach, Hal Daumé III, Kate Crawford.
+      "Datasheets for Datasets" `https://arxiv.org/abs/1803.09010
+      <https://arxiv.org/abs/1803.09010>`_ (2018)
