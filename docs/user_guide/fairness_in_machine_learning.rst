@@ -170,7 +170,7 @@ when modeling. They identify them as:
 * *The Framing Trap*
 
 We provide some definitions and examples of these traps to help Fairlearn
-users think about how choices they make in their work can avoid these common pitfalls.
+users think about how choices they make in their work can lead to or avoid these common pitfalls.
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
