@@ -240,9 +240,9 @@ be appropriate for the situation at hand, keeping in mind the limitations of a
 mathematical formalization. In some cases, there may be no suitable metric.
 
 Some reasons why we fall into this trap are because fairness is context-dependent,
-because it is open to contestation by different groups of people, and because there are differences between ways of thinking
-about fairness between the legal world (i.e., fairness as procedural)
-and the fair-ML community (i.e., fairness as outcome-based).
+because it is open to contestation by different groups of people, and because there are
+differences between ways of thinking about fairness between the legal world
+(i.e., fairness as procedural) and the fair-ML community (i.e., fairness as outcome-based).
 
 Kleinberg et al. [#6]_ abstract the problem of  risk assessment via the use of
 represent group belonging, and risk assignment scores.
@@ -250,12 +250,13 @@ represent group belonging, and risk assignment scores.
 Where mathematical abstraction encounters a limitation is when capturing
 information regarding procedurality (for example, how do judges and police officers
 determine whether bail, counselling, probation, or incarceration is appropriate);
-contextuality (different communities may have different definitions for what constitutes an "unfair" outcome;
-different groups determine what constitutes immoral discrimination, i.e. is it immoral
-to hire an applicant whose primary language is not English, for a non-English speaking role, over
-an applicant whose only spoken language is English?); and contestability (the definitions
-of discrimination and unfairness are politically contested and change over time, 
-which may pose fundamental challenges for representing them mathematically).
+contextuality (different communities may have different definitions for what constitutes an
+"unfair" outcome; different groups determine what constitutes immoral discrimination,
+for instance, is it unfair to hire an applicant whose primary language is English,
+for a English speaking role, over an applicant whose only spoken language is not English?);
+and contestability (the definitions of discrimination and unfairness are politically
+contested and change over time, which may pose fundamental challenges for representing
+them mathematically).
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
