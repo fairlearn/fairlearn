@@ -300,7 +300,6 @@ In the algorithmic framework, for example, input variables may contain previous 
 statements taken by the accused, witnesses and police officers. Labels (outcome)
 include recommendations by the algorithm on an appropriate course of action based
 
-recommended outcome.
 
 Within the sociotechnical framework the model incorporates not only more nuanced
 data on the history of the case, but also the social context in which judging and
