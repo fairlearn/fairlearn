@@ -239,7 +239,7 @@ approach to solve the conflict. Instead we need to decide which metrics might
 be appropriate for the situation at hand, keeping in mind the limitations of a
 mathematical formalization. In some cases, there may be no suitable metric.
 
-Some reasons why we fall into this trap is because fairness is context-dependent,
+Some reasons why we fall into this trap are because fairness is context-dependent,
 open to contestation by different groups of people, and differences between ways of thinking
 about fairness between the legal world (i.e., fairness as procedural)
 and the fair-ML community (i.e., fairness as outcome-based).
