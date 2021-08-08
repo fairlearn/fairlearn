@@ -207,7 +207,6 @@ discussing with other team members to obtain feedback. By introducing an
 algorithm, it is possible that loan officers may limit their conversations
 with team members and clients, assuming the algorithm's recommendations are good enough
 without those additional sources of information. 
-that takes advantage of people who need funds but did not receive them.
 
 To avoid this pitfall, we must be aware that once a technology is incorporated
 into a social context, new groups may reinterpret it differently. We should
