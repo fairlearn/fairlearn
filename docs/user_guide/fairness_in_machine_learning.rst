@@ -267,9 +267,9 @@ to take into account differences in involved social contexts can result in misle
 results and potentially harmful consequences. 
 
 For instance, reusing a machine learning algorithm used to screen job applications in the
-nursing industry, for job applications in the information technology sector. An intuitive
-yet important difference between both contexts is the difference in skills required to
-succeed in both industries. A slightly more subtle difference is the demographic differences
+nursing industry, for a system used to screen job applications in the information technology sector could fall into the portability trap. One
+important difference between both contexts is the difference in skills required to
+succeed in both industries. Another key difference between these contexts involves the demographic differences
 (in terms of gender) of employees in each of these industries, which may result from
 wording in job postings, social constructs on gender and societal roles, and the male-female
 ratio of successful applicants in each field.
@@ -289,28 +289,25 @@ To help us avoid drawing narrow boundaries of what is considered in scope for
 the problem, we might consider using wider "frames" around what is considered to be in
 scope for the problem, moving from an algorithmic frame to a sociotechnical frame.
 
-The sociotechnical frame recognizes that a machine learning model is part
+For instance, adopting a _sociotechnical_ frame (instead of a data-focused, or algorithmic frame) allows us to recognize that a machine learning model is part
 of social and technical interactions between people and technology, and thus the social
-components of this within this social context should be included as part of the problem
+components of a given social context should be included as part of the problem formulation
 and modeling approach (including local decision-making processes, incentive structures,
 institutional processes, and more).
 
-Example: assessing risk of re-engagement in criminal behaviour in an individual
+For instance, we might fall into this trap by assessing risk of re-engagement in criminal behavior for an individual
 charged with an offense, while failing
-to consider factors such as race, socio-economic status, mental health, along with
-socially-dependent views present in judges, police officers, or any actors responsible
-for recommending a course of action.
+to consider factors such as the legacy of racial biases in criminal justice systems, the relationship of socio-economic status and mental health to the social construction of criminality, along with
+existing societal biases of judges, police officers, or other social actors
+involved in the larger sociotechnical frame around a criminal justice algorithm.
 
-In the algorithmic framework, for example, input variables may contain previous criminal history,
-statements taken by the accused, witnesses and police officers. Labels (outcome)
-include recommendations by the algorithm on an appropriate course of action based
 
 
 Within the sociotechnical framework the model incorporates not only more nuanced
 data on the history of the case, but also the social context in which judging and
-recommending an outcome take place. This frame incorporates the processes
-associated with crime reporting, the offense-trial pipeline, and identifies areas
-in which different people interact with one another as outcomes are recommended.
+recommending an outcome take place. This frame might incorporate the processes
+associated with crime reporting, the offense-trial pipeline, and identify how
+the relationship between various social actors and the algorithm may impact the intended outcomes of a given model.
 
 .. topic:: References:
 
