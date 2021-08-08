@@ -299,7 +299,6 @@ for recommending a course of action.
 In the algorithmic framework, for example, input variables may contain previous criminal history,
 statements taken by the accused, witnesses and police officers. Labels (outcome)
 include recommendations by the algorithm on an appropriate course of action based
-on a computed risk score. Model is limited in assessing fairness out outcome.
 
 information regarding the accused, their upbringing and how it relates to their
 current status, along with a recommendation that incorporates these factors into the
