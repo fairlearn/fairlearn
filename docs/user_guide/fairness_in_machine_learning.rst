@@ -185,7 +185,7 @@ Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that by using data science to
 study internet speed in a given region, insights we gain from using data science
 can help us in negotiating deals or discovering potential for good policies.
-However, if there are additional socioeconomic problems within a community,
+However, if there are additional socioeconomic challenges within a community,
 for example with education, infrastructure, information
 technology and health services, then an algorithmic solution purely focused on internet
 speed will fail to meaningfully address the needs of the community.
