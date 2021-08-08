@@ -250,7 +250,7 @@ represent group belonging, and risk assignment scores.
 Where mathematical abstraction encounters a limitation is when capturing
 information regarding procedurality (for example, how do judges and police officers
 determine whether bail, counselling, probation, or incarceration is appropriate);
-contextuality (different societies determine what constitutes an "unfair" outcome, furthermore
+contextuality (different communities may have different definitions for what constitutes an "unfair" outcome;
 different groups determine what constitutes immoral discrimination, i.e. is it immoral
 to hire an applicant whose primary language is not English, for a non-English speaking role, over
 an applicant whose only spoken language is English?); and contestability (the definitions
