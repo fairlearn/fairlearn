@@ -254,7 +254,7 @@ The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
 This trap occurs when we fail to understand how reusing a model or
-algorithm that is designed for one specific social context, may not necessarily
+algorithm that is designed for one specific social context may not necessarily
 apply to a different social context. Reusing an algorithmic solution and failing
 to take into account differences in involved social contexts can result in misleading
 results and potentially harmful consequences. 
