@@ -150,7 +150,7 @@ learning systems typically translate a real-world context into a machine learnin
 model through abstraction: focusing only on 'relevant' aspects of that context,
 which are typically described by inputs, outputs, and the relationship between them.
 However, by abstracting away the social context they are at risk of falling into
-'abstraction traps': a failure to consider how social context and technology is interrelated.
+'abstraction traps': a failure to consider how social context and technology are interrelated.
 
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
