@@ -195,7 +195,7 @@ The Ripple Effect Trap
 
 This trap occurs when we do not consider the unintended consequences of introducing
 technology into an existing social system. Such consequences include changes in
-behavior, outcomes individual experience and a change in underlying social values
+behaviors, outcomes, individual experiences, or changes in underlying social values
 and incentives of a given social system, for instance by increasing perceived value
 of quantifiable metrics over non-quantifiable ones.
 
