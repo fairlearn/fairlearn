@@ -184,7 +184,7 @@ See also the "Construct Validity" section in Fairlearn's user guide.
 Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that by using data science to
 study internet speed in a given region, insights we gain from using data science
-help us in negotiating deals or discovering potential for good policies.
+can help us in negotiating deals or discovering potential for good policies.
 However, if there are additional socioeconomic problems within a community,
 for example lack of education, infrastructure, information
 technology and health services, then an algorithmic solution purely focused on internet
