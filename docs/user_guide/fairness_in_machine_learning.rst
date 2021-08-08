@@ -245,7 +245,6 @@ about fairness between the legal world (i.e., fairness as procedural)
 and the fair-ML community (i.e., fairness as outcome-based).
 
 Kleinberg et al. [#6]_ abstract the problem of  risk assessment via the use of
-vectors to represent information about  person, boolean values to
 represent group belonging, and risk assignment scores.
 
 Where mathematical abstraction encounters a limitation is when capturing
