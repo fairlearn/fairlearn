@@ -407,8 +407,8 @@ class MetricFrame:
                     mf = self._by_group
                     max_vals = [mf[m].max() for m in mf.columns]
                     result = pd.Series(max_vals, index=self._by_group.columns, dtype='object')
-                except ValueError:
-                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+                except ValueError as ve:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == 'coerce':
                 if not self.control_levels:
                     mf = self._by_group
@@ -419,8 +419,8 @@ class MetricFrame:
             if errors == 'raise':
                 try:
                     result = self._by_group.groupby(level=self.control_levels).max()
-                except ValueError:
-                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+                except ValueError as ve:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == 'coerce':
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self._by_group.copy()
@@ -466,8 +466,8 @@ class MetricFrame:
                     mf = self._by_group
                     min_vals = [mf[m].min() for m in mf.columns]
                     result = pd.Series(min_vals, index=self._by_group.columns, dtype='object')
-                except ValueError:
-                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+                except ValueError as ve:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == 'coerce':
                 if not self.control_levels:
                     mf = self._by_group
@@ -478,8 +478,8 @@ class MetricFrame:
             if errors == 'raise':
                 try:
                     result = self._by_group.groupby(level=self.control_levels).min()
-                except ValueError:
-                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+                except ValueError as ve:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == 'coerce':
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self._by_group.copy()
@@ -541,9 +541,9 @@ class MetricFrame:
 
         try:
             return (self.by_group - subtrahend).abs().max(level=self.control_levels)
-        except ValueError:
+        except ValueError as ve:
             if errors == 'raise':
-                raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+                raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == 'coerce':
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self.by_group.copy()
