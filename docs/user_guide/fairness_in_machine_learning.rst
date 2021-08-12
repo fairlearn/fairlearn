@@ -273,15 +273,15 @@ solution and failing to take into account differences in involved social
 contexts can result in misleading results and potentially harmful consequences.
 
 For instance, reusing a machine learning algorithm used to screen
-job applications in the nursing industry, for a system used to screen
+job applications in the nursing industry for a system used to screen
 job applications in the information technology sector could fall into the
 portability trap. One important difference between both contexts is
 the difference in skills required to succeed in both industries.
 Another key difference between these contexts involves the demographic
 differences (in terms of gender) of employees in each of these industries,
 which may result from wording in job postings, social constructs on gender
-and societal roles, and the male-female ratio of successful applicants in
-each field.
+and societal roles, and the percentages of successful applicants in
+each field per (gender) group.
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
@@ -292,7 +292,7 @@ involved include but are not limited to: the social landscape that the
 chosen phenomenon exists in, characteristics of individuals or
 circumstances of the chosen situation, third parties involved along with
 their circumstances, and the task that is being set out to abstract
-(i.e. calculating a risk score, choosing between a pool of candidates,
+(i.e., calculating a risk score, choosing between a pool of candidates,
 selecting an appropriate treatment, etc).
 
 To help us avoid drawing narrow boundaries of what is considered in scope
