@@ -539,16 +539,15 @@ class MetricFrame:
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        try:
-            return (self.by_group - subtrahend).abs().max(level=self.control_levels)
-        except ValueError as ve:
-            if errors == 'raise':
-                raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
-            elif errors == 'coerce':
-                # Fill all impossible columns with NaN before grouping metric frame
-                mf = self.by_group.copy()
-                mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
-                return (mf - subtrahend).abs().max(level=self.control_levels)
+        mf = self.by_group.copy()
+        # Can assume errors='coerce', else error would already have been raised in .group_min
+        # Fill all non-scalar values with NaN
+        if isinstance(mf, pd.Series):
+            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
+        else:
+            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+
+        return (mf - subtrahend).abs().max(level=self.control_levels)
 
     def ratio(self,
               method: str = 'between_groups',
