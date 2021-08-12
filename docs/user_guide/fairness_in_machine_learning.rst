@@ -316,11 +316,11 @@ social construction of criminality, along with existing societal biases of
 judges, police officers, or other social actors involved in the larger
 sociotechnical frame around a criminal justice algorithm.
 
-Within the sociotechnical framework the model incorporates not only more
+Within the sociotechnical frame the model incorporates not only more
 nuanced data on the history of the case, but also the social context in
 which judging and recommending an outcome take place. This frame might
 incorporate the processes associated with crime reporting, the offense-trial
-pipeline, and identify how the relationship between various social actors and
+pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
 
 .. topic:: References:
