@@ -256,7 +256,7 @@ capturing information regarding procedurality (for example, how do judges
 and police officers determine whether bail, counselling, probation, or
 incarceration is appropriate); contextuality (different communities may have
 different definitions for what constitutes an "unfair" outcome;
-groups determine what constitutes immoral discrimination, for instance, is it
+ for instance, is it
 unfair to hire an applicant whose primary language is English, for an
 English speaking role, over an applicant whose only spoken language is
 not English?); and contestability (the definitions of discrimination and
