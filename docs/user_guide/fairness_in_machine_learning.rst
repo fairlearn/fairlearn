@@ -181,13 +181,13 @@ This trap occurs when we assume that the best solution to a problem
 may involve technology, and fail to recognize other possible solutions
 outside of this realm. Solutionist approaches may also not be appropriate
 in situations where definitions of fairness may change over time
-(see :ref:`<formalism_tag>`).
+(see :ref:`formalism_trap`).
 
 Example: consider the problem of internet connectivity in rural communities.
-An example of the solutionism trap is assuming that by using data science to
-study internet speed in a given region, insights we gain from using data
-science can help us in negotiating deals or discovering potential for good
-policies. However, if there are additional socioeconomic challenges within
+An example of the solutionism trap is assuming that using data science to
+measure internet speed in a given region
+can help improve internet connectivity.
+ However, if there are additional socioeconomic challenges within
 a community, for example with education, infrastructure, information
 technology, or health services, then an algorithmic solution purely
 focused on internet speed may fail to meaningfully address the needs of
@@ -199,15 +199,15 @@ The Ripple Effect Trap
 This trap occurs when we do not consider the unintended consequences of
 introducing technology into an existing social system. Such consequences
 include changes in behaviors, outcomes, individual experiences, or changes
-in underlying social values and incentives of a given social system, for
-instance by increasing perceived value of quantifiable metrics over
+in underlying social values and incentives of a given social system; for
+instance, by increasing perceived value of quantifiable metrics over
 non-quantifiable ones.
 
 Example: consider the problem of banks deciding whether an individual should
 be approved for a loan. Prior to using machine learning algorithms
-to compute a "score", banks might rely on loan officers engaging in
-conversations with clients, recommending a plan based on their unique
-situation, and discussing with other team members to obtain feedback.
+to compute a "score", banks might rely on loan officers that engage in
+conversations with clients, recommend a plan based on their unique
+situation, and discuss with other team members to obtain feedback.
 By introducing an algorithm, it is possible that loan officers may limit
 their conversations with team members and clients, assuming the algorithm's
 recommendations are good enough without those additional sources of information.
@@ -219,7 +219,7 @@ after introducing a model, including how it may change the power dynamics of
 existing groups in that context, or how actors might change their behaviors to
 game the model.
 
-.. _<formalism_tag>:
+.. _formalism_trap:
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
@@ -233,7 +233,7 @@ Fairness is a complex construct that is contested: different people may
 have different ideas of what is fair in a particular scenario. While
 mathematical fairness metrics may capture some aspects of fairness, they
 fail to capture all relevant aspects. For example, group fairness metrics
-do not account for differences in individual experiences nor do they
+do not account for differences in individual experiences, nor do they
 account for procedural justice.
 
 In some scenarios, fairness metrics such as demographic parity and equalized
@@ -255,7 +255,7 @@ Where mathematical abstraction encounters a limitation is when
 capturing information regarding procedurality (for example, how do judges
 and police officers determine whether bail, counselling, probation, or
 incarceration is appropriate); contextuality (different communities may have
-different definitions for what constitutes an "unfair" outcome; different
+different definitions for what constitutes an "unfair" outcome;
 groups determine what constitutes immoral discrimination, for instance, is it
 unfair to hire an applicant whose primary language is English, for an
 English speaking role, over an applicant whose only spoken language is
