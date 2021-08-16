@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 """
-================================
-Plotting Metrics with Error Bars
-================================
+============================
+Plotting Metrics with Errors
+============================
 """
 # %%
 # Load and preprocess the data set
@@ -47,18 +47,18 @@ z_score = 1.959964
 digits_of_precision = 4
 
 
-def wilson(p, n, digits=digits_of_precision, z=z_score):
-    """Return lower and upper bound"""
+def general_wilson(p, n, digits=digits_of_precision, z=z_score):
+    """Return lower and upper bound using Wilson Interval."""
     denominator = 1 + z**2/n
     centre_adjusted_probability = p + z*z / (2*n)
     adjusted_standard_deviation = np.sqrt((p*(1 - p) + z*z / (4*n)))/np.sqrt(n)
     lower_bound = (centre_adjusted_probability - z*adjusted_standard_deviation) / denominator
     upper_bound = (centre_adjusted_probability + z*adjusted_standard_deviation) / denominator
-    return (round(lower_bound, digits), round(upper_bound, digits))
+    return [round(lower_bound, digits), round(upper_bound, digits)]
 
 
-def compute_error_metric(metric_value, sample_size, z_score):
-    """Compute standard error calculation (for binary classification).
+def general_normal_err_binomial(p, n, digits=digits_of_precision, z=z_score):
+    """Return standard error (for binary classification).
 
     Assumes infinitely large population.
     Should be used when the sampling fraction is small.
@@ -68,35 +68,35 @@ def compute_error_metric(metric_value, sample_size, z_score):
     ----------
     .. [1] https://en.wikipedia.org/wiki/Margin_of_error
     """
-    return z_score*np.sqrt(metric_value*(1.0-metric_value))/np.sqrt(sample_size)
+    return round(z*np.sqrt(p*(1.0-p))/np.sqrt(n), digits)
 
 
 def recall_wilson(y_true, y_pred):
     assert len(y_true) == len(y_pred)
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)
+    bounds = general_wilson(tp/(tp+fn), tp + fn, digits_of_precision, z_score)
     return bounds
 
 
 def recall_normal_err(y_true, y_pred):
     assert len(y_true) == len(y_pred)
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    error = compute_error_metric(tp/(tp+fn), tp + fn, z_score=z_score)
-    return (error, error)
+    error = general_normal_err_binomial(tp/(tp+fn), tp + fn, digits_of_precision, z_score)
+    return error
 
 
 def accuracy_wilson(y_true, y_pred):
     assert len(y_true) == len(y_pred)
     score = accuracy_score(y_true, y_pred)
-    bounds = wilson(score, len(y_true), digits_of_precision, z_score)
+    bounds = general_wilson(score, len(y_true), digits_of_precision, z_score)
     return bounds
 
 
 def accuracy_normal_err(y_true, y_pred):
     assert len(y_true) == len(y_pred)
     score = accuracy_score(y_true, y_pred)
-    error = compute_error_metric(score, len(y_true), z_score)
-    return (error, error)
+    error = general_normal_err_binomial(score, len(y_true), digits_of_precision, z_score)
+    return error
 
 
 # %%
@@ -124,7 +124,7 @@ metrics_dict = {
     'Accuracy Bounds': accuracy_wilson,
     'Accuracy Error': accuracy_normal_err,
 }
-metric_frame = MetricFrame(metrics_dict, y_test_true, y_test_pred, sensitive_features=test_set_sex)
+metric_frame = MetricFrame(metrics=metrics_dict, y_true=y_test_true, y_pred=y_test_pred, sensitive_features=test_set_sex)
 
 # %%
 # Plotting
@@ -138,9 +138,9 @@ plot_metric_frame(metric_frame, kind="scatter", metrics=['Recall', 'Accuracy'])
 # ----------------------------------------
 plot_metric_frame(metric_frame, kind="scatter",
                   metrics=['Recall', 'Accuracy'],
-                  error_bars=['Recall Error', 'Accuracy Error'],
+                  errors=['Recall Error', 'Accuracy Error'],
                   figsize=(12, 4), subplots=True, layout=[2, 1])
-plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error', colormap="Pastel1")
+plot_metric_frame(metric_frame, kind="bar", metrics='Recall', errors='Recall Error', colormap="Pastel1")
 
 
 # %%
@@ -154,7 +154,7 @@ plot_metric_frame(metric_frame, kind="scatter",
 # %%
 # Plot metrics with error labels
 # ------------------------------
-plot_metric_frame(metric_frame, kind="bar", metrics='Recall', error_bars='Recall Error', colormap="Pastel1", plot_error_labels=True)
+plot_metric_frame(metric_frame, kind="bar", metrics='Recall', errors='Recall Error', colormap="Pastel1", plot_error_labels=True)
 
 # %%
 # Plots all columns and treats them as metrics without error bars
@@ -168,13 +168,14 @@ plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 
 axs = plot_metric_frame(metric_frame,
                         metrics=['Recall', 'Accuracy'],
-                        error_bars=['Recall Error', 'Accuracy Error'],
+                        errors=['Recall Error', 'Accuracy Error'],
                         figsize=(12, 4),
                         kind="scatter",
                         colormap="rainbow",
                         rot=45,
                         subplots=True,
-                        layout=[1, 2])
+                        layout=[1, 2],
+                        legend_label="95% Confidence Interval")
 axs[0][0].set_ylabel("Recall")
 axs[0][0].set_title("Recall Plot")
 axs[0][1].set_title("Accuracy Plot")
@@ -201,8 +202,8 @@ def error_metric_function(y_true, y_pred):
 
     # compute custom metric function here
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    bounds = wilson(tp/(tp+fn), tp + fn, digits_of_precision,
-                    z_score)
+    bounds = general_wilson(tp/(tp+fn), tp + fn, digits_of_precision,
+                            z_score)
 
     # returns the bounds in the format (lower_bound, upper_bound)
     return bounds
