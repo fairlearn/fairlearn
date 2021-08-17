@@ -379,8 +379,10 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def group(self, grouping_function: str, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
+    def __group(self, grouping_function: str, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
+
+        This is a private method, please use .group_min() or .group_max() instead.
 
         Parameters
         ----------
@@ -471,7 +473,7 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.group('max', errors)
+        return self.__group('max', errors)
 
     def group_min(self, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -495,7 +497,7 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.group('min', errors)
+        return self.__group('min', errors)
 
     def difference(self,
                    method: str = 'between_groups',
