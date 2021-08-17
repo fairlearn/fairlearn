@@ -30,8 +30,8 @@ _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = \
     "Calculated conf_intervals' upper bound cannot be less than lower bound"
 
 
-def _is_arraylike(error):
-    return (isinstance(error, np.ndarray) or isinstance(error, list))
+def _is_arraylike(input):
+    return (isinstance(input, np.ndarray) or isinstance(input, list))
 
 
 def _check_if_metrics_and_error_metrics_same_length(metrics, errors, conf_intervals):
@@ -83,6 +83,15 @@ def _check_valid_conf_interval(df_conf_intervals):
             raise ValueError(_CONF_INTERVALS_FLIPPED_BOUNDS_ERROR)
 
 
+def _build_legend(ax, kind, legend_label):
+    color = ax.lines[0].get_color() if kind == "scatter" else "black"
+
+    # extend legend with 95% CI text
+    handles, labels = ax.get_legend_handles_labels()
+    custom_line = [Line2D([0], [0], color=color, label=legend_label)]
+    handles.extend(custom_line)
+    ax.legend(handles=handles)
+
 def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
     if df_all_errors is not None:
         yerr = np.array(
@@ -96,27 +105,9 @@ def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kw
 
         if isinstance(axs, np.ndarray):
             for ax in axs.flatten():
-                if kind == "scatter":
-                    color = ax.lines[0].get_color()
-                else:
-                    color = "black"
-
-                # extend legend with 95% CI text
-                handles, labels = ax.get_legend_handles_labels()
-                custom_line = [Line2D([0], [0], color=color, label=legend_label)]
-                handles.extend(custom_line)
-                ax.legend(handles=handles)
+                _build_legend(ax, kind, legend_label)
         else:
-            if kind == "scatter":
-                color = axs.lines[0].get_color()
-            else:
-                color = "black"
-
-            # extend legend with 95% CI text
-            handles, labels = axs.get_legend_handles_labels()
-            custom_line = [Line2D([0], [0], color=color, label=legend_label)]
-            handles.extend(custom_line)
-            axs.legend(handles=handles)
+            _build_legend(axs, kind, legend_label)
 
     else:
         if kind == "scatter":
@@ -158,7 +149,7 @@ def plot_metric_frame(metric_frame: MetricFrame, *,
         The collection of disaggregated metric values, along with the metric errors.
 
     kind : str, default="scatter"
-        The type of plot to display. i.e. "bar", "line", etc.
+        The type of plot to display. e.g. "bar", "line", etc.
         List of options is detailed in :meth:`pandas.DataFrame.plot`
 
     metrics : str or list of str
@@ -178,7 +169,7 @@ def plot_metric_frame(metric_frame: MetricFrame, *,
 
         Note:
             The return of the error function should be an scalar of the
-            symmetric errors. i.e. :code:`0.01`
+            symmetric errors. e.g. :code:`0.01`
 
     conf_intervals : str or list of str
         The name of the confidence intervals to plot.
@@ -186,7 +177,7 @@ def plot_metric_frame(metric_frame: MetricFrame, *,
 
         Note:
             The return of the error function should be an array of the lower
-            and upper bounds. i.e. :code:`[0.59, 0.62]`
+            and upper bounds. e.g. :code:`[0.59, 0.62]`
 
     subplots : bool, default=True
         Whether or not to plot metrics on separate subplots

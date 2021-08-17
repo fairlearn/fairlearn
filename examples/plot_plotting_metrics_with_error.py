@@ -9,11 +9,6 @@ Plotting Metrics with Errors
 # %%
 # Load and preprocess the data set
 # ================================
-# We download the data set using :meth:`fetch_openml` function in :class:`sklearn.datasets`.
-# The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
-# There are some caveats to using this dataset, but we will use it solely as an example
-# to demonstrate the plotting metrics with error bars functionality
-#
 # We start by importing the various modules we're going to use:
 from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 from fairlearn.metrics import MetricFrame
@@ -21,9 +16,19 @@ from sklearn.datasets import fetch_openml
 from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import make_column_selector as selector
+from sklearn.pipeline import Pipeline
 import pandas as pd
 import numpy as np
 
+# %%
+# We download the data set using :meth:`fetch_openml` function in :class:`sklearn.datasets`.
+# The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
+# There are some caveats to using this dataset, but we will use it solely as an example
+# to demonstrate the plotting metrics with error bars functionality
 
 data = fetch_openml(data_id=1590, as_frame=True)
 X = data.data
@@ -31,9 +36,40 @@ y = (data.target == '>50K') * 1
 X_train, X_test, y_train_true, y_test_true = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
-X_train_processed = pd.get_dummies(X_train)
-X_test_processed = pd.get_dummies(X_test)
+numeric_transformer = Pipeline(
+    steps=[
+        ("impute", SimpleImputer()),
+        ("scaler", StandardScaler()),
+    ]
+)
+
+categorical_transformer = Pipeline(
+    [
+        ("impute", SimpleImputer(strategy="most_frequent")),
+        ("ohe", OneHotEncoder(handle_unknown="ignore", sparse=False)),
+    ]
+)
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", numeric_transformer, selector(dtype_exclude="category")),
+        ("cat", categorical_transformer, selector(dtype_include="category")),
+    ]
+)
+
+X_train_processed = preprocessor.fit_transform(X_train)
+X_test_processed = preprocessor.transform(X_test)
 test_set_sex = X_test['race']
+
+# %%
+# Classifier
+# ==========
+# Now we use a :py:class:`sklearn.tree.DecisionTreeClassifier` to make predictions
+#
+
+classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+classifier.fit(X_train_processed, y_train_true)
+y_test_pred = classifier.predict(X_test_processed)
 
 # %%
 # Error metric calculations
@@ -98,16 +134,6 @@ def accuracy_normal_err(y_true, y_pred):
     error = general_normal_err_binomial(score, len(y_true), digits_of_precision, z_score)
     return error
 
-
-# %%
-# Classifier
-# ==========
-# Now we use a :py:class:`sklearn.tree.DecisionTreeClassifier` to make predictions
-#
-
-classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-classifier.fit(X_train_processed, y_train_true)
-y_test_pred = classifier.predict(X_test_processed)
 
 # %%
 # MetricFrame
@@ -197,15 +223,30 @@ axs[0][1].set_ylim((0, 1))
 # that takes in :code:`y_true` and :code:`y_pred`, and returns the error metric:
 
 
-def error_metric_function(y_true, y_pred):
+def custom_error_metric_function(y_true, y_pred):
     assert len(y_true) == len(y_pred)
 
     # compute custom metric function here
+    # In this case, we will calculate a wilson bound for recall
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     bounds = general_wilson(tp/(tp+fn), tp + fn, digits_of_precision,
                             z_score)
 
     # returns the bounds in the format (lower_bound, upper_bound)
     return bounds
+
+# %%
+metrics_dict = {
+    'Recall': recall_score,
+    'Recall Bounds': custom_error_metric_function,
+}
+metric_frame = MetricFrame(metrics=metrics_dict, y_true=y_test_true, y_pred=y_test_pred, sensitive_features=test_set_sex)
+
+# %%
+# Plotting
+# ========
+# Plot metrics without error bars
+# -------------------------------
+plot_metric_frame(metric_frame, kind="bar", metrics='Recall', conf_intervals='Recall Bounds')
 
 # %%
