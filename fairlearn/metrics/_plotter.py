@@ -30,8 +30,8 @@ _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = \
     "Calculated conf_intervals' upper bound cannot be less than lower bound"
 
 
-def _is_arraylike(input):
-    return (isinstance(input, np.ndarray) or isinstance(input, list))
+def _is_arraylike(input_):
+    return (isinstance(input_, np.ndarray) or isinstance(input_, list))
 
 
 def _check_if_metrics_and_error_metrics_same_length(metrics, errors, conf_intervals):
@@ -91,6 +91,7 @@ def _build_legend(ax, kind, legend_label):
     custom_line = [Line2D([0], [0], color=color, label=legend_label)]
     handles.extend(custom_line)
     ax.legend(handles=handles)
+
 
 def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
     if df_all_errors is not None:

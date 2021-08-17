@@ -21,7 +21,6 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
-import pandas as pd
 import numpy as np
 
 # %%
@@ -234,6 +233,7 @@ def custom_error_metric_function(y_true, y_pred):
 
     # returns the bounds in the format (lower_bound, upper_bound)
     return bounds
+
 
 # %%
 metrics_dict = {
