@@ -10,6 +10,4 @@ Importing this file imports the standalone function `plot_metric_frame`
 that visualizes metrics and their statistical metric errors from MetricFrames.
 """
 
-from ..metrics._plotter import (  # noqa: F401
-    plot_metric_frame
-)
+from ..metrics._plotter import plot_metric_frame  # noqa: F401
