@@ -24,6 +24,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Janhavi Mahajan](https://github.com/janhavi13)
 - [Vanessa Milan](https://www.microsoft.com/en-us/research/people/vmilan/)
 - [Sangeeta Mudnal](https://www.linkedin.com/in/sangeeta-mudnal-36868429/)
+- [Nils Müller](https://www.github.com/shimst3r)
 - [Lauren Pendo](https://github.com/laurenpendo)
 - [Stephen Robicheaux](https://github.com/stephenrobic)
 - [Kevin Robinson](https://github.com/kevinrobinson)

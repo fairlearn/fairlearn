@@ -31,7 +31,8 @@ Current release
 
 -  Our current version may differ substantially from earlier versions.
    Users of earlier versions should visit our
-   `migration guide <https://fairlearn.org/main/user_guide/mitigation.html>`__.
+   `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`_
+   to navigate significant changes and find information on how to migrate.
 
 What we mean by *fairness*
 --------------------------
@@ -119,17 +120,8 @@ guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
 Maintainers
 -----------
 
-The Fairlearn project is maintained by:
-
--  **@adrinjalali**
--  **@hildeweerts**
--  **@MiroDudik**
--  **@mmadaio**
--  **@riedgar-ms**
--  **@romanlutz**
-
-For a full list of contributors refer to the `authors
-page <./AUTHORS.md>`__
+A list of current maintainers is
+`on our website <https://fairlearn.org/main/about/index.html>`__.
 
 Issues
 ------
