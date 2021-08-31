@@ -1412,8 +1412,6 @@ class Test1m1sf0cfErrorHandlingCM:
         self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2)
 
-        self.expected = pd.Series({"confusion_matrix": np.nan}, dtype=object)
-
     def test_min_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
@@ -1423,7 +1421,7 @@ class Test1m1sf0cfErrorHandlingCM:
     def test_min_coerce(self):
         self._prepare()
         target_mins = self.target.group_min(errors='coerce')
-        assert target_mins.equals(self.expected)
+        assert target_mins.isna().all()
 
     def test_min_wrong_input(self):
         self._prepare()
@@ -1447,7 +1445,7 @@ class Test1m1sf0cfErrorHandlingCM:
     def test_max_coerce(self):
         self._prepare()
         target_maxs = self.target.group_max(errors='coerce')
-        assert target_maxs.equals(self.expected)
+        assert target_maxs.isna().all()
 
     def test_max_wrong_input(self):
         self._prepare()
@@ -1471,7 +1469,7 @@ class Test1m1sf0cfErrorHandlingCM:
     def test_difference_coerce(self):
         self._prepare()
         target_differences = self.target.difference(errors='coerce')
-        assert target_differences.equals(self.expected)
+        assert target_differences.isna().all()
 
     def test_difference_wrong_input(self):
         self._prepare()
@@ -1483,7 +1481,7 @@ class Test1m1sf0cfErrorHandlingCM:
         # default is 'coerce'
         self._prepare()
         target_differences = self.target.difference()
-        assert target_differences.equals(self.expected)
+        assert target_differences.isna().all()
 
     def test_ratio_raise(self):
         self._prepare()
@@ -1494,7 +1492,7 @@ class Test1m1sf0cfErrorHandlingCM:
     def test_ratio_coerce(self):
         self._prepare()
         target_ratio = self.target.ratio(errors='coerce')
-        assert target_ratio.equals(self.expected)
+        assert target_ratio.isna().all()
 
     def test_ratio_wrong_input(self):
         self._prepare()
@@ -1506,7 +1504,7 @@ class Test1m1sf0cfErrorHandlingCM:
         # default is 'coerce'
         self._prepare()
         target_ratio = self.target.ratio()
-        assert target_ratio.equals(self.expected)
+        assert target_ratio.isna().all()
 
 
 class Test2m1sf0cfErrorHandlingCM2:
@@ -1518,9 +1516,6 @@ class Test2m1sf0cfErrorHandlingCM2:
         self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2)
 
-        self.expected = pd.Series({"confusion_matrix1": np.nan,
-                                   "confusion_matrix2": np.nan}, dtype=object)
-
     def test_min_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
@@ -1530,7 +1525,7 @@ class Test2m1sf0cfErrorHandlingCM2:
     def test_min_coerce(self):
         self._prepare()
         target_mins = self.target.group_min(errors='coerce')
-        assert target_mins.equals(self.expected)
+        assert target_mins.isna().all()
 
     def test_min_wrong_input(self):
         self._prepare()
@@ -1554,7 +1549,7 @@ class Test2m1sf0cfErrorHandlingCM2:
     def test_max_coerce(self):
         self._prepare()
         target_maxs = self.target.group_max(errors='coerce')
-        assert target_maxs.equals(self.expected)
+        assert target_maxs.isna().all()
 
     def test_max_wrong_input(self):
         self._prepare()
@@ -1578,7 +1573,7 @@ class Test2m1sf0cfErrorHandlingCM2:
     def test_difference_coerce(self):
         self._prepare()
         target_differences = self.target.difference(errors='coerce')
-        assert target_differences.equals(self.expected)
+        assert target_differences.isna().all()
 
     def test_difference_wrong_input(self):
         self._prepare()
@@ -1590,7 +1585,7 @@ class Test2m1sf0cfErrorHandlingCM2:
         # default is 'coerce'
         self._prepare()
         target_differences = self.target.difference()
-        assert target_differences.equals(self.expected)
+        assert target_differences.isna().all()
 
     def test_ratio_raise(self):
         self._prepare()
@@ -1601,7 +1596,7 @@ class Test2m1sf0cfErrorHandlingCM2:
     def test_ratio_coerce(self):
         self._prepare()
         target_ratio = self.target.ratio(errors='coerce')
-        assert target_ratio.equals(self.expected)
+        assert target_ratio.isna().all()
 
     def test_ratio_wrong_input(self):
         self._prepare()
@@ -1613,7 +1608,7 @@ class Test2m1sf0cfErrorHandlingCM2:
         # default is 'coerce'
         self._prepare()
         target_ratio = self.target.ratio()
-        assert target_ratio.equals(self.expected)
+        assert target_ratio.isna().all()
 
 
 class Test1m1sf0cfErrorHandlingSeries:
