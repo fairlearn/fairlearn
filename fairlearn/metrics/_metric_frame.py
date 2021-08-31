@@ -31,11 +31,12 @@ _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
-_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
+_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. " \
+                                      "Valid values are {0}".format(_VALID_ERROR_STRING)
 _INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = \
     "Invalid grouping function specified. Valid values are {0}".format(_VALID_GROUPING_FUNCTION)
-_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells. Please remove non-scalar columns " \
-    "from your metric frame or use parameter errors='coerce'."
+_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells. " \
+    "Please remove non-scalar columns from your metric frame or use parameter errors='coerce'."
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -379,7 +380,8 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def __group(self, grouping_function: str, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
+    def __group(self, grouping_function: str, errors: str = 'raise') \
+            -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
         This is a private method, please use .group_min() or .group_max() instead.
@@ -388,8 +390,8 @@ class MetricFrame:
         ----------
         grouping_function: {'min', 'max'}
         errors: {'raise', 'coerce'}, default 'raise'
-            if 'raise', then invalid parsing will raise an exception
-            if 'coerce', then invalid parsing will be set as NaN
+        if 'raise', then invalid parsing will raise an exception
+        if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
@@ -420,9 +422,11 @@ class MetricFrame:
                     mf = self._by_group
                     # Fill in the possible min/max values, else np.nan
                     if grouping_function == 'min':
-                        vals = [mf[m].min() if np.isscalar(mf[m].values[0]) else np.nan for m in mf.columns]
+                        vals = [mf[m].min() if np.isscalar(mf[m].values[0])
+                                else np.nan for m in mf.columns]
                     else:
-                        vals = [mf[m].max() if np.isscalar(mf[m].values[0]) else np.nan for m in mf.columns]
+                        vals = [mf[m].max() if np.isscalar(mf[m].values[0])
+                                else np.nan for m in mf.columns]
 
                     result = pd.Series(vals, index=mf.columns, dtype='object')
         else:

@@ -10,12 +10,16 @@ import sklearn.metrics as skm
 import fairlearn.metrics as metrics
 
 from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
-from fairlearn.metrics._metric_frame import _INVALID_ERRORS_VALUE_ERROR_MESSAGE, _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
+from fairlearn.metrics._metric_frame import (
+    _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
+    _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
+)
 
 metric = [skm.recall_score,
           skm.precision_score,
           skm.accuracy_score,
           skm.balanced_accuracy_score]
+
 
 class Test1m1sf0cf:
     # Single metric supplied as callable
@@ -1050,7 +1054,9 @@ class Test2m1sf1cfErrorHandlingCM:
                                           sensitive_features=g_2,
                                           control_features=g_3)
 
-        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score}, y_true=y_t, y_pred=y_p,
+        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score},
+                                            y_true=y_t,
+                                            y_pred=y_p,
                                             sensitive_features=g_2,
                                             control_features=g_3)
 
@@ -1287,7 +1293,9 @@ class Test2m1sf0cfErrorHandlingCM:
         self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2)
 
-        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score}, y_true=y_t, y_pred=y_p,
+        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score},
+                                            y_true=y_t,
+                                            y_pred=y_p,
                                             sensitive_features=g_2)
 
     def test_min_raise(self):
@@ -1406,7 +1414,6 @@ class Test1m1sf0cfErrorHandlingCM:
 
         self.expected = pd.Series({"confusion_matrix": np.nan}, dtype=object)
 
-
     def test_min_raise(self):
         self._prepare()
         with pytest.raises(ValueError) as exc:
@@ -1511,7 +1518,8 @@ class Test2m1sf0cfErrorHandlingCM2:
         self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2)
 
-        self.expected = pd.Series({"confusion_matrix1": np.nan, "confusion_matrix2": np.nan}, dtype=object)
+        self.expected = pd.Series({"confusion_matrix1": np.nan,
+                                   "confusion_matrix2": np.nan}, dtype=object)
 
     def test_min_raise(self):
         self._prepare()
@@ -1606,6 +1614,7 @@ class Test2m1sf0cfErrorHandlingCM2:
         self._prepare()
         target_ratio = self.target.ratio()
         assert target_ratio.equals(self.expected)
+
 
 class Test1m1sf0cfErrorHandlingSeries:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
