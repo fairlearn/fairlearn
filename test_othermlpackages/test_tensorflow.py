@@ -4,7 +4,6 @@
 
 import pytest
 from . import package_test_common as ptc
-import scikeras
 
 
 from fairlearn.reductions import DemographicParity
@@ -13,6 +12,7 @@ from fairlearn.reductions import DemographicParity
 tf = pytest.importorskip("tensorflow")
 from tensorflow.keras.layers import Dense # noqa
 from tensorflow.keras.models import Sequential # noqa
+import scikeras
 from scikeras.wrappers import KerasClassifier
 
 
