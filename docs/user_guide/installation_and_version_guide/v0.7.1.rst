@@ -1,0 +1,11 @@
+v0.7.1
+======
+
+.. note::
+
+  v0.7.1 is not yet released. This page reflects changes on the current
+  :code:`main` branch that will eventually be a part of v0.7.1.
+
+* Relaxed checks made on :code:`X` in :code:`_validate_and_reformat_input()`
+  since that is the concern of the underlying estimator and not Fairlearn.
+* Add support for Python 3.9

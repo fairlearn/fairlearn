@@ -1,0 +1,11 @@
+v0.4.2
+------
+
+* If methods such as :code:`predict` are called before :code:`fit`, a
+  :class:`sklearn.exceptions.NotFittedError` is raised instead of
+  :code:`NotFittedException`, and the latter is now removed.
+* Separated out :code:matplotlib dependency into an extension that can be
+  installed via :code:`pip install fairlearn[customplots]`.
+* Added a :code:`GroupMetricSet` class to hold collections of
+  :code:`GroupMetricResult` objects
+
