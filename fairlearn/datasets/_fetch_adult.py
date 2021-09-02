@@ -26,7 +26,6 @@ def fetch_adult(*, cache=True, data_home=None,
     year.
 
     ..versionadded: 0.5.0
-    ..versionchanged: 0.7.1
 
     Parameters
     ----------

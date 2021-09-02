@@ -56,7 +56,6 @@ def fetch_boston(*, cache=True, data_home=None,
     =======  ======================================================================
 
     ..versionadded: 0.5.0
-    ..versionchanged: 0.7.1
 
     Parameters
     ----------
