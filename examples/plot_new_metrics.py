@@ -168,13 +168,13 @@ numeric_transformer = Pipeline(
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(handle_unknown="ignore")),
+        ("ohe", OneHotEncoder(handle_unknown="ignore"))
     ]
 )
 preprocessor = ColumnTransformer(
     transformers=[
         ("num", numeric_transformer, selector(dtype_exclude="category")),
-        ("cat", categorical_transformer, selector(dtype_include="category")),
+        ("cat", categorical_transformer, selector(dtype_include="category"))
     ]
 )
 
@@ -187,8 +187,8 @@ unmitigated_predictor = Pipeline(
         ("preprocessor", preprocessor),
         (
             "classifier",
-            LogisticRegression(solver="liblinear", fit_intercept=True),
-        ),
+            LogisticRegression(solver="liblinear", fit_intercept=True)
+        )
     ]
 )
 
@@ -235,14 +235,14 @@ fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6, zero_division=1)
 metric_fns = {
     "selection_rate": selection_rate,
     "fbeta_06": fbeta_06,
-    "count": count,
+    "count": count
 }
 
 grouped_on_sex = MetricFrame(
     metrics=metric_fns,
     y_true=y_test,
     y_pred=y_pred,
-    sensitive_features=A_test["sex"],
+    sensitive_features=A_test["sex"]
 )
 
 # %%
@@ -296,7 +296,7 @@ grouped_on_race = MetricFrame(
     metrics=metric_fns,
     y_true=y_test,
     y_pred=y_pred,
-    sensitive_features=A_test["race"],
+    sensitive_features=A_test["race"]
 )
 
 # %%
@@ -335,7 +335,7 @@ random_weights = np.random.rand(len(y_test))
 
 example_sample_params = {
     "selection_rate": {"sample_weight": random_weights},
-    "fbeta_06": {"sample_weight": random_weights},
+    "fbeta_06": {"sample_weight": random_weights}
 }
 
 
@@ -344,7 +344,7 @@ grouped_with_weights = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test["sex"],
-    sample_params=example_sample_params,
+    sample_params=example_sample_params
 )
 
 # %%
@@ -426,7 +426,7 @@ grouped_on_race_and_sex = MetricFrame(
     metrics=metric_fns,
     y_true=y_test,
     y_pred=y_pred,
-    sensitive_features=A_test[["race", "sex"]],
+    sensitive_features=A_test[["race", "sex"]]
 )
 
 # %%
@@ -469,7 +469,7 @@ cond_credit_score = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test["Credit Score"],
+    control_features=A_test["Credit Score"]
 )
 
 # %%
@@ -502,7 +502,7 @@ cond_both = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test[["Loan Size", "Credit Score"]],
+    control_features=A_test[["Loan Size", "Credit Score"]]
 )
 
 # %%
@@ -529,7 +529,7 @@ counts = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test[["Loan Size", "Credit Score"]],
+    control_features=A_test[["Loan Size", "Credit Score"]]
 )
 
 counts.by_group
