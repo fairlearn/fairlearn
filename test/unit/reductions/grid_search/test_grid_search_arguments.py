@@ -3,6 +3,7 @@
 
 import logging
 import numpy as np
+from numpy.lib.function_base import disp
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
@@ -17,8 +18,8 @@ from fairlearn.utils._input_validation import \
      _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, BoundedGroupLoss, \
     ZeroOneLoss
-from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
-    GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
+from fairlearn.reductions._grid_search._grid_generator import _GridGenerator, \
+    GRID_DIMENSION_WARN_THRESHOLD, GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
 
 from test.unit.fixes import get_sklearn_expected_1d_message
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
@@ -230,6 +231,40 @@ class ArgumentTests:
                 in size_log_record.msg.format(*size_log_record.args)
         else:
             assert len(log_records) == 0
+
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    def test_custom_grid(self, transformX, transformY, transformA):
+
+        grid_size = 10
+        grid_limit = 2.0
+        grid_offset = 0.1
+
+        disparity_moment = EqualizedOdds()
+        X, y, A = _quick_data(False)
+
+        disparity_moment.load_data(X, y, sensitive_features=A)
+
+        grid = _GridGenerator(grid_size, grid_limit,
+            disparity_moment.pos_basis, disparity_moment.neg_basis,
+            disparity_moment.neg_basis_present, False, grid_offset).grid
+
+        indices = [7, 3, 4]
+        grid = grid.iloc[:, indices]
+
+        gs = GridSearch(
+            estimator=LogisticRegression(solver='liblinear'),
+            constraints=EqualizedOdds(),
+            grid=grid,
+        )
+
+        # Check that fit runs successfully
+        gs.fit(
+            transformX(X),
+            transformY(y),
+            sensitive_features=transformA(A))
+
 
     # ----------------------------
 
