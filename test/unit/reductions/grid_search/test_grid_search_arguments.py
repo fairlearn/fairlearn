@@ -237,6 +237,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     def test_custom_grid(self, transformX, transformY, transformA):
 
+        # Creating a standard grid with the default parameters
         grid_size = 10
         grid_limit = 2.0
         grid_offset = 0.1
@@ -250,6 +251,7 @@ class ArgumentTests:
             disparity_moment.pos_basis, disparity_moment.neg_basis,
             disparity_moment.neg_basis_present, False, grid_offset).grid
 
+        # Creating a custom grid by selecting only a few columns from the grid to try out
         indices = [7, 3, 4]
         grid = grid.iloc[:, indices]
 
@@ -259,7 +261,7 @@ class ArgumentTests:
             grid=grid,
         )
 
-        # Check that fit runs successfully
+        # Check that fit runs successfully with the custom grid
         gs.fit(
             transformX(X),
             transformY(y),
