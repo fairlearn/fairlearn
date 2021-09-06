@@ -163,18 +163,18 @@ A_test = A_test.reset_index(drop=True)
 # have poorer data quality.
 
 numeric_transformer = Pipeline(
-    steps=[("impute", SimpleImputer()), ("scaler", StandardScaler()) ]
+    steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())]
 )
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(handle_unknown="ignore")) 
+        ("ohe", OneHotEncoder(handle_unknown="ignore"))
     ]
 )
 preprocessor = ColumnTransformer(
     transformers=[
         ("num", numeric_transformer, selector(dtype_exclude="category")),
-        ("cat", categorical_transformer, selector(dtype_include="category")) 
+        ("cat", categorical_transformer, selector(dtype_include="category"))
     ]
 )
 
