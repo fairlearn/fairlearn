@@ -17,7 +17,7 @@ from .utils import batchify
 
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
-@pytest.mark.parametrize("num_batches", [1, 3, 5])
+@pytest.mark.parametrize("num_batches", [1, 3, 5, len(y_t)])
 def test_alternate_compute(transform_y_t, transform_y_p, num_batches):
     target = metrics.StreamingMetricFrame(metrics=skm.recall_score)
 
@@ -45,7 +45,7 @@ def test_alternate_compute(transform_y_t, transform_y_p, num_batches):
 
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
-@pytest.mark.parametrize("num_batches", [1, 3, 5])
+@pytest.mark.parametrize("num_batches", [1, 3, 5, len(y_t)])
 def test_simple_sample_params(transform_y_t, transform_y_p, num_batches):
     sample_weights = np.random.rand(len(y_t))
     batch_generator = batchify(num_batches, y_t, y_p, g_4, sample_weights)
@@ -83,7 +83,7 @@ def test_simple_sample_params(transform_y_t, transform_y_p, num_batches):
 
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
-@pytest.mark.parametrize("num_batches", [1, 3, 5])
+@pytest.mark.parametrize("num_batches", [1, 3, 5, len(y_t)])
 def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
     batch_generator = batchify(num_batches, y_t, y_p, g_4)
     target = metrics.StreamingMetricFrame(metrics=skm.recall_score)
@@ -120,6 +120,11 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
 
     assert target_metric.group_min() == met_regular.group_min()
     assert target_metric.group_max() == met_regular.group_max()
+
+    # Verify that reset works.
+    target.reset()
+    assert all(v is None for v in (target._y_true, target._y_pred, target._sensitive_features,
+                                   target._control_features, target._sample_params))
 
 
 def test_exception_on_no_data():

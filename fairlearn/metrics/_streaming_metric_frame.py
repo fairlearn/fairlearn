@@ -53,11 +53,15 @@ class StreamingMetricFrame:
         self._sample_params = None
 
     def reset(self):
-        """Reset accumulators: y_true, y_pred, sensitive_features and control_features."""
+        """Reset accumulators.
+
+        Reset y_true, y_pred, sensitive_features, control_features and sample_params.
+        """
         self._y_true = None
         self._y_pred = None
         self._sensitive_features = None
         self._control_features = None
+        self._sample_params = None
 
     def add_data(self, y_true, y_pred, sensitive_features, control_features=None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
