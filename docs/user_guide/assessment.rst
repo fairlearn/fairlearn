@@ -134,10 +134,10 @@ We may also be interested in multiclass classification, however, typical group f
     >>> # print results
     >>> print(mf.by_group) # series with accuracy for each sensitive group
     sensitive_feature_0
-    a           1
+    a         1.0
     b         0.5
     c    0.428571
-    d           1
+    d         1.0
     Name: accuracy_score, dtype: object
     >>> print(mf.difference()) # difference in accuracy between the two sensitive groups
     0.5714285714285714
