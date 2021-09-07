@@ -118,6 +118,30 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
+We may also be interested in multiclass classification, however, typical group fairness metrics such as equalized odds and demographic parity are only defined for binary classification. We could, for every group, define one-to-one or one-to-rest classifications and calculate such metrics on this instead. However, we can also use metrics that are defined for multiclass classification. For example, accuracy is a multiclass metric, and we can easily use this using scikit-learn's :class:`sklearn.metrics.accuracy_score` in combination with a :class:`MetricFrame` as follows:
+
+.. doctest:: assessment_metrics
+
+    >>> from sklearn.metrics import accuracy_score
+    >>> from fairlearn.metrics import MetricFrame
+    >>> # Multiclass labels
+    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
+    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
+    >>> # compute metric frame
+    >>> mf = MetricFrame(metric=accuracy_score,
+    ...                 y_true=y_mult_true, y_pred=y_mult_pred,
+    ...                 sensitive_features=group_membership_data)
+    >>> # print results
+    >>> print(mf.by_group) # series with accuracy for each sensitive group
+    sensitive_feature_0
+    a           1
+    b         0.5
+    c    0.428571
+    d           1
+    Name: accuracy_score, dtype: object
+    >>> print(mf.difference()) # difference in accuracy between the two sensitive groups
+    0.5714285714285714
+
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
 show each group's size):
