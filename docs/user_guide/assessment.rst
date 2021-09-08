@@ -118,6 +118,9 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
+Multiclass Metrics
+^^^^^^^^^^^^^^^^^^
+
 We may also be interested in multiclass classification. However, typical group
 fairness metrics such as equalized odds and demographic parity are only defined
 for binary classification. One way to measure fairness in the multiclass
@@ -125,7 +128,7 @@ scenario is to define one-to-one or one-to-rest classifications for each group
 and calculate the metrics on this instead. Alternatively, we can use predefined
 metrics for multiclass classification. For example, accuracy is a multiclass
 metric that we can utilize through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
-in combination with a :class:`MetricFrame` as follows:
+in combination with a :code:`MetricFrame` as follows:
 
 .. doctest:: assessment_metrics
 
@@ -145,6 +148,9 @@ in combination with a :class:`MetricFrame` as follows:
     Name: accuracy_score, dtype: object
     >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
     0.5714285714285714
+
+Multiple Metrics in one :code:`MetricFrame`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
@@ -198,6 +204,9 @@ If multiple metrics are being evaluated, then ``sample_params`` becomes a dictio
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
 
+Non-sample Parameters
+^^^^^^^^^^^^^^^^^^^^^
+
 We do not support non-sample parameters at the current time. If these are required, then
 use :func:`functools.partial` to prebind the required arguments to the metric
 function:
@@ -220,6 +229,9 @@ function:
     c    0.6335...
     d    0...
     Name: metric, dtype: object
+
+Multiple Sensitive Features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
 holds the intersections of these groups:
