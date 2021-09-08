@@ -118,7 +118,7 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
-We may also be interested in multiclass classification, however, typical group fairness metrics such as equalized odds and demographic parity are only defined for binary classification. We could, for every group, define one-to-one or one-to-rest classifications and calculate such metrics on this instead. However, we can also use metrics that are defined for multiclass classification. For example, accuracy is a multiclass metric that we can utilize through scikit-learn's :py:func:`sklearn.metrics.accuracy_score` in combination with a :class:`MetricFrame` as follows:
+We may also be interested in multiclass classification. However, typical group fairness metrics such as equalized odds and demographic parity are only defined for binary classification. One way to measure fairness in the multiclass scenario is to define one-to-one or one-to-rest classifications for each group and calculate the metrics on this instead. Alternatively, we can use predefined metrics for multiclass classification. For example, accuracy is a multiclass metric that we can utilize through scikit-learn's :py:func:`sklearn.metrics.accuracy_score` in combination with a :class:`MetricFrame` as follows:
 
 .. doctest:: assessment_metrics
 
