@@ -3,7 +3,6 @@
 
 import logging
 import numpy as np
-from numpy.lib.function_base import disp
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression, LinearRegression
@@ -247,7 +246,8 @@ class ArgumentTests:
 
         disparity_moment.load_data(X, y, sensitive_features=A)
 
-        grid = _GridGenerator(grid_size, grid_limit,
+        grid = _GridGenerator(
+            grid_size, grid_limit,
             disparity_moment.pos_basis, disparity_moment.neg_basis,
             disparity_moment.neg_basis_present, False, grid_offset).grid
 
@@ -267,7 +267,6 @@ class ArgumentTests:
             transformY(y),
             sensitive_features=transformA(A))
 
-
     # ----------------------------
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
@@ -275,6 +274,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_df_bad_columns(self, transformX, transformA, A_two_dim):
+
         gs = GridSearch(self.estimator, self.disparity_criterion,
                         sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)
