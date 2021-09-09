@@ -118,7 +118,7 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
-Multiclass Metrics
+Multiclass metrics
 ^^^^^^^^^^^^^^^^^^
 
 We may also be interested in multiclass classification. However, typical group
@@ -149,7 +149,7 @@ in combination with a :code:`MetricFrame` as follows:
     >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
     0.5714285714285714
 
-Multiple Metrics in one :code:`MetricFrame`
+Multiple metrics in one :code:`MetricFrame`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
@@ -204,7 +204,7 @@ If multiple metrics are being evaluated, then ``sample_params`` becomes a dictio
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
 
-Non-sample Parameters
+Non-sample parameters
 ^^^^^^^^^^^^^^^^^^^^^
 
 We do not support non-sample parameters at the current time. If these are required, then
@@ -230,7 +230,7 @@ function:
     d    0...
     Name: metric, dtype: object
 
-Multiple Sensitive Features
+Multiple sensitive features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
@@ -267,7 +267,7 @@ that there were no samples in it.
 
 .. _scalar_metric_results:
 
-Scalar Results from :code:`MetricFrame`
+Scalar results from :code:`MetricFrame`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Higher level machine learning algorithms (such as hyperparameter tuners) often

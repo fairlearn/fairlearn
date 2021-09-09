@@ -139,7 +139,8 @@ Does Fairlearn support multiclass classification?
     For example, it is possible to pass
     :py:func:`sklearn.metrics.accuracy_score` or
     :py:func:`sklearn.metrics.confusion_matrix` as the metric functions, and
-    supply multiclass data for :code:`y_true` and :code:`y_pred`. We give an example with multiclass data in the :ref:`user guide <metrics_with_grouping>`.
+    supply multiclass data for :code:`y_true` and :code:`y_pred`.
+    We give an example with multiclass data in the :ref:`user guide <metrics_with_grouping>`.
     There are
     `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
     to add more extensive support to Fairlearn's assessment capabilities.
