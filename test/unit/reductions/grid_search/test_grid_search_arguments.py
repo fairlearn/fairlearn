@@ -267,6 +267,9 @@ class ArgumentTests:
             transformY(y),
             sensitive_features=transformA(A))
 
+        # Check that it trained the correct number of predictors
+        assert len(gs.predictors_) == len(grid.columns)
+
     # ----------------------------
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
