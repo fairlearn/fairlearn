@@ -10,7 +10,7 @@ def plot_model_comparison(
     y_true,
     y_preds,
     sensitive_features,
-    show_plot=True: bool,
+    show_plot: bool,
     ax=None,
     **kwargs
     ):
@@ -86,11 +86,10 @@ def plot_model_comparison(
             for key in y_preds
         ]
     except TypeError as e:
-        try:
-            x = [
-                x_axis_metric(y_true, y_preds[key])
-                for key in y_preds
-            ]
+        x = [
+            x_axis_metric(y_true, y_preds[key])
+            for key in y_preds
+        ]
 
     try:
         y = [
@@ -98,11 +97,10 @@ def plot_model_comparison(
             for key in y_preds
         ]
     except TypeError as e:
-        try:
-            y = [
-                y_axis_metric(y_true, y_preds[key])
-                for key in y_preds
-            ]
+        y = [
+            y_axis_metric(y_true, y_preds[key])
+            for key in y_preds
+        ]
 
     # Plot
     if ax is None:
