@@ -35,7 +35,7 @@ GridSearch with Census Data
 from sklearn.model_selection import train_test_split
 from fairlearn.reductions import GridSearch
 from fairlearn.reductions import DemographicParity, ErrorRate
-from fairlearn.metrics import MetricFrame, selection_rate, count
+from fairlearn.metrics import MetricFrame, selection_rate, count, plot_model_comparison, make_derived_metric
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics as skm
@@ -229,3 +229,20 @@ plt.ylabel("selection rate difference")
 #
 # In a real example, we would pick the model which represented the best trade-off
 # between accuracy and disparity given the relevant business constraints.
+#
+# %% [markdown]
+# Comparing models easily
+# -----------------------
+# Fairlearn also provides functionality to compare models much more easily. 
+
+# %%
+
+# Plot model comparison
+plot_model_comparison(
+    x_axis_metric=skm.accuracy_score,
+    y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),
+    y_true=Y_test,
+    y_preds=predictions,
+    sensitive_features=A_test,
+    show_plot=True
+)

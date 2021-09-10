@@ -470,6 +470,19 @@ There are many other customizations that can be done. More information can be fo
 
 .. _dashboard:
 
+
+Plotting model comparisons
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+To easily compare many different models using certain metrics, Fairlearn provides
+an easy interface.
+
+.. literalinclude:: ../auto_examples/plot_grid_search_census.py
+    :language: python
+    :start-after: # Plot model comparison
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_grid_search_census_003.png
+    :align: center
+
 Fairlearn dashboard
 -------------------
 
