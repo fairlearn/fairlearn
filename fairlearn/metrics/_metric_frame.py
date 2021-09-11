@@ -193,28 +193,25 @@ class MetricFrame:
     Examples
     --------
     >>> from fairlearn.metrics import MetricFrame, selection_rate
-    >>> from fairlearn.datasets import fetch_adult
-    >>> data = fetch_adult(as_frame=True)
-    >>> X = data.data
-    >>> y_true = (data.target == '>50K') * 1
-    >>> sex = X['sex']
+    >>> y_true = [0,1,1,1,0,0,1,1]
+    >>> sex = ['Female']*4 + ['Male']*4
     >>> selection_rates = MetricFrame(metrics=selection_rate,
     ...                       y_true=y_true,
     ...                       y_pred=y_true,
     ...                       sensitive_features=sex)
     >>> selection_rates.by_group
-    sex
-    Female    0.109251
-    Male      0.303767
+    sensitive_feature_0
+    Female    0.75
+    Male      0.5
     Name: selection_rate, dtype: object
     >>> selection_rates.difference()
-    0.19451574596420296
+    0.25
     >>> selection_rates.group_max()
-    0.3037672281776417
+    0.75
     >>> selection_rates.group_min()
-    0.10925148221343874
+    0.5
     >>> selection_rates.ratio()
-    0.3596552625800337
+    0.6666666666666666
     """
 
     # The deprecation decorator does two things:
