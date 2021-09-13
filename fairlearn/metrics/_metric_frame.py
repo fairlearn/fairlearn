@@ -193,7 +193,7 @@ class MetricFrame:
     Examples
     --------
     >>> from fairlearn.metrics import MetricFrame, selection_rate
-    >>> y_true = [0,1,1,1,1,0,0,1,1,1]
+    >>> y_true = [0,1,1,1,1,0,0,0,1,1]
     >>> sex = ['Female']*5 + ['Male']*5
     >>> selection_rates = MetricFrame(metrics=selection_rate,
     ...                       y_true=y_true,
