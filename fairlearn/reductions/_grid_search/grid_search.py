@@ -198,7 +198,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(i):
                 return self.objective_weight * self.objectives_[i] + \
-                    self.constraint_weight * self.gammas_[i].max()
+                    self.constraint_weight * self.gammas_[grid.columns[i]].max()
             losses = [loss_fct(i) for i in range(len(self.objectives_))]
             self.best_idx_ = losses.index(min(losses))
         else:

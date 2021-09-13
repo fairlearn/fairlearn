@@ -12,3 +12,6 @@ v0.7.1
 * Added error handling in :code:`MetricFrame`. Methods :code:`group_max`, :code:`group_min`,
   :code:`difference` and :code:`ratio` now accept :code:`errors` as a parameter,
   which could either be :code:`raise` or :code:`coerce`.
+* Fixed a bug whereby passing a custom :code:`grid` object to a :code:`GridSearch`
+  reduction would result in a :code:`KeyError` if the column names were not ordered
+  integers.
