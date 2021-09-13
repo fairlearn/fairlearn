@@ -202,7 +202,7 @@ class MetricFrame:
     >>> selection_rates.by_group
     sensitive_feature_0
     Female    0.8
-    Male      0.6
+    Male      0.4
     Name: selection_rate, dtype: object
     >>> selection_rates.difference()
     0.4
