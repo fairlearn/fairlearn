@@ -187,7 +187,7 @@ Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that using data science to
 measure internet speed in a given region
 can help improve internet connectivity.
- However, if there are additional socioeconomic challenges within
+However, if there are additional socioeconomic challenges within
 a community, for example with education, infrastructure, information
 technology, or health services, then an algorithmic solution purely
 focused on internet speed may fail to meaningfully address the needs of
@@ -256,7 +256,7 @@ capturing information regarding procedurality (for example, how do judges
 and police officers determine whether bail, counselling, probation, or
 incarceration is appropriate); contextuality (different communities may have
 different definitions for what constitutes an "unfair" outcome;
- for instance, is it
+for instance, is it
 unfair to hire an applicant whose primary language is English, for an
 English speaking role, over an applicant whose only spoken language is
 not English?); and contestability (the definitions of discrimination and
@@ -300,7 +300,7 @@ for the problem, we might consider using wider "frames" around what is
 considered to be in scope for the problem, moving from an algorithmic frame
 to a sociotechnical frame.
 
-For instance, adopting a _sociotechnical_ frame (instead of a data-focused,
+For instance, adopting a *sociotechnical* frame (instead of a data-focused,
 or algorithmic frame) allows us to recognize that a machine learning model
 is part of social and technical interactions between people and technology,
 and thus the social components of a given social context should be included
