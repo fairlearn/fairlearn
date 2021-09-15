@@ -243,7 +243,6 @@ plot_model_comparison(
     y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),
     y_true=Y_test,
     y_preds=predictions,
-    sensitive_features=A_test,
-    show_plot=True
+    sensitive_features=A_test
 )
 # End model comparison
