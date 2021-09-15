@@ -1,4 +1,4 @@
-from ..utils._input_validation import _validate_and_reformat_labels, _validate_and_reformat_labels_and_sf, check_consistent_length
+from ..utils._input_validation import _validate_and_reformat_labels, _validate_and_reformat_labels_and_sf, check_consistent_length, _INPUT_DATA_FORMAT_ERROR_MESSAGE
 from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
 from typing import Callable, List, Union
@@ -10,7 +10,6 @@ def plot_model_comparison(
     y_true,
     y_preds,
     sensitive_features,
-    show_plot: bool,
     ax=None,
     **kwargs
     ):
@@ -33,18 +32,16 @@ def plot_model_comparison(
     y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
         The ground-truth labels (for classification) or target values (for regression).
 
-    y_pred : List, pandas.Series, numpy.ndarray, pandas.DataFrame
-        The predictions.
-
+    y_preds : dict
+        A dictionary mapping a model name (string) to its predictions (
+        List, pandas.Series, numpy.ndarray, pandas.DataFrame)
+ 
     sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame, optional
         The sensitive features which should be used to create the subgroups.
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
         We also forbid DataFrames with column names of ``None``.
         For cases where no names are provided we generate names ``sensitive_feature_[n]``.
-    
-    show_plot : bool, optional
-        When set to True, the generated pyplot will be drawn
     
     ax : matplotlib.axes.Axes, optional
         If supplied, the scatter plot is drawn on this Axes object.
@@ -53,7 +50,7 @@ def plot_model_comparison(
     Returns
     -------
     ax : matplotlib.axes.Axes
-        The Axes object that was drawn on. If supplied
+        The Axes object that was drawn on.
     
     Notes
     -----
@@ -70,6 +67,9 @@ def plot_model_comparison(
         import matplotlib.pyplot as plt
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+
+    if not isinstance(y_preds, dict):
+        raise ValueError(_INPUT_DATA_FORMAT_ERROR_MESSAGE.format("y_preds", "dict", type(y_preds).__name__))
 
     # Input validation
     y_true, sensitive_features, _ = _validate_and_reformat_labels_and_sf(y_true, sensitive_features=sensitive_features)
@@ -119,8 +119,5 @@ def plot_model_comparison(
         ax.scatter(x, y, **kwargs) # Does it make sense to pass all other kwarg's?
     except AttributeError as e:
         raise TypeError("got an unexpected keyword argument")
-
-    if show_plot:
-        plt.show()
 
     return ax
