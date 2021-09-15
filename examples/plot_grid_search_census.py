@@ -246,3 +246,4 @@ plot_model_comparison(
     sensitive_features=A_test,
     show_plot=True
 )
+# End model comparison

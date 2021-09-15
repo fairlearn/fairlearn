@@ -81,3 +81,5 @@ metric_frame.by_group.plot(
     figsize=[12, 8],
     title="Show all metrics in pie",
 )
+
+# End customize examples

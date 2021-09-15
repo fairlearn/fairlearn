@@ -461,6 +461,7 @@ argument. Here is an example of a pie chart.
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Customize plots with kind
+    :end-before: # End customize examples
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_004.png
     :align: center
@@ -479,6 +480,7 @@ an easy to use interface.
 .. literalinclude:: ../auto_examples/plot_grid_search_census.py
     :language: python
     :start-after: # Plot model comparison
+    :end-before: # End model comparison
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_grid_search_census_003.png
     :align: center
