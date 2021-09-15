@@ -473,7 +473,7 @@ There are many other customizations that can be done. More information can be fo
 
 Plotting model comparisons
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-To compare many different models using certain metrics, Fairlearn provides
+To compare multiple models using certain metrics, Fairlearn provides
 an easy to use interface.
 
 .. literalinclude:: ../auto_examples/plot_grid_search_census.py
