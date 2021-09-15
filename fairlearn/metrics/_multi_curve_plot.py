@@ -20,7 +20,7 @@ def plot_model_comparison(
     ----------
     x_axis_metric : Callable
         The (aggregating) metric function for the x-axis
-        The passed metric function must take `y_true, y_pred`, and possibly `sensitive_values`.
+        The passed metric function must take `y_true, y_pred`, and optionally `sensitive_features`.
         If the metric is grouped, it must aggregate results. For instance, use
         `make_derived_metric(metric=balanced_accuracy_score, transform='group_min')`
         to aggregate the `balanced_accuracy_score`.
