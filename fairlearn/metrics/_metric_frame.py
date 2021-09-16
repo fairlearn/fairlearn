@@ -197,33 +197,70 @@ class MetricFrame:
     >>> y_true = [1,1,1,1,1,0,0,1,1,0]
     >>> y_pred = [0,1,1,1,1,0,0,0,1,1]
     >>> sex = ['Female']*5 + ['Male']*5
-    >>> metrics = {"accuracy": accuracy_score, "selection rate": selection_rate}
-    >>> selection_rates = MetricFrame(
+    >>> metrics = {"selection rate": selection_rate}
+    >>> mf1 = MetricFrame(
     ...      metrics=metrics,
     ...      y_true=y_true,
     ...      y_pred=y_pred,
     ...      sensitive_features=sex)
-    >>> selection_rates.by_group # doctest: +NORMALIZE_WHITESPACE
+
+    Access the disaggregated metrics via a pandas Series
+
+    >>> mf1.by_group # doctest: +NORMALIZE_WHITESPACE
+                        selection rate
+    sensitive_feature_0
+    Female                         0.8
+    Male                           0.4
+
+    Access the largest difference, smallest ratio, and worst-case performance
+
+    >>> print(f"difference: {mf1.difference()[0]:.3}\t"
+    ...      f"ratio: {mf1.ratio()[0]:.3}\t"
+    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    difference: 0.4	ratio: 0.5	max across groups: 0.8
+
+    You can also evaluate multiple metrics by providing a dictionary
+
+    >>> metrics_dict = {"selection_rate": selection_rate, "accuracy":accuracy_score}
+    >>> mf2 = MetricFrame(
+    ...      metrics=metrics_dict,
+    ...      y_true=y_true,
+    ...      y_pred=y_pred,
+    ...      sensitive_features=sex)
+
+    Access the disaggregated metrics via a pandas DataFrame
+
+    >>> mf2.by_group # doctest: +NORMALIZE_WHITESPACE
                         accuracy selection rate
     sensitive_feature_0
     Female                   0.8            0.8
     Male                     0.6            0.4
-    >>> selection_rates.difference()
+
+    The largest difference, smallest ratio, and the maximum and minimum values
+    across the groups are then all pandas Series, for example:
+
+    >>> mf2.difference()
     accuracy          0.2
     selection rate    0.4
     dtype: object
-    >>> selection_rates.group_max()
-    accuracy          0.8
-    selection rate    0.8
-    dtype: object
-    >>> selection_rates.group_min()
-    accuracy          0.6
-    selection rate    0.4
-    dtype: object
-    >>> selection_rates.ratio()
-    accuracy          0.75
-    selection rate     0.5
-    dtype: object
+
+    You'll probably want to view them transposed
+
+   >>> pd.DataFrame({'difference': metricframe_unmitigated.difference(),
+   ...               'ratio': metricframe_unmitigated.ratio(),
+   ...               'group_min': metricframe_unmitigated.group_min(),
+   ...               'group_max': metricframe_unmitigated.group_max()}).T # doctest: +NORMALIZE_WHITESPACE
+                  selection rate accuracy
+    difference            0.4      0.2
+    ratio                 0.5     0.75
+    group_min             0.4      0.6
+    group_max             0.8      0.8
+
+    You can also easily plot all of the metrics using DataFrame plotting capabilities
+
+    >>> mf2.by_group.plot.bar(subplots=True, layout= [1,3], figsize=(12, 4),
+    ...                  legend=False, rot=-45, position=1.5); # doctest: +SKIP
+
     """
 
     # The deprecation decorator does two things:
