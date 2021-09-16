@@ -208,7 +208,7 @@ class MetricFrame:
     Access the disaggregated metrics via a pandas Series
 
     >>> mf1.by_group # doctest: +NORMALIZE_WHITESPACE
-                        selection rate
+                        selection_rate
     sensitive_feature_0
     Female                         0.8
     Male                           0.4
@@ -233,7 +233,7 @@ class MetricFrame:
     Access the disaggregated metrics via a pandas DataFrame
 
     >>> mf2.by_group # doctest: +NORMALIZE_WHITESPACE
-                        accuracy selection rate
+                        accuracy selection_rate
     sensitive_feature_0
     Female                   0.8            0.8
     Male                     0.6            0.4
@@ -243,7 +243,7 @@ class MetricFrame:
 
     >>> mf2.difference()
     accuracy          0.2
-    selection rate    0.4
+    selection_rate    0.4
     dtype: object
 
     You'll probably want to view them transposed
@@ -252,7 +252,7 @@ class MetricFrame:
     ...               'ratio': mf2.ratio(),
     ...               'group_min': mf2.group_min(),
     ...               'group_max': mf2.group_max()}).T
-               accuracy selection rate
+               accuracy selection_rate
     difference      0.2            0.4
     ratio          0.75            0.5
     group_min       0.6            0.4
