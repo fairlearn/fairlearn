@@ -198,7 +198,7 @@ class MetricFrame:
     >>> y_true = [1,1,1,1,1,0,0,1,1,0]
     >>> y_pred = [0,1,1,1,1,0,0,0,1,1]
     >>> sex = ['Female']*5 + ['Male']*5
-    >>> metrics = {"selection rate": selection_rate}
+    >>> metrics = {"selection_rate": selection_rate}
     >>> mf1 = MetricFrame(
     ...      metrics=metrics,
     ...      y_true=y_true,
@@ -218,7 +218,8 @@ class MetricFrame:
     >>> print(f"difference: {mf1.difference()[0]:.3}\t"
     ...      f"ratio: {mf1.ratio()[0]:.3}\t"
     ...      f"max across groups: {mf1.group_max()[0]:.3}")
-    difference: 0.4 ratio: 0.5  max across groups: 0.8
+    ...# doctest: +NORMALIZE_WHITESPACE
+    difference: 0.4     ratio: 0.5      max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
 
