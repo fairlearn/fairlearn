@@ -205,7 +205,7 @@ class MetricFrame:
     ...      sensitive_features=sex)
     >>> selection_rates.by_group
                         accuracy selection rate
-    sensitive_feature_0
+    sensitive_feature_0                        
     Female                   0.8            0.8
     Male                     0.6            0.4
     >>> selection_rates.difference()
