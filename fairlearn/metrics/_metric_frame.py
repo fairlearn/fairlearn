@@ -218,11 +218,11 @@ class MetricFrame:
     >>> print(f"difference: {mf1.difference()[0]:.3}\t"
     ...      f"ratio: {mf1.ratio()[0]:.3}\t"
     ...      f"max across groups: {mf1.group_max()[0]:.3}")
-    difference: 0.4	ratio: 0.5	max across groups: 0.8
+    difference: 0.4 ratio: 0.5  max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
 
-    >>> metrics_dict = {"selection_rate": selection_rate, "accuracy":accuracy_score}
+    >>> metrics_dict = {"accuracy":accuracy_score, "selection_rate": selection_rate}
     >>> mf2 = MetricFrame(
     ...      metrics=metrics_dict,
     ...      y_true=y_true,
@@ -247,15 +247,15 @@ class MetricFrame:
 
     You'll probably want to view them transposed
 
-    >>> pd.DataFrame({'difference': metricframe_unmitigated.difference(),
-    ...               'ratio': metricframe_unmitigated.ratio(),
-    ...               'group_min': metricframe_unmitigated.group_min(),
-    ...               'group_max': metricframe_unmitigated.group_max()}).T
-                  selection rate accuracy
-    difference            0.4      0.2
-    ratio                 0.5     0.75
-    group_min             0.4      0.6
-    group_max             0.8      0.8
+    >>> pd.DataFrame({'difference': mf2.difference(),
+    ...               'ratio': mf2.ratio(),
+    ...               'group_min': mf2.group_min(),
+    ...               'group_max': mf2.group_max()}).T
+               accuracy selection rate
+    difference      0.2            0.4
+    ratio          0.75            0.5
+    group_min       0.6            0.4
+    group_max       0.8            0.8
 
     You can also easily plot all of the metrics using DataFrame plotting capabilities
 
