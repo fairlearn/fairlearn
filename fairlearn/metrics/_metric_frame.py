@@ -203,9 +203,9 @@ class MetricFrame:
     ...      y_true=y_true,
     ...      y_pred=y_pred,
     ...      sensitive_features=sex)
-    >>> selection_rates.by_group
+    >>> selection_rates.by_group # doctest: +NORMALIZE_WHITESPACE
                         accuracy selection rate
-    sensitive_feature_0                        
+    sensitive_feature_0
     Female                   0.8            0.8
     Male                     0.6            0.4
     >>> selection_rates.difference()
