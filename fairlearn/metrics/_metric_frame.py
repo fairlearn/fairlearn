@@ -95,7 +95,7 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
 
 
 class MetricFrame:
-    """Collection of disaggregated metric values.
+    r"""Collection of disaggregated metric values.
 
     This data structure stores and manipulates disaggregated values for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
