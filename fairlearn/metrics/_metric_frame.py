@@ -194,6 +194,7 @@ class MetricFrame:
     --------
     >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> from sklearn.metrics import accuracy_score
+    >>> import pandas as pd
     >>> y_true = [1,1,1,1,1,0,0,1,1,0]
     >>> y_pred = [0,1,1,1,1,0,0,0,1,1]
     >>> sex = ['Female']*5 + ['Male']*5
@@ -249,7 +250,7 @@ class MetricFrame:
    >>> pd.DataFrame({'difference': metricframe_unmitigated.difference(),
    ...               'ratio': metricframe_unmitigated.ratio(),
    ...               'group_min': metricframe_unmitigated.group_min(),
-   ...               'group_max': metricframe_unmitigated.group_max()}).T # doctest: +NORMALIZE_WHITESPACE
+   ...               'group_max': metricframe_unmitigated.group_max()}).T
                   selection rate accuracy
     difference            0.4      0.2
     ratio                 0.5     0.75
