@@ -213,7 +213,7 @@ class MetricFrame:
     Female                         0.8
     Male                           0.4
 
-    Access the largest difference, smallest ratio, and worst-case performance
+    Access the largest difference, smallest ratio, and worst case performance
 
     >>> print(f"difference: {mf1.difference()[0]:.3}\t"
     ...      f"ratio: {mf1.ratio()[0]:.3}\t"
@@ -247,10 +247,10 @@ class MetricFrame:
 
     You'll probably want to view them transposed
 
-   >>> pd.DataFrame({'difference': metricframe_unmitigated.difference(),
-   ...               'ratio': metricframe_unmitigated.ratio(),
-   ...               'group_min': metricframe_unmitigated.group_min(),
-   ...               'group_max': metricframe_unmitigated.group_max()}).T
+    >>> pd.DataFrame({'difference': metricframe_unmitigated.difference(),
+    ...               'ratio': metricframe_unmitigated.ratio(),
+    ...               'group_min': metricframe_unmitigated.group_min(),
+    ...               'group_max': metricframe_unmitigated.group_max()}).T
                   selection rate accuracy
     difference            0.4      0.2
     ratio                 0.5     0.75
