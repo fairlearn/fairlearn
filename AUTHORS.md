@@ -28,6 +28,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Stephen Robicheaux](https://github.com/stephenrobic)
 - [Kevin Robinson](https://github.com/kevinrobinson)
 - [Mehrnoosh Sameki](https://github.com/mesameki)
+- [Bram Schut](http://github.com/bram49)
 - [Chinmay Singh](https://www.microsoft.com/en-us/research/people/chsingh/)
 - [Hanna Wallach](https://www.microsoft.com/en-us/research/people/wallach/)
 - [Hilde Weerts](https://github.com/hildeweerts)
