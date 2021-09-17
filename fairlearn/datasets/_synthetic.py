@@ -9,15 +9,17 @@ from sklearn.datasets import make_classification
 from sklearn.utils import check_random_state
 
 
-class SensitiveFeatureGroup:
+class SensitiveFeatureGroupConfig:
 
     def __init__(self, group_dict, **classification_kwargs):
-        """ group_dict is a dict assigning to a group in each sensitive
+        """ `group_dict` is a dict assigning to a group in each sensitive
         feature category. E.g.,::
             {
                 'gender': 'Other',
                 'age': '50-60',
             }
+        `classification_kwargs` is the set of kwargs that will be passed on to
+        make_classification.
         """
         self.group_dict = group_dict
         self.classification_kwargs = classification_kwargs
@@ -27,6 +29,16 @@ class SensitiveFeatureGroup:
 
 
 class SensitiveFeature:
+    """
+    Parameters
+    ----------
+    name : str
+        Name of the feature
+
+    groups : list of str
+        List of groups for the feature
+    """
+
     def __init__(self, name, groups):
         self.name = name
         self.groups = groups
@@ -61,11 +73,12 @@ class SensitiveDatasetMaker:
         return group_dicts
 
     def init_configured_groups(self):
-        """ Create a new SensitiveFeatureGroup for each feature group. """
+        """ Create a new SensitiveFeatureGroupConfig for each feature group.
+        """
         self.configured_groups = {}
         for group_dict in self.all_group_dicts():
             group = tuple(group_dict.values())
-            self.configured_groups[group] = SensitiveFeatureGroup(group_dict)
+            self.configured_groups[group] = SensitiveFeatureGroupConfig(group_dict)
 
     def make_sensitive_classification(self, **kwargs):
         classification_kwargs = {
