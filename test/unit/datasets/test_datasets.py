@@ -9,7 +9,9 @@ from fairlearn.datasets import (
     fetch_adult,
     fetch_boston,
     fetch_bank_marketing,
-    make_sensitive_classification,
+    SensitiveDatasetMaker,
+    SensitiveFeature,
+    SensitiveFeatureGroupConfig
 )
 
 # =============================================
@@ -43,20 +45,30 @@ class TestFairlearnDataset:
     def test_simple_make_sensitive_classification(self):
         """Ensure that dataset creation is deterministic."""
         rng = np.random.RandomState(54321)
-        X, y, gender = make_sensitive_classification(random_state=rng)
+        gender_feature = SensitiveFeature(
+            'Gender', ['Man', 'Non-binary', 'Other', 'Unspecified', 'Woman'])
+        dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature],
+                                        random_state=rng)
+        X, y, features = dataset.make_sensitive_classification(n_samples=500)
+        gender = features['Gender']
 
         counts = [127, 370, 324, 210]
         for i in range(4):
             assert np.sum(y[i*500:(i+1)*500]) == counts[i]
 
-        assert np.isclose(np.mean(X), -0.002847)
-        assert X.shape == (2000, 20)
-        assert y.shape == (2000,)
-        assert gender.shape == (2000,)
+        assert np.isclose(np.mean(X), 0.0097618)
+        assert X.shape == (2500, 20)
+        assert y.shape == (2500,)
+        assert gender.shape == (2500,)
 
     def test_custom_make_sensitive_classification(self):
         """Ensure that custom dataset creation is deterministic."""
         rng = np.random.RandomState(54321)
+        gender_feature = SensitiveFeature(
+            'Gender', ['Man', 'Non-binary', 'Other', 'Unspecified', 'Woman'])
+        dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature],
+                                        random_state=rng)
+
         feature_config = {
             'Man': {'n_samples': 500, 'class_sep': 1},
             'Non-binary': {'n_samples': 200, 'class_sep': 3},
@@ -64,20 +76,14 @@ class TestFairlearnDataset:
             'Unspecified': {'n_samples': 400, 'class_sep': 0.5},
             'Woman': {'n_samples': 300, 'class_sep': 2},
         }
-        X, y, gender = make_sensitive_classification(feature_config=feature_config,
-                                                     n_features=25,
-                                                     random_state=rng)
+        for key, config in feature_config.items():
+            dataset.configured_groups[(key,)].classification_kwargs.update(config)
+
+        X, y, features = dataset.make_sensitive_classification(n_features=25)
+        gender = features['Gender']
 
         n_samples = np.sum([v['n_samples'] for v in feature_config.values()])
-        assert set(np.unique(gender)) == set(feature_config.keys())
+        assert set(pd.unique(gender)) == set(feature_config.keys())
         assert X.shape == (n_samples, 25)
         assert y.shape == (n_samples,)
         assert gender.shape == (n_samples,)
-
-    def test_bad_make_sensitive_classification(self):
-        """Test make_sensitive_classification handling of bad inputs."""
-        with pytest.raises(ValueError):
-            make_sensitive_classification(feature_config={})
-
-        with pytest.raises(ValueError):
-            make_sensitive_classification(n_features=0)
