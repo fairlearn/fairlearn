@@ -26,15 +26,13 @@ from sklearn.tree import DecisionTreeClassifier
 
 rng = np.random.RandomState(42)
 
-gender_feature = SensitiveFeature('Gender')
-gender_feature.add_group('Man')
-gender_feature.add_group('Other', class_sep=0.5)
-gender_feature.add_group('Unspecified', class_sep=0.5)
-gender_feature.add_group('Woman', class_sep=2.0)
+gender_feature = SensitiveFeature('Gender', ['Man', 'Other', 'Unspecified', 'Woman'])
 
 dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature], random_state=rng)
 X, y, features = dataset.make_sensitive_classification(n_samples=2500)
-gender = features[0]
+gender = features['Gender']
+
+# %%
 
 X_train, X_test, y_train, y_test, gender_train, gender_test = train_test_split(
     X, y, gender, test_size=0.3, random_state=rng
@@ -64,3 +62,5 @@ metric_frame.by_group.plot.bar(
     figsize=[12, 8],
     title="Show all metrics",
 )
+
+# %%

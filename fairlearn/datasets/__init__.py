@@ -8,11 +8,15 @@
 from ._fetch_adult import fetch_adult
 from ._fetch_boston import fetch_boston
 from ._fetch_bank_marketing import fetch_bank_marketing
-from ._synthetic import make_sensitive_classification
+from ._synthetic import (
+    SensitiveDatasetMaker, SensitiveFeature, SensitiveFeatureGroup
+)
 
 __all__ = [
     "fetch_adult",
     "fetch_boston",
     "fetch_bank_marketing",
-    "make_sensitive_classification",
+    "SensitiveDatasetMaker",
+    "SensitiveFeature",
+    "SensitiveFeatureGroup",
 ]
