@@ -36,9 +36,10 @@ class SensitiveFeature:
 
 class SensitiveDatasetMaker:
 
-    def __init__(self, sensitive_features=None, random_state=None):
+    def __init__(self, sensitive_features=None, random_state=None, default_group_samples=50):
         self.rng = check_random_state(random_state)
         self.sensitive_features = sensitive_features or []
+        self.default_group_samples = default_group_samples
         self.init_configured_groups()
 
     def __repr__(self):
@@ -89,15 +90,16 @@ class SensitiveDatasetMaker:
             group_config = group.classification_kwargs.copy()
             group_config.update(classification_kwargs)
             group_config.setdefault('weights', (self.rng.uniform(0.2, 0.8),))
-            group_config.setdefault('n_samples', 50)
+            group_config.setdefault('n_samples', self.default_group_samples)
 
             X, y = make_classification(**group_config)
             Xs.append(X)
             ys.append(y)
 
             for feature in self.feature_names():
-                group_assignments = [group.group_assignments[feature]] * group_config['n_samples']
-                sensitive_features[feature].extend(group_assignments)
+                sensitive_features[feature].extend(
+                    [group_assignments[feature]] * group_config['n_samples']
+                )
 
         X = np.concatenate(Xs)
         y = np.concatenate(ys)
