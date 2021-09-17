@@ -4,6 +4,7 @@ from collections import OrderedDict
 from itertools import product
 
 import numpy as np
+import pandas as pd
 from sklearn.datasets import make_classification
 from sklearn.utils import check_random_state
 
@@ -36,10 +37,9 @@ class SensitiveFeature:
 
 class SensitiveDatasetMaker:
 
-    def __init__(self, sensitive_features=None, random_state=None, default_group_samples=50):
+    def __init__(self, sensitive_features=None, random_state=None):
         self.rng = check_random_state(random_state)
         self.sensitive_features = sensitive_features or []
-        self.default_group_samples = default_group_samples
         self.init_configured_groups()
 
     def __repr__(self):
@@ -76,6 +76,7 @@ class SensitiveDatasetMaker:
             'n_features': 20,
             'n_informative': 4,
             'n_classes': 2,
+            'n_samples': 50,
             'random_state': self.rng,
         }
         classification_kwargs.update(kwargs)
@@ -87,10 +88,9 @@ class SensitiveDatasetMaker:
         for group_assignments in self.all_groups_assignments():
             group = self.configured_groups[tuple(group_assignments.values())]
 
-            group_config = group.classification_kwargs.copy()
-            group_config.update(classification_kwargs)
+            group_config = classification_kwargs.copy()
+            group_config.update(group.classification_kwargs)
             group_config.setdefault('weights', (self.rng.uniform(0.2, 0.8),))
-            group_config.setdefault('n_samples', self.default_group_samples)
 
             X, y = make_classification(**group_config)
             Xs.append(X)
@@ -103,5 +103,8 @@ class SensitiveDatasetMaker:
 
         X = np.concatenate(Xs)
         y = np.concatenate(ys)
+
+        sensitive_features = pd.DataFrame.from_dict(
+            {k: np.array(v) for k, v in sensitive_features.items()})
 
         return X, y, sensitive_features

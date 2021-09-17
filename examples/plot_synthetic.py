@@ -27,15 +27,16 @@ from sklearn.tree import DecisionTreeClassifier
 rng = np.random.RandomState(42)
 
 gender_feature = SensitiveFeature('Gender', ['Man', 'Other', 'Unspecified', 'Woman'])
+age_feature = SensitiveFeature('Age', ['<21', '21-64', '>64'])
 
-dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature], random_state=rng)
-X, y, features = dataset.make_sensitive_classification(n_samples=50)
-gender = features['Gender']
+dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature, age_feature], random_state=rng)
 
-# %%
+# need a convenience method here
+dataset.configured_groups[('Man', '<21')].classification_kwargs['n_samples'] = 100
+X, y, features = dataset.make_sensitive_classification(n_samples=300)
 
-X_train, X_test, y_train, y_test, gender_train, gender_test = train_test_split(
-    X, y, gender, test_size=0.3, random_state=rng
+X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = train_test_split(
+    X, y, features, test_size=0.3, random_state=rng
 )
 
 classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
@@ -54,7 +55,7 @@ metrics = {
 metric_frame = MetricFrame(metrics=metrics,
                            y_true=y_test,
                            y_pred=y_pred,
-                           sensitive_features=gender_test)
+                           sensitive_features=sensitive_test)
 metric_frame.by_group.plot.bar(
     subplots=True,
     layout=[3, 3],
