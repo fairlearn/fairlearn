@@ -1,5 +1,6 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+from collections import OrderedDict
 from itertools import product
 
 import numpy as np
@@ -21,7 +22,7 @@ class SensitiveFeatureGroup:
         self.classification_kwargs = kwargs
 
     def __repr__(self):
-        return f'{self.group_assignments}={self.classification_kwargs()}'
+        return f'{self.group_assignments}={self.classification_kwargs}'
 
 
 class SensitiveFeature:
@@ -29,34 +30,45 @@ class SensitiveFeature:
         self.name = name
         self.groups = groups
 
+    def __repr__(self):
+        return f'{self.name}[{",".join(self.groups)}]'
+
 
 class SensitiveDatasetMaker:
 
     def __init__(self, sensitive_features=None, random_state=None):
         self.rng = check_random_state(random_state)
         self.sensitive_features = sensitive_features or []
-        self.configured_groups = {}
-
-    def feature_names(self):
-        return [feature.name for feature in self.sensitive_features]
+        self.init_configured_groups()
 
     def __repr__(self):
         features = ', '.join([str(feature) for feature in self.sensitive_features])
         return f'SensitiveDatasetMaker({features})'
 
-    # def add_feature(self, feature_name, groups):
-    #     self.sensitive_features.append(SensitiveFeature(feature_name, groups))
+    def feature_names(self):
+        return [feature.name for feature in self.sensitive_features]
 
-    def feature_groups(self):
+    def all_groups_assignments(self):
         all_groups = []
         for feature in self.sensitive_features:
             groups = [(feature.name, group_name)
                       for group_name in feature.groups]
             all_groups.append(groups)
+        group_assignments = []
         for group in product(*all_groups):
-            group_kwargs = {feature_name: group_name
-                            for feature_name, group_name in group}
-            yield SensitiveFeatureGroup(group_kwargs)
+            group_assignments.append(OrderedDict(
+                [(feature_name, group_name) for feature_name, group_name in group]))
+        return group_assignments
+
+    def init_configured_groups(self):
+        self.configured_groups = {}
+        for group_assignments in self.all_groups_assignments():
+            group = tuple(group_assignments.values())
+            self.configured_groups[group] = SensitiveFeatureGroup(group_assignments)
+
+    def feature_groups(self):
+        for group_assignments in self.all_groups_assignments():
+            yield self.configured_groups[group_assignments]
 
     def make_sensitive_classification(self, **kwargs):
         classification_kwargs = {
@@ -71,14 +83,18 @@ class SensitiveDatasetMaker:
         sensitive_features = {feature_name: []
                               for feature_name in self.feature_names()}
 
-        for group in self.feature_groups():
-            group_config = group.classification_kwargs
+        for group_assignments in self.all_groups_assignments():
+            group = self.configured_groups[tuple(group_assignments.values())]
+
+            group_config = group.classification_kwargs.copy()
             group_config.update(classification_kwargs)
             group_config.setdefault('weights', (self.rng.uniform(0.2, 0.8),))
             group_config.setdefault('n_samples', 50)
+
             X, y = make_classification(**group_config)
             Xs.append(X)
             ys.append(y)
+
             for feature in self.feature_names():
                 group_assignments = [group.group_assignments[feature]] * group_config['n_samples']
                 sensitive_features[feature].extend(group_assignments)

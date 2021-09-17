@@ -29,7 +29,7 @@ rng = np.random.RandomState(42)
 gender_feature = SensitiveFeature('Gender', ['Man', 'Other', 'Unspecified', 'Woman'])
 
 dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature], random_state=rng)
-X, y, features = dataset.make_sensitive_classification(n_samples=2500)
+X, y, features = dataset.make_sensitive_classification(n_samples=50)
 gender = features['Gender']
 
 # %%
