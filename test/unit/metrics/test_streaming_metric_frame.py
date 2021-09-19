@@ -29,7 +29,7 @@ def test_alternate_compute(transform_y_t, transform_y_p, num_batches):
                         sensitive_features=g_f)
 
     assert len(target._y_true) == len(y_t)
-    assert target.get_metric().overall == skm.recall_score(y_t, y_p)
+    assert target.get_metric_frame().overall == skm.recall_score(y_t, y_p)
 
     batch_generator = batchify(num_batches, y_t, y_p, g_4)
     for y_t_batches, y_p_batches, g_4_batches in batch_generator:
@@ -40,7 +40,7 @@ def test_alternate_compute(transform_y_t, transform_y_p, num_batches):
     assert len(target._y_true) == 2 * len(y_t)
 
     # We check that calling `by_group` will recompute the values.
-    assert len(target.get_metric().by_group) == 2
+    assert len(target.get_metric_frame().by_group) == 2
 
 
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
@@ -58,7 +58,7 @@ def test_simple_sample_params(transform_y_t, transform_y_p, num_batches):
                         sensitive_features=g_f,
                         sample_params={'sample_weight': sw_batches})
 
-    target_metric = target.get_metric()
+    target_metric = target.get_metric_frame()
     # Check we have correct return types
     assert isinstance(target_metric.overall, float)
     assert isinstance(target_metric.by_group, pd.Series)
@@ -94,7 +94,7 @@ def test_basic_streaming(transform_y_t, transform_y_p, num_batches):
                         y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f)
 
-    target_metric = target.get_metric()
+    target_metric = target.get_metric_frame()
     # Check on the indices properties
     assert target_metric.control_levels is None
     assert isinstance(target_metric.sensitive_levels, list)
@@ -131,7 +131,7 @@ def test_exception_on_no_data():
     target = metrics.StreamingMetricFrame(metrics=skm.recall_score)
 
     with pytest.raises(ValueError) as excinfo:
-        _ = target.get_metric()
+        _ = target.get_metric_frame()
     assert "No data to process" in str(excinfo.value)
 
 
@@ -178,7 +178,7 @@ def test_multimetric_straming(transform_y_t, transform_y_p, num_batches):
                         y_pred=transform_y_p(y_p_batches),
                         sensitive_features=g_f)
 
-    target_metric = target.get_metric()
+    target_metric = target.get_metric_frame()
 
     # Compare to the non-batched version.
     g4 = pd.DataFrame(data=g_4, columns=['My feature'])
@@ -212,7 +212,7 @@ def test_nested_sample_params(transform_y_t, transform_y_p, num_batches):
                         sample_params={'recall': {'sample_weight': sw_batches},
                                        'precision': {'sample_weight': sw_batches}})
 
-    target_metric = target.get_metric()
+    target_metric = target.get_metric_frame()
 
     # Compare to the non-batched version.
     g4 = pd.DataFrame(data=g_4, columns=['My feature'])
@@ -229,3 +229,18 @@ def test_nested_sample_params(transform_y_t, transform_y_p, num_batches):
 
     assert (target_metric.group_min() == met_regular.group_min()).all()
     assert (target_metric.group_max() == met_regular.group_max()).all()
+
+
+def test_batchsize_mismatch():
+    target = metrics.StreamingMetricFrame(metrics=skm.recall_score)
+
+    batch_2 = y_t[:-1], y_p, g_4
+    batch_3 = y_t, y_p[:-1], g_4
+    batch_4 = y_t, y_p, g_4[:-1]
+
+    for y_true, y_pred, sensitive in (batch_2, batch_3, batch_4):
+        target.reset()
+        target.add_data(y_true=y_t, y_pred=y_p, sensitive_features=g_4)
+        with pytest.raises(ValueError) as excinfo:
+            target.add_data(y_true=y_true, y_pred=y_pred, sensitive_features=sensitive)
+        assert "inconsistent numbers of samples" in str(excinfo.value)

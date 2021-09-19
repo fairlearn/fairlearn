@@ -107,11 +107,13 @@ class StreamingMetricFrame:
             control features are present.
         """
         check_consistent_length(y_true, y_pred)
+        check_consistent_length(y_true, sensitive_features)
         self._y_true = self._concat_if_not_none(self._y_true, y_true)
         self._y_pred = self._concat_if_not_none(self._y_pred, y_pred)
         self._sensitive_features = self._concat_if_not_none(self._sensitive_features,
                                                             sensitive_features)
         if control_features is not None:
+            check_consistent_length(y_true, control_features)
             self._control_features = self._concat_if_not_none(self._control_features,
                                                               control_features)
         elif self._control_features is not None:
@@ -121,7 +123,7 @@ class StreamingMetricFrame:
             self._sample_params = self._concat_if_not_none(self._sample_params,
                                                            sample_params)
 
-    def get_metric(self) -> MetricFrame:
+    def get_metric_frame(self) -> MetricFrame:
         """Get the MetricFrame computed on the accumulated values."""
         if self._y_true is None:
             raise ValueError(_EMPTY_BATCHES_ERR)
