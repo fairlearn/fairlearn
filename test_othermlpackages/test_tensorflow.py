@@ -9,7 +9,7 @@ from fairlearn.reductions import DemographicParity
 tf = pytest.importorskip("tensorflow")
 from tensorflow.keras.layers import Dense # noqa
 from tensorflow.keras.models import Sequential # noqa
-from scikeras.wrappers import KerasClassifier
+from scikeras.wrappers import KerasClassifier # noqa
 
 
 def create_model():
