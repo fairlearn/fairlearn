@@ -342,3 +342,9 @@ the algorithm may impact the intended outcomes of a given model.
       Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
       (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
       (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
+
+   .. [#4] Jacobs, Wallach `"Measurement and Fairness"
+      <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
+
+   .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
+      <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
