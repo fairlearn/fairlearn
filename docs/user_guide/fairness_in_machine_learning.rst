@@ -90,18 +90,18 @@ For example, in Fairlearn, we consider the following types of parity constraints
   :math:`h` satisfies demographic parity under a distribution over
   :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
   independent of the sensitive feature :math:`A`. This is equivalent to
-  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#3]_
+  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#2]_
 
 * *Equalized odds*: A classifier :math:`h` satisfies equalized odds under a
   distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
   conditionally independent of the sensitive feature :math:`A` given the label
   :math:`Y`. This is equivalent to
   :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-  [#3]_
+  [#2]_
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-  [#2]_
+  [#1]_
 
 *Regression*:
 
@@ -109,11 +109,11 @@ For example, in Fairlearn, we consider the following types of parity constraints
   under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
   of the sensitive feature :math:`A`. This is equivalent to
   :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-  [#1]_
+  [#0]_
 
 * *Bounded group loss*: A predictor :math:`f` satisfies bounded group loss at
   level :math:`\zeta` under a distribution over :math:`(X, A, Y)` if
-  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#1]_
+  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#0]_
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded
 group loss primarily seeks to mitigate quality-of-service harms. Equalized
@@ -156,7 +156,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#4]_
+In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#3]_
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
@@ -325,20 +325,20 @@ the algorithm may impact the intended outcomes of a given model.
 
 .. topic:: References:
 
-   .. [#1] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
+   .. [#0] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
       Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
       ICML, 2019.
    
-   .. [#2] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
+   .. [#1] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
       Learning"
       <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
       NIPS, 2016.
    
-   .. [#3] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
+   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
       Approach to Fair Classification"
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
 	  
-   .. [#4] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
+   .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
       Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
       (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
       (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
