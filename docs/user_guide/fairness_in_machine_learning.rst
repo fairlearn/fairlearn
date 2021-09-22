@@ -342,17 +342,6 @@ the algorithm may impact the intended outcomes of a given model.
       Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
       (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
       (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
-   
-   .. [#5] Mark S. Ackerman. 2000. `"The intellectual challenge of CSCW: The gap between
-      social requirements and technical feasibility"
-      https://doi.org/10.1207/S15327051HCI1523_5`. Human-Computer Interaction 15,
-      2-3 (2000), 179–203.
 
-   .. [#6] Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan. 2017.
-      `"Inherent trade-offs in the fair determination of risk scores"
-      https://arxiv.org/abs/1609.05807`. In Proc. of ITCS.
 
-   .. [#7] Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer
-      Wortman Vaughan, Hanna Wallach, Hal Daumé III, Kate Crawford.
-      "Datasheets for Datasets" `https://arxiv.org/abs/1803.09010
-      <https://arxiv.org/abs/1803.09010>`_ (2018)
+
