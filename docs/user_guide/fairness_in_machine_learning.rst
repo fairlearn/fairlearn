@@ -181,7 +181,7 @@ This trap occurs when we assume that the best solution to a problem
 may involve technology, and fail to recognize other possible solutions
 outside of this realm. Solutionist approaches may also not be appropriate
 in situations where definitions of fairness may change over time
-(see :ref:`formalism_trap`).
+(see :ref:`The Formalism Trap`).
 
 Example: consider the problem of internet connectivity in rural communities.
 An example of the solutionism trap is assuming that using data science to
