@@ -342,6 +342,3 @@ the algorithm may impact the intended outcomes of a given model.
       Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
       (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
       (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
-
-
-
