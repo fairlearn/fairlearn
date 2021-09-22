@@ -224,10 +224,10 @@ The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
 
 Many tasks of a data scientist involve some form of formalization: from
-measuring real-world phenomena as data to translating business KPI's
-and constraints into metrics, loss functions, or parameters. We fall into the
-formalism trap when we fail to account for the full meaning of social
-concepts like fairness.
+measuring real-world phenomena as data to translating business Key Performance
+Indicators (KPIs) and constraints into metrics, loss functions, or parameters.
+We fall into the formalism trap when we fail to account for the full meaning
+of social concepts like fairness.
 
 Fairness is a complex construct that is contested: different people may
 have different ideas of what is fair in a particular scenario. While
@@ -252,16 +252,16 @@ fairness between the legal world (i.e., fairness as procedural) and the fair-ML
 community (i.e., fairness as outcome-based).
 
 Where mathematical abstraction encounters a limitation is when
-capturing information regarding procedurality (for example, how do judges
+capturing information regarding contextuality (different communities
+may have different definitions for what constitutes an "unfair" outcome;
+for instance, is it unfair to hire an applicant whose primary language
+is English, for an English speaking role, over an applicant whose only
+spoken language is not English?); contestability (the definitions of
+discrimination and unfairness are politically contested and change
+over time, which may pose fundamental challenges for representing
+them mathematically); and procedurality (for example, how do judges
 and police officers determine whether bail, counselling, probation, or
-incarceration is appropriate); contextuality (different communities may have
-different definitions for what constitutes an "unfair" outcome;
-for instance, is it
-unfair to hire an applicant whose primary language is English, for an
-English speaking role, over an applicant whose only spoken language is
-not English?); and contestability (the definitions of discrimination and
-unfairness are politically contested and change over time, which may pose
-fundamental challenges for representing them mathematically).
+incarceration is appropriate);
 
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
