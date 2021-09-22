@@ -138,7 +138,10 @@ y_pred = unmitigated_predictor.predict(X_test)
 # follows:
 
 acc_frame = MetricFrame(
-    skm.accuracy_score, y_test, y_pred, sensitive_features=A_test["sex"]
+    metrics=skm.accuracy_score,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test["sex"]
 )
 print("Minimum accuracy_score: ", acc_frame.group_min())
 
@@ -180,9 +183,9 @@ print("Minimum accuracy_score: ", my_acc_min)
 random_weights = np.random.rand(len(y_test))
 
 acc_frame_sw = MetricFrame(
-    skm.accuracy_score,
-    y_test,
-    y_pred,
+    metrics=skm.accuracy_score,
+    y_true=y_test,
+    y_pred=y_pred,
     sensitive_features=A_test["sex"],
     sample_params={"sample_weight": random_weights},
 )
@@ -209,9 +212,9 @@ fbeta_03 = functools.partial(skm.fbeta_score, beta=0.3)
 fbeta_03.__name__ = "fbeta_score__beta_0.3"
 
 beta_frame = MetricFrame(
-    fbeta_03,
-    y_test,
-    y_pred,
+    metrics=fbeta_03,
+    y_true=y_test,
+    y_pred=y_pred,
     sensitive_features=A_test["sex"],
     sample_params={"sample_weight": random_weights},
 )

@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-from fairlearn._input_validation import _merge_columns
+from fairlearn.utils._input_validation import _merge_columns
 
 
 def ensure_list(X):

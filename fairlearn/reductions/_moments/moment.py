@@ -35,9 +35,9 @@ class Moment:
         ----------
         X : array
             The feature array
-        y : pandas.Series
+        y : :class:`pandas.Series`
             The label vector
-        sensitive_features : pandas.Series
+        sensitive_features : :class:`pandas.Series`
             The sensitive feature vector (default None)
         """
         assert self.data_loaded is False, \
