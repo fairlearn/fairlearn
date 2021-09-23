@@ -164,18 +164,18 @@ For example, in Fairlearn, we consider the following types of parity constraints
   :math:`h` satisfies demographic parity under a distribution over
   :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
   independent of the sensitive feature :math:`A`. This is equivalent to
-  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#3]_
+  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#2]_
 
 * *Equalized odds*: A classifier :math:`h` satisfies equalized odds under a
   distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
   conditionally independent of the sensitive feature :math:`A` given the label
   :math:`Y`. This is equivalent to
   :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-  [#3]_
+  [#2]_
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-  [#2]_
+  [#1]_
 
 *Regression*:
 
@@ -183,11 +183,11 @@ For example, in Fairlearn, we consider the following types of parity constraints
   under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
   of the sensitive feature :math:`A`. This is equivalent to
   :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-  [#1]_
+  [#0]_
 
 * *Bounded group loss*: A predictor :math:`f` satisfies bounded group loss at
   level :math:`\zeta` under a distribution over :math:`(X, A, Y)` if
-  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#1]_
+  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#0]_
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded
 group loss primarily seeks to mitigate quality-of-service harms. Equalized
@@ -215,21 +215,206 @@ which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
 subpackage :mod:`fairlearn.metrics`.
 
+What traps can we fall into when modeling a social problem?
+--------------------------------------------------------------
+
+Machine learning systems used in the real world are inherently sociotechnical
+systems, which include both technologies and social actors. Designers of machine
+learning systems typically translate a real-world context into a machine learning
+model through abstraction: focusing only on 'relevant' aspects of that context,
+which are typically described by inputs, outputs, and the relationship between them.
+However, by abstracting away the social context they are at risk of falling into
+'abstraction traps': a failure to consider how social context and technology
+are interrelated.
+
+In this section, we explain what those traps are, and give some suggestions on
+how we can avoid them.
+
+In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#3]_
+identify failure modes that can arise from abstracting away the social context
+when modeling. They identify them as:
+
+* *The Solutionism Trap*
+
+* *The Ripple Effect Trap*
+
+* *The Formalism Trap*
+
+* *The Portability Trap*
+
+* *The Framing Trap*
+
+We provide some definitions and examples of these traps to help Fairlearn
+users think about how choices they make in their work can lead to or avoid
+these common pitfalls.
+
+The Solutionism Trap
+^^^^^^^^^^^^^^^^^^^^
+
+This trap occurs when we assume that the best solution to a problem
+may involve technology, and fail to recognize other possible solutions
+outside of this realm. Solutionist approaches may also not be appropriate
+in situations where definitions of fairness may change over time
+(see 'The Formalism Trap' below).
+
+Example: consider the problem of internet connectivity in rural communities.
+An example of the solutionism trap is assuming that using data science to
+measure internet speed in a given region
+can help improve internet connectivity.
+However, if there are additional socioeconomic challenges within
+a community, for example with education, infrastructure, information
+technology, or health services, then an algorithmic solution purely
+focused on internet speed may fail to meaningfully address the needs of
+the community.
+
+The Ripple Effect Trap
+^^^^^^^^^^^^^^^^^^^^^^
+
+This trap occurs when we do not consider the unintended consequences of
+introducing technology into an existing social system. Such consequences
+include changes in behaviors, outcomes, individual experiences, or changes
+in underlying social values and incentives of a given social system; for
+instance, by increasing perceived value of quantifiable metrics over
+non-quantifiable ones.
+
+Example: consider the problem of banks deciding whether an individual should
+be approved for a loan. Prior to using machine learning algorithms
+to compute a "score", banks might rely on loan officers that engage in
+conversations with clients, recommend a plan based on their unique
+situation, and discuss with other team members to obtain feedback.
+By introducing an algorithm, it is possible that loan officers may limit
+their conversations with team members and clients, assuming the algorithm's
+recommendations are good enough without those additional sources of information.
+
+To avoid this pitfall, we must be aware that once a technology is incorporated
+into a social context, new groups may reinterpret it differently. We should
+adopt "what if" scenarios to envision how the social context might change
+after introducing a model, including how it may change the power dynamics of
+existing groups in that context, or how actors might change their behaviors to
+game the model.
+
+The Formalism Trap
+^^^^^^^^^^^^^^^^^^
+
+Many tasks of a data scientist involve some form of formalization: from
+measuring real-world phenomena as data to translating business Key Performance
+Indicators (KPIs) and constraints into metrics, loss functions, or parameters.
+We fall into the formalism trap when we fail to account for the full meaning
+of social concepts like fairness.
+
+Fairness is a complex construct that is contested: different people may
+have different ideas of what is fair in a particular scenario. While
+mathematical fairness metrics may capture some aspects of fairness, they
+fail to capture all relevant aspects. For example, group fairness metrics
+do not account for differences in individual experiences, nor do they
+account for procedural justice.
+
+In some scenarios, fairness metrics such as demographic parity and equalized
+odds cannot be satisfied at the same time. At a first glance, this may appear
+to be a mathematical problem. However, the conflict is actually grounded in
+different understandings of what fairness is. Consequently, there is no
+mathematical approach to solve the conflict. Instead we need to decide which
+metrics might be appropriate for the situation at hand, keeping in mind the
+limitations of a mathematical formalization. In some cases, there may be no
+suitable metric.
+
+Some reasons why we fall into this trap are because fairness is
+context-dependent, because it is open to contestation by different groups
+of people, and because there are differences between ways of thinking about
+fairness between the legal world (i.e., fairness as procedural) and the fair-ML
+community (i.e., fairness as outcome-based).
+
+Where mathematical abstraction encounters a limitation is when
+capturing information regarding contextuality (different communities
+may have different definitions for what constitutes an "unfair" outcome;
+for instance, is it unfair to hire an applicant whose primary language
+is English, for an English speaking role, over an applicant whose only
+spoken language is not English?); contestability (the definitions of
+discrimination and unfairness are politically contested and change
+over time, which may pose fundamental challenges for representing
+them mathematically); and procedurality (for example, how do judges
+and police officers determine whether bail, counselling, probation, or
+incarceration is appropriate);
+
+The Portability Trap
+^^^^^^^^^^^^^^^^^^^^
+
+This trap occurs when we fail to understand how reusing a model or
+algorithm that is designed for one specific social context may not
+necessarily apply to a different social context. Reusing an algorithmic
+solution and failing to take into account differences in involved social
+contexts can result in misleading results and potentially harmful consequences.
+
+For instance, reusing a machine learning algorithm used to screen
+job applications in the nursing industry for a system used to screen
+job applications in the information technology sector could fall into the
+portability trap. One important difference between both contexts is
+the difference in skills required to succeed in both industries.
+Another key difference between these contexts involves the demographic
+differences (in terms of gender) of employees in each of these industries,
+which may result from wording in job postings, social constructs on gender
+and societal roles, and the percentages of successful applicants in
+each field per (gender) group.
+
+The Framing Trap
+^^^^^^^^^^^^^^^^
+
+This trap occurs when we fail to consider the full picture surrounding
+a particular social context when abstracting a social problem. Elements
+involved include but are not limited to: the social landscape that the
+chosen phenomenon exists in, characteristics of individuals or
+circumstances of the chosen situation, third parties involved along with
+their circumstances, and the task that is being set out to abstract
+(i.e., calculating a risk score, choosing between a pool of candidates,
+selecting an appropriate treatment, etc).
+
+To help us avoid drawing narrow boundaries of what is considered in scope
+for the problem, we might consider using wider "frames" around what is
+considered to be in scope for the problem, moving from an algorithmic frame
+to a sociotechnical frame.
+
+For instance, adopting a *sociotechnical* frame (instead of a data-focused,
+or algorithmic frame) allows us to recognize that a machine learning model
+is part of social and technical interactions between people and technology,
+and thus the social components of a given social context should be included
+as part of the problem formulation and modeling approach (including local
+decision-making processes, incentive structures, institutional processes,
+and more).
+
+For instance, we might fall into this trap by assessing risk of re-engagement
+in criminal behavior for an individual charged with an offense, while failing
+to consider factors such as the legacy of racial biases in criminal justice
+systems, the relationship of socio-economic status and mental health to the
+social construction of criminality, along with existing societal biases of
+judges, police officers, or other social actors involved in the larger
+sociotechnical frame around a criminal justice algorithm.
+
+Within the sociotechnical frame the model incorporates not only more
+nuanced data on the history of the case, but also the social context in
+which judging and recommending an outcome take place. This frame might
+incorporate the processes associated with crime reporting, the offense-trial
+pipeline, and an awareness of how the relationship between various social actors and
+the algorithm may impact the intended outcomes of a given model.
 
 .. topic:: References:
 
-   .. [#1] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
+   .. [#0] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
       Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
       ICML, 2019.
    
-   .. [#2] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
+   .. [#1] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
       Learning"
       <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
       NIPS, 2016.
    
-   .. [#3] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
+   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
       Approach to Fair Classification"
       <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
+	  
+   .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
+      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
+      (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
+      (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
 
    .. [#4] Jacobs, Wallach `"Measurement and Fairness"
       <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
