@@ -27,13 +27,25 @@ from sklearn.tree import DecisionTreeClassifier
 rng = np.random.RandomState(42)
 
 gender_feature = SensitiveFeature('Gender', ['Man', 'Other', 'Unspecified', 'Woman'])
-age_feature = SensitiveFeature('Age', ['<21', '21-64', '>64'])
+age_feature = SensitiveFeature('Age', ['<10', '10-30', '>30-70'])
 
-dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature, age_feature], random_state=rng)
+dataset = SensitiveDatasetMaker(
+    sensitive_features=[gender_feature, age_feature],
+    random_state=rng
+)
 
 # need a convenience method here
-dataset.configured_groups[('Man', '<21')].classification_kwargs['n_samples'] = 100
-X, y, features = dataset.make_sensitive_classification(n_samples=300)
+for key, feature_group in dataset.configured_groups.items():
+    if 'Man' in key:
+        feature_group.classification_kwargs['class_sep'] = 0.85
+        feature_group.classification_kwargs['n_samples'] = 2000
+    elif 'Woman' in key:
+        feature_group.classification_kwargs['class_sep'] = 1.25
+    elif 'Other' in key:
+        feature_group.classification_kwargs['class_sep'] = 0.5
+dataset.configured_groups[('Woman', '10-30')].classification_kwargs['n_samples'] = 500
+
+X, y, features = dataset.make_sensitive_classification(n_samples=3000)
 
 X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = train_test_split(
     X, y, features, test_size=0.3, random_state=rng
@@ -63,5 +75,3 @@ metric_frame.by_group.plot.bar(
     figsize=[12, 8],
     title="Show all metrics",
 )
-
-# %%
