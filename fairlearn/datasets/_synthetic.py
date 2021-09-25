@@ -6,7 +6,7 @@ from itertools import product
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification
-from sklearn.utils import check_random_state
+from sklearn.utils import check_random_state, shuffle
 
 
 class SensitiveFeatureGroupConfig:
@@ -141,7 +141,10 @@ class SensitiveDatasetMaker:
         X = np.concatenate(Xs)
         y = np.concatenate(ys)
 
+        X, y, *shuffled_sensitive_features = shuffle(X, y, *sensitive_features.values())
         sensitive_features = pd.DataFrame.from_dict(
-            {k: np.array(v) for k, v in sensitive_features.items()})
+            {k: np.array(v) for k, v in zip(sensitive_features.keys(),
+                                            shuffled_sensitive_features)}
+        )
 
         return X, y, sensitive_features
