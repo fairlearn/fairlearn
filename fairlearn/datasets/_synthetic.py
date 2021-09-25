@@ -48,10 +48,20 @@ class SensitiveFeature:
 
 
 class SensitiveDatasetMaker:
+    """ Synthetic dataset constructor with support for sensitive features.
 
-    def __init__(self, sensitive_features=None, random_state=None):
+    Parameters
+    ----------
+    sensitive_features : list of SensitiveFeature instances
+
+    random_state : int or np.random.RandomState instance
+        Seed or random state
+
+    """
+
+    def __init__(self, sensitive_features, random_state=None):
         self.rng = check_random_state(random_state)
-        self.sensitive_features = sensitive_features or []
+        self.sensitive_features = sensitive_features
         self.init_configured_groups()
 
     def __repr__(self):
@@ -80,12 +90,30 @@ class SensitiveDatasetMaker:
             group = tuple(group_dict.values())
             self.configured_groups[group] = SensitiveFeatureGroupConfig(group_dict)
 
-    def make_sensitive_classification(self, **kwargs):
+    def make_sensitive_classification(self, n_samples_per_group=50, **kwargs):
+        """ Make classification dataset with the configured sensitive features.
+
+        Options passed to this method in :code:`**kwargs` will be forwarded to
+        :code:`sklearn.datasets.make_classification`, which is responsible for
+        generating the data of each feature group.
+
+        Parameters
+        ----------
+        n_samples_per_group : int, default=50
+            Default number of samples to generate for each group.
+
+        Returns
+        -------
+        X, y, sensitive_features : Tuple(ndarray, ndarray, dict)
+            A labeled dataset with sensitive_features separated from the
+            non-sensitive features X.
+
+        """
         classification_kwargs = {
             'n_features': 20,
             'n_informative': 4,
             'n_classes': 2,
-            'n_samples': 50,
+            'n_samples': n_samples_per_group,
             'random_state': self.rng,
         }
         classification_kwargs.update(kwargs)
