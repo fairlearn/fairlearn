@@ -26,24 +26,21 @@ from sklearn.tree import DecisionTreeClassifier
 
 rng = np.random.RandomState(42)
 
-gender_feature = SensitiveFeature('Gender', ['Man', 'Other', 'Unspecified', 'Woman'])
-age_feature = SensitiveFeature('Age', ['<10', '10-30', '>30-70'])
+gender_feature = SensitiveFeature('gender', ['Man', 'Other', 'Unspecified', 'Woman'])
+age_feature = SensitiveFeature('age', ['<10', '10-30', '>30'])
 
 dataset = SensitiveDatasetMaker(
     sensitive_features=[gender_feature, age_feature],
     random_state=rng
 )
 
-# need a convenience method here
-for key, feature_group in dataset.configured_groups.items():
-    if 'Man' in key:
-        feature_group.classification_kwargs['class_sep'] = 0.85
-        feature_group.classification_kwargs['n_samples'] = 2000
-    elif 'Woman' in key:
-        feature_group.classification_kwargs['class_sep'] = 1.25
-    elif 'Other' in key:
-        feature_group.classification_kwargs['class_sep'] = 0.5
-dataset.configured_groups[('Woman', '10-30')].classification_kwargs['n_samples'] = 500
+dataset.set_group_configs({'n_samples': 2000, 'class_sep': 0.85}, gender='Man')
+dataset.set_group_configs({'class_sep': 1.25}, gender='Woman')
+dataset.set_group_configs({'n_samples': 1000}, gender='Woman', age='10-30')
+dataset.set_group_configs({'class_sep': 0.5}, gender='Other')
+
+# this will overwrite the class_sep value for the gender groups set above
+dataset.set_group_configs({'class_sep': 1.0}, age='<10')
 
 X, y, features = dataset.make_sensitive_classification(n_samples=3000)
 
