@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from collections import defaultdict
 import pandas as pd
 import numpy as np
 import pytest
@@ -46,17 +47,26 @@ class TestFairlearnDataset:
         """Ensure that dataset creation is deterministic."""
         rng = np.random.RandomState(54321)
         gender_feature = SensitiveFeature(
-            'Gender', ['Man', 'Non-binary', 'Other', 'Unspecified', 'Woman'])
+            'gender', ['Man', 'Non-binary', 'Other', 'Unspecified', 'Woman'])
         dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature],
                                         random_state=rng)
         X, y, features = dataset.make_sensitive_classification(n_samples=500)
-        gender = features['Gender']
+        gender = features['gender']
 
-        counts = [127, 370, 324, 210]
-        for i in range(4):
-            assert np.sum(y[i*500:(i+1)*500]) == counts[i]
+        expected_counts = {
+            'Man': 130,
+            'Non-binary': 215,
+            'Other': 164,
+            'Unspecified': 272,
+            'Woman': 237,
+        }
+        counts = defaultdict(int)
+        for label, g in zip(y, gender):
+            counts[g] += 1 if label else 0
+        for k, v in expected_counts.items():
+            assert v == counts[k]
 
-        assert np.isclose(np.mean(X), 0.0097618)
+        assert np.isclose(np.mean(X), -0.0047114)
         assert X.shape == (2500, 20)
         assert y.shape == (2500,)
         assert gender.shape == (2500,)
@@ -65,7 +75,7 @@ class TestFairlearnDataset:
         """Ensure that custom dataset creation is deterministic."""
         rng = np.random.RandomState(54321)
         gender_feature = SensitiveFeature(
-            'Gender', ['Man', 'Non-binary', 'Other', 'Unspecified', 'Woman'])
+            'gender', ['Man', 'Non-binary', 'Other', 'Unspecified', 'Woman'])
         dataset = SensitiveDatasetMaker(sensitive_features=[gender_feature],
                                         random_state=rng)
 
@@ -77,10 +87,10 @@ class TestFairlearnDataset:
             'Woman': {'n_samples': 300, 'class_sep': 2},
         }
         for key, config in feature_config.items():
-            dataset.configured_groups[(key,)].classification_kwargs.update(config)
+            dataset.set_group_configs(config, gender=key)
 
         X, y, features = dataset.make_sensitive_classification(n_features=25)
-        gender = features['Gender']
+        gender = features['gender']
 
         n_samples = np.sum([v['n_samples'] for v in feature_config.values()])
         assert set(pd.unique(gender)) == set(feature_config.keys())

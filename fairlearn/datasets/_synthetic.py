@@ -62,7 +62,7 @@ class SensitiveDatasetMaker:
     def __init__(self, sensitive_features, random_state=None):
         self.rng = check_random_state(random_state)
         self.sensitive_features = sensitive_features
-        self._init_configured_groups()
+        self._init_group_configs()
 
     def __repr__(self):
         features = ', '.join([str(feature) for feature in self.sensitive_features])
@@ -82,35 +82,35 @@ class SensitiveDatasetMaker:
             ))
         return group_dicts
 
-    def _init_configured_groups(self):
+    def _init_group_configs(self):
         """ Create a new SensitiveFeatureGroupConfig for each feature group.
 
         The only default setting is :code:`weights`, which is uniformly randomly
         assigned for each group to ensure group-wise variation of the number of
         True labels.
         """
-        self.configured_groups = {}
+        self.group_configs = {}
         for group_dict in self.all_group_dicts():
             group = tuple(group_dict.values())
             config = SensitiveFeatureGroupConfig(group_dict)
             config.classification_kwargs['weights'] = (self.rng.uniform(0.2, 0.8),)
-            self.configured_groups[group] = config
+            self.group_configs[group] = config
 
-    def get_groups(self, **kwargs):
+    def get_group_configs(self, **kwargs):
         """ Get group configs matching kwargs.
 
-        For instance, :code:`get_groups(gender='Other')` will return a list of
-        all group configs where the gender is set to 'Other'.
+        For instance, :code:`get_group_configs(gender='Other')` will return a
+        list of all group configs where the gender is set to 'Other'.
         """
         results = []
-        for config in self.configured_groups.values():
+        for config in self.group_configs.values():
             group = config.group_dict
             if all([group.get(k) == v for k, v in kwargs.items()]):
                 results.append(config)
         return results
 
     def set_group_configs(self, config, **kwargs):
-        for group in self.get_groups(**kwargs):
+        for group in self.get_group_configs(**kwargs):
             group.classification_kwargs.update(config)
 
     def make_sensitive_classification(self, n_samples_per_group=50, **kwargs):
@@ -146,7 +146,7 @@ class SensitiveDatasetMaker:
                               for feature in self.sensitive_features}
 
         for group_dict in self.all_group_dicts():
-            group = self.configured_groups[tuple(group_dict.values())]
+            group = self.group_configs[tuple(group_dict.values())]
 
             group_config = classification_kwargs.copy()
             group_config.update(group.classification_kwargs)
