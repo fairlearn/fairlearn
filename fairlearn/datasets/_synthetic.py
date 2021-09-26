@@ -62,7 +62,7 @@ class SensitiveDatasetMaker:
     def __init__(self, sensitive_features, random_state=None):
         self.rng = check_random_state(random_state)
         self.sensitive_features = sensitive_features
-        self.init_configured_groups()
+        self._init_configured_groups()
 
     def __repr__(self):
         features = ', '.join([str(feature) for feature in self.sensitive_features])
@@ -82,7 +82,7 @@ class SensitiveDatasetMaker:
             ))
         return group_dicts
 
-    def init_configured_groups(self):
+    def _init_configured_groups(self):
         """ Create a new SensitiveFeatureGroupConfig for each feature group.
         """
         self.configured_groups = {}
