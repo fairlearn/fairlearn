@@ -7,7 +7,7 @@ Revisiting the Boston Housing Dataset
 Introduction
 ^^^^^^^^^^^^^^^^^
 
-The Boston Housing dataset is one of three datasets currently callable in fairlearn's *datasets* module. In the past, it has commonly been used for benchmarking in popular machine learning libraries, including scikit-learn and open-ml. However, as the machine learning community has developed awareness about fairness issues with popular benchmarking datasets, the Boston Housing data has been phased out of many libraries. We migrated the dataset to fairlearn after it was phased out of scikit-learn in June 2020. The dataset remains in fairlearn as an example of how system racism can occur in data and to show the effect of fairlearn's assessment and pre-/in-/post-processing tools on real, problematic data. 
+The Boston Housing dataset has commonly been used for benchmarking in popular machine learning libraries, including scikit-learn and open-ml. However, as the machine learning community has developed awareness about fairness issues with popular benchmarking datasets, the Boston Housing data has been phased out of many libraries. We migrated the dataset to fairlearn after it was phased out of scikit-learn in June 2020. The dataset remains in fairlearn as an example of how systemic racism can be embedded in data. 
 
 **We wrote this blog post to achieve the following goals:**
   * Educate users about the history of the dataset and the bias contained therein
