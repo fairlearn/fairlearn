@@ -258,11 +258,7 @@ class MetricFrame:
     group_min       0.6            0.4
     group_max       0.8            0.8
 
-    You can also easily plot all of the metrics using DataFrame plotting capabilities
-
-    >>> mf2.by_group.plot.bar(subplots=True, layout= [1,3], figsize=(12, 4),
-    ...                  legend=False, rot=-45, position=1.5); # doctest: +SKIP
-
+    You can find more information about plotting grouped metrics in the following section: :ref:`plot`
     """
 
     # The deprecation decorator does two things:
