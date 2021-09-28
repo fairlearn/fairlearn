@@ -258,7 +258,7 @@ class MetricFrame:
     group_min       0.6            0.4
     group_max       0.8            0.8
 
-    You can find more information about plotting grouped metrics in the following section: :ref:`plot`
+    More information about plotting metrics can be found in the following section: :ref:`plot`
     """
 
     # The deprecation decorator does two things:
