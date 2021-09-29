@@ -25,7 +25,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     .. versionchanged:: 0.3.0
         Was a function before, not a class
 
-    .. versionchanged:: 0.4.6 
+    .. versionchanged:: 0.4.6
         Requires 0-1 labels for classification problems
 
     Parameters
@@ -48,7 +48,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         .. versionchanged:: 0.5.0
             :code:`eps` is now only responsible for setting the L1 norm bound
-            in the optimization 
+            in the optimization
 
     max_iter : int
         Maximum number of iterations
