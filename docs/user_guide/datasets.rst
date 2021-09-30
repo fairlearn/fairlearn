@@ -2,7 +2,7 @@ Datasets
 ==========
 
 Revisiting the Boston Housing Dataset
--------
+-------------------------------------
 
 Introduction
 ^^^^^^^^^^^^^^^^^
