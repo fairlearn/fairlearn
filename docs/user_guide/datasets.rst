@@ -45,7 +45,7 @@ characteristics. Further, the authors took the derivative of their housing
 value equation with respect to nitric oxides concentration 
 to measure the "amount of money households
 were willing to pay with respect to air polution levels in their census 
-tracts". The variables in the dataset are representative of the early 1970s 
+tracts." The variables in the dataset are representative of the early 1970s 
 and come from a mixture of surveys, administrative records, and other research
 papers. While the paper does define each variable and suggest its impact on 
 the housing value equation, it lacks reasoning for including that particular
