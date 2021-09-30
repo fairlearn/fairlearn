@@ -88,7 +88,7 @@ The cells below show basic summary statistics about the data, the dtypes of the
 columns, and the number of missing values. Note that the 
 :func:`fairlearn.datasets.fetch_boston` function warns user by default that the
 dataset contains fairness issues. Setting :code:`warn=False` will turn the
-warning off. To return the dataset as a data frame, pass 
+warning off. To return the dataset as a :class:`pandas.DataFrame`, pass 
 :code:`as_frame=True` and call the *data* attribute.
 
 For more information about how to use the :code:`fetch_boston` function, 
