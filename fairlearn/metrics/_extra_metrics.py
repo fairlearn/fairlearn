@@ -61,7 +61,7 @@ def _get_labels_for_confusion_matrix(labels, pos_label):
     # Ensure unique_labels has two elements
     if len(unique_labels) == 1:
         if unique_labels[0] == pos_label:
-            unique_labels = [None, pos_label]
+            unique_labels = [np.iinfo(np.int64).min, pos_label]
         else:
             unique_labels.append(pos_label)
     elif len(unique_labels) == 2:
