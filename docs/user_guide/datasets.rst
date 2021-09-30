@@ -94,16 +94,13 @@ warning off. To return the dataset as a :class:`pandas.DataFrame`, pass
 :code:`as_frame=True` and call the *data* attribute.
 
 For more information about how to use the :code:`fetch_boston` function, 
-visit the `fairlearn datasets documentation 
-<https://fairlearn.org/v0.7.0/api_reference/fairlearn.datasets.html#id15>`_. 
+visit :mod:`fairlearn.datasets`. 
 
 .. note::
 
     Calling the :func:`fairlearn.datasets.fetch_boston` function will raise a 
     :code:`FairnessWarning`.
-    For more information on this warning refer to
-    `https://fairlearn.org/v0.7.0/api_reference/fairlearn.datasets.html 
-    <https://fairlearn.org/v0.7.0/api_reference/fairlearn.datasets.html>`_.
+    For more information on this warning refer to :mod:`fairlearn.datasets`.
 
 .. doctest:: datasets
 
@@ -157,7 +154,7 @@ an **increase in B** should have a **negative influence on housing value**
 if Blacks are regarded as undesirable neighbors by Whites. However, market 
 discrimination means that housing values are higher at very high levels of B. 
 One expects, therefore, a parabolic relationship between proportion Black in 
-a neighborhood and housing values.
+a neighborhood and housing values."
 
 To break down the *B* reasoning further, the authors assume that 
 self-segregation correlates to higher home values, though subsequent authors 
