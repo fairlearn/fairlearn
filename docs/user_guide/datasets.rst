@@ -30,18 +30,20 @@ Dataset Origin and Use
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Contrary to expectation, the Boston Housing dataset was not developed for 
-economic purposes. `Harrison and Rubenfield (1978) <https://deepblue.lib.umich.edu/bitstream/handle/2027.42/22636/0000186.pdf?sequence=1&isAllowed=y>` 
+economic purposes. `Harrison and Rubenfield (1978) <https://deepblue.lib.umich.edu/bitstream/handle/2027.42/22636/0000186.pdf?sequence=1&isAllowed=y>`_ 
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. The authors use a 
-`hedonic pricing <https://www.investopedia.com/terms/h/hedonicpricing.asp>` 
+`hedonic pricing <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_ 
 approach, which assumes that the price of a good or service can be modeled as a 
 function of features both internal and external to the good or service. The 
 input to this model was a dataset comprising the Boston Standard Metropolitan 
-Statistical Area, with the *NOX* variable serving as a proxy for air quality. 
+Statistical Area, with the nitric oxides concentration (*NOX*) 
+serving as a proxy for air quality. 
 The paper sought to estimate the median value of owner-occupied homes (now 
 *MEDV*), and included the remaining variables to measure other neighborhood 
 characteristics. Further, the authors took the derivative of their housing 
-value equation with respect to *NOX* to measure the "amount of money households
+value equation with respect to nitric oxides concentration 
+to measure the "amount of money households
 were willing to pay with respect to air polution levels in their census 
 tracts". The variables in the dataset are representative of the early 1970s 
 and come from a mixture of surveys, administrative records, and other research
@@ -51,15 +53,15 @@ set of variables.
 
 Modern machine learning practicioners have used the Boston Housing dataset as 
 a benchmark to assess the performance of emerging supervised learning 
-techniques. It's featured in `scipy lectures <https://scipy-lectures.org/packages/scikit-learn/auto_examples/plot_boston_prediction.html>`, 
+techniques. It's featured in `scipy lectures <https://scipy-lectures.org/packages/scikit-learn/auto_examples/plot_boston_prediction.html>`_, 
 indexed in the `University of California-Irvine Machine Learning Repository 
-<https://archive.ics.uci.edu/ml/machine-learning-databases/housing/>` and in 
-Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`, 
-and for a time was included as one of `scikit-learn's <https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html>`
+<https://archive.ics.uci.edu/ml/machine-learning-databases/housing/>`_ and in 
+Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`_, 
+and for a time was included as one of `scikit-learn's <https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html>`_
  and tensorflow's standard toy datasets. It has also been the benchmark of 
-choice for `many <https://ieeexplore.ieee.org/abstract/document/8556738/>` 
-`machine <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=1187&context=imse_conf>` 
-`learning <https://proceedings.neurips.cc/paper/1999/file/f3144cefe89a60d6a1afaf7859c5076b-Paper.pdf>`
+choice for `many <https://ieeexplore.ieee.org/abstract/document/8556738/>`_ 
+`machine <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=1187&context=imse_conf>`_ 
+`learning <https://proceedings.neurips.cc/paper/1999/file/f3144cefe89a60d6a1afaf7859c5076b-Paper.pdf>`_
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all&source=header>`.
 As of scikit-learn version 1.2, the dataset has been removed.
 
@@ -93,7 +95,7 @@ warning off. To return the dataset as a :class:`pandas.DataFrame`, pass
 
 For more information about how to use the :code:`fetch_boston` function, 
 visit the `fairlearn datasets documentation 
-<https://fairlearn.org/v0.7.0/api_reference/fairlearn.datasets.html#id15>`. 
+<https://fairlearn.org/v0.7.0/api_reference/fairlearn.datasets.html#id15>`_. 
 
 .. note::
 
@@ -135,7 +137,7 @@ Dataset Issues
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 While the dataset is widely used, it has significant ethical issues. As 
-explained in scikit-learn's `documentation <https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html#rec2f484fdebe-2>`, 
+explained in scikit-learn's `documentation <https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html#rec2f484fdebe-2>`_, 
 Harrison and Rubenfield developed the *B* under the assumption that racial 
 self-segregation had a positive impact on house prices. *B* then is a measure 
 of systemic racism, as it encodes racism as a factor in house pricing. Thus, 
@@ -160,13 +162,13 @@ a neighborhood and housing values.
 To break down the *B* reasoning further, the authors assume that 
 self-segregation correlates to higher home values, though subsequent authors 
 contend that this hypothesis is impossible to prove with evidence (see `Kain 
-and Quigley, 1975 <https://www.nber.org/books/kain75-1>`). Additionally, though
+and Quigley, 1975 <https://www.nber.org/books/kain75-1>`_). Additionally, though
 the authors specify a parabolic transformation for *B*, they do not provide 
 evidence that the relationship between *B* and *MEDV* is parabolic. Harrison 
 and Rubenfield set a threshold of 63% as the point in which median house 
 prices flip from declining to increasing, but do not provide the basis for 
 this threshold. An `analysis of the dataset 
-<https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>` by 
+<https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>`_ by 
 M. Carlisle further shows that the Boston Housing dataset suffers from serious
 quality and incompleteness issues, as Carlisle was unable to recover the 
 original Census data mapping for all the points in the *B* variable. 
@@ -204,7 +206,7 @@ to turn this problem into a classification problem. The code below maps
 *LSTAT*, *B*, and *MEDV* to binary values where values greater than the median 
 of the column map to 1, and otherwise the values are 0. Note that this 
 methodology follows scikit-lego's `exploration 
-<https://scikit-lego.netlify.app/fairness.html>` of the Boston Housing data.
+<https://scikit-lego.netlify.app/fairness.html>`_ of the Boston Housing data.
 
 .. doctest:: datasets
     :options:  +NORMALIZE_WHITESPACE
@@ -304,7 +306,7 @@ strongly discourage using it in predictive modelling analyses. We've kept it
 in fairlearn because of its potential as a teaching tool for how to deal with 
 ethical issues in a dataset. There are ways to `remove correlations between 
 sensitive features and the remaining columns 
-<https://scikit-lego.netlify.app/fairness.html>`, but other benchmark datasets
+<https://scikit-lego.netlify.app/fairness.html>`_, but other benchmark datasets
 exist that do not present these issues.
 
 It's important to keep the differences between the way Harrison and Rubenfield 
@@ -325,8 +327,8 @@ how well it learns and replicates the biases in this dataset.
 
 If you are searching for a house pricing dataset to use for benchmarking 
 purposes or to create a hedonic pricing model, scikit-learn recommends the 
-`California housing dataset <https://scikit-learn.org/stable/datasets/real_world.html#california-housing-dataset>` 
-or the `Ames dataset <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>` 
+`California housing dataset <https://scikit-learn.org/stable/datasets/real_world.html#california-housing-dataset>`_ 
+or the `Ames dataset <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>`_ 
 in place of the Boston housing dataset, as these datasets do not suffer from 
 bias issues. We recommend you proceed with extreme caution when calling the 
 Boston housing data from fairlearn, and hope this article gives you pause 
