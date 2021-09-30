@@ -27,7 +27,7 @@ tools on real, problematic data.
 .. _dataset_origin:
 
 Dataset Origin and Use
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 Contrary to expectation, the Boston Housing dataset was not developed for 
 economic purposes. `Harrison and Rubenfield (1978) <https://deepblue.lib.umich.edu/bitstream/handle/2027.42/22636/0000186.pdf?sequence=1&isAllowed=y>` 
