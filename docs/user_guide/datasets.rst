@@ -72,11 +72,10 @@ indexed in the `University of California-Irvine Machine Learning Repository
 <https://archive.ics.uci.edu/ml/machine-learning-databases/housing/>`_ and in 
 Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`_, 
 and for a time was included as one of scikit-learn's
- and tensorflow's standard toy datasets. 
+ and tensorflow's standard toy datasets (see :mod:`tf.keras.datasets.boston_housing`). 
  
-It has also been the benchmark of choice for `many[#2]`
-`machine[#3]`
-`learning[#4]`
+It has also been the benchmark of choice for many [#2]
+machine [#3] learning [#4] 
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all&source=header>`.
 
 In scikit-learn version 1.2, the dataset will be removed.
@@ -168,9 +167,9 @@ Both variables come from the 1970 US Census.
 male workers classified as laborers**). The logarithmic specification implies 
 that socioeconomic status distinctions mean more in the upper brackets of 
 society than in the lower classes."
-- *B*: "Black proportion of population. At low to moderate levels of B, 
+- *B*: "Proportion of population that is Black. At low to moderate levels of B, 
 an **increase in B** should have a **negative influence on housing value** 
-if Blacks are regarded as undesirable neighbors by Whites. However, market 
+if Black people are regarded as undesirable neighbors by White people. However, market 
 discrimination means that housing values are higher at very high levels of B. 
 One expects, therefore, a parabolic relationship between proportion Black in 
 a neighborhood and housing values."
@@ -289,7 +288,7 @@ demographic parity at zero, implying a different selection rate across groups.
 The next series of tables dives deeper into the breakdown of various metrics by
 group. 
 
-The proportion of Blacks higher than the median is associated with a 
+The proportion of Black people higher than the median is associated with a 
 higher false positve rate. 
 
 *B* == True is also associated with a slightly lower precision. 
