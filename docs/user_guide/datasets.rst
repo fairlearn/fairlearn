@@ -385,8 +385,8 @@ If you are searching for a house pricing dataset to use for benchmarking
 purposes or to create a hedonic pricing model, scikit-learn recommends the 
 California housing dataset (:func:`sklearn.datasets.fetch_california_housing`)
 or the `Ames dataset <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>`_ 
-in place of the Boston housing dataset, as these datasets do not generate
-fairness-related harms. 
+in place of the Boston housing dataset, as using these datasets should not
+cause the same fairness-related harms. 
 
 We recommend you proceed with extreme caution when 
 calling the Boston housing data from Fairlearn, and hope this article gives 
