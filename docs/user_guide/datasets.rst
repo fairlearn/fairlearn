@@ -363,7 +363,7 @@ the goal of which was to determine the causal impacts of these variables on
 median home value. 
 
 Interpretation of causal models involves looking at model
-coefficients to ascertain the effect of one variable on the depedent variable,
+coefficients to ascertain the effect of one variable on the dependent variable,
 holding all other factors constant. This use case is different than the typical 
 supervised learning analysis. 
 
