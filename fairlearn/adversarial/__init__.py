@@ -3,6 +3,6 @@
 
 """Adversarial techniques to help mitigate fairness disparities."""
 
-from ._adversarial_debiasing import AdversarialDebiasing
+from ._adversarial_mitigation import AdversarialMitigation
 
-__all__ = ["AdversarialDebiasing"]
+__all__ = ["AdversarialMitigation"]
