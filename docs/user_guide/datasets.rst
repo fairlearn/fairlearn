@@ -234,7 +234,7 @@ are at risk of generating fairness-related harms.
 
 How does that look in a typical machine learning pipeline? 
 
-Because both the sensitive and target feaures are continuous, to leverage 
+Because both the sensitive and target features are continuous, to leverage 
 Fairlearn's assessment capabilities, we need to apply column transformations 
 to turn this problem into a classification problem. 
 The code below maps *LSTAT*, *B*, and *MEDV* to binary values 
