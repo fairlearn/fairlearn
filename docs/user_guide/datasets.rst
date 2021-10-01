@@ -350,7 +350,7 @@ We've kept it in Fairlearn because of its potential as a teaching tool
 for how to deal with ethical issues in a dataset. 
 
 There are ways to `remove correlations between sensitive features and the remaining columns 
-<https://scikit-lego.netlify.app/fairness.html>`_, but other benchmark datasets
+<https://scikit-lego.netlify.app/fairness.html>`_, but that is by no means a guarantee that fairness-related harms won't occur. Besides, other benchmark datasets
 exist that do not present these issues.
 
 
