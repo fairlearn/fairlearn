@@ -151,7 +151,7 @@ Dataset Issues
 While the dataset is widely used, it has significant ethical issues.
 
 As explained in :func:`sklearn.datasets.load_boston`, 
-Harrison and Rubenfield developed the *B* under the assumption that racial 
+Harrison and Rubenfield developed the feature *B* under the assumption that racial 
 self-segregation had a positive impact on house prices. 
 
 *B* then is a measure of systemic racism, as it encodes racism as a factor in house pricing. 
