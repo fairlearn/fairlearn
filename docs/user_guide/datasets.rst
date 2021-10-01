@@ -15,10 +15,10 @@ including scikit-learn and open-ml.
 However, as the machine learning community has developed awareness about fairness issues with 
 popular benchmarking datasets, the Boston Housing data has been phased out of many libraries. 
 
-We migrated the dataset to fairlearn after it was phased out of scikit-learn in June 2020. 
+We migrated the dataset to Fairlearn after it was phased out of scikit-learn in June 2020. 
 
-The dataset remains in fairlearn as an example of how system racism can occur in data and to 
-show the effect of fairlearn's assessment and pre-/in-/post-processing tools on real, problematic data. 
+The dataset remains in Fairlearn as an example of how system racism can occur in data and to 
+show the effect of Fairlearn's assessment and pre-/in-/post-processing tools on real, problematic data. 
 
 **We wrote this blog post to achieve the following goals:**
   * Educate users about the history of the dataset and its fairness-related harms
@@ -26,14 +26,14 @@ show the effect of fairlearn's assessment and pre-/in-/post-processing tools on 
   * Suggest best practices for dealing with the Boston Housing data and 
   alternative benchmarking datasets
 
-.. _dataset_origin:
+.. _boston_dataset_origin:
 
 Dataset Origin and Use
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Contrary to expectation, the Boston Housing dataset was not developed for economic purposes.
 
-`Harrison and Rubenfield (1978) <https://deepblue.lib.umich.edu/bitstream/handle/2027.42/22636/0000186.pdf?sequence=1&isAllowed=y>`_ 
+Harrison and Rubenfield (1978)_ 
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
 
@@ -55,7 +55,7 @@ to measure the "amount of money households
 were willing to pay with respect to air pollution levels in their census 
 tracts." 
 
-The variables in the dataset are representative of the early 1970s 
+The variables in the dataset were collected in the early 1970s 
 and come from a mixture of surveys, administrative records, and other research
 papers. 
 
@@ -74,9 +74,9 @@ Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`
 and for a time was included as one of scikit-learn's
  and tensorflow's standard toy datasets. 
  
-It has also been the benchmark of choice for `many <https://ieeexplore.ieee.org/abstract/document/8556738/>`_ 
-`machine <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=1187&context=imse_conf>`_ 
-`learning <https://proceedings.neurips.cc/paper/1999/file/f3144cefe89a60d6a1afaf7859c5076b-Paper.pdf>`_
+It has also been the benchmark of choice for `many[#2]`
+`machine[#3]`
+`learning[#4]`
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all&source=header>`.
 
 In scikit-learn version 1.2, the dataset will be removed.
@@ -117,12 +117,6 @@ To return the dataset as a :class:`pandas.DataFrame`, pass
 For more information about how to use the :code:`fetch_boston` function, 
 visit :mod:`fairlearn.datasets`. 
 
-.. note::
-
-    Calling the :func:`fairlearn.datasets.fetch_boston` function will raise a 
-    :code:`FairnessWarning`.
-    For more information on this warning refer to :mod:`fairlearn.datasets`.
-
 .. doctest:: datasets
 
     >>> from fairlearn.datasets import fetch_boston
@@ -149,7 +143,7 @@ visit :mod:`fairlearn.datasets`.
     75%	3.677083	12.500000	18.100000	0.624000	6.623500	94.075000	5.188425	666.000000	20.200000	396.225000	16.955000	25.000000
     max	88.976200	100.000000	27.740000	0.871000	8.780000	100.000000	12.126500	711.000000	22.000000	396.900000	37.970000	50.000000    
 
-.. _dataset_issues:
+.. _boston_dataset_issues:
 
 Dataset Issues
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -163,7 +157,7 @@ self-segregation had a positive impact on house prices.
 *B* then is a measure of systemic racism, as it encodes racism as a factor in house pricing. 
 
 Thus, any models trained using this data that do not take special care to process *B* 
-will learn to use mathematically encoded racism as a factor in house price prediction.
+will learn to use mathematically encoded racism as a factor in house price prediction. 
 
 Harrison and Rubenfield describe their projected impact of the problematic 
 variables as follows. 
@@ -183,8 +177,7 @@ a neighborhood and housing values."
 
 To describe the *B* reasoning further, the authors assume that 
 self-segregation correlates to higher home values, though subsequent authors 
-contend that this hypothesis is impossible to prove with evidence (see `Kain 
-and Quigley, 1975 <https://www.nber.org/books/kain75-1>`_). 
+contend that this hypothesis is impossible to prove with evidence (see [#5]_). 
 
 Additionally, though the authors specify a parabolic transformation 
 for *B*, they do not provide evidence that the relationship between *B* and *MEDV* is parabolic. 
@@ -221,11 +214,17 @@ analysis.
 Predictive models will learn the patterns of systemic racism and classism 
 encoded in the data and will reproduce those patterns in their predictions.
 
+It's also important to note that merely excluding these variables from the dataset
+will not ensure that the model does not discriminate.
+
+However, through careful assessment, the negative effects of these variables
+can be mitigated.
+
 The next section describes the potential risk in using this dataset in a 
 typical machine learning prediction pipeline.
 
 
-.. _harms_assessment:
+.. _boston_harms_assessment:
 
 Fairness-related harms assessment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -236,7 +235,7 @@ are at risk of generating fairness-related harms.
 How does that look in a typical machine learning pipeline? 
 
 Because both the sensitive and target feaures are continuous, to leverage 
-fairlearn's assessment capabilities, we need to apply column transformations 
+Fairlearn's assessment capabilities, we need to apply column transformations 
 to turn this problem into a classification problem. 
 The code below maps *LSTAT*, *B*, and *MEDV* to binary values 
 where values greater than the median of the column map to 1, 
@@ -348,7 +347,7 @@ Discussion
 The Boston housing dataset presents many ethical issues, and in general, we 
 strongly discourage using it in predictive modelling analyses. 
 
-We've kept it in fairlearn because of its potential as a teaching tool 
+We've kept it in Fairlearn because of its potential as a teaching tool 
 for how to deal with ethical issues in a dataset. 
 
 There are ways to `remove correlations between sensitive features and the remaining columns 
@@ -390,5 +389,22 @@ in place of the Boston housing dataset, as these datasets do not generate
 fairness-related harms. 
 
 We recommend you proceed with extreme caution when 
-calling the Boston housing data from fairlearn, and hope this article gives 
+calling the Boston housing data from Fairlearn, and hope this article gives 
 you pause about using it in the future.
+
+.. topic:: References:
+
+ .. [#1] David Harrison, Daniel Rubenfield, `"Hedonic Housing Prices and the Demand for Clean Air" <https://deepblue.lib.umich.edu/bitstream/handle/2027.42/22636/0000186.pdf?sequence=1&isAllowed=y>`_,
+      Journal of Environmental Economics and Management, 1978.
+      
+.. [#2] Ali Al Bataineh, Devinder Kaur, `"A Comparative Study of Different Curve Fitting Algorithms in Artificial Neural Network using Housing Dataset" <https://ieeexplore.ieee.org/abstract/document/8556738>`_,
+      IEEE, 2018.
+ 
+.. [#3] Mohsen Shahhosseini, Guiping Hu, Hieu Pham, `"Optimizing Ensemble Weights for MachineLearning Models: A Case Study for Housing PricePrediction" <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=1187&context=imse_conf>`_,
+      Industrial and Manufacturing Systems Engineering Conference Proceedings and Posters, 2019. 
+      
+ .. [#4] Michael E. Tipping , `"The Relevance Vector Machine" <https://proceedings.neurips.cc/paper/1999/file/f3144cefe89a60d6a1afaf7859c5076b-Paper.pdf>`_,
+       1999.
+  
+  .. [#5] John F. Kain, John M. Quigley, `"Housing Markets and Racial Discrimination: A Microeconomic Analysis" <https://www.nber.org/books/kain75-1>`_, 
+         National Bureau of Economic Research (NBER), 1975.
