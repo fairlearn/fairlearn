@@ -63,7 +63,7 @@ While the paper does define each variable and suggest its impact on
 the housing value equation, it lacks reasoning for including that particular
 set of variables.
 
-Modern machine learning practicioners have used the Boston Housing dataset as 
+Modern machine learning practitioners have used the Boston Housing dataset as 
 a benchmark to assess the performance of emerging supervised learning 
 techniques. 
 
