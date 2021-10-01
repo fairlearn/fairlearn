@@ -294,8 +294,7 @@ higher false positve rate.
 
 *B* == True is also associated with a slightly lower precision. 
 
-The accuracy, recall, and selection rate when *LSTAT* == 
-True all are lower than when *LSTAT* is False. 
+The accuracy, recall, and selection rate when *LSTAT* is `True` all are lower than when *LSTAT* is `False`. 
 
 These results indicate that our simple model is worse at predicting 
 an outcome for individuals in the "lower status" category.
