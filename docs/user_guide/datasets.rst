@@ -227,7 +227,7 @@ typical machine learning prediction pipeline.
 
 .. _harms_assessment:
 
-fairness-related Harms Assessment
+Fairness-related harms assessment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As explained above, machine learning models that use the Boston Housing dataset 
