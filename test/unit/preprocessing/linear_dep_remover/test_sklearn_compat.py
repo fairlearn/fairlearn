@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import pytest
 import numpy as np
 import pandas as pd
 from sklearn.utils.estimator_checks import parametrize_with_checks
