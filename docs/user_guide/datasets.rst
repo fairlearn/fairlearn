@@ -122,8 +122,8 @@ visit :mod:`fairlearn.datasets`.
     >>> from fairlearn.datasets import fetch_boston
     >>> import pandas as pd
 
-    >>> X, y = fetch_boston(as_frame = True, return_X_y= True)
-    >>> boston_housing = pd.concat([X, y], axis = 1)
+    >>> X, y = fetch_boston(as_frame=True, return_X_y=True)
+    >>> boston_housing=pd.concat([X, y], axis=1)
     >>> boston_housing.head()
         CRIM	ZN	INDUS	CHAS	NOX	RM	AGE	DIS	RAD	TAX	PTRATIO	B	LSTAT	MEDV
     0	0.00632	18.0	2.31	0	0.538	6.575	65.2	4.0900	1	296.0	15.3	396.90	4.98	24.0
