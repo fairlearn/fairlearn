@@ -205,19 +205,15 @@ Again, the authors provide no evidence of a proposed relationship between
 in the hedonic pricing model.
 
 
-*LSAT* and *B* are not mutually exclusive.
+Intersectionality also requires consideration.
 
-One might infer that "lower-status" Black people impact house prices
-differently than non-"lower-status" Black people. 
+Due to systematic racism, Black people may be more likely to be categorized as "lower status" by the authors' definition.
 
-Additionally, Black people might be more likely to be categorized 
-as "lower status" by the author's definition due to systemic racism. 
-
-Harrison and Rubenfield do not consider this intersectionality in their analysis;
-this phenomenon could be measured via an interaction variable 
+Harrison and Rubenfield do not consider this intersectionality in their analysis.
+In an econometric analysis, intersectionality could be measured via an interaction variable 
 between the two fields. 
 
-However, including only one of these variables in the analysis is not
+Including only one of these variables in the analysis is not
 sufficient in removing the bias encoded in the removed variable from the dataset.
 
 Because these columns are related, one likely can serve as a proxy for the other.
