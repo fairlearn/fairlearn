@@ -71,12 +71,12 @@ It's featured in `scipy lectures <https://scipy-lectures.org/packages/scikit-lea
 indexed in the `University of California-Irvine Machine Learning Repository 
 <https://archive.ics.uci.edu/ml/machine-learning-databases/housing/>`_ and in 
 Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`_, 
-and for a time was included as one of scikit-learn's
- and tensorflow's standard toy datasets (see :mod:`tf.keras.datasets.boston_housing`). 
+and for a time was included as one of scikit-learn's and tensorflow's standard toy datasets
+(see :mod:`tf.keras.datasets.boston_housing`). 
  
 It has also been the benchmark of choice for many [#2]
 machine [#3] learning [#4] 
-`papers <https://arxiv.org/search/?query=boston+housing&searchtype=all&source=header>`.
+`papers <https://arxiv.org/search/?query=boston+housing&searchtype=all&source=header>`_.
 
 In scikit-learn version 1.2, the dataset will be removed.
 
