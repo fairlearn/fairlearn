@@ -78,7 +78,7 @@ class FullyConnected(torch.nn.Module):
             x = layer(x)
         return x
 
-predictor_model = FullyConnected(list_nodes = [14, 20, 1])
+predictor_model = FullyConnected(list_nodes = [14, 30, 20, 1])
 # %%
 # Now, we can use `fairlearn.adversarial.AdversarialMitigation` to train our
 # predictor model on the UCI Adult dataset in a fair way. The specific fairness
@@ -91,12 +91,13 @@ mitigator = AdversarialMitigation(
         environment='torch',
         predictor_model = predictor_model,
         objective = "EO",
+        cuda=True
 )
 
 # %% Then, we can fit the data to our model
 
-mitigator.fit(X, y, sensitive_features=sensitive_feature,
-        epochs = 1000)
+mitigator.fit(X, y, sensitive_feature=sensitive_feature,
+        epochs = 1000, batch_size=2**14, shuffle=True)
 
 # %% Predict
 

@@ -10,32 +10,93 @@ from math import ceil
 class AdversarialMitigation():
     """
     Inprocessing algorithm based on the paper *Mitigating Unwanted Biases*
-    *with Adversarial Learning* [#4]_. This algorithm takes as input two
+    *with Adversarial Learning* [#1]_. This algorithm takes as input two
     models, a predictor and an adversarial, defined either as a `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>` or
     `Tensorflow2 model 
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`.
+
+    
+    Parameters
+    ----------
+    environment : string, optional
+        The machine learning library to use. Value must be either
+        \"torch\" or \"tensorflow\" which indicate PyTorch or Tensorflow 2
+        respectively. If none is specified, default is torch, else tensorflow,
+        depending on which is installed.
+
+    predictor_model : torch.nn.Module, tensorflow.keras.Model
+        The predictor model to train. If :code:`environment = \"torch\"`, we
+        expect a `torch.nn.Module`. If :code:`environment = \"tensorflow\"`, we
+        expect a `tensorflow.keras.Model`
+
+    objective : string, optional
+        The fairness measure to optimize for. Must be either \"DP\" (demographic
+        parity) or \"EO\" (Equality of Odds). Default is \"DP\".
+
+    learning_rate : number, optional
+        A small number greater than zero to set as initial learning rate. Default
+        is 0.01.
+
+    alpha : number, optional
+        A small number $\alpha$ as specified in [#1]_. Default is 0.1.
+
+    cuda : bool, optional
+        A boolean to indicate whether we can use cuda:0 (first GPU) when training
+        a PyTorch model.
+
+    References
+    ----------
+    .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
+      Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
+      AIES, 2018.
+
     """
     # TODO figure out what can go in docstrings ^
     def __init__(self, *, 
             environment = 'any', 
             predictor_model,
-            objective = 'demographic parity',
+            objective = 'DP',
             learning_rate = 0.01,
             alpha = 0.1,
+            cuda = False
     ):
         self._setup_environment(environment)
-        self.predictor_model = predictor_model
+        self._setup_predictor_model(predictor_model)
         self._setup_objective(objective)
         self._setup(learning_rate)
         self.alpha = alpha
+        self._setup_cuda(cuda)
 
-    def fit(self, X, y, *, sensitive_features,
-            epochs = 1, 
+    def fit(self, X, y, *, sensitive_feature,
+            epochs = 1000, 
             batch_size = -1,
             shuffle = False):
-        X, Y, Z = self._validate_input(X, y, sensitive_features)
-        # TODO if pytorch move to cuda!
+        """
+        Train the predictor model.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            Two-dimensional numpy array containing training data
+        
+        y : numpy.ndarray
+            One-dimensional numpy array containing training targets
+        
+        sensitive_feature : numpy.ndarray
+            One-dimensional numpy array containing the sensitive feature of the
+            training data. 
+        
+        epochs : number, optional
+            Maximum number of epochs to train for. Default is 1000. # TODO
+        
+        batch_size : number, optional
+            Batch size. Default is |X|.
+        
+        shuffle : bool, optional
+            Iff True, shuffle the data after every iteration. Default is False
+        """
+        X, Y, Z = self._validate_input(X, y, sensitive_feature)
         # TODO decreasing learning rate: not really necessary with adam
         # TODO stopping condition!? If |grad| < eps
         if batch_size == -1: batch_size = X.shape[0]
@@ -57,13 +118,42 @@ class AdversarialMitigation():
             Z = Z[idx].view(Z.size())
         elif self.tensorflow:
             X, Y, Z = sklearn_shuffle(X, Y, Z)
+        return X, Y, Z
 
-    def partial_fit(self, X, y, *, sensitive_features):
-        X, Y, Z = self._validate_input(X, y, sensitive_features)
-        # TODO if pytorch move to cuda!
+    def partial_fit(self, X, y, *, sensitive_feature):
+        """
+        Train the predictor model once on the given data
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            Two-dimensional numpy array containing training data
+        
+        y : numpy.ndarray
+            One-dimensional numpy array containing training targets
+        
+        sensitive_feature : numpy.ndarray
+            One-dimensional numpy array containing the sensitive feature of the
+            training data. 
+        """
+        X, Y, Z = self._validate_input(X, y, sensitive_feature)
         self._train_step(X, Y, Z)
     
     def predict(self, X):
+        """
+        Gather predictions for given test data
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            Two-dimensional numpy array containing test data
+        
+        Returns
+        -------
+        y_pred_discrete : numpy.ndarray
+            One-dimensional numpy array containing discrete predictions for 
+            given X
+        """
         if (not isinstance(X, ndarray)):
             raise ValueError(_KWARG_ERROR_MESSAGE.format("X", "a numpy array"))
         
@@ -74,9 +164,14 @@ class AdversarialMitigation():
         if self.torch:
             self.predictor_model.eval()
             X = torch.from_numpy(X).float()
+            if self.cuda:
+                X = X.to(self.device)
             with torch.no_grad():
                 y_pred = self.predictor_model(X)
-            y_pred = y_pred.detach().cpu().numpy()
+            if self.cuda:
+                y_pred = y_pred.detach().cpu().numpy()
+            else:
+                y_pred = y_pred.numpy()
         elif self.tensorflow:
             X = X.astype(float32)
             #TODO
@@ -163,7 +258,7 @@ class AdversarialMitigation():
 
     def _validate_input(self, X, Y, Z):
         # Check that data are numpy arrays
-        for var, name in [(X, "X"), (Y, "y"), (Z, "sensitive_features")]:
+        for var, name in [(X, "X"), (Y, "y"), (Z, "sensitive_feature")]:
             if (not isinstance(var, ndarray)):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(name, "a numpy array"))
         
@@ -172,7 +267,7 @@ class AdversarialMitigation():
             raise ValueError("Input data has an ambiguous number of rows")
         
         # Check dimensionality
-        for var, name, dim in [(X, "X", 2), (Y, "y", 1), (Z, "sensitive_features", 1)]:
+        for var, name, dim in [(X, "X", 2), (Y, "y", 1), (Z, "sensitive_feature", 1)]:
             if (not len(var.shape) == dim):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(name, str(dim) + "-dimensional"))
         
@@ -184,6 +279,10 @@ class AdversarialMitigation():
             X = torch.from_numpy(X).float()
             Y = torch.from_numpy(Y).float()
             Z = torch.from_numpy(Z).float()
+            if self.cuda:
+                X = X.to(self.device)
+                Y = Y.to(self.device)
+                Z = Z.to(self.device)
         elif self.tensorflow:
             # TODO also y?
             X = X.astype(float32)
@@ -230,6 +329,19 @@ class AdversarialMitigation():
             raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     "environment", "one of \[\'torch\',\'tensorflow\'\]"))
     
+    def _setup_predictor_model(self, predictor_model):
+        if self.torch:
+            if not isinstance(predictor_model, torch.nn.Module):
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                    "predictor_model", "a `torch.nn.Module`"
+                ))
+        else:
+            if not isinstance(predictor_model, tensorflow.keras.Model):
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                    "predictor_model", "a `tensorflow.keras.Model`"
+                ))
+        self.predictor_model = predictor_model
+
     def _setup(self, learning_rate):
         if self.torch:
             self.predictor_optimizer = torch.optim.Adam(self.predictor_model.parameters(), lr=learning_rate)
@@ -272,3 +384,16 @@ class AdversarialMitigation():
                 self.predictor_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
             if z_binary:
                 self.adversary_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
+    
+    def _setup_cuda(self, cuda):
+        if (not cuda) or (not self.torch):
+            self.cuda = False
+        elif (cuda):
+            if (not self.torch):
+                raise ValueError("Can't use cuda with tensorflow")
+            if not torch.cuda.is_available():
+                raise ValueError("Cuda is not available")
+            self.cuda = True
+            self.device = torch.device("cuda:0")
+            self.adversary_model = self.adversary_model.to(self.device)
+            self.predictor_model = self.predictor_model.to(self.device)
