@@ -50,6 +50,8 @@ from ._extra_metrics import (  # noqa: F401
 
 from ._exposure import (  # noqa: F401
     exposure,
+    utility,
+    exposure_utility_ratio,
     allocation_harm_in_ranking_difference,
     allocation_harm_in_ranking_ratio,
     quality_of_service_harm_in_ranking_difference,
@@ -75,7 +77,7 @@ _disparities = [
     "demographic_parity_difference",
     "demographic_parity_ratio",
     "equalized_odds_difference",
-    "equalized_odds_ratio",
+    "equalized_odds_ratio"
 ]
 
 _extra_metrics = [
@@ -88,13 +90,15 @@ _extra_metrics = [
     "count"
 ]
 
-_ranking_metrics = {
+_ranking_metrics = [
     "exposure"
+    "utility"
+    "exposure_utility_ratio"
     "allocation_harm_in_ranking_difference",
     "allocation_harm_in_ranking_ratio",
     "quality_of_service_harm_in_ranking_difference",
     "quality_of_service_harm_in_ranking_ratio"
-}
+]
 
 __all__ = _core + _disparities + _extra_metrics + _ranking_metrics \
           + list(sorted(_generated_metric_dict.keys()))
