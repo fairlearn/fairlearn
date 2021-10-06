@@ -19,7 +19,7 @@ class AdversarialMitigation():
     
     Parameters
     ----------
-    environment : string, optional
+    environment : str, default = \"torch\"
         The machine learning library to use. Value must be either
         \"torch\" or \"tensorflow\" which indicate PyTorch or Tensorflow 2
         respectively. If none is specified, default is torch, else tensorflow,
@@ -30,18 +30,18 @@ class AdversarialMitigation():
         expect a `torch.nn.Module`. If :code:`environment = \"tensorflow\"`, we
         expect a `tensorflow.keras.Model`
 
-    objective : string, optional
+    objective : str, default = \"DP\"
         The fairness measure to optimize for. Must be either \"DP\" (demographic
-        parity) or \"EO\" (Equality of Odds). Default is \"DP\".
+        parity) or \"EO\" (Equality of Odds).
 
-    learning_rate : number, optional
+    learning_rate : float, default = 0.01
         A small number greater than zero to set as initial learning rate. Default
         is 0.01.
 
-    alpha : number, optional
-        A small number $\alpha$ as specified in [#1]_. Default is 0.1.
+    alpha : float, default = 0.1
+        A small number $\alpha$ as specified in [#1]_.
 
-    cuda : bool, optional
+    cuda : bool, default = False
         A boolean to indicate whether we can use cuda:0 (first GPU) when training
         a PyTorch model.
 
@@ -87,13 +87,13 @@ class AdversarialMitigation():
             One-dimensional numpy array containing the sensitive feature of the
             training data. 
         
-        epochs : number, optional
+        epochs : float, default = 1000
             Maximum number of epochs to train for. Default is 1000. # TODO
         
-        batch_size : number, optional
+        batch_size : float, default = |X|
             Batch size. Default is |X|.
         
-        shuffle : bool, optional
+        shuffle : bool, default = False
             Iff True, shuffle the data after every iteration. Default is False
         """
         X, Y, Z = self._validate_input(X, y, sensitive_feature)
