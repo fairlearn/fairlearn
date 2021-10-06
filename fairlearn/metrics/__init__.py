@@ -48,6 +48,14 @@ from ._extra_metrics import (  # noqa: F401
     _mean_underprediction,
     count)
 
+from ._exposure import (  # noqa: F401
+    exposure,
+    allocation_harm_in_ranking_difference,
+    allocation_harm_in_ranking_ratio,
+    quality_of_service_harm_in_ranking_difference,
+    quality_of_service_harm_in_ranking_ratio
+)
+
 
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
@@ -67,7 +75,7 @@ _disparities = [
     "demographic_parity_difference",
     "demographic_parity_ratio",
     "equalized_odds_difference",
-    "equalized_odds_ratio"
+    "equalized_odds_ratio",
 ]
 
 _extra_metrics = [
@@ -80,4 +88,13 @@ _extra_metrics = [
     "count"
 ]
 
-__all__ = _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys()))
+_ranking_metrics = {
+    "exposure"
+    "allocation_harm_in_ranking_difference",
+    "allocation_harm_in_ranking_ratio",
+    "quality_of_service_harm_in_ranking_difference",
+    "quality_of_service_harm_in_ranking_ratio"
+}
+
+__all__ = _core + _disparities + _extra_metrics + _ranking_metrics \
+          + list(sorted(_generated_metric_dict.keys()))
