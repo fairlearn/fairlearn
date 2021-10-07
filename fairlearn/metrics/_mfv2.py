@@ -29,6 +29,14 @@ class MetricFunctionRequest:
         return result
 
 
+def apply_to_dataframe(data: pd.DataFrame, metric_functions: Dict[str, MetricFunctionRequest]) -> pd.Series:
+    values = dict()
+    for name, mf in metric_functions.items():
+        values[name] = mf.invoke(data)
+    result = pd.Series(data=values.values(), index=values.keys())
+    return result
+
+
 class MFv2:
     def __init__(self,
                  metric_functions: Dict[str, MetricFunctionRequest],
@@ -40,6 +48,9 @@ class MFv2:
         for name, mf in metric_functions.items():
             overall_values[name] = mf.invoke(data)
         self._overall = pd.Series(data=overall_values.values(), index=overall_values.keys())
+
+        self._by_group = data.groupby(sensitive_features).apply(
+            apply_to_dataframe, metric_functions=metric_functions)
 
     @property
     def overall(self):
