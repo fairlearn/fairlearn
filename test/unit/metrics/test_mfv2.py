@@ -138,7 +138,8 @@ class TestMFv2:
         wrapped_funcs = {
             'precision': MetricFunctionRequest(func=skm.precision_score)
         }
-        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1', 'group_2'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df,
+                      sensitive_features=['group_1', 'group_2'])
 
         funcs = {
             'precision': skm.precision_score
@@ -165,7 +166,8 @@ class TestMFv2:
             'precision': MetricFunctionRequest(func=skm.precision_score),
             'bal_acc': MetricFunctionRequest(func=skm.balanced_accuracy_score)
         }
-        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1', 'group_2'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df,
+                      sensitive_features=['group_1', 'group_2'])
 
         funcs = {
             'precision': skm.precision_score,
@@ -194,14 +196,11 @@ class TestMFv2:
         }
         df = pd.DataFrame.from_dict(data)
 
-        func_data_arg_map = {
-            'y_true': 'y_true',
-            'y_pred': 'y_pred',
-            'sample_weight': 'my_sample_weight'
-        }
         wrapped_funcs = {
             'precision': MetricFunctionRequest(func=skm.precision_score),
-            'prec_w': MetricFunctionRequest(func=skm.precision_score, arguments=func_data_arg_map)
+            'prec_w': MetricFunctionRequest(func=skm.precision_score,
+                                            args=['y_true', 'y_pred'],
+                                            kwargs={'sample_weight': 'my_sample_weight'})
         }
         target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1'])
 
@@ -233,7 +232,7 @@ class TestMFv2:
         }
         df = pd.DataFrame.from_dict(data)
 
-        simple_selection_rate = MetricFunctionRequest(func=np.mean, arguments={'a': 'y_pred'})
+        simple_selection_rate = MetricFunctionRequest(func=np.mean, args=['y_pred'])
         wrapped_funcs = {
             'ssr': simple_selection_rate,
             'sr': MetricFunctionRequest(func=selection_rate)
