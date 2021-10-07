@@ -75,7 +75,7 @@ class AdversarialMitigation():
             batch_size=-1,
             shuffle=False):
         """
-        Train the predictor model.
+        Fit the model based on the given training data and sensitive features.
 
         Parameters
         ----------
@@ -153,7 +153,7 @@ class AdversarialMitigation():
 
         Returns
         -------
-        y_pred_discrete : numpy.ndarray
+        y_pred : numpy.ndarray
             One-dimensional numpy array containing discrete predictions for
             given X
         """
