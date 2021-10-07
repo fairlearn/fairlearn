@@ -176,7 +176,7 @@ discrimination means that housing values are higher at very high levels of B.
 One expects, therefore, a parabolic relationship between proportion Black in 
 a neighborhood and housing values."
 
-To describe the *B* reasoning further, the authors assume that 
+To describe the reasoning behind *B* further, the authors assume that 
 self-segregation correlates to higher home values, though subsequent authors 
 contend that this hypothesis is impossible to prove with evidence (see [#5]_). 
 
