@@ -43,11 +43,7 @@ class MFv2:
                  data: pd.DataFrame,
                  sensitive_features: List[str]
                  ):
-
-        overall_values = dict()
-        for name, mf in metric_functions.items():
-            overall_values[name] = mf.invoke(data)
-        self._overall = pd.Series(data=overall_values.values(), index=overall_values.keys())
+        self._overall = apply_to_dataframe(data, metric_functions=metric_functions)
 
         self._by_group = data.groupby(sensitive_features).apply(
             apply_to_dataframe, metric_functions=metric_functions)

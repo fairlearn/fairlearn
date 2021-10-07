@@ -182,3 +182,37 @@ class TestMFv2:
         assert target.by_group['bal_acc']['ba']['f'] == expected.by_group['bal_acc']['ba']['f']
         assert target.by_group['bal_acc']['aa']['g'] == expected.by_group['bal_acc']['aa']['g']
         assert target.by_group['bal_acc']['ba']['g'] == expected.by_group['bal_acc']['ba']['g']
+
+    def test_sample_weights(self):
+        data = {
+            'y_true': y_t,
+            'y_pred': y_p,
+            'group_1': g_1,
+            'group_2': g_2,
+            'sample_weight': s_w
+        }
+        df = pd.DataFrame.from_dict(data)
+
+        wrapped_funcs = {
+            'precision': MetricFunctionRequest(func=skm.precision_score),
+            'prec_w': MetricFunctionRequest(func=skm.precision_score, arguments=['y_true', 'y_pred', 'sample_weight'])
+        }
+        target = MFv2(wrapped_funcs, df, ['group_1'])
+
+        funcs = {
+            'precision': skm.precision_score,
+            'prec_w': skm.precision_score
+        }
+        s_p = {'prec_w': {'sample_weight': s_w}}
+        expected = MetricFrame(metrics=funcs, y_true=y_t, y_pred=y_p,
+                               sensitive_features={'group_1': g_1},
+                               sample_params=s_p)
+
+        assert target.overall['precision'] == expected.overall['precision']
+        assert target.overall['prec_w'] == expected.overall['prec_w']
+        assert target.overall['prec_w'] != target.overall['precision'], "Weights should do something"
+
+        assert target.by_group['precision']['aa'] == expected.by_group['precision']['aa']
+        assert target.by_group['precision']['ba'] == expected.by_group['precision']['ba']
+        assert target.by_group['prec_w']['aa'] == expected.by_group['prec_w']['aa']
+        assert target.by_group['prec_w']['ba'] == expected.by_group['prec_w']['ba']
