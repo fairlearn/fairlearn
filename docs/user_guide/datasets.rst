@@ -46,14 +46,13 @@ Statistical Area <https://www.census.gov/history/www/programs/geography/metropol
 serving as a proxy for air quality.
 
 The paper sought to estimate the median value of owner-occupied homes (now 
-*MEDV*), and included the remaining variables to measure other neighborhood 
+*MEDV*), and included the remaining variables to capture other neighborhood 
 characteristics.
 
 Further, the authors took the derivative of their housing 
 value equation with respect to nitric oxides concentration 
-to measure the "amount of money households
-were willing to pay with respect to air pollution levels in their census 
-tracts." 
+to measure the "amount of money households were willing to pay 
+with respect to air pollution levels in their census tracts." 
 
 The variables in the dataset were collected in the early 1970s 
 and come from a mixture of surveys, administrative records, and other research
@@ -100,6 +99,8 @@ B            1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
 LSTAT        % lower status of the population
 MEDV         Median value of owner-occupied homes in $1000’s
 ============ ============================================================================
+
+All of these variables are from datasets that represent the early 1970s.
 
 The cells below show basic summary statistics about the data, the data types of the 
 columns, and the number of missing values.
@@ -150,18 +151,17 @@ Dataset Issues
 While the dataset is widely used, it has significant ethical issues.
 
 As explained in :func:`sklearn.datasets.load_boston`, 
-Harrison and Rubenfield developed the feature *B* under the assumption that racial 
-self-segregation had a positive impact on house prices. 
+Harrison and Rubenfield developed the feature *B* (proportion of population that is Black) 
+under the assumption that racial self-segregation had a positive impact on house prices. 
 
-*B* then is a measure of systemic racism, as it encodes racism as a factor in house pricing. 
+*B* then encodes systemic racism as a factor in house pricing. 
 
 Thus, any models trained using this data that do not take special care to process *B* 
 will learn to use mathematically encoded racism as a factor in house price prediction. 
 
 Harrison and Rubenfield describe their projected impact of the problematic 
-variables as follows. 
-
-Both variables come from the 1970 US Census.
+variables as follows (note that these descriptions 
+are verbatim from their paper): 
 
 * *LSTAT*: "Proportion of population that is lower status = 0.5 * 
 (**proportion of adults without some high school education and proportion of 
@@ -177,8 +177,8 @@ One expects, therefore, a parabolic relationship between proportion Black in
 a neighborhood and housing values."
 
 To describe the reasoning behind *B* further, the authors assume that 
-self-segregation correlates to higher home values, though subsequent authors 
-contend that this hypothesis is impossible to prove with evidence (see [#5]_). 
+self-segregation correlates to higher home values. However, other 
+researchers (see [#5]_) did not find evidence that supports this hypothesis. 
 
 Additionally, though the authors specify a parabolic transformation 
 for *B*, they do not provide evidence that the relationship between *B* and *MEDV* is parabolic. 
@@ -196,7 +196,9 @@ original Census data mapping for all the points in the *B* variable.
 The definition of the *LSTAT* variable is also suspect. 
 Harrison and Rubenfield define lower status as a function of the proportion
 of adults without some high school education and the proportion of male workers 
-classified as laborers. 
+classified as laborers. They apply a logarithmic transformation to the variable 
+with the assumption that resulting variable distribution reflects their understanding of
+socioeconomic distinctions.
 
 However, the categorization of a certain level of 
 education and job category as indicative of "lower status" is reflective of
@@ -209,10 +211,12 @@ in the hedonic pricing model.
 
 Intersectionality also requires consideration.
 
-Due to systematic racism, Black people may be more likely to be categorized as "lower status" by the authors' definition.
+Due to systemic racism present in the data at the time it was collected,
+Black people may have been more likely to be categorized as "lower status" by the authors' definition.
 
 Harrison and Rubenfield do not consider this intersectionality in their analysis.
-In an econometric analysis, intersectionality could be measured via an interaction variable 
+In an econometric analysis like the analysis demonstrated in the paper,
+intersectionality could be captured via an interaction variable 
 between the two fields. 
 
 Including only one of these variables in the analysis is not
@@ -232,7 +236,7 @@ Predictive models will learn the patterns of systemic racism and classism
 encoded in the data and will reproduce those patterns in their predictions.
 
 It's also important to note that merely excluding these variables from the dataset
-will not ensure that the model does not discriminate.
+is not sufficient to mitigate these issues.
 
 However, through careful assessment, the negative effects of these variables
 can be mitigated.
@@ -394,8 +398,8 @@ or the `Ames dataset <https://inria.github.io/scikit-learn-mooc/python_scripts/d
 in place of the Boston housing dataset, as using these datasets should not
 cause the same fairness-related harms. 
 
-We recommend you proceed with extreme caution when 
-calling the Boston housing data from Fairlearn, and hope this article gives 
+We recommend not using the Boston Housing dataset for machine learning 
+benchmarking purposes, and hope this article gives 
 you pause about using it in the future.
 
 .. topic:: References:
