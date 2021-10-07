@@ -7,6 +7,8 @@ import pandas as pd
 
 
 class MetricFunctionRequest:
+    """Wrapper for functions, to give them args and kwargs."""
+
     def __init__(self,
                  *,
                  func: Callable,
@@ -18,17 +20,21 @@ class MetricFunctionRequest:
 
     @property
     def func(self) -> Callable:
+        """Return the wrapped function."""
         return self._func
 
     @property
     def args(self) -> List[str]:
+        """Return the list of positional arguments."""
         return self._args
 
     @property
     def kwargs(self) -> Dict[str, str]:
+        """Return the mapping from column names to kwarg names."""
         return self._kwargs
 
     def invoke(self, df: pd.DataFrame):
+        """Invoke the wrapped function on the supplied DataFrame."""
         args = [df[arg_name] for arg_name in self.args]
 
         kwargs = dict()
@@ -40,7 +46,10 @@ class MetricFunctionRequest:
         return result
 
 
-def apply_to_dataframe(data: pd.DataFrame, metric_functions: Dict[str, MetricFunctionRequest]) -> pd.Series:
+def apply_to_dataframe(
+        data: pd.DataFrame,
+        metric_functions: Dict[str, MetricFunctionRequest]) -> pd.Series:
+    """Apply metric functions to a DataFrame."""
     values = dict()
     for name, mf in metric_functions.items():
         values[name] = mf.invoke(data)
@@ -49,6 +58,8 @@ def apply_to_dataframe(data: pd.DataFrame, metric_functions: Dict[str, MetricFun
 
 
 class MFv2:
+    """An alternative for MetricFrame."""
+
     def __init__(self,
                  *,
                  metric_functions: Dict[str, MetricFunctionRequest],
@@ -68,8 +79,10 @@ class MFv2:
 
     @property
     def overall(self):
+        """Return the overall value."""
         return self._overall
 
     @property
     def by_group(self):
+        """Return the value for each subgroup."""
         return self._by_group

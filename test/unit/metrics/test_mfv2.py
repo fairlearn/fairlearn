@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 
-from typing import ByteString
 import numpy as np
 import pandas as pd
 import sklearn.metrics as skm
@@ -13,7 +12,7 @@ from fairlearn.metrics import MetricFunctionRequest, MetricFrame, MFv2, selectio
 
 
 # Bring in some pre-prepared input arrays
-from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4, s_w
+from .data_for_test import y_t, y_p, g_1, g_2, s_w
 from .data_for_test import array_gen
 
 
@@ -219,7 +218,8 @@ class TestMFv2:
 
         assert target.overall['precision'] == expected.overall['precision']
         assert target.overall['prec_w'] == expected.overall['prec_w']
-        assert target.overall['prec_w'] != target.overall['precision'], "Weights should do something"
+        assert target.overall['prec_w'] != \
+            target.overall['precision'], "Weights should do something"
 
         assert target.by_group['precision']['aa'] == expected.by_group['precision']['aa']
         assert target.by_group['precision']['ba'] == expected.by_group['precision']['ba']
@@ -366,5 +366,6 @@ class TestMFv2:
                 for cf_2 in cf_2_groups:
                     for sf_1 in sf_1_groups:
                         for sf_2 in sf_2_groups:
-                            assert target.by_group[m][cf_1][cf_2][sf_1][sf_2] == other.by_group[m][cf_1][cf_2][sf_1][sf_2]
+                            assert target.by_group[m][cf_1][cf_2][sf_1][sf_2] ==\
+                                other.by_group[m][cf_1][cf_2][sf_1][sf_2]
         assert delta_new < delta_old, "Check new version is faster"
