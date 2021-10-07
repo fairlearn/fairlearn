@@ -25,6 +25,11 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     The approach used is taken from section 3.4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_.
 
+    .. versionadded:: 0.3.0
+
+    .. versionchanged:: 0.4.6
+        Enabled for more than two sensitive feature values
+
     Parameters
     ----------
     estimator : estimator
@@ -62,6 +67,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     sample_weight_name : str
         Name of the argument to `estimator.fit()` which supplies the sample weights
         (defaults to `sample_weight`)
+
+        .. versionadded:: 0.5.0
 
     References
     ----------
