@@ -8,15 +8,11 @@ Introduction
 ^^^^^^^^^^^^^^^^^
 
 The Boston Housing dataset is one of the datasets currently callable in :mod:`fairlearn.datasets` module.
-
 In the past, it has commonly been used for benchmarking in popular machine learning libraries, 
 including scikit-learn and open-ml. 
-
 However, as the machine learning community has developed awareness about fairness issues with 
 popular benchmarking datasets, the Boston Housing data has been phased out of many libraries. 
-
 We migrated the dataset to Fairlearn after it was phased out of scikit-learn in June 2020. 
-
 The dataset remains in Fairlearn as an example of how systemic racism can occur in data and to 
 show the effect of Fairlearn's assessment and pre-/in-/post-processing tools on real, problematic data. 
 
@@ -32,15 +28,12 @@ Dataset Origin and Use
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Contrary to expectation, the Boston Housing dataset was not developed for economic purposes.
-
 Harrison and Rubenfield (1978)_ 
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
-
 The authors use a `hedonic pricing <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_ 
 approach, which assumes that the price of a good or service can be modeled as a 
 function of features both internal and external to the good or service. 
-
 The input to this model was a dataset comprising the `Boston Standard Metropolitan 
 Statistical Area <https://www.census.gov/history/www/programs/geography/metropolitan_areas.html>`_, with the nitric oxides concentration (*NOX*) 
 serving as a proxy for air quality.
@@ -48,16 +41,13 @@ serving as a proxy for air quality.
 The paper sought to estimate the median value of owner-occupied homes (now 
 *MEDV*), and included the remaining variables to capture other neighborhood 
 characteristics.
-
 Further, the authors took the derivative of their housing 
 value equation with respect to nitric oxides concentration 
 to measure the "amount of money households were willing to pay 
 with respect to air pollution levels in their census tracts." 
-
 The variables in the dataset were collected in the early 1970s 
 and come from a mixture of surveys, administrative records, and other research
 papers. 
-
 While the paper does define each variable and suggest its impact on 
 the housing value equation, it lacks reasoning for including that particular
 set of variables.
@@ -65,18 +55,15 @@ set of variables.
 Modern machine learning practitioners have used the Boston Housing dataset as 
 a benchmark to assess the performance of emerging supervised learning 
 techniques. 
-
 It's featured in `scipy lectures <https://scipy-lectures.org/packages/scikit-learn/auto_examples/plot_boston_prediction.html>`_, 
 indexed in the `University of California-Irvine Machine Learning Repository 
 <https://archive.ics.uci.edu/ml/machine-learning-databases/housing/>`_ and in 
 Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`_, 
 and for a time was included as one of scikit-learn's and tensorflow's standard toy datasets
 (see :func:`tf.keras.datasets.boston_housing`). 
- 
 It has also been the benchmark of choice for many [#2]_
 machine [#3]_ learning [#4]_ 
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_.
-
 In scikit-learn version 1.2, the dataset will be removed.
 
 The dataset contains the following columns:
@@ -153,15 +140,14 @@ While the dataset is widely used, it has significant ethical issues.
 As explained in :func:`sklearn.datasets.load_boston`, 
 Harrison and Rubenfield developed the feature *B* (proportion of population that is Black) 
 under the assumption that racial self-segregation had a positive impact on house prices. 
-
 *B* then encodes systemic racism as a factor in house pricing. 
-
 Thus, any models trained using this data that do not take special care to process *B* 
 will learn to use mathematically encoded racism as a factor in house price prediction. 
 
-Harrison and Rubenfield describe their projected impact of the problematic 
+Harrison and Rubenfield describe their projected impact of the *B* and *LSTAT* 
 variables as follows (note that these descriptions 
-are verbatim from their paper): 
+are verbatim from their paper). However, many of the authors' assumptions 
+have later been found to be unsubstantiated.
 
 * *LSTAT*: "Proportion of population that is lower status = 0.5 * 
 (**proportion of adults without some high school education and proportion of 
@@ -181,12 +167,11 @@ self-segregation correlates to higher home values. However, other
 researchers (see [#5]_) did not find evidence that supports this hypothesis. 
 
 Additionally, though the authors specify a parabolic transformation 
-for *B*, they do not provide evidence that the relationship between *B* and *MEDV* is parabolic. 
-
+for *B*, they do not provide evidence that the relationship between *B* and *MEDV* 
+is parabolic. 
 Harrison and Rubenfield set a threshold of 63% as the point in which median house 
 prices flip from declining to increasing, but do not provide the basis for 
 this threshold. 
-
 An `analysis of the dataset <https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>`_ 
 by M. Carlisle further shows that the Boston Housing dataset suffers from serious
 quality and incompleteness issues, as Carlisle was unable to recover the 
@@ -203,41 +188,40 @@ socioeconomic distinctions.
 However, the categorization of a certain level of 
 education and job category as indicative of "lower status" is reflective of
 social constructs of class and not objective fact.
-
 Again, the authors provide no evidence of a proposed relationship between
 *LSTAT* and *MEDV* and do not sufficiently justify its inclusion 
 in the hedonic pricing model.
 
 
-Intersectionality also requires consideration.
+Intersectionality also requires consideration. 
+Intersectionality is defined as the interesection between multiple demographic groups. 
+The impacts of a technical system on intersectional groups may be different 
+than the impacts experienced by the individual demographic groups (e.g., Black
+people in aggregate and women in aggregate may experience a technical system 
+differently than Black women).
 
 Due to systemic racism present in the data at the time it was collected,
-Black people may have been more likely to be categorized as "lower status" by the authors' definition.
-
+Black people may have been more likely to be categorized as "lower status" by the authors' 
+definition.
 Harrison and Rubenfield do not consider this intersectionality in their analysis.
 In an econometric analysis like the analysis demonstrated in the paper,
 intersectionality could be captured via an interaction variable 
 between the two fields. 
-
-Including only one of these variables in the analysis is not
-sufficient in removing the bias encoded in the removed variable from the dataset.
-
+In the machine learning context, considering each group separately (i.e., 
+considering impacts on *B* and *LSTAT* separately) may obscure harms. 
+Additionally, including only one of these variables in the analysis is not
+sufficient in removing the signals encoded in the removed variable from the dataset.
 Because these columns are related, one likely can serve as a proxy for the other.
-
 Thus, we recommend great care be taken to account for intersectionality in data.
-
 
 The inclusion of these columns might make sense for an econometric analysis, 
 which seeks to understand the causal impact of various factors on a dependent 
 variable, but these columns are problematic in the context of a predictive
 analysis. 
-
 Predictive models will learn the patterns of systemic racism and classism 
 encoded in the data and will reproduce those patterns in their predictions.
-
 It's also important to note that merely excluding these variables from the dataset
 is not sufficient to mitigate these issues.
-
 However, through careful assessment, the negative effects of these variables
 can be mitigated.
 
@@ -252,9 +236,7 @@ Fairness-related harms assessment
 
 As explained above, machine learning models that use the Boston Housing dataset 
 are at risk of generating fairness-related harms. 
-
 How does that look in a typical machine learning pipeline? 
-
 Because both the sensitive and target features are continuous, to leverage 
 Fairlearn's assessment capabilities, we need to apply column transformations 
 to turn this problem into a classification problem. 
@@ -306,17 +288,14 @@ Note that this methodology follows scikit-lego's `exploration
 
 Checking the demographic parity differences shows that neither variable has a 
 demographic parity at zero, implying a different selection rate across groups. 
-
-The next series of tables dives deeper into the breakdown of various metrics by
+The next series of tables further breaks down evaluation metrics by
 group. 
 
 The proportion of Black people higher than the median is associated with a 
 higher false positve rate. 
-
 *B* == True is also associated with a slightly lower precision. 
 
 The accuracy, recall, and selection rate when *LSTAT* is `True` all are lower than when *LSTAT* is `False`. 
-
 These results indicate that our simple model is worse at predicting 
 an outcome for individuals in the "lower status" category.
 
@@ -356,10 +335,8 @@ Discussion
 
 The Boston housing dataset presents many ethical issues, and in general, we 
 strongly discourage using it in predictive modelling analyses. 
-
 We've kept it in Fairlearn because of its potential as a teaching tool 
 for how to deal with ethical issues in a dataset. 
-
 There are ways to `remove correlations between sensitive features and the remaining columns 
 <https://scikit-lego.netlify.app/fairness.html>`_, but that is by no means a guarantee that fairness-related harms won't occur. Besides, other benchmark datasets
 exist that do not present these issues.
@@ -368,24 +345,19 @@ exist that do not present these issues.
 It's important to keep the differences between the way Harrison and Rubenfield 
 used the dataset and the way modern machine learning practicioners have used 
 it in focus. 
-
 Harrison and Rubenfield conducted an empirical econometric study,
 the goal of which was to determine the causal impacts of these variables on 
 median home value. 
-
 Interpretation of causal models involves looking at model
 coefficients to ascertain the effect of one variable on the dependent variable,
 holding all other factors constant. This use case is different than the typical 
 supervised learning analysis. 
-
 A machine learning model will pick up on the 
 patterns encoded in the data and use that to predict an outcome.
 In the Boston housing dataset, the patterns the authors encoded through
 the *B* and *LSTAT* variables include systemic racism and class inequalities, 
 respectively. 
-
 A predictive model will learn to use those patterns to make a prediction. 
-
 Using the Boston housing dataset as a benchmark for a new 
 supervised learning model means that the model's performance is in part due to
 how well it learns and replicates the patterns in this dataset.
@@ -397,8 +369,7 @@ California housing dataset (:func:`sklearn.datasets.fetch_california_housing`)
 or the `Ames dataset <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>`_ 
 in place of the Boston housing dataset, as using these datasets should not
 cause the same fairness-related harms. 
-
-We recommend not using the Boston Housing dataset for machine learning 
+We we strongly discourage using the Boston Housing dataset for machine learning 
 benchmarking purposes, and hope this article gives 
 you pause about using it in the future.
 
