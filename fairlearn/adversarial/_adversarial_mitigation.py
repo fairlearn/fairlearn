@@ -37,9 +37,9 @@ class AdversarialMitigation():
         expect a `torch.nn.Module`. If :code:`environment = \"tensorflow\"`, we
         expect a `tensorflow.keras.Model`
 
-    objective : str, default = \"DP\"
-        The fairness measure to optimize for. Must be either \"DP\" (demographic
-        parity) or \"EO\" (Equality of Odds).
+    constraints : str, default = \"demographic_parity\"
+        The fairness measure to optimize for. Must be either \"demographic_parity\"
+        (demographic parity) or \"equalized_odds\" (Equality of Odds).
 
     learning_rate : float, default = 0.01
         A small number greater than zero to set as initial learning rate
@@ -58,14 +58,14 @@ class AdversarialMitigation():
     def __init__(self, *,
                  environment='any',
                  predictor_model,
-                 objective='DP',
+                 constraints='DP',
                  learning_rate=0.01,
                  alpha=0.1,
                  cuda=False
                  ):
         self._setup_environment(environment)
         self._setup_predictor_model(predictor_model)
-        self._setup_objective(objective)
+        self._setup_constraints(constraints)
         self._setup(learning_rate)
         self.alpha = alpha
         self._setup_cuda(cuda)
@@ -356,14 +356,14 @@ class AdversarialMitigation():
             self.predictor_optimizer = tf.train.AdamOptimizer(learning_rate)
             self.adversary_optimizer = tf.train.AdamOptimizer(learning_rate)
 
-    def _setup_objective(self, objective):
-        if (objective == "DP"):
+    def _setup_constraints(self, constraints):
+        if (constraints == "demographic_parity"):
             self.pass_y = False
-        elif (objective == "EO"):
+        elif (constraints == "equalized_odds"):
             self.pass_y = True
         else:
             raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                "objective", "one of \\[\'DP\',\'EO\'\\]"))
+                "constraints", "one of \\[\'DP\',\'EO\'\\]"))
 
         y_nodes = 1  # y always 1!
         adversarial_in = y_nodes * (2 if self.pass_y else 1)
