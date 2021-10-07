@@ -50,3 +50,27 @@ class TestMFv2:
 
         assert len(target.overall) == len(expected.overall) == 1
         assert target.overall['precision'] == expected.overall['precision']
+
+    def test_overall_two_func(self):
+        data = {
+            'y_true': y_t,
+            'y_pred': y_p,
+            'group_1': g_1
+        }
+        df = pd.DataFrame.from_dict(data)
+
+        wrapped_funcs = {
+            'precision': MetricFunctionRequest(func=skm.precision_score),
+            'accuracy': MetricFunctionRequest(func=skm.accuracy_score)
+        }
+        target = MFv2(wrapped_funcs, df, ['group_1'])
+
+        funcs = {
+            'precision': skm.precision_score,
+            'accuracy': skm.accuracy_score
+        }
+        expected = MetricFrame(metrics=funcs, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
+
+        assert len(target.overall) == len(expected.overall) == 2
+        assert target.overall['precision'] == expected.overall['precision']
+        assert target.overall['accuracy'] == expected.overall['accuracy']
