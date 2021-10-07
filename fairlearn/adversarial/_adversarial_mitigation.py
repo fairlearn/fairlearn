@@ -53,7 +53,8 @@ class AdversarialMitigation():
 
     """
 
-    # TODO figure out what can go in docstrings ^
+    # TODO binary/continuous?
+    # TODO more variables (also specify dimensionality!)
 
     def __init__(self, *,
                  environment='any',
@@ -63,6 +64,7 @@ class AdversarialMitigation():
                  alpha=0.1,
                  cuda=False
                  ):
+        """Initialize Adversarial Mitigation."""
         self._setup_environment(environment)
         self._setup_predictor_model(predictor_model)
         self._setup_constraints(constraints)
@@ -114,6 +116,7 @@ class AdversarialMitigation():
                 X, Y, Z = self._shuffle(X, Y, Z)
 
     def _shuffle(self, X, Y, Z):
+        """Shuffle the rows of X, Y, Z."""
         if self.torch:
             idx = torch.randperm(X.shape[0])
             X = X[idx].view(X.size())
@@ -125,7 +128,7 @@ class AdversarialMitigation():
 
     def partial_fit(self, X, y, *, sensitive_feature):
         """
-        Train the predictor model once on the given data.
+        Perform one epoch on given samples and update model.
 
         Parameters
         ----------
@@ -180,16 +183,18 @@ class AdversarialMitigation():
             # TODO
 
         y_pred = y_pred.reshape(-1)
-        y_pred_discrete = (y_pred >= 0).astype(float)
-        return y_pred_discrete
+        y_pred = (y_pred >= 0).astype(float)
+        return y_pred
 
     def _train_step(self, X, Y, Z):
+        """Call the implementation-specific train_step."""
         if self.torch:
             self._train_step_torch(X, Y, Z)
         elif self.tensorflow:
             self._train_step_tensorflow(X, Y, Z)
 
     def _train_step_torch(self, X, Y, Z):
+        """Perform one training step over data in pytorch model."""
         self.predictor_model.train()
         self.adversary_model.train()
 
@@ -228,6 +233,7 @@ class AdversarialMitigation():
         self.adversary_optimizer.step()
 
     def _train_step_tensorflow(self, X, Y, Z):
+        """Perform one training step over data in tensorflow model."""
         with tf.GradientTape(persistent=True) as tape:
             # training=True is only needed if there are layers with different
             # behavior during training versus inference (e.g. Dropout).
@@ -261,6 +267,7 @@ class AdversarialMitigation():
             zip(dU_LA, self.adversary_model.trainable_variables))
 
     def _validate_input(self, X, Y, Z):
+        """Validate the input data."""
         # Check that data are numpy arrays
         for var, name in [(X, "X"), (Y, "y"), (Z, "sensitive_feature")]:
             if (not isinstance(var, ndarray)):
@@ -297,6 +304,7 @@ class AdversarialMitigation():
         return X, Y, Z
 
     def _setup_environment(self, environment):
+        """Import either PyTorch or Tensorflow."""
         self.torch = False
         self.tensorflow = False
         # If no environment is passed, try to select torch or tensorflow
@@ -334,6 +342,7 @@ class AdversarialMitigation():
                 "environment", "one of \\[\'torch\',\'tensorflow\'\\]"))
 
     def _setup_predictor_model(self, predictor_model):
+        """Verify the type of predictor matches the environment."""
         if self.torch:
             if not isinstance(predictor_model, torch.nn.Module):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
@@ -347,6 +356,7 @@ class AdversarialMitigation():
         self.predictor_model = predictor_model
 
     def _setup(self, learning_rate):
+        """Initialize the optimizers depending on which environment is used."""
         if self.torch:
             self.predictor_optimizer = torch.optim.Adam(
                 self.predictor_model.parameters(), lr=learning_rate)
@@ -357,6 +367,7 @@ class AdversarialMitigation():
             self.adversary_optimizer = tf.train.AdamOptimizer(learning_rate)
 
     def _setup_constraints(self, constraints):
+        """Verify the constraints and set up the corresponding network structure."""
         if (constraints == "demographic_parity"):
             self.pass_y = False
         elif (constraints == "equalized_odds"):
@@ -373,8 +384,8 @@ class AdversarialMitigation():
         z_binary = True
 
         if self.torch:
-            from ._pytorch_models import regressor
-            self.adversary_model = regressor(adversarial_in, z_nodes)
+            from ._pytorch_models import FullyConnected
+            self.adversary_model = FullyConnected(adversarial_in, [y_nodes, z_nodes])
             if y_binary:
                 self.predictor_criterion = torch.nn.BCEWithLogitsLoss()
             else:
@@ -384,14 +395,15 @@ class AdversarialMitigation():
             else:
                 pass  # TODO
         elif self.tensorflow:
-            from ._tensorflow_models import regressor
-            self.adversary_model = regressor(adversarial_in, z_nodes)
+            from ._tensorflow_models import FullyConnected
+            self.adversary_model = FullyConnected(adversarial_in, [y_nodes, z_nodes])
             if y_binary:
                 self.predictor_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
             if z_binary:
                 self.adversary_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
 
     def _setup_cuda(self, cuda):
+        """Verify whether we can use the GPU and move pytorch model to it."""
         if (not cuda) or (not self.torch):
             self.cuda = False
         elif (cuda):
