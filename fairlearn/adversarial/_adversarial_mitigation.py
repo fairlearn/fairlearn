@@ -7,16 +7,23 @@ from numpy import finfo, float32, ndarray
 from sklearn.utils import shuffle as sklearn_shuffle
 from math import ceil
 
+torch = None
+tf = None
+
+
 class AdversarialMitigation():
-    """
-    Inprocessing algorithm based on the paper *Mitigating Unwanted Biases*
-    *with Adversarial Learning* [#1]_. This algorithm takes as input two
+    r"""Inprocessing algorithm to mitigate biases using PyTorch or Tensorflow.
+
+    This algorithm is our implementation of work in `"Mitigating Unwanted Biases with
+    Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`.
+    This algorithm takes as input two
     models, a predictor and an adversarial, defined either as a `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>` or
-    `Tensorflow2 model 
-    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`.
+    `Tensorflow2 model
+    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`. You train this
+    predictor using an API that is similar to estimators in `sklearn`.
 
-    
+
     Parameters
     ----------
     environment : str, default = \"torch\"
@@ -35,32 +42,27 @@ class AdversarialMitigation():
         parity) or \"EO\" (Equality of Odds).
 
     learning_rate : float, default = 0.01
-        A small number greater than zero to set as initial learning rate. Default
-        is 0.01.
+        A small number greater than zero to set as initial learning rate
 
     alpha : float, default = 0.1
-        A small number $\alpha$ as specified in [#1]_.
+        A small number $\alpha$ as specified in the paper.
 
     cuda : bool, default = False
         A boolean to indicate whether we can use cuda:0 (first GPU) when training
         a PyTorch model.
 
-    References
-    ----------
-    .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
-      Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
-      AIES, 2018.
-
     """
+
     # TODO figure out what can go in docstrings ^
-    def __init__(self, *, 
-            environment = 'any', 
-            predictor_model,
-            objective = 'DP',
-            learning_rate = 0.01,
-            alpha = 0.1,
-            cuda = False
-    ):
+
+    def __init__(self, *,
+                 environment='any',
+                 predictor_model,
+                 objective='DP',
+                 learning_rate=0.01,
+                 alpha=0.1,
+                 cuda=False
+                 ):
         self._setup_environment(environment)
         self._setup_predictor_model(predictor_model)
         self._setup_objective(objective)
@@ -69,9 +71,9 @@ class AdversarialMitigation():
         self._setup_cuda(cuda)
 
     def fit(self, X, y, *, sensitive_feature,
-            epochs = 1000, 
-            batch_size = -1,
-            shuffle = False):
+            epochs=1000,
+            batch_size=-1,
+            shuffle=False):
         """
         Train the predictor model.
 
@@ -79,34 +81,35 @@ class AdversarialMitigation():
         ----------
         X : numpy.ndarray
             Two-dimensional numpy array containing training data
-        
+
         y : numpy.ndarray
             One-dimensional numpy array containing training targets
-        
+
         sensitive_feature : numpy.ndarray
             One-dimensional numpy array containing the sensitive feature of the
-            training data. 
-        
-        epochs : float, default = 1000
+            training data.
+
+        epochs : int, default = 1000
             Maximum number of epochs to train for. Default is 1000. # TODO
-        
-        batch_size : float, default = |X|
-            Batch size. Default is |X|.
-        
+
+        batch_size : int, default = -1
+            Batch size. For no batching, set this to -1.
+
         shuffle : bool, default = False
             Iff True, shuffle the data after every iteration. Default is False
         """
         X, Y, Z = self._validate_input(X, y, sensitive_feature)
         # TODO decreasing learning rate: not really necessary with adam
         # TODO stopping condition!? If |grad| < eps
-        if batch_size == -1: batch_size = X.shape[0]
+        if batch_size == -1:
+            batch_size = X.shape[0]
         batches = ceil(X.shape[0] / batch_size)
         for epoch in range(epochs):
             for batch in range(batches):
                 batch_slice = slice(batch * batch_size, min((batch + 1) * batch_size, X.shape[0]))
                 self._train_step(X[batch_slice],
-                        Y[batch_slice],
-                        Z[batch_slice])
+                                 Y[batch_slice],
+                                 Z[batch_slice])
             if shuffle and epoch != epochs - 1:
                 X, Y, Z = self._shuffle(X, Y, Z)
 
@@ -122,45 +125,45 @@ class AdversarialMitigation():
 
     def partial_fit(self, X, y, *, sensitive_feature):
         """
-        Train the predictor model once on the given data
+        Train the predictor model once on the given data.
 
         Parameters
         ----------
         X : numpy.ndarray
             Two-dimensional numpy array containing training data
-        
+
         y : numpy.ndarray
             One-dimensional numpy array containing training targets
-        
+
         sensitive_feature : numpy.ndarray
             One-dimensional numpy array containing the sensitive feature of the
-            training data. 
+            training data.
         """
         X, Y, Z = self._validate_input(X, y, sensitive_feature)
         self._train_step(X, Y, Z)
-    
+
     def predict(self, X):
         """
-        Gather predictions for given test data
+        Gather predictions for given test data.
 
         Parameters
         ----------
         X : numpy.ndarray
             Two-dimensional numpy array containing test data
-        
+
         Returns
         -------
         y_pred_discrete : numpy.ndarray
-            One-dimensional numpy array containing discrete predictions for 
+            One-dimensional numpy array containing discrete predictions for
             given X
         """
         if (not isinstance(X, ndarray)):
             raise ValueError(_KWARG_ERROR_MESSAGE.format("X", "a numpy array"))
-        
+
         # Check dimensionality
         if (not len(X.shape) == 2):
-                raise ValueError(_KWARG_ERROR_MESSAGE.format("X", "2-dimensional"))
-        
+            raise ValueError(_KWARG_ERROR_MESSAGE.format("X", "2-dimensional"))
+
         if self.torch:
             self.predictor_model.eval()
             X = torch.from_numpy(X).float()
@@ -174,12 +177,12 @@ class AdversarialMitigation():
                 y_pred = y_pred.numpy()
         elif self.tensorflow:
             X = X.astype(float32)
-            #TODO
+            # TODO
 
         y_pred = y_pred.reshape(-1)
         y_pred_discrete = (y_pred >= 0).astype(float)
         return y_pred_discrete
-    
+
     def _train_step(self, X, Y, Z):
         if self.torch:
             self._train_step_torch(X, Y, Z)
@@ -196,8 +199,8 @@ class AdversarialMitigation():
 
         Y_hat = self.predictor_model(X)
         LP = self.predictor_criterion(Y_hat, Y)
-        LP.backward(retain_graph=True) # Check what this does at some point in time
-    
+        LP.backward(retain_graph=True)  # Check what this does at some point in time
+
         dW_LP = [deepcopy(p.grad) for p in self.predictor_model.parameters()]
 
         self.predictor_optimizer.zero_grad()
@@ -224,7 +227,6 @@ class AdversarialMitigation():
         self.predictor_optimizer.step()
         self.adversary_optimizer.step()
 
-    
     def _train_step_tensorflow(self, X, Y, Z):
         with tf.GradientTape(persistent=True) as tape:
             # training=True is only needed if there are layers with different
@@ -242,8 +244,8 @@ class AdversarialMitigation():
         dW_LP = tape.gradient(LP, self.predictor_model.trainable_variables)
         dU_LA = tape.gradient(LA, self.adversary_model.trainable_variables)
         dW_LA = tape.gradient(LA, self.predictor_model.trainable_variables)
-        
-        del tape # Because persistent=True !
+
+        del tape  # Because persistent=True !
 
         for i in range(len(dW_LP)):
             # Normalize dW_LA
@@ -252,29 +254,31 @@ class AdversarialMitigation():
             proj = tf.reduce_sum(tf.multiply(dW_LP[i], unit_dW_LA))
             # Calculate dW
             dW_LP[i] = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
-        
-        self.predictor_optimizer.apply_gradients(zip(dW_LP, self.predictor_model.trainable_variables))
-        self.adversary_optimizer.apply_gradients(zip(dU_LA, self.adversary_model.trainable_variables))
+
+        self.predictor_optimizer.apply_gradients(
+            zip(dW_LP, self.predictor_model.trainable_variables))
+        self.adversary_optimizer.apply_gradients(
+            zip(dU_LA, self.adversary_model.trainable_variables))
 
     def _validate_input(self, X, Y, Z):
         # Check that data are numpy arrays
         for var, name in [(X, "X"), (Y, "y"), (Z, "sensitive_feature")]:
             if (not isinstance(var, ndarray)):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(name, "a numpy array"))
-        
+
         # Check for equal number of samples
         if not (X.shape[0] == Y.shape[0] and X.shape[0] == Z.shape[0]):
             raise ValueError("Input data has an ambiguous number of rows")
-        
+
         # Check dimensionality
         for var, name, dim in [(X, "X", 2), (Y, "y", 1), (Z, "sensitive_feature", 1)]:
             if (not len(var.shape) == dim):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(name, str(dim) + "-dimensional"))
-        
+
         # Reshape to 2-D
         Y = Y.reshape(-1, 1)
         Z = Z.reshape(-1, 1)
-        
+
         if self.torch:
             X = torch.from_numpy(X).float()
             Y = torch.from_numpy(Y).float()
@@ -291,7 +295,7 @@ class AdversarialMitigation():
 
         # TODO Validate Z is binary? Possibly Y continuous?
         return X, Y, Z
-    
+
     def _setup_environment(self, environment):
         self.torch = False
         self.tensorflow = False
@@ -324,11 +328,11 @@ class AdversarialMitigation():
             except ImportError:
                 raise RuntimeError(_IMPORT_ERROR_MESSAGE.format('tensorflow'))
             self.tensorflow = True
-        
+
         if not (self.torch or self.tensorflow):
             raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                    "environment", "one of \[\'torch\',\'tensorflow\'\]"))
-    
+                "environment", "one of \\[\'torch\',\'tensorflow\'\\]"))
+
     def _setup_predictor_model(self, predictor_model):
         if self.torch:
             if not isinstance(predictor_model, torch.nn.Module):
@@ -336,7 +340,7 @@ class AdversarialMitigation():
                     "predictor_model", "a `torch.nn.Module`"
                 ))
         else:
-            if not isinstance(predictor_model, tensorflow.keras.Model):
+            if not isinstance(predictor_model, tf.keras.Model):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     "predictor_model", "a `tensorflow.keras.Model`"
                 ))
@@ -344,8 +348,10 @@ class AdversarialMitigation():
 
     def _setup(self, learning_rate):
         if self.torch:
-            self.predictor_optimizer = torch.optim.Adam(self.predictor_model.parameters(), lr=learning_rate)
-            self.adversary_optimizer = torch.optim.Adam(self.adversary_model.parameters(), lr=learning_rate)
+            self.predictor_optimizer = torch.optim.Adam(
+                self.predictor_model.parameters(), lr=learning_rate)
+            self.adversary_optimizer = torch.optim.Adam(
+                self.adversary_model.parameters(), lr=learning_rate)
         elif self.tensorflow:
             self.predictor_optimizer = tf.train.AdamOptimizer(learning_rate)
             self.adversary_optimizer = tf.train.AdamOptimizer(learning_rate)
@@ -357,13 +363,13 @@ class AdversarialMitigation():
             self.pass_y = True
         else:
             raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                    "objective", "one of \[\'DP\',\'EO\'\]"))
-        
-        y_nodes = 1 # y always 1!
-        adversarial_in = y_nodes * (2 if self.pass_y else 1)
-        z_nodes = 1 # TODO think about multiples sensitive values
+                "objective", "one of \\[\'DP\',\'EO\'\\]"))
 
-        y_binary = True # TODO continuous case... with MSE loss?
+        y_nodes = 1  # y always 1!
+        adversarial_in = y_nodes * (2 if self.pass_y else 1)
+        z_nodes = 1  # TODO think about multiples sensitive values
+
+        y_binary = True  # TODO continuous case... with MSE loss?
         z_binary = True
 
         if self.torch:
@@ -372,11 +378,11 @@ class AdversarialMitigation():
             if y_binary:
                 self.predictor_criterion = torch.nn.BCEWithLogitsLoss()
             else:
-                pass # TODO continuous case
+                pass  # TODO continuous case
             if z_binary:
                 self.adversary_criterion = torch.nn.BCEWithLogitsLoss()
             else:
-                pass # TODO
+                pass  # TODO
         elif self.tensorflow:
             from ._tensorflow_models import regressor
             self.adversary_model = regressor(adversarial_in, z_nodes)
@@ -384,7 +390,7 @@ class AdversarialMitigation():
                 self.predictor_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
             if z_binary:
                 self.adversary_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
-    
+
     def _setup_cuda(self, cuda):
         if (not cuda) or (not self.torch):
             self.cuda = False
