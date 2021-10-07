@@ -2,10 +2,11 @@
 # Licensed under the MIT License.
 
 
+import numpy as np
 import pandas as pd
 import sklearn.metrics as skm
 
-from fairlearn.metrics import MetricFunctionRequest, MetricFrame, MFv2
+from fairlearn.metrics import MetricFunctionRequest, MetricFrame, MFv2, selection_rate
 
 
 # Bring in some pre-prepared input arrays
@@ -221,3 +222,25 @@ class TestMFv2:
         assert target.by_group['precision']['ba'] == expected.by_group['precision']['ba']
         assert target.by_group['prec_w']['aa'] == expected.by_group['prec_w']['aa']
         assert target.by_group['prec_w']['ba'] == expected.by_group['prec_w']['ba']
+
+    def test_simple_selection_rate(self):
+        data = {
+            'y_true': y_t,
+            'y_pred': y_p,
+            'group_1': g_1,
+            'group_2': g_2,
+            'my_sample_weight': s_w
+        }
+        df = pd.DataFrame.from_dict(data)
+
+        simple_selection_rate = MetricFunctionRequest(func=np.mean, arguments={'a': 'y_pred'})
+        wrapped_funcs = {
+            'ssr': simple_selection_rate,
+            'sr': MetricFunctionRequest(func=selection_rate)
+        }
+
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_2'])
+
+        assert target.overall['ssr'] == target.overall['sr']
+        for g in np.unique(g_2):
+            assert target.by_group['ssr'][g] == target.by_group['sr'][g]
