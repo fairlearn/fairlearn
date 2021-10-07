@@ -2,15 +2,19 @@
 # Licensed under the MIT License.
 
 
+from typing import ByteString
 import numpy as np
 import pandas as pd
 import sklearn.metrics as skm
+
+import time
 
 from fairlearn.metrics import MetricFunctionRequest, MetricFrame, MFv2, selection_rate
 
 
 # Bring in some pre-prepared input arrays
 from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4, s_w
+from .data_for_test import array_gen
 
 
 class TestMetricFunctionRequest:
@@ -281,3 +285,86 @@ class TestMFv2:
         assert target.by_group['precision']['f']['ba'] == expected.by_group['precision']['f']['ba']
         assert target.by_group['precision']['g']['aa'] == expected.by_group['precision']['g']['aa']
         assert target.by_group['precision']['g']['ba'] == expected.by_group['precision']['g']['ba']
+
+    def test_perf(self):
+        num_samples = 10000
+
+        rng = np.random.default_rng(seed=2350135)
+
+        metric_dict = {
+            'recall': skm.recall_score,
+            'prec': skm.precision_score,
+            'acc': skm.accuracy_score
+        }
+        wrapped_dict = {
+            'recall': MetricFunctionRequest(func=skm.recall_score),
+            'prec': MetricFunctionRequest(func=skm.precision_score),
+            'acc': MetricFunctionRequest(func=skm.accuracy_score)
+        }
+
+        # Generate 'true' and 'predicted' values
+        y_true = rng.integers(low=0, high=1, endpoint=True, size=num_samples)
+        y_pred = rng.integers(low=0, high=1, endpoint=True, size=num_samples)
+
+        # Generate the conditional and sensitive features
+        # Note that we have quite a few prime numbers here
+        cf_1_groups = ['aa', 'aaa', 'aaaa']
+        cf_2_groups = ['p', 'qq']
+        sf_1_groups = ['A', 'B', 'C', 'D', 'E']
+        sf_2_groups = ['H', 'L', 'M', 'P', 'Q', 'R', 'S']
+        cf_1_arr = array_gen(cf_1_groups, 11, num_samples)
+        cf_2_arr = array_gen(cf_2_groups, 13, num_samples)
+        sf_1_arr = array_gen(sf_1_groups, 17, num_samples)
+        sf_2_arr = array_gen(sf_2_groups, 19, num_samples)
+
+        # Sanity check that all groups appear
+        assert len(np.unique(cf_1_arr)) == len(cf_1_groups)
+        assert len(np.unique(sf_1_arr)) == len(sf_1_groups)
+        assert len(np.unique(cf_2_arr)) == len(cf_2_groups)
+        assert len(np.unique(sf_2_arr)) == len(sf_2_groups)
+
+        # Make some inputs
+        sf_frame = pd.DataFrame(np.stack([sf_1_arr, sf_2_arr], axis=1), columns=["SF0", "SF1"])
+        cf_array = pd.DataFrame(np.stack([cf_1_arr, cf_2_arr], axis=1), columns=['CF0', 'CF1'])
+
+        # Create the target object
+
+        begin = time.time()
+        target = MetricFrame(metrics=metric_dict, y_true=y_true, y_pred=y_pred,
+                             sensitive_features=sf_frame,
+                             control_features=cf_array)
+        end = time.time()
+
+        delta_old = end - begin
+
+        all_data = pd.concat(
+            [
+                pd.Series(name='y_true', data=y_true),
+                pd.Series(name='y_pred', data=y_pred),
+                sf_frame,
+                cf_array
+            ],
+            axis=1
+        )
+        print(all_data.head())
+        begin = time.time()
+        other = MFv2(
+            metric_functions=wrapped_dict,
+            data=all_data,
+            sensitive_features=["SF0", "SF1"],
+            control_features=['CF0', 'CF1']
+        )
+        end = time.time()
+
+        delta_new = end - begin
+
+        print(f"delta_old: {delta_old}")
+        print(f"delta_new: {delta_new}")
+
+        for m in ['recall', 'prec', 'acc']:
+            for cf_1 in cf_1_groups:
+                for cf_2 in cf_2_groups:
+                    for sf_1 in sf_1_groups:
+                        for sf_2 in sf_2_groups:
+                            assert target.by_group[m][cf_1][cf_2][sf_1][sf_2] == other.by_group[m][cf_1][cf_2][sf_1][sf_2]
+        assert delta_new < delta_old, "Check new version is faster"
