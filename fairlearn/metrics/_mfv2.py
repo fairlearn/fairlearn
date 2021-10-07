@@ -8,6 +8,7 @@ import pandas as pd
 
 class MetricFunctionRequest:
     def __init__(self,
+                 *,
                  func: Callable,
                  arguments: Dict[str, str] = {'y_true': 'y_true', 'y_pred': 'y_pred'}):
         self._func = func
@@ -41,6 +42,7 @@ def apply_to_dataframe(data: pd.DataFrame, metric_functions: Dict[str, MetricFun
 
 class MFv2:
     def __init__(self,
+                 *,
                  metric_functions: Dict[str, MetricFunctionRequest],
                  data: pd.DataFrame,
                  sensitive_features: List[str],

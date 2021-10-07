@@ -42,7 +42,7 @@ class TestMFv2:
         wrapped_funcs = {
             'precision': MetricFunctionRequest(func=skm.precision_score)
         }
-        target = MFv2(wrapped_funcs, df, ['group_1'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1'])
 
         funcs = {
             'precision': skm.precision_score
@@ -64,7 +64,7 @@ class TestMFv2:
             'precision': MetricFunctionRequest(func=skm.precision_score),
             'accuracy': MetricFunctionRequest(func=skm.accuracy_score)
         }
-        target = MFv2(wrapped_funcs, df, ['group_1'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1'])
 
         funcs = {
             'precision': skm.precision_score,
@@ -87,7 +87,7 @@ class TestMFv2:
         wrapped_funcs = {
             'precision': MetricFunctionRequest(func=skm.precision_score)
         }
-        target = MFv2(wrapped_funcs, df, ['group_1'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1'])
 
         funcs = {
             'precision': skm.precision_score
@@ -111,7 +111,7 @@ class TestMFv2:
             'precision': MetricFunctionRequest(func=skm.precision_score),
             'accuracy': MetricFunctionRequest(func=skm.accuracy_score)
         }
-        target = MFv2(wrapped_funcs, df, ['group_1'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1'])
 
         funcs = {
             'precision': skm.precision_score,
@@ -138,7 +138,7 @@ class TestMFv2:
         wrapped_funcs = {
             'precision': MetricFunctionRequest(func=skm.precision_score)
         }
-        target = MFv2(wrapped_funcs, df, ['group_1', 'group_2'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1', 'group_2'])
 
         funcs = {
             'precision': skm.precision_score
@@ -165,7 +165,7 @@ class TestMFv2:
             'precision': MetricFunctionRequest(func=skm.precision_score),
             'bal_acc': MetricFunctionRequest(func=skm.balanced_accuracy_score)
         }
-        target = MFv2(wrapped_funcs, df, ['group_1', 'group_2'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1', 'group_2'])
 
         funcs = {
             'precision': skm.precision_score,
@@ -203,7 +203,7 @@ class TestMFv2:
             'precision': MetricFunctionRequest(func=skm.precision_score),
             'prec_w': MetricFunctionRequest(func=skm.precision_score, arguments=func_data_arg_map)
         }
-        target = MFv2(wrapped_funcs, df, ['group_1'])
+        target = MFv2(metric_functions=wrapped_funcs, data=df, sensitive_features=['group_1'])
 
         funcs = {
             'precision': skm.precision_score,
