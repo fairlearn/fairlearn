@@ -27,6 +27,7 @@ import sys as _sys
 
 from ._metric_frame import MetricFrame  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
+from ._mfv2 import MetricFunctionRequest  # noqa: F401
 
 from ._generated_metrics import _generated_metric_dict
 
@@ -60,7 +61,8 @@ for _name, _func in _generated_metric_dict.items():
 
 _core = [
     "MetricFrame",
-    "make_derived_metric"
+    "make_derived_metric",
+    "MetricFunctionRequest"
 ]
 
 _disparities = [

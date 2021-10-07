@@ -7,7 +7,7 @@ import pandas as pd
 
 
 class MetricFunctionRequest:
-    def __init__(self, func, arguments: List[str] = ['y_true, y_pred']):
+    def __init__(self, func, arguments: List[str] = ['y_true', 'y_pred']):
         self._func = func
         self._args = arguments
 
