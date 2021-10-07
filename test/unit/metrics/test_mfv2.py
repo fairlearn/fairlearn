@@ -244,3 +244,41 @@ class TestMFv2:
         assert target.overall['ssr'] == target.overall['sr']
         for g in np.unique(g_2):
             assert target.by_group['ssr'][g] == target.by_group['sr'][g]
+
+    def test_1cf(self):
+        data = {
+            'y_true': y_t,
+            'y_pred': y_p,
+            'group_1': g_1,
+            'group_2': g_2,
+            'my_sample_weight': s_w
+        }
+        df = pd.DataFrame.from_dict(data)
+
+        wrapped_funcs = {
+            'precision': MetricFunctionRequest(func=skm.precision_score)
+        }
+        target = MFv2(metric_functions=wrapped_funcs,
+                      data=df,
+                      sensitive_features=['group_1'],
+                      control_features=['group_2'])
+        funcs = {
+            'precision': skm.precision_score
+        }
+        expected = MetricFrame(
+            metrics=funcs,
+            y_true=y_t,
+            y_pred=y_p,
+            sensitive_features={'group_1': g_1},
+            control_features={'group_2': g_2}
+        )
+
+        assert len(target.overall) == len(expected.overall) == 2
+        assert target.overall['precision']['f'] == expected.overall['precision']['f']
+        assert target.overall['precision']['g'] == expected.overall['precision']['g']
+
+        assert len(target.by_group) == len(expected.by_group) == 4
+        assert target.by_group['precision']['f']['aa'] == expected.by_group['precision']['f']['aa']
+        assert target.by_group['precision']['f']['ba'] == expected.by_group['precision']['f']['ba']
+        assert target.by_group['precision']['g']['aa'] == expected.by_group['precision']['g']['aa']
+        assert target.by_group['precision']['g']['ba'] == expected.by_group['precision']['g']['ba']

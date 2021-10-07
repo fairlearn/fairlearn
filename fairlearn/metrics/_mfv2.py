@@ -43,11 +43,17 @@ class MFv2:
     def __init__(self,
                  metric_functions: Dict[str, MetricFunctionRequest],
                  data: pd.DataFrame,
-                 sensitive_features: List[str]
+                 sensitive_features: List[str],
+                 control_features: List[str] = []
                  ):
-        self._overall = apply_to_dataframe(data, metric_functions=metric_functions)
+        if len(control_features) == 0:
+            self._overall = apply_to_dataframe(data, metric_functions=metric_functions)
+        else:
+            self._overall = data.groupby(by=control_features).apply(
+                apply_to_dataframe, metric_functions=metric_functions
+            )
 
-        self._by_group = data.groupby(sensitive_features).apply(
+        self._by_group = data.groupby(control_features+sensitive_features).apply(
             apply_to_dataframe, metric_functions=metric_functions)
 
     @property
