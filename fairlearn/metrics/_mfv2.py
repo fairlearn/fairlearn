@@ -7,7 +7,9 @@ import pandas as pd
 
 
 class MetricFunctionRequest:
-    def __init__(self, func: Callable, arguments: List[str] = ['y_true', 'y_pred']):
+    def __init__(self,
+                 func: Callable,
+                 arguments: Dict[str, str] = {'y_true': 'y_true', 'y_pred': 'y_pred'}):
         self._func = func
         self._args = arguments
 
@@ -16,13 +18,13 @@ class MetricFunctionRequest:
         return self._func
 
     @property
-    def arguments(self) -> List[str]:
+    def arguments(self) -> Dict[str, str]:
         return self._args
 
     def invoke(self, df: pd.DataFrame):
         kwargs = dict()
-        for arg_name in self.arguments:
-            kwargs[arg_name] = df[arg_name]
+        for func_arg_name, data_arg_name in self.arguments.items():
+            kwargs[func_arg_name] = df[data_arg_name]
 
         result = self.func(**kwargs)
 

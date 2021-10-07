@@ -189,13 +189,18 @@ class TestMFv2:
             'y_pred': y_p,
             'group_1': g_1,
             'group_2': g_2,
-            'sample_weight': s_w
+            'my_sample_weight': s_w
         }
         df = pd.DataFrame.from_dict(data)
 
+        func_data_arg_map = {
+            'y_true': 'y_true',
+            'y_pred': 'y_pred',
+            'sample_weight': 'my_sample_weight'
+        }
         wrapped_funcs = {
             'precision': MetricFunctionRequest(func=skm.precision_score),
-            'prec_w': MetricFunctionRequest(func=skm.precision_score, arguments=['y_true', 'y_pred', 'sample_weight'])
+            'prec_w': MetricFunctionRequest(func=skm.precision_score, arguments=func_data_arg_map)
         }
         target = MFv2(wrapped_funcs, df, ['group_1'])
 
