@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 from ._constants import _IMPORT_ERROR_MESSAGE, _KWARG_ERROR_MESSAGE

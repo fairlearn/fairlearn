@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 _IMPORT_ERROR_MESSAGE = "Please make sure to install {} in order to use this module."
