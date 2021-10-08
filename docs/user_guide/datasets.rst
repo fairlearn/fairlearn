@@ -21,8 +21,7 @@ socio-technical issue.
 This article has the following goals:
   * Educate users about the history of the dataset and its fairness-related harms
   * Show users how fairness-related harms manifest in the data and in downstream modelling tasks
-  * Suggest best practices for dealing with the Boston Housing data and 
-  alternative benchmarking datasets
+  * Suggest best practices for dealing with the Boston Housing data and alternative benchmarking datasets
 
 
 .. _boston_dataset_origin:
@@ -185,7 +184,6 @@ of adults without some high school education and the proportion of male workers
 classified as laborers. They apply a logarithmic transformation to the variable 
 with the assumption that resulting variable distribution reflects their understanding of
 socioeconomic distinctions.
-
 However, the categorization of a certain level of 
 education and job category as indicative of "lower status" is reflective of
 social constructs of class and not objective fact.
