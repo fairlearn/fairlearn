@@ -15,12 +15,12 @@ class AdversarialMitigation():
     r"""Inprocessing algorithm to mitigate biases using PyTorch or Tensorflow.
 
     This algorithm is our implementation of work in `"Mitigating Unwanted Biases with
-    Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`.
+    Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_.
     This algorithm takes as input two
     models, a predictor and an adversarial, defined either as a `PyTorch module
-    <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>` or
+    <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
     `Tensorflow2 model
-    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`. You train this
+    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
     predictor using an API that is similar to estimators in `sklearn`.
 
 
@@ -39,7 +39,7 @@ class AdversarialMitigation():
 
     constraints : str, default = \"demographic_parity\"
         The fairness measure to optimize for. Must be either \"demographic_parity\"
-        (demographic parity) or \"equalized_odds\" (Equality of Odds).
+        (Demographic Parity) or \"equalized_odds\" (Equalized Odds).
 
     learning_rate : float, default = 0.01
         A small number greater than zero to set as initial learning rate

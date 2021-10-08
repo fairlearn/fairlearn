@@ -1,5 +1,5 @@
 fairlearn\.adversarial package
-===========================
+==============================
 
 .. automodule:: fairlearn.adversarial
     :members:

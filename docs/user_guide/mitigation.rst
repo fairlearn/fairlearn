@@ -49,9 +49,9 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - Inprocessing algorithm based on the paper *Mitigating Unwanted Biases*
         *with Adversarial Learning* [#4]_. This algorithm takes as input two
         models, a predictor and an adversarial, defined either as a `PyTorch module
-        <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>` or
+        <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
         `Tensorflow2 model 
-        <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`.
+        <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_.
       - ✔
       - ✘
       - DP, EO
