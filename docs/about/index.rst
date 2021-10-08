@@ -1,7 +1,7 @@
 .. _about:
 
-About
-=====
+About us
+========
 
 .. _mission:
 

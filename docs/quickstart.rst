@@ -1,7 +1,7 @@
 .. _quickstart:
 
-Getting started
-===============
+Get Started
+===========
 
 Installation
 ------------
