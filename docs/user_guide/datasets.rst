@@ -388,7 +388,7 @@ how well it learns and replicates the patterns in this dataset.
 The Boston Housing dataset raises the more general issue of whether it's valid to 
 port datasets constructed for one specific use case to different use cases.
 Using a dataset without considering the context and purposes for which it 
-was created can be risky even if the dataset does not carry the risk of
+was created can be risky even if the dataset does not carry the possibility of
 generating fairness-related harms. Any machine learning model 
 developed using a dataset with an opaque data-generating process runs the 
 risk of generating spurious or non-meaningful results. Construct validity is
