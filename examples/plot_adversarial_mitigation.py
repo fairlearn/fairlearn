@@ -95,7 +95,7 @@ mitigator = AdversarialMitigation(
     environment='torch',
     predictor_model=predictor_model,
     objective="EO",
-    cuda=True
+    cuda=False
 )
 
 # %% Then, we can fit the data to our model
