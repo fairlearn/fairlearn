@@ -16,11 +16,14 @@ We migrated the dataset to Fairlearn after it was phased out of scikit-learn in 
 The dataset remains in Fairlearn as an example of how systemic racism can occur in data and to 
 show the effect of Fairlearn's assessment and pre-/in-/post-processing tools on real, problematic data. 
 
-**We wrote this blog post to achieve the following goals:**
+We also think this dataset provides an interesting case study of how fairness is fundamentally a
+socio-technical issue. 
+This article has the following goals:
   * Educate users about the history of the dataset and its fairness-related harms
   * Show users how fairness-related harms manifest in the data and in downstream modelling tasks
   * Suggest best practices for dealing with the Boston Housing data and 
   alternative benchmarking datasets
+
 
 .. _boston_dataset_origin:
 
@@ -31,11 +34,11 @@ Contrary to expectation, the Boston Housing dataset was not developed for econom
 Harrison and Rubenfield (1978)_ 
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
-The authors use a `hedonic pricing <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_ 
+The authors use a hedonic pricing [#9] 
 approach, which assumes that the price of a good or service can be modeled as a 
 function of features both internal and external to the good or service. 
-The input to this model was a dataset comprising the `Boston Standard Metropolitan 
-Statistical Area <https://www.census.gov/history/www/programs/geography/metropolitan_areas.html>`_, with the nitric oxides concentration (*NOX*) 
+The input to this model was a dataset comprising the Boston Standard Metropolitan 
+Statistical Area [#10]_, with the nitric oxides concentration (*NOX*) 
 serving as a proxy for air quality.
 
 The paper sought to estimate the median value of owner-occupied homes (now 
@@ -86,8 +89,6 @@ B            1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
 LSTAT        % lower status of the population
 MEDV         Median value of owner-occupied homes in $1000’s
 ============ ============================================================================
-
-All of these variables are from datasets that represent the early 1970s.
 
 The cells below show basic summary statistics about the data, the data types of the 
 columns, and the number of missing values.
@@ -150,13 +151,13 @@ are verbatim from their paper). However, many of the authors' assumptions
 have later been found to be unsubstantiated.
 
 * *LSTAT*: "Proportion of population that is lower status = 0.5 * 
-(**proportion of adults without some high school education and proportion of 
-male workers classified as laborers**). The logarithmic specification implies 
+(proportion of adults without some high school education and proportion of 
+male workers classified as laborers). The logarithmic specification implies 
 that socioeconomic status distinctions mean more in the upper brackets of 
 society than in the lower classes."
 
 * *B*: "Proportion of population that is Black. At low to moderate levels of B, 
-an **increase in B** should have a **negative influence on housing value** 
+an increase in B should have a negative influence on housing value 
 if Black people are regarded as undesirable neighbors by White people. However, market 
 discrimination means that housing values are higher at very high levels of B. 
 One expects, therefore, a parabolic relationship between proportion Black in 
@@ -172,7 +173,7 @@ is parabolic.
 Harrison and Rubenfield set a threshold of 63% as the point in which median house 
 prices flip from declining to increasing, but do not provide the basis for 
 this threshold. 
-An `analysis of the dataset <https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>`_ 
+An analysis of the dataset [#8]_ 
 by M. Carlisle further shows that the Boston Housing dataset suffers from serious
 quality and incompleteness issues, as Carlisle was unable to recover the 
 original Census data mapping for all the points in the *B* variable. 
@@ -192,6 +193,32 @@ Again, the authors provide no evidence of a proposed relationship between
 *LSTAT* and *MEDV* and do not sufficiently justify its inclusion 
 in the hedonic pricing model.
 
+Construct validity provides a useful lens through which to analyze the 
+construction of this dataset.
+Construct validity refers to the extent to which a given measurement model
+measures the intended construct in way that is meaningful and useful. 
+In Harrison and Rubenfield's analysis, the measurement model involves 
+constructing the assumed point at which prejudice against Black people occurs 
+and the effect that prejudice has on house values. 
+Likewise, the measurement model also constructs membership in
+lower-status classes based on educational attainment
+and labor category. 
+It is useful to ask whether the way the authors chose to create 
+the measurements accurately represents phenomenon the authors 
+sought to measure. 
+As is discussed above, the authors do not provide justification for their 
+variable construction choices beyond the projected impacts described 
+in the variable definitions.
+Both measurements fail the test of content validity, a subcategory of
+construct validity, as the variable definitions are subjective and thus
+open to being contested.
+The authors also do not establish convergent validity, another subcategory 
+of construct validity, in that they do not show their measurements correlate
+with measurements from measurement models in which construct validity has 
+been established. 
+However, given the time period in which the paper 
+was published there may have been a dearth of related measurement models.
+For more information on construct validity, refer to :ref:`construct_validity`.
 
 Intersectionality also requires consideration. 
 Intersectionality is defined as the interesection between multiple demographic groups. 
@@ -244,8 +271,7 @@ The code below maps *LSTAT*, *B*, and *MEDV* to binary values
 where values greater than the median of the column map to 1, 
 and otherwise the values are 0. 
 
-Note that this methodology follows scikit-lego's `exploration 
-<https://scikit-lego.netlify.app/fairness.html>`_ of the Boston Housing data.
+Note that this methodology follows scikit-lego's [#7]_ of the Boston Housing data.
 
 .. doctest:: datasets
     :options:  +NORMALIZE_WHITESPACE
@@ -337,9 +363,9 @@ The Boston housing dataset presents many ethical issues, and in general, we
 strongly discourage using it in predictive modelling analyses. 
 We've kept it in Fairlearn because of its potential as a teaching tool 
 for how to deal with ethical issues in a dataset. 
-There are ways to `remove correlations between sensitive features and the remaining columns 
-<https://scikit-lego.netlify.app/fairness.html>`_, but that is by no means a guarantee that fairness-related harms won't occur. Besides, other benchmark datasets
-exist that do not present these issues.
+There are ways to remove correlations between sensitive features and the remaining columns [#7]_, 
+but that is by no means a guarantee that fairness-related harms won't occur. 
+Besides, other benchmark datasets exist that do not present these issues.
 
 
 It's important to keep the differences between the way Harrison and Rubenfield 
@@ -357,16 +383,24 @@ patterns encoded in the data and use that to predict an outcome.
 In the Boston housing dataset, the patterns the authors encoded through
 the *B* and *LSTAT* variables include systemic racism and class inequalities, 
 respectively. 
-A predictive model will learn to use those patterns to make a prediction. 
 Using the Boston housing dataset as a benchmark for a new 
 supervised learning model means that the model's performance is in part due to
 how well it learns and replicates the patterns in this dataset.
 
+The Boston Housing dataset raises the more general issue of whether it's valid to 
+port datasets constructed for one specific use case to different use cases.
+Using a dataset without considering the context and purposes for which it 
+was created can be risky even if the dataset does not carry the risk of
+generating fairness-related harms. Any machine learning model 
+developed using a dataset with an opaque data-generating process runs the 
+risk of generating spurious or non-meaningful results. Construct validity is
+also relevant here; a dataset may not maintain construct validity across
+different types of statistical analyses and different predicted outcomes.
 
 If you are searching for a house pricing dataset to use for benchmarking 
 purposes or to create a hedonic pricing model, scikit-learn recommends the 
 California housing dataset (:func:`sklearn.datasets.fetch_california_housing`)
-or the `Ames dataset <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>`_ 
+or the Ames housing dataset [#6]_ 
 in place of the Boston housing dataset, as using these datasets should not
 cause the same fairness-related harms. 
 We we strongly discourage using the Boston Housing dataset for machine learning 
@@ -383,12 +417,28 @@ you pause about using it in the future.
       IEEE, 2018.
  
 
-  .. [#3] Mohsen Shahhosseini, Guiping Hu, Hieu Pham, `"Optimizing Ensemble Weights for MachineLearning Models: A Case Study for Housing PricePrediction" <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=1187&context=imse_conf>`_,
+  .. [#3] Mohsen Shahhosseini, Guiping Hu, Hieu Pham, `"Optimizing Ensemble Weights for Machine Learning Models: A Case Study for Housing Price Prediction" <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=1187&context=imse_conf>`_,
       Industrial and Manufacturing Systems Engineering Conference Proceedings and Posters, 2019.   
 
 
   .. [#4] Michael E. Tipping , `"The Relevance Vector Machine" <https://proceedings.neurips.cc/paper/1999/file/f3144cefe89a60d6a1afaf7859c5076b-Paper.pdf>`_,
-       1999.
+      1999.
   
   .. [#5] John F. Kain, John M. Quigley, `"Housing Markets and Racial Discrimination: A Microeconomic Analysis" <https://www.nber.org/books/kain75-1>`_, 
-         National Bureau of Economic Research (NBER), 1975.
+      National Bureau of Economic Research (NBER), 1975.
+
+  .. [#6] Scikit-Learn, `"The Ames housing dataset" <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>_`,
+      2021.
+   
+  .. [#7] Scikit-Lego, `"Fairness" <https://scikit-lego.netlify.app/fairness.html>`_,
+      2019.
+   
+  .. [#8] M Carlisle, `"racist data destruction?" <https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>`_,
+      Medium, 2019.
+
+  .. [#9] Marshall Hargrave, `"Hedonic Pricing" <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_,
+      Investopedia, 2021.
+  
+  .. [#10] `"Metropolitan Areas", <https://www.census.gov/history/www/programs/geography/metropolitan_areas.html>`_,
+        United States Census Bureau.     
+         
