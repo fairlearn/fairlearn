@@ -198,11 +198,11 @@ measures the intended construct in way that is meaningful and useful.
 In Harrison and Rubenfield's analysis, the measurement model involves 
 constructing the assumed point at which prejudice against Black people occurs 
 and the effect that prejudice has on house values. 
-Likewise, the measurement model also constructs membership in
+Likewise, another measurement model also constructs membership in
 lower-status classes based on educational attainment
 and labor category. 
 It is useful to ask whether the way the authors chose to create 
-the measurements accurately represents phenomenon the authors 
+the measurements accurately represents phenomenon they 
 sought to measure. 
 As is discussed above, the authors do not provide justification for their 
 variable construction choices beyond the projected impacts described 
