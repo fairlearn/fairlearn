@@ -157,8 +157,7 @@ class AdversarialMitigation():
         Returns
         -------
         y_pred : numpy.ndarray
-            One-dimensional numpy array containing discrete predictions for
-            given X
+            One-dimensional array containing discrete predictions
         """
         if (not isinstance(X, ndarray)):
             raise ValueError(_KWARG_ERROR_MESSAGE.format("X", "a numpy array"))
