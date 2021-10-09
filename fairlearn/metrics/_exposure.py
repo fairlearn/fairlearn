@@ -1,8 +1,7 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
-from typing import Any
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._metric_frame import MetricFrame
@@ -14,12 +13,14 @@ _INVALID_RANKING_ERROR_MESSAGE = "Please input a valid complete ranking."
 def exposure(y_true,
              y_pred,
              *,
-             pos_label: Any = 1,
              sample_weight=None) -> float:
     """Calculate the exposure allocated to the ranking in y_pred.
 
-    For consistency with other metric functions, the ``y_true`` and ``pos_label`` arguments
-    are required, but ignored.
+    Exposure is defined as the average logarithmic discount, where
+    logarithmic discount = 1 / log2 (1 + i) for i in y_pred.
+
+    For consistency with other metric functions, the ``y_true`` argument
+    is required, but ignored.
 
 
     Parameters
@@ -28,8 +29,6 @@ def exposure(y_true,
         The true ranking (ignored)
     y_pred : array_like
         The predicted ranking
-    pos_label : Scalar
-        The label to treat as the 'good' outcome (ignored)
     sample_weight : array_like
         Optional array of sample weights
     """
@@ -46,18 +45,19 @@ def exposure(y_true,
     if sample_weight is not None:
         s_w = np.squeeze(np.asarray(sample_weight))
 
-    return np.dot(v, s_w).sum()
+    return np.dot(v, s_w).sum() / len(y_pred)
 
 
 def utility(y_true,
             y_pred,
             *,
-            pos_label: Any = 1,
             sample_weight=None) -> float:
-    """Calculate the exposure allocated to the ranking in y_pred.
+    """Calculate the average utility of the ranking in y_pred.
 
-    For consistency with other metric functions, the ``y_true`` and ``pos_label`` arguments
-    are required, but ignored.
+    Utility is defined as the average of y_true.
+
+    For consistency with other metric functions, the ``y_pred`` arguments
+    is required, but ignored.
 
 
     Parameters
@@ -65,9 +65,7 @@ def utility(y_true,
     y_true : array_like
         The utility
     y_pred : array_like
-        The predicted ranking
-    pos_label : Scalar
-        The label to treat as the 'good' outcome (ignored)
+        The predicted ranking (ignored)
     sample_weight : array_like
         Optional array of sample weights
     """
@@ -87,12 +85,11 @@ def exposure_utility_ratio(
         y_true,
         y_pred,
         *,
-        pos_label: Any = 1,
         sample_weight=None) -> float:
-    """Calculate the exposure allocated to the ranking in y_pred.
+    """Calculate the exposure utility ratio of the ranking in y_pred.
 
-    For consistency with other metric functions, the ``y_true`` and ``pos_label`` arguments
-    are required, but ignored.
+    The exposure utility ratio is defined as the exposure of ``y_pred`` divided by the utility of
+    ``y_true``.
 
 
     Parameters
@@ -101,8 +98,6 @@ def exposure_utility_ratio(
         The utility
     y_pred : array_like
         The predicted ranking
-    pos_label : Scalar
-        The label to treat as the 'good' outcome (ignored)
     sample_weight : array_like
         Optional array of sample weights
     """
