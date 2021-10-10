@@ -229,9 +229,9 @@ Due to systemic racism present in the data at the time it was collected,
 Black people may have been more likely to be categorized as "lower status" by the authors' 
 definition.
 Harrison and Rubenfield do not consider this intersectionality in their analysis.
-In an econometric analysis like the analysis demonstrated in the paper,
-intersectionality could be captured via an interaction variable 
-between the two fields. 
+When using a linear model,
+intersectionality could be captured via an interaction variable, which combines 
+the two fields. 
 In the machine learning context, considering each group separately (i.e., 
 considering impacts on *B* and *LSTAT* separately) may obscure harms. 
 Additionally, including only one of these variables in the analysis is not
