@@ -401,7 +401,7 @@ California housing dataset (:func:`sklearn.datasets.fetch_california_housing`)
 or the Ames housing dataset [#6]_ 
 in place of the Boston housing dataset, as using these datasets should not
 cause the same fairness-related harms. 
-We we strongly discourage using the Boston Housing dataset for machine learning 
+We strongly discourage using the Boston Housing dataset for machine learning 
 benchmarking purposes, and hope this article gives 
 you pause about using it in the future.
 
