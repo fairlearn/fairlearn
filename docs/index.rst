@@ -5,8 +5,6 @@ Table of Contents
 
 .. toctree::
    :maxdepth: 1
-   
-   about/index
 
    quickstart
 
@@ -19,3 +17,5 @@ Table of Contents
    contributor_guide/index
 
    FAQ <faq>
+
+   about/index
