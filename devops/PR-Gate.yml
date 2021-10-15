@@ -24,7 +24,7 @@ jobs:
   parameters:
     platforms:  { Windows: vs2017-win2016 }
     installationType: 'PipLocal'
-    pyVersions: [3.6]
+    pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     
