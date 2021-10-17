@@ -21,6 +21,9 @@ class ConditionalLossMoment(LossMoment):
         An upper bound on the loss, also referred to as :math:`\\zeta`;
         `upper_bound` is an optional argument that is not always
         required; default None
+
+        .. versionadded:: 0.5.0
+
     no_groups : bool
         indicates whether to calculate the mean loss or group-level losses,
         default False, i.e., group-level losses are the default behavior
@@ -103,7 +106,12 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
 class MeanLoss(ConditionalLossMoment):
-    """Moment for evaluating the mean loss."""
+    """Moment for evaluating the mean loss.
+
+        .. versionchanged:: 0.5.0
+            Used to be called :code:`AverageLossMoment`
+
+    """
 
     def __init__(self, loss):
         super().__init__(loss, upper_bound=None, no_groups=True)
@@ -113,6 +121,10 @@ class BoundedGroupLoss(ConditionalLossMoment):
     """Moment for constraining the worst-case loss by a group.
 
     For more information refer to the :ref:`user guide <bounded_group_loss>`.
+
+    .. versionchanged:: 0.5.0
+        Used to be called :code:`GroupLossMoment`
+
     """
 
     def __init__(self, loss, *, upper_bound=None):

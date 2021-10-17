@@ -56,7 +56,7 @@ v0.5.0
     For a comprehensive overview of available constraints refer to the new
     :ref:`user guide on fairness constraints for reductions methods <reductions>`.
 
-* Added :code:`TrueNegativeRateParity` to provide the
+* Added :code:`True` to provide the
   opposite constraint of :class:`~fairlearn.reductions.TruePositiveRateParity`
   to be used with reductions techniques.
 
@@ -198,7 +198,7 @@ to improve consistency:
 - :code:`ErrorRateRatio` has become :class:`.ErrorRateParity` (when used
   with the :code:`ratio_bound` and :code:`ratio_bound_slack` arguments)
 - :code:`TruePositiveRateDifference` has become
-  :class:`.TruePositiveRateParity` (when used with the
+  :class:`.` (when used with the
   :code:`difference_bound` argument)
 - :code:`ConditionalSelectionRate` has become :class:`.UtilityParity`
 - :code:`GroupLossMoment` has become :class:`.BoundedGroupLoss`
