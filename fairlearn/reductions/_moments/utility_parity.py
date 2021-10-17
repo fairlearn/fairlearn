@@ -65,6 +65,9 @@ class UtilityParity(ClassificationMoment):
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
+    .. versionchanged:: 0.5.0
+        Used to be called :code:`ConditionalSelectionRate`
+
     Parameters
     ----------
     difference_bound : float
@@ -74,17 +77,27 @@ class UtilityParity(ClassificationMoment):
         If neither `ratio_bound` nor `difference_bound` are set then a default
         difference bound of 0.01 is used for backwards compatibility.
         Default None.
+
+        .. versionadded:: 0.5.0
+
     ratio_bound : float
         The constraints' ratio bound for constraints that are expressed as
         ratios. The specified value needs to be in (0,1].
         If `difference_bound` is used then `ratio_bound` needs to be None.
         Default None.
+
+        .. versionchanged:: 0.5.0
+            Used to be called :code:`ratio`
+
     ratio_bound_slack : float
         The constraints' ratio bound slack for constraints that are
         expressed as ratios, also referred to as :math:`\\epsilon` in
         documentation.
         `ratio_bound_slack` is ignored if `ratio_bound` is not specified.
         Default 0.0
+
+        .. versionadded:: 0.5.0
+
     """
 
     def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
@@ -350,6 +363,11 @@ class TruePositiveRateParity(UtilityParity):
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
+    .. versionadded:: 0.4.6
+
+    .. versionchanged:: 0.5.0
+        Used to be called :code:`TruePositiveRateDifference`
+
     References
     ----------
     .. [5] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
@@ -501,6 +519,9 @@ class ErrorRateParity(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+
+    .. versionchanged:: 0.5.0
+        Used to be called :code:`ErrorRateRatio`
 
     References
     ----------
