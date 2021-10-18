@@ -277,6 +277,8 @@ Base metric                                     :code:`group_min` :code:`group_m
 :func:`.selection_rate`                         .                 .                 Y                  Y
 :func:`.true_negative_rate`                     .                 .                 Y                  Y
 :func:`.true_positive_rate`                     .                 .                 Y                  Y
+:func:`.exposure`                               .                 .                 Y                  Y
+:func:`.utility`                                .                 .                 Y                  Y
 :func:`sklearn.metrics.accuracy_score`          Y                 .                 Y                  Y
 :func:`sklearn.metrics.balanced_accuracy_score` Y                 .                 .                  .
 :func:`sklearn.metrics.f1_score`                Y                 .                 .                  .

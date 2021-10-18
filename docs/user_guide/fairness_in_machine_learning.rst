@@ -194,6 +194,20 @@ group loss primarily seeks to mitigate quality-of-service harms. Equalized
 odds and equal opportunity can be used as a diagnostic for both allocation
 harms as well as quality-of-service harms.
 
+*Ranking*:
+
+Fairlearn considers two constraints for rankings, based on the exposure of X, where exposure
+is defined as how much attention each place in the ranking gets. Calculated by a logarithmic
+discount :math:`\frac{1}{log(1+i)}` for each position :math:`i`.
+
+* *Allocation harm*:  A ranking :math:`\tau` has a fair exposure allocation under
+a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
+independent over sensitive feature :math:`A`.
+
+* *Quality-of-service harm*: A ranking :math:`\tau` satisfies parity in quality-of-service under
+a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
+proportional to :math:`Y`, independent over sensitive feature :math:`A`.
+
 Disparity metrics, group metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
