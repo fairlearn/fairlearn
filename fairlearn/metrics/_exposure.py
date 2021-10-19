@@ -127,7 +127,7 @@ def allocation_harm_in_ranking_difference(
     y_pred : array-like
         Predicted ranking
     sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which the allocation harm should be assessed
     method : str
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
         for details.
@@ -169,7 +169,7 @@ def allocation_harm_in_ranking_ratio(
     y_pred : array-like
         Predicted ranking
     sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which the allocation harm should be assessed
     method : str
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
@@ -209,9 +209,9 @@ def quality_of_service_harm_in_ranking_difference(
     y_true : array-like
         Ground truth (correct) labels.
     y_pred : array-like
-        Predicted labels :math:`h(X)` returned by the classifier.
+        Predicted ranking
     sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which the quality-of-service should be assessed
     method : str
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
         for details.
@@ -253,7 +253,7 @@ def quality_of_service_harm_in_ranking_ratio(
     y_pred : array-like
         Predicted ranking
     sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which the quality-of-service should be assessed
     method : str
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.

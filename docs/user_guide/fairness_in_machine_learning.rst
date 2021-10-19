@@ -202,12 +202,12 @@ discount :math:`\frac{1}{log(1+i)}` for each position :math:`i`, as used in disc
 cumulative gain (DCG).
 
 * *Allocation harm*:  A ranking :math:`\tau` has a fair exposure allocation under
-a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
-independent over sensitive feature :math:`A`. [#6]_
+  a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
+  independent over sensitive feature :math:`A`. [#6]_
 
 * *Quality-of-service harm*: A ranking :math:`\tau` satisfies parity in quality-of-service under
-a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
-proportional to :math:`Y`, independent over sensitive feature :math:`A`. [#6]_
+  a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
+  proportional to :math:`Y`, independent over sensitive feature :math:`A`. [#6]_
 
 Disparity metrics, group metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

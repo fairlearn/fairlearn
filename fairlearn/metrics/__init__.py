@@ -77,7 +77,11 @@ _disparities = [
     "demographic_parity_difference",
     "demographic_parity_ratio",
     "equalized_odds_difference",
-    "equalized_odds_ratio"
+    "equalized_odds_ratio",
+    "allocation_harm_in_ranking_difference",
+    "allocation_harm_in_ranking_ratio",
+    "quality_of_service_harm_in_ranking_difference",
+    "quality_of_service_harm_in_ranking_ratio"
 ]
 
 _extra_metrics = [
@@ -91,13 +95,9 @@ _extra_metrics = [
 ]
 
 _ranking_metrics = [
-    "exposure"
-    "utility"
+    "exposure",
+    "utility",
     "exposure_utility_ratio"
-    "allocation_harm_in_ranking_difference",
-    "allocation_harm_in_ranking_ratio",
-    "quality_of_service_harm_in_ranking_difference",
-    "quality_of_service_harm_in_ranking_ratio"
 ]
 
 __all__ = _core + _disparities + _extra_metrics + _ranking_metrics \
