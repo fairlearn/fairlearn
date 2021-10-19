@@ -198,15 +198,16 @@ harms as well as quality-of-service harms.
 
 Fairlearn considers two constraints for rankings, based on the exposure of X, where exposure
 is defined as how much attention each place in the ranking gets. Calculated by a logarithmic
-discount :math:`\frac{1}{log(1+i)}` for each position :math:`i`.
+discount :math:`\frac{1}{log(1+i)}` for each position :math:`i`, as used in discounted
+cumulative gain (DCG).
 
 * *Allocation harm*:  A ranking :math:`\tau` has a fair exposure allocation under
 a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
-independent over sensitive feature :math:`A`.
+independent over sensitive feature :math:`A`. [#6]_
 
 * *Quality-of-service harm*: A ranking :math:`\tau` satisfies parity in quality-of-service under
 a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
-proportional to :math:`Y`, independent over sensitive feature :math:`A`.
+proportional to :math:`Y`, independent over sensitive feature :math:`A`. [#6]_
 
 Disparity metrics, group metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -435,3 +436,6 @@ the algorithm may impact the intended outcomes of a given model.
 
    .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
       <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
+
+   .. [#6] Singh, Joachims `"Fairness of Exposure in Rankings"
+      <https://dl.acm.org/doi/10.1145/3219819.3220088>`_, KDD, 2018.
