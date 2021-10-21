@@ -12,11 +12,15 @@ class MetricFunctionRequest:
     def __init__(self,
                  *,
                  func: Callable,
-                 args: List[str] = ['y_true', 'y_pred'],
-                 kwargs: Dict[str, str] = dict()):
+                 args: List[str] = None,
+                 kwargs: Dict[str, str] = None):
         self._func = func
-        self._args = args
-        self._kwargs = kwargs
+        self._args = ['y_true', 'y_pred']
+        if args is not None:
+            self._args = args
+        self._kwargs = dict()
+        if kwargs is not None:
+            self._kwargs = kwargs
 
     @property
     def func(self) -> Callable:
@@ -65,8 +69,11 @@ class MFv2:
                  metric_functions: Dict[str, MetricFunctionRequest],
                  data: pd.DataFrame,
                  sensitive_features: List[str],
-                 control_features: List[str] = []
+                 control_features: List[str] = None
                  ):
+        if control_features is None:
+            control_features = []
+
         if len(control_features) == 0:
             self._overall = apply_to_dataframe(data, metric_functions=metric_functions)
         else:
