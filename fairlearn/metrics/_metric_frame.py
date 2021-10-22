@@ -304,6 +304,7 @@ class MetricFrame:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
+        # Prepare the DataFrame
         all_data = pd.DataFrame(dtype='object')
         all_data['y_true'] = y_t
         all_data['y_pred'] = y_p
@@ -350,9 +351,6 @@ class MetricFrame:
             else:
                 self._overall = temp
 
-        # self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
-        # self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
-
         rows = copy.deepcopy(sf_list)
         if cf_list is not None:
             # Prepend the conditional features, so they are 'higher'
@@ -367,51 +365,6 @@ class MetricFrame:
             self._by_group = temp.reindex(index=all_indices)
         else:
             self._by_group = temp
-
-    def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
-        if cf_list is None:
-            result = pd.Series(index=func_dict.keys(), dtype='object')
-            for func_name in func_dict:
-                metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
-                result[func_name] = metric_value
-        else:
-            result = self._compute_dataframe_from_rows(func_dict, y_true, y_pred, cf_list)
-        return result
-
-    def _compute_by_group(self, func_dict, y_true, y_pred, sf_list, cf_list):
-        rows = copy.deepcopy(sf_list)
-        if cf_list is not None:
-            # Prepend the conditional features, so they are 'higher'
-            rows = copy.deepcopy(cf_list) + rows
-
-        return self._compute_dataframe_from_rows(func_dict, y_true, y_pred, rows)
-
-    def _compute_dataframe_from_rows(self, func_dict, y_true, y_pred, rows):
-        if len(rows) == 1:
-            row_index = pd.Index(data=rows[0].classes, name=rows[0].name)
-        else:
-            row_index = pd.MultiIndex.from_product([x.classes for x in rows],
-                                                   names=[x.name for x in rows])
-
-        if len(row_index) > _SUBGROUP_COUNT_WARNING_THRESHOLD:
-            msg = _SUBGROUP_COUNT_WARNING.format(len(row_index))
-            logger.warning(msg)
-
-        result = pd.DataFrame(index=row_index, columns=func_dict.keys())
-        for func_name in func_dict:
-            for row_curr in row_index:
-                mask = None
-                if len(rows) > 1:
-                    mask = self._mask_from_tuple(row_curr, rows)
-                else:
-                    # Have to force row_curr to be an unary tuple
-                    mask = self._mask_from_tuple((row_curr,), rows)
-
-                # Only call the metric function if the mask is non-empty
-                if sum(mask) > 0:
-                    curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
-                    result[func_name][row_curr] = curr_metric
-        return result
 
     @ property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
