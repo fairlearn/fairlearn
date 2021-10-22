@@ -56,6 +56,7 @@ class GroupFeature:
         """Help with the metrics."""
         self._encoder = LabelEncoder()
         self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
+        self._raw_values = feature_vector
 
         self._name = "{0}{1}".format(base_name, index)
         if name is not None:

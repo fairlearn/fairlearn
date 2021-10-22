@@ -292,6 +292,15 @@ class MetricFrame:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
+        all_data = pd.DataFrame()
+        all_data['y_true'] = y_t
+        all_data['y_pred'] = y_p
+        for sf in sf_list:
+            all_data[sf.name] = sf._raw_values
+        if cf_list is not None:
+            for cf in cf_list:
+                all_data[cf.name] = cf._raw_values
+
         # Check for duplicate feature names
         nameset = set()
         namelist = self._sf_names
