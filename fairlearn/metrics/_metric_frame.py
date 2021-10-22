@@ -309,17 +309,17 @@ class MetricFrame:
         all_data['y_true'] = y_t
         all_data['y_pred'] = y_p
         for sf in sf_list:
-            all_data[sf.name] = sf._raw_values
+            all_data[sf.name] = list(sf._raw_values)
         if cf_list is not None:
             for cf in cf_list:
-                all_data[cf.name] = cf._raw_values
+                all_data[cf.name] = list(cf._raw_values)
 
         annotated_funcs = dict()
         for name, fc in func_dict.items():
             kwarg_dict = dict()
             for param_name, param_values in fc.sample_params_.items():
                 col_name = f'{name}_{param_name}'
-                all_data[col_name] = param_values
+                all_data[col_name] = list(param_values)
                 kwarg_dict[param_name] = col_name
             amf = AnnotatedMetricFunction(func=fc._func,
                                           args=['y_true', 'y_pred'],
