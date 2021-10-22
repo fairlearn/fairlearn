@@ -292,7 +292,7 @@ class MetricFrame:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
-        all_data = pd.DataFrame()
+        all_data = pd.DataFrame(dtype='object')
         all_data['y_true'] = y_t
         all_data['y_pred'] = y_p
         for sf in sf_list:
