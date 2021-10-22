@@ -338,11 +338,19 @@ class MetricFrame:
         if self._cf_names is None:
             self._overall = apply_to_dataframe(all_data, metric_functions=annotated_funcs)
         else:
-            self._overall = all_data.groupby(by=self._cf_names).apply(
+            temp = all_data.groupby(by=self._cf_names).apply(
                 apply_to_dataframe, metric_functions=annotated_funcs
             )
+            # If there are multiple control features, might have missing combinations
+            if len(self._cf_names) > 1:
+                all_indices = pd.MultiIndex.from_product([x.classes for x in cf_list],
+                                                         names=[x.name for x in cf_list])
 
-        self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
+                self._overall = temp.reindex(index=all_indices)
+            else:
+                self._overall = temp
+
+        # self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
         self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
