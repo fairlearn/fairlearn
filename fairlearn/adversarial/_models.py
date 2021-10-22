@@ -3,6 +3,7 @@
 
 from ._constants import _IMPORT_ERROR_MESSAGE
 
+
 def getTorchModel():
     try:
         from torch.nn import Module, Linear, Sigmoid, ModuleList
@@ -36,6 +37,7 @@ def getTorchModel():
 
     return FullyConnected
 
+
 def getTensorflowModel():
     try:
         from tensorflow.keras import Model
@@ -66,5 +68,5 @@ def getTensorflowModel():
             for layer in self.layers_:
                 x = layer(x)
             return x
-    
+
     return FullyConnected

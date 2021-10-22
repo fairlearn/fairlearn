@@ -3,15 +3,22 @@
 
 from ._constants import _IMPORT_ERROR_MESSAGE, _KWARG_ERROR_MESSAGE
 from copy import deepcopy
-from numpy import finfo, float32, ndarray
-from sklearn.utils import shuffle as sklearn_shuffle
+from numpy import finfo, float32, ndarray, unique, zeros, argmax, logical_or, arange
+from numpy import all as np_all
+from numpy import sum as np_sum
+from sklearn.utils import check_array, shuffle
 from math import ceil
+from time import time
 
 torch = None
 tf = None
 
+AUTO = "auto"
+BINARY = "binary"
+CATEGORY = "category"
+CONTINUOUS = "numeric"
 
-class AdversarialMitigation():
+class AdversarialMitigationBase():
     r"""Inprocessing algorithm to mitigate biases using PyTorch or Tensorflow.
 
     This algorithm is our implementation of work in `"Mitigating Unwanted Biases with
@@ -23,19 +30,42 @@ class AdversarialMitigation():
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
     predictor using an API that is similar to estimators in `sklearn`.
 
+    To summarize the paper, assume we have data :math:`X, Y, Z`, where we want to
+    predict :math:`Y` from :math:`X` while being fair with respect to :math:`Z`
+    and to some fairness measure. We firstly create predictor and adversary neural
+    networks with learnable weights :math:`W` and :math:`U` respectively. Without
+    considering fairness yet, this typical supervised-learning problem aims to
+    minimize the predictor loss :math:`L_P`. Now, to improve fairness, we not
+    only want to minimize the predictor loss, but we want to decrease the
+    adversary's ability to predict the sensitive features from the predictor's
+    predictions. Suppose the adversary has loss term :math:`L_A, then the paper
+    trains the predictor with gradient:
+
+    .. math::
+        \nabla_W L_P - \text{proj}_{\nabla_W L_A} \nabla_W L_P - \alpha \nabla_W L_A
+
+    In this implementation, we accept :math:`X, Y, Z` as 1d or 2d array-like. We
+    make the important design choice to #TODO
+
 
     Parameters
     ----------
-    environment : str, default = \"torch\"
-        The machine learning library to use. Value must be either
-        \"torch\" or \"tensorflow\" which indicate PyTorch or Tensorflow 2
-        respectively. If none is specified, default is torch, else tensorflow,
-        depending on which is installed.
+    library : str, default = \"auto\"
+        The library to use. Must be one of :code:`\{'torch','tensorflow',
+        'auto'\}` which indicates PyTorch, TensorFlow, or to automatically infer
+        the library from the :code:`predictor_model` and which are installed.
 
-    predictor_model : torch.nn.Module, tensorflow.keras.Model
-        The predictor model to train. If :code:`environment = \"torch\"`, we
-        expect a `torch.nn.Module`. If :code:`environment = \"tensorflow\"`, we
-        expect a `tensorflow.keras.Model`
+    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+        The predictor model to train. If a list of integers
+        :math:`[n_1, n_2, \dots, n_k]` is passed, a fully
+        connected neural network with sigmoidal activation functions is
+        constructed with :math:`k` hidden layers that have :math:`n_i` nodes
+        respectively. If :code:`library` is specified, we cannot pass a model
+        that uses a different library.
+
+    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+        The adversary model to train. Must be the same type as the
+        :code:`predictor_model`.
 
     constraints : str, default = \"demographic_parity\"
         The fairness measure to optimize for. Must be either \"demographic_parity\"
@@ -53,29 +83,37 @@ class AdversarialMitigation():
 
     """
 
-    # TODO binary/continuous?
-    # TODO more variables (also specify dimensionality!)
-
     def __init__(self, *,
-                 environment='any',
+                 library='auto',
                  predictor_model,
-                 constraints='DP',
+                 adversary_model,
+                 predictor_loss='auto',
+                 adversary_loss='auto',
+                 prediction_function='auto',
+                 constraints='demographic_parity',
                  learning_rate=0.01,
                  alpha=0.1,
                  cuda=False
                  ):
         """Initialize Adversarial Mitigation."""
-        self._setup_environment(environment)
-        self._setup_predictor_model(predictor_model)
-        self._setup_constraints(constraints)
-        self._setup(learning_rate)
+        self._init_models(library, predictor_model, adversary_model)
+        self._init_losses(predictor_loss, adversary_loss, prediction_function)
+        self.constraints = constraints,
+        self._init_constraints(constraints)
+        self.learning_rate = learning_rate
         self.alpha = alpha
-        self._setup_cuda(cuda)
+        self._init_cuda(cuda)
+
+        # The design is very data-dependent. Instead of having users specify
+        # every nitty-gritty detail of the data they will pass, we will try to
+        # infer as much detail as possible the first time that data is passed
+        self.setup_with_data_ = False
 
     def fit(self, X, y, *, sensitive_feature,
             epochs=1000,
             batch_size=-1,
-            shuffle=False):
+            shuffle=False,
+            progress_updates=None):
         """
         Fit the model based on the given training data and sensitive features.
 
@@ -99,15 +137,33 @@ class AdversarialMitigation():
 
         shuffle : bool, default = False
             Iff True, shuffle the data after every iteration. Default is False
+        
+        progress_updates # TODO
         """
         X, Y, Z = self._validate_input(X, y, sensitive_feature)
         # TODO decreasing learning rate: not really necessary with adam
         # TODO stopping condition!? If |grad| < eps
+        # TODO can only fit once!!
         if batch_size == -1:
             batch_size = X.shape[0]
         batches = ceil(X.shape[0] / batch_size)
+
+        start_time = time()
+        last_update_time = start_time
         for epoch in range(epochs):
             for batch in range(batches):
+                if progress_updates:
+                    if (time() - last_update_time) > progress_updates:
+                        last_update_time = time()
+                        progress = (epoch/epochs) + (batch/(batches*epochs))
+                        print("|{}>{}| Epoch: {}/{}, Batch: {}{}/{}, ETA: {} sec".format(
+                            "=" * round(20 * progress),
+                            " " * round(20 * (1-progress)),
+                            epoch+1, epochs, 
+                            " " * (len(str(batch+1))-len(str(batches))),
+                            batch+1, batches,
+                            str(round(((last_update_time - start_time) / progress) * (1 - progress), 2))
+                        ))
                 batch_slice = slice(batch * batch_size, min((batch + 1) * batch_size, X.shape[0]))
                 self._train_step(X[batch_slice],
                                  Y[batch_slice],
@@ -123,7 +179,7 @@ class AdversarialMitigation():
             Y = Y[idx].view(Y.size())
             Z = Z[idx].view(Z.size())
         elif self.tensorflow:
-            X, Y, Z = sklearn_shuffle(X, Y, Z)
+            X, Y, Z = shuffle(X, Y, Z)
         return X, Y, Z
 
     def partial_fit(self, X, y, *, sensitive_feature):
@@ -156,15 +212,13 @@ class AdversarialMitigation():
 
         Returns
         -------
-        y_pred : numpy.ndarray
+        y_pred : numpy.ndarray # TODO
             One-dimensional array containing discrete predictions
         """
-        if (not isinstance(X, ndarray)):
-            raise ValueError(_KWARG_ERROR_MESSAGE.format("X", "a numpy array"))
+        if not self._setup_with_data:
+            raise UserWarning("Havent seen data yet")
 
-        # Check dimensionality
-        if (not len(X.shape) == 2):
-            raise ValueError(_KWARG_ERROR_MESSAGE.format("X", "2-dimensional"))
+        X = _check_array(X)
 
         if self.torch:
             self.predictor_model.eval()
@@ -172,18 +226,20 @@ class AdversarialMitigation():
             if self.cuda:
                 X = X.to(self.device)
             with torch.no_grad():
-                y_pred = self.predictor_model(X)
+                Y_pred = self.predictor_model(X)
             if self.cuda:
-                y_pred = y_pred.detach().cpu().numpy()
+                Y_pred = Y_pred.detach().cpu().numpy()
             else:
-                y_pred = y_pred.numpy()
+                Y_pred = Y_pred.numpy()
         elif self.tensorflow:
-            X = X.astype(float32)
             # TODO
+            pass
 
-        y_pred = y_pred.reshape(-1)
-        y_pred = (y_pred >= 0).astype(float)
-        return y_pred
+        assert Y_pred.ndim == 2
+
+        Y_pred = self.prediction_function(Y_pred)
+
+        return Y_pred
 
     def _train_step(self, X, Y, Z):
         """Call the implementation-specific train_step."""
@@ -202,7 +258,7 @@ class AdversarialMitigation():
         self.adversary_optimizer.zero_grad()
 
         Y_hat = self.predictor_model(X)
-        LP = self.predictor_criterion(Y_hat, Y)
+        LP = self.predictor_loss(Y_hat, Y)
         LP.backward(retain_graph=True)  # Check what this does at some point in time
 
         dW_LP = [deepcopy(p.grad) for p in self.predictor_model.parameters()]
@@ -215,7 +271,7 @@ class AdversarialMitigation():
             Y_hat = torch.cat((Y_hat, Y), dim=1)
 
         Z_hat = self.adversary_model(Y_hat)
-        LA = self.adversary_criterion(Z_hat, Z)
+        LA = self.adversary_loss(Z_hat, Z)
         LA.backward()
 
         dW_LA = [p.grad for p in self.predictor_model.parameters()]
@@ -237,14 +293,14 @@ class AdversarialMitigation():
             # training=True is only needed if there are layers with different
             # behavior during training versus inference (e.g. Dropout).
             Y_hat = self.predictor(X, training=True)
-            LP = tf.reduce_mean(self.predictor_criterion(Y_hat, Y))
+            LP = self.predictor_loss(Y_hat, Y)
 
             # For equalized odds
             if self.pass_y:
                 Y_hat = tf.concat((Y_hat, Y), axis=1)
 
             Z_hat = self.adversary(Y_hat)
-            LA = tf.reduce_mean(self.adversary_criterion(Z_hat, Z))
+            LA = self.adversary_loss(Z_hat, Z)
 
         dW_LP = tape.gradient(LP, self.predictor_model.trainable_variables)
         dU_LA = tape.gradient(LA, self.adversary_model.trainable_variables)
@@ -265,25 +321,141 @@ class AdversarialMitigation():
         self.adversary_optimizer.apply_gradients(
             zip(dU_LA, self.adversary_model.trainable_variables))
 
+    def _infer_type(self, Y):
+        if np_all(logical_or(Y == 0, Y == 1)):
+            if Y.shape[1] == 1:
+                return BINARY
+            else:
+                if np_all(np_sum(Y, axis=1) == 1):
+                    return CATEGORY
+                else:
+                    raise ValueError("Cannot infer column")
+        else:
+            return CONTINUOUS
+
+    def _get_loss(self, Y, choice):
+        """Infer loss."""
+        if callable(choice):
+            return choice
+        if choice == AUTO:
+            choice = self._infer_type(Y)
+        if choice == BINARY:
+            if self.torch:
+                return torch.nn.BCEWithLogitsLoss(reduction='mean')
+            else:
+                return tf.losses.BinaryCrossentropy(
+                    from_logits=True, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+        elif choice == CATEGORY:
+            if self.torch:
+                return torch.nn.CrossEntropyLoss(reduction='mean')
+            else:
+                return tf.losses.CategoricalCrossentropy(
+                    from_logits=True, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+        elif choice == CONTINUOUS:
+            if self.torch:
+                return torch.nn.MSELoss(reduction='mean')
+            else:
+                return tf.keras.losses.MeanSquaredError(
+                    reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+        else:
+            raise ValueError("Cant infer loss function")
+
+    def _get_function(self, Y, choice):
+        """Infer prediction function."""
+        if callable(choice):
+            return choice
+        if choice == AUTO:
+            choice = self._infer_type(Y)
+        if choice == BINARY:
+            return lambda pred : (pred >= 0.).astype(float)
+        elif choice == CATEGORY:
+            shape = Y.shape
+            def loss(pred):
+                c = argmax(pred, axis=1)
+                b = zeros(shape, dtype=float)
+                a = arange(shape[0])
+                b[a, c] = 1
+                return b
+            return loss
+        elif choice == CONTINUOUS:
+            return lambda pred : pred
+        else:
+            raise ValueError("Cant infer loss function")
+
+    def _setup_with_data(self, X, Y, Z):
+        """Final setup that is required as soon as the first data is given."""
+        self.setup_with_data_ = True
+
+        # Initialize models if not done yet
+        if not self._initialized_models:
+            if self.torch:
+                from ._models import getTorchModel
+                modelClass = getTorchModel()
+            elif self.tensorflow:
+                from ._models import getTensorflowModel
+                modelClass = getTensorflowModel()
+
+            self.predictor_model = modelClass(
+                list_nodes=[X.shape[1]] + self.predictor_model + [Y.shape[1]])
+
+            adversarial_in = Y.shape[1] * (2 if self.pass_y else 1)
+            self.adversary_model = modelClass(
+                list_nodes=[adversarial_in] + self.adversary_model + [Z.shape[1]])
+
+            self._initialized_models = True
+
+        # Setup losses, if they are set to 'auto'
+        self.predictor_loss = self._get_loss(Y, self.predictor_loss)
+        self.adversary_loss = self._get_loss(Z, self.adversary_loss)
+        self.prediction_function = self._get_function(Y, self.prediction_function)
+
+        # Setup optimizers, because now we definitely have models set up
+        if self.torch:
+            self.predictor_optimizer = torch.optim.Adam(
+                self.predictor_model.parameters(), lr=self.learning_rate)
+            self.adversary_optimizer = torch.optim.Adam(
+                self.adversary_model.parameters(), lr=self.learning_rate)
+        elif self.tensorflow:
+            self.predictor_optimizer = tf.train.AdamOptimizer(self.learning_rate)
+            self.adversary_optimizer = tf.train.AdamOptimizer(self.learning_rate)
+
+        # Use CUDA
+        if self.cuda:
+            self.adversary_model = self.adversary_model.to(self.device)
+            self.predictor_model = self.predictor_model.to(self.device)
+
+    # def _create_loss_fn(self, preprocessor):
+    #     """Create a loss function over vectors using underlying assumptions
+    #     about the distribution types of every dimension."""
+    #     dist_types = unique(preprocessor.distribution_types)
+    #     if dist_types is [FloatEncoder.CONTINUOUS] or dist_types is [FloatEncoder.BINARY]:
+    #         # Vector of a single type (or just a single value!)
+    #         loss = self._loss_helper(dist_types[0])
+    #     elif dist_types is [FloatEncoder.CATEGORY] and preprocessor.nr_original_columns == 1:
+    #         # Single categorical
+    #         loss = self._loss_helper(dist_types[0])
+    #     else:
+    #         # Vector of various types
+    #         fns = [self._loss_helper(dist_type) for dist_type in preprocessor.distribution_types]
+    #         cols = [preprocessor.from_original[i] for i in range(preprocessor.nr_original_columns)]
+
+    #         def loss(A, B):
+    #             return sum(fns[i](A[:, cols[i]], B[:, cols[i]])
+    #                        for i in range(preprocessor.nr_original_columns))
+    #     return loss
+
     def _validate_input(self, X, Y, Z):
         """Validate the input data."""
-        # Check that data are numpy arrays
-        for var, name in [(X, "X"), (Y, "y"), (Z, "sensitive_feature")]:
-            if (not isinstance(var, ndarray)):
-                raise ValueError(_KWARG_ERROR_MESSAGE.format(name, "a numpy array"))
+        if self.setup_with_data_ == False:
+            self._setup_with_data(X, Y, Z)
+
+        X = _check_array(X)
+        Y = _check_array(Y)
+        Z = _check_array(Z)
 
         # Check for equal number of samples
         if not (X.shape[0] == Y.shape[0] and X.shape[0] == Z.shape[0]):
             raise ValueError("Input data has an ambiguous number of rows")
-
-        # Check dimensionality
-        for var, name, dim in [(X, "X", 2), (Y, "y", 1), (Z, "sensitive_feature", 1)]:
-            if (not len(var.shape) == dim):
-                raise ValueError(_KWARG_ERROR_MESSAGE.format(name, str(dim) + "-dimensional"))
-
-        # Reshape to 2-D
-        Y = Y.reshape(-1, 1)
-        Z = Z.reshape(-1, 1)
 
         if self.torch:
             X = torch.from_numpy(X).float()
@@ -293,79 +465,91 @@ class AdversarialMitigation():
                 X = X.to(self.device)
                 Y = Y.to(self.device)
                 Z = Z.to(self.device)
-        elif self.tensorflow:
-            # TODO also y?
-            X = X.astype(float32)
-            Y = Y.astype(float32)
-            Z = Z.astype(float32)
-
-        # TODO Validate Z is binary? Possibly Y continuous?
         return X, Y, Z
 
-    def _setup_environment(self, environment):
-        """Import either PyTorch or Tensorflow."""
+    def _init_models(self, library, predictor_model, adversary_model):
+        """Import either PyTorch or Tensorflow, depending on predictor.
+
+        if library is 'auto', then infer from predictor_model. If predictor_model
+        is a list, then choose torch or tensorflow, depending on which is installed"""
+
+        # The library to use
         self.torch = False
         self.tensorflow = False
-        # If no environment is passed, try to select torch or tensorflow
+
+        # Discover which librarys are available
+        torch_installed = False
+        tf_installed = False
         global torch
         global tf
-        if environment == "any":
-            try:
-                import torch
-                environment = "torch"
-                self.torch = True
-            except ImportError:
-                pass
-            if not (environment == 'torch'):
-                try:
-                    import tensorflow as tf
-                    environment = "tensorflow"
-                    self.tensorflow = True
-                except ImportError:
-                    pass
-        elif environment == 'torch':
-            try:
-                import torch
-            except ImportError:
-                raise RuntimeError(_IMPORT_ERROR_MESSAGE.format('torch'))
+        try:
+            import torch
+            torch_installed = True
+        except ImportError:
+            pass
+        try:
+            import tensorflow as tf
+            tf_installed = True
+        except ImportError:
+            pass
+
+        if (not torch_installed) and (not tf_installed):
+            raise ValueError(_IMPORT_ERROR_MESSAGE.format("one of \\[\'torch\',\'tensorflow\'\\]"))
+
+        # At this point, either tensorflow or torch is installed
+        if library == 'torch':
+            if not torch_installed:
+                raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
             self.torch = True
-        elif environment == 'tensorflow':
-            try:
-                import tensorflow as tf
-            except ImportError:
-                raise RuntimeError(_IMPORT_ERROR_MESSAGE.format('tensorflow'))
+        elif library == 'tensorflow':
+            if not tf_installed:
+                raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
             self.tensorflow = True
+        elif library == 'auto':
+            if isinstance(predictor_model, list):
+                if torch_installed:
+                    self.torch = True
+                elif tf_installed:
+                    self.tensorflow = True
+            elif torch_installed and isinstance(predictor_model, torch.nn.Module):
+                self.torch = True
+            elif tf_installed and isinstance(predictor_model, tf.keras.Model):
+                self.tensorflow = True
 
-        if not (self.torch or self.tensorflow):
-            raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                "environment", "one of \\[\'torch\',\'tensorflow\'\\]"))
+        if (self.torch or self.tensorflow) == False:
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    'predictor_model',
+                    "one of \\[\'list\', \'torch\',\'tensorflow\'\\]"))
 
-    def _setup_predictor_model(self, predictor_model):
-        """Verify the type of predictor matches the environment."""
-        if self.torch:
-            if not isinstance(predictor_model, torch.nn.Module):
+        # At this point, either self.torch or self.tensorflow is selected
+        if isinstance(predictor_model, list):
+            if not isinstance(adversary_model, list):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                    "predictor_model", "a `torch.nn.Module`"
-                ))
+                    "adversary_model", "a list"))
+            self._initialized_models = False
         else:
-            if not isinstance(predictor_model, tf.keras.Model):
-                raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                    "predictor_model", "a `tensorflow.keras.Model`"
-                ))
+            if isinstance(predictor_model, torch.nn.Module):
+                if not isinstance(adversary_model, torch.nn.Module):
+                    raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                        "adversary_model", "\'torch.nn.Module\'"))
+
+            if isinstance(predictor_model, tensorflow.keras.Model):
+                if not isinstance(adversary_model, tensorflow.keras.Model):
+                    raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                        "adversary_model", "\'tensorflow.keras.Model\'"))
+            self._initialized_models = True
+        # Note, if initialized_models == False, the model will still be a list
         self.predictor_model = predictor_model
+        self.adversary_model = adversary_model
 
-    def _setup(self, learning_rate):
-        """Initialize the optimizers depending on which environment is used."""
-        if self.torch:
-            self.predictor_optimizer = torch.optim.Adam(
-                self.predictor_model.parameters(), lr=learning_rate)
-            self.adversary_optimizer = torch.optim.Adam(
-                self.adversary_model.parameters(), lr=learning_rate)
-        elif self.tensorflow:
-            self.predictor_optimizer = tf.train.AdamOptimizer(learning_rate)
-            self.adversary_optimizer = tf.train.AdamOptimizer(learning_rate)
+    def _init_losses(self, predictor_loss, adversary_loss, prediction_function):
+        self.predictor_loss = predictor_loss
+        self.adversary_loss = adversary_loss
+        self.prediction_function = prediction_function
+        # TODO validation of function types?
 
-    def _setup_constraints(self, constraints):
+    def _init_constraints(self, constraints):
         """Verify the constraints and set up the corresponding network structure."""
         if (constraints == "demographic_parity"):
             self.pass_y = False
@@ -373,44 +557,26 @@ class AdversarialMitigation():
             self.pass_y = True
         else:
             raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                "constraints", "one of \\[\'DP\',\'EO\'\\]"))
+                "constraints", "one of \\[\'demographic_parity\',\'equalized_odds\'\\]"))
 
-        y_nodes = 1  # y always 1!
-        adversarial_in = y_nodes * (2 if self.pass_y else 1)
-        z_nodes = 1  # TODO think about multiples sensitive values
-
-        y_binary = True  # TODO continuous case... with MSE loss?
-        z_binary = True
-
-        if self.torch:
-            from ._pytorch_models import FullyConnected
-            self.adversary_model = FullyConnected(adversarial_in, [y_nodes, z_nodes])
-            if y_binary:
-                self.predictor_criterion = torch.nn.BCEWithLogitsLoss()
-            else:
-                pass  # TODO continuous case
-            if z_binary:
-                self.adversary_criterion = torch.nn.BCEWithLogitsLoss()
-            else:
-                pass  # TODO
-        elif self.tensorflow:
-            from ._tensorflow_models import FullyConnected
-            self.adversary_model = FullyConnected(adversarial_in, [y_nodes, z_nodes])
-            if y_binary:
-                self.predictor_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
-            if z_binary:
-                self.adversary_criterion = tf.losses.BinaryCrossentropy(from_logits=True)
-
-    def _setup_cuda(self, cuda):
+    def _init_cuda(self, cuda):
         """Verify whether we can use the GPU and move pytorch model to it."""
-        if (not cuda) or (not self.torch):
+        if (not cuda):
             self.cuda = False
         elif (cuda):
             if (not self.torch):
-                raise ValueError("Can't use cuda with tensorflow")
+                raise ValueError("Cuda can only be used with pytorch")
             if not torch.cuda.is_available():
                 raise ValueError("Cuda is not available")
             self.cuda = True
             self.device = torch.device("cuda:0")
-            self.adversary_model = self.adversary_model.to(self.device)
-            self.predictor_model = self.predictor_model.to(self.device)
+
+def _check_array(X):
+    """Calls :code:`sklearn.utils.check_array` on parameter X with the
+    parameters suited for Adversarial Mitigation."""
+    return check_array(
+        X, accept_sparse=False, accept_large_sparse=False,
+        dtype="numeric", order=None, copy=False, force_all_finite=True,
+        ensure_2d=True, allow_nd=False, ensure_min_samples=1,
+        ensure_min_features=1, estimator=None
+    )
