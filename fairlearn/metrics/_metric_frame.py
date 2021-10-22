@@ -351,7 +351,22 @@ class MetricFrame:
                 self._overall = temp
 
         # self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
-        self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
+        # self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
+
+        rows = copy.deepcopy(sf_list)
+        if cf_list is not None:
+            # Prepend the conditional features, so they are 'higher'
+            rows = copy.deepcopy(cf_list) + rows
+
+        temp = all_data.groupby([x.name for x in rows]).apply(
+            apply_to_dataframe, metric_functions=annotated_funcs)
+        if len(rows) > 1:
+            all_indices = pd.MultiIndex.from_product([x.classes for x in rows],
+                                                     names=[x.name for x in rows])
+
+            self._by_group = temp.reindex(index=all_indices)
+        else:
+            self._by_group = temp
 
     def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
         if cf_list is None:
@@ -398,7 +413,7 @@ class MetricFrame:
                     result[func_name][row_curr] = curr_metric
         return result
 
-    @property
+    @ property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
@@ -437,7 +452,7 @@ class MetricFrame:
         else:
             return self._overall
 
-    @property
+    @ property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the collection of metrics evaluated for each subgroup.
 
@@ -467,7 +482,7 @@ class MetricFrame:
         else:
             return self._by_group
 
-    @property
+    @ property
     def control_levels(self) -> List[str]:
         """Return a list of feature names which are produced by control features.
 
@@ -483,7 +498,7 @@ class MetricFrame:
         """
         return self._cf_names
 
-    @property
+    @ property
     def sensitive_levels(self) -> List[str]:
         """Return a list of the feature names which are produced by sensitive features.
 

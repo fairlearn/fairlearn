@@ -276,9 +276,9 @@ def test_2m_1sf_sample_weights():
         """
         assert len(y_t) == len(y_p)
         assert len(y_t) == len(some_param_name)
-        for i in range(len(y_t)):
-            assert some_param_name[i] == y_t[i] + y_p[i]
-        return sum(some_param_name)
+        assert all(some_param_name == y_t + y_p)
+        assert isinstance(some_param_name, pd.Series)
+        return some_param_name.sum()
 
     def multi_sp(y_t, y_p, some_param_name, some_other):
         """Metric accepting multiple sample parameters.
@@ -291,7 +291,8 @@ def test_2m_1sf_sample_weights():
         assert len(y_t) == len(some_param_name)
         assert len(y_t) == len(some_other)
         assert np.array_equal(some_other, y_t + y_p*some_param_name)
-        return sum(some_other)
+        assert isinstance(some_other, pd.Series)
+        return some_other.sum()
 
     # Give the metrics some unusual names
     m1 = r'! # \ | $'
@@ -303,7 +304,7 @@ def test_2m_1sf_sample_weights():
 
     # Generate some random inputs for multi_sp
     rng = np.random.default_rng(seed=6*9)
-    param1 = rng.random(len(y_t))
+    param1 = rng.integers(low=0, high=100, size=len(y_t))
 
     # Generate the columns of expected values for the two metrics
     sums = y_t + s_w
