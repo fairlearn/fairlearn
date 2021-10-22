@@ -40,6 +40,17 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells.
     "Please remove non-scalar columns from your metric frame or use parameter errors='coerce'."
 
 
+def apply_to_dataframe(
+        data: pd.DataFrame,
+        metric_functions: Dict[str, AnnotatedMetricFunction]) -> pd.Series:
+    """Apply metric functions to a DataFrame."""
+    values = dict()
+    for name, mf in metric_functions.items():
+        values[name] = mf.invoke(data)
+    result = pd.Series(data=values.values(), index=values.keys())
+    return result
+
+
 def _deprecate_metric_frame_init(new_metric_frame_init):
     """Issue deprecation warnings for the `MetricFrame` constructor.
 
@@ -323,6 +334,13 @@ class MetricFrame:
             if name in nameset:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
+
+        if self._cf_names is None:
+            self._overall = apply_to_dataframe(all_data, metric_functions=annotated_funcs)
+        else:
+            self._overall = all_data.groupby(by=self._cf_names).apply(
+                apply_to_dataframe, metric_functions=annotated_funcs
+            )
 
         self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
         self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
