@@ -75,35 +75,3 @@ class FunctionContainer:
     def sample_params_(self) -> Dict[str, np.ndarray]:
         """Return the dictionary of sample parameters (as ndarray)."""
         return self._sample_params
-
-    def generate_sample_params_for_mask(self,
-                                        mask: np.ndarray) -> Dict[str, np.ndarray]:
-        """Return the sample parameters selected by the given mask."""
-        curr_sample_params = dict()
-        for name, value in self.sample_params_.items():
-            curr_sample_params[name] = value[mask]
-        return curr_sample_params
-
-    def evaluate(self,
-                 y_true,
-                 y_pred,
-                 mask: np.ndarray) -> Any:
-        """Evaluate the metric for the given mask and input data.
-
-        The mask will be applied to ``y_true``, ``y_pred`` and
-        the sample parameters.
-        """
-        # Following are internal sanity checks
-        assert isinstance(y_true, np.ndarray)
-        assert isinstance(y_pred, np.ndarray)
-        assert len(y_true) == len(y_pred)
-        assert len(y_true) == len(mask)
-        params = self.generate_sample_params_for_mask(mask)
-
-        return self.func_(y_true[mask], y_pred[mask], **params)
-
-    def evaluate_all(self,
-                     y_true,
-                     y_pred) -> Any:
-        """Evaluate the metric on all data."""
-        return self.func_(y_true, y_pred, **self.sample_params_)
