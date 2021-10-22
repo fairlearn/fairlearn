@@ -70,17 +70,6 @@ class GroupFeature:
                                                          type(feature_vector.name))
                     raise ValueError(msg)
 
-    def get_mask_for_class(self,
-                           target_class: Any) -> np.ndarray:
-        """Fetch a mask array for the given class."""
-        idx = self.classes.index(target_class)
-        return self.get_mask_for_class_index(idx)
-
-    def get_mask_for_class_index(self,
-                                 target_class_index: int) -> np.ndarray:
-        """Fetch a mask array for the given class index."""
-        return (self._encoded == target_class_index)
-
     @property
     def name(self) -> str:
         """Return the name of the feature."""

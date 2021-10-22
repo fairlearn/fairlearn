@@ -15,13 +15,6 @@ expected_classes = ['a', 'b', 'c']
 def common_validations(sf):
     assert np.array_equal(expected_classes, sf.classes)
 
-    mask = sf.get_mask_for_class('a')
-    assert np.array_equal(mask,  [True, False, False, True])
-    mask_b = sf.get_mask_for_class('b')
-    assert np.array_equal(mask_b, [False, True, False, False])
-    mask_c = sf.get_mask_for_class('c')
-    assert np.array_equal(mask_c, [False, False, True, False])
-
 
 def test_list():
     target = metrics._group_feature.GroupFeature("Sens", raw_feature, 0, None)

@@ -117,11 +117,6 @@ class TestTwoFeatures():
             assert result[i].name == expected_names[i]
         assert np.array_equal(result[0].classes, ['a', 'b', 'c'])
         assert np.array_equal(result[1].classes, [5, 6])
-        assert np.array_equal(result[0].get_mask_for_class('a'), [True, True, False, False])
-        assert np.array_equal(result[0].get_mask_for_class('b'), [False, False, True, False])
-        assert np.array_equal(result[0].get_mask_for_class('c'), [False, False, False, True])
-        assert np.array_equal(result[1].get_mask_for_class(5), [True, False, False, True])
-        assert np.array_equal(result[1].get_mask_for_class(6), [False, True, True, False])
 
     def test_nested_list(self):
         a, b, y_true = self._get_raw_data()
