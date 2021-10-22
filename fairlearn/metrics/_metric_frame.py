@@ -13,6 +13,7 @@ from functools import wraps
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
 from ._group_feature import GroupFeature
+from ._annotated_metric_function import AnnotatedMetricFunction
 
 
 logger = logging.getLogger(__name__)
@@ -300,6 +301,18 @@ class MetricFrame:
         if cf_list is not None:
             for cf in cf_list:
                 all_data[cf.name] = cf._raw_values
+
+        annotated_funcs = dict()
+        for name, fc in func_dict.items():
+            kwarg_dict = dict()
+            for param_name, param_values in fc.sample_params_.items():
+                col_name = f'{name}_{param_name}'
+                all_data[col_name] = param_values
+                kwarg_dict[param_name] = col_name
+            amf = AnnotatedMetricFunction(func=fc._func,
+                                          args=['y_true', 'y_pred'],
+                                          kwargs=kwarg_dict)
+            annotated_funcs[name] = amf
 
         # Check for duplicate feature names
         nameset = set()

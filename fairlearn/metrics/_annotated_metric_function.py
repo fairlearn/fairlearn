@@ -6,7 +6,7 @@ from typing import Callable, Dict, List
 import pandas as pd
 
 
-class MetricFunctionRequest:
+class AnnotatedMetricFunction:
     """Wrapper for functions, to give them args and kwargs."""
 
     def __init__(self,
