@@ -33,7 +33,7 @@ Contrary to expectation, the Boston Housing dataset was not developed for econom
 Harrison and Rubenfield (1978)_ 
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
-The authors use a hedonic pricing [#9] 
+The authors use a hedonic pricing [#9]_ 
 approach, which assumes that the price of a good or service can be modeled as a 
 function of features both internal and external to the good or service. 
 The input to this model was a dataset comprising the Boston Standard Metropolitan 
