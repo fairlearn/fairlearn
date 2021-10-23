@@ -29,8 +29,7 @@ This article has the following goals:
 Dataset Origin and Use
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Contrary to expectation, the Boston Housing dataset was not developed for economic purposes.
-Harrison and Rubenfield (1978)_ 
+Harrison and Rubenfield [#1]_ 
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
 The authors use a hedonic pricing [#9]_ 
@@ -45,8 +44,8 @@ The paper sought to estimate the median value of owner-occupied homes (now
 characteristics.
 Further, the authors took the derivative of their housing 
 value equation with respect to nitric oxides concentration 
-to measure the "amount of money households were willing to pay 
-with respect to air pollution levels in their census tracts." 
+to measure the "amount of money households were willing to pay  
+when purchasing a home with respect to air pollution levels in their census tracts." 
 The variables in the dataset were collected in the early 1970s 
 and come from a mixture of surveys, administrative records, and other research
 papers. 
@@ -65,7 +64,7 @@ and for a time was included as one of scikit-learn's and tensorflow's standard t
 (see :func:`tf.keras.datasets.boston_housing`). 
 It has also been the benchmark of choice for many machine learning 
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_ [#2]_ [#3]_ [#4]_.
-In scikit-learn version 1.2, the dataset will be removed.
+`In scikit-learn version 1.2, the dataset will be removed.<https://github.com/scikit-learn/scikit-learn/issues/16155>`_
 
 The dataset contains the following columns:
 
@@ -190,8 +189,8 @@ Again, the authors provide no evidence of a proposed relationship between
 *LSTAT* and *MEDV* and do not sufficiently justify its inclusion 
 in the hedonic pricing model.
 
-Construct validity provides a useful lens through which to analyze the 
-construction of this dataset.
+Construct validity (:ref:`construct_validity`) provides a useful lens through 
+which to analyze the construction of this dataset.
 Construct validity refers to the extent to which a given measurement model
 measures the intended construct in way that is meaningful and useful. 
 In Harrison and Rubenfield's analysis, the measurement model involves 
@@ -215,7 +214,6 @@ with measurements from measurement models in which construct validity has
 been established. 
 However, given the time period in which the paper 
 was published there may have been a dearth of related measurement models.
-For more information on construct validity, refer to :ref:`construct_validity`.
 
 Intersectionality also requires consideration. 
 Intersectionality is defined as the interesection between multiple demographic groups. 
