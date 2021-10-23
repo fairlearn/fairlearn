@@ -17,11 +17,13 @@ The dataset remains in Fairlearn as an example of how systemic racism can occur 
 show the effect of Fairlearn's unfairness assessment and mitigation tools on real, problematic data. 
 
 We also think this dataset provides an interesting case study of how fairness is fundamentally a
-socio-technical issue. 
+socio-technical issue, by exploring how societal biases manifest in data in ways that can't
+simply be fixed with technical mitigation approaches.
 This article has the following goals:
-  * Educate users about the history of the dataset and its fairness-related harms
-  * Show users how fairness-related harms manifest in the data and in downstream modelling tasks
-  * Suggest best practices for dealing with the Boston Housing data and other benchmarking datasets with similar issues
+  * Educate users about the history of the dataset and how the variables were constructed
+  * Show users how socioeconomic inequities are reflected in the data in ways that 
+  can potentially lead to fairness-related harms in downstream modelling tasks
+  * Suggest alternative benchmarking datasets
 
 
 .. _boston_dataset_origin:
@@ -64,7 +66,9 @@ and for a time was included as one of scikit-learn's and tensorflow's standard t
 (see :func:`tf.keras.datasets.boston_housing`). 
 It has also been the benchmark of choice for many machine learning 
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_ [#2]_ [#3]_ [#4]_.
-`In scikit-learn version 1.2, the dataset will be removed.<https://github.com/scikit-learn/scikit-learn/issues/16155>`_
+In 2020, users brought the dataset's fairness issues to the scikit-learn development team 
+(see scikit-learn issue `#16155 <https://github.com/scikit-learn/scikit-learn/issues/16155>`_).
+In scikit-learn version 1.2, the dataset will be removed.
 
 The dataset contains the following columns:
 
@@ -216,15 +220,16 @@ However, given the time period in which the paper
 was published there may have been a dearth of related measurement models.
 
 Intersectionality also requires consideration. 
-Intersectionality is defined as the interesection between multiple demographic groups. 
+Intersectionality is defined as the interesection between multiple demographic groups.[#11]_ 
 The impacts of a technical system on intersectional groups may be different 
 than the impacts experienced by the individual demographic groups (e.g., Black
 people in aggregate and women in aggregate may experience a technical system 
 differently than Black women).
 
-Due to systemic racism present in the data at the time it was collected,
-Black people may have been more likely to be categorized as "lower status" by the authors' 
-definition.
+Due to the effects of discriminatory socioeconomic policies, 
+including housing policies, in effect at the time the article was written, 
+Black people may have been more likely to be categorized as "lower status" 
+by the authors' definition.
 Harrison and Rubenfield do not consider this intersectionality in their analysis.
 When using a linear model,
 intersectionality could be captured via an interaction variable, which combines 
@@ -383,7 +388,7 @@ supervised learning model means that the model's performance is in part due to
 how well it learns and replicates the patterns in this dataset.
 
 The Boston Housing dataset raises the more general issue of whether it's valid to 
-port datasets constructed for one specific use case to different use cases.
+port datasets constructed for one specific use case to different use cases (see :ref:`portability_trap`).
 Using a dataset without considering the context and purposes for which it 
 was created can be risky even if the dataset does not carry the possibility of
 generating fairness-related harms. Any machine learning model 
@@ -435,5 +440,8 @@ you pause about using it in the future.
       Investopedia, 2021.
   
   .. [#10] `"Metropolitan Areas", <https://www.census.gov/history/www/programs/geography/metropolitan_areas.html>`_,
-        United States Census Bureau.     
+        United States Census Bureau.
+  
+  .. [#11] Kinmberlé Crenshaw, Mapping the margins: Intersectionality, identity politics, and violence against women of color, 
+      Stanford Law Review, 1993, 43(6), 1241-1299. 
          
