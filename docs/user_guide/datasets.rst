@@ -91,7 +91,7 @@ MEDV         Median value of owner-occupied homes in $1000’s
 The cells below show basic summary statistics about the data, the data types of the 
 columns, and the number of missing values.
 
-Note that the :func:`fairlearn.datasets.fetch_boston` function warns user by 
+Note that the :func:`fairlearn.datasets.fetch_boston` function warns users by 
 default that the dataset contains fairness issues. 
 
 Setting :code:`warn=False` will turn the warning off. 
