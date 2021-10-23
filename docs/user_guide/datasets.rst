@@ -63,9 +63,8 @@ indexed in the `University of California-Irvine Machine Learning Repository
 Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`_, 
 and for a time was included as one of scikit-learn's and tensorflow's standard toy datasets
 (see :func:`tf.keras.datasets.boston_housing`). 
-It has also been the benchmark of choice for many [#2]_
-machine [#3]_ learning [#4]_ 
-`papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_.
+It has also been the benchmark of choice for many machine learning 
+`papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_ [#2]_ [#3]_ [#4]_.
 In scikit-learn version 1.2, the dataset will be removed.
 
 The dataset contains the following columns:
