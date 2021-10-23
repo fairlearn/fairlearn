@@ -21,7 +21,7 @@ socio-technical issue.
 This article has the following goals:
   * Educate users about the history of the dataset and its fairness-related harms
   * Show users how fairness-related harms manifest in the data and in downstream modelling tasks
-  * Suggest best practices for dealing with the Boston Housing data and alternative benchmarking datasets
+  * Suggest best practices for dealing with the Boston Housing data and other benchmarking datasets with similar issues
 
 
 .. _boston_dataset_origin:
