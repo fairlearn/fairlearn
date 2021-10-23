@@ -14,7 +14,7 @@ However, as the machine learning community has developed awareness about fairnes
 popular benchmarking datasets, the Boston Housing data has been phased out of many libraries. 
 We migrated the dataset to Fairlearn after it was phased out of scikit-learn in June 2020. 
 The dataset remains in Fairlearn as an example of how systemic racism can occur in data and to 
-show the effect of Fairlearn's assessment and pre-/in-/post-processing tools on real, problematic data. 
+show the effect of Fairlearn's unfairness assessment and mitigation tools on real, problematic data. 
 
 We also think this dataset provides an interesting case study of how fairness is fundamentally a
 socio-technical issue. 
