@@ -366,7 +366,7 @@ class MetricFrame:
         else:
             self._by_group = temp
 
-    @ property
+    @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
