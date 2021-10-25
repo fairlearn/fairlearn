@@ -196,16 +196,19 @@ harms as well as quality-of-service harms.
 
 *Ranking*:
 
-Fairlearn considers two constraints for rankings, based on the exposure of X, where exposure
-is defined as how much attention each place in the ranking gets. Calculated by a logarithmic
-discount :math:`\frac{1}{log(1+i)}` for each position :math:`i`, as used in discounted
-cumulative gain (DCG).
+Fairlearn includes two constraints for rankings, based on exposure: a measure for the amount of
+attention an instance is expected to receive, based on their position in the ranking. Exposure is
+computed as a logarithmic discount :math:`\frac{1}{log(1+i)}` for each position :math:`i`, as used
+in discounted cumulative gain (DCG).
 
-* *Allocation harm*:  A ranking :math:`\tau` has a fair exposure allocation under
-  a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
-  independent over sensitive feature :math:`A`. [#6]_
+* *Allocation harm*: We try to allocate the exposure that each item gets fairly across the groups.
+  A ranking :math:`\tau` has a fair exposure allocation under a distribution over :math:`(X,A,Y)`,
+  if its ranking for :math:`\tau(X)` is statistically independent over sensitive feature:math:`A`.
+  [#6]_
 
-* *Quality-of-service harm*: A ranking :math:`\tau` satisfies parity in quality-of-service under
+* *Quality-of-service harm*: We try to keep the exposure that each item gets proportional to its
+  "ground-truth" relevance. Otherwise small differences in relevance can lead to huge differences
+  in exposure. A ranking :math:`\tau` satisfies parity in quality-of-service under
   a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
   proportional to :math:`Y`, independent over sensitive feature :math:`A`. [#6]_
 

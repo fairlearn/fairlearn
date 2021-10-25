@@ -17,7 +17,8 @@ def exposure(y_true,
     """Calculate the exposure allocated to the ranking in y_pred.
 
     Exposure is defined as the average logarithmic discount, where
-    logarithmic discount = 1 / log2 (1 + i) for i in y_pred.
+    logarithmic discount equals :math:`1 / log_2 (1 + i)` for i in y_pred, as used
+    in discounted cumulative gain (DCG).
 
     For consistency with other metric functions, the ``y_true`` argument
     is required, but ignored.
@@ -26,7 +27,7 @@ def exposure(y_true,
     Parameters
     ----------
     y_true : array_like
-        The true ranking (ignored)
+        Ground truth relevance scores. (ignored)
     y_pred : array_like
         The predicted ranking
     sample_weight : array_like
@@ -52,18 +53,21 @@ def utility(y_true,
             y_pred,
             *,
             sample_weight=None) -> float:
-    """Calculate the average utility of the ranking in y_pred.
+    """Calculate the utility of the ranking.
 
     Utility is defined as the average of y_true.
 
-    For consistency with other metric functions, the ``y_pred`` arguments
+    The goal of this metric is to be used in the `exposure_utility_ratio` metric. Where we try
+    to keep the `exposure` proportional to the `utility`.
+
+    For consistency with other metric functions, the ``y_pred`` argument
     is required, but ignored.
 
 
     Parameters
     ----------
     y_true : array_like
-        The utility
+        Ground truth relevance scores.
     y_pred : array_like
         The predicted ranking (ignored)
     sample_weight : array_like
@@ -88,6 +92,19 @@ def exposure_utility_ratio(
         sample_weight=None) -> float:
     """Calculate the exposure utility ratio of the ranking in y_pred.
 
+    Where we use the two metrics:: func:`fairlearn.metrics.exposure` and
+    func:`fairlearn.metrics.utility`.
+
+    Exposure is defined as the average logarithmic discount, where
+    logarithmic discount equals :math:`1 / log_2 (1 + i)` for i in y_pred, as used
+    in discounted cumulative gain (DCG).
+
+    Utility is defined as the average of y_true.
+
+    The goal of this metric is to measure the ratio between `utility` and `exposure`. Since in
+    ranking problems, an often occurring problem is that small differences in utility lead to
+    huge differences in exposure. See `user guide`.
+
     The exposure utility ratio is defined as the exposure of ``y_pred`` divided by the utility of
     ``y_true``.
 
@@ -95,7 +112,7 @@ def exposure_utility_ratio(
     Parameters
     ----------
     y_true : array_like
-        The utility
+        Ground truth relevance scores.
     y_pred : array_like
         The predicted ranking
     sample_weight : array_like
@@ -123,7 +140,7 @@ def allocation_harm_in_ranking_difference(
     Parameters
     ----------
     y_true : array-like
-        Ground truth (correct) labels.
+        Ground truth relevance scores.
     y_pred : array-like
         Predicted ranking
     sensitive_features :
@@ -165,7 +182,7 @@ def allocation_harm_in_ranking_ratio(
     Parameters
     ----------
     y_true : array-like
-        Ground truth (correct) labels.
+        Ground truth relevance scores.
     y_pred : array-like
         Predicted ranking
     sensitive_features :
@@ -207,7 +224,7 @@ def quality_of_service_harm_in_ranking_difference(
     Parameters
     ----------
     y_true : array-like
-        Ground truth (correct) labels.
+        Ground truth relevance scores.
     y_pred : array-like
         Predicted ranking
     sensitive_features :
@@ -249,7 +266,7 @@ def quality_of_service_harm_in_ranking_ratio(
     Parameters
     ----------
     y_true : array-like
-        Ground truth (correct) labels.
+        Ground truth relevance scores.
     y_pred : array-like
         Predicted ranking
     sensitive_features :
