@@ -14,6 +14,7 @@ torch = None
 tf = None
 
 AUTO = "auto"
+CLASSIFICATION = "classification"
 BINARY = "binary"
 CATEGORY = "category"
 CONTINUOUS = "numeric"
@@ -321,24 +322,32 @@ class AdversarialMitigationBase():
         self.adversary_optimizer.apply_gradients(
             zip(dU_LA, self.adversary_model.trainable_variables))
 
-    def _infer_type(self, Y):
-        if np_all(logical_or(Y == 0, Y == 1)):
-            if Y.shape[1] == 1:
-                return BINARY
+    def _infer_type(self, Y, choice):
+        if choice == CLASSIFICATION:
+            if Y.shape[1] == 1: return BINARY
+            elif Y.shape[1] > 1: return CATEGORY
             else:
-                if np_all(np_sum(Y, axis=1) == 1):
-                    return CATEGORY
+                pass
+        elif choice == AUTO:
+            if np_all(logical_or(Y == 0, Y == 1)):
+                if Y.shape[1] == 1:
+                    return BINARY
                 else:
-                    raise ValueError("Cannot infer column")
+                    if np_all(np_sum(Y, axis=1) == 1):
+                        return CATEGORY
+                    else:
+                        raise ValueError("Cannot infer column")
+            else:
+                return CONTINUOUS
         else:
-            return CONTINUOUS
+            pass
 
     def _get_loss(self, Y, choice):
         """Infer loss."""
         if callable(choice):
             return choice
-        if choice == AUTO:
-            choice = self._infer_type(Y)
+        if choice == AUTO or choice == CLASSIFICATION:
+            choice = self._infer_type(Y, choice)
         if choice == BINARY:
             if self.torch:
                 return torch.nn.BCEWithLogitsLoss(reduction='mean')
@@ -364,8 +373,8 @@ class AdversarialMitigationBase():
         """Infer prediction function."""
         if callable(choice):
             return choice
-        if choice == AUTO:
-            choice = self._infer_type(Y)
+        if choice == AUTO or choice == CLASSIFICATION:
+            choice = self._infer_type(Y, choice)
         if choice == BINARY:
             return lambda pred : (pred >= 0.).astype(float)
         elif choice == CATEGORY:
@@ -580,3 +589,15 @@ def _check_array(X):
         ensure_2d=True, allow_nd=False, ensure_min_samples=1,
         ensure_min_features=1, estimator=None
     )
+
+class AdversarialClassifier(AdversarialMitigationBase):
+    def __init__(self, **kwargs):
+        kwargs['predictor_loss'] = CLASSIFICATION
+        kwargs['predictor_function'] = CLASSIFICATION
+        super(AdversarialClassifier, self).__init__(**kwargs)
+
+class AdversarialRegressor(AdversarialMitigationBase):
+    def __init__(self, *args, **kwargs):
+        print(args)
+        kwargs['predictor_loss'] = CONTINUOUS
+        super(AdversarialRegressor, self).__init__(*args, **kwargs)
