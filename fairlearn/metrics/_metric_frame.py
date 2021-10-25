@@ -405,7 +405,7 @@ class MetricFrame:
         else:
             return self._overall
 
-    @ property
+    @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the collection of metrics evaluated for each subgroup.
 
@@ -435,7 +435,7 @@ class MetricFrame:
         else:
             return self._by_group
 
-    @ property
+    @property
     def control_levels(self) -> List[str]:
         """Return a list of feature names which are produced by control features.
 
@@ -451,7 +451,7 @@ class MetricFrame:
         """
         return self._cf_names
 
-    @ property
+    @property
     def sensitive_levels(self) -> List[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
