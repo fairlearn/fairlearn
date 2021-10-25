@@ -45,8 +45,8 @@ def apply_to_dataframe(
         metric_functions: Dict[str, AnnotatedMetricFunction]) -> pd.Series:
     """Apply metric functions to a DataFrame."""
     values = dict()
-    for name, mf in metric_functions.items():
-        values[name] = mf.invoke(data)
+    for function_name, metric_function in metric_functions.items():
+        values[function_name] = metric_function.invoke(data)
     result = pd.Series(data=values.values(), index=values.keys())
     return result
 
