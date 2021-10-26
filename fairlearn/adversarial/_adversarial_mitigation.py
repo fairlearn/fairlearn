@@ -233,7 +233,7 @@ class AdversarialMitigationBase():
             else:
                 Y_pred = Y_pred.numpy()
         elif self.tensorflow:
-            # TODO
+            Y_pred = self.predictor_model(X, training=False)
             pass
 
         assert Y_pred.ndim == 2
