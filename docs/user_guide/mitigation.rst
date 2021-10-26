@@ -45,15 +45,14 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✔
       - ✘
-   *  - :class:`~fairlearn.adversarial.AdversarialMitigation`
+   *  - :class:`~fairlearn.adversarial.AdversarialMitigationBase`
       - Inprocessing algorithm based on the paper *Mitigating Unwanted Biases*
-        *with Adversarial Learning* [#4]_. This algorithm takes as input two
-        models, a predictor and an adversarial, defined either as a `PyTorch module
+        *with Adversarial Learning* [#4]_. This algorithm uses a predictor and an adversarial neural network, defined either as a `PyTorch module
         <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
         `Tensorflow2 model 
-        <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_.
+        <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. Must have transformed data to 2d :class:`numpy.ndarray` of type :class:`float`.
       - ✔
-      - ✘
+      - ✔
       - DP, EO
 
 DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
