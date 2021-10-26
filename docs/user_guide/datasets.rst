@@ -140,7 +140,7 @@ Dataset Issues
 While the dataset is widely used, it has significant ethical issues.
 
 As explained in :func:`sklearn.datasets.load_boston`, 
-Harrison and Rubenfield developed the feature *B* (proportion of population that is Black) 
+Harrison and Rubenfield developed the feature *B* (result of the formula *1000(B_k - 0.63)^2k*) 
 under the assumption that racial self-segregation had a positive impact on house prices. 
 *B* then encodes systemic racism as a factor in house pricing. 
 Thus, any models trained using this data that do not take special care to process *B* 
