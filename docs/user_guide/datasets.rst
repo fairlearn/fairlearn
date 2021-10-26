@@ -67,7 +67,7 @@ and for a time was included as one of scikit-learn's and tensorflow's standard t
 It has also been the benchmark of choice for many machine learning 
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_ [#2]_ [#3]_ [#4]_.
 In 2020, users brought the dataset's fairness issues to the scikit-learn development team 
-(see scikit-learn issue `#16155 <https://github.com/scikit-learn/scikit-learn/issues/16155>`_).
+(see scikit-learn issue `#16155 <https://github.com/scikit-learn/scikit-learn/issues/16155>`_), after which the team decided to remove the dataset in scikit-learn version 1.2.
 In scikit-learn version 1.2, the dataset will be removed.
 
 The dataset contains the following columns:
