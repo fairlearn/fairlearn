@@ -98,6 +98,13 @@ class AdversarialMitigationBase():
                  ):
         """Initialize Adversarial Mitigation."""
         self._init_models(library, predictor_model, adversary_model)
+
+        # Inherit library-specific code
+        if self.torch:
+            self._extend_instance(AdversarialPytorchMixin)
+        elif self.tensorflow:
+            self._extend_instance(AdversarialTensorflowMixin)
+
         self._init_losses(predictor_loss, adversary_loss, prediction_function)
         self.constraints = constraints,
         self._init_constraints(constraints)
@@ -174,13 +181,7 @@ class AdversarialMitigationBase():
 
     def _shuffle(self, X, Y, Z):
         """Shuffle the rows of X, Y, Z."""
-        if self.torch:
-            idx = torch.randperm(X.shape[0])
-            X = X[idx].view(X.size())
-            Y = Y[idx].view(Y.size())
-            Z = Z[idx].view(Z.size())
-        elif self.tensorflow:
-            X, Y, Z = shuffle(X, Y, Z)
+        X, Y, Z = shuffle(X, Y, Z)
         return X, Y, Z
 
     def partial_fit(self, X, y, *, sensitive_feature):
@@ -213,114 +214,22 @@ class AdversarialMitigationBase():
 
         Returns
         -------
-        y_pred : numpy.ndarray # TODO
-            One-dimensional array containing discrete predictions
+        Y_pred : numpy.ndarray
+            Two-dimensional array containing the model predictions fed through
+            the :code:`prediction_function`
         """
         if not self._setup_with_data:
             raise UserWarning("Havent seen data yet")
 
         X = _check_array(X)
 
-        if self.torch:
-            self.predictor_model.eval()
-            X = torch.from_numpy(X).float()
-            if self.cuda:
-                X = X.to(self.device)
-            with torch.no_grad():
-                Y_pred = self.predictor_model(X)
-            if self.cuda:
-                Y_pred = Y_pred.detach().cpu().numpy()
-            else:
-                Y_pred = Y_pred.numpy()
-        elif self.tensorflow:
-            Y_pred = self.predictor_model(X, training=False)
-            pass
+        Y_pred = self._evaluate(X)
 
         assert Y_pred.ndim == 2
 
         Y_pred = self.prediction_function(Y_pred)
 
         return Y_pred
-
-    def _train_step(self, X, Y, Z):
-        """Call the implementation-specific train_step."""
-        if self.torch:
-            self._train_step_torch(X, Y, Z)
-        elif self.tensorflow:
-            self._train_step_tensorflow(X, Y, Z)
-
-    def _train_step_torch(self, X, Y, Z):
-        """Perform one training step over data in pytorch model."""
-        self.predictor_model.train()
-        self.adversary_model.train()
-
-        # Clear gradient
-        self.predictor_optimizer.zero_grad()
-        self.adversary_optimizer.zero_grad()
-
-        Y_hat = self.predictor_model(X)
-        LP = self.predictor_loss(Y_hat, Y)
-        LP.backward(retain_graph=True)  # Check what this does at some point in time
-
-        dW_LP = [deepcopy(p.grad) for p in self.predictor_model.parameters()]
-
-        self.predictor_optimizer.zero_grad()
-        self.adversary_optimizer.zero_grad()
-
-        # For equalized odds
-        if self.pass_y:
-            Y_hat = torch.cat((Y_hat, Y), dim=1)
-
-        Z_hat = self.adversary_model(Y_hat)
-        LA = self.adversary_loss(Z_hat, Z)
-        LA.backward()
-
-        dW_LA = [p.grad for p in self.predictor_model.parameters()]
-
-        for i, p in enumerate(self.predictor_model.parameters()):
-            # Normalize dW_LA
-            unit_dW_LA = dW_LA[i] / (torch.norm(dW_LA[i]) + torch.finfo(float).tiny)
-            # Project
-            proj = torch.sum(torch.inner(dW_LP[i], unit_dW_LA))
-            # Calculate dW
-            p.grad = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
-
-        self.predictor_optimizer.step()
-        self.adversary_optimizer.step()
-
-    def _train_step_tensorflow(self, X, Y, Z):
-        """Perform one training step over data in tensorflow model."""
-        with tf.GradientTape(persistent=True) as tape:
-            # training=True is only needed if there are layers with different
-            # behavior during training versus inference (e.g. Dropout).
-            Y_hat = self.predictor(X, training=True)
-            LP = self.predictor_loss(Y_hat, Y)
-
-            # For equalized odds
-            if self.pass_y:
-                Y_hat = tf.concat((Y_hat, Y), axis=1)
-
-            Z_hat = self.adversary(Y_hat)
-            LA = self.adversary_loss(Z_hat, Z)
-
-        dW_LP = tape.gradient(LP, self.predictor_model.trainable_variables)
-        dU_LA = tape.gradient(LA, self.adversary_model.trainable_variables)
-        dW_LA = tape.gradient(LA, self.predictor_model.trainable_variables)
-
-        del tape  # Because persistent=True !
-
-        for i in range(len(dW_LP)):
-            # Normalize dW_LA
-            unit_dW_LA = dW_LA[i] / (tf.norm(dW_LA[i]) + finfo(float32).tiny)
-            # Project
-            proj = tf.reduce_sum(tf.multiply(dW_LP[i], unit_dW_LA))
-            # Calculate dW
-            dW_LP[i] = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
-
-        self.predictor_optimizer.apply_gradients(
-            zip(dW_LP, self.predictor_model.trainable_variables))
-        self.adversary_optimizer.apply_gradients(
-            zip(dU_LA, self.adversary_model.trainable_variables))
 
     def _infer_type(self, Y, choice):
         if choice == CLASSIFICATION:
@@ -433,26 +342,6 @@ class AdversarialMitigationBase():
             self.adversary_model = self.adversary_model.to(self.device)
             self.predictor_model = self.predictor_model.to(self.device)
 
-    # def _create_loss_fn(self, preprocessor):
-    #     """Create a loss function over vectors using underlying assumptions
-    #     about the distribution types of every dimension."""
-    #     dist_types = unique(preprocessor.distribution_types)
-    #     if dist_types is [FloatEncoder.CONTINUOUS] or dist_types is [FloatEncoder.BINARY]:
-    #         # Vector of a single type (or just a single value!)
-    #         loss = self._loss_helper(dist_types[0])
-    #     elif dist_types is [FloatEncoder.CATEGORY] and preprocessor.nr_original_columns == 1:
-    #         # Single categorical
-    #         loss = self._loss_helper(dist_types[0])
-    #     else:
-    #         # Vector of various types
-    #         fns = [self._loss_helper(dist_type) for dist_type in preprocessor.distribution_types]
-    #         cols = [preprocessor.from_original[i] for i in range(preprocessor.nr_original_columns)]
-
-    #         def loss(A, B):
-    #             return sum(fns[i](A[:, cols[i]], B[:, cols[i]])
-    #                        for i in range(preprocessor.nr_original_columns))
-    #     return loss
-
     def _validate_input(self, X, Y, Z):
         """Validate the input data."""
         if self.setup_with_data_ == False:
@@ -466,14 +355,6 @@ class AdversarialMitigationBase():
         if not (X.shape[0] == Y.shape[0] and X.shape[0] == Z.shape[0]):
             raise ValueError("Input data has an ambiguous number of rows")
 
-        if self.torch:
-            X = torch.from_numpy(X).float()
-            Y = torch.from_numpy(Y).float()
-            Z = torch.from_numpy(Z).float()
-            if self.cuda:
-                X = X.to(self.device)
-                Y = Y.to(self.device)
-                Z = Z.to(self.device)
         return X, Y, Z
 
     def _init_models(self, library, predictor_model, adversary_model):
@@ -579,6 +460,12 @@ class AdversarialMitigationBase():
                 raise ValueError("Cuda is not available")
             self.cuda = True
             self.device = torch.device("cuda:0")
+    
+    def _extend_instance(self, cls_):
+        """Apply mixins to a class instance after creation."""
+        base_cls = self.__class__
+        base_cls_name = self.__class__.__name__
+        self.__class__ = type(base_cls_name, (cls_, base_cls),{})
 
 def _check_array(X):
     """Calls :code:`sklearn.utils.check_array` on parameter X with the
@@ -589,6 +476,133 @@ def _check_array(X):
         ensure_2d=True, allow_nd=False, ensure_min_samples=1,
         ensure_min_features=1, estimator=None
     )
+
+class AdversarialMixin():
+    """The interface of a mixin class."""
+    def _evaluate(self, X: ndarray) -> ndarray:
+        """Feed 2d :class:`numpy.ndarray` through model and receive output as
+        2d :class:`numpy.ndarray`."""
+        pass
+
+    def _train_step(self, X: ndarray, Y: ndarray, Z: ndarray) -> ndarray:
+        """Perform one training step over data."""
+        pass
+
+class AdversarialPytorchMixin(AdversarialMixin):
+    def _shuffle(self, X, Y, Z):
+        """Overrides base's _shuffle, as PyTorch tensors are not compatible
+        with sklearn's shuffle."""
+        idx = torch.randperm(X.shape[0])
+        X = X[idx].view(X.size())
+        Y = Y[idx].view(Y.size())
+        Z = Z[idx].view(Z.size())
+        return X, Y, Z
+    
+    def _evaluate(self, X):
+        self.predictor_model.eval()
+        X = torch.from_numpy(X).float()
+        if self.cuda:
+            X = X.to(self.device)
+        with torch.no_grad():
+            Y_pred = self.predictor_model(X)
+        if self.cuda:
+            Y_pred = Y_pred.detach().cpu().numpy()
+        else:
+            Y_pred = Y_pred.numpy()
+        return Y_pred
+
+    def _train_step(self, X, Y, Z):
+        """Perform one training step over data in pytorch model."""
+        self.predictor_model.train()
+        self.adversary_model.train()
+
+        # Clear gradient
+        self.predictor_optimizer.zero_grad()
+        self.adversary_optimizer.zero_grad()
+
+        Y_hat = self.predictor_model(X)
+        LP = self.predictor_loss(Y_hat, Y)
+        LP.backward(retain_graph=True)  # Check what this does at some point in time
+
+        dW_LP = [deepcopy(p.grad) for p in self.predictor_model.parameters()]
+
+        self.predictor_optimizer.zero_grad()
+        self.adversary_optimizer.zero_grad()
+
+        # For equalized odds
+        if self.pass_y:
+            Y_hat = torch.cat((Y_hat, Y), dim=1)
+
+        Z_hat = self.adversary_model(Y_hat)
+        LA = self.adversary_loss(Z_hat, Z)
+        LA.backward()
+
+        dW_LA = [p.grad for p in self.predictor_model.parameters()]
+
+        for i, p in enumerate(self.predictor_model.parameters()):
+            # Normalize dW_LA
+            unit_dW_LA = dW_LA[i] / (torch.norm(dW_LA[i]) + torch.finfo(float).tiny)
+            # Project
+            proj = torch.sum(torch.inner(dW_LP[i], unit_dW_LA))
+            # Calculate dW
+            p.grad = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
+
+        self.predictor_optimizer.step()
+        self.adversary_optimizer.step()
+    
+    def _validate_input(self, X, Y, Z):
+        """Validate the input data."""
+        X, Y, Z = super(AdversarialPytorchMixin, self)._validate_input(X, Y, Z)
+
+        X = torch.from_numpy(X).float()
+        Y = torch.from_numpy(Y).float()
+        Z = torch.from_numpy(Z).float()
+
+        if self.cuda:
+            X = X.to(self.device)
+            Y = Y.to(self.device)
+            Z = Z.to(self.device)
+
+        return X, Y, Z
+
+class AdversarialTensorflowMixin(AdversarialMixin):
+    def _evaluate(self, X):
+        Y_pred = self.predictor_model(X, training=False)
+        return Y_pred
+
+    def _train_step(self, X, Y, Z):
+        """Perform one training step over data in tensorflow model."""
+        with tf.GradientTape(persistent=True) as tape:
+            # training=True is only needed if there are layers with different
+            # behavior during training versus inference (e.g. Dropout).
+            Y_hat = self.predictor(X, training=True)
+            LP = self.predictor_loss(Y_hat, Y)
+
+            # For equalized odds
+            if self.pass_y:
+                Y_hat = tf.concat((Y_hat, Y), axis=1)
+
+            Z_hat = self.adversary(Y_hat)
+            LA = self.adversary_loss(Z_hat, Z)
+
+        dW_LP = tape.gradient(LP, self.predictor_model.trainable_variables)
+        dU_LA = tape.gradient(LA, self.adversary_model.trainable_variables)
+        dW_LA = tape.gradient(LA, self.predictor_model.trainable_variables)
+
+        del tape  # Because persistent=True !
+
+        for i in range(len(dW_LP)):
+            # Normalize dW_LA
+            unit_dW_LA = dW_LA[i] / (tf.norm(dW_LA[i]) + finfo(float32).tiny)
+            # Project
+            proj = tf.reduce_sum(tf.multiply(dW_LP[i], unit_dW_LA))
+            # Calculate dW
+            dW_LP[i] = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
+
+        self.predictor_optimizer.apply_gradients(
+            zip(dW_LP, self.predictor_model.trainable_variables))
+        self.adversary_optimizer.apply_gradients(
+            zip(dU_LA, self.adversary_model.trainable_variables))
 
 class AdversarialClassifier(AdversarialMitigationBase):
     def __init__(self, **kwargs):
