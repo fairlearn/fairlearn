@@ -17,8 +17,8 @@ The dataset remains in Fairlearn as an example of how systemic racism can occur 
 show the effect of Fairlearn's unfairness assessment and mitigation tools on real, problematic data. 
 
 We also think this dataset provides an interesting case study of how fairness is fundamentally a
-socio-technical issue, by exploring how societal biases manifest in data in ways that can't
-simply be fixed with technical mitigation approaches.
+socio-technical issue by exploring how societal biases manifest in data in ways that can't
+simply be fixed with technical mitigation approaches (although the harms they engender may be mitigated).
 This article has the following goals:
   * Educate users about the history of the dataset and how the variables were constructed
   * Show users how socioeconomic inequities are reflected in the data in ways that 
