@@ -13,7 +13,8 @@ from fairlearn.metrics import MetricFrame
 # %%
 # This notebook shows how to apply functionalities of :mod:`fairlearn.metrics` to ranking problems.
 # We showcase the example "Fairly Allocating Economic Opportunity" from the paper
-# "Fairness of Exposure in Ranking" by Singh and Joachims (2018).
+# `"Fairness of Exposure in Ranking" <https://dl.acm.org/doi/10.1145/3219819.3220088>`_
+# by Singh and Joachims (2018).
 # The example demonstrates how small differences in item relevance can lead to large differences
 # in exposure. Differences in exposure can be harmful not only because you are ranking individuals
 # directly but individuals can also be indirect affected by a ranking, think about books, music or
@@ -51,7 +52,7 @@ y_true = [0.82, 0.81, 0.80, 0.79, 0.78, 0.77]
 #   items, based on their position in the ranking. Exposure is the value that we assign to every
 #   place in the ranking, calculated by a
 #   standard exposure drop-off of :math:`1/log_2(1+j)` as used in Discounted Cumulative Gain
-#   :ref:`(DCG) <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.dcg_score.html>`
+#   (`DCG <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.dcg_score.html>`_)
 #   , to account for position bias. If there are big differences in exposure this could be an
 #   indication of allocation harm, i.e. males are on average ranked way higher than females by the
 #   web-service.
@@ -59,10 +60,10 @@ y_true = [0.82, 0.81, 0.80, 0.79, 0.78, 0.77]
 # - The :func:`fairlearn.metrics.utility` metric indicates the average "ground-truth" relevance of
 #   a group.
 #
-# - The :func:`exposure_utility_ratio` metric computes the average exposure of a group, divided by
-#   its utility (i.e., average relevance). Differences between groups indicate that the exposure of
-#   some groups is not proportional to their ground-truth utility, which can be seen as a measure
-#   of quality-of-service harm.
+# - The :func:`fairlearn.metrics.exposure_utility_ratio` metric computes the average exposure of a
+#   group, divided by its utility (i.e., average relevance). Differences between groups indicate
+#   that the exposure of some groups is not proportional to their ground-truth utility, which can
+#   be seen as a measure of quality-of-service harm.
 #
 # We can compare ranking metrics across groups using :class:`fairlearn.metrics.MetricFrame`.
 
@@ -88,7 +89,7 @@ mf.by_group.plot(
 
 # %%
 # We can compute the minimum ratio between groups using
-# :meth:`MetricFrame.ratio(method='between_groups')`. The closer the ratio is to 1 the more fair
+# :func:`fairlearn.metrics.MetricFrame.ratio`. The closer the ratio is to 1 the more fair
 # the ranking is.
 mf.ratio()
 
