@@ -7,7 +7,7 @@ Ranking
 =========================================
 """
 
-from fairlearn.metrics import exposure, utility, exposure_utility_ratio
+from fairlearn.metrics import exposure, utility, proportional_exposure
 from fairlearn.metrics import MetricFrame
 
 # %%
@@ -30,8 +30,8 @@ from fairlearn.metrics import MetricFrame
 # In this setting a relevance of 0.75 is defined as, 75% of all employers issuing the query
 # considered the applicant relevant.
 #
-# The Probability Ranking Principle suggests to rank the applicants in decreasing order of
-# relevance. What does this mean for the exposure between the two groups?
+# A simple way to rank the participants is in decreasing order of relevance. What does this mean
+# for the exposure between the two groups?
 #
 # NOTE: The used data should raise questions about
 # :ref:`construct validity <fairness_in_machine_learning.construct-validity>` , since we
@@ -60,7 +60,7 @@ y_true = [0.82, 0.81, 0.80, 0.79, 0.78, 0.77]
 # - The :func:`fairlearn.metrics.utility` metric indicates the average "ground-truth" relevance of
 #   a group.
 #
-# - The :func:`fairlearn.metrics.exposure_utility_ratio` metric computes the average exposure of a
+# - The :func:`fairlearn.metrics.proportional_exposure` metric computes the average exposure of a
 #   group, divided by its utility (i.e., average relevance). Differences between groups indicate
 #   that the exposure of some groups is not proportional to their ground-truth utility, which can
 #   be seen as a measure of quality-of-service harm.
@@ -70,7 +70,7 @@ y_true = [0.82, 0.81, 0.80, 0.79, 0.78, 0.77]
 metrics = {
     'exposure (allocation harm)': exposure,
     'average utility': utility,
-    'exposure/utility (quality-of-service)': exposure_utility_ratio
+    'proportional exposure (quality-of-service)': proportional_exposure
 }
 
 mf = MetricFrame(metrics=metrics,
@@ -97,7 +97,7 @@ mf.ratio()
 # The first plot shows that the web-service that men get significantly more exposure than women.
 # Although the second plot shows that the average utility of women is comparable to men.
 # Therefor we can say that the ranking contains quality-of-service harm against women, since the
-# exposure/utility ratio is not equal (plot 3)
+# proportional exposure is not equal (plot 3)
 
 # %%
 # How can we fix this? A simple solution is to rerank the items, in such a way that females get
@@ -113,7 +113,7 @@ y_true = [0.79, 0.81, 0.80, 0.82, 0.78, 0.77]  # Continuous relevance score
 metrics = {
     'exposure (allocation harm)': exposure,
     'average utility': utility,
-    'exposure/utility (quality_of_service)': exposure_utility_ratio
+    'proportional exposure (quality-of-service)': proportional_exposure
 }
 
 mf = MetricFrame(metrics=metrics,
@@ -133,6 +133,11 @@ mf.by_group.plot(
 mf.ratio()
 
 # %%
-# The new plots show that the exposure and exposure/utility ratio are now much more equal. The
+# The new plots show that the exposure and proportional exposure are now much more equal. The
 # difference in exposure allocation is much smaller and the quality-of-service is better
 # in proportion to the group's average utility.
+#
+# This was a simple example using fabricated data, just to show what the exposure metrics are
+# capable of measuring. Manually switching of people in a ranking is however not recommendable with
+# real world larger data sets. There we would recommend mitigation techniques, that are
+# unfortunately not yet implemented in Fairlearn.

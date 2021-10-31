@@ -51,11 +51,11 @@ from ._extra_metrics import (  # noqa: F401
 from ._exposure import (  # noqa: F401
     exposure,
     utility,
-    exposure_utility_ratio,
-    allocation_harm_in_ranking_difference,
-    allocation_harm_in_ranking_ratio,
-    quality_of_service_harm_in_ranking_difference,
-    quality_of_service_harm_in_ranking_ratio
+    proportional_exposure,
+    exposure_difference,
+    exposure_ratio,
+    proportional_exposure_difference,
+    proportional_exposure_ratio
 )
 
 
@@ -81,7 +81,11 @@ _disparities = [
     "allocation_harm_in_ranking_difference",
     "allocation_harm_in_ranking_ratio",
     "quality_of_service_harm_in_ranking_difference",
-    "quality_of_service_harm_in_ranking_ratio"
+    "quality_of_service_harm_in_ranking_ratio",
+    "exposure_difference",
+    "exposure_ratio",
+    "proportional_exposure_difference",
+    "proportional_exposure_ratio"
 ]
 
 _extra_metrics = [
@@ -97,7 +101,7 @@ _extra_metrics = [
 _ranking_metrics = [
     "exposure",
     "utility",
-    "exposure_utility_ratio"
+    "proportional_exposure"
 ]
 
 __all__ = _core + _disparities + _extra_metrics + _ranking_metrics \

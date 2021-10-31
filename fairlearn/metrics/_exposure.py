@@ -85,12 +85,12 @@ def utility(y_true,
     return np.dot(u, s_w).sum() / len(u)
 
 
-def exposure_utility_ratio(
+def proportional_exposure(
         y_true,
         y_pred,
         *,
         sample_weight=None) -> float:
-    """Calculate the exposure utility ratio of the ranking in y_pred.
+    """Calculate the proportional exposure of the ranking in y_pred.
 
     Where we use the two metrics:: func:`fairlearn.metrics.exposure` and
     func:`fairlearn.metrics.utility`.
@@ -101,11 +101,11 @@ def exposure_utility_ratio(
 
     Utility is defined as the average of y_true.
 
-    The goal of this metric is to measure the ratio between `utility` and `exposure`. Since in
-    ranking problems, an often occurring problem is that small differences in utility lead to
+    The goal of this metric is to keep `utility` and `exposure` proportional to each other. Since
+    in ranking problems, an often occurring problem is that small differences in utility lead to
     huge differences in exposure. See `user guide`.
 
-    The exposure utility ratio is defined as the exposure of ``y_pred`` divided by the utility of
+    The proportional exposure is defined as the exposure of ``y_pred`` divided by the utility of
     ``y_true``.
 
 
@@ -123,18 +123,19 @@ def exposure_utility_ratio(
     return e / u
 
 
-def allocation_harm_in_ranking_difference(
+def exposure_difference(
         y_true,
         y_pred,
         *,
         sensitive_features,
         method='between_groups',
         sample_weight=None) -> float:
-    """Calculate the difference in exposure allocation.
+    """Calculate the difference in exposure allocation between groups.
 
     The exposure allocation difference is defined as the difference
-    between the largest and the smallest group-level exposure,
-    The exposure allocation difference of 0 means that all groups have the same exposure.
+    between the largest and the smallest group-level exposure.
+    The exposure allocation difference of 0 means that all groups have the same exposure. A high
+    exposure difference can be seen as an indication of allocation harm.
 
 
     Parameters
@@ -165,18 +166,19 @@ def allocation_harm_in_ranking_difference(
     return result
 
 
-def allocation_harm_in_ranking_ratio(
+def exposure_ratio(
         y_true,
         y_pred,
         *,
         sensitive_features,
         method='between_groups',
         sample_weight=None) -> float:
-    """Calculate the exposure allocation ratio.
+    """Calculate the ratio of exposure allocation between groups.
 
-    The exposure allocation ratio is defined as the ratio
-    between the largest and the smallest group-level exposure,
-    The exposure allocation ratio of 1 means that all groups have the same exposure.
+    The exposure ratio is defined as the ratio
+    between the largest and the smallest group-level exposure.
+    The exposure allocation ratio of 1 means that all groups have the same exposure. A low exposure
+    ratio can be seen as an indication of allocation harm.
 
 
     Parameters
@@ -207,18 +209,19 @@ def allocation_harm_in_ranking_ratio(
     return result
 
 
-def quality_of_service_harm_in_ranking_difference(
+def proportional_exposure_difference(
         y_true,
         y_pred,
         *,
         sensitive_features,
         method='between_groups',
         sample_weight=None) -> float:
-    """Calculate the quality of service harm ratio between the best and worst serviced groups.
+    """Calculate the proportional exposure difference between the best and worst serviced groups.
 
-    Quality-of-service is defined as the exposure that a group gets divided by their average
+    Proportional exposure is defined as the exposure that a group gets divided by their average
     relevance.
-    The quality-of-service ratio of 1 means that all groups have the same exposure.
+    The proportional exposure difference of 0 means that all groups have the same exposure. A large
+    difference can be seen as an indication of quality-of-service harm.
 
 
     Parameters
@@ -240,7 +243,7 @@ def quality_of_service_harm_in_ranking_difference(
     float
         The exposure/utility difference
     """
-    mf = MetricFrame(metrics=exposure_utility_ratio,
+    mf = MetricFrame(metrics=proportional_exposure,
                      y_true=y_true,
                      y_pred=y_pred,
                      sensitive_features=sensitive_features,
@@ -249,18 +252,19 @@ def quality_of_service_harm_in_ranking_difference(
     return result
 
 
-def quality_of_service_harm_in_ranking_ratio(
+def proportional_exposure_ratio(
         y_true,
         y_pred,
         *,
         sensitive_features,
         method='between_groups',
         sample_weight=None) -> float:
-    """Calculate the quality of service harm ratio between the best and worst serviced groups.
+    """Calculate the proportional exposure ratio between the best and worst serviced groups.
 
-    Quality-of-service is defined as the exposure that a group gets divided by their average
+    Proportional exposure is defined as the exposure that a group gets divided by their average
     relevance.
-    The quality-of-service ratio of 1 means that all groups have the same exposure.
+    The proportional exposure ratio of 1 means that all groups have the same exposure. A ratio
+    close to 0, can be seen as an indication of quality-of-service harm.
 
 
     Parameters
@@ -282,7 +286,7 @@ def quality_of_service_harm_in_ranking_ratio(
     float
         The exposure/utility ratio
     """
-    mf = MetricFrame(metrics=exposure_utility_ratio,
+    mf = MetricFrame(metrics=proportional_exposure,
                      y_true=y_true,
                      y_pred=y_pred,
                      sensitive_features=sensitive_features,
