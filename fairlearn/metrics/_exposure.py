@@ -39,6 +39,10 @@ def exposure(y_true,
     if len(set(y_pred)) != len(y_pred):  # check for repetition in input ranking
         raise ValueError(_INVALID_RANKING_ERROR_MESSAGE)
 
+    # ranking should start by 1, to prevent zero division.
+    if 0 in y_pred:
+        y_pred = [x+1 for x in y_pred]
+
     y_pred = _convert_to_ndarray_and_squeeze(y_pred)
     v = [1 / np.log2(1 + j) for j in y_pred]  # logarithmic discount
 
