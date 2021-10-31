@@ -14,7 +14,8 @@ from fairlearn.metrics import (
 )
 from fairlearn.metrics._exposure import (
     _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE,
-    _INVALID_RANKING_ERROR_MESSAGE
+    _INVALID_RANKING_ERROR_MESSAGE,
+    _ZERO_DIVISION_ERROR
 )
 
 from .data_for_test import y_t, s_w, g_1
@@ -62,12 +63,23 @@ def test_proportional_exposure_invalid_ranking():
     assert _INVALID_RANKING_ERROR_MESSAGE == exc.value.args[0]
 
 
+def test_exposure_zero_division():
+    assert exposure([], [0]) == 1
+
+
+def test_proportional_exposure_zero_division():
+    with pytest.raises(ZeroDivisionError) as exc:
+        _ = proportional_exposure([0, 0, 0], [1, 2, 3])
+    assert _ZERO_DIVISION_ERROR == exc.value.args[0]
+
+
 def test_exposure_single_element():
     assert exposure([], [1]) == 1
     assert exposure([], [10]) == 1/np.log2(1 + 10)
 
 
 def test_utility_single_element():
+    assert utility([0], []) == 0
     assert utility([1], []) == 1
     assert utility([1, 2], []) == 1.5
     assert utility([1, 2, 3], []) == 2

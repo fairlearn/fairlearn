@@ -8,6 +8,7 @@ from ._metric_frame import MetricFrame
 
 _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE = "Empty {0} passed to exposure function."
 _INVALID_RANKING_ERROR_MESSAGE = "Please input a valid complete ranking."
+_ZERO_DIVISION_ERROR = "Average utility is 0, which causes a zero division error."
 
 
 def exposure(y_true,
@@ -124,6 +125,10 @@ def proportional_exposure(
     """
     e = exposure(y_true, y_pred, sample_weight=sample_weight)
     u = utility(y_true, y_pred, sample_weight=sample_weight)
+
+    if u == 0:
+        raise ZeroDivisionError(_ZERO_DIVISION_ERROR)
+
     return e / u
 
 
