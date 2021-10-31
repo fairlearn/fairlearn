@@ -92,32 +92,32 @@ def test_proportional_exposure_single_element():
 
 def test_exposure_unweighted():
     result = exposure(y_t, y_p)
-    assert result == 0.23141957054179535
+    assert round(result, 3) == 0.231
 
 
 def test_exposure_weighted():
     result = exposure(y_t, y_p, sample_weight=s_w)
-    assert result == 0.4384130413271165
+    assert round(result, 3) == 0.438
 
 
 def test_utility_unweighted():
     result = utility(y_t, y_p)
-    assert result == 0.6338028169014085
+    assert round(result, 3) == 0.634
 
 
 def test_utility_weighted():
     result = utility(y_t, y_p, sample_weight=s_w)
-    assert result == 1.323943661971831
+    assert round(result, 3) == 1.324
 
 
 def test_proportional_exposure_unweighted():
     result = proportional_exposure(y_t, y_p)
-    assert result == 0.36512865574372155
+    assert round(result, 3) == 0.365
 
 
 def test_proportional_exposure_weighted():
     result = proportional_exposure(y_t, y_p, sample_weight=s_w)
-    assert result == 0.33114176525771566
+    assert round(result, 3) == 0.331
 
 
 '''
