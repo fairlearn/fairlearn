@@ -20,110 +20,123 @@ Mitigating Fairness using Adversarial Mitigation
 # In short, we provide an implementation that supports:
 #
 # - Any predictor neural network implemented in either PyTorch or Tensorflow2
-# - Binary classification or TODO: single variable regression
-# - One sensitive feature or TODO: multiple?
+# - Classification or regression
+# - Multiple sensitive features
 # - Two fairness objectives: Demographic parity or Equality of Odds
 #
-# This implementation follows closely the API of an `Estimator` in :code:`sklearn`
-#
-# Example 1: UCI Adult Dataset
-# ============================
-# Firstly, we load the dataset. For this example we choose the `sex` as the sensitive feature.
-# We also preprocess the data such that every categorical column is translated to
-# integer categories. Continuous-valued columns are left unchanged.
+# This implementation follows closely the API of an `Estimator` in :class:`sklearn`
 
-from sklearn.metrics import accuracy_score
-from fairlearn.metrics import equalized_odds_difference, MetricFrame, \
-        true_positive_rate, false_positive_rate, selection_rate
-from fairlearn.adversarial import AdversarialMitigation
-import torch
+# %%
+# Example 1: Simple use case with UCI Adult Dataset
+# =================================================
+# Firstly, we cover a most basic application of adversarial mitigation. However,
+# this starts by loading and preprocessing the dataset. 
+# 
+# For this example we choose the sex as the sensitive feature.
+
 from fairlearn.datasets import fetch_adult
-from sklearn.preprocessing import MinMaxScaler
-from numpy import isnan
 
 # Get dataset
-data_bunch = fetch_adult()
-X = data_bunch.data
-y = data_bunch.target
+X, y = fetch_adult(as_frame=True, return_X_y=True)
 
-# Remove rows with NaNs
-non_NaN_rows = ~isnan(X).any(axis=1)
+# Remove rows with NaNs. In general dropping NaNs is not statistically sound,
+# but for this example we ignore that.
+non_NaN_rows = ~X.isna().any(axis=1)
+
 X = X[non_NaN_rows]
 y = y[non_NaN_rows]
 
-# Scale all columns to [0,1]
-scaler = MinMaxScaler().fit(X)  # scales to [0,1]
-X = scaler.transform(X)
+# Choose sensitive feature
+sensitive_feature = X['sex']
 
-# Translate binary prediction from strings to 0 or 1
-y = (y == ">50K").astype(float)
+# %% 
+# Clearly, the UCI adult dataset can not be fed into a neural network (yet),
+# as we have many columns that are not numerical in nature. To resolve this
+# issues, we could for instance use one-hot-encodings to preprocess categorical
+# columns. Additionally, let's preprocess the columns of number to a
+# standardized range. For these tasks, we can use functionality from
+# `sklearn.preprocessor`.
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, StandardScaler
+from sklearn.compose import make_column_transformer, make_column_selector
+from numpy import number
+from pandas import Series
 
-# Get sensitive feature
-sensitive_feature = X[:, data_bunch.feature_names.index("sex")]
+def transform(X):
+    if isinstance(X, Series):  # make_column_transformer works with DataFrames
+        X = X.to_frame()
+    ct = make_column_transformer(
+        (StandardScaler(),
+         make_column_selector(dtype_include=number)),
+        (OneHotEncoder(drop='if_binary', sparse=False),
+         make_column_selector(dtype_include="category")))
+    return ct.fit_transform(X)
 
+
+X = transform(X)
+y = transform(y)
+sensitive_feature = transform(sensitive_feature)
 
 # %%
-# Then, we define the predictor model using PyTorch. Note that we need to pass
-# logits instead of sigmoidial values. TODO is this how u write it?
+# Now, we can use :class:`fairlearn.adversarial.AdversarialClassifier` to train on the
+# UCI Adult dataset. As our predictor and adversary models, we use for
+# simplicity the fairlearn built-in constructors for fully connected neural
+# networks with sigmoid activations. We initialize neural network constructors
+# by passing a list :math:`h_1, h_2, \dots` that indicate the number of nodes
+# :math:`h_i` per hidden layer :math:`i`.
+# 
+# The specific fairness
+# objective that we choose for this example is demographic parity, so we also
+# set :code:`objective = "demographic_parity"`.
 
+from fairlearn.adversarial import AdversarialClassifier
 
-class FullyConnected(torch.nn.Module):
-    def __init__(self, list_nodes):
-        super(FullyConnected, self).__init__()
-        layers = []
-        for i in range(len(list_nodes) - 1):
-            layers.append(torch.nn.Linear(list_nodes[i], list_nodes[i + 1]))
-            layers.append(torch.nn.Sigmoid())
-        layers.pop(-1)
-        self.layers = torch.nn.ModuleList(layers)
-
-    def forward(self, x):
-        for layer in self.layers:
-            x = layer(x)
-        return x
-
-
-predictor_model = FullyConnected(list_nodes=[14, 30, 20, 1])
-# %%
-# Now, we can use `fairlearn.adversarial.AdversarialMitigation` to train our
-# predictor model on the UCI Adult dataset in a fair way. The specific fairness
-# objective that we choose is for this example equality of odds, so we set
-# :code:`objective = "EO"`.
-
-
-mitigator = AdversarialMitigation(
-    environment='torch',
-    predictor_model=predictor_model,
-    objective="EO",
-    cuda=False
+mitigator = AdversarialClassifier(
+    predictor_model=[50, 20],
+    adversary_model=[6, 6],
+    constraints="demographic_parity"
 )
 
-# %% Then, we can fit the data to our model
+# %% 
+# Then, we can fit the data to our model. We generally follow sklearn API,
+# but in this case we require some extra kwargs. In particular, we should
+# specify the number of epochs, batch size, whether to shuffle the rows of data
+# after every epoch, and optionally after how many seconds to show a progress
+# update.
 
-mitigator.fit(X, y, sensitive_feature=sensitive_feature,
-              epochs=1000, batch_size=2**14, shuffle=True)
+mitigator.fit(
+    X,
+    y,
+    sensitive_features=sensitive_feature,
+    epochs=100,
+    batch_size=2**10,
+    shuffle=True,
+    progress_updates=5
+)
 
-# %% Predict
+# %% 
+# Predict and evaluate. In particular, we trained the predictor for demographic
+# parity, so we are not only interested in the accuracy, but also in the selection
+# rate.
 
 y_pred = mitigator.predict(X)
 
-# %% Evaluate
-
-
-EO_diff = equalized_odds_difference(y, y_pred, sensitive_features=sensitive_feature)
-print("Equality of Odds difference: " + str(EO_diff))
+from sklearn.metrics import accuracy_score
+from fairlearn.metrics import equalized_odds_difference, MetricFrame, \
+    true_positive_rate, false_positive_rate, selection_rate
 mf = MetricFrame(
     metrics={
         'accuracy': accuracy_score,
-        'selection_rate': selection_rate,
-        'tpr': true_positive_rate, 'fpr': false_positive_rate},
+        'selection_rate': selection_rate},
     y_true=y,
     y_pred=y_pred,
     sensitive_features=sensitive_feature)
 
 print(mf.by_group)
 
-# %% Compare with normal predictor!
-
 # %%
-# From these results, we see that we have trained a ...
+# We see that the results are not great. The accuracy is not optimal, and there
+# remains demographic disparity. 
+# Of course, the success of this method of mitigating fairness
+# depends strongly on neural network models and the specific hyperparameters, so
+# when applying this method one should pay close attention to their parameter
+# settings.
