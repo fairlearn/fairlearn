@@ -67,6 +67,26 @@ class AdversarialMitigationBase():
     adversary_model : list, torch.nn.Module, tensorflow.keras.Model
         The adversary model to train. Must be the same type as the
         :code:`predictor_model`.
+    
+    predictor_loss : str, callable, default='auto'
+        Either a string that indicates the type of :code:`y`,
+        or :code:`'auto'` to infer the type of :code:`y`, or a callable
+        loss function with an API that follows the chosen library (torch or
+        tensorflow). Note that torch and tensorflow loss functions don't agree
+        on parameter order.
+    
+    adversary_loss : str, callable, default='auto'
+        Either a string that indicates the type of :code:`sensitive_features`,
+        or :code:`'auto'` to infer the type of :code:`sensitive_features`, or a
+        callable loss function with an API that follows the chosen library
+        (torch or tensorflow). Note that torch and tensorflow loss functions
+        don't agree on parameter order.
+    
+    predictor_function : str, callable, default='auto'
+        Either a string that indicates the type of :code:`y`,
+        or :code:`'auto'` to infer the type of :code:`y`, or a callable
+        prediction function maps the continuous output of the predictor model to
+        a discrete prediction.
 
     constraints : str, default = \"demographic_parity\"
         The fairness measure to optimize for. Must be either \"demographic_parity\"
@@ -94,7 +114,7 @@ class AdversarialMitigationBase():
                  adversary_model,
                  predictor_loss='auto',
                  adversary_loss='auto',
-                 prediction_function='auto',
+                 predictor_function='auto',
                  constraints='demographic_parity',
                  optimizer='Adam',
                  learning_rate=0.01,
@@ -110,7 +130,7 @@ class AdversarialMitigationBase():
         elif self.tensorflow:
             self._extend_instance(AdversarialTensorflowMixin)
 
-        self._init_losses(predictor_loss, adversary_loss, prediction_function)
+        self._init_losses(predictor_loss, adversary_loss, predictor_function)
         self._init_constraints(constraints)
         self.optimizer = optimizer
         self.learning_rate = learning_rate
@@ -122,7 +142,7 @@ class AdversarialMitigationBase():
         # infer as much detail as possible the first time that data is passed
         self.setup_with_data_ = False
 
-    def fit(self, X, y, *, sensitive_feature,
+    def fit(self, X, y, *, sensitive_features,
             epochs=1,
             batch_size=-1,
             shuffle=False,
@@ -155,7 +175,7 @@ class AdversarialMitigationBase():
             If a number :math:`t` is provided, we regularly print an update
             about the training loop after at least every :math:`t` seconds.
         """
-        X, Y, Z = self._validate_input(X, y, sensitive_feature)
+        X, Y, Z = self._validate_input(X, y, sensitive_features)
         # TODO decreasing learning rate: not really necessary with adam
         # TODO stopping condition!? If |grad| < eps
         if batch_size == -1:
@@ -196,7 +216,7 @@ class AdversarialMitigationBase():
         X, Y, Z = shuffle(X, Y, Z)
         return X, Y, Z
 
-    def partial_fit(self, X, y, *, sensitive_feature):
+    def partial_fit(self, X, y, *, sensitive_features):
         """
         Perform one epoch on given samples and update model.
 
@@ -212,7 +232,7 @@ class AdversarialMitigationBase():
             Two-dimensional numpy array containing the sensitive feature of the
             training data.
         """
-        X, Y, Z = self._validate_input(X, y, sensitive_feature)
+        X, Y, Z = self._validate_input(X, y, sensitive_features)
         self._train_step(X, Y, Z)
 
     def predict(self, X):
@@ -228,7 +248,7 @@ class AdversarialMitigationBase():
         -------
         Y_pred : numpy.ndarray
             Two-dimensional array containing the model predictions fed through
-            the :code:`prediction_function`
+            the :code:`predictor_function`
         """
         if not self._setup_with_data:
             raise UserWarning("Havent seen data yet")
@@ -239,7 +259,7 @@ class AdversarialMitigationBase():
 
         assert Y_pred.ndim == 2
 
-        Y_pred = self.prediction_function(Y_pred)
+        Y_pred = self.predictor_function(Y_pred)
 
         return Y_pred
 
@@ -334,7 +354,7 @@ class AdversarialMitigationBase():
         # Setup losses, if they are set to 'auto'
         self.predictor_loss = self._get_loss(Y, self.predictor_loss)
         self.adversary_loss = self._get_loss(Z, self.adversary_loss)
-        self.prediction_function = self._get_function(Y, self.prediction_function)
+        self.predictor_function = self._get_function(Y, self.predictor_function)
 
         # Setup optimizers, because now we definitely have models set up
         self._setup_optimizer(self.optimizer)
@@ -439,10 +459,10 @@ class AdversarialMitigationBase():
         self.predictor_model = predictor_model
         self.adversary_model = adversary_model
 
-    def _init_losses(self, predictor_loss, adversary_loss, prediction_function):
+    def _init_losses(self, predictor_loss, adversary_loss, predictor_function):
         self.predictor_loss = predictor_loss
         self.adversary_loss = adversary_loss
-        self.prediction_function = prediction_function
+        self.predictor_function = predictor_function
         # TODO validation of function types? Don't know how.
 
     def _init_constraints(self, constraints):
