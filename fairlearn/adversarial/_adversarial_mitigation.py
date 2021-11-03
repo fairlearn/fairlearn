@@ -136,14 +136,14 @@ class AdversarialMitigationBase():
             Two-dimensional numpy array containing training data
 
         y : numpy.ndarray
-            One-dimensional numpy array containing training targets
+            Two-dimensional numpy array containing training targets
 
-        sensitive_feature : numpy.ndarray
-            One-dimensional numpy array containing the sensitive feature of the
+        sensitive_features : numpy.ndarray
+            Two-dimensional numpy array containing the sensitive features of the
             training data.
 
-        epochs : int, default = 1000
-            Maximum number of epochs to train for. Default is 1000. # TODO
+        epochs : int, default = 1
+            Number of epochs to train for.
 
         batch_size : int, default = -1
             Batch size. For no batching, set this to -1.
@@ -151,12 +151,13 @@ class AdversarialMitigationBase():
         shuffle : bool, default = False
             Iff True, shuffle the data after every iteration. Default is False
         
-        progress_updates # TODO
+        progress_updates : number, optional
+            If a number :math:`t` is provided, we regularly print an update
+            about the training loop after at least every :math:`t` seconds.
         """
         X, Y, Z = self._validate_input(X, y, sensitive_feature)
         # TODO decreasing learning rate: not really necessary with adam
         # TODO stopping condition!? If |grad| < eps
-        # TODO can only fit once!!
         if batch_size == -1:
             batch_size = X.shape[0]
         batches = ceil(X.shape[0] / batch_size)
@@ -205,10 +206,10 @@ class AdversarialMitigationBase():
             Two-dimensional numpy array containing training data
 
         y : numpy.ndarray
-            One-dimensional numpy array containing training targets
+            Two-dimensional numpy array containing training targets
 
-        sensitive_feature : numpy.ndarray
-            One-dimensional numpy array containing the sensitive feature of the
+        sensitive_features : numpy.ndarray
+            Two-dimensional numpy array containing the sensitive feature of the
             training data.
         """
         X, Y, Z = self._validate_input(X, y, sensitive_feature)
@@ -243,6 +244,8 @@ class AdversarialMitigationBase():
         return Y_pred
 
     def _infer_type(self, Y, choice):
+        """Identify user query :code:`choice`"""
+        # TODO think about increasing the clarity here.
         if choice == CLASSIFICATION:
             if Y.shape[1] == 1: return BINARY
             elif Y.shape[1] > 1: return CATEGORY
