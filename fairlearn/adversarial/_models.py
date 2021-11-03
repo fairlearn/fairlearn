@@ -4,9 +4,10 @@
 from ._constants import _IMPORT_ERROR_MESSAGE
 
 
-def getTorchModel():
+def getTorchModel(list_nodes, activation="sigmoid"):
     try:
         from torch.nn import Module, Linear, Sigmoid, ModuleList
+        from torch.nn.init import xavier_uniform_
     except ImportError as e:
         raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
 
@@ -19,13 +20,13 @@ def getTorchModel():
             Number of nodes per layer.
         """
 
-        def __init__(self, list_nodes):
+        def __init__(self, list_nodes, activation):
             """Initialize the layers of the NN."""
             super(FullyConnected, self).__init__()
             layers = []
             for i in range(len(list_nodes) - 1):
                 layers.append(Linear(list_nodes[i], list_nodes[i + 1]))
-                layers.append(Sigmoid())
+                layers.append(activation)
             layers.pop(-1)
             self.layers_ = ModuleList(layers)
 
@@ -34,16 +35,36 @@ def getTorchModel():
             for layer in self.layers_:
                 x = layer(x)
             return x
+    
+    if (not activation) or activation == 'sigmoid':
+        activation = Sigmoid()
+    model = FullyConnected(list_nodes, activation)
 
-    return FullyConnected
+    def init_weights(m):
+        if isinstance(m, Linear):
+            xavier_uniform_(m.weight)
+            m.bias.data.fill_(0.)
+    model.apply(init_weights)
+
+    return model
 
 
-def getTensorflowModel():
+def getTensorflowModel(list_nodes, activation='sigmoid'):
+    """Fully connected neural network as a Tensorflow model.
+
+    Parameters
+    ----------
+    list_nodes: List[int]
+        Number of nodes per layer.
+    """
     try:
         from tensorflow.keras import Model
         from tensorflow.keras.layers import Dense
+        from tensorflow.keras.initializers import GlorotNormal
     except ImportError as e:
         raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
+
+    initializer_w = GlorotNormal()
 
     class FullyConnected(Model):
         """Fully connected neural network as a Tensorflow model.
@@ -54,13 +75,22 @@ def getTensorflowModel():
             Number of nodes per layer.
         """
 
-        def __init__(self, list_nodes):
+        def __init__(self, list_nodes, activation=activation):
             """Initialize the layers of the NN."""
             super(FullyConnected, self).__init__()
             layers = []
             for i in range(1, len(list_nodes) - 1):
-                layers.append(Dense(list_nodes[i], activation='sigmoid'))
-            layers.append(Dense(list_nodes[-1]))
+                layers.append(Dense(
+                    units=list_nodes[i], 
+                    kernel_initializer=initializer_w,
+                    bias_initializer='zeros',
+                    activation=activation,
+                ))
+            layers.append(Dense(
+                list_nodes[-1], 
+                kernel_initializer=initializer_w,
+                bias_initializer='zeros'
+            ))
             self.layers_ = layers
 
         def call(self, x):
@@ -69,4 +99,6 @@ def getTensorflowModel():
                 x = layer(x)
             return x
 
-    return FullyConnected
+    model = FullyConnected(list_nodes, activation)
+
+    return model
