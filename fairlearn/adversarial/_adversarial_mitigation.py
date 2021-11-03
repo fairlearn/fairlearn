@@ -51,7 +51,7 @@ class AdversarialMitigationBase():
 
     Parameters
     ----------
-    library : str, default = \"auto\"
+    library : str, default = "auto"
         The library to use. Must be one of :code:`\{'torch','tensorflow',
         'auto'\}` which indicates PyTorch, TensorFlow, or to automatically infer
         the library from the :code:`predictor_model` and which are installed.
@@ -72,10 +72,14 @@ class AdversarialMitigationBase():
         The fairness measure to optimize for. Must be either \"demographic_parity\"
         (Demographic Parity) or \"equalized_odds\" (Equalized Odds).
 
+    optimizer : str, torch.optim, tensorflow.keras.optimizers, default = "Adam"
+        The optimizer class to use. If a string is passed instead, this must be
+        either "SGD" or "Adam".
+
     learning_rate : float, default = 0.01
         A small number greater than zero to set as initial learning rate
 
-    alpha : float, default = 0.1
+    alpha : float, default = 1.0
         A small number $\alpha$ as specified in the paper.
 
     cuda : bool, default = False
@@ -92,8 +96,9 @@ class AdversarialMitigationBase():
                  adversary_loss='auto',
                  prediction_function='auto',
                  constraints='demographic_parity',
+                 optimizer='Adam',
                  learning_rate=0.01,
-                 alpha=0.1,
+                 alpha=1.0,
                  cuda=False
                  ):
         """Initialize Adversarial Mitigation."""
@@ -106,8 +111,8 @@ class AdversarialMitigationBase():
             self._extend_instance(AdversarialTensorflowMixin)
 
         self._init_losses(predictor_loss, adversary_loss, prediction_function)
-        self.constraints = constraints,
         self._init_constraints(constraints)
+        self.optimizer = optimizer
         self.learning_rate = learning_rate
         self.alpha = alpha
         self._init_cuda(cuda)
@@ -118,7 +123,7 @@ class AdversarialMitigationBase():
         self.setup_with_data_ = False
 
     def fit(self, X, y, *, sensitive_feature,
-            epochs=1000,
+            epochs=1,
             batch_size=-1,
             shuffle=False,
             progress_updates=None):
@@ -158,24 +163,30 @@ class AdversarialMitigationBase():
 
         start_time = time()
         last_update_time = start_time
+        predictor_losses = [None]
+        adversary_losses = []
         for epoch in range(epochs):
             for batch in range(batches):
                 if progress_updates:
                     if (time() - last_update_time) > progress_updates:
                         last_update_time = time()
                         progress = (epoch/epochs) + (batch/(batches*epochs))
-                        print("|{}>{}| Epoch: {}/{}, Batch: {}{}/{}, ETA: {} sec".format(
+                        print("|{}>{}| Epoch: {}/{}, Batch: {}{}/{}, ETA: {:.2f} sec. Losses (predictor/adversary): {:.2f}/{:.2f}".format(
                             "=" * round(20 * progress),
                             " " * round(20 * (1-progress)),
                             epoch+1, epochs, 
                             " " * (len(str(batch+1))-len(str(batches))),
                             batch+1, batches,
-                            str(round(((last_update_time - start_time) / progress) * (1 - progress), 2))
-                        ))
+                            ((last_update_time - start_time) / progress) * (1 - progress),
+                            predictor_losses[-1],
+                            adversary_losses[-1]
+                        ), end='\n')
                 batch_slice = slice(batch * batch_size, min((batch + 1) * batch_size, X.shape[0]))
-                self._train_step(X[batch_slice],
-                                 Y[batch_slice],
-                                 Z[batch_slice])
+                (LP, LA) = self._train_step(X[batch_slice],
+                                            Y[batch_slice],
+                                            Z[batch_slice])
+                predictor_losses.append(LP)
+                adversary_losses.append(LA)
             if shuffle and epoch != epochs - 1:
                 X, Y, Z = self._shuffle(X, Y, Z)
 
@@ -261,20 +272,19 @@ class AdversarialMitigationBase():
             if self.torch:
                 return torch.nn.BCEWithLogitsLoss(reduction='mean')
             else:
-                return tf.losses.BinaryCrossentropy(
-                    from_logits=True, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+                return tf.keras.losses.BinaryCrossentropy(
+                    from_logits=True)
         elif choice == CATEGORY:
             if self.torch:
                 return torch.nn.CrossEntropyLoss(reduction='mean')
             else:
-                return tf.losses.CategoricalCrossentropy(
-                    from_logits=True, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+                return tf.keras.losses.CategoricalCrossentropy(
+                    from_logits=True)
         elif choice == CONTINUOUS:
             if self.torch:
                 return torch.nn.MSELoss(reduction='mean')
             else:
-                return tf.keras.losses.MeanSquaredError(
-                    reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+                return tf.keras.losses.MeanSquaredError()
         else:
             raise ValueError("Cant infer loss function")
 
@@ -306,20 +316,16 @@ class AdversarialMitigationBase():
 
         # Initialize models if not done yet
         if not self._initialized_models:
-            if self.torch:
-                from ._models import getTorchModel
-                modelClass = getTorchModel()
-            elif self.tensorflow:
-                from ._models import getTensorflowModel
-                modelClass = getTensorflowModel()
-
-            self.predictor_model = modelClass(
-                list_nodes=[X.shape[1]] + self.predictor_model + [Y.shape[1]])
-
+            predictor_list_nodes = [X.shape[1]] + self.predictor_model + [Y.shape[1]]
             adversarial_in = Y.shape[1] * (2 if self.pass_y else 1)
-            self.adversary_model = modelClass(
-                list_nodes=[adversarial_in] + self.adversary_model + [Z.shape[1]])
+            adversary_list_nodes = [adversarial_in] + self.adversary_model + [Z.shape[1]]
+            if self.torch:
+                from ._models import getTorchModel as getModel
+            elif self.tensorflow:
+                from ._models import getTensorflowModel as getModel
 
+            self.predictor_model = getModel(list_nodes=predictor_list_nodes)
+            self.adversary_model = getModel(list_nodes=adversary_list_nodes)
             self._initialized_models = True
 
         # Setup losses, if they are set to 'auto'
@@ -328,14 +334,7 @@ class AdversarialMitigationBase():
         self.prediction_function = self._get_function(Y, self.prediction_function)
 
         # Setup optimizers, because now we definitely have models set up
-        if self.torch:
-            self.predictor_optimizer = torch.optim.Adam(
-                self.predictor_model.parameters(), lr=self.learning_rate)
-            self.adversary_optimizer = torch.optim.Adam(
-                self.adversary_model.parameters(), lr=self.learning_rate)
-        elif self.tensorflow:
-            self.predictor_optimizer = tf.train.AdamOptimizer(self.learning_rate)
-            self.adversary_optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        self._setup_optimizer(self.optimizer)
 
         # Use CUDA
         if self.cuda:
@@ -351,9 +350,13 @@ class AdversarialMitigationBase():
         Y = _check_array(Y)
         Z = _check_array(Z)
 
+        X = X.astype(float)
+        Y = Y.astype(float)
+        Z = Z.astype(float)
+
         # Check for equal number of samples
         if not (X.shape[0] == Y.shape[0] and X.shape[0] == Z.shape[0]):
-            raise ValueError("Input data has an ambiguous number of rows")
+            raise ValueError("Input data has an ambiguous number of rows: {}, {}, {}.".format(X.shape[0], Y.shape[0], Z.shape[0]))
 
         return X, Y, Z
 
@@ -424,8 +427,8 @@ class AdversarialMitigationBase():
                     raise ValueError(_KWARG_ERROR_MESSAGE.format(
                         "adversary_model", "\'torch.nn.Module\'"))
 
-            if isinstance(predictor_model, tensorflow.keras.Model):
-                if not isinstance(adversary_model, tensorflow.keras.Model):
+            if isinstance(predictor_model, tf.keras.Model):
+                if not isinstance(adversary_model, tf.keras.Model):
                     raise ValueError(_KWARG_ERROR_MESSAGE.format(
                         "adversary_model", "\'tensorflow.keras.Model\'"))
             self._initialized_models = True
@@ -437,10 +440,11 @@ class AdversarialMitigationBase():
         self.predictor_loss = predictor_loss
         self.adversary_loss = adversary_loss
         self.prediction_function = prediction_function
-        # TODO validation of function types?
+        # TODO validation of function types? Don't know how.
 
     def _init_constraints(self, constraints):
         """Verify the constraints and set up the corresponding network structure."""
+        self.constraints = constraints
         if (constraints == "demographic_parity"):
             self.pass_y = False
         elif (constraints == "equalized_odds"):
@@ -484,8 +488,18 @@ class AdversarialMixin():
         2d :class:`numpy.ndarray`."""
         pass
 
-    def _train_step(self, X: ndarray, Y: ndarray, Z: ndarray) -> ndarray:
-        """Perform one training step over data."""
+    def _train_step(self, X: ndarray, Y: ndarray, Z: ndarray) -> (float, float):
+        """Perform one training step over data.
+        
+        Returns
+        -------
+        (LP, LA) : tuple of (float, float)
+            predictor loss and adversary loss."""
+        pass
+
+    def _setup_optimizer(self, optimizer):
+        """Setup self.predictor_optimizer and self.adversary_optimizer using the
+        parameter optimizer given by the user."""
         pass
 
 class AdversarialPytorchMixin(AdversarialMixin):
@@ -524,7 +538,8 @@ class AdversarialPytorchMixin(AdversarialMixin):
         LP = self.predictor_loss(Y_hat, Y)
         LP.backward(retain_graph=True)  # Check what this does at some point in time
 
-        dW_LP = [deepcopy(p.grad) for p in self.predictor_model.parameters()]
+        dW_LP = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
+
 
         self.predictor_optimizer.zero_grad()
         self.adversary_optimizer.zero_grad()
@@ -537,18 +552,39 @@ class AdversarialPytorchMixin(AdversarialMixin):
         LA = self.adversary_loss(Z_hat, Z)
         LA.backward()
 
-        dW_LA = [p.grad for p in self.predictor_model.parameters()]
+        dW_LA = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
 
         for i, p in enumerate(self.predictor_model.parameters()):
             # Normalize dW_LA
             unit_dW_LA = dW_LA[i] / (torch.norm(dW_LA[i]) + torch.finfo(float).tiny)
             # Project
-            proj = torch.sum(torch.inner(dW_LP[i], unit_dW_LA))
+            proj = torch.sum(torch.inner(unit_dW_LA, dW_LP[i]))
             # Calculate dW
             p.grad = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
 
         self.predictor_optimizer.step()
         self.adversary_optimizer.step()
+
+        return (LP.item(), LA.item())
+    
+    def _setup_optimizer(self, optimizer):
+        if isinstance(optimizer, str):
+            #keyword cases.
+            if optimizer.lower() == "adam":
+                self.predictor_optimizer = torch.optim.Adam(
+                    self.predictor_model.parameters(), lr=self.learning_rate)
+                self.adversary_optimizer = torch.optim.Adam(
+                    self.adversary_model.parameters(), lr=self.learning_rate)
+            elif optimizer.lower() == "sgd":
+                self.predictor_optimizer = torch.optim.SGD(
+                    self.predictor_model.parameters(), lr=self.learning_rate)
+                self.adversary_optimizer = torch.optim.SGD(
+                    self.adversary_model.parameters(), lr=self.learning_rate)
+            else:
+                raise ValueError("TODO error msg")
+        else:
+            self.predictor_optimizer = optimizer
+            self.adversary_optimizer = optimizer
     
     def _validate_input(self, X, Y, Z):
         """Validate the input data."""
@@ -568,6 +604,7 @@ class AdversarialPytorchMixin(AdversarialMixin):
 class AdversarialTensorflowMixin(AdversarialMixin):
     def _evaluate(self, X):
         Y_pred = self.predictor_model(X, training=False)
+        Y_pred = Y_pred.numpy()
         return Y_pred
 
     def _train_step(self, X, Y, Z):
@@ -575,15 +612,17 @@ class AdversarialTensorflowMixin(AdversarialMixin):
         with tf.GradientTape(persistent=True) as tape:
             # training=True is only needed if there are layers with different
             # behavior during training versus inference (e.g. Dropout).
-            Y_hat = self.predictor(X, training=True)
-            LP = self.predictor_loss(Y_hat, Y)
+            Y_hat = self.predictor_model(X, training=True)
+
+            LP = self.predictor_loss(Y, Y_hat)
 
             # For equalized odds
             if self.pass_y:
                 Y_hat = tf.concat((Y_hat, Y), axis=1)
 
-            Z_hat = self.adversary(Y_hat)
-            LA = self.adversary_loss(Z_hat, Z)
+            Z_hat = self.adversary_model(Y_hat)
+
+            LA = self.adversary_loss(Z, Z_hat)
 
         dW_LP = tape.gradient(LP, self.predictor_model.trainable_variables)
         dU_LA = tape.gradient(LA, self.adversary_model.trainable_variables)
@@ -603,6 +642,23 @@ class AdversarialTensorflowMixin(AdversarialMixin):
             zip(dW_LP, self.predictor_model.trainable_variables))
         self.adversary_optimizer.apply_gradients(
             zip(dU_LA, self.adversary_model.trainable_variables))
+        
+        return (LP.numpy().item(), LA.numpy().item())
+    
+    def _setup_optimizer(self, optimizer):
+        if isinstance(optimizer, str):
+            #keyword cases.
+            if optimizer.lower() == "adam":
+                self.predictor_optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
+                self.adversary_optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
+            elif optimizer.lower() == "sgd":
+                self.predictor_optimizer = tf.keras.optimizers.SGD(learning_rate=self.learning_rate)
+                self.adversary_optimizer = tf.keras.optimizers.SGD(learning_rate=self.learning_rate)
+            else:
+                raise ValueError("TODO error msg")
+        else:
+            self.predictor_optimizer = optimizer
+            self.adversary_optimizer = optimizer
 
 class AdversarialClassifier(AdversarialMitigationBase):
     def __init__(self, **kwargs):
@@ -612,6 +668,5 @@ class AdversarialClassifier(AdversarialMitigationBase):
 
 class AdversarialRegressor(AdversarialMitigationBase):
     def __init__(self, *args, **kwargs):
-        print(args)
         kwargs['predictor_loss'] = CONTINUOUS
         super(AdversarialRegressor, self).__init__(*args, **kwargs)
