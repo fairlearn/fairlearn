@@ -23,6 +23,9 @@ terms of intent, such as prejudice.
 rather than specific causes (such as societal biases), we avoid the usage of
 the words *bias* or *debiasing* in describing the functionality of Fairlearn.
 
+
+.. _types_of_harms:
+
 Types of harms
 --------------
 
@@ -76,6 +79,9 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 **Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
  
+ 
+.. _construct_validity:
+
 What is construct validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -144,6 +150,9 @@ sense as sensitive feature. The term is based on anti-discrimination laws
 that define specific *protected classes*. Since we seek to apply group
 fairness in a wider range of settings, we avoid this term.
 
+
+.. _parity_constraints:
+
 Parity constraints
 ^^^^^^^^^^^^^^^^^^
 
@@ -194,6 +203,9 @@ group loss primarily seeks to mitigate quality-of-service harms. Equalized
 odds and equal opportunity can be used as a diagnostic for both allocation
 harms as well as quality-of-service harms.
 
+
+.. _disparity_metrics:
+
 Disparity metrics, group metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -214,6 +226,9 @@ Additionally, group metrics yield the minimum and maximum metric value and for
 which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
 subpackage :mod:`fairlearn.metrics`.
+
+
+.. _abstraction_traps:
 
 What traps can we fall into when modeling a social problem?
 --------------------------------------------------------------
@@ -248,6 +263,9 @@ We provide some definitions and examples of these traps to help Fairlearn
 users think about how choices they make in their work can lead to or avoid
 these common pitfalls.
 
+
+.. _solutionism_trap:
+
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -266,6 +284,9 @@ a community, for example with education, infrastructure, information
 technology, or health services, then an algorithmic solution purely
 focused on internet speed may fail to meaningfully address the needs of
 the community.
+
+
+.. _ripple_effect_trap:
 
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -292,6 +313,9 @@ adopt "what if" scenarios to envision how the social context might change
 after introducing a model, including how it may change the power dynamics of
 existing groups in that context, or how actors might change their behaviors to
 game the model.
+
+
+.. _formalism_trap:
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
@@ -336,6 +360,9 @@ them mathematically); and procedurality (for example, how do judges
 and police officers determine whether bail, counselling, probation, or
 incarceration is appropriate);
 
+
+.. _portability_trap:
+
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -355,6 +382,9 @@ differences (in terms of gender) of employees in each of these industries,
 which may result from wording in job postings, social constructs on gender
 and societal roles, and the percentages of successful applicants in
 each field per (gender) group.
+
+
+.. _framing_trap:
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
