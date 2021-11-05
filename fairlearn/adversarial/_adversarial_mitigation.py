@@ -41,21 +41,24 @@ class AdversarialMitigationBase():
     minimize the predictor loss :math:`L_P`. Now, to improve fairness, we not
     only want to minimize the predictor loss, but we want to decrease the
     adversary's ability to predict the sensitive features from the predictor's
-    predictions. Suppose the adversary has loss term :math:`L_A, then the paper
+    predictions. Suppose the adversary has loss term :math:`L_A`, then the paper
     trains the predictor with gradient:
 
     .. math::
         \nabla_W L_P - \text{proj}_{\nabla_W L_A} \nabla_W L_P - \alpha \nabla_W L_A
 
     In this implementation, we accept :math:`X, Y, Z` as 1d or 2d array-like. We
-    make the important design choice to #TODO
+    make the important design choice to allow for arbitrary distribution types,
+    such as binary classes or continuous values, and allow for arbitrary loss
+    functions. However, the user should take care when choosing loss functions
+    #TODO reference below a section on loss functions?
 
 
     Parameters
     ----------
-    library : str, default = "auto"
-        The library to use. Must be one of :code:`\{'torch','tensorflow',
-        'auto'\}` which indicates PyTorch, TensorFlow, or to automatically infer
+    library : str, default = 'auto'
+        The library to use. Must be one of :code:`['torch','tensorflow',
+        'auto']` which indicates PyTorch, TensorFlow, or to automatically infer
         the library from the :code:`predictor_model` and which are installed.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
@@ -70,14 +73,14 @@ class AdversarialMitigationBase():
         The adversary model to train. Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_loss : str, callable, default='auto'
+    predictor_loss : str, callable, default = 'auto'
         Either a string that indicates the type of :code:`y`,
         or :code:`'auto'` to infer the type of :code:`y`, or a callable
         loss function with an API that follows the chosen library (torch or
         tensorflow). Note that torch and tensorflow loss functions don't agree
         on parameter order.
 
-    adversary_loss : str, callable, default='auto'
+    adversary_loss : str, callable, default = 'auto'
         Either a string that indicates the type of :code:`sensitive_features`,
         or :code:`'auto'` to infer the type of :code:`sensitive_features`, or a
         callable loss function with an API that follows the chosen library
@@ -90,11 +93,11 @@ class AdversarialMitigationBase():
         prediction function maps the continuous output of the predictor model to
         a discrete prediction.
 
-    constraints : str, default = \"demographic_parity\"
-        The fairness measure to optimize for. Must be either \"demographic_parity\"
-        (Demographic Parity) or \"equalized_odds\" (Equalized Odds).
+    constraints : str, default = 'demographic_parity'
+        The fairness measure to optimize for. Must be either 'demographic_parity'
+        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
 
-    optimizer : str, torch.optim, tensorflow.keras.optimizers, default = "Adam"
+    optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either "SGD" or "Adam".
 
@@ -107,6 +110,14 @@ class AdversarialMitigationBase():
     cuda : bool, default = False
         A boolean to indicate whether we can use cuda:0 (first GPU) when training
         a PyTorch model.
+    
+    Notes
+    -----
+    # TODO
+
+    References
+    ----------
+    # TODO
 
     """
 
@@ -371,9 +382,6 @@ class AdversarialMitigationBase():
 
     def _validate_input(self, X, Y, Z):
         """Validate the input data."""
-        if not self.setup_with_data_:
-            self._setup_with_data(X, Y, Z)
-
         X = _check_array(X)
         Y = _check_array(Y)
         Z = _check_array(Z)
@@ -387,6 +395,9 @@ class AdversarialMitigationBase():
             raise ValueError(
                 "Input data has an ambiguous number of rows: {}, {}, {}.".format(
                     X.shape[0], Y.shape[0], Z.shape[0]))
+
+        if not self.setup_with_data_:
+            self._setup_with_data(X, Y, Z)
 
         return X, Y, Z
 
@@ -417,7 +428,7 @@ class AdversarialMitigationBase():
             pass
 
         if (not torch_installed) and (not tf_installed):
-            raise ValueError(_IMPORT_ERROR_MESSAGE.format("one of \\[\'torch\',\'tensorflow\'\\]"))
+            raise ValueError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
 
         # At this point, either tensorflow or torch is installed
         if library == 'torch':
@@ -438,6 +449,11 @@ class AdversarialMitigationBase():
                 self.torch = True
             elif tf_installed and isinstance(predictor_model, tf.keras.Model):
                 self.tensorflow = True
+        else:
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    'library',
+                    "one of \\[\'auto\', \'torch\',\'tensorflow\'\\]"))
 
         if (self.torch or self.tensorflow) == False:
             raise ValueError(
