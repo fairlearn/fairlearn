@@ -93,7 +93,8 @@ from fairlearn.adversarial import AdversarialClassifier
 mitigator = AdversarialClassifier(
     predictor_model=[50, 20],
     adversary_model=[6, 6],
-    constraints="demographic_parity"
+    constraints="demographic_parity",
+    learning_rate=0.0001
 )
 
 # %% 
@@ -108,7 +109,7 @@ mitigator.fit(
     y,
     sensitive_features=sensitive_feature,
     epochs=100,
-    batch_size=2**10,
+    batch_size=2**9,
     shuffle=True,
     progress_updates=5
 )
