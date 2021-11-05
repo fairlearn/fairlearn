@@ -3,7 +3,12 @@
 
 """Adversarial techniques to help mitigate fairness disparities."""
 
-from ._adversarial_mitigation import AdversarialMitigationBase, AdversarialClassifier, AdversarialRegressor
+from ._adversarial_mitigation import AdversarialMitigationBase, \
+    AdversarialClassifier, AdversarialRegressor
 from ._preprocessor import FloatTransformer
 
-__all__ = ["AdversarialMitigationBase", "AdversarialClassifier", "AdversarialRegressor", "FloatTransformer"]
+__all__ = [
+    "AdversarialMitigationBase",
+    "AdversarialClassifier",
+    "AdversarialRegressor",
+    "FloatTransformer"]

@@ -5,10 +5,17 @@ from ._constants import _IMPORT_ERROR_MESSAGE
 
 
 def getTorchModel(list_nodes, activation="sigmoid"):
+    """Fully connected neural network as a Torch model.
+
+    Parameters
+    ----------
+    list_nodes: List[int]
+        Number of nodes per layer.
+    """
     try:
         from torch.nn import Module, Linear, Sigmoid, ModuleList
         from torch.nn.init import xavier_uniform_
-    except ImportError as e:
+    except ImportError:
         raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
 
     class FullyConnected(Module):
@@ -35,7 +42,7 @@ def getTorchModel(list_nodes, activation="sigmoid"):
             for layer in self.layers_:
                 x = layer(x)
             return x
-    
+
     if (not activation) or activation == 'sigmoid':
         activation = Sigmoid()
     model = FullyConnected(list_nodes, activation)
@@ -61,7 +68,7 @@ def getTensorflowModel(list_nodes, activation='sigmoid'):
         from tensorflow.keras import Model
         from tensorflow.keras.layers import Dense
         from tensorflow.keras.initializers import GlorotNormal
-    except ImportError as e:
+    except ImportError:
         raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
 
     initializer_w = GlorotNormal()
@@ -81,13 +88,13 @@ def getTensorflowModel(list_nodes, activation='sigmoid'):
             layers = []
             for i in range(1, len(list_nodes) - 1):
                 layers.append(Dense(
-                    units=list_nodes[i], 
+                    units=list_nodes[i],
                     kernel_initializer=initializer_w,
                     bias_initializer='zeros',
                     activation=activation,
                 ))
             layers.append(Dense(
-                list_nodes[-1], 
+                list_nodes[-1],
                 kernel_initializer=initializer_w,
                 bias_initializer='zeros'
             ))

@@ -1,9 +1,9 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ._constants import _IMPORT_ERROR_MESSAGE, _KWARG_ERROR_MESSAGE
-from copy import deepcopy
-from numpy import finfo, float32, ndarray, unique, zeros, argmax, logical_or, arange
+from ._constants import _IMPORT_ERROR_MESSAGE, _KWARG_ERROR_MESSAGE, \
+    _PROGRESS_UPDATE
+from numpy import finfo, float32, ndarray, zeros, argmax, logical_or, arange
 from numpy import all as np_all
 from numpy import sum as np_sum
 from sklearn.utils import check_array, shuffle
@@ -110,7 +110,7 @@ class AdversarialMitigationBase():
     cuda : bool, default = False
         A boolean to indicate whether we can use cuda:0 (first GPU) when training
         a PyTorch model.
-    
+
     Notes
     -----
     # TODO
@@ -205,7 +205,7 @@ class AdversarialMitigationBase():
                     if (time() - last_update_time) > progress_updates:
                         last_update_time = time()
                         progress = (epoch / epochs) + (batch / (batches * epochs))
-                        print("|{}>{}| Epoch: {}/{}, Batch: {}{}/{}, ETA: {:.2f} sec. Losses (predictor/adversary): {:.2f}/{:.2f}".format(
+                        print(_PROGRESS_UPDATE.format(
                             "=" * round(20 * progress),
                             " " * round(20 * (1 - progress)),
                             epoch + 1, epochs,
@@ -277,7 +277,7 @@ class AdversarialMitigationBase():
         return Y_pred
 
     def _infer_type(self, Y, choice):
-        """Identify user query :code:`choice`"""
+        """Identify user query :code:`choice`."""
         # TODO think about increasing the clarity here.
         if choice == CLASSIFICATION:
             if Y.shape[1] == 1:
@@ -350,7 +350,7 @@ class AdversarialMitigationBase():
             raise ValueError("Cant infer loss function")
 
     def _setup_with_data(self, X, Y, Z):
-        """Final setup that is required as soon as the first data is given."""
+        """Finalize setup that is required as soon as the first data is given."""
         self.setup_with_data_ = True
 
         # Initialize models if not done yet
@@ -402,11 +402,12 @@ class AdversarialMitigationBase():
         return X, Y, Z
 
     def _init_models(self, library, predictor_model, adversary_model):
-        """Import either PyTorch or Tensorflow, depending on predictor.
+        """
+        Import either PyTorch or Tensorflow, depending on predictor.
 
         if library is 'auto', then infer from predictor_model. If predictor_model
-        is a list, then choose torch or tensorflow, depending on which is installed"""
-
+        is a list, then choose torch or tensorflow, depending on which is installed.
+        """
         # The library to use
         self.torch = False
         self.tensorflow = False
@@ -455,7 +456,7 @@ class AdversarialMitigationBase():
                     'library',
                     "one of \\[\'auto\', \'torch\',\'tensorflow\'\\]"))
 
-        if (self.torch or self.tensorflow) == False:
+        if not (self.torch or self.tensorflow):
             raise ValueError(
                 _KWARG_ERROR_MESSAGE.format(
                     'predictor_model',
@@ -519,8 +520,12 @@ class AdversarialMitigationBase():
 
 
 def _check_array(X):
-    """Calls :code:`sklearn.utils.check_array` on parameter X with the
-    parameters suited for Adversarial Mitigation."""
+    """
+    Validate the input array, and possible coerce to 2D.
+
+    Calls :code:`sklearn.utils.check_array` on parameter X with the
+    parameters suited for Adversarial Mitigation.
+    """
     return check_array(
         X, accept_sparse=False, accept_large_sparse=False,
         dtype="numeric", order=None, copy=False, force_all_finite=True,
@@ -533,29 +538,40 @@ class AdversarialMixin():
     """The interface of a mixin class."""
 
     def _evaluate(self, X: ndarray) -> ndarray:
-        """Feed 2d :class:`numpy.ndarray` through model and receive output as
-        2d :class:`numpy.ndarray`."""
+        """
+        Evaluate the model given input `X`.
+
+        Feed 2d `numpy.ndarray` through model and receive output as
+        2d `numpy.ndarray`.
+        """
         pass
 
     def _train_step(self, X: ndarray, Y: ndarray, Z: ndarray) -> (float, float):
-        """Perform one training step over data.
+        """
+        Perform one training step over data.
 
         Returns
         -------
         (LP, LA) : tuple of (float, float)
-            predictor loss and adversary loss."""
+            predictor loss and adversary loss.
+        """
         pass
 
     def _setup_optimizer(self, optimizer):
-        """Setup self.predictor_optimizer and self.adversary_optimizer using the
-        parameter optimizer given by the user."""
+        """
+        Initialize the optimizers.
+
+        Setup self.predictor_optimizer and self.adversary_optimizer using the
+        parameter optimizer given by the user.
+        """
         pass
 
 
 class AdversarialPytorchMixin(AdversarialMixin):
+    """Adds PyTorch specific functions."""
+
     def _shuffle(self, X, Y, Z):
-        """Overrides base's _shuffle, as PyTorch tensors are not compatible
-        with sklearn's shuffle."""
+        """Override base's shuffle to work with `torch.FloatTensor`."""
         idx = torch.randperm(X.shape[0])
         X = X[idx].view(X.size())
         Y = Y[idx].view(Y.size())
@@ -563,6 +579,12 @@ class AdversarialPytorchMixin(AdversarialMixin):
         return X, Y, Z
 
     def _evaluate(self, X):
+        """
+        Evaluate the model given input `X`.
+
+        Feed 2d `numpy.ndarray` through model and receive output as
+        2d `numpy.ndarray`.
+        """
         self.predictor_model.eval()
         X = torch.from_numpy(X).float()
         if self.cuda:
@@ -576,7 +598,14 @@ class AdversarialPytorchMixin(AdversarialMixin):
         return Y_pred
 
     def _train_step(self, X, Y, Z):
-        """Perform one training step over data in pytorch model."""
+        """
+        Perform one training step over data in PyTorch models.
+
+        Returns
+        -------
+        (LP, LA) : tuple of (float, float)
+            predictor loss and adversary loss.
+        """
         self.predictor_model.train()
         self.adversary_model.train()
 
@@ -617,6 +646,12 @@ class AdversarialPytorchMixin(AdversarialMixin):
         return (LP.item(), LA.item())
 
     def _setup_optimizer(self, optimizer):
+        """
+        Create the optimizers for PyTorch.
+
+        Setup self.predictor_optimizer and self.adversary_optimizer using the
+        parameter optimizer given by the user.
+        """
         if isinstance(optimizer, str):
             # keyword cases.
             if optimizer.lower() == "adam":
@@ -636,7 +671,7 @@ class AdversarialPytorchMixin(AdversarialMixin):
             self.adversary_optimizer = optimizer
 
     def _validate_input(self, X, Y, Z):
-        """Validate the input data."""
+        """Extend the base `_validate_input` to send data to GPU when required."""
         X, Y, Z = super(AdversarialPytorchMixin, self)._validate_input(X, Y, Z)
 
         X = torch.from_numpy(X).float()
@@ -652,13 +687,28 @@ class AdversarialPytorchMixin(AdversarialMixin):
 
 
 class AdversarialTensorflowMixin(AdversarialMixin):
+    """Adds TensorFlow specific functions."""
+
     def _evaluate(self, X):
+        """
+        Evaluate the model given input `X`.
+
+        Feed 2d `numpy.ndarray` through model and receive output as
+        2d `numpy.ndarray`.
+        """
         Y_pred = self.predictor_model(X, training=False)
         Y_pred = Y_pred.numpy()
         return Y_pred
 
     def _train_step(self, X, Y, Z):
-        """Perform one training step over data in tensorflow model."""
+        """
+        Perform one training step over data in TensorFlow models.
+
+        Returns
+        -------
+        (LP, LA) : tuple of (float, float)
+            predictor loss and adversary loss.
+        """
         with tf.GradientTape(persistent=True) as tape:
             # training=True is only needed if there are layers with different
             # behavior during training versus inference (e.g. Dropout).
@@ -696,6 +746,12 @@ class AdversarialTensorflowMixin(AdversarialMixin):
         return (LP.numpy().item(), LA.numpy().item())
 
     def _setup_optimizer(self, optimizer):
+        """
+        Create the optimizers for TensorFlow.
+
+        Setup self.predictor_optimizer and self.adversary_optimizer using the
+        parameter optimizer given by the user.
+        """
         if isinstance(optimizer, str):
             # keyword cases.
             if optimizer.lower() == "adam":
@@ -716,13 +772,19 @@ class AdversarialTensorflowMixin(AdversarialMixin):
 
 
 class AdversarialClassifier(AdversarialMitigationBase):
+    """Creates an AdversarialMitigationBase with loss and predictions set to classification."""
+
     def __init__(self, **kwargs):
+        """Initialize model by setting the predictor loss and function."""
         kwargs['predictor_loss'] = CLASSIFICATION
         kwargs['predictor_function'] = CLASSIFICATION
         super(AdversarialClassifier, self).__init__(**kwargs)
 
 
 class AdversarialRegressor(AdversarialMitigationBase):
+    """Create an AdversarialMitigationBase that has predictor loss set to regression."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize model by setting the predictor loss."""
         kwargs['predictor_loss'] = CONTINUOUS
         super(AdversarialRegressor, self).__init__(*args, **kwargs)
