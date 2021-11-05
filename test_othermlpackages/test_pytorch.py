@@ -100,6 +100,7 @@ def test_thresholdoptimizer_classification():
 
     ptc.run_thresholdoptimizer_classification(estimator)
 
+
 def test_adversarial_classification():
     mitigator = AdversarialClassifier(
         library="torch",

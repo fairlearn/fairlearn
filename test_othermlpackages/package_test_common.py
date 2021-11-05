@@ -122,10 +122,11 @@ def run_thresholdoptimizer_classification(estimator):
                                                       sensitive_features=A_test)
     assert dp_diff_mitigated <= dp_diff_unmitigated
 
+
 def run_adversarialmitigation_classification(estimator):
     """Run classification test with AdversarialMitigation."""
     X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
-    
+
     non_NaN_rows = ~X.isna().any(axis=1)
 
     X = X[non_NaN_rows]

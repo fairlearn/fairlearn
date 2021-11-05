@@ -44,6 +44,7 @@ def test_thresholdoptimizer_classification():
 
     ptc.run_thresholdoptimizer_classification(estimator)
 
+
 def test_adversarial_classification():
     mitigator = AdversarialClassifier(
         library="tensorflow",
@@ -52,5 +53,5 @@ def test_adversarial_classification():
         constraints="demographic_parity",
         learning_rate=0.0001
     )
-    
+
     ptc.run_adversarialmitigation_classification(mitigator)
