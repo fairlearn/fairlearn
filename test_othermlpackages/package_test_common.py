@@ -6,6 +6,7 @@
 import copy
 
 import pandas as pd
+from numpy import mean
 
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
@@ -14,6 +15,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
+from fairlearn.adversarial import FloatTransformer
 
 
 def fetch_adult():
@@ -119,3 +121,44 @@ def run_thresholdoptimizer_classification(estimator):
                                                       mitigated_predictions,
                                                       sensitive_features=A_test)
     assert dp_diff_mitigated <= dp_diff_unmitigated
+
+def run_adversarialmitigation_classification(estimator):
+    """Run classification test with AdversarialMitigation."""
+    X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
+    
+    non_NaN_rows = ~X.isna().any(axis=1)
+
+    X = X[non_NaN_rows]
+    y = y[non_NaN_rows]
+
+    sensitive_feature = X['sex']
+
+    ft = FloatTransformer()
+    X, y, sensitive_feature = ft.fit_transform(X, y, sensitive_feature)
+
+    X_train, X_test, Y_train, Y_test, A_train, A_test = \
+        train_test_split(X, y, sensitive_feature,
+                         test_size=0.3,
+                         random_state=12345,
+                         stratify=y)
+
+    estimator.fit(
+        X_train,
+        Y_train,
+        sensitive_features=A_train,
+        epochs=100,
+        batch_size=2**9,
+        shuffle=True,
+        progress_updates=None
+    )
+
+    predictions = estimator.predict(X_test)
+
+    dp_diff = demographic_parity_difference(Y_test,
+                                            predictions,
+                                            sensitive_features=A_test)
+
+    accuracy = mean(predictions == Y_test)
+
+    # If this ever gives a problem, consider relaxing these constraints.
+    assert accuracy > 0.6 and dp_diff < 0.3

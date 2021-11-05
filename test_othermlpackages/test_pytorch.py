@@ -10,6 +10,7 @@ from torch import nn, optim # noqa
 
 from fairlearn.reductions import DemographicParity # noqa
 from . import package_test_common as ptc # noqa
+from fairlearn.adversarial import AdversarialClassifier
 
 
 def create_model():
@@ -98,3 +99,14 @@ def test_thresholdoptimizer_classification():
     estimator = create_model()
 
     ptc.run_thresholdoptimizer_classification(estimator)
+
+def test_adversarial_classification():
+    mitigator = AdversarialClassifier(
+        library="torch",
+        predictor_model=[50, 20],
+        adversary_model=[6, 6],
+        constraints="demographic_parity",
+        learning_rate=0.0001
+    )
+
+    ptc.run_adversarialmitigation_classification(mitigator)

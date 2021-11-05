@@ -5,6 +5,7 @@ import pytest
 from . import package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
+from fairlearn.adversarial import AdversarialClassifier
 
 tf = pytest.importorskip("tensorflow")
 from tensorflow.keras.layers import Dense # noqa
@@ -42,3 +43,14 @@ def test_thresholdoptimizer_classification():
     estimator = KerasClassifier(build_fn=create_model)
 
     ptc.run_thresholdoptimizer_classification(estimator)
+
+def test_adversarial_classification():
+    mitigator = AdversarialClassifier(
+        library="tensorflow",
+        predictor_model=[50, 20],
+        adversary_model=[6, 6],
+        constraints="demographic_parity",
+        learning_rate=0.0001
+    )
+    
+    ptc.run_adversarialmitigation_classification(mitigator)
