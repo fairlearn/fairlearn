@@ -86,7 +86,7 @@ DIS          weighted distances to five Boston employment centers
 RAD          index of accessibility to radial highways
 TAX          full-value property-tax rate per $10,000
 PTRATIO      pupil-teacher ratio by town
-B            1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+B            1000(Bk - 0.63)^2 where Bk is the proportion of Black people by town
 LSTAT        % lower status of the population
 MEDV         Median value of owner-occupied homes in $1000’s
 ============ ============================================================================
@@ -267,30 +267,31 @@ How does that look in a typical machine learning pipeline?
 Because both the sensitive and target features are continuous, to leverage 
 Fairlearn's assessment capabilities, we need to apply column transformations 
 to turn this problem into a classification problem. 
-The code below maps *LSTAT*, *B*, and *MEDV* to binary values 
-where values greater than the median of the column map to 1, 
-and otherwise the values are 0. 
 
-Note that this methodology follows scikit-lego's [#7]_ of the Boston Housing data.
+The code below maps *LSTAT* and *MEDV* to binary values where values greater 
+than the median of the column map to TRUE, and otherwise the values are FALSE. 
+This methodology follows scikit-lego's [#7]_ exploration
+of the Boston Housing data. We also transform *B* into a binary variable where 
+TRUE values are above the value 136.9. Observations below this point correspond to 
+the "true" proportion of Black people above 63%, at which point the authors
+assumed that house prices would begin to be affected by the racism of 
+others in the community.
 
 .. doctest:: datasets
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from sklearn.preprocessing import StandardScaler
     >>> from sklearn.linear_model import LogisticRegression
-    >>> from sklearn.pipeline import Pipeline
     >>> from sklearn.model_selection import train_test_split
     >>> import numpy as np
 
-    >>> X_clf = X.assign(B=lambda d: d['B'] > np.median(d['B']), 
+    >>> X_clf = X.assign(B=lambda d: d['B'] > 136.9, 
     ... LSTAT=lambda d: d['LSTAT'] > np.median(d['LSTAT']))
     >>> y_clf = y > np.median(y)
     >>> X_train, X_test, y_train, y_test = train_test_split(X_clf, y_clf)
 
-    >>> pipe = Pipeline( [("scale", StandardScaler()), 
-    ... ("predict", LogisticRegression())] )
-    >>> pipe.fit(X_train, y_train)
-    >>> predicted = pipe.predict(X_test)
+    >>> model = LogisticRegression(random_state=123, solver = 'liblinear')
+    >>> model.fit(X_train, y_train)
+    >>> predicted = model.predict(X_test)
 
     >>> import sklearn.metrics as skm
     >>> from fairlearn.metrics import demographic_parity_difference,
@@ -309,19 +310,20 @@ Note that this methodology follows scikit-lego's [#7]_ of the Boston Housing dat
 
     >>> print(f"Demographic parity difference:\nB: {DP_B}\nLSTAT: {DP_LSTAT}")
     Demographic parity difference for:
-    B: 0.0901639344262295
-    LSTAT: 0.8877297565822156
+    B: 0.5470085470085471
+    LSTAT: 0.8583829365079365
 
 Checking the demographic parity differences shows that neither variable has a 
 demographic parity at zero, implying a different selection rate across groups. 
 The next series of tables further breaks down evaluation metrics by
 group. 
 
-The proportion of Black people higher than the median is associated with a 
-higher false positve rate. 
-*B* == True is also associated with a slightly lower precision. 
-
-The accuracy, recall, and selection rate when *LSTAT* is `True` all are lower than when *LSTAT* is `False`. 
+The vast majority of observations of *B* fall above the cutoff.
+Observations below the cutoff have zero precision and recall,
+but the model has a higher accuracy for this group than records 
+where *B* > 136.9. 
+The precision, recall, and selection rate when *LSTAT* is `True` all are 
+lower than when *LSTAT* is `False`. 
 These results indicate that our simple model is worse at predicting 
 an outcome for individuals in the "lower status" category.
 
@@ -339,19 +341,19 @@ an outcome for individuals in the "lower status" category.
     ... sensitive_features=X_test["B"])
     >>> print(grouped_metric.by_group)
            accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
-    B                                                                                    
-    False  0.852459          0.92     0.766667              0.064516             0.766667          0.409836     61   
-    True   0.863636      0.909091     0.833333                   0.1             0.833333               0.5     66     
-
+    B                                                                                                             
+    False       1.0           0.0          0.0                   0.0                  0.0               0.0     10
+    True   0.837607       0.84375     0.857143              0.185185             0.857143          0.547009    117
+    
     >>> grouped_metric = MetricFrame(metrics=metrics,
     ... y_true=y_test,
     ... y_pred=predicted,
     ... sensitive_features=X_test["LSTAT"])
     >>> print(grouped_metric.by_group)
            accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
-    LSTAT                                                                        
-    False  0.901639      0.910714     0.980769              0.555556             0.980769          0.918033     61 
-    True   0.818182           1.0     0.142857                   0.0             0.142857          0.030303     66 
+    LSTAT                                                                                                         
+    False   0.84127      0.864407     0.962264                   0.8             0.962264          0.936508     63
+    True   0.859375           0.6          0.3              0.037037                  0.3          0.078125     64
     
 
 .. _discussion:
