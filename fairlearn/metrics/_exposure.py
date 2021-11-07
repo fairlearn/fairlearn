@@ -29,8 +29,8 @@ def exposure(y_true,
     ----------
     y_true : array_like
         Ground truth relevance scores. (ignored)
-    y_pred : array_like
-        The predicted ranking
+    y_pred : array_like of unique integers
+        The predicted ranking. The lower the integer the higher on the ranking.
     sample_weight : array_like
         Optional array of sample weights
     """
@@ -62,7 +62,7 @@ def utility(y_true,
 
     Utility is defined as the average of y_true.
 
-    The goal of this metric is to be used in the `exposure_utility_ratio` metric. Where we try
+    The goal of this metric is to be used in the `proportional_exposure` metric. Where we try
     to keep the `exposure` proportional to the `utility`.
 
     For consistency with other metric functions, the ``y_pred`` argument
@@ -73,8 +73,8 @@ def utility(y_true,
     ----------
     y_true : array_like
         Ground truth relevance scores.
-    y_pred : array_like
-        The predicted ranking (ignored)
+    y_pred : array_like of unique integers
+        The predicted ranking. The lower the integer the higher on the ranking. (ignored)
     sample_weight : array_like
         Optional array of sample weights
     """
@@ -106,9 +106,9 @@ def proportional_exposure(
 
     Utility is defined as the average of y_true.
 
-    The goal of this metric is to keep `utility` and `exposure` proportional to each other. Since
-    in ranking problems, an often occurring problem is that small differences in utility lead to
-    huge differences in exposure. See `user guide`.
+    In ranking problems, a frequent problem is that small differences in utility can lead to large
+    differences in exposure. See `user guide`. The goal of this metric is to keep `utility` and
+    `exposure` proportional to each other.
 
     The proportional exposure is defined as the exposure of ``y_pred`` divided by the utility of
     ``y_true``.
@@ -118,8 +118,8 @@ def proportional_exposure(
     ----------
     y_true : array_like
         Ground truth relevance scores.
-    y_pred : array_like
-        The predicted ranking
+    y_pred : array_like of unique integers
+        The predicted ranking. The lower the integer the higher on the ranking.
     sample_weight : array_like
         Optional array of sample weights
     """
@@ -141,7 +141,7 @@ def exposure_difference(
         sample_weight=None) -> float:
     """Calculate the difference in exposure allocation between groups.
 
-    The exposure allocation difference is defined as the difference
+    An exposure allocation difference is defined as the difference
     between the largest and the smallest group-level exposure.
     The exposure allocation difference of 0 means that all groups have the same exposure. A high
     exposure difference can be seen as an indication of allocation harm.
@@ -151,8 +151,8 @@ def exposure_difference(
     ----------
     y_true : array-like
         Ground truth relevance scores.
-    y_pred : array-like
-        Predicted ranking
+    y_pred : array_like of unique integers
+        The predicted ranking. The lower the integer the higher on the ranking.
     sensitive_features :
         The sensitive features over which the allocation harm should be assessed
     method : str
@@ -194,8 +194,8 @@ def exposure_ratio(
     ----------
     y_true : array-like
         Ground truth relevance scores.
-    y_pred : array-like
-        Predicted ranking
+    y_pred : array_like of unique integers
+        The predicted ranking. The lower the integer the higher on the ranking.
     sensitive_features :
         The sensitive features over which the allocation harm should be assessed
     method : str
@@ -237,8 +237,8 @@ def proportional_exposure_difference(
     ----------
     y_true : array-like
         Ground truth relevance scores.
-    y_pred : array-like
-        Predicted ranking
+    y_pred : array_like of unique integers
+        The predicted ranking. The lower the integer the higher on the ranking.
     sensitive_features :
         The sensitive features over which the quality-of-service should be assessed
     method : str
@@ -280,8 +280,8 @@ def proportional_exposure_ratio(
     ----------
     y_true : array-like
         Ground truth relevance scores.
-    y_pred : array-like
-        Predicted ranking
+    y_pred : array_like of unique integers
+        The predicted ranking. The lower the integer the higher on the ranking.
     sensitive_features :
         The sensitive features over which the quality-of-service should be assessed
     method : str
