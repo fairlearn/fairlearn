@@ -34,10 +34,13 @@ Mitigating Fairness using Adversarial Mitigation
 # 
 # For this example we choose the sex as the sensitive feature.
 
-from fairlearn.datasets import fetch_adult
 
-# Get dataset
-X, y = fetch_adult(as_frame=True, return_X_y=True)
+# Get dataset.
+
+from sklearn.datasets import fetch_openml
+X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
+# from fairlearn.datasets import fetch_adult
+# X, y = fetch_adult(as_frame=True, return_X_y=True)
 
 # Remove rows with NaNs. In general dropping NaNs is not statistically sound,
 # but for this example we ignore that.
@@ -89,9 +92,8 @@ sensitive_feature = transform(sensitive_feature)
 # set :code:`objective = "demographic_parity"`.
 
 from fairlearn.adversarial import AdversarialClassifier
-import torch
+
 mitigator = AdversarialClassifier(
-    library='torch',
     predictor_model=[50, 20],
     adversary_model=[6, 6],
     constraints="demographic_parity",
