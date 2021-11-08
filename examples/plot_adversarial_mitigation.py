@@ -89,8 +89,9 @@ sensitive_feature = transform(sensitive_feature)
 # set :code:`objective = "demographic_parity"`.
 
 from fairlearn.adversarial import AdversarialClassifier
-
+import torch
 mitigator = AdversarialClassifier(
+    library='torch',
     predictor_model=[50, 20],
     adversary_model=[6, 6],
     constraints="demographic_parity",
