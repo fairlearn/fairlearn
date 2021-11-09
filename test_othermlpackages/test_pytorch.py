@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from fairlearn.adversarial import AdversarialClassifier
 import pytest
 import numpy as np
 import pandas as pd
@@ -10,7 +11,6 @@ from torch import nn, optim # noqa
 
 from fairlearn.reductions import DemographicParity # noqa
 from . import package_test_common as ptc # noqa
-from fairlearn.adversarial import AdversarialClassifier
 
 
 def create_model():
