@@ -38,12 +38,15 @@ Mitigating Fairness using Adversarial Mitigation
 # Get dataset.
 from fairlearn.metrics import MetricFrame, selection_rate
 from sklearn.metrics import accuracy_score
-from fairlearn.adversarial import AdversarialFairnessClassifier
+from fairlearn.adversarial import AdversarialFairnessClassifier, \
+    AdversarialFairness
 from pandas import Series
 from numpy import number
 from sklearn.compose import make_column_transformer, make_column_selector
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+from torch.nn import BCEWithLogitsLoss
 
 X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 
@@ -81,6 +84,12 @@ X = transform(X)
 y = transform(y)
 sensitive_feature = transform(sensitive_feature)
 
+X_train, X_test, Y_train, Y_test, A_train, A_test = \
+        train_test_split(X, y, sensitive_feature,
+                         test_size=0.2,
+                         random_state=12345,
+                         stratify=y)
+
 # %%
 # Now, we can use :class:`fairlearn.adversarial.AdversarialFairnessClassifier` to train on the
 # UCI Adult dataset. As our predictor and adversary models, we use for
@@ -102,6 +111,23 @@ mitigator = AdversarialFairnessClassifier(
 )
 
 # %%
+# This definition of the mitigator is equivalent to the following
+
+mitigator = AdversarialFairness(
+    library="torch",
+    predictor_model=[50, 20],
+    adversary_model=[6, 6],
+    predictor_loss=BCEWithLogitsLoss(reduction='mean'),
+    adversary_loss=BCEWithLogitsLoss(reduction='mean'),
+    predictor_function=lambda pred: (pred >= 0.).astype(float),
+    constraints="demographic_parity",
+    optimizer="Adam",
+    learning_rate=0.0001,
+    alpha=1.0,
+    cuda=False
+)
+
+# %%
 # Then, we can fit the data to our model. We generally follow sklearn API,
 # but in this case we require some extra kwargs. In particular, we should
 # specify the number of epochs, batch size, whether to shuffle the rows of data
@@ -109,9 +135,9 @@ mitigator = AdversarialFairnessClassifier(
 # update.
 
 mitigator.fit(
-    X,
-    y,
-    sensitive_features=sensitive_feature,
+    X_train,
+    Y_train,
+    sensitive_features=A_train,
     epochs=100,
     batch_size=2**9,
     shuffle=True,
@@ -123,15 +149,15 @@ mitigator.fit(
 # parity, so we are not only interested in the accuracy, but also in the selection
 # rate.
 
-y_pred = mitigator.predict(X)
+predictions = mitigator.predict(X_test)
 
 mf = MetricFrame(
     metrics={
         'accuracy': accuracy_score,
         'selection_rate': selection_rate},
-    y_true=y,
-    y_pred=y_pred,
-    sensitive_features=sensitive_feature)
+    y_true=Y_test,
+    y_pred=predictions,
+    sensitive_features=A_test)
 
 print(mf.by_group)
 
