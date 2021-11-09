@@ -38,7 +38,7 @@ Mitigating Fairness using Adversarial Mitigation
 # Get dataset.
 from fairlearn.metrics import MetricFrame, selection_rate
 from sklearn.metrics import accuracy_score
-from fairlearn.adversarial import AdversarialClassifier
+from fairlearn.adversarial import AdversarialFairnessClassifier
 from pandas import Series
 from numpy import number
 from sklearn.compose import make_column_transformer, make_column_selector
@@ -82,7 +82,7 @@ y = transform(y)
 sensitive_feature = transform(sensitive_feature)
 
 # %%
-# Now, we can use :class:`fairlearn.adversarial.AdversarialClassifier` to train on the
+# Now, we can use :class:`fairlearn.adversarial.AdversarialFairnessClassifier` to train on the
 # UCI Adult dataset. As our predictor and adversary models, we use for
 # simplicity the fairlearn built-in constructors for fully connected neural
 # networks with sigmoid activations. We initialize neural network constructors
@@ -94,7 +94,7 @@ sensitive_feature = transform(sensitive_feature)
 # set :code:`objective = "demographic_parity"`.
 
 
-mitigator = AdversarialClassifier(
+mitigator = AdversarialFairnessClassifier(
     predictor_model=[50, 20],
     adversary_model=[6, 6],
     constraints="demographic_parity",

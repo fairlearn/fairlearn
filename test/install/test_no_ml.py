@@ -3,7 +3,7 @@
 
 import pytest
 
-from fairlearn.adversarial import AdversarialMitigationBase
+from fairlearn.adversarial import AdversarialFairness
 from fairlearn.adversarial._constants import _IMPORT_ERROR_MESSAGE
 
 
@@ -11,7 +11,7 @@ from fairlearn.adversarial._constants import _IMPORT_ERROR_MESSAGE
 def test_no_library(library):
     expected_library = "torch or tensorflow" if library is None else library
     with pytest.raises(RuntimeError) as exc:
-        AdversarialMitigationBase(
+        AdversarialFairness(
             library=library,
             predictor_model=[5, 5],
             adversary_model=[2]

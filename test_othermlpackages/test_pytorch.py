@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from fairlearn.adversarial import AdversarialClassifier
+from fairlearn.adversarial import AdversarialFairnessClassifier
 import pytest
 import numpy as np
 import pandas as pd
@@ -102,7 +102,7 @@ def test_thresholdoptimizer_classification():
 
 
 def test_adversarial_classification():
-    mitigator = AdversarialClassifier(
+    mitigator = AdversarialFairnessClassifier(
         library="torch",
         predictor_model=[50, 20],
         adversary_model=[6, 6],
@@ -110,4 +110,4 @@ def test_adversarial_classification():
         learning_rate=0.0001
     )
 
-    ptc.run_adversarialmitigation_classification(mitigator)
+    ptc.run_AdversarialFairness_classification(mitigator)

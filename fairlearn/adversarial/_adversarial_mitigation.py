@@ -23,7 +23,7 @@ CONTINUOUS = "continuous"
 TYPES = [AUTO, CLASSIFICATION, BINARY, CATEGORY, CONTINUOUS]
 
 
-class AdversarialMitigationBase():
+class AdversarialFairness():
     r"""Inprocessing algorithm to mitigate biases using PyTorch or Tensorflow.
 
     This algorithm is our implementation of work in `"Mitigating Unwanted Biases with
@@ -792,20 +792,20 @@ class AdversarialTensorflowMixin(AdversarialMixin):
             self.adversary_optimizer = optimizer
 
 
-class AdversarialClassifier(AdversarialMitigationBase):
-    """Creates an AdversarialMitigationBase with loss and predictions set to classification."""
+class AdversarialFairnessClassifier(AdversarialFairness):
+    """Creates an AdversarialFairness with loss and predictions set to classification."""
 
     def __init__(self, **kwargs):
         """Initialize model by setting the predictor loss and function."""
         kwargs['predictor_loss'] = CLASSIFICATION
         kwargs['predictor_function'] = CLASSIFICATION
-        super(AdversarialClassifier, self).__init__(**kwargs)
+        super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
 
-class AdversarialRegressor(AdversarialMitigationBase):
-    """Create an AdversarialMitigationBase that has predictor loss set to regression."""
+class AdversarialFairnessRegressor(AdversarialFairness):
+    """Create an AdversarialFairness that has predictor loss set to regression."""
 
     def __init__(self, *args, **kwargs):
         """Initialize model by setting the predictor loss."""
         kwargs['predictor_loss'] = CONTINUOUS
-        super(AdversarialRegressor, self).__init__(*args, **kwargs)
+        super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
