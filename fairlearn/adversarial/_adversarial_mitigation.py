@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from ._constants import _IMPORT_ERROR_MESSAGE, _KWARG_ERROR_MESSAGE, \
-    _PROGRESS_UPDATE
+    _PROGRESS_UPDATE, _TYPE_CHECK_ERROR
 from numpy import finfo, float32, ndarray, zeros, argmax, logical_or, arange
 from numpy import all as np_all
 from numpy import sum as np_sum
@@ -18,7 +18,9 @@ AUTO = "auto"
 CLASSIFICATION = "classification"
 BINARY = "binary"
 CATEGORY = "category"
-CONTINUOUS = "numeric"
+CONTINUOUS = "continuous"
+
+TYPES = [AUTO, CLASSIFICATION, BINARY, CATEGORY, CONTINUOUS]
 
 
 class AdversarialMitigationBase():
@@ -263,6 +265,9 @@ class AdversarialMitigationBase():
             Two-dimensional array containing the model predictions fed through
             the :code:`predictor_function`
         """
+        if not self._initialized_models:
+            raise RuntimeError(
+                "Models have not been initialized, as we have seen no data yet.")
         if not self._setup_with_data:
             raise UserWarning("Havent seen data yet")
 
@@ -276,16 +281,19 @@ class AdversarialMitigationBase():
 
         return Y_pred
 
-    def _infer_type(self, Y, choice):
+    def _check_type(self, Y, choice, data_name):
         """Identify user query :code:`choice`."""
-        # TODO think about increasing the clarity here.
         if choice == CLASSIFICATION:
             if Y.shape[1] == 1:
                 return BINARY
             elif Y.shape[1] > 1:
                 return CATEGORY
-            else:
-                pass
+        elif choice == BINARY:
+            if Y.shape[1] == 1:
+                return BINARY
+        elif choice == CATEGORY:
+            if Y.shape[1] > 1:
+                return CATEGORY
         elif choice == AUTO:
             if np_all(logical_or(Y == 0, Y == 1)):
                 if Y.shape[1] == 1:
@@ -293,61 +301,64 @@ class AdversarialMitigationBase():
                 else:
                     if np_all(np_sum(Y, axis=1) == 1):
                         return CATEGORY
-                    else:
-                        raise ValueError("Cannot infer column")
             else:
                 return CONTINUOUS
         else:
-            pass
+            # This means choice was not one of the above. Error must be handled elsewhere.
+            return choice
+        # This means choice was one of the above but the data disagrees
+        raise ValueError(_TYPE_CHECK_ERROR.format(data_name, choice))
 
-    def _get_loss(self, Y, choice):
+    def _get_loss(self, Y, choice, data_name):
         """Infer loss."""
         if callable(choice):
             return choice
-        if choice == AUTO or choice == CLASSIFICATION:
-            choice = self._infer_type(Y, choice)
-        if choice == BINARY:
-            if self.torch:
-                return torch.nn.BCEWithLogitsLoss(reduction='mean')
-            else:
-                return tf.keras.losses.BinaryCrossentropy(
-                    from_logits=True)
-        elif choice == CATEGORY:
-            if self.torch:
-                return torch.nn.CrossEntropyLoss(reduction='mean')
-            else:
-                return tf.keras.losses.CategoricalCrossentropy(
-                    from_logits=True)
-        elif choice == CONTINUOUS:
-            if self.torch:
-                return torch.nn.MSELoss(reduction='mean')
-            else:
-                return tf.keras.losses.MeanSquaredError()
-        else:
-            raise ValueError("Cant infer loss function")
+        elif isinstance(choice, str):
+            choice = self._check_type(Y, choice, data_name)
+            if choice == BINARY:
+                if self.torch:
+                    return torch.nn.BCEWithLogitsLoss(reduction='mean')
+                else:
+                    return tf.keras.losses.BinaryCrossentropy(
+                        from_logits=True)
+            elif choice == CATEGORY:
+                if self.torch:
+                    return torch.nn.CrossEntropyLoss(reduction='mean')
+                else:
+                    return tf.keras.losses.CategoricalCrossentropy(
+                        from_logits=True)
+            elif choice == CONTINUOUS:
+                if self.torch:
+                    return torch.nn.MSELoss(reduction='mean')
+                else:
+                    return tf.keras.losses.MeanSquaredError()
+        # This is never reached
+        raise ValueError(_KWARG_ERROR_MESSAGE.format(
+            "choice", "one of {} or a callable".format(TYPES)))
 
-    def _get_function(self, Y, choice):
+    def _get_function(self, Y, choice, data_name):
         """Infer prediction function."""
         if callable(choice):
             return choice
-        if choice == AUTO or choice == CLASSIFICATION:
-            choice = self._infer_type(Y, choice)
-        if choice == BINARY:
-            return lambda pred: (pred >= 0.).astype(float)
-        elif choice == CATEGORY:
-            shape = Y.shape
+        if isinstance(choice, str):
+            choice = self._check_type(Y, choice, data_name)
+            if choice == BINARY:
+                return lambda pred: (pred >= 0.).astype(float)
+            elif choice == CATEGORY:
+                shape = Y.shape
 
-            def loss(pred):
-                c = argmax(pred, axis=1)
-                b = zeros(shape, dtype=float)
-                a = arange(shape[0])
-                b[a, c] = 1
-                return b
-            return loss
-        elif choice == CONTINUOUS:
-            return lambda pred: pred
-        else:
-            raise ValueError("Cant infer loss function")
+                def loss(pred):
+                    c = argmax(pred, axis=1)
+                    b = zeros(shape, dtype=float)
+                    a = arange(shape[0])
+                    b[a, c] = 1
+                    return b
+                return loss
+            elif choice == CONTINUOUS:
+                return lambda pred: pred
+        # This is never reached
+        raise ValueError(_KWARG_ERROR_MESSAGE.format(
+            "choice", "one of {} or a callable".format(TYPES)))
 
     def _setup_with_data(self, X, Y, Z):
         """Finalize setup that is required as soon as the first data is given."""
@@ -368,9 +379,9 @@ class AdversarialMitigationBase():
             self._initialized_models = True
 
         # Setup losses, if they are set to 'auto'
-        self.predictor_loss = self._get_loss(Y, self.predictor_loss)
-        self.adversary_loss = self._get_loss(Z, self.adversary_loss)
-        self.predictor_function = self._get_function(Y, self.predictor_function)
+        self.predictor_loss = self._get_loss(Y, self.predictor_loss, "y")
+        self.adversary_loss = self._get_loss(Z, self.adversary_loss, "sensitive_features")
+        self.predictor_function = self._get_function(Y, self.predictor_function, "y")
 
         # Setup optimizers, because now we definitely have models set up
         self._setup_optimizer(self.optimizer)
@@ -428,9 +439,6 @@ class AdversarialMitigationBase():
         except ImportError:
             pass
 
-        if (not torch_installed) and (not tf_installed):
-            raise ValueError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
-
         # At this point, either tensorflow or torch is installed
         if library == 'torch':
             if not torch_installed:
@@ -441,6 +449,8 @@ class AdversarialMitigationBase():
                 raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
             self.tensorflow = True
         elif library == 'auto':
+            if (not torch_installed) and (not tf_installed):
+                raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
             if isinstance(predictor_model, list):
                 if torch_installed:
                     self.torch = True
@@ -454,13 +464,13 @@ class AdversarialMitigationBase():
             raise ValueError(
                 _KWARG_ERROR_MESSAGE.format(
                     'library',
-                    "one of \\[\'auto\', \'torch\',\'tensorflow\'\\]"))
+                    "one of [\'auto\', \'torch\',\'tensorflow\']"))
 
         if not (self.torch or self.tensorflow):
             raise ValueError(
                 _KWARG_ERROR_MESSAGE.format(
                     'predictor_model',
-                    "one of \\[\'list\', \'torch\',\'tensorflow\'\\]"))
+                    "one of [\'list\', \'torch\',\'tensorflow\']"))
 
         # At this point, either self.torch or self.tensorflow is selected
         if isinstance(predictor_model, list):
@@ -472,22 +482,30 @@ class AdversarialMitigationBase():
             if isinstance(predictor_model, torch.nn.Module):
                 if not isinstance(adversary_model, torch.nn.Module):
                     raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                        "adversary_model", "\'torch.nn.Module\'"))
+                        "adversary_model", "a \'torch.nn.Module\'"))
 
             if isinstance(predictor_model, tf.keras.Model):
                 if not isinstance(adversary_model, tf.keras.Model):
                     raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                        "adversary_model", "\'tensorflow.keras.Model\'"))
+                        "adversary_model", "a \'tensorflow.keras.Model\'"))
             self._initialized_models = True
         # Note, if initialized_models == False, the model will still be a list
         self.predictor_model = predictor_model
         self.adversary_model = adversary_model
 
+    def _verify_dist_type(self, input_type, dist_name):
+        if callable(input_type):
+            return input_type
+        elif isinstance(input_type, str):
+            if input_type.lower() in TYPES:
+                return input_type.lower()
+        raise ValueError(_KWARG_ERROR_MESSAGE.format(
+            dist_name, "one of {} or a callable".format(TYPES)))
+
     def _init_losses(self, predictor_loss, adversary_loss, predictor_function):
-        self.predictor_loss = predictor_loss
-        self.adversary_loss = adversary_loss
-        self.predictor_function = predictor_function
-        # TODO validation of function types?
+        self.predictor_loss = self._verify_dist_type(predictor_loss, "predictor_loss")
+        self.adversary_loss = self._verify_dist_type(adversary_loss, "adversary_loss")
+        self.predictor_function = self._verify_dist_type(predictor_function, "predictor_function")
 
     def _init_constraints(self, constraints):
         """Verify the constraints and set up the corresponding network structure."""
@@ -498,7 +516,7 @@ class AdversarialMitigationBase():
             self.pass_y = True
         else:
             raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                "constraints", "one of \\[\'demographic_parity\',\'equalized_odds\'\\]"))
+                "constraints", "\'demographic_parity\' or \'equalized_odds\'"))
 
     def _init_cuda(self, cuda):
         """Verify whether we can use the GPU and move pytorch model to it."""
@@ -506,7 +524,7 @@ class AdversarialMitigationBase():
             self.cuda = False
         elif (cuda):
             if (not self.torch):
-                raise ValueError("Cuda can only be used with pytorch")
+                raise ValueError("Cuda is PyTorch-only")
             if not torch.cuda.is_available():
                 raise ValueError("Cuda is not available")
             self.cuda = True
@@ -546,7 +564,7 @@ class AdversarialMixin():
         """
         pass
 
-    def _train_step(self, X: ndarray, Y: ndarray, Z: ndarray) -> (float, float):
+    def _train_step(self, X: ndarray, Y: ndarray, Z: ndarray):
         """
         Perform one training step over data.
 
@@ -665,8 +683,10 @@ class AdversarialPytorchMixin(AdversarialMixin):
                 self.adversary_optimizer = torch.optim.SGD(
                     self.adversary_model.parameters(), lr=self.learning_rate)
             else:
-                raise ValueError("TODO error msg")
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                    'optimizer', '"Adam" or "SGD" or an optimizer'))
         else:
+            # TODO this setup for optimizers doesnt work in pytorch
             self.predictor_optimizer = optimizer
             self.adversary_optimizer = optimizer
 
@@ -765,7 +785,8 @@ class AdversarialTensorflowMixin(AdversarialMixin):
                 self.adversary_optimizer = tf.keras.optimizers.SGD(
                     learning_rate=self.learning_rate)
             else:
-                raise ValueError("TODO error msg")
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                    'optimizer', '"Adam" or "SGD" or an optimizer'))
         else:
             self.predictor_optimizer = optimizer
             self.adversary_optimizer = optimizer
