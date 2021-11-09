@@ -6,7 +6,8 @@
 import copy
 
 import pandas as pd
-from numpy import mean
+import torch
+from numpy import mean, random
 
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
@@ -125,6 +126,9 @@ def run_thresholdoptimizer_classification(estimator):
 
 def run_AdversarialFairness_classification(estimator):
     """Run classification test with AdversarialFairness."""
+    random.seed(123)
+    torch.manual_seed(123)
+
     X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 
     non_NaN_rows = ~X.isna().any(axis=1)
@@ -139,7 +143,7 @@ def run_AdversarialFairness_classification(estimator):
 
     X_train, X_test, Y_train, Y_test, A_train, A_test = \
         train_test_split(X, y, sensitive_feature,
-                         test_size=0.3,
+                         test_size=0.2,
                          random_state=12345,
                          stratify=y)
 
