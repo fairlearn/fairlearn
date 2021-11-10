@@ -5,10 +5,8 @@
 
 from ._adversarial_mitigation import AdversarialFairness, \
     AdversarialFairnessClassifier, AdversarialFairnessRegressor
-from ._preprocessor import FloatTransformer
 
 __all__ = [
     "AdversarialFairness",
     "AdversarialFairnessClassifier",
-    "AdversarialFairnessRegressor",
-    "FloatTransformer"]
+    "AdversarialFairnessRegressor"]

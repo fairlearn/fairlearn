@@ -7,16 +7,16 @@ import copy
 
 import pandas as pd
 import torch
-from numpy import mean, random
+from numpy import mean, random, number
 
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
+from sklearn.compose import make_column_selector, make_column_transformer
 
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
-from fairlearn.adversarial import FloatTransformer
 
 
 def fetch_adult():
@@ -138,8 +138,20 @@ def run_AdversarialFairness_classification(estimator):
 
     sensitive_feature = X['sex']
 
-    ft = FloatTransformer()
-    X, y, sensitive_feature = ft.fit_transform(X, y, sensitive_feature)
+    def preprocess(X):
+        if isinstance(X, pd.Series):
+            X = X.to_frame()
+        """Make the Transformer for a single dataframe."""
+        ct = make_column_transformer(
+            (StandardScaler(),
+            make_column_selector(dtype_include=number)),
+            (OneHotEncoder(drop='if_binary', sparse=False),
+            make_column_selector(dtype_include="category")))
+        return ct.fit_transform(X)
+
+    X = preprocess(X)
+    y = preprocess(y)
+    sensitive_feature = preprocess(sensitive_feature)
 
     X_train, X_test, Y_train, Y_test, A_train, A_test = \
         train_test_split(X, y, sensitive_feature,
