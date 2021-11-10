@@ -239,14 +239,16 @@ predictor_model.apply(weights_init)
 adversary_model.apply(weights_init)
 
 # %%
-# We define some funky optimizers.
+# We may define the optimizers however we like. In this case, let's use a
+# predictor optimizer with SGD with decaying learning rate, and Adam for the
+# adversary.
 predictor_optimizer = torch.optim.SGD(predictor_model.parameters(), lr=0.5, momentum=0.9, nesterov=True)
 adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.1)
 scheduler1 = torch.optim.lr_scheduler.LambdaLR(predictor_optimizer, lr_lambda=lambda epoch: 1/(3*epoch+2))
 
 # %%
-# Then, the instance itself.
-# We take care in defining the loss function with weights because
+# Then, the instance itself. We Will define the loss function with
+# weights because we are dealing with an imbalanced dataset.
 
 mitigator = AdversarialFairnessClassifier(
     predictor_model=predictor_model,
@@ -273,13 +275,13 @@ batch_size = 2**8
 # extent the constraint (demographic parity in this case) is satisfied.
 def validate():
     predictions = mitigator.predict(X_test)
-
     dp_diff = demographic_parity_difference(Y_test,
                                             predictions,
                                             sensitive_features=Z_test)
     accuracy = mean(predictions == Y_test)
     selection_rate = mean(predictions == 1.)
-    return (dp_diff, accuracy, selection_rate)
+    print("DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
+        dp_diff, accuracy, selection_rate))
 
 # %%
 # We make use of a callback function to incorporate the validation into the training
@@ -291,7 +293,7 @@ def callback_fn():
     epoch_count+=1
     scheduler1.step()
 
-    print(validate())
+    validate()
 
 # %%
 # Finally, we fit the model
@@ -302,7 +304,7 @@ mitigator.fit(
     epochs=epochs,
     batch_size=batch_size,
     shuffle=True,
-    progress_updates=1,
+    progress_updates=None,
     callback_fn=callback_fn)
 
 
@@ -318,7 +320,7 @@ adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.0001)
 mitigator.alpha = 5
 
 def callback_fn():
-    print(validate())
+    validate()
 
 mitigator.fit(
     X,
@@ -327,7 +329,7 @@ mitigator.fit(
     epochs=epochs,
     batch_size=batch_size,
     shuffle=True,
-    progress_updates=1,
+    progress_updates=None,
     callback_fn=callback_fn)
 # %%
 # We take a look at the results. Notice we achieve a much lower demographic parity
