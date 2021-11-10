@@ -142,9 +142,9 @@ def run_AdversarialFairness_classification(estimator):
         """Make the Transformer for a single dataframe."""
         ct = make_column_transformer(
             (StandardScaler(),
-            make_column_selector(dtype_include=number)),
+             make_column_selector(dtype_include=number)),
             (OneHotEncoder(drop='if_binary', sparse=False),
-            make_column_selector(dtype_include="category")))
+             make_column_selector(dtype_include="category")))
         return ct.fit_transform(X)
 
     X = preprocess(X)

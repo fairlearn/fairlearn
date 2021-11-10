@@ -36,14 +36,14 @@ Mitigating Fairness using Adversarial Mitigation
 
 
 # Get dataset.
-from math import ceil, sqrt
+from math import sqrt
 from fairlearn.metrics import MetricFrame, selection_rate, \
     demographic_parity_difference
 from sklearn.metrics import accuracy_score
 from fairlearn.adversarial import AdversarialFairnessClassifier, \
     AdversarialFairness
 from pandas import Series
-from numpy import number, random, mean, where, concatenate
+from numpy import number, random, mean
 from sklearn.compose import make_column_transformer, make_column_selector
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.datasets import fetch_openml
@@ -193,6 +193,7 @@ X = X_train
 Y = Y_train
 Z = Z_train
 
+
 class PredictorModel(torch.nn.Module):
     def __init__(self):
         super(PredictorModel, self).__init__()
@@ -204,10 +205,11 @@ class PredictorModel(torch.nn.Module):
             torch.nn.Linear(50, 5),
             torch.nn.Sigmoid(),
             torch.nn.Linear(5, 1)
-        ) # NO final activation function!
+        )  # NO final activation function!
 
     def forward(self, x):
         return self.layers(x)
+
 
 class AdversaryModel(torch.nn.Module):
     def __init__(self):
@@ -218,22 +220,26 @@ class AdversaryModel(torch.nn.Module):
             torch.nn.Linear(6, 6),
             torch.nn.Sigmoid(),
             torch.nn.Linear(6, 1),
-        ) # NO final activation function!
+        )  # NO final activation function!
 
     def forward(self, x):
         return self.layers(x)
 
-predictor_model=PredictorModel()
-adversary_model=AdversaryModel()
+
+predictor_model = PredictorModel()
+adversary_model = AdversaryModel()
 # %%
 # Xavier initialization is more popular than PyTorch's default initialization, so
 # let's put that to the test. Note that I also initialize the biases, but this is
 # less common in practice. Intuitively, it seems wise to initialize small weights,
 # so we set the gain low.
+
+
 def weights_init(m):
     if isinstance(m, torch.nn.Conv2d):
         torch.nn.init.xavier_normal_(m.weight.data, gain=0.1)
         torch.nn.init.xavier_normal_(m.bias.data, gain=0.1)
+
 
 predictor_model.apply(weights_init)
 adversary_model.apply(weights_init)
@@ -273,6 +279,8 @@ batch_size = 2**8
 # Instead of only looking at training loss, we also take a look at some validation
 # metrics. For this, we chose the demographic parity difference to check to what
 # extent the constraint (demographic parity in this case) is satisfied.
+
+
 def validate():
     predictions = mitigator.predict(X_test)
     dp_diff = demographic_parity_difference(Y_test,
@@ -286,17 +294,23 @@ def validate():
 # %%
 # We make use of a callback function to incorporate the validation into the training
 # loop. Additionally, we handle the prediction_optimizer updates here.
+
+
 epoch_count = 1
+
+
 def callback_fn():
     global epoch_count
     mitigator.alpha = 0.1 * sqrt(epoch_count)
-    epoch_count+=1
+    epoch_count += 1
     scheduler1.step()
 
     validate()
 
 # %%
 # Finally, we fit the model
+
+
 mitigator.fit(
     X,
     Y,
@@ -315,12 +329,15 @@ mitigator.fit(
 # As mentioned earlier, training adversarially is tricky, and ideally
 # you'd train this in a controlled way.
 
+
 predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.0001)
 adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.0001)
 mitigator.alpha = 5
 
+
 def callback_fn():
     validate()
+
 
 mitigator.fit(
     X,
@@ -347,4 +364,3 @@ mf = MetricFrame(
     sensitive_features=Z_test)
 
 print(mf.by_group)
-
