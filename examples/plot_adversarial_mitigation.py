@@ -173,7 +173,7 @@ print(mf.by_group)
 
 # %%
 # Example 2: More advanced models
-# -------------------------------
+# ===============================
 # Below we experiment with our models in order to achieve better results than above.
 # Adversarial Learning is inherently difficult because models can diverge quickly.
 # Intuitively, you should imagine that there are "very easy" local minima that the
