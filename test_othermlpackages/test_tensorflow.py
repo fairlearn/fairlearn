@@ -46,6 +46,7 @@ def test_thresholdoptimizer_classification():
 
 
 def test_adversarial_classification():
+    tf.random.set_seed(123)
     mitigator = AdversarialFairnessClassifier(
         library="tensorflow",
         predictor_model=[50, 20],

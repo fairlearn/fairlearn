@@ -102,6 +102,7 @@ def test_thresholdoptimizer_classification():
 
 
 def test_adversarial_classification():
+    torch.manual_seed(123)
     mitigator = AdversarialFairnessClassifier(
         library="torch",
         predictor_model=[50, 20],

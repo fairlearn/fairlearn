@@ -6,7 +6,6 @@
 import copy
 
 import pandas as pd
-import torch
 from numpy import mean, random, number
 
 from sklearn.datasets import fetch_openml
@@ -127,7 +126,6 @@ def run_thresholdoptimizer_classification(estimator):
 def run_AdversarialFairness_classification(estimator):
     """Run classification test with AdversarialFairness."""
     random.seed(123)
-    torch.manual_seed(123)
 
     X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 
