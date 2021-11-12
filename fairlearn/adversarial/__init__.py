@@ -4,9 +4,10 @@
 """Adversarial techniques to help mitigate fairness disparities."""
 
 from ._adversarial_mitigation import AdversarialFairness, \
-    AdversarialFairnessClassifier, AdversarialFairnessRegressor
+    AdversarialFairnessClassifier, AdversarialFairnessRegressor, Keyword
 
 __all__ = [
     "AdversarialFairness",
     "AdversarialFairnessClassifier",
-    "AdversarialFairnessRegressor"]
+    "AdversarialFairnessRegressor",
+    "Keyword"]

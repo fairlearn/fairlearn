@@ -13,15 +13,15 @@ from time import time
 torch = None
 tf = None
 
-# TODO export these variables? as a class?
-AUTO = "auto"
-CLASSIFICATION = "classification"
-BINARY = "binary"
-CATEGORY = "category"
-CONTINUOUS = "continuous"
+# TODO Is this a sensible way?
+class Keyword:
+    AUTO = "auto"
+    CLASSIFICATION = "classification"
+    BINARY = "binary"
+    CATEGORY = "category"
+    CONTINUOUS = "continuous"
 
-TYPES = [AUTO, CLASSIFICATION, BINARY, CATEGORY, CONTINUOUS]
-
+    TYPES = [AUTO, CLASSIFICATION, BINARY, CATEGORY, CONTINUOUS]
 
 class AdversarialFairness():
     r"""Train complex predictors while mitigating biases in PyTorch or Tensorflow.
@@ -422,83 +422,66 @@ class AdversarialFairness():
 
     def _check_type(self, Y, choice, data_name):
         """Identify user query :code:`choice`."""
-        if choice == CLASSIFICATION:
-            if Y.shape[1] == 1:
-                return BINARY
-            elif Y.shape[1] > 1:
-                return CATEGORY
-        elif choice == BINARY:
-            if Y.shape[1] == 1:
-                return BINARY
-        elif choice == CATEGORY:
-            if Y.shape[1] > 1:
-                return CATEGORY
-        elif choice == AUTO:
+        if choice == Keyword.CLASSIFICATION:
             if np_all(logical_or(Y == 0, Y == 1)):
                 if Y.shape[1] == 1:
-                    return BINARY
+                    return Keyword.BINARY
+                elif Y.shape[1] > 1:
+                    if np_all(np_sum(Y, axis=1) == 1):
+                        return Keyword.CATEGORY
+        elif choice == Keyword.BINARY:
+            if np_all(logical_or(Y == 0, Y == 1)):
+                if Y.shape[1] == 1:
+                    return Keyword.BINARY
+        elif choice == Keyword.CATEGORY:
+            if np_all(logical_or(Y == 0, Y == 1)):
+                if Y.shape[1] > 1:
+                    if np_all(np_sum(Y, axis=1) == 1):
+                        return Keyword.CATEGORY
+        elif choice == Keyword.AUTO:
+            if np_all(logical_or(Y == 0, Y == 1)):
+                if Y.shape[1] == 1:
+                    return Keyword.BINARY
                 else:
                     if np_all(np_sum(Y, axis=1) == 1):
-                        return CATEGORY
+                        return Keyword.CATEGORY
             else:
-                return CONTINUOUS
-        else:
-            # This means choice was not one of the above. Error must be handled elsewhere.
+                return Keyword.CONTINUOUS
+        elif choice == Keyword.CONTINUOUS:
             return choice
         # This means choice was one of the above but the data disagrees
         raise ValueError(_TYPE_CHECK_ERROR.format(data_name, choice))
 
-    def _get_loss(self, Y, choice, data_name):
-        """Infer loss."""
+    def _interpret_choice(self, Y, choice, data_name):
+        """Infer choice from either a function or Keyword.BINARY, Keyword.CATEGORY, or Keyword.CONTINUOUS."""
         if callable(choice):
             return choice
         elif isinstance(choice, str):
             choice = self._check_type(Y, choice, data_name)
-            if choice == BINARY:
-                if self.torch:
-                    return torch.nn.BCEWithLogitsLoss(reduction='mean')
-                else:
-                    return tf.keras.losses.BinaryCrossentropy(
-                        from_logits=True)
-            elif choice == CATEGORY:
-                if self.torch:
-                    return torch.nn.CrossEntropyLoss(reduction='mean')
-                else:
-                    return tf.keras.losses.CategoricalCrossentropy(
-                        from_logits=True)
-            elif choice == CONTINUOUS:
-                if self.torch:
-                    return torch.nn.MSELoss(reduction='mean')
-                else:
-                    return tf.keras.losses.MeanSquaredError()
-        # This is never reached
+            if choice == Keyword.BINARY or choice == Keyword.CATEGORY or choice == Keyword.CONTINUOUS:
+                return choice
         raise ValueError(_KWARG_ERROR_MESSAGE.format(
-            "choice", "one of {} or a callable".format(TYPES)))
+            "choice", "one of {} or a callable".format(Keyword.TYPES)))        
 
     def _get_function(self, Y, choice, data_name):
         """Infer prediction function."""
-        if callable(choice):
+        choice = self._interpret_choice(Y, choice, data_name)
+        if choice == Keyword.BINARY:
+            return lambda pred: (pred >= 0.).astype(float)
+        elif choice == Keyword.CATEGORY:
+            shape = Y.shape
+
+            def loss(pred):
+                c = argmax(pred, axis=1)
+                b = zeros(shape, dtype=float)
+                a = arange(shape[0])
+                b[a, c] = 1
+                return b
+            return loss
+        elif choice == Keyword.CONTINUOUS:
+            return lambda pred: pred
+        else:
             return choice
-        if isinstance(choice, str):
-            choice = self._check_type(Y, choice, data_name)
-            if choice == BINARY:
-                return lambda pred: (pred >= 0.).astype(float)
-            elif choice == CATEGORY:
-                shape = Y.shape
-
-                def loss(pred):
-                    c = argmax(pred, axis=1)
-                    b = zeros(shape, dtype=float)
-                    a = arange(shape[0])
-                    b[a, c] = 1
-                    return b
-                return loss
-            elif choice == CONTINUOUS:
-                return lambda pred: pred
-        # This is never reached
-        raise ValueError(_KWARG_ERROR_MESSAGE.format(
-            "choice", "one of {} or a callable".format(TYPES)))
-
     def _setup_with_data(self, X, Y, Z):
         """Finalize setup that is required as soon as the first data is given."""
         self.setup_with_data_ = True
@@ -636,10 +619,10 @@ class AdversarialFairness():
         if callable(input_type):
             return input_type
         elif isinstance(input_type, str):
-            if input_type.lower() in TYPES:
+            if input_type.lower() in Keyword.TYPES:
                 return input_type.lower()
         raise ValueError(_KWARG_ERROR_MESSAGE.format(
-            dist_name, "one of {} or a callable".format(TYPES)))
+            dist_name, "one of {} or a callable".format(Keyword.TYPES)))
 
     def _init_losses(self, predictor_loss, adversary_loss, predictor_function):
         self.predictor_loss = self._verify_dist_type(predictor_loss, "predictor_loss")
@@ -738,6 +721,9 @@ class AdversarialMixin():
                              " adversary_optimizer explicitely, or define" +
                              " none and use kwarg optimizer")
 
+    def _get_loss(self, Y, choice, data_name):
+        """Infer loss from ndarray Y under assumption choice."""
+        pass
 
 class AdversarialPytorchMixin(AdversarialMixin):
     """Adds PyTorch specific functions."""
@@ -840,6 +826,18 @@ class AdversarialPytorchMixin(AdversarialMixin):
             else:
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     'optimizer', '"Adam" or "SGD" or an optimizer'))
+    
+    def _get_loss(self, Y, choice, data_name):
+        """Infer loss."""
+        choice = self._interpret_choice(Y, choice, data_name)
+        if callable(choice):
+            return choice
+        if choice == Keyword.BINARY:
+            return torch.nn.BCEWithLogitsLoss(reduction='mean')
+        elif choice == Keyword.CATEGORY:
+            return torch.nn.CrossEntropyLoss(reduction='mean')
+        elif choice == Keyword.CONTINUOUS:
+            return torch.nn.MSELoss(reduction='mean')
 
     def _validate_input(self, X, Y, Z):
         """Extend the base `_validate_input` to send data to GPU when required."""
@@ -939,6 +937,19 @@ class AdversarialTensorflowMixin(AdversarialMixin):
             else:
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     'optimizer', '"Adam" or "SGD" or an optimizer'))
+    
+    
+    def _get_loss(self, Y, choice, data_name):
+        """Infer loss."""
+        choice = self._interpret_choice(Y, choice, data_name)
+        if callable(choice):
+            return choice
+        if choice == Keyword.BINARY:
+            return tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        elif choice == Keyword.CATEGORY:
+            return tf.keras.losses.CategoricalCrossentropy(from_logits=True)
+        elif choice == Keyword.CONTINUOUS:
+            return tf.keras.losses.MeanSquaredError()
 
 
 class AdversarialFairnessClassifier(AdversarialFairness):
@@ -946,8 +957,8 @@ class AdversarialFairnessClassifier(AdversarialFairness):
 
     def __init__(self, **kwargs):
         """Initialize model by setting the predictor loss and function."""
-        kwargs['predictor_loss'] = CLASSIFICATION
-        kwargs['predictor_function'] = CLASSIFICATION
+        kwargs['predictor_loss'] = Keyword.CLASSIFICATION
+        kwargs['predictor_function'] = Keyword.CLASSIFICATION
         super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
 
@@ -956,5 +967,5 @@ class AdversarialFairnessRegressor(AdversarialFairness):
 
     def __init__(self, *args, **kwargs):
         """Initialize model by setting the predictor loss."""
-        kwargs['predictor_loss'] = CONTINUOUS
+        kwargs['predictor_loss'] = Keyword.CONTINUOUS
         super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
