@@ -14,7 +14,11 @@ torch = None
 tf = None
 
 # TODO Is this a sensible way?
+
+
 class Keyword:
+    """Keywords to use to define template loss/predictor functions in AdversarialFairness."""
+
     AUTO = "auto"
     CLASSIFICATION = "classification"
     BINARY = "binary"
@@ -22,6 +26,7 @@ class Keyword:
     CONTINUOUS = "continuous"
 
     TYPES = [AUTO, CLASSIFICATION, BINARY, CATEGORY, CONTINUOUS]
+
 
 class AdversarialFairness():
     r"""Train complex predictors while mitigating biases in PyTorch or Tensorflow.
@@ -155,11 +160,6 @@ class AdversarialFairness():
     cuda : bool, default = False
         A boolean to indicate whether we can use cuda:0 (first GPU) when training
         a PyTorch model.
-
-    Notes
-    -----
-    Hey
-    # TODO
 
     References
     ----------
@@ -453,15 +453,16 @@ class AdversarialFairness():
         raise ValueError(_TYPE_CHECK_ERROR.format(data_name, choice))
 
     def _interpret_choice(self, Y, choice, data_name):
-        """Infer choice from either a function or Keyword.BINARY, Keyword.CATEGORY, or Keyword.CONTINUOUS."""
+        """Infer from a callable or Keyword.BINARY, Keyword.CATEGORY, or Keyword.CONTINUOUS."""
         if callable(choice):
             return choice
         elif isinstance(choice, str):
             choice = self._check_type(Y, choice, data_name)
-            if choice == Keyword.BINARY or choice == Keyword.CATEGORY or choice == Keyword.CONTINUOUS:
+            if choice == Keyword.BINARY or choice == Keyword.CATEGORY or \
+                    choice == Keyword.CONTINUOUS:
                 return choice
         raise ValueError(_KWARG_ERROR_MESSAGE.format(
-            "choice", "one of {} or a callable".format(Keyword.TYPES)))        
+            "choice", "one of {} or a callable".format(Keyword.TYPES)))
 
     def _get_function(self, Y, choice, data_name):
         """Infer prediction function."""
@@ -482,6 +483,7 @@ class AdversarialFairness():
             return lambda pred: pred
         else:
             return choice
+
     def _setup_with_data(self, X, Y, Z):
         """Finalize setup that is required as soon as the first data is given."""
         self.setup_with_data_ = True
@@ -725,6 +727,7 @@ class AdversarialMixin():
         """Infer loss from ndarray Y under assumption choice."""
         pass
 
+
 class AdversarialPytorchMixin(AdversarialMixin):
     """Adds PyTorch specific functions."""
 
@@ -826,7 +829,7 @@ class AdversarialPytorchMixin(AdversarialMixin):
             else:
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     'optimizer', '"Adam" or "SGD" or an optimizer'))
-    
+
     def _get_loss(self, Y, choice, data_name):
         """Infer loss."""
         choice = self._interpret_choice(Y, choice, data_name)
@@ -937,8 +940,7 @@ class AdversarialTensorflowMixin(AdversarialMixin):
             else:
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     'optimizer', '"Adam" or "SGD" or an optimizer'))
-    
-    
+
     def _get_loss(self, Y, choice, data_name):
         """Infer loss."""
         choice = self._interpret_choice(Y, choice, data_name)
