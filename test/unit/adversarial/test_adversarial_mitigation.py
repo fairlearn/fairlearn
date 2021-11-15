@@ -18,7 +18,16 @@ class loss_class:
     # class loss:
     #     def backward(self, **kwargs): return
     def __call__(self, x, y): return  # self.loss()
+BCE = type('binary', (loss_class,), {})
+CCE = type('category', (loss_class,), {})
+MSE = type('continuous', (loss_class,), {})
 
+def KeywordToClass(kw):
+    print(kw)
+    index = [Keyword.BINARY, Keyword.CATEGORY, Keyword.CONTINUOUS].index(kw)
+    print(index)
+    print([BCE, CCE, MSE][index])
+    return [BCE, CCE, MSE][index]
 
 layer_class = type('Layer', (object,), {})
 
@@ -30,9 +39,9 @@ class fake_torch:
             'parameters': lambda self: (i for i in [1, 2]),
             'train': lambda self: None,
             '__call__': lambda self, X: self.forward(X)})
-        BCEWithLogitsLoss = type('BCEWithLogitsLoss', (loss_class,), {})
-        CrossEntropyLoss = type('CrossEntropyLoss', (loss_class,), {})
-        MSELoss = type('MSELoss', (loss_class,), {})
+        BCEWithLogitsLoss = type('BCEWithLogitsLoss', (BCE,), {})
+        CrossEntropyLoss = type('CrossEntropyLoss', (CCE,), {})
+        MSELoss = type('MSELoss', (MSE,), {})
 
     class optim:
         class Adam:
@@ -48,12 +57,13 @@ class fake_torch:
 class fake_tensorflow:
     class keras:
         Model = type('Model', (model_class,), {})
-
-sys.modules['torch'] = fake_torch
-# sys.modules['tensorflow'] = fake_tensorflow
-
-# Disable library specific code :)
-
+        class losses:
+            BinaryCrossentropy = type('BinaryCrossentropy', (BCE,), {})
+            CategoricalCrossentropy = type('CategoricalCrossentropy', (CCE,), {})
+            MeanSquaredError = type('MeanSquaredError', (MSE,), {})
+        class optimizers:
+            class Adam:
+                def __init__(self, **kwargs): pass
 
 class RemoveAll():
     def _evaluate(self, X): return X
@@ -66,19 +76,19 @@ class RemoveTrainStep():
     def _train_step(self, X, Y, Z): return (0, 0)
 
 
-rows = 40
-cols = 4
+rows = 60
+cols = 5
 Bin2d = np.random.choice([0., 1.], size=(rows, cols))
 Bin1d = np.random.choice([0., 1.], size=(rows, 1))
 Cat = np.zeros((rows, cols), dtype=float)
 Cat[np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))] = 1.
-print(Cat)
 Cont2d = np.random.rand(rows, cols)
 Cont1d = np.random.rand(rows, 1)
 
 
 def generate_data_combinations(n=10):
     datas = [Bin1d, Cat, Cont2d, Cont1d]
+    dist_type = [Keyword.BINARY, Keyword.CATEGORY, Keyword.CONTINUOUS, Keyword.CONTINUOUS]
     K = len(datas)
     total_combinations = K ** 3
     combinations = np.random.choice(total_combinations, size=n).tolist()
@@ -90,18 +100,29 @@ def generate_data_combinations(n=10):
         c = (c - Y) // K
         Z = c % K
         assert X + Y * K + Z * K * K == c_orig
+        X_type = dist_type[X]
         X = datas[X]
+        Y_type = dist_type[Y]
         Y = datas[Y]
+        Z_type = dist_type[Z]
         Z = datas[Z]
-        yield (X, Y, Z)
+        yield (X, Y, Z), (X_type, Y_type, Z_type)
 
 
-def get_instance(cls=AdversarialFairness, fake_mixin=False, fake_training=False):
-    predictor = fake_torch.nn.Module()
-    adversary = fake_torch.nn.Module()
+def get_instance(cls=AdversarialFairness, fake_mixin=False, fake_training=False, torch=True, tensorflow=False):
+    if torch: sys.modules['torch'] = fake_torch
+    else: sys.modules['torch'] = None
+    if tensorflow: sys.modules['tensorflow'] = fake_tensorflow
+    else: sys.modules['tensorflow'] = None
+
+    if torch:
+        predictor = fake_torch.nn.Module()
+        adversary = fake_torch.nn.Module()
+    elif tensorflow:
+        predictor = fake_tensorflow.keras.Model()
+        adversary = fake_tensorflow.keras.Model()
 
     mitigator = cls(
-        library="torch",
         predictor_model=predictor,
         adversary_model=adversary
     )
@@ -114,35 +135,46 @@ def get_instance(cls=AdversarialFairness, fake_mixin=False, fake_training=False)
 
 # CURRENTLY not testing what the models look like, just that it is correct type
 
-
-def test_classifier():
-    mitigator = get_instance(AdversarialFairnessClassifier, fake_training=True)
+@pytest.mark.parametrize("torch", [True, False])
+def test_classifier(torch):
+    mitigator = get_instance(AdversarialFairnessClassifier, fake_training=True,
+        torch=torch, tensorflow=not torch)
     assert isinstance(mitigator, AdversarialFairness)
 
     mitigator.fit(Cont2d, Bin1d, sensitive_features=Cat)
+    assert isinstance(mitigator.predictor_loss, BCE)
+    assert isinstance(mitigator.adversary_loss, CCE)
 
 
-def test_regressor():
-    mitigator = get_instance(AdversarialFairnessRegressor, fake_training=True)
+@pytest.mark.parametrize("torch", [True, False])
+def test_regressor(torch):
+    mitigator = get_instance(AdversarialFairnessRegressor, fake_training=True,
+        torch=torch, tensorflow=not torch)
     assert isinstance(mitigator, AdversarialFairness)
 
     mitigator.fit(Cont2d, Cont2d, sensitive_features=Cat)
+    assert isinstance(mitigator.predictor_loss, MSE)
+    assert isinstance(mitigator.adversary_loss, CCE)
 
 
-def test_fake_models():
-    for (X, Y, Z) in generate_data_combinations():
-        mitigator = get_instance(fake_mixin=True)
+@pytest.mark.parametrize("torch", [True, False])
+def test_fake_models(torch):
+    for ((X, Y, Z), (X_type, Y_type, Z_type)) in generate_data_combinations():
+        mitigator = get_instance(fake_training=True,
+            torch=torch, tensorflow=not torch)
         mitigator.fit(X, Y, sensitive_features=Z)
+        assert isinstance(mitigator.predictor_loss, KeywordToClass(Y_type))
+        assert isinstance(mitigator.adversary_loss, KeywordToClass(Z_type))
 
 
 def test_fake_models_list_inputs():
-    for (X, Y, Z) in generate_data_combinations():
+    for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
 
 def test_fake_models_df_inputs():
-    for (X, Y, Z) in generate_data_combinations():
+    for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(pd.DataFrame(X), pd.DataFrame(Y), sensitive_features=pd.DataFrame(Z))
 
@@ -214,7 +246,7 @@ def check_2dnp(X):
 
 
 def test_validate_data():
-    for (X, Y, Z) in generate_data_combinations():
+    for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X, Y, Z)
         for x in (X, Y, Z):
@@ -222,7 +254,7 @@ def test_validate_data():
 
 
 def test_validate_data_list_inputs():
-    for (X, Y, Z) in generate_data_combinations():
+    for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
         for x in (X, Y, Z):
@@ -230,7 +262,7 @@ def test_validate_data_list_inputs():
 
 
 def test_validate_data_df_inputs():
-    for (X, Y, Z) in generate_data_combinations():
+    for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.DataFrame(Y), pd.DataFrame(Z))
         for x in (X, Y, Z):
@@ -238,7 +270,7 @@ def test_validate_data_df_inputs():
 
 
 def test_validate_data_ambiguous_rows():
-    for (X, Y, Z) in generate_data_combinations():
+    for ((X, Y, Z), types) in generate_data_combinations():
         X = X[:5, :]
         mitigator = get_instance(fake_mixin=True)
         with pytest.raises(ValueError) as exc:
@@ -246,3 +278,7 @@ def test_validate_data_ambiguous_rows():
             assert str(exc.value) == \
                 "Input data has an ambiguous number of rows: {}, {}, {}.".format(
                     X.shape[0], Y.shape[0], Z.shape[0])
+
+
+sys.modules['torch'] = None
+sys.modules['tensorflow'] = None
