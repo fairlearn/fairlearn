@@ -22,17 +22,17 @@ Mitigating Fairness using Adversarial Mitigation
 # - Any predictor neural network implemented in either PyTorch or Tensorflow2
 # - Classification or regression
 # - Multiple sensitive features
-# - Two fairness objectives: Demographic parity or Equality of Odds
+# - Two fairness objectives: Demographic parity or Equalized Odds
 #
 # This implementation follows closely the API of an `Estimator` in :class:`sklearn`
 
 # %%
 # Example 1: Simple use case with UCI Adult Dataset
 # =================================================
-# Firstly, we cover a most basic application of adversarial mitigation. However,
-# this starts by loading and preprocessing the dataset.
+# Firstly, we cover the most basic application of adversarial mitigation.
+# We start by loading and preprocessing the dataset.
 #
-# For this example we choose the sex as the sensitive feature.
+# For this example we choose the feature 'sex' as the sensitive feature.
 
 
 # Get dataset.
@@ -54,7 +54,7 @@ torch.manual_seed(123)
 
 X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 
-# Remove rows with NaNs. In general dropping NaNs is not statistically sound,
+# Remove rows with NaNs. In many cases, dropping rows that contain missing values is not the best approach for dealing with missing values,
 # but for this example we ignore that.
 non_NaN_rows = ~X.isna().any(axis=1)
 
@@ -65,9 +65,9 @@ y = y[non_NaN_rows]
 sensitive_feature = X['sex']
 
 # %%
-# Clearly, the UCI adult dataset can not be fed into a neural network (yet),
+# The UCI adult dataset can not be fed into a neural network (yet),
 # as we have many columns that are not numerical in nature. To resolve this
-# issues, we could for instance use one-hot-encodings to preprocess categorical
+# issue, we could for instance use one-hot-encodings to preprocess categorical
 # columns. Additionally, let's preprocess the columns of number to a
 # standardized range. For these tasks, we can use functionality from
 # `sklearn.preprocessor`.
@@ -97,8 +97,8 @@ X_train, X_test, Y_train, Y_test, Z_train, Z_test = \
 # %%
 # Now, we can use :class:`fairlearn.adversarial.AdversarialFairnessClassifier` to train on the
 # UCI Adult dataset. As our predictor and adversary models, we use for
-# simplicity the fairlearn built-in constructors for fully connected neural
-# networks with sigmoid activations. We initialize neural network constructors
+# simplicity the default constructors for fully connected neural
+# networks with sigmoid activations implemented in Fairlearn. We initialize neural network constructors
 # by passing a list :math:`h_1, h_2, \dots` that indicate the number of nodes
 # :math:`h_i` per hidden layer :math:`i`.
 #
@@ -185,7 +185,7 @@ print(mf.by_group)
 #
 # So, to finetune our model and the training thereof, we start by defining our
 # neural networks in the way we'd like them and in the way we can easily tweak them.
-# I'll be using PyTorch, but the same can be achieved using Tensorflow!
+# We will be using PyTorch, but the same can be achieved using Tensorflow!
 random.seed(123)
 torch.manual_seed(123)
 
