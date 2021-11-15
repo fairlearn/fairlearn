@@ -563,7 +563,6 @@ class AdversarialFairness():
         except ImportError:
             pass
 
-        # At this point, either tensorflow or torch is installed
         if library == 'torch':
             if not torch_installed:
                 raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
@@ -575,6 +574,7 @@ class AdversarialFairness():
         elif library == 'auto':
             if (not torch_installed) and (not tf_installed):
                 raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
+            # At this point, either tensorflow or torch is installed
             if isinstance(predictor_model, list):
                 if torch_installed:
                     self.torch = True
@@ -584,36 +584,42 @@ class AdversarialFairness():
                 self.torch = True
             elif tf_installed and isinstance(predictor_model, tf.keras.Model):
                 self.tensorflow = True
+            else:
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                    'predictor_model',
+                    "a list, torch.nn.Module, or tf.keras.Model. Also, " +
+                    "make sure to have installed the corresponding library"))
         else:
             raise ValueError(
                 _KWARG_ERROR_MESSAGE.format(
                     'library',
                     "one of [\'auto\', \'torch\',\'tensorflow\']"))
 
-        if not (self.torch or self.tensorflow):
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format(
-                    'predictor_model',
-                    "one of [\'list\', \'torch\',\'tensorflow\']"))
+        # Assert some conditions for sanity, even though these will be ensured by checks above.
+        # Assert either self.torch or self.tensorflow is selected
+        assert self.torch or self.tensorflow
+        # Assert package is selected => package is installed
+        assert ((not self.torch) or torch_installed) and ((not self.tensorflow) or tf_installed)
 
-        # At this point, either self.torch or self.tensorflow is selected
+        # Also check that the type of adversary_model is the same as predictor_model.
         if isinstance(predictor_model, list):
+            # For now, if predictor_model is a list, so must adversary_model be.
             if not isinstance(adversary_model, list):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     "adversary_model", "a list"))
             self._initialized_models = False
-        else:
-            if isinstance(predictor_model, torch.nn.Module):
-                if not isinstance(adversary_model, torch.nn.Module):
-                    raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                        "adversary_model", "a \'torch.nn.Module\'"))
-
-            if isinstance(predictor_model, tf.keras.Model):
-                if not isinstance(adversary_model, tf.keras.Model):
-                    raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                        "adversary_model", "a \'tensorflow.keras.Model\'"))
+        elif self.torch:
+            if not isinstance(adversary_model, torch.nn.Module):
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                    "adversary_model", "a \'torch.nn.Module\'"))
             self._initialized_models = True
-        # Note, if initialized_models == False, the model will still be a list
+        elif self.tensorflow:
+            if not isinstance(adversary_model, tf.keras.Model):
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                    "adversary_model", "a \'tensorflow.keras.Model\'"))
+            self._initialized_models = True
+        # Note, if initialized_models == False, the models will still be lists
+
         self.predictor_model = predictor_model
         self.adversary_model = adversary_model
 

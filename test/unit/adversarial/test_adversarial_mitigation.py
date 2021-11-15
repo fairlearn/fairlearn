@@ -45,8 +45,12 @@ class fake_torch:
         def float(self): return self.X
     # def clone(self, X): return X.copy()
 
+class fake_tensorflow:
+    class keras:
+        Model = type('Model', (model_class,), {})
 
 sys.modules['torch'] = fake_torch
+# sys.modules['tensorflow'] = fake_tensorflow
 
 # Disable library specific code :)
 
