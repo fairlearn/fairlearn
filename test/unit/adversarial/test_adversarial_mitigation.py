@@ -26,10 +26,7 @@ MSE = type('continuous', (loss_class,), {})
 
 
 def KeywordToClass(kw):
-    print(kw)
     index = [Keyword.BINARY, Keyword.CATEGORY, Keyword.CONTINUOUS].index(kw)
-    print(index)
-    print([BCE, CCE, MSE][index])
     return [BCE, CCE, MSE][index]
 
 
