@@ -18,9 +18,12 @@ class loss_class:
     # class loss:
     #     def backward(self, **kwargs): return
     def __call__(self, x, y): return  # self.loss()
+
+
 BCE = type('binary', (loss_class,), {})
 CCE = type('category', (loss_class,), {})
 MSE = type('continuous', (loss_class,), {})
+
 
 def KeywordToClass(kw):
     print(kw)
@@ -28,6 +31,7 @@ def KeywordToClass(kw):
     print(index)
     print([BCE, CCE, MSE][index])
     return [BCE, CCE, MSE][index]
+
 
 layer_class = type('Layer', (object,), {})
 
@@ -54,16 +58,20 @@ class fake_torch:
         def float(self): return self.X
     # def clone(self, X): return X.copy()
 
+
 class fake_tensorflow:
     class keras:
         Model = type('Model', (model_class,), {})
+
         class losses:
             BinaryCrossentropy = type('BinaryCrossentropy', (BCE,), {})
             CategoricalCrossentropy = type('CategoricalCrossentropy', (CCE,), {})
             MeanSquaredError = type('MeanSquaredError', (MSE,), {})
+
         class optimizers:
             class Adam:
                 def __init__(self, **kwargs): pass
+
 
 class RemoveAll():
     def _evaluate(self, X): return X
@@ -109,11 +117,20 @@ def generate_data_combinations(n=10):
         yield (X, Y, Z), (X_type, Y_type, Z_type)
 
 
-def get_instance(cls=AdversarialFairness, fake_mixin=False, fake_training=False, torch=True, tensorflow=False):
-    if torch: sys.modules['torch'] = fake_torch
-    else: sys.modules['torch'] = None
-    if tensorflow: sys.modules['tensorflow'] = fake_tensorflow
-    else: sys.modules['tensorflow'] = None
+def get_instance(
+        cls=AdversarialFairness,
+        fake_mixin=False,
+        fake_training=False,
+        torch=True,
+        tensorflow=False):
+    if torch:
+        sys.modules['torch'] = fake_torch
+    else:
+        sys.modules['torch'] = None
+    if tensorflow:
+        sys.modules['tensorflow'] = fake_tensorflow
+    else:
+        sys.modules['tensorflow'] = None
 
     if torch:
         predictor = fake_torch.nn.Module()
@@ -135,10 +152,11 @@ def get_instance(cls=AdversarialFairness, fake_mixin=False, fake_training=False,
 
 # CURRENTLY not testing what the models look like, just that it is correct type
 
+
 @pytest.mark.parametrize("torch", [True, False])
 def test_classifier(torch):
     mitigator = get_instance(AdversarialFairnessClassifier, fake_training=True,
-        torch=torch, tensorflow=not torch)
+                             torch=torch, tensorflow=not torch)
     assert isinstance(mitigator, AdversarialFairness)
 
     mitigator.fit(Cont2d, Bin1d, sensitive_features=Cat)
@@ -149,7 +167,7 @@ def test_classifier(torch):
 @pytest.mark.parametrize("torch", [True, False])
 def test_regressor(torch):
     mitigator = get_instance(AdversarialFairnessRegressor, fake_training=True,
-        torch=torch, tensorflow=not torch)
+                             torch=torch, tensorflow=not torch)
     assert isinstance(mitigator, AdversarialFairness)
 
     mitigator.fit(Cont2d, Cont2d, sensitive_features=Cat)
@@ -161,7 +179,7 @@ def test_regressor(torch):
 def test_fake_models(torch):
     for ((X, Y, Z), (X_type, Y_type, Z_type)) in generate_data_combinations():
         mitigator = get_instance(fake_training=True,
-            torch=torch, tensorflow=not torch)
+                                 torch=torch, tensorflow=not torch)
         mitigator.fit(X, Y, sensitive_features=Z)
         assert isinstance(mitigator.predictor_loss, KeywordToClass(Y_type))
         assert isinstance(mitigator.adversary_loss, KeywordToClass(Z_type))
