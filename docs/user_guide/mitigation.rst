@@ -668,7 +668,7 @@ Adversarial Learning
 Fairlearn provides an implementation of the adversarial learning method presented in [#4]_.
 The authors take classic supervised learning setting in which
 a predictor neural network is trained, and extend it with an adversarial
-network that aims to predict the sensitive feature. Then, they train the
+network that aims to predict a sensitive feature. Then, they train the
 predictor not only to minimize its own loss, but also minimize the predictive
 ability of the adversarial.
 

@@ -35,7 +35,8 @@ Mitigating Fairness using Adversarial Mitigation
 # For this example we choose the feature 'sex' as the sensitive feature.
 
 
-# Get dataset.
+# %%
+# Imports used by the rest of the script
 from math import sqrt
 from fairlearn.metrics import MetricFrame, selection_rate, \
     demographic_parity_difference
