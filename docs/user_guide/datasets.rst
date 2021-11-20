@@ -300,7 +300,7 @@ others in the community.
     >>> DP_LSTAT = fm.demographic_parity_difference(y_true = y_test, 
     ...                                          y_pred = predicted, 
     ...                                          sensitive_features = X_test["LSTAT"])
-    >>> print(f"Demographic parity difference:\nB: {DP_B}\nLSTAT: {DP_LSTAT}")
+    >>> print(f"Demographic parity difference:\nB: {DP_B}\nLSTAT: {DP_LSTAT}")  # doctest: +SKIP
     Demographic parity difference for:
     B: 0.5470085470085471
     LSTAT: 0.8583829365079365
@@ -330,7 +330,7 @@ an outcome for individuals in the "lower status" category.
     ...                                 y_true=y_test, 
     ...                                 y_pred=predicted,
     ...                                 sensitive_features=X_test["B"])
-    >>> print(grouped_metric.by_group)
+    >>> print(grouped_metric.by_group)  # doctest: +SKIP
            accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
     B                                                                                                             
     False       1.0           0.0          0.0                   0.0                  0.0               0.0     10
@@ -340,7 +340,7 @@ an outcome for individuals in the "lower status" category.
     ...                                 y_true=y_test,
     ...                                 y_pred=predicted,
     ...                                 sensitive_features=X_test["LSTAT"])
-    >>> print(grouped_metric.by_group)
+    >>> print(grouped_metric.by_group)  # doctest: +SKIP
            accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
     LSTAT                                                                                                         
     False   0.84127      0.864407     0.962264                   0.8             0.962264          0.936508     63
