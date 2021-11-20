@@ -157,14 +157,15 @@ def run_AdversarialFairness_classification(estimator):
                          random_state=12345,
                          stratify=y)
 
+    estimator.epochs=100
+    estimator.batch_size=2**9
+    estimator.shuffle=True
+    estimator.progress_updates=None
+
     estimator.fit(
         X_train,
         Y_train,
-        sensitive_features=A_train,
-        epochs=100,
-        batch_size=2**9,
-        shuffle=True,
-        progress_updates=None
+        sensitive_features=A_train
     )
 
     predictions = estimator.predict(X_test)

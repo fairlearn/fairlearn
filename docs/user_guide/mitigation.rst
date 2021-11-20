@@ -822,7 +822,7 @@ The loss functions of this method [#4]_, denoted by :math:`L_P` and :math:`L_A`,
 .. testcode::
 
     mitigator = AdversarialFairness(
-        library="torch",
+        backend="torch",
         predictor_model=[50, 20],
         adversary_model=[6, 6],
         predictor_loss=torch.nn.BCEWithLogitsLoss(),

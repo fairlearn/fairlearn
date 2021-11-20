@@ -6,7 +6,9 @@ from ._constants import _IMPORT_ERROR_MESSAGE, _KWARG_ERROR_MESSAGE, \
 from numpy import finfo, float32, ndarray, zeros, argmax, logical_or, arange
 from numpy import all as np_all
 from numpy import sum as np_sum
+from sklearn.base import ClassifierMixin, RegressorMixin, BaseEstimator
 from sklearn.utils import check_array, shuffle
+from sklearn.utils.validation import check_is_fitted
 from math import ceil
 from time import time
 
@@ -28,7 +30,7 @@ class Keyword:
     TYPES = [AUTO, CLASSIFICATION, BINARY, CATEGORY, CONTINUOUS]
 
 
-class AdversarialFairness():
+class AdversarialFairness(BaseEsimator):
     r"""Train complex predictors while mitigating biases in PyTorch or Tensorflow.
 
     This algorithm is our implementation of the supervised learning method proposed in
@@ -96,7 +98,7 @@ class AdversarialFairness():
     values from one model.
 
     When passing arbitrary functions as :code:`predictor_loss`, :code:`adversary_loss`,
-    or :code:`predictor_function`, one has to take care that the underlying library
+    or :code:`predictor_function`, one has to take care that the underlying backend
     supports these functions. That is to say, one should not use
     TensorFlow loss functions with PyTorch models for instance, foremostly
     because a TensorFlow loss function may not work with PyTorch's automatic
@@ -105,18 +107,18 @@ class AdversarialFairness():
 
     Parameters
     ----------
-    library : str, default = 'auto'
-        The library to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
+    backend : str, default = 'auto'
+        The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
         or :code:`'auto'` which indicates PyTorch, TensorFlow, or to automatically infer
-        the library from the :code:`predictor_model` and which are installed.
+        the backend from the :code:`predictor_model` and which are installed.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
         The predictor model to train. If a list of integers
         :math:`[n_1, n_2, \dots, n_k]` is passed, a fully
         connected neural network with sigmoidal activation functions is
         constructed with :math:`k` hidden layers that have :math:`n_i` nodes
-        respectively. If :code:`library` is specified, we cannot pass a model
-        that uses a different library.
+        respectively. If :code:`backend` is specified, we cannot pass a model
+        that uses a different backend.
 
     adversary_model : list, torch.nn.Module, tensorflow.keras.Model
         The adversary model to train. Must be the same type as the
@@ -125,14 +127,14 @@ class AdversarialFairness():
     predictor_loss : str, callable, default = 'auto'
         Either a string that indicates the type of :code:`y`,
         or :code:`'auto'` to infer the type of :code:`y`, or a callable
-        loss function with an API that follows the chosen library (torch or
+        loss function with an API that follows the chosen backend (torch or
         tensorflow). Note that torch and tensorflow loss functions don't agree
         on parameter order.
 
     adversary_loss : str, callable, default = 'auto'
         Either a string that indicates the type of :code:`sensitive_features`,
         or :code:`'auto'` to infer the type of :code:`sensitive_features`, or a
-        callable loss function with an API that follows the chosen library
+        callable loss function with an API that follows the chosen backend
         (torch or tensorflow). Note that torch and tensorflow loss functions
         don't agree on parameter order.
 
@@ -161,6 +163,28 @@ class AdversarialFairness():
         A boolean to indicate whether we can use cuda:0 (first GPU) when training
         a PyTorch model.
 
+    epochs : int, default = 1
+        Number of epochs to train for.
+
+    batch_size : int, default = -1
+        Batch size. For no batching, set this to -1.
+
+    shuffle : bool, default = False
+        Iff True, shuffle the data after every iteration. Default is False
+
+    progress_updates : number, optional
+        If a number :math:`t` is provided, we regularly print an update
+        about the training loop after at least every :math:`t` seconds.
+
+    skip_validation : bool
+        Skip the validation of the data. Useful because validate_input is
+        a costly operation, and we may instead pass all data to validate_input
+        at an earlier stage.
+
+    callback_fn : callable
+        Callback function, called every epoch. For instance useable when
+        wanting to validate. Should take zero arguments.
+
     References
     ----------
     .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
@@ -181,7 +205,11 @@ class AdversarialFairness():
     >>> mitigator = AdversarialFairness(
     ...     predictor_model=[50, 20],
     ...     adversary_model=[6, 6],
-    ...     learning_rate=0.0001
+    ...     learning_rate=0.0001,
+    ...     epochs=100,
+    ...     batch_size=2**9,
+    ...     shuffle=True,
+    ...     progress_updates=5
     ... )
     >>>
     >>> def transform(X):
@@ -206,11 +234,7 @@ class AdversarialFairness():
     >>> mitigator.fit(
     ...     X,
     ...     y,
-    ...     sensitive_features=sensitive_feature,
-    ...     epochs=100,
-    ...     batch_size=2**9,
-    ...     shuffle=True,
-    ...     progress_updates=5
+    ...     sensitive_features=sensitive_feature
     ... )
     |==>                  | Epoch: 12/100, Batch: 50/89, ETA: 38.30 sec. Loss (pred/adv): 0.55/0.63
     |=====>               | Epoch: 24/100, Batch: 35/89, ETA: 32.78 sec. Loss (pred/adv): 0.57/0.62
@@ -239,7 +263,7 @@ class AdversarialFairness():
     """
 
     def __init__(self, *,
-                 library='auto',
+                 backend='auto',
                  predictor_model,
                  adversary_model,
                  predictor_loss='auto',
@@ -251,38 +275,103 @@ class AdversarialFairness():
                  adversary_optimizer=None,
                  learning_rate=0.001,
                  alpha=1.0,
-                 cuda=False
+                 cuda=False,
+                 epochs=1,
+                 batch_size=-1,
+                 shuffle=False,
+                 progress_updates=None,
+                 skip_validation=False,
+                 callback_fn=None,
+                 warm_start=False
                  ):
-        """Initialize Adversarial Mitigation."""
-        self._init_models(library, predictor_model, adversary_model)
-
-        # Inherit library-specific code
-        if self.torch:
-            self._extend_instance(AdversarialPytorchMixin)
-        elif self.tensorflow:
-            self._extend_instance(AdversarialTensorflowMixin)
-
-        self._init_losses(predictor_loss, adversary_loss, predictor_function)
-        self._init_constraints(constraints)
+        self.backend = backend
+        self.predictor_model = predictor_model
+        self.adversary_model = adversary_model
+        self.predictor_loss = predictor_loss
+        self.adversary_loss = adversary_loss
+        self.predictor_function = predictor_function
+        self.constraints = constraints
         self.optimizer = optimizer
         self.predictor_optimizer = predictor_optimizer
         self.adversary_optimizer = adversary_optimizer
         self.learning_rate = learning_rate
         self.alpha = alpha
-        self._init_cuda(cuda)
+        self.cuda = cuda
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.progress_updates = progress_updates
+        self.skip_validation = skip_validation
+        self.callback_fn = callback_fn
+        self.warm_start = warm_start
 
-        # The design is very data-dependent. Instead of having users specify
-        # every nitty-gritty detail of the data they will pass, we will try to
-        # infer as much detail as possible the first time that data is passed
-        self.setup_with_data_ = False
+    def setup(self, X, Y, Z):
+        """Finalize setup that is required as soon as the first data is given."""
+        self._validate_backend(backend, predictor_model, adversary_model)
 
-    def fit(self, X, y, *, sensitive_features,
-            epochs=1,
-            batch_size=-1,
-            shuffle=False,
-            progress_updates=None,
-            skip_validation=False,
-            callback_fn=None):
+        # Inherit backend-specific code
+        if self._torch:
+            self._extend_instance(AdversarialPytorchMixin)
+        elif self._tensorflow:
+            self._extend_instance(AdversarialTensorflowMixin)
+
+        # Verify the constraints and set up the corresponding network structure.
+        if (constraints == "demographic_parity"):
+            self._pass_y = False
+        elif (constraints == "equalized_odds"):
+            self._pass_y = True
+        else:
+            raise ValueError(_KWARG_ERROR_MESSAGE.format(
+                "constraints", "\'demographic_parity\' or \'equalized_odds\'"))
+
+        # Initialize models if not done yet
+        if not self._initialized_models:
+            predictor_list_nodes = [X.shape[1]] + self.predictor_model + [Y.shape[1]]
+            adversarial_in = Y.shape[1] * (2 if self._pass_y else 1)
+            adversary_list_nodes = [adversarial_in] + self.adversary_model + [Z.shape[1]]
+            if self._torch:
+                from ._models import getTorchModel as getModel
+            elif self._tensorflow:
+                from ._models import getTensorflowModel as getModel
+
+            self._predictor_model = getModel(list_nodes=predictor_list_nodes)
+            self._adversary_model = getModel(list_nodes=adversary_list_nodes)
+            self._initialized_models = True
+
+        predictor_loss = self._verify_dist_type(self.predictor_loss, "predictor_loss")
+        adversary_loss = self._verify_dist_type(self.adversary_loss, "adversary_loss")
+        predictor_function = self._verify_dist_type(self.predictor_function, "predictor_function")
+
+        # Setup losses, if they are set to 'auto'
+        self._predictor_loss = self._get_loss(Y, predictor_loss, "y")
+        self._adversary_loss = self._get_loss(Z, adversary_loss, "sensitive_features")
+        self._predictor_function = self._get_function(Y, predictor_function, "y")
+
+        # Setup optimizers, because now we definitely have models set up
+        self._setup_optimizer(self.optimizer)
+
+        # Setup cuda
+        if (not self.cuda):
+            self._cuda = False
+        elif (self.cuda):
+            if (not self._torch):
+                raise ValueError("Cuda is PyTorch-only")
+            if not torch.cuda.is_available():
+                raise ValueError("Cuda is not available")
+            self._cuda = True
+            self._device = torch.device("cuda:0")
+
+        # Use CUDA
+        if self._cuda:
+            self._adversary_model = self._adversary_model.to(self._device)
+            self._predictor_model = self._predictor_model.to(self._device)
+
+        self._setup = True
+
+        # Sklearn-parameters
+        self.n_features_in_ = Y.shape[1]
+
+    def fit(self, X, y, *, sensitive_features):
         """
         Fit the model based on the given training data and sensitive features.
 
@@ -297,29 +386,14 @@ class AdversarialFairness():
         sensitive_features : numpy.ndarray
             Two-dimensional numpy array containing the sensitive features of the
             training data.
-
-        epochs : int, default = 1
-            Number of epochs to train for.
-
-        batch_size : int, default = -1
-            Batch size. For no batching, set this to -1.
-
-        shuffle : bool, default = False
-            Iff True, shuffle the data after every iteration. Default is False
-
-        progress_updates : number, optional
-            If a number :math:`t` is provided, we regularly print an update
-            about the training loop after at least every :math:`t` seconds.
-
-        skip_validation : bool
-            Skip the validation of the data. Useful because validate_input is
-            a costly operation, and we may instead pass all data to validate_input
-            at an earlier stage.
-
-        callback_fn : callable
-            Callback function, called every epoch. For instance useable when
-            wanting to validate. Should take zero arguments.
         """
+        epochs = self.epochs
+        batch_size = self.batch_size
+        shuffle = self.shuffle
+        progress_updates = self.progress_updates
+        skip_validation = self.skip_validation
+        callback_fn = self.callback_fn
+
         X, Y, Z = self._validate_input(X, y, sensitive_features)
         # TODO decreasing learning rate: not really necessary with adam
         # TODO stopping condition!? If |grad| < eps
@@ -363,7 +437,7 @@ class AdversarialFairness():
         X, Y, Z = shuffle(X, Y, Z)
         return X, Y, Z
 
-    def partial_fit(self, X, y, *, sensitive_features, skip_validation=False):
+    def partial_fit(self, X, y, *, sensitive_features):
         """
         Perform one epoch on given samples and update model.
 
@@ -378,16 +452,28 @@ class AdversarialFairness():
         sensitive_features : numpy.ndarray
             Two-dimensional numpy array containing the sensitive feature of the
             training data.
-
-        skip_validation : bool
-            Skip the validation of the data. Useful because validate_input is
-            a costly operation, and we may instead pass all data to validate_input
-            at an earlier stage.
         """
+        skip_validation = self.skip_validation
+    
         X, Y, Z = X, y, sensitive_features
         if not skip_validation:
             X, Y, Z = self._validate_input(X, Y, Z)
         self._train_step(X, Y, Z)
+
+    def decision_function(self, X):
+        if not self._setup:
+            raise UserWarning("Havent seen data yet")
+
+        check_is_fitted(self)
+
+        X = _check_array(X)
+
+        Y_pred = self._evaluate(X)
+
+        assert Y_pred.ndim == 2
+
+        return Y_pred
+
 
     def predict(self, X):
         """
@@ -404,11 +490,10 @@ class AdversarialFairness():
             Two-dimensional array containing the model predictions fed through
             the :code:`predictor_function`
         """
-        if not self._initialized_models:
-            raise RuntimeError(
-                "Models have not been initialized, as we have seen no data yet.")
-        if not self._setup_with_data:
+        if not self._setup:
             raise UserWarning("Havent seen data yet")
+
+        check_is_fitted(self)
 
         X = _check_array(X)
 
@@ -484,37 +569,6 @@ class AdversarialFairness():
         else:
             return choice
 
-    def _setup_with_data(self, X, Y, Z):
-        """Finalize setup that is required as soon as the first data is given."""
-        self.setup_with_data_ = True
-
-        # Initialize models if not done yet
-        if not self._initialized_models:
-            predictor_list_nodes = [X.shape[1]] + self.predictor_model + [Y.shape[1]]
-            adversarial_in = Y.shape[1] * (2 if self.pass_y else 1)
-            adversary_list_nodes = [adversarial_in] + self.adversary_model + [Z.shape[1]]
-            if self.torch:
-                from ._models import getTorchModel as getModel
-            elif self.tensorflow:
-                from ._models import getTensorflowModel as getModel
-
-            self.predictor_model = getModel(list_nodes=predictor_list_nodes)
-            self.adversary_model = getModel(list_nodes=adversary_list_nodes)
-            self._initialized_models = True
-
-        # Setup losses, if they are set to 'auto'
-        self.predictor_loss = self._get_loss(Y, self.predictor_loss, "y")
-        self.adversary_loss = self._get_loss(Z, self.adversary_loss, "sensitive_features")
-        self.predictor_function = self._get_function(Y, self.predictor_function, "y")
-
-        # Setup optimizers, because now we definitely have models set up
-        self._setup_optimizer(self.optimizer)
-
-        # Use CUDA
-        if self.cuda:
-            self.adversary_model = self.adversary_model.to(self.device)
-            self.predictor_model = self.predictor_model.to(self.device)
-
     def _validate_input(self, X, Y, Z):
         """Validate the input data."""
         X = _check_array(X)
@@ -531,23 +585,23 @@ class AdversarialFairness():
                 "Input data has an ambiguous number of rows: {}, {}, {}.".format(
                     X.shape[0], Y.shape[0], Z.shape[0]))
 
-        if not self.setup_with_data_:
-            self._setup_with_data(X, Y, Z)
+        if (not self._setup) or (not self.warm_start):
+            self.setup(X, Y, Z)
 
         return X, Y, Z
 
-    def _init_models(self, library, predictor_model, adversary_model):
+    def _validate_backend(self, backend, predictor_model, adversary_model):
         """
         Import either PyTorch or Tensorflow, depending on predictor.
 
-        if library is 'auto', then infer from predictor_model. If predictor_model
+        if backend is 'auto', then infer from predictor_model. If predictor_model
         is a list, then choose torch or tensorflow, depending on which is installed.
         """
-        # The library to use
-        self.torch = False
-        self.tensorflow = False
+        # The backend to use
+        self._torch = False
+        self._tensorflow = False
 
-        # Discover which librarys are available
+        # Discover which backends are available
         torch_installed = False
         tf_installed = False
         global torch
@@ -563,43 +617,43 @@ class AdversarialFairness():
         except ImportError:
             pass
 
-        if library == 'torch':
+        if backend == 'torch':
             if not torch_installed:
                 raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
-            self.torch = True
-        elif library == 'tensorflow':
+            self._torch = True
+        elif backend == 'tensorflow':
             if not tf_installed:
                 raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
-            self.tensorflow = True
-        elif library == 'auto':
+            self._tensorflow = True
+        elif backend == 'auto':
             if (not torch_installed) and (not tf_installed):
                 raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
             # At this point, either tensorflow or torch is installed
             if isinstance(predictor_model, list):
                 if torch_installed:
-                    self.torch = True
+                    self._torch = True
                 elif tf_installed:
-                    self.tensorflow = True
+                    self._tensorflow = True
             elif torch_installed and isinstance(predictor_model, torch.nn.Module):
-                self.torch = True
+                self._torch = True
             elif tf_installed and isinstance(predictor_model, tf.keras.Model):
-                self.tensorflow = True
+                self._tensorflow = True
             else:
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     'predictor_model',
                     "a list, torch.nn.Module, or tf.keras.Model. Also, " +
-                    "make sure to have installed the corresponding library"))
+                    "make sure to have installed the corresponding backend"))
         else:
             raise ValueError(
                 _KWARG_ERROR_MESSAGE.format(
-                    'library',
+                    'backend',
                     "one of [\'auto\', \'torch\',\'tensorflow\']"))
 
         # Assert some conditions for sanity, even though these will be ensured by checks above.
-        # Assert either self.torch or self.tensorflow is selected
-        assert self.torch or self.tensorflow
+        # Assert either self._torch or self._tensorflow is selected
+        assert self._torch or self._tensorflow
         # Assert package is selected => package is installed
-        assert ((not self.torch) or torch_installed) and ((not self.tensorflow) or tf_installed)
+        assert ((not self._torch) or torch_installed) and ((not self._tensorflow) or tf_installed)
 
         # Also check that the type of adversary_model is the same as predictor_model.
         if isinstance(predictor_model, list):
@@ -608,20 +662,17 @@ class AdversarialFairness():
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     "adversary_model", "a list"))
             self._initialized_models = False
-        elif self.torch:
+        elif self._torch:
             if not isinstance(adversary_model, torch.nn.Module):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     "adversary_model", "a \'torch.nn.Module\'"))
             self._initialized_models = True
-        elif self.tensorflow:
+        elif self._tensorflow:
             if not isinstance(adversary_model, tf.keras.Model):
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     "adversary_model", "a \'tensorflow.keras.Model\'"))
             self._initialized_models = True
         # Note, if initialized_models == False, the models will still be lists
-
-        self.predictor_model = predictor_model
-        self.adversary_model = adversary_model
 
     def _verify_dist_type(self, input_type, dist_name):
         if callable(input_type):
@@ -632,33 +683,27 @@ class AdversarialFairness():
         raise ValueError(_KWARG_ERROR_MESSAGE.format(
             dist_name, "one of {} or a callable".format(Keyword.TYPES)))
 
-    def _init_losses(self, predictor_loss, adversary_loss, predictor_function):
-        self.predictor_loss = self._verify_dist_type(predictor_loss, "predictor_loss")
-        self.adversary_loss = self._verify_dist_type(adversary_loss, "adversary_loss")
-        self.predictor_function = self._verify_dist_type(predictor_function, "predictor_function")
-
-    def _init_constraints(self, constraints):
+    def _validate_constraints(self, constraints):
         """Verify the constraints and set up the corresponding network structure."""
-        self.constraints = constraints
         if (constraints == "demographic_parity"):
-            self.pass_y = False
+            self._pass_y = False
         elif (constraints == "equalized_odds"):
-            self.pass_y = True
+            self._pass_y = True
         else:
             raise ValueError(_KWARG_ERROR_MESSAGE.format(
                 "constraints", "\'demographic_parity\' or \'equalized_odds\'"))
 
-    def _init_cuda(self, cuda):
+    def _validate_cuda(self, cuda):
         """Verify whether we can use the GPU and move pytorch model to it."""
         if (not cuda):
-            self.cuda = False
+            self._cuda = False
         elif (cuda):
-            if (not self.torch):
+            if (not self._torch):
                 raise ValueError("Cuda is PyTorch-only")
             if not torch.cuda.is_available():
                 raise ValueError("Cuda is not available")
-            self.cuda = True
-            self.device = torch.device("cuda:0")
+            self._cuda = True
+            self._device = torch.device("cuda:0")
 
     def _extend_instance(self, cls_):
         """Apply mixins to a class instance after creation."""
@@ -709,7 +754,7 @@ class AdversarialMixin():
         """
         Initialize the optimizers.
 
-        Setup self.predictor_optimizer and self.adversary_optimizer using the
+        Setup self._predictor_optimizer and self._adversary_optimizer using the
         parameter optimizer given by the user.
         """
         if not isinstance(optimizer, str) and \
@@ -754,11 +799,11 @@ class AdversarialPytorchMixin(AdversarialMixin):
         """
         self.predictor_model.eval()
         X = torch.from_numpy(X).float()
-        if self.cuda:
-            X = X.to(self.device)
+        if self._cuda:
+            X = X.to(self._device)
         with torch.no_grad():
             Y_pred = self.predictor_model(X)
-        if self.cuda:
+        if self._cuda:
             Y_pred = Y_pred.detach().cpu().numpy()
         else:
             Y_pred = Y_pred.numpy()
@@ -777,24 +822,24 @@ class AdversarialPytorchMixin(AdversarialMixin):
         self.adversary_model.train()
 
         # Clear gradient
-        self.predictor_optimizer.zero_grad()
-        self.adversary_optimizer.zero_grad()
+        self._predictor_optimizer.zero_grad()
+        self._adversary_optimizer.zero_grad()
 
         Y_hat = self.predictor_model(X)
-        LP = self.predictor_loss(Y_hat, Y)
+        LP = self._predictor_loss(Y_hat, Y)
         LP.backward(retain_graph=True)  # Check what this does at some point in time
 
         dW_LP = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
 
-        self.predictor_optimizer.zero_grad()
-        self.adversary_optimizer.zero_grad()
+        self._predictor_optimizer.zero_grad()
+        self._adversary_optimizer.zero_grad()
 
         # For equalized odds
-        if self.pass_y:
+        if self._pass_y:
             Y_hat = torch.cat((Y_hat, Y), dim=1)
 
         Z_hat = self.adversary_model(Y_hat)
-        LA = self.adversary_loss(Z_hat, Z)
+        LA = self._adversary_loss(Z_hat, Z)
         LA.backward()
 
         dW_LA = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
@@ -807,8 +852,8 @@ class AdversarialPytorchMixin(AdversarialMixin):
             # Calculate dW
             p.grad = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
 
-        self.predictor_optimizer.step()
-        self.adversary_optimizer.step()
+        self._predictor_optimizer.step()
+        self._adversary_optimizer.step()
 
         return (LP.item(), LA.item())
 
@@ -816,22 +861,22 @@ class AdversarialPytorchMixin(AdversarialMixin):
         """
         Create the optimizers for PyTorch.
 
-        Setup self.predictor_optimizer and self.adversary_optimizer using the
+        Setup self._predictor_optimizer and self._adversary_optimizer using the
         parameter optimizer given by the user.
         """
         super(AdversarialPytorchMixin, self)._setup_optimizer(optimizer)
         if isinstance(optimizer, str):
             # keyword cases.
             if optimizer.lower() == "adam":
-                self.predictor_optimizer = torch.optim.Adam(
-                    self.predictor_model.parameters(), lr=self.learning_rate)
-                self.adversary_optimizer = torch.optim.Adam(
-                    self.adversary_model.parameters(), lr=self.learning_rate)
+                self._predictor_optimizer = torch.optim.Adam(
+                    self._predictor_model.parameters(), lr=self.learning_rate)
+                self._adversary_optimizer = torch.optim.Adam(
+                    self._adversary_model.parameters(), lr=self.learning_rate)
             elif optimizer.lower() == "sgd":
-                self.predictor_optimizer = torch.optim.SGD(
-                    self.predictor_model.parameters(), lr=self.learning_rate)
-                self.adversary_optimizer = torch.optim.SGD(
-                    self.adversary_model.parameters(), lr=self.learning_rate)
+                self._predictor_optimizer = torch.optim.SGD(
+                    self._predictor_model.parameters(), lr=self.learning_rate)
+                self._adversary_optimizer = torch.optim.SGD(
+                    self._adversary_model.parameters(), lr=self.learning_rate)
             else:
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
                     'optimizer', '"Adam" or "SGD" or an optimizer'))
@@ -856,10 +901,10 @@ class AdversarialPytorchMixin(AdversarialMixin):
         Y = torch.from_numpy(Y).float()
         Z = torch.from_numpy(Z).float()
 
-        if self.cuda:
-            X = X.to(self.device)
-            Y = Y.to(self.device)
-            Z = Z.to(self.device)
+        if self._cuda:
+            X = X.to(self._device)
+            Y = Y.to(self._device)
+            Z = Z.to(self._device)
 
         return X, Y, Z
 
@@ -892,15 +937,15 @@ class AdversarialTensorflowMixin(AdversarialMixin):
             # behavior during training versus inference (e.g. Dropout).
             Y_hat = self.predictor_model(X, training=True)
 
-            LP = self.predictor_loss(Y, Y_hat)
+            LP = self._predictor_loss(Y, Y_hat)
 
             # For equalized odds
-            if self.pass_y:
+            if self._pass_y:
                 Y_hat = tf.concat((Y_hat, Y), axis=1)
 
             Z_hat = self.adversary_model(Y_hat)
 
-            LA = self.adversary_loss(Z, Z_hat)
+            LA = self._adversary_loss(Z, Z_hat)
 
         dW_LP = tape.gradient(LP, self.predictor_model.trainable_variables)
         dU_LA = tape.gradient(LA, self.adversary_model.trainable_variables)
@@ -916,9 +961,9 @@ class AdversarialTensorflowMixin(AdversarialMixin):
             # Calculate dW
             dW_LP[i] = dW_LP[i] - (proj * unit_dW_LA) - (self.alpha * dW_LA[i])
 
-        self.predictor_optimizer.apply_gradients(
+        self._predictor_optimizer.apply_gradients(
             zip(dW_LP, self.predictor_model.trainable_variables))
-        self.adversary_optimizer.apply_gradients(
+        self._adversary_optimizer.apply_gradients(
             zip(dU_LA, self.adversary_model.trainable_variables))
 
         return (LP.numpy().item(), LA.numpy().item())
@@ -927,21 +972,21 @@ class AdversarialTensorflowMixin(AdversarialMixin):
         """
         Create the optimizers for TensorFlow.
 
-        Setup self.predictor_optimizer and self.adversary_optimizer using the
+        Setup self._predictor_optimizer and self._adversary_optimizer using the
         parameter optimizer given by the user.
         """
         super(AdversarialTensorflowMixin, self)._setup_optimizer(optimizer)
         if isinstance(optimizer, str):
             # keyword cases.
             if optimizer.lower() == "adam":
-                self.predictor_optimizer = tf.keras.optimizers.Adam(
+                self._predictor_optimizer = tf.keras.optimizers.Adam(
                     learning_rate=self.learning_rate)
-                self.adversary_optimizer = tf.keras.optimizers.Adam(
+                self._adversary_optimizer = tf.keras.optimizers.Adam(
                     learning_rate=self.learning_rate)
             elif optimizer.lower() == "sgd":
-                self.predictor_optimizer = tf.keras.optimizers.SGD(
+                self._predictor_optimizer = tf.keras.optimizers.SGD(
                     learning_rate=self.learning_rate)
-                self.adversary_optimizer = tf.keras.optimizers.SGD(
+                self._adversary_optimizer = tf.keras.optimizers.SGD(
                     learning_rate=self.learning_rate)
             else:
                 raise ValueError(_KWARG_ERROR_MESSAGE.format(
@@ -960,7 +1005,7 @@ class AdversarialTensorflowMixin(AdversarialMixin):
             return tf.keras.losses.MeanSquaredError()
 
 
-class AdversarialFairnessClassifier(AdversarialFairness):
+class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
     """Creates an AdversarialFairness with loss and predictions set to classification."""
 
     def __init__(self, **kwargs):
@@ -970,7 +1015,7 @@ class AdversarialFairnessClassifier(AdversarialFairness):
         super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
 
-class AdversarialFairnessRegressor(AdversarialFairness):
+class AdversarialFairnessRegressor(AdversarialFairness, RegressorMixin):
     """Create an AdversarialFairness that has predictor loss set to regression."""
 
     def __init__(self, *args, **kwargs):

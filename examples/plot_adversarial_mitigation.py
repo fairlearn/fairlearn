@@ -112,14 +112,18 @@ mitigator = AdversarialFairnessClassifier(
     predictor_model=[50, 20],
     adversary_model=[6, 6],
     constraints="demographic_parity",
-    learning_rate=0.0001
+    learning_rate=0.0001,
+    epochs=100,
+    batch_size=2**9,
+    shuffle=True,
+    progress_updates=5
 )
 
 # %%
 # This definition of the mitigator is equivalent to the following
 
 mitigator = AdversarialFairness(
-    library="torch",
+    backend="torch",
     predictor_model=[50, 20],
     adversary_model=[6, 6],
     predictor_loss=torch.nn.BCEWithLogitsLoss(reduction='mean'),
@@ -129,7 +133,11 @@ mitigator = AdversarialFairness(
     optimizer="Adam",
     learning_rate=0.0001,
     alpha=1.0,
-    cuda=False
+    cuda=False,
+    epochs=100,
+    batch_size=2**9,
+    shuffle=True,
+    progress_updates=5
 )
 
 # %%
@@ -142,11 +150,7 @@ mitigator = AdversarialFairness(
 mitigator.fit(
     X_train,
     Y_train,
-    sensitive_features=Z_train,
-    epochs=100,
-    batch_size=2**9,
-    shuffle=True,
-    progress_updates=5
+    sensitive_features=Z_train
 )
 
 # %%
@@ -269,12 +273,14 @@ mitigator = AdversarialFairnessClassifier(
     predictor_optimizer=predictor_optimizer,
     adversary_optimizer=adversary_optimizer,
     alpha=0.1,
-    constraints='demographic_parity'
+    constraints='demographic_parity',
+    epochs=13,
+    batch_size=2**8,
+    shuffle=True,
+    progress_updates=None,
+    callback_fn=callback_fn,
+    warm_start=True
 )
-
-# Carefully tweaked ;)
-epochs = 13
-batch_size = 2**8
 
 # %%
 # Instead of only looking at training loss, we also take a look at some validation
@@ -315,12 +321,7 @@ def callback_fn():
 mitigator.fit(
     X,
     Y,
-    sensitive_features=Z,
-    epochs=epochs,
-    batch_size=batch_size,
-    shuffle=True,
-    progress_updates=None,
-    callback_fn=callback_fn)
+    sensitive_features=Z)
 
 
 # %%
@@ -343,12 +344,7 @@ def callback_fn():
 mitigator.fit(
     X,
     Y,
-    sensitive_features=Z,
-    epochs=epochs,
-    batch_size=batch_size,
-    shuffle=True,
-    progress_updates=None,
-    callback_fn=callback_fn)
+    sensitive_features=Z)
 # %%
 # We take a look at the results. Notice we achieve a much lower demographic parity
 # difference than in Exercise 1! This does come at the cost of some accuracy, but
