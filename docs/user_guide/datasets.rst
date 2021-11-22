@@ -283,8 +283,6 @@ others in the community.
 
     >>> from sklearn.linear_model import LogisticRegression
     >>> from sklearn.model_selection import train_test_split
-    >>> import sklearn.metrics as skm
-    >>> import fairlearn.metrics as fm
     >>> import numpy as np
     >>> X_clf = X.assign(B=lambda d: d['B'] > 136.9, 
     ...                  LSTAT=lambda d: d['LSTAT'] > np.median(d['LSTAT']))
@@ -319,6 +317,8 @@ lower than when *LSTAT* is `False`.
 These results indicate that our simple model is worse at predicting 
 an outcome for individuals in the "lower status" category.
 
+    >>> import sklearn.metrics as skm
+    >>> import fairlearn.metrics as fm
     >>> metrics = {'accuracy': skm.accuracy_score,
     ...            'precision': skm.precision_score,
     ...            'recall': skm.recall_score,
