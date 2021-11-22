@@ -825,21 +825,3 @@ class MetricFrame:
                 col_list.append(col_name)
                 target[col_name] = source[:, i]
             column_mapping[base_name] = col_list
-
-    def _mask_from_tuple(self, index_tuple, feature_list) -> np.ndarray:
-        """Generate a mask for the ``y_true``, ``y_pred`` and ``sample_params`` arrays.
-
-        Given a tuple of feature values (which indexes the ``by_groups``
-        DataFrame), generate a mask to select the corresponding samples
-        from the input
-        """
-        # Following are internal sanity checks
-        assert isinstance(index_tuple, tuple)
-        assert len(index_tuple) == len(feature_list)
-
-        result = feature_list[0].get_mask_for_class(index_tuple[0])
-        for i in range(1, len(index_tuple)):
-            result = np.logical_and(
-                result,
-                feature_list[i].get_mask_for_class(index_tuple[i]))
-        return result
