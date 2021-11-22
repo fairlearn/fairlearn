@@ -3,7 +3,6 @@
 
 import functools
 import numpy as np
-import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
@@ -69,7 +68,6 @@ def test_mixed_metrics():
         assert expected == actual
 
 
-@pytest.mark.skip("Trouble building internal DataFrame")
 def test_multid_input_output():
     # In this, both y_t and y_p are 2d arrays
     # The metric results are also arrays
@@ -84,10 +82,12 @@ def test_multid_input_output():
                                  sensitive_features=g_1)
 
     expected_overall = skm.r2_score(y_t_2, y_p_2, multioutput='raw_values')
-    assert np.array_equal(target.overall, expected_overall)
+    # Have to use allclose rather than equal since we don't know how
+    # groupby will do its slicing
+    assert np.allclose(target.overall, expected_overall, rtol=1e-12, atol=1e-10)
     for g in np.unique(g_1):
         mask = g_1 == g
 
         expected = skm.r2_score(y_t_2[mask], y_p_2[mask], multioutput='raw_values')
         actual = target.by_group[g]
-        assert np.array_equal(actual, expected)
+        assert np.allclose(actual, expected, rtol=1e-12, atol=1e-10)

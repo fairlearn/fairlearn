@@ -37,13 +37,23 @@ class AnnotatedMetricFunction:
         """Return the mapping from column names to kwarg names."""
         return self._kwargs
 
-    def invoke(self, df: pd.DataFrame):
+    def invoke(self, df: pd.DataFrame, split_columns: Dict[str, List[str]]):
         """Invoke the wrapped function on the supplied DataFrame."""
-        args = [df[arg_name] for arg_name in self.args]
+        args = []
+        for arg_name in self.args:
+            if arg_name in split_columns:
+                sub_frame = df[split_columns[arg_name]]
+                args.append(sub_frame.to_numpy())
+            else:
+                args.append(df[arg_name])
 
         kwargs = dict()
         for func_arg_name, data_arg_name in self.kwargs.items():
-            kwargs[func_arg_name] = df[data_arg_name]
+            if data_arg_name in split_columns:
+                sub_frame = df[split_columns[data_arg_name]]
+                kwargs[func_arg_name] = sub_frame.to_numpy()
+            else:
+                kwargs[func_arg_name] = df[data_arg_name]
 
         result = self.func(*args, **kwargs)
 

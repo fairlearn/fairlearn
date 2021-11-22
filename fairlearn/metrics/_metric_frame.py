@@ -3,6 +3,7 @@
 
 import copy
 import logging
+import uuid
 import numpy as np
 import pandas as pd
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -42,11 +43,12 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells.
 
 def apply_to_dataframe(
         data: pd.DataFrame,
-        metric_functions: Dict[str, AnnotatedMetricFunction]) -> pd.Series:
+        metric_functions: Dict[str, AnnotatedMetricFunction],
+        split_columns: Dict[str, List[str]]) -> pd.Series:
     """Apply metric functions to a DataFrame."""
     values = dict()
     for function_name, metric_function in metric_functions.items():
-        values[function_name] = metric_function.invoke(data)
+        values[function_name] = metric_function.invoke(data, split_columns)
     result = pd.Series(data=values.values(), index=values.keys())
     return result
 
@@ -305,9 +307,11 @@ class MetricFrame:
             self._cf_names = [x.name for x in cf_list]
 
         # Prepare the DataFrame
+        split_columns = dict()
         all_data = pd.DataFrame(dtype='object')
-        all_data['y_true'] = y_t
-        all_data['y_pred'] = y_p
+        self._add_array_to_dataframe(all_data, y_t, 'y_true', split_columns)
+        self._add_array_to_dataframe(all_data, y_p, 'y_pred', split_columns)
+
         for sf in sf_list:
             all_data[sf.name] = list(sf._raw_values)
         if cf_list is not None:
@@ -319,7 +323,7 @@ class MetricFrame:
             kwarg_dict = dict()
             for param_name, param_values in fc.sample_params_.items():
                 col_name = f'{name}_{param_name}'
-                all_data[col_name] = list(param_values)
+                self._add_array_to_dataframe(all_data, param_values, col_name, split_columns)
                 kwarg_dict[param_name] = col_name
             amf = AnnotatedMetricFunction(func=fc._func,
                                           args=['y_true', 'y_pred'],
@@ -337,10 +341,13 @@ class MetricFrame:
             nameset.add(name)
 
         if self._cf_names is None:
-            self._overall = apply_to_dataframe(all_data, metric_functions=annotated_funcs)
+            self._overall = apply_to_dataframe(
+                all_data,
+                metric_functions=annotated_funcs,
+                split_columns=split_columns)
         else:
             temp = all_data.groupby(by=self._cf_names).apply(
-                apply_to_dataframe, metric_functions=annotated_funcs
+                apply_to_dataframe, metric_functions=annotated_funcs, split_columns=split_columns
             )
             # If there are multiple control features, might have missing combinations
             if len(self._cf_names) > 1:
@@ -357,7 +364,7 @@ class MetricFrame:
             rows = copy.deepcopy(cf_list) + rows
 
         temp = all_data.groupby([x.name for x in rows]).apply(
-            apply_to_dataframe, metric_functions=annotated_funcs)
+            apply_to_dataframe, metric_functions=annotated_funcs, split_columns=split_columns)
         if len(rows) > 1:
             all_indices = pd.MultiIndex.from_product([x.classes for x in rows],
                                                      names=[x.name for x in rows])
@@ -798,6 +805,26 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
+
+    def _add_array_to_dataframe(
+            self,
+            target: pd.DataFrame,
+            source: np.ndarray,
+            base_name: str,
+            column_mapping: Dict[str, List[str]]):
+        if len(source.shape) == 1:
+            target[base_name] = source
+            return
+        else:
+            n_cols = source.shape[1]
+            unique_str = str(uuid.uuid4())
+            name_fmt = f"{base_name}_{unique_str}"+"{0}"
+            col_list = []
+            for i in range(n_cols):
+                col_name = name_fmt.format(i)
+                col_list.append(col_name)
+                target[col_name] = source[:, i]
+            column_mapping[base_name] = col_list
 
     def _mask_from_tuple(self, index_tuple, feature_list) -> np.ndarray:
         """Generate a mask for the ``y_true``, ``y_pred`` and ``sample_params`` arrays.
