@@ -296,8 +296,15 @@ class MetricFrame:
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
+
+        self._all_data = pd.DataFrame(dtype='object')
+        self._split_columns: Dict[str, List[str]] = dict()
+
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
+
+        self._accrete_array(y_t, 'y_true')
+        self._accrete_array(y_p, 'y_pred')
 
         func_dict = self._process_functions(metrics, sample_params)
 
@@ -313,24 +320,19 @@ class MetricFrame:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name for x in cf_list]
 
-        # Prepare the DataFrame
-        split_columns = dict()
-        all_data = pd.DataFrame(dtype='object')
-        self._add_array_to_dataframe(all_data, y_t, 'y_true', split_columns)
-        self._add_array_to_dataframe(all_data, y_p, 'y_pred', split_columns)
-
+        # Add sensitive and conditional features to _all_data
         for sf in sf_list:
-            all_data[sf.name] = list(sf._raw_values)
+            self._all_data[sf.name] = list(sf._raw_values)
         if cf_list is not None:
             for cf in cf_list:
-                all_data[cf.name] = list(cf._raw_values)
+                self._all_data[cf.name] = list(cf._raw_values)
 
         annotated_funcs = dict()
         for name, fc in func_dict.items():
             kwarg_dict = dict()
             for param_name, param_values in fc.sample_params_.items():
                 col_name = f'{name}_{param_name}'
-                self._add_array_to_dataframe(all_data, param_values, col_name, split_columns)
+                self._accrete_array(param_values, col_name)
                 kwarg_dict[param_name] = col_name
             amf = AnnotatedMetricFunction(func=fc._func,
                                           name=name,
@@ -350,12 +352,14 @@ class MetricFrame:
 
         if self._cf_names is None:
             self._overall = apply_to_dataframe(
-                all_data,
+                self._all_data,
                 metric_functions=annotated_funcs,
-                split_columns=split_columns)
+                split_columns=self._split_columns)
         else:
-            temp = all_data.groupby(by=self._cf_names).apply(
-                apply_to_dataframe, metric_functions=annotated_funcs, split_columns=split_columns
+            temp = self._all_data.groupby(by=self._cf_names).apply(
+                apply_to_dataframe,
+                metric_functions=annotated_funcs,
+                split_columns=self._split_columns
             )
             # If there are multiple control features, might have missing combinations
             if len(self._cf_names) > 1:
@@ -371,8 +375,10 @@ class MetricFrame:
             # Prepend the conditional features, so they are 'higher'
             rows = copy.deepcopy(cf_list) + rows
 
-        temp = all_data.groupby([x.name for x in rows]).apply(
-            apply_to_dataframe, metric_functions=annotated_funcs, split_columns=split_columns)
+        temp = self._all_data.groupby([x.name for x in rows]).apply(
+            apply_to_dataframe,
+            metric_functions=annotated_funcs,
+            split_columns=self._split_columns)
         if len(rows) > 1:
             all_indices = pd.MultiIndex.from_product([x.classes for x in rows],
                                                      names=[x.name for x in rows])
@@ -814,14 +820,17 @@ class MetricFrame:
 
         return result
 
-    def _add_array_to_dataframe(
+    def _accrete_array(
             self,
-            target: pd.DataFrame,
             source: np.ndarray,
-            base_name: str,
-            column_mapping: Dict[str, List[str]]):
+            base_name: str):
+        """Adds an ndarray to _all_data DataFrame.
+
+        Splits into multiple columns if required, and updates
+        _split_columns accordingly.
+        """
         if len(source.shape) == 1:
-            target[base_name] = source
+            self._all_data[base_name] = source
             return
         else:
             n_cols = source.shape[1]
@@ -831,5 +840,5 @@ class MetricFrame:
             for i in range(n_cols):
                 col_name = name_fmt.format(i)
                 col_list.append(col_name)
-                target[col_name] = source[:, i]
-            column_mapping[base_name] = col_list
+                self._all_data[col_name] = source[:, i]
+            self._split_columns[base_name] = col_list
