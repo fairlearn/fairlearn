@@ -50,7 +50,8 @@ class AnnotatedMetricFunction:
         """Invoke the wrapped function on the supplied DataFrame.
 
         The function extracts its arguments from the supplied DataFrame :code:`df`.
-        Columns listed in :code:`self.postional_argument_names` are supplied positionally, while those
+        Columns listed in :code:`self.postional_argument_names` are supplied
+        positionally, while those
         in :code:`self.kw_argument_mapping` are supplied as keyword arguments.
 
         There are two subtleties.

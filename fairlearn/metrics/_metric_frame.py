@@ -824,7 +824,7 @@ class MetricFrame:
             self,
             source: np.ndarray,
             base_name: str):
-        """Adds an ndarray to _all_data DataFrame.
+        """Add an ndarray to _all_data DataFrame.
 
         Splits into multiple columns if required, and updates
         _split_columns accordingly.
