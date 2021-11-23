@@ -45,7 +45,14 @@ def apply_to_dataframe(
         data: pd.DataFrame,
         metric_functions: Dict[str, AnnotatedMetricFunction],
         split_columns: Dict[str, List[str]]) -> pd.Series:
-    """Apply metric functions to a DataFrame."""
+    """Apply metric functions to a DataFrame.
+    
+    The incoming DataFrame may have been sliced via `groupby()`.
+    This function applies each annotated function in turn to the
+    supplied DataFrame.
+    The `split_columns` argument provides information about arguments
+    which may have been split across multiple DataFrame columns.
+    """
     values = dict()
     for function_name, metric_function in metric_functions.items():
         values[function_name] = metric_function.invoke(data, split_columns)
