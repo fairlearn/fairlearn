@@ -12,35 +12,40 @@ class AnnotatedMetricFunction:
     def __init__(self,
                  *,
                  func: Callable,
-                 args: List[str] = None,
-                 kwargs: Dict[str, str] = None):
-        self._func = func
-        self._args = ['y_true', 'y_pred']
-        if args is not None:
-            self._args = args
-        self._kwargs = dict()
-        if kwargs is not None:
-            self._kwargs = kwargs
-
-    @property
-    def func(self) -> Callable:
-        """Return the wrapped function."""
-        return self._func
-
-    @property
-    def args(self) -> List[str]:
-        """Return the list of positional arguments."""
-        return self._args
-
-    @property
-    def kwargs(self) -> Dict[str, str]:
-        """Return the mapping from column names to kwarg names."""
-        return self._kwargs
+                 postional_argument_names: List[str] = None,
+                 kw_argument_mapping: Dict[str, str] = None):
+        self.func = func
+        self.postional_argument_names = ['y_true', 'y_pred']
+        if postional_argument_names is not None:
+            self.postional_argument_names = postional_argument_names
+        self.kwargs = dict()
+        if kw_argument_mapping is not None:
+            self.kw_argument_mapping = kw_argument_mapping
 
     def invoke(self, df: pd.DataFrame, split_columns: Dict[str, List[str]]):
-        """Invoke the wrapped function on the supplied DataFrame."""
+        """Invoke the wrapped function on the supplied DataFrame.
+
+        The function extracts its arguments from the supplied DataFrame :code:`df`.
+        Columns listed in :code:`self.postional_argument_names` are supplied positionally, while those
+        in :code:`self.kw_argument_mapping` are supplied as keyword arguments.
+
+        There are two subtleties.
+        Firstly, the keyword arguments expected by the function might not
+        have the same names as the columns in the supplied DataFrame.
+        This is the reason :code:`self.kw_argument_mapping` is a dictionary, rather than
+        just a list of column names.
+
+        The second issue is coping with when users have passed in a 2D array as
+        a named argument (especially, `y_true` or `y_pred`).
+        These can't be packed into a single DataFrame column (pandas throws an error),
+        so we have to split them into individual columns (giving them unique names)
+        and then stitch them back together before packing then into the keyword
+        argument. The mapping is provided by the :code:`split_columns` argument.
+        This is a dictionary mapping the argument name to the list of corresponding
+        column names.
+        """
         args = []
-        for arg_name in self.args:
+        for arg_name in self.postional_argument_names:
             if arg_name in split_columns:
                 sub_frame = df[split_columns[arg_name]]
                 args.append(sub_frame.to_numpy())
@@ -48,7 +53,7 @@ class AnnotatedMetricFunction:
                 args.append(df[arg_name])
 
         kwargs = dict()
-        for func_arg_name, data_arg_name in self.kwargs.items():
+        for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
             if data_arg_name in split_columns:
                 sub_frame = df[split_columns[data_arg_name]]
                 kwargs[func_arg_name] = sub_frame.to_numpy()

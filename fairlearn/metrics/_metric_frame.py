@@ -326,8 +326,8 @@ class MetricFrame:
                 self._add_array_to_dataframe(all_data, param_values, col_name, split_columns)
                 kwarg_dict[param_name] = col_name
             amf = AnnotatedMetricFunction(func=fc._func,
-                                          args=['y_true', 'y_pred'],
-                                          kwargs=kwarg_dict)
+                                          postional_argument_names=['y_true', 'y_pred'],
+                                          kw_argument_mapping=kwarg_dict)
             annotated_funcs[name] = amf
 
         # Check for duplicate feature names
