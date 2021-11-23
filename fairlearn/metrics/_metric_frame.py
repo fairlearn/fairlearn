@@ -46,7 +46,7 @@ def apply_to_dataframe(
         metric_functions: Dict[str, AnnotatedMetricFunction],
         split_columns: Dict[str, List[str]]) -> pd.Series:
     """Apply metric functions to a DataFrame.
-    
+
     The incoming DataFrame may have been sliced via `groupby()`.
     This function applies each annotated function in turn to the
     supplied DataFrame.
@@ -333,6 +333,7 @@ class MetricFrame:
                 self._add_array_to_dataframe(all_data, param_values, col_name, split_columns)
                 kwarg_dict[param_name] = col_name
             amf = AnnotatedMetricFunction(func=fc._func,
+                                          name=name,
                                           postional_argument_names=['y_true', 'y_pred'],
                                           kw_argument_mapping=kwarg_dict)
             annotated_funcs[name] = amf
