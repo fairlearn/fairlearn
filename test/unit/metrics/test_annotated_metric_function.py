@@ -17,7 +17,6 @@ def test_constructor_unnamed():
 
 def test_constructor_no_name():
     # Tests case where no name is given and the function has no __name__
-    sample_params = {'sample_weight': [1, 2, 3]}
     my_func = functools.partial(recall_score, pos_label=0)
 
     fc = AnnotatedMetricFunction(func=my_func, name=None)
