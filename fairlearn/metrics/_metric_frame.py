@@ -12,7 +12,6 @@ import warnings
 from functools import wraps
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
-from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
 from ._group_feature import GroupFeature
 from ._annotated_metric_function import AnnotatedMetricFunction
 
@@ -31,6 +30,7 @@ _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
 _FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}' is of type {1}"
 _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
+_SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
 _INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. " \
@@ -726,7 +726,7 @@ class MetricFrame:
         return result
 
     def _process_functions(self, metric, sample_params) -> Dict[str, AnnotatedMetricFunction]:
-        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""
+        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""  # noqa: E501
         self._user_supplied_callable = True
         func_dict = dict()
 
