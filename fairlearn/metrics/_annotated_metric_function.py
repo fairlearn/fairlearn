@@ -8,7 +8,7 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_NAME = 'metric'
+_DEFAULT_NAME = "metric"
 
 _METRIC_FUNCTION_NONE = "Found 'None' instead of metric function"
 _METRIC_FUNCTION_NOT_CALLABLE = "Object passed as metric function not callable"
@@ -17,12 +17,14 @@ _METRIC_FUNCTION_NOT_CALLABLE = "Object passed as metric function not callable"
 class AnnotatedMetricFunction:
     """Wrapper for functions, to give them args and kwargs."""
 
-    def __init__(self,
-                 *,
-                 func: Callable,
-                 name: Optional[str],
-                 postional_argument_names: List[str] = None,
-                 kw_argument_mapping: Dict[str, str] = None):
+    def __init__(
+        self,
+        *,
+        func: Callable,
+        name: Optional[str],
+        postional_argument_names: List[str] = None,
+        kw_argument_mapping: Dict[str, str] = None
+    ):
         if func is None:
             raise ValueError(_METRIC_FUNCTION_NONE)
         if not callable(func):
@@ -30,7 +32,7 @@ class AnnotatedMetricFunction:
         self.func = func
 
         if name is None:
-            if hasattr(func, '__name__'):
+            if hasattr(func, "__name__"):
                 self.name = func.__name__
             else:
                 logger.warning("Supplied 'func' had no __name__ attribute")
@@ -39,7 +41,7 @@ class AnnotatedMetricFunction:
             self.name = name
 
         self.func = func
-        self.postional_argument_names = ['y_true', 'y_pred']
+        self.postional_argument_names = ["y_true", "y_pred"]
         if postional_argument_names is not None:
             self.postional_argument_names = postional_argument_names
         self.kw_argument_mapping = dict()
