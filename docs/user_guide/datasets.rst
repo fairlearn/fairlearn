@@ -116,12 +116,11 @@ visit :mod:`fairlearn.datasets`.
     >>> boston_housing=pd.concat([X, y], axis=1)
     >>> boston_housing.head()
         CRIM          ZN     INDUS         CHAS    NOX       RM       AGE   DIS       RAD  TAX       PTRATIO       B            LSTAT      MEDV
-          0   0.00632  18.0    2.31     0         0.538        6.575   65.2    4.0900  1         296.0         15.3       396.90       4.98     24.0
-          1   0.02731  0.0      7.07    0         0.469        6.421   78.9    4.9671  2         242.0         17.8       396.90       9.14     21.6
-          2   0.02729  0.0      7.07    0         0.469        7.185   61.1    4.9671  2         242.0         17.8       392.83       4.03     34.7
-          3   0.03237  0.0      2.18    0         0.458        6.998   45.8    6.0622  3         222.0         18.7       394.63       2.94     33.4
-          4   0.06905  0.0      2.18    0         0.458        7.147   54.2    6.0622  3         222.0         18.7       396.90       5.33     36.2
-
+    0   0.00632  18.0    2.31     0         0.538        6.575   65.2    4.0900  1         296.0         15.3       396.90       4.98     24.0
+    1   0.02731  0.0      7.07    0         0.469        6.421   78.9    4.9671  2         242.0         17.8       396.90       9.14     21.6
+    2   0.02729  0.0      7.07    0         0.469        7.185   61.1    4.9671  2         242.0         17.8       392.83       4.03     34.7
+    3   0.03237  0.0      2.18    0         0.458        6.998   45.8    6.0622  3         222.0         18.7       394.63       2.94     33.4
+    4   0.06905  0.0      2.18    0         0.458        7.147   54.2    6.0622  3         222.0         18.7       396.90       5.33     36.2
 
 .. _boston_dataset_issues:
 
@@ -305,8 +304,8 @@ others in the community.
     ...                                 y_true=y_test, 
     ...                                 y_pred=predicted,
     ...                                 sensitive_features=X_test["B"])
-    >>> print(grouped_metric.by_group)  # doctest: +SKIP
-           accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
+    >>> print(grouped_metric.by_group)
+        accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
     B                                                                                                             
     False       1.0           0.0          0.0                   0.0                  0.0               0.0     10
     True   0.837607       0.84375     0.857143              0.185185             0.857143          0.547009    117
@@ -315,8 +314,8 @@ others in the community.
     ...                                 y_true=y_test,
     ...                                 y_pred=predicted,
     ...                                 sensitive_features=X_test["LSTAT"])
-    >>> print(grouped_metric.by_group)  # doctest: +SKIP
-           accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
+    >>> print(grouped_metric.by_group)
+        accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
     LSTAT                                                                                                         
     False   0.84127      0.864407     0.962264                   0.8             0.962264          0.936508     63
     True   0.859375           0.6          0.3              0.037037                  0.3          0.078125     64    
