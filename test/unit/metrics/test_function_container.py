@@ -4,17 +4,15 @@
 import functools
 import numpy as np
 from sklearn.metrics import recall_score
-from fairlearn.metrics._function_container import FunctionContainer
+from fairlearn.metrics._annotated_metric_function import AnnotatedMetricFunction
 
 
 def test_constructor_unnamed():
-    sample_params = {'sample_weight': [1, 2, 3]}
-
-    fc = FunctionContainer(recall_score, None, sample_params)
-    assert fc.name_ == recall_score.__name__
-    assert len(fc.sample_params_) == 1
-    assert isinstance(fc.sample_params_['sample_weight'], np.ndarray)
-    assert np.array_equal(fc.sample_params_['sample_weight'], [1, 2, 3])
+    fc = AnnotatedMetricFunction(func=recall_score, name=None)
+    assert fc.name == recall_score.__name__
+    assert np.array_equal(fc.postional_argument_names, ['y_true', 'y_pred'])
+    assert isinstance(fc.kw_argument_mapping, dict)
+    assert len(fc.kw_argument_mapping) == 0
 
 
 def test_constructor_no_name():
@@ -22,18 +20,16 @@ def test_constructor_no_name():
     sample_params = {'sample_weight': [1, 2, 3]}
     my_func = functools.partial(recall_score, pos_label=0)
 
-    fc = FunctionContainer(my_func, None, sample_params)
-    assert fc.name_ == 'metric'
-    assert len(fc.sample_params_) == 1
-    assert isinstance(fc.sample_params_['sample_weight'], np.ndarray)
-    assert np.array_equal(fc.sample_params_['sample_weight'], [1, 2, 3])
+    fc = AnnotatedMetricFunction(func=my_func, name=None)
+    assert fc.name == 'metric'
+    assert np.array_equal(fc.postional_argument_names, ['y_true', 'y_pred'])
+    assert isinstance(fc.kw_argument_mapping, dict)
+    assert len(fc.kw_argument_mapping) == 0
 
 
 def test_constructor_named():
-    sample_params = {'sample_weight': [1, 2, 3]}
-
-    fc = FunctionContainer(recall_score, "OverrideName", sample_params)
-    assert fc.name_ == "OverrideName"
-    assert len(fc.sample_params_) == 1
-    assert isinstance(fc.sample_params_['sample_weight'], np.ndarray)
-    assert np.array_equal(fc.sample_params_['sample_weight'], [1, 2, 3])
+    fc = AnnotatedMetricFunction(func=recall_score, name="OverrideName")
+    assert fc.name == "OverrideName"
+    assert np.array_equal(fc.postional_argument_names, ['y_true', 'y_pred'])
+    assert isinstance(fc.kw_argument_mapping, dict)
+    assert len(fc.kw_argument_mapping) == 0

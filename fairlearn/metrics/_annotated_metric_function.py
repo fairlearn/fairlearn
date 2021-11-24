@@ -42,7 +42,7 @@ class AnnotatedMetricFunction:
         self.postional_argument_names = ['y_true', 'y_pred']
         if postional_argument_names is not None:
             self.postional_argument_names = postional_argument_names
-        self.kwargs = dict()
+        self.kw_argument_mapping = dict()
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
 
