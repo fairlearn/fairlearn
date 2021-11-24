@@ -9,9 +9,9 @@ import fairlearn.metrics as metrics
 from .utils import _get_raw_MetricFrame
 
 
-class TestSingleFeature():
+class TestSingleFeature:
     def _get_raw_data(self):
-        return ['a', 'a', 'b', 'c'], pd.Series(data=[0, 0, 1, 1])
+        return ["a", "a", "b", "c"], pd.Series(data=[0, 0, 1, 1])
 
     def _common_validations(self, result, expected_name):
         assert isinstance(result, list)
@@ -19,7 +19,7 @@ class TestSingleFeature():
         sf = result[0]
         assert isinstance(sf, metrics._group_feature.GroupFeature)
         assert sf.name == expected_name
-        assert np.array_equal(sf.classes, ['a', 'b', 'c'])
+        assert np.array_equal(sf.classes, ["a", "b", "c"])
 
     def test_single_list(self):
         raw_feature, y_true = self._get_raw_data()
@@ -41,7 +41,9 @@ class TestSingleFeature():
         raw_feature = pd.Series(data=r_f, name=0)
 
         target = _get_raw_MetricFrame()
-        msg = "Series name must be a string. Value '0' was of type <class 'int'>"
+        msg = (
+            "Series name must be a string. Value '0' was of type <class 'int'>"
+        )
         with pytest.raises(ValueError) as execInfo:
             _ = target._process_features("Ignored", raw_feature, y_true)
         assert execInfo.value.args[0] == msg
@@ -74,7 +76,7 @@ class TestSingleFeature():
 
     def test_single_dict(self):
         r_f, y_true = self._get_raw_data()
-        raw_feature = {'Mine!': r_f}
+        raw_feature = {"Mine!": r_f}
 
         target = _get_raw_MetricFrame()
         result = target._process_features("Ignored", raw_feature, y_true)
@@ -92,22 +94,27 @@ class TestSingleFeature():
 
     def test_from_dict_failure(self):
         r_f, y_true = self._get_raw_data()
-        raw_feature = {'Mine!': np.asarray(r_f).reshape(-1, 1)}
+        raw_feature = {"Mine!": np.asarray(r_f).reshape(-1, 1)}
         target = _get_raw_MetricFrame()
-        msg = "DataFrame.from_dict() failed on sensitive features. "\
+        msg = (
+            "DataFrame.from_dict() failed on sensitive features. "
             "Please ensure each array is strictly 1-D."
+        )
         with pytest.raises(ValueError) as ve:
             _ = target._process_features("Unused", raw_feature, y_true)
         assert msg == ve.value.args[0]
         assert ve.value.__cause__ is not None
         assert isinstance(ve.value.__cause__, ValueError)
         # Ensure we got the gnomic pandas message
-        assert ve.value.__cause__.args[0] == 'If using all scalar values, you must pass an index'
+        assert (
+            ve.value.__cause__.args[0]
+            == "If using all scalar values, you must pass an index"
+        )
 
 
-class TestTwoFeatures():
+class TestTwoFeatures:
     def _get_raw_data(self):
-        return ['a', 'a', 'b', 'c'], [5, 6, 6, 5], np.asarray([0, 1, 1, 0])
+        return ["a", "a", "b", "c"], [5, 6, 6, 5], np.asarray([0, 1, 1, 0])
 
     def _common_validations(self, result, expected_names):
         assert isinstance(result, list)
@@ -115,7 +122,7 @@ class TestTwoFeatures():
         for i in range(2):
             assert isinstance(result[i], metrics._group_feature.GroupFeature)
             assert result[i].name == expected_names[i]
-        assert np.array_equal(result[0].classes, ['a', 'b', 'c'])
+        assert np.array_equal(result[0].classes, ["a", "b", "c"])
         assert np.array_equal(result[1].classes, [5, 6])
 
     def test_nested_list(self):
@@ -125,7 +132,7 @@ class TestTwoFeatures():
         target = _get_raw_MetricFrame()
         msg = "Feature lists must be of scalar types"
         with pytest.raises(ValueError) as execInfo:
-            _ = target._process_features('SF', rf, y_true)
+            _ = target._process_features("SF", rf, y_true)
         assert execInfo.value.args[0] == msg
 
     def test_2d_array(self):
@@ -134,8 +141,8 @@ class TestTwoFeatures():
         rf = np.asarray([a, b], dtype=object).transpose()
 
         target = _get_raw_MetricFrame()
-        result = target._process_features('CF', rf, y_true)
-        self._common_validations(result, ['CF0', 'CF1'])
+        result = target._process_features("CF", rf, y_true)
+        self._common_validations(result, ["CF0", "CF1"])
 
     def test_named_dataframe(self):
         cols = ["Col Alpha", "Col Num"]
@@ -144,7 +151,7 @@ class TestTwoFeatures():
         rf = pd.DataFrame(data=zip(a, b), columns=cols)
 
         target = _get_raw_MetricFrame()
-        result = target._process_features('Ignored', rf, y_true)
+        result = target._process_features("Ignored", rf, y_true)
         self._common_validations(result, cols)
 
     def test_unnamed_dataframe(self):
@@ -155,7 +162,7 @@ class TestTwoFeatures():
         target = _get_raw_MetricFrame()
         msg = "DataFrame column names must be strings. Name '0' is of type <class 'int'>"
         with pytest.raises(ValueError) as execInfo:
-            _ = target._process_features('Unused', rf, y_true)
+            _ = target._process_features("Unused", rf, y_true)
         assert execInfo.value.args[0] == msg
 
     def test_list_of_series(self):
@@ -165,13 +172,13 @@ class TestTwoFeatures():
         target = _get_raw_MetricFrame()
         msg = "Feature lists must be of scalar types"
         with pytest.raises(ValueError) as execInfo:
-            _ = target._process_features('Unused', rf, y_true)
+            _ = target._process_features("Unused", rf, y_true)
         assert execInfo.value.args[0] == msg
 
     def test_dictionary(self):
         a, b, y_true = self._get_raw_data()
 
-        rf = {'Alpha': a, 'Beta': b}
+        rf = {"Alpha": a, "Beta": b}
         target = _get_raw_MetricFrame()
-        result = target._process_features('Unused', rf, y_true)
-        self._common_validations(result, ['Alpha', 'Beta'])
+        result = target._process_features("Unused", rf, y_true)
+        self._common_validations(result, ["Alpha", "Beta"])
