@@ -8,7 +8,9 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 
-_SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
+_SERIES_NAME_NOT_STRING = (
+    "Series name must be a string. Value '{0}' was of type {1}"
+)
 
 
 class GroupFeature:
@@ -48,11 +50,9 @@ class GroupFeature:
         Optional name for the feature
     """
 
-    def __init__(self,
-                 base_name: str,
-                 feature_vector,
-                 index: int,
-                 name: Optional[str]):
+    def __init__(
+        self, base_name: str, feature_vector, index: int, name: Optional[str]
+    ):
         """Help with the metrics."""
         self._encoder = LabelEncoder()
         self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
@@ -66,8 +66,9 @@ class GroupFeature:
                 if isinstance(feature_vector.name, str):
                     self._name = feature_vector.name
                 else:
-                    msg = _SERIES_NAME_NOT_STRING.format(feature_vector.name,
-                                                         type(feature_vector.name))
+                    msg = _SERIES_NAME_NOT_STRING.format(
+                        feature_vector.name, type(feature_vector.name)
+                    )
                     raise ValueError(msg)
 
     @property
