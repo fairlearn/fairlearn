@@ -31,10 +31,10 @@ class AnnotatedMetricFunction:
 
         if name is None:
             if hasattr(func, '__name__'):
-                self._name = func.__name__
+                self.name = func.__name__
             else:
                 logger.warning("Supplied 'func' had no __name__ attribute")
-                self._name = _DEFAULT_NAME
+                self.name = _DEFAULT_NAME
         else:
             self.name = name
 

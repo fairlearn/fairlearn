@@ -306,7 +306,7 @@ class MetricFrame:
         self._accrete_array(y_t, 'y_true')
         self._accrete_array(y_p, 'y_pred')
 
-        func_dict = self._process_functions(metrics, sample_params)
+        annotated_funcs = self._process_functions(metrics, sample_params)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
@@ -326,19 +326,6 @@ class MetricFrame:
         if cf_list is not None:
             for cf in cf_list:
                 self._all_data[cf.name] = list(cf._raw_values)
-
-        annotated_funcs = dict()
-        for name, fc in func_dict.items():
-            kwarg_dict = dict()
-            for param_name, param_values in fc.sample_params_.items():
-                col_name = f'{name}_{param_name}'
-                self._accrete_array(param_values, col_name)
-                kwarg_dict[param_name] = col_name
-            amf = AnnotatedMetricFunction(func=fc._func,
-                                          name=name,
-                                          postional_argument_names=['y_true', 'y_pred'],
-                                          kw_argument_mapping=kwarg_dict)
-            annotated_funcs[name] = amf
 
         # Check for duplicate feature names
         nameset = set()
@@ -738,17 +725,23 @@ class MetricFrame:
 
         return result
 
-    def _process_functions(self, metric, sample_params) -> Dict[str, FunctionContainer]:
-        """Get the underlying metrics into :class:`fairlearn.metrics.FunctionContainer` objects."""
+    def _process_functions(self, metric, sample_params) -> Dict[str, AnnotatedMetricFunction]:
+        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""
         self._user_supplied_callable = True
         func_dict = dict()
+
+        # The supplied 'metric' may be a dictionary of functions
         if isinstance(metric, dict):
             self._user_supplied_callable = False
             s_p = dict()
+
             if sample_params is not None:
+                # If we have sample_params, they had better be a dictionary
                 if not isinstance(sample_params, dict):
                     raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
+                # The keys of the sample_params dictionary must be a
+                # subset of our supplied metric functions
                 sp_keys = set(sample_params.keys())
                 mf_keys = set(metric.keys())
                 if not sp_keys.issubset(mf_keys):
@@ -759,12 +752,44 @@ class MetricFrame:
                 curr_s_p = None
                 if name in s_p:
                     curr_s_p = s_p[name]
-                fc = FunctionContainer(func, name, curr_s_p)
-                func_dict[fc.name_] = fc
+
+                amf = self._process_one_function(func, name, curr_s_p)
+                func_dict[amf.name] = amf
         else:
-            fc = FunctionContainer(metric, None, sample_params)
-            func_dict[fc.name_] = fc
+            # This is the case where the user has supplied a single metric function
+            amf = self._process_one_function(metric, None, sample_params)
+            func_dict[amf.name] = amf
         return func_dict
+
+    def _process_one_function(
+            self,
+            func: Callable,
+            name: str,
+            sample_parameters: Dict[str, Any]) -> AnnotatedMetricFunction:
+        # Deal with the sample parameters
+        _sample_param_arrays = dict()
+        if sample_parameters is not None:
+            if not isinstance(sample_parameters, dict):
+                raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
+            for k, v in sample_parameters.items():
+                if v is not None:
+                    # Coerce any sample_params to being ndarrays for easy masking
+                    _sample_param_arrays[k] = np.asarray(v)
+
+        # Build the kwargs
+        kwarg_dict = dict()
+        for param_name, param_values in _sample_param_arrays.items():
+            col_name = f'{name}_{param_name}'
+            self._accrete_array(param_values, col_name)
+            kwarg_dict[param_name] = col_name
+
+        # Construct the return object
+        amf = AnnotatedMetricFunction(func=func,
+                                      name=name,
+                                      postional_argument_names=['y_true', 'y_pred'],
+                                      kw_argument_mapping=kwarg_dict)
+
+        return amf
 
     def _process_features(self, base_name, features, sample_array) -> List[GroupFeature]:
         """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
