@@ -107,11 +107,14 @@ For more information about how to use the :code:`fetch_boston` function,
 visit :mod:`fairlearn.datasets`. 
 
 .. doctest:: datasets
+    :options:  +NORMALIZE_WHITESPACE
 
     >>> import warnings
     >>> warnings.filterwarnings('ignore')
     >>> from fairlearn.datasets import fetch_boston
     >>> import pandas as pd
+    >>> pd.set_option('display.max_columns', 20)
+    >>> pd.set_option('display.width', 80)
     >>> X, y = fetch_boston(as_frame=True, return_X_y=True)
     >>> boston_housing=pd.concat([X, y], axis=1)
     >>> boston_housing.head()
@@ -121,7 +124,21 @@ visit :mod:`fairlearn.datasets`.
     2   0.02729  0.0      7.07    0         0.469        7.185   61.1    4.9671  2         242.0         17.8       392.83       4.03     34.7
     3   0.03237  0.0      2.18    0         0.458        6.998   45.8    6.0622  3         222.0         18.7       394.63       2.94     33.4
     4   0.06905  0.0      2.18    0         0.458        7.147   54.2    6.0622  3         222.0         18.7       396.90       5.33     36.2
-
+    <BLANKLINE>
+    [5 rows x 14 columns]
+    >>> boston_housing.describe()
+        CRIM	ZN	INDUS	NOX	RM	AGE	DIS	TAX	PTRATIO	B	LSTAT	MEDV
+    count	506.000000	506.000000	506.000000	506.000000	506.000000	506.000000	506.000000	506.000000	506.000000	506.000000	506.000000	506.000000
+    mean	3.613524	11.363636	11.136779	0.554695	6.284634	68.574901	3.795043	408.237154	18.455534	356.674032	12.653063	22.532806
+    std	8.601545	23.322453	6.860353	0.115878	0.702617	28.148861	2.105710	168.537116	2.164946	91.294864	7.141062	9.197104
+    min	0.006320	0.000000	0.460000	0.385000	3.561000	2.900000	1.129600	187.000000	12.600000	0.320000	1.730000	5.000000
+    25%	0.082045	0.000000	5.190000	0.449000	5.885500	45.025000	2.100175	279.000000	17.400000	375.377500	6.950000	17.025000
+    50%	0.256510	0.000000	9.690000	0.538000	6.208500	77.500000	3.207450	330.000000	19.050000	391.440000	11.360000	21.200000
+    75%	3.677083	12.500000	18.100000	0.624000	6.623500	94.075000	5.188425	666.000000	20.200000	396.225000	16.955000	25.000000
+    max	88.976200	100.000000	27.740000	0.871000	8.780000	100.000000	12.126500	711.000000	22.000000	396.900000	37.970000	50.000000
+    <BLANKLINE>
+    [8 rows x 12 columns]
+    
 .. _boston_dataset_issues:
 
 Dataset Issues
@@ -254,10 +271,9 @@ Fairness-related harms assessment
 As explained above, machine learning models that use the Boston Housing dataset 
 are at risk of generating fairness-related harms. 
 How does that look in a typical machine learning pipeline? 
-Because both the sensitive and target features are continuous, to leverage 
-Fairlearn's assessment capabilities, we need to apply column transformations 
-to turn this problem into a classification problem. 
 
+We apply a column transformation to the target feature 
+to turn this problem into a classification problem.
 The code below maps *LSTAT* and *MEDV* to binary values where values greater 
 than the median of the column map to TRUE, and otherwise the values are FALSE. 
 This methodology follows scikit-lego's [#7]_ exploration
@@ -304,32 +320,32 @@ others in the community.
     ...                                 y_true=y_test, 
     ...                                 y_pred=predicted,
     ...                                 sensitive_features=X_test["B"])
-    >>> print(grouped_metric.by_group)
+    >>> print(grouped_metric.by_group)  # doctest: +SKIP
         accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
     B                                                                                                             
     False       1.0           0.0          0.0                   0.0                  0.0               0.0     10
     True   0.837607       0.84375     0.857143              0.185185             0.857143          0.547009    117
-    
+    <BLANKLINE>
+    [2 rows x 7 columns]
     >>> grouped_metric = fm.MetricFrame(metrics=metrics,
     ...                                 y_true=y_test,
     ...                                 y_pred=predicted,
     ...                                 sensitive_features=X_test["LSTAT"])
-    >>> print(grouped_metric.by_group)
+    >>> print(grouped_metric.by_group)  # doctest: +SKIP
         accuracy     precision       recall   false positive rate   true positive rate    selection rate  count
     LSTAT                                                                                                         
     False   0.84127      0.864407     0.962264                   0.8             0.962264          0.936508     63
     True   0.859375           0.6          0.3              0.037037                  0.3          0.078125     64    
+    <BLANKLINE>
+    [2 rows x 7 columns]
 
-
-Checking the demographic parity differences shows that neither variable has a 
-demographic parity at zero, implying a different selection rate across groups. 
-The next series of tables further breaks down evaluation metrics by
-group. 
-
+The demographic parity differences shows that neither variable has a 
+demographic parity at zero, which implies different 
+selection rates across groups. 
 The vast majority of observations of *B* fall above the cutoff.
-Observations below the cutoff have zero precision and recall,
-but the model has a higher accuracy for this group than records 
-where *B* > 136.9. 
+For the *B* variable, observations below the cutoff have zero precision 
+and recall, but the model has a higher accuracy for 
+this group than records where *B* > 136.9.
 The precision, recall, and selection rate when *LSTAT* is `True` all are 
 lower than when *LSTAT* is `False`. 
 These results indicate that our simple model is worse at predicting 
@@ -353,12 +369,13 @@ Besides, other benchmark datasets exist that do not present these issues.
 It's important to keep the differences between the way Harrison and Rubenfield 
 used the dataset and the way modern machine learning practicioners have used 
 it in focus. 
-Harrison and Rubenfield conducted an empirical econometric study,
+Harrison and Rubenfield conducted an empirical study,
 the goal of which was to determine the causal impacts of these variables on 
 median home value. 
 Interpretation of causal models involves looking at model
 coefficients to ascertain the effect of one variable on the dependent variable,
-holding all other factors constant. This use case is different than the typical 
+holding all other factors constant. 
+This use case is different than the typical 
 supervised learning analysis. 
 A machine learning model will pick up on the 
 patterns encoded in the data and use that to predict an outcome.
@@ -373,10 +390,12 @@ The Boston Housing dataset raises the more general issue of whether it's valid t
 port datasets constructed for one specific use case to different use cases (see :ref:`portability_trap`).
 Using a dataset without considering the context and purposes for which it 
 was created can be risky even if the dataset does not carry the possibility of
-generating fairness-related harms. Any machine learning model 
+generating fairness-related harms. 
+Any machine learning model 
 developed using a dataset with an opaque data-generating process runs the 
-risk of generating spurious or non-meaningful results. Construct validity is
-also relevant here; a dataset may not maintain construct validity across
+risk of generating spurious or non-meaningful results. 
+Construct validity is also relevant here; 
+a dataset may not maintain construct validity across
 different types of statistical analyses and different predicted outcomes.
 
 If you are searching for a house pricing dataset to use for benchmarking 
@@ -384,7 +403,7 @@ purposes or to create a hedonic pricing model, scikit-learn recommends the
 California housing dataset (:func:`sklearn.datasets.fetch_california_housing`)
 or the Ames housing dataset [#6]_ 
 in place of the Boston housing dataset, as using these datasets should not
-cause the same fairness-related harms. 
+generate the same fairness-related harms. 
 We strongly discourage using the Boston Housing dataset for machine learning 
 benchmarking purposes, and hope this article gives 
 you pause about using it in the future.
@@ -425,5 +444,4 @@ you pause about using it in the future.
         United States Census Bureau.
   
   .. [#11] Kinmberlé Crenshaw, Mapping the margins: Intersectionality, identity politics, and violence against women of color, 
-      Stanford Law Review, 1993, 43(6), 1241-1299. 
-         
+      Stanford Law Review, 1993, 43(6), 1241-1299.
