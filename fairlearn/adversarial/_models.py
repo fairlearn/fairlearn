@@ -4,6 +4,9 @@
 from ._constants import _IMPORT_ERROR_MESSAGE
 
 
+# TODO final activation different
+# TODO move to backend engines?
+
 def getTorchModel(list_nodes, activation="sigmoid"):
     """Fully connected neural network as a Torch model.
 
@@ -34,7 +37,7 @@ def getTorchModel(list_nodes, activation="sigmoid"):
             for i in range(len(list_nodes) - 1):
                 layers.append(Linear(list_nodes[i], list_nodes[i + 1]))
                 layers.append(activation)
-            layers.pop(-1)
+            # layers.pop(-1)
             self.layers_ = ModuleList(layers)
 
         def forward(self, x):
@@ -71,7 +74,7 @@ def getTensorflowModel(list_nodes, activation='sigmoid'):
     except ImportError:
         raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
 
-    initializer_w = GlorotNormal()
+    initializer_w = GlorotNormal(seed=123)
 
     class FullyConnected(Model):
         """Fully connected neural network as a Tensorflow model.
@@ -86,7 +89,7 @@ def getTensorflowModel(list_nodes, activation='sigmoid'):
             """Initialize the layers of the NN."""
             super(FullyConnected, self).__init__()
             layers = []
-            for i in range(1, len(list_nodes) - 1):
+            for i in range(1, len(list_nodes)):
                 layers.append(Dense(
                     units=list_nodes[i],
                     kernel_initializer=initializer_w,

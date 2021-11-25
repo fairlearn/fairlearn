@@ -5,12 +5,21 @@ import sys  # , fake_torch
 import pytest
 import numpy as np
 import pandas as pd
-from fairlearn.adversarial import Keyword, AdversarialFairness, \
+from fairlearn.adversarial import AdversarialFairness, \
     AdversarialFairnessClassifier, AdversarialFairnessRegressor
+import fairlearn.adversarial._adversarial_mitigation as main_file
+from fairlearn.adversarial._util import interpret_keyword
 from fairlearn.adversarial._constants import _TYPE_CHECK_ERROR
 
 
 model_class = type('Model', (object,), {})
+
+
+Keyword_BINARY = 'binary'
+Keyword_CATEGORY = 'category'
+Keyword_CONTINUOUS = 'continuous'
+Keyword_AUTO = 'auto'
+Keyword_CLASSIFICATION = 'classification'
 
 
 class loss_class:
@@ -20,13 +29,13 @@ class loss_class:
     def __call__(self, x, y): return  # self.loss()
 
 
-BCE = type('binary', (loss_class,), {})
-CCE = type('category', (loss_class,), {})
-MSE = type('continuous', (loss_class,), {})
+BCE = type(Keyword_BINARY, (loss_class,), {})
+CCE = type(Keyword_CATEGORY, (loss_class,), {})
+MSE = type(Keyword_CONTINUOUS, (loss_class,), {})
 
 
 def KeywordToClass(kw):
-    index = [Keyword.BINARY, Keyword.CATEGORY, Keyword.CONTINUOUS].index(kw)
+    index = [Keyword_BINARY, Keyword_CATEGORY, Keyword_CONTINUOUS].index(kw)
     return [BCE, CCE, MSE][index]
 
 
@@ -70,17 +79,6 @@ class fake_tensorflow:
                 def __init__(self, **kwargs): pass
 
 
-class RemoveAll():
-    def _evaluate(self, X): return X
-    def _train_step(self, X, Y, Z): return (0, 0)
-    def _setup_optimizer(self, optimizer): pass
-    def _get_loss(self, Y, choice, data_name): pass
-
-
-class RemoveTrainStep():
-    def _train_step(self, X, Y, Z): return (0, 0)
-
-
 rows = 60
 cols = 5
 Bin2d = np.random.choice([0., 1.], size=(rows, cols))
@@ -93,7 +91,7 @@ Cont1d = np.random.rand(rows, 1)
 
 def generate_data_combinations(n=10):
     datas = [Bin1d, Cat, Cont2d, Cont1d]
-    dist_type = [Keyword.BINARY, Keyword.CATEGORY, Keyword.CONTINUOUS, Keyword.CONTINUOUS]
+    dist_type = [Keyword_BINARY, Keyword_CATEGORY, Keyword_CONTINUOUS, Keyword_CONTINUOUS]
     K = len(datas)
     total_combinations = K ** 3
     combinations = np.random.choice(total_combinations, size=n).tolist()
@@ -113,6 +111,20 @@ def generate_data_combinations(n=10):
         Z = datas[Z]
         yield (X, Y, Z), (X_type, Y_type, Z_type)
 
+
+class RemoveAll(main_file.BackendEngine):
+    def __init__(self, base, X, Y, Z): pass
+    def evaluate(self, X): return X
+    def train_step(self, X, Y, Z): return (0, 0)
+    def setup_optimizer(self, optimizer): pass
+    def get_loss(self, Y, choice, data_name): pass
+
+
+class RemoveTrainStepPytorch(main_file.PytorchEngine):
+    def train_step(self, X, Y, Z): return (0, 0)
+
+class RemoveTrainStepTensorflow(main_file.TensorflowEngine):
+    def train_step(self, X, Y, Z): return (0, 0)
 
 def get_instance(
         cls=AdversarialFairness,
@@ -140,46 +152,51 @@ def get_instance(
         predictor_model=predictor,
         adversary_model=adversary
     )
+
     if fake_mixin:
-        mitigator._extend_instance(RemoveAll)
-    else:
-        if fake_training:
-            mitigator._extend_instance(RemoveTrainStep)
+        mitigator.backend = RemoveAll
+    elif fake_training:
+        if tensorflow:
+            mitigator.backend = RemoveTrainStepTensorflow
+        if torch:
+            mitigator.backend = RemoveTrainStepPytorch
+
     return mitigator
 
 # CURRENTLY not testing what the models look like, just that it is correct type
 
 
-@pytest.mark.parametrize("torch", [True, False])
-def test_classifier(torch):
+@pytest.mark.parametrize("torch1", [True, False])
+def test_classifier(torch1):
     mitigator = get_instance(AdversarialFairnessClassifier, fake_training=True,
-                             torch=torch, tensorflow=not torch)
+                             torch=torch1, tensorflow=not torch1)
     assert isinstance(mitigator, AdversarialFairness)
 
     mitigator.fit(Cont2d, Bin1d, sensitive_features=Cat)
-    assert isinstance(mitigator.predictor_loss, BCE)
-    assert isinstance(mitigator.adversary_loss, CCE)
+    assert isinstance(mitigator.backendEngine_.predictor_loss, BCE)
+    assert isinstance(mitigator.backendEngine_.adversary_loss, CCE)
 
 
-@pytest.mark.parametrize("torch", [True, False])
-def test_regressor(torch):
+@pytest.mark.parametrize("torch2", [True, False])
+def test_regressor(torch2):
     mitigator = get_instance(AdversarialFairnessRegressor, fake_training=True,
-                             torch=torch, tensorflow=not torch)
+                             torch=torch2, tensorflow=not torch2)
     assert isinstance(mitigator, AdversarialFairness)
 
     mitigator.fit(Cont2d, Cont2d, sensitive_features=Cat)
-    assert isinstance(mitigator.predictor_loss, MSE)
-    assert isinstance(mitigator.adversary_loss, CCE)
+    assert isinstance(mitigator.backendEngine_.predictor_loss, MSE)
+    assert isinstance(mitigator.backendEngine_.adversary_loss, CCE)
 
 
-@pytest.mark.parametrize("torch", [True, False])
-def test_fake_models(torch):
+@pytest.mark.parametrize("torch3", [True, False])
+def test_fake_models(torch3):
     for ((X, Y, Z), (X_type, Y_type, Z_type)) in generate_data_combinations():
         mitigator = get_instance(fake_training=True,
-                                 torch=torch, tensorflow=not torch)
+                                 torch=torch3, tensorflow=not torch3)
+
         mitigator.fit(X, Y, sensitive_features=Z)
-        assert isinstance(mitigator.predictor_loss, KeywordToClass(Y_type))
-        assert isinstance(mitigator.adversary_loss, KeywordToClass(Z_type))
+        assert isinstance(mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type))
+        assert isinstance(mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type))
 
 
 def test_fake_models_list_inputs():
@@ -195,62 +212,65 @@ def test_fake_models_df_inputs():
 
 
 def check_type_helper(data, actual_type, valid_choices, invalid_choices):
+    param_name = "param"
     data_name = "test"
     mitigator = get_instance()
     for valid_choice in valid_choices:
-        assert mitigator._check_type(data, valid_choice, data_name) == actual_type
+        assert interpret_keyword(data, valid_choice, param_name, data_name).value == actual_type
 
     for invalid_choice in invalid_choices:
         with pytest.raises(ValueError) as exc:
-            assert not mitigator._check_type(data, invalid_choice, data_name)
+            assert not interpret_keyword(data, invalid_choice, param_name, data_name)
             assert str(exc.value) == _TYPE_CHECK_ERROR.format(data_name, invalid_choice)
 
 
 def test_check_type_correct_data():
-    check_type_helper(Bin1d, Keyword.BINARY,
-                      [Keyword.AUTO, Keyword.BINARY, Keyword.CLASSIFICATION],
-                      [Keyword.CATEGORY, None, 'bogus'])
-    check_type_helper(Cat, Keyword.CATEGORY,
-                      [Keyword.AUTO, Keyword.CATEGORY, Keyword.CLASSIFICATION],
-                      [Keyword.BINARY, None, 'bogus'])
-    check_type_helper(Cont1d, Keyword.CONTINUOUS,
-                      [Keyword.AUTO, Keyword.CONTINUOUS],
-                      [Keyword.BINARY, Keyword.CATEGORY, Keyword.CLASSIFICATION, None, 'bogus'])
-    check_type_helper(Cont2d, Keyword.CONTINUOUS,
-                      [Keyword.AUTO, Keyword.CONTINUOUS],
-                      [Keyword.BINARY, Keyword.CATEGORY, Keyword.CLASSIFICATION, None, 'bogus'])
-    # Bin2d is not interpretable as binary 2d, need to set custom loss for this.
-    check_type_helper(Bin2d, Keyword.CONTINUOUS,
-                      [Keyword.CONTINUOUS],
-                      [Keyword.BINARY, Keyword.CATEGORY, Keyword.CLASSIFICATION, None, 'bogus'])
+    check_type_helper(Bin1d, Keyword_BINARY,
+                      [Keyword_AUTO, Keyword_BINARY, Keyword_CLASSIFICATION],
+                      [Keyword_CATEGORY, None, 'bogus'])
+    check_type_helper(Cat, Keyword_CATEGORY,
+                      [Keyword_AUTO, Keyword_CATEGORY, Keyword_CLASSIFICATION],
+                      [Keyword_BINARY, None, 'bogus'])
+    check_type_helper(Cont1d, Keyword_CONTINUOUS,
+                      [Keyword_AUTO, Keyword_CONTINUOUS],
+                      [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION, None, 'bogus'])
+    check_type_helper(Cont2d, Keyword_CONTINUOUS,
+                      [Keyword_AUTO, Keyword_CONTINUOUS],
+                      [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION, None, 'bogus'])
+    # Bin2d is not interpretable as binary 2d, nor continuous, because it is so ambiguous.
+    check_type_helper(Bin2d, None,
+                      [],
+                      [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION, Keyword_CONTINUOUS, None, 'bogus'])
 
+    param_name = "test"
     data_name = "test"
     mitigator = get_instance()
     with pytest.raises(ValueError) as exc:
-        assert mitigator._check_type(Bin2d, Keyword.AUTO, data_name) is None
-        assert str(exc.value) == _TYPE_CHECK_ERROR.format(data_name, Keyword.AUTO)
-
+        assert interpret_keyword(Bin2d, Keyword_AUTO, param_name, data_name) is None
+        assert str(exc.value) == _TYPE_CHECK_ERROR.format(data_name, Keyword_AUTO)
 
 def test_check_type_faulty_data():
     notBin1d = Bin1d.copy()
     notBin1d[0] = 0.1
-    check_type_helper(notBin1d, Keyword.CONTINUOUS,
-                      [Keyword.AUTO, Keyword.CONTINUOUS],
-                      [Keyword.BINARY, Keyword.CATEGORY, Keyword.CLASSIFICATION])
+    check_type_helper(notBin1d, Keyword_CONTINUOUS,
+                      [Keyword_AUTO, Keyword_CONTINUOUS],
+                      [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION])
     notCat = Cat.copy()
     notCat[0, 0:2] = 1
-    check_type_helper(notCat, Keyword.CONTINUOUS,
-                      [Keyword.CONTINUOUS],  # Auto doesnt work on ambiguous
-                      [Keyword.BINARY, Keyword.CATEGORY, Keyword.CLASSIFICATION])
+    # Special case where values are still {0,1}, but sums arent 1. Then we also
+    # reject continuous
+    check_type_helper(notCat, None,
+                      [],  # Auto doesnt work on ambiguous
+                      [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION, Keyword_CONTINUOUS, Keyword_AUTO])
     notCat[0, 0] = 0.5
-    check_type_helper(notCat, Keyword.CONTINUOUS,
-                      [Keyword.AUTO, Keyword.CONTINUOUS],  # Auto does work here
-                      [Keyword.BINARY, Keyword.CATEGORY, Keyword.CLASSIFICATION])
+    check_type_helper(notCat, Keyword_CONTINUOUS,
+                      [Keyword_AUTO, Keyword_CONTINUOUS],  # Auto does work here
+                      [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION])
     notCat[0, 1] = 0.5
     notCat[0, 2:] = 0.  # Special case because now first row sums to one but is not one-hot
-    check_type_helper(notCat, Keyword.CONTINUOUS,
-                      [Keyword.AUTO, Keyword.CONTINUOUS],  # Auto does work here
-                      [Keyword.BINARY, Keyword.CATEGORY, Keyword.CLASSIFICATION])
+    check_type_helper(notCat, Keyword_CONTINUOUS,
+                      [Keyword_AUTO, Keyword_CONTINUOUS],  # Auto does work here
+                      [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION])
 
 
 def check_2dnp(X):
