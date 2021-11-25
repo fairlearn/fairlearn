@@ -1,3 +1,6 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 from ._constants import (
     _KWARG_ERROR_MESSAGE,
     _TYPE_CHECK_ERROR,
@@ -47,6 +50,31 @@ def _check_array(X):
 
 
 def interpret_keyword(data, input_type, param_name, data_name):
+    """
+    Interpret a keyword (such as "binary") while keeping the data in mind.
+
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The data to infer the type of.
+
+    input_type : str
+        The type suggestion of the data. Should be 'binary', 'category',
+        'continuous', 'auto', 'classification'.
+
+    param_name : str
+        The parameter that this is about, so for instance `predictor_loss` or
+        `predictor_model`.
+
+    data_name : str
+        The data of which we interpret the type, so for
+        instance `y` or `sensitive_features`.
+
+    Returns
+    -------
+    kw : Keyword
+        The keyword that fits the data and input_choice
+    """
     if callable(input_type):
         return input_type
     elif isinstance(input_type, str):
@@ -115,7 +143,7 @@ def _get_function(keyword):
     Infer prediction function.
 
     If
-    """
+    """  # FIXME docstring
     if keyword == Keyword.BINARY:
         return lambda pred: (pred >= 0.5).astype(float)
     elif keyword == Keyword.CATEGORY:

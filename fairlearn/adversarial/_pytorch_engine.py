@@ -1,8 +1,9 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 from ._backend_engine import BackendEngine
 from ._util import Keyword
 from ._constants import _KWARG_ERROR_MESSAGE
-
-from numpy import finfo, float32
 
 # dynamic import.
 torch = None
@@ -12,6 +13,12 @@ class PytorchEngine(BackendEngine):
     """Adds PyTorch specific functions."""
 
     def __init__(self, base, X, Y, Z):
+        """
+        Initialize the (Pytorch specific parts) of the backend engine.
+
+        The Pytorch-specifics include setting module class and handling Cuda.
+        Also set up the optimizers after the init!
+        """
         global torch
         import torch
 
@@ -168,10 +175,12 @@ class PytorchEngine(BackendEngine):
             self.adversary_optimizer = self.base.adversary_optimizer
 
     def get_optimizer(self, optimizer, keyword_name):
-        """Get the optimizer base class corresponding to the string name.
+        """
+        Get the optimizer base class corresponding to the string name.
 
         The parameter `optimizer` should be a string that tells us which optimizer
-        to use."""
+        to use.
+        """
         if isinstance(optimizer, str):
             if optimizer.lower() == "adam":
                 return torch.optim.Adam
@@ -198,6 +207,7 @@ class PytorchEngine(BackendEngine):
             return torch.nn.MSELoss(reduction="mean")
 
     def get_model(self, list_nodes):
+        """Get the model."""  # TODO move to this class.
         from ._models import getTorchModel as getModel
 
         return getModel(list_nodes=list_nodes)

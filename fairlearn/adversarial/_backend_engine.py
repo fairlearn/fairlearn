@@ -1,3 +1,6 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 from ._util import interpret_keyword
 from ._constants import _KWARG_ERROR_MESSAGE, _NOT_IMPLEMENTED
 from sklearn.utils import shuffle
@@ -10,6 +13,15 @@ class BackendEngine:
     model_class = None
 
     def __init__(self, base, X, Y, Z):
+        """
+        Initialize the generic parts of the backend engine.
+
+        Every subclass of BackendEngine needs to import its requirements, set
+        self.model_class to the type that predictor_model and adversary_model
+        should be, and set up the optimizers after the init. The generic
+        steps that are performed in this method is to type-check the models
+        and set up the losses.
+        """
         self.base = base
 
         # Set up predictor_model
@@ -60,9 +72,11 @@ class BackendEngine:
         )
 
     def shuffle(self, X, Y, Z):
-        """Shuffle the rows of X, Y, Z.
+        """
+        Shuffle the rows of X, Y, Z.
 
-        Needs to be overriden by backends that do not work with sklearn."""
+        Needs to be overriden by backends that are non-compatible such as torch.
+        """
         X, Y, Z = shuffle(X, Y, Z, random_state=self.base.random_state_)
         return X, Y, Z
 
@@ -95,4 +109,5 @@ class BackendEngine:
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
     def get_model(self, list_nodes):
+        """Get the model."""  # TODO specify what kind of models these should be
         raise NotImplementedError(_NOT_IMPLEMENTED)

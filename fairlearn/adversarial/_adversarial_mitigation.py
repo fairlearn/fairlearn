@@ -1,7 +1,6 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from torch._C import Value
 from ._constants import (
     _IMPORT_ERROR_MESSAGE,
     _KWARG_ERROR_MESSAGE,
@@ -231,8 +230,10 @@ class AdversarialFairness(BaseEstimator):
         self.warm_start = warm_start
         self.random_state = random_state
 
-        # Want to get rid of this variable, but check_if_fitted can be expensive?
+        # FIXME Want to get rid of this variable, but check_if_fitted can be expensive?
         self._setup = False
+
+        # TODO label encoder for sensitive features (and y)?
 
     def __setup(self, X, Y, Z):
         """
@@ -538,7 +539,7 @@ class AdversarialFairness(BaseEstimator):
             raise RuntimeError(
                 _IMPORT_ERROR_MESSAGE.format("torch or tensorflow")
             )
-        # Or all other cases
+        # Or all other cases, a mismatch between model model (and installation)
         raise ValueError(
             _KWARG_ERROR_MESSAGE.format(
                 "predictor_model and adversary_model",
