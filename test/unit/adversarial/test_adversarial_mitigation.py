@@ -7,7 +7,9 @@ import numpy as np
 import pandas as pd
 from fairlearn.adversarial import AdversarialFairness, \
     AdversarialFairnessClassifier, AdversarialFairnessRegressor
-import fairlearn.adversarial._adversarial_mitigation as main_file
+from fairlearn.adversarial._pytorch_engine import PytorchEngine
+from fairlearn.adversarial._tensorflow_engine import TensorflowEngine
+from fairlearn.adversarial._backend_engine import BackendEngine
 from fairlearn.adversarial._util import interpret_keyword
 from fairlearn.adversarial._constants import _TYPE_CHECK_ERROR
 
@@ -49,8 +51,8 @@ class fake_torch:
             'parameters': lambda self: (i for i in [1, 2]),
             'train': lambda self: None,
             '__call__': lambda self, X: self.forward(X)})
-        BCEWithLogitsLoss = type('BCEWithLogitsLoss', (BCE,), {})
-        CrossEntropyLoss = type('CrossEntropyLoss', (CCE,), {})
+        BCELoss = type('BCELoss', (BCE,), {})
+        NLLLoss = type('NLLLoss', (CCE,), {})
         MSELoss = type('MSELoss', (MSE,), {})
 
     class optim:
@@ -112,7 +114,7 @@ def generate_data_combinations(n=10):
         yield (X, Y, Z), (X_type, Y_type, Z_type)
 
 
-class RemoveAll(main_file.BackendEngine):
+class RemoveAll(BackendEngine):
     def __init__(self, base, X, Y, Z): pass
     def evaluate(self, X): return X
     def train_step(self, X, Y, Z): return (0, 0)
@@ -120,10 +122,10 @@ class RemoveAll(main_file.BackendEngine):
     def get_loss(self, Y, choice, data_name): pass
 
 
-class RemoveTrainStepPytorch(main_file.PytorchEngine):
+class RemoveTrainStepPytorch(PytorchEngine):
     def train_step(self, X, Y, Z): return (0, 0)
 
-class RemoveTrainStepTensorflow(main_file.TensorflowEngine):
+class RemoveTrainStepTensorflow(TensorflowEngine):
     def train_step(self, X, Y, Z): return (0, 0)
 
 def get_instance(
