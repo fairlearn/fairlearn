@@ -7,10 +7,12 @@ The predictor's output is adjusted to fulfill specified parity constraints. The 
 learn how to adjust the predictor's output from the training data.
 """
 
+from ._thresholder import Thresholder
 from ._threshold_optimizer import ThresholdOptimizer  # noqa: F401
 from ._plotting import plot_threshold_optimizer  # noqa: F401
 
 __all__ = [
+    "Thresholder"
     "ThresholdOptimizer",
-    "plot_threshold_optimizer"
+    "plot_threshold_optimizer",
 ]
