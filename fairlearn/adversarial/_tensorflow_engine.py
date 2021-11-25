@@ -14,6 +14,7 @@ class TensorflowEngine(BackendEngine):
     def __init__(self, base, X, Y, Z):
         global tensorflow
         import tensorflow
+
         self.model_class = tensorflow.keras.Model
         super(TensorflowEngine, self).__init__(base, X, Y, Z)
 
@@ -62,16 +63,24 @@ class TensorflowEngine(BackendEngine):
 
         for i in range(len(dW_LP)):
             # Normalize dW_LA
-            unit_dW_LA = dW_LA[i] / (tensorflow.norm(dW_LA[i]) + finfo(float32).tiny)
+            unit_dW_LA = dW_LA[i] / (
+                tensorflow.norm(dW_LA[i]) + finfo(float32).tiny
+            )
             # Project
-            proj = tensorflow.reduce_sum(tensorflow.multiply(dW_LP[i], unit_dW_LA))
+            proj = tensorflow.reduce_sum(
+                tensorflow.multiply(dW_LP[i], unit_dW_LA)
+            )
             # Calculate dW
-            dW_LP[i] = dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
+            dW_LP[i] = (
+                dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
+            )
 
         self.predictor_optimizer.apply_gradients(
-            zip(dW_LP, self.predictor_model.trainable_variables))
+            zip(dW_LP, self.predictor_model.trainable_variables)
+        )
         self.adversary_optimizer.apply_gradients(
-            zip(dU_LA, self.adversary_model.trainable_variables))
+            zip(dU_LA, self.adversary_model.trainable_variables)
+        )
 
         return (LP.numpy().item(), LA.numpy().item())
 
@@ -87,16 +96,22 @@ class TensorflowEngine(BackendEngine):
         already initialized optimizer.
         """
         if isinstance(self.base.predictor_optimizer, str):
-            optim = self.get_optimizer(self.base.predictor_optimizer,
-                'predictor_optimizer')
-            self.predictor_optimizer = optim(learning_rate=self.base.learning_rate)
+            optim = self.get_optimizer(
+                self.base.predictor_optimizer, "predictor_optimizer"
+            )
+            self.predictor_optimizer = optim(
+                learning_rate=self.base.learning_rate
+            )
         else:
             self.predictor_optimizer = self.base.predictor_optimizer
 
         if isinstance(self.base.adversary_optimizer, str):
-            optim = self.get_optimizer(self.base.adversary_optimizer,
-                'adversary_optimizer')
-            self.adversary_optimizer = optim(learning_rate=self.base.learning_rate)
+            optim = self.get_optimizer(
+                self.base.adversary_optimizer, "adversary_optimizer"
+            )
+            self.adversary_optimizer = optim(
+                learning_rate=self.base.learning_rate
+            )
         else:
             self.adversary_optimizer = self.base.adversary_optimizer
 
@@ -110,8 +125,12 @@ class TensorflowEngine(BackendEngine):
                 return tensorflow.keras.optimizers.Adam
             elif optimizer.lower() == "sgd":
                 return tensorflow.keras.optimizers.SGD
-        raise ValueError(_KWARG_ERROR_MESSAGE.format(
-            keyword_name, '"Adam" or "SGD" or an (!)initialized(!) optimizer'))
+        raise ValueError(
+            _KWARG_ERROR_MESSAGE.format(
+                keyword_name,
+                '"Adam" or "SGD" or an (!)initialized(!) optimizer',
+            )
+        )
 
     def get_loss(self, keyword):
         """Get loss function corresponding to the keyword."""
@@ -122,10 +141,13 @@ class TensorflowEngine(BackendEngine):
             return tensorflow.keras.losses.BinaryCrossentropy(from_logits=False)
         elif keyword == Keyword.CATEGORY:
             # User softmax as final layer
-            return tensorflow.keras.losses.CategoricalCrossentropy(from_logits=False)
+            return tensorflow.keras.losses.CategoricalCrossentropy(
+                from_logits=False
+            )
         elif keyword == Keyword.CONTINUOUS:
             return tensorflow.keras.losses.MeanSquaredError()
 
     def get_model(self, list_nodes):
         from ._models import getTensorflowModel as getModel
+
         return getModel(list_nodes=list_nodes)

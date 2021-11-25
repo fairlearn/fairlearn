@@ -7,19 +7,21 @@ from numpy import finfo, float32
 # dynamic import.
 torch = None
 
+
 class PytorchEngine(BackendEngine):
     """Adds PyTorch specific functions."""
 
     def __init__(self, base, X, Y, Z):
         global torch
         import torch
+
         self.model_class = torch.nn.Module
         super(PytorchEngine, self).__init__(base, X, Y, Z)
 
         # Setup cuda - Recommended to do this before setting up optimizers!
-        if (not base.cuda):
+        if not base.cuda:
             self.cuda = False
-        elif (base.cuda):
+        elif base.cuda:
             if not torch.cuda.is_available():
                 raise ValueError("Cuda is not available")
             self.cuda = True
@@ -76,9 +78,14 @@ class PytorchEngine(BackendEngine):
 
         Y_hat = self.predictor_model(X)
         LP = self.predictor_loss(Y_hat, Y)
-        LP.backward(retain_graph=True)  # Check what this does at some point in time
+        LP.backward(
+            retain_graph=True
+        )  # Check what this does at some point in time
 
-        dW_LP = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
+        dW_LP = [
+            torch.clone(p.grad.detach())
+            for p in self.predictor_model.parameters()
+        ]
 
         self.predictor_optimizer.zero_grad()
         self.adversary_optimizer.zero_grad()
@@ -91,15 +98,22 @@ class PytorchEngine(BackendEngine):
         LA = self.adversary_loss(Z_hat, Z)
         LA.backward()
 
-        dW_LA = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
+        dW_LA = [
+            torch.clone(p.grad.detach())
+            for p in self.predictor_model.parameters()
+        ]
 
         for i, p in enumerate(self.predictor_model.parameters()):
             # Normalize dW_LA
-            unit_dW_LA = dW_LA[i] / (torch.norm(dW_LA[i]) + torch.finfo(float).tiny)
+            unit_dW_LA = dW_LA[i] / (
+                torch.norm(dW_LA[i]) + torch.finfo(float).tiny
+            )
             # Project
             proj = torch.sum(torch.inner(unit_dW_LA, dW_LP[i]))
             # Calculate dW
-            p.grad = dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
+            p.grad = (
+                dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
+            )
 
         self.predictor_optimizer.step()
         self.adversary_optimizer.step()
@@ -134,24 +148,28 @@ class PytorchEngine(BackendEngine):
         already initialized optimizer.
         """
         if isinstance(self.base.predictor_optimizer, str):
-            optim = self.get_optimizer(self.base.predictor_optimizer,
-                'predictor_optimizer')
+            optim = self.get_optimizer(
+                self.base.predictor_optimizer, "predictor_optimizer"
+            )
             self.predictor_optimizer = optim(
-                self.predictor_model.parameters(), lr=self.base.learning_rate)
+                self.predictor_model.parameters(), lr=self.base.learning_rate
+            )
         else:
             self.predictor_optimizer = self.base.predictor_optimizer
-        
+
         if isinstance(self.base.adversary_optimizer, str):
-            optim = self.get_optimizer(self.base.adversary_optimizer,
-                'adversary_optimizer')
+            optim = self.get_optimizer(
+                self.base.adversary_optimizer, "adversary_optimizer"
+            )
             self.adversary_optimizer = optim(
-                self.adversary_model.parameters(), lr=self.base.learning_rate)
+                self.adversary_model.parameters(), lr=self.base.learning_rate
+            )
         else:
             self.adversary_optimizer = self.base.adversary_optimizer
 
     def get_optimizer(self, optimizer, keyword_name):
         """Get the optimizer base class corresponding to the string name.
-        
+
         The parameter `optimizer` should be a string that tells us which optimizer
         to use."""
         if isinstance(optimizer, str):
@@ -159,8 +177,12 @@ class PytorchEngine(BackendEngine):
                 return torch.optim.Adam
             elif optimizer.lower() == "sgd":
                 return torch.optim.SGD
-        raise ValueError(_KWARG_ERROR_MESSAGE.format(
-            keyword_name, '"Adam" or "SGD" or an (!)initialized(!) optimizer'))
+        raise ValueError(
+            _KWARG_ERROR_MESSAGE.format(
+                keyword_name,
+                '"Adam" or "SGD" or an (!)initialized(!) optimizer',
+            )
+        )
 
     def get_loss(self, keyword):
         """Get loss function corresponding to the keyword."""
@@ -168,15 +190,16 @@ class PytorchEngine(BackendEngine):
             return keyword
         if keyword == Keyword.BINARY:
             # Use sigmoid as last layer
-            return torch.nn.BCELoss(reduction='mean')
+            return torch.nn.BCELoss(reduction="mean")
         elif keyword == Keyword.CATEGORY:
             # Use logsoftmax as last layer
-            return torch.nn.NLLLoss(reduction='mean')
+            return torch.nn.NLLLoss(reduction="mean")
         elif keyword == Keyword.CONTINUOUS:
-            return torch.nn.MSELoss(reduction='mean')
+            return torch.nn.MSELoss(reduction="mean")
 
     def get_model(self, list_nodes):
         from ._models import getTorchModel as getModel
+
         return getModel(list_nodes=list_nodes)
 
     def validate_input(self, X, Y, Z):

@@ -7,6 +7,7 @@ from ._constants import _IMPORT_ERROR_MESSAGE
 # TODO final activation different
 # TODO move to backend engines?
 
+
 def getTorchModel(list_nodes, activation="sigmoid"):
     """Fully connected neural network as a Torch model.
 
@@ -46,20 +47,21 @@ def getTorchModel(list_nodes, activation="sigmoid"):
                 x = layer(x)
             return x
 
-    if (not activation) or activation == 'sigmoid':
+    if (not activation) or activation == "sigmoid":
         activation = Sigmoid()
     model = FullyConnected(list_nodes, activation)
 
     def init_weights(m):
         if isinstance(m, Linear):
             xavier_uniform_(m.weight)
-            m.bias.data.fill_(0.)
+            m.bias.data.fill_(0.0)
+
     model.apply(init_weights)
 
     return model
 
 
-def getTensorflowModel(list_nodes, activation='sigmoid'):
+def getTensorflowModel(list_nodes, activation="sigmoid"):
     """Fully connected neural network as a Tensorflow model.
 
     Parameters
@@ -90,17 +92,21 @@ def getTensorflowModel(list_nodes, activation='sigmoid'):
             super(FullyConnected, self).__init__()
             layers = []
             for i in range(1, len(list_nodes)):
-                layers.append(Dense(
-                    units=list_nodes[i],
+                layers.append(
+                    Dense(
+                        units=list_nodes[i],
+                        kernel_initializer=initializer_w,
+                        bias_initializer="zeros",
+                        activation=activation,
+                    )
+                )
+            layers.append(
+                Dense(
+                    list_nodes[-1],
                     kernel_initializer=initializer_w,
-                    bias_initializer='zeros',
-                    activation=activation,
-                ))
-            layers.append(Dense(
-                list_nodes[-1],
-                kernel_initializer=initializer_w,
-                bias_initializer='zeros'
-            ))
+                    bias_initializer="zeros",
+                )
+            )
             self.layers_ = layers
 
         def call(self, x):

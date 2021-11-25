@@ -1,8 +1,12 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ._constants import _IMPORT_ERROR_MESSAGE, _KWARG_ERROR_MESSAGE, \
-    _PROGRESS_UPDATE, _NO_DATA
+from ._constants import (
+    _IMPORT_ERROR_MESSAGE,
+    _KWARG_ERROR_MESSAGE,
+    _PROGRESS_UPDATE,
+    _NO_DATA,
+)
 from ._util import _get_function, interpret_keyword, Keyword, _check_array
 from ._backend_engine import BackendEngine
 from ._pytorch_engine import PytorchEngine
@@ -228,28 +232,30 @@ class AdversarialFairness(BaseEstimator):
     1.0                  0.809447       0.228322
     """
 
-    def __init__(self, *,
-                 backend='auto',
-                 predictor_model,
-                 adversary_model,
-                 predictor_loss='auto',
-                 adversary_loss='auto',
-                 predictor_function='auto',
-                 constraints='demographic_parity',
-                 predictor_optimizer='Adam',
-                 adversary_optimizer='Adam',
-                 learning_rate=0.001,
-                 alpha=1.0,
-                 cuda=None,
-                 epochs=1,
-                 batch_size=-1,
-                 shuffle=False,
-                 progress_updates=None,
-                 skip_validation=False,
-                 callback_fn=None,
-                 warm_start=False,
-                 random_state=None,
-                 ):
+    def __init__(
+        self,
+        *,
+        backend="auto",
+        predictor_model,
+        adversary_model,
+        predictor_loss="auto",
+        adversary_loss="auto",
+        predictor_function="auto",
+        constraints="demographic_parity",
+        predictor_optimizer="Adam",
+        adversary_optimizer="Adam",
+        learning_rate=0.001,
+        alpha=1.0,
+        cuda=None,
+        epochs=1,
+        batch_size=-1,
+        shuffle=False,
+        progress_updates=None,
+        skip_validation=False,
+        callback_fn=None,
+        warm_start=False,
+        random_state=None,
+    ):
         self.backend = backend
         self.predictor_model = predictor_model
         self.adversary_model = adversary_model
@@ -279,18 +285,24 @@ class AdversarialFairness(BaseEstimator):
         self._validate_backend()
 
         # Verify the constraints and set up the corresponding network structure.
-        if (self.constraints == "demographic_parity"):
+        if self.constraints == "demographic_parity":
             self.pass_y_ = False
-        elif (self.constraints == "equalized_odds"):
+        elif self.constraints == "equalized_odds":
             self.pass_y_ = True
         else:
-            raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                "constraints", "\'demographic_parity\' or \'equalized_odds\'"))
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    "constraints", "'demographic_parity' or 'equalized_odds'"
+                )
+            )
 
         self.random_state_ = check_random_state(self.random_state)
 
         self.predictor_function_ = _get_function(
-            interpret_keyword(Y, self.predictor_function, "predictor_function", "y"))
+            interpret_keyword(
+                Y, self.predictor_function, "predictor_function", "y"
+            )
+        )
 
         # Initialize backend
         self.backendEngine_ = self.backend_(self, X, Y, Z)
@@ -331,21 +343,32 @@ class AdversarialFairness(BaseEstimator):
                 if self.progress_updates:
                     if (time() - last_update_time) > self.progress_updates:
                         last_update_time = time()
-                        progress = (epoch / self.epochs) + (batch / (batches * self.epochs))
-                        print(_PROGRESS_UPDATE.format(
-                            "=" * round(20 * progress),
-                            " " * round(20 * (1 - progress)),
-                            epoch + 1, self.epochs,
-                            " " * (len(str(batch + 1)) - len(str(batches))),
-                            batch + 1, batches,
-                            ((last_update_time - start_time) / progress) * (1 - progress),
-                            predictor_losses[-1],
-                            adversary_losses[-1]
-                        ), end='\n')
-                batch_slice = slice(batch * self.batch_size, min((batch + 1) * self.batch_size, X.shape[0]))
-                (LP, LA) = self.backendEngine_.train_step(X[batch_slice],
-                                            Y[batch_slice],
-                                            Z[batch_slice])
+                        progress = (epoch / self.epochs) + (
+                            batch / (batches * self.epochs)
+                        )
+                        print(
+                            _PROGRESS_UPDATE.format(
+                                "=" * round(20 * progress),
+                                " " * round(20 * (1 - progress)),
+                                epoch + 1,
+                                self.epochs,
+                                " " * (len(str(batch + 1)) - len(str(batches))),
+                                batch + 1,
+                                batches,
+                                ((last_update_time - start_time) / progress)
+                                * (1 - progress),
+                                predictor_losses[-1],
+                                adversary_losses[-1],
+                            ),
+                            end="\n",
+                        )
+                batch_slice = slice(
+                    batch * self.batch_size,
+                    min((batch + 1) * self.batch_size, X.shape[0]),
+                )
+                (LP, LA) = self.backendEngine_.train_step(
+                    X[batch_slice], Y[batch_slice], Z[batch_slice]
+                )
                 predictor_losses.append(LP)
                 adversary_losses.append(LA)
 
@@ -353,7 +376,6 @@ class AdversarialFairness(BaseEstimator):
                     self.callback_fn(self, epoch, batch)
             if self.shuffle and epoch != self.epochs - 1:
                 X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
-
 
     def partial_fit(self, X, y, *, sensitive_features):
         """
@@ -383,7 +405,6 @@ class AdversarialFairness(BaseEstimator):
 
         Y_pred = self.backendEngine_.evaluate(X)
         return Y_pred
-
 
     def predict(self, X):
         """
@@ -425,7 +446,9 @@ class AdversarialFairness(BaseEstimator):
         if not (X.shape[0] == Y.shape[0] and X.shape[0] == Z.shape[0]):
             raise ValueError(
                 "Input data has an ambiguous number of rows: {}, {}, {}.".format(
-                    X.shape[0], Y.shape[0], Z.shape[0]))
+                    X.shape[0], Y.shape[0], Z.shape[0]
+                )
+            )
 
         if (not self._setup) or (not self.warm_start):
             self.setup(X, Y, Z)
@@ -449,59 +472,79 @@ class AdversarialFairness(BaseEstimator):
         torch_installed = False
         tensorflow_installed = False
 
-        if isinstance(self.backend, type) and issubclass(self.backend, BackendEngine):
+        if isinstance(self.backend, type) and issubclass(
+            self.backend, BackendEngine
+        ):
             self.backend_ = self.backend
             return
-        if self.backend == 'torch' or self.backend == 'auto':
+        if self.backend == "torch" or self.backend == "auto":
             select = False
             try:
                 from torch.nn import Module as model
+
                 torch_installed = True
-                if isinstance(self.predictor_model, (list, model)) and \
-                    isinstance(self.adversary_model, (list, model)):
+                if isinstance(
+                    self.predictor_model, (list, model)
+                ) and isinstance(self.adversary_model, (list, model)):
                     select = True
-                elif self.backend == 'torch':
-                    raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                    'predictor_model and adversary_model',
-                    "a list or torch.nn.Module"))
+                elif self.backend == "torch":
+                    raise ValueError(
+                        _KWARG_ERROR_MESSAGE.format(
+                            "predictor_model and adversary_model",
+                            "a list or torch.nn.Module",
+                        )
+                    )
             except ImportError:
-                if self.backend == 'torch':
+                if self.backend == "torch":
                     raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
             if select:
                 self.backend_ = PytorchEngine
                 return
-        if self.backend == 'tensorflow' or self.backend == 'auto':
+        if self.backend == "tensorflow" or self.backend == "auto":
             select = False
             try:
                 from tensorflow.keras import Model as model
+
                 tensorflow_installed = True
-                if isinstance(self.predictor_model, (list, model)) and \
-                    isinstance(self.adversary_model, (list, model)):
+                if isinstance(
+                    self.predictor_model, (list, model)
+                ) and isinstance(self.adversary_model, (list, model)):
                     select = True
-                elif self.backend == 'tensorflow':
-                    raise ValueError(_KWARG_ERROR_MESSAGE.format(
-                    'predictor_model and adversary_model',
-                    "a list or tensorflow.keras.Model"))
+                elif self.backend == "tensorflow":
+                    raise ValueError(
+                        _KWARG_ERROR_MESSAGE.format(
+                            "predictor_model and adversary_model",
+                            "a list or tensorflow.keras.Model",
+                        )
+                    )
             except ImportError:
-                if self.backend == 'tensorflow':
-                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
+                if self.backend == "tensorflow":
+                    raise RuntimeError(
+                        _IMPORT_ERROR_MESSAGE.format("tensorflow")
+                    )
             if select:
                 self.backend_ = TensorflowEngine
                 return
         # The keyword self.backend was weird
-        if self.backend not in ['torch', 'tensorflow', 'auto']:
+        if self.backend not in ["torch", "tensorflow", "auto"]:
             raise ValueError(
                 _KWARG_ERROR_MESSAGE.format(
-                    'backend',
-                    "one of [\'auto\', \'torch\',\'tensorflow\']"))
+                    "backend", "one of ['auto', 'torch','tensorflow']"
+                )
+            )
         # Or no backend is installed
         if not (torch_installed or tensorflow_installed):
-            raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
+            raise RuntimeError(
+                _IMPORT_ERROR_MESSAGE.format("torch or tensorflow")
+            )
         # Or all other cases
-        raise ValueError(_KWARG_ERROR_MESSAGE.format(
-            'predictor_model and adversary_model',
-            "a list, torch.nn.Module, or tensorflow.keras.Model. Also, " +
-            "make sure to have installed the corresponding backend"))
+        raise ValueError(
+            _KWARG_ERROR_MESSAGE.format(
+                "predictor_model and adversary_model",
+                "a list, torch.nn.Module, or tensorflow.keras.Model. Also, "
+                + "make sure to have installed the corresponding backend",
+            )
+        )
 
 
 class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
@@ -509,10 +552,12 @@ class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
 
     def __init__(self, **kwargs):
         """Initialize model by setting the predictor loss and function."""
-        kwargs['predictor_loss'] = kwargs.get('predictor_loss',
-            Keyword.CLASSIFICATION.value)
-        kwargs['predictor_function'] = kwargs.get('predictor_function',
-            Keyword.CLASSIFICATION.value)
+        kwargs["predictor_loss"] = kwargs.get(
+            "predictor_loss", Keyword.CLASSIFICATION.value
+        )
+        kwargs["predictor_function"] = kwargs.get(
+            "predictor_function", Keyword.CLASSIFICATION.value
+        )
         super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
 
@@ -521,8 +566,10 @@ class AdversarialFairnessRegressor(AdversarialFairness, RegressorMixin):
 
     def __init__(self, *args, **kwargs):
         """Initialize model by setting the predictor loss."""
-        kwargs['predictor_loss'] = kwargs.get('predictor_loss',
-            Keyword.CONTINUOUS.value)
-        kwargs['predictor_function'] = kwargs.get('predictor_function',
-            Keyword.CONTINUOUS.value)
+        kwargs["predictor_loss"] = kwargs.get(
+            "predictor_loss", Keyword.CONTINUOUS.value
+        )
+        kwargs["predictor_function"] = kwargs.get(
+            "predictor_function", Keyword.CONTINUOUS.value
+        )
         super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
