@@ -183,7 +183,7 @@ class PredictorModel(torch.nn.Module):
             torch.nn.LeakyReLU(),
             torch.nn.Linear(200, 1),
             torch.nn.Sigmoid(),
-        )  # NO final activation function!
+        )
 
     def forward(self, x):
         return self.layers(x)
@@ -197,7 +197,7 @@ class AdversaryModel(torch.nn.Module):
             torch.nn.LeakyReLU(),
             torch.nn.Linear(3, 1),
             torch.nn.Sigmoid(),
-        )  # NO final activation function!
+        )
 
     def forward(self, x):
         return self.layers(x)
@@ -229,7 +229,8 @@ adversary_model.apply(weights_init)
 # %%
 # Instead of only looking at training loss, we also take a look at some validation
 # metrics. For this, we chose the demographic parity difference to check to what
-# extent the constraint (demographic parity in this case) is satisfied. We will pass this validation step to our model later.
+# extent the constraint (demographic parity in this case) is satisfied.
+# We will pass this validation step to our model later. 
 
 
 def validate(mitigator):
@@ -244,6 +245,7 @@ def validate(mitigator):
             dp_diff, accuracy, selection_rate
         )
     )
+    return dp_diff, accuracy, selection_rate
 
 
 # %%
@@ -262,21 +264,24 @@ scheduler2 = torch.optim.lr_scheduler.ExponentialLR(
 # %%
 # We make use of a callback function to both update the hyperparameters and to
 # validate the model. We update these hyperparameters at every 10 steps, and we
-# validate every 100 steps.
+# validate every 100 steps. Additionally, we can implement early stopping
+# easily by calling :code:`return True` in a callback function.
 
 step = 1
-skip = 10
 
-
-def callbackfn(model, epoch, batch):
+def callbackfn(model, *args):
     global step
     step += 1
-    if step % skip == 0:
-        model.alpha = sqrt(step // skip)
+    # Update hyperparameters
+    if step % 10 == 0:
+        model.alpha = sqrt(step // 10)
         scheduler1.step()
         scheduler2.step()
+    # Validate (and early stopping)
     if step % 100 == 0:
-        validate(model)
+        dp_diff, accuracy, selection_rate = validate(model)
+        if dp_diff < 0.01 and accuracy > 0.8:
+            return True
 
 
 # %%
@@ -290,7 +295,7 @@ mitigator = AdversarialFairnessClassifier(
     adversary_optimizer=adversary_optimizer,
     alpha=1.0,
     constraints="demographic_parity",
-    epochs=7,
+    epochs=10,
     batch_size=2 ** 7,
     shuffle=True,
     progress_updates=1,
@@ -320,3 +325,9 @@ mf = MetricFrame(
 )
 
 print(mf.by_group)
+
+# %%
+
+# %%
+
+# %%

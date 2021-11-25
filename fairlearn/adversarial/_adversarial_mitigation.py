@@ -373,7 +373,9 @@ class AdversarialFairness(BaseEstimator):
                 adversary_losses.append(LA)
 
                 if callable(self.callback_fn):
-                    self.callback_fn(self, epoch, batch)
+                    stop = self.callback_fn(self, epoch, batch)
+                    if stop:
+                        return
             if self.shuffle and epoch != self.epochs - 1:
                 X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
 
