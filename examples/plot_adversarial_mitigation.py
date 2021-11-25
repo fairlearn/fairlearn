@@ -26,6 +26,27 @@ Mitigating Fairness using Adversarial Mitigation
 #
 # This implementation follows closely the API of an `Estimator` in :class:`sklearn`
 
+
+# %%
+# Imports used by the rest of the script
+from fairlearn.metrics import (
+    MetricFrame,
+    selection_rate,
+    demographic_parity_difference,
+)
+from fairlearn.adversarial import AdversarialFairnessClassifier
+
+from numpy import number, mean
+from sklearn.compose import make_column_transformer, make_column_selector
+from sklearn.metrics import accuracy_score
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+import torch
+from math import sqrt
+
 # %%
 # Example 1: Simple use case with UCI Adult Dataset
 # =================================================
@@ -35,38 +56,10 @@ Mitigating Fairness using Adversarial Mitigation
 # For this example we choose the feature 'sex' as the sensitive feature.
 
 
-# %%
-# Imports used by the rest of the script
-from math import sqrt
-from fairlearn.metrics import (
-    MetricFrame,
-    selection_rate,
-    demographic_parity_difference,
-)
-from sklearn.metrics import accuracy_score
-from fairlearn.adversarial import (
-    AdversarialFairnessClassifier,
-    AdversarialFairness,
-)
-from pandas import Series
-from numpy import double, float64, number, random, mean
-from sklearn.compose import make_column_transformer, make_column_selector
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.datasets import fetch_openml
-from sklearn.model_selection import train_test_split
-import torch
-
 X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 
-# Remove rows with NaNs. In many cases, dropping rows that contain missing values is not the best approach for dealing with missing values,
-# but for this example we ignore that.
-non_NaN_rows = ~X.isna().any(axis=1)
-
-X = X[non_NaN_rows]
-y = y[non_NaN_rows]
-
 # Choose sensitive feature
-sensitive_feature = X["sex"]
+z = X["sex"]
 
 # %%
 # The UCI adult dataset can not be fed into a neural network (yet),
@@ -74,29 +67,42 @@ sensitive_feature = X["sex"]
 # issue, we could for instance use one-hot-encodings to preprocess categorical
 # columns. Additionally, let's preprocess the columns of number to a
 # standardized range. For these tasks, we can use functionality from
-# `sklearn.preprocessor`.
+# `sklearn.preprocessor`. Also, if we don't want to blatantly transform
+# NaN's (which are common in this dataset) to zero's, then we should take
+# care and define our own missing data imputer.
 
 
-def transform(X):
-    if isinstance(X, Series):  # make_column_transformer works with DataFrames
-        X = X.to_frame()
-    ct = make_column_transformer(
-        (StandardScaler(), make_column_selector(dtype_include=number)),
-        (
-            OneHotEncoder(drop="if_binary", sparse=False),
-            make_column_selector(dtype_include="category"),
+ct = make_column_transformer(
+    (
+        Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="mean")),
+                ("normalizer", StandardScaler()),
+            ]
         ),
-    )
-    return ct.fit_transform(X)
+        make_column_selector(dtype_include=number),
+    ),
+    (
+        Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("encoder", OneHotEncoder(drop="if_binary", sparse=False)),
+            ]
+        ),
+        make_column_selector(dtype_include="category"),
+    ),
+)
 
-
-X = transform(X)
-y = transform(y)
-sensitive_feature = transform(sensitive_feature)
+y = (y == y[0]).astype(float).to_frame()
+z = (z == z[0]).astype(float).to_frame()
 
 X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(
-    X, y, sensitive_feature, test_size=0.2, random_state=12345, stratify=y
+    X, y, z, test_size=0.2, random_state=12345, stratify=y
 )
+
+X_train = ct.fit_transform(X_train)
+X_test = ct.transform(X_test)
+
 
 # %%
 # Now, we can use :class:`fairlearn.adversarial.AdversarialFairnessClassifier` to train on the
@@ -116,14 +122,12 @@ X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(
 
 
 mitigator = AdversarialFairnessClassifier(
-    predictor_model=[50, 20],
-    adversary_model=[6, 6],
-    constraints="demographic_parity",
-    learning_rate=0.0001,
-    epochs=10,
+    predictor_model=[50],
+    adversary_model=[3],
+    epochs=20,
     batch_size=2 ** 9,
     shuffle=True,
-    progress_updates=5,
+    progress_updates=0.5,
     random_state=123,
 )
 
@@ -150,15 +154,16 @@ mf = MetricFrame(
 print(mf.by_group)
 
 # %%
-# We see that the results are not great. The accuracy is not optimal, and there
-# remains demographic disparity. That is because there is no known out-of-the-box
-# solution that is able to train an adversarial network succesfully. There are many
-# variables at play, and we will improve our model in the next section.
+# When using adversarial debiasing out-of-the-box, you may not yield such
+# good training results after the first attempt. In general, training
+# adversarial networks is hard, and you may need to tweak the
+# hyperparameters continuously. Example 2 will demonstrate some
+# techniques we can use such as using dynamic hyperparameters,
+# validation, and early stopping. A more extensive list of advices is given here #TODO
 
 # %%
-# Example 2: More advanced models
-# ===============================
-# Below we experiment with our models in order to achieve better results than above.
+# Example 2: Finetuning
+# =====================
 # Adversarial Learning is inherently difficult because models can diverge quickly.
 # Intuitively, you should imagine that there are "very easy" local minima that the
 # models may converge to. For instance, if the predictor always outputs class=0,
@@ -170,16 +175,13 @@ print(mf.by_group)
 # So, to finetune our model and the training thereof, we start by defining our
 # neural networks in the way we'd like them and in the way we can easily tweak them.
 # We will be using PyTorch, but the same can be achieved using Tensorflow!
-X = X_train
-Y = Y_train
-Z = Z_train
 
 
 class PredictorModel(torch.nn.Module):
     def __init__(self):
         super(PredictorModel, self).__init__()
         self.layers = torch.nn.Sequential(
-            torch.nn.Linear(X.shape[1], 200),
+            torch.nn.Linear(X_train.shape[1], 200),
             torch.nn.LeakyReLU(),
             torch.nn.Linear(200, 1),
             torch.nn.Sigmoid(),
@@ -230,7 +232,7 @@ adversary_model.apply(weights_init)
 # Instead of only looking at training loss, we also take a look at some validation
 # metrics. For this, we chose the demographic parity difference to check to what
 # extent the constraint (demographic parity in this case) is satisfied.
-# We will pass this validation step to our model later. 
+# We will pass this validation step to our model later.
 
 
 def validate(mitigator):
@@ -238,7 +240,7 @@ def validate(mitigator):
     dp_diff = demographic_parity_difference(
         Y_test, predictions, sensitive_features=Z_test
     )
-    accuracy = mean(predictions == Y_test)
+    accuracy = mean(predictions == Y_test.values)
     selection_rate = mean(predictions == 1.0)
     print(
         "DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
@@ -249,7 +251,10 @@ def validate(mitigator):
 
 
 # %%
-# We may define the optimizers however we like. In this case, we use the suggestion from the paper to set the hyperparameters alpha and learning rate (:math:`\mu`) to depend on the timestep such that :math:`alpha \mu \rightarrow 0` as the timestep grows.
+# We may define the optimizers however we like. In this case, we use the
+# suggestion from the paper to set the hyperparameters alpha and learning
+# rate (:math:`\mu`) to depend on the timestep such that :math:`alpha \mu
+# \rightarrow 0` as the timestep grows.
 
 predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.01)
 adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.01)
@@ -268,6 +273,7 @@ scheduler2 = torch.optim.lr_scheduler.ExponentialLR(
 # easily by calling :code:`return True` in a callback function.
 
 step = 1
+
 
 def callbackfn(model, *args):
     global step
@@ -306,7 +312,7 @@ mitigator = AdversarialFairnessClassifier(
 # %%
 # Finally, we fit the model
 
-mitigator.fit(X, Y, sensitive_features=Z)
+mitigator.fit(X_train, Y_train, sensitive_features=Z_train)
 
 validate(mitigator)
 
@@ -325,9 +331,3 @@ mf = MetricFrame(
 )
 
 print(mf.by_group)
-
-# %%
-
-# %%
-
-# %%
