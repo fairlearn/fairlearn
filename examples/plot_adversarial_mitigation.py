@@ -38,11 +38,16 @@ Mitigating Fairness using Adversarial Mitigation
 # %%
 # Imports used by the rest of the script
 from math import sqrt
-from fairlearn.metrics import MetricFrame, selection_rate, \
-    demographic_parity_difference
+from fairlearn.metrics import (
+    MetricFrame,
+    selection_rate,
+    demographic_parity_difference,
+)
 from sklearn.metrics import accuracy_score
-from fairlearn.adversarial import AdversarialFairnessClassifier, \
-    AdversarialFairness
+from fairlearn.adversarial import (
+    AdversarialFairnessClassifier,
+    AdversarialFairness,
+)
 from pandas import Series
 from numpy import double, float64, number, random, mean
 from sklearn.compose import make_column_transformer, make_column_selector
@@ -61,7 +66,7 @@ X = X[non_NaN_rows]
 y = y[non_NaN_rows]
 
 # Choose sensitive feature
-sensitive_feature = X['sex']
+sensitive_feature = X["sex"]
 
 # %%
 # The UCI adult dataset can not be fed into a neural network (yet),
@@ -76,10 +81,12 @@ def transform(X):
     if isinstance(X, Series):  # make_column_transformer works with DataFrames
         X = X.to_frame()
     ct = make_column_transformer(
-        (StandardScaler(),
-         make_column_selector(dtype_include=number)),
-        (OneHotEncoder(drop='if_binary', sparse=False),
-         make_column_selector(dtype_include="category")))
+        (StandardScaler(), make_column_selector(dtype_include=number)),
+        (
+            OneHotEncoder(drop="if_binary", sparse=False),
+            make_column_selector(dtype_include="category"),
+        ),
+    )
     return ct.fit_transform(X)
 
 
@@ -87,11 +94,9 @@ X = transform(X)
 y = transform(y)
 sensitive_feature = transform(sensitive_feature)
 
-X_train, X_test, Y_train, Y_test, Z_train, Z_test = \
-        train_test_split(X, y, sensitive_feature,
-                         test_size=0.2,
-                         random_state=12345,
-                         stratify=y)
+X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(
+    X, y, sensitive_feature, test_size=0.2, random_state=12345, stratify=y
+)
 
 # %%
 # Now, we can use :class:`fairlearn.adversarial.AdversarialFairnessClassifier` to train on the
@@ -116,21 +121,17 @@ mitigator = AdversarialFairnessClassifier(
     constraints="demographic_parity",
     learning_rate=0.0001,
     epochs=10,
-    batch_size=2**9,
+    batch_size=2 ** 9,
     shuffle=True,
     progress_updates=5,
     random_state=123,
 )
 
 # %%
-# Then, we can fit the data to our model. 
+# Then, we can fit the data to our model.
 torch.manual_seed(123)
 
-mitigator.fit(
-    X_train,
-    Y_train,
-    sensitive_features=Z_train
-)
+mitigator.fit(X_train, Y_train, sensitive_features=Z_train)
 
 # %%
 # Predict and evaluate. In particular, we trained the predictor for demographic
@@ -140,12 +141,11 @@ mitigator.fit(
 predictions = mitigator.predict(X_test)
 
 mf = MetricFrame(
-    metrics={
-        'accuracy': accuracy_score,
-        'selection_rate': selection_rate},
+    metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},
     y_true=Y_test,
     y_pred=predictions,
-    sensitive_features=Z_test)
+    sensitive_features=Z_test,
+)
 
 print(mf.by_group)
 
@@ -182,7 +182,7 @@ class PredictorModel(torch.nn.Module):
             torch.nn.Linear(X.shape[1], 200),
             torch.nn.LeakyReLU(),
             torch.nn.Linear(200, 1),
-            torch.nn.Sigmoid()
+            torch.nn.Sigmoid(),
         )  # NO final activation function!
 
     def forward(self, x):
@@ -196,7 +196,7 @@ class AdversaryModel(torch.nn.Module):
             torch.nn.Linear(1, 3),
             torch.nn.LeakyReLU(),
             torch.nn.Linear(3, 1),
-            torch.nn.Sigmoid()
+            torch.nn.Sigmoid(),
         )  # NO final activation function!
 
     def forward(self, x):
@@ -215,6 +215,7 @@ torch.manual_seed(123)
 
 gain = 0.1
 
+
 def weights_init(m):
     if isinstance(m, torch.nn.Linear):
         torch.nn.init.xavier_normal_(m.weight.data, gain=gain)
@@ -230,38 +231,48 @@ adversary_model.apply(weights_init)
 # metrics. For this, we chose the demographic parity difference to check to what
 # extent the constraint (demographic parity in this case) is satisfied. We will pass this validation step to our model later.
 
+
 def validate(mitigator):
     predictions = mitigator.predict(X_test)
-    dp_diff = demographic_parity_difference(Y_test,
-                                            predictions,
-                                            sensitive_features=Z_test)
+    dp_diff = demographic_parity_difference(
+        Y_test, predictions, sensitive_features=Z_test
+    )
     accuracy = mean(predictions == Y_test)
-    selection_rate = mean(predictions == 1.)
-    print("DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
-        dp_diff, accuracy, selection_rate))
+    selection_rate = mean(predictions == 1.0)
+    print(
+        "DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
+            dp_diff, accuracy, selection_rate
+        )
+    )
 
 
 # %%
-# We may define the optimizers however we like. In this case, we use the suggestion from the paper to set the hyperparameters alpha and learning rate (:math:`\mu`) to depend on the timestep such that :math:`alpha \mu \rightarrow 0` as the timestep grows. 
+# We may define the optimizers however we like. In this case, we use the suggestion from the paper to set the hyperparameters alpha and learning rate (:math:`\mu`) to depend on the timestep such that :math:`alpha \mu \rightarrow 0` as the timestep grows.
 
 predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.01)
 adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.01)
 
-scheduler1 = torch.optim.lr_scheduler.ExponentialLR(predictor_optimizer, gamma=0.99)
-scheduler2 = torch.optim.lr_scheduler.ExponentialLR(adversary_optimizer, gamma=0.99)
+scheduler1 = torch.optim.lr_scheduler.ExponentialLR(
+    predictor_optimizer, gamma=0.99
+)
+scheduler2 = torch.optim.lr_scheduler.ExponentialLR(
+    adversary_optimizer, gamma=0.99
+)
 
 # %%
-# We make use of a callback function to both update the hyperparameters and to 
+# We make use of a callback function to both update the hyperparameters and to
 # validate the model. We update these hyperparameters at every 10 steps, and we
 # validate every 100 steps.
 
 step = 1
 skip = 10
+
+
 def callbackfn(model, epoch, batch):
     global step
     step += 1
     if step % skip == 0:
-        model.alpha = sqrt(step//skip)
+        model.alpha = sqrt(step // skip)
         scheduler1.step()
         scheduler2.step()
     if step % 100 == 0:
@@ -278,22 +289,19 @@ mitigator = AdversarialFairnessClassifier(
     predictor_optimizer=predictor_optimizer,
     adversary_optimizer=adversary_optimizer,
     alpha=1.0,
-    constraints='demographic_parity',
+    constraints="demographic_parity",
     epochs=7,
-    batch_size=2**7,
+    batch_size=2 ** 7,
     shuffle=True,
     progress_updates=1,
     callback_fn=callbackfn,
-    random_state=123
+    random_state=123,
 )
 
 # %%
 # Finally, we fit the model
 
-mitigator.fit(
-    X,
-    Y,
-    sensitive_features=Z)
+mitigator.fit(X, Y, sensitive_features=Z)
 
 validate(mitigator)
 
@@ -305,12 +313,10 @@ validate(mitigator)
 predictions = mitigator.predict(X_test)
 
 mf = MetricFrame(
-    metrics={
-        'accuracy': accuracy_score,
-        'selection_rate': selection_rate},
+    metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},
     y_true=Y_test,
     y_pred=predictions,
-    sensitive_features=Z_test)
+    sensitive_features=Z_test,
+)
 
 print(mf.by_group)
-
