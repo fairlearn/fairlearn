@@ -44,14 +44,12 @@ from sklearn.metrics import accuracy_score
 from fairlearn.adversarial import AdversarialFairnessClassifier, \
     AdversarialFairness
 from pandas import Series
-from numpy import number, random, mean
+from numpy import double, float64, number, random, mean
 from sklearn.compose import make_column_transformer, make_column_selector
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 import torch
-random.seed(123)
-torch.manual_seed(123)
 
 X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 
@@ -105,7 +103,11 @@ X_train, X_test, Y_train, Y_test, Z_train, Z_test = \
 #
 # The specific fairness
 # objective that we choose for this example is demographic parity, so we also
-# set :code:`objective = "demographic_parity"`.
+# set :code:`objective = "demographic_parity"`. We generally follow sklearn API,
+# but in this case we require some extra kwargs. In particular, we should
+# specify the number of epochs, batch size, whether to shuffle the rows of data
+# after every epoch, and optionally after how many seconds to show a progress
+# update.
 
 
 mitigator = AdversarialFairnessClassifier(
@@ -113,39 +115,16 @@ mitigator = AdversarialFairnessClassifier(
     adversary_model=[6, 6],
     constraints="demographic_parity",
     learning_rate=0.0001,
-    epochs=100,
+    epochs=10,
     batch_size=2**9,
     shuffle=True,
-    progress_updates=5
+    progress_updates=5,
+    random_state=123,
 )
 
 # %%
-# This definition of the mitigator is equivalent to the following
-
-mitigator = AdversarialFairness(
-    backend="torch",
-    predictor_model=[50, 20],
-    adversary_model=[6, 6],
-    predictor_loss=torch.nn.BCEWithLogitsLoss(reduction='mean'),
-    adversary_loss=torch.nn.BCEWithLogitsLoss(reduction='mean'),
-    predictor_function=lambda pred: (pred >= 0.).astype(float),
-    constraints="demographic_parity",
-    optimizer="Adam",
-    learning_rate=0.0001,
-    alpha=1.0,
-    cuda=False,
-    epochs=100,
-    batch_size=2**9,
-    shuffle=True,
-    progress_updates=5
-)
-
-# %%
-# Then, we can fit the data to our model. We generally follow sklearn API,
-# but in this case we require some extra kwargs. In particular, we should
-# specify the number of epochs, batch size, whether to shuffle the rows of data
-# after every epoch, and optionally after how many seconds to show a progress
-# update.
+# Then, we can fit the data to our model. 
+torch.manual_seed(123)
 
 mitigator.fit(
     X_train,
@@ -191,9 +170,6 @@ print(mf.by_group)
 # So, to finetune our model and the training thereof, we start by defining our
 # neural networks in the way we'd like them and in the way we can easily tweak them.
 # We will be using PyTorch, but the same can be achieved using Tensorflow!
-random.seed(123)
-torch.manual_seed(123)
-
 X = X_train
 Y = Y_train
 Z = Z_train
@@ -203,13 +179,10 @@ class PredictorModel(torch.nn.Module):
     def __init__(self):
         super(PredictorModel, self).__init__()
         self.layers = torch.nn.Sequential(
-            torch.nn.Linear(X.shape[1], 50),
+            torch.nn.Linear(X.shape[1], 200),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(50, 50),
-            torch.nn.LeakyReLU(),
-            torch.nn.Linear(50, 5),
-            torch.nn.Sigmoid(),
-            torch.nn.Linear(5, 1)
+            torch.nn.Linear(200, 1),
+            torch.nn.Sigmoid()
         )  # NO final activation function!
 
     def forward(self, x):
@@ -220,11 +193,10 @@ class AdversaryModel(torch.nn.Module):
     def __init__(self):
         super(AdversaryModel, self).__init__()
         self.layers = torch.nn.Sequential(
-            torch.nn.Linear(1, 6),
-            torch.nn.Sigmoid(),
-            torch.nn.Linear(6, 6),
-            torch.nn.Sigmoid(),
-            torch.nn.Linear(6, 1),
+            torch.nn.Linear(1, 3),
+            torch.nn.LeakyReLU(),
+            torch.nn.Linear(3, 1),
+            torch.nn.Sigmoid()
         )  # NO final activation function!
 
     def forward(self, x):
@@ -239,56 +211,26 @@ adversary_model = AdversaryModel()
 # less common in practice. Intuitively, it seems wise to initialize small weights,
 # so we set the gain low.
 
+torch.manual_seed(123)
+
+gain = 0.1
 
 def weights_init(m):
-    if isinstance(m, torch.nn.Conv2d):
-        torch.nn.init.xavier_normal_(m.weight.data, gain=0.1)
-        torch.nn.init.xavier_normal_(m.bias.data, gain=0.1)
+    if isinstance(m, torch.nn.Linear):
+        torch.nn.init.xavier_normal_(m.weight.data, gain=gain)
+        m.bias.data.fill_(gain)
+        # torch.nn.init.xavier_normal_(m.bias.data, gain=gain)
 
 
 predictor_model.apply(weights_init)
 adversary_model.apply(weights_init)
 
 # %%
-# We may define the optimizers however we like. In this case, let's use a
-# predictor optimizer with SGD with decaying learning rate, and Adam for the
-# adversary.
-predictor_optimizer = torch.optim.SGD(predictor_model.parameters(), lr=0.5, momentum=0.9, nesterov=True)
-adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.1)
-scheduler1 = torch.optim.lr_scheduler.LambdaLR(predictor_optimizer, lr_lambda=lambda epoch: 1/(3*epoch+2))
-
-# %%
-# Then, the instance itself. We Will define the loss function with
-# weights because we are dealing with an imbalanced dataset.
-
-mitigator = AdversarialFairnessClassifier(
-    predictor_model=predictor_model,
-    adversary_model=adversary_model,
-    predictor_loss=torch.nn.BCEWithLogitsLoss(
-        pos_weight=torch.ones([1])*mean(Y == 1.)),
-    adversary_loss=torch.nn.BCEWithLogitsLoss(
-        pos_weight=torch.ones([1])*mean(Z == 1.)),
-    predictor_function="binary",
-    optimizer=None,
-    predictor_optimizer=predictor_optimizer,
-    adversary_optimizer=adversary_optimizer,
-    alpha=0.1,
-    constraints='demographic_parity',
-    epochs=13,
-    batch_size=2**8,
-    shuffle=True,
-    progress_updates=None,
-    callback_fn=callback_fn,
-    warm_start=True
-)
-
-# %%
 # Instead of only looking at training loss, we also take a look at some validation
 # metrics. For this, we chose the demographic parity difference to check to what
-# extent the constraint (demographic parity in this case) is satisfied.
+# extent the constraint (demographic parity in this case) is satisfied. We will pass this validation step to our model later.
 
-
-def validate():
+def validate(mitigator):
     predictions = mitigator.predict(X_test)
     dp_diff = demographic_parity_difference(Y_test,
                                             predictions,
@@ -298,53 +240,63 @@ def validate():
     print("DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
         dp_diff, accuracy, selection_rate))
 
+
 # %%
-# We make use of a callback function to incorporate the validation into the training
-# loop. Additionally, we handle the prediction_optimizer updates here.
+# We may define the optimizers however we like. In this case, we use the suggestion from the paper to set the hyperparameters alpha and learning rate (:math:`\mu`) to depend on the timestep such that :math:`alpha \mu \rightarrow 0` as the timestep grows. 
+
+predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.01)
+adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.01)
+
+scheduler1 = torch.optim.lr_scheduler.ExponentialLR(predictor_optimizer, gamma=0.99)
+scheduler2 = torch.optim.lr_scheduler.ExponentialLR(adversary_optimizer, gamma=0.99)
+
+# %%
+# We make use of a callback function to both update the hyperparameters and to 
+# validate the model. We update these hyperparameters at every 10 steps, and we
+# validate every 100 steps.
+
+step = 1
+skip = 10
+def callbackfn(model, epoch, batch):
+    global step
+    step += 1
+    if step % skip == 0:
+        model.alpha = sqrt(step//skip)
+        scheduler1.step()
+        scheduler2.step()
+    if step % 100 == 0:
+        validate(model)
 
 
-epoch_count = 1
+# %%
+# Then, the instance itself. Notice that we do not explicitely define loss
+# functions, because the model is able to infer this on its own in this example.
 
-
-def callback_fn():
-    global epoch_count
-    mitigator.alpha = 0.1 * sqrt(epoch_count)
-    epoch_count += 1
-    scheduler1.step()
-
-    validate()
+mitigator = AdversarialFairnessClassifier(
+    predictor_model=predictor_model,
+    adversary_model=adversary_model,
+    predictor_optimizer=predictor_optimizer,
+    adversary_optimizer=adversary_optimizer,
+    alpha=1.0,
+    constraints='demographic_parity',
+    epochs=7,
+    batch_size=2**7,
+    shuffle=True,
+    progress_updates=1,
+    callback_fn=callbackfn,
+    random_state=123
+)
 
 # %%
 # Finally, we fit the model
 
-
 mitigator.fit(
     X,
     Y,
     sensitive_features=Z)
 
+validate(mitigator)
 
-# %%
-# Then, we more carefully improve this by changing the model. That is, we do not
-# change the predictor/adversary model parameters, but we do change the learning
-# parameters. In particular, we set very small learning rates and alpha a bit higher.
-# As mentioned earlier, training adversarially is tricky, and ideally
-# you'd train this in a controlled way.
-
-
-predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.0001)
-adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.0001)
-mitigator.alpha = 5
-
-
-def callback_fn():
-    validate()
-
-
-mitigator.fit(
-    X,
-    Y,
-    sensitive_features=Z)
 # %%
 # We take a look at the results. Notice we achieve a much lower demographic parity
 # difference than in Exercise 1! This does come at the cost of some accuracy, but
@@ -361,3 +313,4 @@ mf = MetricFrame(
     sensitive_features=Z_test)
 
 print(mf.by_group)
+
