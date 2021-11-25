@@ -1,6 +1,7 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from torch._C import Value
 from ._constants import (
     _IMPORT_ERROR_MESSAGE,
     _KWARG_ERROR_MESSAGE,
@@ -76,10 +77,12 @@ class AdversarialFairness(BaseEstimator):
 
     Parameters
     ----------
-    backend : str, default = 'auto'
+    backend : str, BackendEngine, default = 'auto'
         The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
-        or :code:`'auto'` which indicates PyTorch, TensorFlow, or to automatically infer
+        or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
+        automatically infer
         the backend from the :code:`predictor_model` and which are installed.
+        You can also pass in a BackendEngine class.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
         The predictor model to train. If a list of integers
@@ -98,7 +101,8 @@ class AdversarialFairness(BaseEstimator):
         or :code:`'auto'` to infer the type of :code:`y`, or a callable
         loss function with an API that follows the chosen backend (torch or
         tensorflow). Note that torch and tensorflow loss functions don't agree
-        on parameter order.
+        on parameter order, as in Pytorch it is :math:`l(\hat y, y)` while in
+        Tensorflow it is :math:`l(y, \hat y)`.
 
     adversary_loss : str, callable, default = 'auto'
         Either a string that indicates the type of :code:`sensitive_features`,
@@ -112,26 +116,28 @@ class AdversarialFairness(BaseEstimator):
         or :code:`'auto'` to infer the type of :code:`y`, or a callable
         prediction function maps the continuous output of the predictor model to
         a discrete prediction. For example, passing 'binary' maps the predictor's
-        output logits :math:`y` to 1 iff :math:`y \geq 0`.
+        sigmoidal output :math:`y` to 1 iff :math:`y \geq \frac12`.
 
     constraints : str, default = 'demographic_parity'
         The fairness measure to optimize for. Must be either 'demographic_parity'
         (Demographic Parity) or 'equalized_odds' (Equalized Odds).
 
-    optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
+    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
-        either "SGD" or "Adam".
+        either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
+        initialized with the model and given learning rate.
+        If not a string but an already initialized optimizer is passed, this
+        optimizer is used instead.
+    
+    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
+        The optimizer class to use. Similarly defined as
+        :code:`predictor_optimizer`
 
     learning_rate : float, default = 0.001
         A small number greater than zero to set as initial learning rate
 
     alpha : float, default = 1.0
-        A small number $\alpha$ as specified in the paper.
-
-    cuda : str, default = None
-        A string to indicate which device to use when training. For instance,
-        set :code:`cuda='cuda:0'` to train on the first GPU. Only for PyTorch
-        backend.
+        A small number :math:`\alpha` as specified in the paper.
 
     epochs : int, default = 1
         Number of epochs to train for.
@@ -140,11 +146,12 @@ class AdversarialFairness(BaseEstimator):
         Batch size. For no batching, set this to -1.
 
     shuffle : bool, default = False
-        Iff True, shuffle the data after every iteration. Default is False
+        Iff true, shuffle the data after every iteration.
 
     progress_updates : number, optional
-        If a number :math:`t` is provided, we regularly print an update
-        about the training loop after at least every :math:`t` seconds.
+        If a number :math:`t` is provided, we print an update
+        about the training loop after processing a batch and :math:`t` seconds
+        have passed since the previous update.
 
     skip_validation : bool
         Skip the validation of the data. Useful because validate_input is
@@ -155,6 +162,19 @@ class AdversarialFairness(BaseEstimator):
         Callback function, called every epoch. For instance useable when
         wanting to validate. Should take zero arguments.
 
+    cuda : str, default = None
+        A string to indicate which device to use when training. For instance,
+        set :code:`cuda='cuda:0'` to train on the first GPU. Only for PyTorch
+        backend.
+    
+    warm_start : bool, default=False
+        When set to True, reuse the solution of the previous call to fit as
+        initialization, otherwise, just erase the previous solution.
+
+    random_state : int, RandomState instance, default = None
+        Controls the randomized aspects of this algorithm, such as shuffling.
+        Useful to get reproducible output across multiple function calls.
+
     References
     ----------
     .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
@@ -163,73 +183,7 @@ class AdversarialFairness(BaseEstimator):
 
     Examples
     --------
-    >>> from fairlearn.adversarial import AdversarialFairness
-    >>> from fairlearn.metrics import MetricFrame, selection_rate
-    >>> from numpy import number
-    >>> from sklearn.metrics import accuracy_score
-    >>> from sklearn.compose import make_column_transformer, make_column_selector
-    >>> from sklearn.preprocessing import OneHotEncoder, StandardScaler
-    >>> from sklearn.datasets import fetch_openml
-    >>> from pandas import Series
-    >>>
-    >>> mitigator = AdversarialFairness(
-    ...     predictor_model=[50, 20],
-    ...     adversary_model=[6, 6],
-    ...     learning_rate=0.0001,
-    ...     epochs=100,
-    ...     batch_size=2**9,
-    ...     shuffle=True,
-    ...     progress_updates=5
-    ... )
-    >>>
-    >>> def transform(X):
-    ...     if isinstance(X, Series):
-    ...         X = X.to_frame()
-    ...     ct = make_column_transformer(
-    ...         (StandardScaler(),
-    ...          make_column_selector(dtype_include=number)),
-    ...         (OneHotEncoder(drop='if_binary', sparse=False),
-    ...          make_column_selector(dtype_include="category")))
-    ...     return ct.fit_transform(X)
-    ...
-    >>> X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
-    >>> non_NaN_rows = ~X.isna().any(axis=1)
-    >>> X, y = X[non_NaN_rows], y[non_NaN_rows]
-    >>> sensitive_feature = X['sex']
-    >>>
-    >>> X = transform(X)
-    >>> y = transform(y)
-    >>> sensitive_feature = transform(sensitive_feature)
-    >>>
-    >>> mitigator.fit(
-    ...     X,
-    ...     y,
-    ...     sensitive_features=sensitive_feature
-    ... )
-    |==>                  | Epoch: 12/100, Batch: 50/89, ETA: 38.30 sec. Loss (pred/adv): 0.55/0.63
-    |=====>               | Epoch: 24/100, Batch: 35/89, ETA: 32.78 sec. Loss (pred/adv): 0.57/0.62
-    |=======>             | Epoch: 36/100, Batch: 54/89, ETA: 27.15 sec. Loss (pred/adv): 0.56/0.61
-    |==========>          | Epoch: 48/100, Batch: 68/89, ETA: 21.89 sec. Loss (pred/adv): 0.37/0.63
-    |============>        | Epoch: 60/100, Batch: 81/89, ETA: 16.74 sec. Loss (pred/adv): 0.34/0.58
-    |==============>      | Epoch: 73/100, Batch: 12/89, ETA: 11.60 sec. Loss (pred/adv): 0.38/0.58
-    |=================>   | Epoch: 85/100, Batch: 13/89, ETA: 6.60 sec. Loss (pred/adv): 0.36/0.65
-    |===================> | Epoch: 97/100, Batch: 2/89, ETA: 1.66 sec. Loss (pred/adv): 0.35/0.64
-    >>>
-    >>> y_pred = mitigator.predict(X)
-    >>>
-    >>> mf = MetricFrame(
-    ...     metrics={
-    ...         'accuracy': accuracy_score,
-    ...         'selection_rate': selection_rate},
-    ...     y_true=y,
-    ...     y_pred=y_pred,
-    ...     sensitive_features=sensitive_feature)
-    >>>
-    >>> print(mf.by_group)
-                        accuracy selection_rate
-    sensitive_feature_0
-    0.0                  0.906295       0.147397
-    1.0                  0.809447       0.228322
+    
     """
 
     def __init__(
@@ -241,18 +195,18 @@ class AdversarialFairness(BaseEstimator):
         predictor_loss="auto",
         adversary_loss="auto",
         predictor_function="auto",
-        constraints="demographic_parity",
         predictor_optimizer="Adam",
         adversary_optimizer="Adam",
+        constraints="demographic_parity",
         learning_rate=0.001,
         alpha=1.0,
-        cuda=None,
         epochs=1,
         batch_size=-1,
         shuffle=False,
         progress_updates=None,
         skip_validation=False,
         callback_fn=None,
+        cuda=None,
         warm_start=False,
         random_state=None,
     ):
@@ -262,26 +216,35 @@ class AdversarialFairness(BaseEstimator):
         self.predictor_loss = predictor_loss
         self.adversary_loss = adversary_loss
         self.predictor_function = predictor_function
-        self.constraints = constraints
         self.predictor_optimizer = predictor_optimizer
         self.adversary_optimizer = adversary_optimizer
+        self.constraints = constraints
         self.learning_rate = learning_rate
         self.alpha = alpha
-        self.cuda = cuda
         self.epochs = epochs
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.progress_updates = progress_updates
         self.skip_validation = skip_validation
         self.callback_fn = callback_fn
+        self.cuda = cuda
         self.warm_start = warm_start
         self.random_state = random_state
 
         # Want to get rid of this variable, but check_if_fitted can be expensive?
         self._setup = False
 
-    def setup(self, X, Y, Z):
-        """Finalize setup that is required as soon as the first data is given."""
+    def __setup(self, X, Y, Z):
+        """
+        Setup the entire model from the parameters and the given data.
+
+        Following sklearn API, we do not do intialization in `__init__`, but
+        instead in `fit`. Firstly, we validate the backend. Then, we validate
+        some key-word arguments. Then, we initialize the BackendEngine, which
+        handles the initialization of the losses and optimizers. Among these
+        steps, if a loss or function is not explicitely defined, we try to
+        infer something appropriate from data (see interpret_keyword).
+        """
         self._validate_backend()
 
         # Verify the constraints and set up the corresponding network structure.
@@ -295,6 +258,17 @@ class AdversarialFairness(BaseEstimator):
                     "constraints", "'demographic_parity' or 'equalized_odds'"
                 )
             )
+        
+        for kw, kwname in (
+            (self.learning_rate, 'learning_rate'),
+            (self.alpha, 'alpha'),
+            (self.epochs, 'epochs'),
+            (self.progress_updates, 'progress_updates')
+        ):
+            if kw and kw <= 0.:
+                raise ValueError(
+                    _KWARG_ERROR_MESSAGE.format(kwname, 'a positive number')
+                )
 
         self.random_state_ = check_random_state(self.random_state)
 
@@ -399,6 +373,19 @@ class AdversarialFairness(BaseEstimator):
         self.backendEngine_.train_step(X, Y, Z)
 
     def decision_function(self, X):
+        """
+        Compute predictor output for given test data.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            Two-dimensional numpy array containing test data
+
+        Returns
+        -------
+        Y_pred : numpy.ndarray
+            Two-dimensional array containing the model predictions
+        """
         if not self._setup:
             raise UserWarning(_NO_DATA)
 
@@ -410,7 +397,7 @@ class AdversarialFairness(BaseEstimator):
 
     def predict(self, X):
         """
-        Gather predictions for given test data.
+        Compute discrete predictions for given test data.
 
         Parameters
         ----------
@@ -434,7 +421,12 @@ class AdversarialFairness(BaseEstimator):
         return Y_pred
 
     def _validate_input(self, X, Y, Z):
-        """Validate the input data and possibly setup this estimator."""
+        """
+        Validate the input data and possibly setup this estimator.
+        
+        Important note is that we follow call `__setup` from here, because the
+        setup procedure requires the validated data.
+        """
         if not self.skip_validation:
             X = _check_array(X)
             Y = _check_array(Y)
@@ -453,11 +445,12 @@ class AdversarialFairness(BaseEstimator):
             )
 
         if (not self._setup) or (not self.warm_start):
-            self.setup(X, Y, Z)
+            self.__setup(X, Y, Z)
 
         if not self.skip_validation:
             # Some backendEngine may want to do some additional preprocessing,
             # such as moving to GPU.
+            # FIXME: Maybe we move this to backendEngine_.prepareData?
             attr = getattr(self.backendEngine_, "validate_input", None)
             if attr:
                 X, Y, Z = attr(X, Y, Z)
@@ -468,7 +461,13 @@ class AdversarialFairness(BaseEstimator):
         """
         Import either PyTorch or Tensorflow, depending on predictor.
 
-        Better description.
+        Given a backend and the predictor/adversary models, we do some steps.
+        Firstly, if the backend is a BackendEngine subclass, we just use this.
+        Else, we check if parameters comply with a torch backend. Do this by
+        checking if backend is set to torch or auto, we have torch installed,
+        and whether the models are torch models (or lists). If any step fails,
+        we try the same for tensorflow, and if that also fails then we give an
+        appropriate error message.
         """
         # Discover which backends are available
         torch_installed = False
