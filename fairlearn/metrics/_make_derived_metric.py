@@ -148,7 +148,7 @@ def make_derived_metric(
     -------
     callable
         Function with the same signature as the :code:`metric` but with additional
-        :code:`sensitive_feature=` and :code:`method=` arguments, to enable the
+        :code:`sensitive_features=` and :code:`method=` arguments, to enable the
         required computation
     """
     dm = _DerivedMetric(metric=metric,
