@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LinearRegression
 from fairlearn.postprocessing import Thresholder
 
 
@@ -52,7 +52,25 @@ def test_thresholder():
     expected_y = pd.Series([1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0,
                            1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0])
 
-    thresholder_combined.fit(X, y)
-    outputted_y = thresholder_combined.predict(X_test, sensitive_features=A_test.loc[:, 'SF1+2'])
+    several_tests = [
+        {'estimator': LinearRegression(),
+         'predict_method': 'predict',
+         },
+        {'estimator': LogisticRegression(),
+         'predict_method': 'predict_proba',
+         }
+    ]
 
-    assert (np.array_equal(outputted_y, expected_y))
+    for test in several_tests:
+        estimator = test['estimator']
+        estimator.fit(X, y)
+        thresholder_combined = Thresholder(estimator=estimator,
+                                           threshold_dict=threshold_dict_combined,
+                                           prefit=True,
+                                           predict_method=test['predict_method'])
+
+        thresholder_combined.fit(X, y)
+        outputted_y = thresholder_combined.predict(
+            X_test, sensitive_features=A_test.loc[:, 'SF1+2'])
+
+        assert (np.array_equal(outputted_y, expected_y))

@@ -28,11 +28,19 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import Bunch
 
-from ..utils._common import _get_soft_predictions
-from ..utils._input_validation import (
+# for me to get it to work now
+from utils._common import _get_soft_predictions
+from utils._input_validation import (
     _validate_and_reformat_input,
     _KW_CONTROL_FEATURES,
 )
+# how it should be
+# from ..utils._common import _get_soft_predictions
+# from ..utils._input_validation import (
+#     _validate_and_reformat_input,
+#     _KW_CONTROL_FEATURES,
+# )
+
 from ._constants import (
     LABEL_KEY,
     SCORE_KEY,
