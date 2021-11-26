@@ -49,10 +49,10 @@ class AdversarialFairness(BaseEstimator):
     also providing a simple interface for simple use cases. So, for simple use
     cases, the user may for example pass :code:`predictor_loss="binary"` to indicate
     that we assume that we are predicting binary data, and that we should use an
-    instance of :mod:`torch.nn.BCEWithLogitsLoss` (or the
+    instance of `torch.nn.BCEWithLogitsLoss` (or the
     tensorflow equivalent of binary cross entropy if the models are tensorflow
     models). Or, the user could pass an instance of
-    :mod:`torch.nn.BCEWithLogitsLoss` directly to accomplish the same.
+    `torch.nn.BCEWithLogitsLoss` directly to accomplish the same.
     Besides :code:`"binary"`, we provide loss functions for :code:`"category"`
     (categorical cross entropy)
     and :code:`"continuous"` (mean squared error) as well.
@@ -127,7 +127,7 @@ class AdversarialFairness(BaseEstimator):
         initialized with the model and given learning rate.
         If not a string but an already initialized optimizer is passed, this
         optimizer is used instead.
-    
+
     adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
         The optimizer class to use. Similarly defined as
         :code:`predictor_optimizer`
@@ -165,7 +165,7 @@ class AdversarialFairness(BaseEstimator):
         A string to indicate which device to use when training. For instance,
         set :code:`cuda='cuda:0'` to train on the first GPU. Only for PyTorch
         backend.
-    
+
     warm_start : bool, default=False
         When set to True, reuse the solution of the previous call to fit as
         initialization, otherwise, just erase the previous solution.
@@ -180,9 +180,6 @@ class AdversarialFairness(BaseEstimator):
        Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
        AIES, 2018.
 
-    Examples
-    --------
-    
     """
 
     def __init__(
@@ -209,6 +206,7 @@ class AdversarialFairness(BaseEstimator):
         warm_start=False,
         random_state=None,
     ):
+        """Initialize class by only storing (kw)args, as per sklearn API."""
         self.backend = backend
         self.predictor_model = predictor_model
         self.adversary_model = adversary_model
@@ -237,7 +235,7 @@ class AdversarialFairness(BaseEstimator):
 
     def __setup(self, X, Y, Z):
         """
-        Setup the entire model from the parameters and the given data.
+        Initialize the entire model from the parameters and the given data.
 
         Following sklearn API, we do not do intialization in `__init__`, but
         instead in `fit`. Firstly, we validate the backend. Then, we validate
@@ -259,16 +257,16 @@ class AdversarialFairness(BaseEstimator):
                     "constraints", "'demographic_parity' or 'equalized_odds'"
                 )
             )
-        
+
         for kw, kwname in (
-            (self.learning_rate, 'learning_rate'),
-            (self.alpha, 'alpha'),
-            (self.epochs, 'epochs'),
-            (self.progress_updates, 'progress_updates')
+            (self.learning_rate, "learning_rate"),
+            (self.alpha, "alpha"),
+            (self.epochs, "epochs"),
+            (self.progress_updates, "progress_updates"),
         ):
-            if kw and kw <= 0.:
+            if kw and kw <= 0.0:
                 raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(kwname, 'a positive number')
+                    _KWARG_ERROR_MESSAGE.format(kwname, "a positive number")
                 )
 
         self.random_state_ = check_random_state(self.random_state)
@@ -424,7 +422,7 @@ class AdversarialFairness(BaseEstimator):
     def _validate_input(self, X, Y, Z):
         """
         Validate the input data and possibly setup this estimator.
-        
+
         Important note is that we follow call `__setup` from here, because the
         setup procedure requires the validated data.
         """
