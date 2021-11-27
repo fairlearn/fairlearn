@@ -5,8 +5,6 @@ from typing import List, Optional
 import numpy as np
 import pandas as pd
 
-from sklearn.preprocessing import LabelEncoder
-
 
 _SERIES_NAME_NOT_STRING = (
     "Series name must be a string. Value '{0}' was of type {1}"
@@ -54,8 +52,7 @@ class GroupFeature:
         self, base_name: str, feature_vector, index: int, name: Optional[str]
     ):
         """Help with the metrics."""
-        self._encoder = LabelEncoder()
-        self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
+        self._classes = np.unique(feature_vector)
         self._raw_values = feature_vector
 
         self._name = "{0}{1}".format(base_name, index)
@@ -79,4 +76,4 @@ class GroupFeature:
     @property
     def classes(self) -> List:
         """Return list of unique classes."""
-        return list(self._encoder.classes_)
+        return list(self._classes)
