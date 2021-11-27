@@ -18,8 +18,8 @@ class TestSingleFeature:
         assert len(result) == 1
         sf = result[0]
         assert isinstance(sf, metrics._group_feature.GroupFeature)
-        assert sf.name == expected_name
-        assert np.array_equal(sf.classes, ["a", "b", "c"])
+        assert sf.name_ == expected_name
+        assert np.array_equal(sf.classes_, ["a", "b", "c"])
 
     def test_single_list(self):
         raw_feature, y_true = self._get_raw_data()
@@ -121,9 +121,9 @@ class TestTwoFeatures:
         assert len(result) == 2
         for i in range(2):
             assert isinstance(result[i], metrics._group_feature.GroupFeature)
-            assert result[i].name == expected_names[i]
-        assert np.array_equal(result[0].classes, ["a", "b", "c"])
-        assert np.array_equal(result[1].classes, [5, 6])
+            assert result[i].name_ == expected_names[i]
+        assert np.array_equal(result[0].classes_, ["a", "b", "c"])
+        assert np.array_equal(result[1].classes_, [5, 6])
 
     def test_nested_list(self):
         a, b, y_true = self._get_raw_data()
