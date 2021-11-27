@@ -57,6 +57,7 @@ from math import sqrt
 
 
 X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
+pos_label = y[0]
 
 # Choose sensitive feature
 z = X["sex"]
@@ -92,9 +93,6 @@ ct = make_column_transformer(
         make_column_selector(dtype_include="category"),
     ),
 )
-
-y = (y == y[0]).astype(float).to_frame()
-z = (z == z[0]).astype(float).to_frame()
 
 X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(
     X, y, z, test_size=0.2, random_state=12345, stratify=y
@@ -146,8 +144,8 @@ predictions = mitigator.predict(X_test)
 
 mf = MetricFrame(
     metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},
-    y_true=Y_test,
-    y_pred=predictions,
+    y_true=Y_test == pos_label,
+    y_pred=predictions == pos_label,
     sensitive_features=Z_test,
 )
 
@@ -238,10 +236,10 @@ adversary_model.apply(weights_init)
 def validate(mitigator):
     predictions = mitigator.predict(X_test)
     dp_diff = demographic_parity_difference(
-        Y_test, predictions, sensitive_features=Z_test
+        Y_test == pos_label, predictions == pos_label, sensitive_features=Z_test
     )
-    accuracy = mean(predictions == Y_test.values)
-    selection_rate = mean(predictions == 1.0)
+    accuracy = mean(predictions.values == Y_test.values)
+    selection_rate = mean(predictions == pos_label)
     print(
         "DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
             dp_diff, accuracy, selection_rate
@@ -325,9 +323,11 @@ predictions = mitigator.predict(X_test)
 
 mf = MetricFrame(
     metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},
-    y_true=Y_test,
-    y_pred=predictions,
+    y_true=Y_test == pos_label,
+    y_pred=predictions == pos_label,
     sensitive_features=Z_test,
 )
 
 print(mf.by_group)
+
+# %%

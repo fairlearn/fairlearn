@@ -4,17 +4,30 @@
 from ._constants import (
     _IMPORT_ERROR_MESSAGE,
     _KWARG_ERROR_MESSAGE,
+    _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
     _NO_DATA,
+    _TRANSFORM_NO_PARAM,
+    _TRANSFORMER_WEIRD_DIST_TYPE,
 )
-from ._util import _get_function, interpret_keyword, Keyword, _check_array
 from ._backend_engine import BackendEngine
 from ._pytorch_engine import PytorchEngine
 from ._tensorflow_engine import TensorflowEngine
-from sklearn.base import ClassifierMixin, RegressorMixin, BaseEstimator
-from sklearn.utils.validation import check_is_fitted, check_random_state
+from ._preprocessor import FloatTransformer
+from sklearn.base import (
+    ClassifierMixin,
+    RegressorMixin,
+    BaseEstimator,
+    TransformerMixin,
+)
+from sklearn.utils.validation import (
+    check_is_fitted,
+    check_random_state,
+    check_array,
+)
 from math import ceil
 from time import time
+from numpy import zeros, argmax, arange
 
 
 class AdversarialFairness(BaseEstimator):
@@ -96,30 +109,36 @@ class AdversarialFairness(BaseEstimator):
         :code:`predictor_model`.
 
     predictor_loss : str, callable, default = 'auto'
-        Either a string that indicates the type of :code:`y`,
-        or :code:`'auto'` to infer the type of :code:`y`, or a callable
+        Either the string :code:`'auto'` or a callable. The string
+        :code:`'auto'` indicates to infer the loss
+        from the distribution type of :code:`y`
+        (computed in :code:`dist_type_` of
+        the transformer). A callable should be a
         loss function with an API that follows the chosen backend (torch or
         tensorflow). Note that torch and tensorflow loss functions don't agree
         on parameter order, as in Pytorch it is :math:`l(\hat y, y)` while in
         Tensorflow it is :math:`l(y, \hat y)`.
 
     adversary_loss : str, callable, default = 'auto'
-        Either a string that indicates the type of :code:`sensitive_features`,
-        or :code:`'auto'` to infer the type of :code:`sensitive_features`, or a
-        callable loss function with an API that follows the chosen backend
-        (torch or tensorflow). Note that torch and tensorflow loss functions
-        don't agree on parameter order.
+        Either the string :code:`'auto'` or a callable. The string
+        :code:`'auto'` indicates to infer the loss
+        from the distribution type of :code:`sensitive_features`
+        (computed in :code:`dist_type_` of
+        the transformer). A callable should be a
+        loss function with an API that follows the chosen backend (torch or
+        tensorflow).
 
-    predictor_function : str, callable, default='auto'
-        Either a string that indicates the type of :code:`y`,
-        or :code:`'auto'` to infer the type of :code:`y`, or a callable
-        prediction function maps the continuous output of the predictor model to
-        a discrete prediction. For example, passing 'binary' maps the predictor's
-        sigmoidal output :math:`y` to 1 iff :math:`y \geq \frac12`.
-
-    constraints : str, default = 'demographic_parity'
-        The fairness measure to optimize for. Must be either 'demographic_parity'
-        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
+    predictor_function : str, callable, default = 'auto'
+        Either the string :code:`'auto'` or a callable. The string
+        :code:`'auto'` indicates to infer the predictor function
+        from the distribution type of :code:`y`
+        (computed in :code:`dist_type_` of
+        the transformer). A callable should be a
+        function that maps the continuous output of the predictor model to
+        a discrete prediction. For example, if the transform of :code:`y` has
+        has as attribute :code:`dist_type_=="binary", then map the predictors
+        sigmoidal output :math:`y` to 1 iff :math:`y \geq \frac12`. Note
+        that it is important that the model has sigmoidal outputs in this case.
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
@@ -131,6 +150,43 @@ class AdversarialFairness(BaseEstimator):
     adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
         The optimizer class to use. Similarly defined as
         :code:`predictor_optimizer`
+
+    constraints : str, default = 'demographic_parity'
+        The fairness measure to optimize for. Must be either 'demographic_parity'
+        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
+
+    transformer : sklearn.base.TransformerMixin, default = fairlearn.adversarial.FloatTransformer
+        The preprocessor to use on the predictions :code:`y`
+        and :code:`sensitive_features`. The given transformer *must* map data
+        to a 2d ndarray containing only floats. Per default, we use a
+        FloatTransformer that maps strictly binary or categorical tables
+        to binary or
+        one-hot encodings, and it maps strictly continuous-valued (possible 2d)
+        to itself.
+
+    y_distribution : str, default = 'auto'
+        This is a string that indicates an assumption about the distribution of
+        the target values :math:`y`. Possible assumptions are
+        "binary", "category", "continuous", "classification", "auto" (default).
+        This assumption is fed to the transformer. If the predictions are not
+        describable using one of these keywords, you must provide explicitely
+        the following keywords: :code:`transformer`, :code:`predictor_loss`,
+        :code:`predictor_function`, as the transformer, loss, and discrete
+        prediction function cannot be automatically inferred, as the
+        assumption about the distribution of :math:`y`
+        can not be automatically inferred.
+
+    z_distribution : str, default = 'auto'
+        This is a string that indicates an assumption about the distribution of
+        the sensitive features :math:`z`. Possible assumptions are
+        "binary", "category", "continuous", "classification", "auto" (default).
+        This assumption is fed to the transformer. If the predictions are not
+        describable using one of these keywords, you must provide explicitely
+        the following keywords: :code:`transformer`, :code:`adversary_loss`,
+        as the transformer and loss function cannot be
+        automatically inferred, as the
+        assumption about the distribution of :math:`z` (sensitive features)
+        can not be automatically inferred.
 
     learning_rate : float, default = 0.001
         A small number greater than zero to set as initial learning rate
@@ -147,26 +203,31 @@ class AdversarialFairness(BaseEstimator):
     shuffle : bool, default = False
         Iff true, shuffle the data after every iteration.
 
-    progress_updates : number, optional
+    progress_updates : number, optional, default = None
         If a number :math:`t` is provided, we print an update
         about the training loop after processing a batch and :math:`t` seconds
         have passed since the previous update.
 
-    skip_validation : bool
+    skip_validation : bool, default = False
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
-        at an earlier stage.
+        at an earlier stage. Note that not only checking :math:`X`
+        is skipped, but also no tranform is applied to :math:`y` and
+        :math:`z` (sensitive features).
 
     callback_fn : callable
-        Callback function, called every epoch. For instance useable when
-        wanting to validate. Should take zero arguments.
+        Callback function, called after every batch. For instance useable when
+        wanting to validate. We pass as arguments:
+        :code:`(self, epoch, batch)`. If a callable returns something non-None
+        (such as True) then the fitting stops, which is useful when
+        implementing *early stopping*.
 
     cuda : str, default = None
         A string to indicate which device to use when training. For instance,
         set :code:`cuda='cuda:0'` to train on the first GPU. Only for PyTorch
         backend.
 
-    warm_start : bool, default=False
+    warm_start : bool, default = False
         When set to True, reuse the solution of the previous call to fit as
         initialization, otherwise, just erase the previous solution.
 
@@ -194,6 +255,9 @@ class AdversarialFairness(BaseEstimator):
         predictor_optimizer="Adam",
         adversary_optimizer="Adam",
         constraints="demographic_parity",
+        transformer=FloatTransformer,
+        y_distribution="auto",
+        z_distribution="auto",
         learning_rate=0.001,
         alpha=1.0,
         epochs=1,
@@ -216,6 +280,9 @@ class AdversarialFairness(BaseEstimator):
         self.predictor_optimizer = predictor_optimizer
         self.adversary_optimizer = adversary_optimizer
         self.constraints = constraints
+        self.transformer = transformer
+        self.y_distribution = y_distribution
+        self.z_distribution = z_distribution
         self.learning_rate = learning_rate
         self.alpha = alpha
         self.epochs = epochs
@@ -230,8 +297,6 @@ class AdversarialFairness(BaseEstimator):
 
         # FIXME Want to get rid of this variable, but check_if_fitted can be expensive?
         self._setup = False
-
-        # TODO label encoder for sensitive features (and y)?
 
     def __setup(self, X, Y, Z):
         """
@@ -264,30 +329,144 @@ class AdversarialFairness(BaseEstimator):
             (self.epochs, "epochs"),
             (self.progress_updates, "progress_updates"),
         ):
-            if kw and kw <= 0.0:
+            if kw and kw < 0.0:
                 raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(kwname, "a positive number")
+                    _KWARG_ERROR_MESSAGE.format(
+                        kwname, "a non-negative number"
+                    )
                 )
+        if self.batch_size <= 0.0 and self.batch_size != -1:
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    "batch_size", "a positive number or -1"
+                )
+            )
+
+        for kw, kwname in (
+            (self.shuffle, "shuffle"),
+            (self.skip_validation, "skip_validation"),
+            (self.warm_start, "warm_start"),
+        ):
+            if not isinstance(kw, bool):
+                raise ValueError(
+                    _KWARG_ERROR_MESSAGE.format(kwname, "a boolean")
+                )
+
+        if self.callback_fn and not callable(self.callback_fn):
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format("callback_fn", "a callable")
+            )
+
+        kws = ["auto", "binary", "category", "continuous", "classification"]
+        for kw, kwname in (
+            (self.y_distribution, "y_distribution"),
+            (self.z_distribution, "z_distribution"),
+        ):
+            if kw not in kws:
+                raise ValueError(
+                    _KWARG_ERROR_MESSAGE.format(
+                        kwname,
+                        "one of {}".format(kws),
+                    )
+                )
+
+        for kw, kwname in (
+            (self.predictor_loss, "predictor_loss"),
+            (self.adversary_loss, "adversary_loss"),
+            (self.predictor_function, "predictor_function"),
+        ):
+            # Some keywords can also be a callable instead of a str.
+            if isinstance(kw, str) and kw != "auto":
+                raise ValueError(
+                    _KWARG_ERROR_MESSAGE.format(
+                        kwname,
+                        "auto or a callable",
+                    )
+                )
+
+        if self.cuda and not isinstance(self.cuda, str):
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    "cuda",
+                    'None, or the device to use (such as "cuda:0")',
+                )
+            )
 
         self.random_state_ = check_random_state(self.random_state)
 
-        self.predictor_function_ = _get_function(
-            interpret_keyword(
-                Y, self.predictor_function, "predictor_function", "y"
+        if not (
+            self.transformer
+            and hasattr(self.transformer, "fit")
+            and hasattr(self.transformer, "transform")
+            and issubclass(self.transformer, TransformerMixin)
+        ):
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    "transformer",
+                    "a transformer that implements TransformerMixin.",
+                )
             )
-        )
+
+        # Create preprocessors
+        if self.y_distribution == "auto":
+            self.y_transform_ = self.transformer()
+        else:
+            try:
+                self.y_transform_ = self.transformer(
+                    dist_assumption=self.y_distribution
+                )
+            except TypeError as e:
+                e.value += _TRANSFORM_NO_PARAM
+                raise e
+        self.y_transform_.fit(Y)
+
+        if self.z_distribution == "auto":
+            self.z_transform_ = self.transformer()
+        else:
+            try:
+                self.z_transform_ = self.transformer(
+                    dist_assumption=self.z_distribution
+                )
+            except TypeError as e:
+                e.value += _TRANSFORM_NO_PARAM
+                raise e
+        self.z_transform_.fit(Z)
+
+        # Check if preprocessors supply correct information (no info is also ok)
+        for transform in (self.y_transform_, self.z_transform_):
+            if hasattr(
+                transform, "dist_type_"
+            ) and transform.dist_type_ not in (
+                "binary",
+                "category",
+                "continuous",
+            ):
+                raise ValueError(
+                    _TRANSFORMER_WEIRD_DIST_TYPE.format(
+                        transform, transform.dist_type_
+                    )
+                )
+
+        self._set_predictor_function()
 
         # Initialize backend
+        # here, losses and optimizers are also set up.
         self.backendEngine_ = self.backend_(self, X, Y, Z)
 
-        self._setup = True
-
         # Sklearn-parameters
-        self.n_features_in_ = Y.shape[1]
+        self.n_features_in_ = X.shape[1]
+        self.n_features_out_ = self.y_transform_.n_features_in_
+
+        # Handy param to know if we have done the setup, or check_if_fitted?
+        self._setup = True
 
     def fit(self, X, y, *, sensitive_features):
         """
         Fit the model based on the given training data and sensitive features.
+
+        Currently, for discrete y and sensitive_features
+        *ALL* classes need to be passed in
+        the first call to fit!
 
         Parameters
         ----------
@@ -325,7 +504,8 @@ class AdversarialFairness(BaseEstimator):
                                 " " * round(20 * (1 - progress)),
                                 epoch + 1,
                                 self.epochs,
-                                " " * (len(str(batch + 1)) - len(str(batches))),
+                                " "
+                                * (len(str(batch + 1)) - len(str(batches))),
                                 batch + 1,
                                 batches,
                                 ((last_update_time - start_time) / progress)
@@ -334,7 +514,7 @@ class AdversarialFairness(BaseEstimator):
                                 adversary_losses[-1],
                             ),
                             end="\n",
-                        )
+                        )  # TODO: use logger?
                 batch_slice = slice(
                     batch * self.batch_size,
                     min((batch + 1) * self.batch_size, X.shape[0]),
@@ -345,7 +525,7 @@ class AdversarialFairness(BaseEstimator):
                 predictor_losses.append(LP)
                 adversary_losses.append(LA)
 
-                if callable(self.callback_fn):
+                if self.callback_fn and callable(self.callback_fn):
                     stop = self.callback_fn(self, epoch, batch)
                     if stop:
                         return
@@ -389,7 +569,7 @@ class AdversarialFairness(BaseEstimator):
             raise UserWarning(_NO_DATA)
 
         check_is_fitted(self)
-        X = _check_array(X)
+        X = check_X(X)
 
         Y_pred = self.backendEngine_.evaluate(X)
         return Y_pred
@@ -413,10 +593,11 @@ class AdversarialFairness(BaseEstimator):
             raise UserWarning(_NO_DATA)
 
         check_is_fitted(self)
-        X = _check_array(X)
+        X = check_X(X)
 
         Y_pred = self.backendEngine_.evaluate(X)
         Y_pred = self.predictor_function_(Y_pred)
+        Y_pred = self.y_transform_.inverse_transform(Y_pred)
         return Y_pred
 
     def _validate_input(self, X, Y, Z):
@@ -427,13 +608,14 @@ class AdversarialFairness(BaseEstimator):
         setup procedure requires the validated data.
         """
         if not self.skip_validation:
-            X = _check_array(X)
-            Y = _check_array(Y)
-            Z = _check_array(Z)
+            X = check_X(X)
 
-            X = X.astype(float)
-            Y = Y.astype(float)
-            Z = Z.astype(float)
+        if (not self._setup) or (not self.warm_start):
+            self.__setup(X, Y, Z)
+
+        if not self.skip_validation:
+            Y = self.y_transform_.transform(Y)
+            Z = self.z_transform_.transform(Z)
 
         # Check for equal number of samples
         if not (X.shape[0] == Y.shape[0] and X.shape[0] == Z.shape[0]):
@@ -443,13 +625,9 @@ class AdversarialFairness(BaseEstimator):
                 )
             )
 
-        if (not self._setup) or (not self.warm_start):
-            self.__setup(X, Y, Z)
-
         if not self.skip_validation:
             # Some backendEngine may want to do some additional preprocessing,
             # such as moving to GPU.
-            # FIXME: Maybe we move this to backendEngine_.prepareData?
             attr = getattr(self.backendEngine_, "validate_input", None)
             if attr:
                 X, Y, Z = attr(X, Y, Z)
@@ -546,17 +724,47 @@ class AdversarialFairness(BaseEstimator):
             )
         )
 
+    def _set_predictor_function(self):
+        """
+        Infer prediction function.
+
+        Provide a callable predictor function that maps soft-probabilities
+        (or more precisely, predictor_model output) to discrete prediction.
+        Alternatively, pass a Transformer with the :code:`transformer` key-word
+        that has a :code:`dist_type_` attribute that a BackendEngine
+        can use to interpret a loss function.
+        """
+        if callable(self.predictor_function):
+            self.predictor_function_ = self.predictor_function
+        elif hasattr(self.y_transform_, "dist_type_"):
+            if self.y_transform_.dist_type_ == "binary":
+                self.predictor_function_ = lambda pred: (pred >= 0.5).astype(
+                    float
+                )
+            elif self.y_transform_.dist_type_ == "category":
+
+                def loss(pred):
+                    shape = pred.shape
+                    c = argmax(pred, axis=1)
+                    b = zeros(shape, dtype=float)
+                    a = arange(shape[0])
+                    b[a, c] = 1
+                    return b
+
+                self.predictor_function_ = loss
+            elif self.y_transform_.dist_type_ == "continuous":
+                self.predictor_function_ = lambda pred: pred
+        if not self.predictor_function_:
+            raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
+
 
 class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
     """Creates an AdversarialFairness with loss and predictions set to classification."""
 
     def __init__(self, **kwargs):
         """Initialize model by setting the predictor loss and function."""
-        kwargs["predictor_loss"] = kwargs.get(
-            "predictor_loss", Keyword.CLASSIFICATION.value
-        )
-        kwargs["predictor_function"] = kwargs.get(
-            "predictor_function", Keyword.CLASSIFICATION.value
+        kwargs["y_distribution"] = kwargs.get(
+            "y_distribution", "classification"
         )
         super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
@@ -566,10 +774,25 @@ class AdversarialFairnessRegressor(AdversarialFairness, RegressorMixin):
 
     def __init__(self, *args, **kwargs):
         """Initialize model by setting the predictor loss."""
-        kwargs["predictor_loss"] = kwargs.get(
-            "predictor_loss", Keyword.CONTINUOUS.value
-        )
-        kwargs["predictor_function"] = kwargs.get(
-            "predictor_function", Keyword.CONTINUOUS.value
-        )
+        kwargs["y_distribution"] = kwargs.get("y_distribution", "continuous")
         super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
+
+
+def check_X(X):
+    """
+    Validate the input array, and possible coerce to 2D.
+
+    Calls :code:`sklearn.utils.check_array` on parameter X with the
+    parameters suited for Adversarial Mitigation.
+
+    Returns
+    -------
+    X : numpy.ndarray
+        Cleaned data.
+    """
+    return check_array(
+        X,
+        accept_sparse=False,
+        accept_large_sparse=False,
+        dtype=float,
+    ).astype(float)

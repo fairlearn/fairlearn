@@ -10,11 +10,11 @@ from fairlearn.adversarial import (
     AdversarialFairnessClassifier,
     AdversarialFairnessRegressor,
 )
+from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.adversarial._pytorch_engine import PytorchEngine
 from fairlearn.adversarial._tensorflow_engine import TensorflowEngine
 from fairlearn.adversarial._backend_engine import BackendEngine
-from fairlearn.adversarial._util import interpret_keyword
-from fairlearn.adversarial._constants import _TYPE_CHECK_ERROR
+from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
 
 
 model_class = type("Model", (object,), {})
@@ -268,23 +268,18 @@ def test_fake_models_df_inputs():
 
 
 def check_type_helper(data, actual_type, valid_choices, invalid_choices):
-    param_name = "param"
-    data_name = "test"
-    mitigator = get_instance()
     for valid_choice in valid_choices:
+        prep = FloatTransformer(valid_choice)
+        prep.fit(data)
         assert (
-            interpret_keyword(data, valid_choice, param_name, data_name).value
-            == actual_type
+            prep.dist_type_ == actual_type
         )
 
     for invalid_choice in invalid_choices:
         with pytest.raises(ValueError) as exc:
-            assert not interpret_keyword(
-                data, invalid_choice, param_name, data_name
-            )
-            assert str(exc.value) == _TYPE_CHECK_ERROR.format(
-                data_name, invalid_choice
-            )
+            prep = FloatTransformer(invalid_choice)
+            prep.fit(data)
+            assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(invalid_choice, prep.inferred_type_)
 
 
 def test_check_type_correct_data():
@@ -339,17 +334,10 @@ def test_check_type_correct_data():
         ],
     )
 
-    param_name = "test"
-    data_name = "test"
-    mitigator = get_instance()
     with pytest.raises(ValueError) as exc:
-        assert (
-            interpret_keyword(Bin2d, Keyword_AUTO, param_name, data_name)
-            is None
-        )
-        assert str(exc.value) == _TYPE_CHECK_ERROR.format(
-            data_name, Keyword_AUTO
-        )
+        prep = FloatTransformer(Keyword_AUTO)
+        prep.fit(Bin2d)
+        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(Keyword_AUTO, prep.inferred_type_)
 
 
 def test_check_type_faulty_data():

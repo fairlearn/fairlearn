@@ -1,8 +1,12 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ._util import interpret_keyword
-from ._constants import _KWARG_ERROR_MESSAGE, _NOT_IMPLEMENTED
+from ._constants import (
+    _KWARG_ERROR_MESSAGE,
+    _NOT_IMPLEMENTED,
+    _DIST_TYPE_NOT_IMPLEMENTED,
+    _NO_LOSS,
+)
 from sklearn.utils import shuffle
 from numpy import ndarray
 
@@ -24,10 +28,13 @@ class BackendEngine:
         """
         self.base = base
 
+        n_X_features = X.shape[1]
+        n_Y_features = base.y_transform_.n_features_out_
+        n_Z_features = base.z_transform_.n_features_out_
         # Set up predictor_model
         if isinstance(base.predictor_model, list):
             predictor_list_nodes = (
-                [X.shape[1]] + base.predictor_model + [Y.shape[1]]
+                [n_X_features] + base.predictor_model + [n_Y_features]
             )
             self.predictor_model = self.get_model(
                 list_nodes=predictor_list_nodes
@@ -44,9 +51,9 @@ class BackendEngine:
 
         # Set up adversary_model
         if isinstance(base.adversary_model, list):
-            adversarial_in = Y.shape[1] * (2 if base.pass_y_ else 1)
+            adversarial_in = n_Y_features * (2 if base.pass_y_ else 1)
             adversary_list_nodes = (
-                [adversarial_in] + base.adversary_model + [Z.shape[1]]
+                [adversarial_in] + base.adversary_model + [n_Z_features]
             )
             self.adversary_model = self.get_model(
                 list_nodes=adversary_list_nodes
@@ -62,14 +69,19 @@ class BackendEngine:
             )
 
         # Set up losses
-        self.predictor_loss = self.get_loss(
-            interpret_keyword(Y, base.predictor_loss, "predictor_loss", "y")
-        )
-        self.adversary_loss = self.get_loss(
-            interpret_keyword(
-                Z, base.adversary_loss, "adversary_loss", "sensitive_features"
-            )
-        )
+        if callable(base.predictor_loss):
+            self.predictor_loss = base.predictor_loss
+        elif hasattr(base.y_transform_, "dist_type_"):
+            self.predictor_loss = self.get_loss(base.y_transform_.dist_type_)
+        else:
+            raise ValueError(_NO_LOSS.format("predictor_loss"))
+
+        if callable(base.adversary_loss):
+            self.adversary_loss = base.adversary_loss
+        elif hasattr(base.z_transform_, "dist_type_"):
+            self.adversary_loss = self.get_loss(base.z_transform_.dist_type_)
+        else:
+            raise ValueError(_NO_LOSS.format("adversary_loss"))
 
     def shuffle(self, X, Y, Z):
         """
@@ -104,9 +116,18 @@ class BackendEngine:
         """Create the predictor_optimizer and adversary_optimizer here."""
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
-    def get_loss(self, keyword):
-        """Infer loss from keyword or callable."""
-        raise NotImplementedError(_NOT_IMPLEMENTED)
+    def get_loss(self, dist_type):
+        """
+        Infer loss from keyword or callable.
+
+        This is the base function which can be used as fall-back for subclass
+        methods.
+        """
+        raise ValueError(
+            _DIST_TYPE_NOT_IMPLEMENTED.format(
+                self.__class__.__name__, dist_type
+            )
+        )
 
     def get_model(self, list_nodes):
         """Get the model."""  # TODO specify what kind of models these should be

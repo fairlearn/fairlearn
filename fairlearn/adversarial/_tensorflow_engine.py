@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 from ._backend_engine import BackendEngine
-from ._util import Keyword
 from ._constants import _KWARG_ERROR_MESSAGE
 
 from numpy import finfo, float32
@@ -143,20 +142,21 @@ class TensorflowEngine(BackendEngine):
             )
         )
 
-    def get_loss(self, keyword):
+    def get_loss(self, dist_type):
         """Get loss function corresponding to the keyword."""
-        if callable(keyword):
-            return keyword
-        if keyword == Keyword.BINARY:
+        if dist_type == "binary":
             # Use sigmoid as final layer
-            return tensorflow.keras.losses.BinaryCrossentropy(from_logits=False)
-        elif keyword == Keyword.CATEGORY:
+            return tensorflow.keras.losses.BinaryCrossentropy(
+                from_logits=False
+            )
+        elif dist_type == "category":
             # User softmax as final layer
             return tensorflow.keras.losses.CategoricalCrossentropy(
                 from_logits=False
             )
-        elif keyword == Keyword.CONTINUOUS:
+        elif dist_type == "continuous":
             return tensorflow.keras.losses.MeanSquaredError()
+        super(TensorflowEngine, self).get_loss(dist_type)
 
     def get_model(self, list_nodes):
         """Get the model."""  # TODO move to this class.
