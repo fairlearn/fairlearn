@@ -53,7 +53,7 @@ class GroupFeature:
     ):
         """Help with the metrics."""
         self._classes = np.unique(feature_vector)
-        self._raw_values = feature_vector
+        self._raw_feature_values = feature_vector
 
         self._name = "{0}{1}".format(base_name, index)
         if name is not None:
@@ -69,11 +69,16 @@ class GroupFeature:
                     raise ValueError(msg)
 
     @property
-    def name(self) -> str:
+    def name_(self) -> str:
         """Return the name of the feature."""
         return self._name
 
     @property
-    def classes(self) -> List:
+    def classes_(self) -> List:
         """Return list of unique classes."""
         return list(self._classes)
+
+    @property
+    def raw_feature_(self):
+        """Return the feature values passed in constructor."""
+        return self._raw_feature_values

@@ -292,7 +292,7 @@ class MetricFrame:
                  y_true,
                  y_pred,
                  sensitive_features,
-                 control_features: Optional = None,
+                 control_features=None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -310,7 +310,7 @@ class MetricFrame:
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
-        self._sf_names = [x.name for x in sf_list]
+        self._sf_names = [x.name_ for x in sf_list]
 
         # Prepare the control features
         # Adjust _sf_indices if needed
@@ -318,14 +318,14 @@ class MetricFrame:
         self._cf_names = None
         if control_features is not None:
             cf_list = self._process_features("control_feature_", control_features, y_t)
-            self._cf_names = [x.name for x in cf_list]
+            self._cf_names = [x.name_ for x in cf_list]
 
         # Add sensitive and conditional features to _all_data
         for sf in sf_list:
-            self._all_data[sf.name] = list(sf._raw_values)
+            self._all_data[sf.name_] = list(sf.raw_feature_)
         if cf_list is not None:
             for cf in cf_list:
-                self._all_data[cf.name] = list(cf._raw_values)
+                self._all_data[cf.name_] = list(cf.raw_feature_)
 
         # Check for duplicate feature names
         nameset = set()
@@ -350,25 +350,25 @@ class MetricFrame:
             )
             # If there are multiple control features, might have missing combinations
             if len(self._cf_names) > 1:
-                all_indices = pd.MultiIndex.from_product([x.classes for x in cf_list],
-                                                         names=[x.name for x in cf_list])
+                all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
+                                                         names=[x.name_ for x in cf_list])
 
                 self._overall = temp.reindex(index=all_indices)
             else:
                 self._overall = temp
 
-        rows = copy.deepcopy(sf_list)
+        grouping_features = copy.deepcopy(sf_list)
         if cf_list is not None:
             # Prepend the conditional features, so they are 'higher'
-            rows = copy.deepcopy(cf_list) + rows
+            grouping_features = copy.deepcopy(cf_list) + grouping_features
 
-        temp = self._all_data.groupby([x.name for x in rows]).apply(
+        temp = self._all_data.groupby([x.name_ for x in grouping_features]).apply(
             apply_to_dataframe,
             metric_functions=annotated_funcs,
             split_columns=self._split_columns)
-        if len(rows) > 1:
-            all_indices = pd.MultiIndex.from_product([x.classes for x in rows],
-                                                     names=[x.name for x in rows])
+        if len(grouping_features) > 1:
+            all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
+                                                     names=[x.name_ for x in grouping_features])
 
             self._by_group = temp.reindex(index=all_indices)
         else:
