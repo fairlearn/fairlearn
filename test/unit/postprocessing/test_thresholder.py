@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 
 from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 from fairlearn.postprocessing import Thresholder
 
 
@@ -55,18 +57,26 @@ def test_thresholder():
     several_tests = [
         {'estimator': LinearRegression(),
          'predict_method': 'predict',
+         'prefit': True
          },
         {'estimator': LogisticRegression(),
          'predict_method': 'predict_proba',
+         'prefit': False
+         },
+        {'estimator': Pipeline(steps=[
+            ("logistic_regression", LogisticRegression())]),
+         'predict_method': 'predict_proba',
+         'prefit': True
          }
     ]
 
     for test in several_tests:
         estimator = test['estimator']
-        estimator.fit(X, y)
+        if test['prefit']:
+            estimator.fit(X, y)
         thresholder_combined = Thresholder(estimator=estimator,
                                            threshold_dict=threshold_dict_combined,
-                                           prefit=True,
+                                           prefit=test['prefit'],
                                            predict_method=test['predict_method'])
 
         thresholder_combined.fit(X, y)
