@@ -24,7 +24,8 @@ Mitigating Fairness using Adversarial Mitigation
 # - Multiple sensitive features
 # - Two fairness objectives: Demographic parity or Equalized Odds
 #
-# This implementation follows closely the API of an `Estimator` in :class:`sklearn`
+# This implementation follows closely the API of an `Estimator`
+# in scikit-learn.
 
 
 # %%
@@ -54,8 +55,8 @@ from math import sqrt
 # We start by loading and preprocessing the dataset.
 #
 # For this example we choose the feature 'sex' as the sensitive feature.
-
-
+# %%
+# Fetch the data
 X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 pos_label = y[0]
 
@@ -103,12 +104,14 @@ X_prep_test = ct.transform(X_test)
 
 
 # %%
-# Now, we can use :class:`fairlearn.adversarial.AdversarialFairnessClassifier` to train on the
+# Now, we can use :class:`fairlearn.adversarial.AdversarialFairnessClassifier`
+# to train on the
 # UCI Adult dataset. As our predictor and adversary models, we use for
 # simplicity the default constructors for fully connected neural
-# networks with sigmoid activations implemented in Fairlearn. We initialize neural network constructors
+# networks with sigmoid activations implemented in Fairlearn. We initialize
+# neural network constructors
 # by passing a list :math:`h_1, h_2, \dots` that indicate the number of nodes
-# :math:`h_i` per hidden layer :math:`i`.
+# :math:`h_i` per hidden layer :math:`i`. # FIXME
 #
 # The specific fairness
 # objective that we choose for this example is demographic parity, so we also
