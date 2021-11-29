@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -93,13 +93,13 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         final_predictions = 0.0*base_predictions_vector
 
-        for a, threshold in self.threshold_dict.items():
+        for sf, threshold in self.threshold_dict.items():
 
             operation = ThresholdOperation('>', threshold)
 
             thresholded_predictions = 1.0 * operation(base_predictions_vector)
 
-            final_predictions[sensitive_feature_vector == a] = \
-                thresholded_predictions[sensitive_feature_vector == a]
+            final_predictions[sensitive_feature_vector == sf] = \
+                thresholded_predictions[sensitive_feature_vector == sf]
 
         return final_predictions
