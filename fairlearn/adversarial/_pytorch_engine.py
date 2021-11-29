@@ -2,7 +2,11 @@
 # Licensed under the MIT License.
 
 from ._backend_engine import BackendEngine
-from ._constants import _KWARG_ERROR_MESSAGE
+from ._constants import (
+    _KWARG_ERROR_MESSAGE,
+    _MODEL_UNRECOGNIZED_STR,
+    _MODEL_UNRECOGNIZED_ITEM,
+)
 
 # dynamic import.
 torch = None
@@ -20,6 +24,8 @@ class PytorchEngine(BackendEngine):
         """
         global torch
         import torch
+
+        torch.manual_seed(base.random_state_.random())
 
         self.model_class = torch.nn.Module
         super(PytorchEngine, self).__init__(base, X, Y, Z)
@@ -205,10 +211,73 @@ class PytorchEngine(BackendEngine):
         super(PytorchEngine, self).get_loss(dist_type)
 
     def get_model(self, list_nodes):
-        """Get the model."""  # TODO move to this class.
-        from ._models import getTorchModel as getModel
+        """
+        Build a model from a list of keywords.
 
-        return getModel(list_nodes=list_nodes)
+        A BackendEngine should implement get_model in order to
+        simplify the user's work. In particular, we will adhere
+        to the following API where list_nodes is a list of neural network
+        layers.
+
+        Parameters
+        ----------
+        list_nodes: list
+            list of keywords. Integer keywords indicate a layer with
+            a number of nodes.
+            Callable keywords are added to the model as a layer directly,
+            which is useful for activation functions. String keywords are
+            not supported in the Pytorch backend (try tensorflow instead).
+
+        Returns
+        -------
+        model : torch.nn.Module
+            initialized model with layers as specified.
+        """
+
+        class FullyConnected(torch.nn.Module):
+            """Neural network class."""
+
+            def __init__(self):
+                """Initialize the layers of the NN."""
+                super(FullyConnected, self).__init__()
+                layers = []
+                nodes = None
+                for i, item in enumerate(list_nodes):
+                    if isinstance(item, int):
+                        if nodes:
+                            layers.append(torch.nn.Linear(nodes, list_nodes[i]))
+                        nodes = item
+                    elif callable(item):
+                        layers.append(item)
+                    elif isinstance(item, str):
+                        if item.lower() == "sigmoid":
+                            layers.append(torch.nn.Sigmoid())
+                        elif item.lower() == "softmax":
+                            layers.append(torch.nn.Softmax())
+                        else:
+                            raise ValueError(
+                                _MODEL_UNRECOGNIZED_STR.format(item)
+                            )
+                    else:
+                        raise ValueError(_MODEL_UNRECOGNIZED_ITEM.format(item))
+                self.layers_ = torch.nn.ModuleList(layers)
+
+            def forward(self, x):
+                """Propagate x through the network."""
+                for layer in self.layers_:
+                    x = layer(x)
+                return x
+
+        model = FullyConnected()
+
+        def init_weights(m):
+            if isinstance(m, torch.nn.Linear):
+                torch.nn.init.xavier_uniform_(m.weight)
+                m.bias.data.fill_(0.0)
+
+        model.apply(init_weights)
+
+        return model
 
     def validate_input(self, X, Y, Z):
         """Extend the base `_validate_input` to send data to GPU when required."""

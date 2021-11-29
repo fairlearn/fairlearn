@@ -36,6 +36,12 @@ class BackendEngine:
             predictor_list_nodes = (
                 [n_X_features] + base.predictor_model + [n_Y_features]
             )
+            if hasattr(base.y_transform_, "dist_type_"):
+                if base.y_transform_.dist_type_ == "binary":
+                    predictor_list_nodes.append("sigmoid")
+                elif base.y_transform_.dist_type_ == "category":
+                    predictor_list_nodes.append("softmax")
+
             self.predictor_model = self.get_model(
                 list_nodes=predictor_list_nodes
             )
@@ -55,6 +61,12 @@ class BackendEngine:
             adversary_list_nodes = (
                 [adversarial_in] + base.adversary_model + [n_Z_features]
             )
+            if hasattr(base.z_transform_, "dist_type_"):
+                if base.z_transform_.dist_type_ == "binary":
+                    adversary_list_nodes.append("sigmoid")
+                elif base.z_transform_.dist_type_ == "category":
+                    adversary_list_nodes.append("softmax")
+
             self.adversary_model = self.get_model(
                 list_nodes=adversary_list_nodes
             )
@@ -130,5 +142,17 @@ class BackendEngine:
         )
 
     def get_model(self, list_nodes):
-        """Get the model."""  # TODO specify what kind of models these should be
+        """
+        Build a model from a list of keywords.
+
+        A BackendEngine should implement get_model in order to
+        simplify the user's work. In particular, we will adhere
+        to the following API where list_nodes is a list of neural network
+        layers.
+
+        Parameters
+        ----------
+        list_nodes: list
+            list of keywords.
+        """
         raise NotImplementedError(_NOT_IMPLEMENTED)

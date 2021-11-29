@@ -45,3 +45,15 @@ _TRANSFORM_NO_PARAM = (
     + 'keyword (such as "binary" and "category") in '
     + "its __init__"
 )
+_MODEL_UNRECOGNIZED_STR = (
+    "Key-word argument predictor_model or adversary_model received "
+    + "an unrecognized string: {}. If you were trying to signal a "
+    + "certain activation function, try passing an instance of that "
+    + "function directly."
+)
+_MODEL_UNRECOGNIZED_ITEM = (
+    "Key-word argument predictor_model or adversary_model received "
+    + "an unrecognized item: {}. Either pass an int to signal a linear layer, "
+    + "a callable to add directly to the model (such as an activation "
+    + "function) or a supported keyword (string)."
+)

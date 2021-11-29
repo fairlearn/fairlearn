@@ -98,8 +98,8 @@ X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(
     X, y, z, test_size=0.2, random_state=12345, stratify=y
 )
 
-X_train = ct.fit_transform(X_train)
-X_test = ct.transform(X_test)
+X_prep_train = ct.fit_transform(X_train)
+X_prep_test = ct.transform(X_test)
 
 
 # %%
@@ -120,27 +120,25 @@ X_test = ct.transform(X_test)
 
 
 mitigator = AdversarialFairnessClassifier(
-    predictor_model=[50],
-    adversary_model=[3],
-    epochs=20,
-    batch_size=2 ** 9,
-    shuffle=True,
+    backend="tensorflow",
+    predictor_model=[50, "leaky_relu"],
+    adversary_model=[3, "leaky_relu"],
+    batch_size=2 ** 8,
     progress_updates=0.5,
     random_state=123,
 )
 
 # %%
 # Then, we can fit the data to our model.
-torch.manual_seed(123)
 
-mitigator.fit(X_train, Y_train, sensitive_features=Z_train)
+mitigator.fit(X_prep_train, Y_train, sensitive_features=Z_train)
 
 # %%
 # Predict and evaluate. In particular, we trained the predictor for demographic
 # parity, so we are not only interested in the accuracy, but also in the selection
 # rate.
 
-predictions = mitigator.predict(X_test)
+predictions = mitigator.predict(X_prep_test)
 
 mf = MetricFrame(
     metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},
@@ -179,7 +177,7 @@ class PredictorModel(torch.nn.Module):
     def __init__(self):
         super(PredictorModel, self).__init__()
         self.layers = torch.nn.Sequential(
-            torch.nn.Linear(X_train.shape[1], 200),
+            torch.nn.Linear(X_prep_train.shape[1], 200),
             torch.nn.LeakyReLU(),
             torch.nn.Linear(200, 1),
             torch.nn.Sigmoid(),
@@ -234,7 +232,7 @@ adversary_model.apply(weights_init)
 
 
 def validate(mitigator):
-    predictions = mitigator.predict(X_test)
+    predictions = mitigator.predict(X_prep_test)
     dp_diff = demographic_parity_difference(
         Y_test == pos_label, predictions == pos_label, sensitive_features=Z_test
     )
@@ -310,7 +308,7 @@ mitigator = AdversarialFairnessClassifier(
 # %%
 # Finally, we fit the model
 
-mitigator.fit(X_train, Y_train, sensitive_features=Z_train)
+mitigator.fit(X_prep_train, Y_train, sensitive_features=Z_train)
 
 validate(mitigator)
 
@@ -319,7 +317,50 @@ validate(mitigator)
 # difference than in Exercise 1! This does come at the cost of some accuracy, but
 # such a tradeof is to be expected.
 
-predictions = mitigator.predict(X_test)
+predictions = mitigator.predict(X_prep_test)
+
+mf = MetricFrame(
+    metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},
+    y_true=Y_test == pos_label,
+    y_pred=predictions == pos_label,
+    sensitive_features=Z_test,
+)
+
+print(mf.by_group)
+
+# %%
+# Example 2: Scikit-learn applications
+# ====================================
+# AdversarialFairness is quite compliant with scikit-learn API, so functions
+# such as pipelining and model selection are applicable here. In particular,
+# applying pipelining might seem complicated as scikit-learn only pipelines
+# :code:`X` and :code:`y``, not the :code:`sensitive_features`.
+# We overcome this issue by passing the sensitive features through the
+# pipeline as keyword-argument
+# :code:`[name of model]__sensitive_features` to fit.
+
+pipeline = Pipeline(
+    [
+        (
+            "preprocessor",
+            ct
+        ),
+        (
+            "classifier",
+            AdversarialFairnessClassifier(
+                backend="tensorflow",
+                predictor_model=[50, "leaky_relu"],
+                adversary_model=[3, "leaky_relu"],
+                batch_size=2 ** 8,
+                random_state=123,
+            ),
+        ),
+    ]
+)
+
+pipeline.fit(X_train, Y_train, classifier__sensitive_features=Z_train)
+
+predictions = pipeline.predict(X_test)
 
 mf = MetricFrame(
     metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},

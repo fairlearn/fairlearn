@@ -23,6 +23,8 @@ class TensorflowEngine(BackendEngine):
         global tensorflow
         import tensorflow
 
+        tensorflow.random.set_seed(base.random_state_.random())
+
         self.model_class = tensorflow.keras.Model
         super(TensorflowEngine, self).__init__(base, X, Y, Z)
 
@@ -146,9 +148,7 @@ class TensorflowEngine(BackendEngine):
         """Get loss function corresponding to the keyword."""
         if dist_type == "binary":
             # Use sigmoid as final layer
-            return tensorflow.keras.losses.BinaryCrossentropy(
-                from_logits=False
-            )
+            return tensorflow.keras.losses.BinaryCrossentropy(from_logits=False)
         elif dist_type == "category":
             # User softmax as final layer
             return tensorflow.keras.losses.CategoricalCrossentropy(
@@ -159,7 +159,62 @@ class TensorflowEngine(BackendEngine):
         super(TensorflowEngine, self).get_loss(dist_type)
 
     def get_model(self, list_nodes):
-        """Get the model."""  # TODO move to this class.
-        from ._models import getTensorflowModel as getModel
+        """
+        Build a model from a list of keywords.
 
-        return getModel(list_nodes=list_nodes)
+        A BackendEngine should implement get_model in order to
+        simplify the user's work. In particular, we will adhere
+        to the following API where list_nodes is a list of neural network
+        layers.
+
+        Parameters
+        ----------
+        list_nodes: list
+            list of keywords. Integer keywords indicate a layer with
+            a number of nodes.
+            Callable keywords are added to the model as a layer directly,
+            which is useful for activation functions. String keywords are
+            interpreted using :code:`tensorflow.keras.activations.deserialize`.
+
+        Returns
+        -------
+        model : tensorflow.keras.Model
+            initialized model with layers as specified.
+        """
+        initializer_w = tensorflow.keras.initializers.GlorotNormal()
+
+        class FullyConnected(tensorflow.keras.Model):
+            """Neural network class."""
+
+            def __init__(self):
+                """Initialize the layers of the NN."""
+                super(FullyConnected, self).__init__()
+                layers = []
+                for i, item in enumerate(list_nodes):
+                    if i == 0:
+                        continue  # What if the first item is not an int?
+                    if isinstance(item, int):
+                        layers.append(
+                            tensorflow.keras.layers.Dense(
+                                units=item,
+                                kernel_initializer=initializer_w,
+                                bias_initializer="zeros",
+                            )
+                        )
+                    elif callable(item):
+                        layers.append(item)
+                    elif isinstance(item, str):
+                        layers.append(
+                            tensorflow.keras.activations.deserialize(item)
+                        )
+                self.layers_ = layers
+
+            def call(self, x):
+                """Propagate x through the network."""
+                for layer in self.layers_:
+                    x = layer(x)
+                return x
+
+        model = FullyConnected()
+
+        return model
