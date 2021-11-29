@@ -1,7 +1,11 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ._constants import _TYPE_COMPLIANCE_ERROR, _TYPE_CHECK_ERROR
+from ._constants import (
+    _TYPE_COMPLIANCE_ERROR,
+    _TYPE_CHECK_ERROR,
+    _ARG_ERROR_MESSAGE,
+)
 from sklearn.utils import check_array
 from sklearn.preprocessing import OneHotEncoder
 from pandas import Series, DataFrame
@@ -86,10 +90,18 @@ class FloatTransformer(TransformerMixin):
             self.inferred_type_ = type_of_target(X)
             self.dist_type_ = self._get_type(X, self.inferred_type_)
         else:
-            assert isinstance(X, self.in_type_)
+            if not isinstance(X, self.in_type_):
+                raise ValueError(
+                    _ARG_ERROR_MESSAGE.format("X", "of type " + self.in_type_)
+                )
             inferred = type_of_target(X)
-            assert inferred == self.inferred_type_
-            assert self._get_type(X, inferred) == self.dist_type_
+            if not inferred == self.inferred_type_:
+                raise ValueError(
+                    "Inferred distribution type of X does not match "
+                    + self.inferred_type_
+                )
+            if not self._get_type(X, inferred) == self.dist_type_:
+                raise ValueError(_TYPE_CHECK_ERROR.format(self.dist_type_))
 
         if self.in_type_ == DataFrame:
             self.columns_ = X.columns
@@ -101,7 +113,7 @@ class FloatTransformer(TransformerMixin):
             dtype=dtype,
             ensure_2d=False,
         )
-        assert isinstance(X, ndarray)
+
         self.input_dim_ = X.ndim
         if X.ndim == 1:
             X = X.reshape(-1, 1)
@@ -122,8 +134,7 @@ class FloatTransformer(TransformerMixin):
             )
             self.ct_.fit(X)
             self.n_features_out_ = sum(
-                len(cat) if len(cat) != 2 else 1
-                for cat in self.ct_.categories_
+                len(cat) if len(cat) != 2 else 1 for cat in self.ct_.categories_
             )
         # elif "multilabel-indicator" needn't be encoded, so we do not create
         # an encoder then.
@@ -132,7 +143,6 @@ class FloatTransformer(TransformerMixin):
 
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
-        assert isinstance(X, self.in_type_)
         if self.inferred_type_ in ["continuous", "continuous-multioutput"]:
             return self._prep(X, dtype=float)
         elif self.inferred_type_ in ["binary", "multiclass"]:

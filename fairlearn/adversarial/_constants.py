@@ -4,6 +4,7 @@
 _IMPORT_ERROR_MESSAGE = (
     "Please make sure to install {} in order to use this module."
 )
+_ARG_ERROR_MESSAGE = "Argument '{}' should be set to {}."
 _KWARG_ERROR_MESSAGE = "Key-word argument '{}' should be set to {}."
 _TYPE_CHECK_ERROR = "Data does not follow distribution assumption '{}'."
 _TYPE_COMPLIANCE_ERROR = _TYPE_CHECK_ERROR + " The data looks '{}'."
