@@ -28,12 +28,16 @@ Keyword_CLASSIFICATION = "classification"
 
 
 class loss_class:
+    """Mock loss class."""
+
     def __init__(self, **kwargs):
+        """Do not need to init anything."""
         pass
 
     # class loss:
     #     def backward(self, **kwargs): return
     def __call__(self, x, y):
+        """Mock loss should be callable from train_step."""
         return  # self.loss()
 
 
@@ -43,6 +47,7 @@ MSE = type(Keyword_CONTINUOUS, (loss_class,), {})
 
 
 def KeywordToClass(kw):
+    """Map keyword (string) to a loss class."""
     index = [Keyword_BINARY, Keyword_CATEGORY, Keyword_CONTINUOUS].index(kw)
     return [BCE, CCE, MSE][index]
 
@@ -51,7 +56,11 @@ layer_class = type("Layer", (object,), {})
 
 
 class fake_torch:
+    """Mock of the PyTorch module."""
+
     class nn:
+        """Mock of torch.nn."""
+
         Module = type(
             "Module",
             (model_class,),
@@ -67,28 +76,46 @@ class fake_torch:
         MSELoss = type("MSELoss", (MSE,), {})
 
     class optim:
+        """Mock of torch.optim."""
+
         class Adam:
+            """Mock of pytorch Adam optimizer, with empty init and zerograd."""
+
             def __init__(self, params, **kwargs):
+                """Mock init because this mock optimizer is initialized."""
                 pass
 
             def zero_grad(self):
+                """Mock zerograd because this mock optimizer is used."""
                 pass
 
     class from_numpy:
+        """Mock torch.from_numpy, torch.Tensor is now a class with data."""
+
         def __init__(self, X):
+            """Save data."""
             self.X = X
 
-        def float(self):
+        def float(self):  # noqa: A003
+            """Because it is used in the algorithm."""
             return self.X
 
-    # def clone(self, X): return X.copy()
+    def manual_seed(seed):
+        """Mock of set seed."""
+        pass
 
 
 class fake_tensorflow:
+    """Mock of the TensorFlow module."""
+
     class keras:
+        """Mock of tf.keras."""
+
         Model = type("Model", (model_class,), {})
 
         class losses:
+            """Mock of tf.keras.losses."""
+
             BinaryCrossentropy = type("BinaryCrossentropy", (BCE,), {})
             CategoricalCrossentropy = type(
                 "CategoricalCrossentropy", (CCE,), {}
@@ -96,9 +123,20 @@ class fake_tensorflow:
             MeanSquaredError = type("MeanSquaredError", (MSE,), {})
 
         class optimizers:
+            """Mock of tf.keras.optimizers."""
+
             class Adam:
-                def __init__(self, **kwargs):
+                """Mock of pytorch Adam optimizer, with empty init."""
+
+                def __init__(self, **kwargs):  # noqa: D107
                     pass
+
+    class random:
+        """mock of tf.random."""
+
+        def set_seed(seed):
+            """Set the random seed."""
+            pass
 
 
 rows = 60
@@ -114,6 +152,15 @@ Cont1d = np.random.rand(rows, 1)
 
 
 def generate_data_combinations(n=10):
+    """
+    Generate datasets with appropriate (and random) distribution type.
+
+    Yields
+    ------
+    ((X, Y, Z), (X_type, Y_type, Z_type)) : tuple
+        (X, Y, Z) is data, and (X_type, Y_type, Z_type) are their respective
+        distribution types.
+    """
     datas = [Bin1d, Cat, Cont2d, Cont1d]
     dist_type = [
         Keyword_BINARY,
@@ -142,29 +189,35 @@ def generate_data_combinations(n=10):
 
 
 class RemoveAll(BackendEngine):
-    def __init__(self, base, X, Y, Z):
+    """Mock BackendEngine that implements nothing, to test base class."""
+
+    def __init__(self, base, X, Y, Z):  # noqa: D107
         pass
 
-    def evaluate(self, X):
+    def evaluate(self, X):  # noqa: D102
         return X
 
-    def train_step(self, X, Y, Z):
+    def train_step(self, X, Y, Z):  # noqa: D102
         return (0, 0)
 
-    def setup_optimizer(self, optimizer):
+    def setup_optimizer(self, optimizer):  # noqa: D102
         pass
 
-    def get_loss(self, Y, choice, data_name):
+    def get_loss(self, Y, choice, data_name):  # noqa: D102
         pass
 
 
 class RemoveTrainStepPytorch(PytorchEngine):
-    def train_step(self, X, Y, Z):
+    """Mock train_step only, then we can still perform Backend inits."""
+
+    def train_step(self, X, Y, Z):  # noqa: D102
         return (0, 0)
 
 
 class RemoveTrainStepTensorflow(TensorflowEngine):
-    def train_step(self, X, Y, Z):
+    """Mock train_step only, then we can still perform Backend inits."""
+
+    def train_step(self, X, Y, Z):  # noqa: D102
         return (0, 0)
 
 
@@ -175,6 +228,26 @@ def get_instance(
     torch=True,
     tensorflow=False,
 ):
+    """
+    Shared set up of test cases that create an instance of the model.
+
+    Parameters
+    ----------
+    cls : class
+        class to initialize, should be (sub)class (of) AdversarialFairness
+
+    fake_mixin: bool
+        use an entirely fake backendEngine
+
+    fake_training: bool
+        only remove training step from backendEngine
+
+    torch: bool
+        Use torch (and set the fake torch module)
+
+    tensorflow: bool
+        Use tensorflow (and set the fake tensorflow module)
+    """
     if torch:
         sys.modules["torch"] = fake_torch
     else:
@@ -209,6 +282,7 @@ def get_instance(
 
 @pytest.mark.parametrize("torch1", [True, False])
 def test_classifier(torch1):
+    """Test classifier subclass."""
     mitigator = get_instance(
         AdversarialFairnessClassifier,
         fake_training=True,
@@ -224,6 +298,7 @@ def test_classifier(torch1):
 
 @pytest.mark.parametrize("torch2", [True, False])
 def test_regressor(torch2):
+    """Test regressor subclass."""
     mitigator = get_instance(
         AdversarialFairnessRegressor,
         fake_training=True,
@@ -239,6 +314,7 @@ def test_regressor(torch2):
 
 @pytest.mark.parametrize("torch3", [True, False])
 def test_fake_models(torch3):
+    """Test various data types and see if it is interpreted correctly."""
     for ((X, Y, Z), (X_type, Y_type, Z_type)) in generate_data_combinations():
         mitigator = get_instance(
             fake_training=True, torch=torch3, tensorflow=not torch3
@@ -254,12 +330,14 @@ def test_fake_models(torch3):
 
 
 def test_fake_models_list_inputs():
+    """Test model with lists as input."""
     for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
 
 def test_fake_models_df_inputs():
+    """Test model with data frames as input."""
     for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(
@@ -268,21 +346,23 @@ def test_fake_models_df_inputs():
 
 
 def check_type_helper(data, actual_type, valid_choices, invalid_choices):
+    """Help to check if distribution types are interpreted correctly."""
     for valid_choice in valid_choices:
         prep = FloatTransformer(valid_choice)
         prep.fit(data)
-        assert (
-            prep.dist_type_ == actual_type
-        )
+        assert prep.dist_type_ == actual_type
 
     for invalid_choice in invalid_choices:
         with pytest.raises(ValueError) as exc:
             prep = FloatTransformer(invalid_choice)
             prep.fit(data)
-            assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(invalid_choice, prep.inferred_type_)
+            assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
+                invalid_choice, prep.inferred_type_
+            )
 
 
 def test_check_type_correct_data():
+    """Test distribution types on some correct/incorrectly distributed data."""
     check_type_helper(
         Bin1d,
         Keyword_BINARY,
@@ -337,10 +417,13 @@ def test_check_type_correct_data():
     with pytest.raises(ValueError) as exc:
         prep = FloatTransformer(Keyword_AUTO)
         prep.fit(Bin2d)
-        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(Keyword_AUTO, prep.inferred_type_)
+        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
+            Keyword_AUTO, prep.inferred_type_
+        )
 
 
 def test_check_type_faulty_data():
+    """Check distribution types on slightly faulty datasets."""
     notBin1d = Bin1d.copy()
     notBin1d[0] = 0.1
     check_type_helper(
@@ -385,13 +468,15 @@ def test_check_type_faulty_data():
 
 
 def check_2dnp(X):
+    """Make sure X is a 2d float ndarray."""
     assert isinstance(X, np.ndarray)
     assert X.ndim == 2
     assert len(X.shape) == 2
-    assert X.dtype == np.float
+    assert X.dtype == float
 
 
 def test_validate_data():
+    """Test if validate_data properly preprocesses datasets to ndarray."""
     for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X, Y, Z)
@@ -400,6 +485,7 @@ def test_validate_data():
 
 
 def test_validate_data_list_inputs():
+    """Test if validate_data properly preprocesses list datasets to ndarray."""
     for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
@@ -408,6 +494,7 @@ def test_validate_data_list_inputs():
 
 
 def test_validate_data_df_inputs():
+    """Test if validate_data properly preprocesses dataframes to ndarray."""
     for ((X, Y, Z), types) in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(
@@ -418,11 +505,12 @@ def test_validate_data_df_inputs():
 
 
 def test_validate_data_ambiguous_rows():
+    """Test if an ambiguous number of rows are caught."""
     for ((X, Y, Z), types) in generate_data_combinations():
         X = X[:5, :]
         mitigator = get_instance(fake_mixin=True)
         with pytest.raises(ValueError) as exc:
-            mitigator._validate_input(X, Y, Z)
+            mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
             assert str(
                 exc.value
             ) == "Input data has an ambiguous number of rows: {}, {}, {}.".format(
