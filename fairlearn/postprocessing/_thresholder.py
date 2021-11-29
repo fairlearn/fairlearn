@@ -28,12 +28,14 @@ from postprocessing._constants import (
 
 
 class Thresholder(BaseEstimator, MetaEstimatorMixin):
-    r"""Create my own description here
+    r"""Create my own description here.
 
     Parameters
+    //Todo
 
     References
     ----------
+    //Todo
 
     """
 
@@ -76,9 +78,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         return self
 
     def predict(self, X, *, sensitive_features):
-        """
-        Predict stuff, write better explanation later"""
-
+        """Predict stuff, write better explanation later."""
         check_is_fitted(self)
 
         # get soft predictions
