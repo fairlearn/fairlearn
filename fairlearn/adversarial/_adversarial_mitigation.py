@@ -25,6 +25,7 @@ from sklearn.utils.validation import (
     check_random_state,
     check_array,
 )
+from sklearn.exceptions import NotFittedError
 from math import ceil
 from time import time
 from numpy import zeros, argmax, arange
@@ -457,9 +458,6 @@ class AdversarialFairness(BaseEstimator):
         self.n_features_in_ = X.shape[1]
         self.n_features_out_ = self.y_transform_.n_features_in_
 
-        # Handy param to know if we have done the setup, or check_if_fitted?
-        self._setup = True
-
     def fit(self, X, y, *, sensitive_features):
         """
         Fit the model based on the given training data and sensitive features.
@@ -565,9 +563,6 @@ class AdversarialFairness(BaseEstimator):
         Y_pred : numpy.ndarray
             Two-dimensional array containing the model predictions
         """
-        if not self._setup:
-            raise UserWarning(_NO_DATA)
-
         check_is_fitted(self)
         X = check_X(X)
 
@@ -589,9 +584,6 @@ class AdversarialFairness(BaseEstimator):
             Two-dimensional array containing the model predictions fed through
             the :code:`predictor_function`
         """
-        if not self._setup:
-            raise UserWarning(_NO_DATA)
-
         check_is_fitted(self)
         X = check_X(X)
 
@@ -610,7 +602,13 @@ class AdversarialFairness(BaseEstimator):
         if not self.skip_validation:
             X = check_X(X)
 
-        if (not self._setup) or (not self.warm_start):
+        try:  # TODO check this
+            check_is_fitted(self)
+            is_fitted = True
+        except NotFittedError as e:
+            is_fitted = False
+
+        if (not is_fitted) or (not self.warm_start):
             self.__setup(X, Y, Z)
 
         if not self.skip_validation:
