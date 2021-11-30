@@ -1,6 +1,8 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from math import ceil
+from time import time
 from ._constants import (
     _IMPORT_ERROR_MESSAGE,
     _KWARG_ERROR_MESSAGE,
@@ -26,8 +28,6 @@ from sklearn.utils.validation import (
     check_array,
 )
 from sklearn.exceptions import NotFittedError
-from math import ceil
-from time import time
 from numpy import zeros, argmax, arange
 
 
@@ -48,45 +48,11 @@ class AdversarialFairness(BaseEstimator):
     :code:`adversary_model` may not have a discrete prediction at the end of the
     model. Instead, even if we are dealing with discrete predictions, we may output
     the sigmoidal or soft-max, but we may not output discrete integer predictions.
-    # TODO say something about easy-to-use List[int] models.
 
-    There are three important key-words to identify the assumption about the
-    underlying distribution of the data, which are:
-    :code:`"binary"`, :code:`"category"`, or :code:`"continuous"`.
-    Additionally, passing
-    :code:`"classification"` will infer whether to use :code:`"binary"` or
-    :code:`"category"`, and passing :code:`"auto"` will infer whether to use
-    :code:`"binary"`, :code:`"category"`, or :code:`"continuous"`.
-
-    We make the important design choice to allow for arbitrary loss functions
-    :code:`predictor_loss` and :code:`adversary_loss` while
-    also providing a simple interface for simple use cases. So, for simple use
-    cases, the user may for example pass :code:`predictor_loss="binary"` to indicate
-    that we assume that we are predicting binary data, and that we should use an
-    instance of `torch.nn.BCEWithLogitsLoss` (or the
-    tensorflow equivalent of binary cross entropy if the models are tensorflow
-    models). Or, the user could pass an instance of
-    `torch.nn.BCEWithLogitsLoss` directly to accomplish the same.
-    Besides :code:`"binary"`, we provide loss functions for :code:`"category"`
-    (categorical cross entropy)
-    and :code:`"continuous"` (mean squared error) as well.
-    We handle :code:`adversary_loss` in the same way.
-
-    Additionally, one may pass one of these key-words as a :code:`predictor_function`.
-    For instance, setting :code:`predictor_function="category"` maps the model's
-    continuous output vector (assumped to be the logits or probabilities per
-    category) to a discrete category prediction. However, we could also pass such
-    a mapping function as :code:`predictor_function` directly, which may be
-    helpful in complex use cases where we are predicting multiple discrete
-    values from one model.
-
-    When passing arbitrary functions as :code:`predictor_loss`, :code:`adversary_loss`,
-    or :code:`predictor_function`, one has to take care that the underlying backend
-    supports these functions. That is to say, one should not use
-    TensorFlow loss functions with PyTorch models for instance, foremostly
-    because a TensorFlow loss function may not work with PyTorch's automatic
-    differentation, and TensorFlow loss functions expect their parameters differently
-    than PyTorch loss functions expect their parameters.
+    The distribution types of the data are automatically assumed,
+    and appropriate loss functions, decision functions and preprocessors
+    for the target and sensitive features are chosen accordingly.
+    For more information, visit the user guide. #FIXME how to reference?
 
     Parameters
     ----------
@@ -98,11 +64,18 @@ class AdversarialFairness(BaseEstimator):
         You can also pass in a BackendEngine class.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
-        The predictor model to train. If a list of integers
-        :math:`[n_1, n_2, \dots, n_k]` is passed, a fully
-        connected neural network with sigmoidal activation functions is
-        constructed with :math:`k` hidden layers that have :math:`n_i` nodes
-        respectively. If :code:`backend` is specified, we cannot pass a model
+        The predictor model to train. 
+        Instead of a neural network model, we can pass a list of keywords
+        :math:`k_1, k_2, \dots` that indicate either
+        the number of nodes :math:`k_i` (if :math:`k_i` is integer) or a keyword
+        that indicates an activation function (if :math:`k_i` is a string) or
+        a layer or activation function instance directly (if :math:`k_i` is
+        callable).
+        However, the number of nodes in the input
+        and output layer are automatically inferred from data, and the final
+        activation function (such as softmax for categorical
+        predictors) are inferred from data.
+        If :code:`backend` is specified, we cannot pass a model
         that uses a different backend.
 
     adversary_model : list, torch.nn.Module, tensorflow.keras.Model
@@ -486,6 +459,9 @@ class AdversarialFairness(BaseEstimator):
 
         start_time = time()
         last_update_time = start_time
+
+        # logger = logging.getLogger(__name__) FIXME: use logger
+
         predictor_losses = [None]
         adversary_losses = []
         for epoch in range(self.epochs):
@@ -512,7 +488,7 @@ class AdversarialFairness(BaseEstimator):
                                 adversary_losses[-1],
                             ),
                             end="\n",
-                        )  # TODO: use logger?
+                        )
                 batch_slice = slice(
                     batch * self.batch_size,
                     min((batch + 1) * self.batch_size, X.shape[0]),
@@ -529,6 +505,8 @@ class AdversarialFairness(BaseEstimator):
                         return
             if self.shuffle and epoch != self.epochs - 1:
                 X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
+        
+        return self
 
     def partial_fit(self, X, y, *, sensitive_features):
         """
@@ -548,6 +526,8 @@ class AdversarialFairness(BaseEstimator):
         """
         X, Y, Z = self._validate_input(X, y, sensitive_features)
         self.backendEngine_.train_step(X, Y, Z)
+
+        return self
 
     def decision_function(self, X):
         """

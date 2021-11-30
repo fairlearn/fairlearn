@@ -229,6 +229,7 @@ adversary_model = AdversaryModel()
 # seems wise to initialize small weights,
 # so we set the gain low.
 
+torch.manual_seed(123)
 
 def weights_init(m):
     if isinstance(m, torch.nn.Linear):
