@@ -581,7 +581,7 @@ class AdversarialFairness(BaseEstimator):
         try:  # TODO check this
             check_is_fitted(self)
             is_fitted = True
-        except NotFittedError as e:
+        except NotFittedError:
             is_fitted = False
 
         if (not is_fitted) or (not self.warm_start):

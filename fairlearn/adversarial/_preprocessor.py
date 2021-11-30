@@ -9,7 +9,6 @@ from ._constants import (
 from sklearn.utils import check_array
 from sklearn.preprocessing import OneHotEncoder
 from pandas import Series, DataFrame
-from numpy import ndarray
 from sklearn.base import TransformerMixin
 from sklearn.utils.multiclass import type_of_target
 from numpy import all as np_all
