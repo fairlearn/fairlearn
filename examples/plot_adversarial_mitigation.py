@@ -11,21 +11,24 @@ Mitigating Fairness using Adversarial Mitigation
 # *Unwanted Biases with Adversarial Learning* as proposed by
 # `Zhang et al. 2018 <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_.
 #
-# In short, the authors take classic supervised learning setting in which
+# In short, the authors take the classic supervised learning setting in which
 # a predictor neural network is trained, and extend it with an adversarial
-# network that aims to predict the sensitive feature. Then, they train the
+# network that aims to predict the sensitive feature given these
+# predictions and possibly also given the true target. Then, they train the
 # predictor not only to minimize its own loss, but also minimize the predictive
-# ability of the adversarial.
+# ability of the adversarial. If this model converges properly,
+# the adversary will attain a loss equal to the entropy, so the adversary
+# can not
+# predict the sensitive features from the predictions.
 #
 # In short, we provide an implementation that supports:
 #
 # - Any predictor neural network implemented in either PyTorch or Tensorflow2
-# - Classification or regression
-# - Multiple sensitive features
+# - Classification (binary and categorical) or (multidimensional) regression
+# - Highly customizable parameters, allowing multi-output
+# prediction models and sensitive features.
 # - Two fairness objectives: Demographic parity or Equalized Odds
-#
-# This implementation follows closely the API of an `Estimator`
-# in scikit-learn.
+# - A scikit-learn compliant API
 
 
 # %%
@@ -138,7 +141,8 @@ mitigator.fit(X_prep_train, Y_train, sensitive_features=Z_train)
 
 # %%
 # Predict and evaluate. In particular, we trained the predictor for demographic
-# parity, so we are not only interested in the accuracy, but also in the selection
+# parity, so we are not only interested in the accuracy, but also
+# in the selection
 # rate.
 
 predictions = mitigator.predict(X_prep_test)
@@ -156,23 +160,31 @@ print(mf.by_group)
 # When using adversarial debiasing out-of-the-box, you may not yield such
 # good training results after the first attempt. In general, training
 # adversarial networks is hard, and you may need to tweak the
-# hyperparameters continuously. Example 2 will demonstrate some
+# hyperparameters continuously. Besides general scikit-learn algorithms
+# that finetune your estimator,
+# Example 2 will demonstrate some problem-specific
 # techniques we can use such as using dynamic hyperparameters,
-# validation, and early stopping. A more extensive list of advices is given here #TODO
+# validation, and early stopping to improve this method.
 
 # %%
 # Example 2: Finetuning
 # =====================
-# Adversarial Learning is inherently difficult because models can diverge quickly.
-# Intuitively, you should imagine that there are "very easy" local minima that the
-# models may converge to. For instance, if the predictor always outputs class=0,
-# then the adversary's objective is much easier, namely it only has to output the
-# most correlated sensitive feature to class=0. Such minima are very easily reached
-# unfortunately. #TODO this description is very bad at the moment, working on
-# understanding it:).
-#
-# So, to finetune our model and the training thereof, we start by defining our
-# neural networks in the way we'd like them and in the way we can easily tweak them.
+# Adversarial Learning is inherently difficult because of various issues,
+# such as mode collapse, divergence, and diminishing gradients.
+# In particular, mode collapse seems a real problem on this dataset: the
+# predictor and adversary trap themselves in a local minimum by favoring one
+# class (mode). Problems with diverging parameters may also occur, which
+# may be an indication of a bad choice of hyperparameters, such as a
+# learning rate that is too large. This problems one may encounter are
+# of course case specific, but general good practices when training
+# such models are: train slowly, ensuring the
+# losses remain balanced, and keep track of validation accuracies.
+# Additionally, we found that single hidden layer neural
+# networks work best for this use case.
+
+# In this example, we show some of these good practices in practice.
+# We start by defining our
+# neural networks explicitely so that it is more apparant.
 # We will be using PyTorch, but the same can be achieved using Tensorflow!
 
 
@@ -207,30 +219,33 @@ class AdversaryModel(torch.nn.Module):
 predictor_model = PredictorModel()
 adversary_model = AdversaryModel()
 # %%
-# Xavier initialization is more popular than PyTorch's default initialization, so
-# let's put that to the test. Note that I also initialize the biases, but this is
-# less common in practice. Intuitively, it seems wise to initialize small weights,
+# Xavier initialization is more popular than PyTorch's default initialization,
+# so
+# we might as well demonstrate this too. Note that I also
+# initialize the biases, but this is
+# less common in practice. Intuitively, it
+# seems wise to initialize small weights,
 # so we set the gain low.
-
-torch.manual_seed(123)
-
-gain = 0.1
 
 
 def weights_init(m):
     if isinstance(m, torch.nn.Linear):
-        torch.nn.init.xavier_normal_(m.weight.data, gain=gain)
-        m.bias.data.fill_(gain)
-        # torch.nn.init.xavier_normal_(m.bias.data, gain=gain)
+        torch.nn.init.xavier_normal_(m.weight.data, gain=0.1)
+        m.bias.data.fill_(0.1)
 
 
 predictor_model.apply(weights_init)
 adversary_model.apply(weights_init)
 
 # %%
-# Instead of only looking at training loss, we also take a look at some validation
-# metrics. For this, we chose the demographic parity difference to check to what
+# Instead of only looking at training loss, we also take a look at
+# some validation
+# metrics. Most importantly, we chose the demographic parity difference
+# to check to what
 # extent the constraint (demographic parity in this case) is satisfied.
+# We also look at the selection_rate to observe whether our model is
+# suffering from mode collapse, and we also calculate the accuracy on the
+# validation set as well.
 # We will pass this validation step to our model later.
 
 
@@ -285,7 +300,12 @@ def callbackfn(model, *args):
     # Validate (and early stopping)
     if step % 100 == 0:
         dp_diff, accuracy, selection_rate = validate(model)
-        if dp_diff < 0.01 and accuracy > 0.8:
+        if (
+            dp_diff < 0.01
+            and accuracy > 0.8
+            and selection_rate > 0.0
+            and selection_rate < 1.0
+        ):
             return True
 
 
@@ -316,9 +336,13 @@ mitigator.fit(X_prep_train, Y_train, sensitive_features=Z_train)
 validate(mitigator)
 
 # %%
-# We take a look at the results. Notice we achieve a much lower demographic parity
-# difference than in Exercise 1! This does come at the cost of some accuracy, but
-# such a tradeof is to be expected.
+# We take a look at the results. Notice we achieve a much lower demographic
+# parity
+# difference than in Exercise 1! This does come at the cost of some accuracy,
+# but
+# such a tradeof is to be expected as we are purposely mitigating
+# the unfairness that
+# was present in the data.
 
 predictions = mitigator.predict(X_prep_test)
 
@@ -332,7 +356,7 @@ mf = MetricFrame(
 print(mf.by_group)
 
 # %%
-# Example 2: Scikit-learn applications
+# Example 3: Scikit-learn applications
 # ====================================
 # AdversarialFairness is quite compliant with scikit-learn API, so functions
 # such as pipelining and model selection are applicable here. In particular,
@@ -344,10 +368,7 @@ print(mf.by_group)
 
 pipeline = Pipeline(
     [
-        (
-            "preprocessor",
-            ct
-        ),
+        ("preprocessor", ct),
         (
             "classifier",
             AdversarialFairnessClassifier(
