@@ -254,10 +254,17 @@ class PytorchEngine(BackendEngine):
                             layers.append(torch.nn.Sigmoid())
                         elif item.lower() == "softmax":
                             layers.append(torch.nn.Softmax())
+                        elif item.lower() == "relu":
+                            layers.append(torch.nn.ReLU())
+                        elif item.lower() == "leaky_relu":
+                            layers.append(torch.nn.LeakyReLU())
                         else:
                             raise ValueError(
                                 _MODEL_UNRECOGNIZED_STR.format(item)
                             )
+                        # TODO support more strings? Or better option?
+                        # possibly gather all activation classes, get __name__,
+                        # and do pattern matching.
                     else:
                         raise ValueError(_MODEL_UNRECOGNIZED_ITEM.format(item))
                 self.layers_ = torch.nn.ModuleList(layers)

@@ -21,7 +21,7 @@ Mitigating Fairness using Adversarial Mitigation
 # can not
 # predict the sensitive features from the predictions.
 #
-# In short, we provide an implementation that supports:
+# We provide an implementation that supports:
 #
 # - Any predictor neural network implemented in either PyTorch or Tensorflow2
 # - Classification (binary and categorical) or (multidimensional) regression
@@ -114,7 +114,9 @@ X_prep_test = ct.transform(X_test)
 # networks with sigmoid activations implemented in Fairlearn. We initialize
 # neural network constructors
 # by passing a list :math:`h_1, h_2, \dots` that indicate the number of nodes
-# :math:`h_i` per hidden layer :math:`i`. # FIXME
+# :math:`h_i` per hidden layer :math:`i`. You can also put strings in this list
+# to indicate certain activation functions, or just pass an initialized
+# activation function directly.
 #
 # The specific fairness
 # objective that we choose for this example is demographic parity, so we also
@@ -267,7 +269,7 @@ def validate(mitigator):
 # %%
 # We may define the optimizers however we like. In this case, we use the
 # suggestion from the paper to set the hyperparameters alpha and learning
-# rate (:math:`\mu`) to depend on the timestep such that :math:`alpha \mu
+# rate (:math:`\mu`) to depend on the timestep such that :math:`\alpha \cdot \mu
 # \rightarrow 0` as the timestep grows.
 
 predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.01)
