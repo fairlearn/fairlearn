@@ -231,6 +231,7 @@ adversary_model = AdversaryModel()
 
 torch.manual_seed(123)
 
+
 def weights_init(m):
     if isinstance(m, torch.nn.Linear):
         torch.nn.init.xavier_normal_(m.weight.data, gain=0.1)

@@ -8,7 +8,6 @@ from ._constants import (
     _KWARG_ERROR_MESSAGE,
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
-    _NO_DATA,
     _TRANSFORM_NO_PARAM,
     _TRANSFORMER_WEIRD_DIST_TYPE,
 )
@@ -64,7 +63,7 @@ class AdversarialFairness(BaseEstimator):
         You can also pass in a BackendEngine class.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
-        The predictor model to train. 
+        The predictor model to train.
         Instead of a neural network model, we can pass a list of keywords
         :math:`k_1, k_2, \dots` that indicate either
         the number of nodes :math:`k_i` (if :math:`k_i` is integer) or a keyword
@@ -305,9 +304,7 @@ class AdversarialFairness(BaseEstimator):
         ):
             if kw and kw < 0.0:
                 raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(
-                        kwname, "a non-negative number"
-                    )
+                    _KWARG_ERROR_MESSAGE.format(kwname, "a non-negative number")
                 )
         if self.batch_size <= 0.0 and self.batch_size != -1:
             raise ValueError(
@@ -478,8 +475,7 @@ class AdversarialFairness(BaseEstimator):
                                 " " * round(20 * (1 - progress)),
                                 epoch + 1,
                                 self.epochs,
-                                " "
-                                * (len(str(batch + 1)) - len(str(batches))),
+                                " " * (len(str(batch + 1)) - len(str(batches))),
                                 batch + 1,
                                 batches,
                                 ((last_update_time - start_time) / progress)
@@ -505,7 +501,7 @@ class AdversarialFairness(BaseEstimator):
                         return
             if self.shuffle and epoch != self.epochs - 1:
                 X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
-        
+
         return self
 
     def partial_fit(self, X, y, *, sensitive_features):
