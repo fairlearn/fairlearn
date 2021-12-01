@@ -7,7 +7,7 @@ from fairlearn.adversarial import AdversarialFairness
 from fairlearn.adversarial._constants import _IMPORT_ERROR_MESSAGE
 
 
-@pytest.mark.parametrize("library", [None, 'torch', 'tensorflow'])
+@pytest.mark.parametrize("library", ['auto', 'torch', 'tensorflow'])
 def test_no_library(library):
     expected_library = "torch or tensorflow" if library is None else library
     X = [[0]]
