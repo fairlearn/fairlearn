@@ -15,3 +15,5 @@ v0.7.1
 * Fixed a bug whereby passing a custom :code:`grid` object to a :code:`GridSearch`
   reduction would result in a :code:`KeyError` if the column names were not ordered
   integers.
+* :class:`~fairlearn.preprocessing.CorrelationRemover` now exposes
+  :code:`n_features_in_` and :code:`feature_names_in_`.

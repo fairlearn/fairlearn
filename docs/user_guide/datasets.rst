@@ -73,6 +73,7 @@ In scikit-learn version 1.2, the dataset will be removed.
 
 The dataset contains the following columns:
 
+<<<<<<< HEAD
 .. list-table::
    :header-rows: 1
    :widths: 7 30
@@ -108,6 +109,26 @@ The dataset contains the following columns:
       - % lower status of the population
    *  - MEDV
       - Median value of owner-occupied homes in $1000’s
+=======
+============ ==========================================================================
+Column Name   Description                                                              
+============ ==========================================================================
+CRIM         per capita crime rate by town                                         
+ZN           proportion of residential land zoned for lots over 25,000 sq.ft.
+INDUS        proportion of non-retail business acres per town
+CHAS         Charles River dummy variable (= 1 if tract bounds river; 0 otherwise)
+NOX          nitric oxides concentration (parts per 10 million)
+RM           average number of rooms per dwelling
+AGE          proportion of owner-occupied units built prior to 1940
+DIS          weighted distances to five Boston employment centers
+RAD          index of accessibility to radial highways
+TAX          full-value property-tax rate per $10,000
+PTRATIO      pupil-teacher ratio by town
+B            1000(Bk - 0.63)^2 where Bk is the proportion of Black people by town
+LSTAT        % lower status of the population
+MEDV         Median value of owner-occupied homes in $1000’s
+============ ============================================================================
+>>>>>>> 1585b1845afec0d40c8f88dd5a829d00ff3fc969
 
 The cells below show basic summary statistics about the data, the data types of the 
 columns, and the number of missing values.
@@ -135,6 +156,7 @@ visit :mod:`fairlearn.datasets`.
     >>> pd.set_option('display.width', 80)
     >>> X, y = fetch_boston(as_frame=True, return_X_y=True)
     >>> boston_housing=pd.concat([X, y], axis=1)
+<<<<<<< HEAD
     >>> with pd.option_context('expand_frame_repr', False):
     ...    boston_housing.head()
           CRIM    ZN  INDUS CHAS    NOX     RM   AGE     DIS RAD    TAX  PTRATIO       B  LSTAT  MEDV
@@ -144,6 +166,25 @@ visit :mod:`fairlearn.datasets`.
     3  0.03237   0.0   2.18    0  0.458  6.998  45.8  6.0622   3  222.0     18.7   394.63   2.94  33.4
     4  0.06905   0.0   2.18    0  0.458  7.147  54.2  6.0622   3  222.0     18.7   396.90   5.33  36.2
 
+=======
+    >>> boston_housing.head()
+               CRIM    ZN  INDUS CHAS    NOX     RM   AGE     DIS RAD    TAX  PTRATIO  \
+        0  0.00632  18.0   2.31    0  0.538  6.575  65.2  4.0900   1  296.0     15.3   
+        1  0.02731   0.0   7.07    0  0.469  6.421  78.9  4.9671   2  242.0     17.8   
+        2  0.02729   0.0   7.07    0  0.469  7.185  61.1  4.9671   2  242.0     17.8   
+        3  0.03237   0.0   2.18    0  0.458  6.998  45.8  6.0622   3  222.0     18.7   
+        4  0.06905   0.0   2.18    0  0.458  7.147  54.2  6.0622   3  222.0     18.7   
+
+                B  LSTAT  MEDV  
+        0  396.90   4.98  24.0  
+        1  396.90   9.14  21.6  
+        2  392.83   4.03  34.7  
+        3  394.63   2.94  33.4  
+        4  396.90   5.33  36.2  
+       <BLANKLINE>
+       [5 rows x 14 columns]
+    
+>>>>>>> 1585b1845afec0d40c8f88dd5a829d00ff3fc969
 .. _boston_dataset_issues:
 
 Dataset Issues

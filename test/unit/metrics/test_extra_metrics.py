@@ -36,17 +36,17 @@ class TestGetLabelsForConfusionMatrix:
         r1 = _get_labels_for_confusion_matrix([-1], None)
         assert np.array_equal(r1, [-1, 1])
         r2 = _get_labels_for_confusion_matrix([1], None)
-        assert np.array_equal(r2, [None, 1])
+        assert np.array_equal(r2, [np.iinfo(np.int64).min, 1])
 
     def test_single_value_numeric_pos_label(self):
         r0 = _get_labels_for_confusion_matrix([0], 3)
         assert np.array_equal(r0, [0, 3])
         r1 = _get_labels_for_confusion_matrix([0], 0)
-        assert np.array_equal(r1, [None, 0])
+        assert np.array_equal(r1, [np.iinfo(np.int64).min, 0])
 
     def test_single_value_alpha_pos_label(self):
         r0 = _get_labels_for_confusion_matrix(['a'], 'a')
-        assert np.array_equal(r0, [None, 'a'])
+        assert np.array_equal(r0, [np.iinfo(np.int64).min, 'a'])
         r1 = _get_labels_for_confusion_matrix(['a'], 0)
         assert np.array_equal(r1, ['a', 0])
 

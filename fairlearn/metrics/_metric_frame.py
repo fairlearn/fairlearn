@@ -95,7 +95,7 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
 
 
 class MetricFrame:
-    """Collection of disaggregated metric values.
+    r"""Collection of disaggregated metric values.
 
     This data structure stores and manipulates disaggregated values for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
@@ -189,6 +189,76 @@ class MetricFrame:
 
         .. deprecated:: 0.7.0
             `metric` will be removed in version 0.10.0, use `metrics` instead.
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import MetricFrame, selection_rate
+    >>> from sklearn.metrics import accuracy_score
+    >>> import pandas as pd
+    >>> y_true = [1,1,1,1,1,0,0,1,1,0]
+    >>> y_pred = [0,1,1,1,1,0,0,0,1,1]
+    >>> sex = ['Female']*5 + ['Male']*5
+    >>> metrics = {"selection_rate": selection_rate}
+    >>> mf1 = MetricFrame(
+    ...      metrics=metrics,
+    ...      y_true=y_true,
+    ...      y_pred=y_pred,
+    ...      sensitive_features=sex)
+
+    Access the disaggregated metrics via a pandas Series
+
+    >>> mf1.by_group # doctest: +NORMALIZE_WHITESPACE
+                        selection_rate
+    sensitive_feature_0
+    Female                         0.8
+    Male                           0.4
+
+    Access the largest difference, smallest ratio, and worst case performance
+
+    >>> print(f"difference: {mf1.difference()[0]:.3}\t"
+    ...      f"ratio: {mf1.ratio()[0]:.3}\t"
+    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    ...# doctest: +NORMALIZE_WHITESPACE
+    difference: 0.4     ratio: 0.5      max across groups: 0.8
+
+    You can also evaluate multiple metrics by providing a dictionary
+
+    >>> metrics_dict = {"accuracy":accuracy_score, "selection_rate": selection_rate}
+    >>> mf2 = MetricFrame(
+    ...      metrics=metrics_dict,
+    ...      y_true=y_true,
+    ...      y_pred=y_pred,
+    ...      sensitive_features=sex)
+
+    Access the disaggregated metrics via a pandas DataFrame
+
+    >>> mf2.by_group # doctest: +NORMALIZE_WHITESPACE
+                        accuracy selection_rate
+    sensitive_feature_0
+    Female                   0.8            0.8
+    Male                     0.6            0.4
+
+    The largest difference, smallest ratio, and the maximum and minimum values
+    across the groups are then all pandas Series, for example:
+
+    >>> mf2.difference()
+    accuracy          0.2
+    selection_rate    0.4
+    dtype: object
+
+    You'll probably want to view them transposed
+
+    >>> pd.DataFrame({'difference': mf2.difference(),
+    ...               'ratio': mf2.ratio(),
+    ...               'group_min': mf2.group_min(),
+    ...               'group_max': mf2.group_max()}).T
+               accuracy selection_rate
+    difference      0.2            0.4
+    ratio          0.75            0.5
+    group_min       0.6            0.4
+    group_max       0.8            0.8
+
+    More information about plotting metrics can be found in the following section: :ref:`plot`
     """
 
     # The deprecation decorator does two things:
