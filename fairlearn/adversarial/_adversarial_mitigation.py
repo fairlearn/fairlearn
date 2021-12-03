@@ -268,9 +268,6 @@ class AdversarialFairness(BaseEstimator):
         self.warm_start = warm_start
         self.random_state = random_state
 
-        # FIXME Want to get rid of this variable, but check_if_fitted can be expensive?
-        self._setup = False
-
     def __setup(self, X, Y, Z):
         """
         Initialize the entire model from the parameters and the given data.
