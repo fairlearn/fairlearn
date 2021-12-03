@@ -441,11 +441,11 @@ class AdversarialFairness(BaseEstimator):
         X : numpy.ndarray
             Two-dimensional numpy array containing training data
 
-        y : numpy.ndarray
-            Two-dimensional numpy array containing training targets
+        y : array
+            Array-like containing training targets
 
-        sensitive_features : numpy.ndarray
-            Two-dimensional numpy array containing the sensitive features of the
+        sensitive_features : array
+            Array-like containing the sensitive features of the
             training data.
         """
         X, Y, Z = self._validate_input(X, y, sensitive_features)
@@ -513,11 +513,11 @@ class AdversarialFairness(BaseEstimator):
         X : numpy.ndarray
             Two-dimensional numpy array containing training data
 
-        y : numpy.ndarray
-            Two-dimensional numpy array containing training targets
+        y : array
+            Array-like containing training targets
 
-        sensitive_features : numpy.ndarray
-            Two-dimensional numpy array containing the sensitive feature of the
+        sensitive_features : array
+            Array-like containing the sensitive feature of the
             training data.
         """
         X, Y, Z = self._validate_input(X, y, sensitive_features)
@@ -537,7 +537,7 @@ class AdversarialFairness(BaseEstimator):
         Returns
         -------
         Y_pred : numpy.ndarray
-            Two-dimensional array containing the model predictions
+            Two-dimensional array containing the model's (soft-)predictions
         """
         check_is_fitted(self)
         X = check_X(X)
@@ -556,9 +556,9 @@ class AdversarialFairness(BaseEstimator):
 
         Returns
         -------
-        Y_pred : numpy.ndarray
-            Two-dimensional array containing the model predictions fed through
-            the :code:`predictor_function`
+        Y_pred : array
+            array-like containing the model's predictions fed through
+            the (discrete) :code:`predictor_function`
         """
         check_is_fitted(self)
         X = check_X(X)
