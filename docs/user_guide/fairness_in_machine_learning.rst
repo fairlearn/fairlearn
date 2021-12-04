@@ -194,6 +194,24 @@ group loss primarily seeks to mitigate quality-of-service harms. Equalized
 odds and equal opportunity can be used as a diagnostic for both allocation
 harms as well as quality-of-service harms.
 
+*Ranking*:
+
+Fairlearn includes two constraints for rankings, based on exposure: a measure for the amount of
+attention an instance is expected to receive, based on their position in the ranking. Exposure is
+computed as a logarithmic discount :math:`\frac{1}{log(1+i)}` for each position :math:`i`, as used
+in discounted cumulative gain (DCG).
+
+* *Exposure*: We try to allocate the exposure that each item gets fairly across the groups.
+  A ranking :math:`\tau` has a fair exposure allocation under a distribution over :math:`(X,A,Y)`,
+  if its ranking for :math:`\tau(X)` is statistically independent over sensitive feature:math:`A`.
+  [#6]_
+
+* *Proportional exposure*: We try to keep the exposure that each item gets proportional to its
+  "ground-truth" relevance. Otherwise small differences in relevance can lead to huge differences
+  in exposure. A ranking :math:`\tau` satisfies parity in quality-of-service under
+  a distribution over :math:`(X,A,Y)`, if its ranking for :math:`\tau(X)` is statistically
+  proportional to :math:`Y`, independent over sensitive feature :math:`A`. [#6]_
+
 Disparity metrics, group metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -421,3 +439,6 @@ the algorithm may impact the intended outcomes of a given model.
 
    .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
       <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
+
+   .. [#6] Singh, Joachims `"Fairness of Exposure in Rankings"
+      <https://dl.acm.org/doi/10.1145/3219819.3220088>`_, KDD, 2018.
