@@ -86,8 +86,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         self.validate_threshold_dict_keys()
 
     def validate_threshold_dict_keys(self):
-        """Check if all keys of :code:`threshold_dict` are of the same type"""
-
+        """Check if all keys of :code:`threshold_dict` are of the same type."""
         keys = list(self.threshold_dict.keys())
 
         if len(keys) > 1:
@@ -100,7 +99,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
     def reformat_threshold_dict_keys(self):
         """Reformats the keys of the provided :code: `threshold_dict`.
-        This is necessary to check to which group a sample belongs, after 
+
+        This is necessary to check to which group a sample belongs, after
         :code: `_validate_and_reformat_input` is called on the data.
         """
         new_keys_dict = {}
@@ -155,15 +155,15 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         return self
 
     def predict(self, X, *, sensitive_features):
-        """Predict using the group-specific thresholds provided in
-        :code: `threshold_dict`.
+        """Predict using the group-specific thresholds provided in :code: `threshold_dict`.
 
         Parameters
         ----------
         X : numpy.ndarray or pandas.DataFrame
             The feature matrix
         sensitive_features : numpy.ndarray, list, pandas.DataFrame,\
-            or pandas.Series sensitive features to identify groups by
+            or pandas.Series
+            sensitive features to identify groups by
 
         Returns
         -------
