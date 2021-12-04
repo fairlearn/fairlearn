@@ -116,6 +116,35 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         self.threshold_dict = new_keys_dict
 
+    def check_for_unseen_sf_values(self, sensitive_feature_vector):
+        """Checks if there are sensitive feature value(s) (cominations),
+        that are not mentioned in :code: `threshold_dict`.
+
+        Returns
+        -------
+        Warning message if there are unseen feature value(s) (cominations),
+        None if not
+        """
+        known_sf_values = list(self.threshold_dict.keys())
+
+        new_sf_values = []
+
+        for sf_value in sensitive_feature_vector:
+            if (sf_value not in known_sf_values) and \
+                    (sf_value not in new_sf_values):
+
+                new_sf_values.append(sf_value)
+
+        if new_sf_values:
+
+            msg = 'The following groups are provided at predict time,\
+                    but not mentioned in `threshold_dict`: '
+
+            for new_sf in new_sf_values:
+                msg += ' {}'.format(new_sf)
+
+        return msg if new_sf_values else None
+
     def fit(self, X, y, **kwargs):
         """Fit the estimator.
 
@@ -191,12 +220,10 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             self.reformat_threshold_dict_keys()
 
         # warn if there are sensitive features not in threshold dict
-        sf_values = list(self.threshold_dict.keys())
-        if not all(sf_value in sf_values for sf_value in sensitive_feature_vector):
-            # Throw warning that we there as combi not in threshold_dict
-            # I will improve this warning to also mention which specific values are
-            # found in sensitive_feature_vector but not in threshold_dict
-            warn('combi not found in threshold_dict')
+        potential_msg = \
+            self.check_for_unseen_sf_values(sensitive_feature_vector)
+        if potential_msg:
+            warn(potential_msg)
 
         final_predictions = 0.0*base_predictions_vector
 
