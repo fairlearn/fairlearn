@@ -117,8 +117,10 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         self.threshold_dict = new_keys_dict
 
     def check_for_unseen_sf_values(self, sensitive_feature_vector):
-        """Checks if there are sensitive feature value(s) (cominations),
-        that are not mentioned in :code: `threshold_dict`.
+        """Check for unseen sensitive feature values.
+
+        Checks if there are sensitive feature value(s) (cominations),
+         that are not mentioned in :code: `threshold_dict`.
 
         Returns
         -------
