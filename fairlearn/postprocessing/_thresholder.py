@@ -28,15 +28,52 @@ from postprocessing._constants import (
 
 
 class Thresholder(BaseEstimator, MetaEstimatorMixin):
-    r"""Create my own description here.
+    r"""A classifier that uses group-specific thresholds for prediction.
 
     Parameters
-    //Todo
+    ----------
+    estimator : object
+        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
+        whose output is postprocessed.
+
+    threshold_dict : dict
+        Dictionary that maps sensitive feature values to group-specific thresholds
+
+    prefit : bool, default=False
+        If True, avoid refitting the given estimator. Note that when used with
+        :func:`sklearn.model_selection.cross_val_score`,
+        :class:`sklearn.model_selection.GridSearchCV`, this will result in an
+        error. In that case, please use ``prefit=False``.
+
+    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
+            }, default='auto'
+
+        Defines which method of the ``estimator`` is used to get the output
+        values.
+
+        - 'auto': use one of ``predict_proba``, ``decision_function``, or
+          ``predict``, in that order.
+        - 'predict_proba': use the second column from the output of
+          `predict_proba`. It is assumed that the second column represents the
+          positive outcome.
+        - 'decision_function': use the raw values given by the
+          `decision_function`.
+        - 'predict': only use if estimator is a regressor. Uses the regression 
+        values given by `predict`.
+
+    Notes
+    -----
+    The procedure is based on the algorithm of
+    `Kamiran et al. (2012) <>
+    `Hardt et al. (2016) <https://ieeexplore.ieee.org/document/6413831>`_ [1]_.
 
     References
     ----------
-    //Todo
-
+    .. [1] F. Kamiran, A. Karim and X. Zhang, 
+        "Decision Theory for Discrimination-Aware Classification," 
+        2012 IEEE 12th International Conference on Data Mining, 2012, 
+        pp. 924-929, doi: 10.1109/ICDM.2012.45.
+        Available: https://ieeexplore.ieee.org/document/6413831
     """
 
     def __init__(self, estimator, threshold_dict, prefit=False,
@@ -49,23 +86,23 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         self.validate_threshold_dict_keys()
 
     def validate_threshold_dict_keys(self):
-        """Add info"""
+        """Check if all keys of :code:`threshold_dict` are of the same type"""
 
         keys = list(self.threshold_dict.keys())
 
-        # check if all keys are of the same dtype
         if len(keys) > 1:
-            same_type = all(isinstance(key, type(keys[0])) for key in keys[1:])
+            same_type = \
+                all(isinstance(key, type(keys[0])) for key in keys[1:])
 
             if not same_type:
-                warn("The keys of threshold_dict are not of the same type.")
+                warn("Not all the keys of 'threshold_dict' are of the same\
+                type. Please make sure that all keys are of the same type")
 
     def reformat_threshold_dict_keys(self):
-        """Add info"""
-
-        # If there are multiple sensitive features this reformatting is
-        # necessary in order to be able to warn the user if there are sensitive features
-        # provided at predict time which are not mentioned in threshold_dict
+        """Reformats the keys of the provided :code: `threshold_dict`.
+        This is necessary to check to which group a sample belongs, after 
+        :code: `_validate_and_reformat_input` is called on the data.
+        """
         new_keys_dict = {}
         for sf_tuple, threshold in self.threshold_dict.items():
 
@@ -84,6 +121,13 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         If `prefit` is set to `True` then the base estimator is kept as is.
         Otherwise it is fitted from the provided arguments.
+
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            The feature matrix
+        y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+            The label vector
         """
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
@@ -111,7 +155,23 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         return self
 
     def predict(self, X, *, sensitive_features):
-        """Predict stuff, write better explanation later."""
+        """Predict using the group-specific thresholds provided in
+        :code: `threshold_dict`.
+
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            The feature matrix
+        sensitive_features : numpy.ndarray, list, pandas.DataFrame,\
+            or pandas.Series sensitive features to identify groups by
+
+        Returns
+        -------
+        numpy.ndarray
+            The prediction in the form of a scalar or vector.
+            If `X` represents the data for a single example the result will be
+            a scalar. Otherwise the result will be a vector.
+        """
         check_is_fitted(self)
 
         # get soft predictions
