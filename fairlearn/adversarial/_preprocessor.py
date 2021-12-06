@@ -22,19 +22,12 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
     Applies one-hot-encoding to categorical columns, 'passthrough' to
     numerical columns.
-
-    Attributes
-    ----------
-    dist_type_ : str
-        After succesfully fitting to data,
-        :code:`dist_type_` is one of "binary", "category", "continuous".
-        This indicates the assumption about the given data.
     """
 
     def __init__(self, dist_assumption="auto"):
         """
         Initialize empty transformers with the given distribution assumption.
-        
+
         Parameters
         ----------
         dist_assumption : str, default = "auto"
@@ -48,52 +41,6 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
             you must build your own transformer instead.
         """
         self.dist_assumption = dist_assumption
-
-    # NOTE : could make this part of AdversarialFairness, and let
-    # AdversarialFairness accept distribution assumption instead of the transf.
-    def _get_type(self, data, inferred):
-        if inferred == "multilabel-indicator":
-            #  Design choice: multiple binary columns are not supported.
-            #                 multiple columns may only be one-hot encoding
-            # FIXME provide warning and switch to binary2d
-            # or not? because it could be multiple categorical... who knows!
-            if not np_all(np_sum(data, axis=1) == 1):
-                raise ValueError(_TYPE_CHECK_ERROR.format("category"))
-
-        # Match inferred with dist_assumption
-        if inferred == "binary" and self.dist_assumption in [
-            "binary",
-            "classification",
-            "auto",
-        ]:
-            return "binary"
-        elif inferred in [
-            "multiclass",
-            "multilabel-indicator",
-        ] and self.dist_assumption in [
-            "category",
-            "classification",
-            "auto",
-        ]:
-            return "category"
-        elif inferred in [
-            "continuous",
-            "continuous-multioutput",
-        ] and self.dist_assumption in [
-            "continuous",
-            "auto",
-        ]:
-            return "continuous"
-        elif inferred == "multiclass-multioutput":
-            raise NotImplementedError("multiclass-multioutput not supported")
-            # NOTE we can actually implement this as concatenations of loss
-            # functions, but that is up to the future user to decide for now.
-        elif inferred == "unknown":
-            raise ValueError(_TYPE_UNKNOWN_ERROR)
-
-        raise ValueError(
-            _TYPE_COMPLIANCE_ERROR.format(self.dist_assumption, inferred)
-        )
 
     def _prep(self, X, dtype=None, init=False):
         """
@@ -112,20 +59,20 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         """
         if init:
             self.in_type_ = type(X)
-            self.inferred_type_ = type_of_target(X)
-            self.dist_type_ = self._get_type(X, self.inferred_type_)
+            self.inferred_type_ = _infer_type(X)
+            self.dist_type_ = _get_type(X, self.dist_assumption)
         else:
             if not isinstance(X, self.in_type_):
                 raise ValueError(
                     _ARG_ERROR_MESSAGE.format("X", "of type " + self.in_type_)
                 )
-            inferred = type_of_target(X)
+            inferred = _infer_type(X)
             if not inferred == self.inferred_type_:
                 raise ValueError(
                     "Inferred distribution type of X does not match "
                     + self.inferred_type_
                 )
-            if not self._get_type(X, inferred) == self.dist_type_:
+            if not _get_type(X, self.dist_assumption) == self.dist_type_:
                 raise ValueError(_TYPE_CHECK_ERROR.format(self.dist_type_))
 
         if self.in_type_ == DataFrame:
@@ -198,3 +145,54 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
             inverse = inverse.tolist()
 
         return inverse
+
+
+def _infer_type(data):
+    """Memoize of type_of_target without prohibiting data garbage-disposal."""
+    if hasattr(data, "____inferred_type____"):
+        return data.____inferred_type____
+    inferred = type_of_target(data)
+    # data.____inferred_dtype____ = inferred  # FIXME
+    return inferred
+
+
+def _get_type(data, assumption):
+    """Get the type (binary, category, continuous) of the data under assump."""
+    inferred = _infer_type(data)
+    if inferred == "multilabel-indicator":
+        #  Design choice: multiple binary columns are not supported.
+        #                 multiple columns may only be one-hot encoding
+        # FIXME provide warning and switch to binary2d
+        # or not? because it could be multiple categorical... who knows!
+        if not np_all(np_sum(data, axis=1) == 1):
+            raise ValueError(_TYPE_CHECK_ERROR.format("category"))
+
+    # Match inferred with dist_assumption
+    if inferred == "binary" and assumption in [
+        "binary",
+        "classification",
+        "auto",
+    ]:
+        return "binary"
+    elif inferred in ["multiclass", "multilabel-indicator"] and assumption in [
+        "category",
+        "classification",
+        "auto",
+    ]:
+        return "category"
+    elif inferred in [
+        "continuous",
+        "continuous-multioutput",
+    ] and assumption in [
+        "continuous",
+        "auto",
+    ]:
+        return "continuous"
+    elif inferred == "multiclass-multioutput":
+        raise NotImplementedError("multiclass-multioutput not supported")
+        # NOTE we can actually implement this as concatenations of loss
+        # functions, but that is up to the future user to decide for now.
+    elif inferred == "unknown":
+        raise ValueError(_TYPE_UNKNOWN_ERROR)
+
+    raise ValueError(_TYPE_COMPLIANCE_ERROR.format(assumption, inferred))

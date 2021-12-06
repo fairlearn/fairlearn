@@ -6,6 +6,7 @@ from ._constants import (
     _NOT_IMPLEMENTED,
     _DIST_TYPE_NOT_IMPLEMENTED,
     _NO_LOSS,
+    _LIST_MODEL_UNSUPPORTED,
 )
 from sklearn.utils import shuffle
 from numpy import ndarray
@@ -33,14 +34,17 @@ class BackendEngine:
         n_Z_features = base.z_transform_.n_features_out_
         # Set up predictor_model
         if isinstance(base.predictor_model, list):
+            if not isinstance(base.predictor_loss_, str):
+                raise ValueError(
+                    _LIST_MODEL_UNSUPPORTED.format("predictor", "predictor")
+                )
             predictor_list_nodes = (
                 [n_X_features] + base.predictor_model + [n_Y_features]
             )
-            if hasattr(base.y_transform_, "dist_type_"):
-                if base.y_transform_.dist_type_ == "binary":
-                    predictor_list_nodes.append("sigmoid")
-                elif base.y_transform_.dist_type_ == "category":
-                    predictor_list_nodes.append("softmax")
+            if base.predictor_loss_ == "binary":
+                predictor_list_nodes.append("sigmoid")
+            elif base.predictor_loss_ == "category":
+                predictor_list_nodes.append("softmax")
 
             self.predictor_model = self.get_model(
                 list_nodes=predictor_list_nodes
@@ -57,15 +61,18 @@ class BackendEngine:
 
         # Set up adversary_model
         if isinstance(base.adversary_model, list):
+            if not isinstance(base.adversary_loss_, str):
+                raise ValueError(
+                    _LIST_MODEL_UNSUPPORTED.format("adversary", "adversary")
+                )
             adversarial_in = n_Y_features * (2 if base.pass_y_ else 1)
             adversary_list_nodes = (
                 [adversarial_in] + base.adversary_model + [n_Z_features]
             )
-            if hasattr(base.z_transform_, "dist_type_"):
-                if base.z_transform_.dist_type_ == "binary":
-                    adversary_list_nodes.append("sigmoid")
-                elif base.z_transform_.dist_type_ == "category":
-                    adversary_list_nodes.append("softmax")
+            if base.adversary_loss_ == "binary":
+                adversary_list_nodes.append("sigmoid")
+            elif base.adversary_loss_ == "category":
+                adversary_list_nodes.append("softmax")
 
             self.adversary_model = self.get_model(
                 list_nodes=adversary_list_nodes
@@ -81,17 +88,17 @@ class BackendEngine:
             )
 
         # Set up losses
-        if callable(base.predictor_loss):
-            self.predictor_loss = base.predictor_loss
-        elif hasattr(base.y_transform_, "dist_type_"):
-            self.predictor_loss = self.get_loss(base.y_transform_.dist_type_)
+        if callable(base.predictor_loss_):
+            self.predictor_loss = base.predictor_loss_
+        elif isinstance(base.predictor_loss_, str):
+            self.predictor_loss = self.get_loss(base.predictor_loss_)
         else:
             raise ValueError(_NO_LOSS.format("predictor_loss"))
 
-        if callable(base.adversary_loss):
-            self.adversary_loss = base.adversary_loss
-        elif hasattr(base.z_transform_, "dist_type_"):
-            self.adversary_loss = self.get_loss(base.z_transform_.dist_type_)
+        if callable(base.adversary_loss_):
+            self.adversary_loss = base.adversary_loss_
+        elif isinstance(base.adversary_loss_, str):
+            self.adversary_loss = self.get_loss(base.adversary_loss_)
         else:
             raise ValueError(_NO_LOSS.format("adversary_loss"))
 

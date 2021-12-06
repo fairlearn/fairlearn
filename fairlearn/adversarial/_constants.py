@@ -12,18 +12,12 @@ _INVALID_DATA = (
     "Data of '{}' can not be interpreted. Only continuous data or array "
     + "with only 0s and 1s."
 )
-_TRANSFORMER_WEIRD_DIST_TYPE = (
-    "Transformer {} has an unsupported dist_type_ {}. "
-    + "Make sure the provided dist_type_ is either "
-    + '"binary", "category", or "continuous".'
-)
 _PREDICTION_FUNCTION_AMBIGUOUS = (
     "Can not interpret prediction_function. Please provide a callable as "
     + "key-word argument that maps soft-probabilities "
     + "(or more precisely, predictor_model output) "
-    + "to discrete prediction. Or, pass a Transformer with the `transformer` "
-    + "key-word that has a dist_type_ attribute that "
-    + "a BackendEngine can use to interpret a loss function."
+    + "to discrete prediction. Or, pass a "
+    + "key-word such as 'binary', 'category', or 'continuous'."
 )
 _DIST_TYPE_NOT_IMPLEMENTED = (
     "BackendEngine {} has no loss function defined for the given "
@@ -37,14 +31,7 @@ _NOT_IMPLEMENTED = "Interface-class method has not been implemented"
 _NO_DATA = "Haven't seen data yet. Call fit or partial_fit first to set up."
 _NO_LOSS = (
     "Can not interpret {}. Please provide a callable as key-word argument. "
-    + "Or, pass a Transformer with the `transformer` key-word that "
-    + "has a dist_type_ attribute that "
-    + "a BackendEngine can use to interpret a loss function."
-)
-_TRANSFORM_NO_PARAM = (
-    ". Make sure your provided transform accepts a distribution "
-    + 'keyword (such as "binary" and "category") in '
-    + "its __init__"
+    + "Or, pass 'binary', 'category', or 'continuous'. "
 )
 _MODEL_UNRECOGNIZED_STR = (
     "Key-word argument predictor_model or adversary_model received "
@@ -59,3 +46,7 @@ _MODEL_UNRECOGNIZED_ITEM = (
     + "function) or a supported keyword (string)."
 )
 _TYPE_UNKNOWN_ERROR = "Unknown label type."
+_LIST_MODEL_UNSUPPORTED = (
+    "Passing model {}_model as list of keywords is not "
+    + "supported when the accompanying {}_loss is not a keyword."
+)

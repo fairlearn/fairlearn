@@ -187,11 +187,14 @@ We also offer some shortcuts for binary, categorical, and continuous data
 that you may use to further specify appropriate types. This is useful when
 you want to be sure that the inferred distribution type is what you expect.
 For instance, to indicate that the predictions should be categorical, you
-pass :code:`y_distribution='category'`. For a list of keywords and their
-implications, see the Table below. Additionally, there are keywords
-:code:`auto` and :code:`classification`. The former indicates to automatically
-infer the distribution (which is the default keyword), and the latter indicates
-to select either :code:`binary` or :code:`category`.
+pass :code:`predictor_loss='category'`
+and :code:`prediction_function='category'`.
+For a list of keywords and their
+implications, see the Table below. 
+.. Additionally, there are keywords
+.. :code:`auto` and :code:`classification`. The former indicates to automatically
+.. infer the distribution (which is the default keyword), and the latter indicates
+.. to select either :code:`binary` or :code:`category`.
 
 .. list-table::
    :header-rows: 1

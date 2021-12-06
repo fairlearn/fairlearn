@@ -8,13 +8,14 @@ from ._constants import (
     _KWARG_ERROR_MESSAGE,
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
-    _TRANSFORM_NO_PARAM,
-    _TRANSFORMER_WEIRD_DIST_TYPE,
 )
 from ._backend_engine import BackendEngine
 from ._pytorch_engine import PytorchEngine
 from ._tensorflow_engine import TensorflowEngine
-from ._preprocessor import FloatTransformer
+from ._preprocessor import (
+    FloatTransformer,
+    _get_type,
+)
 from sklearn.base import (
     ClassifierMixin,
     RegressorMixin,
@@ -48,10 +49,18 @@ class AdversarialFairness(BaseEstimator):
     model. Instead, even if we are dealing with discrete predictions, we may output
     the sigmoidal or soft-max, but we may not output discrete integer predictions.
 
-    The distribution types of the data are automatically assumed,
-    and appropriate loss functions, decision functions and preprocessors
-    for the target and sensitive features are chosen accordingly.
-    For more information, visit the user guide. #FIXME how to reference?
+    The distribution types of :code:`y` and :code:`sensitive_features`
+    are set by their preprocessor :code:`y_transform` and :code:`z_transform`
+    respectively. The default transformer :code:`FloatTransformer("auto")`
+    attempts to automatically infer
+    whether to assume binomial, multinomial, or normally distributed data.
+    You can force the transformer to assume one of the above by passing
+    :code:`FloatTransformer("binary")`, :code:`FloatTransformer("category")`,
+    :code:`FloatTransformer("continuous")` instead.
+    Loss functions and decision functions
+    for the target and sensitive features are also predefined for keywords
+    "binary", "category", and "continuous"
+    For more information, visit the user guide.
 
     Parameters
     ----------
@@ -82,36 +91,42 @@ class AdversarialFairness(BaseEstimator):
         :code:`predictor_model`.
 
     predictor_loss : str, callable, default = 'auto'
-        Either the string :code:`'auto'` or a callable. The string
+        Either the string
+        :code:`'auto'`, :code:`'binary'`, :code:`'category'`,
+        :code:`'continuous'`, or a callable. The string
         :code:`'auto'` indicates to infer the loss
         from the distribution type of :code:`y`
-        (computed in :code:`dist_type_` of
-        the :code:`y_transform`). A callable should be a
+        The string-keyword indicates a
+        distribution type, see user guide for more information.
+        A callable should be a
         loss function with an API that follows the chosen backend (torch or
         tensorflow). Note that torch and tensorflow loss functions don't agree
         on parameter order, as in Pytorch it is :math:`l(\hat y, y)` while in
         Tensorflow it is :math:`l(y, \hat y)`.
 
     adversary_loss : str, callable, default = 'auto'
-        Either the string :code:`'auto'` or a callable. The string
+        Either the string
+        :code:`'auto'`, :code:`'binary'`, :code:`'category'`,
+        :code:`'continuous'`, or a callable. The string
         :code:`'auto'` indicates to infer the loss
         from the distribution type of :code:`sensitive_features`
-        (computed in :code:`dist_type_` of
-        the :code:`z_transform`). A callable should be a
+        The string-keyword indicates a
+        distribution type, see user guide for more information.
+        A callable should be a
         loss function with an API that follows the chosen backend (torch or
         tensorflow).
 
     predictor_function : str, callable, default = 'auto'
-        Either the string :code:`'auto'` or a callable. The string
+        Either the string
+        :code:`'auto'`, :code:`'binary'`, :code:`'category'`,
+        :code:`'continuous'`, or a callable. The string
         :code:`'auto'` indicates to infer the predictor function
         from the distribution type of :code:`y`
-        (computed in :code:`dist_type_` of
-        the transformer). A callable should be a
+        The string-keyword indicates a
+        distribution type, see user guide for more information.
+        A callable should be a
         function that maps the continuous output of the predictor model to
-        a discrete prediction. For example, if the transform of :code:`y` has
-        has as attribute :code:`dist_type_=="binary", then map the predictors
-        sigmoidal output :math:`y` to 1 iff :math:`y \geq \frac12`. Note
-        that it is important that the model has sigmoidal outputs in this case.
+        a discrete prediction.
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
@@ -136,14 +151,6 @@ class AdversarialFairness(BaseEstimator):
         to binary or
         one-hot encodings, and it maps strictly continuous-valued (possible 2d)
         to itself.
-        If you set a custom :code:`y_transform`, you will likely also require
-        a custom :code:`predictor_loss` and
-        :code:`predictor_function`, as the loss, and discrete
-        prediction function cannot be automatically inferred from
-        the transformer, as the
-        assumption about the distribution of :math:`y`
-        can not be automatically inferred from
-        :code:`self.y_transform_.dist_type_`.
 
     z_transform : sklearn.base.TransformerMixin, default = fairlearn.adversarial.FloatTransformer("auto")
         The preprocessor to use on the :code:`sensitive_features`.
@@ -153,13 +160,6 @@ class AdversarialFairness(BaseEstimator):
         to binary or
         one-hot encodings, and it maps strictly continuous-valued (possible 2d)
         to itself.
-        If you set a custom :code:`z_transform`, you will likely also require
-        a custom :code:`adversary_loss`, as the loss
-        cannot be automatically inferred from
-        the transformer, as the
-        assumption about the distribution of :code:`sensitive_features`
-        can not be automatically inferred from
-        :code:`self.z_transform_.dist_type_`.
 
     learning_rate : float, default = 0.001
         A small number greater than zero to set as initial learning rate
@@ -214,7 +214,7 @@ class AdversarialFairness(BaseEstimator):
        Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
        AIES, 2018.
 
-    """
+    """  # noqa : E501
 
     def __init__(
         self,
@@ -342,17 +342,31 @@ class AdversarialFairness(BaseEstimator):
         self.y_transform_ = self.y_transform.fit(Y)
         self.z_transform_ = self.z_transform.fit(Z)
 
+        read_kw = (
+            lambda data, kw_or_func: _get_type(data, kw_or_func)
+            if isinstance(kw_or_func, str)
+            else kw_or_func
+        )
+
+        self.predictor_loss_ = read_kw(Y, self.predictor_loss)
+        self.adversary_loss_ = read_kw(Z, self.adversary_loss)
+        self.predictor_function_ = read_kw(Y, self.predictor_function)
+
+        kws = ["binary", "category", "continuous"]
         for kw, kwname in (
-            (self.predictor_loss, "predictor_loss"),
-            (self.adversary_loss, "adversary_loss"),
-            (self.predictor_function, "predictor_function"),
+            (self.predictor_loss_, "predictor_loss"),
+            (self.adversary_loss_, "adversary_loss"),
+            (self.predictor_function_, "predictor_function"),
         ):
             # Some keywords can also be a callable instead of a str.
-            if isinstance(kw, str) and kw != "auto":
+            if not ((isinstance(kw, str) and kw in kws) or callable(kw)):
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(
                         kwname,
-                        "auto or a callable",
+                        (
+                            "'auto', 'binary', 'category', 'continuous', "
+                            + "or a callable",
+                        ),
                     )
                 )
 
@@ -365,22 +379,6 @@ class AdversarialFairness(BaseEstimator):
             )
 
         self.random_state_ = check_random_state(self.random_state)
-
-        # Check if preprocessors supply correct information (no info is also ok)
-        # FIXME : Possibly accept lack of keyword if losses and predictor given.
-        for transform in (self.y_transform_, self.z_transform_):
-            if hasattr(
-                transform, "dist_type_"
-            ) and transform.dist_type_ not in (
-                "binary",
-                "category",
-                "continuous",
-            ):
-                raise ValueError(
-                    _TRANSFORMER_WEIRD_DIST_TYPE.format(
-                        transform, transform.dist_type_
-                    )
-                )
 
         self._set_predictor_function()
 
@@ -672,20 +670,24 @@ class AdversarialFairness(BaseEstimator):
         """
         Infer prediction function.
 
-        Provide a callable predictor function that maps soft-probabilities
-        (or more precisely, predictor_model output) to discrete prediction.
-        Alternatively, pass a :code:`y_transform`
-        that has a :code:`dist_type_` attribute that can be used
-        to interpret a loss function.
+        The :code:`predictor_function` should be either the string
+        :code:`'auto'`, :code:`'binary'`, :code:`'category'`,
+        :code:`'continuous'`, or a callable. The string
+        :code:`'auto'` indicates to infer the predictor function
+        from the distribution type of :code:`y`
+        A callable should be a
+        function that maps the continuous output of the predictor model to
+        a discrete prediction.
         """
-        if callable(self.predictor_function):
-            self.predictor_function_ = self.predictor_function
-        elif hasattr(self.y_transform_, "dist_type_"):
-            if self.y_transform_.dist_type_ == "binary":
+        if callable(self.predictor_function_):
+            pass
+        elif isinstance(self.predictor_function_, str):
+            kw = self.predictor_function_
+            if kw == "binary":
                 self.predictor_function_ = lambda pred: (pred >= 0.5).astype(
                     float
                 )
-            elif self.y_transform_.dist_type_ == "category":
+            elif kw == "category":
 
                 def loss(pred):
                     shape = pred.shape
@@ -696,9 +698,11 @@ class AdversarialFairness(BaseEstimator):
                     return b
 
                 self.predictor_function_ = loss
-            elif self.y_transform_.dist_type_ == "continuous":
+            elif kw == "continuous":
                 self.predictor_function_ = lambda pred: pred
-        if not self.predictor_function_:
+            else:
+                raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
+        else:
             raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
 
 
