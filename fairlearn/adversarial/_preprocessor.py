@@ -16,9 +16,7 @@ from numpy import all as np_all
 from numpy import sum as np_sum
 
 
-# FIXME : Should be BaseEstimator, but then deep-copy fails as FloatTransformer
-# has a get_params but non-instance call to get_params fails.
-class FloatTransformer(TransformerMixin):
+class FloatTransformer(BaseEstimator, TransformerMixin):
     """
     Transformer that maps dataframes to numpy arrays of floats.
 
