@@ -5,16 +5,19 @@ from ._constants import (
     _TYPE_COMPLIANCE_ERROR,
     _TYPE_CHECK_ERROR,
     _ARG_ERROR_MESSAGE,
+    _TYPE_UNKNOWN_ERROR,
 )
 from sklearn.utils import check_array
 from sklearn.preprocessing import OneHotEncoder
 from pandas import Series, DataFrame
-from sklearn.base import TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.multiclass import type_of_target
 from numpy import all as np_all
 from numpy import sum as np_sum
 
 
+# FIXME : Should be BaseEstimator, but then deep-copy fails as FloatTransformer
+# has a get_params but non-instance call to get_params fails.
 class FloatTransformer(TransformerMixin):
     """
     Transformer that maps dataframes to numpy arrays of floats.
@@ -64,6 +67,8 @@ class FloatTransformer(TransformerMixin):
             raise NotImplementedError("multiclass-multioutput not supported")
             # NOTE we can actually implement this as concatenations of loss
             # functions, but that is up to the future user to decide for now.
+        elif inferred == "unknown":
+            raise ValueError(_TYPE_UNKNOWN_ERROR)
 
         raise ValueError(
             _TYPE_COMPLIANCE_ERROR.format(self.dist_assumption, inferred)

@@ -58,3 +58,4 @@ _MODEL_UNRECOGNIZED_ITEM = (
     + "a callable to add directly to the model (such as an activation "
     + "function) or a supported keyword (string)."
 )
+_TYPE_UNKNOWN_ERROR = "Unknown label type."

@@ -425,7 +425,7 @@ class AdversarialFairness(BaseEstimator):
         self.n_features_in_ = X.shape[1]
         self.n_features_out_ = self.y_transform_.n_features_in_
 
-    def fit(self, X, y, *, sensitive_features):
+    def fit(self, X, y, *, sensitive_features=None):
         """
         Fit the model based on the given training data and sensitive features.
 
@@ -448,8 +448,10 @@ class AdversarialFairness(BaseEstimator):
         X, Y, Z = self._validate_input(X, y, sensitive_features)
 
         if self.batch_size == -1:
-            self.batch_size = X.shape[0]
-        batches = ceil(X.shape[0] / self.batch_size)
+            batch_size = X.shape[0]
+        else:
+            batch_size = self.batch_size
+        batches = ceil(X.shape[0] / batch_size)
 
         start_time = time()
         last_update_time = start_time
@@ -483,8 +485,8 @@ class AdversarialFairness(BaseEstimator):
                             end="\n",
                         )
                 batch_slice = slice(
-                    batch * self.batch_size,
-                    min((batch + 1) * self.batch_size, X.shape[0]),
+                    batch * batch_size,
+                    min((batch + 1) * batch_size, X.shape[0]),
                 )
                 (LP, LA) = self.backendEngine_.train_step(
                     X[batch_slice], Y[batch_slice], Z[batch_slice]
@@ -501,7 +503,7 @@ class AdversarialFairness(BaseEstimator):
 
         return self
 
-    def partial_fit(self, X, y, *, sensitive_features):
+    def partial_fit(self, X, y, *, sensitive_features=None):
         """
         Perform one epoch on given samples and update model.
 
@@ -580,6 +582,10 @@ class AdversarialFairness(BaseEstimator):
             is_fitted = True
         except NotFittedError:
             is_fitted = False
+
+        if Z is None:
+            print("Warning: no sensitive_features provided")  # FIXME : logger?
+            Z = [0] * X.shape[0]
 
         if (not is_fitted) or (not self.warm_start):
             self.__setup(X, Y, Z)

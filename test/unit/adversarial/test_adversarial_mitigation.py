@@ -5,6 +5,7 @@ import sys  # , fake_torch
 import pytest
 import numpy as np
 import pandas as pd
+from sklearn.utils import estimator_checks
 from fairlearn.adversarial import (
     AdversarialFairness,
     AdversarialFairnessClassifier,
@@ -192,10 +193,20 @@ class RemoveAll(BackendEngine):
     """Mock BackendEngine that implements nothing, to test base class."""
 
     def __init__(self, base, X, Y, Z):  # noqa: D107
+        self.base = base
         pass
 
-    def evaluate(self, X):  # noqa: D102
-        return X
+    def evaluate(self, X):
+        """Deterministic evaluation function."""
+        cols = self.base.y_transform_.n_features_out_
+        rows = len(X)
+        y = []
+        for row in range(rows):
+            rng = np.random.default_rng(
+                int(np.round(np.mean(X[row]) * (2 ** 32)))
+            )
+            y.append(rng.random(cols))
+        return np.stack(y)
 
     def train_step(self, X, Y, Z):  # noqa: D102
         return (0, 0)
@@ -277,7 +288,46 @@ def get_instance(
     return mitigator
 
 
-# CURRENTLY not testing what the models look like, just that it is correct type
+# TODO: extend list or work on commented-out checks.
+@pytest.mark.parametrize(
+    "test_fn",
+    [
+        # transformer checks
+        # estimator_checks.check_transformer_general,
+        # estimator_checks.check_transformers_unfitted,
+        # general estimator checks
+        estimator_checks.check_fit2d_predict1d,
+        estimator_checks.check_methods_subset_invariance,
+        estimator_checks.check_fit2d_1sample,
+        estimator_checks.check_fit2d_1feature,
+        estimator_checks.check_get_params_invariance,
+        estimator_checks.check_set_params,
+        estimator_checks.check_dict_unchanged,
+        estimator_checks.check_dont_overwrite_parameters,
+        # nonmeta_checks
+        estimator_checks.check_estimators_dtypes,
+        estimator_checks.check_fit_score_takes_y,
+        estimator_checks.check_dtype_object,
+        # estimator_checks.check_sample_weights_pandas_series,
+        # estimator_checks.check_sample_weights_list,
+        estimator_checks.check_estimators_fit_returns_self,
+        estimator_checks.check_complex_data,
+        estimator_checks.check_estimators_empty_data_messages,
+        estimator_checks.check_pipeline_consistency,
+        estimator_checks.check_estimators_nan_inf,
+        # estimator_checks.check_estimators_overwrite_params,
+        estimator_checks.check_estimator_sparse_data,
+        # estimator_checks.check_estimators_pickle,
+    ],
+)
+def test_estimator_checks(test_fn):
+    instance = get_instance(
+        AdversarialFairness, torch=True, tensorflow=False, fake_mixin=True
+    )
+    test_fn(
+        AdversarialFairness.__name__,
+        instance,
+    )
 
 
 @pytest.mark.parametrize("torch1", [True, False])
