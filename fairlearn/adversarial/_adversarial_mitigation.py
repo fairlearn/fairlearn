@@ -86,7 +86,7 @@ class AdversarialFairness(BaseEstimator):
         :code:`'auto'` indicates to infer the loss
         from the distribution type of :code:`y`
         (computed in :code:`dist_type_` of
-        the transformer). A callable should be a
+        the :code:`y_transform`). A callable should be a
         loss function with an API that follows the chosen backend (torch or
         tensorflow). Note that torch and tensorflow loss functions don't agree
         on parameter order, as in Pytorch it is :math:`l(\hat y, y)` while in
@@ -97,7 +97,7 @@ class AdversarialFairness(BaseEstimator):
         :code:`'auto'` indicates to infer the loss
         from the distribution type of :code:`sensitive_features`
         (computed in :code:`dist_type_` of
-        the transformer). A callable should be a
+        the :code:`z_transform`). A callable should be a
         loss function with an API that follows the chosen backend (torch or
         tensorflow).
 
@@ -128,38 +128,38 @@ class AdversarialFairness(BaseEstimator):
         The fairness measure to optimize for. Must be either 'demographic_parity'
         (Demographic Parity) or 'equalized_odds' (Equalized Odds).
 
-    transformer : sklearn.base.TransformerMixin, default = fairlearn.adversarial.FloatTransformer
-        The preprocessor to use on the predictions :code:`y`
-        and :code:`sensitive_features`. The given transformer *must* map data
+    y_transform : sklearn.base.TransformerMixin, default = fairlearn.adversarial.FloatTransformer("auto")
+        The preprocessor to use on the predictions :code:`y`.
+        The given transformer *must* map data
         to a 2d ndarray containing only floats. Per default, we use a
         FloatTransformer that maps strictly binary or categorical tables
         to binary or
         one-hot encodings, and it maps strictly continuous-valued (possible 2d)
         to itself.
-
-    y_distribution : str, default = 'auto'
-        This is a string that indicates an assumption about the distribution of
-        the target values :math:`y`. Possible assumptions are
-        "binary", "category", "continuous", "classification", "auto" (default).
-        This assumption is fed to the transformer. If the predictions are not
-        describable using one of these keywords, you must provide explicitely
-        the following keywords: :code:`transformer`, :code:`predictor_loss`,
-        :code:`predictor_function`, as the transformer, loss, and discrete
-        prediction function cannot be automatically inferred, as the
+        If you set a custom :code:`y_transform`, you will likely also require
+        a custom :code:`predictor_loss` and
+        :code:`predictor_function`, as the loss, and discrete
+        prediction function cannot be automatically inferred from
+        the transformer, as the
         assumption about the distribution of :math:`y`
-        can not be automatically inferred.
+        can not be automatically inferred from
+        :code:`self.y_transform_.dist_type_`.
 
-    z_distribution : str, default = 'auto'
-        This is a string that indicates an assumption about the distribution of
-        the sensitive features :math:`z`. Possible assumptions are
-        "binary", "category", "continuous", "classification", "auto" (default).
-        This assumption is fed to the transformer. If the predictions are not
-        describable using one of these keywords, you must provide explicitely
-        the following keywords: :code:`transformer`, :code:`adversary_loss`,
-        as the transformer and loss function cannot be
-        automatically inferred, as the
-        assumption about the distribution of :math:`z` (sensitive features)
-        can not be automatically inferred.
+    z_transform : sklearn.base.TransformerMixin, default = fairlearn.adversarial.FloatTransformer("auto")
+        The preprocessor to use on the :code:`sensitive_features`.
+        The given transformer *must* map data
+        to a 2d ndarray containing only floats. Per default, we use a
+        FloatTransformer that maps strictly binary or categorical tables
+        to binary or
+        one-hot encodings, and it maps strictly continuous-valued (possible 2d)
+        to itself.
+        If you set a custom :code:`z_transform`, you will likely also require
+        a custom :code:`adversary_loss`, as the loss
+        cannot be automatically inferred from
+        the transformer, as the
+        assumption about the distribution of :code:`sensitive_features`
+        can not be automatically inferred from
+        :code:`self.z_transform_.dist_type_`.
 
     learning_rate : float, default = 0.001
         A small number greater than zero to set as initial learning rate
@@ -228,9 +228,8 @@ class AdversarialFairness(BaseEstimator):
         predictor_optimizer="Adam",
         adversary_optimizer="Adam",
         constraints="demographic_parity",
-        transformer=FloatTransformer,
-        y_distribution="auto",
-        z_distribution="auto",
+        y_transform=FloatTransformer("auto"),
+        z_transform=FloatTransformer("auto"),
         learning_rate=0.001,
         alpha=1.0,
         epochs=1,
@@ -253,9 +252,8 @@ class AdversarialFairness(BaseEstimator):
         self.predictor_optimizer = predictor_optimizer
         self.adversary_optimizer = adversary_optimizer
         self.constraints = constraints
-        self.transformer = transformer
-        self.y_distribution = y_distribution
-        self.z_distribution = z_distribution
+        self.y_transform = y_transform
+        self.z_transform = z_transform
         self.learning_rate = learning_rate
         self.alpha = alpha
         self.epochs = epochs
@@ -325,18 +323,24 @@ class AdversarialFairness(BaseEstimator):
                 _KWARG_ERROR_MESSAGE.format("callback_fn", "a callable")
             )
 
-        kws = ["auto", "binary", "category", "continuous", "classification"]
         for kw, kwname in (
-            (self.y_distribution, "y_distribution"),
-            (self.z_distribution, "z_distribution"),
+            (self.y_transform, "y_transform"),
+            (self.z_transform, "z_transform"),
         ):
-            if kw not in kws:
+            if not (
+                issubclass(type(kw), TransformerMixin)
+                and hasattr(kw, "fit")
+                and hasattr(kw, "transform")
+            ):
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(
                         kwname,
-                        "one of {}".format(kws),
+                        "a sklearn Transformer (subclass TransformerMixin)",
                     )
                 )
+
+        self.y_transform_ = self.y_transform.fit(Y)
+        self.z_transform_ = self.z_transform.fit(Z)
 
         for kw, kwname in (
             (self.predictor_loss, "predictor_loss"),
@@ -362,45 +366,8 @@ class AdversarialFairness(BaseEstimator):
 
         self.random_state_ = check_random_state(self.random_state)
 
-        if not (
-            self.transformer
-            and hasattr(self.transformer, "fit")
-            and hasattr(self.transformer, "transform")
-            and issubclass(self.transformer, TransformerMixin)
-        ):
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format(
-                    "transformer",
-                    "a transformer that implements TransformerMixin.",
-                )
-            )
-
-        # Create preprocessors
-        if self.y_distribution == "auto":
-            self.y_transform_ = self.transformer()
-        else:
-            try:
-                self.y_transform_ = self.transformer(
-                    dist_assumption=self.y_distribution
-                )
-            except TypeError as e:
-                e.value += _TRANSFORM_NO_PARAM
-                raise e
-        self.y_transform_.fit(Y)
-
-        if self.z_distribution == "auto":
-            self.z_transform_ = self.transformer()
-        else:
-            try:
-                self.z_transform_ = self.transformer(
-                    dist_assumption=self.z_distribution
-                )
-            except TypeError as e:
-                e.value += _TRANSFORM_NO_PARAM
-                raise e
-        self.z_transform_.fit(Z)
-
         # Check if preprocessors supply correct information (no info is also ok)
+        # FIXME : Possibly accept lack of keyword if losses and predictor given.
         for transform in (self.y_transform_, self.z_transform_):
             if hasattr(
                 transform, "dist_type_"
@@ -707,9 +674,9 @@ class AdversarialFairness(BaseEstimator):
 
         Provide a callable predictor function that maps soft-probabilities
         (or more precisely, predictor_model output) to discrete prediction.
-        Alternatively, pass a Transformer with the :code:`transformer` key-word
-        that has a :code:`dist_type_` attribute that a BackendEngine
-        can use to interpret a loss function.
+        Alternatively, pass a :code:`y_transform`
+        that has a :code:`dist_type_` attribute that can be used
+        to interpret a loss function.
         """
         if callable(self.predictor_function):
             self.predictor_function_ = self.predictor_function
@@ -740,8 +707,8 @@ class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
 
     def __init__(self, **kwargs):
         """Initialize model by setting the predictor loss and function."""
-        kwargs["y_distribution"] = kwargs.get(
-            "y_distribution", "classification"
+        kwargs["y_transform"] = kwargs.get(
+            "y_transform", FloatTransformer("classification")
         )
         super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
@@ -751,7 +718,9 @@ class AdversarialFairnessRegressor(AdversarialFairness, RegressorMixin):
 
     def __init__(self, *args, **kwargs):
         """Initialize model by setting the predictor loss."""
-        kwargs["y_distribution"] = kwargs.get("y_distribution", "continuous")
+        kwargs["y_transform"] = kwargs.get(
+            "y_transform", FloatTransformer("continuous")
+        )
         super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
 
 

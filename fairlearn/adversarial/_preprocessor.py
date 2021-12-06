@@ -24,12 +24,35 @@ class FloatTransformer(TransformerMixin):
 
     Applies one-hot-encoding to categorical columns, 'passthrough' to
     numerical columns.
+
+    Attributes
+    ----------
+    dist_type_ : str
+        After succesfully fitting to data,
+        :code:`dist_type_` is one of "binary", "category", "continuous".
+        This indicates the assumption about the given data.
     """
 
     def __init__(self, dist_assumption="auto"):
-        """Initialize empty transformers."""
+        """
+        Initialize empty transformers with the given distribution assumption.
+        
+        Parameters
+        ----------
+        dist_assumption : str, default = "auto"
+            This is a string that indicates an assumption about the
+            distribution of
+            the data that will be transformed. Possible assumptions are
+            "binary", "category", "continuous", "classification",
+            "auto" (default).
+            If the data is not
+            describable using one of these keywords,
+            you must build your own transformer instead.
+        """
         self.dist_assumption = dist_assumption
 
+    # NOTE : could make this part of AdversarialFairness, and let
+    # AdversarialFairness accept distribution assumption instead of the transf.
     def _get_type(self, data, inferred):
         if inferred == "multilabel-indicator":
             #  Design choice: multiple binary columns are not supported.
@@ -124,7 +147,7 @@ class FloatTransformer(TransformerMixin):
 
         return X
 
-    def fit(self, X):
+    def fit(self, X, y=None):
         """Fit the three transformers."""
         X = self._prep(X, init=True)
         self.n_features_in_ = X.shape[1]
