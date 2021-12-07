@@ -323,25 +323,7 @@ class AdversarialFairness(BaseEstimator):
                 _KWARG_ERROR_MESSAGE.format("callback_fn", "a callable")
             )
 
-        for kw, kwname in (
-            (self.y_transform, "y_transform"),
-            (self.z_transform, "z_transform"),
-        ):
-            if not (
-                issubclass(type(kw), TransformerMixin)
-                and hasattr(kw, "fit")
-                and hasattr(kw, "transform")
-            ):
-                raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(
-                        kwname,
-                        "a sklearn Transformer (subclass TransformerMixin)",
-                    )
-                )
-
-        self.y_transform_ = self.y_transform.fit(Y)
-        self.z_transform_ = self.z_transform.fit(Z)
-
+        # NOTE: inferring distribution type should happen before transforming
         read_kw = (
             lambda data, kw_or_func: _get_type(data, kw_or_func)
             if isinstance(kw_or_func, str)
@@ -369,6 +351,25 @@ class AdversarialFairness(BaseEstimator):
                         ),
                     )
                 )
+
+        for kw, kwname in (
+            (self.y_transform, "y_transform"),
+            (self.z_transform, "z_transform"),
+        ):
+            if not (
+                issubclass(type(kw), TransformerMixin)
+                and hasattr(kw, "fit")
+                and hasattr(kw, "transform")
+            ):
+                raise ValueError(
+                    _KWARG_ERROR_MESSAGE.format(
+                        kwname,
+                        "a sklearn Transformer (subclass TransformerMixin)",
+                    )
+                )
+
+        self.y_transform_ = self.y_transform.fit(Y)
+        self.z_transform_ = self.z_transform.fit(Z)
 
         if self.cuda and not isinstance(self.cuda, str):
             raise ValueError(
