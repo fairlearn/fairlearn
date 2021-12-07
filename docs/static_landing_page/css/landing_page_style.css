@@ -29,7 +29,7 @@ body {
 .masthead h1 {
 	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-weight: 500;
-	font-size: 84px;
+	font-size: 76px;
 	line-height: 88px;
 	color: #ffffff;
 }
@@ -39,12 +39,12 @@ h1 {
 	color: #333333;
 }
 h2 {
-	font-size: 48px;
+	font-size: 44px;
 	line-height: 52px;
 	color: #333333;
 }
 h3 {
-	font-size: 32px;
+	font-size: 28px;
 	line-height: 34px;
 	color: #333333;
 }
@@ -78,7 +78,7 @@ footer {
 }
 /* Subhead */
 p {
-	font-size: 22px;
+	font-size: 20px;
 	line-height: 26px;
 }
 li {
