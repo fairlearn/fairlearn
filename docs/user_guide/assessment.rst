@@ -118,6 +118,40 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
+Multiclass metrics
+^^^^^^^^^^^^^^^^^^
+
+We may also be interested in multiclass classification. However, typical group
+fairness metrics such as equalized odds and demographic parity are only defined
+for binary classification. One way to measure fairness in the multiclass
+scenario is to define one-to-one or one-to-rest classifications for each group
+and calculate the metrics on this instead. Alternatively, we can use predefined
+metrics for multiclass classification. For example, accuracy is a multiclass
+metric that we can utilize through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
+in combination with a :code:`MetricFrame` as follows:
+
+.. doctest:: assessment_metrics
+
+    >>> from sklearn.metrics import accuracy_score
+    >>> from fairlearn.metrics import MetricFrame
+    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
+    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
+    >>> mf = MetricFrame(metric=accuracy_score,
+    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
+    ...                  sensitive_features=group_membership_data)
+    >>> print(mf.by_group) # series with accuracy for each sensitive group
+    sensitive_feature_0
+    a         1.0
+    b         0.5
+    c    0.428571
+    d         1.0
+    Name: accuracy_score, dtype: object
+    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
+    0.5714285714285714
+
+Multiple metrics in one :code:`MetricFrame`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
 show each group's size):
@@ -170,6 +204,9 @@ If multiple metrics are being evaluated, then ``sample_params`` becomes a dictio
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
 
+Non-sample parameters
+^^^^^^^^^^^^^^^^^^^^^
+
 We do not support non-sample parameters at the current time. If these are required, then
 use :func:`functools.partial` to prebind the required arguments to the metric
 function:
@@ -192,6 +229,9 @@ function:
     c    0.6335...
     d    0...
     Name: metric, dtype: object
+
+Multiple sensitive features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
 holds the intersections of these groups:
@@ -227,7 +267,7 @@ that there were no samples in it.
 
 .. _scalar_metric_results:
 
-Scalar Results from :code:`MetricFrame`
+Scalar results from :code:`MetricFrame`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Higher level machine learning algorithms (such as hyperparameter tuners) often
