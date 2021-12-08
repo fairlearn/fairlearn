@@ -14,7 +14,7 @@ However, as the machine learning community has developed awareness about fairnes
 popular benchmarking datasets, the Boston Housing data has been phased out of many libraries. 
 We migrated the dataset to Fairlearn after it was phased out of scikit-learn in June 2020. 
 The dataset remains in Fairlearn as an example of how systemic racism can occur in data and to 
-show the effect of Fairlearn's unfairness assessment and mitigation tools on real, problematic data. 
+show the effects of Fairlearn's unfairness assessment and mitigation tools on real, problematic data. 
 
 We also think this dataset provides an interesting case study of how fairness is fundamentally a
 socio-technical issue by exploring how societal biases manifest in data in ways that can't
@@ -69,7 +69,6 @@ It has also been the benchmark of choice for many machine learning
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_ [#2]_ [#3]_ [#4]_.
 In 2020, users brought the dataset's fairness issues to the scikit-learn development team 
 (see scikit-learn issue `#16155 <https://github.com/scikit-learn/scikit-learn/issues/16155>`_), after which the team decided to remove the dataset in scikit-learn version 1.2.
-In scikit-learn version 1.2, the dataset will be removed.
 
 The dataset contains the following columns:
 
@@ -216,7 +215,7 @@ Likewise, another measurement model also constructs membership in
 lower-status classes based on educational attainment
 and labor category. 
 It is useful to ask whether the way the authors chose to create 
-the measurements accurately represents phenomenon they 
+the measurements accurately represents the phenomenon they 
 sought to measure. 
 As is discussed above, the authors do not provide justification for their 
 variable construction choices beyond the projected impacts described 
@@ -383,13 +382,13 @@ holding all other factors constant.
 This use case is different than the typical 
 supervised learning analysis. 
 A machine learning model will pick up on the 
-patterns encoded in the data and use that to predict an outcome.
+patterns encoded in the data and use those patterns to predict an outcome.
 In the Boston housing dataset, the patterns the authors encoded through
 the *B* and *LSTAT* variables include systemic racism and class inequalities, 
 respectively. 
 Using the Boston housing dataset as a benchmark for a new 
 supervised learning model means that the model's performance is in part due to
-how well it learns and replicates the patterns in this dataset.
+how well it learns and replicates these patterns.
 
 The Boston Housing dataset raises the more general issue of whether it's valid to 
 port datasets constructed for one specific use case to different use cases (see :ref:`portability_trap`).
