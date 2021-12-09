@@ -146,13 +146,18 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
         return inverse
 
-
+# memoize_store = {}
 def _infer_type(data):
-    """Memoize of type_of_target without prohibiting data garbage-disposal."""
-    if hasattr(data, "____inferred_type____"):
-        return data.____inferred_type____
+    """
+    Memoize type_of_target without prohibiting data garbage-disposal.
+    
+    Currently no nice solution :( id() is not reliably giving different values.
+    """
+    # memoized = memoize_store.get(id(data), None)
+    # if memoized is not None:
+    #     return memoized
     inferred = type_of_target(data)
-    # data.____inferred_dtype____ = inferred  # FIXME
+    # memoize_store[id(data)] = inferred
     return inferred
 
 
