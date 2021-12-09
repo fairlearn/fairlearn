@@ -149,15 +149,12 @@ class BackendEngine:
         """
         # Preinitialized optimizer
         if issubclass(type(optim_param), self.optim_class):
-            print("passed optim")
             return optim_param
         # Optimizer constructor
         elif callable(optim_param):
-            print("construct optim")
             return optim_param(model)
         # Optimizer keyword
         elif isinstance(optim_param, str):
-            print("keywor doptim")
             got_optim = self.get_optimizer(optim_param, model)
             if got_optim is None:
                 raise ValueError(
