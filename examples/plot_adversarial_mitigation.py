@@ -186,7 +186,7 @@ print(mf.by_group)
 
 # In this example, we show some of these good practices in practice.
 # We start by defining our
-# neural networks explicitely so that it is more apparant.
+# predictor neural network explicitely so that it is more apparant.
 # We will be using PyTorch, but the same can be achieved using Tensorflow!
 
 
@@ -204,45 +204,9 @@ class PredictorModel(torch.nn.Module):
         return self.layers(x)
 
 
-class AdversaryModel(torch.nn.Module):
-    def __init__(self):
-        super(AdversaryModel, self).__init__()
-        self.layers = torch.nn.Sequential(
-            torch.nn.Linear(1, 3),
-            torch.nn.LeakyReLU(),
-            torch.nn.Linear(3, 1),
-            torch.nn.Sigmoid(),
-        )
-
-    def forward(self, x):
-        return self.layers(x)
-
-
 predictor_model = PredictorModel()
-adversary_model = AdversaryModel()
 # %%
-# Xavier initialization is more popular than PyTorch's default initialization,
-# so
-# we might as well demonstrate this too. Note that I also
-# initialize the biases, but this is
-# less common in practice. Intuitively, it
-# seems wise to initialize small weights,
-# so we set the gain low.
-
-torch.manual_seed(123)
-
-
-def weights_init(m):
-    if isinstance(m, torch.nn.Linear):
-        torch.nn.init.xavier_normal_(m.weight.data, gain=0.1)
-        m.bias.data.fill_(0.1)
-
-
-predictor_model.apply(weights_init)
-adversary_model.apply(weights_init)
-
-# %%
-# Instead of only looking at training loss, we also take a look at
+# We also take a look at
 # some validation
 # metrics. Most importantly, we chose the demographic parity difference
 # to check to what
@@ -274,41 +238,43 @@ def validate(mitigator):
 # rate (:math:`\mu`) to depend on the timestep such that :math:`\alpha \cdot \mu
 # \rightarrow 0` as the timestep grows.
 
-predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.01)
-adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.01)
-
-scheduler1 = torch.optim.lr_scheduler.ExponentialLR(
-    predictor_optimizer, gamma=0.995
-)
-scheduler2 = torch.optim.lr_scheduler.ExponentialLR(
-    adversary_optimizer, gamma=0.995
-)
-
-# %%
 # We make use of a callback function to both update the hyperparameters and to
 # validate the model. We update these hyperparameters at every 10 steps, and we
 # validate every 100 steps. Additionally, we can implement early stopping
 # easily by calling :code:`return True` in a callback function.
 
+
+schedulers = []
+
+def optimizer_constructor(model):
+    global schedulers
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    schedulers.append(
+        torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.995)
+    )
+    return optimizer
+
 step = 1
 
 
-def callbackfn(model, *args):
+def callback_fn(model, *args):
     global step
+    global schedulers
     step += 1
     # Update hyperparameters
-    if step % 1 == 0:
-        model.alpha = 0.3 * sqrt(step // 1)
-        scheduler1.step()
-        scheduler2.step()
-    # Validate (and early stopping)
-    if step % 100 == 0:
+    model.alpha = 0.3 * sqrt(step // 1)
+    for scheduler in schedulers:
+        scheduler.step()
+    # Validate (and early stopping) every 50 steps
+    if step % 50 == 0:
         dp_diff, accuracy, selection_rate = validate(model)
+        # Early stopping condition:
+        # Good accuracy + low dp_diff + no mode collapse
         if (
-            dp_diff < 0.01
+            dp_diff < 0.03
             and accuracy > 0.8
-            and selection_rate > 0.0
-            and selection_rate < 1.0
+            and selection_rate > 0.01
+            and selection_rate < 0.99
         ):
             return True
 
@@ -319,16 +285,13 @@ def callbackfn(model, *args):
 
 mitigator = AdversarialFairnessClassifier(
     predictor_model=predictor_model,
-    adversary_model=adversary_model,
-    predictor_optimizer=predictor_optimizer,
-    adversary_optimizer=adversary_optimizer,
-    alpha=1.0,
-    constraints="demographic_parity",
+    adversary_model=[3, "leaky_relu"],
+    predictor_optimizer=optimizer_constructor,
+    adversary_optimizer=optimizer_constructor,
     epochs=10,
     batch_size=2 ** 7,
     shuffle=True,
-    progress_updates=1,
-    callback_fn=callbackfn,
+    callback_fn=callback_fn,
     random_state=123,
 )
 
