@@ -278,10 +278,10 @@ predictor_optimizer = torch.optim.Adam(predictor_model.parameters(), lr=0.01)
 adversary_optimizer = torch.optim.Adam(adversary_model.parameters(), lr=0.01)
 
 scheduler1 = torch.optim.lr_scheduler.ExponentialLR(
-    predictor_optimizer, gamma=0.99
+    predictor_optimizer, gamma=0.995
 )
 scheduler2 = torch.optim.lr_scheduler.ExponentialLR(
-    adversary_optimizer, gamma=0.99
+    adversary_optimizer, gamma=0.995
 )
 
 # %%
@@ -297,8 +297,8 @@ def callbackfn(model, *args):
     global step
     step += 1
     # Update hyperparameters
-    if step % 10 == 0:
-        model.alpha = sqrt(step // 10)
+    if step % 1 == 0:
+        model.alpha = 0.3 * sqrt(step // 1)
         scheduler1.step()
         scheduler2.step()
     # Validate (and early stopping)
