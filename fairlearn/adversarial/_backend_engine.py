@@ -15,7 +15,10 @@ from numpy import ndarray
 class BackendEngine:
     """The interface of a mixin class."""
 
+    # NOTE: to validate objects passed.
+    # We don't validate loss yet.
     model_class = None
+    optim_class = None
 
     def __init__(self, base, X, Y, Z):
         """
@@ -32,75 +35,158 @@ class BackendEngine:
         n_X_features = X.shape[1]
         n_Y_features = base.y_transform_.n_features_out_
         n_Z_features = base.z_transform_.n_features_out_
+
         # Set up predictor_model
-        if isinstance(base.predictor_model, list):
-            if not isinstance(base.predictor_loss_, str):
-                raise ValueError(
-                    _LIST_MODEL_UNSUPPORTED.format("predictor", "predictor")
-                )
-            predictor_list_nodes = (
-                [n_X_features] + base.predictor_model + [n_Y_features]
-            )
-            if base.predictor_loss_ == "binary":
-                predictor_list_nodes.append("sigmoid")
-            elif base.predictor_loss_ == "category":
-                predictor_list_nodes.append("softmax")
+        self.predictor_model = self.__init_model__(
+            base.predictor_model,
+            base.predictor_loss_,
+            n_X_features,
+            n_Y_features,
+            "predictor",
+        )
+        self.adversary_model = self.__init_model__(
+            base.adversary_model,
+            base.adversary_loss_,
+            n_Y_features * (2 if base.pass_y_ else 1),
+            n_Z_features,
+            "adversary",
+        )
 
-            self.predictor_model = self.get_model(
-                list_nodes=predictor_list_nodes
-            )
-        elif issubclass(type(base.predictor_model), self.model_class):
-            self.predictor_model = base.predictor_model
-        else:
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format(
-                    "predictor_model",
-                    "a list or a '{}'".format(self.model_class),
-                )
-            )
-
-        # Set up adversary_model
-        if isinstance(base.adversary_model, list):
-            if not isinstance(base.adversary_loss_, str):
-                raise ValueError(
-                    _LIST_MODEL_UNSUPPORTED.format("adversary", "adversary")
-                )
-            adversarial_in = n_Y_features * (2 if base.pass_y_ else 1)
-            adversary_list_nodes = (
-                [adversarial_in] + base.adversary_model + [n_Z_features]
-            )
-            if base.adversary_loss_ == "binary":
-                adversary_list_nodes.append("sigmoid")
-            elif base.adversary_loss_ == "category":
-                adversary_list_nodes.append("softmax")
-
-            self.adversary_model = self.get_model(
-                list_nodes=adversary_list_nodes
-            )
-        elif issubclass(type(base.adversary_model), self.model_class):
-            self.adversary_model = base.adversary_model
-        else:
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format(
-                    "adversary_model",
-                    "a list or a '{}'".format(self.model_class),
-                )
-            )
+        if hasattr(self, '__move_model__'): self.__move_model__()
 
         # Set up losses
-        if callable(base.predictor_loss_):
-            self.predictor_loss = base.predictor_loss_
-        elif isinstance(base.predictor_loss_, str):
-            self.predictor_loss = self.get_loss(base.predictor_loss_)
-        else:
-            raise ValueError(_NO_LOSS.format("predictor_loss"))
+        self.predictor_loss = self.__init_loss__(
+            base.predictor_loss_, "predictor"
+        )
+        self.adversary_loss = self.__init_loss__(
+            base.adversary_loss_, "adversary"
+        )
 
-        if callable(base.adversary_loss_):
-            self.adversary_loss = base.adversary_loss_
-        elif isinstance(base.adversary_loss_, str):
-            self.adversary_loss = self.get_loss(base.adversary_loss_)
+        # Set up optimizers
+        self.predictor_optimizer = self.__init_optimizers__(
+            base.predictor_optimizer, self.predictor_model, "predictor"
+        )
+        self.adversary_optimizer = self.__init_optimizers__(
+            base.predictor_optimizer, self.adversary_model, "adversary"
+        )
+
+    def __init_model__(
+        self, model_param, loss_param, X_features, y_features, name
+    ):
+        """
+        Get an initialized model.
+
+        Parameters
+        ----------
+        model_param : list, self.model_class
+            parameter that specifies the model
+        loss_param
+            loss function. If this is a str then it is auto-inferred and we
+            can build a model here. If it is not a str then we cannot infer,
+            and we will raise an error if model_param is a list
+        X_features : int
+            number of features in input variable
+        y_features : int
+            number of features in target variable
+        name : str
+            name of model, either "predictor" or "adversary"
+        """
+        if isinstance(model_param, list):
+            if not isinstance(loss_param, str):
+                # Can not parse model as list when loss is undefined
+                raise ValueError(_LIST_MODEL_UNSUPPORTED.format(name, name))
+            predictor_list_nodes = [X_features] + model_param + [y_features]
+            if loss_param == "binary":
+                predictor_list_nodes.append("sigmoid")
+            elif loss_param == "category":
+                predictor_list_nodes.append("softmax")
+
+            return self.get_model(list_nodes=predictor_list_nodes)
+        elif issubclass(type(model_param), self.model_class):
+            return model_param
         else:
-            raise ValueError(_NO_LOSS.format("adversary_loss"))
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    f"{name}_model", f"a list or a '{name}_model'"
+                )
+            )
+
+    def __init_loss__(self, loss_param, name):
+        """
+        Get an initialized loss.
+
+        Parameters
+        ----------
+        loss_param
+            given loss. If auto-inferred, apply get_loss. Otherwise, use
+            loss_param as loss function directly
+        name : str
+            name of model, either "predictor" or "adversary"
+        """
+        if callable(loss_param):
+            return loss_param
+        elif isinstance(loss_param, str):
+            return self.get_loss(loss_param)
+        else:
+            raise ValueError(_NO_LOSS.format(f"{name}_loss"))
+
+    def __init_optimizers__(self, optim_param, model, name):
+        """
+        Get an initialized optimizer.
+
+        Parameters
+        ----------
+        optim_param
+            Optimizer parameter. If a subclass instance of self.optim_class
+            then we use this directly. If it is a callable then we call
+            this (and pass the model through this call) and set the result
+            of this call as the optimizer. If it is a string, we apply
+            get_optimizer
+        model
+            initialized model
+        name : str
+            name of model, either "predictor" or "adversary"
+        """
+        # Preinitialized optimizer
+        if issubclass(type(optim_param), self.optim_class):
+            print("passed optim")
+            return optim_param
+        # Optimizer constructor
+        elif callable(optim_param):
+            print("construct optim")
+            return optim_param(model)
+        # Optimizer keyword
+        elif isinstance(optim_param, str):
+            print("keywor doptim")
+            got_optim = self.get_optimizer(optim_param, model)
+            if got_optim is None:
+                raise ValueError(
+                    _KWARG_ERROR_MESSAGE.format(
+                        f"{name}_optimizer",
+                        (
+                            f"a string that is supported by {self.__name__}, "
+                            + f"an already initialized optimizer (must "
+                            + f"subclass {self.optim_class}), or a constructor "
+                            + f"that takes as parameter the {name}_model and "
+                            + f"returns an initialized optimizer."
+                        ),
+                    )
+                )
+            else:
+                return got_optim
+        # Invalid optim_param
+        raise ValueError(
+            _KWARG_ERROR_MESSAGE.format(
+                f"{name}_optimizer",
+                (
+                    f"a string that indicates a certain optimizer, "
+                    + f"an already initialized optimizer (must subclass "
+                    + f"{self.optim_class}), or a constructor that takes "
+                    + f"as parameter the {name}_model and returns an "
+                    + f"initialized optimizer."
+                ),
+            )
+        )
 
     def shuffle(self, X, Y, Z):
         """
@@ -131,7 +217,7 @@ class BackendEngine:
         """
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
-    def setup_optimizer(self):
+    def get_optimizer(self, optim_param, model):
         """Create the predictor_optimizer and adversary_optimizer here."""
         raise NotImplementedError(_NOT_IMPLEMENTED)
 

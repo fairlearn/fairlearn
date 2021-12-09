@@ -26,9 +26,8 @@ class TensorflowEngine(BackendEngine):
         tensorflow.random.set_seed(base.random_state_.random())
 
         self.model_class = tensorflow.keras.Model
+        self.optim_class = tensorflow.keras.optimizers.Optimizer
         super(TensorflowEngine, self).__init__(base, X, Y, Z)
-
-        self.setup_optimizer()
 
     def evaluate(self, X):
         """
@@ -94,55 +93,18 @@ class TensorflowEngine(BackendEngine):
 
         return (LP.numpy().item(), LA.numpy().item())
 
-    def setup_optimizer(self):
-        """
-        Create the optimizers for PyTorch.
-
-        Setup predictor_optimizer and adversary_optimizer using the
-        base.predictor_optimizer and base.adversary_optimizer given by the user.
-        If the parameters given by the users are strings, we use get_optimizer
-        to get the optimizer base class and initialize it with the lr parameter.
-        If the parameter given by the user is not a string, assume it is an
-        already initialized optimizer.
-        """
-        if isinstance(self.base.predictor_optimizer, str):
-            optim = self.get_optimizer(
-                self.base.predictor_optimizer, "predictor_optimizer"
-            )
-            self.predictor_optimizer = optim(
+    def get_optimizer(self, optim_param, model):
+        """Get an optimizer instance corresponding to the string name."""
+        optim = None
+        if isinstance(optim_param, str):
+            if optim_param.lower() == "adam":
+                optim = tensorflow.keras.optimizers.Adam
+            elif optim_param.lower() == "sgd":
+                optim = tensorflow.keras.optimizers.SGD
+        if optim is not None:
+            return optim(
                 learning_rate=self.base.learning_rate
             )
-        else:
-            self.predictor_optimizer = self.base.predictor_optimizer
-
-        if isinstance(self.base.adversary_optimizer, str):
-            optim = self.get_optimizer(
-                self.base.adversary_optimizer, "adversary_optimizer"
-            )
-            self.adversary_optimizer = optim(
-                learning_rate=self.base.learning_rate
-            )
-        else:
-            self.adversary_optimizer = self.base.adversary_optimizer
-
-    def get_optimizer(self, optimizer, keyword_name):
-        """
-        Get the optimizer base class corresponding to the string name.
-
-        The parameter `optimizer` should be a string that tells us which optimizer
-        to use.
-        """
-        if isinstance(optimizer, str):
-            if optimizer.lower() == "adam":
-                return tensorflow.keras.optimizers.Adam
-            elif optimizer.lower() == "sgd":
-                return tensorflow.keras.optimizers.SGD
-        raise ValueError(
-            _KWARG_ERROR_MESSAGE.format(
-                keyword_name,
-                '"Adam" or "SGD" or an (!)initialized(!) optimizer',
-            )
-        )
 
     def get_loss(self, dist_type):
         """Get loss function corresponding to the keyword."""

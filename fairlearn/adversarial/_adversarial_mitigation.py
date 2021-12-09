@@ -128,14 +128,18 @@ class AdversarialFairness(BaseEstimator):
         function that maps the continuous output of the predictor model to
         a discrete prediction.
 
-    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
+    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
         initialized with the model and given learning rate.
-        If not a string but an already initialized optimizer is passed, this
-        optimizer is used instead.
+        If an instance of a subclass of torch.optim.Optimizer
+        or tensorflow.keras.optimizers.Optimizer is passed, this
+        is used directly. If a callable :code:`fn` is passed, we call this
+        callable and pass our model, and set the result of this call
+        as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
-    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, default = 'Adam'
+
+    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. Similarly defined as
         :code:`predictor_optimizer`
 

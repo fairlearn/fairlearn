@@ -28,22 +28,22 @@ class PytorchEngine(BackendEngine):
         torch.manual_seed(base.random_state_.random())
 
         self.model_class = torch.nn.Module
+        self.optim_class = torch.optim.Optimizer
         super(PytorchEngine, self).__init__(base, X, Y, Z)
 
-        # Setup cuda - Recommended to do this before setting up optimizers!
-        if not base.cuda:
+    def __move_model__(self):
+        # Setup cuda - do this before setting up optimizers!
+        if not self.base.cuda:
             self.cuda = False
-        elif base.cuda:
+        elif self.base.cuda:
             if not torch.cuda.is_available():
                 raise ValueError("Cuda is not available")
             self.cuda = True
-            self.device = torch.device(base.cuda)
+            self.device = torch.device(self.base.cuda)
 
         if self.cuda:
-            base.adversary_model_ = base.adversary_model_.to(self.device)
-            base.predictor_model_ = base.predictor_model_.to(self.device)
-
-        self.setup_optimizer()
+            self.adversary_model = self.adversary_model.to(self.device)
+            self.predictor_model = self.predictor_model.to(self.device)
 
     def shuffle(self, X, Y, Z):
         """Override base's shuffle to work with `torch.FloatTensor`."""
@@ -148,55 +148,18 @@ class PytorchEngine(BackendEngine):
 
         return (LP.item(), LA.item())
 
-    def setup_optimizer(self):
-        """
-        Create the optimizers for PyTorch.
-
-        Setup predictor_optimizer and adversary_optimizer using the
-        base.predictor_optimizer and base.adversary_optimizer given by the user.
-        If the parameters given by the users are strings, we use get_optimizer
-        to get the optimizer base class and initialize it with the lr parameter.
-        If the parameter given by the user is not a string, assume it is an
-        already initialized optimizer.
-        """
-        if isinstance(self.base.predictor_optimizer, str):
-            optim = self.get_optimizer(
-                self.base.predictor_optimizer, "predictor_optimizer"
+    def get_optimizer(self, optim_param, model):
+        """Get an optimizer instance corresponding to the string name."""
+        optim = None
+        if isinstance(optim_param, str):
+            if optim_param.lower() == "adam":
+                optim = torch.optim.Adam
+            elif optim_param.lower() == "sgd":
+                optim = torch.optim.SGD
+        if optim is not None:
+            return optim(
+                model.parameters(), lr=self.base.learning_rate
             )
-            self.predictor_optimizer = optim(
-                self.predictor_model.parameters(), lr=self.base.learning_rate
-            )
-        else:
-            self.predictor_optimizer = self.base.predictor_optimizer
-
-        if isinstance(self.base.adversary_optimizer, str):
-            optim = self.get_optimizer(
-                self.base.adversary_optimizer, "adversary_optimizer"
-            )
-            self.adversary_optimizer = optim(
-                self.adversary_model.parameters(), lr=self.base.learning_rate
-            )
-        else:
-            self.adversary_optimizer = self.base.adversary_optimizer
-
-    def get_optimizer(self, optimizer, keyword_name):
-        """
-        Get the optimizer base class corresponding to the string name.
-
-        The parameter `optimizer` should be a string that tells us which optimizer
-        to use.
-        """
-        if isinstance(optimizer, str):
-            if optimizer.lower() == "adam":
-                return torch.optim.Adam
-            elif optimizer.lower() == "sgd":
-                return torch.optim.SGD
-        raise ValueError(
-            _KWARG_ERROR_MESSAGE.format(
-                keyword_name,
-                '"Adam" or "SGD" or an (!)initialized(!) optimizer',
-            )
-        )
 
     def get_loss(self, dist_type):
         """Get loss function corresponding to the keyword."""
