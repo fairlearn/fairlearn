@@ -50,3 +50,4 @@ _LIST_MODEL_UNSUPPORTED = (
     "Passing model {}_model as list of keywords is not "
     + "supported when the accompanying {}_loss is not a keyword."
 )
+_CALLBACK_RETURNS_ERROR = "Callback function returned a non-boolean value"

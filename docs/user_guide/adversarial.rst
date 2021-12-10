@@ -272,7 +272,7 @@ this specific model.
 #. For some tabular datasets, we found that single hidden layer neural
    networks are easier to train than deeper networks.
 #. Validate your model! Provide this model with a callback function in
-   the constructor's keyword :code:`callback_fn`. Optionally, have
+   the constructor's keyword :code:`callbacks`. Optionally, have
    this function return :code:`True` to indicate early stoppings.
 #. The authors of [#4]_ have found it to be useful to maintain a global step
    count and gradually increase :math:`\alpha` while decreasing the learning

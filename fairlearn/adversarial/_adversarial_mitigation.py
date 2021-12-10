@@ -8,6 +8,7 @@ from ._constants import (
     _KWARG_ERROR_MESSAGE,
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
+    _CALLBACK_RETURNS_ERROR
 )
 from ._backend_engine import BackendEngine
 from ._pytorch_engine import PytorchEngine
@@ -192,11 +193,12 @@ class AdversarialFairness(BaseEstimator):
         is skipped, but also no tranform is applied to :math:`y` and
         :math:`z` (sensitive features).
 
-    callback_fn : callable
+    callbacks : callable
         Callback function, called after every batch. For instance useable when
-        wanting to validate. We pass as arguments:
-        :code:`(self, epoch, batch)`. If a callable returns something non-None
-        (such as True) then the fitting stops, which is useful when
+        wanting to validate. Can also be a list of callback functions
+        We pass as arguments:
+        :code:`(self, step)`. A callable may return a boolean that, if
+        true, the fitting stops, which is useful when
         implementing *early stopping*.
 
     cuda : str, default = None
@@ -241,7 +243,7 @@ class AdversarialFairness(BaseEstimator):
         shuffle=False,
         progress_updates=None,
         skip_validation=False,
-        callback_fn=None,
+        callbacks=None,
         cuda=None,
         warm_start=False,
         random_state=None,
@@ -265,7 +267,7 @@ class AdversarialFairness(BaseEstimator):
         self.shuffle = shuffle
         self.progress_updates = progress_updates
         self.skip_validation = skip_validation
-        self.callback_fn = callback_fn
+        self.callbacks = callbacks
         self.cuda = cuda
         self.warm_start = warm_start
         self.random_state = random_state
@@ -322,10 +324,17 @@ class AdversarialFairness(BaseEstimator):
                     _KWARG_ERROR_MESSAGE.format(kwname, "a boolean")
                 )
 
-        if self.callback_fn and not callable(self.callback_fn):
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format("callback_fn", "a callable")
-            )
+        if self.callbacks and not callable(self.callbacks):
+            if not isinstance(self.callbacks, list):
+                raise ValueError(
+                            _KWARG_ERROR_MESSAGE.format("callbacks", "a callable or list of callables")
+                        )
+            else:
+                for cb in self.callbacks:
+                    if not callable(cb):
+                        raise ValueError(
+                            _KWARG_ERROR_MESSAGE.format("callbacks", "a callable or list of callables")
+                        )
 
         # NOTE: inferring distribution type should happen before transforming
         read_kw = (
@@ -430,6 +439,8 @@ class AdversarialFairness(BaseEstimator):
 
         predictor_losses = [None]
         adversary_losses = []
+
+        self.step_ = 0
         for epoch in range(self.epochs):
             for batch in range(batches):
                 if self.progress_updates:
@@ -464,10 +475,24 @@ class AdversarialFairness(BaseEstimator):
                 predictor_losses.append(LP)
                 adversary_losses.append(LA)
 
-                if self.callback_fn and callable(self.callback_fn):
-                    stop = self.callback_fn(self, epoch, batch)
+                self.step_ += 1
+
+                if self.callbacks:
+                    stop = False
+                    if isinstance(self.callbacks, list):
+                        for cb in self.callbacks:
+                            result = cb(self, self.step_)
+                            if result and not isinstance(result, bool):
+                                raise RuntimeError(_CALLBACK_RETURNS_ERROR)
+                            stop = stop or result
+                    else:  # callable(self.callbacks):
+                        result = self.callbacks(self, self.step_)
+                        if result and not isinstance(result, bool):
+                            raise RuntimeError(_CALLBACK_RETURNS_ERROR)
+                        stop = result
+
                     if stop:
-                        return
+                        return self
             if self.shuffle and epoch != self.epochs - 1:
                 X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
 

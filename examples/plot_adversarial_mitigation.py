@@ -257,7 +257,7 @@ def optimizer_constructor(model):
 step = 1
 
 
-def callback_fn(model, *args):
+def callbacks(model, *args):
     global step
     global schedulers
     step += 1
@@ -291,7 +291,7 @@ mitigator = AdversarialFairnessClassifier(
     epochs=10,
     batch_size=2 ** 7,
     shuffle=True,
-    callback_fn=callback_fn,
+    callbacks=callbacks,
     random_state=123,
 )
 
