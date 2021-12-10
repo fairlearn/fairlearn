@@ -67,7 +67,7 @@ class BackendEngine:
             base.predictor_optimizer, self.predictor_model, "predictor"
         )
         self.adversary_optimizer = self.__init_optimizers__(
-            base.predictor_optimizer, self.adversary_model, "adversary"
+            base.adversary_optimizer, self.adversary_model, "adversary"
         )
 
     def __init_model__(
