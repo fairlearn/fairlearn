@@ -775,4 +775,5 @@ def check_X(X):
         accept_sparse=False,
         accept_large_sparse=False,
         dtype=float,
+        allow_nd=True
     ).astype(float)
