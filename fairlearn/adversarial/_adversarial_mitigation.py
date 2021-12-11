@@ -240,6 +240,7 @@ class AdversarialFairness(BaseEstimator):
         alpha=1.0,
         epochs=1,
         batch_size=-1,
+        max_iter=-1,
         shuffle=False,
         progress_updates=None,
         skip_validation=False,
@@ -264,6 +265,7 @@ class AdversarialFairness(BaseEstimator):
         self.alpha = alpha
         self.epochs = epochs
         self.batch_size = batch_size
+        self.max_iter = max_iter
         self.shuffle = shuffle
         self.progress_updates = progress_updates
         self.skip_validation = skip_validation
@@ -297,6 +299,7 @@ class AdversarialFairness(BaseEstimator):
                 )
             )
 
+        # Non-negative parameters
         for kw, kwname in (
             (self.learning_rate, "learning_rate"),
             (self.alpha, "alpha"),
@@ -307,12 +310,18 @@ class AdversarialFairness(BaseEstimator):
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(kwname, "a non-negative number")
                 )
-        if self.batch_size <= 0.0 and self.batch_size != -1:
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format(
-                    "batch_size", "a positive number or -1"
+
+        # Positive or -1 parameters
+        for kw, kwname in (
+            (self.batch_size, "batch_size"),
+            (self.max_iter, "max_iter"),
+        ):
+            if kw <= 0.0 and kw != -1:
+                raise ValueError(
+                    _KWARG_ERROR_MESSAGE.format(
+                        kwname, "a positive number or -1"
+                    )
                 )
-            )
 
         for kw, kwname in (
             (self.shuffle, "shuffle"),
@@ -476,6 +485,10 @@ class AdversarialFairness(BaseEstimator):
                 adversary_losses.append(LA)
 
                 self.step_ += 1
+
+                # Purposefully first stop and then handle callbacks
+                if self.max_iter != -1 and self.step_ >= self.max_iter:
+                    return self
 
                 if self.callbacks:
                     stop = False
