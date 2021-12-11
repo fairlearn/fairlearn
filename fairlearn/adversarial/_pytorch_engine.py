@@ -3,7 +3,6 @@
 
 from ._backend_engine import BackendEngine
 from ._constants import (
-    _KWARG_ERROR_MESSAGE,
     _MODEL_UNRECOGNIZED_STR,
     _MODEL_UNRECOGNIZED_ITEM,
 )
@@ -32,6 +31,7 @@ class PytorchEngine(BackendEngine):
         super(PytorchEngine, self).__init__(base, X, Y, Z)
 
     def __move_model__(self):
+        """Move model to CUDA."""
         # Setup cuda - do this before setting up optimizers!
         if not self.base.cuda:
             self.cuda = False
@@ -157,9 +157,7 @@ class PytorchEngine(BackendEngine):
             elif optim_param.lower() == "sgd":
                 optim = torch.optim.SGD
         if optim is not None:
-            return optim(
-                model.parameters(), lr=self.base.learning_rate
-            )
+            return optim(model.parameters(), lr=self.base.learning_rate)
 
     def get_loss(self, dist_type):
         """Get loss function corresponding to the keyword."""

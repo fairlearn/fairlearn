@@ -146,12 +146,11 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
         return inverse
 
+
 # hash = lambda d : id(d) + sum(d.shape) + d.size + id(d.dtype)
 # memoize_store = {}
 def _infer_type(data):
-    """
-    Memoize type_of_target without prohibiting data garbage-disposal.
-    """
+    """Memoize type_of_target without prohibiting data garbage-disposal."""
     # memoized = memoize_store.get(hash(data), None)
     # if memoized is not None:
     #     print("hit")

@@ -8,7 +8,7 @@ from ._constants import (
     _KWARG_ERROR_MESSAGE,
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
-    _CALLBACK_RETURNS_ERROR
+    _CALLBACK_RETURNS_ERROR,
 )
 from ._backend_engine import BackendEngine
 from ._pytorch_engine import PytorchEngine
@@ -336,13 +336,17 @@ class AdversarialFairness(BaseEstimator):
         if self.callbacks and not callable(self.callbacks):
             if not isinstance(self.callbacks, list):
                 raise ValueError(
-                            _KWARG_ERROR_MESSAGE.format("callbacks", "a callable or list of callables")
-                        )
+                    _KWARG_ERROR_MESSAGE.format(
+                        "callbacks", "a callable or list of callables"
+                    )
+                )
             else:
                 for cb in self.callbacks:
                     if not callable(cb):
                         raise ValueError(
-                            _KWARG_ERROR_MESSAGE.format("callbacks", "a callable or list of callables")
+                            _KWARG_ERROR_MESSAGE.format(
+                                "callbacks", "a callable or list of callables"
+                            )
                         )
 
         # NOTE: inferring distribution type should happen before transforming
@@ -437,7 +441,15 @@ class AdversarialFairness(BaseEstimator):
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
-            raise ValueError(_KWARG_ERROR_MESSAGE.format("epochs", "a positive number, or key-word argument max_iter should be a positive number."))
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format(
+                    "epochs",
+                    (
+                        "a positive number, or key-word argument "
+                        + "max_iter should be a positive number."
+                    ),
+                )
+            )
 
         if self.batch_size == -1:
             batch_size = X.shape[0]
@@ -515,7 +527,7 @@ class AdversarialFairness(BaseEstimator):
 
                     if stop:
                         return self
-            if self.shuffle and epoch != epochs - 1: # Don't shuffle last epoch
+            if self.shuffle and epoch != epochs - 1:  # Don't shuffle last epoch
                 X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
 
         return self
@@ -797,5 +809,5 @@ def check_X(X):
         accept_sparse=False,
         accept_large_sparse=False,
         dtype=float,
-        allow_nd=True
+        allow_nd=True,
     ).astype(float)

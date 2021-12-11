@@ -52,7 +52,8 @@ class BackendEngine:
             "adversary",
         )
 
-        if hasattr(self, '__move_model__'): self.__move_model__()
+        if hasattr(self, "__move_model__"):
+            self.__move_model__()
 
         # Set up losses
         self.predictor_loss = self.__init_loss__(
@@ -162,10 +163,10 @@ class BackendEngine:
                         f"{name}_optimizer",
                         (
                             f"a string that is supported by {self.__name__}, "
-                            + f"an already initialized optimizer (must "
+                            + "an already initialized optimizer (must "
                             + f"subclass {self.optim_class}), or a constructor "
                             + f"that takes as parameter the {name}_model and "
-                            + f"returns an initialized optimizer."
+                            + "returns an initialized optimizer."
                         ),
                     )
                 )
@@ -176,11 +177,11 @@ class BackendEngine:
             _KWARG_ERROR_MESSAGE.format(
                 f"{name}_optimizer",
                 (
-                    f"a string that indicates a certain optimizer, "
-                    + f"an already initialized optimizer (must subclass "
+                    "a string that indicates a certain optimizer, "
+                    + "an already initialized optimizer (must subclass "
                     + f"{self.optim_class}), or a constructor that takes "
                     + f"as parameter the {name}_model and returns an "
-                    + f"initialized optimizer."
+                    + "initialized optimizer."
                 ),
             )
         )

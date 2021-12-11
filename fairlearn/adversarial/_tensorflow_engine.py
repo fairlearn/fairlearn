@@ -2,8 +2,6 @@
 # Licensed under the MIT License.
 
 from ._backend_engine import BackendEngine
-from ._constants import _KWARG_ERROR_MESSAGE
-
 from numpy import finfo, float32
 
 # dynamic imports.
@@ -102,9 +100,7 @@ class TensorflowEngine(BackendEngine):
             elif optim_param.lower() == "sgd":
                 optim = tensorflow.keras.optimizers.SGD
         if optim is not None:
-            return optim(
-                learning_rate=self.base.learning_rate
-            )
+            return optim(learning_rate=self.base.learning_rate)
 
     def get_loss(self, dist_type):
         """Get loss function corresponding to the keyword."""

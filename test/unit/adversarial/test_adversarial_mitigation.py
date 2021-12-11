@@ -80,7 +80,7 @@ class fake_torch:
         """Mock of torch.optim."""
 
         class Optimizer:
-            """Mock of pytorch Adam optimizer, with empty init and zerograd."""
+            """Mock of base optimizer, with empty init and zerograd."""
 
             def __init__(self, params, **kwargs):
                 """Mock init because this mock optimizer is initialized."""
@@ -89,8 +89,9 @@ class fake_torch:
             def zero_grad(self):
                 """Mock zerograd because this mock optimizer is used."""
                 pass
-        
-        class Adam(Optimizer): pass
+
+        class Adam(Optimizer):
+            """Mock of pytorch Adam optimizer, with empty init and zerograd."""
 
     class from_numpy:
         """Mock torch.from_numpy, torch.Tensor is now a class with data."""
@@ -127,13 +128,15 @@ class fake_tensorflow:
 
         class optimizers:
             """Mock of tf.keras.optimizers."""
+
             class Optimizer:
-                """Mock of pytorch Adam optimizer, with empty init."""
+                """Mock of base optimizer."""
 
                 def __init__(self, **kwargs):  # noqa: D107
                     pass
 
-            class Adam(Optimizer): pass
+            class Adam(Optimizer):
+                """Mock of pytorch Adam optimizer."""
 
     class random:
         """mock of tf.random."""
