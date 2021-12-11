@@ -303,7 +303,6 @@ class AdversarialFairness(BaseEstimator):
         for kw, kwname in (
             (self.learning_rate, "learning_rate"),
             (self.alpha, "alpha"),
-            (self.epochs, "epochs"),
             (self.progress_updates, "progress_updates"),
         ):
             if kw and kw < 0.0:
@@ -314,6 +313,7 @@ class AdversarialFairness(BaseEstimator):
         # Positive or -1 parameters
         for kw, kwname in (
             (self.batch_size, "batch_size"),
+            (self.epochs, "epochs"),
             (self.max_iter, "max_iter"),
         ):
             if kw <= 0.0 and kw != -1:
@@ -435,11 +435,20 @@ class AdversarialFairness(BaseEstimator):
         """
         X, Y, Z = self._validate_input(X, y, sensitive_features)
 
+        # Not checked in __setup, because partial_fit may not require it.
+        if self.epochs == -1 and self.max_iter == -1:
+            raise ValueError(_KWARG_ERROR_MESSAGE.format("epochs", "a positive number, or key-word argument max_iter should be a positive number."))
+
         if self.batch_size == -1:
             batch_size = X.shape[0]
         else:
             batch_size = self.batch_size
         batches = ceil(X.shape[0] / batch_size)
+
+        if self.epochs == -1:
+            epochs = ceil(self.max_iter / batches)
+        else:
+            epochs = self.epochs
 
         start_time = time()
         last_update_time = start_time
@@ -450,20 +459,20 @@ class AdversarialFairness(BaseEstimator):
         adversary_losses = []
 
         self.step_ = 0
-        for epoch in range(self.epochs):
+        for epoch in range(epochs):
             for batch in range(batches):
                 if self.progress_updates:
                     if (time() - last_update_time) > self.progress_updates:
                         last_update_time = time()
-                        progress = (epoch / self.epochs) + (
-                            batch / (batches * self.epochs)
+                        progress = (epoch / epochs) + (
+                            batch / (batches * epochs)
                         )
                         print(
                             _PROGRESS_UPDATE.format(
                                 "=" * round(20 * progress),
                                 " " * round(20 * (1 - progress)),
                                 epoch + 1,
-                                self.epochs,
+                                epochs,
                                 " " * (len(str(batch + 1)) - len(str(batches))),
                                 batch + 1,
                                 batches,
@@ -506,7 +515,7 @@ class AdversarialFairness(BaseEstimator):
 
                     if stop:
                         return self
-            if self.shuffle and epoch != self.epochs - 1:
+            if self.shuffle and epoch != epochs - 1: # Don't shuffle last epoch
                 X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
 
         return self
