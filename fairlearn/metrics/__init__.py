@@ -46,7 +46,7 @@ from ._extra_metrics import (  # noqa: F401
     selection_rate,
     _mean_overprediction,
     _mean_underprediction,
-    )
+    count)
 
 from ._roc_auc import RocAuc
 
@@ -79,6 +79,7 @@ _extra_metrics = [
     "false_negative_rate",
     "mean_prediction",
     "selection_rate",
+    "count"
 ]
 
 __all__ = _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys()))

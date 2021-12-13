@@ -20,24 +20,24 @@ def fetch_adult(*, cache=True, data_home=None,
     Classes                       2
     ==============   ==============
 
-    Source: https://archive.ics.uci.edu/ml/datasets/Adult
-    Ronny Kohavi and Barry Becker, "Scaling Up the Accuracy of Naive-Bayes
-    Classifiers: a Decision-Tree Hybrid", Proceedings of the Second
-    International Conference on Knowledge Discovery and Data Mining, 1996
+    Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
 
+    .. versionadded:: 0.5.0
+
     Parameters
     ----------
-    cache : boolean, default=True
+    cache : bool, default=True
         Whether to cache downloaded datasets using joblib.
 
-    data_home : optional, default: None
-        Specify another download and cache folder for the datasets. By default
-        all scikit-learn data is stored in '~/.fairlearn-data' subfolders.
+    data_home : str, default=None
+        Specify another download and cache folder for the datasets.
+        By default, all scikit-learn data is stored in '~/.fairlearn-data'
+        subfolders.
 
-    as_frame : boolean, default=False
+    as_frame : bool, default=False
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical). The target is
         a pandas DataFrame or Series depending on the number of target_columns.
@@ -45,13 +45,13 @@ def fetch_adult(*, cache=True, data_home=None,
         data. If ``return_X_y`` is True, then ``(data, target)`` will be pandas
         DataFrames or Series as describe above.
 
-    return_X_y : boolean, default=False.
+    return_X_y : bool, default=False
         If True, returns ``(data.data, data.target)`` instead of a Bunch
         object.
 
     Returns
     -------
-    dataset : :class:`~sklearn.utils.Bunch`
+    dataset : :obj:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
         data : ndarray, shape (48842, 14)
@@ -71,6 +71,17 @@ def fetch_adult(*, cache=True, data_home=None,
 
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
         if ``return_X_y`` is True and ``as_frame`` is True
+
+    References
+    ----------
+    .. [1] R. Kohavi and B. Becker, UCI Machine Learning Repository:
+       Adult Data Set, 01-May-1996. [Online]. Available:
+       https://archive.ics.uci.edu/ml/datasets/adult.
+
+    .. [2] R. Kohavi, "Scaling Up the Accuracy of Naive-Bayes Classifiers:
+       a Decision-Tree Hybrid," in *Second International Conference on knowledge
+       discovery and data mining: proceedings: August 2-4, 1996, Portland,
+       Oregon*, 1996, pp. 202–207.
 
     """
     if not data_home:

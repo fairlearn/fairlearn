@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+import functools
 
 import numpy as np
 import pandas as pd
@@ -9,7 +10,10 @@ import sklearn.metrics as skm
 import fairlearn.metrics as metrics
 
 from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4
-
+from fairlearn.metrics._metric_frame import (
+    _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
+    _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
+)
 
 metric = [skm.recall_score,
           skm.precision_score,
@@ -20,8 +24,7 @@ metric = [skm.recall_score,
 class Test1m1sf0cf:
     # Single metric supplied as callable
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(metric_fn,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_4)
 
         assert self.target.control_levels is None
@@ -117,8 +120,7 @@ class Test1m1sf0cfFnDict:
     # Key difference is that the function is supplied as a dict
     def _prepare(self, metric_fn):
         self.mfn = "Random name"
-        self.target = metrics.MetricFrame({self.mfn: metric_fn},
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics={self.mfn: metric_fn}, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_4)
 
         assert self.target.control_levels is None
@@ -219,8 +221,7 @@ class Test1m1sf0cfFnDict:
 class Test2m1sf0cf:
     def _prepare(self):
         fns = {'recall': skm.recall_score, 'prec': skm.precision_score}
-        self.target = metrics.MetricFrame(fns,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=pd.Series(data=g_4))
 
         assert self.target.control_levels is None
@@ -306,8 +307,7 @@ class Test2m1sf0cf:
 class Test1m1cf1sf:
     # Metric function supplied in callable
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(metric_fn,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                                           sensitive_features=pd.Series(data=g_2, name='sf0'),
                                           control_features=pd.Series(data=g_3, name='cf0'))
 
@@ -413,8 +413,7 @@ class Test1m1cf1sfFnDict:
     # Key difference is that the metric function is supplied in a dict
     def _prepare(self, metric_fn):
         self.mfn = "Some name"
-        self.target = metrics.MetricFrame({self.mfn: metric_fn},
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics={self.mfn: metric_fn}, y_true=y_t, y_pred=y_p,
                                           sensitive_features=pd.Series(data=g_2, name='sf0'),
                                           control_features=pd.Series(data=g_3, name='cf0'))
 
@@ -517,8 +516,7 @@ class Test1m1cf1sfFnDict:
 class Test1m1sf2cf:
     # Single metric, supplied as callable
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(metric_fn,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
                                           sensitive_features=list(g_2),
                                           control_features=np.stack([g_3, g_1], axis=1))
 
@@ -666,8 +664,7 @@ class Test1m1sf2cfFnDict:
     # Single metric, supplied as dict
     def _prepare(self, metric_fn):
         self.mfn = "Random name"
-        self.target = metrics.MetricFrame({self.mfn: metric_fn},
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics={self.mfn: metric_fn}, y_true=y_t, y_pred=y_p,
                                           sensitive_features=list(g_2),
                                           control_features=np.stack([g_3, g_1], axis=1))
 
@@ -812,8 +809,7 @@ class Test1m1sf2cfFnDict:
 class Test2m1sf1cf:
     def _prepare(self):
         fns = {'recall': skm.recall_score, 'prec': skm.precision_score}
-        self.target = metrics.MetricFrame(fns,
-                                          y_t, y_p,
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
                                           sensitive_features=g_2,
                                           control_features=g_3)
 
@@ -935,8 +931,7 @@ class Test2m1sf1cf:
 def test_2m_1sf_2cf():
     # This test is structured differently, and hence not written as a class
     func_dict = {'recall': skm.recall_score, 'prec': skm.precision_score}
-    target = metrics.MetricFrame(func_dict,
-                                 y_t, y_p,
+    target = metrics.MetricFrame(metrics=func_dict, y_true=y_t, y_pred=y_p,
                                  sensitive_features=list(g_2),
                                  control_features={'cf0': g_3, 'cf1': g_1})
 
@@ -1049,3 +1044,670 @@ def test_2m_1sf_2cf():
         assert ratios_overall[mfn][('m', 'aa')] == min(ratio_overall_m_a)
         assert ratios_overall[mfn][('m', 'ba')] == pytest.approx(min(ratio_overall_m_b),
                                                                  rel=1e-10, abs=1e-16)
+
+
+class Test2m1sf1cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'recall': skm.recall_score, 'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2,
+                                          control_features=g_3)
+
+        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score},
+                                            y_true=y_t,
+                                            y_pred=y_p,
+                                            sensitive_features=g_2,
+                                            control_features=g_3)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        expected_mins = self.expected.group_min()
+        expected_mins['confusion_matrix'] = np.nan
+        assert target_mins.equals(expected_mins)
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        expected_maxs = self.expected.group_max()
+        expected_maxs['confusion_matrix'] = np.nan
+        assert target_maxs.equals(expected_maxs)
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+
+class Test1m1sf1cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2,
+                                          control_features=g_3)
+
+        self.expected = metrics.MetricFrame(metrics={}, y_true=y_t, y_pred=y_p,
+                                            sensitive_features=g_2,
+                                            control_features=g_3)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        expected_mins = self.expected.group_min()
+        expected_mins['confusion_matrix'] = np.nan
+        assert target_mins.equals(expected_mins)
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        expected_maxs = self.expected.group_max()
+        expected_maxs['confusion_matrix'] = np.nan
+        assert target_maxs.equals(expected_maxs)
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+
+class Test2m1sf0cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'recall': skm.recall_score, 'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2)
+
+        self.expected = metrics.MetricFrame(metrics={'recall': skm.recall_score},
+                                            y_true=y_t,
+                                            y_pred=y_p,
+                                            sensitive_features=g_2)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        expected_mins = self.expected.group_min()
+        expected_mins['confusion_matrix'] = np.nan
+        assert target_mins.equals(expected_mins)
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        expected_maxs = self.expected.group_max()
+        expected_maxs['confusion_matrix'] = np.nan
+        assert target_maxs.equals(expected_maxs)
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        expected_differences = self.expected.difference()
+        expected_differences['confusion_matrix'] = np.nan
+        assert target_differences.equals(expected_differences)
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        expected_ratio = self.expected.ratio()
+        expected_ratio['confusion_matrix'] = np.nan
+        assert target_ratio.equals(expected_ratio)
+
+
+class Test1m1sf0cfErrorHandlingCM:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    def _prepare(self):
+        fns = {'confusion_matrix': skm.confusion_matrix}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        assert target_mins.isna().all()
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        assert target_maxs.isna().all()
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        assert target_differences.isna().all()
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        assert target_differences.isna().all()
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        assert target_ratio.isna().all()
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        assert target_ratio.isna().all()
+
+
+class Test2m1sf0cfErrorHandlingCM2:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    # Tests for two non-scalar columns in MetricFrame.
+    def _prepare(self):
+        fns = {'confusion_matrix1': skm.confusion_matrix,
+               'confusion_matrix2': functools.partial(skm.confusion_matrix, normalize='all')}
+        self.target = metrics.MetricFrame(metrics=fns, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        assert target_mins.isna().all()
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        assert target_maxs.isna().all()
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        assert target_differences.isna().all()
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        assert target_differences.isna().all()
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        assert target_ratio.isna().all()
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        assert target_ratio.isna().all()
+
+
+class Test1m1sf0cfErrorHandlingSeries:
+    # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
+    # Tests for two non-scalar columns in MetricFrame.
+    def _prepare(self):
+        self.target = metrics.MetricFrame(metrics=skm.confusion_matrix, y_true=y_t, y_pred=y_p,
+                                          sensitive_features=g_2)
+
+    def test_min_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_coerce(self):
+        self._prepare()
+        target_mins = self.target.group_min(errors='coerce')
+        assert np.isnan(target_mins)
+
+    def test_min_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_min_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_min(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_coerce(self):
+        self._prepare()
+        target_maxs = self.target.group_max(errors='coerce')
+        assert np.isnan(target_maxs)
+
+    def test_max_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_max_default(self):
+        # default is 'raise'
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.group_max(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_coerce(self):
+        self._prepare()
+        target_differences = self.target.difference(errors='coerce')
+        assert np.isnan(target_differences)
+
+    def test_difference_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_difference_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_differences = self.target.difference()
+        assert np.isnan(target_differences)
+
+    def test_ratio_raise(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='raise')
+        assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_coerce(self):
+        self._prepare()
+        target_ratio = self.target.ratio(errors='coerce')
+        assert np.isnan(target_ratio)
+
+    def test_ratio_wrong_input(self):
+        self._prepare()
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(errors='WRONG')
+        assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
+
+    def test_ratio_default(self):
+        # default is 'coerce'
+        self._prepare()
+        target_ratio = self.target.ratio()
+        assert np.isnan(target_ratio)

@@ -20,7 +20,8 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
     Classes                             2
     ==============   ====================
 
-    Source: http://archive.ics.uci.edu/ml/datasets/Bank+Marketing
+    Source: UCI Repository [3]_ Paper: Moro et al., 2014 [4]_
+
     The data is related with direct marketing campaigns of a Portuguese
     banking institution. The marketing campaigns were based on phone calls.
     Often, more than one contact to the same client was required,
@@ -29,17 +30,19 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
     The classification goal is to predict if the client will subscribe a
     term deposit (variable y).
 
+    .. versionadded:: 0.5.0
 
     Parameters
     ----------
-    cache : boolean, default=True
+    cache : bool, default=True
         Whether to cache downloaded datasets using joblib.
 
-    data_home : optional, default: None
-        Specify another download and cache folder for the datasets. By default
-        all scikit-learn data is stored in '~/.fairlearn-data' subfolders.
+    data_home : str, default=None
+        Specify another download and cache folder for the datasets.
+        By default, all data is stored in '~/.fairlearn-data'
+        subfolders.
 
-    as_frame : boolean, default=False
+    as_frame : bool, default=False
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical). The target is
         a pandas DataFrame or Series depending on the number of target_columns.
@@ -47,13 +50,13 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
         data. If ``return_X_y`` is True, then ``(data, target)`` will be pandas
         DataFrames or Series as describe above.
 
-    return_X_y : boolean, default=False.
+    return_X_y : bool, default=False
         If True, returns ``(data.data, data.target)`` instead of a Bunch
         object.
 
     Returns
     -------
-    dataset : :class:`~sklearn.utils.Bunch`
+    dataset : :obj:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
         data : ndarray, shape (45211, 17)
@@ -74,6 +77,16 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
 
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
         if ``return_X_y`` is True and ``as_frame`` is True
+
+    References
+    ----------
+    .. [3] S. Moro, P. Cortez, and P. Rita, UCI Machine Learning Repository:
+       Bank Marketing Data Set, 14-Feb-2014. [Online]. Available:
+       https://archive.ics.uci.edu/ml/datasets/Bank+Marketing.
+
+    .. [4] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict
+       the Success of Bank Telemarketing. Decision Support Systems,
+       Elsevier, 62:22-31, June 2014
 
     """
     if not data_home:
