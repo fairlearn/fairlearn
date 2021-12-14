@@ -202,8 +202,7 @@ class RocAuc:
             metrics = self.splitter,
             y_true = self.y_true,
             y_pred = self.y_score,
-            sensitive_features = self.sensitive_features,
-                        )
+            sensitive_features = self.sensitive_features)
         self.sensitive_series = mf.by_group
         return self.sensitive_series
 

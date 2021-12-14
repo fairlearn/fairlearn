@@ -4,7 +4,7 @@ import numpy as np
 import pkg_resources
 import pytest
 from fairlearn.metrics import RocAuc
-from .data_for_test import y_p, y_t, g_1, g_2, y_score
+from .data_for_test import y_t, g_1, g_2, y_score
 
 PYTEST_MPL_NOT_INSTALLED_MSG = "skipping plotting tests because pytest-mpl is not installed"
 
@@ -18,15 +18,13 @@ pytest can run the tests either to check that there are no exceptions (using
 a typical pytest command without extra options) or to actually compare the
 generated images with the baseline plots (using pytest --mpl)."""
 
-SENSITIVE_FEATURES = np.stack([g_1, g_2])
 
-def _plot_by_group(y_t, y_score, SENSITIVE_FEATURES):
+def _plot_by_group(y_true, y_score, sensitive_features):
     import matplotlib.pyplot as plt
     rc = RocAuc(
-        y_true=y_t,
+        y_true=y_true,
         y_score=y_score,
-        sensitive_features=SENSITIVE_FEATURES
-                 )
+        sensitive_features=sensitive_features)
     roc_plot = rc.plot_by_group()
     return roc_plot.figure_
 
@@ -44,7 +42,8 @@ def is_mpl_installed():
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="plot_by_group_ex1.png")
     def test_plot_by_group_ex1(self):
-        return _plot_by_group(y_t, y_score, SENSITIVE_FEATURES)
+        sensitive_features = np.hstack((g_1.reshape(-1,1), g_2.reshape(-1,1)))
+        return _plot_by_group(y_t, y_score, sensitive_features)
 
     # @pytest.mark.mpl_image_compare(filename="equalized_odds_ex2.png")
     # def test_plot_equalized_odds_ex2(self):
