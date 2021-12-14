@@ -199,7 +199,7 @@ class RocAuc:
 
         """
         mf = MetricFrame(
-            metric = self.splitter,
+            metrics = self.splitter,
             y_true = self.y_true,
             y_pred = self.y_score,
             sensitive_features = self.sensitive_features,
