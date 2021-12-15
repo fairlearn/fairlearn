@@ -188,7 +188,7 @@ def plot_model_comparison(
         if model_names_int_:
             model_names = [key for key in y_preds.keys()]
         else:
-            model_names = [i for i, _ in y_preds]
+            model_names = [i for i, _ in enumerate(y_preds)]
         kwargs["c"] = model_names
 
     # Add to ax
