@@ -39,7 +39,7 @@ def test_thresholder():
     A_test_combined = A_test.loc[:, 'SF1+2']
     A_test_multiple = A_test.loc[:, ['SF1', 'SF2']]
 
-    threshold_dict_combined = {'AC': .36, 'BC': .43, 'BD': .4, 'AD': .465}
+    threshold_dict_combined = {'AC': .36, 'BC': .43, 'BD': ('>', .4), 'AD': .465}
     threshold_dict_multiple = {('A', 'C'): .36, ('B', 'C'): .43, ('B', 'D'): .4, ('A', 'D'): .465}
 
     expected_y = pd.Series([1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0,

@@ -9,22 +9,23 @@ from sklearn.utils.validation import check_is_fitted
 from warnings import warn
 
 
-from postprocessing._threshold_operation import ThresholdOperation
+# from postprocessing._threshold_operation import ThresholdOperation
+from ._threshold_operation import ThresholdOperation
 
 # try to get it to work now
-from utils._common import _get_soft_predictions
-from utils._input_validation import _validate_and_reformat_input
-from postprocessing._constants import (
-    BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
-    BASE_ESTIMATOR_NOT_FITTED_WARNING)
+# from utils._common import _get_soft_predictions
+# from utils._input_validation import _validate_and_reformat_input
+# from postprocessing._constants import (
+#     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
+#     BASE_ESTIMATOR_NOT_FITTED_WARNING)
 
 
 # how it should be
-# from ..utils._common import _get_soft_predictions
-# from ..utils._input_validation import _validate_and_reformat_input
-# from ._constants import (
-#     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
-#     BASE_ESTIMATOR_NOT_FITTED_WARNING)
+from ..utils._common import _get_soft_predictions
+from ..utils._input_validation import _validate_and_reformat_input
+from ._constants import (
+    BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
+    BASE_ESTIMATOR_NOT_FITTED_WARNING)
 
 
 class Thresholder(BaseEstimator, MetaEstimatorMixin):
@@ -83,19 +84,59 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         self.prefit = prefit
         self.predict_method = predict_method
 
-        self.validate_threshold_dict_keys()
+        self.validate_threshold_dict()
 
-    def validate_threshold_dict_keys(self):
-        """Check if all keys of :code:`threshold_dict` are of the same type."""
-        keys = list(self.threshold_dict.keys())
+    def validate_threshold_dict(self):
+        """Validate if :code: `threshold_dict` is specified correctly.
 
+        For the keys (subgroups/sensitive feature values), check if all keys are of the same type.
+        For the values (thresholds), check if they are provided as either `float` or `tuple`.
+        If a threshold is specified in a tuple, check if it done correctly, i.e. ('>',float)
+        or ('<',float)
+
+        Warn the user if any of the above requirements is violated.
+        """
+        keys, values = zip(*self.threshold_dict.items())
+
+        # Check if all keys are of the same type
         if len(keys) > 1:
-            same_type = \
-                all(isinstance(key, type(keys[0])) for key in keys[1:])
+            for key in keys[1:]:
+                if isinstance(type(key), type(keys[0])):
+                    warn("Not all the keys of 'threshold_dict' are of the same type. \
+                        {} is of type '{}', while {} is of type '{}'. \
+                        Please make sure that all keys are of the same type.".format(
+                        keys[0], type(keys[0]).__name__, key, type(key).__name__))
+                    break
 
-            if not same_type:
-                warn("Not all the keys of 'threshold_dict' are of the same\
-                type. Please make sure that all keys are of the same type")
+        # Check the provided thresholds
+        for threshold in values:
+            # Check if all specified thresholds are of type 'float' or 'tuple'
+            if not isinstance(threshold, (float, tuple)):
+                warn("All specified thresholds should be of type 'float' or 'tuple',\
+                     but {} is of type '{}'".format(
+                    threshold, type(threshold).__name__))
+                break
+
+            # If provided in tuple, check if done so correctly
+            if isinstance(threshold, tuple):
+                msg = ''
+                if threshold[0] not in ['>', '<']:
+                    msg += "The operator of a specified threshold operation should be \
+                        either '>' or '<'. However, for {} it is {}.".format(
+                        threshold, threshold[0])
+                if not isinstance(threshold[1], float):
+                    if msg:
+                        msg += " The threshold should be of type 'float', \
+                            however {} is of type '{}'.".format(
+                            threshold[1], type(threshold[1]).__name__)
+                    else:
+                        msg += "The threshold of a specified threshold \
+                                operation should be of type 'float'. \
+                                However, for {} it is of type '{}'.".format(
+                            threshold, type(threshold[1]).__name__)
+                if msg:
+                    warn(msg)
+                    break
 
     def reformat_threshold_dict_keys(self):
         """Reformats the keys of the provided :code: `threshold_dict`.
@@ -119,12 +160,12 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     def check_for_unseen_sf_values(self, sensitive_feature_vector):
         """Check for unseen sensitive feature values.
 
-        Checks if there are sensitive feature value(s) (cominations),
-         that are not mentioned in :code: `threshold_dict`.
+        Checks if there are sensitive feature value(s) (combinations),
+        that are not mentioned in :code: `threshold_dict`.
 
         Returns
         -------
-        Warning message if there are unseen feature value(s) (cominations),
+        Warning message if there are unseen feature value(s) (combinations),
         None if not
         """
         known_sf_values = list(self.threshold_dict.keys())
@@ -231,7 +272,12 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         for sf, threshold in self.threshold_dict.items():
 
-            operation = ThresholdOperation('>', threshold)
+            # The threshold is provided as either a float or
+            # ('>',float) or ('<',float)
+            if isinstance(threshold, float):
+                operation = ThresholdOperation('>', threshold)
+            else:
+                operation = ThresholdOperation(threshold[0], threshold[1])
 
             thresholded_predictions = 1.0 * operation(base_predictions_vector)
 
