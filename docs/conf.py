@@ -83,8 +83,8 @@ intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'matplotlib': ('https://matplotlib.org/', None,),
                        'tensorflow': (
                             'https://www.tensorflow.org/api_docs/python',
-                            'https://github.com/GPflow/tensorflow-intersphinx/'
-                            'raw/master/tf2_py_objects.inv'
+                            'https://raw.githubusercontent.com/GPflow/'
+                            'tensorflow-intersphinx/master/tf2_py_objects.inv'
                         )}
 
 # Add any paths that contain templates here, relative to this directory.
