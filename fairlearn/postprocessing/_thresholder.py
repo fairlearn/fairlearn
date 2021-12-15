@@ -75,6 +75,62 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         2012 IEEE 12th International Conference on Data Mining, 2012, 
         pp. 924-929, doi: 10.1109/ICDM.2012.45.
         Available: https://ieeexplore.ieee.org/document/6413831
+
+    Examples
+    --------
+    The following example shows how to threshold predictions for both data with
+    a single sensitive feature and data with multiple sensitive features 
+    >>> from fairlearn.postprocessing import Thresholder
+    >>> import pandas as pd
+    >>> from sklearn.linear_model import LogisticRegression
+
+    >>> # Example with one sensitive feature
+    >>> X = pd.DataFrame([[0, 4], [6, 2], [1, 3], [10, 5], [1, 7], [-2, 1]])
+    >>> y = pd.Series([1, 1, 1, 0, 0, 0])
+
+    >>> estimator = LogisticRegression()
+    >>> estimator.fit(X, y)
+
+    >>> X_test = pd.DataFrame([[-1, 6], [2, 2], [8, -11]])
+    >>> sensitive_features_test = pd.DataFrame([['A'], ['B'], ['C']], columns=['SF1'])
+
+    >>> estimator.predict_proba(X_test)[:, 1]
+    [0.333 0.6242 0.988]
+    >>> pred = estimator.predict(X_test)
+    [0 1 1]   
+
+    >>> threshold_dict = {'A': .3, 'B': .65, 'C': ('<', .6)}
+
+    >>> thresholder = Thresholder(estimator=estimator,
+    ...                      threshold_dict=threshold_dict,
+    ...                      prefit=True,
+    ...                      predict_method='predict_proba')
+
+    >>> thresholder.fit(X, y)
+    >>> thresholder.predict(
+    ...        X_test, sensitive_features=sensitive_features_test)
+    0   1.0
+    1   0.0
+    2   0.0
+
+    >>> # Example with two sensitive features
+    >>> sensitive_features_test = pd.DataFrame([['A', 'D'],
+    ...                                         ['B', 'E'],
+    ...                                         ['B', 'D']], columns=['SF1', 'SF2'])
+
+    >>> threshold_dict = {('A', 'D'): .3, ('B', 'E'): .65, ('B', 'D'): ('<', .6)}
+
+    >>> thresholder = Thresholder(estimator=estimator,
+    ...                      threshold_dict=threshold_dict,
+    ...                      prefit=True,
+    ...                      predict_method='predict_proba')
+
+    >>> thresholder.fit(X, y)
+    >>> thresholder.predict(
+    ...        X_test, sensitive_features=sensitive_features_test)
+    0   1.0
+    1   0.0
+    2   0.0
     """
 
     def __init__(self, estimator, threshold_dict, prefit=False,
@@ -94,7 +150,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         If a threshold is specified in a tuple, check if it done correctly, i.e. ('>',float)
         or ('<',float)
 
-        Warn the user if any of the above requirements is violated.
+        Warn the user if any of the above requirements are violated.
         """
         keys, values = zip(*self.threshold_dict.items())
 
