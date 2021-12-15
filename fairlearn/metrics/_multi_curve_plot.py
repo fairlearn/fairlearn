@@ -109,11 +109,12 @@ def plot_model_comparison(
         # If no style was provided, we suggest these axis labels.
         # If an ax was provided, we rather not overwrite this.
         for f, m in [(ax.set_xlabel, x_axis_metric), (ax.set_ylabel, y_axis_metric)]:
-            if hasattr(m, '__qualname__'): f(m.__qualname__)
-            elif hasattr(m, '__name__'): f(m.__name__)
+            if hasattr(m, '__qualname__'): name = m.__qualname__
+            elif hasattr(m, '__name__'): name = m.__name__
             elif isinstance(m, _DerivedMetric):
-                f("%s, %s" % (m._metric_fn.__name__, m._transform))
-            else: f(m.__repr__)
+                name = f"{m._metric_fn.__name__}, {m._transform}"
+            else: name = m.__repr__
+            f(name.replace("_", " "))
     
     try:
         ax.scatter(x, y, **kwargs) # Does it make sense to pass all other kwarg's?
