@@ -1,3 +1,6 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 from ..utils._input_validation import (
     _validate_and_reformat_labels,
     _validate_and_reformat_labels_and_sf,
@@ -6,7 +9,7 @@ from ..utils._input_validation import (
 )
 from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
-from typing import Callable, List, Union
+from typing import Callable, Union
 
 
 def plot_model_comparison(
@@ -23,7 +26,8 @@ def plot_model_comparison(
     plot=True,
     **kwargs,
 ):
-    """Plot a model comparison
+    """
+    Plot a model comparison.
 
     Parameters
     ----------
@@ -51,7 +55,8 @@ def plot_model_comparison(
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
         We also forbid DataFrames with column names of ``None``.
-        For cases where no names are provided we generate names ``sensitive_feature_[n]``.
+        For cases where no names are provided
+        we generate names ``sensitive_feature_[n]``.
 
     ax : matplotlib.axes.Axes, optional
         If supplied, the scatter plot is drawn on this Axes object.
@@ -80,15 +85,16 @@ def plot_model_comparison(
 
     Notes
     -----
-    To offer flexibility in plotting style, just as the underlying `matplotlib` provides,
-    one has three options:
-        - (1) change the style of the returned Axes
-        - (2) supply an Axes with your own style already applied
-        - (3) supply matplotlib arguments as you normally would to `matplotlib.axes.Axes.scatter`
+    To offer flexibility in plotting style, just as the
+    underlying `matplotlib` provides,
+    one has three options: 1) change the style of the returned Axes
+    2) supply an Axes with your own style already applied
+    3) supply matplotlib arguments as you normally
+    would to `matplotlib.axes.Axes.scatter`
 
-    In case no Axes object is supplied, axis labels are automatically inferred from their class name
-    """
-
+    In case no Axes object is supplied, axis labels are
+    automatically inferred from their class name.
+    """  # noqa: E501
     try:
         import matplotlib.pyplot as plt
     except ImportError:
@@ -138,10 +144,18 @@ def plot_model_comparison(
     if not ax_supplied_:
         ax = plt.axes()
 
-    assert isinstance(axis_labels, bool)
-    assert isinstance(point_labels, bool)
-    assert isinstance(color_gradient, bool)
-    assert isinstance(plot, bool)
+    for (kwarg, name) in (
+        (axis_labels, "axis_labels"),
+        (point_labels, "point_labels"),
+        (color_gradient, "color_gradient"),
+        (plot, "plot"),
+    ):
+        if not isinstance(kwarg, bool):
+            raise ValueError(
+                _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
+                    name, "boolean", type(kwarg).__name__
+                )
+            )
 
     model_names_int_ = True
     for key in y_preds:
@@ -150,10 +164,10 @@ def plot_model_comparison(
 
     # NOTE: If an ax was provided, we rather not overwrite this, right?
     if axis_labels:
-        for f, m in [
+        for f, m in (
             (ax.set_xlabel, x_axis_metric),
             (ax.set_ylabel, y_axis_metric),
-        ]:
+        ):
             if hasattr(m, "__qualname__"):
                 name = m.__qualname__
             elif hasattr(m, "__name__"):
@@ -182,7 +196,7 @@ def plot_model_comparison(
         ax.scatter(
             x, y, **kwargs
         )  # Does it make sense to pass all other kwarg's?
-    except AttributeError as e:
+    except AttributeError:
         raise TypeError("got an unexpected keyword argument")
 
     if plot:

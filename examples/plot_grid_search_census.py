@@ -233,7 +233,7 @@ plt.ylabel("selection rate difference")
 # %% [markdown]
 # Comparing models easily
 # -----------------------
-# Fairlearn also provides functionality to compare models much more easily. 
+# Fairlearn also provides functionality to compare models much more easily.
 
 # %%
 

@@ -39,15 +39,14 @@ def test_no_matplotlib(constraints):
         plot_threshold_optimizer(threshold_optimizer)
         assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 
+
 def test_no_matplotlib_plot_model_comparison():
     with pytest.raises(RuntimeError) as exc:
-        ax = plot_model_comparison(
-            x_axis_metric = lambda x: None,
-            y_axis_metric = lambda x: None,
-            y_true = [],
-            y_preds = {},
-            sensitive_features = [],
-            ax=None,
+        plot_model_comparison(
+            x_axis_metric=lambda x: None,
+            y_axis_metric=lambda x: None,
+            y_true=[],
+            y_preds={},
+            sensitive_features=[],
         )
         assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
-
