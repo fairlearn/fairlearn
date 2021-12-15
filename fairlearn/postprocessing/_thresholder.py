@@ -31,14 +31,25 @@ from ._constants import (
 class Thresholder(BaseEstimator, MetaEstimatorMixin):
     r"""A classifier that uses group-specific thresholds for prediction.
 
+    Can be used to output binary predictions, based on the output of
+    both regressors and classifiers.
+
     Parameters
     ----------
     estimator : object
-        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
+        A `scikit-learn compatible estimator
+        <https://scikit-learn.org/stable/developers/develop.html#estimators>`_
         whose output is postprocessed.
 
     threshold_dict : dict
-        Dictionary that maps sensitive feature values to group-specific thresholds
+        Dictionary that maps sensitive feature values to group-specific thresholds.
+        Of the form {`sensitive_feature_value(s)`: `threshold`}, with:
+
+        - `sensitive_feature_value`: a value SF of the sensitive feature to
+          specify a subgroup, or a tuple (SF1,SF2,...) if there are multiple
+          sensitive features
+        - `threshold`: { `float` , ( '>' , `float` ), ( '<' , `float` )}. The threshold specifies
+          when to predict 1. Providing `float` has the same effect as ( '>' , `float` ).
 
     prefit : bool, default=False
         If True, avoid refitting the given estimator. Note that when used with
@@ -46,11 +57,11 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         :class:`sklearn.model_selection.GridSearchCV`, this will result in an
         error. In that case, please use ``prefit=False``.
 
-    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
-            }, default='auto'
+    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'}
+             default='auto'
 
-        Defines which method of the ``estimator`` is used to get the output
-        values.
+        Defines which method of the ``estimator`` is used to get the values
+        to be
 
         - 'auto': use one of ``predict_proba``, ``decision_function``, or
           ``predict``, in that order.
@@ -59,8 +70,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
           positive outcome.
         - 'decision_function': use the raw values given by the
           `decision_function`.
-        - 'predict': only use if estimator is a regressor. Uses the regression 
-        values given by `predict`.
+        - 'predict': only use if estimator is a regressor. Uses the regression
+          values given by `predict`.
 
     Notes
     -----
@@ -70,42 +81,36 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
     References
     ----------
-    .. [1] F. Kamiran, A. Karim and X. Zhang, 
-        "Decision Theory for Discrimination-Aware Classification," 
-        2012 IEEE 12th International Conference on Data Mining, 2012, 
+    .. [1] F. Kamiran, A. Karim and X. Zhang,
+        "Decision Theory for Discrimination-Aware Classification,"
+        2012 IEEE 12th International Conference on Data Mining, 2012,
         pp. 924-929, doi: 10.1109/ICDM.2012.45.
         Available: https://ieeexplore.ieee.org/document/6413831
 
     Examples
     --------
     The following example shows how to threshold predictions for both data with
-    a single sensitive feature and data with multiple sensitive features 
+    a single sensitive feature and data with multiple sensitive features.
+
     >>> from fairlearn.postprocessing import Thresholder
     >>> import pandas as pd
-    >>> from sklearn.linear_model import LogisticRegression
-
+    >>> from sklearn.ensemble import RandomForestClassifier
     >>> # Example with one sensitive feature
     >>> X = pd.DataFrame([[0, 4], [6, 2], [1, 3], [10, 5], [1, 7], [-2, 1]])
     >>> y = pd.Series([1, 1, 1, 0, 0, 0])
-
-    >>> estimator = LogisticRegression()
+    >>> estimator = RandomForestClassifier(random_state=1)
     >>> estimator.fit(X, y)
-
     >>> X_test = pd.DataFrame([[-1, 6], [2, 2], [8, -11]])
     >>> sensitive_features_test = pd.DataFrame([['A'], ['B'], ['C']], columns=['SF1'])
-
     >>> estimator.predict_proba(X_test)[:, 1]
-    [0.333 0.6242 0.988]
-    >>> pred = estimator.predict(X_test)
-    [0 1 1]   
-
-    >>> threshold_dict = {'A': .3, 'B': .65, 'C': ('<', .6)}
-
+    [0.24 0.82 0.61]
+    >>> estimator.predict(X_test)
+    [0 1 1]
+    >>> threshold_dict = {'A': .2, 'B': ('<', .6), 'C': ('>', .7)}
     >>> thresholder = Thresholder(estimator=estimator,
     ...                      threshold_dict=threshold_dict,
     ...                      prefit=True,
     ...                      predict_method='predict_proba')
-
     >>> thresholder.fit(X, y)
     >>> thresholder.predict(
     ...        X_test, sensitive_features=sensitive_features_test)
@@ -113,18 +118,15 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     1   0.0
     2   0.0
 
-    >>> # Example with two sensitive features
+    >>> # Example with multiple sensitive features
     >>> sensitive_features_test = pd.DataFrame([['A', 'D'],
     ...                                         ['B', 'E'],
     ...                                         ['B', 'D']], columns=['SF1', 'SF2'])
-
-    >>> threshold_dict = {('A', 'D'): .3, ('B', 'E'): .65, ('B', 'D'): ('<', .6)}
-
+    >>> threshold_dict = {('A', 'D'): .2, ('B', 'E'): ('<', .6), ('B', 'D'): ('>', .7)}
     >>> thresholder = Thresholder(estimator=estimator,
     ...                      threshold_dict=threshold_dict,
     ...                      prefit=True,
     ...                      predict_method='predict_proba')
-
     >>> thresholder.fit(X, y)
     >>> thresholder.predict(
     ...        X_test, sensitive_features=sensitive_features_test)
@@ -140,9 +142,9 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         self.prefit = prefit
         self.predict_method = predict_method
 
-        self.validate_threshold_dict()
+        self._validate_threshold_dict()
 
-    def validate_threshold_dict(self):
+    def _validate_threshold_dict(self):
         """Validate if :code: `threshold_dict` is specified correctly.
 
         For the keys (subgroups/sensitive feature values), check if all keys are of the same type.
@@ -194,7 +196,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
                     warn(msg)
                     break
 
-    def reformat_threshold_dict_keys(self):
+    def _reformat_threshold_dict_keys(self):
         """Reformats the keys of the provided :code: `threshold_dict`.
 
         This is necessary to check to which group a sample belongs, after
@@ -213,7 +215,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         self.threshold_dict = new_keys_dict
 
-    def check_for_unseen_sf_values(self, sensitive_feature_vector):
+    def _check_for_unseen_sf_values(self, sensitive_feature_vector):
         """Check for unseen sensitive feature values.
 
         Checks if there are sensitive feature value(s) (combinations),
@@ -254,7 +256,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         ----------
         X : numpy.ndarray or pandas.DataFrame
             The feature matrix
-        y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        y : numpy.ndarray, list, pandas.DataFrame, or pandas.Series
             The label vector
         """
         if self.estimator is None:
@@ -295,7 +297,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         Returns
         -------
-        numpy.ndarray
+        numpy.ndarray, list, pandas.DataFrame, or pandas.Series
             The prediction in the form of a scalar or vector.
             If `X` represents the data for a single example the result will be
             a scalar. Otherwise the result will be a vector.
@@ -316,11 +318,11 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         # in order to check if sensitive_feature_vector contains sensitive feature
         # combinations not provided in threshold_dict
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-            self.reformat_threshold_dict_keys()
+            self._reformat_threshold_dict_keys()
 
         # warn if there are sensitive features not in threshold dict
         potential_msg = \
-            self.check_for_unseen_sf_values(sensitive_feature_vector)
+            self._check_for_unseen_sf_values(sensitive_feature_vector)
         if potential_msg:
             warn(potential_msg)
 

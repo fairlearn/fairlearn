@@ -12,7 +12,7 @@ from ._threshold_optimizer import ThresholdOptimizer  # noqa: F401
 from ._plotting import plot_threshold_optimizer  # noqa: F401
 
 __all__ = [
-    "Thresholder"
+    "Thresholder",
     "ThresholdOptimizer",
     "plot_threshold_optimizer",
 ]
