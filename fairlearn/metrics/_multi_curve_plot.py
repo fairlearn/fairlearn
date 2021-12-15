@@ -196,8 +196,9 @@ def plot_model_comparison(
         ax.scatter(
             x, y, **kwargs
         )  # Does it make sense to pass all other kwarg's?
-    except AttributeError:
-        raise TypeError("got an unexpected keyword argument")
+    except AttributeError as e:
+        # FIXME: Add some info?
+        raise e
 
     if plot:
         plt.show()
