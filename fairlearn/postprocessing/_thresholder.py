@@ -1,26 +1,17 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from logging import error
 import numpy as np
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 from warnings import warn
+from copy import Error, copy
 
-
-# from postprocessing._threshold_operation import ThresholdOperation
 from ._threshold_operation import ThresholdOperation
 
-# try to get it to work now
-# from utils._common import _get_soft_predictions
-# from utils._input_validation import _validate_and_reformat_input
-# from postprocessing._constants import (
-#     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
-#     BASE_ESTIMATOR_NOT_FITTED_WARNING)
-
-
-# how it should be
 from ..utils._common import _get_soft_predictions
 from ..utils._input_validation import _validate_and_reformat_input
 from ._constants import (
@@ -61,7 +52,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
              default='auto'
 
         Defines which method of the ``estimator`` is used to get the values
-        to be
+        to be thresholded
 
         - 'auto': use one of ``predict_proba``, ``decision_function``, or
           ``predict``, in that order.
@@ -72,6 +63,12 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
           `decision_function`.
         - 'predict': only use if estimator is a regressor. Uses the regression
           values given by `predict`.
+
+    default_threshold : { `float` , ( '>' , `float` ), ( '<' , `float` )}
+        default=0.5. 
+        The default threshold is the threshold to which groups that are not
+        mentioned in the ``threshold_dict`` are compared. Providing 
+        `float` has the same effect as ( '>' , `float` ).
 
     Notes
     -----
@@ -136,16 +133,17 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     """
 
     def __init__(self, estimator, threshold_dict, prefit=False,
-                 predict_method='deprecated'):
+                 predict_method='deprecated', default_threshold=0.5):
         self.estimator = estimator
         self.threshold_dict = threshold_dict
         self.prefit = prefit
         self.predict_method = predict_method
+        self.default_threshold = default_threshold
 
         self._validate_threshold_dict()
 
     def _validate_threshold_dict(self):
-        """Validate if :code: `threshold_dict` is specified correctly.
+        """Check if :code: `threshold_dict` is specified correctly.
 
         For the keys (subgroups/sensitive feature values), check if all keys are of the same type.
         For the values (thresholds), check if they are provided as either `float` or `tuple`.
@@ -226,12 +224,10 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         Warning message if there are unseen feature value(s) (combinations),
         None if not
         """
-        known_sf_values = list(self.threshold_dict.keys())
-
         new_sf_values = []
 
         for sf_value in sensitive_feature_vector:
-            if (sf_value not in known_sf_values) and \
+            if (sf_value not in self.known_sf_values) and \
                     (sf_value not in new_sf_values):
 
                 new_sf_values.append(sf_value)
@@ -239,14 +235,14 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         if new_sf_values:
 
             msg = 'The following groups are provided at predict time,\
-                    but not mentioned in `threshold_dict`: '
+                    but were not observed at fit time: '
 
             for new_sf in new_sf_values:
                 msg += ' {}'.format(new_sf)
 
         return msg if new_sf_values else None
 
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y, sensitive_features, **kwargs):
         """Fit the estimator.
 
         If `prefit` is set to `True` then the base estimator is kept as is.
@@ -258,7 +254,18 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             The feature matrix
         y : numpy.ndarray, list, pandas.DataFrame, or pandas.Series
             The label vector
+        sensitive_features : numpy.ndarray, list, pandas.DataFrame,\
+            or pandas.Series
+            sensitive features to identify groups by
         """
+        # get list of groups seen at training time, to compare with groups
+        # at predict time
+        _, _, sensitive_feature_vector, _ = _validate_and_reformat_input(
+            X, y=y, sensitive_features=sensitive_features, expect_y=True,
+            enforce_binary_labels=False)
+
+        self.known_sf_values = sensitive_feature_vector.unique()
+
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
 
@@ -285,7 +292,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         return self
 
     def predict(self, X, *, sensitive_features):
-        """Predict using the group-specific thresholds provided in :code: `threshold_dict`.
+        """Predict using the group-specific thresholds provided in ``threshold_dict``.
 
         Parameters
         ----------
@@ -314,7 +321,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             X, y=base_predictions, sensitive_features=sensitive_features, expect_y=True,
             enforce_binary_labels=False)
 
-        # If there are multiple sensituive features, reformat threshold_dict keys
+        # If there are multiple sensitive features, reformat threshold_dict keys
         # in order to check if sensitive_feature_vector contains sensitive feature
         # combinations not provided in threshold_dict
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
@@ -324,10 +331,11 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         potential_msg = \
             self._check_for_unseen_sf_values(sensitive_feature_vector)
         if potential_msg:
-            warn(potential_msg)
+            raise Error(potential_msg)
 
         final_predictions = 0.0*base_predictions_vector
 
+        # predict for the groups mentioned in threshold_dict
         for sf, threshold in self.threshold_dict.items():
 
             # The threshold is provided as either a float or
@@ -341,5 +349,21 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
             final_predictions[sensitive_feature_vector == sf] = \
                 thresholded_predictions[sensitive_feature_vector == sf]
+
+        # Predict for groups not mentioned in threshold_dict
+        for unmentioned_sf in [sf for sf in self.known_sf_values if sf not in self.threshold_dict.keys()]:
+
+            # The threshold is provided as either a float or
+            # ('>',float) or ('<',float)
+            if isinstance(self.default_threshold, float):
+                operation = ThresholdOperation('>', self.default_threshold)
+            else:
+                operation = ThresholdOperation(
+                    self.default_threshold[0], self.default_threshold[1])
+
+            thresholded_predictions = 1.0 * operation(base_predictions_vector)
+
+            final_predictions[sensitive_feature_vector == unmentioned_sf] = \
+                thresholded_predictions[sensitive_feature_vector == unmentioned_sf]
 
         return final_predictions

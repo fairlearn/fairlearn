@@ -36,11 +36,14 @@ def test_thresholder():
                      columns=['SF1', 'SF2', 'SF1+2']),
         A])
 
+    A_combined = A.loc[:, 'SF1+2']
+    A_multiple = A.loc[:, ['SF1', 'SF2']]
+
     A_test_combined = A_test.loc[:, 'SF1+2']
     A_test_multiple = A_test.loc[:, ['SF1', 'SF2']]
 
-    threshold_dict_combined = {'AC': .36, 'BC': .43, 'BD': ('>', .4), 'AD': .465}
-    threshold_dict_multiple = {('A', 'C'): .36, ('B', 'C'): .43, ('B', 'D'): .4, ('A', 'D'): .465}
+    threshold_dict_combined = {'AC': .36, 'BC': .43, 'BD': ('>', .4)}
+    threshold_dict_multiple = {('A', 'C'): .36, ('B', 'C'): .43, ('B', 'D'): .4}
 
     expected_y = pd.Series([1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0,
                            1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0])
@@ -50,6 +53,7 @@ def test_thresholder():
         {'estimator': LinearRegression(),
          'predict_method': 'predict',
          'prefit': True,
+         'A': A_combined,
          'A_test': A_test_combined,
          'threshold_dict': threshold_dict_combined
          },
@@ -57,6 +61,7 @@ def test_thresholder():
         {'estimator': LogisticRegression(),
          'predict_method': 'predict_proba',
          'prefit': False,
+         'A': A_combined,
          'A_test': A_test_combined,
          'threshold_dict': threshold_dict_combined
          },
@@ -65,6 +70,7 @@ def test_thresholder():
             ("logistic_regression", LogisticRegression())]),
          'predict_method': 'predict_proba',
          'prefit': True,
+         'A': A_combined,
          'A_test': A_test_combined,
          'threshold_dict': threshold_dict_combined
          },
@@ -72,6 +78,7 @@ def test_thresholder():
         {'estimator': LogisticRegression(),
          'predict_method': 'predict_proba',
          'prefit': False,
+         'A': A_multiple,
          'A_test': A_test_multiple,
          'threshold_dict': threshold_dict_multiple
          }
@@ -84,9 +91,10 @@ def test_thresholder():
         thresholder = Thresholder(estimator=estimator,
                                   threshold_dict=test['threshold_dict'],
                                   prefit=test['prefit'],
-                                  predict_method=test['predict_method'])
+                                  predict_method=test['predict_method'],
+                                  default_threshold=.465)
 
-        thresholder.fit(X, y)
+        thresholder.fit(X, y, sensitive_features=test['A'])
         outputted_y = thresholder.predict(
             X_test, sensitive_features=test['A_test'])
 
