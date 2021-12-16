@@ -207,8 +207,10 @@ class AdversarialFairness(BaseEstimator):
         backend.
 
     warm_start : bool, default = False
-        When set to True, reuse the solution of the previous call to fit as
-        initialization, otherwise, just erase the previous solution.
+        Normally, when set to False, a call to fit triggers reinitialization,
+        which discards the models and intializes them again. Setting to
+        True triggers reuse of these models. Note: if pre-initialized models
+        were passed, the model (and its parameters) are never discard.
 
     random_state : int, RandomState instance, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
@@ -437,7 +439,9 @@ class AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        X, Y, Z = self._validate_input(X, y, sensitive_features)
+        X, Y, Z = self._validate_input(
+            X, y, sensitive_features, reinitialize=True
+        )
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -548,7 +552,9 @@ class AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive feature of the
             training data.
         """
-        X, Y, Z = self._validate_input(X, y, sensitive_features)
+        X, Y, Z = self._validate_input(
+            X, y, sensitive_features, reinitialize=False
+        )
         self.backendEngine_.train_step(X, Y, Z)
 
         return self
@@ -596,12 +602,13 @@ class AdversarialFairness(BaseEstimator):
         Y_pred = self.y_transform_.inverse_transform(Y_pred)
         return Y_pred
 
-    def _validate_input(self, X, Y, Z):
+    def _validate_input(self, X, Y, Z, reinitialize=False):
         """
         Validate the input data and possibly setup this estimator.
 
         Important note is that we follow call `__setup` from here, because the
-        setup procedure requires the validated data.
+        setup procedure requires the validated data. If `reintialize` is True,
+        then always call `__setup`.
         """
         if not self.skip_validation:
             X = check_X(X)
@@ -616,7 +623,7 @@ class AdversarialFairness(BaseEstimator):
             print("Warning: no sensitive_features provided")  # FIXME : logger?
             Z = [0] * X.shape[0]
 
-        if (not is_fitted) or (not self.warm_start):
+        if (not is_fitted) or (reinitialize):
             self.__setup(X, Y, Z)
 
         if not self.skip_validation:

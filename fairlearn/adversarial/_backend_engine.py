@@ -36,21 +36,25 @@ class BackendEngine:
         n_Y_features = base.y_transform_.n_features_out_
         n_Z_features = base.z_transform_.n_features_out_
 
-        # Set up predictor_model
-        self.predictor_model = self.__init_model__(
-            base.predictor_model,
-            base.predictor_loss_,
-            n_X_features,
-            n_Y_features,
-            "predictor",
-        )
-        self.adversary_model = self.__init_model__(
-            base.adversary_model,
-            base.adversary_loss_,
-            n_Y_features * (2 if base.pass_y_ else 1),
-            n_Z_features,
-            "adversary",
-        )
+        # Set up models
+        if base.warm_start and hasattr(base, 'backendEngine_'):
+            self.predictor_model = base.backendEngine_.predictor_model
+            self.adversary_model = base.backendEngine_.adversary_model
+        else:
+            self.predictor_model = self.__init_model__(
+                base.predictor_model,
+                base.predictor_loss_,
+                n_X_features,
+                n_Y_features,
+                "predictor",
+            )
+            self.adversary_model = self.__init_model__(
+                base.adversary_model,
+                base.adversary_loss_,
+                n_Y_features * (2 if base.pass_y_ else 1),
+                n_Z_features,
+                "adversary",
+            )
 
         if hasattr(self, "__move_model__"):
             self.__move_model__()
