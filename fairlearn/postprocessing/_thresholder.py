@@ -1,14 +1,13 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from logging import error
 import numpy as np
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 from warnings import warn
-from copy import Error, copy
+from copy import Error
 
 from ._threshold_operation import ThresholdOperation
 
@@ -65,9 +64,9 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
           values given by `predict`.
 
     default_threshold : { `float` , ( '>' , `float` ), ( '<' , `float` )}
-        default=0.5. 
+        default=0.5.
         The default threshold is the threshold to which groups that are not
-        mentioned in the ``threshold_dict`` are compared. Providing 
+        mentioned in the ``threshold_dict`` are compared. Providing
         `float` has the same effect as ( '>' , `float` ).
 
     Notes
@@ -336,16 +335,15 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         final_predictions = 0.0*base_predictions_vector
 
         def _make_predictions(sf, threshold):
-            """Helper function that predicts all instances of a subgroup
+            """Predict all instances of a specific subgroup.
 
             Parameters
             ----------
             sf : any
-                value of to identify subgroup
+                value of sensitive feature to identify subgroup by
             threshold : { `float` , ( '>' , `float` ), ( '<' , `float` )}
-                threshold to base the prediciton on            
+                threshold to base the prediciton on
             """
-
             # The threshold is provided as either a float or
             # ('>',float) or ('<',float)
             if isinstance(threshold, float):
@@ -363,7 +361,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             _make_predictions(sf, threshold)
 
         # Predict for groups not mentioned in threshold_dict
-        for unmentioned_sf in [sf for sf in self.known_sf_values if sf not in self.threshold_dict.keys()]:
+        for unmentioned_sf in [sf for sf in self.known_sf_values if
+                               sf not in self.threshold_dict.keys()]:
             _make_predictions(unmentioned_sf, self.default_threshold)
 
         return final_predictions
