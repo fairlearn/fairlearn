@@ -335,8 +335,16 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         final_predictions = 0.0*base_predictions_vector
 
-        # predict for the groups mentioned in threshold_dict
-        for sf, threshold in self.threshold_dict.items():
+        def _make_predictions(sf, threshold):
+            """Helper function that predicts all instances of a subgroup
+
+            Parameters
+            ----------
+            sf : any
+                value of to identify subgroup
+            threshold : { `float` , ( '>' , `float` ), ( '<' , `float` )}
+                threshold to base the prediciton on            
+            """
 
             # The threshold is provided as either a float or
             # ('>',float) or ('<',float)
@@ -350,20 +358,12 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             final_predictions[sensitive_feature_vector == sf] = \
                 thresholded_predictions[sensitive_feature_vector == sf]
 
+        # predict for the groups mentioned in threshold_dict
+        for sf, threshold in self.threshold_dict.items():
+            _make_predictions(sf, threshold)
+
         # Predict for groups not mentioned in threshold_dict
         for unmentioned_sf in [sf for sf in self.known_sf_values if sf not in self.threshold_dict.keys()]:
-
-            # The threshold is provided as either a float or
-            # ('>',float) or ('<',float)
-            if isinstance(self.default_threshold, float):
-                operation = ThresholdOperation('>', self.default_threshold)
-            else:
-                operation = ThresholdOperation(
-                    self.default_threshold[0], self.default_threshold[1])
-
-            thresholded_predictions = 1.0 * operation(base_predictions_vector)
-
-            final_predictions[sensitive_feature_vector == unmentioned_sf] = \
-                thresholded_predictions[sensitive_feature_vector == unmentioned_sf]
+            _make_predictions(unmentioned_sf, self.default_threshold)
 
         return final_predictions
