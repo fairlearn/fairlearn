@@ -132,14 +132,15 @@ Which ML libraries does Fairlearn support?
     `predict()` methods. Also, any classification or regression
     algorithm can be evaluated using our metrics.
 
-Does Fairlearn support multi-class classification?
+Does Fairlearn support multiclass classification?
     On the assessment side, Fairlearn's :class:`metrics.MetricFrame`
     can be used with any metrics for supervised learning, including those for
-    multi-class classification.
+    multiclass classification.
     For example, it is possible to pass
     :py:func:`sklearn.metrics.accuracy_score` or
     :py:func:`sklearn.metrics.confusion_matrix` as the metric functions, and
-    supply multi-class data for :code:`y_true` and :code:`y_pred`.
+    supply multiclass data for :code:`y_true` and :code:`y_pred`.
+    We give an example with multiclass data in the :ref:`user guide <metrics_with_grouping>`.
     There are
     `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
     to add more extensive support to Fairlearn's assessment capabilities.
@@ -149,7 +150,7 @@ Does Fairlearn support multi-class classification?
     :class:`reductions.ExponentiatedGradient` and
     :class:`reductions.GridSearch`
     support :ref:`bounded group loss <bounded_group_loss>` constraints, which
-    are applicable to any supervised learning setting, including multi-class
+    are applicable to any supervised learning setting, including multiclass
     classification.
 
 Does Fairlearn support multiple and non-binary sensitive features?
