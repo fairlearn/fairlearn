@@ -3,7 +3,6 @@
 
 import copy
 import logging
-import uuid
 import numpy as np
 import pandas as pd
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -302,7 +301,6 @@ class MetricFrame:
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        
         all_data['y_true'] = list(y_t)
         all_data['y_pred'] = list(y_p)
 
@@ -722,7 +720,10 @@ class MetricFrame:
 
         return result
 
-    def _process_functions(self, metric, sample_params, all_data: pd.DataFrame) -> Dict[str, AnnotatedMetricFunction]:
+    def _process_functions(self,
+                           metric, sample_params,
+                           all_data: pd.DataFrame
+                           ) -> Dict[str, AnnotatedMetricFunction]:
         """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""  # noqa: E501
         self._user_supplied_callable = True
         func_dict = dict()
